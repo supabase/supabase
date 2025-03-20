@@ -1,6 +1,6 @@
 import { cn } from 'ui'
 import { useThreeJS } from './helpers'
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import SceneRenderer from './utils/SceneRenderer'
 import TicketScene from './scenes/TicketScene'
 import TunnelScene from './scenes/TunnelScene'
@@ -15,7 +15,7 @@ interface TicketCanvasProps {
 const TicketCanvas = ({ className, onUpgradeToSecret }: TicketCanvasProps) => {
   const sceneRef = useRef<TicketScene | null>(null)
   const tunnelRef = useRef<TunnelScene | null>(null)
-  const hudRef = useRef<HUDScene | null>(null)
+  const [hudObj, setHudObj] = useState<HUDScene | null>(null)
   const initQueue = useRef<{ init: Promise<void>; renderer: SceneRenderer }[]>([])
   const onUpgradeToSecretRef = useRef(onUpgradeToSecret)
   const [state, dispatch] = useConfData()
@@ -68,23 +68,7 @@ const TicketCanvas = ({ className, onUpgradeToSecret }: TicketCanvasProps) => {
 
         sceneRef.current = scene
         tunnelRef.current = tunnel
-        hudRef.current = hud
-
-        // Example: Update people online count based on ticket number
-        // In a real app, you might fetch this from an API
-        if (userData.ticket_number) {
-          const baseCount = 1000
-          const randomOffset = Math.floor(Math.random() * 500)
-          hudRef.current.setPeopleOnline(baseCount + randomOffset)
-        }
-
-        hudRef.current.setOxygenLevel(0.6)
-        hudRef.current.setShieldIntegrity(0.99)
-
-        // Example: Set fuel level based on user data
-        // This is just a placeholder - you'd use real data in production
-        const fuelLevel = userData.platinum ? 0.95 : 0.75
-        hudRef.current.setFuelLevel(fuelLevel)
+        setHudObj(hud)
 
         dispatch({ type: 'TICKET_LOADING_SUCCESS' })
       })
@@ -113,35 +97,41 @@ const TicketCanvas = ({ className, onUpgradeToSecret }: TicketCanvasProps) => {
     if (sceneRef.current) {
       void updateTicket()
       if (state.ticketVisibility) {
-        hudRef.current?.dimmHud()
-        hudRef.current?.setLayout("ticket")
+        hudObj?.dimmHud()
+        hudObj?.setLayout('ticket')
       } else {
-        hudRef.current?.undimmHud()
-        hudRef.current?.setLayout("default")
+        hudObj?.undimmHud()
+        hudObj?.setLayout('default')
       }
     }
-  }, [state.ticketVisibility, state.userTicketData.name, state.userTicketData.platinum, state.userTicketData.secret, state.userTicketData.ticket_number])
-
-  useEffect(() => {
-    if (!hudRef.current || !userData) return
-
-    // Example: Update people online count based on ticket number
-    // In a real app, you might fetch this from an API
-    if (userData.ticket_number) {
-      const baseCount = 1000
-      const randomOffset = Math.floor(Math.random() * 500)
-      hudRef.current.setPeopleOnline(baseCount + randomOffset)
-    }
-
-    // Example: Set fuel level based on user data
-    // This is just a placeholder - you'd use real data in production
-    const fuelLevel = userData.platinum ? 0.95 : 0.75
-    hudRef.current.setFuelLevel(fuelLevel)
-  }, [userData])
+  }, [
+    hudObj,
+    state.ticketVisibility,
+    state.userTicketData.name,
+    state.userTicketData.platinum,
+    state.userTicketData.secret,
+    state.userTicketData.ticket_number,
+  ])
 
   useEffect(() => {
     onUpgradeToSecretRef.current = onUpgradeToSecret
   }, [onUpgradeToSecret])
+
+  useEffect(() => {
+    if (state.gaugesData && hudObj) {
+      if (state.gaugesData.peopleOnline)
+        hudObj.setPeopleOnline(state.gaugesData.peopleOnline, true)
+      hudObj.setPeopleOnlineActive(state.partymodeStatus === 'on', true)
+      if (state.gaugesData.payloadSaturation)
+        hudObj.setMeetupsAmount(state.gaugesData.payloadSaturation, true)
+      if (state.gaugesData.payloadFill)
+        hudObj.setPayloadFill(state.gaugesData.payloadFill, true)
+      if (state.gaugesData.meetupsAmount)
+        hudObj.setMeetupsAmount(state.gaugesData.meetupsAmount, true)
+
+      hudObj.draw()
+    } 
+  }, [state.gaugesData, state.partymodeStatus, hudObj])
 
   const { containerRef } = useThreeJS(setup)
   return (

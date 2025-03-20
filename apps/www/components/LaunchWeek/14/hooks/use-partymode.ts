@@ -6,23 +6,49 @@ import { REALTIME_CHANNEL_STATES, REALTIME_SUBSCRIBE_STATES } from '@supabase/su
 const LW14_TOPIC = 'lw14'
 const GAUGES_UPDATES_EVENT = 'gauges-update'
 
-export const usePartymode = (defaultState: 'on' | 'off') => {
+export const usePartymode = () => {
   const [state, dispatch] = useLw14ConfData()
-  const [shouldInitialize, setShouldInitialize] = useState(defaultState === 'on' && !state.realtimeGaugesChannel)
+  const [shouldInitialize, setShouldInitialize] = useState(
+    state.partymodeStatus === 'on' && !state.realtimeGaugesChannel
+  )
 
   const createChannelAndSubscribe = useCallback(() => {
-    const channel = supabase
-      .channel(LW14_TOPIC)
+    const channel = supabase.channel(LW14_TOPIC, {
+      config: {
+        broadcast: {
+          self: true,
+          ack: true,
+        },
+      },
+    })
+
+    const userStatus = {}
+
+    channel
       .on('broadcast', { event: GAUGES_UPDATES_EVENT }, (payload) => {
         console.log('Channel update', payload)
       })
+      .on('presence', { event: 'sync' }, () => {
+        const newState = channel.presenceState()
+        const uniqueUsers = new Set([
+          ...Object.entries(newState).map(([_, value]) => value[0].presence_ref),
+        ])
 
-    channel.subscribe((status, error) => {
-      console.log('Channel status', status, error)
-      if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
-        dispatch({ type: 'PARTYMODE_ENABLE', payload: channel })
-      }
-    })
+        console.log('Presence sync', uniqueUsers.size, channel.presenceState())
+
+        dispatch({
+          type: 'GAUGES_DATA_FETCHED',
+          payload: { peopleOnline: uniqueUsers.size },
+        })
+      })
+      .subscribe(async (status, error) => {
+        console.log('Channel status', status, error)
+        await channel.track(userStatus)
+
+        if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
+          dispatch({ type: 'PARTYMODE_ENABLE', payload: channel })
+        }
+      })
   }, [dispatch])
 
   const toggle = useCallback(async () => {
@@ -48,7 +74,6 @@ export const usePartymode = (defaultState: 'on' | 'off') => {
   }, [createChannelAndSubscribe, shouldInitialize])
 
   return {
-    state: state.realtimeGaugesChannel?.state,
     toggle,
   }
 }

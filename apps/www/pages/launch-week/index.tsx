@@ -36,7 +36,7 @@ const Lw14Page = () => {
         }}
       />
 
-      <Lw14ConfDataProvider initState={{ userTicketData: defaultUserData }}>
+      <Lw14ConfDataProvider initState={{ userTicketData: defaultUserData, partymodeStatus: 'on' }}>
         <LwView />
       </Lw14ConfDataProvider>
     </>

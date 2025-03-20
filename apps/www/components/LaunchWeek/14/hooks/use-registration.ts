@@ -153,14 +153,14 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
   }, [fetchOrCreateUser, realtimeChannel])
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(({ data, error }) => {
       dispatch({ type: 'SESSION_UPDATED', payload: data.session })
     })
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      dispatch({ type: 'SESSION_UPDATED', payload: session })
+      dispatch({ type: 'SESSION_UPDATED', payload: session  })
     })
 
     return () => subscription.unsubscribe()

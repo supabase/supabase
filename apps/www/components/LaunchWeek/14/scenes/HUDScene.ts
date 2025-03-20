@@ -6,9 +6,9 @@ interface HudSceneState {
   visible: boolean
   peopleOnline: number
   peopleOnlineActive: boolean
-  fuelLevel: number
-  shieldIntegrity: number
-  oxygenLevel: number
+  payloadSaturation: number
+  payloadFill: number
+  meetupsAmount: number
   vignetteRaduis: number
   vignetteSmoothness: number
   layout: 'default' | 'ticket'
@@ -83,7 +83,7 @@ class HUDScene implements BaseScene {
     },
   }
 
-  resolutions = {
+  private resolutions = {
     0: {
       numberControl: {
         coords: { y: 611 - 20, x: 0, alignment: 'center' as const },
@@ -296,9 +296,9 @@ class HUDScene implements BaseScene {
     this.state = {
       visible: options.defaultVisible ?? false,
       peopleOnline: 0,
-      fuelLevel: 0,
-      shieldIntegrity: 0,
-      oxygenLevel: 0,
+      payloadSaturation: 0,
+      payloadFill: 0,
+      meetupsAmount: 0,
       peopleOnlineActive: options.online ?? false,
       vignetteRaduis: 1,
       vignetteSmoothness: 0,
@@ -359,7 +359,7 @@ class HUDScene implements BaseScene {
     this.hudCanvas.height = this.canvasHeight
     this.hudContext = this.hudCanvas.getContext('2d')
 
-    this.draw()
+    this._draw()
 
     // Create noise texture with higher resolution for more subtle grain
     this.noiseTexture = this.createNoiseTexture(512, 512)
@@ -475,47 +475,65 @@ class HUDScene implements BaseScene {
   }
 
   // Public methods to update state
-  setPeopleOnline(count: number): void {
+  setPeopleOnline(count: number, skipDraw?: boolean): void {
     this.state.peopleOnline = count
+    if (skipDraw) {
+      return
+    }
 
-    this.draw()
+    this._draw()
     if (this.hudTexture) this.hudTexture.needsUpdate = true
   }
 
-  setFuelLevel(level: number): void {
-    this.state.fuelLevel = Math.max(0, Math.min(1, level))
+  setPayloadSaturation(level: number, skipDraw?: boolean): void {
+    this.state.payloadSaturation = Math.max(0, Math.min(1, level))
 
-    this.draw()
+    if (skipDraw) {
+      return
+    }
+    this._draw()
     if (this.hudTexture) this.hudTexture.needsUpdate = true
   }
 
-  setShieldIntegrity(level: number): void {
-    this.state.shieldIntegrity = Math.max(0, Math.min(1, level))
+  setPayloadFill(level: number, skipDraw?: boolean): void {
+    this.state.payloadFill = Math.max(0, Math.min(1, level))
+    if (skipDraw) {
+      return
+    }
 
-    this.draw()
+    this._draw()
     if (this.hudTexture) this.hudTexture.needsUpdate = true
   }
 
-  setOxygenLevel(level: number): void {
-    this.state.oxygenLevel = Math.max(0, Math.min(1, level))
+  setMeetupsAmount(amount: number, skipDraw?: boolean): void {
+    this.state.meetupsAmount = amount
 
-    this.draw()
+    if (skipDraw) {
+      return
+    }
+    this._draw()
     if (this.hudTexture) this.hudTexture.needsUpdate = true
   }
 
-  setPeopleOnlineActive(active: boolean): void {
+  setPeopleOnlineActive(active: boolean, skipDraw?: boolean): void {
     this.state.peopleOnlineActive = active
-    this.draw()
+
+    if (skipDraw) {
+      return
+    }
+
+    this._draw()
+
     if (this.hudTexture) this.hudTexture.needsUpdate = true
   }
 
-  setLayout(value: "default" | "ticket"): void {
-    if(value === this.state.layout) {
+  setLayout(value: 'default' | 'ticket'): void {
+    if (value === this.state.layout) {
       return
     }
 
     this.state.layout = value
-    this.draw()
+    this._draw()
     if (this.hudTexture) this.hudTexture.needsUpdate = true
   }
 
@@ -527,6 +545,11 @@ class HUDScene implements BaseScene {
   undimmHud() {
     this.state.vignetteRaduis = 1
     this.state.vignetteSmoothness = 0
+  }
+
+  draw(): void {
+    this._draw()
+    if (this.hudTexture) this.hudTexture.needsUpdate = true
   }
 
   resize(ev: UIEvent): void {
@@ -541,7 +564,7 @@ class HUDScene implements BaseScene {
       const newResolutionKey = this.getResolutionKey(window.innerWidth)
       if (this.activeResolutionKey !== newResolutionKey && this.hudTexture) {
         this.activeResolutionKey = newResolutionKey
-        this.draw()
+        this._draw()
         this.hudTexture.needsUpdate = true
       }
     }
@@ -562,7 +585,7 @@ class HUDScene implements BaseScene {
     }
   }
 
-  private draw() {
+  private _draw() {
     if (!this.hudContext) {
       throw new Error('HUD context not initialized')
     }
@@ -591,20 +614,21 @@ class HUDScene implements BaseScene {
     }
 
     this.drawBarControl(ctx, sizes.bars.coords[0], {
-      label: 'FUEL',
-      percentage: this.state.fuelLevel,
+      label: 'PAYLOAD SATURATION',
+      percentage: this.state.payloadSaturation,
       alignment: sizes.bars.coords[0].alignment,
     })
 
     this.drawBarControl(ctx, sizes.bars.coords[1], {
-      label: 'SHIELD INTEGRITY',
-      percentage: this.state.shieldIntegrity,
+      label: 'PAYLOAD FILL',
+      percentage: this.state.payloadFill,
       alignment: sizes.bars.coords[1].alignment,
     })
 
-    this.drawBarControl(ctx, sizes.bars.coords[2], {
-      label: 'OXYGEN',
-      percentage: this.state.oxygenLevel,
+    this.drawNumberControl(ctx, sizes.bars.coords[2], {
+      label: 'MEETUPS AMOUNT',
+      value: this.state.meetupsAmount,
+      active: true,
       alignment: sizes.bars.coords[2].alignment,
     })
 

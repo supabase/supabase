@@ -46,8 +46,17 @@ type LwAction =
   | { type: 'TICKET_LOADING_START' }
   | { type: 'TICKET_LOADING_SUCCESS' }
   | { type: 'TICKET_LOADING_ERROR'; payload?: Error }
-  | { type: 'PARTYMODE_ENABLE', payload: RealtimeChannel }
+  | { type: 'PARTYMODE_ENABLE'; payload: RealtimeChannel }
   | { type: 'PARTYMODE_DISABLE' }
+  | {
+      type: 'GAUGES_DATA_FETCHED'
+      payload: {
+        payloadSaturation?: number
+        payloadFill?: number
+        meetupsAmount?: number
+        peopleOnline?: number
+      }
+    }
 
 // Define state interface
 interface LwState {
@@ -59,8 +68,15 @@ interface LwState {
   ticketLoadingState: 'unloaded' | 'loading' | 'error' | 'loaded'
   ticketVisibility: boolean
   claimFormState: 'initial' | 'visible' | 'hidden'
+  partymodeStatus: 'on' | 'off'
   realtimeGaugesChannel: RealtimeChannel | null
   referal?: string
+  gaugesData: {
+    payloadSaturation: number | null
+    payloadFill: number | null
+    meetupsAmount: number | null
+    peopleOnline: number | null
+  } | null
 }
 
 export const lwReducer = (state: LwState, action: LwAction): LwState => {
@@ -117,12 +133,33 @@ export const lwReducer = (state: LwState, action: LwAction): LwState => {
       return {
         ...state,
         realtimeGaugesChannel: action.payload,
+        partymodeStatus: 'on',
       }
     }
     case 'PARTYMODE_DISABLE': {
       return {
         ...state,
         realtimeGaugesChannel: null,
+        partymodeStatus: 'off',
+      }
+    }
+    case 'GAUGES_DATA_FETCHED': {
+      const nonNullableKeys = Object.fromEntries(
+        Object.entries(action.payload).filter(([_, v]) => v !== undefined)
+      ) as typeof action.payload
+      const newGaugeData = state.gaugesData
+        ? { ...state.gaugesData, ...nonNullableKeys }
+        : {
+            payloadSaturation: null,
+            payloadFill: null,
+            meetupsAmount: null,
+            peopleOnline: null,
+            ...nonNullableKeys,
+          }
+
+      return {
+        ...state,
+        gaugesData: newGaugeData,
       }
     }
     default:
@@ -151,8 +188,9 @@ export const Lw14ConfDataProvider = ({
     userTicketDataState: 'unloaded',
     userTicketDataError: null,
     claimFormState: 'initial',
-    partyModeState: 'unloaded',
     realtimeGaugesChannel: null,
+    partymodeStatus: 'off',
+    gaugesData: null,
     ...initState,
   })
 
