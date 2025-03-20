@@ -147,7 +147,7 @@ export const ConnectionPooling = () => {
               {disablePoolModeSelection ? (
                 <Badge>Shared Pooler</Badge>
               ) : (
-                <Badge>Dedicated Pooler</Badge>
+                <Badge>Shared/Dedicated Pooler</Badge>
               )}
             </div>
             <DocsButton href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler" />
