@@ -5,9 +5,23 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Fri, 20 Dec 2024 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Fri, 07 Mar 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/dedicated-poolers</guid>
+  <title>Dedicated Poolers</title>
+  <link>https://supabase.com/blog/dedicated-poolers</link>
+  <description>A dedicated pgbouncer instance that&apos;s co-located with your database for maximum performance and reliability.</description>
+  <pubDate>Fri, 07 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/pgrouting-postgres-graph-database</guid>
+  <title>Postgres as a Graph Database: (Ab)using pgRouting</title>
+  <link>https://supabase.com/blog/pgrouting-postgres-graph-database</link>
+  <description></description>
+  <pubDate>Tue, 25 Feb 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/ai-hackathon-at-y-combinator</guid>
   <title>AI Hackathon at Y Combinator</title>
   <link>https://supabase.com/blog/ai-hackathon-at-y-combinator</link>

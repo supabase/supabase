@@ -12,12 +12,11 @@ import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateAuthMenu } from './AuthLayout.utils'
 
 const AuthProductMenu = () => {
+  const router = useRouter()
   const { ref: projectRef = 'default' } = useParams()
   const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
 
   useAuthConfigPrefetch({ projectRef })
-
-  const router = useRouter()
   const page = router.pathname.split('/')[4]
 
   return (

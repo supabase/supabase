@@ -2,8 +2,9 @@ import EdgeFunctionSecrets from 'components/interfaces/Functions/EdgeFunctionSec
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import type { NextPageWithLayout } from 'types'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
+import type { NextPageWithLayout } from 'types'
+
 const SecretsPage: NextPageWithLayout = () => {
   return (
     <ScaffoldContainer size="large" className="pt-6">

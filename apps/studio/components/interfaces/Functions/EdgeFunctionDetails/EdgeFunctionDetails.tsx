@@ -1,136 +1,67 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { object, string, boolean } from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
+import z from 'zod'
 
 import { useParams } from 'common'
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
+  cn,
   CodeBlock,
   CriticalIcon,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormMessage_Shadcn_,
   Input,
-  Modal,
+  Input_Shadcn_,
   Switch,
-  Toggle,
-  cn,
   Tabs_Shadcn_ as Tabs,
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
-  Input_Shadcn_,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import CommandRender from '../CommandRender'
+import { INVOCATION_TABS } from './EdgeFunctionDetails.constants'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 
-const schema = object({
-  name: string().required('Name is required'),
-  verify_jwt: boolean().required(),
+const FormSchema = z.object({
+  name: z.string().min(0, 'Name is required'),
+  verify_jwt: z.boolean(),
 })
 
-interface InvocationTab {
-  id: string
-  label: string
-  language: 'bash' | 'js' | 'ts' | 'dart' | 'python'
-  hideLineNumbers?: boolean
-  code: (functionUrl: string, functionName: string, apiKey: string) => string
-}
-
-const INVOCATION_TABS: InvocationTab[] = [
-  {
-    id: 'curl',
-    label: 'cURL',
-    language: 'bash',
-    code: (functionUrl, _, apiKey) => `curl -L -X POST '${functionUrl}' \\
-  -H 'Authorization: Bearer ${apiKey}' \\
-  -H 'Content-Type: application/json' \\
-  --data '{"name":"Functions"}'`,
-  },
-  {
-    id: 'supabase-js',
-    label: 'JavaScript',
-    language: 'js',
-    hideLineNumbers: true,
-    code: (_, functionName) => `import { createClient } from '@supabase/supabase-js'
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
-const { data, error } = await supabase.functions.invoke('${functionName}', {
-  body: { name: 'Functions' },
-})`,
-  },
-  {
-    id: 'swift',
-    label: 'Swift',
-    language: 'ts',
-    hideLineNumbers: true,
-    code: (_, functionName) => `struct Response: Decodable {
-  // Expected response definition
-}
-
-let response: Response = try await supabase.functions
-  .invoke(
-    "${functionName}",
-    options: FunctionInvokeOptions(
-      body: ["name": "Functions"]
-    )
-  )`,
-  },
-  {
-    id: 'flutter',
-    label: 'Flutter',
-    language: 'dart',
-    hideLineNumbers: true,
-    code: (
-      _,
-      functionName
-    ) => `final res = await supabase.functions.invoke('${functionName}', body: {'name': 'Functions'});
-final data = res.data;`,
-  },
-  {
-    id: 'python',
-    label: 'Python',
-    language: 'python',
-    hideLineNumbers: true,
-    code: (_, functionName) => `response = supabase.functions.invoke(
-    "${functionName}",
-    invoke_options={"body": {"name": "Functions"}}
-)`,
-  },
-]
-
-const EdgeFunctionDetails = () => {
+export const EdgeFunctionDetails = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [showInstructions, setShowInstructions] = useState(false)
+  const canUpdateEdgeFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
+
   const { mutate: updateEdgeFunction, isLoading: isUpdating } = useEdgeFunctionUpdateMutation()
   const { mutate: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation({
     onSuccess: () => {
@@ -139,7 +70,10 @@ const EdgeFunctionDetails = () => {
     },
   })
 
-  const canUpdateEdgeFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
+  const form = useForm({
+    resolver: zodResolver(FormSchema),
+    defaultValues: { name: '', verify_jwt: false },
+  })
 
   const { anonKey } = getAPIKeys(settings)
   const apiKey = anonKey?.api_key ?? '[YOUR ANON KEY]'
@@ -150,31 +84,17 @@ const EdgeFunctionDetails = () => {
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain.hostname}/functions/v1/${selectedFunction?.slug}`
       : `${protocol}://${endpoint}/functions/v1/${selectedFunction?.slug}`
-
-  const { managementCommands, secretCommands, invokeCommands } = generateCLICommands({
+  const hasImportMap = useMemo(
+    () => selectedFunction?.import_map || selectedFunction?.import_map_path,
+    [selectedFunction]
+  )
+  const { managementCommands } = generateCLICommands({
     selectedFunction,
     functionUrl,
     anonKey: apiKey,
   })
 
-  const form = useForm({
-    resolver: yupResolver(schema),
-    defaultValues: {
-      name: '',
-      verify_jwt: false,
-    },
-  })
-
-  useEffect(() => {
-    if (selectedFunction) {
-      form.reset({
-        name: selectedFunction.name,
-        verify_jwt: selectedFunction.verify_jwt,
-      })
-    }
-  }, [selectedFunction])
-
-  const onUpdateFunction = async (values: any) => {
+  const onUpdateFunction: SubmitHandler<z.infer<typeof FormSchema>> = async (values: any) => {
     if (!projectRef) return console.error('Project ref is required')
     if (selectedFunction === undefined) return console.error('No edge function selected')
 
@@ -198,15 +118,19 @@ const EdgeFunctionDetails = () => {
     deleteEdgeFunction({ projectRef, slug: selectedFunction.slug })
   }
 
-  const hasImportMap = useMemo(
-    () => selectedFunction?.import_map || selectedFunction?.import_map_path,
-    [selectedFunction]
-  )
+  useEffect(() => {
+    if (selectedFunction) {
+      form.reset({
+        name: selectedFunction.name,
+        verify_jwt: selectedFunction.verify_jwt,
+      })
+    }
+  }, [selectedFunction])
 
   return (
-    <div className="mx-auto flex flex-col xl:flex-row gap-8 pb-8">
+    <div className="mx-auto flex flex-col-reverse 2xl:flex-row gap-8 pb-8">
       <div className="flex-1 min-w-0 overflow-hidden">
-        <ScaffoldSection isFullWidth>
+        <ScaffoldSection isFullWidth className="!pt-0 2xl:first:!pt-12">
           <ScaffoldSectionTitle className="mb-4">Function Configuration</ScaffoldSectionTitle>
           <Form_Shadcn_ {...form}>
             <form onSubmit={form.handleSubmit(onUpdateFunction)}>
@@ -224,7 +148,7 @@ const EdgeFunctionDetails = () => {
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
                             {...field}
-                            className="w-full"
+                            className="w-64"
                             disabled={!canUpdateEdgeFunction}
                           />
                         </FormControl_Shadcn_>
@@ -347,35 +271,32 @@ const EdgeFunctionDetails = () => {
           </Alert_Shadcn_>
         </ScaffoldSection>
 
-        <Modal
-          size="small"
-          alignFooter="right"
-          header={<h3>Confirm to delete {selectedFunction?.name}</h3>}
+        <ConfirmationModal
           visible={showDeleteModal}
           loading={isDeleting}
+          variant="destructive"
+          confirmLabel="Delete"
+          confirmLabelLoading="Deleting"
+          title={`Confirm to delete ${selectedFunction?.name}`}
           onCancel={() => setShowDeleteModal(false)}
           onConfirm={onConfirmDelete}
-        >
-          <Modal.Content>
-            <Alert_Shadcn_ variant="warning">
-              <CriticalIcon />
-              <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                Ensure that you have made a backup if you want to restore your edge function
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          </Modal.Content>
-        </Modal>
+          alert={{
+            base: { variant: 'destructive' },
+            title: 'This action cannot be undone',
+            description:
+              'Ensure that you have made a backup if you want to restore your edge function',
+          }}
+        />
       </div>
 
-      <div className="w-full xl:max-w-[600px] shrink-0">
-        <ScaffoldSection isFullWidth>
+      <div className="w-full 2xl:max-w-[600px] shrink-0">
+        <ScaffoldSection isFullWidth className="!pt-6 2xl:first:!pt-12">
           <Card>
             <CardHeader>
               <CardTitle>Details</CardTitle>
             </CardHeader>
             <CardContent className="pt-6 space-y-6">
-              <dl className="grid grid-cols-1 xl:grid-cols-[auto_1fr] gap-y-6 gap-x-10">
+              <dl className="grid grid-cols-1 xl:grid-cols-[auto_1fr] gap-y-4 xl:gap-y-6 gap-x-10">
                 <dt className="text-sm text-foreground-light">Slug</dt>
                 <dd className="text-sm lg:text-left">{selectedFunction?.slug}</dd>
 
@@ -444,5 +365,3 @@ const EdgeFunctionDetails = () => {
     </div>
   )
 }
-
-export default EdgeFunctionDetails

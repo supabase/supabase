@@ -2695,7 +2695,7 @@ functions:
       - The password reset flow consist of 2 broad steps: (i) Allow the user to login via the password reset link; (ii) Update the user's password.
       - The `resetPasswordForEmail()` only sends a password reset link to the user's email.
       To update the user's password, see [`updateUser()`](/docs/reference/javascript/auth-updateuser).
-      - A `SIGNED_IN` and `PASSWORD_RECOVERY` event will be emitted when the password recovery link is clicked.
+      - A `PASSWORD_RECOVERY` event will be emitted when the password recovery link is clicked.
       You can use [`onAuthStateChange()`](/docs/reference/javascript/auth-onauthstatechange) to listen and invoke a callback function on these events.
       - When the user clicks the reset link in the email they are redirected back to your application.
       You can configure the URL that the user is redirected to with the `redirectTo` parameter.
@@ -3213,6 +3213,69 @@ functions:
               {
                 "name": "woodwinds",
                 "instruments": [
+                  {
+                    "name": "flute"
+                  }
+                ]
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+      - id: query-referenced-tables-with-spaces-in-their-names
+        name: Query referenced tables with spaces in their names
+        description: |
+          If your table name contains spaces, you must use double quotes in the `select` statement to reference the table.
+        code: |
+          ```js
+          const { data, error } = await supabase
+            .from('orchestal sections')
+            .select(`
+              name,
+              "musical instruments" (
+                name
+              )
+            `)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              "orchestral sections" (id int8 primary key, name text);
+            create table
+              "musical instruments" (
+                id int8 primary key,
+                section_id int8 not null references "orchestral sections",
+                name text
+              );
+
+            insert into
+              "orchestral sections" (id, name)
+            values
+              (1, 'strings'),
+              (2, 'woodwinds');
+            insert into
+              "musical instruments" (id, section_id, name)
+            values
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "strings",
+                "musical instruments": [
+                  {
+                    "name": "violin"
+                  }
+                ]
+              },
+              {
+                "name": "woodwinds",
+                "musical instruments": [
                   {
                     "name": "flute"
                   }
@@ -5788,10 +5851,10 @@ functions:
           {
             "data": [
               {
-                "name": "Luke"
+                "name": "Leia"
               },
               {
-                "name": "Leia"
+                "name": "Han"
               }
             ],
             "status": 200,
@@ -6530,6 +6593,8 @@ functions:
 
   - id: returns
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.returns'
+    notes: |
+      - Deprecated: use overrideTypes method instead
     title: returns()
     examples:
       - id: override-type-of-successful-response
@@ -6539,11 +6604,94 @@ functions:
           const { data } = await supabase
             .from('countries')
             .select()
+            .returns<Array<MyType>>()
+          ```
+        response: |
+          ```
+          let x: typeof data // MyType[]
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: override-type-of-object-response
+        name: Override type of object response
+        code: |
+          ```ts
+          const { data } = await supabase
+            .from('countries')
+            .select()
+            .maybeSingle()
             .returns<MyType>()
           ```
         response: |
           ```
           let x: typeof data // MyType | null
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+
+  - id: overrideTypes
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.overrideTypes'
+    title: overrideTypes()
+    examples:
+      - id: complete-override-type-of-successful-response
+        name: Complete Override type of successful response
+        code: |
+          ```ts
+          const { data } = await supabase
+            .from('countries')
+            .select()
+            .overrideTypes<Array<MyType>, { merge: false }>()
+          ```
+        response: |
+          ```ts
+          let x: typeof data // MyType[]
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: complete-override-type-of-object-response
+        name: Complete Override type of object response
+        code: |
+          ```ts
+          const { data } = await supabase
+            .from('countries')
+            .select()
+            .maybeSingle()
+            .overrideTypes<MyType, { merge: false }>()
+          ```
+        response: |
+          ```ts
+          let x: typeof data // MyType | null
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: partial-override-type-of-successful-response
+        name: Partial Override type of successful response
+        code: |
+          ```ts
+          const { data } = await supabase
+            .from('countries')
+            .select()
+            .overrideTypes<Array<{ status: "A" | "B" }>>()
+          ```
+        response: |
+          ```ts
+          let x: typeof data // Array<CountryRowProperties & { status: "A" | "B" }>
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: partial-override-type-of-object-response
+        name: Partial Override type of object response
+        code: |
+          ```ts
+          const { data } = await supabase
+            .from('countries')
+            .select()
+            .maybeSingle()
+            .overrideTypes<{ status: "A" | "B" }>()
+          ```
+        response: |
+          ```ts
+          let x: typeof data // CountryRowProperties & { status: "A" | "B" } | null
           ```
         hideCodeBlock: true
         isSpotlight: true

@@ -324,15 +324,25 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     const start = params.iso_timestamp_start ? dayjs(params.iso_timestamp_start) : dayjs()
     const end = params.iso_timestamp_end ? dayjs(params.iso_timestamp_end) : dayjs()
     const daysDiff = Math.abs(start.diff(end, 'days'))
-    if (
-      editorValue &&
-      !editorValue.includes('limit') &&
-      daysDiff > LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD
-    ) {
+
+    if (daysDiff >= LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD) {
+      newWarnings.push({
+        text: 'Querying large date ranges can be slow. Consider selecting a smaller date range.',
+      })
+    }
+    if (editorValue && !editorValue.includes('limit')) {
       newWarnings.push({ text: 'When querying large date ranges, include a LIMIT clause.' })
     }
     setWarnings(newWarnings)
-  }, [editorValue, params.iso_timestamp_start, params.iso_timestamp_end])
+  }, [
+    editorValue,
+    ite,
+    its,
+    router.query,
+    params.iso_timestamp_end,
+    params.iso_timestamp_start,
+    params,
+  ])
 
   // Show the prompt on page load based on query params
   useEffect(() => {

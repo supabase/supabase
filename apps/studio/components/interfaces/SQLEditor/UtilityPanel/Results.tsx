@@ -50,24 +50,29 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
   )
 
   const formatter = (column: any, row: any) => {
+    const cellValue = row[column]
+
     return (
       <ContextMenu_Shadcn_ modal={false}>
         <ContextMenuTrigger_Shadcn_ asChild>
           <div
             className={cn(
               'flex items-center h-full font-mono text-xs w-full whitespace-pre',
-              row[column] === null && 'text-foreground-lighter'
+              cellValue === null && 'text-foreground-lighter'
             )}
           >
-            {row[column] === null ? 'NULL' : JSON.stringify(row[column])}
+            {cellValue === null
+              ? 'NULL'
+              : typeof cellValue === 'string'
+                ? cellValue
+                : JSON.stringify(cellValue)}
           </div>
         </ContextMenuTrigger_Shadcn_>
         <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
           <ContextMenuItem_Shadcn_
             className="gap-x-2"
             onSelect={() => {
-              const cellValue = row[column] ?? ''
-              const value = formatClipboardValue(cellValue)
+              const value = formatClipboardValue(cellValue ?? '')
               copyToClipboard(value)
             }}
             onFocusCapture={(e) => e.stopPropagation()}

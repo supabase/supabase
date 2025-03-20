@@ -1,188 +1,112 @@
-import { useEffect, useState } from 'react'
-import { CornerDownLeft, Loader2, Book, Check, ChevronsUpDown, Plus, File } from 'lucide-react'
-import { Button, Input_Shadcn_, Label_Shadcn_, cn } from 'ui'
-import { AiIconAnimation } from 'ui'
-import { BASE_PATH } from 'lib/constants'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
-import { IS_PLATFORM } from 'lib/constants'
-import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
-import { toast } from 'sonner'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { AlertCircle, Book, Check } from 'lucide-react'
 import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import * as z from 'zod'
+
 import { useParams } from 'common'
-import { useAppStateSnapshot } from 'state/app-state'
+import { EDGE_FUNCTION_TEMPLATES } from 'components/interfaces/Functions/Functions.templates'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
+import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
+  AiIconAnimation,
+  Button,
+  cn,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  Input_Shadcn_,
+  Label_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
-import { useFlag } from 'hooks/ui/useFlag'
 
-const EDGE_FUNCTION_TEMPLATES = [
-  {
-    value: 'hello-world',
-    name: 'Simple Hello World',
-    description: 'Basic function that returns a JSON response',
-    content: `// Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-interface reqPayload {
-  name: string;
-}
-
-console.info('server started');
-
-Deno.serve(async (req: Request) => {
-  const { name }: reqPayload = await req.json();
-  const data = {
-    message: \`Hello \${name} from foo!\`,
-  };
-
-  return new Response(
-    JSON.stringify(data),
-    { headers: { 'Content-Type': 'application/json', 'Connection': 'keep-alive' }}
-  );
-});`,
-  },
-  {
-    value: 'database-access',
-    name: 'Supabase Database Access',
-    description: 'Example using Supabase client to query your database',
-    content: `// Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from 'jsr:@supabase/supabase-js@2'
-
-Deno.serve(async (req) => {
-  try {
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
-    )
-
-    const { data, error } = await supabase.from('countries').select('*')
-
-    if (error) {
-      throw error
-    }
-
-    return new Response(JSON.stringify({ data }), {
-      headers: { 'Content-Type': 'application/json' },
-      status: 200,
-    })
-  } catch (err) {
-    return new Response(String(err?.message ?? err), { status: 500 })
-  }
-})`,
-  },
-  {
-    value: 'node-api',
-    name: 'Node Built-in API Example',
-    description: 'Example using Node.js built-in crypto and http modules',
-    content: `// Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { randomBytes } from "node:crypto";
-import { createServer } from "node:http";
-import process from "node:process";
-
-const generateRandomString = (length) => {
-  const buffer = randomBytes(length);
-  return buffer.toString('hex');
-};
-
-const randomString = generateRandomString(10);
-console.log(randomString);
-
-const server = createServer((req, res) => {
-  const message = \`Hello\`;
-  res.end(message);
-});
-
-server.listen(9999);`,
-  },
-  {
-    value: 'express',
-    name: 'Express Server',
-    description: 'Example using Express.js for routing',
-    content: `// Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import express from "npm:express@4.18.2";
-
-const app = express();
-
-app.get(/(.*)/, (req, res) => {
-  res.send("Welcome to Supabase");
-});
-
-app.listen(8000);`,
-  },
+// Array of adjectives and nouns for random function name generation
+const ADJECTIVES = [
+  'quick',
+  'clever',
+  'bright',
+  'swift',
+  'rapid',
+  'smart',
+  'smooth',
+  'dynamic',
+  'super',
+  'hyper',
+]
+const NOUNS = [
+  'function',
+  'handler',
+  'processor',
+  'responder',
+  'worker',
+  'service',
+  'api',
+  'endpoint',
+  'action',
+  'task',
 ]
 
-interface TreeNode {
-  id: string
-  name: string
-  metadata?: {
-    isEditing?: boolean
-    originalId: number
-  }
-  children?: TreeNode[]
+// Function name validation regex - only allows alphanumeric characters, hyphens, and underscores
+const FUNCTION_NAME_REGEX = /^[A-Za-z0-9_-]+$/
+
+// Define form schema with yup
+const FormSchema = z.object({
+  functionName: z
+    .string()
+    .min(1, 'Function name is required')
+    .regex(FUNCTION_NAME_REGEX, 'Only letters, numbers, hyphens, and underscores allowed'),
+})
+
+// Generate a random function name
+const generateRandomFunctionName = () => {
+  const adjective = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)]
+  const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)]
+  return `${adjective}-${noun}`
 }
 
-interface TreeNodeRendererProps {
-  element: TreeNode
-  isBranch: boolean
-  isExpanded: boolean
-  isSelected: boolean
-  level: number
-  getNodeProps: () => React.HTMLAttributes<HTMLDivElement>
+// Convert invalid function name to valid one
+const sanitizeFunctionName = (name: string): string => {
+  // Replace invalid characters with hyphens
+  return name.replace(/[^A-Za-z0-9_-]/g, '-')
 }
 
-const getLanguageFromFileName = (fileName: string): string => {
-  const extension = fileName.split('.').pop()?.toLowerCase()
-  switch (extension) {
-    case 'ts':
-    case 'tsx':
-      return 'typescript'
-    case 'js':
-    case 'jsx':
-      return 'javascript'
-    case 'json':
-      return 'json'
-    case 'html':
-      return 'html'
-    case 'css':
-      return 'css'
-    case 'md':
-      return 'markdown'
-    default:
-      return 'typescript' // Default to typescript
-  }
-}
+// Type for the form values
+type FormValues = z.infer<typeof FormSchema>
 
 const NewFunctionPage = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { ref, template } = useParams()
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
   const { setAiAssistantPanel } = useAppStateSnapshot()
   const edgeFunctionCreate = useFlag('edgeFunctionCreate')
-
-  // TODO (Saxon): Remove this once the flag is fully launched
-  useEffect(() => {
-    if (!edgeFunctionCreate) {
-      router.push(`/project/${ref}/functions`)
-    }
-  }, [edgeFunctionCreate, ref, router])
+  const { mutate: sendEvent } = useSendEventMutation()
+  const org = useSelectedOrganization()
 
   const [files, setFiles] = useState<
     { id: number; name: string; content: string; selected?: boolean }[]
@@ -191,55 +115,48 @@ const NewFunctionPage = () => {
       id: 1,
       name: 'index.ts',
       selected: true,
-      content: `// Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-
-console.info('server started');
-
-Deno.serve(async (req: Request) => {
-  const data = {
-    message: 'Hello from Supabase Edge Functions!',
-  };
-
-  return new Response(
-    JSON.stringify(data),
-    { headers: { 'Content-Type': 'application/json', 'Connection': 'keep-alive' }}
-  );
-});`,
+      content: EDGE_FUNCTION_TEMPLATES[0].content,
     },
   ])
-  const [functionName, setFunctionName] = useState('')
   const [open, setOpen] = useState(false)
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
   const [savedCode, setSavedCode] = useState<string>('')
 
-  const { mutateAsync: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
+  const form = useForm<FormValues>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      functionName: generateRandomFunctionName(),
+    },
+  })
+
+  const { mutate: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
+    // [Joshen] To investigate: For some reason, the invalidation for list of edge functions isn't triggering
     onSuccess: () => {
       toast.success('Successfully deployed edge function')
+      const functionName = form.getValues('functionName')
       if (ref && functionName) {
         router.push(`/project/${ref}/functions/${functionName}/details`)
       }
     },
   })
 
-  const onDeploy = async () => {
-    if (isDeploying || !ref || !functionName) return
+  const onSubmit = (values: FormValues) => {
+    if (isDeploying || !ref) return
 
-    try {
-      await deployFunction({
-        projectRef: ref,
-        metadata: {
-          entrypoint_path: 'index.ts',
-          name: functionName,
-          verify_jwt: true,
-        },
-        files: files.map(({ name, content }) => ({ name, content })),
-      })
-    } catch (error) {
-      toast.error(
-        `Failed to deploy function: ${error instanceof Error ? error.message : 'Unknown error'}`
-      )
-    }
+    deployFunction({
+      projectRef: ref,
+      metadata: {
+        entrypoint_path: 'index.ts',
+        name: values.functionName,
+        verify_jwt: true,
+      },
+      files: files.map(({ name, content }) => ({ name, content })),
+    })
+    sendEvent({
+      action: 'edge_function_deploy_button_clicked',
+      properties: { origin: 'functions_editor' },
+      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+    })
   }
 
   const handleChat = () => {
@@ -259,6 +176,11 @@ Deno.serve(async (req: Request) => {
         ],
       },
     })
+    sendEvent({
+      action: 'edge_function_ai_assistant_button_clicked',
+      properties: { origin: 'functions_editor_chat' },
+      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+    })
   }
 
   const onSelectTemplate = (templateValue: string) => {
@@ -268,6 +190,11 @@ Deno.serve(async (req: Request) => {
         prev.map((file) => (file.selected ? { ...file, content: template.content } : file))
       )
       setOpen(false)
+      sendEvent({
+        action: 'edge_function_template_clicked',
+        properties: { templateName: template.name, origin: 'editor_page' },
+        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      })
     }
   }
 
@@ -289,32 +216,53 @@ Deno.serve(async (req: Request) => {
     }
   }
 
+  // Try to sanitize function name when it's invalid
+  const handleDeploy = () => {
+    const currentName = form.getValues('functionName')
+    const isValid = FUNCTION_NAME_REGEX.test(currentName)
+
+    if (!isValid && currentName) {
+      const sanitizedName = sanitizeFunctionName(currentName)
+      form.setValue('functionName', sanitizedName, { shouldValidate: true })
+    }
+
+    form.handleSubmit(onSubmit)()
+  }
+
+  // TODO (Saxon): Remove this once the flag is fully launched
+  useEffect(() => {
+    if (!edgeFunctionCreate) {
+      router.push(`/project/${ref}/functions`)
+    }
+  }, [edgeFunctionCreate, ref, router])
+
+  useEffect(() => {
+    if (template) {
+      const templateMeta = EDGE_FUNCTION_TEMPLATES.find((x) => x.value === template)
+      if (templateMeta) {
+        form.reset({ functionName: template })
+        setFiles([
+          {
+            id: 1,
+            name: 'index.ts',
+            selected: true,
+            content: templateMeta.content,
+          },
+        ])
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [template])
+
   return (
     <PageLayout
       size="full"
       isCompact
+      title="Create new edge function"
       breadcrumbs={[
         {
           label: 'Edge Functions',
           href: `/project/${ref}/functions`,
-        },
-        {
-          element: (
-            <div className="flex items-center gap-2">
-              <Label_Shadcn_ htmlFor="function-name" className="text-foreground-light sr-only">
-                Function name
-              </Label_Shadcn_>
-              <Input_Shadcn_
-                id="function-name"
-                type="text"
-                autoFocus
-                placeholder="Give your function a name..."
-                value={functionName}
-                onChange={(e) => setFunctionName(e.target.value)}
-                className="w-[400px] p-0 text-base text-foreground bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0"
-              />
-            </div>
-          ),
         },
       ]}
       primaryActions={
@@ -331,7 +279,7 @@ Deno.serve(async (req: Request) => {
                 Templates
               </Button>
             </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="w-[300px] p-0">
+            <PopoverContent_Shadcn_ className="w-[300px] p-0" align="end">
               <Command_Shadcn_>
                 <CommandInput_Shadcn_ placeholder="Search templates..." />
                 <CommandList_Shadcn_>
@@ -391,25 +339,54 @@ Deno.serve(async (req: Request) => {
         }}
       />
 
-      <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100">
-        <Button
-          loading={isDeploying}
-          size="medium"
-          disabled={!functionName || files.length === 0}
-          onClick={onDeploy}
-          iconRight={
-            isDeploying ? (
-              <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
-            ) : (
-              <div className="flex items-center space-x-1">
-                <CornerDownLeft size={10} strokeWidth={1.5} />
-              </div>
-            )
-          }
+      <Form_Shadcn_ {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 gap-3"
         >
-          Deploy function
-        </Button>
-      </div>
+          <div className="flex items-center gap-3">
+            <Label_Shadcn_ htmlFor="functionName">Function name</Label_Shadcn_>
+            <FormField_Shadcn_
+              control={form.control}
+              name="functionName"
+              render={({ field }) => (
+                <FormItem_Shadcn_ className="flex flex-col gap-0 m-0">
+                  <div className="flex items-center">
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_
+                        id="functionName"
+                        type="text"
+                        size={'large'}
+                        placeholder="Give your function a name..."
+                        className="w-[250px]"
+                        {...field}
+                      />
+                    </FormControl_Shadcn_>
+                    {form.formState.errors.functionName && (
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <AlertCircle className="w-4 h-4 text-destructive ml-2" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {form.formState.errors.functionName.message}
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                  </div>
+                </FormItem_Shadcn_>
+              )}
+            />
+          </div>
+          <Button
+            loading={isDeploying}
+            size="medium"
+            disabled={files.length === 0 || isDeploying}
+            onClick={handleDeploy}
+          >
+            Deploy function
+          </Button>
+        </form>
+      </Form_Shadcn_>
     </PageLayout>
   )
 }

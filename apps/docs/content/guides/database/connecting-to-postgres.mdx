@@ -83,14 +83,18 @@ Get your project's direct string from the [Database Settings](/dashboard/project
 2. Click `Database`.
 3. Under `Connection string`, make sure `Display connection pooler` is unchecked. Copy the URI.
 
-## Supavisor session mode
+## Shared pooler
 
-The session mode connection string connects to your Postgres instance via a proxy. This is ideal for persistent servers when IPv6 is not supported.
+Every Supabase project includes a free, shared connection pooler. This is ideal for persistent servers when IPv6 is not supported.
+
+### Supavisor session mode
+
+The session mode connection string connects to your Postgres instance via a proxy.
 
 The connection string looks like this:
 
 ```
-postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pooler.supabase.com:5432/postgres
+postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
 ```
 
 Get your project's session mode string from the [Database Settings](/dashboard/project/_/settings/database) page:
@@ -99,7 +103,7 @@ Get your project's session mode string from the [Database Settings](/dashboard/p
 2. Click `Database`.
 3. Under `Connection string`, make sure `Display connection pooler` is checked and `Session mode` is selected. Copy the URI.
 
-## Supavisor transaction mode
+### Supavisor transaction mode
 
 The transaction mode connection string connects to your Postgres instance via a proxy which serves as a connection pooler. This is ideal for serverless or edge functions, which require many transient connections.
 
@@ -112,7 +116,7 @@ Transaction mode does not support [prepared statements](https://postgresql.org/d
 The connection string looks like this:
 
 ```
-postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pooler.supabase.com:6543/postgres
+postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
 ```
 
 Get your project's transaction mode string from the [Database Settings](/dashboard/project/_/settings/database) page:
@@ -120,6 +124,10 @@ Get your project's transaction mode string from the [Database Settings](/dashboa
 1. Go to the `Settings` section.
 2. Click `Database`.
 3. Under `Connection string`, make sure `Display connection pooler` is checked and `Transaction mode` is selected. Copy the URI.
+
+## Dedicated pooler
+
+The Dedicated Pooler is a [PgBouncer](https://www.pgbouncer.org/) instance that's co-located with your Postgres database. This will require you to connect with IPv6 or, if that's not an option, you can use the [IPv4 add-on](/docs/guides/platform/ipv4-address).
 
 ## More about connection pooling
 

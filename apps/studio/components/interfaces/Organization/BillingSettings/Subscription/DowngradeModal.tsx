@@ -72,7 +72,6 @@ const DowngradeModal = ({
     }) || []
 
   const hasInstancesOnMicro = projects.some((project) => project.infra_compute_size === 'micro')
-  const downgradingToNano = subscription?.nano_enabled === true
 
   return (
     <Modal
@@ -93,8 +92,7 @@ const DowngradeModal = ({
               unresponsive or enter read only mode."
           />
 
-          {((previousProjectAddons.length ?? 0) > 0 ||
-            (hasInstancesOnMicro && downgradingToNano)) && (
+          {((previousProjectAddons.length ?? 0) > 0 || hasInstancesOnMicro) && (
             <Admonition type="warning" title="Projects affected by the downgrade">
               <ul className="space-y-1 max-h-[100px] overflow-y-auto">
                 {previousProjectAddons.map((project) => (
