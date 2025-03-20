@@ -9,7 +9,7 @@ function TopNavigationSearch() {
       size="small"
       className="transition w-64 rounded-full hover:bg-surface-200 hover:border-foreground-muted cursor-pointer"
       icon={<Search size={14} />}
-      placeholder="Search Design System..."
+      placeholder="Search UI Library..."
     />
   )
 }

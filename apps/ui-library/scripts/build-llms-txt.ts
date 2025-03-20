@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-const BASE_URL = 'https://supabase-design-system.vercel.app/design-system/docs'
+const BASE_URL = 'https://supabase.com/ui/docs'
 
 interface DocMeta {
   title: string
@@ -76,11 +76,11 @@ function getDocFiles(): DocMeta[] {
 
 // Generate the llms.txt content
 const docs = getDocFiles()
-let content = `# Supabase Design System
+let content = `# Supabase UI Library
 Last updated: ${new Date().toISOString()}
 
 ## Overview
-The Design System used in Supabase Studio.
+Library of components for your project. The components integrate with Supabase and are shadcn compatible.
 
 ## Docs
 `

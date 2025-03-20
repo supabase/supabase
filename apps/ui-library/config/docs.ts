@@ -10,15 +10,21 @@ export const gettingStarted: SidebarNavGroup = {
   items: [
     {
       title: 'Introduction',
-      href: '/docs/introduction',
+      href: '/docs/getting-started/introduction',
       items: [],
       commandItemLabel: 'Introduction',
     },
     {
       title: 'Quick Start',
-      href: '/docs/quick-start',
+      href: '/docs/getting-started/quickstart',
       items: [],
       commandItemLabel: 'Quick Start',
+    },
+    {
+      title: 'FAQ',
+      href: '/docs/getting-started/faq',
+      items: [],
+      commandItemLabel: 'FAQ',
     },
   ],
 }

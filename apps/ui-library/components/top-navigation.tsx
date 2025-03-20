@@ -12,7 +12,7 @@ function TopNavigation() {
         <div className="max-w-site border-b w-full flex flex-row items-center gap-6 mx-auto px-6 border-r border-l justify-between">
           <div className="flex items-center gap-8">
             <Link href="/">
-              <h1>Supabase Design System</h1>
+              <h1>Supabase UI Library</h1>
             </Link>
             <HomepageSvgHandler name="design-system-marks" className="h-4 w-auto" />
           </div>

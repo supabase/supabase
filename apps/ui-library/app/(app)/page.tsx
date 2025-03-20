@@ -10,7 +10,7 @@ export default function Home() {
             <DesignSystemMarks />
           </div> */}
           <div>
-            <h1 className="text-4xl text-foreground mb-3">Supabase Design System</h1>
+            <h1 className="text-4xl text-foreground mb-3">Supabase UI Library</h1>
             <h2 className="text-xl text-foreground-light font-light">
               Design resources for building consistent user experiences
             </h2>

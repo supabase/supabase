@@ -20,9 +20,7 @@ function SideNavigation() {
 
   const pathRegex = /\/docs\/([^/]+)/
   const match = pathname?.match(pathRegex)
-  const selectedFramework = match?.[1] || 'nextjs'
-
-  console.log(selectedFramework)
+  const selectedFramework = frameworks.includes(match?.[1] ?? '') ? match?.[1]! : 'nextjs'
 
   const onSelect = (value: string) => {
     const firstUrl = frameworkPages[value].items[0].href
