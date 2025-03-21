@@ -103,15 +103,15 @@ void main() {
 
     color = mix(color, black, 1.0-v);
     
-    //get the luminance of the image
-    float luminance = luma(color);
-    vec3 desaturated = vec3(luminance);
-
-    //now blend the noise over top the backround 
-    //in our case soft-light looks pretty good
-    vec3 noiseColor = blendSoftLight(desaturated, g);
-    float response = smoothstep(0.05, 0.5, luminance);
-    color = mix(vec4(noiseColor, color.a), vec4(desaturated, color.a), pow(response,2.0));
+    ////get the luminance of the image
+    //float luminance = luma(color);
+    //vec3 desaturated = vec3(luminance);
+    //
+    ////now blend the noise over top the backround 
+    ////in our case soft-light looks pretty good
+    //vec3 noiseColor = blendSoftLight(desaturated, g);
+    //float response = smoothstep(0.05, 0.5, luminance);
+    //color = mix(vec4(noiseColor, color.a), vec4(desaturated, color.a), pow(response,2.0));
   
     gl_FragColor = color;
   }

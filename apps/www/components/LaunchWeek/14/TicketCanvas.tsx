@@ -118,19 +118,27 @@ const TicketCanvas = ({ className, onUpgradeToSecret }: TicketCanvasProps) => {
   }, [onUpgradeToSecret])
 
   useEffect(() => {
-    if (state.gaugesData && hudObj) {
-      if (state.gaugesData.peopleOnline)
-        hudObj.setPeopleOnline(state.gaugesData.peopleOnline, true)
-      hudObj.setPeopleOnlineActive(state.partymodeStatus === 'on', true)
-      if (state.gaugesData.payloadSaturation)
-        hudObj.setMeetupsAmount(state.gaugesData.payloadSaturation, true)
-      if (state.gaugesData.payloadFill)
-        hudObj.setPayloadFill(state.gaugesData.payloadFill, true)
-      if (state.gaugesData.meetupsAmount)
-        hudObj.setMeetupsAmount(state.gaugesData.meetupsAmount, true)
+    const isOn = state.partymodeStatus === 'on'
+    const data = state.gaugesData
+    if (data && hudObj) {
+      if (isOn) {
+        hudObj.setPeopleOnlineActive(true, true)
+
+        if (data.peopleOnline) hudObj.setPeopleOnline(data.peopleOnline, true)
+        if (data.payloadSaturation) hudObj.setMeetupsAmount(data.payloadSaturation, true)
+        if (data.payloadFill) hudObj.setPayloadFill(data.payloadFill, true)
+        if (data.meetupsAmount) hudObj.setMeetupsAmount(data.meetupsAmount, true)
+      } else {
+
+        hudObj.setPeopleOnlineActive(false, true)
+        hudObj.setPeopleOnline(0, true)
+        hudObj.setMeetupsAmount(0, true)
+        hudObj.setPayloadFill(0, true)
+        hudObj.setMeetupsAmount(0, true)
+      }
 
       hudObj.draw()
-    } 
+    }
   }, [state.gaugesData, state.partymodeStatus, hudObj])
 
   const { containerRef } = useThreeJS(setup)

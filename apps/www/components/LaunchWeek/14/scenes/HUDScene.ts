@@ -45,7 +45,7 @@ class HUDScene implements BaseScene {
   // canvas height will be calculated based on camera aspect ratio
   private referenceCanvasWidth = 1120
   private referenceCanvasHeight = 707
-  private qualityMultiplier = 1.5
+  private qualityMultiplier = 2
 
   private referenceStyles = {
     axis: {
@@ -792,6 +792,7 @@ class HUDScene implements BaseScene {
 
     // Draw the dot with color based on active state
     ctx.fillStyle = data.active ? control.activeColor : control.disabledColor
+
     ctx.beginPath()
     ctx.arc(
       contentX + control.dotSize / 2,
