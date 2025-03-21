@@ -1,27 +1,27 @@
 import { type PropsWithChildren } from 'react'
 import { type BundledLanguage, codeToTokens, type ThemedToken } from 'shiki'
 import { createTwoslasher, type NodeHover } from 'twoslash'
-import { cn } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { AnnotatedSpan } from './CodeBlock.client'
+import { CodeCopyButton } from './CodeBlock.client'
 
 const twoslasher = createTwoslasher()
 const TWOSLASHABLE_LANGS = ['js', 'ts', 'jsx', 'tsx', 'javascript', 'typescript']
 
 export async function CodeBlock({
   className,
-  lang: explicitLang,
+  lang: langSetting,
   lineNumbers = true,
   contents,
   children,
 }: PropsWithChildren<{
   className?: string
   lang?: string
-  lineNumbers: boolean
+  lineNumbers?: boolean
   contents?: string
 }>) {
   let code = (contents || extractCode(children)).trim()
-  const lang = tryToBundledLanguage(explicitLang) || extractLang(children)
+  const lang = tryToBundledLanguage(langSetting) || extractLang(children)
 
   let twoslashed = null as null | Map<number, Map<number, Array<NodeHover>>>
   if (TWOSLASHABLE_LANGS.includes(lang)) {
@@ -32,7 +32,6 @@ export async function CodeBlock({
       code = editedCode
     } catch (_err) {
       // Silently ignore, if imports aren't defined type compilation fails
-      console.error(_err)
     }
   }
 
@@ -47,8 +46,10 @@ export async function CodeBlock({
   return (
     <div
       className={cn(
+        'group',
+        'relative',
         'not-prose',
-        'w-full overflow-x-auto',
+        'w-full overflow-hidden',
         'border border-default rounded-lg',
         'bg-200',
         'text-sm',
@@ -66,13 +67,17 @@ export async function CodeBlock({
               ))}
             </div>
           )}
-          <div className={cn('p-6', lineNumbers ? 'flex-grow' : '')}>
+          <div className={cn('p-6 overflow-x-auto', lineNumbers ? 'flex-grow' : '')}>
             {tokens.map((line, idx) => (
               <CodeLine key={idx} tokens={line} twoslash={twoslashed?.get(idx)} />
             ))}
           </div>
         </code>
       </pre>
+      <CodeCopyButton
+        content={code.trim()}
+        className="hidden group-hover:block absolute top-2 right-2"
+      />
     </div>
   )
 }
@@ -107,6 +112,50 @@ function CodeLine({
         )
       )}
     </span>
+  )
+}
+
+export function AnnotatedSpan({
+  token,
+  annotations,
+}: {
+  token: ThemedToken
+  annotations: Array<NodeHover>
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger>
+        <span style={token.htmlStyle}>{token.content}</span>
+      </TooltipTrigger>
+      <TooltipContent className="max-w-[min(80vw,400px)] p-0 divide-y">
+        {annotations.map((annotation, idx) => (
+          <Annotation key={idx} annotation={annotation} />
+        ))}
+      </TooltipContent>
+    </Tooltip>
+  )
+}
+
+function Annotation({ annotation }: { annotation: NodeHover }) {
+  const { text, docs, tags } = annotation
+  return (
+    <div className="flex flex-col gap-2">
+      <code className={cn('block bg-200 p-2', (docs || tags) && 'border-b border-default')}>
+        {text}
+      </code>
+      {docs && <p className={cn('p-2', tags && 'border-b border-default')}>{docs}</p>}
+      {tags && (
+        <div className="p-2 flex flex-col">
+          {tags.map((tag, idx) => {
+            return (
+              <span key={idx}>
+                <code>@{tag[0]}</code> {tag[1]}
+              </span>
+            )
+          })}
+        </div>
+      )}
+    </div>
   )
 }
 
