@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router'
+import { useCallback } from 'react'
 
 import { useParams } from 'common/hooks'
 import { TableGridEditor } from 'components/interfaces/TableGridEditor'
@@ -8,7 +9,6 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { TablesData } from 'data/tables/tables-query'
-import { useCallback } from 'react'
 import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {

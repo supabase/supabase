@@ -1,11 +1,11 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { compact } from 'lodash'
+import { useEffect } from 'react'
+import { CalculatedColumn } from 'react-data-grid'
 
 import type { Filter, SavedState } from 'components/grid/types'
 import { Entity, isTableLike } from 'data/table-editor/table-editor-types'
 import { useUrlState } from 'hooks/ui/useUrlState'
-import { useEffect, useMemo } from 'react'
-import { CalculatedColumn } from 'react-data-grid'
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
 import type { Sort, SupaColumn, SupaTable } from './types'
@@ -174,22 +174,6 @@ export const saveTableEditorStateToLocalStorageDebounced = AwesomeDebouncePromis
   500
 )
 
-export function useLoadTableEditorStateFromLocalStorage({
-  projectRef,
-  tableName,
-  schema,
-}: {
-  projectRef: string | undefined
-  tableName: string | undefined
-  schema?: string | null
-}) {
-  return useMemo(() => {
-    if (!projectRef || !tableName) return undefined
-
-    return loadTableEditorStateFromLocalStorage(projectRef, tableName, schema)
-  }, [projectRef, tableName, schema])
-}
-
 export function useLoadTableEditorStateFromLocalStorageIntoUrl({
   projectRef,
   table,
@@ -222,7 +206,7 @@ export function useLoadTableEditorStateFromLocalStorageIntoUrl({
     }
 
     if (params) {
-      setParams(params)
+      setParams((prevParams) => ({ ...prevParams, ...params }))
     }
   }, [projectRef, table])
 }

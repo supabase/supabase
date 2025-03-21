@@ -34,7 +34,6 @@ export const createTableEditorTableState = ({
   const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.name, table.schema)
   const gridColumns = getInitialGridColumns(
     getGridColumns(table, {
-      projectRef,
       tableId: table.id,
       editable,
       onAddColumn: editable ? onAddColumn : undefined,
@@ -60,7 +59,6 @@ export const createTableEditorTableState = ({
 
       const gridColumns = getInitialGridColumns(
         getGridColumns(supaTable, {
-          projectRef,
           tableId: table.id,
           editable,
           onAddColumn: editable ? onAddColumn : undefined,
