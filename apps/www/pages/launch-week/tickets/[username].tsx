@@ -1,5 +1,5 @@
 import { NextSeo } from 'next-seo'
-import { LW14_DATE, LW14_TITLE, LW14_URL } from '~/lib/constants'
+import { LW14_DATE, LW14_TITLE, LW14_URL, SITE_ORIGIN } from '~/lib/constants'
 import { LwView } from '~/components/LaunchWeek/14/LwView'
 import { Lw14ConfDataProvider, UserTicketData } from '~/components/LaunchWeek/14/hooks/use-conf-data'
 import Error from 'next/error'
@@ -63,15 +63,11 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     process.env.LIVE_SUPABASE_COM_SERVICE_ROLE_KEY!
   )
 
-  const SITE_URL = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : 'http://localhost:3000'
-
   // fetch the normal ticket
   // stores the og images in supabase storage
   fetch(
     // @ts-ignore
-    `${SITE_URL}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}`
+    `${SITE_ORIGIN}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}`
   )
 
   // fetch a specific user
@@ -89,11 +85,11 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   // fetch the platinum ticket
   // stores the og images in supabase storage
   if (user?.secret) {
-    fetch(`${SITE_URL}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&secret=true`)
+    fetch(`${SITE_ORIGIN}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&secret=true`)
   } else if (user?.platinum) {
     // fetch /api-v2/ticket-og
     fetch(
-      `${SITE_URL}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&platinum=true`
+      `${SITE_ORIGIN}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&platinum=true`
     )
   }
 
