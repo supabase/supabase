@@ -1,4 +1,4 @@
-import { IS_PLATFORM, useParams } from 'common'
+import { useParams } from 'common'
 import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import DefaultLayout from 'components/layouts/DefaultLayout'

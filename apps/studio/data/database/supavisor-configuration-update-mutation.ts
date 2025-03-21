@@ -53,7 +53,7 @@ export const useSupavisorConfigurationUpdateMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to update Supavisor configuration: ${data.message}`)
+        toast.error(`Failed to update Shared Pooler configuration: ${data.message}`)
       } else {
         onError(data, variables, context)
       }
