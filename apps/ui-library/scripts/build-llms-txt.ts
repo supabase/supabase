@@ -47,11 +47,12 @@ function getMdxFiles(dir: string): string[] {
 // Function to get all MDX files and their metadata
 function getDocFiles(): DocMeta[] {
   const docsDir = path.join(process.cwd(), 'content/docs')
-  const mdxFiles = getMdxFiles(docsDir)
+  const mdxFiles = getMdxFiles(docsDir).sort((a, b) => a.localeCompare(b))
 
   const docs: DocMeta[] = []
 
   for (const fullPath of mdxFiles) {
+    console.log(fullPath)
     const content = fs.readFileSync(fullPath, 'utf-8')
     const { title, description } = extractFrontmatter(content)
 
