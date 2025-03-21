@@ -24,8 +24,7 @@ import { SharedData } from '~/components/SharedData'
 import StepHikeCompact from '~/components/StepHikeCompact'
 import { CodeSampleDummy, CodeSampleWrapper } from '~/features/directives/CodeSample.client'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
-import { CodeBlock } from '~/features/ui/CodeBlock'
-import * as CH from '~/features/ui/CodeHike'
+import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import InfoTooltip from '~/features/ui/InfoTooltip'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import { ShowUntil } from '~/features/ui/ShowUntil'
@@ -40,7 +39,6 @@ const components = {
   AuthProviders,
   Button,
   ButtonCard,
-  CH,
   CodeSampleDummy,
   CodeSampleWrapper,
   CostWarning,

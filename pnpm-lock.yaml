@@ -201,9 +201,6 @@ importers:
 
   apps/docs:
     dependencies:
-      '@code-hike/mdx':
-        specifier: ^0.9.0
-        version: 0.9.0(encoding@0.1.13)(react@18.2.0)
       '@har-sdk/openapi-sampler':
         specifier: ^2.2.0
         version: 2.2.0

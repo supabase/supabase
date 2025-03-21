@@ -1,5 +1,4 @@
 // @ts-check
-import { remarkCodeHike } from '@code-hike/mdx'
 import nextMdx from '@next/mdx'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
@@ -17,17 +16,7 @@ const withBundleAnalyzer = configureBundleAnalyzer({
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [
-      [
-        remarkCodeHike,
-        {
-          theme: codeHikeTheme,
-          lineNumbers: true,
-          showCopyButton: true,
-        },
-      ],
-      remarkGfm,
-    ],
+    remarkPlugins: [remarkGfm],
     rehypePlugins: [rehypeSlug],
     providerImportSource: '@mdx-js/react',
   },

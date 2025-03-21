@@ -630,7 +630,9 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
 
 <StepHikeCompact.Code>
 
-```ts utils/supabase/server-props.ts
+<$CodeTabs>
+
+```ts name=utils/supabase/server-props.ts
 import { type GetServerSidePropsContext } from 'next'
 import { createServerClient, serializeCookieHeader } from '@supabase/ssr'
 
@@ -659,7 +661,7 @@ export function createClient({ req, res }: GetServerSidePropsContext) {
 }
 ```
 
-```ts utils/supabase/static-props.ts
+```ts name=utils/supabase/static-props.ts
 import { createClient as createClientPrimitive } from '@supabase/supabase-js'
 
 export function createClient() {
@@ -672,7 +674,7 @@ export function createClient() {
 }
 ```
 
-```ts utils/supabase/component.ts
+```ts name=utils/supabase/component.ts
 import { createBrowserClient } from '@supabase/ssr'
 
 export function createClient() {
@@ -685,7 +687,7 @@ export function createClient() {
 }
 ```
 
-```ts utils/supabase/api.ts
+```ts name=utils/supabase/api.ts
 import { createServerClient, serializeCookieHeader } from '@supabase/ssr'
 import { type NextApiRequest, type NextApiResponse } from 'next'
 
@@ -714,6 +716,8 @@ export default function createClient(req: NextApiRequest, res: NextApiResponse) 
 }
 ```
 
+</$CodeTabs>
+
 </StepHikeCompact.Code>
 
 </StepHikeCompact.Step>
@@ -730,7 +734,9 @@ Since Supabase is being called from a component, use the client defined in `@/ut
 
 <StepHikeCompact.Code>
 
-```ts pages/login.tsx
+<$CodeTabs>
+
+```ts name=pages/login.tsx
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
@@ -783,6 +789,8 @@ export default function LoginPage() {
 }
 ```
 
+</$CodeTabs>
+
 </StepHikeCompact.Code>
 
 </StepHikeCompact.Step>
@@ -813,7 +821,9 @@ Since this is an API route, use the Supabase client from `@/utils/supabase/api.t
 
 <StepHikeCompact.Code>
 
-```ts pages/api/auth/confirm.ts
+<$CodeTabs>
+
+```ts name=pages/api/auth/confirm.ts
 import { type EmailOtpType } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
@@ -852,11 +862,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 ```
 
-```tsx pages/error.tsx
+```tsx name=pages/error.tsx
 export default function ErrorPage() {
   return <p>Sorry, something went wrong</p>
 }
 ```
+
+</$CodeTabs>
 
 </StepHikeCompact.Code>
 

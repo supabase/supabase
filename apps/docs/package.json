@@ -32,7 +32,6 @@
     "clean": "rimraf node_modules features/docs/generated examples"
   },
   "dependencies": {
-    "@code-hike/mdx": "^0.9.0",
     "@har-sdk/openapi-sampler": "^2.2.0",
     "@mdx-js/loader": "^2.1.5",
     "@mdx-js/react": "^2.3.0",

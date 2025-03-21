@@ -1,9 +1,9 @@
+import { mdxToMarkdown } from 'mdast-util-mdx'
+import { toMarkdown } from 'mdast-util-to-markdown'
 import { describe, expect, it } from 'vitest'
 
-import { fromDocsMarkdown } from './utils.server'
 import { codeTabsRemark } from './CodeTabs'
-import { toMarkdown } from 'mdast-util-to-markdown'
-import { mdxToMarkdown } from 'mdast-util-mdx'
+import { fromDocsMarkdown } from './utils.server'
 
 describe('CodeTabs', () => {
   it('should wrap code blocks in Tabs and TabPanel', () => {

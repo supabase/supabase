@@ -7,11 +7,11 @@
  * ````mdx
  * <$CodeTabs>
  *
- * ```js a.js
+ * ```js name=a.js
  * console.log('file a')
  * ```
  *
- * ```js b.js
+ * ```js name=b.js
  * console.log('file b')
  * ```
  *
@@ -19,9 +19,10 @@
  * ````
  */
 
-import { type Parent, type Code, type Root, type BlockContent, type DefinitionContent } from 'mdast'
+import { type Parent, type Code, type Root } from 'mdast'
 import type { MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import { visitParents } from 'unist-util-visit-parents'
+
 import { isCodeSampleWrapper } from './CodeSample'
 
 export function codeTabsRemark() {
@@ -36,7 +37,7 @@ function rewriteNodes(tree: Root) {
     if (node.name !== '$CodeTabs') return
     if (node.children.some((child) => child.type !== 'code' && !isCodeSampleWrapper(child))) {
       throw new Error(
-        `CodeTabs must contain only code blocks and code sample wrappers, found:\n\n ${JSON.stringify(node.children, null, 2)}`
+        `CodeTabs must contain only code blocks and code sample wrappers, found:\n\n${JSON.stringify(node.children, null, 2)}`
       )
     }
 
