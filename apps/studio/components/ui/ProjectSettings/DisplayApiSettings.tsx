@@ -4,11 +4,13 @@ import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useServiceRoleKeyLeakQuery } from 'data/lint/service-role-key-leak-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import { AlertCircle, Loader2 } from 'lucide-react'
-import { Input } from 'ui'
 
+import Link from 'next/link'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Input, WarningIcon } from 'ui'
 const DisplayApiSettings = ({
   legacy,
   showNotice = true,
@@ -41,6 +43,10 @@ const DisplayApiSettings = ({
   const apiKeys = settings?.service_api_keys ?? []
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0
+
+  const { data: hasServiceRoleKeyLeak } = useServiceRoleKeyLeakQuery({
+    projectRef: projectRef,
+  })
 
   return (
     <>
@@ -143,6 +149,32 @@ const DisplayApiSettings = ({
                       (legacy ? 'Prefer using Secret API keys instead.' : '')
                 }
               />
+              {hasServiceRoleKeyLeak && x.tags === 'service_role' && (
+                <Alert_Shadcn_ variant="destructive" className="my-4">
+                  <WarningIcon />
+                  <AlertTitle_Shadcn_>Urgent: Service Role key leak detected</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_ className="max-w-2xl">
+                    <p>
+                      Your service role key may be compromised. Rotate it immediately and ensure
+                      it's used only on a private server. We detected that it is likely being used
+                      on the client-side, in a browser or mobile app.{' '}
+                      <span className="font-bold">Generate new API keys</span> below in JWT Settings
+                      to rotate this key.
+                    </p>
+                    <p></p>
+                    <p className="mt-2">
+                      Read{' '}
+                      <Link
+                        className="underline"
+                        href="https://supabase.com/docs/guides/api/api-keys"
+                      >
+                        Understanding API Keys
+                      </Link>{' '}
+                      to learn more.
+                    </p>
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              )}
             </Panel.Content>
           ))
         )}
@@ -161,7 +193,7 @@ const DisplayApiSettings = ({
           ) : (
             <Panel.Notice
               className="border-t"
-              title="New API keys coming Q4 2024"
+              title="New API keys coming in 2025"
               description={`
 \`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.
 `}
