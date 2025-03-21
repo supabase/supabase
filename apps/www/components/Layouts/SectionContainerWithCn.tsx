@@ -3,7 +3,7 @@ import { cn } from 'ui'
 import { cva, type VariantProps } from 'class-variance-authority'
 
 const sectionContainerVariants = cva(
-  'container relative mx-auto px-6 sm:py-18',
+  'container relative mx-auto px-6',
   {
     variants: {
       width: {
@@ -12,7 +12,7 @@ const sectionContainerVariants = cva(
       },
       height: {
         normal: 'py-16 md:py-24 lg:py-24',
-        narrow: 'py-6 md:py-12 lg:py-16',
+        narrow: 'py-6 md:py-8',
         none: ''
       },
     },
