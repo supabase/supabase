@@ -91,7 +91,7 @@ const FunctionList = ({
             <Table.td className="truncate">
               <Button
                 type="text"
-                className="text-foreground p-0 hover:bg-transparent"
+                className="text-foreground text-sm p-0 hover:bg-transparent"
                 onClick={() => editFunction(x)}
               >
                 {x.name}

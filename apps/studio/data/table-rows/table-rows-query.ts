@@ -6,7 +6,7 @@ import {
 } from '@tanstack/react-query'
 
 import { IS_PLATFORM } from 'common'
-import { Query } from 'components/grid/query/Query'
+import { Query } from '@supabase/pg-meta/src/query'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
 import {
