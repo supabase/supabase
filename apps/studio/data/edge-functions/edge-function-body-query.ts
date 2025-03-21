@@ -25,14 +25,13 @@ export async function getEdgeFunctionBody(
   if (!projectRef) throw new Error('projectRef is required')
   if (!slug) throw new Error('slug is required')
 
-  // First, fetch the eszip data
+  // Fetch the eszip data
   const headers = await constructHeaders()
   headers.set('Accept', 'application/octet-stream')
 
   const baseUrl = API_URL?.replace('/platform', '')
-  const url = `${baseUrl}/v1/projects/{ref}/functions/{function_slug}/body`
-    .replace('{ref}', projectRef)
-    .replace('{function_slug}', slug)
+  const url = `${baseUrl}/v1/projects/${projectRef}/functions/${slug}/body`
+
   const response = await fetch(url, {
     method: 'GET',
     headers,
@@ -46,10 +45,11 @@ export async function getEdgeFunctionBody(
     handleError(error)
   }
 
+  // Get the eszip data as ArrayBuffer
   const eszip = await response.arrayBuffer()
   console.log('eszip received, size:', eszip.byteLength)
 
-  // Send to server for processing
+  // Send to our API for processing
   const parseResponse = await fetch('/api/edge-functions/parse-body', {
     method: 'POST',
     body: eszip,

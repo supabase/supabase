@@ -59,9 +59,6 @@ const CodePage = () => {
   const { mutateAsync: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
       toast.success('Successfully updated edge function')
-      if (ref && functionSlug) {
-        router.push(`/project/${ref}/functions/${functionSlug}/details`)
-      }
     },
   })
 
