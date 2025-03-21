@@ -24,6 +24,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { InviteMemberButton } from './InviteMemberButton'
 import MembersView from './MembersView'
 import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
+import EnforceMFAToggle from './EnforceMFAToggle'
 
 const TeamSettings = () => {
   const {
@@ -78,6 +79,9 @@ const TeamSettings = () => {
   return (
     <>
       <ScaffoldContainerLegacy>
+        <ScaffoldSectionContent className="w-full">
+          <EnforceMFAToggle />
+        </ScaffoldSectionContent>
         <ScaffoldFilterAndContent>
           <ScaffoldActionsContainer className="w-full flex-col md:flex-row gap-2 justify-between">
             <Input
