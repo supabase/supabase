@@ -28,10 +28,10 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
     const allowNavPanelToExpand = process.env.NEXT_PUBLIC_NODE_ENV !== 'test' && storedAllowNavPanel
 
     const iconClasses = [
-      'absolute left-0 top-0 flex rounded items-center h-10 w-10 items-center justify-center text-foreground-lighter', // Layout
+      'absolute left-0 top-0 flex rounded h-10 w-10 items-center justify-center text-foreground-lighter', // Layout
       'group-hover/item:text-foreground-light',
-      isActive && '!text-foreground',
-      'transition-colors',
+      isActive ? '!text-foreground [&_svg]:stroke-[1.5]' : '[&_svg]:stroke-[1]',
+      'transition-all',
     ]
 
     const classes = [
