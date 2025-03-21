@@ -221,7 +221,6 @@ export const handleTabNavigation = (ref: string | undefined, id: string, router:
   const tab = store.tabsMap[id]
   if (!tab) return
 
-  console.log('handleTabNavigation')
   store.activeTab = id
 
   // Add to recent items when navigating to a non-preview, non-new tab

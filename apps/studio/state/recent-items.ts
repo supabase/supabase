@@ -1,5 +1,6 @@
+import { partition } from 'lodash'
 import { proxy, subscribe } from 'valtio'
-import { Tab, TabType } from './tabs'
+import { editorEntityTypes, Tab, TabType } from './tabs'
 
 /**
  * [TODO REFACTOR] Joshen: JFYI this differs from the way that we usually write our stores
@@ -106,29 +107,14 @@ export const addRecentItem = (ref: string | undefined, tab: Tab) => {
     metadata: tab.metadata, // Set the metadata
   }
 
-  // Remove any existing instance of this item based on type and metadata
-  store.items = store.items.filter((existingItem) => {
-    if (existingItem.type !== recentItem.type) return true // Keep items of different types
-
-    // Check for duplicates based on type-specific metadata
-    switch (recentItem.type) {
-      case 'sql':
-        return existingItem.metadata?.sqlId !== recentItem.metadata?.sqlId // Check SQL ID
-      case 'r':
-      case 'v':
-      case 'm':
-      case 'f':
-      case 'p':
-        return existingItem.metadata?.tableId !== recentItem.metadata?.tableId // Check Table ID
-      case 'schema':
-        return existingItem.metadata?.schema !== recentItem.metadata?.schema // Check Schema
-      default:
-        return true // Keep items of unknown type
-    }
-  })
-
   // Add the new recent item to the beginning of the list
   store.items.unshift(recentItem)
+
+  // Ensure that there's only up to max of MAX_RECENT_ITEMS items per tab type
+  const [itemsOfSameType, itemsOfDifferentType] = partition(store.items, (item) => {
+    if (editorEntityTypes.table.includes(item.type)) return item
+  })
+  store.items = [...itemsOfSameType.slice(0, MAX_RECENT_ITEMS), ...itemsOfDifferentType]
 }
 
 // Function to clear all recent items
