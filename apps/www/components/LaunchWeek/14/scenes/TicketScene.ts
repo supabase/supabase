@@ -897,6 +897,9 @@ class TicketScene implements BaseScene {
           lines.push(text.substring(pos, pos + maxChars - 3) + '...')
           break
         } else {
+          if(text[pos] === ' ') {
+            pos++
+          }
           lines.push(text.substring(pos, pos + maxChars))
           pos += maxChars
         }
@@ -909,7 +912,7 @@ class TicketScene implements BaseScene {
         const fontSize = this.typography.main.relativeSize * canvas.height
         const usernameLines = getWrappedText({
           text: this.state.texts.username,
-          maxChars: 15,
+          maxChars: 18,
           maxLines: 4,
         })
 
