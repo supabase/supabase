@@ -31,14 +31,17 @@ interface RegistrationProps {
 
 export const useRegistration = ({ onError, onRegister }: RegistrationProps = {}) => {
   const [realtimeChannel, setRealtimeChannel] = useState<RealtimeChannel | null>(null)
-  const [{ userTicketData: userData, session, userTicketDataState, referal }, dispatch] =
-    useConfData()
+  const [
+    { userTicketData: userData, session, userTicketDataState, urlParamsLoaded, referal },
+    dispatch,
+  ] = useConfData()
   const sessionUser = session?.user
   const callbacksRef = useRef({ onError, onRegister })
 
   // Triggered on session
   const fetchOrCreateUser = useCallback(async () => {
     if (['loading', 'loaded'].includes(userTicketDataState)) return
+    if (!urlParamsLoaded) return
 
     if (!sessionUser) {
       console.warn('Cannot fetch user without session. Skipping...')
@@ -56,6 +59,8 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
 
     if (!userData.id) {
       dispatch({ type: 'USER_TICKET_FETCH_STARTED' })
+
+      console.log('Inserting ticket for user', username, referal)
 
       const { error: ticketInsertError } = await supabase
         .from('tickets')
@@ -115,7 +120,15 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
     }
 
     callbacksRef.current.onRegister?.()
-  }, [dispatch, realtimeChannel, referal, sessionUser, userData.id, userTicketDataState])
+  }, [
+    dispatch,
+    realtimeChannel,
+    referal,
+    sessionUser,
+    urlParamsLoaded,
+    userData.id,
+    userTicketDataState,
+  ])
 
   async function prefetchData(username: string) {
     // Prefetch GitHub avatar
@@ -126,7 +139,11 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
   }
 
   const handleGithubSignIn = useCallback(async () => {
-    const redirectTo = `${LW14_URL}${userData.username ? '?referral=' + userData.username : ''}`
+    let redirectTo = `${LW14_URL}`
+
+    if(referal) {
+      redirectTo += `/tickets/${referal}`
+    }
 
     const response = await supabase?.auth.signInWithOAuth({
       provider: 'github',
@@ -141,7 +158,7 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
         return
       }
     }
-  }, [userData.username])
+  }, [referal])
 
   useEffect(() => {
     fetchOrCreateUser()
@@ -154,14 +171,18 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data, error }) => {
-      if(error) console.error('Session error', error)
+      if (error) console.error('Session error', error)
       dispatch({ type: 'SESSION_UPDATED', payload: data.session })
     })
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      dispatch({ type: 'SESSION_UPDATED', payload: session  })
+      dispatch({ type: 'SESSION_UPDATED', payload: session })
+      
+      if (session && window.location.hash.includes('access_token')) {
+        window.history.replaceState(null, '', window.location.pathname + window.location.search)
+      }
     })
 
     return () => subscription.unsubscribe()

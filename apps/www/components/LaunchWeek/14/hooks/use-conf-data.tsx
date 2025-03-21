@@ -1,6 +1,6 @@
 import { RealtimeChannel, Session, SupabaseClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/router'
-import { createContext, Dispatch, useContext, useMemo, useReducer } from 'react'
+import { createContext, Dispatch, useContext, useEffect, useMemo, useReducer } from 'react'
 
 /**
  * This is copy of shared use-conf-data.ts. For laynch week 14 we need different ticket states.
@@ -48,6 +48,7 @@ type LwAction =
   | { type: 'TICKET_LOADING_ERROR'; payload?: Error }
   | { type: 'PARTYMODE_ENABLE'; payload: RealtimeChannel }
   | { type: 'PARTYMODE_DISABLE' }
+  | { type: 'URL_PARAMS_LOADED'; payload: { referal?: string } }
   | {
       type: 'GAUGES_DATA_FETCHED'
       payload: {
@@ -77,6 +78,7 @@ interface LwState {
     meetupsAmount: number | null
     peopleOnline: number | null
   } | null
+  urlParamsLoaded: boolean
 }
 
 export const lwReducer = (state: LwState, action: LwAction): LwState => {
@@ -161,6 +163,9 @@ export const lwReducer = (state: LwState, action: LwAction): LwState => {
         gaugesData: newGaugeData,
       }
     }
+    case 'URL_PARAMS_LOADED': {
+      return { ...state, urlParamsLoaded: true, referal: action.payload.referal }
+    }
     default:
       action satisfies never
       return state
@@ -169,6 +174,14 @@ export const lwReducer = (state: LwState, action: LwAction): LwState => {
 
 export const Lw14ConfDataContext = createContext<[LwState, Dispatch<LwAction>] | null>(null)
 
+function takeFirst(param: string | string[] | undefined): string | undefined {
+  if (Array.isArray(param)) {
+    return param[0]
+  }
+
+  return param ?? undefined
+}
+
 export const Lw14ConfDataProvider = ({
   children,
   initState,
@@ -176,9 +189,9 @@ export const Lw14ConfDataProvider = ({
   children: React.ReactNode
   initState?: Partial<LwState>
 }) => {
-  const { query } = useRouter()
+  const { query, isReady } = useRouter()
 
-  const [state, dispatch] = useReducer(lwReducer, {
+  const providerValue = useReducer(lwReducer, {
     userTicketData: {},
     ticketState: 'loading',
     session: null,
@@ -190,17 +203,20 @@ export const Lw14ConfDataProvider = ({
     realtimeGaugesChannel: null,
     partymodeStatus: 'off',
     gaugesData: null,
+    urlParamsLoaded: false,
     ...initState,
   })
+  const [, dispatch] = providerValue
 
-  const finalState = useMemo(() => {
-    return [{ ...state, referal: query.username?.toString() }, dispatch] as [
-      LwState,
-      Dispatch<LwAction>,
-    ]
-  }, [query.username, state])
+  useEffect(() => {
+    if (isReady) {
+      dispatch({ type: 'URL_PARAMS_LOADED', payload: { referal: takeFirst(query.username) } })
+    }
+  }, [dispatch, isReady, query.username])
 
-  return <Lw14ConfDataContext.Provider value={finalState}>{children}</Lw14ConfDataContext.Provider>
+  return (
+    <Lw14ConfDataContext.Provider value={providerValue}>{children}</Lw14ConfDataContext.Provider>
+  )
 }
 
 export default function useLw14ConfData() {
