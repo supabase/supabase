@@ -111,13 +111,11 @@ void main() {
     float grainSize = 3.0 + 4.0 * sin(time);
     vec3 g = vec3(grain(vUv, resolution / grainSize, time));
     
-    float luminance = luma(stackedColor);
-    vec3 desaturated = vec3(luminance);
     vec3 noiseColor = blendSoftLight(vec3(0.2,0.2,0.2), g);
     
     float grainStrength = 0.02;
     stackedColor = vec4(
-      mix(desaturated, noiseColor, grainStrength),
+      mix(stackedColor.rgb, noiseColor, grainStrength),
       stackedColor.a
     );
   
