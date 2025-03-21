@@ -50,7 +50,7 @@ function SideNavigation() {
         </div>
         <div className="px-6">
           <Select_Shadcn_ value={selectedFramework} onValueChange={onSelect}>
-            <SelectTrigger_Shadcn_ className="w-[180px]">
+            <SelectTrigger_Shadcn_ className="w-[180px] rounded-md">
               <SelectValue />
             </SelectTrigger_Shadcn_>
             <SelectContent_Shadcn_>
