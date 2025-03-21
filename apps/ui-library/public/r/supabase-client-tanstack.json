@@ -5,7 +5,8 @@
   "title": "Supabase Client for Tanstack Start",
   "description": "",
   "dependencies": [
-    "@supabase/ssr@latest"
+    "@supabase/ssr@latest",
+    "@supabase/supabase-js@latest"
   ],
   "registryDependencies": [],
   "files": [

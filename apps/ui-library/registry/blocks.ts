@@ -1,4 +1,4 @@
-import { type Registry } from 'shadcn/registry'
+import { type Registry, type RegistryItem } from 'shadcn/registry'
 import { clients } from './clients'
 import dropzone from './default/blocks/dropzone/registry-item.json' assert { type: 'json' }
 import passwordBasedAuthNextjs from './default/blocks/password-based-auth-nextjs/registry-item.json' assert { type: 'json' }
@@ -18,9 +18,11 @@ const combine = (component: Registry['items'][number]) => {
   })
 }
 
+const nextjsClient = clients.find((client) => client.name === 'supabase-client-nextjs')
+const reactClient = clients.find((client) => client.name === 'supabase-client-react')
 export const blocks = [
-  passwordBasedAuthNextjs,
-  passwordBasedAuthReact,
-  ...combine(dropzone as Registry['items'][number]),
-  ...combine(realtimeCursor as Registry['items'][number]),
+  registryItemAppend(passwordBasedAuthNextjs as RegistryItem, [nextjsClient!]),
+  registryItemAppend(passwordBasedAuthReact as RegistryItem, [reactClient!]),
+  ...combine(dropzone as RegistryItem),
+  ...combine(realtimeCursor as RegistryItem),
 ] as Registry['items']

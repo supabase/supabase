@@ -71,6 +71,18 @@
         {
           "path": "registry/default/blocks/password-based-auth-nextjs/components/update-password-form.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
         }
       ]
     },
@@ -192,7 +204,12 @@
       "title": "Dropzone (File Upload)",
       "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
       "registryDependencies": ["button", "tooltip", "progress"],
-      "dependencies": ["react-dropzone", "lucide-react", "@supabase/ssr@latest"],
+      "dependencies": [
+        "react-dropzone",
+        "lucide-react",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
       "files": [
         {
           "path": "registry/default/blocks/dropzone/components/dropzone.tsx",
@@ -312,7 +329,7 @@
       "title": "Realtime Cursor",
       "description": "Component which renders realtime cursors from other users in a room.",
       "registryDependencies": [],
-      "dependencies": ["lucide-react", "@supabase/ssr@latest"],
+      "dependencies": ["lucide-react", "@supabase/ssr@latest", "@supabase/supabase-js@latest"],
       "files": [
         {
           "path": "registry/default/blocks/realtime-cursor/components/cursor.tsx",
@@ -400,7 +417,7 @@
       "title": "Supabase Client for Tanstack Start",
       "description": "",
       "registryDependencies": [],
-      "dependencies": ["@supabase/ssr@latest"],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
       "files": [
         {
           "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
