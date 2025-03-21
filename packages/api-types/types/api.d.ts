@@ -2483,12 +2483,6 @@ export interface components {
       wal_sender_timeout?: string
       work_mem?: string
     }
-    UpdatePostgrestConfigBody: {
-      db_extra_search_path?: string
-      db_pool?: number
-      db_schema?: string
-      max_rows?: number
-    }
     UpdateProviderBody: {
       attribute_mapping?: components['schemas']['AttributeMapping']
       domains?: string[]
@@ -2777,6 +2771,12 @@ export interface components {
       body?: string
       name?: string
       verify_jwt?: boolean
+    }
+    V1UpdatePostgrestConfigBody: {
+      db_extra_search_path?: string
+      db_pool?: number
+      db_schema?: string
+      max_rows?: number
     }
     ValidationError: {
       message: string
@@ -5410,7 +5410,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdatePostgrestConfigBody']
+        'application/json': components['schemas']['V1UpdatePostgrestConfigBody']
       }
     }
     responses: {
