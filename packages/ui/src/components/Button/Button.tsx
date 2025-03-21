@@ -6,7 +6,6 @@ import { Loader2 } from 'lucide-react'
 import { cloneElement, forwardRef, isValidElement } from 'react'
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../lib/constants'
 import { cn } from '../../lib/utils/cn'
-import { IconContext } from '../Icon/IconContext'
 
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
