@@ -1,7 +1,14 @@
-// Import necessary functions from valtio for state management
 import { proxy, subscribe } from 'valtio'
-// Import Tab and TabType types for defining recent items
 import { Tab, TabType } from './tabs'
+
+/**
+ * [TODO REFACTOR] Joshen: JFYI this differs from the way that we usually write our stores
+ * where we have contexts and such - ideally we need to refactor this for consistency
+ * and the main benefit from our usual way of writing stores is that we do not need to pass
+ * in the project ref to all the functions, as the stores are written to be scoped to the project
+ *
+ * So do not use this as reference for writing new valtio stores - refer to database-selector instead
+ */
 
 // Define the key for storing recent items in localStorage
 const RECENT_ITEMS_KEY = 'supabase_recent_items'

@@ -4,6 +4,15 @@ import { ReactNode } from 'react'
 import { proxy, subscribe } from 'valtio'
 import { addRecentItem } from './recent-items'
 
+/**
+ * [TODO REFACTOR] Joshen: JFYI this differs from the way that we usually write our stores
+ * where we have contexts and such - ideally we need to refactor this for consistency
+ * and the main benefit from our usual way of writing stores is that we do not need to pass
+ * in the project ref to all the functions, as the stores are written to be scoped to the project
+ *
+ * So do not use this as reference for writing new valtio stores - refer to database-selector instead
+ */
+
 // Define the type of tabs available in the application
 export type TabType = ENTITY_TYPE | 'sql' | 'schema' | 'new'
 
