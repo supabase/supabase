@@ -620,7 +620,7 @@ class HUDScene implements BaseScene {
     })
 
     this.drawBarControl(ctx, sizes.bars.coords[1], {
-      label: 'PAYLOAD FILL',
+      label: 'PAYLOAD VOLUME',
       percentage: this.state.payloadFill,
       alignment: sizes.bars.coords[1].alignment,
     })
