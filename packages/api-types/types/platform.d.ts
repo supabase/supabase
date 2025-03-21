@@ -441,7 +441,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Send exit survey to HubSpot */
+    /** Send exit survey to HubSpot, Notion, and survey_responses table */
     post: operations['SendFeedbackController_sendExitSurvey']
     delete?: never
     options?: never
@@ -4957,6 +4957,14 @@ export interface components {
       }
       updated_at: string
     }
+    GetPostgrestConfigResponse: {
+      db_anon_role: string
+      db_extra_search_path: string
+      db_schema: string
+      jwt_secret: string
+      max_rows: number
+      role_claim_key: string
+    }
     GetProjectByFlyExtensionIdResponse: {
       ref: string
     }
@@ -5944,14 +5952,6 @@ export interface components {
       rls_forced: boolean
       schema: string
       size: string
-    }
-    PostgrestConfigResponse: {
-      db_anon_role: string
-      db_extra_search_path: string
-      db_schema: string
-      jwt_secret: string
-      max_rows: number
-      role_claim_key: string
     }
     PostgresTrigger: {
       /** @enum {string} */
@@ -7151,6 +7151,13 @@ export interface components {
       db_schema?: string
       max_rows?: number
     }
+    UpdatePostgrestConfigResponse: {
+      db_extra_search_path: string
+      /** @description If `null`, the value is automatically configured based on compute size. */
+      db_pool: number | null
+      db_schema: string
+      max_rows: number
+    }
     UpdateProfileBody: {
       first_name: string
       last_name: string
@@ -7415,13 +7422,6 @@ export interface components {
       updated_at: string
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
-    }
-    V1PostgrestConfigResponse: {
-      db_extra_search_path: string
-      /** @description If `null`, the value is automatically configured based on compute size. */
-      db_pool: number | null
-      db_schema: string
-      max_rows: number
     }
     ValidateQueryBody: {
       query: string
@@ -14367,7 +14367,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PostgrestConfigResponse']
+          'application/json': components['schemas']['GetPostgrestConfigResponse']
         }
       }
       403: {
@@ -14406,7 +14406,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1PostgrestConfigResponse']
+          'application/json': components['schemas']['UpdatePostgrestConfigResponse']
         }
       }
       403: {
@@ -15363,11 +15363,39 @@ export interface operations {
       query: {
         attribute:
           | 'cpu_usage'
+          | 'cpu_usage_busy_system'
+          | 'cpu_usage_busy_user'
+          | 'cpu_usage_busy_iowait'
+          | 'cpu_usage_busy_irqs'
+          | 'cpu_usage_busy_other'
+          | 'cpu_usage_busy_idle'
+          | 'client_connections_max_limit'
+          | 'client_connections_pgbouncer'
+          | 'client_connections_postgres'
+          | 'client_connections_realtime'
+          | 'client_connections_supavisor'
           | 'max_cpu_usage'
           | 'avg_cpu_usage'
           | 'disk_io_budget'
+          | 'disk_iops_usage'
+          | 'disk_iops_max'
+          | 'disk_iops_read'
+          | 'disk_iops_write'
           | 'disk_io_consumption'
+          | 'ram_available_max'
           | 'ram_usage'
+          | 'ram_usage_used'
+          | 'ram_usage_free'
+          | 'ram_usage_applications'
+          | 'ram_usage_page_tables'
+          | 'ram_usage_swap_cache'
+          | 'ram_usage_cache_and_buffers'
+          | 'ram_usage_slab'
+          | 'ram_usage_cache'
+          | 'ram_usage_buffers'
+          | 'ram_usage_unused'
+          | 'ram_usage_swap'
+          | 'ram_usage_hardware_corrupted'
           | 'swap_usage'
           | 'physical_replication_lag_physical_replica_lag_seconds'
           | 'pg_stat_database_num_backends'
