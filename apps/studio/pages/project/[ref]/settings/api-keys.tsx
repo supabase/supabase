@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import LegacyAPIKeys from 'components/interfaces/APIKeys/LegacyAPIKeys'
 import { PublishableAPIKeys } from 'components/interfaces/APIKeys/PublishableAPIKeys'
 import { SecretAPIKeys } from 'components/interfaces/APIKeys/SecretAPIKeys'
@@ -39,9 +40,11 @@ const ApiKeysSettings: NextPageWithLayout = () => {
 }
 
 ApiKeysSettings.getLayout = (page) => (
-  <SettingsLayout>
-    <ApiKeysLayout>{page}</ApiKeysLayout>
-  </SettingsLayout>
+  <DefaultLayout>
+    <SettingsLayout>
+      <ApiKeysLayout>{page}</ApiKeysLayout>
+    </SettingsLayout>
+  </DefaultLayout>
 )
 
 export default ApiKeysSettings
