@@ -1,22 +1,12 @@
-import { readFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
-
 import { type PropsWithChildren } from 'react'
 import { type BundledLanguage, codeToTokens, type ThemedToken } from 'shiki'
 import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { CodeCopyButton } from './CodeBlock.client'
+import denoTypes from './types/lib.deno.d.ts.include'
 
-const extraFiles: ExtraFiles = {}
-const currDir = dirname(fileURLToPath(import.meta.url))
-try {
-  const denoTypes = await readFile(join(currDir, './types/lib.deno.d.ts.include'), 'utf8')
-  extraFiles['deno.d.ts'] = denoTypes
-} catch (err) {
-  console.error('Error loading extra types:', err)
-}
+const extraFiles: ExtraFiles = { 'deno.d.ts': denoTypes }
 
 const twoslasher = createTwoslasher({ extraFiles })
 const TWOSLASHABLE_LANGS = ['js', 'ts', 'jsx', 'tsx', 'javascript', 'typescript']

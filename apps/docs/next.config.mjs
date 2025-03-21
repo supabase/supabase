@@ -43,6 +43,13 @@ const nextConfig = {
       transform: 'lodash/{{member}}',
     },
   },
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.include$/,
+      type: 'asset/source',
+    })
+    return config
+  },
   transpilePackages: ['ui', 'ui-patterns', 'common', 'dayjs', 'shared-data', 'api-types', 'icons'],
   experimental: {
     outputFileTracingIncludes: {
