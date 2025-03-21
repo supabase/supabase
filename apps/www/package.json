@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@code-hike/mdx": "^0.9.0",
+    "@hcaptcha/react-hcaptcha": "^1.11.1",
     "@heroicons/react": "^1.0.6",
     "@mdx-js/react": "^2.3.0",
     "@next/bundle-analyzer": "^14.2.3",
@@ -48,7 +49,7 @@
     "lodash": "^4.0.0",
     "lucide-react": "*",
     "markdown-toc": "^1.2.0",
-    "next": "^14.2.20",
+    "next": "catalog:",
     "next-contentlayer2": "0.5.3",
     "next-mdx-remote": "^4.4.1",
     "next-seo": "^6.5.0",

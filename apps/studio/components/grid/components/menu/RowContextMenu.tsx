@@ -4,6 +4,7 @@ import { Item, ItemParams, Menu, PredicateParams, Separator } from 'react-contex
 
 import type { SupaRow } from 'components/grid/types'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { ROW_CONTEXT_MENU_ID } from '.'
 import { useTrackedState } from '../../store/Store'
 import { copyToClipboard, formatClipboardValue } from '../../utils/common'
@@ -14,13 +15,14 @@ export type RowContextMenuProps = {
 
 const RowContextMenu = ({ rows }: RowContextMenuProps) => {
   const state = useTrackedState()
-  const snap = useTableEditorStateSnapshot()
+  const tableEditorSnap = useTableEditorStateSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
 
   function onDeleteRow(p: ItemParams) {
     const { props } = p
     const { rowIdx } = props
     const row = rows[rowIdx]
-    if (row) snap.onDeleteRows([row])
+    if (row) tableEditorSnap.onDeleteRows([row])
   }
 
   function onEditRowClick(p: ItemParams) {
@@ -40,21 +42,21 @@ const RowContextMenu = ({ rows }: RowContextMenuProps) => {
     (p: ItemParams) => {
       const { props } = p
 
-      if (!state.selectedCellPosition || !props) {
+      if (!snap.selectedCellPosition || !props) {
         return
       }
 
       const { rowIdx } = props
       const row = rows[rowIdx]
 
-      const columnKey = state.gridColumns[state.selectedCellPosition?.idx as number].key
+      const columnKey = state.gridColumns[snap.selectedCellPosition.idx as number].key
 
       const value = row[columnKey]
       const text = formatClipboardValue(value)
 
       copyToClipboard(text)
     },
-    [rows, state.gridColumns, state.selectedCellPosition]
+    [rows, state.gridColumns, snap.selectedCellPosition]
   )
 
   return (

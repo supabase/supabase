@@ -164,7 +164,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
         if (throughput > THROUGHPUT_RANGE['gp3'].max) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Throughput can not exceed ${formatNumber(maxThroughput)} MiB/s`,
+            message: `Throughput can not exceed ${formatNumber(maxThroughput)} MB/s`,
             path: ['throughput'],
           })
         }
@@ -172,14 +172,14 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
           const iopsRequiredForThroughput = calculateIopsRequiredForThroughput(throughput)
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Need at least ${formatNumber(iopsRequiredForThroughput)} IOPS to support ${formatNumber(throughput)} MiB/s.`,
+            message: `Need at least ${formatNumber(iopsRequiredForThroughput)} IOPS to support ${formatNumber(throughput)} MB/s.`,
             path: ['throughput'],
           })
         }
         if (throughput < THROUGHPUT_RANGE[DiskType.GP3].min) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Throughput must be at least ${formatNumber(THROUGHPUT_RANGE[DiskType.GP3].min)} MiB/s`,
+            message: `Throughput must be at least ${formatNumber(THROUGHPUT_RANGE[DiskType.GP3].min)} MB/s`,
             path: ['throughput'],
           })
         }

@@ -22,6 +22,12 @@ const AuthorizedAppRow = ({ app, onSelectRevoke }: AuthorizedAppRowProps) => {
         </div>
       </Table.td>
       <Table.td>{app.name}</Table.td>
+      <Table.td>{app.created_by}</Table.td>
+      <Table.td>
+        <p className="font-mono truncate w-[220px]" title={app.app_id}>
+          {app.app_id}
+        </p>
+      </Table.td>
       <Table.td>{dayjs(app.authorized_at).format('DD/MM/YYYY, HH:mm:ss')}</Table.td>
       <Table.td align="right">
         <Button type="default" icon={<Trash />} className="px-1" onClick={() => onSelectRevoke()} />

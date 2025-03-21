@@ -38,17 +38,17 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: 1b63d22ef9b987f802cba06f01ec0da4b8eb4847
+          key: e5609278486869b545fda23b5732727b6e70a1c1
       - name: install linter
         if: steps.filter.outputs.docs == 'true' && steps.cache-cargo.outputs.cache-hit != 'true'
-        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev 1b63d22ef9b987f802cba06f01ec0da4b8eb4847
+        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev e5609278486869b545fda23b5732727b6e70a1c1
       - name: install reviewdog
         if: steps.filter.outputs.docs == 'true'
         uses: reviewdog/action-setup@3f401fe1d58fe77e10d665ab713057375e39b887 # v1.3.0
         with:
           reviewdog_version: v0.20.2
-      - name: run linter
-        if: steps.filter.outputs.docs == 'true'
+      - name: run linter (internal)
+        if: steps.filter.outputs.docs == 'true' && github.event.pull_request.head.repo.full_name == github.repository
         env:
           BASE_REF: ${{ github.base_ref }}
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -57,4 +57,25 @@ jobs:
           git diff --name-only origin/$BASE_REF HEAD \
             | { grep -E "^apps/docs/content/" || test $? = 1; } \
             | xargs -r supa-mdx-lint --format rdf \
-            | reviewdog -f=rdjsonl -reporter=github-pr-review
+            | reviewdog -f=rdjsonl -reporter=github-pr-review -tee
+      - name: run linter (external)
+        if: steps.filter.outputs.docs == 'true' && github.event.pull_request.head.repo.full_name != github.repository
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ github.head_ref }}
+        run: |
+          set -o pipefail
+          run_lints() {
+            git diff --name-only origin/$BASE_REF HEAD \
+              | { grep -E "^apps/docs/content/" || test $? = 1; } \
+              | xargs -rx -n 1000000000 supa-mdx-lint --format markdown
+          }
+          set +e
+          LINT_RESULTS=$(run_lints)
+          LINT_EXIT_CODE=$?
+          set -e
+          if [[ $LINT_EXIT_CODE -ne 0 ]]; then
+            gh pr comment $BRANCH_NAME --body "$LINT_RESULTS"
+            exit 1
+          fi

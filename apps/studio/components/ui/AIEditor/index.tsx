@@ -125,6 +125,19 @@ const AIEditor = ({
       }
     }
 
+    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/deno/lib.deno.d.ts`)
+      .then((response) => response.text())
+      .then((code) => {
+        monaco.languages.typescript.typescriptDefaults.addExtraLib(code)
+      })
+
+    // Add edge runtime types to the TS language service
+    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/deno/edge-runtime.d.ts`)
+      .then((response) => response.text())
+      .then((code) => {
+        monaco.languages.typescript.typescriptDefaults.addExtraLib(code)
+      })
+
     if (!!executeQueryRef.current) {
       editor.addAction({
         id: 'run-query',
