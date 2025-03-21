@@ -93,7 +93,7 @@ export const AccountIdentities = () => {
               >
                 <div className="flex gap-x-4">
                   <Image
-                    className={cn(iconKey === 'github-icon' ? 'invert' : '')}
+                    className={cn(iconKey === 'github-icon' ? 'dark:invert' : '')}
                     src={`${BASE_PATH}/img/icons/${iconKey}.svg`}
                     width={30}
                     height={30}

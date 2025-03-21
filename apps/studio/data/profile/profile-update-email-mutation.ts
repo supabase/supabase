@@ -36,7 +36,10 @@ export const useEmailUpdateMutation = ({
     (vars) => updateEmail(vars),
     {
       async onSuccess(data, variables, context) {
-        await Promise.all([auth.getUser(), queryClient.invalidateQueries(profileKeys.profile())])
+        await Promise.all([
+          auth.refreshSession(),
+          queryClient.invalidateQueries(profileKeys.profile()),
+        ])
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

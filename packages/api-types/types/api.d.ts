@@ -32,6 +32,26 @@ export interface paths {
     patch: operations['v1-update-a-branch-config']
     trace?: never
   }
+  '/v1/branches/{branch_id}/merge': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Merges a database branch
+     * @description Merges the specified database branch
+     */
+    post: operations['v1-merge-a-branch']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/branches/{branch_id}/push': {
     parameters: {
       query?: never
@@ -487,14 +507,14 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's supavisor config */
-    get: operations['v1-get-supavisor-config']
+    get: operations['getSupavisorConfig']
     put?: never
     post?: never
     delete?: never
     options?: never
     head?: never
     /** Updates project's supavisor config */
-    patch: operations['v1-update-supavisor-config']
+    patch: operations['updateSupavisorConfig']
     trace?: never
   }
   '/v1/projects/{ref}/config/database/postgres': {
@@ -2494,6 +2514,7 @@ export interface components {
     UpdateSupavisorConfigBody: {
       default_pool_size?: number | null
       /**
+       * @deprecated
        * @description Dedicated pooler mode for the project
        * @enum {string}
        */
@@ -2861,6 +2882,34 @@ export interface operations {
         }
       }
       /** @description Failed to update database branch */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-merge-a-branch': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        branch_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BranchUpdateResponse']
+        }
+      }
+      /** @description Failed to merge database branch */
       500: {
         headers: {
           [name: string]: unknown
@@ -4177,7 +4226,7 @@ export interface operations {
       }
     }
   }
-  'v1-get-supavisor-config': {
+  getSupavisorConfig: {
     parameters: {
       query?: never
       header?: never
@@ -4206,7 +4255,7 @@ export interface operations {
       }
     }
   }
-  'v1-update-supavisor-config': {
+  updateSupavisorConfig: {
     parameters: {
       query?: never
       header?: never
