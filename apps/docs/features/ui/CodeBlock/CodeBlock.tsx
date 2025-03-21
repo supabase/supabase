@@ -59,6 +59,7 @@ export async function CodeBlock({
   return (
     <div
       className={cn(
+        'shiki',
         'group',
         'relative',
         'not-prose',
