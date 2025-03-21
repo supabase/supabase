@@ -16,6 +16,7 @@ import { useSnapshot } from 'valtio'
 
 import { useParams } from 'common'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   getTabsStore,
   handleTabClose,
@@ -154,6 +155,7 @@ const TabPreview = ({ tab }: { tab: string }) => {
   const { ref } = useParams()
   const store = getTabsStore(ref)
   const tabs = useSnapshot(store)
+
   const tabData = tabs.tabsMap[tab]
 
   if (!tabData) return null
@@ -175,6 +177,7 @@ const TabPreview = ({ tab }: { tab: string }) => {
 export function Tabs() {
   const { ref } = useParams()
   const router = useRouter()
+  const appSnap = useAppStateSnapshot()
 
   const editor = useEditorType()
   const store = getTabsStore(ref)
@@ -216,7 +219,12 @@ export function Tabs() {
   }
 
   const handleClose = (id: string) => {
-    handleTabClose(ref, id, router, editor)
+    const onClearDashboardHistory = () => {
+      if (ref && editor) {
+        appSnap.setDashboardHistory(ref, editor === 'table' ? 'editor' : editor, undefined)
+      }
+    }
+    handleTabClose({ ref, id, router, editor, onClearDashboardHistory })
   }
 
   const handleTabChange = (id: string) => {

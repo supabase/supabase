@@ -244,13 +244,21 @@ export const handleTabNavigation = (ref: string | undefined, id: string, router:
 }
 
 // Function to handle closing a tab
-export const handleTabClose = (
-  ref: string | undefined,
-  id: string,
-  router: NextRouter,
-  editor?: 'sql' | 'table',
+export const handleTabClose = ({
+  ref,
+  id,
+  router,
+  editor,
+  onClose,
+  onClearDashboardHistory,
+}: {
+  ref: string | undefined
+  id: string
+  router: NextRouter
+  editor?: 'sql' | 'table'
   onClose?: (id: string) => void
-) => {
+  onClearDashboardHistory: () => void
+}) => {
   if (!ref) return
 
   const store = getTabsStore(ref)
@@ -285,6 +293,8 @@ export const handleTabClose = (
       store.activeTab = nextTabId
       handleTabNavigation(ref, nextTabId, router)
     } else {
+      onClearDashboardHistory()
+
       // If no tabs of same type, go to the home of the current section
       switch (currentTab?.type) {
         case 'sql':

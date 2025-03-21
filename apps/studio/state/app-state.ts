@@ -157,7 +157,7 @@ const getInitialState = () => {
 export const appState = proxy({
   ...getInitialState(),
 
-  setDashboardHistory: (ref: string, key: 'sql' | 'editor', id: string) => {
+  setDashboardHistory: (ref: string, key: 'sql' | 'editor', id: string | undefined) => {
     if (appState.dashboardHistory[key] !== id) {
       appState.dashboardHistory[key] = id
       localStorage.setItem(
