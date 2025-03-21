@@ -32,6 +32,7 @@ BEGIN;
     DECLARE
       request_id bigint;
       payload jsonb;
+      user_id uuid;
       url text := TG_ARGV[0]::text;
       method text := TG_ARGV[1]::text;
       headers jsonb DEFAULT '{}'::jsonb;
@@ -64,8 +65,14 @@ BEGIN;
         timeout_ms = TG_ARGV[4]::integer;
       END IF;
 
+      SELECT auth.uid() into user_id;
+
       CASE
         WHEN method = 'GET' THEN
+          IF user_id IS NOT NULL THEN
+            params = params || CONCAT('{"user_id": "', user_id, '"}');
+          END IF;
+
           SELECT http_get INTO request_id FROM net.http_get(
             url,
             params,
@@ -78,7 +85,8 @@ BEGIN;
             'record', NEW,
             'type', TG_OP,
             'table', TG_TABLE_NAME,
-            'schema', TG_TABLE_SCHEMA
+            'schema', TG_TABLE_SCHEMA,
+            'user_id', user_id
           );
 
           SELECT http_post INTO request_id FROM net.http_post(
