@@ -1,0 +1,23 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "supabase-client-nextjs",
+  "type": "registry:lib",
+  "title": "Supabase Client for Next.js",
+  "description": "",
+  "registryDependencies": [],
+  "dependencies": ["@supabase/ssr@latest"],
+  "files": [
+    {
+      "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+      "type": "registry:lib"
+    }
+  ]
+}
