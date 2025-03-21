@@ -22,7 +22,7 @@ export async function getOrganizationMfaEnforcement(
 
   if (orgMfaError) handleError(orgMfaError)
 
-  return orgMfaRequired.enforced
+  return orgMfaRequired?.enforced
 }
 
 export type OrganizationMfaError = ResponseError

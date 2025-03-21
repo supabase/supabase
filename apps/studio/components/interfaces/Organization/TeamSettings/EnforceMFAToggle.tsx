@@ -1,16 +1,16 @@
-import { cn, Collapsible_Shadcn_, CollapsibleTrigger_Shadcn_, CollapsibleContent_Shadcn_ } from 'ui'
-import { useState } from 'react'
-import { ChevronRight } from 'lucide-react'
-
 import { Toggle } from 'ui'
 import { useParams } from 'common'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import Panel from 'components/ui/Panel'
 import { useOrganizationMfaQuery } from 'data/organizations/organization-mfa-query'
 import { useOrganizationMfaToggleMutation } from 'data/organizations/organization-mfa-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useAppStateSnapshot } from 'state/app-state'
 
 const EnforceMFAToggle = () => {
   const { slug } = useParams()
+  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const {
     data: mfa,
     error: mfaError,
@@ -20,10 +20,11 @@ const EnforceMFAToggle = () => {
   } = useOrganizationMfaQuery({ slug })
   const { mutate: sendToggle } = useOrganizationMfaToggleMutation()
 
-  let mfaEnabled = mfa
+  const snap = useAppStateSnapshot()
   const onToggleMfa = () => {
-    mfaEnabled = !mfaEnabled
-    sendToggle({ slug: slug, enforced: mfaEnabled })
+    const value = !snap.isMfaEnforced ? 'true' : 'false'
+    snap.setIsMfaEnforced(value === 'true')
+    sendToggle({ slug: slug, enforced: value === 'true' })
   }
 
   return (
@@ -33,8 +34,9 @@ const EnforceMFAToggle = () => {
         <Panel title={<h5 key="panel-title">Team Settings</h5>}>
           <Panel.Content>
             <Toggle
-              checked={mfaEnabled}
+              checked={snap.isMfaEnforced}
               onChange={onToggleMfa}
+              disabled={!canUpdateOrganization}
               label="Require MFA to access organization"
               descriptionText="Team members must have MFA enabled and a valid MFA session to access the organization and any projects."
             />
