@@ -67,7 +67,7 @@ export async function GET(req: Request, res: Response) {
       .eq('username', username)
       .maybeSingle()
 
-    if (error) console.log('fetch error', error.message)
+    if (error) console.log('Failed to fetch user. Inner error:', error.message)
     if (!user) throw new Error(error?.message ?? 'user not found')
 
     const {
@@ -98,11 +98,11 @@ export async function GET(req: Request, res: Response) {
       },
       secret: {
         color: 'rgba(44, 244, 148)',
-        background: 'rgba(44, 244, 148, 0.4)',
+        background: 'rgba(44, 244, 148, 0.2)',
       },
       platinum: {
         color: 'rgba(255, 199, 58)',
-        background: 'rgba(255, 199, 58, 0.4)',
+        background: 'rgba(255, 199, 58, 0.2)',
       },
     }
 
@@ -129,15 +129,14 @@ export async function GET(req: Request, res: Response) {
     })
 
     const usernameToLines = (username: string): string[] => {
-      // NOTE: replace spaces with non-breaking spaces
-      username = username.trim().replace(' ', '\u00A0')
+      const lineLenght = 12
 
-      const line1 = username.slice(0, 11).trim()
-      const line2 = username.slice(11, 22).trim()
-      let line3 = username.slice(22).trim()
+      const line1 = username.slice(0, lineLenght).trim().replace(/ /g, '\u00A0')
+      const line2 = username.slice(lineLenght, lineLenght * 2).trim().replace(/ /g, '\u00A0')
+      let line3 = username.slice(lineLenght * 2).trim().replace(/ /g, '\u00A0')
 
       // NOTE: If third line is too long, trim to 8 characters and add '...'
-      if (line3.length > 11) {
+      if (line3.length > lineLenght) {
         line3 = line3.slice(0, 8) + '...'
       }
 
