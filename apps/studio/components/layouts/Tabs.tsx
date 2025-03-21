@@ -18,6 +18,7 @@ import { useParams } from 'common'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
+  editorEntityTypes,
   getTabsStore,
   handleTabClose,
   handleTabDragEnd,
@@ -66,9 +67,9 @@ const SortableTab = ({
   const shouldShowSchema = useMemo(() => {
     // For both table and schema tabs, show schema if:
     // Any tab has a different schema than the current schema parameter
-    if (tab.type === 'r' || tab.type === 'schema') {
+    if (tab.type === 'r') {
       const anyTabHasDifferentSchema = openTabs
-        .filter((t) => t.type === 'r' || t.type === 'schema')
+        .filter((t) => t.type === 'r')
         .some((t) => t.metadata?.schema !== currentSchema)
 
       return anyTabHasDifferentSchema
@@ -121,7 +122,7 @@ const SortableTab = ({
               </motion.span>
             )}
           </AnimatePresence>
-          <span>{tab.type === 'schema' ? 'schema' : tab.label || 'Untitled'}</span>
+          <span>{tab.label || 'Untitled'}</span>
         </div>
         <span
           role="button"
@@ -168,7 +169,7 @@ const TabPreview = ({ tab }: { tab: string }) => {
       className="flex relative items-center gap-2 px-3 text-xs bg-dash-sidebar dark:bg-surface-100 shadow-lg rounded-sm h-10"
     >
       <EntityTypeIcon type={tabData.type} />
-      <span>{tabData.type === 'schema' ? 'schema' : tabData.label || 'Untitled'}</span>
+      <span>{tabData.label || 'Untitled'}</span>
       <div className="absolute w-full top-0 left-0 right-0 h-px bg-foreground-muted" />
     </motion.div>
   )
@@ -194,16 +195,11 @@ export function Tabs() {
     .map((id) => tabs.tabsMap[id])
     .filter((tab) => tab !== undefined) as Tab[]
 
-  const entityTypes = {
-    table: ['r', 'v', 'm', 'f', 'p', 'schema'],
-    sql: ['sql'],
-  }
-
   const hasNewTab = router.asPath.includes('/new')
 
   // Filter by editor type - only show SQL tabs for SQL editor and table tabs for table editor
   const editorTabs = !!editor
-    ? openTabs.filter((tab) => entityTypes[editor]?.includes(tab.type))
+    ? openTabs.filter((tab) => editorEntityTypes[editor]?.includes(tab.type))
     : []
 
   const handleDragEnd = (event: DragEndEvent) => {

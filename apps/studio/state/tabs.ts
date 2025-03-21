@@ -14,7 +14,7 @@ import { addRecentItem } from './recent-items'
  */
 
 // Define the type of tabs available in the application
-export type TabType = ENTITY_TYPE | 'sql' | 'schema' | 'new'
+export type TabType = ENTITY_TYPE | 'sql'
 
 export interface Tab {
   id: string // Unique identifier for the tab
@@ -112,9 +112,7 @@ export const addTab = (ref: string | undefined, tab: Tab) => {
   // If tab exists but isn't active, just make it active
   if (store.tabsMap[tab.id]) {
     store.activeTab = tab.id
-    if (!tab.isPreview && tab.type !== 'new') {
-      addRecentItem(ref, tab)
-    }
+    if (!tab.isPreview) addRecentItem(ref, tab)
     return
   }
 
@@ -124,9 +122,7 @@ export const addTab = (ref: string | undefined, tab: Tab) => {
     store.tabsMap[tab.id] = tab
     store.activeTab = tab.id
     // Add to recent items when creating permanent tab
-    if (tab.type !== 'new') {
-      addRecentItem(ref, tab)
-    }
+    addRecentItem(ref, tab)
     return
   }
 
@@ -195,9 +191,7 @@ export const makeTabPermanent = (ref: string | undefined, tabId: string) => {
     tab.isPreview = false
     store.previewTabId = undefined
     // Add to recent items when preview tab becomes permanent
-    if (tab.type !== 'new') {
-      addRecentItem(ref, tab)
-    }
+    addRecentItem(ref, tab)
   }
 }
 
@@ -224,9 +218,7 @@ export const handleTabNavigation = (ref: string | undefined, id: string, router:
   store.activeTab = id
 
   // Add to recent items when navigating to a non-preview, non-new tab
-  if (!tab.isPreview && tab.type !== 'new') {
-    addRecentItem(ref, tab)
-  }
+  if (!tab.isPreview) addRecentItem(ref, tab)
 
   switch (tab.type) {
     case 'sql':
@@ -241,12 +233,6 @@ export const handleTabNavigation = (ref: string | undefined, id: string, router:
       router.push(
         `/project/${router.query.ref}/editor/${tab.metadata?.tableId}?schema=${tab.metadata?.schema}`
       )
-      break
-    case 'schema':
-      router.push(`/project/${router.query.ref}/explorer/schema/${tab.metadata?.schema}`)
-      break
-    case 'new':
-      router.push(`/project/${router.query.ref}/explorer/new`)
       break
   }
 }
@@ -380,8 +366,6 @@ export function createTabId<T extends TabType>(type: T, params: CreateTabIdParam
       return `p-${(params as CreateTabIdParams['p']).id}`
     case 'sql':
       return `sql-${(params as CreateTabIdParams['sql']).id}`
-    case 'schema':
-      return `schema-${(params as CreateTabIdParams['schema']).schema}`
     default:
       return ''
   }
@@ -389,7 +373,7 @@ export function createTabId<T extends TabType>(type: T, params: CreateTabIdParam
 
 // Object mapping editor types to their corresponding tab types
 export const editorEntityTypes = {
-  table: ['r', 'v', 'm', 'f', 'p', 'schema'],
+  table: ['r', 'v', 'm', 'f', 'p'],
   sql: ['sql'],
 }
 
