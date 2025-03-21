@@ -5,7 +5,7 @@ author: prashant
 image: mongodb-data-api/mongodb-data-api-og.png
 thumb: mongodb-data-api/mongodb-data-api-og.png
 categories:
-  - product
+  - migration
   - postgres
 tags:
   - postgres
@@ -65,13 +65,42 @@ create table mongo_users_raw (
 );
 ```
 
-Then, ingest the exported JSON data into this table. For bulk ingestion, you can use PostgreSQL’s COPY command or write custom scripts:
+Then, ingest the exported JSON data into this Supabase table using this custom script:
 
-```sql
--- users.json content example: [{"name": "John", "orders": [...]}, {...}]
-COPY mongo_users_raw(data)
-FROM '/path/to/users.json'
-WITH (FORMAT json);
+```jsx
+import { createClient } from '@supabase/supabase-js'
+import fs from 'fs'
+
+const supabaseUrl = 'YOUR_SUPABASE_URL'
+const supabaseKey = 'YOUR_SUPABASE_API_KEY'
+const tableName = 'YOUR_TABLE_NAME'
+const jsonFilePath = './filename.json'
+
+const supabase = createClient(supabaseUrl, supabaseKey)
+
+async function loadDocumentsToSupabase() {
+  try {
+    // Read JSON file
+    const rawData = fs.readFileSync(jsonFilePath)
+    const dataArray = JSON.parse(rawData).map((data) => ({ data }))
+
+    // Insert data into Supabase
+    const { error } = await supabase
+      .from(tableName)
+      .insert(dataArray)
+
+    if (error) {
+      console.error('Error inserting data:', error)
+      return
+    }
+
+    console.log(`Successfully inserted ${dataArray.length} records into ${tableName}`)
+  } catch (error) {
+    console.error('Error in process:', error)
+  }
+}
+
+loadDocumentsToSupabase()
 ```
 
 ### Step 3: Normalize the data using SQL
@@ -146,9 +175,12 @@ Once your data is migrated, you can start to use Supabase to its fullest:
 - **Schema flexibility**: PostgreSQL schemas are less flexible than MongoDB; careful upfront design mitigates this.
 - **Complexity in migration**: Document structures require transformation scripts.
 - **Query patterns**: Analyze existing MongoDB queries to optimize relational joins.
+- **Add indexes**: Use the Index Advisor in the Supabase Dashboard to further optimize your tables.
 
 ## Conclusion
 
 Supabase is an ideal replacement for MongoDB, especially considering the Data API deprecation. Supabase is built on Postgres, one of the world’s most powerful and scalable databases. In addition, Supabase’s Data API directly parallels MongoDB's Data API, offering a simplified transition path.
+
+[This blog post](https://blog.mansueli.com/migrating-from-mongodb-to-supabase-with-postgresql) provides further detail on how to transition from MongoDB. If you’re encountering difficulty, feel free to reach out to us. We’d be happy to help.
 
 With careful planning and methodical execution, engineering teams can navigate this migration confidently, leveraging Supabase as a trusted, long-term solution.
