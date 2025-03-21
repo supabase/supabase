@@ -20,6 +20,16 @@ export type CustomerStoryType = {
 export const data: CustomerStoryType[] = [
   {
     type: 'Customer Story',
+    title: 'Deriv: Accelerating Online Trading with a Scalable Postgres Backend',
+    description: 'Accelerating Online Trading with a Scalable Postgres Backend',
+    organization: 'Deriv',
+    imgUrl: 'images/customers/logos/deriv.png',
+    logo: '/images/customers/logos/deriv.png',
+    logo_inverse: '/images/customers/logos/light/deriv.png',
+    url: '/customers/deriv',
+  },
+  {
+    type: 'Customer Story',
     title:
       'Quilia Empowers Personal Injury Clients with Streamlined Data Management using Supabase',
     description:
