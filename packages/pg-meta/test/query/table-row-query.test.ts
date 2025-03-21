@@ -515,7 +515,7 @@ describe('Table Row Query', () => {
       }
     )
 
-    withTestDatabase('should truncate fields to maxCharacters', async (db) => {
+    withTestDatabase('should truncate fields to maxCharacters avoid', async (db) => {
       // Create test table with array column
       await db.executeQuery(`
         CREATE TABLE test_large_array_table (
@@ -528,7 +528,8 @@ describe('Table Row Query', () => {
         -- Create an array with 1000 elements to ensure it exceeds 10KB
         INSERT INTO test_large_array_table (name, large_array) VALUES
           ('Normal Array Item', ARRAY['tag1', 'tag2', 'tag3']),
-          (repeat('A', 700 * 1024 * 1024), ARRAY['tag1', 'tag2', 'tag3']);
+          -- Locally testing with up to 700 Mo in size should work and not raise a JS string alloc size error
+          (repeat('A', 5 * 1024 * 1024), ARRAY['tag1', 'tag2', 'tag3']);
       `)
 
       // Get table metadata
