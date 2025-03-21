@@ -71,6 +71,17 @@ export const generateSettingsMenu = (
                     },
                   ]
                 : []),
+              ...(features?.newApiKeys
+                ? [
+                    {
+                      name: 'JWT Secrets',
+                      key: 'jwt-secrets',
+                      url: `/project/${ref}/settings/jwt-secrets`,
+                      items: [],
+                      label: 'NEW',
+                    },
+                  ]
+                : []),
             ]
           : []),
         {
