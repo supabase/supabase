@@ -13,7 +13,9 @@ import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunc
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
@@ -103,6 +105,8 @@ const NewFunctionPage = () => {
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
   const { setAiAssistantPanel } = useAppStateSnapshot()
   const edgeFunctionCreate = useFlag('edgeFunctionCreate')
+  const { mutate: sendEvent } = useSendEventMutation()
+  const org = useSelectedOrganization()
 
   const [files, setFiles] = useState<
     { id: number; name: string; content: string; selected?: boolean }[]
@@ -148,6 +152,11 @@ const NewFunctionPage = () => {
       },
       files: files.map(({ name, content }) => ({ name, content })),
     })
+    sendEvent({
+      action: 'edge_function_deploy_button_clicked',
+      properties: { origin: 'functions_editor' },
+      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+    })
   }
 
   const handleChat = () => {
@@ -167,6 +176,11 @@ const NewFunctionPage = () => {
         ],
       },
     })
+    sendEvent({
+      action: 'edge_function_ai_assistant_button_clicked',
+      properties: { origin: 'functions_editor_chat' },
+      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+    })
   }
 
   const onSelectTemplate = (templateValue: string) => {
@@ -176,6 +190,11 @@ const NewFunctionPage = () => {
         prev.map((file) => (file.selected ? { ...file, content: template.content } : file))
       )
       setOpen(false)
+      sendEvent({
+        action: 'edge_function_template_clicked',
+        properties: { templateName: template.name, origin: 'editor_page' },
+        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      })
     }
   }
 

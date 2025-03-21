@@ -184,7 +184,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   }
 
   return (
-    <>
+    <div className="sb-grid-header__inner">
       {showHeaderActions && (
         <div className="flex items-center gap-x-2">
           {isReadOnly && (
@@ -465,7 +465,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
           onSelectConfirm={onToggleRLS}
         />
       )}
-    </>
+    </div>
   )
 }
 

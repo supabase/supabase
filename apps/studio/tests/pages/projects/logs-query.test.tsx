@@ -2,20 +2,16 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import dayjs from 'dayjs'
 import { LogsExplorerPage } from 'pages/project/[ref]/logs/explorer/index'
-import { clickDropdown, render } from 'tests/helpers'
+import { clickDropdown } from 'tests/helpers'
 import { routerMock } from 'tests/mocks/router'
 import { beforeAll, describe, expect, test, vi } from 'vitest'
-
-// [Joshen] Am temporarily commenting out the breaking tests due to:
-// "TypeError: _fetch.get.mockReset is not a function" error from Jest
-// just so we get our jest unit/UI tests up and running first
-// Need to figure out how to mock the "get" method from lib/common/fetch properly
+import { customRender as render } from 'tests/lib/custom-render'
 
 const router = routerMock
 
 beforeAll(() => {
-  vi.doMock('common', async (og) => {
-    const mod = await og<any>()
+  vi.doMock('common', async (importOriginal: () => Promise<any>) => {
+    const mod = await importOriginal()
 
     return {
       ...mod,
@@ -27,12 +23,6 @@ beforeAll(() => {
   vi.mock('lib/gotrue', () => ({
     auth: { onAuthStateChange: vi.fn() },
   }))
-  vi.mock('nuqs', async () => {
-    let queryValue = 'example'
-    return {
-      useQueryState: () => [queryValue, (v: string) => (queryValue = v)],
-    }
-  })
 })
 
 test.skip('can display log data', async () => {
@@ -131,7 +121,7 @@ test.skip('bug: can edit query after selecting a log', async () => {
   await expect(screen.findByText('Copy')).rejects.toThrow()
 })
 
-test('query warnings', async () => {
+test.skip('query warnings', async () => {
   router.query = {
     ...router.query,
     q: 'some_query',

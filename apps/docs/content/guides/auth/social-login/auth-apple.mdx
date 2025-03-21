@@ -37,7 +37,7 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
 
     Behind the scenes, Supabase Auth uses the [REST APIs](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api) provided by Apple.
 
-    <CreateClientSnippet />
+    <$Partial path="create_client_snippet.mdx" />
 
     To initiate sign in, you can use the `signInWithOAuth()` method from the Supabase JavaScript library:
 
@@ -49,7 +49,7 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
 
     This call takes the user to Apple's consent screen. Once the flow ends, the user's profile information is exchanged and validated with Supabase Auth before it redirects back to your web application with an access and refresh token representing the user's session.
 
-    <OAuthPkceFlow />
+    <$Partial path="oauth_pkce_flow.mdx" />
 
     ### Configuration [#configuration-web]
 

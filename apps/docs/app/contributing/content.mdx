@@ -415,10 +415,10 @@ We incorporate content reuse in the docs to avoid duplication. If you find yours
     >
 
     ```mdx
-    <DatabaseSetup />
+    <$Partial path="database_setup.mdx" />
     ```
 
-    <DatabaseSetup />
+    <$Partial path="database_setup.mdx" />
 
     </AccordionItem>
 
@@ -430,10 +430,10 @@ We incorporate content reuse in the docs to avoid duplication. If you find yours
     >
 
     ```mdx
-    <CreateClientSnippet />
+    <$Partial path="create_client_snippet.mdx" />
     ```
 
-    <CreateClientSnippet />
+    <$Partial path="create_client_snippet.mdx" />
 
     </AccordionItem>
 
@@ -442,8 +442,18 @@ We incorporate content reuse in the docs to avoid duplication. If you find yours
 
 To make a new partial:
 
-1. Make a new MDX file in `apps/docs/components/MDX`.
+1. Make a new MDX file in `apps/docs/content/_partials`.
 1. Write your reusable content.
-1. Inside `apps/docs/components/MDX/partials.tsx`, import and re-export your partial.
-1. Inside `apps/docs/features/docs/mdx.shared.tsx`, import your partial and include it in the `components` object.
-1. You can now use your partial inside any other MDX file by using: `<YourPartialName />`.
+1. You can now use your partial inside any other MDX file by using: `<$Partial path="path/from/_partials/directory.mdx" />`.
+
+If you need compile-time variable replacement, you can define variables that get replaced with strings.
+
+```mdx
+<$Partial path="path/to/file.mdx" variables={{ "substitute": "this" }}>
+```
+
+```mdx
+Here is the partial text to {{ .substitute }}.
+```
+
+Only string replacements are possible at this time. For more complex use cases, consider making a custom component.

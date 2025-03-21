@@ -10,8 +10,8 @@ import { Button } from 'ui'
 // [Alaister] As of 11th February 2025, this notice is around Fly's Postgres offering
 // https://github.com/orgs/supabase/discussions/33413
 // Timelines TLDR:
-// - Before March 14 2025: Users will still be able to access your existing Fly Postgres projects.
-// - On March 14 2025: Your Fly Postgres projects are removed from our platform
+// - Before April 11 2025: Users will still be able to access your existing Fly Postgres projects.
+// - On April 11 2025: Your Fly Postgres projects are removed from our platform
 // We can disable this banner after 14th March 2025 as the Fly Postgres offering is no longer available
 
 export const NoticeBanner = () => {
@@ -34,7 +34,7 @@ export const NoticeBanner = () => {
       className="flex items-center justify-center gap-x-4 bg-surface-100 py-3 transition text-foreground box-border border-b border-default"
     >
       <p className="text-sm">
-        Supabase is deprecating Fly's Postgres offering managed by Supabase on March 14, 2025
+        Supabase is deprecating Fly's Postgres offering managed by Supabase on April 11, 2025
       </p>
       <div className="flex items-center gap-x-1">
         <Button asChild type="link" iconRight={<ExternalLink size={14} />}>
