@@ -154,6 +154,7 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data, error }) => {
+      if(error) console.error('Session error', error)
       dispatch({ type: 'SESSION_UPDATED', payload: data.session })
     })
 

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import useLw14ConfData from './use-conf-data'
 import supabase from '../supabase'
-import { REALTIME_SUBSCRIBE_STATES } from '@supabase/supabase-js'
+import { REALTIME_CHANNEL_STATES, REALTIME_SUBSCRIBE_STATES } from '@supabase/supabase-js'
 
 const LW14_TOPIC = 'lw14'
 const GAUGES_UPDATES_EVENT = 'gauges-update'
@@ -63,7 +63,6 @@ export const usePartymode = () => {
       await state.realtimeGaugesChannel?.unsubscribe()
       dispatch({ type: 'PARTYMODE_DISABLE' })
     } else {
-
       createChannelAndSubscribe()
     }
   }, [createChannelAndSubscribe, dispatch, state.partymodeStatus, state.realtimeGaugesChannel])
@@ -91,15 +90,28 @@ export const usePartymode = () => {
   }, [dispatch])
 
   useEffect(() => {
-    if (shouldInitialize) {
-      setShouldInitialize(false)
+    if (
+      state.partymodeStatus === 'on' &&
+      (!state.realtimeGaugesChannel ||
+        state.realtimeGaugesChannel.state === REALTIME_CHANNEL_STATES.closed)
+    ) {
       const channel = createChannelAndSubscribe()
       void fetchGaugesData()
       return () => {
-        channel.unsubscribe()
+        if (
+          state.partymodeStatus === 'off' &&
+          state.realtimeGaugesChannel?.state === REALTIME_CHANNEL_STATES.joined
+        )
+          channel.unsubscribe()
       }
     }
-  }, [createChannelAndSubscribe, fetchGaugesData, shouldInitialize])
+  }, [
+    createChannelAndSubscribe,
+    fetchGaugesData,
+    shouldInitialize,
+    state.partymodeStatus,
+    state.realtimeGaugesChannel,
+  ])
 
   return {
     toggle,
