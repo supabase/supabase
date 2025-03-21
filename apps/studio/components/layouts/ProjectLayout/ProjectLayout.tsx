@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
-import { AIAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
+import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
 import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import AISettingsModal from 'components/ui/AISettingsModal'
 import { Loading } from 'components/ui/Loading'
@@ -227,7 +227,9 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                         '2xl:min-w-[500px] 2xl:max-w-[600px]'
                       )}
                     >
-                      {aiAssistantPanel.open && <AIAssistantPanel />}
+                      {aiAssistantPanel.open && (
+                        <AIAssistant className="w-full h-[100dvh] md:h-full max-h-[100dvh]" />
+                      )}
                       {editorPanel.open && <EditorPanel />}
                     </ResizablePanel>
                   </>
