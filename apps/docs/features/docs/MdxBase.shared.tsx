@@ -1,11 +1,14 @@
 import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
+
 import { Button, Image } from 'ui'
-import { Admonition, type AdmonitionProps } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
+
+import { AiPromptsIndex } from '~/app/guides/getting-started/ai-prompts/[slug]/AiPromptsIndex'
 import { AppleSecretGenerator } from '~/components/AppleSecretGenerator'
 import AuthProviders from '~/components/AuthProviders'
 import { AuthSmsProviderConfig } from '~/components/AuthSmsProviderConfig'
@@ -21,22 +24,21 @@ import { SharedData } from '~/components/SharedData'
 import StepHikeCompact from '~/components/StepHikeCompact'
 import { CodeSampleDummy, CodeSampleWrapper } from '~/features/directives/CodeSample.client'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
-import * as CH from '~/features/ui/CodeHike'
-import { ShowUntil } from '~/features/ui/ShowUntil'
-import { TabPanel, Tabs } from '~/features/ui/Tabs'
+import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import InfoTooltip from '~/features/ui/InfoTooltip'
+import { TabPanel, Tabs } from '~/features/ui/Tabs'
+import { ShowUntil } from '~/features/ui/ShowUntil'
 
 const components = {
   Accordion,
   AccordionItem,
   Admonition,
-  // Admonition: (props: AdmonitionProps) => <Admonition className="[&_a]:underline" {...props} />,
+  AiPromptsIndex,
   AuthSmsProviderConfig,
   AppleSecretGenerator,
   AuthProviders,
   Button,
   ButtonCard,
-  CH,
   CodeSampleDummy,
   CodeSampleWrapper,
   CostWarning,
@@ -46,7 +48,7 @@ const components = {
   IconCheck: Check,
   IconPanel,
   IconX: X,
-  Image: (props: any) => <Image fill className="object-contain" {...props} />,
+  Image: (props: any) => <Image fill alt="" className="object-contain" {...props} />,
   JwtGenerator,
   Link,
   NavData,
@@ -75,6 +77,7 @@ const components = {
       {props.children}
     </Heading>
   ),
+  pre: CodeBlock,
 }
 
 export { components }
