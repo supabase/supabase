@@ -45,16 +45,14 @@ class SceneRenderer {
   private _mouseMoveHandler: ((ev: MouseEvent) => void) | null = null
   private _isDisposed = false
   private _isInitialized = false
-  private _webglrenderTarget: WebGLRenderTarget
 
   constructor(
     public container: HTMLElement,
     private waitFor?: { init: Promise<void>; renderer: SceneRenderer }[],
     private uuid?: string
   ) {
-    this._webglrenderTarget = new WebGLRenderTarget(this.container.clientWidth, this.container.clientHeight, { type: HalfFloatType })
     this.renderer = new WebGLRenderer({ antialias: true, alpha: true })
-    this.composer = new EffectComposer(this.renderer, this._webglrenderTarget)
+    this.composer = new EffectComposer(this.renderer)
 
     this.camera = new PerspectiveCamera(
       75,
@@ -189,7 +187,6 @@ class SceneRenderer {
     this.renderer.setSize(this.container.clientWidth, this.container.clientHeight)
     this.composer.setSize(this.container.clientWidth, this.container.clientHeight)
     this.cachedContainerBBox = this.container.getBoundingClientRect()
-    this._webglrenderTarget.setSize(this.container.clientWidth, this.container.clientHeight)
 
     for (const activeScene of this.activeScenes) {
       activeScene.resize(ev)

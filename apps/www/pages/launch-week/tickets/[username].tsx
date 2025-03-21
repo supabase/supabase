@@ -13,13 +13,11 @@ interface Props {
 }
 
 const Lw14Page = ({ user, ogImageUrl }: Props) => {
-  const { username, name, platinum, secret } = user
+  const { username } = user
 
-  const ticketType = secret ? 'secret' : platinum ? 'platinum' : 'regular'
 
   const TITLE = `${LW14_TITLE} | ${LW14_DATE}`
   const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
-  // const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/14/lw14-og.png?lw=14`
   const PAGE_URL = `${LW14_URL}/tickets/${username}`
 
   if (!username) {
