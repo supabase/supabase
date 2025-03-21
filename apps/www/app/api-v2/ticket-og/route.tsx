@@ -130,11 +130,11 @@ export async function GET(req: Request, res: Response) {
 
     const usernameToLines = (username: string): string[] => {
       // NOTE: replace spaces with non-breaking spaces
-      username = username.replace(' ', '\u00A0')
+      username = username.trim().replace(' ', '\u00A0')
 
-      const line1 = username.slice(0, 11)
-      const line2 = username.slice(11, 22)
-      let line3 = username.slice(22)
+      const line1 = username.slice(0, 11).trim()
+      const line2 = username.slice(11, 22).trim()
+      let line3 = username.slice(22).trim()
 
       // NOTE: If third line is too long, trim to 8 characters and add '...'
       if (line3.length > 11) {
