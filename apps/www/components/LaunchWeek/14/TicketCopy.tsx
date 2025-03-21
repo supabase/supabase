@@ -9,8 +9,8 @@ export default function TicketCopy() {
   const { username } = userData
   const [copied, setCopied] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
-  const displayUrl = `.../launch-week?referal=${username}`
-  const link = `${LW14_URL}?referal=${username}`
+  const displayUrl = `.../launch-week/tickets/${username}`
+  const link = `${LW14_URL}/tickets/${username}`
 
   return (
     <button
