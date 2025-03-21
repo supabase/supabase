@@ -626,7 +626,7 @@ class HUDScene implements BaseScene {
     })
 
     this.drawNumberControl(ctx, sizes.bars.coords[2], {
-      label: 'MEETUPS AMOUNT',
+      label: 'MEETUPS',
       value: this.state.meetupsAmount,
       active: true,
       alignment: sizes.bars.coords[2].alignment,
