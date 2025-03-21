@@ -9,7 +9,7 @@ apps/**/out
 apps/www/schema.sql
 apps/www/public/images/*
 apps/docs/**/generated/*
-apps/docs/examples
+apps/docs/examples/*
 examples/slack-clone/nextjs-slack-clone/full-schema.sql
 # ignore files with custom js formatting
 apps/studio/public

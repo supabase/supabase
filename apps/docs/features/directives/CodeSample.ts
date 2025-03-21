@@ -29,7 +29,7 @@
 
 import * as acorn from 'acorn'
 import tsPlugin from 'acorn-typescript'
-import { type BlockContent, type Code, type Root } from 'mdast'
+import { type DefinitionContent, type BlockContent, type Code, type Root } from 'mdast'
 import type { MdxJsxAttributeValueExpression, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -460,4 +460,8 @@ function createArrayAttributeValueExpression(...arrayElements: string[]) {
     },
   }
   return expression
+}
+
+export function isCodeSampleWrapper(node: BlockContent | DefinitionContent) {
+  return node.type === 'mdxJsxFlowElement' && node.name === 'CodeSampleWrapper'
 }
