@@ -17,8 +17,6 @@ interface TicketSceneState {
   ticketNumber: number
   texts: {
     username: string
-    species: string
-    earth: string
     seatCode: string
     date: string
   }
@@ -125,14 +123,6 @@ class TicketScene implements BaseScene {
     user: {
       x: 367 / 2000,
       y: 533 / 1400,
-    },
-    species: {
-      x: 367 / 2000,
-      y: 628 / 1400,
-    },
-    planet: {
-      x: 367 / 2000,
-      y: 721 / 1400,
     },
     date: {
       x: 1185 / 2000,
@@ -275,8 +265,6 @@ class TicketScene implements BaseScene {
       ticketNumber: options.user.ticketNumber || 0,
       texts: {
         username: options.user.name ?? '',
-        species: 'Modern Human',
-        earth: 'Earth',
         date: 'MAR 31—APR 4',
         // Start assigning seats from A001
         seatCode: (466561 + (options.user.ticketNumber || 0)).toString(36),
@@ -915,19 +903,6 @@ class TicketScene implements BaseScene {
 
         context.fillStyle = colorObjToRgb(
           isNeon ? colors.textNeonDimmedColor : colors.textDimmedColor
-        )
-        // Draw species
-        context.fillText(
-          this.state.texts.species,
-          this.texts.species.x * canvas.width,
-          this.texts.species.y * canvas.height
-        )
-
-        // Draw planet
-        context.fillText(
-          this.state.texts.earth,
-          this.texts.planet.x * canvas.width,
-          this.texts.planet.y * canvas.height
         )
 
         context.fillStyle = colorObjToRgb(isNeon ? colors.textNeonColor : colors.textDimmedColor)
