@@ -5,6 +5,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { Camera, Euler, MathUtils, Scene, Vector3 } from 'three'
 import { GlitchPass } from '../effects/glitch'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
+import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader'
 import { CRTShader } from '../effects/crt-shader'
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass'
 import { TransparentBloomPass } from '../effects/transparent-bloom'
@@ -255,6 +256,7 @@ class TicketScene implements BaseScene {
   private _glitchPass: GlitchPass | null = null
   private _crtPass: ShaderPass | null = null
   private _effectsEnabled = false
+  private _fxaaPass: ShaderPass | null = null
 
   constructor(private options: TicketSceneOptions) {
     this.state = {
@@ -345,11 +347,19 @@ class TicketScene implements BaseScene {
 
     context.composer.addPass(this._modelRenderPass)
 
+    this._fxaaPass = new ShaderPass(FXAAShader)
+    this._fxaaPass.material.uniforms['resolution'].value.x =
+      1 / (window.innerWidth * 2)
+    this._fxaaPass.material.uniforms['resolution'].value.y =
+      1 / (window.innerHeight * 2)
+
     // Add the effects passes but with zero intensity
     if (this._glitchPass) context.composer.addPass(this._glitchPass)
     if (this._crtPass) context.composer.addPass(this._crtPass)
     if (this._bloomPass) context.composer.addPass(this._bloomPass)
     context.composer.addPass(new OutputPass())
+
+    context.composer.addPass(this._fxaaPass)
 
     return gltf.scene as unknown as Scene
   }
@@ -384,6 +394,13 @@ class TicketScene implements BaseScene {
       resolutionDescriptor.ticketScale.y,
       resolutionDescriptor.ticketScale.z
     )
+
+    if (this._sceneRenderer && this._fxaaPass) {
+    this._fxaaPass.material.uniforms['resolution'].value.x =
+      1 / (window.innerWidth * 2)
+    this._fxaaPass.material.uniforms['resolution'].value.y =
+      1 / (window.innerHeight * 2)
+    }
 
     return
   }
@@ -731,6 +748,7 @@ class TicketScene implements BaseScene {
       }
 
       if ((TicketScene.TEXTURE_NAMES as readonly string[]).includes(part.material.name)) {
+        part.material.dithering = true
         this._namedMeshes[part.material.name as AvailableTextures] = part
       } else {
         console.warn(`Mesh ${part.material.name} is not a named texture`)
@@ -897,7 +915,7 @@ class TicketScene implements BaseScene {
           lines.push(text.substring(pos, pos + maxChars - 3) + '...')
           break
         } else {
-          if(text[pos] === ' ') {
+          if (text[pos] === ' ') {
             pos++
           }
           lines.push(text.substring(pos, pos + maxChars))

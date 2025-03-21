@@ -380,6 +380,7 @@ class HUDScene implements BaseScene {
       transparent: true,
       side: THREE.DoubleSide,
       depthWrite: false, // Helps with transparency issues
+      dithering: true
     })
 
     this.shader.uniforms.vignetteRadius.value = this.state.vignetteRaduis
