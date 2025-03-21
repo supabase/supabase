@@ -1,6 +1,6 @@
 'use client'
 import SandpackWrapper from './sandpack'
-import CodeBlock from '../CodeBlock/CodeBlock'
+import { CodeBlock } from 'ui'
 import Image from 'next/image'
 
 type ExampleLayoutProps = {
@@ -20,7 +20,7 @@ export default function ExampleLayout({
 }: ExampleLayoutProps) {
   return (
     <div>
-      <div className="h-full grid grid-cols-1 lg:grid-cols-2 gap-2 lg:h-screen">
+      <div className="lg:h-[calc(100vh-150px)] min-h-fit grid grid-cols-1 lg:grid-cols-2 gap-2">
         {/* Left column: Code display */}
         <div className="h-full flex flex-col gap-2 overflow-hidden">
           <div className="p-8 border bg-surface-75 rounded-lg relative overflow-hidden">
@@ -42,11 +42,11 @@ export default function ExampleLayout({
               draggable={false}
               className="object-cover absolute z-0 inset-0 dark:hidden block"
             />
-            <h1 className="text-xl font-medium text-neutral-100 mb-4">{title}</h1>
+            <h1 className="text-xl font-medium text-foreground mb-4">{title}</h1>
             <p className="text-foreground-light">{description}</p>
           </div>
-          <div className="flex-1 rounded-lg border bg-surface-100 overflow-auto max-h-96 lg:max-h-none">
-            <CodeBlock className="!bg-surface-75" lang="tsx">
+          <div className="flex-1 rounded-lg border bg-surface-75 overflow-auto max-h-96 lg:max-h-none">
+            <CodeBlock className="border-none !bg-surface-75" language="jsx">
               {appJsCode}
             </CodeBlock>
           </div>

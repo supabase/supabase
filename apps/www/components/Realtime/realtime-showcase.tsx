@@ -119,7 +119,7 @@ export default function RealtimeShowcase() {
           </TabsList_Shadcn_>
 
           {/* Tab Content */}
-          <div className="flex-1 h-full overflow-hidden pt-8 px-8 lg:p-16 border-b">
+          <div className="flex-1 h-full overflow-hidden py-8 px-8 lg:p-16 border-b">
             <TabsContent_Shadcn_ value="presence" className="mt-0 border-0 p-0">
               <PresenceExample />
             </TabsContent_Shadcn_>

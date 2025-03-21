@@ -15,47 +15,97 @@ const supabaseUrl = '${process.env.NEXT_PUBLIC_SUPABASE_REALTIME_URL}';
 const supabaseKey = '${process.env.NEXT_PUBLIC_SUPABASE_REALTIME_ANON_KEY}';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Channel name - using a unique ID to ensure both instances connect to the same channel
-const CHANNEL = 'todo-example-${instanceId}';
+// Generate a unique instance ID for this session
+const instanceId = '${instanceId}';
+
+// Channel name for the todos in this instance
+const CHANNEL = \`todos:\${instanceId}\`;
 
 export default function App() {
-  const [todos, setTodos] = useState([
-    {
-      id: '1',
-      text: 'Review project requirements',
-      completed: false,
-      created_by: 'system'
-    },
-    {
-      id: '2',
-      text: 'Set up development environment',
-      completed: true,
-      created_by: 'system'
-    },
-    {
-      id: '3',
-      text: 'Create basic UI components',
-      completed: false,
-      created_by: 'system'
-    },
-    {
-      id: '4',
-      text: 'Implement real-time sync',
-      completed: false,
-      created_by: 'system'
-    },
-    {
-      id: '5',
-      text: 'Write documentation',
-      completed: false,
-      created_by: 'system'
-    }
-  ]);
+  const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState('');
   const [username, setUsername] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const userId = useState(() => Math.random().toString(36).substring(2, 15))[0];
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Sign in anonymously and store instanceId in user metadata
+  useEffect(() => {
+    const signInAnonymously = async () => {
+      try {
+        const { data, error } = await supabase.auth.signInAnonymously({
+          options: {
+            data: { instanceId }
+          }
+        });
+        
+        if (error) {
+          console.error('Error signing in anonymously:', error.message);
+          return;
+        }
+        
+        setUser(data.user);
+        console.log('Signed in anonymously with user ID:', data.user.id);
+      } catch (error) {
+        console.error('Unexpected error during sign in:', error.message);
+      }
+    };
+    
+    signInAnonymously();
+  }, []);
+
+  // Fetch todos from the database when user is authenticated
+  useEffect(() => {
+    if (!user) return;
+    
+    const fetchTodos = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('todos')
+          .select('*')
+          .eq('channel', instanceId)
+          
+        if (error) {
+          console.error('Error fetching todos:', error.message);
+          return;
+        }
+        
+        setTodos(data || []);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Unexpected error fetching todos:', error.message);
+      }
+    };
+    
+    fetchTodos();
+    
+    const setupRealtimeChannel = async () => {
+      await supabase.realtime.setAuth(); // Needed for Realtime Authorization
+      const changes = supabase
+        .channel(CHANNEL, {
+          config: { private: true },
+        })
+        .on('broadcast', { event: 'INSERT' }, (payload) => {
+          const { record: todo } = payload.payload;
+          setTodos(prev => [...prev, todo]);
+        })
+        .on('broadcast', { event: 'UPDATE' }, (payload) => {
+          const { record: todo } = payload.payload;
+          setTodos(prev => 
+            prev.map(t => t.id === todo.id ? todo : t)
+          );
+        })
+        .on('broadcast', { event: 'DELETE' }, (payload) => {
+          console.log('DELETE', payload);
+          const { old_record: todo } = payload.payload;
+          setTodos(prev => prev.filter(t => t.id !== todo.id));
+        })
+        .subscribe();
+    };
+    setupRealtimeChannel();
+    
+  }, [user, instanceId]);
 
   useEffect(() => {
     // Generate a random username
@@ -66,12 +116,12 @@ export default function App() {
     }\${Math.floor(Math.random() * 100)}\`;
     setUsername(randomName);
 
-    // Subscribe to broadcast channel
-    const channel = supabase.channel(CHANNEL);
+    // Subscribe to presence channel
+    const presenceChannel = supabase.channel(\`presence:\${instanceId}\`);
 
     // Track presence state
-    channel.on('presence', { event: 'sync' }, () => {
-      const state = channel.presenceState();
+    presenceChannel.on('presence', { event: 'sync' }, () => {
+      const state = presenceChannel.presenceState();
       const presenceList = [];
       
       // Convert presence state to array
@@ -83,33 +133,12 @@ export default function App() {
       setOnlineUsers(presenceList);
     });
 
-    channel
-      .on('broadcast', { event: 'todo_action' }, (payload) => {
-        const action = payload.payload;
-        
-        switch (action.type) {
-          case 'add':
-            setTodos((prev) => [...prev, action.todo]);
-            break;
-          case 'toggle':
-            setTodos((prev) =>
-              prev.map((todo) =>
-                todo.id === action.todo.id
-                  ? { ...todo, completed: action.todo.completed }
-                  : todo
-              )
-            );
-            break;
-          case 'delete':
-            setTodos((prev) => prev.filter((todo) => todo.id !== action.todo.id));
-            break;
-        }
-      })
+    presenceChannel
       .subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {
           // Track presence
-          await channel.track({
-            user_id: userId,
+          await presenceChannel.track({
+            user_id: user?.id || 'anonymous',
             username: randomName,
             online_at: new Date().getTime(),
           });
@@ -118,60 +147,87 @@ export default function App() {
       });
 
     return () => {
-      channel.unsubscribe();
+      presenceChannel.unsubscribe();
     };
-  }, []);
+  }, [user?.id, instanceId]);
 
-  const handleAddTodo = (e) => {
+  const handleAddTodo = async (e) => {
     e.preventDefault();
-    if (!newTodo.trim() || !isConnected) return;
+    if (!newTodo.trim() || !isConnected || !user) return;
 
-    const todo = {
-      id: Math.random().toString(36).substring(2, 15),
-      text: newTodo.trim(),
-      completed: false,
-      created_by: userId,
-    };
-
-    // Broadcast the add action
-    supabase.channel(CHANNEL).send({
-      type: 'broadcast',
-      event: 'todo_action',
-      payload: { type: 'add', todo },
-    });
-
-    setNewTodo('');
+    try {
+      // Insert the todo into the Supabase table
+      // The database trigger will handle broadcasting
+      const { error } = await supabase
+        .from('todos')
+        .insert({
+          text: newTodo.trim(),
+          completed: false,
+          created_by: user.id,
+          channel: instanceId
+        });
+        
+      if (error) {
+        console.error('Error adding todo:', error.message);
+        return;
+      }
+      
+      // Clear the input
+      setNewTodo('');
+    } catch (error) {
+      console.error('Unexpected error adding todo:', error.message);
+    }
   };
 
-  const handleToggleTodo = (todo) => {
-    if (!isConnected) return;
+  const handleToggleTodo = async (todo) => {
+    if (!isConnected || !user) return;
 
-    const updatedTodo = { ...todo, completed: !todo.completed };
-
-    // Broadcast the toggle action
-    supabase.channel(CHANNEL).send({
-      type: 'broadcast',
-      event: 'todo_action',
-      payload: { type: 'toggle', todo: updatedTodo },
-    });
+    try {
+      // Update the todo in the database
+      // The database trigger will handle broadcasting
+      const { error } = await supabase
+        .from('todos')
+        .update({ completed: !todo.completed })
+        .eq('id', todo.id)
+        .eq('channel', instanceId);
+        
+      if (error) {
+        console.error('Error updating todo:', error.message);
+      }
+    } catch (error) {
+      console.error('Unexpected error updating todo:', error.message);
+    }
   };
 
-  const handleDeleteTodo = (todo) => {
-    if (!isConnected) return;
+  const handleDeleteTodo = async (todo) => {
+    if (!isConnected || !user) return;
 
-    // Broadcast the delete action
-    supabase.channel(CHANNEL).send({
-      type: 'broadcast',
-      event: 'todo_action',
-      payload: { type: 'delete', todo },
-    });
+    try {
+      // Delete the todo from the database
+      // The database trigger will handle broadcasting
+      const { error } = await supabase
+        .from('todos')
+        .delete()
+        .eq('id', todo.id)
+        
+      if (error) {
+        console.error('Error deleting todo:', error.message);
+      }
+    } catch (error) {
+      console.error('Unexpected error deleting todo:', error.message);
+    }
   };
 
   return (
     <div className="flex flex-col h-screen bg-neutral-900 text-white antialiased">
       {/* Header */}
       <div className="flex justify-between items-center px-5 pt-3">
-        <h1 className="font-medium text-sm text-neutral-400">{todos.filter((todo) => !todo.completed).length} todos to complete</h1>
+        <h1 className="font-medium text-sm text-neutral-400">
+          {user ? 
+            \`\${todos.filter((todo) => !todo.completed).length} todos to complete\` :
+            'Connecting...'
+          }
+        </h1>
         <div className="flex gap-2 flex-wrap">
           {onlineUsers.map((user, index) => (
             <div 
@@ -189,7 +245,11 @@ export default function App() {
       <div className="flex-1 overflow-hidden p-4">
         <div className="mx-auto">
           <div className="space-y-1">
-            {todos.length === 0 ? (
+            {isLoading ? (
+              <div className="text-center py-8 text-neutral-500">
+                Loading todos...
+              </div>
+            ) : todos.length === 0 ? (
               <div className="text-center py-8 text-neutral-500">
                 No todos yet. Add one to get started!
               </div>
@@ -242,7 +302,7 @@ export default function App() {
                   handleAddTodo(e);
                 }
               }}
-              disabled={!isConnected}
+              disabled={!isConnected || !user}
               className="flex-1 px-4 py-2 bg-transparent border border-neutral-800 text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-600 focus:border-transparent placeholder-neutral-500"
             />
           </form>
