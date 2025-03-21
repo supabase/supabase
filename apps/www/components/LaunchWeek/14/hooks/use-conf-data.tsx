@@ -80,7 +80,6 @@ interface LwState {
 }
 
 export const lwReducer = (state: LwState, action: LwAction): LwState => {
-  console.log('action', action, state)
   switch (action.type) {
     case 'SESSION_UPDATED':
       return {
@@ -195,11 +194,11 @@ export const Lw14ConfDataProvider = ({
   })
 
   const finalState = useMemo(() => {
-    return [{ ...state, referal: query.referal?.toString() }, dispatch] as [
+    return [{ ...state, referal: query.username?.toString() }, dispatch] as [
       LwState,
       Dispatch<LwAction>,
     ]
-  }, [query.referal, state])
+  }, [query.username, state])
 
   return <Lw14ConfDataContext.Provider value={finalState}>{children}</Lw14ConfDataContext.Provider>
 }

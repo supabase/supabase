@@ -1,7 +1,7 @@
 import React from 'react'
 import { ImageResponse } from '@vercel/og'
 import { createClient } from '@supabase/supabase-js'
-import { themes } from '~/components/LaunchWeek/13/Ticket/ticketThemes'
+import { themes } from '~/components/LaunchWeek/14/utils/ticketThemes'
 
 export const runtime = 'edge' // 'nodejs' is the default
 export const dynamic = 'force-dynamic' // defaults to auto
@@ -74,13 +74,10 @@ export async function GET(req: Request, res: Response) {
       name,
       secret,
       platinum: isPlatinum,
-      metadata,
       shared_on_twitter: sharedOnTwitter,
       shared_on_linkedin: sharedOnLinkedIn,
       ticket_number,
     } = user
-
-    const isDark = metadata.theme !== 'light'
 
     const platinum = isPlatinum ?? (!!sharedOnTwitter && !!sharedOnLinkedIn) ?? false
     if (assumePlatinum && !platinum) return await fetch(`${STORAGE_URL}/images/og-14-platinum.png`)
@@ -90,8 +87,8 @@ export async function GET(req: Request, res: Response) {
     // Generate image and upload to storage.
     const ticketType = secret ? 'secret' : platinum ? 'platinum' : 'regular'
 
-    const STYLING_CONFIG = (isDark?: boolean) => ({
-      TICKET_FOREGROUND: themes(isDark)[ticketType].TICKET_FOREGROUND,
+    const STYLING_CONFIG = () => ({
+      TICKET_FOREGROUND: themes()[ticketType].TICKET_FOREGROUND,
     })
 
     const TICKET_THEME = {
@@ -116,8 +113,7 @@ export async function GET(req: Request, res: Response) {
     const OG_HEIGHT = 628
     const USERNAME_BOTTOM = 435
 
-    // NOTE: defaulted to true on 14th launch-week as we only have dark theme
-    const BACKGROUND = (isDark: boolean = true) => ({
+    const BACKGROUND = () => ({
       regular: {
         LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png?v4`,
         BACKGROUND_IMG: `${STORAGE_URL}/assets/og-14-regular.png`,
@@ -152,7 +148,7 @@ export async function GET(req: Request, res: Response) {
     const computeBackgroundWidth = (letters: number) => {
       return 100 + (letters * 40 + (letters - 1) * 12)
     }
-    const lines = usernameToLines(username)
+    const lines = usernameToLines(name ?? username)
 
     const generatedTicketImage = new ImageResponse(
       (
@@ -164,7 +160,7 @@ export async function GET(req: Request, res: Response) {
               position: 'relative',
               fontFamily: '"Nippo-Regular"',
               overflow: 'hidden',
-              color: STYLING_CONFIG(isDark).TICKET_FOREGROUND,
+              color: STYLING_CONFIG().TICKET_FOREGROUND,
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
@@ -182,9 +178,9 @@ export async function GET(req: Request, res: Response) {
                 right: '-2px',
                 zIndex: '0',
                 backgroundSize: 'cover',
-                backgroundColor: STYLING_CONFIG(true).TICKET_FOREGROUND,
+                backgroundColor: STYLING_CONFIG().TICKET_FOREGROUND,
               }}
-              src={BACKGROUND(isDark)[ticketType].BACKGROUND_IMG}
+              src={BACKGROUND()[ticketType].BACKGROUND_IMG}
             />
             {/* Seat number */}
             <div
