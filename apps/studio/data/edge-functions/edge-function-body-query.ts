@@ -50,7 +50,7 @@ export async function getEdgeFunctionBody(
   console.log('eszip received, size:', eszip.byteLength)
 
   // Send to our API for processing
-  const parseResponse = await fetch('/api/edge-functions/parse-body', {
+  const parseResponse = await fetch(`${BASE_PATH}/api/edge-functions/parse-body`, {
     method: 'POST',
     body: eszip,
     headers: {
