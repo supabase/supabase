@@ -93,27 +93,35 @@ void main() {
   void main() {
     // Sample the diffuse texture to get base color with alpha
 
-    float grainSize = 2.0;
-    vec3 g = vec3(grain(vUv, resolution / grainSize, time));
+    vec4 blackBase = vec4(0.0, 0.0, 0.0, 1.0);
 
     float v = vignette(vUv, vignetteRadius, vignetteSmoothness);
-    vec4 black = vec4(0.0, 0.0, 0.0, 1.0);
-    
-    vec4 color = texture2D(tDiffuse, vUv);
+    float invertedVignette = 1.0 - v;
 
-    color = mix(color, black, 1.0-v);
+    float minAlpha = 0.3;
+    blackBase.a *= mix(minAlpha, 1.0, invertedVignette);
+
+    vec4 textureColor = texture2D(tDiffuse, vUv);
+
+    vec4 stackedColor = vec4(
+      mix(blackBase.rgb, textureColor.rgb, textureColor.a),
+      mix(blackBase.a, max(blackBase.a, textureColor.a), 0.8)
+    );
+
+    float grainSize = 3.0 + 4.0 * sin(time);
+    vec3 g = vec3(grain(vUv, resolution / grainSize, time));
     
-    ////get the luminance of the image
-    //float luminance = luma(color);
-    //vec3 desaturated = vec3(luminance);
-    //
-    ////now blend the noise over top the backround 
-    ////in our case soft-light looks pretty good
-    //vec3 noiseColor = blendSoftLight(desaturated, g);
-    //float response = smoothstep(0.05, 0.5, luminance);
-    //color = mix(vec4(noiseColor, color.a), vec4(desaturated, color.a), pow(response,2.0));
+    float luminance = luma(stackedColor);
+    vec3 desaturated = vec3(luminance);
+    vec3 noiseColor = blendSoftLight(vec3(0.2,0.2,0.2), g);
+    
+    float grainStrength = 0.02;
+    stackedColor = vec4(
+      mix(desaturated, noiseColor, grainStrength),
+      stackedColor.a
+    );
   
-    gl_FragColor = color;
+    gl_FragColor = stackedColor;
   }
 `,
   uniforms: {
