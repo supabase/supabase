@@ -1,4 +1,5 @@
- {
+[
+  {
     "name": "Twilio",
     "icon": "twilio-icon",
     "form": [
@@ -34,3 +35,4 @@
       }
     ]
   }
+]

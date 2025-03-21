@@ -392,6 +392,6 @@
 .sbui-minus-space-x-96 {
   /* @apply -space-x-96; */
 }
-/* .sbui-minus-space-x-px {
+.sbui-minus-space-x-px {
   /* @apply -space-x-; */
-} */
+}
