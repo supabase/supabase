@@ -16,6 +16,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
+  Badge,
   Button,
   CodeBlock,
   CollapsibleContent_Shadcn_,
@@ -392,19 +393,24 @@ export const DatabaseConnectionString = () => {
                     >
                       <Button
                         type="default"
-                        size="tiny"
+                        size="large"
                         iconRight={
                           <ChevronDown className="transition group-data-[state=open]:rotate-180" />
                         }
                         className="text-foreground !bg-dash-sidebar justify-between"
                       >
-                        Using the Shared Pooler for transaction pooling
+                        <div className="text-xs flex items-center p-2">
+                          <span>Using the Shared Pooler</span>
+                          <Badge variant={'brand'} size={'small'} className="ml-2">
+                            IPv4 compatible
+                          </Badge>
+                        </div>
                       </Button>
                     </CollapsibleTrigger_Shadcn_>
                     <CollapsibleContent_Shadcn_ className="bg-dash-sidebar rounded-b border text-xs">
                       <p className="px-3 py-2">
-                        You may use the Shared Pooler, which supports IPv4 networks, for transaction
-                        mode via the following connection string
+                        Only recommended when your network does not support IPv6. Added latency
+                        compared to dedicated pooler.
                       </p>
                       <CodeBlock
                         wrapperClassName={cn(
