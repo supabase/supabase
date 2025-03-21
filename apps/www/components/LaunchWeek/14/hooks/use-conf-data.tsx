@@ -210,9 +210,12 @@ export const Lw14ConfDataProvider = ({
 
   useEffect(() => {
     if (isReady) {
-      dispatch({ type: 'URL_PARAMS_LOADED', payload: { referal: takeFirst(query.username) } })
+      dispatch({
+        type: 'URL_PARAMS_LOADED',
+        payload: { referal: takeFirst(query.referal) ?? takeFirst(query.username) },
+      })
     }
-  }, [dispatch, isReady, query.username])
+  }, [dispatch, isReady, query.referal, query.username])
 
   return (
     <Lw14ConfDataContext.Provider value={providerValue}>{children}</Lw14ConfDataContext.Provider>

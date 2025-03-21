@@ -142,7 +142,7 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
     let redirectTo = `${LW14_URL}`
 
     if(referal) {
-      redirectTo += `/tickets/${referal}`
+      redirectTo += `?referal=${referal}`
     }
 
     const response = await supabase?.auth.signInWithOAuth({
