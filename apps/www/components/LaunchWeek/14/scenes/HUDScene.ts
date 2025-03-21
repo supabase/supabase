@@ -630,6 +630,7 @@ class HUDScene implements BaseScene {
       value: this.state.meetupsAmount,
       active: true,
       alignment: sizes.bars.coords[2].alignment,
+      showDot: false,
     })
 
     this.drawNumberControl(ctx, sizes.numberControl.coords, {
@@ -637,6 +638,7 @@ class HUDScene implements BaseScene {
       value: this.state.peopleOnline,
       active: this.state.peopleOnlineActive,
       alignment: sizes.numberControl.coords.alignment,
+      showDot: true,
     })
   }
 
@@ -747,7 +749,13 @@ class HUDScene implements BaseScene {
   private drawNumberControl(
     ctx: CanvasRenderingContext2D,
     coords: { x: number; y: number },
-    data: { label: string; value: number | null; active: boolean; alignment?: 'left' | 'center' }
+    data: { 
+      label: string; 
+      value: number | null; 
+      active: boolean; 
+      alignment?: 'left' | 'center';
+      showDot?: boolean;
+    }
   ) {
     const control = this.scaledStyles.numberControl
     const alignment = data.alignment || 'left'
@@ -786,24 +794,36 @@ class HUDScene implements BaseScene {
     ctx.textBaseline = 'top'
     ctx.fillText(data.label, alignment === 'center' ? x : labelX, coords.y)
 
-    // Draw dot below the label
+    // Calculate position for dot and text
     const dotY =
       coords.y + control.lineHeight + control.yGap + control.lineHeight / 2 - control.dotSize / 2
+    
+    // Determine if dot should be shown (default to true if not specified)
+    const showDot = data.showDot !== undefined ? data.showDot : true;
+    
+    // Position for text - depends on whether dot is shown
+    let textX = contentX;
+    
+    // Draw the dot if showDot is true
+    if (showDot) {
+      // Draw the dot with color based on active state
+      ctx.fillStyle = data.active ? control.activeColor : control.disabledColor
+      
+      ctx.beginPath()
+      ctx.arc(
+        contentX + control.dotSize / 2,
+        dotY + control.dotSize / 2,
+        control.dotSize / 2,
+        0,
+        Math.PI * 2
+      )
+      ctx.fill()
+      
+      // If dot is shown, text starts after dot + gap
+      textX = contentX + control.dotSize + control.xGap;
+    }
 
-    // Draw the dot with color based on active state
-    ctx.fillStyle = data.active ? control.activeColor : control.disabledColor
-
-    ctx.beginPath()
-    ctx.arc(
-      contentX + control.dotSize / 2,
-      dotY + control.dotSize / 2,
-      control.dotSize / 2,
-      0,
-      Math.PI * 2
-    )
-    ctx.fill()
-
-    // Draw value or dashes on the right of the dot
+    // Draw value or dashes
     ctx.textAlign = 'left'
     ctx.textBaseline = 'middle'
 
@@ -811,11 +831,11 @@ class HUDScene implements BaseScene {
       // Draw the actual value when active
       ctx.fillStyle = control.valueColor
       const value = data.value.toString().padStart(3, '0')
-      ctx.fillText(value, contentX + control.dotSize + control.xGap, dotY + control.dotSize / 2)
+      ctx.fillText(value, textX, dotY + control.dotSize / 2)
     } else {
       // Draw dashes when inactive
       ctx.fillStyle = control.disabledColor
-      ctx.fillText('---', contentX + control.dotSize + control.xGap, dotY + control.dotSize / 2)
+      ctx.fillText('---', textX, dotY + control.dotSize / 2)
     }
 
     ctx.restore()
