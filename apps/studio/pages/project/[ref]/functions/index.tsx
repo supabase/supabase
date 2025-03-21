@@ -15,6 +15,8 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
@@ -43,6 +45,8 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     isSuccess,
   } = useEdgeFunctionsQuery({ projectRef: ref })
   const edgeFunctionCreate = useFlag('edgeFunctionCreate')
+  const { mutate: sendEvent } = useSendEventMutation()
+  const org = useSelectedOrganization()
 
   const hasFunctions = (functions ?? []).length > 0
 
@@ -74,7 +78,14 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
         </Dialog>
         {edgeFunctionCreate && (
           <DropdownMenuItem
-            onSelect={() => router.push(`/project/${ref}/functions/new`)}
+            onSelect={() => {
+              router.push(`/project/${ref}/functions/new`)
+              sendEvent({
+                action: 'edge_function_via_editor_button_clicked',
+                properties: { origin: 'secondary_action' },
+                groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+              })
+            }}
             className="gap-4"
           >
             <Code className="shrink-0" size={16} strokeWidth={1.5} />
@@ -106,7 +117,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
       type="default"
       className="px-1 pointer-events-auto"
       icon={<AiIconAnimation size={16} />}
-      onClick={() =>
+      onClick={() => {
         setAiAssistantPanel({
           open: true,
           initialInput: `Create a new edge function that ...`,
@@ -120,7 +131,12 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
             ],
           },
         })
-      }
+        sendEvent({
+          action: 'edge_function_ai_assistant_button_clicked',
+          properties: { origin: 'secondary_action' },
+          groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+        })
+      }}
       tooltip={{
         content: {
           side: 'bottom',

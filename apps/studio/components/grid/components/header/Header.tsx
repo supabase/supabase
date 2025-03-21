@@ -32,6 +32,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Separator,
+  SonnerProgress,
 } from 'ui'
 import FilterPopover from './filter/FilterPopover'
 import { SortPopover } from './sort'
@@ -288,6 +289,10 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     { keepPreviousData: true }
   )
 
+  const allRows = data?.rows ?? []
+  const totalRows = countData?.count ?? 0
+  const { editable } = state
+
   const onSelectAllRows = () => {
     snap.setSelectedRows(new Set(allRows.map((row) => row.idx)), true)
   }
@@ -321,6 +326,15 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       return setIsExporting(false)
     }
 
+    const toastId = snap.allRowsSelected
+      ? toast(<SonnerProgress progress={0} message={`Exporting all rows from ${table.name}`} />, {
+          closeButton: false,
+          duration: Infinity,
+        })
+      : toast.loading(
+          `Exporting ${snap.selectedRows.size} row${snap.selectedRows.size > 1 ? 's' : ''} from ${table.name}`
+        )
+
     const rows = snap.allRowsSelected
       ? await fetchAllTableRows({
           projectRef: project.ref,
@@ -329,8 +343,29 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           filters,
           sorts,
           impersonatedRole: roleImpersonationState.role,
+          progressCallback: (value: number) => {
+            const progress = Math.min((value / totalRows) * 100, 100)
+            toast(
+              <SonnerProgress
+                progress={progress}
+                message={`Exporting all rows from ${table.name}`}
+              />,
+              {
+                id: toastId,
+                closeButton: false,
+                duration: Infinity,
+              }
+            )
+          },
         })
       : allRows.filter((x) => snap.selectedRows.has(x.idx))
+
+    if (rows.length === 0) {
+      toast.dismiss(toastId)
+      toast.error('Export failed, please try exporting again')
+      setIsExporting(false)
+      return
+    }
 
     const formattedRows = rows.map((row) => {
       const formattedRow = row
@@ -345,6 +380,11 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       columns: state.table!.columns.map((column) => column.name),
     })
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    toast.success(`Downloaded ${rows.length} rows to CSV`, {
+      id: toastId,
+      closeButton: true,
+      duration: 4000,
+    })
     saveAs(csvData, `${state.table!.name}_rows.csv`)
     setIsExporting(false)
   }
@@ -364,6 +404,20 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       return setIsExporting(false)
     }
 
+    if (snap.allRowsSelected && totalRows === 0) {
+      toast.error('Export failed, please try exporting again')
+      return setIsExporting(false)
+    }
+
+    const toastId = snap.allRowsSelected
+      ? toast(<SonnerProgress progress={0} message={`Exporting all rows from ${table.name}`} />, {
+          closeButton: false,
+          duration: Infinity,
+        })
+      : toast.loading(
+          `Exporting ${snap.selectedRows.size} row${snap.selectedRows.size > 1 ? 's' : ''} from ${table.name}`
+        )
+
     const rows = snap.allRowsSelected
       ? await fetchAllTableRows({
           projectRef: project.ref,
@@ -372,21 +426,42 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           filters,
           sorts,
           impersonatedRole: roleImpersonationState.role,
+          progressCallback: (value: number) => {
+            const progress = Math.min((value / totalRows) * 100, 100)
+            toast(
+              <SonnerProgress
+                progress={progress}
+                message={`Exporting all rows from ${table.name}`}
+              />,
+              {
+                id: toastId,
+                closeButton: false,
+                duration: Infinity,
+              }
+            )
+          },
         })
       : allRows.filter((x) => snap.selectedRows.has(x.idx))
 
+    if (rows.length === 0) {
+      toast.error('Export failed, please exporting try again')
+      setIsExporting(false)
+      return
+    }
+
     const sqlStatements = formatTableRowsToSQL(table, rows)
     const sqlData = new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' })
+    toast.success(`Downloading ${rows.length} rows to SQL`, {
+      id: toastId,
+      closeButton: true,
+      duration: 4000,
+    })
     saveAs(sqlData, `${state.table!.name}_rows.sql`)
     setIsExporting(false)
   }
   function deselectRows() {
     snap.setSelectedRows(new Set())
   }
-
-  const allRows = data?.rows ?? []
-  const totalRows = countData?.count ?? 0
-  const { editable } = state
 
   useSubscribeToImpersonatedRole(() => {
     if (snap.allRowsSelected || snap.selectedRows.size > 0) {

@@ -5042,7 +5042,6 @@ export interface components {
       current_period_end: number
       current_period_start: number
       customer_balance: number
-      nano_enabled: boolean
       next_invoice_at: number
       payment_method_type: string
       plan: components['schemas']['BillingSubscriptionPlan']
