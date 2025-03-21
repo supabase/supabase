@@ -646,11 +646,8 @@ class TicketScene implements BaseScene {
   }
 
   private _updateTicketPosition() {
-    this._ticket?.position.lerp(
-      this._internalState.naturalPosition,
-      0.01
-    )
-  } 
+    this._ticket?.position.lerp(this._internalState.naturalPosition, 0.01)
+  }
 
   private _updateMeshBoundingBoxes() {
     // Update bounding boxes for all named meshes
