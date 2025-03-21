@@ -1,12 +1,30 @@
 import { NextSeo } from 'next-seo'
-import { LW14_DATE, LW14_TITLE, LW14_URL, SITE_ORIGIN } from '~/lib/constants'
+import { LW14_DATE, LW14_TITLE, LW14_URL } from '~/lib/constants'
 import { LwView } from '~/components/LaunchWeek/14/LwView'
-import { Lw14ConfDataProvider } from '~/components/LaunchWeek/14/hooks/use-conf-data'
+import { Lw14ConfDataProvider, UserTicketData } from '~/components/LaunchWeek/14/hooks/use-conf-data'
+import Error from 'next/error'
+import { GetStaticPaths, GetStaticProps } from 'next'
+import { createClient } from '@supabase/supabase-js'
+import dayjs from 'dayjs'
 
-const Lw14Page = () => {
+interface Props {
+  user: UserTicketData
+  ogImageUrl: string
+}
+
+const Lw14Page = ({ user, ogImageUrl }: Props) => {
+  const { username, name, platinum, secret } = user
+
+  const ticketType = secret ? 'secret' : platinum ? 'platinum' : 'regular'
+
   const TITLE = `${LW14_TITLE} | ${LW14_DATE}`
   const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
-  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/14/lw14-og.png?lw=14`
+  // const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/14/lw14-og.png?lw=14`
+  const PAGE_URL = `${LW14_URL}/tickets/${username}`
+
+  if (!username) {
+    return <Error statusCode={404} />
+  }
 
   return (
     <>
@@ -16,10 +34,12 @@ const Lw14Page = () => {
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: LW14_URL,
+          url: PAGE_URL,
           images: [
             {
-              url: OG_IMAGE,
+              url: ogImageUrl,
+              width: 1200,
+              height: 628,
             },
           ],
         }}
@@ -33,3 +53,69 @@ const Lw14Page = () => {
 }
 
 export default Lw14Page
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const username = params?.username?.toString() || null
+  let user
+
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.LIVE_SUPABASE_COM_SERVICE_ROLE_KEY!
+  )
+
+  const SITE_URL = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : 'http://localhost:3000'
+
+  // fetch the normal ticket
+  // stores the og images in supabase storage
+  fetch(
+    // @ts-ignore
+    `${SITE_URL}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}`
+  )
+
+  // fetch a specific user
+  if (username) {
+    const { data } = await supabaseAdmin!
+      .from('tickets_view')
+      .select('name, username, ticket_number, metadata, platinum, secret, role, company, location')
+      .eq('launch_week', 'lw14')
+      .eq('username', username)
+      .single()
+
+    user = data
+  }
+
+  // fetch the platinum ticket
+  // stores the og images in supabase storage
+  if (user?.secret) {
+    fetch(`${SITE_URL}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&secret=true`)
+  } else if (user?.platinum) {
+    // fetch /api-v2/ticket-og
+    fetch(
+      `${SITE_URL}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&platinum=true`
+    )
+  }
+
+  const ticketType = user?.secret ? 'secret' : user?.platinum ? 'platinum' : 'regular'
+  const ogImageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw14/og/${ticketType}/${username}.png?t=${dayjs(new Date()).format('DHHmmss')}`
+
+  return {
+    props: {
+      user: {
+        ...user,
+        username,
+      },
+      ogImageUrl,
+      key: username,
+    },
+    revalidate: 5,
+  }
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  return Promise.resolve({
+    paths: [],
+    fallback: 'blocking',
+  })
+}
