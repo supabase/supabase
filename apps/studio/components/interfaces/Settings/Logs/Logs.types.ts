@@ -92,6 +92,7 @@ export type QueryType =
   | 'postgrest'
   | 'warehouse'
   | 'pg_cron'
+  | 'pgbouncer'
 
 export type Mode = 'simple' | 'custom'
 

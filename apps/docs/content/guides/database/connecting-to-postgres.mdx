@@ -127,7 +127,15 @@ Get your project's transaction mode string from the [Database Settings](/dashboa
 
 ## Dedicated pooler
 
-The Dedicated Pooler is a [PgBouncer](https://www.pgbouncer.org/) instance that's co-located with your Postgres database. This will require you to connect with IPv6 or, if that's not an option, you can use the [IPv4 add-on](/docs/guides/platform/ipv4-address).
+For paying customers, we provision a Dedicated Pooler ([PgBouncer](https://www.pgbouncer.org/)) that's co-located with your Postgres database. This will require you to connect with IPv6 or, if that's not an option, you can use the [IPv4 add-on](/docs/guides/platform/ipv4-address).
+
+The Dedicated Pooler ensures best performance and latency, while using up more of your project's compute resources. If your network supports IPv6 or you have the IPv4 add-on, we encourage you to use the Dedicated Pooler over the Shared Pooler.
+
+<Admonition type="note">
+
+PgBouncer always runs in Transaction mode and the current version does not support prepared statement (will be added in a few weeks).
+
+</Admonition>
 
 ## More about connection pooling
 

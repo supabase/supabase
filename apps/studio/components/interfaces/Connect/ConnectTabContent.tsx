@@ -6,58 +6,75 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
-import { useFlag } from 'hooks/ui/useFlag'
 import { pluckObjectFields } from 'lib/helpers'
 import { cn } from 'ui'
 import type { projectKeys } from './Connect.types'
 import { getConnectionStrings as getConnectionStringsV2 } from './DatabaseSettings.utils'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { getAddons } from '../Billing/Subscription/Subscription.utils'
 
 interface ConnectContentTabProps extends HTMLAttributes<HTMLDivElement> {
   projectKeys: projectKeys
   filePath: string
   connectionStringPooler?: {
-    transaction: string
-    session: string
+    transactionShared: string
+    sessionShared: string
+    transactionDedicated?: string
+    sessionDedicated?: string
+    ipv4SupportedForDedicatedPooler: boolean
   }
-  connectionStringDirect?: string
 }
 
 const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabProps>(
   ({ projectKeys, filePath, ...props }, ref) => {
     const { ref: projectRef } = useParams()
-    const allowPgBouncerSelection = useFlag('dualPoolerSupport')
+    const selectedOrg = useSelectedOrganization()
+    const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
+    const allowPgBouncerSelection = useMemo(() => subscription?.plan.id !== 'free', [subscription])
 
     const { data: settings } = useProjectSettingsV2Query({ projectRef })
     const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })
     const { data: supavisorConfig } = useSupavisorConfigurationQuery({ projectRef })
+    const { data: addons } = useProjectAddonsQuery({ projectRef })
+    const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
 
-    const isPgBouncerEnabled = allowPgBouncerSelection && !!pgbouncerConfig?.pgbouncer_enabled
     const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
     const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
     const connectionInfo = pluckObjectFields(settings || emptyState, DB_FIELDS)
-    const poolingConfiguration = isPgBouncerEnabled
-      ? pgbouncerConfig
-      : supavisorConfig?.find((x) => x.database_type === 'PRIMARY')
+    const poolingConfigurationShared = supavisorConfig?.find((x) => x.database_type === 'PRIMARY')
+    const poolingConfigurationDedicated = allowPgBouncerSelection ? pgbouncerConfig : undefined
 
-    const connectionStrings =
-      poolingConfiguration !== undefined
+    const connectionStringsShared =
+      poolingConfigurationShared !== undefined
         ? getConnectionStringsV2({
             connectionInfo,
             poolingInfo: {
-              connectionString: poolingConfiguration.connection_string,
-              db_host: poolingConfiguration.db_host,
-              db_name: poolingConfiguration.db_name,
-              db_port: poolingConfiguration.db_port,
-              db_user: poolingConfiguration.db_user,
+              connectionString: poolingConfigurationShared.connection_string,
+              db_host: poolingConfigurationShared.db_host,
+              db_name: poolingConfigurationShared.db_name,
+              db_port: poolingConfigurationShared.db_port,
+              db_user: poolingConfigurationShared.db_user,
             },
             metadata: { projectRef },
           })
         : { direct: { uri: '' }, pooler: { uri: '' } }
-    const connectionStringsPooler = connectionStrings.pooler
-    const connectionStringsDirect = connectionStrings.direct
 
-    const connectionStringPoolerTransaction = connectionStringsPooler.uri
-    const connectionStringPoolerSession = connectionStringsPooler.uri.replace('6543', '5432')
+    const connectionStringsDedicated =
+      poolingConfigurationDedicated !== undefined
+        ? getConnectionStringsV2({
+            connectionInfo,
+            poolingInfo: {
+              connectionString: poolingConfigurationDedicated.connection_string,
+              db_host: poolingConfigurationDedicated.db_host,
+              db_name: poolingConfigurationDedicated.db_name,
+              db_port: poolingConfigurationDedicated.db_port,
+              db_user: poolingConfigurationDedicated.db_user,
+            },
+            metadata: { projectRef },
+          })
+        : undefined
 
     const ContentFile = useMemo(() => {
       return dynamic<ConnectContentTabProps>(() => import(`./content/${filePath}/content`), {
@@ -75,10 +92,12 @@ const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabProps>(
           projectKeys={projectKeys}
           filePath={filePath}
           connectionStringPooler={{
-            transaction: connectionStringPoolerTransaction,
-            session: connectionStringPoolerSession,
+            transactionShared: connectionStringsShared.pooler.uri,
+            sessionShared: connectionStringsShared.pooler.uri.replace('6543', '5432'),
+            transactionDedicated: connectionStringsDedicated?.pooler.uri,
+            sessionDedicated: connectionStringsDedicated?.pooler.uri.replace('6543', '5432'),
+            ipv4SupportedForDedicatedPooler: !!ipv4Addon,
           }}
-          connectionStringDirect={connectionStringsDirect.uri}
         />
       </div>
     )
