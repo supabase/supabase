@@ -877,19 +877,68 @@ class TicketScene implements BaseScene {
 
     const isNeon = this.state.secret || this.state.platinum
 
+    function getWrappedText({
+      text,
+      maxChars,
+      maxLines,
+    }: {
+      text: string
+      maxChars: number
+      maxLines: number
+    }): string[] {
+      const lines: string[] = []
+      let pos = 0
+      for (let i = 0; i < maxLines; i++) {
+        if (pos >= text.length) break
+
+        // NOTE: If we're on the last allowed line and there is more text than fits...
+        if (i === maxLines - 1 && text.length - pos > maxChars) {
+          // NOTE: Take only maxChars characters and append an ellipsis on last line
+          lines.push(text.substring(pos, pos + maxChars - 3) + '...')
+          break
+        } else {
+          lines.push(text.substring(pos, pos + maxChars))
+          pos += maxChars
+        }
+      }
+      return lines
+    }
+
     switch (textureKey) {
       case 'TicketFront': {
-        // Draw username
-        context.fillStyle = colorObjToRgb(isNeon ? colors.textNeonColor : colors.textColor)
         const fontSize = this.typography.main.relativeSize * canvas.height
+        const usernameLines = getWrappedText({
+          text: this.state.texts.username,
+          maxChars: 15,
+          maxLines: 4,
+        })
+
         context.font = `400 ${fontSize}px ${mainFontFamily}`
         context.textAlign = 'left'
         context.textBaseline = 'top'
-        context.fillText(
-          this.state.texts.username,
-          this.texts.user.x * canvas.width,
-          this.texts.user.y * canvas.height
-        )
+        const lineHeight = fontSize * 1.2
+        const padding = 4
+
+        // Draw username lines with background
+        usernameLines.forEach((line, index) => {
+          const x = this.texts.user.x * canvas.width
+          const y = this.texts.user.y * canvas.height + index * lineHeight
+
+          const textWidth = context.measureText(line).width
+
+          context.fillStyle = colorObjToRgb(colors.bgColor)
+          context.fillRect(
+            x - padding,
+            y - padding,
+            textWidth + padding * 2,
+            fontSize + padding * 2
+          )
+          context.fillStyle = colorObjToRgb(colors.transparentBg)
+          context.fillRect(x - 287, y + 4, textWidth + 280, fontSize - 24)
+
+          context.fillStyle = colorObjToRgb(isNeon ? colors.textNeonColor : colors.textColor)
+          context.fillText(line, x, y)
+        })
 
         context.fillStyle = colorObjToRgb(isNeon ? colors.textDimmedColor : colors.textColor)
         context.fillText(
@@ -898,12 +947,7 @@ class TicketScene implements BaseScene {
           this.texts.date.y * canvas.height
         )
 
-        context.fillStyle = colorObjToRgb(
-          isNeon ? colors.textNeonDimmedColor : colors.textDimmedColor
-        )
-
         context.fillStyle = colorObjToRgb(isNeon ? colors.textNeonColor : colors.textDimmedColor)
-        // Draw ticket number with different font
         const ticketNumberFontSize = this.typography.ticketNumber.relativeSize * canvas.height
         context.font = `${this.typography.ticketNumber.weight} ${ticketNumberFontSize}px ${ticketNumberFontFamily}`
         context.fillText(

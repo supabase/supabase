@@ -85,7 +85,9 @@ const TicketCanvas = ({ className, onUpgradeToSecret }: TicketCanvasProps) => {
       if (sceneRef.current) {
         sceneRef.current.setVisible(state.ticketVisibility)
         sceneRef.current.setTicketNumber(state.userTicketData.ticket_number ?? 0)
-        sceneRef.current.setUserName(state.userTicketData.name ?? '')
+        sceneRef.current.setUserName(
+          state.userTicketData.name ?? state.userTicketData.username ?? ''
+        )
 
         if (state.userTicketData.secret) await sceneRef.current.upgradeToSecret()
         if (state.userTicketData.platinum) await sceneRef.current.upgradeToPlatinum()
@@ -129,7 +131,6 @@ const TicketCanvas = ({ className, onUpgradeToSecret }: TicketCanvasProps) => {
         if (data.payloadFill) hudObj.setPayloadFill(data.payloadFill, true)
         if (data.meetupsAmount) hudObj.setMeetupsAmount(data.meetupsAmount, true)
       } else {
-
         hudObj.setPeopleOnlineActive(false, true)
         hudObj.setPeopleOnline(0, true)
         hudObj.setMeetupsAmount(0, true)
