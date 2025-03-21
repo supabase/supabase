@@ -257,6 +257,7 @@ export const gettingstarted: NavMenuConstant = {
       name: 'Framework Quickstarts',
       items: [
         { name: 'Next.js', url: '/guides/getting-started/quickstarts/nextjs' },
+        { name: 'React Router (Remix)', url: '/guides/getting-started/quickstarts/react-router' },
         { name: 'React', url: '/guides/getting-started/quickstarts/reactjs' },
         { name: 'Nuxt', url: '/guides/getting-started/quickstarts/nuxtjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
