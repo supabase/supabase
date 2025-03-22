@@ -11,9 +11,11 @@ import {
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useParams } from 'common'
 import type { NextPageWithLayout } from 'types'
 
 const AuthSettings: NextPageWithLayout = () => {
+  const { ref } = useParams()
   const isPermissionsLoaded = usePermissionsLoaded()
   // TODO: check if these permissions cover third party auth as well
   const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'api_keys')
