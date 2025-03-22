@@ -7,8 +7,8 @@ settings:
 catalogs:
   default:
     '@supabase/auth-js':
-      specifier: 2.68.0-rc.6
-      version: 2.68.0-rc.6
+      specifier: 2.69.0-rc.3
+      version: 2.69.0-rc.3
     '@supabase/realtime-js':
       specifier: ^2.11.3
       version: 2.11.3
@@ -585,7 +585,7 @@ importers:
         version: 5.5.0
       '@supabase/auth-js':
         specifier: 'catalog:'
-        version: 2.68.0-rc.6
+        version: 2.69.0-rc.3
       '@supabase/pg-meta':
         specifier: workspace:*
         version: link:../../packages/pg-meta
@@ -1513,7 +1513,7 @@ importers:
     dependencies:
       '@supabase/auth-js':
         specifier: 'catalog:'
-        version: 2.68.0-rc.6
+        version: 2.69.0-rc.3
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.49.1
@@ -6200,6 +6200,9 @@ packages:
 
   '@supabase/auth-js@2.68.0-rc.6':
     resolution: {integrity: sha512-xq3DDNBD33KTGHCYSAMUmDbcxe+thCTVvlcO/5uixjKhRku0LNMUIm5P67ViDQDmf0OYUqd+vdiAtpmyhL2B/Q==}
+
+  '@supabase/auth-js@2.69.0-rc.3':
+    resolution: {integrity: sha512-Be/5DrT+hI1zTnB1lD8I46aHIXxlA4h84jUhzcd0NcC53M+rw0SMXBNwCWY3reSjOgRX/ep2TtklBaBTyOg4Mg==}
 
   '@supabase/functions-js@2.4.4':
     resolution: {integrity: sha512-WL2p6r4AXNGwop7iwvul2BvOtuJ1YQy8EbOd0dhG1oN1q8el/BIRSFCFnWAMM/vJJlHWLi4ad22sKbKr9mvjoA==}
@@ -20358,6 +20361,10 @@ snapshots:
   '@stripe/stripe-js@5.5.0': {}
 
   '@supabase/auth-js@2.68.0-rc.6':
+    dependencies:
+      '@supabase/node-fetch': 2.6.15
+
+  '@supabase/auth-js@2.69.0-rc.3':
     dependencies:
       '@supabase/node-fetch': 2.6.15
 
