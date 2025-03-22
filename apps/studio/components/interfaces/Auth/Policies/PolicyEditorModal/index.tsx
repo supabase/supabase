@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { Modal } from 'ui'
+import { Modal, Button, IconX } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
 import {
@@ -180,6 +180,13 @@ const PolicyEditorModal = ({
           onSelectBackFromTemplates={onSelectBackFromTemplates}
           onToggleFeaturePreviewModal={onToggleFeaturePreviewModal}
         />,
+        <Button
+          key="1"
+          type="text"
+          icon={<IconX />}
+          onClick={isClosingPolicyEditor}
+          className="absolute top-4 right-4"
+        />,
       ]}
       onCancel={isClosingPolicyEditor}
     >
@@ -227,6 +234,7 @@ const PolicyEditorModal = ({
             policy={policyStatementForReview}
             onSelectBack={onViewEditor}
             onSelectSave={onReviewSave}
+            onSelectCancel={onSelectCancel}
           />
         ) : null}
       </div>
