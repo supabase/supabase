@@ -36,7 +36,7 @@ jobs:
           cache: pnpm
 
       - name: Install required dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm i
 
       - name: Run Prettier in fix mode
         run: pnpm run format
