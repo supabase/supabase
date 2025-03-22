@@ -20,3 +20,6 @@ packages/icons/__registry__
 packages/icons/src/icons/*.ts
 apps/ui-library/__registry__
 apps/ui-library/public/r
+apps/**/.contentlayer
+# invalid JSON file
+packages/ui/src/components/Form/examples/PhoneProvidersSchema.json
