@@ -605,5 +605,13 @@
     "position": "Engineering",
     "author_url": "https://github.com/crispy1975",
     "author_image_url": "https://github.com/crispy1975.png"
+  },
+  {
+    "author_id": "prashant",
+    "author": "Prashant Sridharan",
+    "username": "CoolAssPuppy",
+    "position": "Product Marketing",
+    "author_url": "https://x.com/CoolAssPuppy",
+    "author_image_url": "https://avatars.githubusercontent.com/u/914007?v=4"
   }
 ]
