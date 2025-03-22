@@ -1,7 +1,7 @@
 name: reviewdog
 on:
   pull_request:
-  workflow_dispatch:
+    types: [opened, synchronize, reopened, edited]
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
