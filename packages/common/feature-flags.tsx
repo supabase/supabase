@@ -11,9 +11,11 @@ type TrackFeatureFlagVariables = components['schemas']['TelemetryFeatureFlagBody
 export type CallFeatureFlagsResponse = components['schemas']['TelemetryCallFeatureFlagsResponseDto']
 
 export async function getFeatureFlags(API_URL: string) {
-  const data = await get(`${ensurePlatformSuffix(API_URL)}/telemetry/feature-flags`)
+  return {}
 
-  return data as CallFeatureFlagsResponse
+  // const data = await get(`${ensurePlatformSuffix(API_URL)}/telemetry/feature-flags`)
+  //
+  // return data as CallFeatureFlagsResponse
 }
 
 export async function trackFeatureFlag(API_URL: string, body: TrackFeatureFlagVariables) {
@@ -23,7 +25,7 @@ export async function trackFeatureFlag(API_URL: string, body: TrackFeatureFlagVa
       : null) === 'true'
 
   if (!consent) return undefined
-  await post(`${ensurePlatformSuffix(API_URL)}/telemetry/feature-flags/track`, { body })
+  // await post(`${ensurePlatformSuffix(API_URL)}/telemetry/feature-flags/track`, { body })
 }
 
 export type FeatureFlagContextType = {
