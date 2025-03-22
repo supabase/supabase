@@ -24,6 +24,9 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
           fetch-depth: ${{ env.PR_FETCH_DEPTH }}
+          sparse-checkout: |
+            packages
+            apps
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
@@ -41,8 +44,8 @@ jobs:
 
       - name: Commit changes and push to existing branch
         run: |
-          git config --global user.name 'github-tidy-bot'
-          git config --global user.email 'github-tidy-bot@supabase.com'
+          git config --global user.name 'kevcodez'
+          git config --global user.email 'k.grueneberg1994@gmail.com'
           if [[ `git status --porcelain` ]]; then
             echo "[bot] Changes detected, committing."
 
