@@ -43,7 +43,10 @@ import {
   useSidebar,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns'
-import { useIsAPIDocsSidePanelEnabled } from './App/FeaturePreview/FeaturePreviewContext'
+import {
+  useIsAPIDocsSidePanelEnabled,
+  useIsSQLEditorTabsEnabled,
+} from './App/FeaturePreview/FeaturePreviewContext'
 import { ThemeDropdown } from './ThemeDropdown'
 import { UserDropdown } from './UserDropdown'
 
@@ -264,7 +267,9 @@ function ProjectLinks() {
   const snap = useAppStateSnapshot()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { securityLints, errorLints } = useLints()
+
   const showWarehouse = useFlag('warehouse')
+  const isSqlEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -280,7 +285,9 @@ function ProjectLinks() {
     'realtime:all',
   ])
 
-  const toolRoutes = generateToolRoutes(ref, project)
+  const toolRoutes = generateToolRoutes(ref, project, {
+    sqlEditorTabs: isSqlEditorTabsEnabled,
+  })
   const productRoutes = generateProductRoutes(ref, project, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,

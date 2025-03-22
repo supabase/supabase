@@ -32,6 +32,7 @@ import NotFoundState from './NotFoundState'
 import { convertByteaToHex } from './SidePanelEditor/RowEditor/RowEditor.utils'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
 import TableDefinition from './TableDefinition'
+import { makeActiveTabPermanent } from 'state/tabs'
 
 export interface TableGridEditorProps {
   theme?: 'dark' | 'light'
@@ -213,7 +214,12 @@ const TableGridEditor = ({
    */
 
   return (
-    <>
+    <div
+      onClick={() => {
+        makeActiveTabPermanent(project?.ref)
+      }}
+      className="h-full"
+    >
       <SupabaseGrid
         key={gridKey}
         theme={theme}
@@ -260,7 +266,7 @@ const TableGridEditor = ({
         selectedTable={isTableLike(selectedTable) ? selectedTable : undefined}
         onTableCreated={onTableCreated}
       />
-    </>
+    </div>
   )
 }
 

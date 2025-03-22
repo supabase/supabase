@@ -28,6 +28,11 @@ type GetResponseData =
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetResponseData>) => {
   // Platform specific endpoint
+  const { favorite, visibility } = req.query
+  if (favorite || visibility === 'project') {
+    return res.status(200).json({ data: [] })
+  }
+
   const snippets = [
     {
       id: '1',
