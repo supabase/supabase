@@ -42,7 +42,7 @@ const Connect = () => {
     parseAsBoolean.withDefault(false)
   )
 
-    const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(FRAMEWORKS)
+  const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(FRAMEWORKS)
   const [selectedParent, setSelectedParent] = useState(connectionObject[0].key) // aka nextjs
   const [selectedChild, setSelectedChild] = useState(
     connectionObject.find((item) => item.key === selectedParent)?.children[0]?.key ?? ''
