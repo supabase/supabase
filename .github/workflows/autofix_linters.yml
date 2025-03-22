@@ -21,8 +21,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
-          persist-credentials: false
-          github_token: ${{ secrets.PAT_AUTOFIX }}
+          token: ${{ secrets.PAT_AUTOFIX }}
           fetch-depth: ${{ env.PR_FETCH_DEPTH }}
           sparse-checkout: |
             packages
