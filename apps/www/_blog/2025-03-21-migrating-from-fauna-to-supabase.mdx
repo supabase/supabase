@@ -57,7 +57,7 @@ In this phase, with your data secured and your applications still functional, yo
 
 ## Phase 1
 
-Phase 1 of the Fauna to Supabase migration focuses on exporting your data from Fauna, importing into Supabase as a JSONB data type, and rewriting your data APIs to use the Supabase SDK. 
+Phase 1 of the Fauna to Supabase migration focuses on exporting your data from Fauna, importing into Supabase as a JSONB data type, and rewriting your data APIs to use the Supabase SDK.
 
 ### Step 1: Export data from Fauna
 
@@ -79,9 +79,9 @@ Fauna has [also provided instructions](https://docs.fauna.com/fauna/current/migr
 Create a table in Supabase with a JSONB column to store raw Fauna documents:
 
 ```sql
-CREATE TABLE fauna_users_raw (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  data JSONB NOT NULL
+create table fauna_users_raw (
+  id uuid primary key default gen_random_uuid(),
+  data jsonb not null
 );
 ```
 
@@ -105,9 +105,7 @@ async function loadDocumentsToSupabase() {
     const dataArray = JSON.parse(rawData).map((data) => ({ data }))
 
     // Insert data into Supabase
-    const { error } = await supabase
-      .from(tableName)
-      .insert(dataArray)
+    const { error } = await supabase.from(tableName).insert(dataArray)
 
     if (error) {
       console.error('Error inserting data:', error)
@@ -130,21 +128,21 @@ Once your data has been structured into tables, Supabase automatically generates
 Here’s a Fauna query example (using FQL) for obtaining data from a `users` table:
 
 ```jsx
-import { Client, fql } from 'fauna';
+import { Client, fql } from 'fauna'
 
-const client = new Client({ secret: '<your-fauna-secret>' });
+const client = new Client({ secret: '<your-fauna-secret>' })
 
 const usersQuery = fql`
   users.all() {
     name,
     email
   }
-`;
+`
 
-client.query(usersQuery)
-  .then(data => console.log(data))
-  .catch(error => console.error('Error fetching users:', error));
-
+client
+  .query(usersQuery)
+  .then((data) => console.log(data))
+  .catch((error) => console.error('Error fetching users:', error))
 ```
 
 And here’s the equivalent Supabase REST API call:
@@ -152,19 +150,15 @@ And here’s the equivalent Supabase REST API call:
 ```jsx
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  'https://<your-project>.supabase.co',
-  '<your-api-key>'
-)
+const supabase = createClient('https://<your-project>.supabase.co', '<your-api-key>')
 
 const { data, error } = await supabase.from('users').select(`
     user:  metadata->user
   `)
- // the -> operator returns values as jsonb for the user collection
+// the -> operator returns values as jsonb for the user collection
 
 if (error) console.error(error)
 else console.log(data)
-
 ```
 
 ## Phase 2:
@@ -204,19 +198,15 @@ Here’s the PostgREST query for JSONB data from Phase 1:
 ```jsx
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  'https://<your-project>.supabase.co',
-  '<your-api-key>'
-)
+const supabase = createClient('https://<your-project>.supabase.co', '<your-api-key>')
 
 const { data, error } = await supabase.from('users').select(`
     user:  metadata->user
   `)
- // the -> operator returns values as jsonb for the user collection
+// the -> operator returns values as jsonb for the user collection
 
 if (error) console.error(error)
 else console.log(data)
-
 ```
 
 And here’s the equivalent Supabase REST API call with normalized data:
@@ -224,18 +214,12 @@ And here’s the equivalent Supabase REST API call with normalized data:
 ```jsx
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  'https://<your-project>.supabase.co',
-  '<your-api-key>'
-)
+const supabase = createClient('https://<your-project>.supabase.co', '<your-api-key>')
 
-const { data, error } = await supabase
-  .from('users')
-  .select('name, email')
+const { data, error } = await supabase.from('users').select('name, email')
 
 if (error) console.error(error)
 else console.log(data)
-
 ```
 
 ### Step 2: Add more Supabase features
@@ -260,6 +244,6 @@ Once your data is migrated, you can start to use Supabase to its fullest:
 
 ## Conclusion
 
-This is no doubt a stressful time as you transition away from Fauna. Supabase is here to help you every step of the way.  Reach out to us and we can help you plan your transition and provide assistance.
+This is no doubt a stressful time as you transition away from Fauna. Supabase is here to help you every step of the way. Reach out to us and we can help you plan your transition and provide assistance.
 
 Supabase is a comprehensive, scalable replacement for Fauna. Supabase is built on Postgres and offers a robust relational model, powerful security features, and predictable pricing. Supabase enables engineering teams to confidently transition away from Fauna thanks to its SQL ecosystem, more mature/better tooling, row level security, strong typescript support, and full ACID compliance. Thoughtful planning and methodical execution will ensure a seamless migration and long-term reliability.

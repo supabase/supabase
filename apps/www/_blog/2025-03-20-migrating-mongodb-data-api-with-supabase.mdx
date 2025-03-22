@@ -85,9 +85,7 @@ async function loadDocumentsToSupabase() {
     const dataArray = JSON.parse(rawData).map((data) => ({ data }))
 
     // Insert data into Supabase
-    const { error } = await supabase
-      .from(tableName)
-      .insert(dataArray)
+    const { error } = await supabase.from(tableName).insert(dataArray)
 
     if (error) {
       console.error('Error inserting data:', error)
