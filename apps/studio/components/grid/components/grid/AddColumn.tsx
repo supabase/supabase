@@ -1,9 +1,9 @@
-import type { CalculatedColumn } from 'react-data-grid'
-import { Button } from 'ui'
-
 import { Plus } from 'lucide-react'
+import type { CalculatedColumn } from 'react-data-grid'
+
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { Button } from 'ui'
 import { ADD_COLUMN_KEY } from '../../constants'
-import { useTrackedState } from '../../store/Store'
 import { DefaultFormatter } from '../formatter/DefaultFormatter'
 
 export const AddColumn: CalculatedColumn<any, any> = {
@@ -28,17 +28,12 @@ export const AddColumn: CalculatedColumn<any, any> = {
   draggable: false,
 }
 
-type SharedInputProps = Pick<
-  React.InputHTMLAttributes<HTMLInputElement>,
-  'disabled' | 'tabIndex' | 'onClick' | 'aria-label' | 'aria-labelledby'
->
+const AddColumnHeader = () => {
+  const tableEditorSnap = useTableEditorStateSnapshot()
 
-const AddColumnHeader = ({}: SharedInputProps) => {
-  const state = useTrackedState()
-  const { onAddColumn } = state
   return (
-    <div className="sb-grid-add-column">
-      <Button block type="text" onClick={onAddColumn!} icon={<Plus />} />
+    <div className="flex h-full w-full py-1.5 flex items-center">
+      <Button block type="text" onClick={tableEditorSnap.onAddColumn} icon={<Plus />} />
     </div>
   )
 }

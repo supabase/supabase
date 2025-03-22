@@ -5,8 +5,8 @@ import { useDrag, useDrop } from 'react-dnd'
 
 import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { useDispatch, useTrackedState } from '../../store/Store'
 import type { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
 import { ColumnMenu } from '../menu'
 
@@ -19,22 +19,18 @@ export function ColumnHeader<R>({
   foreignKey,
 }: ColumnHeaderProps<R>) {
   const ref = useRef<HTMLDivElement>(null)
-  const dispatch = useDispatch()
   const columnIdx = column.idx
   const columnKey = column.key
   const columnFormat = getColumnFormat(columnType, format)
-  const state = useTrackedState()
+  const snap = useTableEditorTableStateSnapshot()
   const hoverValue = column.name as string
 
-  // keep state.gridColumns' order in sync with data grid component
+  // keep snap.gridColumns' order in sync with data grid component
   useEffect(() => {
-    if (state.gridColumns[columnIdx].key != columnKey) {
-      dispatch({
-        type: 'UPDATE_COLUMN_IDX',
-        payload: { columnKey, columnIdx },
-      })
+    if (snap.gridColumns[columnIdx].key != columnKey) {
+      snap.updateColumnIdx(columnKey, columnIdx)
     }
-  }, [columnKey, columnIdx, state.gridColumns])
+  }, [columnKey, columnIdx, snap.gridColumns])
 
   const [{ isDragging }, drag] = useDrag({
     type: 'column-header',
@@ -98,7 +94,7 @@ export function ColumnHeader<R>({
       }
 
       // Time to actually perform the action
-      moveColumn(dragKey, hoverKey)
+      snap.moveColumn(dragKey, hoverKey)
 
       // Note: we're mutating the monitor item here!
       // Generally it's better to avoid mutations,
@@ -107,14 +103,6 @@ export function ColumnHeader<R>({
       ;(item as DragItem).index = hoverIndex
     },
   })
-
-  const moveColumn = (fromKey: string, toKey: string) => {
-    if (fromKey == toKey) return
-    dispatch({
-      type: 'MOVE_COLUMN',
-      payload: { fromKey, toKey },
-    })
-  }
 
   const opacity = isDragging ? 0 : 1
   const cursor = column.frozen ? 'sb-grid-column-header--cursor' : ''

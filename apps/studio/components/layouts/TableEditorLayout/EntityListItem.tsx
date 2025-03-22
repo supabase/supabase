@@ -209,7 +209,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     <EditorTablePageLink
       title={entity.name}
       id={String(entity.id)}
-      href={`/project/${projectRef}/editor/${entity.id}?schema=${selectedSchema}`}
+      href={`/project/${projectRef}/editor/${entity.id}?schema=${entity.schema}`}
       role="button"
       aria-label={`View ${entity.name}`}
       className={cn(

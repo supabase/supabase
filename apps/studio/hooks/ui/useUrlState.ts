@@ -1,3 +1,4 @@
+import useLatest from 'hooks/misc/useLatest'
 import { useRouter } from 'next/router'
 import { type Dispatch, type SetStateAction, useCallback, useMemo } from 'react'
 
@@ -33,8 +34,12 @@ export function useUrlState<ValueParams extends UrlStateParams>({
     )
   }, [arrayKeysSet, router.query])
 
+  const paramsRef = useLatest(params)
+
   const setParams: Dispatch<SetStateAction<ValueParams>> = useCallback(
     (newParams) => {
+      const params = paramsRef.current
+
       const nextParams = typeof newParams === 'function' ? newParams(params) : newParams
       let newQuery = Object.fromEntries(
         Object.entries({ ...params, ...nextParams }).filter(([, value]) => Boolean(value))
@@ -51,7 +56,8 @@ export function useUrlState<ValueParams extends UrlStateParams>({
         { shallow: true, scroll: false }
       )
     },
-    [router, params, replace]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [router, replace]
   )
 
   return [params, setParams] as const
