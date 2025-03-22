@@ -31,6 +31,18 @@ export const Index: Record<string, any> = {
       chunks: []
     }
     ,
+    "password-based-auth-tanstack": {
+      name: "password-based-auth-tanstack",
+      type: "registry:block",
+      registryDependencies: ["button","card","input","label"],
+      component: React.lazy(() => import("@/registry/default/blocks/password-based-auth-tanstack/routes/login.tsx")),
+      source: "",
+      files: ["registry/default/blocks/password-based-auth-tanstack/routes/login.tsx","registry/default/blocks/password-based-auth-tanstack/routes/auth/error.tsx","registry/default/blocks/password-based-auth-tanstack/routes/_protected.tsx","registry/default/blocks/password-based-auth-tanstack/routes/_protected/info.tsx","registry/default/blocks/password-based-auth-tanstack/routes/auth/confirm.ts","registry/default/blocks/password-based-auth-tanstack/components/login-form.tsx","registry/default/blocks/password-based-auth-tanstack/routes/sign-up.tsx","registry/default/blocks/password-based-auth-tanstack/routes/sign-up-success.tsx","registry/default/blocks/password-based-auth-tanstack/components/sign-up-form.tsx","registry/default/blocks/password-based-auth-tanstack/routes/forgot-password.tsx","registry/default/blocks/password-based-auth-tanstack/routes/update-password.tsx","registry/default/blocks/password-based-auth-tanstack/components/forgot-password-form.tsx","registry/default/blocks/password-based-auth-tanstack/components/update-password-form.tsx","registry/default/blocks/password-based-auth-tanstack/lib/supabase/fetch-user-server-fn.ts","registry/default/clients/tanstack/lib/supabase/client.ts","registry/default/clients/tanstack/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
     "dropzone-nextjs": {
       name: "dropzone-nextjs",
       type: "registry:component",

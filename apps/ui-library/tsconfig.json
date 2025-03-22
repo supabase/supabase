@@ -36,5 +36,10 @@
     ".contentlayer/generated",
     "./../../packages/ui/src/**/*.d.ts"
   ],
-  "exclude": ["node_modules", "./scripts/build-registry.mts"]
+  "exclude": [
+    "node_modules",
+    "./scripts/build-registry.mts",
+    // This file is only used in a registry block and not included in the app.
+    "./registry/default/blocks/password-based-auth-tanstack/lib/supabase/fetch-user-server-fn.ts"
+  ]
 }
