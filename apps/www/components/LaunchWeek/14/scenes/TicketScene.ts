@@ -348,10 +348,8 @@ class TicketScene implements BaseScene {
     context.composer.addPass(this._modelRenderPass)
 
     this._fxaaPass = new ShaderPass(FXAAShader)
-    this._fxaaPass.material.uniforms['resolution'].value.x =
-      1 / (window.innerWidth * 2)
-    this._fxaaPass.material.uniforms['resolution'].value.y =
-      1 / (window.innerHeight * 2)
+    this._fxaaPass.material.uniforms['resolution'].value.x = 1 / (window.innerWidth * 2)
+    this._fxaaPass.material.uniforms['resolution'].value.y = 1 / (window.innerHeight * 2)
 
     // Add the effects passes but with zero intensity
     if (this._glitchPass) context.composer.addPass(this._glitchPass)
@@ -396,10 +394,8 @@ class TicketScene implements BaseScene {
     )
 
     if (this._sceneRenderer && this._fxaaPass) {
-    this._fxaaPass.material.uniforms['resolution'].value.x =
-      1 / (window.innerWidth * 2)
-    this._fxaaPass.material.uniforms['resolution'].value.y =
-      1 / (window.innerHeight * 2)
+      this._fxaaPass.material.uniforms['resolution'].value.x = 1 / (window.innerWidth * 2)
+      this._fxaaPass.material.uniforms['resolution'].value.y = 1 / (window.innerHeight * 2)
     }
 
     return
@@ -905,23 +901,35 @@ class TicketScene implements BaseScene {
       maxLines: number
     }): string[] {
       const lines: string[] = []
-      let pos = 0
-      for (let i = 0; i < maxLines; i++) {
-        if (pos >= text.length) break
+      let remainingText = text.trim()
 
-        // NOTE: If we're on the last allowed line and there is more text than fits...
-        if (i === maxLines - 1 && text.length - pos > maxChars) {
-          // NOTE: Take only maxChars characters and append an ellipsis on last line
-          lines.push(text.substring(pos, pos + maxChars - 3) + '...')
+      for (let i = 0; i < maxLines && remainingText.length > 0; i++) {
+        // If remaining text fits in one line
+        if (remainingText.length <= maxChars) {
+          lines.push(remainingText)
           break
-        } else {
-          if (text[pos] === ' ') {
-            pos++
-          }
-          lines.push(text.substring(pos, pos + maxChars))
-          pos += maxChars
         }
+
+        // Check if we're on the last allowed line
+        if (i === maxLines - 1) {
+          // Add ellipsis for truncated text
+          lines.push(remainingText.substring(0, maxChars - 3) + '...')
+          break
+        }
+
+        // Try to find a space to break at
+        let breakPos = remainingText.lastIndexOf(' ', maxChars)
+
+        // If no space found or it's too early in the string, break at maxChars
+        if (breakPos <= 0 || breakPos < maxChars / 3) {
+          breakPos = maxChars
+        }
+
+        // Add the line and update remaining text
+        lines.push(remainingText.substring(0, breakPos).trim())
+        remainingText = remainingText.substring(breakPos).trim()
       }
+
       return lines
     }
 
@@ -940,23 +948,39 @@ class TicketScene implements BaseScene {
         const lineHeight = fontSize * 1.2
         const padding = 4
 
+        // Calculate max line width for consistent background width
+        const maxLineWidth = Math.max(
+          ...usernameLines.map(line => context.measureText(line).width)
+        )
+
         // Draw username lines with background
         usernameLines.forEach((line, index) => {
           const x = this.texts.user.x * canvas.width
           const y = this.texts.user.y * canvas.height + index * lineHeight
 
           const textWidth = context.measureText(line).width
+          const isLastLine = index === usernameLines.length - 1
+          const backgroundWidth = isLastLine ? textWidth : maxLineWidth
 
+          // Draw main background
           context.fillStyle = colorObjToRgb(colors.bgColor)
           context.fillRect(
             x - padding,
             y - padding,
-            textWidth + padding * 2,
+            backgroundWidth + padding * 2,
             fontSize + padding * 2
           )
+          
+          // Draw secondary background (glow effect)
           context.fillStyle = colorObjToRgb(colors.transparentBg)
-          context.fillRect(x - 287, y + 4, textWidth + 280, fontSize - 24)
+          context.fillRect(
+            x - 287, 
+            y + 4, 
+            backgroundWidth + 280, 
+            fontSize - 24
+          )
 
+          // Draw text
           context.fillStyle = colorObjToRgb(isNeon ? colors.textNeonColor : colors.textColor)
           context.fillText(line, x, y)
         })
