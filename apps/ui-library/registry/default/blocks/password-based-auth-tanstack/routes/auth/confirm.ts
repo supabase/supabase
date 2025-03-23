@@ -21,7 +21,7 @@ const confirmFn = createServerFn({ method: 'GET' })
     const request = getWebRequest()
 
     if (!request) {
-      throw redirect({ to: `/auth/error`, params: { error: 'No request' } })
+      throw redirect({ to: `/auth/error`, search: { error: 'No request' } })
     }
 
     const searchParams = ctx.data
@@ -44,7 +44,7 @@ const confirmFn = createServerFn({ method: 'GET' })
         // redirect the user to an error page with some instructions
         throw redirect({
           to: `/auth/error`,
-          params: { error: error?.message },
+          search: { error: error?.message },
         })
       }
     }
@@ -52,7 +52,7 @@ const confirmFn = createServerFn({ method: 'GET' })
     // redirect the user to an error page with some instructions
     throw redirect({
       to: `/auth/error`,
-      params: { error: 'No token hash or type' },
+      search: { error: 'No token hash or type' },
     })
   })
 
