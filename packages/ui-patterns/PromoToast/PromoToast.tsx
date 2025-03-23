@@ -11,8 +11,7 @@ import announcement from '../Banners/data.json'
 import CountdownComponent from '../Banners/Countdown'
 import "./styles.css"
 
-const SITE_ORIGIN = process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' || process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' ? "" : "http://localhost:3000"
-const LW14BG = `${SITE_ORIGIN}/images/launchweek/14/promo-banner-bg.png`
+const LW14BG = `/docs/img/launchweek/14/promo-banner-bg.png`
 
 const PromoToast = () => {
   const [visible, setVisible] = useState(false)
