@@ -1,5 +1,5 @@
 # Supabase UI Library
-Last updated: 2025-03-22T14:10:43.312Z
+Last updated: 2025-03-23T14:40:10.160Z
 
 ## Overview
 Library of components for your project. The components integrate with Supabase and are shadcn compatible.
@@ -13,12 +13,12 @@ Library of components for your project. The components integrate with Supabase a
     - Components
 - [Quick Start](https://supabase.com/ui/docs/getting-started/quickstart)
     - Components
-- [Nextjs](https://supabase.com/ui/docs/nextjs/client)
-    - Supabase client for Nextjs
+- [Next.js](https://supabase.com/ui/docs/nextjs/client)
+    - Supabase client for Next.js
 - [Dropzone (File Upload)](https://supabase.com/ui/docs/nextjs/dropzone)
     - Displays a control for easier uploading of files directly to Supabase Storage
-- [Password-based Auth (Nextjs)](https://supabase.com/ui/docs/nextjs/password-based-auth)
-    - Password-based Auth block for Nextjs app
+- [Password-based Auth (Next.js)](https://supabase.com/ui/docs/nextjs/password-based-auth)
+    - Password-based Auth block for Next.js app
 - [Realtime Cursor](https://supabase.com/ui/docs/nextjs/realtime-cursor)
     - Real-time cursor sharing for collaborative applications
 - [Supabase Client for React Router](https://supabase.com/ui/docs/react-router/client)
@@ -39,5 +39,7 @@ Library of components for your project. The components integrate with Supabase a
     - Supabase client for Tanstack Start
 - [Dropzone (File Upload)](https://supabase.com/ui/docs/tanstack/dropzone)
     - Displays a control for easier uploading of files directly to Supabase Storage
+- [Tanstack Start](https://supabase.com/ui/docs/tanstack/password-based-auth)
+    - Supabase client for Tanstack Start
 - [Realtime Cursor](https://supabase.com/ui/docs/tanstack/realtime-cursor)
     - Real-time cursor sharing for collaborative applications
