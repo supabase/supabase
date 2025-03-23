@@ -1,5 +1,5 @@
+import { Discord, Discussions, Github } from 'icons'
 import { ArrowUpRight } from 'lucide-react'
-import { IconDiscord, IconDiscussions, IconGitHubSolid } from 'ui'
 
 const data = {
   meta_title: 'Help & Support | Supabase',
@@ -18,7 +18,7 @@ const data = {
           label: 'Open GitHub Issue',
           link: 'https://github.com/supabase/supabase/issues',
           target: '_blank',
-          icon: <IconGitHubSolid />,
+          icon: <Github />,
           type: 'default',
         },
       ],
@@ -31,7 +31,7 @@ const data = {
           label: 'Request feature',
           link: 'https://github.com/orgs/supabase/discussions/categories/feature-requests',
           target: '_blank',
-          icon: <IconGitHubSolid />,
+          icon: <Github />,
           type: 'default',
         },
       ],
@@ -45,14 +45,14 @@ const data = {
           label: 'Ask a question',
           link: 'https://github.com/supabase/supabase/discussions',
           target: '_blank',
-          icon: <IconDiscussions />,
+          icon: <Discussions />,
           type: 'default',
         },
         {
           label: 'Join Discord',
           link: 'https://discord.supabase.com/',
           target: '_blank',
-          icon: <IconDiscord fill="hsl(var(--background-default))" />,
+          icon: <Discord fill="hsl(var(--background-default))" />,
           type: 'secondary',
         },
       ],
