@@ -187,6 +187,54 @@ export const Index: Record<string, any> = {
       chunks: []
     }
     ,
+    "realtime-avatar-stack-nextjs": {
+      name: "realtime-avatar-stack-nextjs",
+      type: "registry:component",
+      registryDependencies: ["avatar","tooltip"],
+      component: React.lazy(() => import("@/registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx")),
+      source: "",
+      files: ["registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx","registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx","registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts","registry/default/clients/nextjs/lib/supabase/client.ts","registry/default/clients/nextjs/lib/supabase/middleware.ts","registry/default/clients/nextjs/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "realtime-avatar-stack-react": {
+      name: "realtime-avatar-stack-react",
+      type: "registry:component",
+      registryDependencies: ["avatar","tooltip"],
+      component: React.lazy(() => import("@/registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx")),
+      source: "",
+      files: ["registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx","registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx","registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts","registry/default/clients/react/lib/supabase/client.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "realtime-avatar-stack-react-router": {
+      name: "realtime-avatar-stack-react-router",
+      type: "registry:component",
+      registryDependencies: ["avatar","tooltip"],
+      component: React.lazy(() => import("@/registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx")),
+      source: "",
+      files: ["registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx","registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx","registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts","registry/default/clients/react-router/lib/supabase.client.ts","registry/default/clients/react-router/lib/supabase.server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "realtime-avatar-stack-tanstack": {
+      name: "realtime-avatar-stack-tanstack",
+      type: "registry:component",
+      registryDependencies: ["avatar","tooltip"],
+      component: React.lazy(() => import("@/registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx")),
+      source: "",
+      files: ["registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx","registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx","registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts","registry/default/clients/tanstack/lib/supabase/client.ts","registry/default/clients/tanstack/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
     "supabase-client-nextjs": {
       name: "supabase-client-nextjs",
       type: "registry:lib",
