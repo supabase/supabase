@@ -5,6 +5,7 @@ import dropzone from './default/blocks/dropzone/registry-item.json' assert { typ
 import passwordBasedAuthNextjs from './default/blocks/password-based-auth-nextjs/registry-item.json' assert { type: 'json' }
 import passwordBasedAuthReact from './default/blocks/password-based-auth-react/registry-item.json' assert { type: 'json' }
 import passwordBasedAuthTanstack from './default/blocks/password-based-auth-tanstack/registry-item.json' assert { type: 'json' }
+import realtimeAvatarStack from './default/blocks/realtime-avatar-stack/registry-item.json' assert { type: 'json' }
 
 import realtimeCursor from './default/blocks/realtime-cursor/registry-item.json' assert { type: 'json' }
 import { registryItemAppend } from './utils'
@@ -32,4 +33,5 @@ export const blocks = [
   ...combine(dropzone as RegistryItem),
   ...combine(realtimeCursor as RegistryItem),
   ...combine(currentUserAvatar as RegistryItem),
+  ...combine(realtimeAvatarStack as RegistryItem),
 ] as Registry['items']
