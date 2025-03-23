@@ -28,6 +28,11 @@ export interface BaseScene {
   cleanup(): void
 
   resize(ev: UIEvent): void
+
+  /**
+   * Handle device pixel ratio changes
+   */
+  devicePixelRatioChanged?(newPixelRatio: number, oldPixelRatio: number): void
 }
 
 class SceneRenderer {
@@ -40,9 +45,11 @@ class SceneRenderer {
   mousePositionState: MousePositionState
   mouseIntensityDecay = 0.98
   mouseIntensityGainRate = 0.003
+  currentPixelRatio: number
 
   private _resizeHandler: ((ev: UIEvent) => void) | null = null
   private _mouseMoveHandler: ((ev: MouseEvent) => void) | null = null
+  private _mediaQueryListHandler: ((ev: MediaQueryListEvent) => void) | null = null
   private _isDisposed = false
   private _isInitialized = false
 
@@ -71,6 +78,7 @@ class SceneRenderer {
     }
 
     this.cachedContainerBBox = this.container.getBoundingClientRect()
+    this.currentPixelRatio = window.devicePixelRatio
   }
 
   async init(sceneInitializer: () => Promise<void>) {
@@ -111,6 +119,13 @@ class SceneRenderer {
 
     this._mouseMoveHandler = this._updateMousePosition.bind(this)
     window.addEventListener('mousemove', this._mouseMoveHandler)
+    
+    // Add device pixel ratio change listener
+    this._mediaQueryListHandler = this._handleDevicePixelRatioChange.bind(this)
+    window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`).addEventListener(
+      'change', 
+      this._mediaQueryListHandler
+    )
   }
 
   async activateScene(scene: BaseScene, main?: boolean) {
@@ -170,6 +185,19 @@ class SceneRenderer {
       window.removeEventListener('resize', this._resizeHandler)
       this._resizeHandler = null
     }
+    
+    if (this._mouseMoveHandler) {
+      window.removeEventListener('mousemove', this._mouseMoveHandler)
+      this._mouseMoveHandler = null
+    }
+    
+    if (this._mediaQueryListHandler) {
+      window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`).removeEventListener(
+        'change', 
+        this._mediaQueryListHandler
+      )
+      this._mediaQueryListHandler = null
+    }
 
     if (this.waitFor) {
       // Mutate array in place instead of replacing reference
@@ -191,6 +219,27 @@ class SceneRenderer {
     for (const activeScene of this.activeScenes) {
       activeScene.resize(ev)
     }
+  }
+  
+  private _handleDevicePixelRatioChange(ev: MediaQueryListEvent) {
+    const oldPixelRatio = this.currentPixelRatio
+    const newPixelRatio = window.devicePixelRatio
+    
+    // Update renderer and composer pixel ratio
+    this.renderer.setPixelRatio(newPixelRatio)
+    this.composer.setPixelRatio(newPixelRatio)
+    
+    // Store the new pixel ratio
+    this.currentPixelRatio = newPixelRatio
+    
+    // Notify all active scenes about the pixel ratio change
+    for (const activeScene of this.activeScenes) {
+      if (typeof activeScene.devicePixelRatioChanged === 'function') {
+        activeScene.devicePixelRatioChanged(newPixelRatio, oldPixelRatio)
+      }
+    }
+    
+    console.log(`SCENE RENDERER: Device pixel ratio changed from ${oldPixelRatio} to ${newPixelRatio}`)
   }
 
   private _decayMouseIntensity() {

@@ -380,7 +380,7 @@ class HUDScene implements BaseScene {
       transparent: true,
       side: THREE.DoubleSide,
       depthWrite: false, // Helps with transparency issues
-      dithering: true
+      dithering: true,
     })
 
     this.shader.uniforms.vignetteRadius.value = this.state.vignetteRaduis
@@ -750,12 +750,12 @@ class HUDScene implements BaseScene {
   private drawNumberControl(
     ctx: CanvasRenderingContext2D,
     coords: { x: number; y: number },
-    data: { 
-      label: string; 
-      value: number | null; 
-      active: boolean; 
-      alignment?: 'left' | 'center';
-      showDot?: boolean;
+    data: {
+      label: string
+      value: number | null
+      active: boolean
+      alignment?: 'left' | 'center'
+      showDot?: boolean
     }
   ) {
     const control = this.scaledStyles.numberControl
@@ -798,18 +798,18 @@ class HUDScene implements BaseScene {
     // Calculate position for dot and text
     const dotY =
       coords.y + control.lineHeight + control.yGap + control.lineHeight / 2 - control.dotSize / 2
-    
+
     // Determine if dot should be shown (default to true if not specified)
-    const showDot = data.showDot !== undefined ? data.showDot : true;
-    
+    const showDot = data.showDot !== undefined ? data.showDot : true
+
     // Position for text - depends on whether dot is shown
-    let textX = contentX;
-    
+    let textX = contentX
+
     // Draw the dot if showDot is true
     if (showDot) {
       // Draw the dot with color based on active state
       ctx.fillStyle = data.active ? control.activeColor : control.disabledColor
-      
+
       ctx.beginPath()
       ctx.arc(
         contentX + control.dotSize / 2,
@@ -819,9 +819,9 @@ class HUDScene implements BaseScene {
         Math.PI * 2
       )
       ctx.fill()
-      
+
       // If dot is shown, text starts after dot + gap
-      textX = contentX + control.dotSize + control.xGap;
+      textX = contentX + control.dotSize + control.xGap
     }
 
     // Draw value or dashes
@@ -961,6 +961,54 @@ class HUDScene implements BaseScene {
     return resolutions.reduce((prev, curr) =>
       resolution - curr >= 0 && resolution - curr < resolution - prev ? curr : prev
     ) as keyof typeof this.resolutions
+  }
+
+  devicePixelRatioChanged(newPixelRatio: number, oldPixelRatio: number): void {
+    // Update canvas dimensions
+    if (this.hudCanvas && this.hudContext) {
+      // Recalculate canvas dimensions directly from reference dimensions and new pixel ratio
+      // instead of multiplying by ratio change to avoid exponential growth/shrinking
+      this.canvasWidth = this.referenceCanvasWidth * this.qualityMultiplier
+      this.canvasHeight = this.referenceCanvasHeight * this.qualityMultiplier
+      
+      this.hudCanvas.width = this.canvasWidth
+      this.hudCanvas.height = this.canvasHeight
+      
+      // Recalculate scaled styles directly from reference styles and new pixel ratio
+      this.scaledStyles = JSON.parse(JSON.stringify(this.referenceStyles), (key, value) => {
+        return typeof value === 'number' ? value * this.qualityMultiplier : value
+      })
+      
+      // Update layouts with new pixel ratio
+      this.layouts = {
+        default: Object.fromEntries(
+          Object.entries(this.resolutions).map(([key, resolutions]) => [
+            key,
+            JSON.parse(JSON.stringify(resolutions), (key, value) => {
+              return typeof value === 'number' ? value * this.qualityMultiplier : value
+            }),
+          ])
+        ) as typeof this.resolutions,
+  
+        ticket: Object.fromEntries(
+          Object.entries(this.resolutionsTicketLayout).map(([key, resolutions]) => [
+            key,
+            JSON.parse(JSON.stringify(resolutions), (key, value) => {
+              return typeof value === 'number' ? value * this.qualityMultiplier : value
+            }),
+          ])
+        ) as typeof this.resolutionsTicketLayout,
+      }
+      
+      // Redraw the HUD with new dimensions
+      this._draw()
+      if (this.hudTexture) this.hudTexture.needsUpdate = true
+      
+      // Update the plane geometry with new dimensions if needed
+      if (this.hudPlane && this.hudMesh) {
+        this.repositionHudElements()
+      }
+    }
   }
 }
 

@@ -474,6 +474,30 @@ class TicketScene implements BaseScene {
     this._loadTextures(true)
   }
 
+  devicePixelRatioChanged(newPixelRatio: number, oldPixelRatio: number): void {
+    // Update FXAA pass resolution values if it exists
+    if (this._fxaaPass) {
+      this._fxaaPass.material.uniforms['resolution'].value.x =
+        1 / (window.innerWidth * newPixelRatio)
+      this._fxaaPass.material.uniforms['resolution'].value.y =
+        1 / (window.innerHeight * newPixelRatio)
+    }
+
+    // Regenerate texture canvases with new pixel ratio
+    this._setupTextureCanvases()
+
+    // Reload textures to apply new pixel ratio
+    this._loadTextures(true)
+
+    // Update bloom pass resolution if it exists
+    if (this._bloomPass && this._sceneRenderer) {
+      this._bloomPass.resolution.set(
+        this._sceneRenderer.container.clientWidth * newPixelRatio,
+        this._sceneRenderer.container.clientHeight * newPixelRatio
+      )
+    }
+  }
+
   private _enableSecretEffects() {
     if (this._effectsEnabled) return // Already enabled
 
@@ -950,7 +974,7 @@ class TicketScene implements BaseScene {
 
         // Calculate max line width for consistent background width
         const maxLineWidth = Math.max(
-          ...usernameLines.map(line => context.measureText(line).width)
+          ...usernameLines.map((line) => context.measureText(line).width)
         )
 
         // Draw username lines with background
@@ -970,15 +994,10 @@ class TicketScene implements BaseScene {
             backgroundWidth + padding * 2,
             fontSize + padding * 2
           )
-          
+
           // Draw secondary background (glow effect)
           context.fillStyle = colorObjToRgb(colors.transparentBg)
-          context.fillRect(
-            x - 287, 
-            y + 4, 
-            backgroundWidth + 280, 
-            fontSize - 24
-          )
+          context.fillRect(x - 287, y + 4, backgroundWidth + 280, fontSize - 24)
 
           // Draw text
           context.fillStyle = colorObjToRgb(isNeon ? colors.textNeonColor : colors.textColor)
@@ -1132,6 +1151,7 @@ class TicketScene implements BaseScene {
 
     return this.resolutions[closestResolution]
   }
+
 }
 
 export default TicketScene

@@ -364,6 +364,20 @@ private createTunnel(scene: THREE.Scene): void {
       this.tunnelGroup.visible = value
     }
   }
+
+  devicePixelRatioChanged(): void {
+    if (this.tunnelGroup) {
+      this.tunnelGroup.traverse((child) => {
+        if (child instanceof THREE.Mesh || child instanceof THREE.Line) {
+          if (child.material) {
+            // Update any material properties that might depend on pixel ratio
+            child.material.needsUpdate = true
+          }
+        }
+      })
+    }
+  }
 }
 
 export default TunnelScene
+
