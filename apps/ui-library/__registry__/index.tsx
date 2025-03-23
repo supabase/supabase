@@ -139,6 +139,54 @@ export const Index: Record<string, any> = {
       chunks: []
     }
     ,
+    "current-user-avatar-nextjs": {
+      name: "current-user-avatar-nextjs",
+      type: "registry:component",
+      registryDependencies: ["avatar"],
+      component: React.lazy(() => import("@/registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx")),
+      source: "",
+      files: ["registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx","registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts","registry/default/clients/nextjs/lib/supabase/client.ts","registry/default/clients/nextjs/lib/supabase/middleware.ts","registry/default/clients/nextjs/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "current-user-avatar-react": {
+      name: "current-user-avatar-react",
+      type: "registry:component",
+      registryDependencies: ["avatar"],
+      component: React.lazy(() => import("@/registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx")),
+      source: "",
+      files: ["registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx","registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts","registry/default/clients/react/lib/supabase/client.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "current-user-avatar-react-router": {
+      name: "current-user-avatar-react-router",
+      type: "registry:component",
+      registryDependencies: ["avatar"],
+      component: React.lazy(() => import("@/registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx")),
+      source: "",
+      files: ["registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx","registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts","registry/default/clients/react-router/lib/supabase.client.ts","registry/default/clients/react-router/lib/supabase.server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "current-user-avatar-tanstack": {
+      name: "current-user-avatar-tanstack",
+      type: "registry:component",
+      registryDependencies: ["avatar"],
+      component: React.lazy(() => import("@/registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx")),
+      source: "",
+      files: ["registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx","registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts","registry/default/clients/tanstack/lib/supabase/client.ts","registry/default/clients/tanstack/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
     "supabase-client-nextjs": {
       name: "supabase-client-nextjs",
       type: "registry:lib",

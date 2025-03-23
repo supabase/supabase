@@ -1,5 +1,6 @@
 import { type Registry, type RegistryItem } from 'shadcn/registry'
 import { clients } from './clients'
+import currentUserAvatar from './default/blocks/current-user-avatar/registry-item.json' assert { type: 'json' }
 import dropzone from './default/blocks/dropzone/registry-item.json' assert { type: 'json' }
 import passwordBasedAuthNextjs from './default/blocks/password-based-auth-nextjs/registry-item.json' assert { type: 'json' }
 import passwordBasedAuthReact from './default/blocks/password-based-auth-react/registry-item.json' assert { type: 'json' }
@@ -30,4 +31,5 @@ export const blocks = [
   registryItemAppend(passwordBasedAuthTanstack as RegistryItem, [tanstackClient!]),
   ...combine(dropzone as RegistryItem),
   ...combine(realtimeCursor as RegistryItem),
+  ...combine(currentUserAvatar as RegistryItem),
 ] as Registry['items']
