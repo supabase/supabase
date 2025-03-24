@@ -1,5 +1,4 @@
 import { components } from 'api-types'
-import { useRouter } from 'next/compat/router'
 import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useRef } from 'react'
 import { LOCAL_STORAGE_KEYS } from './constants'
@@ -61,8 +60,7 @@ export const PageTelemetry = ({
   hasAcceptedConsent: boolean
   enabled?: boolean
 }) => {
-  const router = useRouter()
-  const currentPathname = usePathname()
+  const currentPathname = usePathname() as string
   const previousPathnameRef = useRef(currentPathname)
 
   const featureFlags = useFeatureFlags()
