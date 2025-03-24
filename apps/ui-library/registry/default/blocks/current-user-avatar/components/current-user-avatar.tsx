@@ -7,16 +7,16 @@ import { useCurrentUserName } from '../hooks/use-current-user-name'
 export const CurrentUserAvatar = () => {
   const profileImage = useCurrentUserImage()
   const name = useCurrentUserName()
-  const initials = name
+
+  const initial = name
     ?.split(' ')
-    ?.map((word) => word[0])
-    ?.join('')
+    ?.map((word) => word[0])?.[0]
     ?.toUpperCase()
 
   return (
     <Avatar>
-      {profileImage && <AvatarImage src={profileImage} alt={initials} />}
-      <AvatarFallback>{initials}</AvatarFallback>
+      {profileImage && <AvatarImage src={profileImage} alt={initial} />}
+      <AvatarFallback>{initial}</AvatarFallback>
     </Avatar>
   )
 }
