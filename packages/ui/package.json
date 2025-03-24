@@ -80,8 +80,8 @@
   },
   "devDependencies": {
     "@ctrl/tinycolor": "^3.4.0",
-    "@testing-library/jest-dom": "^6.1.3",
-    "@testing-library/react": "^14.0.0",
+    "@testing-library/jest-dom": "^6.6.0",
+    "@testing-library/react": "^16.0.0",
     "@types/lodash": "4.17.5",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
