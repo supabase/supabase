@@ -1,4 +1,5 @@
 import { components } from 'api-types'
+import { useRouter } from 'next/compat/router'
 import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useRef } from 'react'
 import { LOCAL_STORAGE_KEYS } from './constants'
@@ -60,8 +61,10 @@ export const PageTelemetry = ({
   hasAcceptedConsent: boolean
   enabled?: boolean
 }) => {
-  const currentPathname = usePathname() as string // usePathname returns string | null in typecheck for some reason
-  const previousPathnameRef = useRef(currentPathname)
+  const router = useRouter()
+
+  const pagesPathname = router?.pathname
+  const appPathname = usePathname()
 
   const featureFlags = useFeatureFlags()
 
@@ -72,26 +75,67 @@ export const PageTelemetry = ({
   const sendPageTelemetry = useCallback(() => {
     if (!(enabled && hasAcceptedConsent)) return Promise.resolve()
 
-    return handlePageTelemetry(API_URL, currentPathname, featureFlags.posthog).catch((e) => {
+    return handlePageTelemetry(
+      API_URL,
+      pagesPathname ?? appPathname ?? undefined,
+      featureFlags.posthog
+    ).catch((e) => {
       console.error('Problem sending telemetry page:', e)
     })
-  }, [API_URL, currentPathname, hasAcceptedConsent, featureFlags.posthog])
+  }, [API_URL, pagesPathname, appPathname, hasAcceptedConsent, featureFlags.posthog])
 
   const sendPageLeaveTelemetry = useCallback(() => {
     if (!(enabled && hasAcceptedConsent)) return Promise.resolve()
 
-    return handlePageTelemetry(API_URL, currentPathname, featureFlags.posthog).catch((e) => {
+    return handlePageTelemetry(
+      API_URL,
+      pagesPathname ?? appPathname ?? undefined,
+      featureFlags.posthog
+    ).catch((e) => {
       console.error('Problem sending telemetry page-leave:', e)
     })
-  }, [API_URL, currentPathname, hasAcceptedConsent, featureFlags.posthog])
+  }, [pagesPathname, appPathname, hasAcceptedConsent, featureFlags.posthog])
+
+  const hasSentInitialPageTelemetryRef = useRef(false)
 
   useEffect(() => {
-    // Skip initial mount since we handle that separately
-    if (previousPathnameRef.current === currentPathname) return
+    // Send page telemetry on first page load
+    // Waiting for router ready before sending page_view
+    // if not the path will be dynamic route instead of the browser url
+    if (
+      (router?.isReady ?? true) &&
+      featureFlags.hasLoaded &&
+      !hasSentInitialPageTelemetryRef.current
+    ) {
+      sendPageTelemetry()
+      hasSentInitialPageTelemetryRef.current = true
+    }
+  }, [router?.isReady, featureFlags.hasLoaded])
 
-    previousPathnameRef.current = currentPathname
-    sendPageTelemetry()
-  }, [currentPathname, sendPageTelemetry])
+  useEffect(() => {
+    // For pages router
+    if (router === null) return
+
+    function handleRouteChange() {
+      sendPageTelemetry()
+    }
+
+    // Listen for page changes after a navigation or when the query changes
+    router.events.on('routeChangeComplete', handleRouteChange)
+
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange)
+    }
+  }, [router])
+
+  useEffect(() => {
+    // For app router
+    if (router !== null) return
+
+    if (appPathname) {
+      sendPageTelemetry()
+    }
+  }, [appPathname, router, sendPageTelemetry])
 
   useEffect(() => {
     if (!enabled) return
