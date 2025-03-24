@@ -1,6 +1,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/registry/default/components/ui/card'
+import { createFileRoute } from '@tanstack/react-router'
 
-export default function Page({ searchParams }: { searchParams: { error: string } }) {
+export const Route = createFileRoute('/auth/error')({
+  component: AuthError,
+  validateSearch: (params) => {
+    if (params.error && typeof params.error === 'string') {
+      return { error: params.error }
+    }
+    return null
+  },
+})
+
+function AuthError() {
+  const params = Route.useSearch()
+
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm">
@@ -10,8 +23,8 @@ export default function Page({ searchParams }: { searchParams: { error: string }
               <CardTitle className="text-2xl">Sorry, something went wrong.</CardTitle>
             </CardHeader>
             <CardContent>
-              {searchParams?.error ? (
-                <p className="text-sm text-muted-foreground">Code error: {searchParams.error}</p>
+              {params?.error ? (
+                <p className="text-sm text-muted-foreground">Code error: {params.error}</p>
               ) : (
                 <p className="text-sm text-muted-foreground">An unspecified error occurred.</p>
               )}

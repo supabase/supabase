@@ -10,8 +10,8 @@ export function Command({ name }: CommandCopyProps) {
       ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
       : process.env.VERCEL_TARGET_ENV === 'preview'
         ? `https://${process.env.VERCEL_PROJECT_PREVIEW_URL}`
-        : 'http://localhost:3000'
-  }/r/${name}.json`
+        : 'http://localhost:3004'
+  }${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/r/${name}.json`
 
   return (
     <>
