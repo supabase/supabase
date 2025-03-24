@@ -1,6 +1,8 @@
 import { ChevronDown, Edit, Lock, Trash, Unlock } from 'lucide-react'
 import type { CalculatedColumn } from 'react-data-grid'
 
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
   DropdownMenu,
@@ -12,7 +14,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { useDispatch, useTrackedState } from '../../store/Store'
 
 interface ColumnMenuProps {
   column: CalculatedColumn<any, unknown>
@@ -20,32 +21,37 @@ interface ColumnMenuProps {
 }
 
 const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
-  const state = useTrackedState()
-  const dispatch = useDispatch()
-  const { onEditColumn: onEditColumnFunc, onDeleteColumn: onDeleteColumnFunc } = state
+  const tableEditorSnap = useTableEditorStateSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
 
   const columnKey = column.key
 
   function onFreezeColumn() {
-    dispatch({ type: 'FREEZE_COLUMN', payload: { columnKey } })
+    snap.freezeColumn(columnKey)
   }
 
   function onUnfreezeColumn() {
-    dispatch({ type: 'UNFREEZE_COLUMN', payload: { columnKey } })
+    snap.unfreezeColumn(columnKey)
   }
 
   function onEditColumn() {
-    if (onEditColumnFunc) onEditColumnFunc(columnKey)
+    const pgColumn = snap.originalTable.columns.find((c) => c.name === column.name)
+    if (pgColumn) {
+      tableEditorSnap.onEditColumn(pgColumn)
+    }
   }
 
   function onDeleteColumn() {
-    if (onDeleteColumnFunc) onDeleteColumnFunc(columnKey)
+    const pgColumn = snap.originalTable.columns.find((c) => c.name === column.name)
+    if (pgColumn) {
+      tableEditorSnap.onDeleteColumn(pgColumn)
+    }
   }
 
   function renderMenu() {
     return (
       <>
-        {state.editable && onEditColumn !== undefined && (
+        {snap.editable && (
           <Tooltip>
             <TooltipTrigger asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
               <DropdownMenuItem className="space-x-2" onClick={onEditColumn} disabled={isEncrypted}>
@@ -74,7 +80,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
             </>
           )}
         </DropdownMenuItem>
-        {state.editable && onDeleteColumn !== undefined && (
+        {snap.editable && (
           <>
             <Separator />
             <DropdownMenuItem className="space-x-2" onClick={onDeleteColumn}>
