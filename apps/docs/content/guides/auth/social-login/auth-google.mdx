@@ -224,7 +224,7 @@ To use Google's pre-built signin buttons:
 
 To use your own application code for the signin button, call the `signInWithOAuth` method (or the equivalent for your language).
 
-<CreateClientSnippet />
+<$Partial path="create_client_snippet.mdx" />
 
 ```js
 supabase.auth.signInWithOAuth({
@@ -234,7 +234,7 @@ supabase.auth.signInWithOAuth({
 
 For an implicit flow, that's all you need to do. The user will be taken to Google's consent screen, and finally redirected to your app with an access and refresh token pair representing their session.
 
-<OAuthPkceFlow />
+<$Partial path="oauth_pkce_flow.mdx" />
 
 After a successful code exchange, the user's session will be saved to cookies.
 

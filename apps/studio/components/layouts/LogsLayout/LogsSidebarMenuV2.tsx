@@ -36,6 +36,7 @@ import {
   InnerSideMenuItem,
 } from 'ui-patterns/InnerSideMenu'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 
 const SupaIcon = ({ className }: { className?: string }) => {
   return (
@@ -95,6 +96,8 @@ export function LogsSidebarMenuV2() {
     { projectRef: ref },
     { enabled: IS_PLATFORM && warehouseEnabled && !!tenantData }
   )
+  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
+  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
   const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery({
     projectRef: ref,
@@ -130,13 +133,20 @@ export function LogsSidebarMenuV2() {
     },
     IS_PLATFORM
       ? {
-          name: 'Pooler',
+          name: isFreePlan ? 'Pooler' : 'Shared Pooler',
           key: 'pooler-logs',
           url: `/project/${ref}/logs/pooler-logs`,
           items: [],
         }
       : null,
-    ,
+    !isFreePlan && IS_PLATFORM
+      ? {
+          name: 'Dedicated Pooler',
+          key: 'dedicated-pooler-logs',
+          url: `/project/${ref}/logs/dedicated-pooler-logs`,
+          items: [],
+        }
+      : null,
     authEnabled
       ? {
           name: 'Auth',

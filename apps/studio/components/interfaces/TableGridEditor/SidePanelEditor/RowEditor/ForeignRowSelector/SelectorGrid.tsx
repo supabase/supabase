@@ -1,3 +1,4 @@
+import { NullValue } from 'components/grid/components/common/NullValue'
 import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
 import type { SupaRow, SupaTable } from 'components/grid/types'
 import {
@@ -34,16 +35,24 @@ const columnRender = (name: string, isPrimaryKey = false) => {
   )
 }
 
+// TODO: move this formatter out to a common component
 const formatter = ({ column, format, row }: { column: string; format: string; row: SupaRow }) => {
   const formattedValue =
     format === 'bytea'
       ? convertByteaToHex(row[column])
-      : typeof row[column] === 'object'
-        ? JSON.stringify(row[column])
-        : row[column]
+      : row[column] === null
+        ? null
+        : typeof row[column] === 'object'
+          ? JSON.stringify(row[column])
+          : row[column]
+
   return (
     <div className="group sb-grid-select-cell__formatter overflow-hidden">
-      <span className="text-sm truncate">{formattedValue}</span>
+      {formattedValue === null ? (
+        <NullValue />
+      ) : (
+        <span className="text-sm truncate">{formattedValue}</span>
+      )}
     </div>
   )
 }

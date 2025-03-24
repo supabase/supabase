@@ -1651,6 +1651,128 @@
         "security": [{ "bearer": [] }]
       }
     },
+    "/v1/projects/{ref}/config/auth/signing-keys": {
+      "post": {
+        "operationId": "createSigningKeyForProject",
+        "summary": "[Alpha] Create a new signing key for the project in standby status",
+        "parameters": [
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateSigningKeyBody" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "[Alpha] Create a new signing key for the project in standby status",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CreateSigningKeyBody" }
+              }
+            }
+          },
+          "403": { "description": "" }
+        },
+        "tags": ["Auth"],
+        "security": [{ "bearer": [] }]
+      },
+      "get": {
+        "operationId": "listSigningKeysForProject",
+        "summary": "[Alpha] List all signing keys for the project",
+        "parameters": [
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SigningKeysResponse" }
+              }
+            }
+          },
+          "403": { "description": "" }
+        },
+        "tags": ["Auth"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/v1/projects/{ref}/config/auth/signing-keys/{id}": {
+      "get": {
+        "operationId": "getSigningKeyForProject",
+        "summary": "[Alpha] Get information about a signing key",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } },
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SigningKeyResponse" }
+              }
+            }
+          }
+        },
+        "tags": ["Auth"],
+        "security": [{ "bearer": [] }]
+      },
+      "delete": {
+        "operationId": "deleteSigningKey",
+        "summary": "[Alpha] Remove a signing key from a project, where the status is previously_used",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } },
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SigningKeyResponse" }
+              }
+            }
+          },
+          "403": { "description": "" }
+        },
+        "tags": ["Auth"],
+        "security": [{ "bearer": [] }]
+      },
+      "patch": {
+        "operationId": "patchSigningKey",
+        "summary": "[Alpha] Update a signing key, mainly its status",
+        "parameters": [
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } },
+          { "name": "ref", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateSigningKeyBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SigningKeyResponse" }
+              }
+            }
+          },
+          "403": { "description": "" }
+        },
+        "tags": ["Auth"],
+        "security": [{ "bearer": [] }]
+      }
+    },
     "/v1/projects/{ref}/config/storage": {
       "get": {
         "operationId": "v1-get-storage-config",
@@ -3569,7 +3691,11 @@
       },
       "SecretResponse": {
         "type": "object",
-        "properties": { "name": { "type": "string" }, "value": { "type": "string" } },
+        "properties": {
+          "name": { "type": "string" },
+          "value": { "type": "string" },
+          "updated_at": { "type": "string" }
+        },
         "required": ["name", "value"]
       },
       "CreateSecretBody": {
@@ -3806,6 +3932,68 @@
         },
         "required": ["name", "healthy", "status"]
       },
+      "CreateSigningKeyBody": {
+        "type": "object",
+        "properties": {
+          "algorithm": { "type": "string", "enum": ["EdDSA", "ES256", "RS256", "HS256"] },
+          "status": { "type": "string", "enum": ["in_use", "standby"] }
+        },
+        "required": ["algorithm"],
+        "additionalProperties": false
+      },
+      "SigningKeysResponse": {
+        "type": "object",
+        "properties": {
+          "keys": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string", "format": "uuid" },
+                "algorithm": { "type": "string", "enum": ["EdDSA", "ES256", "RS256", "HS256"] },
+                "status": {
+                  "type": "string",
+                  "enum": ["in_use", "previously_used", "revoked", "standby"]
+                },
+                "public_jwk": { "nullable": true },
+                "created_at": { "type": "string", "format": "date-time" },
+                "updated_at": { "type": "string", "format": "date-time" }
+              },
+              "required": ["id", "algorithm", "status", "created_at", "updated_at"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["keys"],
+        "additionalProperties": false
+      },
+      "SigningKeyResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "algorithm": { "type": "string", "enum": ["EdDSA", "ES256", "RS256", "HS256"] },
+          "status": {
+            "type": "string",
+            "enum": ["in_use", "previously_used", "revoked", "standby"]
+          },
+          "public_jwk": { "nullable": true },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "algorithm", "status", "created_at", "updated_at"],
+        "additionalProperties": false
+      },
+      "UpdateSigningKeyBody": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["in_use", "previously_used", "revoked", "standby"]
+          }
+        },
+        "required": ["status"],
+        "additionalProperties": false
+      },
       "StorageFeatureImageTransformation": {
         "type": "object",
         "properties": { "enabled": { "type": "boolean" } },
@@ -3926,6 +4114,7 @@
           "db_host": { "type": "string" },
           "db_name": { "type": "string" },
           "connectionString": { "type": "string" },
+          "connection_string": { "type": "string" },
           "pool_mode": { "enum": ["transaction", "session"], "type": "string" }
         },
         "required": [
@@ -3939,6 +4128,7 @@
           "db_host",
           "db_name",
           "connectionString",
+          "connection_string",
           "pool_mode"
         ]
       },
@@ -3954,8 +4144,7 @@
           "pool_mode": {
             "enum": ["transaction", "session"],
             "type": "string",
-            "deprecated": true,
-            "description": "This field is deprecated and is ignored in this request"
+            "description": "Dedicated pooler mode for the project"
           }
         }
       },
@@ -3963,7 +4152,7 @@
         "type": "object",
         "properties": {
           "default_pool_size": { "type": "integer", "nullable": true },
-          "pool_mode": { "enum": ["transaction", "session"], "type": "string" }
+          "pool_mode": { "type": "string" }
         },
         "required": ["default_pool_size", "pool_mode"]
       },

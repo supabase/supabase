@@ -6,6 +6,8 @@ import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import {
+  Card,
+  CardContent,
   ScrollArea,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
@@ -37,20 +39,20 @@ const EmailTemplates = () => {
         <AlertError error={authConfigError} subject="Failed to retrieve auth configuration" />
       )}
       {isLoading && (
-        <div className="w-[854px]">
+        <div className="w-[854px] mt-12">
           <GenericSkeletonLoader />
         </div>
       )}
       {isSuccess && (
-        <>
+        <div className="my-12">
           {builtInSMTP ? (
             <div className="mb-4">
               <EmailRateLimitsAlert />
             </div>
           ) : null}
-          <FormPanel>
+          <Card>
             <Tabs_Shadcn_ defaultValue={TEMPLATES_SCHEMAS[0].title.trim().replace(/\s+/g, '-')}>
-              <TabsList_Shadcn_ className="px-4 md:px-8 pt-2 gap-5 overflow-x-scroll no-scrollbar">
+              <TabsList_Shadcn_ className="pt-2 px-6 gap-5 mb-0 overflow-x-scroll no-scrollbar mb-4">
                 {TEMPLATES_SCHEMAS.map((template) => {
                   return (
                     <TabsTrigger_Shadcn_ value={template.title.trim().replace(/\s+/g, '-')}>
@@ -59,18 +61,17 @@ const EmailTemplates = () => {
                   )
                 })}
               </TabsList_Shadcn_>
-
               {TEMPLATES_SCHEMAS.map((template) => {
                 const panelId = template.title.trim().replace(/\s+/g, '-')
                 return (
-                  <TabsContent_Shadcn_ value={panelId} key={panelId}>
+                  <TabsContent_Shadcn_ value={panelId} key={panelId} className="mt-0">
                     <TemplateEditor key={template.title} template={template} />
                   </TabsContent_Shadcn_>
                 )
               })}
             </Tabs_Shadcn_>
-          </FormPanel>
-        </>
+          </Card>
+        </div>
       )}
     </div>
   )

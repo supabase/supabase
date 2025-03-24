@@ -32,6 +32,26 @@ export interface paths {
     patch: operations['v1-update-a-branch-config']
     trace?: never
   }
+  '/v1/branches/{branch_id}/merge': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Merges a database branch
+     * @description Merges the specified database branch
+     */
+    post: operations['v1-merge-a-branch']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/branches/{branch_id}/push': {
     parameters: {
       query?: never
@@ -271,6 +291,41 @@ export interface paths {
     patch: operations['updateApiKey']
     trace?: never
   }
+  '/v1/projects/{ref}/billing/addons': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Lists project addons */
+    get: operations['v1-list-project-addons']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Applies project addon */
+    patch: operations['v1-apply-project-addon']
+    trace?: never
+  }
+  '/v1/projects/{ref}/billing/addons/{addon_variant}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Removes project addon */
+    delete: operations['v1-remove-project-addon']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/branches': {
     parameters: {
       query?: never
@@ -317,6 +372,43 @@ export interface paths {
     patch: operations['v1-update-auth-service-config']
     trace?: never
   }
+  '/v1/projects/{ref}/config/auth/signing-keys': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** [Alpha] List all signing keys for the project */
+    get: operations['listSigningKeysForProject']
+    put?: never
+    /** [Alpha] Create a new signing key for the project in standby status */
+    post: operations['createSigningKeyForProject']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/config/auth/signing-keys/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** [Alpha] Get information about a signing key */
+    get: operations['getSigningKeyForProject']
+    put?: never
+    post?: never
+    /** [Alpha] Remove a signing key from a project, where the status is previously_used */
+    delete: operations['deleteSigningKey']
+    options?: never
+    head?: never
+    /** [Alpha] Update a signing key, mainly its status */
+    patch: operations['patchSigningKey']
+    trace?: never
+  }
   '/v1/projects/{ref}/config/auth/sso/providers': {
     parameters: {
       query?: never
@@ -361,7 +453,7 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Alpha] Lists all third-party auth integrations */
+    /** Lists all third-party auth integrations */
     get: operations['listTPAForProject']
     put?: never
     /** Creates a new third-party auth integration */
@@ -379,11 +471,11 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Alpha] Get a third-party integration */
+    /** Get a third-party integration */
     get: operations['getTPAForProject']
     put?: never
     post?: never
-    /** [Alpha] Removes a third-party auth integration */
+    /** Removes a third-party auth integration */
     delete: operations['deleteTPAForProject']
     options?: never
     head?: never
@@ -415,14 +507,14 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's supavisor config */
-    get: operations['v1-get-supavisor-config']
+    get: operations['getSupavisorConfig']
     put?: never
     post?: never
     delete?: never
     options?: never
     head?: never
     /** Updates project's supavisor config */
-    patch: operations['v1-update-supavisor-config']
+    patch: operations['updateSupavisorConfig']
     trace?: never
   }
   '/v1/projects/{ref}/config/database/postgres': {
@@ -1189,16 +1281,44 @@ export interface components {
       description?: string | null
       hash?: string | null
       id?: string | null
+      /** Format: date-time */
       inserted_at?: string | null
       name: string
       prefix?: string | null
-      secret_jwt_template?: components['schemas']['ApiKeySecretJWTTemplate'] | null
+      secret_jwt_template?: {
+        role: string
+      } | null
       /** @enum {string|null} */
       type?: 'publishable' | 'secret' | 'legacy' | null
+      /** Format: date-time */
       updated_at?: string | null
     }
-    ApiKeySecretJWTTemplate: {
-      role: string
+    ApplyProjectAddonBodyDto: {
+      /** @enum {string} */
+      addon_type:
+        | 'custom_domain'
+        | 'compute_instance'
+        | 'pitr'
+        | 'ipv4'
+        | 'auth_mfa_phone'
+        | 'auth_mfa_web_authn'
+        | 'log_drain'
+      addon_variant:
+        | (
+            | 'ci_micro'
+            | 'ci_small'
+            | 'ci_medium'
+            | 'ci_large'
+            | 'ci_xlarge'
+            | 'ci_2xlarge'
+            | 'ci_4xlarge'
+            | 'ci_8xlarge'
+            | 'ci_12xlarge'
+            | 'ci_16xlarge'
+          )
+        | 'cd_default'
+        | ('pitr_7' | 'pitr_14' | 'pitr_28')
+        | 'ipv4_default'
     }
     AttributeMapping: {
       keys: {
@@ -1390,7 +1510,8 @@ export interface components {
     /** @enum {string} */
     BillingPlanId: 'free' | 'pro' | 'team' | 'enterprise'
     BranchDeleteResponse: {
-      message: string
+      /** @enum {string} */
+      message: 'ok'
     }
     BranchDetailResponse: {
       db_host: string
@@ -1447,11 +1568,11 @@ export interface components {
       updated_at: string
     }
     BranchUpdateResponse: {
-      message: string
+      /** @enum {string} */
+      message: 'ok'
       workflow_run_id: string
     }
     BulkUpdateFunctionBody: {
-      /** Format: int64 */
       created_at?: number
       entrypoint_path?: string
       id: string
@@ -1465,7 +1586,20 @@ export interface components {
       version: number
     }
     BulkUpdateFunctionResponse: {
-      functions: components['schemas']['FunctionResponse'][]
+      functions: {
+        created_at: number
+        entrypoint_path?: string
+        id: string
+        import_map?: boolean
+        import_map_path?: string
+        name: string
+        slug: string
+        /** @enum {string} */
+        status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
+        updated_at: number
+        verify_jwt?: boolean
+        version: number
+      }[]
     }
     CfResponse: {
       errors: Record<string, never>[]
@@ -1475,18 +1609,40 @@ export interface components {
     }
     CreateApiKeyBody: {
       description?: string | null
-      secret_jwt_template?: components['schemas']['ApiKeySecretJWTTemplate'] | null
+      secret_jwt_template?: {
+        role: string
+      } | null
       /** @enum {string} */
       type: 'publishable' | 'secret'
     }
     CreateBranchBody: {
       branch_name: string
-      desired_instance_size?: components['schemas']['DesiredInstanceSize']
+      /** @enum {string} */
+      desired_instance_size?:
+        | 'nano'
+        | 'micro'
+        | 'small'
+        | 'medium'
+        | 'large'
+        | 'xlarge'
+        | '2xlarge'
+        | '4xlarge'
+        | '8xlarge'
+        | '12xlarge'
+        | '16xlarge'
       git_branch?: string
       persistent?: boolean
-      postgres_engine?: components['schemas']['PostgresEngine']
+      /**
+       * @description Postgres engine version. If not provided, the latest version will be used.
+       * @enum {string}
+       */
+      postgres_engine?: '15' | '17-oriole'
       region?: string
-      release_channel?: components['schemas']['ReleaseChannel']
+      /**
+       * @description Release channel. If not provided, GA will be used.
+       * @enum {string}
+       */
+      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
     }
     CreateOrganizationV1Dto: {
       name: string
@@ -1517,6 +1673,12 @@ export interface components {
       name: string
       value: string
     }
+    CreateSigningKeyBody: {
+      /** @enum {string} */
+      algorithm: 'EdDSA' | 'ES256' | 'RS256' | 'HS256'
+      /** @enum {string} */
+      status?: 'in_use' | 'standby'
+    }
     CreateThirdPartyAuthBody: {
       custom_jwks?: Record<string, never>
       jwks_url?: string
@@ -1531,39 +1693,37 @@ export interface components {
       status: string
       verification_errors?: string[]
     }
-    DatabaseUpgradeStatus: {
-      /** @enum {string} */
-      error?:
-        | '1_upgraded_instance_launch_failed'
-        | '2_volume_detachchment_from_upgraded_instance_failed'
-        | '3_volume_attachment_to_original_instance_failed'
-        | '4_data_upgrade_initiation_failed'
-        | '5_data_upgrade_completion_failed'
-        | '6_volume_detachchment_from_original_instance_failed'
-        | '7_volume_attachment_to_upgraded_instance_failed'
-        | '8_upgrade_completion_failed'
-        | '9_post_physical_backup_failed'
-      initiated_at: string
-      latest_status_at: string
-      /** @enum {string} */
-      progress?:
-        | '0_requested'
-        | '1_started'
-        | '2_launched_upgraded_instance'
-        | '3_detached_volume_from_upgraded_instance'
-        | '4_attached_volume_to_original_instance'
-        | '5_initiated_data_upgrade'
-        | '6_completed_data_upgrade'
-        | '7_detached_volume_from_original_instance'
-        | '8_attached_volume_to_upgraded_instance'
-        | '9_completed_upgrade'
-        | '10_completed_post_physical_backup'
-      /** @enum {integer} */
-      status: 0 | 1 | 2
-      target_version: number
-    }
     DatabaseUpgradeStatusResponse: {
-      databaseUpgradeStatus: components['schemas']['DatabaseUpgradeStatus'] | null
+      databaseUpgradeStatus: {
+        /** @enum {string} */
+        error?:
+          | '1_upgraded_instance_launch_failed'
+          | '2_volume_detachchment_from_upgraded_instance_failed'
+          | '3_volume_attachment_to_original_instance_failed'
+          | '4_data_upgrade_initiation_failed'
+          | '5_data_upgrade_completion_failed'
+          | '6_volume_detachchment_from_original_instance_failed'
+          | '7_volume_attachment_to_upgraded_instance_failed'
+          | '8_upgrade_completion_failed'
+          | '9_post_physical_backup_failed'
+        initiated_at: string
+        latest_status_at: string
+        /** @enum {string} */
+        progress?:
+          | '0_requested'
+          | '1_started'
+          | '2_launched_upgraded_instance'
+          | '3_detached_volume_from_upgraded_instance'
+          | '4_attached_volume_to_original_instance'
+          | '5_initiated_data_upgrade'
+          | '6_completed_data_upgrade'
+          | '7_detached_volume_from_original_instance'
+          | '8_attached_volume_to_upgraded_instance'
+          | '9_completed_upgrade'
+          | '10_completed_post_physical_backup'
+        status: number
+        target_version: number
+      } | null
     }
     DeleteProviderResponse: {
       created_at?: string
@@ -1573,7 +1733,6 @@ export interface components {
       updated_at?: string
     }
     DeployFunctionResponse: {
-      /** Format: int64 */
       created_at?: number
       entrypoint_path?: string
       id: string
@@ -1583,23 +1742,10 @@ export interface components {
       slug: string
       /** @enum {string} */
       status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
-      /** Format: int64 */
       updated_at?: number
       verify_jwt?: boolean
       version: number
     }
-    /** @enum {string} */
-    DesiredInstanceSize:
-      | 'micro'
-      | 'small'
-      | 'medium'
-      | 'large'
-      | 'xlarge'
-      | '2xlarge'
-      | '4xlarge'
-      | '8xlarge'
-      | '12xlarge'
-      | '16xlarge'
     Domain: {
       created_at?: string
       domain?: string
@@ -1607,18 +1753,16 @@ export interface components {
       updated_at?: string
     }
     FunctionDeployBody: {
-      file: string[]
-      metadata: components['schemas']['FunctionDeployMetadata']
-    }
-    FunctionDeployMetadata: {
-      entrypoint_path: string
-      import_map_path?: string
-      name?: string
-      static_patterns?: string[]
-      verify_jwt?: boolean
+      file?: string[]
+      metadata: {
+        entrypoint_path: string
+        import_map_path?: string
+        name?: string
+        static_patterns?: string[]
+        verify_jwt?: boolean
+      }
     }
     FunctionResponse: {
-      /** Format: int64 */
       created_at: number
       entrypoint_path?: string
       id: string
@@ -1628,13 +1772,11 @@ export interface components {
       slug: string
       /** @enum {string} */
       status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
-      /** Format: int64 */
       updated_at: number
       verify_jwt?: boolean
       version: number
     }
     FunctionSlugResponse: {
-      /** Format: int64 */
       created_at: number
       entrypoint_path?: string
       id: string
@@ -1644,7 +1786,6 @@ export interface components {
       slug: string
       /** @enum {string} */
       status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
-      /** Format: int64 */
       updated_at: number
       verify_jwt?: boolean
       version: number
@@ -1671,6 +1812,97 @@ export interface components {
       saml?: components['schemas']['SamlDescriptor']
       updated_at?: string
     }
+    ListProjectAddonsResponseDto: {
+      available_addons: {
+        name: string
+        /** @enum {string} */
+        type:
+          | 'custom_domain'
+          | 'compute_instance'
+          | 'pitr'
+          | 'ipv4'
+          | 'auth_mfa_phone'
+          | 'auth_mfa_web_authn'
+          | 'log_drain'
+        variants: {
+          id:
+            | (
+                | 'ci_micro'
+                | 'ci_small'
+                | 'ci_medium'
+                | 'ci_large'
+                | 'ci_xlarge'
+                | 'ci_2xlarge'
+                | 'ci_4xlarge'
+                | 'ci_8xlarge'
+                | 'ci_12xlarge'
+                | 'ci_16xlarge'
+              )
+            | 'cd_default'
+            | ('pitr_7' | 'pitr_14' | 'pitr_28')
+            | 'ipv4_default'
+            | 'auth_mfa_phone_default'
+            | 'auth_mfa_web_authn_default'
+            | 'log_drain_default'
+          meta?: {
+            [key: string]: number | boolean | string | string[]
+          }
+          name: string
+          price: {
+            amount: number
+            description: string
+            /** @enum {string} */
+            interval: 'monthly' | 'hourly'
+            /** @enum {string} */
+            type: 'fixed' | 'usage'
+          }
+        }[]
+      }[]
+      selected_addons: {
+        /** @enum {string} */
+        type:
+          | 'custom_domain'
+          | 'compute_instance'
+          | 'pitr'
+          | 'ipv4'
+          | 'auth_mfa_phone'
+          | 'auth_mfa_web_authn'
+          | 'log_drain'
+        variant: {
+          id:
+            | (
+                | 'ci_micro'
+                | 'ci_small'
+                | 'ci_medium'
+                | 'ci_large'
+                | 'ci_xlarge'
+                | 'ci_2xlarge'
+                | 'ci_4xlarge'
+                | 'ci_8xlarge'
+                | 'ci_12xlarge'
+                | 'ci_16xlarge'
+              )
+            | 'cd_default'
+            | ('pitr_7' | 'pitr_14' | 'pitr_28')
+            | 'ipv4_default'
+            | 'auth_mfa_phone_default'
+            | 'auth_mfa_web_authn_default'
+            | 'log_drain_default'
+          meta?: {
+            [key: string]: number | boolean | string | string[]
+          }
+          name: string
+          price: {
+            amount: number
+            description: string
+            /** @enum {string} */
+            interval: 'monthly' | 'hourly'
+            /** @enum {string} */
+            type: 'fixed' | 'usage'
+          }
+        }
+      }[]
+    }
     ListProvidersResponse: {
       items: components['schemas']['Provider'][]
     }
@@ -1682,10 +1914,18 @@ export interface components {
       dbAllowedCidrsV6?: string[]
     }
     NetworkRestrictionsResponse: {
-      config: components['schemas']['NetworkRestrictionsRequest']
+      /** @description At any given point in time, this is the config that the user has requested be applied to their project. The `status` field indicates if it has been applied to the project, or is pending. When an updated config is received, the applied config is moved to `old_config`. */
+      config: {
+        dbAllowedCidrs?: string[]
+        dbAllowedCidrsV6?: string[]
+      }
       /** @enum {string} */
       entitlement: 'disallowed' | 'allowed'
-      old_config?: components['schemas']['NetworkRestrictionsRequest']
+      /** @description Populated when a new config has been received, but not registered as successfully applied to a project. */
+      old_config?: {
+        dbAllowedCidrs?: string[]
+        dbAllowedCidrsV6?: string[]
+      }
       /** @enum {string} */
       status: 'stored' | 'applied'
     }
@@ -1696,8 +1936,9 @@ export interface components {
       refresh_token: string
     }
     OAuthTokenBody: {
-      client_id: string
-      client_secret: string
+      /** Format: uuid */
+      client_id?: string
+      client_secret?: string
       code?: string
       code_verifier?: string
       /** @enum {string} */
@@ -1707,7 +1948,6 @@ export interface components {
     }
     OAuthTokenResponse: {
       access_token: string
-      /** Format: int64 */
       expires_in: number
       refresh_token: string
       /** @enum {string} */
@@ -1751,11 +1991,6 @@ export interface components {
       wal_sender_timeout?: string
       work_mem?: string
     }
-    /**
-     * @description Postgres engine version. If not provided, the latest version will be used.
-     * @enum {string}
-     */
-    PostgresEngine: '15' | '17-oriole'
     PostgrestConfigWithJWTSecretResponse: {
       db_extra_search_path: string
       /** @description If `null`, the value is automatically configured based on compute size. */
@@ -1773,22 +2008,30 @@ export interface components {
     }
     ProjectUpgradeEligibilityResponse: {
       current_app_version: string
-      current_app_version_release_channel: components['schemas']['ReleaseChannel']
+      /** @enum {string} */
+      current_app_version_release_channel:
+        | 'internal'
+        | 'alpha'
+        | 'beta'
+        | 'ga'
+        | 'withdrawn'
+        | 'preview'
       duration_estimate_hours: number
       eligible: boolean
       extension_dependent_objects: string[]
       latest_app_version: string
       legacy_auth_custom_roles: string[]
       potential_breaking_changes: string[]
-      target_upgrade_versions: components['schemas']['ProjectVersion'][]
+      target_upgrade_versions: {
+        app_version: string
+        /** @enum {string} */
+        postgres_version: '15' | '17-oriole'
+        /** @enum {string} */
+        release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
+      }[]
     }
     ProjectUpgradeInitiateResponse: {
       tracking_id: string
-    }
-    ProjectVersion: {
-      app_version: string
-      postgres_version: components['schemas']['PostgresEngine']
-      release_channel: components['schemas']['ReleaseChannel']
     }
     Provider: {
       created_at?: string
@@ -1852,6 +2095,34 @@ export interface components {
         | 'ap-south-1'
         | 'sa-east-1'
     }
+    SigningKeyResponse: {
+      /** @enum {string} */
+      algorithm: 'EdDSA' | 'ES256' | 'RS256' | 'HS256'
+      /** Format: date-time */
+      created_at: string
+      /** Format: uuid */
+      id: string
+      public_jwk?: unknown
+      /** @enum {string} */
+      status: 'in_use' | 'previously_used' | 'revoked' | 'standby'
+      /** Format: date-time */
+      updated_at: string
+    }
+    SigningKeysResponse: {
+      keys: {
+        /** @enum {string} */
+        algorithm: 'EdDSA' | 'ES256' | 'RS256' | 'HS256'
+        /** Format: date-time */
+        created_at: string
+        /** Format: uuid */
+        id: string
+        public_jwk?: unknown
+        /** @enum {string} */
+        status: 'in_use' | 'previously_used' | 'revoked' | 'standby'
+        /** Format: date-time */
+        updated_at: string
+      }[]
+    }
     SnippetContent: {
       favorite: boolean
       schema_version: string
@@ -1901,14 +2172,15 @@ export interface components {
       username: string
     }
     SslEnforcementRequest: {
-      requestedConfig: components['schemas']['SslEnforcements']
+      requestedConfig: {
+        database: boolean
+      }
     }
     SslEnforcementResponse: {
       appliedSuccessfully: boolean
-      currentConfig: components['schemas']['SslEnforcements']
-    }
-    SslEnforcements: {
-      database: boolean
+      currentConfig: {
+        database: boolean
+      }
     }
     SslValidation: {
       status: string
@@ -1934,6 +2206,11 @@ export interface components {
       available: boolean
     }
     SupavisorConfigResponse: {
+      connection_string: string
+      /**
+       * @deprecated
+       * @description Use connection_string instead
+       */
       connectionString: string
       /** @enum {string} */
       database_type: 'PRIMARY' | 'READ_REPLICA'
@@ -1964,7 +2241,9 @@ export interface components {
     }
     UpdateApiKeyBody: {
       description?: string | null
-      secret_jwt_template?: components['schemas']['ApiKeySecretJWTTemplate'] | null
+      secret_jwt_template?: {
+        role: string
+      } | null
     }
     UpdateAuthConfigBody: {
       api_max_request_duration?: number
@@ -2204,12 +2483,6 @@ export interface components {
       wal_sender_timeout?: string
       work_mem?: string
     }
-    UpdatePostgrestConfigBody: {
-      db_extra_search_path?: string
-      db_pool?: number
-      db_schema?: string
-      max_rows?: number
-    }
     UpdateProviderBody: {
       attribute_mapping?: components['schemas']['AttributeMapping']
       domains?: string[]
@@ -2223,6 +2496,10 @@ export interface components {
       saml?: components['schemas']['SamlDescriptor']
       updated_at?: string
     }
+    UpdateSigningKeyBody: {
+      /** @enum {string} */
+      status: 'in_use' | 'previously_used' | 'revoked' | 'standby'
+    }
     UpdateStorageConfigBody: {
       features?: components['schemas']['StorageFeatures']
       /** Format: int64 */
@@ -2232,18 +2509,18 @@ export interface components {
       default_pool_size?: number | null
       /**
        * @deprecated
-       * @description This field is deprecated and is ignored in this request
+       * @description Dedicated pooler mode for the project
        * @enum {string}
        */
       pool_mode?: 'transaction' | 'session'
     }
     UpdateSupavisorConfigResponse: {
       default_pool_size: number | null
-      /** @enum {string} */
-      pool_mode: 'transaction' | 'session'
+      pool_mode: string
     }
     UpgradeDatabaseBody: {
-      release_channel: components['schemas']['ReleaseChannel']
+      /** @enum {string} */
+      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       target_version: string
     }
     V1AnalyticsResponse: {
@@ -2495,6 +2772,12 @@ export interface components {
       name?: string
       verify_jwt?: boolean
     }
+    V1UpdatePostgrestConfigBody: {
+      db_extra_search_path?: string
+      db_pool?: number
+      db_schema?: string
+      max_rows?: number
+    }
     ValidationError: {
       message: string
     }
@@ -2524,7 +2807,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Branch ID */
         branch_id: string
       }
       cookie?: never
@@ -2553,7 +2835,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Branch ID */
         branch_id: string
       }
       cookie?: never
@@ -2582,7 +2863,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Branch ID */
         branch_id: string
       }
       cookie?: never
@@ -2610,12 +2890,39 @@ export interface operations {
       }
     }
   }
+  'v1-merge-a-branch': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        branch_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BranchUpdateResponse']
+        }
+      }
+      /** @description Failed to merge database branch */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-push-a-branch': {
     parameters: {
       query?: never
       header?: never
       path: {
-        /** @description Branch ID */
         branch_id: string
       }
       cookie?: never
@@ -2644,7 +2951,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Branch ID */
         branch_id: string
       }
       cookie?: never
@@ -2675,9 +2981,7 @@ export interface operations {
         code_challenge?: string
         code_challenge_method?: 'plain' | 'sha256' | 'S256'
         redirect_uri: string
-        response_mode?: string
-        response_type: 'code' | 'token' | 'id_token token'
-        scope?: string
+        response_type: string
         state?: string
       }
       header?: never
@@ -2813,6 +3117,12 @@ export interface operations {
           'application/json': components['schemas']['V1OrganizationSlugResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   'v1-list-organization-members': {
@@ -2833,6 +3143,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['V1OrganizationMemberResponse'][]
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
@@ -2897,6 +3213,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['V1ProjectWithDatabaseResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve project */
       500: {
@@ -2968,12 +3290,11 @@ export interface operations {
   }
   'v1-get-project-api-keys': {
     parameters: {
-      query: {
-        reveal: boolean
+      query?: {
+        reveal?: boolean
       }
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -2988,16 +3309,21 @@ export interface operations {
           'application/json': components['schemas']['ApiKeyResponse'][]
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   createApiKey: {
     parameters: {
-      query: {
-        reveal: boolean
+      query?: {
+        reveal?: boolean
       }
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3016,17 +3342,22 @@ export interface operations {
           'application/json': components['schemas']['ApiKeyResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   getApiKey: {
     parameters: {
-      query: {
-        reveal: boolean
+      query?: {
+        reveal?: boolean
       }
       header?: never
       path: {
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3041,17 +3372,22 @@ export interface operations {
           'application/json': components['schemas']['ApiKeyResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   deleteApiKey: {
     parameters: {
-      query: {
-        reveal: boolean
+      query?: {
+        reveal?: boolean
       }
       header?: never
       path: {
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3076,13 +3412,12 @@ export interface operations {
   }
   updateApiKey: {
     parameters: {
-      query: {
-        reveal: boolean
+      query?: {
+        reveal?: boolean
       }
       header?: never
       path: {
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3101,6 +3436,130 @@ export interface operations {
           'application/json': components['schemas']['ApiKeyResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-list-project-addons': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListProjectAddonsResponseDto']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to list project addons */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-apply-project-addon': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ApplyProjectAddonBodyDto']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to apply project addon */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-remove-project-addon': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        addon_variant:
+          | 'ci_micro'
+          | 'ci_small'
+          | 'ci_medium'
+          | 'ci_large'
+          | 'ci_xlarge'
+          | 'ci_2xlarge'
+          | 'ci_4xlarge'
+          | 'ci_8xlarge'
+          | 'ci_12xlarge'
+          | 'ci_16xlarge'
+          | 'cd_default'
+          | 'pitr_7'
+          | 'pitr_14'
+          | 'pitr_28'
+          | 'ipv4_default'
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to remove project addon */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   'v1-list-all-branches': {
@@ -3108,7 +3567,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3122,6 +3580,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['BranchResponse'][]
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve database branches */
       500: {
@@ -3137,7 +3601,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3156,6 +3619,12 @@ export interface operations {
           'application/json': components['schemas']['BranchResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to create database branch */
       500: {
         headers: {
@@ -3170,7 +3639,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3178,6 +3646,12 @@ export interface operations {
     requestBody?: never
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -3259,6 +3733,153 @@ export interface operations {
       }
       /** @description Failed to update project's auth config */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  listSigningKeysForProject: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SigningKeysResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  createSigningKeyForProject: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateSigningKeyBody']
+      }
+    }
+    responses: {
+      /** @description [Alpha] Create a new signing key for the project in standby status */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateSigningKeyBody']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  getSigningKeyForProject: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SigningKeyResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  deleteSigningKey: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SigningKeyResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  patchSigningKey: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateSigningKeyBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SigningKeyResponse']
+        }
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -3590,6 +4211,12 @@ export interface operations {
           'application/json': components['schemas']['V1PgbouncerConfigResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve project's pgbouncer config */
       500: {
         headers: {
@@ -3599,7 +4226,7 @@ export interface operations {
       }
     }
   }
-  'v1-get-supavisor-config': {
+  getSupavisorConfig: {
     parameters: {
       query?: never
       header?: never
@@ -3628,7 +4255,7 @@ export interface operations {
       }
     }
   }
-  'v1-update-supavisor-config': {
+  updateSupavisorConfig: {
     parameters: {
       query?: never
       header?: never
@@ -3686,6 +4313,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['PostgresConfigResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve project's Postgres config */
       500: {
@@ -4004,6 +4637,12 @@ export interface operations {
           'application/json': components['schemas']['V1BackupsResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get backups */
       500: {
         headers: {
@@ -4018,7 +4657,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4030,6 +4668,12 @@ export interface operations {
     }
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -4069,7 +4713,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4141,7 +4784,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4176,7 +4818,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4222,7 +4863,6 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4262,9 +4902,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Function slug */
         function_slug: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4299,9 +4937,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Function slug */
         function_slug: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4336,14 +4972,11 @@ export interface operations {
         import_map?: boolean
         import_map_path?: string
         name?: string
-        slug?: string
         verify_jwt?: boolean
       }
       header?: never
       path: {
-        /** @description Function slug */
         function_slug: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4383,9 +5016,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Function slug */
         function_slug: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4421,7 +5052,6 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4498,7 +5128,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4535,7 +5164,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4570,7 +5198,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4605,7 +5232,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4670,7 +5296,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4705,7 +5330,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4786,7 +5410,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdatePostgrestConfigBody']
+        'application/json': components['schemas']['V1UpdatePostgrestConfigBody']
       }
     }
     responses: {
@@ -4818,7 +5442,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4855,7 +5478,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4907,6 +5529,12 @@ export interface operations {
           'application/json': components['schemas']['ReadOnlyStatusResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get project readonly mode status */
       500: {
         headers: {
@@ -4929,6 +5557,12 @@ export interface operations {
     requestBody?: never
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -5029,7 +5663,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5064,7 +5697,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5101,7 +5733,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5140,7 +5771,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5175,7 +5805,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5251,7 +5880,6 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5286,7 +5914,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5325,7 +5952,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5362,7 +5988,6 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5397,7 +6022,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5432,7 +6056,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5465,7 +6088,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5504,7 +6126,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never

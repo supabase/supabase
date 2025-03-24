@@ -144,7 +144,15 @@ To use `MergeDeep`, set `compilerOptions.strictNullChecks` to `true` in your `ts
 You can also override the type of an individual successful response if needed:
 
 ```ts
-const { data } = await supabase.from('countries').select().returns<MyType>()
+// Partial type override allows you to only override some of the properties in your results
+const { data } = await supabase.from('countries').select().overrideTypes<Array<{ id: string }>>()
+// For a full replacement of the original return type use the `{ merge: false }` property as second argument
+const { data } = await supabase
+  .from('countries')
+  .select()
+  .overrideTypes<Array<{ id: string }>, { merge: false }>()
+// Use it with `maybeSingle` or `single`
+const { data } = await supabase.from('countries').select().single().overrideTypes<{ id: string }>()
 ```
 
 ### Type shorthands
@@ -231,13 +239,13 @@ jobs:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       PROJECT_REF: <your-project-id>
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
           fetch-depth: 0
-      - uses: actions/setup-node@v2.1.5
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 22
       - run: npm run update-types
       - name: check for file changes
         id: git_status

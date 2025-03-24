@@ -1,21 +1,23 @@
-import React, { Dispatch, SetStateAction } from 'react'
+import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { m, AnimatePresence, LazyMotion, domAnimation } from 'framer-motion'
+import { Dispatch, SetStateAction } from 'react'
 
-import { DEFAULT_EASE } from '~/lib/animations'
 import { Accordion, Button, TextLink } from 'ui'
+import { DEFAULT_EASE } from '~/lib/animations'
 import MenuItem from './MenuItem'
 
+import { useIsLoggedIn, useIsUserLoading } from 'common'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
-import { useKey } from 'react-use'
-import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { ChevronRight } from 'lucide-react'
+import { useKey } from 'react-use'
+import staticContent from '~/.contentlayer/generated/staticContent/_index.json' with { type: 'json' }
 import ProductModulesData from '~/data/ProductModules'
-import { jobsCount } from '~/.contentlayer/generated/staticContent/_index.json' with { type: 'json' }
 
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+
+const { jobsCount } = staticContent
 
 interface Props {
   open: boolean

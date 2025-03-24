@@ -51,6 +51,13 @@ const pageMap = [
     remoteFile: 'bigquery.md',
   },
   {
+    slug: 'clerk',
+    meta: {
+      title: 'Clerk',
+    },
+    remoteFile: 'clerk.md',
+  },
+  {
     slug: 'clickhouse',
     meta: {
       title: 'ClickHouse',

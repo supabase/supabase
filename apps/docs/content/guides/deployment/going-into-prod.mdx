@@ -99,6 +99,28 @@ After developing your project and deciding it's Production Ready, you should run
 
 - When using a custom SMTP service, some services might have link tracking enabled which may overwrite or disform the email confirmation links sent by Supabase Auth. To prevent this from happening, we recommend that you disable link tracking when using a custom SMTP service.
 
+## Subscribe to Supabase status page
+
+Stay informed about Supabase service status by subscribing to the [Status Page](https://status.supabase.com/). We recommend setting up Slack notifications through an RSS feed to ensure your team receives timely updates about service status changes.
+
+### Setting up Slack notifications
+
+1. Install the RSS app in Slack:
+
+   - Visit the [RSS app page](https://slack.com/marketplace/A0F81R7U7-rss) in the Slack marketplace
+   - Click `Add to Slack` if not already installed
+   - Otherwise you will get straight to next step, no need to reinstall the app
+
+2. Configure the Supabase status feed:
+
+   - Create a channel (e.g., `#supabase-status-alerts`) for status updates
+   - On the [RSS app page](https://slack.com/marketplace/A0F81R7U7-rss) go to _Add a Feed_ section and set Feed URL to `https://status.supabase.com/history.rss`
+   - Select your designated channel and click "Subscribe to this feed"
+
+Once configured, your team will receive automatic notifications in Slack whenever the Supabase Status Page is updated.
+
+For detailed setup instructions, see the [Add RSS feeds to Slack](https://slack.com/intl/en-nz/help/articles/218688467-Add-RSS-feeds-to-Slack).
+
 ## Next steps
 
 This checklist is always growing so be sure to check back frequently, and also feel free to suggest additions and amendments by making a PR on [GitHub](https://github.com/supabase/supabase).

@@ -12,6 +12,7 @@ import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/DiskSizeConfigurationModal'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import Table from 'components/to-be-cleaned/Table'
@@ -22,16 +23,17 @@ import Panel from 'components/ui/Panel'
 import { analyticsKeys } from 'data/analytics/keys'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
+import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { useDatabaseReport } from 'data/reports/database-report-query'
-import { BASE_PATH } from 'lib/constants'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { BASE_PATH } from 'lib/constants'
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -48,15 +50,6 @@ DatabaseReport.getLayout = (page) => (
 )
 
 export default DatabaseReport
-
-const REPORT_ATTRIBUTES = [
-  { id: 'ram_usage', label: 'Memory usage' },
-  { id: 'avg_cpu_usage', label: 'Average CPU usage' },
-  { id: 'max_cpu_usage', label: 'Max CPU usage' },
-  { id: 'disk_io_consumption', label: 'Disk IO consumed' },
-  { id: 'pg_stat_database_num_backends', label: 'Number of database connections' },
-  { id: 'supavisor_connections_active', label: 'Number of supavisor connections' },
-]
 
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
@@ -86,6 +79,31 @@ const DatabaseUsage = () => {
     },
   })
 
+  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
+  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
+
+  const REPORT_ATTRIBUTES = [
+    { id: 'ram_usage', label: 'Memory usage', hide: false },
+    { id: 'avg_cpu_usage', label: 'Average CPU usage', hide: false },
+    { id: 'max_cpu_usage', label: 'Max CPU usage', hide: false },
+    { id: 'disk_io_consumption', label: 'Disk IO consumed', hide: false },
+    {
+      id: 'pg_stat_database_num_backends',
+      label: 'Pooler to database connections',
+      hide: false,
+    },
+    {
+      id: 'supavisor_connections_active',
+      label: 'Client to Shared Pooler connections',
+      hide: false,
+    },
+    {
+      id: 'client_connections_pgbouncer',
+      label: 'Client to Dedicated Pooler connections',
+      hide: isFreePlan,
+    },
+  ] as const
+
   const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)
@@ -104,7 +122,7 @@ const DatabaseUsage = () => {
     REPORT_ATTRIBUTES.forEach((attr) => {
       queryClient.invalidateQueries(
         analyticsKeys.infraMonitoring(ref, {
-          attribute: attr.id,
+          attribute: attr?.id,
           startDate: period_start.date,
           endDate: period_start.end,
           interval,
@@ -230,7 +248,7 @@ const DatabaseUsage = () => {
             </div>
             <div className="space-y-6">
               {dateRange &&
-                REPORT_ATTRIBUTES.map((attr) => (
+                REPORT_ATTRIBUTES.filter((attr) => !attr.hide).map((attr) => (
                   <ChartHandler
                     key={attr.id}
                     provider="infra-monitoring"
