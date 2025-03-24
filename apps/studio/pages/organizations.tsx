@@ -41,7 +41,6 @@ const OrganizationsPage: NextPageWithLayout = () => {
                 key={organization.id}
                 icon={<Boxes size={18} strokeWidth={1} className="text-foreground" />}
                 title={organization.name}
-                description={'organization.id'}
                 onClick={() => router.push(`/org/${organization.slug}`)}
               />
             ))

@@ -3,8 +3,8 @@ import { Badge, Card } from 'ui'
 export const ActionCard = (card: {
   icon: JSX.Element
   title: string
-  description: string
-  bgColor: string
+  bgColor?: string
+  description?: string
   isBeta?: boolean
   onClick?: () => void
 }) => {
