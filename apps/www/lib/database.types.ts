@@ -92,37 +92,37 @@ export type Database = {
       }
       meetups: {
         Row: {
-          id: number
+          id: string
           created_at: string | null
-          date: string | number
+          title: string | null
+          country: string | null
+          start_at: string | null
           display_info: string | null
           link: string | null
-          location: string | null
           is_live: boolean
-          city?: string
-          timezone?: string
+          is_published: boolean
         }
         Insert: {
           id?: number
           created_at?: string | null
-          date?: string | number
+          title?: string | null
+          country?: string | null
+          start_at?: string | null
           display_info?: string | null
           link?: string | null
-          location?: string | null
           is_live?: boolean
-          city?: string
-          timezone?: string
+          is_published?: boolean
         }
         Update: {
           id?: number
           created_at?: string | null
-          date?: string | number
+          title?: string | null
+          country?: string | null
+          start_at?: string | null
           display_info?: string | null
           link?: string | null
-          location?: string | null
           is_live?: boolean
-          city?: string
-          timezone?: string
+          is_published?: boolean
         }
         Relationships: []
       }
