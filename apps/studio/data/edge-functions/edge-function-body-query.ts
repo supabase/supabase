@@ -45,26 +45,44 @@ export async function getEdgeFunctionBody(
     handleError(error)
   }
 
-  // Get the eszip data as ArrayBuffer
-  const eszip = await response.arrayBuffer()
-  console.log('eszip received, size:', eszip.byteLength)
-
-  // Send to our API for processing
-  const parseResponse = await fetch(`${BASE_PATH}/api/edge-functions/parse-body`, {
-    method: 'POST',
-    body: eszip,
-    headers: {
-      'Content-Type': 'application/octet-stream',
-    },
-  })
-
-  if (!parseResponse.ok) {
-    const error = await parseResponse.json()
-    handleError(error)
+  // Verify content type is binary/eszip
+  const contentType = response.headers.get('content-type')
+  if (!contentType || !contentType.includes('application/octet-stream')) {
+    throw new Error(
+      'Invalid response: Expected eszip file but received ' + (contentType || 'unknown format')
+    )
   }
 
-  const { files } = await parseResponse.json()
-  return files
+  // Get the eszip data as ArrayBuffer
+  const eszip = await response.arrayBuffer()
+
+  if (eszip.byteLength === 0) {
+    throw new Error('Invalid eszip: File is empty')
+  }
+
+  // Send to our API for processing
+  try {
+    const parseResponse = await fetch(`${BASE_PATH}/api/edge-functions/parse-body`, {
+      method: 'POST',
+      body: eszip,
+      headers: {
+        'Content-Type': 'application/octet-stream',
+      },
+    })
+
+    if (!parseResponse.ok) {
+      const error = await parseResponse.json()
+      handleError(error)
+    }
+
+    const { files } = await parseResponse.json()
+    return files
+  } catch (error) {
+    console.error('Failed to parse eszip file:', error)
+    throw new Error(
+      'Failed to parse function code. The file may be corrupted or in an invalid format.'
+    )
+  }
 }
 
 export type EdgeFunctionBodyData = Awaited<ReturnType<typeof getEdgeFunctionBody>>

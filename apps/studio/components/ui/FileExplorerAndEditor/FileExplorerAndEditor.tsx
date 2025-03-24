@@ -202,6 +202,9 @@ const FileExplorerAndEditor = ({
                         onClick={() => {
                           if (originalId !== null) handleFileSelect(originalId)
                         }}
+                        onDoubleClick={() => {
+                          if (originalId !== null) handleStartRename(originalId)
+                        }}
                       />
                     </div>
                   </ContextMenuTrigger_Shadcn_>

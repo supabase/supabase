@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { CornerDownLeft, Loader2 } from 'lucide-react'
+import { CornerDownLeft, Loader2, AlertCircle } from 'lucide-react'
 import { Button } from 'ui'
 import { BASE_PATH } from 'lib/constants'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -34,7 +34,12 @@ const CodePage = () => {
   }, [edgeFunctionCreate, ref, router])
 
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
-  const { data: functionFiles, isLoading: isLoadingFiles } = useEdgeFunctionBodyQuery({
+  const {
+    data: functionFiles,
+    isLoading: isLoadingFiles,
+    isError: isErrorLoadingFiles,
+    error: filesError,
+  } = useEdgeFunctionBodyQuery({
     projectRef: ref,
     slug: functionSlug,
   })
@@ -82,44 +87,69 @@ const CodePage = () => {
     }
   }
 
-  return (
-    <div className="flex flex-col h-full">
-      {isLoadingFiles ? (
+  const renderContent = () => {
+    if (isLoadingFiles) {
+      return (
         <div className="flex flex-col items-center justify-center h-full bg-surface-200">
           <LogoLoader />
         </div>
-      ) : (
-        <FileExplorerAndEditor
-          files={files}
-          onFilesChange={setFiles}
-          aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete`}
-          aiMetadata={{
-            projectRef: project?.ref,
-            connectionString: project?.connectionString,
-            includeSchemaMetadata,
-          }}
-        />
-      )}
+      )
+    }
 
-      <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 shrink-0">
-        <Button
-          loading={isDeploying}
-          size="medium"
-          disabled={files.length === 0 || isLoadingFiles}
-          onClick={onUpdate}
-          iconRight={
-            isDeploying ? (
-              <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
-            ) : (
-              <div className="flex items-center space-x-1">
-                <CornerDownLeft size={10} strokeWidth={1.5} />
-              </div>
-            )
-          }
-        >
-          Deploy updates
-        </Button>
-      </div>
+    if (isErrorLoadingFiles) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full bg-surface-200">
+          <div className="flex flex-col items-center text-center gap-2 max-w-md">
+            <AlertCircle size={24} strokeWidth={1.5} className="text-amber-900" />
+            <h3 className="text-md mt-4">Failed to load function code</h3>
+            <p className="text-sm text-foreground-light">
+              {filesError?.message ||
+                'There was an error loading the function code. The format may be invalid or the function may be corrupted.'}
+            </p>
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <FileExplorerAndEditor
+        files={files}
+        onFilesChange={setFiles}
+        aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete`}
+        aiMetadata={{
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          includeSchemaMetadata,
+        }}
+      />
+    )
+  }
+
+  return (
+    <div className="flex flex-col h-full">
+      {renderContent()}
+
+      {!isErrorLoadingFiles && (
+        <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 shrink-0">
+          <Button
+            loading={isDeploying}
+            size="medium"
+            disabled={files.length === 0 || isLoadingFiles}
+            onClick={onUpdate}
+            iconRight={
+              isDeploying ? (
+                <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
+              ) : (
+                <div className="flex items-center space-x-1">
+                  <CornerDownLeft size={10} strokeWidth={1.5} />
+                </div>
+              )
+            }
+          >
+            Deploy updates
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
