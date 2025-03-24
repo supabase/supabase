@@ -106,12 +106,17 @@ const TicketCanvas = ({ className, onUpgradeToSecret, narrow }: TicketCanvasProp
 
     if (sceneRef.current) {
       void updateTicket()
+
+      if (state.ticketVisibility) {
+        hudObj?.dimmHud()
+      } else {
+        hudObj?.undimmHud()
+      }
+
       if (!narrow) {
         if (state.ticketVisibility) {
-          hudObj?.dimmHud()
           hudObj?.setLayout('ticket')
         } else {
-          hudObj?.undimmHud()
           hudObj?.setLayout('default')
         }
       }

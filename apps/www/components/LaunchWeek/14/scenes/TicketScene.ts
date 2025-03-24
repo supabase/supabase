@@ -646,40 +646,56 @@ class TicketScene implements BaseScene {
     }
 
     const mousePosition = this._sceneRenderer.mousePositionState
-    // Calculate rotation based on mouse position
-    // Limit rotation to reasonable angles
+    
     if (mousePosition.isWithinContainer) {
-      const mouseX = mousePosition.containerX
-      const mouseY = mousePosition.containerY
+      // Get the scene's current position in world space
+      const scenePosition = new THREE.Vector3();
+      scene.getWorldPosition(scenePosition);
+      
+      // Convert scene position to normalized device coordinates (NDC)
+      const sceneNDC = scenePosition.clone();
+      sceneNDC.project(this._sceneRenderer.camera);
+      
+      // Calculate mouse position relative to the scene's position
+      // This gives us a vector from the scene center to the mouse
+      const relativeMouseX = mousePosition.containerX - sceneNDC.x;
+      const relativeMouseY = mousePosition.containerY - sceneNDC.y;
+      
+      // Scale the rotation based on distance from scene center
+      // The further from center, the more rotation
+      const distanceScale = Math.min(1.0, 
+        Math.sqrt(relativeMouseX * relativeMouseX + relativeMouseY * relativeMouseY) * 2);
+      
+      // Calculate rotation angles with distance scaling
       // Limit the rotation angles to a reasonable range
-      const targetRotationX = MathUtils.clamp(mouseY * -0.2, -0.3, 0.3)
-      const targetRotationZ = MathUtils.clamp(mouseX * -0.3, -0.4, 0.4)
+      const targetRotationX = MathUtils.clamp(relativeMouseY * -0.2 * distanceScale, -0.3, 0.3);
+      const targetRotationZ = MathUtils.clamp(relativeMouseX * -0.3 * distanceScale, -0.4, 0.4);
 
       // Apply smooth rotation with a smaller lerp factor
-      const lerpFactor = Math.min(dt ?? 0.05, 0.05)
+      const lerpFactor = Math.min(dt ?? 0.05, 0.05);
       scene.rotation.x = MathUtils.lerp(
         scene.rotation.x,
         this._internalState.naturalRotation.x + targetRotationX,
         lerpFactor
-      )
+      );
       scene.rotation.z = MathUtils.lerp(
         scene.rotation.z,
         this._internalState.naturalRotation.z + targetRotationZ,
         lerpFactor
-      )
+      );
     } else {
       // Return to neutral position more slowly
-      const lerpFactor = Math.min(dt ?? 0.03, 0.03)
+      const lerpFactor = Math.min(dt ?? 0.03, 0.03);
       scene.rotation.x = MathUtils.lerp(
         scene.rotation.x,
         this._internalState.naturalRotation.x,
         lerpFactor
-      )
+      );
       scene.rotation.z = MathUtils.lerp(
         scene.rotation.z,
         this._internalState.naturalRotation.z,
         lerpFactor
-      )
+      );
     }
   }
 

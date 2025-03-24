@@ -38,7 +38,7 @@ export const LwView = () => {
           <TicketLayoutCanvas narrow={true}>
             <TicketCanvas narrow={true} onUpgradeToSecret={register.upgradeTicket} />
             {state.claimFormState === 'visible' && (
-              <TicketClaim>
+              <TicketClaim narrow>
                 <TicketClaimLogo />
                 <TicketClaimContent>
                   <TicketClaimMessage />
