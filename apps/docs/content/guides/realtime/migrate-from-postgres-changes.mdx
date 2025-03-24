@@ -1,11 +1,11 @@
 ---
-title: 'Migrate to Broadcast Changes'
-subtitle: 'How to migrate from Postgres Changes to Broadcast Changes'
-description: 'How to migrate from Postgres Changes to Broadcast Changes'
-sidebar_label: 'Migrate to Broadcast Changes'
+title: 'Migrate to Broadcast from database'
+subtitle: 'How to migrate from Postgres Changes to Broadcast from database'
+description: 'How to migrate from Postgres Changes to Broadcast from database'
+sidebar_label: 'Migrate to Broadcast from database'
 ---
 
-Postgres Changes has some [limitations](/docs/guides/realtime/postgres-changes#limitations) as your application scales. To continue broadcasting database changes to users as you scale, you can use Broadcast Changes.
+Postgres Changes has some [limitations](/docs/guides/realtime/postgres-changes#limitations) as your application scales. To continue broadcasting database changes to users as you scale, you can use broadcast from database.
 
 ## Example application using Postgres Changes
 
@@ -44,11 +44,11 @@ const changes = supabase
 
 ## Migrate to broadcast changes
 
-To use Broadcast Changes, first familiarize yourself with the [Broadcast Changes implementation](/docs/guides/realtime/broadcast#trigger-broadcast-messages-from-your-database).
+To use broadcast from database, first familiarize yourself with the [Broadcast from database](/docs/guides/realtime/broadcast#broadcast-from-database) approach.
 
 ### Set up authorization
 
-Broadcast Changes is private by default, using [Realtime Authorization](/docs/guides/realtime/authorization) to control access. First, set up RLS policies to control user access to relevant messages:
+Broadcast from database is private by default, using [Realtime Authorization](/docs/guides/realtime/authorization) to control access. First, set up RLS policies to control user access to relevant messages:
 
 ```sql
 CREATE POLICY "authenticated can listen to game moves"
@@ -98,7 +98,7 @@ FOR EACH ROW
 EXECUTE FUNCTION public.broadcast_moves();
 ```
 
-### **Listen to changes in client**
+### Listen to changes in client
 
 Finally you can setup your client to listen for your events
 
