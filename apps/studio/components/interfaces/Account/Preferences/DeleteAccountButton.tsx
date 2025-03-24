@@ -25,6 +25,7 @@ import {
   FormLabel_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
+  Separator,
 } from 'ui'
 
 const setDeletionRequestFlag = () => {
@@ -109,7 +110,11 @@ export const DeleteAccountButton = () => {
         </Button>
       </DialogTrigger>
       <DialogContent className="!w-[500px]">
+<<<<<<< Updated upstream
         <DialogHeader className="pb-0">
+=======
+        <DialogHeader>
+>>>>>>> Stashed changes
           {(organizations ?? []).length > 0 ? (
             <>
               <DialogTitle>Leave all organizations before requesting account deletion</DialogTitle>
@@ -128,25 +133,25 @@ export const DeleteAccountButton = () => {
           )}
         </DialogHeader>
 
+        <Separator />
+
         {isSuccess && (
           <>
             {organizations.length > 0 ? (
-              <DialogSection className="!pt-0">
-                <span className="text-sm text-foreground flex flex-col gap-y-2">
-                  Before submitting an account deletion request, please ensure that your account is
-                  not part of any organization. This can be done by leaving or deleting the
-                  organizations that you are a part of.
-                </span>
-                <Button
-                  block
-                  type="primary"
-                  size="medium"
-                  className="mt-6"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Understood
-                </Button>
-              </DialogSection>
+              <>
+                <DialogSection>
+                  <span className="text-sm text-foreground flex flex-col gap-y-2">
+                    Before submitting an account deletion request, please ensure that your account
+                    is not part of any organization. This can be done by leaving or deleting the
+                    organizations that you are a part of.
+                  </span>
+                </DialogSection>
+                <DialogFooter>
+                  <Button block type="primary" size="medium" onClick={() => setIsOpen(false)}>
+                    Understood
+                  </Button>
+                </DialogFooter>
+              </>
             ) : (
               <Form_Shadcn_ {...form}>
                 <form
