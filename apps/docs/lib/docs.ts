@@ -1,4 +1,3 @@
-import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import matter from 'gray-matter'
 import { serialize } from 'next-mdx-remote/serialize'
 import type { SerializeOptions } from 'next-mdx-remote/dist/types'
@@ -127,22 +126,10 @@ export async function getGuidesStaticProps(
     return
   }
 
-  const codeHikeOptions: CodeHikeConfig = {
-    theme: codeHikeTheme,
-    lineNumbers: true,
-    showCopyButton: true,
-    skipLanguages: [],
-    autoImport: false,
-  }
-
   const mdxOptions: SerializeOptions = {
     mdxOptions: {
       useDynamicImport: true,
-      remarkPlugins: [
-        [remarkMath, { singleDollarTextMath: false }],
-        remarkGfm,
-        [remarkCodeHike, codeHikeOptions],
-      ],
+      remarkPlugins: [[remarkMath, { singleDollarTextMath: false }], remarkGfm],
       rehypePlugins: [rehypeKatex as any],
     },
   }

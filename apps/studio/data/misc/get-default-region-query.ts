@@ -11,7 +11,7 @@ import {
 import type { CloudProvider } from 'shared-data'
 import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 
-const RESTRICTED_POOL = ['WEST_US', 'CENTRAL_EU', 'SOUTHEAST_ASIA']
+const RESTRICTED_POOL = ['EAST_US', 'CENTRAL_EU', 'SOUTHEAST_ASIA']
 
 export type DefaultRegionVariables = {
   cloudProvider?: CloudProvider
