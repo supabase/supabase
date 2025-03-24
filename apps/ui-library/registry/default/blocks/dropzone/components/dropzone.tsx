@@ -1,10 +1,10 @@
 'use client'
 
 import { cn } from '@/lib/utils'
+import { type UseSupabaseUploadReturn } from '@/registry/default/blocks/dropzone/hooks/use-supabase-upload'
 import { Button } from '@/registry/default/components/ui/button'
 import { CheckCircle, File, Loader2, Upload, X } from 'lucide-react'
-import { createContext, PropsWithChildren, useCallback, useContext } from 'react'
-import { UseSupabaseUploadReturn } from '../hooks/use-supabase-upload'
+import { createContext, type PropsWithChildren, useCallback, useContext } from 'react'
 
 export const formatBytes = (
   bytes: number,
@@ -35,6 +35,7 @@ const Dropzone = ({
   getInputProps,
   ...restProps
 }: PropsWithChildren<DropzoneProps>) => {
+  const isSuccess = restProps.isSuccess
   const isActive = restProps.isDragActive
   const isInvalid =
     (restProps.isDragActive && restProps.isDragReject) ||
@@ -46,8 +47,9 @@ const Dropzone = ({
       <div
         {...getRootProps({
           className: cn(
-            'border-2 border-dashed border-gray-300 rounded-lg p-6 text-center bg-card transition-colors duration-300',
+            'border-2 border-gray-300 rounded-lg p-6 text-center bg-card transition-colors duration-300 text-foreground',
             className,
+            isSuccess ? 'border-solid' : 'border-dashed',
             isActive && 'border-primary bg-primary/10',
             isInvalid && 'border-destructive bg-destructive/10'
           ),
@@ -128,13 +130,13 @@ const DropzoneContent = ({ className }: { className?: string }) => {
                     .join(', ')}
                 </p>
               ) : loading && !isSuccessfullyUploaded ? (
-                <p className="text-xs text-foreground-light">Uploading file...</p>
+                <p className="text-xs text-muted-foreground">Uploading file...</p>
               ) : !!fileError ? (
                 <p className="text-xs text-destructive">Failed to upload: {fileError.message}</p>
               ) : isSuccessfullyUploaded ? (
                 <p className="text-xs text-primary">Successfully uploaded file</p>
               ) : (
-                <p className="text-xs text-foreground-light">{formatBytes(file.size, 2)}</p>
+                <p className="text-xs text-muted-foreground">{formatBytes(file.size, 2)}</p>
               )}
             </div>
 
@@ -142,7 +144,7 @@ const DropzoneContent = ({ className }: { className?: string }) => {
               <Button
                 size="icon"
                 variant="link"
-                className="shrink-0 justify-self-end"
+                className="shrink-0 justify-self-end text-muted-foreground hover:text-foreground"
                 onClick={() => handleRemoveFile(file.name)}
               >
                 <X />
@@ -188,13 +190,13 @@ const DropzoneEmptyState = ({ className }: { className?: string }) => {
 
   return (
     <div className={cn('flex flex-col items-center gap-y-2', className)}>
-      <Upload size={20} className="text-foreground-light" />
-      <p className="text-sm text-foreground">
+      <Upload size={20} className="text-muted-foreground" />
+      <p className="text-sm">
         Upload{!!maxFiles && maxFiles > 1 ? ` ${maxFiles}` : ''} file
         {!maxFiles || maxFiles > 1 ? 's' : ''}
       </p>
       <div className="flex flex-col items-center gap-y-1">
-        <p className="text-xs text-foreground-light">
+        <p className="text-xs text-muted-foreground">
           Drag and drop or{' '}
           <a
             onClick={() => inputRef.current?.click()}
@@ -205,7 +207,7 @@ const DropzoneEmptyState = ({ className }: { className?: string }) => {
           to upload
         </p>
         {maxFileSize !== Number.POSITIVE_INFINITY && (
-          <p className="text-xs text-foreground-light">
+          <p className="text-xs text-muted-foreground">
             Maximum file size: {formatBytes(maxFileSize, 2)}
           </p>
         )}

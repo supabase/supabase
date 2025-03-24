@@ -1,6 +1,6 @@
 import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
-import { useCallback, useEffect, useState } from 'react'
-import { FileError, FileRejection, useDropzone } from 'react-dropzone'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { type FileError, type FileRejection, useDropzone } from 'react-dropzone'
 
 const supabase = createClient()
 
@@ -67,7 +67,16 @@ const useSupabaseUpload = (options: UseSupabaseUploadOptions) => {
   const [loading, setLoading] = useState<boolean>(false)
   const [errors, setErrors] = useState<{ name: string; message: string }[]>([])
   const [successes, setSuccesses] = useState<string[]>([])
-  const [isSuccess, setIsSuccess] = useState(false)
+
+  const isSuccess = useMemo(() => {
+    if (errors.length === 0 && successes.length === 0) {
+      return false
+    }
+    if (errors.length === 0 && successes.length === files.length) {
+      return true
+    }
+    return false
+  }, [errors.length, successes.length, files.length])
 
   const onDrop = useCallback(
     (acceptedFiles: File[], fileRejections: FileRejection[]) => {
@@ -132,16 +141,14 @@ const useSupabaseUpload = (options: UseSupabaseUploadOptions) => {
     )
 
     const responseErrors = responses.filter((x) => x.message !== undefined)
-    if (responseErrors.length > 0) {
-      setErrors(responseErrors)
-    }
+    // if there were errors previously, this function tried to upload the files again so we should clear/overwrite the existing errors.
+    setErrors(responseErrors)
 
     const responseSuccesses = responses.filter((x) => x.message === undefined)
-    setSuccesses([...successes, ...responseSuccesses.map((x) => x.name)])
-
-    if (responseErrors.length === 0 && responseSuccesses.length === filesToUpload.length) {
-      setIsSuccess(true)
-    }
+    const newSuccesses = Array.from(
+      new Set([...successes, ...responseSuccesses.map((x) => x.name)])
+    )
+    setSuccesses(newSuccesses)
 
     setLoading(false)
   }, [files, path, bucketName, errors, successes])
