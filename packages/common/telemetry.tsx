@@ -60,7 +60,7 @@ export const PageTelemetry = ({
   hasAcceptedConsent: boolean
   enabled?: boolean
 }) => {
-  const currentPathname = usePathname() as string
+  const currentPathname = usePathname() as string // usePathname returns string | null in typecheck for some reason
   const previousPathnameRef = useRef(currentPathname)
 
   const featureFlags = useFeatureFlags()
