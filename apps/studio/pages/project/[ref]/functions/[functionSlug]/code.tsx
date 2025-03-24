@@ -67,18 +67,23 @@ const CodePage = () => {
     },
   })
 
-  console.log('function:', selectedFunction)
-
   const onUpdate = async () => {
     if (isDeploying || !ref || !functionSlug || !selectedFunction || files.length === 0) return
 
     try {
+      const parsedEntrypointPath =
+        selectedFunction.entrypoint_path?.replace(/\/tmp\/user_fn_[^/]+\//, '') || 'index.ts'
+      const existingFile = files.find((file) => file.name === parsedEntrypointPath) ||
+        files.find((file) => file.name.endsWith('.ts') || file.name.endsWith('.js')) || {
+          name: 'index.ts',
+        }
+
       await deployFunction({
         projectRef: ref,
         metadata: {
           name: selectedFunction.name,
           verify_jwt: selectedFunction.verify_jwt,
-          entrypoint_path: selectedFunction.entrypoint_path || 'index.ts',
+          entrypoint_path: existingFile.name,
           import_map_path: selectedFunction.import_map_path,
         },
         files: files.map(({ name, content }) => ({ name, content })),
