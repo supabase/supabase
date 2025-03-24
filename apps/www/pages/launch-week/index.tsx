@@ -3,6 +3,11 @@ import { LW14_DATE, LW14_TITLE, LW14_URL, SITE_ORIGIN } from '~/lib/constants'
 import { LwView } from '~/components/LaunchWeek/14/LwView'
 import { useRouter } from 'next/router'
 import { Lw14ConfDataProvider } from '~/components/LaunchWeek/14/hooks/use-conf-data'
+import DefaultLayout from '~/components/Layouts/Default'
+import LWStickyNav from '~/components/LaunchWeek/14/Releases/LWStickyNav'
+import LWHeader from '~/components/LaunchWeek/14/Releases/LWHeader'
+import MainStage from '~/components/LaunchWeek/14/Releases/MainStage'
+import BuildStage from '~/components/LaunchWeek/14/Releases/BuildStage'
 
 const Lw14Page = () => {
   const TITLE = `${LW14_TITLE} | ${LW14_DATE}`
@@ -37,7 +42,13 @@ const Lw14Page = () => {
       />
 
       <Lw14ConfDataProvider initState={{ userTicketData: defaultUserData, partymodeStatus: 'on' }}>
-        <LwView />
+        <DefaultLayout className='font-["Departure_Mono"]'>
+          <LWStickyNav />
+          <LWHeader />
+          <MainStage className="relative z-10" />
+          <BuildStage />
+          <LwView />
+        </DefaultLayout>
       </Lw14ConfDataProvider>
     </>
   )
