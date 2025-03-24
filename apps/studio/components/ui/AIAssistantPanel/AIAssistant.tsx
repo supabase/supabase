@@ -262,7 +262,7 @@ export const AIAssistant = ({
       <div className={cn('flex flex-col h-full', className)}>
         <div ref={scrollContainerRef} className={cn('flex-grow overflow-auto flex flex-col')}>
           <div className="z-30 sticky top-0">
-            <div className="border-b flex items-center bg gap-x-3 px-5 h-[46px]">
+            <div className="border-b flex items-center bg gap-x-3 pl-5 pr-4 h-[46px]">
               <AiIconAnimation allowHoverEffect />
 
               <div className="text-sm flex-1">Assistant</div>
@@ -280,11 +280,16 @@ export const AIAssistant = ({
                 </Tooltip>
                 <div className="flex gap-2">
                   {(hasMessages || suggestions || sqlSnippets) && (
-                    <Button type="default" disabled={isChatLoading} onClick={onResetConversation}>
+                    <Button
+                      type="outline"
+                      size={'tiny'}
+                      disabled={isChatLoading}
+                      onClick={onResetConversation}
+                    >
                       Reset
                     </Button>
                   )}
-                  <Button type="default" className="w-7" onClick={closeAssistant} icon={<X />} />
+                  <Button type="text" className="w-7" onClick={closeAssistant} icon={<X />} />
                 </div>
               </div>
             </div>

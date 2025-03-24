@@ -19,6 +19,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLints } from 'hooks/misc/useLints'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useFlag } from 'hooks/ui/useFlag'
+import { useNewLayout } from 'hooks/ui/useNewLayout'
 import { Home } from 'icons'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -61,6 +62,10 @@ const SidebarMotion = motion(SidebarPrimitive) as FC<
 export interface SidebarProps extends ComponentPropsWithoutRef<typeof SidebarPrimitive> {}
 
 export const Sidebar = ({ className, ...props }: SidebarProps) => {
+  const newLayoutPreview = useNewLayout()
+
+  const { ref } = useParams()
+
   const { setOpen } = useSidebar()
   const hideSideBar = useHideSidebar()
 
@@ -74,6 +79,10 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
     if (sidebarBehaviour === 'open') setOpen(true)
     if (sidebarBehaviour === 'closed') setOpen(false)
   }, [sidebarBehaviour, setOpen])
+
+  if (!newLayoutPreview && !ref) {
+    return null
+  }
 
   return (
     <>
@@ -131,6 +140,7 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
 
 export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
   const setCommandMenuOpen = useSetCommandMenuOpen()
+  const { ref: projectRef } = useParams()
 
   // temporary logic to show settings route in sidebar footer
   // this will be removed once we move to an updated org/project nav
@@ -144,13 +154,11 @@ export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
     <>
       <AnimatePresence mode="wait">
         <SidebarContentPrimitive>
-          {/* Org sidebar to be added in with project/org nav */}
-          {/* {project ? ( */}
-          <motion.div key="project-links">
-            <ProjectLinks />
-          </motion.div>
-          {/* Org sidebar to be added in with project/org nav */}
-          {/* ) : (
+          {projectRef ? (
+            <motion.div key="project-links">
+              <ProjectLinks />
+            </motion.div>
+          ) : (
             <motion.div
               key="org-links"
               initial={{ opacity: 0, y: -20 }}
@@ -160,37 +168,10 @@ export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
             >
               <OrganizationLinks />
             </motion.div>
-            )} */}
+          )}
         </SidebarContentPrimitive>
       </AnimatePresence>
       <SidebarFooter>
-        <SidebarMenu className="group-data-[state=expanded]:p-0">
-          <SidebarGroup className="p-0 gap-0.5">
-            {settingsRoutes.map((route) => (
-              <SideBarNavLink
-                key={`settings-routes-${route.key}`}
-                route={route}
-                active={activeRoute === route.key}
-              />
-            ))}
-          </SidebarGroup>
-          <SidebarGroup className="p-0">
-            <SideBarNavLink
-              key="cmdk"
-              route={{
-                key: 'cmdk',
-                label: 'Command Menu',
-                icon: <Command size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-              }}
-              onClick={() => setCommandMenuOpen(true)}
-            />
-          </SidebarGroup>
-        </SidebarMenu>
-        <SidebarMenu className="group-data-[state=expanded]:p-0">
-          <SidebarGroup className="p-0">
-            {IS_PLATFORM ? <UserDropdown /> : <ThemeDropdown />}
-          </SidebarGroup>
-        </SidebarMenu>
         <SidebarGroup className="p-0">{footer}</SidebarGroup>
       </SidebarFooter>
     </>
@@ -288,9 +269,7 @@ function ProjectLinks() {
     realtime: realtimeEnabled,
   })
   const otherRoutes = generateOtherRoutes(ref, project)
-
-  /* Settings routes to be added in with project/org nav */
-  // const settingsRoutes = generateSettingsRoutes(ref, project)
+  const settingsRoutes = generateSettingsRoutes(ref, project)
 
   return (
     <SidebarMenu>
@@ -375,20 +354,19 @@ function ProjectLinks() {
         })}
       </SidebarGroup>
       {/* Settings routes to be added in with project/org nav */}
-      {/* <SidebarGroup className="gap-0.5">
-          {settingsRoutes.map((route, i) => (
-            <SideBarNavLink
-              key={`settings-routes-${i}`}
-              route={route}
-              active={activeRoute === route.key}
-            />
-          ))}
-        </SidebarGroup> */}
+      <SidebarGroup className="gap-0.5">
+        {settingsRoutes.map((route, i) => (
+          <SideBarNavLink
+            key={`settings-routes-${i}`}
+            route={route}
+            active={activeRoute === route.key}
+          />
+        ))}
+      </SidebarGroup>
     </SidebarMenu>
   )
 }
 
-// Not currently used, will be part of org layout PR
 const OrganizationLinks = () => {
   const router = useRouter()
   const { slug } = useParams()
@@ -422,7 +400,7 @@ const OrganizationLinks = () => {
     },
     {
       label: 'Organization settings',
-      href: `/org/${slug}/settings/general`,
+      href: `/org/${slug}/general`,
       key: 'settings',
       icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
@@ -433,7 +411,18 @@ const OrganizationLinks = () => {
       <SidebarGroup className="gap-0.5">
         {navMenuItems.map((item, i) => (
           <SideBarNavLink
-            active={i === 0 ? activeRoute === undefined : activeRoute === item.key}
+            active={
+              i === 0
+                ? activeRoute === undefined
+                : item.key === 'settings'
+                  ? router.pathname.includes('/general') ||
+                    router.pathname.includes('/billing') ||
+                    router.pathname.includes('/invoices') ||
+                    router.pathname.includes('/apps') ||
+                    router.pathname.includes('/audit') ||
+                    router.pathname.includes('/documents')
+                  : activeRoute === item.key
+            }
             route={{
               label: item.label,
               link: item.href,

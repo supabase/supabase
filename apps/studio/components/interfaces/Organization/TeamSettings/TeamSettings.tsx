@@ -9,6 +9,7 @@ import {
   ScaffoldContainerLegacy,
   ScaffoldFilterAndContent,
   ScaffoldSectionContent,
+  ScaffoldTitle,
 } from 'components/layouts/Scaffold'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
@@ -19,13 +20,16 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { Input } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { InviteMemberButton } from './InviteMemberButton'
 import MembersView from './MembersView'
 import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
+import { useNewLayout } from 'hooks/ui/useNewLayout'
 
 const TeamSettings = () => {
+  const newLayoutPreview = useNewLayout()
+
   const {
     organizationMembersCreate: organizationMembersCreationEnabled,
     organizationMembersDelete: organizationMembersDeletionEnabled,
@@ -78,13 +82,13 @@ const TeamSettings = () => {
   return (
     <>
       <ScaffoldContainerLegacy>
+        {newLayoutPreview && <ScaffoldTitle>Team</ScaffoldTitle>}
         <ScaffoldFilterAndContent>
           <ScaffoldActionsContainer className="w-full flex-col md:flex-row gap-2 justify-between">
             <Input
+              size="tiny"
               autoComplete="off"
               icon={<Search size={12} />}
-              size="small"
-              className="w-full md:w-auto"
               value={searchString}
               onChange={(e: any) => setSearchString(e.target.value)}
               name="email"

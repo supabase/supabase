@@ -1,8 +1,16 @@
 import { usePathname } from 'next/navigation'
 
+import { useNewLayout } from 'hooks/ui/useNewLayout'
+
 export function useHideSidebar() {
+  const newLayoutPreview = useNewLayout()
   const pathname = usePathname() ?? ''
-  return (
-    pathname.startsWith('/account') || pathname.startsWith('/new') || pathname === '/organizations'
-  )
+  const shouldHide =
+    pathname.startsWith('/account') ||
+    pathname.startsWith('/new') ||
+    pathname === '/organizations' ||
+    pathname === '/sign-in' ||
+    (pathname === '/projects' && newLayoutPreview)
+
+  return shouldHide
 }

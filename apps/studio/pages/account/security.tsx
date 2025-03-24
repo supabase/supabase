@@ -2,12 +2,11 @@ import { Smartphone } from 'lucide-react'
 
 import { TOTPFactors } from 'components/interfaces/Account'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
+import AccountSettingsLayout from 'components/layouts/AccountLayout/AccountSettingsLayout'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import OrganizationLayout from 'components/layouts/OrganizationLayout'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import type { NextPageWithLayout } from 'types'
 import { Badge, cn, Collapsible } from 'ui'
@@ -29,15 +28,12 @@ const Security: NextPageWithLayout = () => {
   const { data } = useMfaListFactorsQuery()
 
   return (
-    <ScaffoldContainer>
-      <ScaffoldHeader>
-        <ScaffoldTitle>Multi-Factor Authentication</ScaffoldTitle>
-        <ScaffoldDescription>
-          Add an additional layer of security to your account by requiring more than just a password
-          to sign in.
-        </ScaffoldDescription>
-      </ScaffoldHeader>
-      <Collapsible className={cn(collapsibleClasses)}>
+    <>
+      <FormHeader
+        title="Multi-factor authentication"
+        description="Add an additional layer of security to your account by requiring more than just a password to sign in."
+      />
+      <Collapsible className={cn(collapsibleClasses, 'w-full flex flex-1 flex-grow')}>
         <Collapsible.Trigger asChild>
           <button
             type="button"
@@ -59,14 +55,20 @@ const Security: NextPageWithLayout = () => {
           <TOTPFactors />
         </Collapsible.Content>
       </Collapsible>
-    </ScaffoldContainer>
+    </>
   )
 }
 
 Security.getLayout = (page) => (
-  <AccountLayout title="Security" breadcrumbs={[{ key: 'security', label: 'Security' }]}>
-    {page}
-  </AccountLayout>
+  <AppLayout>
+    <DefaultLayout headerTitle="Account">
+      <OrganizationLayout>
+        <AccountLayout title="Security" breadcrumbs={[{ key: 'security', label: 'Security' }]}>
+          <AccountSettingsLayout>{page}</AccountSettingsLayout>
+        </AccountLayout>
+      </OrganizationLayout>
+    </DefaultLayout>
+  </AppLayout>
 )
 
 export default Security

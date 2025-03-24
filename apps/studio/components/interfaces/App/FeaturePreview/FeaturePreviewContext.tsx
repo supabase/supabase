@@ -9,6 +9,13 @@ import InlineEditorPreview from './InlineEditorPreview'
 
 export const FEATURE_PREVIEWS = [
   {
+    key: LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW,
+    name: 'Dashboard layout update',
+    content: <APISidePanelPreview />,
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
+    isNew: false,
+  },
+  {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
     name: 'Project API documentation',
     content: <APISidePanelPreview />,

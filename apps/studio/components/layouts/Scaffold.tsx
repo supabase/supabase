@@ -4,7 +4,8 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { cn } from 'ui'
 
 export const MAX_WIDTH_CLASSES = 'mx-auto w-full max-w-[1200px]'
-export const PADDING_CLASSES = 'px-4 md:px-6 lg:px-14 xl:px-24 2xl:px-28'
+export const PADDING_CLASSES = 'px-6 lg:px-14 xl:px-24 2xl:px-32'
+// const PADDING_CLASSES = 'px-10'
 export const MAX_WIDTH_CLASSES_COLUMN = 'min-w-[420px]'
 
 /**

@@ -3,7 +3,7 @@
 export * from './infrastructure'
 
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
-export const DEFAULT_HOME = IS_PLATFORM ? '/projects' : '/project/default'
+export const DEFAULT_HOME = IS_PLATFORM ? '/organizations' : '/project/default'
 
 export const API_URL = (() => {
   //  If running in platform, use API_URL from the env var
@@ -50,6 +50,11 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_INLINE_EDITOR: 'supabase-ui-preview-inline-editor',
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
 
+  UI_TABLE_EDITOR_TABS: 'supabase-ui-table-editor-tabs',
+  UI_SQL_EDITOR_TABS: 'supabase-ui-sql-editor-tabs',
+
+  UI_NEW_LAYOUT_PREVIEW: 'supabase-ui-new-layout-preview',
+
   SQL_SCRATCH_PAD_BANNER_ACKNOWLEDGED: 'supabase-sql-scratch-pad-banner-acknowledged',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
@@ -91,6 +96,7 @@ export const LOCAL_STORAGE_KEYS = {
   FLY_POSTGRES_DEPRECATION_WARNING: 'fly-postgres-deprecation-warning-dismissed',
 
   AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
+  STORAGE_BUCKETS_COLUMN_CONFIG: (ref: string) => `supabase-storage-buckets-columns-${ref}`,
 
   // api keys view switcher for new and legacy api keys
   API_KEYS_VIEW: (ref: string) => `supabase-api-keys-view-${ref}`,

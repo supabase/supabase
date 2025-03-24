@@ -3,9 +3,14 @@ import dayjs from 'dayjs'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import { ScaffoldContainer, ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
+import {
+  ScaffoldContainer,
+  ScaffoldContainerLegacy,
+  ScaffoldTitle,
+} from 'components/layouts/Scaffold'
+
 import AlertError from 'components/ui/AlertError'
-import { DateRangePicker } from 'components/ui/DateRangePicker'
+import DateRangePicker from 'components/ui/DateRangePicker'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -22,8 +27,11 @@ import Bandwidth from './Bandwidth'
 import Compute from './Compute'
 import SizeAndCounts from './SizeAndCounts'
 import TotalUsage from './TotalUsage'
+import { useNewLayout } from 'hooks/ui/useNewLayout'
 
 const Usage = () => {
+  const newLayoutPreview = useNewLayout()
+
   const { slug, projectRef } = useParams()
   const [dateRange, setDateRange] = useState<any>()
   const [selectedProjectRef, setSelectedProjectRef] = useState<string>()
@@ -112,72 +120,79 @@ const Usage = () => {
 
   return (
     <>
-      <ScaffoldContainer className="sticky top-0 border-b bg-studio z-10 overflow-hidden">
-        <div className="py-4 flex flex-col md:flex-row md:items-center gap-4">
-          {isLoadingSubscription && <ShimmeringLoader className="w-[250px]" />}
+      {newLayoutPreview && (
+        <ScaffoldContainerLegacy>
+          <ScaffoldTitle>Usage</ScaffoldTitle>
+        </ScaffoldContainerLegacy>
+      )}
+      <div className="sticky top-0 border-b bg-studio z-[1] overflow-hidden ">
+        <ScaffoldContainer className="">
+          <div className="py-4 flex items-center space-x-4">
+            {isLoadingSubscription && <ShimmeringLoader className="w-[250px]" />}
 
-          {isErrorSubscription && (
-            <AlertError
-              className="w-full"
-              subject="Failed to retrieve usage data"
-              error={subscriptionError}
-            />
-          )}
-
-          {isSuccessSubscription && (
-            <>
-              <DateRangePicker
-                onChange={setDateRange}
-                value={TIME_PERIODS_BILLING[0].key}
-                options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
-                loading={isLoadingSubscription}
-                currentBillingPeriodStart={subscription?.current_period_start}
-                currentBillingPeriodEnd={subscription?.current_period_end}
+            {isErrorSubscription && (
+              <AlertError
+                className="w-full"
+                subject="Failed to retrieve usage data"
+                error={subscriptionError}
               />
+            )}
 
-              <Listbox
-                size="tiny"
-                name="schema"
-                className="w-full md:w-[180px]"
-                value={selectedProjectRef}
-                onChange={(value: any) => {
-                  if (value === 'all-projects') setSelectedProjectRef(undefined)
-                  else setSelectedProjectRef(value)
-                }}
-              >
-                <Listbox.Option
-                  key="all-projects"
-                  id="all-projects"
-                  label="All projects"
-                  value="all-projects"
+            {isSuccessSubscription && (
+              <>
+                <DateRangePicker
+                  onChange={setDateRange}
+                  value={TIME_PERIODS_BILLING[0].key}
+                  options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
+                  loading={isLoadingSubscription}
+                  currentBillingPeriodStart={subscription?.current_period_start}
+                  currentBillingPeriodEnd={subscription?.current_period_end}
+                />
+
+                <Listbox
+                  size="tiny"
+                  name="schema"
+                  className="w-[180px]"
+                  value={selectedProjectRef}
+                  onChange={(value: any) => {
+                    if (value === 'all-projects') setSelectedProjectRef(undefined)
+                    else setSelectedProjectRef(value)
+                  }}
                 >
-                  All projects
-                </Listbox.Option>
-                {orgProjects?.map((project) => (
                   <Listbox.Option
-                    key={project.ref}
-                    id={project.ref}
-                    value={project.ref}
-                    label={project.name}
+                    key="all-projects"
+                    id="all-projects"
+                    label="All projects"
+                    value="all-projects"
                   >
-                    {project.name}
+                    All projects
                   </Listbox.Option>
-                ))}
-              </Listbox>
+                  {orgProjects?.map((project) => (
+                    <Listbox.Option
+                      key={project.ref}
+                      id={project.ref}
+                      value={project.ref}
+                      label={project.name}
+                    >
+                      {project.name}
+                    </Listbox.Option>
+                  ))}
+                </Listbox>
 
-              <div className="flex flex-col xl:flex-row xl:gap-3">
-                <p className={cn('text-sm transition', isLoadingSubscription && 'opacity-50')}>
-                  Organization is on the {subscription.plan.name} plan
-                </p>
-                <p className="text-sm text-foreground-light">
-                  {billingCycleStart.format('DD MMM YYYY')} -{' '}
-                  {billingCycleEnd.format('DD MMM YYYY')}
-                </p>
-              </div>
-            </>
-          )}
-        </div>
-      </ScaffoldContainer>
+                <div className="flex flex-col xl:flex-row xl:gap-3">
+                  <p className={cn('text-sm transition', isLoadingSubscription && 'opacity-50')}>
+                    Organization is on the {subscription.plan.name} plan
+                  </p>
+                  <p className="text-sm text-foreground-light">
+                    {billingCycleStart.format('DD MMM YYYY')} -{' '}
+                    {billingCycleEnd.format('DD MMM YYYY')}
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
+        </ScaffoldContainer>
+      </div>
 
       {selectedProjectRef ? (
         <ScaffoldContainer className="mt-5">

@@ -14,6 +14,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Input,
   Label_Shadcn_,
@@ -22,6 +23,7 @@ import {
   Popover_Shadcn_,
 } from 'ui'
 import { useFlag } from 'hooks/ui/useFlag'
+import { useNewLayout } from 'hooks/ui/useNewLayout'
 
 interface HomePageActionsProps {
   organizations: { name: string; slug: string }[]
@@ -38,6 +40,8 @@ const HomePageActions = ({
   setSearch,
   setFilterStatus,
 }: HomePageActionsProps) => {
+  const newLayoutPreview = useNewLayout()
+
   const router = useRouter()
 
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
@@ -48,30 +52,33 @@ const HomePageActions = ({
 
   return (
     <div className="flex flex-col gap-2 md:gap-3 md:flex-row">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button type="primary">
-            <span>New project</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent side="bottom" align="center">
-          <>
-            <DropdownMenuLabel>Choose organization</DropdownMenuLabel>
-            {organizations
-              .sort((a, b) => a.name.localeCompare(b.name))
-              .map((x) => (
-                <DropdownMenuItem
-                  key={x.slug}
-                  onClick={() => router.push(`${newProjectPath}/${x.slug}`)}
-                >
-                  {x.name}
-                </DropdownMenuItem>
-              ))}
-          </>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {!newLayoutPreview && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button type="primary">
+              <span>New project</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom" align="start">
+            <>
+              <DropdownMenuLabel>Choose organization</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {organizations
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((x) => (
+                  <DropdownMenuItem
+                    key={x.slug}
+                    onClick={() => router.push(`${newProjectPath}/${x.slug}`)}
+                  >
+                    {x.name}
+                  </DropdownMenuItem>
+                ))}
+            </>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
 
-      {IS_PLATFORM && organizationCreationEnabled && orgsLoaded && (
+      {IS_PLATFORM && organizationCreationEnabled && orgsLoaded && !newLayoutPreview && (
         <Button type="default" asChild>
           <Link href="/new" className="flex items-center gap-2">
             New organization

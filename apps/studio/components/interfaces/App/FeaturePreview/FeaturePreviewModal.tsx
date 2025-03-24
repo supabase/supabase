@@ -9,14 +9,17 @@ import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
 import { useParams } from 'common'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 const FeaturePreviewModal = () => {
+  const enableFunctionsAssistant = useFlag('functionsAssistantV2')
+  const enableNewLayoutPreview = useFlag('newLayoutPreview')
+
   const snap = useAppStateSnapshot()
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
   const { ref: projectRef } = useParams()
   const org = useSelectedOrganization()
-  const enableFunctionsAssistant = useFlag('functionsAssistantV2')
 
   const selectedFeaturePreview =
     snap.selectedFeaturePreview === '' ? FEATURE_PREVIEWS[0].key : snap.selectedFeaturePreview
@@ -60,6 +63,15 @@ const FeaturePreviewModal = () => {
     }
   }, [snap.showFeaturePreviewModal])
 
+  function isReleasedToPublic(feature: (typeof FEATURE_PREVIEWS)[number]) {
+    switch (feature.key) {
+      case LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW:
+        return enableNewLayoutPreview
+      default:
+        return true
+    }
+  }
+
   return (
     <Modal
       hideFooter
@@ -74,7 +86,10 @@ const FeaturePreviewModal = () => {
         <div className="flex">
           <div>
             <ScrollArea className="h-[550px] w-[280px] border-r">
-              {FEATURE_PREVIEWS.map((feature) => {
+              {FEATURE_PREVIEWS.filter((feature) => {
+                // filter out preview features that are not released to the public
+                return isReleasedToPublic(feature)
+              }).map((feature) => {
                 const isEnabled = flags[feature.key] ?? false
 
                 return (

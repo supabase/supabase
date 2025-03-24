@@ -1,5 +1,9 @@
 import { Blocks, FileText, Lightbulb, List, Settings } from 'lucide-react'
 
+import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
+import { generateAuthMenu } from 'components/layouts/AuthLayout/AuthLayout.utils'
+import { generateDatabaseMenu } from 'components/layouts/DatabaseLayout/DatabaseMenu.utils'
+import { generateSettingsMenu } from 'components/layouts/ProjectSettingsLayout/SettingsMenu.utils'
 import type { Route } from 'components/ui/ui.types'
 import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
 import type { Project } from 'data/projects/project-detail-query'
@@ -14,9 +18,12 @@ import {
   TableEditor,
 } from 'icons'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
 
-export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
+export const generateToolRoutes = (
+  ref?: string,
+  project?: Project,
+  features?: { sqlEditorTabs: boolean }
+): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
 
@@ -34,7 +41,10 @@ export const generateToolRoutes = (ref?: string, project?: Project): Route[] => 
       icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: !IS_PLATFORM
         ? `/project/${ref}/sql/1`
-        : ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql/new`),
+        : ref &&
+          (isProjectBuilding
+            ? buildingUrl
+            : `/project/${ref}/sql${features?.sqlEditorTabs ? '' : '/new'}`),
     },
   ]
 }
@@ -52,18 +62,24 @@ export const generateProductRoutes = (
   const storageEnabled = features?.storage ?? true
   const realtimeEnabled = features?.realtime ?? true
 
+  const databaseMenu = generateDatabaseMenu(project)
+  const authMenu = generateAuthMenu(ref as string)
+
   return [
     {
       key: 'database',
       label: 'Database',
       icon: <Database size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link:
-        ref &&
-        (isProjectBuilding
-          ? buildingUrl
-          : isProjectActive
-            ? `/project/${ref}/database/schemas`
-            : `/project/${ref}/database/backups/scheduled`),
+        // ref
+        //  &&
+        // (isProjectBuilding
+        //   ? buildingUrl
+        //   : isProjectActive
+        // ?
+        `/project/${ref}/database/schemas`,
+      // : `/project/${ref}/database/backups/scheduled`),
+      items: databaseMenu,
     },
     ...(authEnabled
       ? [
@@ -72,6 +88,7 @@ export const generateProductRoutes = (
             label: 'Authentication',
             icon: <Auth size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/auth/users`),
+            // items: authMenu,
           },
         ]
       : []),
@@ -159,6 +176,7 @@ export const generateSettingsRoutes = (ref?: string, project?: Project): Route[]
             label: 'Project Settings',
             icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && `/project/${ref}/settings/general`,
+            items: generateSettingsMenu(ref as string),
           },
         ]
       : []),

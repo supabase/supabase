@@ -66,7 +66,7 @@ export const buildPathWithParams = (pathname: string) => {
   return queryString ? `${basePath}?${queryString}` : basePath
 }
 
-export const getReturnToPath = (fallback = '/projects') => {
+export const getReturnToPath = (fallback = '/organizations') => {
   const searchParams = new URLSearchParams(location.search)
 
   let returnTo = searchParams.get('returnTo') ?? fallback
