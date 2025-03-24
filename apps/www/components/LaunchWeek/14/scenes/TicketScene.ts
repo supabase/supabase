@@ -16,6 +16,7 @@ interface TicketSceneState {
   platinum: boolean
   frontside: boolean
   ticketNumber: number
+  narrow: boolean
   texts: {
     username: string
     seatCode: string
@@ -32,6 +33,7 @@ interface TicketSceneOptions {
     name?: string
     ticketNumber?: number
   }
+  narrow?: boolean
   onSeatChartButtonClicked?: () => void
   onWebsiteButtonClicked?: () => void
   onGoBackButtonClicked?: () => void
@@ -204,6 +206,38 @@ class TicketScene implements BaseScene {
     },
   }
 
+  narrowResolutions = {
+    0: {
+      ticketPosition: new Vector3(0, 0, -1.6),
+      ticketScale: new Vector3(0.55, 0.55, 0.55),
+    },
+
+    480: {
+      ticketPosition: new Vector3(0, 0, -1.5),
+      ticketScale: new Vector3(0.65, 0.65, 0.65),
+    },
+
+    768: {
+      ticketPosition: new Vector3(0, 0, -0.5),
+      ticketScale: new Vector3(0.65, 0.65, 0.65),
+    },
+
+    // 784: {
+    //   ticketPosition: new Vector3(0, 0, -0.5),
+    //   ticketScale: new Vector3(0.85, 0.85, 0.85),
+    // },
+
+    1024: {
+      ticketPosition: new Vector3(3.0, 0, 0),
+      ticketScale: new Vector3(1.2,1.2,1.2),
+    },
+
+    1280: {
+      ticketPosition: new Vector3(4.0, 0, 0),
+      ticketScale: new Vector3(1.4,1.4,1.4),
+    },
+  }
+
   private _internalState = {
     naturalRotation: new Vector3(0, 0, Math.PI),
     naturalPosition: new Vector3(0, 0, -0.5),
@@ -265,6 +299,7 @@ class TicketScene implements BaseScene {
       platinum: options.defaultPlatinum || false,
       frontside: true,
       ticketNumber: options.user.ticketNumber || 0,
+      narrow: Boolean(options.narrow),
       texts: {
         username: options.user.name ?? '',
         date: 'MAR 31—APR 4',
@@ -1144,14 +1179,14 @@ class TicketScene implements BaseScene {
   }
 
   private getResolutionDescriptor(resolution: number) {
-    const resolutions = Object.keys(this.resolutions).map(Number)
+    const resolutionBase = this.state.narrow ? this.narrowResolutions : this.resolutions
+    const resolutions = Object.keys(resolutionBase).map(Number)
     const closestResolution = resolutions.reduce((prev, curr) =>
       resolution - curr >= 0 && resolution - curr < resolution - prev ? curr : prev
     ) as keyof typeof this.resolutions
 
-    return this.resolutions[closestResolution]
+    return resolutionBase[closestResolution]
   }
-
 }
 
 export default TicketScene

@@ -35,8 +35,8 @@ export const LwView = () => {
             <TicketHeaderClaim />
             <TicketHeaderDate />
           </TicketHeader>
-          <TicketLayoutCanvas>
-            <TicketCanvas onUpgradeToSecret={register.upgradeTicket} />
+          <TicketLayoutCanvas narrow={true}>
+            <TicketCanvas narrow={true} onUpgradeToSecret={register.upgradeTicket} />
             {state.claimFormState === 'visible' && (
               <TicketClaim>
                 <TicketClaimLogo />
@@ -52,7 +52,7 @@ export const LwView = () => {
             )}
             {state.ticketVisibility && (
               <>
-                <TicketShareLayout>
+                <TicketShareLayout narrow>
                   <TicketCopy />
                   <TicketShare />
                 </TicketShareLayout>

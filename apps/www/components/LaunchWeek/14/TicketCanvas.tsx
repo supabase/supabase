@@ -10,9 +10,10 @@ import HUDScene from './scenes/HUDScene'
 interface TicketCanvasProps {
   className?: string
   onUpgradeToSecret?: () => void
+  narrow: boolean
 }
 
-const TicketCanvas = ({ className, onUpgradeToSecret }: TicketCanvasProps) => {
+const TicketCanvas = ({ className, onUpgradeToSecret, narrow }: TicketCanvasProps) => {
   const sceneRef = useRef<TicketScene | null>(null)
   const tunnelRef = useRef<TunnelScene | null>(null)
   const [hudObj, setHudObj] = useState<HUDScene | null>(null)
@@ -24,6 +25,7 @@ const TicketCanvas = ({ className, onUpgradeToSecret }: TicketCanvasProps) => {
     visible: state.ticketVisibility,
     secret: state.userTicketData.secret,
     platinum: state.userTicketData.platinum,
+    narrow: narrow,
     user: {
       id: state.userTicketData.id,
       name: state.userTicketData.name ?? state.userTicketData.username,
@@ -43,6 +45,7 @@ const TicketCanvas = ({ className, onUpgradeToSecret }: TicketCanvasProps) => {
           defaultVisible: initialSceneDataRef.current.visible,
           defaultSecret: initialSceneDataRef.current.secret,
           defaultPlatinum: initialSceneDataRef.current.platinum,
+          narrow: initialSceneDataRef.current.narrow,
           user: initialSceneDataRef.current.user,
           onSeatChartButtonClicked: () => {
             scene.showBackSide()
@@ -60,6 +63,11 @@ const TicketCanvas = ({ className, onUpgradeToSecret }: TicketCanvasProps) => {
 
         const hud = new HUDScene({
           defaultVisible: true,
+          defaultLayout: initialSceneDataRef.current.narrow
+            ? 'narrow'
+            : initialSceneDataRef.current.visible
+              ? 'ticket'
+              : 'default',
         })
 
         await sceneRenderer.activateScene(scene, true)
@@ -98,21 +106,25 @@ const TicketCanvas = ({ className, onUpgradeToSecret }: TicketCanvasProps) => {
 
     if (sceneRef.current) {
       void updateTicket()
-      if (state.ticketVisibility) {
-        hudObj?.dimmHud()
-        hudObj?.setLayout('ticket')
-      } else {
-        hudObj?.undimmHud()
-        hudObj?.setLayout('default')
+      if (!narrow) {
+        if (state.ticketVisibility) {
+          hudObj?.dimmHud()
+          hudObj?.setLayout('ticket')
+        } else {
+          hudObj?.undimmHud()
+          hudObj?.setLayout('default')
+        }
       }
     }
   }, [
     hudObj,
+    narrow,
     state.ticketVisibility,
     state.userTicketData.name,
     state.userTicketData.platinum,
     state.userTicketData.secret,
     state.userTicketData.ticket_number,
+    state.userTicketData.username,
   ])
 
   useEffect(() => {
