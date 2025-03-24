@@ -71,7 +71,7 @@ export const LwView = () => {
                   <TicketShare />
                 </TicketShareLayout>
 
-                <div className="absolute bottom-4 md:bottom-auto md:top-4 left-0 right-0 flex justify-center">
+                <div className="absolute bottom-4 md:bottom-auto md:top-4 xl:top-6 2xl:top-8 left-0 right-0 flex justify-center">
                   <ActionButton
                     variant={state.partymodeStatus === 'on' ? 'primary' : 'secondary'}
                     icon="P"
