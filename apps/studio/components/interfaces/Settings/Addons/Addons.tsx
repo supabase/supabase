@@ -122,8 +122,8 @@ const Addons = () => {
               You are currently on a preview branch of your project
             </AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
-              Updating addons are not available while you're on a preview branch. To manage your
-              addons, you may return to your{' '}
+              Updating addons here will only apply to this preview branch. To manage your addons,
+              for your main branch, please visit the{' '}
               <Link href={`/project/${parentProject.ref}/settings/general`} className="text-brand">
                 main branch
               </Link>
@@ -245,10 +245,7 @@ const Addons = () => {
                           className="mt-2 pointer-events-auto"
                           onClick={() => setPanel('computeInstance')}
                           disabled={
-                            isBranch ||
-                            !isProjectActive ||
-                            projectUpdateDisabled ||
-                            computeSizeChangesDisabled
+                            !isProjectActive || projectUpdateDisabled || computeSizeChangesDisabled
                           }
                         >
                           Change compute size
@@ -447,10 +444,7 @@ const Addons = () => {
                       className="mt-2 pointer-events-auto"
                       onClick={() => setPanel('ipv4')}
                       disabled={
-                        isBranch ||
-                        !isProjectActive ||
-                        projectUpdateDisabled ||
-                        !(canUpdateIPv4 || ipv4)
+                        !isProjectActive || projectUpdateDisabled || !(canUpdateIPv4 || ipv4)
                       }
                       tooltip={{
                         content: {
@@ -576,7 +570,6 @@ const Addons = () => {
                           className="mt-2 pointer-events-auto"
                           onClick={() => setPanel('pitr')}
                           disabled={
-                            isBranch ||
                             !isProjectActive ||
                             projectUpdateDisabled ||
                             !sufficientPgVersion ||
@@ -652,7 +645,7 @@ const Addons = () => {
                         type="default"
                         className="mt-2 pointer-events-auto"
                         onClick={() => setPanel('customDomain')}
-                        disabled={isBranch || !isProjectActive || projectUpdateDisabled}
+                        disabled={!isProjectActive || projectUpdateDisabled}
                       >
                         Change custom domain
                       </Button>
