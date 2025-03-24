@@ -54,7 +54,6 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const elements = useElements()
   const queryClient = useQueryClient()
 
-  // Convert to local state
   const [formState, setFormState] = useState<{
     plan: keyof typeof PRICING_TIER_LABELS_ORG
     name: string
@@ -69,7 +68,6 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     spend_cap: true,
   })
 
-  // Keep only necessary URL params
   const [searchParams] = useQueryStates({
     returnTo: parseAsString.withDefault(''),
     auth_id: parseAsString.withDefault(''),
