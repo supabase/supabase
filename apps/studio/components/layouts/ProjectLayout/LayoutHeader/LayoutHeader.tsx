@@ -27,6 +27,7 @@ import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
+import { ThemeDropdown } from 'components/interfaces/ThemeDropdown'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -196,13 +197,14 @@ const LayoutHeader = ({
         </div>
         <div className="flex items-center gap-x-2">
           {customHeaderComponents && customHeaderComponents}
-          {IS_PLATFORM && (
+          {IS_PLATFORM ? (
             <>
               <FeedbackDropdown />
               <NotificationsPopoverV2 />
               <HelpPopover />
-              <UserDropdown />
             </>
+          ) : (
+            <ThemeDropdown />
           )}
         </div>
       </div>

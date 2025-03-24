@@ -172,33 +172,6 @@ export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
         </SidebarContentPrimitive>
       </AnimatePresence>
       <SidebarFooter>
-        <SidebarMenu className="group-data-[state=expanded]:p-0">
-          <SidebarGroup className="p-0 gap-0.5">
-            {settingsRoutes.map((route) => (
-              <SideBarNavLink
-                key={`settings-routes-${route.key}`}
-                route={route}
-                active={activeRoute === route.key}
-              />
-            ))}
-          </SidebarGroup>
-          <SidebarGroup className="p-0">
-            <SideBarNavLink
-              key="cmdk"
-              route={{
-                key: 'cmdk',
-                label: 'Command Menu',
-                icon: <Command size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-              }}
-              onClick={() => setCommandMenuOpen(true)}
-            />
-          </SidebarGroup>
-        </SidebarMenu>
-        <SidebarMenu className="group-data-[state=expanded]:p-0">
-          <SidebarGroup className="p-0">
-            {IS_PLATFORM ? <UserDropdown /> : <ThemeDropdown />}
-          </SidebarGroup>
-        </SidebarMenu>
         <SidebarGroup className="p-0">{footer}</SidebarGroup>
       </SidebarFooter>
     </>
