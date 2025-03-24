@@ -1593,7 +1593,7 @@ export const realtime: NavMenuConstant = {
           url: '/guides/realtime/realtime-listening-flutter',
         },
         {
-          name: 'Migrate to Broadcast Changes',
+          name: 'Migrate to Broadcast from database',
           url: '/guides/realtime/migrate-from-postgres-changes',
         },
       ],
