@@ -115,22 +115,6 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     return value.length >= 1
   }
 
-  function onOrgNameChange(e: any) {
-    updateForm('name', e.target.value)
-  }
-
-  function onOrgKindChange(value: any) {
-    updateForm('kind', value)
-  }
-
-  function onOrgSizeChange(value: any) {
-    updateForm('size', value)
-  }
-
-  function onDbPricingPlanChange(value: string) {
-    updateForm('plan', value)
-  }
-
   async function createOrg(paymentMethodId?: string) {
     const dbTier = formState.plan === 'PRO' && !formState.spend_cap ? 'PAYG' : formState.plan
 
@@ -241,7 +225,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
             placeholder="Organization name"
             descriptionText="What's the name of your company or team?"
             value={formState.name}
-            onChange={onOrgNameChange}
+            onChange={(e) => updateForm('name', e.target.value)}
           />
         </Panel.Content>
         <Panel.Content className="Form section-block--body has-inputs-centered">
@@ -249,39 +233,33 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
             label="Type of organization"
             layout="horizontal"
             value={formState.kind}
-            onChange={onOrgKindChange}
+            onChange={(value) => updateForm('kind', value)}
             descriptionText="What would best describe your organization?"
           >
-            {Object.entries(ORG_KIND_TYPES).map(([k, v]) => {
-              return (
-                <Listbox.Option key={k} label={v} value={k}>
-                  {v}
-                </Listbox.Option>
-              )
-            })}
+            {Object.entries(ORG_KIND_TYPES).map(([k, v]) => (
+              <Listbox.Option key={k} label={v} value={k}>
+                {v}
+              </Listbox.Option>
+            ))}
           </Listbox>
         </Panel.Content>
 
-        {formState.kind == 'COMPANY' ? (
+        {formState.kind == 'COMPANY' && (
           <Panel.Content className="Form section-block--body has-inputs-centered">
             <Listbox
               label="Company size"
               layout="horizontal"
               value={formState.size}
-              onChange={onOrgSizeChange}
+              onChange={(value) => updateForm('size', value)}
               descriptionText="How many people are in your company?"
             >
-              {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => {
-                return (
-                  <Listbox.Option key={k} label={v} value={k}>
-                    {v}
-                  </Listbox.Option>
-                )
-              })}
+              {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => (
+                <Listbox.Option key={k} label={v} value={k}>
+                  {v}
+                </Listbox.Option>
+              ))}
             </Listbox>
           </Panel.Content>
-        ) : (
-          <></>
         )}
 
         <Panel.Content>
@@ -303,9 +281,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
             }
             layout="horizontal"
             value={formState.plan}
-            // @ts-ignore
-            onChange={onDbPricingPlanChange}
-            // @ts-ignore
+            onChange={(value) => updateForm('plan', value)}
             descriptionText={
               formState.plan !== 'FREE' ? (
                 <p>
@@ -322,13 +298,11 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
               ) : undefined
             }
           >
-            {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => {
-              return (
-                <Listbox.Option key={k} label={v} value={k}>
-                  {v}
-                </Listbox.Option>
-              )
-            })}
+            {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => (
+              <Listbox.Option key={k} label={v} value={k}>
+                {v}
+              </Listbox.Option>
+            ))}
           </Listbox>
         </Panel.Content>
 
