@@ -191,7 +191,7 @@ You can provide a callback for the `broadcast` channel to receive message. This 
   </TabPanel>
 </Tabs>
 
-### Sending broadcast messages
+### Broadcast from client
 
 <Tabs
   scrollable
@@ -581,7 +581,7 @@ You can pass configuration options while initializing the Supabase Client.
 
 Use this to guarantee that the server has received the message before resolving `channelD.send`'s promise. If the `ack` config is not set to `true` when creating the channel, the promise returned by `channelD.send` will resolve immediately.
 
-### Send messages using REST calls
+### Broadcast using REST calls
 
 You can also send a Broadcast message by making an HTTP request to Realtime servers. This is useful when you want to send messages from your server or client without having to first establish a WebSocket connection.
 
@@ -667,7 +667,7 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
   </TabPanel>
 </Tabs>
 
-## Trigger broadcast messages from your database
+## Broadcast from database
 
 <Admonition type="caution">
 
@@ -677,7 +677,7 @@ This feature is currently in Public Alpha. If you have any issues [submit a supp
 
 ### How it works
 
-Broadcast Changes allows you to trigger messages from your database. To achieve it Realtime is directly reading your WAL (Write Append Log) file using a publication against the `realtime.messages` table so whenever a new insert happens a message is sent to connected users.
+Broadcasting from database allows you to trigger messages from your database. To achieve it Realtime is directly reading your WAL (Write Append Log) file using a publication against the `realtime.messages` table so whenever a new insert happens a message is sent to connected users.
 
 It uses partitioned tables per day which allows the deletion your previous messages in a performant way by dropping the physical tables of this partitioned table. Tables older than 3 days old are deleted.
 
@@ -686,9 +686,9 @@ Broadcasting from the database works like a client-side broadcast, using WebSock
 The database broadcast feature provides two functions to help you send messages:
 
 - `realtime.send` will insert a message into realtime.messages without a specific format.
-- `realtime.broadcast_changes` will insert a message with the required fields to emit database changes to clients. This helps you set up triggers on your tables to emit changes.
+- `realtime.broadcast_changes` uses `realtime.send` but sets the payload to emit a database change to clients. This helps you set up triggers on your tables to emit changes.
 
-### Broadcasting a message from your database
+### Broadcasting a JSON payload from your database
 
 The `realtime.send` function provides the most flexibility by allowing you to broadcast messages from your database without a specific format. This allows you to use database broadcast for messages that aren't necessarily tied to the shape of a Postgres row change.
 
@@ -702,11 +702,11 @@ select
   );
 ```
 
-### Broadcast record changes
+### Broadcasting record changes
 
 #### Setup realtime authorization
 
-Realtime Authorization is required and enabled by default. To allow your users to listen to messages from topics, create a RLS (Row Level Security) policy:
+Realtime Authorization is required when using `realtime.broadcast_changes`. To allow your users to listen to messages from topics, create a RLS (Row Level Security) policy:
 
 ```sql
 CREATE POLICY "authenticated can receive broadcasts"
@@ -714,16 +714,15 @@ ON "realtime"."messages"
 FOR SELECT
 TO authenticated
 USING ( true );
-
 ```
 
 See the [Realtime Authorization](/docs/guides/realtime/authorization) docs to learn how to set up more specific policies.
 
 #### Set up trigger function
 
-First, set up a trigger function that uses `realtime.broadcast_changes` to insert an event whenever it is triggered. The event is set up to include data on the schema, table, operation, and field changes that triggered it.
+First, set up a trigger function that uses `realtime.broadcast_changes`. The event is set up to include data on the schema, table, operation, and field changes that triggered it.
 
-For this example use case, we want to have a topic with the name `topic:<record id>` to which we're going to broadcast events.
+For this example, we want to have a topic with the name `topic:<record id>` to which we're going to broadcast events.
 
 ```sql
 CREATE OR REPLACE FUNCTION public.your_table_changes() RETURNS trigger AS $$
@@ -765,9 +764,9 @@ EXECUTE FUNCTION your_table_changes ();
 
 As you can see, it will be broadcasting all operations so our users will receive events when records are inserted, updated or deleted from `public.your_table` .
 
-#### Listen on client side
+#### Listening on client side
 
-Finally, client side will requires to be set up to listen to the topic `topic:<record id>` to receive the events.
+Finally, client side will requires to be set up to listen to the topic `topic:<record id>` to receive the events. Do not forget that you will need `private` set to true in this scenario as we are using `realtime.broadcast_changes` to send the messages.
 
 ```jsx
 const gameId = 'id'
