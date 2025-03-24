@@ -7,7 +7,7 @@ export const CRTShader = {
     vignetteIntensity: { value: 0.9 },
     noiseIntensity: { value: 0.01 },
     flickerIntensity: { value: 0.01 },
-    rgbShiftAmount: { value: 0.003 },
+    rgbShiftAmount: { value: 0.0 },
     // Add intensity control
     intensity: { value: 1.0 },
   },

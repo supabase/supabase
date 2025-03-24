@@ -135,7 +135,7 @@ class HUDScene implements BaseScene {
         ],
       },
       axis: {
-        visible: true as const,
+        visible: false as const,
         leftCoords: {
           x: 92 + 75,
           y: 206,
@@ -177,7 +177,7 @@ class HUDScene implements BaseScene {
         ],
       },
       axis: {
-        visible: true as const,
+        visible: false as const,
         leftCoords: {
           x: 92,
           y: 206,
@@ -602,17 +602,17 @@ class HUDScene implements BaseScene {
     const layout = this.layouts[this.state.layout]
     const sizes = layout[this.activeResolutionKey]
 
-    if (sizes.axis.visible) {
-      this.drawLeftAlignedAxis(ctx, sizes.axis.leftCoords, {
-        header: 'PREV LWS',
-        labels: ['7', '8', '9', '10', '11', '12', '13'],
-      })
-
-      this.drawLeftAlignedAxis(ctx, sizes.axis.rightCoords, {
-        header: 'TEMP',
-        labels: ['2005', '2027', '2049', '2071', '2093', '2115', '2137'],
-      })
-    }
+    // if (sizes.axis.visible) {
+    //   this.drawLeftAlignedAxis(ctx, sizes.axis.leftCoords, {
+    //     header: 'PREV LWS',
+    //     labels: ['7', '8', '9', '10', '11', '12', '13'],
+    //   })
+    //
+    //   this.drawLeftAlignedAxis(ctx, sizes.axis.rightCoords, {
+    //     header: 'TEMP',
+    //     labels: ['2005', '2027', '2049', '2071', '2093', '2115', '2137'],
+    //   })
+    // }
 
     this.drawBarControl(ctx, sizes.bars.coords[0], {
       label: 'PAYLOAD SATURATION',

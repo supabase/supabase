@@ -101,6 +101,8 @@ export const lwReducer = (state: LwState, action: LwAction): LwState => {
     case 'USER_TICKET_FETCH_ERROR':
       return {
         ...state,
+        session: null,
+        ticketState: "registration", 
         userTicketDataState: 'error',
         userTicketDataError: action.payload,
       }
