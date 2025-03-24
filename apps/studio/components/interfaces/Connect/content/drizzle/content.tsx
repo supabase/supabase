@@ -19,9 +19,23 @@ const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
 
       <ConnectTabContent value=".env">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
-          {`
-DATABASE_URL="${connectionStringPooler.transaction}"
-        `}
+          {connectionStringPooler.ipv4SupportedForDedicatedPooler &&
+          connectionStringPooler.transactionDedicated
+            ? `
+DATABASE_URL="${connectionStringPooler.transactionDedicated}"
+        `
+            : connectionStringPooler.transactionDedicated &&
+                !connectionStringPooler.ipv4SupportedForDedicatedPooler
+              ? `
+# Use Shared connection pooler (supports both IPv4/IPv6)
+DATABASE_URL="${connectionStringPooler.transactionShared}"
+
+# If your network supports IPv6 or you purchased IPv4 addon, use dedicated pooler
+# DATABASE_URL="${connectionStringPooler.transactionDedicated}"
+        `
+              : `
+DATABASE_URL="${connectionStringPooler.transactionShared}"
+`}
         </SimpleCodeBlock>
       </ConnectTabContent>
 
