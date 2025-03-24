@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs } from 'react-router'
 import { redirect } from 'react-router'
-import { createClient } from '~/lib/supabase.server'
+import { createClient } from '@/registry/default/clients/react-router/lib/supabase.server'
 
 export async function action({ request }: ActionFunctionArgs) {
   const { supabase, headers } = createClient(request)

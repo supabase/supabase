@@ -1,12 +1,10 @@
 import { redirect } from 'react-router'
 import { Form, Link, useActionData, useNavigation } from 'react-router'
 import type { ActionFunctionArgs } from 'react-router'
-
-import { Input } from '~/components/ui/input'
-import { Button } from '~/components/ui/button'
-import { Label } from '~/components/ui/label'
-import { FormMessage } from '~/components/FormMessage'
-import { createClient } from '~/lib/supabase.server'
+import { createClient } from '@/registry/default/clients/react-router/lib/supabase.server'
+import { Input } from '@/registry/default/components/ui/input'
+import { Label } from '@/registry/default/components/ui/label'
+import { Button } from '@/registry/default/components/ui/button'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase, headers } = createClient(request)
@@ -35,7 +33,7 @@ const SignIn = () => {
       <Form method="post" className="flex-1 flex flex-col min-w-64">
         <h1 className="text-2xl font-medium">Sign in</h1>
         <p className="text-sm text-foreground">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link className="text-foreground font-medium underline" to="/sign-up">
             Sign up
           </Link>
@@ -52,7 +50,15 @@ const SignIn = () => {
           <Input type="password" name="password" placeholder="Your password" required />
           <Button disabled={isSubmitting}>{isSubmitting ? 'Signing in...' : 'Sign in'}</Button>
 
-          {actionData?.error && <FormMessage message={actionData.error} />}
+          {actionData?.error && (
+            <div className="flex flex-col gap-2 w-full max-w-md text-sm">
+              {actionData.error && (
+                <div className="text-foreground border-l-2 border-foreground px-4">
+                  {actionData.error}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </Form>
     </div>

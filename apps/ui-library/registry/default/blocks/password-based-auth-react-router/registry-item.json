@@ -4,7 +4,7 @@
   "title": "Password Based Auth flow for React Router and Supabase",
   "description": "Password Based Auth flow for React Router and Supabase",
   "registryDependencies": ["button", "card", "input", "label"],
-  "dependencies": ["@supabase/ssr@latest"],
+  "dependencies": ["@supabase/ssr@latest", "@react-router/dev@latest"],
   "files": [
     {
       "path": "registry/default/blocks/password-based-auth-react-router/app/routes.ts",
@@ -12,7 +12,7 @@
       "target": "app/routes.ts"
     },
     {
-      "path": "registry/default/blocks/password-based-auth-react-router/app/sign-in.tsx",
+      "path": "registry/default/blocks/password-based-auth-react-router/app/routes/sign-in.tsx",
       "type": "registry:page",
       "target": "app/routes/sign-in.tsx"
     },
@@ -30,6 +30,11 @@
       "path": "registry/default/blocks/password-based-auth-react-router/app/routes/protected.tsx",
       "type": "registry:page",
       "target": "app/routes/protected.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-react-router/app/routes/forgot-password.tsx",
+      "type": "registry:page",
+      "target": "app/routes/forgot-password.tsx"
     }
   ]
 }

@@ -1,7 +1,7 @@
 import { redirect } from 'react-router'
 import { InfoIcon } from 'lucide-react'
-import FetchDataSteps from '~/components/tutorial/FetchDataSteps'
-import { createClient } from '~/lib/supabase.server'
+
+import { createClient } from '@/registry/default/clients/react-router/lib/supabase.server'
 import type { Route } from '../+types/root'
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
@@ -32,11 +32,9 @@ const ProtectedPage = ({ loaderData }: Route.ComponentProps) => {
       </div>
       <div className="flex flex-col gap-2 items-start">
         <h2 className="font-bold text-2xl mb-4">Your user details</h2>
-        <pre className="text-xs font-mono p-3 rounded border max-h-32 overflow-auto">{JSON.stringify(user, null, 2)}</pre>
-      </div>
-      <div>
-        <h2 className="font-bold text-2xl mb-4">Next steps</h2>
-        <FetchDataSteps />
+        <pre className="text-xs font-mono p-3 rounded border max-h-32 overflow-auto">
+          {JSON.stringify(user, null, 2)}
+        </pre>
       </div>
     </div>
   )
