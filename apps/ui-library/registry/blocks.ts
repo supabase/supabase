@@ -3,6 +3,7 @@ import { clients } from './clients'
 import dropzone from './default/blocks/dropzone/registry-item.json' assert { type: 'json' }
 import passwordBasedAuthNextjs from './default/blocks/password-based-auth-nextjs/registry-item.json' assert { type: 'json' }
 import passwordBasedAuthReact from './default/blocks/password-based-auth-react/registry-item.json' assert { type: 'json' }
+import passwordBasedAuthReactRouter from './default/blocks/password-based-auth-react-router/registry-item.json' assert { type: 'json' }
 import passwordBasedAuthTanstack from './default/blocks/password-based-auth-tanstack/registry-item.json' assert { type: 'json' }
 
 import realtimeCursor from './default/blocks/realtime-cursor/registry-item.json' assert { type: 'json' }
@@ -27,6 +28,7 @@ const tanstackClient = clients.find((client) => client.name === 'supabase-client
 export const blocks = [
   registryItemAppend(passwordBasedAuthNextjs as RegistryItem, [nextjsClient!]),
   registryItemAppend(passwordBasedAuthReact as RegistryItem, [reactClient!]),
+  registryItemAppend(passwordBasedAuthReactRouter as RegistryItem, [reactClient!]),
   registryItemAppend(passwordBasedAuthTanstack as RegistryItem, [tanstackClient!]),
   ...combine(dropzone as RegistryItem),
   ...combine(realtimeCursor as RegistryItem),

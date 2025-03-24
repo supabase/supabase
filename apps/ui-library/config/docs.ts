@@ -75,6 +75,18 @@ export const frameworkPages: Record<string, SidebarNavGroup> = {
     title: 'React Router',
     items: [
       {
+        title: 'Client',
+        href: '/docs/react-router/client',
+        items: [],
+        commandItemLabel: 'Supabase Client for React Router',
+      },
+      {
+        title: 'Password-Based Auth',
+        href: '/docs/react-router/password-based-auth',
+        items: [],
+        commandItemLabel: 'Password-Based Auth for React Router',
+      },
+      {
         title: 'Dropzone',
         href: '/docs/react-router/dropzone',
         items: [],
