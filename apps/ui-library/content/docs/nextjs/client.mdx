@@ -1,6 +1,6 @@
 ---
-title: Nextjs
-description: Supabase client for Nextjs
+title: Next.js
+description: Supabase client for Next.js
 ---
 
 ## Installation
@@ -10,3 +10,15 @@ description: Supabase client for Nextjs
 ## Folder structure
 
 <RegistryBlock itemName="supabase-client-nextjs" />
+
+This block installs a Supabase client to be used by Next.js. It's meant to be used with app router and it's fully SSR compatible.
+
+If you started a project through `npx create-next-app -e with-supabase` command, this block is already included in your project.
+
+You need to add an .env file to your project:
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+
+If you're using a local instance of supabase, you can find these values by running `supabase start` or `supabase status` (if already running).
+
+If you're using supabase.com project, you can find them on this page https://supabase.com/dashboard/project/_/settings/api or in the [Connect modal](https://supabase.com/dashboard/project/_?showConnect=true) under App Frameworks.

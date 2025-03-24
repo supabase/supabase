@@ -46,6 +46,12 @@ export const frameworkPages: Record<string, SidebarNavGroup> = {
     title: 'Next.js',
     items: [
       {
+        title: 'Client',
+        href: '/docs/nextjs/client',
+        items: [],
+        commandItemLabel: 'Supabase Client for Next.js',
+      },
+      {
         title: 'Password-Based Auth',
         href: '/docs/nextjs/password-based-auth',
         items: [],
@@ -85,6 +91,18 @@ export const frameworkPages: Record<string, SidebarNavGroup> = {
   tanstack: {
     title: 'Tanstack Start',
     items: [
+      {
+        title: 'Client',
+        href: '/docs/tanstack/client',
+        items: [],
+        commandItemLabel: 'Supabase Client for Tanstack Start',
+      },
+      {
+        title: 'Password-Based Auth',
+        href: '/docs/tanstack/password-based-auth',
+        items: [],
+        commandItemLabel: 'Password-Based Auth for Tanstack Start',
+      },
       {
         title: 'Dropzone',
         href: '/docs/tanstack/dropzone',
