@@ -70,7 +70,8 @@ export const PostgresVersionSelector = ({
   )
 
   useEffect(() => {
-    const defaultValue = availableVersions[0] ? formatValue(availableVersions[0]) : undefined
+    const gaVersion = availableVersions.find((x) => x.release_channel === 'ga')
+    const defaultValue = gaVersion ? formatValue(gaVersion) : undefined
     form.setValue('postgresVersionSelection', defaultValue)
   }, [isSuccess, form])
 
