@@ -17,7 +17,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogSection,
-  DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
   FormControl_Shadcn_,
@@ -153,33 +152,34 @@ export const DeleteAccountButton = () => {
               <Form_Shadcn_ {...form}>
                 <form
                   id="account-deletion-request"
-                  className="flex flex-col gap-y-4"
                   onSubmit={form.handleSubmit(() => onConfirmDelete())}
                 >
-                  <FormField_Shadcn_
-                    name="account"
-                    control={form.control}
-                    render={({ field }) => (
-                      <FormItem_Shadcn_ className="px-7">
-                        <FormLabel_Shadcn_>
-                          Please type{' '}
-                          <span className="font-bold">{profile?.primary_email ?? ''}</span> to
-                          confirm
-                        </FormLabel_Shadcn_>
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            autoFocus
-                            {...field}
-                            autoComplete="off"
-                            disabled={isLoading}
-                            placeholder="Enter the account above"
-                          />
-                        </FormControl_Shadcn_>
-                      </FormItem_Shadcn_>
-                    )}
-                  />
-                  <DialogSectionSeparator />
-                  <div className="px-7 pb-4">
+                  <DialogSection>
+                    <FormField_Shadcn_
+                      name="account"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem_Shadcn_>
+                          <FormLabel_Shadcn_>
+                            Please type{' '}
+                            <span className="font-bold">{profile?.primary_email ?? ''}</span> to
+                            confirm
+                          </FormLabel_Shadcn_>
+                          <FormControl_Shadcn_>
+                            <Input_Shadcn_
+                              autoFocus
+                              {...field}
+                              autoComplete="off"
+                              disabled={isLoading}
+                              placeholder="Enter the account above"
+                            />
+                          </FormControl_Shadcn_>
+                        </FormItem_Shadcn_>
+                      )}
+                    />
+                  </DialogSection>
+
+                  <DialogFooter>
                     <Button
                       block
                       size="small"
@@ -190,7 +190,7 @@ export const DeleteAccountButton = () => {
                     >
                       Submit request for account deletion
                     </Button>
-                  </div>
+                  </DialogFooter>
                 </form>
               </Form_Shadcn_>
             )}

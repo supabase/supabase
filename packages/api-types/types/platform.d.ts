@@ -441,7 +441,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Send exit survey to HubSpot */
+    /** Send exit survey to HubSpot, Notion, and survey_responses table */
     post: operations['SendFeedbackController_sendExitSurvey']
     delete?: never
     options?: never
@@ -1034,7 +1034,7 @@ export interface paths {
     /** Gets the Billing customer */
     get: operations['CustomerController_getCustomer']
     /** Updates the billing customer */
-    put: operations['updateCustomerV2']
+    put: operations['CustomerController_updateCustomer']
     post?: never
     delete?: never
     options?: never
@@ -1312,7 +1312,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets Stripe payment methods for the given organization */
-    get: operations['getPaymentMethodsV2']
+    get: operations['PaymentsController_getPaymentMethods']
     put?: never
     post?: never
     /** Detach payment method with the given card ID */
@@ -2104,10 +2104,10 @@ export interface paths {
       cookie?: never
     }
     /** Lists project's warehouse access tokens from logflare */
-    get: operations['v1-list-all-warehouse-tokens']
+    get: operations['AccessTokenController_listAccessTokens']
     put?: never
     /** Create a warehouse access token */
-    post: operations['v1-create-a-warehouse-token']
+    post: operations['AccessTokenController_createAccessToken']
     delete?: never
     options?: never
     head?: never
@@ -2125,7 +2125,7 @@ export interface paths {
     put?: never
     post?: never
     /** Delete a warehouse access token */
-    delete: operations['v1-delete-a-warehouse-token']
+    delete: operations['AccessTokenController_deleteAccessToken']
     options?: never
     head?: never
     patch?: never
@@ -2139,10 +2139,10 @@ export interface paths {
       cookie?: never
     }
     /** Lists project's telemetry collections from logflare */
-    get: operations['v1-list-all-telemetry-collections']
+    get: operations['CollectionController_listCollections']
     put?: never
     /** Create a telemetry collection */
-    post: operations['v1-create-a-telemetry-collection']
+    post: operations['CollectionController_createCollection']
     delete?: never
     options?: never
     head?: never
@@ -2157,15 +2157,15 @@ export interface paths {
       cookie?: never
     }
     /** Get a telemetry collection */
-    get: operations['v1-get-a-telemetry-collection']
+    get: operations['CollectionController_getCollectionSchema']
     put?: never
     post?: never
     /** Delete a telemetry collection */
-    delete: operations['v1-delete-a-telemetry-collection']
+    delete: operations['CollectionController_deleteCollection']
     options?: never
     head?: never
     /** Update a telemetry collection */
-    patch: operations['v1-update-a-telemetry-collection']
+    patch: operations['CollectionController_updateCollection']
     trace?: never
   }
   '/platform/projects/{ref}/analytics/warehouse/collections/{token}/schema': {
@@ -2176,7 +2176,7 @@ export interface paths {
       cookie?: never
     }
     /** Get a telemetry collection schema */
-    get: operations['v1-get-a-telemetry-collection-schema']
+    get: operations['CollectionController_getCollection']
     put?: never
     post?: never
     delete?: never
@@ -2193,10 +2193,10 @@ export interface paths {
       cookie?: never
     }
     /** Lists project's warehouse endpoints from logflare */
-    get: operations['v1-list-all-warehouse-endpoints']
+    get: operations['EndpointController_listEndpoints']
     put?: never
     /** Create a warehouse endpoint */
-    post: operations['v1-create-a-warehouse-endpoint']
+    post: operations['EndpointController_createEndpoint']
     delete?: never
     options?: never
     head?: never
@@ -2212,10 +2212,10 @@ export interface paths {
     }
     get?: never
     /** Update a warehouse endpoint */
-    put: operations['v1-update-a-warehouse-endpoint']
+    put: operations['EndpointController_updateEndpoint']
     post?: never
     /** Delete a warehouse endpoint */
-    delete: operations['v1-delete-a-warehouse-endpoint']
+    delete: operations['EndpointController_deleteEndpoint']
     options?: never
     head?: never
     patch?: never
@@ -2229,7 +2229,7 @@ export interface paths {
       cookie?: never
     }
     /** Lists project's warehouse queries from logflare */
-    get: operations['v1-list-all-warehouse-queries']
+    get: operations['WarehouseQueryController_runQuery']
     put?: never
     post?: never
     delete?: never
@@ -2246,7 +2246,7 @@ export interface paths {
       cookie?: never
     }
     /** Parses a warehouse query */
-    get: operations['v1-parse-warehouse-query']
+    get: operations['WarehouseQueryController_parseQuery']
     put?: never
     post?: never
     delete?: never
@@ -2263,7 +2263,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's warehouse tenant from logflare */
-    get: operations['v1-provision-a-warehouse-tenant']
+    get: operations['TenantController_getTenant']
     put?: never
     post?: never
     delete?: never
@@ -2384,9 +2384,9 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's Postgres config */
-    get: operations['v1-get-postgres-config']
+    get: operations['PostgresConfigController_getConfig']
     /** Updates project's Postgres config */
-    put: operations['v1-update-postgres-config']
+    put: operations['PostgresConfigController_updateConfig']
     post?: never
     delete?: never
     options?: never
@@ -2473,14 +2473,14 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's supavisor config */
-    get: operations['v1-get-supavisor-config']
+    get: operations['SupavisorConfigController_getSupavisorConfig']
     put?: never
     post?: never
     delete?: never
     options?: never
     head?: never
     /** Updates project's supavisor config */
-    patch: operations['v1-update-supavisor-config']
+    patch: operations['SupavisorConfigController_updateSupavisorConfig']
     trace?: never
   }
   '/platform/projects/{ref}/content': {
@@ -4335,7 +4335,7 @@ export interface components {
         lint_category: string | null
         lint_name: string | null
         note: string | null
-        project_id: number
+        project_ref: string
       }[]
     }
     CreateOAuthAppBody: {
@@ -4957,6 +4957,14 @@ export interface components {
       }
       updated_at: string
     }
+    GetPostgrestConfigResponse: {
+      db_anon_role: string
+      db_extra_search_path: string
+      db_schema: string
+      jwt_secret: string
+      max_rows: number
+      role_claim_key: string
+    }
     GetProjectByFlyExtensionIdResponse: {
       ref: string
     }
@@ -5042,7 +5050,6 @@ export interface components {
       current_period_end: number
       current_period_start: number
       customer_balance: number
-      nano_enabled: boolean
       next_invoice_at: number
       payment_method_type: string
       plan: components['schemas']['BillingSubscriptionPlan']
@@ -5480,7 +5487,7 @@ export interface components {
         lint_category: string | null
         lint_name: string | null
         note: string | null
-        project_id: number
+        project_ref: string
       }[]
     }
     LoadBalancerDatabase: {
@@ -5772,23 +5779,21 @@ export interface components {
     }
     PgbouncerConfigResponse: {
       connection_string: string
-      connectionString: string
       db_dns_name: string
       db_host: string
       db_name: string
       db_port: number
       db_user: string
       default_pool_size?: number
-      ignore_startup_parameters?: string
+      ignore_startup_parameters: string
       inserted_at: string
       max_client_conn?: number
       pgbouncer_enabled: boolean
       /** @enum {string} */
-      pgbouncer_status: 'COMING_DOWN' | 'COMING_UP' | 'DISABLED' | 'ENABLED' | 'RELOADING'
+      pgbouncer_status: 'COMING_UP' | 'COMING_DOWN' | 'RELOADING' | 'ENABLED' | 'DISABLED'
       /** @enum {string} */
-      pool_mode?: 'transaction' | 'session' | 'statement'
+      pool_mode: 'transaction' | 'session' | 'statement'
       ssl_enforced: boolean
-      supavisor_enabled: boolean
     }
     PgbouncerStatusResponse: {
       active: boolean
@@ -5947,14 +5952,6 @@ export interface components {
       rls_forced: boolean
       schema: string
       size: string
-    }
-    PostgrestConfigResponse: {
-      db_anon_role: string
-      db_extra_search_path: string
-      db_schema: string
-      jwt_secret: string
-      max_rows: number
-      role_claim_key: string
     }
     PostgresTrigger: {
       /** @enum {string} */
@@ -6653,6 +6650,10 @@ export interface components {
     }
     SupavisorConfigResponse: {
       connection_string: string
+      /**
+       * @deprecated
+       * @description Use connection_string instead
+       */
       connectionString: string
       /** @enum {string} */
       database_type: 'PRIMARY' | 'READ_REPLICA'
@@ -7091,10 +7092,10 @@ export interface components {
     UpdatePgbouncerConfigBody: {
       default_pool_size?: number
       ignore_startup_parameters: string
-      max_client_conn?: number | null
-      pgbouncer_enabled: boolean
+      max_client_conn?: number
+      pgbouncer_enabled?: boolean
       /** @enum {string} */
-      pool_mode: 'transaction' | 'session' | 'statement'
+      pool_mode?: 'transaction' | 'session' | 'statement'
     }
     UpdatePolicyBody: {
       check?: string
@@ -7106,12 +7107,16 @@ export interface components {
     UpdatePoolingConfigResponse: {
       default_pool_size?: number
       ignore_startup_parameters: string
-      max_client_conn?: number | null
+      max_client_conn?: number
       pgbouncer_enabled: boolean
       /** @enum {string} */
-      pgbouncer_status: 'COMING_DOWN' | 'COMING_UP' | 'DISABLED' | 'ENABLED' | 'RELOADING'
-      /** @enum {string} */
-      pool_mode: 'transaction' | 'session' | 'statement'
+      pgbouncer_status: 'COMING_UP' | 'COMING_DOWN' | 'RELOADING' | 'ENABLED' | 'DISABLED'
+      /**
+       * @deprecated
+       * @description Cannot be changed, this is ignored
+       * @enum {string}
+       */
+      pool_mode?: 'transaction' | 'session' | 'statement'
     }
     UpdatePostgresConfigBody: {
       effective_cache_size?: string
@@ -7145,6 +7150,13 @@ export interface components {
       db_pool?: number
       db_schema?: string
       max_rows?: number
+    }
+    UpdatePostgrestConfigResponse: {
+      db_extra_search_path: string
+      /** @description If `null`, the value is automatically configured based on compute size. */
+      db_pool: number | null
+      db_schema: string
+      max_rows: number
     }
     UpdateProfileBody: {
       first_name: string
@@ -7235,6 +7247,7 @@ export interface components {
     UpdateSupavisorConfigBody: {
       default_pool_size?: number | null
       /**
+       * @deprecated
        * @description Dedicated pooler mode for the project
        * @enum {string}
        */
@@ -7409,13 +7422,6 @@ export interface components {
       updated_at: string
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
-    }
-    V1PostgrestConfigResponse: {
-      db_extra_search_path: string
-      /** @description If `null`, the value is automatically configured based on compute size. */
-      db_pool: number | null
-      db_schema: string
-      max_rows: number
     }
     ValidateQueryBody: {
       query: string
@@ -9465,7 +9471,6 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -9500,7 +9505,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -9536,7 +9540,6 @@ export interface operations {
       header?: never
       path: {
         invoiceId: string
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -9606,7 +9609,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -9809,7 +9811,7 @@ export interface operations {
       }
     }
   }
-  updateCustomerV2: {
+  CustomerController_updateCustomer: {
     parameters: {
       query?: never
       header?: never
@@ -10527,7 +10529,7 @@ export interface operations {
       }
     }
   }
-  getPaymentMethodsV2: {
+  PaymentsController_getPaymentMethods: {
     parameters: {
       query?: never
       header?: never
@@ -13479,7 +13481,7 @@ export interface operations {
       }
     }
   }
-  'v1-list-all-warehouse-tokens': {
+  AccessTokenController_listAccessTokens: {
     parameters: {
       query?: never
       header?: never
@@ -13514,7 +13516,7 @@ export interface operations {
       }
     }
   }
-  'v1-create-a-warehouse-token': {
+  AccessTokenController_createAccessToken: {
     parameters: {
       query?: never
       header?: never
@@ -13546,7 +13548,7 @@ export interface operations {
       }
     }
   }
-  'v1-delete-a-warehouse-token': {
+  AccessTokenController_deleteAccessToken: {
     parameters: {
       query?: never
       header?: never
@@ -13576,7 +13578,7 @@ export interface operations {
       }
     }
   }
-  'v1-list-all-telemetry-collections': {
+  CollectionController_listCollections: {
     parameters: {
       query?: never
       header?: never
@@ -13611,7 +13613,7 @@ export interface operations {
       }
     }
   }
-  'v1-create-a-telemetry-collection': {
+  CollectionController_createCollection: {
     parameters: {
       query?: never
       header?: never
@@ -13643,7 +13645,7 @@ export interface operations {
       }
     }
   }
-  'v1-get-a-telemetry-collection': {
+  CollectionController_getCollectionSchema: {
     parameters: {
       query?: never
       header?: never
@@ -13675,7 +13677,7 @@ export interface operations {
       }
     }
   }
-  'v1-delete-a-telemetry-collection': {
+  CollectionController_deleteCollection: {
     parameters: {
       query?: never
       header?: never
@@ -13707,7 +13709,7 @@ export interface operations {
       }
     }
   }
-  'v1-update-a-telemetry-collection': {
+  CollectionController_updateCollection: {
     parameters: {
       query?: never
       header?: never
@@ -13739,7 +13741,7 @@ export interface operations {
       }
     }
   }
-  'v1-get-a-telemetry-collection-schema': {
+  CollectionController_getCollection: {
     parameters: {
       query?: never
       header?: never
@@ -13771,7 +13773,7 @@ export interface operations {
       }
     }
   }
-  'v1-list-all-warehouse-endpoints': {
+  EndpointController_listEndpoints: {
     parameters: {
       query?: never
       header?: never
@@ -13806,7 +13808,7 @@ export interface operations {
       }
     }
   }
-  'v1-create-a-warehouse-endpoint': {
+  EndpointController_createEndpoint: {
     parameters: {
       query?: never
       header?: never
@@ -13838,7 +13840,7 @@ export interface operations {
       }
     }
   }
-  'v1-update-a-warehouse-endpoint': {
+  EndpointController_updateEndpoint: {
     parameters: {
       query?: never
       header?: never
@@ -13870,7 +13872,7 @@ export interface operations {
       }
     }
   }
-  'v1-delete-a-warehouse-endpoint': {
+  EndpointController_deleteEndpoint: {
     parameters: {
       query?: never
       header?: never
@@ -13900,7 +13902,7 @@ export interface operations {
       }
     }
   }
-  'v1-list-all-warehouse-queries': {
+  WarehouseQueryController_runQuery: {
     parameters: {
       query?: never
       header?: never
@@ -13933,7 +13935,7 @@ export interface operations {
       }
     }
   }
-  'v1-parse-warehouse-query': {
+  WarehouseQueryController_parseQuery: {
     parameters: {
       query?: never
       header?: never
@@ -13966,7 +13968,7 @@ export interface operations {
       }
     }
   }
-  'v1-provision-a-warehouse-tenant': {
+  TenantController_getTenant: {
     parameters: {
       query?: never
       header?: never
@@ -14280,7 +14282,7 @@ export interface operations {
       }
     }
   }
-  'v1-get-postgres-config': {
+  PostgresConfigController_getConfig: {
     parameters: {
       query?: never
       header?: never
@@ -14309,7 +14311,7 @@ export interface operations {
       }
     }
   }
-  'v1-update-postgres-config': {
+  PostgresConfigController_updateConfig: {
     parameters: {
       query?: never
       header?: never
@@ -14365,7 +14367,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PostgrestConfigResponse']
+          'application/json': components['schemas']['GetPostgrestConfigResponse']
         }
       }
       403: {
@@ -14404,7 +14406,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1PostgrestConfigResponse']
+          'application/json': components['schemas']['UpdatePostgrestConfigResponse']
         }
       }
       403: {
@@ -14592,7 +14594,7 @@ export interface operations {
       }
     }
   }
-  'v1-get-supavisor-config': {
+  SupavisorConfigController_getSupavisorConfig: {
     parameters: {
       query?: never
       header?: never
@@ -14621,7 +14623,7 @@ export interface operations {
       }
     }
   }
-  'v1-update-supavisor-config': {
+  SupavisorConfigController_updateSupavisorConfig: {
     parameters: {
       query?: never
       header?: never
@@ -15361,11 +15363,39 @@ export interface operations {
       query: {
         attribute:
           | 'cpu_usage'
+          | 'cpu_usage_busy_system'
+          | 'cpu_usage_busy_user'
+          | 'cpu_usage_busy_iowait'
+          | 'cpu_usage_busy_irqs'
+          | 'cpu_usage_busy_other'
+          | 'cpu_usage_busy_idle'
+          | 'client_connections_max_limit'
+          | 'client_connections_pgbouncer'
+          | 'client_connections_postgres'
+          | 'client_connections_realtime'
+          | 'client_connections_supavisor'
           | 'max_cpu_usage'
           | 'avg_cpu_usage'
           | 'disk_io_budget'
+          | 'disk_iops_usage'
+          | 'disk_iops_max'
+          | 'disk_iops_read'
+          | 'disk_iops_write'
           | 'disk_io_consumption'
+          | 'ram_available_max'
           | 'ram_usage'
+          | 'ram_usage_used'
+          | 'ram_usage_free'
+          | 'ram_usage_applications'
+          | 'ram_usage_page_tables'
+          | 'ram_usage_swap_cache'
+          | 'ram_usage_cache_and_buffers'
+          | 'ram_usage_slab'
+          | 'ram_usage_cache'
+          | 'ram_usage_buffers'
+          | 'ram_usage_unused'
+          | 'ram_usage_swap'
+          | 'ram_usage_hardware_corrupted'
           | 'swap_usage'
           | 'physical_replication_lag_physical_replica_lag_seconds'
           | 'pg_stat_database_num_backends'

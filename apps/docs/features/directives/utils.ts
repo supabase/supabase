@@ -7,6 +7,7 @@ import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
 import { getGitHubFileContentsImmutableOnly } from '~/lib/octokit'
 import { codeSampleRemark } from './CodeSample'
+import { codeTabsRemark } from './CodeTabs'
 import { fromDocsMarkdown } from './utils.server'
 import { partialsRemark } from './Partial'
 
@@ -28,9 +29,10 @@ export function preprocessMdxWithDefaults(mdx: string) {
   return preprocessMdx(mdx, [
     remarkMkDocsAdmonition(),
     remarkPyMdownTabs(),
+    partialsRemark(),
     codeSampleRemark({
       fetchFromGitHub: getGitHubFileContentsImmutableOnly,
     }),
-    partialsRemark(),
+    codeTabsRemark(),
   ])
 }
