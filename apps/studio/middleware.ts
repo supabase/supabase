@@ -20,7 +20,7 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/get-ip-address',
   '/get-utc-time',
   '/edge-functions/test',
-  '/edge-functions/parse-body',
+  '/edge-functions/body',
 ]
 
 export function middleware(request: NextRequest) {

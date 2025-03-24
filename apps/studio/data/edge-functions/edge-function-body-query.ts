@@ -32,7 +32,7 @@ export async function getEdgeFunctionBody(
     })
 
     // Send to our API for processing (the API will handle the fetch from v1 endpoint)
-    const parseResponse = await fetch(`${BASE_PATH}/api/edge-functions/parse-body`, {
+    const parseResponse = await fetch(`${BASE_PATH}/api/edge-functions/body`, {
       method: 'POST',
       body: JSON.stringify({ projectRef, slug }),
       headers,
