@@ -1212,6 +1212,9 @@ importers:
       animejs:
         specifier: ^3.2.2
         version: 3.2.2
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
       classnames:
         specifier: ^2.3.1
         version: 2.3.2
@@ -2045,6 +2048,9 @@ importers:
       react:
         specifier: '*'
         version: 18.2.0
+      react-countdown:
+        specifier: ^2.3.5
+        version: 2.3.5(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react-dom:
         specifier: '*'
         version: 18.2.0(react@18.2.0)
