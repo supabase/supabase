@@ -14,6 +14,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogSection,
   DialogSectionSeparator,
@@ -110,11 +111,7 @@ export const DeleteAccountButton = () => {
         </Button>
       </DialogTrigger>
       <DialogContent className="!w-[500px]">
-<<<<<<< Updated upstream
-        <DialogHeader className="pb-0">
-=======
         <DialogHeader>
->>>>>>> Stashed changes
           {(organizations ?? []).length > 0 ? (
             <>
               <DialogTitle>Leave all organizations before requesting account deletion</DialogTitle>
