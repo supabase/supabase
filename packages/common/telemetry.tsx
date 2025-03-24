@@ -62,9 +62,8 @@ export const PageTelemetry = ({
   enabled?: boolean
 }) => {
   const router = useRouter()
-
-  const pagesPathname = router?.pathname
-  const appPathname = usePathname()
+  const currentPathname = usePathname()
+  const previousPathnameRef = useRef(currentPathname)
 
   const featureFlags = useFeatureFlags()
 
@@ -75,67 +74,26 @@ export const PageTelemetry = ({
   const sendPageTelemetry = useCallback(() => {
     if (!(enabled && hasAcceptedConsent)) return Promise.resolve()
 
-    return handlePageTelemetry(
-      API_URL,
-      pagesPathname ?? appPathname ?? undefined,
-      featureFlags.posthog
-    ).catch((e) => {
+    return handlePageTelemetry(API_URL, currentPathname, featureFlags.posthog).catch((e) => {
       console.error('Problem sending telemetry page:', e)
     })
-  }, [API_URL, pagesPathname, appPathname, hasAcceptedConsent, featureFlags.posthog])
+  }, [API_URL, currentPathname, hasAcceptedConsent, featureFlags.posthog])
 
   const sendPageLeaveTelemetry = useCallback(() => {
     if (!(enabled && hasAcceptedConsent)) return Promise.resolve()
 
-    return handlePageTelemetry(
-      API_URL,
-      pagesPathname ?? appPathname ?? undefined,
-      featureFlags.posthog
-    ).catch((e) => {
+    return handlePageTelemetry(API_URL, currentPathname, featureFlags.posthog).catch((e) => {
       console.error('Problem sending telemetry page-leave:', e)
     })
-  }, [pagesPathname, appPathname, hasAcceptedConsent, featureFlags.posthog])
-
-  const hasSentInitialPageTelemetryRef = useRef(false)
+  }, [API_URL, currentPathname, hasAcceptedConsent, featureFlags.posthog])
 
   useEffect(() => {
-    // Send page telemetry on first page load
-    // Waiting for router ready before sending page_view
-    // if not the path will be dynamic route instead of the browser url
-    if (
-      (router?.isReady ?? true) &&
-      featureFlags.hasLoaded &&
-      !hasSentInitialPageTelemetryRef.current
-    ) {
-      sendPageTelemetry()
-      hasSentInitialPageTelemetryRef.current = true
-    }
-  }, [router?.isReady, featureFlags.hasLoaded])
+    // Skip initial mount since we handle that separately
+    if (previousPathnameRef.current === currentPathname) return
 
-  useEffect(() => {
-    // For pages router
-    if (router === null) return
-
-    function handleRouteChange() {
-      sendPageTelemetry()
-    }
-
-    // Listen for page changes after a navigation or when the query changes
-    router.events.on('routeChangeComplete', handleRouteChange)
-
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange)
-    }
-  }, [router])
-
-  useEffect(() => {
-    // For app router
-    if (router !== null) return
-
-    if (appPathname) {
-      sendPageTelemetry()
-    }
-  }, [appPathname, router, sendPageTelemetry])
+    previousPathnameRef.current = currentPathname
+    sendPageTelemetry()
+  }, [currentPathname, sendPageTelemetry])
 
   useEffect(() => {
     if (!enabled) return
