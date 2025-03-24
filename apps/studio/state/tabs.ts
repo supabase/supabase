@@ -143,6 +143,7 @@ export const addTab = (ref: string | undefined, tab: Tab) => {
 // this is used for removing tabs from the localstorage state
 // for handling a manual tab removal with a close action, use handleTabClose()
 export const removeTab = (ref: string | undefined, id: string) => {
+  console.log('removeTab')
   const store = getTabsStore(ref)
   const idx = store.openTabs.indexOf(id)
   store.openTabs = store.openTabs.filter((tabId) => tabId !== id)
@@ -282,7 +283,7 @@ export const handleTabClose = ({
   }
 
   // [Joshen] Only navigate away if we're closing the tab that's currently in focus
-  if (store.activeTab === id) {
+  if (store.activeTab === id || id === 'new') {
     if (nextTabId) {
       store.activeTab = nextTabId
       handleTabNavigation(ref, nextTabId, router)
