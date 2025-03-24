@@ -387,7 +387,9 @@ describe('Advanced Query Tests', () => {
         .filter('id', '=', 1)
         .toSql()
 
-      expect(sql).toMatchInlineSnapshot(`"update public.normal_table set (name) = (select name from json_populate_record(null::public.normal_table, '{"name":"Updated Name"}')) where id = 1 returning *;"`)
+      expect(sql).toMatchInlineSnapshot(
+        `"update public.normal_table set (name) = (select name from json_populate_record(null::public.normal_table, '{"name":"Updated Name"}')) where id = 1 returning *;"`
+      )
 
       const result = await validateSql(db, sql)
       expect(result.length).toBe(1)
