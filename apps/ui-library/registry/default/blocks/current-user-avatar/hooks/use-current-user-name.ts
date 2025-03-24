@@ -11,15 +11,7 @@ export const useCurrentUserName = () => {
         console.error(error)
       }
 
-      const githubIdentity = data.session?.user.identities?.find((i) => i.provider === 'github')
-      if (githubIdentity) {
-        const name = (githubIdentity.identity_data?.name ??
-          githubIdentity.identity_data?.fullName) as string
-
-        const username = githubIdentity.identity_data?.username as string
-
-        setName(name ?? username)
-      }
+      setName(data.session?.user.user_metadata.full_name ?? '?')
     }
 
     fetchProfileName()

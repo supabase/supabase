@@ -11,10 +11,7 @@ export const useCurrentUserImage = () => {
         console.error(error)
       }
 
-      const githubIdentity = data.session?.user.identities?.find((i) => i.provider === 'github')
-      if (githubIdentity) {
-        setImage(githubIdentity.identity_data?.avatar_url)
-      }
+      setImage(data.session?.user.user_metadata.avatar_url ?? null)
     }
     fetchUserImage()
   }, [])
