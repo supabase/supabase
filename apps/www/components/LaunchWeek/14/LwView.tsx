@@ -23,7 +23,7 @@ import { useRegistration } from '~/components/LaunchWeek/14/hooks/use-registrati
 import useConfData from './hooks/use-conf-data'
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 
-const dates = [new Date('2025-03-31T07:00:00.000-07:00')]
+const dates = [new Date('2025-03-31T07:00:00.000-08:00')]
 
 export const LwView = () => {
   const partymode = usePartymode()
