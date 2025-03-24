@@ -67,6 +67,8 @@ const CodePage = () => {
     },
   })
 
+  console.log('function:', selectedFunction)
+
   const onUpdate = async () => {
     if (isDeploying || !ref || !functionSlug || !selectedFunction || files.length === 0) return
 
@@ -76,7 +78,8 @@ const CodePage = () => {
         metadata: {
           name: selectedFunction.name,
           verify_jwt: selectedFunction.verify_jwt,
-          entrypoint_path: 'index.ts',
+          entrypoint_path: selectedFunction.entrypoint_path || 'index.ts',
+          import_map_path: selectedFunction.import_map_path,
         },
         files: files.map(({ name, content }) => ({ name, content })),
       })
