@@ -14,6 +14,9 @@ module.exports = config({
   ],
   theme: {
     extend: {
+      fontFamily: {
+        'mono-lw': 'DepartureMono-Regular',
+      },
       keyframes: {
         'flash-code': {
           '0%': { backgroundColor: 'rgba(63, 207, 142, 0.1)' },

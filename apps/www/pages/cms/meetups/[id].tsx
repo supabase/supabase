@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import supabase from '~/lib/supabaseAdmin'
 import Link from 'next/link'
-import { Database } from '~/types/supabase'
+import { Database } from '~/lib/database.types'
 import CMSLayout from '~/components/Layouts/CMSLayout'
 
 type Meetup = Database['public']['Tables']['meetups']['Row']
@@ -41,11 +41,8 @@ export default function MeetupDetail() {
   return (
     <CMSLayout>
       <div className="space-y-6">
-        <div className="flex items-center space-x-4">
-          <Link
-            href="/cms/meetups"
-            className="text-sm font-medium text-brand-400 hover:text-brand-300"
-          >
+        <div className="flex flex-col gap-4">
+          <Link href="/cms/meetups" className="text-sm text-foreground-light hover:underline">
             ← Back to Meetups
           </Link>
           <h1 className="h1">Meetup Details</h1>

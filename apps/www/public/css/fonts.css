@@ -82,10 +82,19 @@
   font-display: swap;
 }
 
+@layer base {
+  @font-face {
+    font-family: 'DepartureMono';
+    src: url('/fonts/departure-mono/DepartureMono-Regular.otf') format('otf');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+}
 @font-face {
-  font-family: 'Departure Mono';
-  src: url('/fonts/departure-mono/DepartureMono-Regular.otf') format('woff2');
-  font-weight: 400;
+  font-family: 'DepartureMono';
+  src: url('/fonts/departure-mono/DepartureMono-Regular.otf') format('woff');
+  font-weight: normal;
   font-style: normal;
   font-display: swap;
 }

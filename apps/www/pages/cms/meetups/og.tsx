@@ -1,19 +1,16 @@
 import { useEffect, useState } from 'react'
 import supabase from '~/lib/supabaseAdmin'
 import Link from 'next/link'
-import { Database } from '~/types/supabase'
+import { Database } from '~/lib/database.types'
 import CMSLayout from '~/components/Layouts/CMSLayout'
-import { Button } from 'ui'
+import { Badge, Button } from 'ui'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 
 type Meetup = Database['public']['Tables']['meetups']['Row']
-type MeetupInsert = Database['public']['Tables']['meetups']['Insert']
 
 export default function MeetupsCMS() {
   const [meetups, setMeetups] = useState<Meetup[]>([])
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [meetupToDelete, setMeetupToDelete] = useState<Meetup | null>(null)
   const { basePath } = useRouter()
 
   useEffect(() => {
@@ -29,34 +26,6 @@ export default function MeetupsCMS() {
     }
 
     setMeetups(data as Meetup[])
-  }
-
-  async function handleImport(meetups: MeetupInsert[]) {
-    const { error } = await supabase.from('meetups').insert(meetups)
-
-    if (error) {
-      console.error('Error importing meetups:', error)
-      return
-    }
-
-    // Refresh the list after import
-    fetchMeetups()
-  }
-
-  async function handleDelete() {
-    if (!meetupToDelete) return
-
-    const { error } = await supabase.from('meetups').delete().eq('id', meetupToDelete.id.toString())
-
-    if (error) {
-      console.error('Error deleting meetup:', error)
-      return
-    }
-
-    // Refresh the list after deletion
-    fetchMeetups()
-    setShowDeleteConfirm(false)
-    setMeetupToDelete(null)
   }
 
   // Group meetups by country
@@ -78,9 +47,9 @@ export default function MeetupsCMS() {
   // Calculate how many countries should go in each column
   const countriesPerColumn = Math.ceil(countryGroups.length / 3)
   const columns = [
-    countryGroups.slice(0, countriesPerColumn),
-    countryGroups.slice(countriesPerColumn, countriesPerColumn * 2 - 7),
-    countryGroups.slice(countriesPerColumn * 2 - 7),
+    countryGroups.slice(0, countriesPerColumn + 1),
+    countryGroups.slice(countriesPerColumn + 1, countriesPerColumn * 2 - 4),
+    countryGroups.slice(countriesPerColumn * 2 - 4),
   ]
 
   return (
@@ -95,7 +64,7 @@ export default function MeetupsCMS() {
           </div>
         </div>
 
-        <div className="relative font-['Departure_Mono'] text-foreground-lighter w-[1200px] h-[670px] bg-alternative text-lg border flex items-start justify-center gap-2 p-10">
+        <div className="relative font-['DepartureMono'] text-foreground-lighter w-[1200px] h-[780px] bg-alternative text-lg border flex items-start justify-center gap-2 p-10">
           <Image
             src={`${basePath}/images/launchweek/14/meetups-og-bg.png`}
             alt="meetups bg"
@@ -107,7 +76,7 @@ export default function MeetupsCMS() {
           {columns.map((column, columnIndex) => (
             <div key={columnIndex} className="relative z-10 flex-1 flex flex-col">
               {columnIndex === 0 && (
-                <div className="text-2xl mb-12 flex items-center gap-3 text-foreground">
+                <div className="text-2xl mb-[53px] flex items-center gap-3 text-foreground">
                   <svg
                     width="27"
                     height="25"
@@ -148,13 +117,18 @@ export default function MeetupsCMS() {
               {column.map(([country, countryMeetups]) => (
                 <div key={country} className="">
                   <div className="grid grid-cols-[130px_1fr] gap-4">
-                    <div className="">{country}</div>
+                    <div className="">{country === 'Saudi Arabia' ? 'S. Arabia' : country}</div>
                     <div className="gap-1">
                       {[...countryMeetups]
                         .sort((a, b) => (a.title || '').localeCompare(b.title || ''))
                         .map((meetup) => (
-                          <div key={meetup.id} className="text-foreground">
+                          <div key={meetup.id} className="text-foreground flex items-center gap-2">
                             {meetup.title || 'Unnamed Meetup'}
+                            {meetup.is_live && (
+                              <Badge variant="brand" className="!py-0">
+                                New
+                              </Badge>
+                            )}
                           </div>
                         ))}
                     </div>

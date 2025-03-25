@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Database } from '~/types/supabase'
+import { Database } from '~/lib/database.types'
+import { timezones } from '~/data/timezones'
 
 type Meetup = Database['public']['Tables']['meetups']['Row']
 type MeetupInsert = Database['public']['Tables']['meetups']['Insert']
@@ -213,8 +214,10 @@ export default function MeetupForm({ initialData = {}, onSubmit, submitLabel }: 
   const [formData, setFormData] = useState<Partial<MeetupInsert>>({
     title: initialData.title || '',
     country: initialData.country || '',
+    city: initialData.city || '',
     start_at: initialData.start_at || '',
     display_info: initialData.display_info || '',
+    timezone: initialData.timezone || '',
     is_live: initialData.is_live || false,
     is_published: initialData.is_published || true,
     link: initialData.link || '',
@@ -226,95 +229,131 @@ export default function MeetupForm({ initialData = {}, onSubmit, submitLabel }: 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block mb-2 text-foreground">Title</label>
-        <input
-          type="text"
-          value={formData.title || ''}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          className="w-full border border-border rounded-md bg-surface-100 p-2 text-foreground focus:outline-none focus:ring-2 focus:ring-brand-400"
-          required
-          autoFocus
-        />
+    <form onSubmit={handleSubmit} className="space-y-2">
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className="block mb-1 text-sm text-foreground">Title</label>
+          <input
+            type="text"
+            value={formData.title || ''}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            className="w-full border border-border rounded-md bg-surface-100 p-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand-400"
+            required
+            autoFocus
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1 text-sm text-foreground">City</label>
+          <input
+            type="text"
+            value={formData.city || ''}
+            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+            className="w-full border border-border rounded-md bg-surface-100 p-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand-400"
+            required
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className="block mb-1 text-sm text-foreground">Country</label>
+          <select
+            value={formData.country || ''}
+            onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+            className="w-full border border-border rounded-md bg-surface-100 p-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand-400"
+            required
+          >
+            <option value="">Select a country</option>
+            {countries.map((country) => (
+              <option key={country} value={country}>
+                {country}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block mb-1 text-sm text-foreground">Timezone</label>
+          <select
+            value={formData.timezone || ''}
+            onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
+            className="w-full border border-border rounded-md bg-surface-100 p-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand-400"
+            required
+          >
+            <option value="">Select a timezone</option>
+            {timezones.map((timezone) => (
+              <option key={timezone} value={timezone}>
+                {timezone}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className="block mb-1 text-sm text-foreground">Start Date</label>
+          <input
+            type="datetime-local"
+            value={formData.start_at || ''}
+            onChange={(e) => setFormData({ ...formData, start_at: e.target.value })}
+            className="w-full border border-border rounded-md bg-surface-100 p-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand-400"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1 text-sm text-foreground">Link</label>
+          <input
+            type="url"
+            value={formData.link || ''}
+            onChange={(e) => setFormData({ ...formData, link: e.target.value })}
+            className="w-full border border-border rounded-md bg-surface-100 p-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand-400"
+          />
+        </div>
       </div>
 
       <div>
-        <label className="block mb-2 text-foreground">Country</label>
-        <select
-          value={formData.country || ''}
-          onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-          className="w-full border border-border rounded-md bg-surface-100 p-2 text-foreground focus:outline-none focus:ring-2 focus:ring-brand-400"
-          required
-        >
-          <option value="">Select a country</option>
-          {countries.map((country) => (
-            <option key={country} value={country}>
-              {country}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label className="block mb-2 text-foreground">Start Date</label>
-        <input
-          type="datetime-local"
-          value={formData.start_at || ''}
-          onChange={(e) => setFormData({ ...formData, start_at: e.target.value })}
-          className="w-full border border-border rounded-md bg-surface-100 p-2 text-foreground focus:outline-none focus:ring-2 focus:ring-brand-400"
-          required
-        />
-      </div>
-
-      <div>
-        <label className="block mb-2 text-foreground">Display Info</label>
+        <label className="block mb-1 text-sm text-foreground">Display Info</label>
         <input
           type="text"
           value={formData.display_info || ''}
           onChange={(e) => setFormData({ ...formData, display_info: e.target.value })}
-          className="w-full border border-border rounded-md bg-surface-100 p-2 text-foreground focus:outline-none focus:ring-2 focus:ring-brand-400"
+          className="w-full border border-border rounded-md bg-surface-100 p-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand-400"
         />
       </div>
 
-      <div>
-        <label className="block mb-2 text-foreground">Link</label>
-        <input
-          type="url"
-          value={formData.link || ''}
-          onChange={(e) => setFormData({ ...formData, link: e.target.value })}
-          className="w-full border border-border rounded-md bg-surface-100 p-2 text-foreground focus:outline-none focus:ring-2 focus:ring-brand-400"
-        />
-      </div>
+      <div className="flex items-center justify-between pt-2">
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              checked={formData.is_live || false}
+              onChange={(e) => setFormData({ ...formData, is_live: e.target.checked })}
+              className="mr-2 h-4 w-4 rounded border-border text-brand-400 focus:ring-brand-400"
+            />
+            <label className="text-sm text-foreground">Is Live</label>
+          </div>
 
-      <div className="flex items-center space-x-4">
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            checked={formData.is_live || false}
-            onChange={(e) => setFormData({ ...formData, is_live: e.target.checked })}
-            className="mr-2 h-4 w-4 rounded border-border text-brand-400 focus:ring-brand-400"
-          />
-          <label className="text-foreground">Is Live</label>
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              checked={formData.is_published || false}
+              onChange={(e) => setFormData({ ...formData, is_published: e.target.checked })}
+              className="mr-2 h-4 w-4 rounded border-border text-brand-400 focus:ring-brand-400"
+            />
+            <label className="text-sm text-foreground">Is Published</label>
+          </div>
         </div>
 
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            checked={formData.is_published || false}
-            onChange={(e) => setFormData({ ...formData, is_published: e.target.checked })}
-            className="mr-2 h-4 w-4 rounded border-border text-brand-400 focus:ring-brand-400"
-          />
-          <label className="text-foreground">Is Published</label>
-        </div>
+        <button
+          type="submit"
+          className="px-3 py-1.5 shadow-sm border border-transparent text-sm text-white bg-brand-400 hover:bg-brand-300 focus:ring-2 focus:ring-offset-2 focus:ring-brand-300 rounded-md font-medium"
+        >
+          {submitLabel}
+        </button>
       </div>
-
-      <button
-        type="submit"
-        className="px-3 py-2 shadow-sm border border-transparent text-white bg-brand-400 hover:bg-brand-300 focus:ring-2 focus:ring-offset-2 focus:ring-brand-300 rounded-md font-medium"
-      >
-        {submitLabel}
-      </button>
     </form>
   )
 }

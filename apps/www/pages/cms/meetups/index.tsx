@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import supabase from '~/lib/supabaseAdmin'
 import Link from 'next/link'
-import { Database } from '~/types/supabase'
+import { Database } from '~/lib/database.types'
 import CMSLayout from '~/components/Layouts/CMSLayout'
 import dayjs from 'dayjs'
 import { Button } from 'ui'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 
 type Meetup = Database['public']['Tables']['meetups']['Row']
 type MeetupInsert = Database['public']['Tables']['meetups']['Insert']
@@ -19,7 +20,10 @@ export default function MeetupsCMS() {
   }, [])
 
   async function fetchMeetups() {
-    const { data, error } = await supabase.from('meetups').select('*')
+    const { data, error } = await supabase
+      .from('meetups')
+      .select('*')
+      .order('start_at', { ascending: true })
 
     if (error) {
       console.error('Error fetching meetups:', error)
@@ -57,6 +61,27 @@ export default function MeetupsCMS() {
     setMeetupToDelete(null)
   }
 
+  async function handleStatusChange(
+    meetupId: string | number,
+    field: 'is_live' | 'is_published',
+    value: boolean
+  ) {
+    const { error } = await supabase
+      .from('meetups')
+      .update({ [field]: value })
+      .eq('id', meetupId.toString())
+
+    if (error) {
+      console.error('Error updating meetup status:', error)
+      return
+    }
+
+    // Update local state
+    setMeetups(
+      meetups.map((meetup) => (meetup.id === meetupId ? { ...meetup, [field]: value } : meetup))
+    )
+  }
+
   return (
     <CMSLayout>
       <div className="space-y-4">
@@ -86,22 +111,57 @@ export default function MeetupsCMS() {
                   {meetup.start_at ? dayjs(meetup.start_at).format('DD MMM YY') : 'No date'}
                 </span>
                 <div className="flex items-center space-x-2">
-                  <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                      meetup.is_live ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                    }`}
-                  >
-                    {meetup.is_live ? 'Live' : 'Not Live'}
-                  </span>
-                  <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                      meetup.is_published
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}
-                  >
-                    {meetup.is_published ? 'Published' : 'Draft'}
-                  </span>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                          meetup.is_live
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        {meetup.is_live ? 'Live' : 'Not Live'}
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() => handleStatusChange(meetup.id, 'is_live', true)}
+                      >
+                        Live
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleStatusChange(meetup.id, 'is_live', false)}
+                      >
+                        Not Live
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                          meetup.is_published
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}
+                      >
+                        {meetup.is_published ? 'Published' : 'Draft'}
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() => handleStatusChange(meetup.id, 'is_published', true)}
+                      >
+                        Published
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleStatusChange(meetup.id, 'is_published', false)}
+                      >
+                        Draft
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
               <div className="flex items-center space-x-4">

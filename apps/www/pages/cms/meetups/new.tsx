@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import supabase from '~/lib/supabaseAdmin'
 import Link from 'next/link'
 import MeetupForm from '~/components/MeetupForm'
-import { Database } from '~/types/supabase'
+import { Database } from '~/lib/database.types'
 import CMSLayout from '~/components/Layouts/CMSLayout'
 
 type MeetupInsert = Database['public']['Tables']['meetups']['Insert']
@@ -36,7 +36,7 @@ export default function NewMeetup() {
     <CMSLayout>
       <div className="space-y-6">
         <div className="flex flex-col gap-4">
-          <Link href="/cms/meetups" className="text-sm font-medium text-foreground-light">
+          <Link href="/cms/meetups" className="text-sm text-foreground-light hover:underline">
             ← Back to Meetups
           </Link>
           <h1 className="h1">Create New Meetup</h1>

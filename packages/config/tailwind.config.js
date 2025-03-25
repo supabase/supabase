@@ -373,6 +373,7 @@ const uiConfig = ui({
       fontFamily: {
         sans: 'var(--font-custom, Circular, custom-font, Helvetica Neue, Helvetica, Arial, sans-serif)',
         mono: 'var(--font-source-code-pro, Source Code Pro, Office Code Pro, Menlo, monospace)',
+        'mono-lw': 'var(departure-mono, Departure Mono, Menlo, monospace)',
       },
 
       // shadcn defaults START

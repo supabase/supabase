@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import MeetupForm from '~/components/MeetupForm'
 import supabase from '~/lib/supabaseAdmin'
-import { Database } from '~/types/supabase'
+import { Database } from '~/lib/database.types'
 import CMSLayout from '~/components/Layouts/CMSLayout'
 import dayjs from 'dayjs'
 
@@ -74,11 +74,8 @@ export default function EditMeetup() {
   return (
     <CMSLayout>
       <div className="space-y-6">
-        <div className="flex items-center space-x-4">
-          <Link
-            href="/cms/meetups"
-            className="text-sm font-medium text-brand-400 hover:text-brand-300"
-          >
+        <div className="flex flex-col gap-4">
+          <Link href="/cms/meetups" className="text-sm text-foreground-light hover:underline">
             ← Back to Meetups
           </Link>
           <h1 className="h1">Edit Meetup</h1>
