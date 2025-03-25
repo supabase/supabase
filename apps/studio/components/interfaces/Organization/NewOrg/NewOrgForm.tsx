@@ -45,9 +45,17 @@ interface NewOrgFormProps {
 }
 
 const formSchema = z.object({
-  plan: z.enum(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'] as const),
+  plan: z
+    .string()
+    .transform((val) => val.toUpperCase())
+    .pipe(z.enum(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'] as const)),
   name: z.string().min(1),
-  kind: z.enum(['PERSONAL', 'EDUCATIONAL', 'STARTUP', 'AGENCY', 'COMPANY', 'UNDISCLOSED'] as const),
+  kind: z
+    .string()
+    .transform((val) => val.toUpperCase())
+    .pipe(
+      z.enum(['PERSONAL', 'EDUCATIONAL', 'STARTUP', 'AGENCY', 'COMPANY', 'UNDISCLOSED'] as const)
+    ),
   size: z.enum(['1', '10', '50', '100', '300'] as const),
   spend_cap: z.boolean(),
 })
