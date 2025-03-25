@@ -11,7 +11,6 @@ import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body
 import { toast } from 'sonner'
 import { useRouter } from 'next/router'
 import { useParams } from 'common'
-import { useAppStateSnapshot } from 'state/app-state'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'

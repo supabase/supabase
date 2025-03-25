@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { handleError, constructHeaders } from 'data/fetchers'
-import { IS_PLATFORM, API_URL, BASE_PATH } from 'lib/constants'
+import { IS_PLATFORM, BASE_PATH } from 'lib/constants'
 import { ResponseError } from 'types'
 import { edgeFunctionsKeys } from './keys'
 
