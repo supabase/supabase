@@ -13,10 +13,11 @@ const FileUploadDemo = () => {
     path: 'test',
     allowedMimeTypes: ['image/*'],
     maxFiles: 2,
+    maxFileSize: 1000 * 1000 * 10, // 10MB,
   })
 
   return (
-    <div>
+    <div className="w-[500px]">
       <Dropzone {...props}>
         <DropzoneEmptyState />
         <DropzoneContent />
