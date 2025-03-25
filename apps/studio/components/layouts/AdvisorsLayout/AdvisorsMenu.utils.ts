@@ -40,7 +40,7 @@ export const generateAdvisorsMenu = (
               {
                 name: 'Advisor Rules',
                 key: 'advisor-rules',
-                url: `/project/${ref}/advisors/rules`,
+                url: `/project/${ref}/advisors/rules/security`,
                 items: [],
               },
             ],

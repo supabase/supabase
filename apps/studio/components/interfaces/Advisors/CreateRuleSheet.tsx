@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -6,9 +7,10 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { useLintRuleCreateMutation } from 'data/lint/create-lint-rule-mutation'
-import { LintCategory, LintName } from 'data/lint/lint-rules-query'
+import { LintName } from 'data/lint/lint-rules-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useRouter } from 'next/router'
 import {
   Button,
   Form_Shadcn_,
@@ -34,67 +36,60 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { LintInfo } from '../Linter/Linter.constants'
 import { lintInfoMap } from '../Linter/Linter.utils'
 import { generateRuleDescription } from './AdvisorRules.utils'
 
 interface CreateRuleSheetProps {
+  lint?: LintInfo
   open: boolean
   onOpenChange: (value: boolean) => void
 }
 
-const FormSchema = z
-  .object({
-    type: z.enum(['category', 'name']),
-    lint_category: z.enum(['ALL', 'PERFORMANCE', 'SECURITY']),
-    lint_name: z.string().optional(),
-    note: z.string().optional(),
-    assigned_to: z.string().optional(),
-    is_disabled: z.boolean(),
-  })
-  .superRefine((data, ctx) => {
-    const { type, lint_category, lint_name, is_disabled, assigned_to } = data
-    if (type === 'category' && !lint_category) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Please select a category`,
-        path: ['lint_category'],
-      })
-    }
-    if (type === 'name' && !lint_name) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Please select a lint name`,
-        path: ['lint_name'],
-      })
-    }
-    if (is_disabled === false && assigned_to === 'all') {
-    }
-  })
+const FormSchema = z.object({
+  lint_name: z.string().optional(),
+  note: z.string().optional(),
+  assigned_to: z.string().optional(),
+  is_disabled: z.boolean(),
+})
 
 const defaultValues = {
-  type: 'name' as 'category' | 'name',
-  lint_category: 'PERFORMANCE' as LintCategory,
   lint_name: undefined,
   note: undefined,
   assigned_to: 'all',
   is_disabled: true,
 }
 
-// [Joshen] Spoken with Hieu - we'll eventually support granularity of Entity/Items as well, just not atm
-// Exceptions are meant to be client side filtering, as this is fully separate from the lint-runner
-// TODO:
-// - Fill up lintInfoMap with categories
-// - Update description of the disable switch with the right report
-// - Filter lints from UI in each advisors page
-// - Support deleting rules
-export const CreateRuleSheet = ({ open, onOpenChange }: CreateRuleSheetProps) => {
+/**
+ * [Joshen] JFYI while the API supports adding rules on a category, I'm intentionally leaving that functionality out for now
+ * as the only use case for that would be to ignore _all_ lints in that category (which I'm not sure if that's what we want to advise users doing atm)
+ *
+ * (Spoken with Hieu) We'll eventually support granularity of Entity/Items as well, just not atm
+ */
+export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetProps) => {
+  const router = useRouter()
   const { ref: projectRef } = useParams()
+  const [_, setExpandedLint] = useQueryState('lint')
+
+  const routeCategory = router.pathname.split('/').pop()
   const organization = useSelectedOrganization()
   const { data: members = [] } = useOrganizationMembersQuery({ slug: organization?.slug })
 
   const { mutate: createRule, isLoading: isCreating } = useLintRuleCreateMutation({
-    onSuccess: () => {
-      toast.success('Successfully created new rule!')
+    onSuccess: (_, vars) => {
+      const ruleLint = vars.exception.lint_name
+      const ruleLintMeta = lintInfoMap.find((x) => x.name === ruleLint)
+      toast.success(`Successfully created new rule for ${ruleLintMeta?.title}`)
+
+      if (ruleLintMeta) {
+        if (!!routeCategory && routeCategory !== ruleLintMeta.category) {
+          router.push(
+            `/project/${projectRef}/advisors/rules/${ruleLintMeta.category}?lint=${ruleLintMeta.name}`
+          )
+        } else {
+          setExpandedLint(ruleLintMeta?.name)
+        }
+      }
       onOpenChange(false)
     },
   })
@@ -107,32 +102,31 @@ export const CreateRuleSheet = ({ open, onOpenChange }: CreateRuleSheetProps) =>
     defaultValues,
   })
 
-  const { type, lint_category, lint_name, assigned_to, is_disabled } = form.watch()
+  const { lint_name, assigned_to, is_disabled } = form.watch()
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     if (!projectRef) return console.error('Project ref is required')
 
-    const { type, ...payload } = values
     createRule({
       projectRef,
       exception: {
-        ...payload,
-        lint_category: type === 'category' ? values.lint_category : undefined,
-        lint_name: type === 'name' ? (values.lint_name as LintName) : undefined,
+        ...values,
+        lint_category: undefined,
+        lint_name: values.lint_name as LintName,
         assigned_to: values.assigned_to === 'all' ? undefined : values.assigned_to,
       },
     })
   }
 
   useEffect(() => {
-    if (open) form.reset(defaultValues)
+    if (open) form.reset({ ...defaultValues, lint_name: lint?.name })
   }, [open])
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="flex flex-col gap-0">
         <SheetHeader className="shrink-0 flex items-center gap-4">
-          <SheetTitle>Add an Advisor rule</SheetTitle>
+          <SheetTitle>Create a rule on Advisor lints</SheetTitle>
         </SheetHeader>
         <SheetSection className="overflow-auto flex-grow px-0">
           <Form_Shadcn_ {...form}>
@@ -142,72 +136,62 @@ export const CreateRuleSheet = ({ open, onOpenChange }: CreateRuleSheetProps) =>
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <FormField_Shadcn_
-                name="type"
+                key="lint_name"
+                name="lint_name"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItemLayout label="Rule is based on" layout="vertical" className="px-5">
-                    <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
-                      <SelectTrigger_Shadcn_ className="col-span-8">
-                        <SelectValue_Shadcn_ />
-                      </SelectTrigger_Shadcn_>
-                      <SelectContent_Shadcn_>
-                        <SelectItem_Shadcn_ value="name">Lint name</SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="category">Advisor category</SelectItem_Shadcn_>
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
+                  <FormItemLayout layout="vertical" className="px-5" label="Lint name">
+                    <FormControl_Shadcn_>
+                      <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
+                        <SelectTrigger_Shadcn_ className="col-span-8">
+                          <SelectValue_Shadcn_ placeholder="Select a lint name" />
+                        </SelectTrigger_Shadcn_>
+                        <SelectContent_Shadcn_>
+                          {lintInfoMap.map((x) => (
+                            <SelectItem_Shadcn_ key={x.name} value={x.name}>
+                              {x.title}
+                            </SelectItem_Shadcn_>
+                          ))}
+                        </SelectContent_Shadcn_>
+                      </Select_Shadcn_>
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+
+              <FormField_Shadcn_
+                name="is_disabled"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="flex"
+                    className="px-5"
+                    label={`Disable this lint for ${assigned_to === 'all' ? 'project' : 'the assigned member'}`}
+                  >
+                    <Tooltip>
+                      <TooltipTrigger type="button">
+                        <FormControl_Shadcn_>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={field.disabled || assigned_to === 'all'}
+                          />
+                        </FormControl_Shadcn_>
+                      </TooltipTrigger>
+                      {assigned_to === 'all' && (
+                        <TooltipContent side="bottom" className="w-72">
+                          Assign the rule to a specific project member before toggling this option
+                          off. This will <span className="text-brand">assign the rule</span> to the
+                          selected member, and only that member will see the lint in the advisor
+                          reports.
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
                   </FormItemLayout>
                 )}
               />
 
               <Separator />
-
-              {type === 'category' ? (
-                <FormField_Shadcn_
-                  key="lint-category"
-                  name="lint_category"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItemLayout label="Advisor Category" layout="vertical" className="px-5">
-                      <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
-                        <SelectTrigger_Shadcn_ className="col-span-8">
-                          <SelectValue_Shadcn_ placeholder="Select a category" />
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
-                          <SelectItem_Shadcn_ value="ALL">All</SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="PERFORMANCE">
-                            Performance Advisor
-                          </SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="SECURITY">Security Advisor</SelectItem_Shadcn_>
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-              ) : type === 'name' ? (
-                <FormField_Shadcn_
-                  key="lint_name"
-                  name="lint_name"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItemLayout layout="vertical" className="px-5" label="Lint name">
-                      <FormControl_Shadcn_>
-                        <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
-                          <SelectTrigger_Shadcn_ className="col-span-8">
-                            <SelectValue_Shadcn_ placeholder="Select a lint name" />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
-                            {lintInfoMap.map((x) => (
-                              <SelectItem_Shadcn_ key={x.name} value={x.name}>
-                                {x.title}
-                              </SelectItem_Shadcn_>
-                            ))}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-              ) : null}
 
               <FormField_Shadcn_
                 name="assigned_to"
@@ -237,41 +221,10 @@ export const CreateRuleSheet = ({ open, onOpenChange }: CreateRuleSheetProps) =>
                 )}
               />
 
-              <FormField_Shadcn_
-                name="is_disabled"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="flex"
-                    className="px-5"
-                    label={`Disable ${type === 'category' ? 'category' : 'this lint'} for ${assigned_to === 'all' ? 'project' : 'the assigned member'}`}
-                  >
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <FormControl_Shadcn_>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={field.disabled || assigned_to === 'all'}
-                          />
-                        </FormControl_Shadcn_>
-                      </TooltipTrigger>
-                      {assigned_to === 'all' && (
-                        <TooltipContent side="bottom">
-                          You may assign the rule to a specific user
-                        </TooltipContent>
-                      )}
-                    </Tooltip>
-                  </FormItemLayout>
-                )}
-              />
-
-              {((type === 'category' && !!lint_category) || (type === 'name' && !!lint_name)) && (
+              {!!lint_name && (
                 <div className="px-5">
                   <Admonition showIcon={false} type="default">
                     {generateRuleDescription({
-                      type,
-                      category: lint_category,
                       name: lint_name,
                       disabled: is_disabled,
                       member: members.find((x) => x.gotrue_id === assigned_to),

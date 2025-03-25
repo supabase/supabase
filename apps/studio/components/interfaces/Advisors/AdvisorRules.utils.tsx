@@ -12,32 +12,25 @@ export const generateRuleText = (e: LintException, member?: Member) => {
 }
 
 export const generateRuleDescription = ({
-  type,
-  category,
   name,
   member,
   disabled,
 }: {
-  type: string
-  category?: string
   name?: string
   member?: Member
   disabled: boolean
 }) => {
+  const lint = lintInfoMap.find((x) => x.name === name)
   return (
     <>
-      {type === 'category' ? (
-        <>
-          All lints in the{' '}
-          <span className="capitalize">{(category ?? '').toLowerCase()} Advisor</span>
-        </>
-      ) : (
-        <>The "{lintInfoMap.find((x) => x.name === name)?.title}" lint</>
-      )}{' '}
-      will be{' '}
-      {disabled
-        ? `ignored for ${!!member ? `${member.username ?? member.primary_email} only` : 'this project'}`
-        : `visible to ${!!member ? `${member.username ?? member.primary_email} only` : ''}`}
+      <p className="font-mono uppercase text-xs text-foreground-lighter">What this rule means:</p>
+      <p>
+        The "{lint?.title}" lint from the <span className="capitalize">{lint?.category}</span>{' '}
+        Advisor will be{' '}
+        {disabled
+          ? `ignored for ${!!member ? `${member.username ?? member.primary_email} only` : 'this project'}`
+          : `visible to ${!!member ? `${member.username ?? member.primary_email} only` : ''}`}
+      </p>
     </>
   )
 }
