@@ -494,7 +494,7 @@ const nextConfig = {
             key: 'Strict-Transport-Security',
             value:
               process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1'
-                ? 'max-age=1200; includeSubDomains'
+                ? 'max-age=31536000; includeSubDomains; preload'
                 : '',
           },
           {
@@ -523,6 +523,10 @@ const nextConfig = {
       {
         source: '/favicon/:slug*',
         headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
+      },
+      {
+        source: '/(.*).ts',
+        headers: [{ key: 'content-type', value: 'text/typescript' }],
       },
     ]
   },

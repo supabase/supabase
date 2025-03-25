@@ -19,7 +19,8 @@
     "config": "workspace:*",
     "js-tiktoken": "^1.0.10",
     "jsonrepair": "^3.5.0",
-    "openai": "^4.26.1"
+    "openai": "^4.26.1",
+    "zod": "3.23.8"
   },
   "devDependencies": {
     "@ai-sdk/openai": "^0.0.72",
@@ -33,6 +34,7 @@
     "sql-formatter": "^15.0.0",
     "tsconfig": "workspace:*",
     "typescript": "~5.5.0",
+    "vite": "^6.0.0",
     "vitest": "^3.0.0"
   }
 }

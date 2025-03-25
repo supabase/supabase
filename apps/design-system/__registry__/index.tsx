@@ -1864,6 +1864,28 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "toc-demo": {
+      name: "toc-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/toc-demo")),
+      source: "",
+      files: ["registry/default/example/toc-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "toc-single-demo": {
+      name: "toc-single-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/toc-single-demo")),
+      source: "",
+      files: ["registry/default/example/toc-single-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "multi-select-demo": {
       name: "multi-select-demo",
       type: "components:example",

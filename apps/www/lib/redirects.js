@@ -2969,6 +2969,11 @@ module.exports = [
     source: '/docs/guides/platform/spend-cap',
     destination: '/docs/guides/platform/cost-control#spend-cap',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/project-management/api',
+    destination: '/docs/reference/api/introduction',
+  },
 
   // marketing
 

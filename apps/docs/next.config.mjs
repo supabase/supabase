@@ -1,5 +1,4 @@
 // @ts-check
-import { remarkCodeHike } from '@code-hike/mdx'
 import nextMdx from '@next/mdx'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
@@ -17,17 +16,7 @@ const withBundleAnalyzer = configureBundleAnalyzer({
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [
-      [
-        remarkCodeHike,
-        {
-          theme: codeHikeTheme,
-          lineNumbers: true,
-          showCopyButton: true,
-        },
-      ],
-      remarkGfm,
-    ],
+    remarkPlugins: [remarkGfm],
     rehypePlugins: [rehypeSlug],
     providerImportSource: '@mdx-js/react',
   },
@@ -54,6 +43,13 @@ const nextConfig = {
       transform: 'lodash/{{member}}',
     },
   },
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.include$/,
+      type: 'asset/source',
+    })
+    return config
+  },
   transpilePackages: ['ui', 'ui-patterns', 'common', 'dayjs', 'shared-data', 'api-types', 'icons'],
   experimental: {
     outputFileTracingIncludes: {
@@ -65,7 +61,7 @@ const nextConfig = {
       ],
       '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
     },
-    serverComponentsExternalPackages: ['libpg-query'],
+    serverComponentsExternalPackages: ['libpg-query', 'twoslash'],
   },
   async headers() {
     return [
@@ -74,7 +70,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Strict-Transport-Security',
-            value: process.env.VERCEL === '1' ? 'max-age=1200; includeSubDomains' : '',
+            value: process.env.VERCEL === '1' ? 'max-age=31536000; includeSubDomains; preload' : '',
           },
           {
             key: 'X-Robots-Tag',
@@ -97,7 +93,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Strict-Transport-Security',
-            value: process.env.VERCEL === '1' ? 'max-age=1200; includeSubDomains' : '',
+            value: process.env.VERCEL === '1' ? 'max-age=31536000; includeSubDomains; preload' : '',
           },
           {
             key: 'X-Robots-Tag',

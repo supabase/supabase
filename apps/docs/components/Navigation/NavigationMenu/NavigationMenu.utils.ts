@@ -135,6 +135,8 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.Realtime
     case pathname.startsWith('resources'):
       return MenuId.Resources
+    case pathname.startsWith('security'):
+      return MenuId.Security
     case pathname.startsWith('self-hosting'):
       return MenuId.SelfHosting
     case pathname.startsWith('storage'):

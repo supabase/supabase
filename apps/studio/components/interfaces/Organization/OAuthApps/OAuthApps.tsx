@@ -213,6 +213,8 @@ const OAuthApps = () => {
                     head={[
                       <Table.th key="icon" className="w-[30px]"></Table.th>,
                       <Table.th key="name">Name</Table.th>,
+                      <Table.th key="created-by">Created by</Table.th>,
+                      <Table.th key="app-id">App ID</Table.th>,
                       <Table.th key="authorized-at">Authorized at</Table.th>,
                       <Table.th key="delete-action"></Table.th>,
                     ]}

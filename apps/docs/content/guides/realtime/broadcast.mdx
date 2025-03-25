@@ -693,12 +693,13 @@ The database broadcast feature provides two functions to help you send messages:
 The `realtime.send` function provides the most flexibility by allowing you to broadcast messages from your database without a specific format. This allows you to use database broadcast for messages that aren't necessarily tied to the shape of a Postgres row change.
 
 ```sql
-SELECT realtime.send (
-	to_jsonb ('{}'::text), -- JSONB Payload
-	'event', -- Event name
-	'topic', -- Topic
-	FALSE -- Public / Private flag
-);
+select
+  realtime.send(
+    jsonb_build_object('hello', 'world'), -- JSONB Payload
+    'event', -- Event name
+    'topic', -- Topic
+    false -- Public / Private flag
+  );
 ```
 
 ### Broadcast record changes
@@ -772,7 +773,9 @@ Finally, client side will requires to be set up to listen to the topic `topic:<r
 const gameId = 'id'
 await supabase.realtime.setAuth() // Needed for Realtime Authorization
 const changes = supabase
-  .channel(`topic:${gameId}`)
+  .channel(`topic:${gameId}`, {
+    config: { private: true },
+  })
   .on('broadcast', { event: 'INSERT' }, (payload) => console.log(payload))
   .on('broadcast', { event: 'UPDATE' }, (payload) => console.log(payload))
   .on('broadcast', { event: 'DELETE' }, (payload) => console.log(payload))

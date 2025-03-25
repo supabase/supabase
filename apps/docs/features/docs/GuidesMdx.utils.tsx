@@ -31,6 +31,7 @@ const PUBLISHED_SECTIONS = [
   'queues',
   'realtime',
   'resources',
+  'security',
   'self-hosting',
   'storage',
   'telemetry',

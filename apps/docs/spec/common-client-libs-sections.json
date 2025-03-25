@@ -377,6 +377,14 @@
             "type": "function"
           },
           {
+            "id": "overrideTypes",
+            "title": "Partially override or replace type of successful response",
+            "slug": "db-overrideTypes",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function"
+          },
+          {
             "id": "explain",
             "title": "Using explain",
             "slug": "explain",

@@ -1,6 +1,6 @@
 /packages/shared-data/pricing.ts @roryw10 @kevcodez
 /packages/shared-data/plans.ts @roryw10 @kevcodez
-/packages/common/telemetry-constants.ts @4L3k51 @loong @pamelachia
+/packages/common/telemetry-constants.ts @4L3k51 @supabase/growth-eng
 
 /apps/studio/ @supabase/Dashboard
 

@@ -37,8 +37,8 @@ export type OrganizationAuditLogsResponse = {
 
 export type OrganizationAuditLogsVariables = {
   slug?: string
-  iso_timestamp_start?: string
-  iso_timestamp_end?: string
+  iso_timestamp_start: string
+  iso_timestamp_end: string
 }
 
 export async function getOrganizationAuditLogs(

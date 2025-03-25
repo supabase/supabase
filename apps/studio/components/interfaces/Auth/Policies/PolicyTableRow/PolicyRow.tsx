@@ -67,7 +67,13 @@ const PolicyRow = ({
           </p>
 
           <div className="flex flex-col gap-y-1">
-            <p className="text-sm text-foreground">{policy.name}</p>
+            <Button
+              type="text"
+              className="h-auto text-foreground text-sm border-none p-0 hover:bg-transparent"
+              onClick={() => onSelectEditPolicy(policy)}
+            >
+              {policy.name}
+            </Button>
             <div className="flex items-center gap-x-1">
               <div className="text-foreground-lighter text-sm">
                 Applied to:

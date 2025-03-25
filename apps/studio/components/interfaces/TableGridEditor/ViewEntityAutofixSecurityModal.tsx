@@ -1,12 +1,14 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useViewDefinitionQuery } from 'data/database/view-definition-query'
+import { lintKeys } from 'data/lint/keys'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { Entity } from 'data/table-editor/table-editor-types'
-import { toast } from 'sonner'
+import { Entity, isViewLike } from 'data/table-editor/table-editor-types'
 import { ScrollArea, SimpleCodeBlock } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { lintKeys } from '../../../data/lint/keys'
 
 interface ViewEntityAutofixSecurityModalProps {
   table: Entity
@@ -21,11 +23,16 @@ export default function ViewEntityAutofixSecurityModal({
 }: ViewEntityAutofixSecurityModalProps) {
   const { project } = useProjectContext()
   const queryClient = useQueryClient()
-  const viewDefinition = useViewDefinitionQuery({
-    id: table?.id,
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { isSuccess, isLoading, data } = useViewDefinitionQuery(
+    {
+      id: table?.id,
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      enabled: isAutofixViewSecurityModalOpen && isViewLike(table),
+    }
+  )
 
   const { mutate: execute } = useExecuteSqlMutation({
     onSuccess: async () => {
@@ -49,6 +56,10 @@ export default function ViewEntityAutofixSecurityModal({
     })
   }
 
+  if (!isViewLike(table)) {
+    return null
+  }
+
   return (
     <ConfirmationModal
       visible={isAutofixViewSecurityModalOpen}
@@ -56,9 +67,7 @@ export default function ViewEntityAutofixSecurityModal({
       title="Confirm autofixing view security"
       confirmLabel="Confirm"
       onCancel={() => setIsAutofixViewSecurityModalOpen(false)}
-      onConfirm={() => {
-        handleConfirm()
-      }}
+      onConfirm={() => handleConfirm()}
     >
       <p className="text-sm text-foreground-light">
         Setting <code>security_invoker=on</code> ensures the View runs with the permissions of the
@@ -66,22 +75,24 @@ export default function ViewEntityAutofixSecurityModal({
       </p>
       <div className="flex items-center gap-8 mt-8">
         <div className=" border rounded-md w-1/2">
-          <div className="p-4 bg-200 font-mono text-sm font-semibold">Existing query</div>
+          <div className="p-4 pb-0 bg-200 font-mono text-sm font-semibold">Existing query</div>
           <ScrollArea className="h-[225px] px-4 py-2">
-            {viewDefinition.data && (
+            {isLoading && <GenericSkeletonLoader />}
+            {isSuccess && (
               <SimpleCodeBlock>
-                {`create view ${table.schema}.${table.name} as\n ${viewDefinition.data}`}
+                {`create view ${table.schema}.${table.name} as\n ${data}`}
               </SimpleCodeBlock>
             )}
           </ScrollArea>
         </div>
 
         <div className=" border rounded-md w-1/2">
-          <div className="p-4 bg-200 font-mono text-sm font-semibold">Updated query</div>
+          <div className="p-4 pb-0 bg-200 font-mono text-sm font-semibold">Updated query</div>
           <ScrollArea className="h-[225px] px-4 py-2">
-            {viewDefinition.data && (
+            {isLoading && <GenericSkeletonLoader />}
+            {isSuccess && (
               <SimpleCodeBlock>
-                {`create view ${table.schema}.${table.name} with (security_invoker = on) as\n ${viewDefinition.data}`}
+                {`create view ${table.schema}.${table.name} with (security_invoker = on) as\n ${data}`}
               </SimpleCodeBlock>
             )}
           </ScrollArea>

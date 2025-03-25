@@ -1067,6 +1067,16 @@ export const examples: Registry = [
     files: ['example/inner-side-menu-with-search.tsx'],
   },
   {
+    name: 'toc-demo',
+    type: 'components:example',
+    files: ['example/toc-demo.tsx'],
+  },
+  {
+    name: 'toc-single-demo',
+    type: 'components:example',
+    files: ['example/toc-single-demo.tsx'],
+  },
+  {
     name: 'multi-select-demo',
     type: 'components:example',
     files: ['example/multi-select-demo.tsx'],
