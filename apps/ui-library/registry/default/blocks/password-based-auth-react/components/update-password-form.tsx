@@ -1,5 +1,3 @@
-'use client'
-
 import { cn } from '@/lib/utils'
 import { createClient } from '@/registry/default/clients/react/lib/supabase/client'
 import { Button } from '@/registry/default/components/ui/button'
@@ -18,9 +16,9 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const supabase = createClient()
 
   const handleForgotPassword = async (e: React.FormEvent) => {
+    const supabase = createClient()
     e.preventDefault()
     setIsLoading(true)
     setError(null)
@@ -28,8 +26,8 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
     try {
       const { error } = await supabase.auth.updateUser({ password })
       if (error) throw error
-
-      // TODO:Update this route to redirect to an authenticated route. The user already has an active session.
+      // Update this route to redirect to an authenticated route. The user already has an active session.
+      location.href = '/info'
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
@@ -65,7 +63,7 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
             </div>
             <div className="mt-4 text-center text-sm">
               Already have an account?{' '}
-              <a href="#" className="underline underline-offset-4">
+              <a href="/login" className="underline underline-offset-4">
                 Login
               </a>
             </div>
