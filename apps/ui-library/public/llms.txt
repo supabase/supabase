@@ -1,29 +1,45 @@
-# Supabase Design System
-Last updated: 2025-03-19T20:34:00.110Z
+# Supabase UI Library
+Last updated: 2025-03-23T14:40:10.160Z
 
 ## Overview
-The Design System used in Supabase Studio.
+Library of components for your project. The components integrate with Supabase and are shadcn compatible.
 
 ## Docs
-- [Password-based Auth (Nextjs)](https://supabase-design-system.vercel.app/design-system/docs/blocks/password-based-auth-nextjs)
-    - Password-based Auth block for Nextjs app
-- [Password-based Auth (React)](https://supabase-design-system.vercel.app/design-system/docs/blocks/password-based-auth-react)
-    - Password-based Auth block for React
-- [Nextjs](https://supabase-design-system.vercel.app/design-system/docs/clients/nextjs)
-    - Supabase client for Nextjs
-- [React](https://supabase-design-system.vercel.app/design-system/docs/clients/react)
-    - Supabase client for React
-- [Remix](https://supabase-design-system.vercel.app/design-system/docs/clients/remix)
-    - Supabase client for Remix
-- [Tanstack Start](https://supabase-design-system.vercel.app/design-system/docs/clients/tanstack)
-    - Supabase client for Tanstack Start
-- [Dropzone (File Upload)](https://supabase-design-system.vercel.app/design-system/docs/components/dropzone)
-    - Displays a control for easier uploading of files directly to Supabase Storage
-- [Realtime Cursor](https://supabase-design-system.vercel.app/design-system/docs/components/realtime-cursor)
-    - Real-time cursor sharing for collaborative applications
-- [FAQ](https://supabase-design-system.vercel.app/design-system/docs/faq)
+- [Prompts](https://supabase.com/ui/docs/ai-editors-rules/prompts)
+    - Rules for AI Code Editors for Supabase
+- [FAQ](https://supabase.com/ui/docs/getting-started/faq)
     - Frequently asked questions
-- [Introduction](https://supabase-design-system.vercel.app/design-system/docs/getting-started/introduction)
+- [Introduction](https://supabase.com/ui/docs/getting-started/introduction)
     - Components
-- [Quick Start](https://supabase-design-system.vercel.app/design-system/docs/index)
+- [Quick Start](https://supabase.com/ui/docs/getting-started/quickstart)
     - Components
+- [Next.js](https://supabase.com/ui/docs/nextjs/client)
+    - Supabase client for Next.js
+- [Dropzone (File Upload)](https://supabase.com/ui/docs/nextjs/dropzone)
+    - Displays a control for easier uploading of files directly to Supabase Storage
+- [Password-based Auth (Next.js)](https://supabase.com/ui/docs/nextjs/password-based-auth)
+    - Password-based Auth block for Next.js app
+- [Realtime Cursor](https://supabase.com/ui/docs/nextjs/realtime-cursor)
+    - Real-time cursor sharing for collaborative applications
+- [Supabase Client for React Router](https://supabase.com/ui/docs/react-router/client)
+    - Supabase client for React Router
+- [Dropzone (File Upload)](https://supabase.com/ui/docs/react-router/dropzone)
+    - Displays a control for easier uploading of files directly to Supabase Storage
+- [Realtime Cursor](https://supabase.com/ui/docs/react-router/realtime-cursor)
+    - Real-time cursor sharing for collaborative applications
+- [React](https://supabase.com/ui/docs/react/client)
+    - Supabase client for React
+- [Dropzone (File Upload)](https://supabase.com/ui/docs/react/dropzone)
+    - Displays a control for easier uploading of files directly to Supabase Storage
+- [Password-based Auth (React)](https://supabase.com/ui/docs/react/password-based-auth)
+    - Password-based Auth block for React
+- [Realtime Cursor](https://supabase.com/ui/docs/react/realtime-cursor)
+    - Real-time cursor sharing for collaborative applications
+- [Tanstack Start](https://supabase.com/ui/docs/tanstack/client)
+    - Supabase client for Tanstack Start
+- [Dropzone (File Upload)](https://supabase.com/ui/docs/tanstack/dropzone)
+    - Displays a control for easier uploading of files directly to Supabase Storage
+- [Tanstack Start](https://supabase.com/ui/docs/tanstack/password-based-auth)
+    - Supabase client for Tanstack Start
+- [Realtime Cursor](https://supabase.com/ui/docs/tanstack/realtime-cursor)
+    - Real-time cursor sharing for collaborative applications
