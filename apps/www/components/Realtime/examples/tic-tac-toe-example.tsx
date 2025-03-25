@@ -343,7 +343,7 @@ export default function App() {
     <ExampleLayout
       appJsCode={appJsCode}
       files={ticTacToeFiles}
-      title="Tic Tac Toe Example"
+      title="Tic Tac Toe Game"
       description="A multiplayer Tic Tac Toe game where two players can compete in real-time. This example demonstrates game state synchronization, turn management, win detection, and player presence. Players are automatically assigned X or O symbols, with the game tracking moves, determining winners, and allowing for game resets. Perfect for learning how to build simple multiplayer games with Supabase Realtime."
     />
   )

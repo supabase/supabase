@@ -185,7 +185,7 @@ export default function App() {
     <ExampleLayout
       appJsCode={appJsCode}
       files={chatFiles}
-      title="Chat Example"
+      title="Chat App"
       description="A real-time chat application that enables instant messaging between multiple users. Features include message broadcasting, presence indicators showing who's online, and a clean, responsive UI. This example demonstrates how to implement a complete chat system with user avatars, timestamps, and message history using Supabase Realtime channels."
     />
   )

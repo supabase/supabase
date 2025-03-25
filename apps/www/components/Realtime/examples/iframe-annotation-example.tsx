@@ -348,7 +348,7 @@ export default function App() {
     <ExampleLayout
       appJsCode={appJsCode}
       files={imageAnnotationFiles}
-      title="Image Annotation Example"
+      title="Image Annotation"
       description="A collaborative image annotation tool that allows multiple users to add comments to specific points on an image. This example demonstrates position-based annotations, real-time comment synchronization, and presence awareness. Users can click anywhere on the image to leave comments, see other users' annotations instantly, and engage in discussions about specific parts of the visual content. Ideal for design feedback, educational materials, or collaborative visual analysis."
     />
   )
