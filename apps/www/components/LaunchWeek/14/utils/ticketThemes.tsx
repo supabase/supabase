@@ -5,6 +5,9 @@ export const themes = () => ({
   platinum: {
     TICKET_FOREGROUND: '#1F1F1F',
   },
+  platinumSecret: {
+    TICKET_FOREGROUND: '#1F1F1F',
+  },
   secret: {
     TICKET_FOREGROUND: '#1F1F1F',
   },

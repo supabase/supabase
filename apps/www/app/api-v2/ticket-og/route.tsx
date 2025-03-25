@@ -18,10 +18,11 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 const STORAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw14`
 
 // Load custom font
-const FONT_URL = `${STORAGE_URL}/assets/font/Nippo-Regular.otf`
-const MONO_FONT_URL = `${STORAGE_URL}/assets/font/DepartureMono-Regular.otf`
-const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
-const mono_font = fetch(new URL(MONO_FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
+// const FONT_URL = `${STORAGE_URL}/assets/font/Nippo-Regular.otf`
+// const MONO_FONT_URL = `${STORAGE_URL}/assets/font/DepartureMono-Regular.otf`
+
+const FONT_URL = '/fonts/launchweek/14/Nippo-Regular.otf'
+const MONO_FONT_URL = '/fonts/launchweek/14/DepartureMono-Regular.otf'
 
 const LW_TABLE = 'tickets'
 const LW_MATERIALIZED_VIEW = 'tickets_view'
@@ -29,8 +30,10 @@ const LW_MATERIALIZED_VIEW = 'tickets_view'
 export async function GET(req: Request, res: Response) {
   const url = new URL(req.url)
   const username = url.searchParams.get('username') ?? url.searchParams.get('amp;username')
-  const assumePlatinum = url.searchParams.get('platinum') ?? url.searchParams.get('amp;platinum')
   const userAgent = req.headers.get('user-agent')
+
+  const font = fetch(new URL(FONT_URL, url)).then((res) => res.arrayBuffer())
+  const mono_font = fetch(new URL(MONO_FONT_URL, url)).then((res) => res.arrayBuffer())
 
   try {
     if (!username) throw new Error('missing username param')
@@ -80,12 +83,18 @@ export async function GET(req: Request, res: Response) {
     } = user
 
     const platinum = isPlatinum ?? (!!sharedOnTwitter && !!sharedOnLinkedIn) ?? false
-    if (assumePlatinum && !platinum) return await fetch(`${STORAGE_URL}/images/og-14-platinum.png`)
+    const platinumSecret = platinum && secret
 
     const seatCode = (466561 + (ticket_number || 0)).toString(36).toUpperCase()
 
     // Generate image and upload to storage.
-    const ticketType = secret ? 'secret' : platinum ? 'platinum' : 'regular'
+    const ticketType = secret
+      ? platinum
+        ? 'platinumSecret'
+        : 'secret'
+      : platinum
+        ? 'platinum'
+        : 'regular'
 
     const STYLING_CONFIG = () => ({
       TICKET_FOREGROUND: themes()[ticketType].TICKET_FOREGROUND,
@@ -104,6 +113,10 @@ export async function GET(req: Request, res: Response) {
         color: 'rgba(255, 199, 58)',
         background: 'rgba(255, 199, 58, 0.2)',
       },
+      platinumSecret: {
+        color: 'rgba(255, 199, 58)',
+        background: 'rgba(255, 199, 58, 0.2)',
+      },
     }
 
     const fontData = await font
@@ -115,16 +128,16 @@ export async function GET(req: Request, res: Response) {
 
     const BACKGROUND = () => ({
       regular: {
-        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png?v4`,
-        BACKGROUND_IMG: `${STORAGE_URL}/assets/og-14-regular.png`,
+        BACKGROUND_IMG: new URL(`/images/launchweek/14/og-14-regular.png`, url).href,
       },
       platinum: {
-        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png?v4`,
-        BACKGROUND_IMG: `${STORAGE_URL}/assets/og-14-platinum.png`,
+        BACKGROUND_IMG: new URL(`/images/launchweek/14/og-14-platinum.png`, url).href,
+      },
+      platinumSecret: {
+        BACKGROUND_IMG: new URL(`/images/launchweek/14/og-14-platinum-secret.png`, url).href,
       },
       secret: {
-        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png?v4`,
-        BACKGROUND_IMG: `${STORAGE_URL}/assets/og-14-secret.png`,
+        BACKGROUND_IMG: new URL(`/images/launchweek/14/og-14-secret.png`, url).href,
       },
     })
 
@@ -132,8 +145,14 @@ export async function GET(req: Request, res: Response) {
       const lineLenght = 12
 
       const line1 = username.slice(0, lineLenght).trim().replace(/ /g, '\u00A0')
-      const line2 = username.slice(lineLenght, lineLenght * 2).trim().replace(/ /g, '\u00A0')
-      let line3 = username.slice(lineLenght * 2).trim().replace(/ /g, '\u00A0')
+      const line2 = username
+        .slice(lineLenght, lineLenght * 2)
+        .trim()
+        .replace(/ /g, '\u00A0')
+      let line3 = username
+        .slice(lineLenght * 2)
+        .trim()
+        .replace(/ /g, '\u00A0')
 
       // NOTE: If third line is too long, trim to 8 characters and add '...'
       if (line3.length > lineLenght) {
@@ -148,6 +167,19 @@ export async function GET(req: Request, res: Response) {
       return 100 + (letters * 40 + (letters - 1) * 12)
     }
     const lines = usernameToLines(name ?? username)
+
+    const secretStyles = {
+      background: 'linear-gradient(0deg, rgb(18 18 18 / 0.5) 50%, transparent 50%)',
+      backgroundSize: '100% 6px, 0px 100%',
+    }
+
+    const secretTextStyles = {
+      textShadow: '0 0 15px rgba(52,211,153,0.8)'      
+    }
+
+    const platinumSecretTextStyles = {
+      textShadow: '0 0 15px rgba(255,199,58,0.8)'      
+    }
 
     const generatedTicketImage = new ImageResponse(
       (
@@ -175,7 +207,6 @@ export async function GET(req: Request, res: Response) {
                 left: '-2px',
                 bottom: '-2px',
                 right: '-2px',
-                zIndex: '0',
                 backgroundSize: 'cover',
                 backgroundColor: STYLING_CONFIG().TICKET_FOREGROUND,
               }}
@@ -191,6 +222,8 @@ export async function GET(req: Request, res: Response) {
                 color: TICKET_THEME[ticketType].color,
                 top: 70,
                 right: 135,
+                ...(secret ? secretTextStyles : {}),
+                ...(platinumSecret ? platinumSecretTextStyles : {})
               }}
             >
               {seatCode}
@@ -221,12 +254,27 @@ export async function GET(req: Request, res: Response) {
                     fontSize: '82px',
                     lineHeight: '56px',
                     display: 'flex',
+                    ...(secret ? secretTextStyles : {}),
+                    ...(platinumSecret ? platinumSecretTextStyles : {})
                   }}
                 >
                   {line}
                 </p>
               </div>
             ))}
+
+            {secret && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  ...secretStyles,
+                }}
+              />
+            )}
           </div>
         </>
       ),
@@ -254,7 +302,7 @@ export async function GET(req: Request, res: Response) {
     )
 
     // [Note] Uncomment only for local testing to return the image directly and skip storage upload.
-    // return await generatedTicketImage
+    return await generatedTicketImage
 
     // Upload image to storage.
     const { error: storageError } = await supabaseAdminClient.storage
