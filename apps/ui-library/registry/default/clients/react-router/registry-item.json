@@ -5,14 +5,14 @@
   "title": "Supabase Client for React Router",
   "description": "",
   "registryDependencies": [],
-  "dependencies": ["@supabase/ssr@latest"],
+  "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
   "files": [
     {
-      "path": "registry/default/clients/react-router/lib/supabase.client.ts",
+      "path": "registry/default/clients/react-router/lib/supabase/client.ts",
       "type": "registry:lib"
     },
     {
-      "path": "registry/default/clients/react-router/lib/supabase.server.ts",
+      "path": "registry/default/clients/react-router/lib/supabase/server.ts",
       "type": "registry:lib"
     }
   ]

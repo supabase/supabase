@@ -131,36 +131,44 @@
       "files": [
         {
           "path": "registry/default/blocks/password-based-auth-react-router/app/routes.ts",
-          "type": "registry:page",
+          "type": "registry:file",
           "target": "app/routes.ts"
         },
         {
           "path": "registry/default/blocks/password-based-auth-react-router/app/routes/sign-in.tsx",
-          "type": "registry:page",
+          "type": "registry:file",
           "target": "app/routes/sign-in.tsx"
         },
         {
           "path": "registry/default/blocks/password-based-auth-react-router/app/routes/sign-up.tsx",
-          "type": "registry:page",
+          "type": "registry:file",
           "target": "app/routes/sign-up.tsx"
         },
         {
           "path": "registry/default/blocks/password-based-auth-react-router/app/routes/sign-out.tsx",
-          "type": "registry:page",
+          "type": "registry:file",
           "target": "app/routes/sign-out.tsx"
         },
         {
           "path": "registry/default/blocks/password-based-auth-react-router/app/routes/forgot-password.tsx",
-          "type": "registry:page",
+          "type": "registry:file",
           "target": "app/routes/forgot-password.tsx"
         },
         {
           "path": "registry/default/blocks/password-based-auth-react-router/app/routes/update-password.tsx",
-          "type": "registry:page",
+          "type": "registry:file",
           "target": "app/routes/update-password.tsx"
         },
         {
-          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "path": "registry/default/blocks/password-based-auth-react-router/components/form-message.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
           "type": "registry:lib"
         }
       ]
@@ -309,7 +317,12 @@
       "title": "Dropzone (File Upload)",
       "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
       "registryDependencies": ["button", "tooltip", "progress"],
-      "dependencies": ["react-dropzone", "lucide-react", "@supabase/ssr@latest"],
+      "dependencies": [
+        "react-dropzone",
+        "lucide-react",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
       "files": [
         {
           "path": "registry/default/blocks/dropzone/components/dropzone.tsx",
@@ -320,11 +333,11 @@
           "type": "registry:hook"
         },
         {
-          "path": "registry/default/clients/react-router/lib/supabase.client.ts",
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
           "type": "registry:lib"
         },
         {
-          "path": "registry/default/clients/react-router/lib/supabase.server.ts",
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
           "type": "registry:lib"
         }
       ]
@@ -430,7 +443,7 @@
       "title": "Realtime Cursor",
       "description": "Component which renders realtime cursors from other users in a room.",
       "registryDependencies": [],
-      "dependencies": ["lucide-react", "@supabase/ssr@latest"],
+      "dependencies": ["lucide-react", "@supabase/ssr@latest", "@supabase/supabase-js@latest"],
       "files": [
         {
           "path": "registry/default/blocks/realtime-cursor/components/cursor.tsx",
@@ -445,11 +458,11 @@
           "type": "registry:hook"
         },
         {
-          "path": "registry/default/clients/react-router/lib/supabase.client.ts",
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
           "type": "registry:lib"
         },
         {
-          "path": "registry/default/clients/react-router/lib/supabase.server.ts",
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
           "type": "registry:lib"
         }
       ]
@@ -530,14 +543,14 @@
       "title": "Supabase Client for React Router",
       "description": "",
       "registryDependencies": [],
-      "dependencies": ["@supabase/ssr@latest"],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
       "files": [
         {
-          "path": "registry/default/clients/react-router/lib/supabase.client.ts",
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
           "type": "registry:lib"
         },
         {
-          "path": "registry/default/clients/react-router/lib/supabase.server.ts",
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
           "type": "registry:lib"
         }
       ]

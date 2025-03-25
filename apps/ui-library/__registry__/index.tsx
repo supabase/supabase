@@ -37,7 +37,7 @@ export const Index: Record<string, any> = {
       registryDependencies: ["button","card","input","label"],
       component: React.lazy(() => import("@/registry/default/blocks/password-based-auth-react-router/app/routes/sign-in.tsx")),
       source: "",
-      files: ["registry/default/blocks/password-based-auth-react-router/app/routes.ts","registry/default/blocks/password-based-auth-react-router/app/routes/sign-in.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/sign-up.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/sign-out.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/forgot-password.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/update-password.tsx","registry/default/clients/react/lib/supabase/client.ts"],
+      files: ["registry/default/blocks/password-based-auth-react-router/app/routes.ts","registry/default/blocks/password-based-auth-react-router/app/routes/sign-in.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/sign-up.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/sign-out.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/forgot-password.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/update-password.tsx","registry/default/blocks/password-based-auth-react-router/components/form-message.tsx","registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -85,7 +85,7 @@ export const Index: Record<string, any> = {
       registryDependencies: ["button","tooltip","progress"],
       component: React.lazy(() => import("@/registry/default/blocks/dropzone/components/dropzone.tsx")),
       source: "",
-      files: ["registry/default/blocks/dropzone/components/dropzone.tsx","registry/default/blocks/dropzone/hooks/use-supabase-upload.ts","registry/default/clients/react-router/lib/supabase.client.ts","registry/default/clients/react-router/lib/supabase.server.ts"],
+      files: ["registry/default/blocks/dropzone/components/dropzone.tsx","registry/default/blocks/dropzone/hooks/use-supabase-upload.ts","registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -133,7 +133,7 @@ export const Index: Record<string, any> = {
       registryDependencies: [],
       component: React.lazy(() => import("@/registry/default/blocks/realtime-cursor/components/cursor.tsx")),
       source: "",
-      files: ["registry/default/blocks/realtime-cursor/components/cursor.tsx","registry/default/blocks/realtime-cursor/components/realtime-cursors.tsx","registry/default/blocks/realtime-cursor/hooks/use-realtime-cursors.ts","registry/default/clients/react-router/lib/supabase.client.ts","registry/default/clients/react-router/lib/supabase.server.ts"],
+      files: ["registry/default/blocks/realtime-cursor/components/cursor.tsx","registry/default/blocks/realtime-cursor/components/realtime-cursors.tsx","registry/default/blocks/realtime-cursor/hooks/use-realtime-cursors.ts","registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -181,7 +181,7 @@ export const Index: Record<string, any> = {
       registryDependencies: [],
       
       source: "",
-      files: ["registry/default/clients/react-router/lib/supabase.client.ts","registry/default/clients/react-router/lib/supabase.server.ts"],
+      files: ["registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

@@ -1,10 +1,9 @@
-import { redirect } from 'react-router'
-import { Form, useActionData } from 'react-router'
 import type { ActionFunctionArgs } from 'react-router'
+import { Form, redirect, useActionData } from 'react-router'
 
-import { Input } from '@/registry/default/components/ui/input'
+import { createClient } from '@/registry/default/clients/react-router/lib/supabase/server'
 import { Button } from '@/registry/default/components/ui/button'
-import { createClient } from '@/registry/default/clients/react-router/lib/supabase.server'
+import { Input } from '@/registry/default/components/ui/input'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase, headers } = createClient(request)

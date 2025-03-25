@@ -1,8 +1,8 @@
-import { type ActionFunctionArgs, Form, data, useActionData } from 'react-router'
-import { AuthApiError } from '@supabase/supabase-js'
-import { createClient } from '@/registry/default/clients/react-router/lib/supabase.server'
-import { Input } from '@/registry/default/components/ui/input'
+import { createClient } from '@/registry/default/clients/react-router/lib/supabase/server'
 import { Button } from '@/registry/default/components/ui/button'
+import { Input } from '@/registry/default/components/ui/input'
+import { AuthApiError } from '@supabase/supabase-js'
+import { type ActionFunctionArgs, Form, data, useActionData } from 'react-router'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()

@@ -1,11 +1,10 @@
-import { redirect } from 'react-router'
-import { Form, Link, useActionData, useNavigation } from 'react-router'
-import type { ActionFunctionArgs } from 'react-router'
-import { createClient } from '@/registry/default/clients/react-router/lib/supabase.server'
+import { FormMessage } from '@/registry/default/blocks/password-based-auth-react-router/components/form-message'
+import { createClient } from '@/registry/default/clients/react-router/lib/supabase/server'
+import { Button } from '@/registry/default/components/ui/button'
 import { Input } from '@/registry/default/components/ui/input'
 import { Label } from '@/registry/default/components/ui/label'
-import { Button } from '@/registry/default/components/ui/button'
-import { FormMessage } from '../../components/FormMessage'
+import type { ActionFunctionArgs } from 'react-router'
+import { Form, Link, redirect, useActionData, useNavigation } from 'react-router'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase, headers } = createClient(request)
