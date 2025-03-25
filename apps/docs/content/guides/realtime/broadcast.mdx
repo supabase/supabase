@@ -351,6 +351,15 @@ You can send a Broadcast message by making an HTTP request to Realtime servers. 
   defaultActiveId="js"
   queryGroup="language"
 >
+  <TabPanel id="curl" label="cURL">
+    ```bash
+    curl -v  \
+    -H 'apikey: <SUPABASE_TOKEN>' \
+    -H 'Content-Type: application/json' \
+    --data-raw '{ "messages": [{"topic": "test", "event": "event", "payload": {"test": "test"}}] }' \
+    'https://<PROJECT_REF>.supabase.co/realtime/v1/api/broadcast'
+    ```
+  </TabPanel>
   <TabPanel id="js" label="JavaScript">
 
     {/* prettier-ignore */}
