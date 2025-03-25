@@ -78,6 +78,19 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   }
 
   useEffect(() => {
+    const { name, kind, plan, size, spend_cap } = router.query
+
+    function isValid(value: string | string[] | undefined) {
+      return typeof value === 'string'
+    }
+    if (isValid(name)) updateForm('name', name)
+    if (isValid(kind)) updateForm('kind', kind)
+    if (isValid(plan)) updateForm('plan', plan)
+    if (isValid(size)) updateForm('size', size)
+    if (isValid(spend_cap)) updateForm('spend_cap', spend_cap)
+  }, [router.isReady])
+
+  useEffect(() => {
     if (!formState.name && organizations?.length === 0 && !user.isLoading) {
       const prefilledOrgName = user.profile?.username ? user.profile.username + `'s Org` : 'My Org'
       updateForm('name', prefilledOrgName)
