@@ -8,7 +8,7 @@ import { organizationKeys } from './keys'
 
 export type OrganizationCustomerProfileUpdateVariables = {
   slug: string
-  address?: components['schemas']['CustomerBillingAddress']
+  address?: components['schemas']['CustomerResponse']['address']
 }
 
 export async function updateOrganizationCustomerProfile({
