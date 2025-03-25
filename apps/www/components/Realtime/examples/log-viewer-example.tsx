@@ -411,7 +411,7 @@ export default function App() {
       dependencies={{
         'react-virtualized': 'latest',
       }}
-      title="Log Viewer Example"
+      title="Log Viewer"
       description="A high-performance log monitoring system that displays and updates logs in real-time. This example demonstrates how to build a scalable log viewer with virtualized rendering for handling large datasets, automatic scrolling to new entries, and filtering by log level. It showcases Supabase Realtime's ability to stream database changes efficiently, making it perfect for monitoring application logs, system events, or any time-series data that requires immediate visibility."
     />
   )

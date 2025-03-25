@@ -226,7 +226,7 @@ export default function App() {
     <ExampleLayout
       appJsCode={appJsCode}
       files={emojiPickerFiles}
-      title="Emoji Picker Example"
+      title="Emoji Picker"
       description="An interactive emoji reaction system where users can send animated emoji expressions that float across the screen. This fun example demonstrates real-time broadcasting of user interactions, presence tracking, and animated UI elements. Perfect for adding engagement to live streams, presentations, or any collaborative space where users want to express reactions without interrupting the main content."
     />
   )

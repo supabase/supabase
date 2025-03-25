@@ -414,7 +414,7 @@ export default function App() {
     <ExampleLayout
       appJsCode={appJsCode}
       files={whiteboardFiles}
-      title="Whiteboard Example"
+      title="Whiteboard"
       description="A collaborative drawing canvas where multiple users can draw together in real-time. Features include color selection, presence awareness showing who's online, and optimized drawing with batched updates for smooth performance. Perfect for brainstorming sessions, design collaboration, or just having fun drawing together."
     />
   )

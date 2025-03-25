@@ -2,6 +2,7 @@
 
 import { SandpackProvider, SandpackLayout, SandpackPreview } from '@codesandbox/sandpack-react'
 import './sandpack-styles.css' // Import custom Sandpack styles
+import { useTheme } from 'next-themes'
 
 type SandpackProps = {
   files: Record<string, string>
@@ -9,6 +10,9 @@ type SandpackProps = {
 }
 
 export default function SandpackWrapper({ files, dependencies = {} }: SandpackProps) {
+  const { resolvedTheme } = useTheme()
+  const isDarkTheme = resolvedTheme?.includes('dark')!
+
   // Ensure we have the required files for React template
   const completeFiles = {
     '/App.js': files['/App.js'] || files['App.js'] || '',
@@ -23,9 +27,10 @@ export default function SandpackWrapper({ files, dependencies = {} }: SandpackPr
   }
 
   return (
-    <div className="flex-1 h-full min-h-96 w-full rounded-lg overflow-hidden border">
+    <div className="flex-1 h-full min-h-80 md:min-h-96 w-full rounded-lg overflow-hidden border">
       <SandpackProvider
         template="react"
+        theme={isDarkTheme ? 'dark' : 'light'}
         files={completeFiles}
         customSetup={{
           dependencies: {
@@ -39,7 +44,7 @@ export default function SandpackWrapper({ files, dependencies = {} }: SandpackPr
           externalResources: ['https://cdn.tailwindcss.com'],
         }}
       >
-        <SandpackLayout className="!h-full !min-h-full sandpack-wrapper !border-none !rounded-none !bg-surface-75 !flex !flex-col">
+        <SandpackLayout className="!h-full !min-h-full sandpack-wrapper !bg-transparent !border-none !rounded-none !bg-surface-75 !flex !flex-col">
           <SandpackPreview
             showNavigator={false}
             showRefreshButton={false}

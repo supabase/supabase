@@ -33,93 +33,81 @@ import {
   Crosshair,
 } from 'lucide-react'
 
+const TabTrigger = ({ value, children }: { value: string; children: React.ReactNode }) => (
+  <TabsTrigger_Shadcn_ value={value} className="flex flex-col items-center gap-1 pt-4 pb-2">
+    {children}
+  </TabsTrigger_Shadcn_>
+)
+
 export default function RealtimeShowcase() {
   return (
     <UserProvider>
       <div>
         <Tabs_Shadcn_ defaultValue="presence" className="w-full">
-          <TabsList_Shadcn_ className="justify-center gap-6 sticky top-16 bg-background z-20 max-w-full overflow-x-auto">
-            <TabsTrigger_Shadcn_ value="presence" className="flex flex-col items-center gap-3 py-4">
-              <Users strokeWidth={1.5} size={20} className="text-brand" />
+          <TabsList_Shadcn_ className="justify-center gap-4 md:gap-6 sticky top-16 bg-background/90 backdrop-blur-sm z-20 max-w-full overflow-x-auto">
+            <TabTrigger value="presence">
+              <Users strokeWidth={1.5} size={20} />
               Presence
-            </TabsTrigger_Shadcn_>
+            </TabTrigger>
 
-            <TabsTrigger_Shadcn_ value="chat" className="flex flex-col items-center gap-3 py-4">
-              <MessageSquare strokeWidth={1.5} size={20} className="text-brand" />
+            <TabTrigger value="chat">
+              <MessageSquare strokeWidth={1.5} size={20} />
               Chat
-            </TabsTrigger_Shadcn_>
+            </TabTrigger>
 
-            <TabsTrigger_Shadcn_ value="todo" className="flex flex-col items-center gap-3 py-4">
-              <CheckSquare strokeWidth={1.5} size={20} className="text-brand" />
+            <TabTrigger value="todo">
+              <CheckSquare strokeWidth={1.5} size={20} />
               Todo List
-            </TabsTrigger_Shadcn_>
+            </TabTrigger>
 
-            <TabsTrigger_Shadcn_ value="editor" className="flex flex-col items-center gap-3 py-4">
-              <Edit strokeWidth={1.5} size={20} className="text-brand" />
+            <TabTrigger value="editor">
+              <Edit strokeWidth={1.5} size={20} />
               Editor
-            </TabsTrigger_Shadcn_>
+            </TabTrigger>
 
-            <TabsTrigger_Shadcn_
-              value="formPresence"
-              className="flex flex-col items-center gap-3 py-4"
-            >
-              <ClipboardList strokeWidth={1.5} size={20} className="text-brand" />
+            <TabTrigger value="formPresence">
+              <ClipboardList strokeWidth={1.5} size={20} />
               Form
-            </TabsTrigger_Shadcn_>
+            </TabTrigger>
 
-            <TabsTrigger_Shadcn_
-              value="cursorTracking"
-              className="flex flex-col items-center gap-3 py-4"
-            >
-              <MousePointer strokeWidth={1.5} size={20} className="text-brand" />
+            <TabTrigger value="cursorTracking">
+              <MousePointer strokeWidth={1.5} size={20} />
               Cursors
-            </TabsTrigger_Shadcn_>
+            </TabTrigger>
 
-            <TabsTrigger_Shadcn_
-              value="whiteboard"
-              className="flex flex-col items-center gap-3 py-4"
-            >
-              <PenTool strokeWidth={1.5} size={20} className="text-brand" />
+            <TabTrigger value="whiteboard">
+              <PenTool strokeWidth={1.5} size={20} />
               Whiteboard
-            </TabsTrigger_Shadcn_>
+            </TabTrigger>
 
-            <TabsTrigger_Shadcn_
-              value="tictactoe"
-              className="flex flex-col items-center gap-3 py-4"
-            >
-              <Hash strokeWidth={1.5} size={20} className="text-brand" />
+            <TabTrigger value="tictactoe">
+              <Hash strokeWidth={1.5} size={20} />
               XO
-            </TabsTrigger_Shadcn_>
+            </TabTrigger>
 
-            <TabsTrigger_Shadcn_ value="emoji" className="flex flex-col items-center gap-3 py-4">
-              <Smile strokeWidth={1.5} size={20} className="text-brand" />
+            <TabTrigger value="emoji">
+              <Smile strokeWidth={1.5} size={20} />
               Reactions
-            </TabsTrigger_Shadcn_>
+            </TabTrigger>
 
-            <TabsTrigger_Shadcn_
-              value="platformer"
-              className="flex flex-col items-center gap-3 py-4"
-            >
-              <Gamepad2 strokeWidth={1.5} size={20} className="text-brand" />
+            <TabTrigger value="platformer">
+              <Gamepad2 strokeWidth={1.5} size={20} />
               Platformer
-            </TabsTrigger_Shadcn_>
+            </TabTrigger>
 
-            <TabsTrigger_Shadcn_
-              value="annotation"
-              className="flex flex-col items-center gap-3 py-4"
-            >
-              <StickyNote strokeWidth={1.5} size={20} className="text-brand" />
+            <TabTrigger value="annotation">
+              <StickyNote strokeWidth={1.5} size={20} />
               Annotation
-            </TabsTrigger_Shadcn_>
+            </TabTrigger>
 
-            <TabsTrigger_Shadcn_ value="logs" className="flex flex-col items-center gap-3 py-4">
-              <FileText strokeWidth={1.5} size={20} className="text-brand" />
+            <TabTrigger value="logs">
+              <FileText strokeWidth={1.5} size={20} />
               Logs
-            </TabsTrigger_Shadcn_>
+            </TabTrigger>
           </TabsList_Shadcn_>
 
           {/* Tab Content */}
-          <div className="flex-1 h-full overflow-hidden py-8 px-8 lg:p-16 border-b">
+          <div className="max-w-5xl mx-auto flex-1 h-full overflow-hidden py-4 lg:py-8">
             <TabsContent_Shadcn_ value="presence" className="mt-0 border-0 p-0">
               <PresenceExample />
             </TabsContent_Shadcn_>

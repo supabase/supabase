@@ -1079,7 +1079,7 @@ canvas {
         postcss: 'latest',
         autoprefixer: 'latest',
       }}
-      title="3D Platformer Example"
+      title="3D Platformer"
       description="An immersive 3D multiplayer platformer game where players navigate a physics-based environment, collect coins, and interact with each other. This advanced example demonstrates real-time position synchronization, 3D physics with jumping and collision detection, projectile shooting mechanics, and player presence with usernames. Built with Three.js and React Three Fiber, it showcases sophisticated game development concepts including interpolated movement, optimized network updates, and responsive controls in a 3D space."
     />
   )
