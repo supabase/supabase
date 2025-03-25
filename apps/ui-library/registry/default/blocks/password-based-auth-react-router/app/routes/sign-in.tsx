@@ -5,6 +5,7 @@ import { createClient } from '@/registry/default/clients/react-router/lib/supaba
 import { Input } from '@/registry/default/components/ui/input'
 import { Label } from '@/registry/default/components/ui/label'
 import { Button } from '@/registry/default/components/ui/button'
+import { FormMessage } from '../../components/FormMessage'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase, headers } = createClient(request)
@@ -50,15 +51,7 @@ const SignIn = () => {
           <Input type="password" name="password" placeholder="Your password" required />
           <Button disabled={isSubmitting}>{isSubmitting ? 'Signing in...' : 'Sign in'}</Button>
 
-          {actionData?.error && (
-            <div className="flex flex-col gap-2 w-full max-w-md text-sm">
-              {actionData.error && (
-                <div className="text-foreground border-l-2 border-foreground px-4">
-                  {actionData.error}
-                </div>
-              )}
-            </div>
-          )}
+          {actionData?.error && <FormMessage message={actionData.error} />}
         </div>
       </Form>
     </div>

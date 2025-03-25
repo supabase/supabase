@@ -37,7 +37,7 @@ export const Index: Record<string, any> = {
       registryDependencies: ["button","card","input","label"],
       component: React.lazy(() => import("@/registry/default/blocks/password-based-auth-react-router/app/routes/sign-in.tsx")),
       source: "",
-      files: ["registry/default/blocks/password-based-auth-react-router/app/routes.ts","registry/default/blocks/password-based-auth-react-router/app/routes/sign-in.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/sign-up.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/sign-out.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/protected.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/forgot-password.tsx","registry/default/clients/react/lib/supabase/client.ts"],
+      files: ["registry/default/blocks/password-based-auth-react-router/app/routes.ts","registry/default/blocks/password-based-auth-react-router/app/routes/sign-in.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/sign-up.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/sign-out.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/forgot-password.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/update-password.tsx","registry/default/clients/react/lib/supabase/client.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

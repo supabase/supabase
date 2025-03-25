@@ -20,6 +20,7 @@
     "@radix-ui/react-progress": "^1.0.3",
     "@radix-ui/react-slot": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.0.7",
+    "@react-router/fs-routes": "^7.4.0",
     "class-variance-authority": "^0.6.0",
     "contentlayer2": "0.4.6",
     "eslint-config-supabase": "workspace:*",
@@ -47,8 +48,8 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@shikijs/compat": "^1.1.7",
     "@react-router/dev": "^7.1.5",
+    "@shikijs/compat": "^1.1.7",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.49.1",
     "@tanstack/react-router": "^1.114.27",
