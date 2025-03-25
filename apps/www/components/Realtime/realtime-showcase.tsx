@@ -43,7 +43,7 @@ export default function RealtimeShowcase() {
   return (
     <UserProvider>
       <div>
-        <Tabs_Shadcn_ defaultValue="presence" className="w-full">
+        <Tabs_Shadcn_ defaultValue="presence" className="">
           <TabsList_Shadcn_ className="justify-center gap-4 md:gap-6 sticky top-16 bg-background/90 backdrop-blur-sm z-20 max-w-full overflow-x-auto">
             <TabTrigger value="presence">
               <Users strokeWidth={1.5} size={20} />
@@ -108,51 +108,51 @@ export default function RealtimeShowcase() {
 
           {/* Tab Content */}
           <div className="max-w-5xl mx-auto flex-1 h-full overflow-hidden py-4 lg:py-8">
-            <TabsContent_Shadcn_ value="presence" className="mt-0 border-0 p-0">
+            <TabsContent_Shadcn_ value="presence" className="mt-0 border-0 py-0 px-4">
               <PresenceExample />
             </TabsContent_Shadcn_>
 
-            <TabsContent_Shadcn_ value="chat" className="mt-0 border-0 p-0">
+            <TabsContent_Shadcn_ value="chat" className="mt-0 border-0 py-0 px-4">
               <ChatExample />
             </TabsContent_Shadcn_>
 
-            <TabsContent_Shadcn_ value="todo" className="mt-0 border-0 p-0">
+            <TabsContent_Shadcn_ value="todo" className="mt-0 border-0 py-0 px-4">
               <TodoExample />
             </TabsContent_Shadcn_>
 
-            <TabsContent_Shadcn_ value="editor" className="mt-0 border-0 p-0">
+            <TabsContent_Shadcn_ value="editor" className="mt-0 border-0 py-0 px-4">
               <CollaborativeEditorExample />
             </TabsContent_Shadcn_>
 
-            <TabsContent_Shadcn_ value="formPresence" className="mt-0 border-0 p-0">
+            <TabsContent_Shadcn_ value="formPresence" className="mt-0 border-0 py-0 px-4">
               <FormPresenceExample />
             </TabsContent_Shadcn_>
 
-            <TabsContent_Shadcn_ value="cursorTracking" className="mt-0 border-0 p-0">
+            <TabsContent_Shadcn_ value="cursorTracking" className="mt-0 border-0 py-0 px-4">
               <CursorTrackingExample />
             </TabsContent_Shadcn_>
 
-            <TabsContent_Shadcn_ value="whiteboard" className="mt-0 border-0 p-0">
+            <TabsContent_Shadcn_ value="whiteboard" className="mt-0 border-0 py-0 px-4">
               <WhiteboardExample />
             </TabsContent_Shadcn_>
 
-            <TabsContent_Shadcn_ value="tictactoe" className="mt-0 border-0 p-0">
+            <TabsContent_Shadcn_ value="tictactoe" className="mt-0 border-0 py-0 px-4">
               <TicTacToeExample />
             </TabsContent_Shadcn_>
 
-            <TabsContent_Shadcn_ value="emoji" className="mt-0 border-0 p-0">
+            <TabsContent_Shadcn_ value="emoji" className="mt-0 border-0 py-0 px-4">
               <EmojiPickerExample />
             </TabsContent_Shadcn_>
 
-            <TabsContent_Shadcn_ value="platformer" className="mt-0 border-0 p-0">
+            <TabsContent_Shadcn_ value="platformer" className="mt-0 border-0 py-0 px-4">
               <Platformer3DExample />
             </TabsContent_Shadcn_>
 
-            <TabsContent_Shadcn_ value="annotation" className="mt-0 border-0 p-0">
+            <TabsContent_Shadcn_ value="annotation" className="mt-0 border-0 py-0 px-4">
               <IframeAnnotationExample />
             </TabsContent_Shadcn_>
 
-            <TabsContent_Shadcn_ value="logs" className="mt-0 border-0 p-0">
+            <TabsContent_Shadcn_ value="logs" className="mt-0 border-0 py-0 px-4">
               <LogViewerExample />
             </TabsContent_Shadcn_>
           </div>
