@@ -15,7 +15,7 @@ export type ProjectAddon = components['schemas']['BillingProjectAddonResponse']
 
 export type PlanId = components['schemas']['BillingPlanId']
 
-export type OrgPlan = components['schemas']['PlanResponse']
+export type OrgPlan = components['schemas']['PlansResponse']['plans'][0]
 
 export type ProjectAddonType = components['schemas']['ProjectAddonType']
 
