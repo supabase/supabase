@@ -58,21 +58,16 @@ async function getParser() {
 }
 
 export async function parseEszip(bytes: Uint8Array) {
-  console.log('Starting parseEszip with bytes length:', bytes.length)
   try {
     const parser = await getParser()
     if (!parser) {
       throw new Error('Failed to initialize parser')
     }
 
-    console.log('Parser instance created successfully')
-
     // Parse bytes in a try-catch block
     let specifiers
     try {
-      console.log('Parsing bytes...')
       specifiers = await parser.parseBytes(bytes)
-      console.log('parseBytes completed successfully, specifiers:', specifiers)
     } catch (parseError) {
       console.error('Error parsing bytes:', parseError)
       // Reset parser on parse error
@@ -82,9 +77,7 @@ export async function parseEszip(bytes: Uint8Array) {
 
     // Load in a separate try-catch
     try {
-      console.log('Loading parser...')
       await parser.load()
-      console.log('Parser loaded successfully')
     } catch (loadError) {
       console.error('Error loading parser:', loadError)
       parserPromise = null
@@ -113,10 +106,7 @@ export async function parseEszip(bytes: Uint8Array) {
 }
 
 async function extractEszip(parser: any, specifiers: string[]) {
-  console.log('extractEszip called with specifiers:', JSON.stringify(specifiers))
   const files = []
-
-  console.log('Total specifiers found:', specifiers.length)
 
   // First, filter out the specifiers we want to keep
   const filteredSpecifiers = specifiers.filter((specifier) => {
@@ -143,35 +133,22 @@ async function extractEszip(parser: any, specifiers: string[]) {
   // Then process each one
   for (const specifier of filteredSpecifiers) {
     try {
-      console.log('Processing specifier:', specifier)
-
       // Try to get the module source
-      console.log('Calling getModuleSource for:', specifier)
-      const module = await parser.getModuleSource(specifier)
-      console.log('Module source obtained, size:', module.length)
+      const moduleSource = await parser.getModuleSource(specifier)
 
       // Get the file path
       const filePath = url2path(specifier)
-      console.log('Mapped file path:', filePath)
 
       // Create a file object
-      const file = new File([module], filePath, {
+      const file = new File([moduleSource], filePath, {
         type: 'text/typescript',
       })
-      console.log('File created:', file.name, 'size:', file.size)
 
       files.push(file)
-      console.log('File added to list, current count:', files.length)
     } catch (error) {
       console.error('Error processing specifier:', specifier, error)
     }
   }
-
-  console.log('Total files extracted:', files.length)
-  console.log(
-    'Files list:',
-    files.map((f) => ({ name: f.name, size: f.size }))
-  )
 
   return files
 }
