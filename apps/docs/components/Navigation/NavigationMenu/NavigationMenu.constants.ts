@@ -1592,10 +1592,6 @@ export const realtime: NavMenuConstant = {
           name: 'Listening to Postgres Changes with Flutter',
           url: '/guides/realtime/realtime-listening-flutter',
         },
-        {
-          name: 'Migrating from Postgres Changes to Broadcasts',
-          url: '/guides/realtime/migrate-from-postgres-changes',
-        },
       ],
     },
     {
