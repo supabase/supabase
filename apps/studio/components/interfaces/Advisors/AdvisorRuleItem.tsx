@@ -1,4 +1,4 @@
-import { ChevronRight, Edit, Trash } from 'lucide-react'
+import { ChevronRight, Trash } from 'lucide-react'
 import { useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -141,12 +141,13 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
                         )}
                       </div>
                       <div className="flex items-center gap-x-2">
-                        <ButtonTooltip
+                        {/* [Joshen] Will implement in part 2 */}
+                        {/* <ButtonTooltip
                           type="default"
                           icon={<Edit />}
                           className="w-7"
                           tooltip={{ content: { side: 'bottom', text: 'Edit rule' } }}
-                        />
+                        /> */}
                         <ButtonTooltip
                           type="default"
                           icon={<Trash />}
