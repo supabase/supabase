@@ -239,13 +239,13 @@ jobs:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       PROJECT_REF: <your-project-id>
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
           fetch-depth: 0
-      - uses: actions/setup-node@v2.1.5
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 22
       - run: npm run update-types
       - name: check for file changes
         id: git_status

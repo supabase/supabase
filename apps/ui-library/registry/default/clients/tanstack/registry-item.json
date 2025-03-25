@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "supabase-client-tanstack",
+  "type": "registry:lib",
+  "title": "Supabase Client for Tanstack Start",
+  "description": "",
+  "registryDependencies": [],
+  "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+  "files": [
+    {
+      "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+      "type": "registry:lib"
+    }
+  ]
+}

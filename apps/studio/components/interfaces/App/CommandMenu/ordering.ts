@@ -1,4 +1,4 @@
-import type { ICommandSection } from 'ui-patterns/CommandMenu/internal/CommandSection'
+import type { ICommandSection } from 'ui-patterns/CommandMenu/internal/types'
 
 const DEFAULT_PRIORITY = 10
 

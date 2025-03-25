@@ -1,31 +1,14 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { compact } from 'lodash'
+import { useEffect } from 'react'
+import { CalculatedColumn } from 'react-data-grid'
 
-import type { Filter } from 'components/grid/types'
+import type { Filter, SavedState } from 'components/grid/types'
 import { Entity, isTableLike } from 'data/table-editor/table-editor-types'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
-import { InitialStateType } from './store/reducers'
-import type { Sort, SupabaseGridProps, SupaColumn, SupaTable } from './types'
-/**
- * Ensure that if editable is false, we should remove all editing actions
- * to prevent rare-case bugs with the UI
- */
-export function cleanupProps(props: SupabaseGridProps) {
-  const { editable } = props
-  if (!editable) {
-    return {
-      ...props,
-      onAddColumn: undefined,
-      onAddRow: undefined,
-      onEditColumn: undefined,
-      onDeleteColumn: undefined,
-      onEditRow: undefined,
-    }
-  } else {
-    return props
-  }
-}
+import type { Sort, SupaColumn, SupaTable } from './types'
 
 export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] {
   if (Array.isArray(sort)) {
@@ -39,6 +22,10 @@ export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] 
     )
   }
   return []
+}
+
+export function sortsToUrlParams(sorts: Sort[]) {
+  return sorts.map((sort) => `${sort.column}:${sort.ascending ? 'asc' : 'desc'}`)
 }
 
 export function formatFilterURLParams(filter?: string[]): Filter[] {
@@ -60,6 +47,16 @@ export function formatFilterURLParams(filter?: string[]): Filter[] {
           .filter((f) => f !== undefined)
       : []
   ) as Filter[]
+}
+
+export function filtersToUrlParams(filters: Filter[]) {
+  return filters.map((filter) => {
+    const selectedOperator = FilterOperatorOptions.find(
+      (option) => option.value === filter.operator
+    )
+
+    return `${filter.column}:${selectedOperator?.abbrev}:${filter.value}`
+  })
 }
 
 export function parseSupaTable(table: Entity): SupaTable {
@@ -119,36 +116,97 @@ export function parseSupaTable(table: Entity): SupaTable {
   }
 }
 
-export const saveStorageDebounced = AwesomeDebouncePromise(saveStorage, 500)
+export function getStorageKey(prefix: string, ref: string) {
+  return `${prefix}_${ref}`
+}
 
-function saveStorage(
-  state: InitialStateType,
-  storageRef: string,
-  sorts?: string[],
+export function loadTableEditorStateFromLocalStorage(
+  projectRef: string,
+  tableName: string,
+  schema?: string | null
+): SavedState | undefined {
+  const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
+  const jsonStr = localStorage.getItem(storageKey)
+  if (!jsonStr) return
+  const json = JSON.parse(jsonStr)
+  const tableKey = !schema || schema == 'public' ? tableName : `${schema}.${tableName}`
+  return json[tableKey]
+}
+
+export function saveTableEditorStateToLocalStorage({
+  projectRef,
+  tableName,
+  schema,
+  gridColumns,
+  sorts,
+  filters,
+}: {
+  projectRef: string
+  tableName: string
+  schema?: string | null
+  gridColumns?: CalculatedColumn<any, any>[]
+  sorts?: string[]
   filters?: string[]
-) {
-  if (!state.table) return
+}) {
+  const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
+  const savedStr = localStorage.getItem(storageKey)
+  const tableKey = !schema || schema == 'public' ? tableName : `${schema}.${tableName}`
 
   const config = {
-    gridColumns: state.gridColumns,
+    ...(gridColumns !== undefined && { gridColumns }),
     ...(sorts !== undefined && { sorts }),
     ...(filters !== undefined && { filters }),
   }
-  const storageKey = getStorageKey(STORAGE_KEY_PREFIX, storageRef)
-  const savedStr = localStorage.getItem(storageKey)
 
   let savedJson
-  const { name, schema } = state.table
-  const tableKey = !schema || schema == 'public' ? name : `${schema}.${name}`
   if (savedStr) {
     savedJson = JSON.parse(savedStr)
-    savedJson = { ...savedJson, [tableKey]: config }
+    const previousConfig = savedJson[tableKey]
+    savedJson = { ...savedJson, [tableKey]: { ...previousConfig, ...config } }
   } else {
     savedJson = { [tableKey]: config }
   }
   localStorage.setItem(storageKey, JSON.stringify(savedJson))
 }
 
-export function getStorageKey(prefix: string, ref: string) {
-  return `${prefix}_${ref}`
+export const saveTableEditorStateToLocalStorageDebounced = AwesomeDebouncePromise(
+  saveTableEditorStateToLocalStorage,
+  500
+)
+
+export function useLoadTableEditorStateFromLocalStorageIntoUrl({
+  projectRef,
+  table,
+}: {
+  projectRef: string | undefined
+  table: Entity | undefined
+}) {
+  const [_, setParams] = useUrlState({
+    arrayKeys: ['sort', 'filter'],
+  })
+  useEffect(() => {
+    if (!projectRef || !table) {
+      return
+    }
+
+    const searchParams = new URLSearchParams(window.location.search)
+
+    const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.name, table.schema)
+
+    // If no sort params are set, use saved state
+
+    let params: { sort?: string[]; filter?: string[] } | undefined
+
+    if (searchParams.getAll('sort').length <= 0 && savedState?.sorts) {
+      params = { ...params, sort: savedState.sorts }
+    }
+
+    if (searchParams.getAll('filter').length <= 0 && savedState?.filters) {
+      params = { ...params, filter: savedState.filters }
+    }
+
+    if (params) {
+      setParams((prevParams) => ({ ...prevParams, ...params }))
+    }
+  }, [projectRef, table])
 }

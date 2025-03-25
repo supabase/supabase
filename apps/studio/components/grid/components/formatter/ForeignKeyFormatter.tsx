@@ -14,19 +14,18 @@ import { NullValue } from '../common/NullValue'
 import { ReferenceRecordPeek } from './ReferenceRecordPeek'
 
 interface Props extends PropsWithChildren<RenderCellProps<SupaRow, unknown>> {
-  tableId?: string
+  tableId?: number
 }
 
 export const ForeignKeyFormatter = (props: Props) => {
   const { project } = useProjectContext()
 
   const { tableId, row, column } = props
-  const id = tableId ? Number(tableId) : undefined
 
   const { data } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    id,
+    id: tableId,
   })
   const foreignKeyColumn = data?.columns.find((x) => x.name === column.key)
   const selectedTable = isTableLike(data) ? data : undefined

@@ -85,16 +85,16 @@ The `functions serve` command has hot-reloading capabilities. It will watch for 
 While serving your local Edge Function, you can invoke it using curl or one of the client libraries.
 To call the function from a browser you need to handle CORS requests. See [CORS](/docs/guides/functions/cors).
 
-<CH.Code>
+<$CodeTabs>
 
-```bash cURL
+```bash name=cURL
 curl --request POST 'http://localhost:54321/functions/v1/hello-world' \
   --header 'Authorization: Bearer SUPABASE_ANON_KEY' \
   --header 'Content-Type: application/json' \
   --data '{ "name":"Functions" }'
 ```
 
-```js JavaScript
+```js name=JavaScript
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
@@ -104,7 +104,7 @@ const { data, error } = await supabase.functions.invoke('hello-world', {
 })
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 <Admonition type="tip" label="Where is my SUPABASE_ANON_KEY?">
 
