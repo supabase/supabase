@@ -50,10 +50,10 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@testing-library/dom": "^10.1.0",
-    "@testing-library/jest-dom": "^6.4.6",
+    "@testing-library/dom": "^10.0.0",
+    "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/react": "^16.0.0",
-    "@testing-library/user-event": "^13.5.0",
+    "@testing-library/user-event": "^14.0.0",
     "@types/common-tags": "^1.8.4",
     "@types/lodash": "^4.17.5",
     "@types/mdast": "^3.0.0",
