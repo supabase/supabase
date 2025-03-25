@@ -3,99 +3,59 @@ title: FAQ
 description: Frequently asked questions
 ---
 
- <Accordion openBehaviour="single">
+ <Accordion openBehaviour="single" collapsible>
   <AccordionItem value="how">
     <AccordionTrigger>How does it work? </AccordionTrigger>
     <AccordionContent>
-      <p>You run a command in a new or existing project that looks something like this:</p>
-      `
-        $npx shadcn@latest add http://localhost:3000/r/password-based-auth-nextjs.json
-      `
-      <p>
+      You run a command in a new or existing project that looks something like this:
+      ```bash
+      npx shadcn@latest add http://supabase.com/ui/r/password-based-auth-nextjs.json
+      ```
         This will add all of the files to your project and install the dependencies.
-      </p>
-      After you've run the command, you can start using the componets. In the case of Auth, you should be up and running with user sign in/sign up with just this one command.
+      After you've run the command, you can start using the components. In the case of Auth, you should be up and running with user sign in/sign up with just this one command.
     </AccordionContent>
   </AccordionItem>
-
-{' '}
-
-<AccordionItem value="overwrite">
-  <AccordionTrigger>Will it overwrite my existing files?</AccordionTrigger>
-  <AccordionContent>
-    No. If you run a command in an existing project, it will <u>not</u> overwrite your existing
-    files. If there conflicting files, you will be asked what you want to do (leave them or
-    overwrite them). If you run it in a new project, it will just add the new files to your project.
-  </AccordionContent>
-</AccordionItem>
-
-  <AccordionItem value="existing-project">
-    <AccordionTrigger>I've already started my a project, what should I do?</AccordionTrigger>
-    <AccordionContent>
-    You can still use these components, even if you've already started your project!
-
-    The commands won't overwrite your existing files, but you should still be careful with the changes to makes sure you understand what's been added. You should run check your changes into Git before running these commands so you'll be able to see a clean diff of the changes.
-
-  </AccordionContent>
-</AccordionItem>
-  <AccordionItem value="shadcn">
-    <AccordionTrigger>I've already installed shadcn/ui, what should I do?</AccordionTrigger>
-    <AccordionContent>
-    The commands won't overwrite your existing files, but if there's a conflict, you'll be asked what you want to do (leave them or overwrite them). If you've already installed shadcn/ui, you will have some existing config files. The command will tell you which files are conflicting and let you decide what to do with them.
-
-    You should check your changes into Git before running these commands so you'll be able to see a clean diff of the changes. This will also allow you to easily revert the changes if you wish.
-    </AccordionContent>
-
-  </AccordionItem>
-  <AccordionItem value="quickstart">
-    <AccordionTrigger>
-      I already started with `npx create-next-app -e with-supabase` what should I do now?
-    </AccordionTrigger>
-    <AccordionContent>
-      Our Next.js quickstart is a great starting point for building a full app with Supabase and Next.js. If you've already started with this, you can use the command `npx shadcn@latest add http://localhost:3000/r/password-based-auth-nextjs.json` to add the auth components to your project.
+    <AccordionItem value="overwrite">
+      <AccordionTrigger>Will it overwrite my existing files?</AccordionTrigger>
+      <AccordionContent>
+        No. If you run a command in an existing project, it will <u>not</u> overwrite your existing
+        files. If there conflicting files, you will be asked what you want to do (leave them or
+        overwrite them). If you run it in a new project, it will just add the new files to your project.
       </AccordionContent>
-
-  </AccordionItem>
-  <AccordionItem value="already-client">
-    <AccordionTrigger>I already have Supabase clients setup, what should I do?</AccordionTrigger>
-    <AccordionContent>
-    If you already have your Supabase client(s) set up and working well, you can just continue using them. If you swap out this auth component for one you've made yourself, you may want to swap the clients as well.
-
-    Generally, if things are working well, you don't need to change anything.
-
-    </AccordionContent>
-
-  </AccordionItem>
-  <AccordionItem value="already-auth">
-    <AccordionTrigger>I already have auth setup, what should I do?</AccordionTrigger>
-    <AccordionContent>
-    The auth component in this ui library is largely based on the `with-supabase` quickstart. If you already have auth setup and working well, you probably won't benefit from using this component.
-
-    You can still feel free to use any of the other components in this library.
-
-    </AccordionContent>
-
-  </AccordionItem>
-
-{' '}
-
-<AccordionItem value="app">
-  <AccordionTrigger>Do I need to use the Next.js app router</AccordionTrigger>
-  <AccordionContent>
-    No. We have clients for both the app router and the pages router. You can use whichever you
-    prefer, or whichever is already set up in your project.
-  </AccordionContent>
-</AccordionItem>
-
-{' '}
-
-<AccordionItem value="ai-builder">
-  <AccordionTrigger>I used an AI builder to build my app, what should I do?</AccordionTrigger>
-  <AccordionContent>
-    If your app is already built, you can use any of the commands to drop components into your
-    project. Your app likely already has a Supabase client set up, so you can just continue using
-    that if it's working well for you.
-  </AccordionContent>
-</AccordionItem>
+    </AccordionItem>
+    <AccordionItem value="existing-project">
+      <AccordionTrigger>I've already started my a project, what should I do?</AccordionTrigger>
+      <AccordionContent>
+        You can still use these components, even if you've already started your project! The commands
+        won't overwrite your existing files, but you should still be careful with the changes to makes
+        sure you understand what's been added. You should commit your changes into Git before running
+        these commands so you'll be able to see a clean diff of the changes.
+      </AccordionContent>
+    </AccordionItem>
+    <AccordionItem value="shadcn">
+      <AccordionTrigger>I've already installed shadcn/ui, what should I do?</AccordionTrigger>
+      <AccordionContent>
+        You're off to a great start! You can now run an add command to add the desired component to your
+        project.
+      </AccordionContent>
+    </AccordionItem>
+    <AccordionItem value="quickstart">
+      <AccordionTrigger>
+        I already started with `npx create-next-app -e with-supabase` what should I do now?
+      </AccordionTrigger>
+      <AccordionContent>
+        Our Next.js quickstart is a great starting point for building a full app with Supabase and
+        Next.js. If you've already started with this template, you can use add command to add more
+        components to your project.
+      </AccordionContent>
+    </AccordionItem>
+    <AccordionItem value="ai-builder">
+      <AccordionTrigger>I used an AI builder to build my app, what should I do?</AccordionTrigger>
+      <AccordionContent>
+        If your app is already built, you can use any of the commands to drop components into your
+        project. Your app likely already has a Supabase client set up, so you can just continue using
+        that if it's working well for you.
+      </AccordionContent>
+    </AccordionItem>
 
 </Accordion>
