@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { z } from 'zod'
 
 import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
 import Panel from 'components/ui/Panel'
@@ -43,6 +44,16 @@ interface NewOrgFormProps {
   onPaymentMethodReset: () => void
 }
 
+const formSchema = z.object({
+  plan: z.enum(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'] as const),
+  name: z.string().min(1),
+  kind: z.enum(['PERSONAL', 'EDUCATIONAL', 'STARTUP', 'AGENCY', 'COMPANY', 'UNDISCLOSED'] as const),
+  size: z.enum(['1', '10', '50', '100', '300'] as const),
+  spend_cap: z.boolean(),
+})
+
+type FormState = z.infer<typeof formSchema>
+
 /**
  * No org selected yet, create a new one
  */
@@ -54,13 +65,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const elements = useElements()
   const queryClient = useQueryClient()
 
-  const [formState, setFormState] = useState<{
-    plan: keyof typeof PRICING_TIER_LABELS_ORG
-    name: string
-    kind: string
-    size: string
-    spend_cap: boolean
-  }>({
+  const [formState, setFormState] = useState<FormState>({
     plan: 'FREE',
     name: '',
     kind: ORG_KIND_DEFAULT,
@@ -73,21 +78,27 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     auth_id: parseAsString.withDefault(''),
   })
 
-  const updateForm = (key: keyof typeof formState, value: any) => {
-    setFormState((prev) => ({ ...prev, [key]: value }))
+  const updateForm = (key: keyof FormState, value: unknown) => {
+    try {
+      const result = formSchema.shape[key].safeParse(value)
+      if (result.success) {
+        setFormState((prev) => ({ ...prev, [key]: result.data }))
+      }
+    } catch {
+      // Invalid value, ignore
+    }
   }
 
   useEffect(() => {
+    if (!router.isReady) return
+
     const { name, kind, plan, size, spend_cap } = router.query
 
-    function isValid(value: string | string[] | undefined) {
-      return typeof value === 'string'
-    }
-    if (isValid(name)) updateForm('name', name)
-    if (isValid(kind)) updateForm('kind', kind)
-    if (isValid(plan)) updateForm('plan', plan)
-    if (isValid(size)) updateForm('size', size)
-    if (isValid(spend_cap)) updateForm('spend_cap', spend_cap)
+    if (typeof name === 'string') updateForm('name', name)
+    if (typeof kind === 'string') updateForm('kind', kind)
+    if (typeof plan === 'string') updateForm('plan', plan)
+    if (typeof size === 'string') updateForm('size', size)
+    if (typeof spend_cap === 'string') updateForm('spend_cap', spend_cap === 'true')
   }, [router.isReady])
 
   useEffect(() => {
