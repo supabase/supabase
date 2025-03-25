@@ -31,6 +31,7 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
       if (!isFree) {
         try {
           await sendExitSurvey({
+            orgSlug: organization?.slug,
             projectRef,
             message,
             reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
