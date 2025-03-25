@@ -130,8 +130,14 @@ export const frameworkPages: Record<string, SidebarNavGroup> = {
     ],
   },
   react: {
-    title: 'React',
+    title: 'React SPA',
     items: [
+      {
+        title: 'Client',
+        href: '/docs/react/client',
+        items: [],
+        commandItemLabel: 'Supabase Client for React SPA',
+      },
       {
         title: 'Password-Based Auth',
         href: '/docs/react/password-based-auth',
