@@ -23,4 +23,15 @@ export const examples: Registry['items'] = [
       },
     ],
   },
+  {
+    name: 'password-based-auth-demo',
+    type: 'registry:example',
+    registryDependencies: [],
+    files: [
+      {
+        path: 'registry/default/examples/password-based-auth.tsx',
+        type: 'registry:example',
+      },
+    ],
+  },
 ]
