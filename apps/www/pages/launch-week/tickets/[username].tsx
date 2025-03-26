@@ -1,7 +1,10 @@
 import { NextSeo } from 'next-seo'
 import { LW14_DATE, LW14_TITLE, LW14_URL, SITE_ORIGIN } from '~/lib/constants'
 import { LwView } from '~/components/LaunchWeek/14/LwView'
-import { Lw14ConfDataProvider, UserTicketData } from '~/components/LaunchWeek/14/hooks/use-conf-data'
+import {
+  Lw14ConfDataProvider,
+  UserTicketData,
+} from '~/components/LaunchWeek/14/hooks/use-conf-data'
 import Error from 'next/error'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { createClient } from '@supabase/supabase-js'
@@ -14,7 +17,6 @@ interface Props {
 
 const Lw14Page = ({ user, ogImageUrl }: Props) => {
   const { username } = user
-
 
   const TITLE = `${LW14_TITLE} | ${LW14_DATE}`
   const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
@@ -80,16 +82,19 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     user = data
   }
 
+  let query = ''
+
+  if (user?.secret) {
+    query += '&secret=true'
+  }
+
+  if (user?.platinum) {
+    query += '&platinum=true'
+  }
+
   // fetch the platinum ticket
   // stores the og images in supabase storage
-  if (user?.secret) {
-    fetch(`${SITE_ORIGIN}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&secret=true`)
-  } else if (user?.platinum) {
-    // fetch /api-v2/ticket-og
-    fetch(
-      `${SITE_ORIGIN}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&platinum=true`
-    )
-  }
+  fetch(`${SITE_ORIGIN}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}${query}`)
 
   const ticketType = user?.secret ? 'secret' : user?.platinum ? 'platinum' : 'regular'
   const ogImageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw14/og/${ticketType}/${username}.png?t=${dayjs(new Date()).format('DHHmmss')}`

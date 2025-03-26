@@ -37,7 +37,7 @@ const usernameToLines = (username: string): string[] => {
     { regexp: new RegExp('\\.', 'g'), replacement: '\u2024' }, // One dot leader (alternative to period)
   ]
   const allowList = [...nonBreakingReplacements.map((x) => x.regexp), new RegExp('\\w', 'g')]
-    .map((x) => x.source.replace("-", "\\-"))
+    .map((x) => x.source.replace('-', '\\-'))
     .join('|')
   const allowRegexp = new RegExp(`[^${allowList}]`, 'g')
   const allowdUsername = username.replace(allowRegexp, '')
@@ -256,6 +256,8 @@ export async function GET(req: Request, res: Response) {
       },
     })
 
+    const NOISE = new URL('/images/launchweek/14/noise-pattern.png', url).href
+
     const computeBackgroundWidth = (letters: number) => {
       return 100 + (letters * 40 + (letters - 1) * 12)
     }
@@ -263,6 +265,11 @@ export async function GET(req: Request, res: Response) {
 
     const secretStyles = {
       background: 'linear-gradient(0deg, rgb(18 18 18 / 0.5) 50%, transparent 50%)',
+      backgroundSize: '100% 6px, 0px 100%',
+    }
+
+    const testStyles = {
+      background: 'red',
       backgroundSize: '100% 6px, 0px 100%',
     }
 
@@ -360,11 +367,25 @@ export async function GET(req: Request, res: Response) {
               <div
                 style={{
                   position: 'absolute',
+                  top: '0px',
+                  left: '0px',
+                  right: '0px',
+                  bottom: '0px',
+                  ...secretStyles,
+                }}
+              />
+            )}
+
+            {secret && (
+              <img
+                src={NOISE}
+                style={{
+                  position: 'absolute',
                   top: 0,
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  ...secretStyles,
+                  opacity: "0.1"
                 }}
               />
             )}
@@ -395,7 +416,7 @@ export async function GET(req: Request, res: Response) {
     )
 
     // [Note] Uncomment only for local testing to return the image directly and skip storage upload.
-    // return await generatedTicketImage
+    // return generatedTicketImage
 
     // Upload image to storage.
     const { error: storageError } = await supabaseAdminClient.storage
