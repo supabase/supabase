@@ -28,12 +28,9 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
     setError(null)
 
     try {
-      console.log(
-        `${window.location.origin}${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/update-password`
-      )
       // The url which will be included in the email. This URL needs to be configured in your redirect URLs in the Supabase dashboard at https://supabase.com/dashboard/project/_/auth/url-configuration
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/update-password`,
+        redirectTo: `${window.location.origin}/ui/example/password-based-auth/update-password`,
       })
       if (error) throw error
       setSuccess(true)
