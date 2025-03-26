@@ -7,7 +7,7 @@
     "preinstall": "npx only-allow pnpm",
     "dev": "next dev --port 3004",
     "build": "pnpm run content:build && pnpm run build:registry && pnpm run build:llms && next build",
-    "build:registry": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-registry.mts && prettier --write registry.json && rimraf -G public/r && shadcn build",
+    "build:registry": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-registry.mts && prettier --write registry.json && rimraf -G public/r && shadcn build && tsx scripts/clean-registry.ts",
     "build:llms": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-llms-txt.ts",
     "start": "next start",
     "lint": "next lint",
