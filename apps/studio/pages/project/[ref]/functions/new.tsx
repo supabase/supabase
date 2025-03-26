@@ -145,6 +145,7 @@ const NewFunctionPage = () => {
 
     deployFunction({
       projectRef: ref,
+      slug: values.functionName,
       metadata: {
         entrypoint_path: 'index.ts',
         name: values.functionName,

@@ -24,7 +24,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   <SideNavigation />
                 </ScrollArea>
               </aside>
-              {children}
+              <div vaul-drawer-wrapper="">
+                <div className="relative flex min-h-screen flex-col bg-background">{children}</div>
+              </div>
             </div>
           </div>
         </main>
