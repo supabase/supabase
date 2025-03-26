@@ -27,7 +27,7 @@ export const isAtBottom = ({ currentTarget }: UIEvent<HTMLDivElement>): boolean 
 
 export const formatUsersData = (users: User[]) => {
   return users.map((user) => {
-    const provider: string = user.raw_app_meta_data?.provider ?? ''
+    const provider: string = (user.raw_app_meta_data?.provider as string) ?? ''
     const providers: string[] = user.providers.map((x: string) => {
       if (x.startsWith('sso')) return 'SAML'
       return x
@@ -168,7 +168,7 @@ export function getDisplayName(user: User, fallback = '-'): string {
     last_name: cc_last_name,
     firstName: ccFirstName,
     first_name: cc_first_name,
-  } = custom_claims ?? {}
+  } = (custom_claims ?? {}) as any
 
   const last = toPrettyJsonString(
     familyName ||

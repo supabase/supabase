@@ -3,9 +3,10 @@
 import { RegistryNode } from '@/lib/process-registry'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/components/shadcn/ui/tabs'
 import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock'
-import { File, Folder } from 'fumadocs-ui/components/files'
 import { useState } from 'react'
+import supabaseTheme from '../lib/themes/supabase-2.json' assert { type: 'json' }
 import { BlockItemPreview } from './block-item'
+import { File, Folder } from './files'
 
 interface BlockItemCodeProps {
   files: RegistryNode[]
@@ -72,7 +73,7 @@ export function BlockItemCode({ files }: BlockItemCodeProps) {
     : null
 
   return (
-    <div className="flex border rounded-lg overflow-hidden h-[652px] not-prose">
+    <div className="flex border rounded-lg overflow-hidden h-[652px] not-prose mt-4">
       {/* File browser sidebar */}
       <div className="w-64 border-r bg-muted/30 overflow-y-auto">
         <div className="border-b bg-muted/50 h-12 items-center flex px-2">
@@ -101,7 +102,12 @@ export function BlockItemCode({ files }: BlockItemCodeProps) {
                 value="code"
                 className="rounded-none [&_figure]:rounded-none [&_figure]:h-full [&_div[data-radix-scroll-area-viewport]]:min-h-[600px]"
               >
-                <DynamicCodeBlock lang={selectedFileExtension} code={selectedFile?.content} />
+                <DynamicCodeBlock
+                  lang={selectedFileExtension}
+                  code={selectedFile?.content}
+                  /* the component supports a theme prop, but it's typed badly */
+                  options={{ theme: supabaseTheme } as any}
+                />
               </TabsContent>
               <TabsContent value="preview" className="h-full flex-1">
                 {selectedFileDemoUrl && <BlockItemPreview title="" src={selectedFileDemoUrl} />}

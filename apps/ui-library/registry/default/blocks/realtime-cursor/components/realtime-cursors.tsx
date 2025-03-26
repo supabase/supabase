@@ -11,7 +11,7 @@ export const RealtimeCursors = ({ roomName, username }: { roomName: string; user
       {Object.keys(cursors).map((id) => (
         <Cursor
           key={id}
-          className="absolute transform ease-linear duration-70 z-50"
+          className="fixed ease-linear duration-70 z-50"
           style={{
             top: 0,
             left: 0,

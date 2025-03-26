@@ -3,7 +3,7 @@
   "displayName": "Supabase Theme",
   "semanticHighlighting": true,
   "colors": {
-    "editor.background": "var(--code-highlight-color)",
+    "editor.background": "var(--background-surface-75) / 0.75",
     "editor.foreground": "var(--code-foreground)",
     "editor.lineHighlightBackground": "var(--code-highlight-color)",
     "editorCursor.foreground": "var(--code-foreground)",
