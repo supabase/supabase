@@ -8,4 +8,4 @@ catalog:
   '@supabase/auth-js': 2.69.0-rc.3
   '@supabase/supabase-js': ^2.47.14
   '@supabase/realtime-js': ^2.11.3
-  next: 14.2.21
+  next: 14.2.26

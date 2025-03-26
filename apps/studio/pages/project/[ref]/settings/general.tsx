@@ -34,15 +34,12 @@ const ProjectSettings: NextPageWithLayout = () => {
       </ScaffoldContainer>
       <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
         <General />
-        {!isBranch ? (
-          <>
-            {/* this is only setable on compliance orgs, currently that means HIPAA orgs */}
-            {hasHipaaAddon && <ComplianceConfig />}
-            <CustomDomainConfig />
-            {projectTransferEnabled && <TransferProjectPanel />}
-            <DeleteProjectPanel />
-          </>
-        ) : null}
+
+        {/* this is only settable on compliance orgs, currently that means HIPAA orgs */}
+        {!isBranch && hasHipaaAddon && <ComplianceConfig />}
+        <CustomDomainConfig />
+        {!isBranch && projectTransferEnabled && <TransferProjectPanel />}
+        {!isBranch && <DeleteProjectPanel />}
       </ScaffoldContainer>
     </>
   )

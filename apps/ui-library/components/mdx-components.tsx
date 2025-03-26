@@ -35,6 +35,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { BlockItem } from './block-item'
+import { BlockPreview } from './block-preview'
 import { ComponentProps } from './component-props'
 import { SonnerExpandConfig } from './sonner-expand-config'
 import { SonnerPositionConfig } from './sonner-expand-position'
@@ -273,6 +274,7 @@ const components = {
   SonnerExpandConfig,
   SonnerPositionConfig,
   BlockItem,
+  BlockPreview,
 }
 
 interface MdxProps {
