@@ -45,17 +45,19 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const isPhoneAuth = user.phone !== null
   const isBanned = user.banned_until !== null
 
-  const providers = (user.raw_app_meta_data?.providers ?? []).map((provider: string) => {
-    return {
-      name: provider.startsWith('sso') ? 'SAML' : provider,
-      icon:
-        provider === 'email'
-          ? `${BASE_PATH}/img/icons/email-icon2.svg`
-          : providerIconMap[provider]
-            ? `${BASE_PATH}/img/icons/${providerIconMap[provider]}.svg`
-            : undefined,
+  const providers = ((user.raw_app_meta_data?.providers as string[]) ?? []).map(
+    (provider: string) => {
+      return {
+        name: provider.startsWith('sso') ? 'SAML' : provider,
+        icon:
+          provider === 'email'
+            ? `${BASE_PATH}/img/icons/email-icon2.svg`
+            : providerIconMap[provider]
+              ? `${BASE_PATH}/img/icons/${providerIconMap[provider]}.svg`
+              : undefined,
+      }
     }
-  })
+  )
 
   const canUpdateUser = useCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
   const canSendMagicLink = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_magic_link')

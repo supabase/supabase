@@ -10,7 +10,7 @@ type DownloadBucketObjectParams = {
   projectRef: string
   bucketId?: string
   path: string
-  options?: components['schemas']['DownloadObjectOptions']
+  options?: components['schemas']['DownloadObjectBody']['options']
 }
 export const downloadBucketObject = async (
   { projectRef, bucketId, path, options }: DownloadBucketObjectParams,
