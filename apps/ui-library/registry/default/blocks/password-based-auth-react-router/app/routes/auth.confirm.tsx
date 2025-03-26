@@ -1,7 +1,6 @@
+import { createClient } from '@/registry/default/clients/react-router/lib/supabase/server'
 import { type EmailOtpType } from '@supabase/supabase-js'
 import { type LoaderFunctionArgs, redirect } from 'react-router'
-
-import { createClient } from '@/registry/default/clients/react-router/lib/supabase/server'
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const requestUrl = new URL(request.url)
@@ -17,9 +16,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
     })
     if (!error) {
       return redirect(next, { headers })
+    } else {
+      return redirect(`/auth/error?error=${error?.message}`)
     }
   }
 
-  // return the user to an error page with instructions
-  return redirect('/auth/auth-code-error')
+  // redirect the user to an error page with some instructions
+  return redirect(`/auth/error?error=No token hash or type`)
 }

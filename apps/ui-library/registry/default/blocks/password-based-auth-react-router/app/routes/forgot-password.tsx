@@ -11,8 +11,8 @@ import { Input } from '@/registry/default/components/ui/input'
 import { Label } from '@/registry/default/components/ui/label'
 import {
   type ActionFunctionArgs,
-  data,
   Link,
+  data,
   redirect,
   useFetcher,
   useSearchParams,
@@ -40,7 +40,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     )
   }
 
-  redirect('/forgot-password?success')
+  return redirect('/forgot-password?success')
 }
 
 export default function ForgotPassword() {

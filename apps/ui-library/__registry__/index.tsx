@@ -35,9 +35,9 @@ export const Index: Record<string, any> = {
       name: "password-based-auth-react-router",
       type: "registry:block",
       registryDependencies: ["button","card","input","label"],
-      component: React.lazy(() => import("@/registry/default/blocks/password-based-auth-react-router/app/routes/sign-in.tsx")),
+      component: React.lazy(() => import("@/registry/default/blocks/password-based-auth-react-router/app/routes/auth.confirm.tsx")),
       source: "",
-      files: ["registry/default/blocks/password-based-auth-react-router/app/routes.ts","registry/default/blocks/password-based-auth-react-router/app/routes/sign-in.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/sign-up.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/sign-out.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/forgot-password.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/update-password.tsx","registry/default/blocks/password-based-auth-react-router/components/form-message.tsx","registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
+      files: ["registry/default/blocks/password-based-auth-react-router/app/routes/auth.confirm.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/auth.error.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/forgot-password.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/login.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/logout.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/protected.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/sign-up.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/update-password.tsx","registry/default/blocks/password-based-auth-react-router/app/routes.ts","registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

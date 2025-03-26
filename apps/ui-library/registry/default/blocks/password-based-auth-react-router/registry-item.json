@@ -11,24 +11,14 @@
   ],
   "files": [
     {
-      "path": "registry/default/blocks/password-based-auth-react-router/app/routes.ts",
+      "path": "registry/default/blocks/password-based-auth-react-router/app/routes/auth.confirm.tsx",
       "type": "registry:file",
-      "target": "app/routes.ts"
+      "target": "app/routes/auth.confirm.tsx"
     },
     {
-      "path": "registry/default/blocks/password-based-auth-react-router/app/routes/sign-in.tsx",
+      "path": "registry/default/blocks/password-based-auth-react-router/app/routes/auth.error.tsx",
       "type": "registry:file",
-      "target": "app/routes/sign-in.tsx"
-    },
-    {
-      "path": "registry/default/blocks/password-based-auth-react-router/app/routes/sign-up.tsx",
-      "type": "registry:file",
-      "target": "app/routes/sign-up.tsx"
-    },
-    {
-      "path": "registry/default/blocks/password-based-auth-react-router/app/routes/sign-out.tsx",
-      "type": "registry:file",
-      "target": "app/routes/sign-out.tsx"
+      "target": "app/routes/auth.error.tsx"
     },
     {
       "path": "registry/default/blocks/password-based-auth-react-router/app/routes/forgot-password.tsx",
@@ -36,13 +26,34 @@
       "target": "app/routes/forgot-password.tsx"
     },
     {
+      "path": "registry/default/blocks/password-based-auth-react-router/app/routes/login.tsx",
+      "type": "registry:file",
+      "target": "app/routes/login.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-react-router/app/routes/logout.tsx",
+      "type": "registry:file",
+      "target": "app/routes/logout.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-react-router/app/routes/protected.tsx",
+      "type": "registry:file",
+      "target": "app/routes/protected.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-react-router/app/routes/sign-up.tsx",
+      "type": "registry:file",
+      "target": "app/routes/sign-up.tsx"
+    },
+    {
       "path": "registry/default/blocks/password-based-auth-react-router/app/routes/update-password.tsx",
       "type": "registry:file",
       "target": "app/routes/update-password.tsx"
     },
     {
-      "path": "registry/default/blocks/password-based-auth-react-router/components/form-message.tsx",
-      "type": "registry:component"
+      "path": "registry/default/blocks/password-based-auth-react-router/app/routes.ts",
+      "type": "registry:file",
+      "target": "app/routes.ts"
     }
   ]
 }
