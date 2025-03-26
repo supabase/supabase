@@ -220,7 +220,11 @@ export function useAssistant(options?: UseAssistantOptions) {
         // Get the existing messages for the active chat
         const existingMessages: readonly MessageType[] =
           projectChatsRecord[activeChatId]?.messages || []
-        console.log({ existingMessages })
+        const messageToUpdate = existingMessages.find((m) => m.id === id)
+
+        if (!!messageToUpdate) {
+          // [Joshen] WE LEFT OFF HERE, jeez this is tricky af
+        }
       }
     },
     [activeChatId, projectChatsRecord]
