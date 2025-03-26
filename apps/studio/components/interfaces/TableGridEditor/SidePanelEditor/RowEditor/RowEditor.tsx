@@ -14,6 +14,7 @@ import InputField from './InputField'
 import { JsonEditor } from './JsonEditor'
 import type { EditValue, RowField } from './RowEditor.types'
 import {
+  convertByteaToHex,
   generateRowFields,
   generateRowObjectFromFields,
   generateUpdateRowPayload,
@@ -130,7 +131,10 @@ const RowEditor = ({
       if (!isNewRecord) {
         const primaryKeyColumns = rowFields.filter((field) => field.isPrimaryKey)
         const identifiers = {} as Dictionary<any>
-        primaryKeyColumns.forEach((column) => (identifiers[column.name] = row![column.name]))
+        primaryKeyColumns.forEach((column) => {
+          identifiers[column.name] =
+            column.format === 'bytea' ? convertByteaToHex(row![column.name]) : row![column.name]
+        })
         configuration.identifiers = identifiers
         configuration.rowIdx = row!.idx
       }

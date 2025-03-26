@@ -39,7 +39,7 @@ const BillingBreakdown = () => {
   return (
     <ScaffoldSection>
       <ScaffoldSectionDetail>
-        <div className="sticky space-y-2 top-12">
+        <div className="sticky space-y-2 top-12 pr-3">
           <p className="text-foreground text-base m-0">Billing Breakdown</p>
           <p className="text-sm text-foreground-light m-0">
             Current billing cycle: {billingCycleStart.format('MMM DD')} -{' '}

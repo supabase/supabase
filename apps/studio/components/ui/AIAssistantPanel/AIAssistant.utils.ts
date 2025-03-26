@@ -7,6 +7,7 @@ import { enumeratedTypesKeys } from 'data/enumerated-types/keys'
 import { tableKeys } from 'data/tables/keys'
 import { CommonDatabaseEntity } from 'state/app-state'
 import { SupportedAssistantEntities } from './AIAssistant.types'
+import { SAFE_FUNCTIONS } from './AiAssistant.constants'
 
 const PLACEHOLDER_PREFIX = `-- Press tab to use this code
 \n&nbsp;\n`
@@ -109,47 +110,44 @@ export const identifyQueryType = (query: string) => {
   }
 }
 
+// Check for function calls that aren't in the safe list
+export const containsUnknownFunction = (query: string) => {
+  const normalizedQuery = query.trim().toLowerCase()
+  const functionCallRegex = /\w+\s*\(/g
+  const functionCalls = normalizedQuery.match(functionCallRegex) || []
+
+  return functionCalls.some((func) => {
+    const isReadOnlyFunc = SAFE_FUNCTIONS.some((safeFunc) => func.trim().toLowerCase() === safeFunc)
+    return !isReadOnlyFunc
+  })
+}
+
 export const isReadOnlySelect = (query: string): boolean => {
   const normalizedQuery = query.trim().toLowerCase()
 
   // Check if it starts with SELECT
-  if (!normalizedQuery.startsWith('select')) {
-    return false
-  }
+  if (!normalizedQuery.startsWith('select')) return false
 
-  // List of keywords that indicate write operations or function calls
-  const disallowedPatterns = [
-    // Write operations
-    'insert',
-    'update',
-    'delete',
-    'alter',
-    'drop',
-    'create',
-    'truncate',
-    'replace',
-    'with',
+  // List of keywords that indicate write operations
+  const writeOperations = ['insert', 'update', 'delete', 'alter', 'drop', 'create', 'replace']
 
-    // Function patterns
-    'function',
-    'procedure',
-  ]
+  // Words that may appear in column names etc
+  const allowedPatterns = ['created', 'inserted', 'updated', 'deleted', 'truncate']
 
-  const allowedPatterns = ['created', 'inserted', 'updated', 'deleted']
-
-  // Check if query contains any disallowed patterns, but allow if part of allowedPatterns
-  return !disallowedPatterns.some((pattern) => {
-    // Check if the found disallowed pattern is actually part of an allowed pattern
-    const isPartOfAllowedPattern = allowedPatterns.some(
-      (allowed) => normalizedQuery.includes(allowed) && allowed.includes(pattern)
+  // Check for any write operations
+  const hasWriteOperation = writeOperations.some((op) => {
+    // Ignore if part of allowed pattern
+    const isAllowed = allowedPatterns.some(
+      (allowed) => normalizedQuery.includes(allowed) && allowed.includes(op)
     )
-
-    if (isPartOfAllowedPattern) {
-      return false
-    }
-
-    return normalizedQuery.includes(pattern)
+    return !isAllowed && normalizedQuery.includes(op)
   })
+  if (hasWriteOperation) return false
+
+  const hasUnknownFunction = containsUnknownFunction(normalizedQuery)
+  if (hasUnknownFunction) return false
+
+  return true
 }
 
 const getContextKey = (pathname: string) => {

@@ -155,7 +155,9 @@ export async function getStaticProps() {
   }) as BlogPost[]
 
   const allEvents = [...staticEvents, ...meetupEvents]
-  const upcomingEvents = allEvents.filter((event: BlogPost) => new Date(event.date!) >= new Date())
+  const upcomingEvents = allEvents.filter((event: BlogPost) =>
+    event.end_date ? new Date(event.end_date!) >= new Date() : new Date(event.date!) >= new Date()
+  )
   const onDemandEvents = allEvents.filter(
     (event: BlogPost) => new Date(event.date!) < new Date() && event.onDemand === true
   )

@@ -91,7 +91,7 @@ const IntegrationTopHeaderLayout = ({ ...props }: PropsWithChildren) => {
   } = useInstalledIntegrations()
   const installedIntegrationItems = integrations.map((integration) => ({
     name: integration.name,
-    label: integration.beta ? 'Beta' : undefined,
+    label: integration.status,
     key: `integrations/${integration.id}`,
     url: `/project/${project?.ref}/integrations/${integration.id}/overview`,
     icon: (
@@ -112,7 +112,7 @@ const IntegrationTopHeaderLayout = ({ ...props }: PropsWithChildren) => {
         <>
           <ProductMenu page={page} menu={generateIntegrationsMenu({ projectRef: project?.ref })} />
           <Separator />
-          <div className="p-6">
+          <div className="px-4 py-6 md:px-6">
             <Menu.Group
               title={
                 <div className="flex flex-col space-y-2 uppercase font-mono">
@@ -167,7 +167,7 @@ const IntegrationsLayoutSide = ({ ...props }: PropsWithChildren) => {
   } = useInstalledIntegrations()
   const installedIntegrationItems = integrations.map((integration) => ({
     name: integration.name,
-    label: integration.beta ? 'Beta' : undefined,
+    label: integration.status,
     key: `integrations/${integration.id}`,
     url: `/project/${project?.ref}/integrations/${integration.id}/overview`,
     icon: (

@@ -15,6 +15,10 @@ export const WRAPPER_HANDLERS = {
   REDIS: 'redis_fdw_handler',
   PADDLE: 'wasm_fdw_handler',
   SNOWFLAKE: 'wasm_fdw_handler',
+  CAL: 'wasm_fdw_handler',
+  CALENDLY: 'wasm_fdw_handler',
+  CLERK: 'wasm_fdw_handler',
+  NOTION: 'wasm_fdw_handler',
 }
 
 export const WRAPPERS: WrapperMeta[] = [
@@ -2077,6 +2081,943 @@ export const WRAPPERS: WrapperMeta[] = [
             label: 'Row ID Column',
             defaultValue: 'id',
             editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'cal_wrapper',
+    description: 'Cal.com is a scheduling platform',
+    handlerName: WRAPPER_HANDLERS.CAL,
+    validatorName: 'wasm_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/cal-com-icon.svg`,
+    extensionName: 'calFdw',
+    label: 'Cal.com',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/cal',
+    minimumExtensionVersion: '0.4.0',
+    server: {
+      options: [
+        {
+          name: 'fdw_package_url',
+          label: 'FDW Package URL',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue:
+            'https://github.com/supabase/wrappers/releases/download/wasm_cal_fdw_v0.1.0/cal_fdw.wasm',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_name',
+          label: 'FDW Package Name',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'supabase:cal-fdw',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_version',
+          label: 'FDW Package Version',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '0.1.0',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_checksum',
+          label: 'FDW Package Checksum',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'bca8a82d6c5f8da0aa58011940c4ddb40bb2c909c02dd89b488289c4fff890c1',
+          hidden: true,
+        },
+        {
+          name: 'api_url',
+          label: 'API URL',
+          required: false,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'https://api.cal.com/v2',
+        },
+        {
+          name: 'api_key_id',
+          label: 'API Key ID',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'My Profile',
+        description: 'Shows your Cal profile',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'bigint',
+          },
+          {
+            name: 'username',
+            type: 'text',
+          },
+          {
+            name: 'email',
+            type: 'text',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'my_profile',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Event Types',
+        description: 'Shows your Event Types',
+        availableColumns: [
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'event-types',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Bookings',
+        description: 'Shows your Bookings',
+        availableColumns: [
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'bookings',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Calendars',
+        description: 'Shows your Calendars',
+        availableColumns: [
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'calendars',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Schedules',
+        description: 'Shows your Schedules',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'bigint',
+          },
+          {
+            name: 'name',
+            type: 'text',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'schedules',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Conferencing',
+        description: 'Shows conferencing',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'bigint',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'conferencing',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'calendly_wrapper',
+    description: 'Calendly is a scheduling platform',
+    handlerName: WRAPPER_HANDLERS.CALENDLY,
+    validatorName: 'wasm_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/calendly-icon.svg`,
+    extensionName: 'calendlyFdw',
+    label: 'Calendly',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/calendly',
+    minimumExtensionVersion: '0.4.0',
+    server: {
+      options: [
+        {
+          name: 'fdw_package_url',
+          label: 'FDW Package URL',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue:
+            'https://github.com/supabase/wrappers/releases/download/wasm_calendly_fdw_v0.1.0/calendly_fdw.wasm',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_name',
+          label: 'FDW Package Name',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'supabase:calendly-fdw',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_version',
+          label: 'FDW Package Version',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '0.1.0',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_checksum',
+          label: 'FDW Package Checksum',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'aa17f1ce2b48b5d8d6cee4f61df4d6b23e9a333c3e5c7a10cec9aae619c156b9',
+          hidden: true,
+        },
+        {
+          name: 'organization',
+          label: 'Organization URL',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue:
+            'https://api.calendly.com/organizations/00000000-0000-0000-0000-000000000000',
+        },
+        {
+          name: 'api_url',
+          label: 'API URL',
+          required: false,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'https://api.calendly.com',
+        },
+        {
+          name: 'api_key_id',
+          label: 'API Key ID',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Current User',
+        description: 'Get the current user used for the API request',
+        availableColumns: [
+          {
+            name: 'uri',
+            type: 'text',
+          },
+          {
+            name: 'slug',
+            type: 'text',
+          },
+          {
+            name: 'created_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'updated_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'current_user',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Event Types',
+        description: 'Shows your Event Types',
+        availableColumns: [
+          {
+            name: 'uri',
+            type: 'text',
+          },
+          {
+            name: 'created_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'updated_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'event_types',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Groups',
+        description: 'Shows your groups',
+        availableColumns: [
+          {
+            name: 'uri',
+            type: 'text',
+          },
+          {
+            name: 'created_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'updated_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'groups',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Organization Memberships',
+        description: 'Shows your Organization Memberships',
+        availableColumns: [
+          {
+            name: 'uri',
+            type: 'text',
+          },
+          {
+            name: 'created_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'updated_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'organization_memberships',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Scheduled Events',
+        description: 'Shows your scheduled events',
+        availableColumns: [
+          {
+            name: 'uri',
+            type: 'text',
+          },
+          {
+            name: 'created_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'updated_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'scheduled_events',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'clerk_wrapper',
+    description: 'User Management Platform',
+    handlerName: WRAPPER_HANDLERS.CLERK,
+    validatorName: 'wasm_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/clerk-icon.svg`,
+    extensionName: 'clerkFdw',
+    label: 'Clerk',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/clerk',
+    minimumExtensionVersion: '0.4.0',
+    server: {
+      options: [
+        {
+          name: 'fdw_package_url',
+          label: 'FDW Package URL',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue:
+            'https://github.com/supabase/wrappers/releases/download/wasm_clerk_fdw_v0.1.0/clerk_fdw.wasm',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_name',
+          label: 'FDW Package Name',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'supabase:clerk-fdw',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_version',
+          label: 'FDW Package Version',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '0.1.0',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_checksum',
+          label: 'FDW Package Checksum',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '613be26b59fa4c074e0b93f0db617fcd7b468d4d02edece0b1f85fdb683ebdc4',
+          hidden: true,
+        },
+        {
+          name: 'api_url',
+          label: 'Clerk API URL',
+          required: false,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'https://api.clerk.com/v1',
+        },
+        {
+          name: 'api_key_id',
+          label: 'Clerk API Key',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Allow List',
+        description: 'List of all identifiers allowed to sign up to an instance',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'invitation_id', type: 'text' },
+          { name: 'identifier', type: 'text' },
+          { name: 'identifier_type', type: 'text' },
+          { name: 'instance_id', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'allowlist_identifiers',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Block List',
+        description: 'List of all identifiers which are not allowed to access an instance',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'identifier', type: 'text' },
+          { name: 'identifier_type', type: 'text' },
+          { name: 'instance_id', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'blocklist_identifiers',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Domains',
+        description: 'List of all domains for an instance',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'name', type: 'text' },
+          { name: 'is_satellite', type: 'boolean' },
+          { name: 'frontend_api_url', type: 'text' },
+          { name: 'accounts_portal_url', type: 'text' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'domains',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Invitations',
+        description: 'List of all non-revoked invitations for your application',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'email_address', type: 'text' },
+          { name: 'url', type: 'text' },
+          { name: 'revoked', type: 'boolean' },
+          { name: 'status', type: 'text' },
+          { name: 'expires_at', type: 'timestamp' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'invitations',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'JWT Templates',
+        description: 'List of all JWT templates',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'name', type: 'text' },
+          { name: 'lifetime', type: 'bigint' },
+          { name: 'allowed_clock_skew', type: 'bigint' },
+          { name: 'custom_signing_key', type: 'boolean' },
+          { name: 'signing_algorithm', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'jwt_templates',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'OAuth Applications',
+        description: 'List of OAuth applications for an instance',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'name', type: 'text' },
+          { name: 'instance_id', type: 'text' },
+          { name: 'client_id', type: 'text' },
+          { name: 'public', type: 'boolean' },
+          { name: 'scopes', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'oauth_applications',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Organizations',
+        description: 'List of organizations for an instance',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'name', type: 'text' },
+          { name: 'slug', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'organizations',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Organization Invitations',
+        description: 'List of organization invitations for an instance',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'email_address', type: 'text' },
+          { name: 'role', type: 'text' },
+          { name: 'role_name', type: 'text' },
+          { name: 'organization_id', type: 'text' },
+          { name: 'status', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'organization_invitations',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Organization Memberships',
+        description: 'List of organization user memberships for an instance',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'role', type: 'text' },
+          { name: 'role_name', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'organization_memberships',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Redirect URLs',
+        description: 'List of all whitelisted redirect urls for the instance',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'url', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'redirect_urls',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'SAML Connections',
+        description: 'List of SAML Connections for an instance',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'name', type: 'text' },
+          { name: 'domain', type: 'text' },
+          { name: 'active', type: 'boolean' },
+          { name: 'provider', type: 'text' },
+          { name: 'user_count', type: 'bigint' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'saml_connections',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Users',
+        description: 'List of all users',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'external_id', type: 'text' },
+          { name: 'username', type: 'text' },
+          { name: 'first_name', type: 'text' },
+          { name: 'last_name', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'users',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'notion_wrapper',
+    description: 'Notion provides a versatile, ready-to-use solution for managing your data.',
+    handlerName: WRAPPER_HANDLERS.NOTION,
+    validatorName: 'wasm_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/notion-icon.svg`,
+    extensionName: 'NotionFdw',
+    label: 'Notion',
+    docsUrl: 'https://fdw.dev/catalog/notion/',
+    minimumExtensionVersion: '0.4.0',
+    server: {
+      options: [
+        {
+          name: 'fdw_package_url',
+          label: 'FDW Package URL',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue:
+            'https://github.com/supabase/wrappers/releases/download/wasm_notion_fdw_v0.1.1/notion_fdw.wasm',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_name',
+          label: 'FDW Package Name',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'supabase:notion-fdw',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_version',
+          label: 'FDW Package Version',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '0.1.1',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_checksum',
+          label: 'FDW Package Checksum',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '6dea3014f462aafd0c051c37d163fe326e7650c26a7eb5d8017a30634b5a46de',
+          hidden: true,
+        },
+        {
+          name: 'api_url',
+          label: 'API URL',
+          required: false,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'https://api.notion.com/v1',
+        },
+        {
+          name: 'api_key_id',
+          label: 'Notion API Key',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Blocks',
+        description: 'Notion Block content',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'page_id', type: 'text' },
+          { name: 'type', type: 'text' },
+          { name: 'created_time', type: 'timestamp' },
+          { name: 'last_edited_time', type: 'timestamp' },
+          { name: 'archived', type: 'boolean' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'block',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Pages',
+        description: 'Notion Pages',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'url', type: 'text' },
+          { name: 'created_time', type: 'timestamp' },
+          { name: 'last_edited_time', type: 'timestamp' },
+          { name: 'archived', type: 'boolean' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'page',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Databases',
+        description: 'Notion Databases',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'url', type: 'text' },
+          { name: 'created_time', type: 'timestamp' },
+          { name: 'last_edited_time', type: 'timestamp' },
+          { name: 'archived', type: 'boolean' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'database',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Users',
+        description: 'Notion Users',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'name', type: 'text' },
+          { name: 'type', type: 'text' },
+          { name: 'avatar_url', type: 'text' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'user',
+            editable: false,
             required: true,
             type: 'text',
           },

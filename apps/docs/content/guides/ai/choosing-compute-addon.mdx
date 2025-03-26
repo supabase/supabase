@@ -277,7 +277,7 @@ There are various ways to improve your pgvector performance. Here are some tips:
 
 It's useful to execute a few thousand “warm-up” queries before going into production. This helps help with RAM utilization. This can also help to determine that you've selected the right compute size for your workload.
 
-### Finetune index parameters
+### Fine-tune index parameters
 
 You can increase the Requests per Second by increasing `m` and `ef_construction` or `lists`. This also has an important caveat: building the index takes longer with higher values for these parameters.
 
@@ -301,7 +301,7 @@ You can increase the Requests per Second by increasing `m` and `ef_construction`
 
 </TabPanel>
 <TabPanel id="ivfflat" label="IVFFlat">
-  
+
 <Image
   alt="multi database"
   src={{

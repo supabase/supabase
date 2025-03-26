@@ -1,6 +1,4 @@
 {
-  "produces": ["application/json"],
-  "schemes": ["http", "https"],
   "swagger": "2.0",
   "info": {
     "description": "Documentation of the gotrue API.",
@@ -9,6 +7,8 @@
   },
   "host": "localhost:9999",
   "basePath": "/",
+  "schemes": ["http", "https"],
+  "produces": ["application/json"],
   "paths": {
     "/admin/generate_link": {
       "post": {

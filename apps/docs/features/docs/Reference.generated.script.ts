@@ -1,27 +1,27 @@
-import { keyBy, isPlainObject } from 'lodash'
+import { isPlainObject, keyBy } from 'lodash'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import slugify from 'slugify'
 import { parse } from 'yaml'
 
-import { REFERENCES, clientSdkIds } from '~/content/navigation.references'
+import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
 import { parseTypeSpec } from '~/features/docs/Reference.typeSpec'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { deepFilterRec } from '~/features/helpers.fn'
 import type { Json } from '~/features/helpers.types'
-import authSpec from '~/spec/auth_v1_openapi.json' assert { type: 'json' }
-import apiCommonSections from '~/spec/common-api-sections.json' assert { type: 'json' }
-import cliCommonSections from '~/spec/common-cli-sections.json' assert { type: 'json' }
-import commonClientLibSections from '~/spec/common-client-libs-sections.json' assert { type: 'json' }
-import selfHostingAnalyticsCommonSections from '~/spec/common-self-hosting-analytics-sections.json' assert { type: 'json' }
+import authSpec from '~/spec/auth_v1_openapi.json' with { type: 'json' }
+import apiCommonSections from '~/spec/common-api-sections.json' with { type: 'json' }
+import cliCommonSections from '~/spec/common-cli-sections.json' with { type: 'json' }
+import commonClientLibSections from '~/spec/common-client-libs-sections.json' with { type: 'json' }
+import selfHostingAnalyticsCommonSections from '~/spec/common-self-hosting-analytics-sections.json' with { type: 'json' }
 import selfHostingAuthCommonSections from '~/spec/common-self-hosting-auth-sections.json'
-import selfHostingFunctionsCommonSections from '~/spec/common-self-hosting-functions-sections.json' assert { type: 'json' }
-import selfHostingRealtimeCommonSections from '~/spec/common-self-hosting-realtime-sections.json' assert { type: 'json' }
-import selfHostingStorageCommonSections from '~/spec/common-self-hosting-storage-sections.json' assert { type: 'json' }
-import storageSpec from '~/spec/storage_v0_openapi.json' assert { type: 'json' }
-import analyticsSpec from '~/spec/transforms/analytics_v0_openapi_deparsed.json' assert { type: 'json' }
-import openApiSpec from '~/spec/transforms/api_v1_openapi_deparsed.json' assert { type: 'json' }
+import selfHostingFunctionsCommonSections from '~/spec/common-self-hosting-functions-sections.json' with { type: 'json' }
+import selfHostingRealtimeCommonSections from '~/spec/common-self-hosting-realtime-sections.json' with { type: 'json' }
+import selfHostingStorageCommonSections from '~/spec/common-self-hosting-storage-sections.json' with { type: 'json' }
+import storageSpec from '~/spec/storage_v0_openapi.json' with { type: 'json' }
+import analyticsSpec from '~/spec/transforms/analytics_v0_openapi_deparsed.json' with { type: 'json' }
+import openApiSpec from '~/spec/transforms/api_v1_openapi_deparsed.json' with { type: 'json' }
 import { IApiEndPoint } from './Reference.api.utils'
 
 const DOCS_DIRECTORY = join(dirname(fileURLToPath(import.meta.url)), '../..')

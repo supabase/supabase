@@ -14,6 +14,7 @@ export interface RealtimeLayoutProps {
 
 const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutProps>) => {
   const project = useSelectedProject()
+  const enableRealtimeSettings = useFlag('enableRealtimeSettings')
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
@@ -22,7 +23,12 @@ const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutPro
     <ProjectLayout
       title={title}
       product="Realtime"
-      productMenu={<ProductMenu page={page} menu={generateRealtimeMenu(project!)} />}
+      productMenu={
+        <ProductMenu
+          page={page}
+          menu={generateRealtimeMenu(project!, { enableRealtimeSettings })}
+        />
+      }
     >
       {children}
     </ProjectLayout>

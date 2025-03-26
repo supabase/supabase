@@ -17,6 +17,8 @@ Phoenix is fast and able to handle millions of concurrent connections.
 
 Phoenix can handle many concurrent connections because Elixir provides lightweight processes (not OS processes) to work with.
 
+{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
+
 Client-facing WebSocket servers need to handle many concurrent connections. Elixir & Phoenix let the Supabase Realtime cluster do this easily.
 
 ## Channels
@@ -31,7 +33,7 @@ Presence is an in-memory key-value store backed by a CRDT. When a user is connec
 
 Broadcast lets you send a message from any connected client to a Channel. Any other client connected to that same Channel will receive that message.
 
-This works globally. A client connected to a Realtime node in the United States can send a message to another client connected to a node in Singapore. Simply connect two clients to the same Realtime Channel and they'll all receive the same messages.
+This works globally. A client connected to a Realtime node in the United States can send a message to another client connected to a node in Singapore. Connect two clients to the same Realtime Channel and they'll all receive the same messages.
 
 Broadcast is useful for getting messages to users in the same location very quickly. If a group of clients are connected to a node in Singapore, the message only needs to go to that Realtime node in Singapore and back down. If users are close to a Realtime node they'll get Broadcast messages in the time it takes to ping the cluster.
 

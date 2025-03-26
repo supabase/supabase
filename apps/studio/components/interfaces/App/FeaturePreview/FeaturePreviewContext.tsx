@@ -5,16 +5,9 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { EMPTY_OBJ } from 'lib/void'
 import { APISidePanelPreview } from './APISidePanelPreview'
 import { CLSPreview } from './CLSPreview'
-import { AssistantV2Preview } from './AssistantV2Preview'
+import InlineEditorPreview from './InlineEditorPreview'
 
 export const FEATURE_PREVIEWS = [
-  {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_ASSISTANT_V2,
-    name: 'Supabase AI Assistant V2',
-    content: <AssistantV2Preview />,
-    discussionsUrl: undefined,
-    isNew: true,
-  },
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
     name: 'Project API documentation',
@@ -28,6 +21,13 @@ export const FEATURE_PREVIEWS = [
     content: <CLSPreview />,
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
     isNew: false,
+  },
+  {
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
+    name: 'Inline SQL Editor',
+    content: <InlineEditorPreview />,
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/33690',
+    isNew: true,
   },
 ]
 
@@ -86,7 +86,7 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
 }
 
-export const useIsAssistantV2Enabled = () => {
+export const useIsInlineEditorEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ASSISTANT_V2]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]
 }

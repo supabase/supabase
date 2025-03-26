@@ -65,26 +65,12 @@ export const useInstalledIntegrations = () => {
     }).sort((a, b) => a.name.localeCompare(b.name))
   }, [wrappers, extensions, isHooksEnabled])
 
-  // available integrations are all integrations that can be installed. If an extension is on available to be installed
-  // on the project, that integration is hidden.
-  const availableIntegrations = useMemo(() => {
-    return INTEGRATIONS.filter((i) => {
-      // special handling for supabase webhooks
-      if (i.id === 'webhooks') {
-        return true
-      }
-      if (i.type === 'wrapper') {
-        return true
-      }
-      if (i.type === 'postgres_extension') {
-        return i.requiredExtensions.every((extName) => {
-          const foundExtension = (extensions ?? []).find((ext) => ext.name === extName)
-          return !!foundExtension
-        })
-      }
-      return false
-    }).sort((a, b) => a.name.localeCompare(b.name))
-  }, [extensions])
+  // available integrations are all integrations that can be installed. If an integration can't be installed (needed
+  // extensions are not available on this DB image), the UI will provide a tooltip explaining why.
+  const availableIntegrations = useMemo(
+    () => INTEGRATIONS.sort((a, b) => a.name.localeCompare(b.name)),
+    []
+  )
 
   const error = fdwError || extensionsError || schemasError
   const isLoading = isSchemasLoading || isFDWLoading || isExtensionsLoading

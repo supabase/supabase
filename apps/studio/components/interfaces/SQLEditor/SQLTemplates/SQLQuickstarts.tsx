@@ -13,10 +13,12 @@ import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 import SQLCard from './SQLCard'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const SQLQuickstarts = () => {
   const router = useRouter()
   const { ref } = useParams()
+  const org = useSelectedOrganization()
   const { profile } = useProfile()
   const project = useSelectedProject()
   const [, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
@@ -56,7 +58,7 @@ const SQLQuickstarts = () => {
   }
 
   return (
-    <div className="block h-full space-y-8 overflow-y-auto p-6">
+    <div className="block h-full space-y-8 overflow-y-auto p-4 md:p-6">
       <div className="mb-8">
         <div className="mb-4">
           <h1 className="text-foreground mb-3 text-xl">Quickstarts</h1>
@@ -76,9 +78,9 @@ const SQLQuickstarts = () => {
               onClick={(sql, title) => {
                 handleNewQuery(sql, title)
                 sendEvent({
-                  category: 'quickstart',
-                  action: 'quickstart_clicked',
-                  label: x.title,
+                  action: 'sql_editor_quickstart_clicked',
+                  properties: { quickstartName: title },
+                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
                 })
               }}
             />

@@ -24,13 +24,13 @@ Check out the [CLI Docs](/docs/guides/cli) to learn how to install the Supabase 
 
 <Admonition type="tip">
 
-If you're using VS code you can have the CLI automatically create helpful Deno settings when running `supabase init`. Simply select `y` when prompted "Generate VS Code settings for Deno? [y/N]"!
+If you're using VS code you can have the CLI automatically create helpful Deno settings when running `supabase init`. Select `y` when prompted "Generate VS Code settings for Deno? [y/N]"!
 
 </Admonition>
 
 <Admonition type="tip">
 
-If you're using an Intellj IDEA editor such as WebStorm, you can use the `--with-intellij-settings` flag with `supabase init` to create an auto generated deno cofig.
+If you're using an IntelliJ IDEA editor such as WebStorm, you can use the `--with-intellij-settings` flag with `supabase init` to create an auto generated Deno config.
 
 </Admonition>
 
@@ -85,16 +85,16 @@ The `functions serve` command has hot-reloading capabilities. It will watch for 
 While serving your local Edge Function, you can invoke it using curl or one of the client libraries.
 To call the function from a browser you need to handle CORS requests. See [CORS](/docs/guides/functions/cors).
 
-<CH.Code>
+<$CodeTabs>
 
-```bash cURL
+```bash name=cURL
 curl --request POST 'http://localhost:54321/functions/v1/hello-world' \
   --header 'Authorization: Bearer SUPABASE_ANON_KEY' \
   --header 'Content-Type: application/json' \
   --data '{ "name":"Functions" }'
 ```
 
-```js JavaScript
+```js name=JavaScript
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
@@ -104,7 +104,7 @@ const { data, error } = await supabase.functions.invoke('hello-world', {
 })
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 <Admonition type="tip" label="Where is my SUPABASE_ANON_KEY?">
 
@@ -190,9 +190,9 @@ import_map = './import_map.json'
 
 When you create a new Edge Function, it will use TypeScript by default. However, it is possible to write and deploy Edge Functions using pure JavaScript.
 
-Save your Function as a JavaScript file (eg: `index.js`) and then update the `supabase/config.toml` as follows:
+Save your Function as a JavaScript file (e.g. `index.js`) and then update the `supabase/config.toml` as follows:
 
-<Admonition type="info">
+<Admonition type="note">
 
 `entrypoint` is available only in Supabase CLI version 1.215.0 or higher.
 

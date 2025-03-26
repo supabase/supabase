@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ComputeInstanceAddonVariantId } from './DiskManagement.types'
 import {
   calculateDiskSizeRequiredForIopsWithGp3,
   calculateDiskSizeRequiredForIopsWithIo2,
@@ -7,13 +8,13 @@ import {
   calculateMaxIopsAllowedForDiskSizeWithio2,
   formatNumber,
 } from './DiskManagement.utils'
-import { ComputeInstanceAddonVariantId } from './DiskManagement.types'
 import { DISK_LIMITS, DiskType, IOPS_RANGE, THROUGHPUT_RANGE } from './ui/DiskManagement.constants'
 
 const baseSchema = z.object({
   storageType: z.enum(['io2', 'gp3']).describe('Type of storage: io2 or gp3'),
   totalSize: z
     .number()
+    .int('Value must be an integer')
     .min(8, { message: 'Allocated disk size must be at least 8 GB.' })
     .describe('Allocated disk size in GB'),
   provisionedIOPS: z.number().describe('Provisioned IOPS for storage type'),
@@ -21,17 +22,46 @@ const baseSchema = z.object({
   computeSize: z
     .custom<ComputeInstanceAddonVariantId>((val): val is ComputeInstanceAddonVariantId => true)
     .describe('Compute size'),
+  growthPercent: z
+    .number()
+    .int('Value must be an integer')
+    .min(10, 'Growth percent must be at least 10%')
+    .max(100, 'Growth percent cannot exceed 100%')
+    .optional()
+    .nullable(),
+  minIncrementGb: z
+    .number()
+    .int('Value must be an integer')
+    .min(1, 'Minimum increment must be at least 1 GB')
+    .max(200, 'Minimum increment cannot exceed 200 GB')
+    .optional()
+    .nullable(),
+  maxSizeGb: z
+    .number()
+    .int('Value must be an integer')
+    .max(60000, 'Maximum size cannot exceed 60TB')
+    .optional()
+    .nullable(),
 })
 
 export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
   const schema = baseSchema.superRefine((data, ctx) => {
-    const { storageType, totalSize, provisionedIOPS, throughput, computeSize } = data
+    const { storageType, totalSize, provisionedIOPS, throughput, maxSizeGb } = data
 
     if (totalSize < defaultTotalSize) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Disk size cannot be reduced in size. Must be at least ${formatNumber(defaultTotalSize)} GB.`,
+        message: `Disk size cannot be reduced in size. Reduce your database size and then head to the Infrastructure settings and go through a Postgres version upgrade to right-size your disk.`,
         path: ['totalSize'],
+      })
+    }
+
+    // Validate maxSizeGb cannot be lower than totalSize
+    if (!!maxSizeGb && maxSizeGb < totalSize) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Max disk size cannot be lower than the current disk size. Must be at least ${formatNumber(totalSize)} GB.`,
+        path: ['maxSizeGb'],
       })
     }
 
@@ -59,11 +89,13 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
           const diskSizeRequiredForIopsWithIo2 =
             calculateDiskSizeRequiredForIopsWithIo2(provisionedIOPS)
 
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Larger Disk size of at least ${formatNumber(diskSizeRequiredForIopsWithIo2)} GB required. Current max is ${formatNumber(maxIOPSforDiskSizeWithio2)} IOPS.`,
-            path: ['provisionedIOPS'],
-          })
+          if (diskSizeRequiredForIopsWithIo2 > totalSize) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Larger Disk size of at least ${formatNumber(diskSizeRequiredForIopsWithIo2)} GB required. Current max is ${formatNumber(maxIOPSforDiskSizeWithio2)} IOPS.`,
+              path: ['provisionedIOPS'],
+            })
+          }
         } else {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
@@ -132,7 +164,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
         if (throughput > THROUGHPUT_RANGE['gp3'].max) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Throughput can not exceed ${formatNumber(maxThroughput)} MiB/s`,
+            message: `Throughput can not exceed ${formatNumber(maxThroughput)} MB/s`,
             path: ['throughput'],
           })
         }
@@ -140,14 +172,14 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
           const iopsRequiredForThroughput = calculateIopsRequiredForThroughput(throughput)
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Need at least ${formatNumber(iopsRequiredForThroughput)} IOPS to support ${formatNumber(throughput)} MiB/s.`,
+            message: `Need at least ${formatNumber(iopsRequiredForThroughput)} IOPS to support ${formatNumber(throughput)} MB/s.`,
             path: ['throughput'],
           })
         }
         if (throughput < THROUGHPUT_RANGE[DiskType.GP3].min) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Throughput must be at least ${formatNumber(THROUGHPUT_RANGE[DiskType.GP3].min)} MiB/s`,
+            message: `Throughput must be at least ${formatNumber(THROUGHPUT_RANGE[DiskType.GP3].min)} MB/s`,
             path: ['throughput'],
           })
         }

@@ -60,7 +60,6 @@ export interface FileExplorerColumnProps {
   fullWidth?: boolean
   openedFolders?: StorageItem[]
   selectedItems: StorageItemWithColumn[]
-  selectedFilePreview: (StorageItemWithColumn & { previewUrl: string | undefined }) | null
   itemSearchString: string
   onFilesUpload: (event: any, index: number) => void
   onSelectAllItemsInColumn: (index: number) => void
@@ -75,7 +74,6 @@ const FileExplorerColumn = ({
   fullWidth = false,
   openedFolders = [],
   selectedItems = [],
-  selectedFilePreview,
   itemSearchString,
   onFilesUpload = noop,
   onSelectAllItemsInColumn = noop,
@@ -144,135 +142,137 @@ const FileExplorerColumn = ({
   )
 
   return (
-    <div
-      ref={fileExplorerColumnRef}
-      className={`
+    <>
+      <div
+        ref={fileExplorerColumnRef}
+        className={`
         ${fullWidth ? 'w-full' : 'w-64 border-r border-overlay'}
         ${view === STORAGE_VIEWS.COLUMNS ? '' : ''}
         hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto
       `}
-      onContextMenu={displayMenu}
-      onDragOver={onDragOver}
-      onDrop={onDrop}
-      onClick={(event) => {
-        const eventTarget = get(event.target, ['className'], '')
-        if (typeof eventTarget === 'string' && eventTarget.includes('react-contexify')) return
-        onSelectColumnEmptySpace(index)
-      }}
-    >
-      {/* Checkbox selection for select all */}
-      {view === STORAGE_VIEWS.COLUMNS && (
-        <div
-          className={`sticky top-0 z-10 mb-0 flex items-center bg-table-header-light px-2.5 [[data-theme*=dark]_&]:bg-table-header-dark ${
-            haveSelectedItems ? 'h-10 py-3 opacity-100' : 'h-0 py-0 opacity-0'
-          } transition-all duration-200`}
-          onClick={(event) => event.stopPropagation()}
-        >
-          {columnFiles.length > 0 ? (
-            <>
-              <SelectAllCheckbox />
-              <p className="text-sm text-foreground-light">Select all {columnFiles.length} files</p>
-            </>
-          ) : (
-            <p className="text-sm text-foreground-light">No files available for selection</p>
-          )}
-        </div>
-      )}
+        onContextMenu={displayMenu}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
+        onClick={(event) => {
+          const eventTarget = get(event.target, ['className'], '')
+          if (typeof eventTarget === 'string' && eventTarget.includes('react-contexify')) return
+          onSelectColumnEmptySpace(index)
+        }}
+      >
+        {/* Checkbox selection for select all */}
+        {view === STORAGE_VIEWS.COLUMNS && (
+          <div
+            className={`sticky top-0 z-10 mb-0 flex items-center bg-table-header-light px-2.5 [[data-theme*=dark]_&]:bg-table-header-dark ${
+              haveSelectedItems ? 'h-10 py-3 opacity-100' : 'h-0 py-0 opacity-0'
+            } transition-all duration-200`}
+            onClick={(event) => event.stopPropagation()}
+          >
+            {columnFiles.length > 0 ? (
+              <>
+                <SelectAllCheckbox />
+                <p className="text-sm text-foreground-light">
+                  Select all {columnFiles.length} files
+                </p>
+              </>
+            ) : (
+              <p className="text-sm text-foreground-light">No files available for selection</p>
+            )}
+          </div>
+        )}
 
-      {/* List Interface Header */}
-      {view === STORAGE_VIEWS.LIST && (
-        <div
-          className="
+        {/* List Interface Header */}
+        {view === STORAGE_VIEWS.LIST && (
+          <div
+            className="
           sticky top-0
           z-10 flex min-w-min items-center border-b border-overlay bg-surface-100 px-2.5
           py-2
         "
-        >
-          <div className="flex w-[40%] min-w-[250px] items-center">
-            <SelectAllCheckbox />
-            <p className="text-sm">Name</p>
+          >
+            <div className="flex w-[40%] min-w-[250px] items-center">
+              <SelectAllCheckbox />
+              <p className="text-sm">Name</p>
+            </div>
+            <p className="w-[11%] min-w-[100px] text-sm">Size</p>
+            <p className="w-[14%] min-w-[100px] text-sm">Type</p>
+            <p className="w-[15%] min-w-[160px] text-sm">Created at</p>
+            <p className="w-[15%] min-w-[160px] text-sm">Last modified at</p>
           </div>
-          <p className="w-[11%] min-w-[100px] text-sm">Size</p>
-          <p className="w-[14%] min-w-[100px] text-sm">Type</p>
-          <p className="w-[15%] min-w-[160px] text-sm">Created at</p>
-          <p className="w-[15%] min-w-[160px] text-sm">Last modified at</p>
-        </div>
-      )}
+        )}
 
-      {/* Shimmering loaders while fetching contents */}
-      {column.status === STORAGE_ROW_STATUS.LOADING && (
-        <div
-          className={`
+        {/* Shimmering loaders while fetching contents */}
+        {column.status === STORAGE_ROW_STATUS.LOADING && (
+          <div
+            className={`
             ${fullWidth ? 'w-full' : 'w-64 border-r border-default'}
             px-2 py-1 my-1 flex flex-shrink-0 flex-col space-y-2 overflow-auto
           `}
-        >
-          <ShimmeringLoader />
-          <ShimmeringLoader />
-          <ShimmeringLoader />
-        </div>
-      )}
-
-      {/* Column Interface */}
-      <InfiniteList
-        items={columnItems}
-        itemProps={{
-          view,
-          columnIndex: index,
-          selectedItems,
-          openedFolders,
-          selectedFilePreview,
-        }}
-        ItemComponent={FileExplorerRow}
-        getItemSize={(index) => (index !== 0 && index === columnItems.length ? 85 : 37)}
-        hasNextPage={column.status !== STORAGE_ROW_STATUS.LOADING && column.hasMoreItems}
-        isLoadingNextPage={column.isLoadingMoreItems}
-        onLoadNextPage={() => onColumnLoadMore(index, column)}
-      />
-
-      {/* Drag drop upload CTA for when column is empty */}
-      {!(snap.isSearching && itemSearchString.length > 0) &&
-        column.items.length === 0 &&
-        column.status !== STORAGE_ROW_STATUS.LOADING && (
-          <div className="h-full w-full flex flex-col items-center justify-center">
-            <img
-              alt="storage-placeholder"
-              src={`${BASE_PATH}/img/storage-placeholder.svg`}
-              className="opacity-75 pointer-events-none"
-            />
-            <p className="text-sm my-3 opacity-75">Drop your files here</p>
-            <p className="w-40 text-center text-xs text-foreground-light">
-              Or upload them via the "Upload file" button above
-            </p>
+          >
+            <ShimmeringLoader />
+            <ShimmeringLoader />
+            <ShimmeringLoader />
           </div>
         )}
 
-      {snap.isSearching &&
-        itemSearchString.length > 0 &&
-        isEmpty &&
-        column.status !== STORAGE_ROW_STATUS.LOADING && (
-          <div className="h-full w-full flex flex-col items-center justify-center">
-            <p className="text-sm my-3 text-foreground">No results found in this folder</p>
-            <p className="w-40 text-center text-sm text-foreground-light">
-              Your search for "{itemSearchString}" did not return any results
-            </p>
-          </div>
-        )}
+        {/* Column Interface */}
+        <InfiniteList
+          items={columnItems}
+          itemProps={{
+            view,
+            columnIndex: index,
+            selectedItems,
+            openedFolders,
+          }}
+          ItemComponent={FileExplorerRow}
+          getItemSize={(index) => (index !== 0 && index === columnItems.length ? 85 : 37)}
+          hasNextPage={column.status !== STORAGE_ROW_STATUS.LOADING && column.hasMoreItems}
+          isLoadingNextPage={column.isLoadingMoreItems}
+          onLoadNextPage={() => onColumnLoadMore(index, column)}
+        />
 
-      {/* Drag drop upload CTA for when column has files */}
-      <DragOverOverlay
-        isOpen={isDraggedOver}
-        folderIsEmpty={isEmpty}
-        onDragLeave={() => setIsDraggedOver(false)}
-        onDrop={() => setIsDraggedOver(false)}
-      />
+        {/* Drag drop upload CTA for when column is empty */}
+        {!(snap.isSearching && itemSearchString.length > 0) &&
+          column.items.length === 0 &&
+          column.status !== STORAGE_ROW_STATUS.LOADING && (
+            <div className="h-full w-full flex flex-col items-center justify-center">
+              <img
+                alt="storage-placeholder"
+                src={`${BASE_PATH}/img/storage-placeholder.svg`}
+                className="opacity-75 pointer-events-none"
+              />
+              <p className="text-sm my-3 opacity-75">Drop your files here</p>
+              <p className="w-40 text-center text-xs text-foreground-light">
+                Or upload them via the "Upload file" button above
+              </p>
+            </div>
+          )}
 
+        {snap.isSearching &&
+          itemSearchString.length > 0 &&
+          isEmpty &&
+          column.status !== STORAGE_ROW_STATUS.LOADING && (
+            <div className="h-full w-full flex flex-col items-center justify-center">
+              <p className="text-sm my-3 text-foreground">No results found in this folder</p>
+              <p className="w-40 text-center text-sm text-foreground-light">
+                Your search for "{itemSearchString}" did not return any results
+              </p>
+            </div>
+          )}
+
+        {/* Drag drop upload CTA for when column has files */}
+        <DragOverOverlay
+          isOpen={isDraggedOver}
+          folderIsEmpty={isEmpty}
+          onDragLeave={() => setIsDraggedOver(false)}
+          onDrop={() => setIsDraggedOver(false)}
+        />
+      </div>
       {/* List interface footer */}
       {view === STORAGE_VIEWS.LIST && (
         <div
           className="
-          sticky bottom-0
-          z-10 flex min-w-min items-center bg-panel-footer-light px-2.5 py-2 [[data-theme*=dark]_&]:bg-panel-footer-dark
+          absolute bottom-0 rounded-b-md mt-auto
+        z-10 flex min-w-min items-center bg-panel-footer-light px-2.5 py-2 [[data-theme*=dark]_&]:bg-panel-footer-dark w-full
         "
         >
           <p className="text-sm">
@@ -280,7 +280,7 @@ const FileExplorerColumn = ({
           </p>
         </div>
       )}
-    </div>
+    </>
   )
 }
 

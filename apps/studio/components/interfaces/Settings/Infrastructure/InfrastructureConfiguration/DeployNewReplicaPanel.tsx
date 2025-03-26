@@ -1,17 +1,17 @@
 import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import {
-  DISK_PRICING,
-  DiskType,
-} from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
-import {
   calculateIOPSPrice,
   calculateThroughputPrice,
 } from 'components/interfaces/DiskManagement/DiskManagement.utils'
+import {
+  DISK_PRICING,
+  DiskType,
+} from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
@@ -71,7 +71,6 @@ const DeployNewReplicaPanel = ({
   const { ref: projectRef } = useParams()
   const project = useSelectedProject()
   const org = useSelectedOrganization()
-  const diskManagementV2 = useFlag('diskManagementV2')
   const diskAndComputeFormEnabled = useFlag('diskAndComputeForm')
 
   const { data } = useReadReplicasQuery({ projectRef })
@@ -79,14 +78,17 @@ const DeployNewReplicaPanel = ({
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const { data: diskConfiguration } = useDiskAttributesQuery({ projectRef })
 
+  const isNotOnTeamOrEnterprisePlan = useMemo(
+    () => !['team', 'enterprise'].includes(subscription?.plan.id ?? ''),
+    [subscription]
+  )
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
-    enabled:
-      subscription !== undefined && !['team', 'enterprise'].includes(subscription?.plan.id ?? ''),
+    enabled: isNotOnTeamOrEnterprisePlan,
   })
   const overdueInvoices = (allOverdueInvoices ?? []).filter(
     (x) => x.organization_id === project?.organization_id
   )
-  const hasOverdueInvoices = overdueInvoices.length > 0
+  const hasOverdueInvoices = overdueInvoices.length > 0 && isNotOnTeamOrEnterprisePlan
 
   // Opting for useState temporarily as Listbox doesn't seem to work with react-hook-form yet
   const [defaultRegion] = Object.entries(AWS_REGIONS).find(
@@ -99,9 +101,10 @@ const DeployNewReplicaPanel = ({
 
   // @ts-ignore
   const { size_gb, type, throughput_mbps, iops } = diskConfiguration?.attributes ?? {}
-  const showNewDiskManagementUI = diskManagementV2 && project?.cloud_provider === 'AWS'
+  const showNewDiskManagementUI = project?.cloud_provider === 'AWS'
   const readReplicaDiskSizes = (size_gb ?? 0) * 1.25
-  const additionalCostDiskSize = readReplicaDiskSizes * DISK_PRICING[type as DiskType]?.storage ?? 0
+  const additionalCostDiskSize =
+    readReplicaDiskSizes * (DISK_PRICING[type as DiskType]?.storage ?? 0)
   const additionalCostIOPS = calculateIOPSPrice({
     oldStorageType: type as DiskType,
     newStorageType: type as DiskType,
@@ -298,7 +301,7 @@ const DeployNewReplicaPanel = ({
                   <Link
                     href={
                       isFreePlan
-                        ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
+                        ? `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelSmallCompute`
                         : diskAndComputeFormEnabled
                           ? `/project/${projectRef}/settings/compute-and-disk`
                           : `/project/${projectRef}/settings/addons?panel=computeInstance`
@@ -397,7 +400,7 @@ const DeployNewReplicaPanel = ({
                       <Link
                         href={
                           isFreePlan
-                            ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
+                            ? `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelMaxReplicas`
                             : diskAndComputeFormEnabled
                               ? `/project/${projectRef}/settings/compute-and-disk`
                               : `/project/${projectRef}/settings/addons?panel=computeInstance`
@@ -525,7 +528,7 @@ const DeployNewReplicaPanel = ({
             <p className="text-foreground-light text-sm">
               Read more about{' '}
               <Link
-                href="https://supabase.com/docs/guides/platform/org-based-billing#read-replicas"
+                href="https://supabase.com/docs/guides/platform/manage-your-usage/read-replicas"
                 target="_blank"
                 rel="noreferrer"
                 className="underline hover:text-foreground transition"

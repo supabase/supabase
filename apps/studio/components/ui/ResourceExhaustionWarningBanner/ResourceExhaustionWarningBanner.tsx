@@ -1,4 +1,4 @@
-import { AlertTriangle, ExternalLink, X } from 'lucide-react'
+import { AlertTriangle, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
@@ -7,20 +7,13 @@ import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
-const ResourceExhaustionWarningBanner = () => {
+export const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
   const router = useRouter()
   const { data: resourceWarnings } = useResourceWarningsQuery()
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
     (warning) => warning.project === ref
-  )
-
-  const [bannerAcknowledged, setBannerAcknowledged] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.AUTH_EMAIL_WARNING_BANNER_ACKNOWLEDGE(ref ?? ''),
-    false
   )
 
   // [Joshen] Read only takes higher precedence over multiple resource warnings
@@ -85,10 +78,6 @@ const ResourceExhaustionWarningBanner = () => {
     default: (metric: string) => `/project/[ref]/settings/[infra-path]#${metric}`,
   }
 
-  const isDismissable =
-    RESOURCE_WARNING_MESSAGES[metric as keyof typeof RESOURCE_WARNING_MESSAGES]?.bannerContent
-      .allowDismissable ?? false
-
   const getCorrectionUrl = (metric: string | undefined | null) => {
     const variant = metric === undefined ? 'undefined' : metric === null ? 'null' : metric
     const url =
@@ -137,21 +126,12 @@ const ResourceExhaustionWarningBanner = () => {
       return isMatch
     })
 
-  // [Joshen] Only certain warnings should be dismissable, in this case for now,
-  // only the auth email banner should be, everything else should not be dismissable
-  const dismissBanner = () => {
-    setBannerAcknowledged(true)
-  }
-
   if (
     hasNoWarnings ||
     hasNoWarningContent ||
     onUsageOrInfraAndNotInReadOnlyMode ||
     onDatabaseSettingsAndInReadOnlyMode ||
-    !isVisible ||
-    (router.pathname.includes('/auth/') &&
-      !!projectResourceWarnings?.auth_restricted_email_sending &&
-      bannerAcknowledged)
+    !isVisible
   ) {
     return null
   }
@@ -182,19 +162,7 @@ const ResourceExhaustionWarningBanner = () => {
             <Link href={correctionUrl}>{buttonText ?? 'Check'}</Link>
           </Button>
         )}
-        {isDismissable && (
-          <Button
-            type="text"
-            icon={<X />}
-            className="px-1.5 !space-x-0"
-            onClick={() => dismissBanner()}
-          >
-            <span className="sr-only">Close</span>
-          </Button>
-        )}
       </div>
     </Alert_Shadcn_>
   )
 }
-
-export default ResourceExhaustionWarningBanner

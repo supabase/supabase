@@ -31,6 +31,7 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
       if (!isFree) {
         try {
           await sendExitSurvey({
+            orgSlug: organization?.slug,
             projectRef,
             message,
             reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
@@ -76,7 +77,7 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
       return toast.error('Please select at least one reason for deleting your project')
     }
 
-    deleteProject({ projectRef: project.ref })
+    deleteProject({ projectRef: project.ref, organizationSlug: organization?.slug })
   }
 
   return (

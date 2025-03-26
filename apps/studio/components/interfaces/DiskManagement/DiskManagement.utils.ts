@@ -105,7 +105,6 @@ export const calculateIOPSPrice = ({
       newProvisionedIOPS - DISK_LIMITS[DiskType.GP3].includedIops
     )
     const oldPrice = oldChargeableIOPS * DISK_PRICING[oldStorageType]?.iops ?? 0
-
     const newPrice = newChargeableIOPS * DISK_PRICING[newStorageType]?.iops ?? 0
 
     return {

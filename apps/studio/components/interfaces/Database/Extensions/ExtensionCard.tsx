@@ -8,8 +8,9 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useDatabaseExtensionDisableMutation } from 'data/database-extensions/database-extension-disable-mutation'
 import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 import { extensions } from 'shared-data'
-import { Button, cn, Switch } from 'ui'
+import { Button, cn, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import EnableExtensionModal from './EnableExtensionModal'
@@ -21,8 +22,8 @@ interface ExtensionCardProps {
 
 const ExtensionCard = ({ extension }: ExtensionCardProps) => {
   const { project } = useProjectContext()
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || ''
   const isOn = extension.installed_version !== null
+  const isOrioleDb = useIsOrioleDb()
 
   const [isDisableModalOpen, setIsDisableModalOpen] = useState(false)
   const [showConfirmEnableModal, setShowConfirmEnableModal] = useState(false)
@@ -31,14 +32,14 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'extensions'
   )
+  const orioleDbCheck = isOrioleDb && extension.name === 'orioledb'
+  const disabled = !canUpdateExtensions || orioleDbCheck
 
   const X_PADDING = 'px-5'
-  const extensionMeta = extensions.find((item: any) => item.name === extension.name)
+  const extensionMeta = extensions.find((item) => item.name === extension.name)
   const docsUrl = extensionMeta?.link.startsWith('/guides')
-    ? siteUrl === 'http://localhost:8082'
-      ? `http://localhost:3001/docs${extensions.find((item) => item.name === extension.name)?.link}`
-      : `https://supabase.com/docs${extensions.find((item) => item.name === extension.name)?.link}`
-    : extensions.find((item: any) => item.name === extension.name)?.link ?? undefined
+    ? `https://supabase.com/docs${extensionMeta?.link}`
+    : extensionMeta?.link ?? undefined
 
   const { mutate: disableExtension, isLoading: isDisabling } = useDatabaseExtensionDisableMutation({
     onSuccess: () => {
@@ -76,13 +77,26 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
           {isDisabling ? (
             <Loader2 className="animate-spin" size={16} />
           ) : (
-            <Switch
-              disabled={!canUpdateExtensions}
-              checked={isOn}
-              onCheckedChange={() =>
-                isOn ? setIsDisableModalOpen(true) : setShowConfirmEnableModal(true)
-              }
-            />
+            <Tooltip>
+              <TooltipTrigger>
+                <Switch
+                  disabled={disabled}
+                  checked={isOn}
+                  onCheckedChange={() =>
+                    isOn ? setIsDisableModalOpen(true) : setShowConfirmEnableModal(true)
+                  }
+                />
+              </TooltipTrigger>
+              {disabled && (
+                <TooltipContent side="bottom">
+                  {!canUpdateExtensions
+                    ? 'You need additional permissions to toggle extensions'
+                    : orioleDbCheck
+                      ? 'Project is using OrioleDB and cannot be disabled'
+                      : null}
+                </TooltipContent>
+              )}
+            </Tooltip>
           )}
         </div>
 

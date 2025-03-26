@@ -1,14 +1,28 @@
-import { motion } from 'framer-motion'
-import { PropsWithChildren } from 'react'
+import { User } from 'lucide-react'
+import { createContext, PropsWithChildren, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
+import { Components } from 'react-markdown/lib/ast-to-react'
 import remarkGfm from 'remark-gfm'
 
-import { cn, markdownComponents, WarningIcon } from 'ui'
-import CollapsibleCodeBlock from './CollapsibleCodeBlock'
-import { SqlSnippet } from './SqlSnippet'
+import { AiIconAnimation, cn, markdownComponents, WarningIcon } from 'ui'
+import { Heading3, InlineCode, Link, ListItem, MarkdownPre, OrderedList } from './MessageMarkdown'
+
+interface MessageContextType {
+  isLoading: boolean
+  readOnly?: boolean
+}
+export const MessageContext = createContext<MessageContextType>({ isLoading: false })
+
+const baseMarkdownComponents: Partial<Components> = {
+  ol: OrderedList,
+  li: ListItem,
+  h3: Heading3,
+  code: InlineCode,
+  a: Link,
+  pre: MarkdownPre,
+}
 
 interface MessageProps {
-  id: string
   role: 'function' | 'system' | 'user' | 'assistant' | 'data' | 'tool'
   content?: string
   isLoading: boolean
@@ -18,7 +32,6 @@ interface MessageProps {
 }
 
 export const Message = function Message({
-  id,
   role,
   content,
   isLoading,
@@ -28,67 +41,45 @@ export const Message = function Message({
   variant = 'default',
 }: PropsWithChildren<MessageProps>) {
   const isUser = role === 'user'
+  const allMarkdownComponents = useMemo(
+    () => ({ ...markdownComponents, ...baseMarkdownComponents }),
+    []
+  )
 
   if (!content) return null
 
   return (
-    <motion.div
-      layout="position"
-      initial={{ y: 5, opacity: 0, scale: 0.99 }}
-      animate={{ y: 0, opacity: 1, scale: 1 }}
-      className="w-full flex flex-col"
-    >
-      {children}
+    <MessageContext.Provider value={{ isLoading, readOnly }}>
       <div
         className={cn(
-          'text-foreground-light text-sm mb max-w-full mb-6',
-          variant === 'warning' && 'bg-warning-200',
-          isUser ? 'px-5 py-3 rounded-lg bg-background-muted w-fit self-end' : 'mb-6'
+          'mb-5 text-foreground-light text-sm',
+          isUser && 'text-foreground',
+          variant === 'warning' && 'bg-warning-200'
         )}
       >
+        {children}
+
         {variant === 'warning' && <WarningIcon className="w-6 h-6" />}
 
         {action}
 
-        <ReactMarkdown
-          className="gap-x-2.5 gap-y-4 flex flex-col [&>*>code]:text-xs [&>*>*>code]:text-xs"
-          remarkPlugins={[remarkGfm]}
-          components={{
-            ...markdownComponents,
-            pre: (props: any) => {
-              return readOnly ? (
-                <div className="mb-1 -mt-2">
-                  <CollapsibleCodeBlock
-                    value={props.children[0].props.children[0]}
-                    language="sql"
-                    hideLineNumbers
-                  />
-                </div>
-              ) : (
-                <SqlSnippet
-                  readOnly={readOnly}
-                  isLoading={isLoading}
-                  sql={props.children[0].props.children}
-                />
-              )
-            },
-            ol: (props: any) => {
-              return <ol className="flex flex-col gap-y-4">{props.children}</ol>
-            },
-            li: (props: any) => {
-              return <li className="[&>pre]:mt-2">{props.children}</li>
-            },
-            h3: (props: any) => {
-              return <h3 className="underline">{props.children}</h3>
-            },
-            code: (props: any) => {
-              return <code className={cn('text-xs', props.className)}>{props.children}</code>
-            },
-          }}
-        >
-          {content}
-        </ReactMarkdown>
+        <div className="flex gap-4 w-auto overflow-hidden">
+          {isUser ? (
+            <figure className="w-5 h-5 shrink-0 bg-foreground rounded-full flex items-center justify-center">
+              <User size={16} strokeWidth={1.5} className="text-background" />
+            </figure>
+          ) : (
+            <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
+          )}
+          <ReactMarkdown
+            className="space-y-5 flex-1 [&>*>code]:text-xs [&>*>*>code]:text-xs min-w-0 [&_li]:space-y-4"
+            remarkPlugins={[remarkGfm]}
+            components={allMarkdownComponents}
+          >
+            {content}
+          </ReactMarkdown>
+        </div>
       </div>
-    </motion.div>
+    </MessageContext.Provider>
   )
 }

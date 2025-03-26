@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { X } from 'lucide-react'
 import { useState } from 'react'
 
 import { useParams } from 'common'
@@ -18,7 +19,6 @@ import DeleteAppModal from './DeleteAppModal'
 import OAuthAppRow from './OAuthAppRow'
 import PublishAppModal from './PublishAppSidePanel'
 import RevokeAppModal from './RevokeAppModal'
-import { X } from 'lucide-react'
 
 // [Joshen] Note on nav UX
 // Kang Ming mentioned that it might be better to split Published Apps and Authorized Apps into 2 separate tabs
@@ -45,7 +45,7 @@ const OAuthApps = () => {
   } = useOAuthAppsQuery({ slug }, { enabled: canReadOAuthApps })
 
   const sortedPublishedApps = publishedApps?.sort((a, b) => {
-    return Number(new Date(a.created_at)) - Number(new Date(b.created_at))
+    return Number(new Date(a.created_at ?? '')) - Number(new Date(b.created_at ?? ''))
   })
 
   const {
@@ -71,7 +71,7 @@ const OAuthApps = () => {
     <>
       <ScaffoldContainerLegacy>
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
             <div>
               <p>Published Apps</p>
               <p className="text-foreground-light text-sm">
@@ -213,6 +213,8 @@ const OAuthApps = () => {
                     head={[
                       <Table.th key="icon" className="w-[30px]"></Table.th>,
                       <Table.th key="name">Name</Table.th>,
+                      <Table.th key="created-by">Created by</Table.th>,
+                      <Table.th key="app-id">App ID</Table.th>,
                       <Table.th key="authorized-at">Authorized at</Table.th>,
                       <Table.th key="delete-action"></Table.th>,
                     ]}

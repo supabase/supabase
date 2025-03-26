@@ -4,7 +4,7 @@ title: 'pg_hashids: Short UIDs'
 description: 'Generate Short UIDs from Numbers'
 ---
 
-[pg_hashids](https://github.com/iCyberon/pg_hashids) provides a secure way to generate short, unique, non-sequential ids from numbers. The hashes are intended to be small, easy-to-remember identifiers that can be used to obfuscate data (optionally) with a password, alphabet, and salt. For example, you may wish to hide data like user IDs, order numbers, or tracking codes in favor of `pg_hashid`'s unique identifers.
+[pg_hashids](https://github.com/iCyberon/pg_hashids) provides a secure way to generate short, unique, non-sequential ids from numbers. The hashes are intended to be small, easy-to-remember identifiers that can be used to obfuscate data (optionally) with a password, alphabet, and salt. For example, you may wish to hide data like user IDs, order numbers, or tracking codes in favor of `pg_hashid`'s unique identifiers.
 
 ## Enable the extension
 
@@ -43,7 +43,7 @@ It's good practice to create the extension within a separate schema (like `exten
 
 ## Usage
 
-Suppose we have a table that stores order information, and we want to give customers a unique identifer without exposing the sequential `id` column. To do this, we can use `pg_hashid`'s `id_encode` function.
+Suppose we have a table that stores order information, and we want to give customers a unique identifier without exposing the sequential `id` column. To do this, we can use `pg_hashid`'s `id_encode` function.
 
 ```sql
 create table orders (

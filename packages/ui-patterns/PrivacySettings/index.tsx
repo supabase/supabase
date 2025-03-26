@@ -4,8 +4,7 @@ import { handleResetTelemetry, LOCAL_STORAGE_KEYS } from 'common'
 import Link from 'next/link'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { Modal, Toggle } from 'ui'
-
-import { useConsentValue } from '../ConsentToast'
+import { useConsentValue } from '../shared/consent'
 
 export const PrivacySettings = ({
   children,
@@ -31,6 +30,8 @@ export const PrivacySettings = ({
   }
 
   const handleOptOutTelemetry = async () => {
+    // remove telemetry data from cookies
+    document.cookie = `${LOCAL_STORAGE_KEYS.TELEMETRY_DATA}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
     handleResetTelemetry(process.env.NEXT_PUBLIC_API_URL!)
   }
 

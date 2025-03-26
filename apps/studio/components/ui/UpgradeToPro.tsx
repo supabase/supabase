@@ -16,6 +16,7 @@ interface UpgradeToProProps {
   secondaryText: string
   addon?: 'pitr' | 'customDomain' | 'computeInstance'
   buttonText?: string
+  source?: string
   disabled?: boolean
 }
 
@@ -25,6 +26,7 @@ const UpgradeToPro = ({
   secondaryText,
   addon,
   buttonText,
+  source = 'upgrade',
   disabled = false,
 }: UpgradeToProProps) => {
   const project = useSelectedProject()
@@ -47,7 +49,7 @@ const UpgradeToPro = ({
     >
       <div className="flex gap-x-3">
         {icon && <div className="mt-1">{icon}</div>}
-        <div className="flex w-full items-center justify-between gap-x-32">
+        <div className="flex flex-col md:flex-row w-full md:items-center justify-between gap-4 md:gap-x-8 xl:gap-x-32">
           <div className="space-y-1">
             <p className="text-sm">{primaryText}</p>
             <div>
@@ -80,8 +82,8 @@ const UpgradeToPro = ({
               <Link
                 href={
                   plan === 'free'
-                    ? `/org/${organization?.slug ?? '_'}/billing?panel=subscriptionPlan`
-                    : `/project/${project?.ref ?? '_'}/settings/addons?panel=${addon}`
+                    ? `/org/${organization?.slug ?? '_'}/billing?panel=subscriptionPlan&source=${source}`
+                    : `/project/${project?.ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
                 }
               >
                 {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable add on')}

@@ -4,7 +4,7 @@ import { useParams } from 'common'
 
 import EmptyState from 'components/interfaces/TableGridEditor/EmptyState'
 import SidePanelEditor from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
-import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
 import type { NextPageWithLayout } from 'types'
 
@@ -25,9 +25,9 @@ const TableEditorPage: NextPageWithLayout = () => {
 }
 
 TableEditorPage.getLayout = (page) => (
-  <ProjectContextFromParamsProvider>
+  <DefaultLayout>
     <TableEditorLayout>{page}</TableEditorLayout>
-  </ProjectContextFromParamsProvider>
+  </DefaultLayout>
 )
 
 export default TableEditorPage

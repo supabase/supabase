@@ -172,3 +172,13 @@ if google_identity:
 
 </TabPanel>
 </Tabs>
+
+## Frequently asked questions
+
+### How to add email/password login to an OAuth account?
+
+Call the `updateUser({ password: 'validpassword'})` to add email with password authentication to an account created with an OAuth provider (Google, GitHub, etc.).
+
+### Can you sign up with email if already using OAuth?
+
+If you try to create an email account after previously signing up with OAuth using the same email, you'll receive an obfuscated user response with no verification email sent. This prevents user enumeration attacks.

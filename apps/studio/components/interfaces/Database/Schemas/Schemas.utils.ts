@@ -12,14 +12,14 @@ const NODE_SEP = 25
 const RANK_SEP = 50
 
 export async function getGraphDataFromTables(
-  ref: string,
-  schema: PostgresSchema,
-  tables: PostgresTable[]
+  ref?: string,
+  schema?: PostgresSchema,
+  tables?: PostgresTable[]
 ): Promise<{
   nodes: Node<TableNodeData>[]
   edges: Edge[]
 }> {
-  if (!tables.length) {
+  if (!tables?.length) {
     return { nodes: [], edges: [] }
   }
 
@@ -121,7 +121,7 @@ export async function getGraphDataFromTables(
   }
 
   const savedPositionsLocalStorage = localStorage.getItem(
-    LOCAL_STORAGE_KEYS.SCHEMA_VISUALIZER_POSITIONS(ref, schema.id)
+    LOCAL_STORAGE_KEYS.SCHEMA_VISUALIZER_POSITIONS(ref ?? 'project', schema?.id ?? 0)
   )
   const savedPositions = tryParseJson(savedPositionsLocalStorage)
   return !!savedPositions

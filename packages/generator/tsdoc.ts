@@ -2,7 +2,7 @@ import { writeToDisk } from './helpers'
 import stringify from 'json-stringify-safe'
 import { parseArgs } from 'node:util'
 import fs from 'fs'
-import { strict as assert } from 'node:assert';
+import { strict as assert } from 'node:assert'
 
 const args = parseArgs({
   options: {
@@ -24,13 +24,7 @@ interface KV {
   [key: string]: any
 }
 
-async function dereference({
-  input,
-  output,
-}: {
-  input: string
-  output: string
-}) {
+async function dereference({ input, output }: { input: string; output: string }) {
   console.log('input', input)
 
   const specRaw = fs.readFileSync(input, 'utf8')
@@ -72,9 +66,7 @@ function dereferenceReducer(child: any, kv: KV) {
     !!child.type.declaration.children &&
     child.type.type === 'reflection'
   ) {
-    child.type.declaration.children.forEach((x: any) =>
-      dereferenceReducer(x, kv)
-    )
+    child.type.declaration.children.forEach((x: any) => dereferenceReducer(x, kv))
   }
 
   const final = { ...child }
@@ -97,10 +89,7 @@ function dereferenceReducer(child: any, kv: KV) {
     const dereferenced = kv[final.type.id]
     final.type.dereferenced = dereferenced || {}
     return final
-  } else if (
-    final.kindString === 'Type alias' &&
-    final.type?.type === 'union'
-  ) {
+  } else if (final.kindString === 'Type alias' && final.type?.type === 'union') {
     // handles union types that contain nested references
     // by replacing the reference in-place
     final.type.types = final.type.types.map((item: any) => {

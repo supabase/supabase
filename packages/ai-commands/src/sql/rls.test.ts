@@ -1,6 +1,7 @@
-import { describe, expect, test } from '@jest/globals'
 import { codeBlock } from 'common-tags'
 import OpenAI from 'openai'
+import { describe, expect, test } from 'vitest'
+
 import {
   assertAndRenderColumn,
   assertAndUnwrapNode,

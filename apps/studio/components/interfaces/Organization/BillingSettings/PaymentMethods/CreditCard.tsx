@@ -1,5 +1,6 @@
 import { MoreHorizontal } from 'lucide-react'
 
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { OrganizationPaymentMethod } from 'data/organizations/organization-payment-methods-query'
 import { BASE_PATH } from 'lib/constants'
 import {
@@ -62,7 +63,7 @@ const CreditCard = ({
         {isExpired && <Badge variant="destructive">Expired</Badge>}
         {isActive && <Badge variant="brand">Active</Badge>}
 
-        {canUpdatePaymentMethods && !isActive && (
+        {canUpdatePaymentMethods && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -72,8 +73,8 @@ const CreditCard = ({
                 aria-label="More options"
               />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {paymentMethodType === 'card' && (
+            <DropdownMenuContent align="end" className="w-36">
+              {paymentMethodType === 'card' && !isActive && (
                 <>
                   <DropdownMenuItem
                     key="make-default"
@@ -84,12 +85,20 @@ const CreditCard = ({
                   <DropdownMenuSeparator />
                 </>
               )}
-              <DropdownMenuItem
+              <DropdownMenuItemTooltip
                 key="delete-method"
+                disabled={isActive}
+                className="!pointer-events-auto"
                 onClick={() => setSelectedMethodToDelete?.(paymentMethod)}
+                tooltip={{
+                  content: {
+                    side: 'left',
+                    text: isActive ? 'Unable to delete a card that is currently active' : undefined,
+                  },
+                }}
               >
                 <p>Delete card</p>
-              </DropdownMenuItem>
+              </DropdownMenuItemTooltip>
             </DropdownMenuContent>
           </DropdownMenu>
         )}

@@ -8,15 +8,9 @@ import {
   Tabs_Shadcn_,
   cn,
 } from 'ui'
-import AuthSelectionRenderer from './LogSelectionRenderers/AuthSelectionRenderer'
-import DatabaseApiSelectionRender from './LogSelectionRenderers/DatabaseApiSelectionRender'
-import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
-import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
-import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
 import type { LogData, QueryType } from './Logs.types'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { WarehouseSelectionRenderer } from './LogSelectionRenderers/WarehouseSelectionRenderer'
 
 export interface LogSelectionProps {
   log?: LogData
@@ -32,25 +26,30 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
   const LogDetails = () => {
     if (error) return <LogErrorState error={error} />
     if (!log) return <LogDetailEmptyState />
-    // if (!log.metadata) return <DefaultPreviewSelectionRenderer log={log} />
 
     switch (queryType) {
-      case 'warehouse':
-        return <WarehouseSelectionRenderer log={log} />
+      // case 'warehouse':
+      //   return <WarehouseSelectionRenderer log={log} />
       case 'api':
-        return <DatabaseApiSelectionRender log={log} />
+        const status = log?.metadata?.[0]?.response?.[0]?.status_code
+        const method = log?.metadata?.[0]?.request?.[0]?.method
+        const path = log?.metadata?.[0]?.request?.[0]?.path
+        const user_agent = log?.metadata?.[0]?.request?.[0]?.headers[0].user_agent
+        const { id, metadata, timestamp, event_message, ...rest } = log
 
-      case 'database':
-        return <DatabasePostgresSelectionRender log={log} />
+        const apiLog = {
+          id,
+          status,
+          method,
+          path,
+          user_agent,
+          timestamp,
+          event_message,
+          metadata,
+          ...rest,
+        }
 
-      case 'fn_edge':
-        return <FunctionInvocationSelectionRender log={log} />
-
-      case 'functions':
-        return <FunctionLogsSelectionRender log={log} />
-
-      case 'auth':
-        return <AuthSelectionRenderer log={log} />
+        return <DefaultPreviewSelectionRenderer log={apiLog} />
       default:
         return <DefaultPreviewSelectionRenderer log={log} />
     }

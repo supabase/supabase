@@ -131,7 +131,7 @@ function FeaturesPage() {
                 <h2 className="text-sm text-foreground-lighter">Filter by tags:</h2>
                 <div className="flex flex-col gap-2.5">
                   {products
-                    .sort((a, b) => (a > b ? 1 : -1))
+                    .sort((a, b) => (a.toLowerCase() > b.toLowerCase() ? 1 : -1))
                     .map((product) => (
                       <div
                         key={product}

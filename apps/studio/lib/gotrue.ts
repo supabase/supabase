@@ -1,8 +1,21 @@
-import type { User } from '@supabase/auth-js'
-import { getAccessToken, gotrueClient } from 'common'
+import { getAccessToken, gotrueClient, type User } from 'common'
 
 export const auth = gotrueClient
 export { getAccessToken }
+
+export const validateReturnTo = (returnTo: string, fallback: string = '/projects'): string => {
+  // Block protocol-relative URLs and external URLs
+  if (returnTo.startsWith('//') || returnTo.includes('://')) {
+    return fallback
+  }
+
+  // For internal paths:
+  // 1. Must start with /
+  // 2. Only allow alphanumeric chars, slashes, hyphens, underscores
+  // 3. For query params, also allow =, &, and ?
+  const safePathPattern = /^\/[a-zA-Z0-9/\-_]*(?:\?[a-zA-Z0-9\-_=&]*)?$/
+  return safePathPattern.test(returnTo) ? returnTo : fallback
+}
 
 export const getAuthUser = async (token: String): Promise<any> => {
   try {
@@ -38,8 +51,19 @@ export const getIdentity = (gotrueUser: User) => {
  * Transfers the search params from the current location path to a newly built path
  */
 export const buildPathWithParams = (pathname: string) => {
-  const searchParams = new URLSearchParams(location.search)
-  return `${pathname}?${searchParams.toString()}`
+  const [basePath, existingParams] = pathname.split('?', 2)
+
+  const pathnameSearchParams = new URLSearchParams(existingParams || '')
+
+  // Merge the parameters, with pathname parameters taking precedence
+  // over the current location's search parameters
+  const mergedParams = new URLSearchParams(location.search)
+  for (const [key, value] of pathnameSearchParams.entries()) {
+    mergedParams.set(key, value)
+  }
+
+  const queryString = mergedParams.toString()
+  return queryString ? `${basePath}?${queryString}` : basePath
 }
 
 export const getReturnToPath = (fallback = '/projects') => {
@@ -54,22 +78,20 @@ export const getReturnToPath = (fallback = '/projects') => {
   searchParams.delete('returnTo')
 
   const remainingSearchParams = searchParams.toString()
+  const validReturnTo = validateReturnTo(returnTo, fallback)
 
-  let validReturnTo
+  const [path, existingQuery] = validReturnTo.split('?')
 
-  // only allow returning to internal pages. e.g. /projects
-  try {
-    // if returnTo is a relative path, this will throw an error
-    new URL(returnTo)
-    // if no error, returnTo is a valid URL and NOT an internal page
-    validReturnTo = fallback
-  } catch (_) {
-    // check returnTo doesn't try trick the browser to redirect
-    // don't try sanitize, it is a losing battle. Go to fallback
-    // disallow anything that starts with /non-word-char+/ or non-char+/
-    const pattern = /^\/?[\W]+\//
-    validReturnTo = pattern.test(returnTo) ? fallback : returnTo
+  const finalSearchParams = new URLSearchParams(existingQuery || '')
+
+  // Add all remaining search params to the final search params
+  if (remainingSearchParams) {
+    const remainingParams = new URLSearchParams(remainingSearchParams)
+    remainingParams.forEach((value, key) => {
+      finalSearchParams.append(key, value)
+    })
   }
 
-  return validReturnTo + (remainingSearchParams ? `?${remainingSearchParams}` : '')
+  const finalQuery = finalSearchParams.toString()
+  return path + (finalQuery ? `?${finalQuery}` : '')
 }

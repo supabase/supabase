@@ -40,8 +40,9 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
 
   const edgeFunctions = useMemo(() => functions ?? [], [functions])
 
+  // Only set a default value if the field is empty
   useEffect(() => {
-    if (isSuccess && edgeFunctions.length > 0) {
+    if (isSuccess && edgeFunctions.length > 0 && !form.getValues('values.edgeFunctionName')) {
       const fn = edgeFunctions[0]
       const functionUrl = buildFunctionUrl(
         fn.slug,
@@ -51,7 +52,6 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
       form.setValue('values.edgeFunctionName', functionUrl)
     }
   }, [edgeFunctions, form, isSuccess, selectedProject?.ref, selectedProject?.restUrl])
-
   return (
     <SheetSection className="flex flex-col gap-6">
       <FormField_Shadcn_

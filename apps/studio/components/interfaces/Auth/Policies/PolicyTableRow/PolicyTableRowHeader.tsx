@@ -1,10 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { Lock, Unlock } from 'lucide-react'
-import { useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
-import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -37,14 +35,12 @@ const PolicyTableRowHeader = ({
   const { ref } = useParams()
   const { setAiAssistantPanel } = useAppStateSnapshot()
 
-  const enableAssistantV2 = useIsAssistantV2Enabled()
   const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
   const canToggleRLS = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const isRealtimeSchema = table.schema === 'realtime'
   const isRealtimeMessagesTable = isRealtimeSchema && table.name === 'messages'
   const isTableLocked = isRealtimeSchema ? !isRealtimeMessagesTable : isLocked
-  const [_, setEditView] = useQueryState('view', { defaultValue: '' })
 
   return (
     <div id={table.id.toString()} className="flex w-full items-center justify-between">
@@ -117,15 +113,10 @@ const PolicyTableRowHeader = ({
               type="default"
               className="px-1"
               onClick={() => {
-                if (enableAssistantV2) {
-                  setAiAssistantPanel({
-                    open: true,
-                    initialInput: `Create a new policy for the ${table.schema} schema on the ${table.name} table that ...`,
-                  })
-                } else {
-                  onSelectCreatePolicy()
-                  setEditView('conversation')
-                }
+                setAiAssistantPanel({
+                  open: true,
+                  initialInput: `Create and name a new policy for the ${table.schema} schema on the ${table.name} table that ...`,
+                })
               }}
               tooltip={{
                 content: {
@@ -137,7 +128,7 @@ const PolicyTableRowHeader = ({
                 },
               }}
             >
-              <AiIconAnimation className="scale-75 [&>div>div]:border-black dark:[&>div>div]:border-white" />
+              <AiIconAnimation size={16} />
             </ButtonTooltip>
           </div>
         </div>

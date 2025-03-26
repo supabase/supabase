@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ExternalLink, TrashIcon } from 'lucide-react'
+import { TrashIcon } from 'lucide-react'
 import { ReactNode, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -7,7 +7,7 @@ import { z } from 'zod'
 
 import { useParams } from 'common'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-import { useFlag } from 'hooks/ui/useFlag'
+
 import {
   Button,
   Form_Shadcn_,
@@ -136,7 +136,6 @@ export function LogDrainDestinationSheetForm({
   onSubmit: (values: z.infer<typeof formSchema>) => void
   mode: 'create' | 'update'
 }) {
-  const lokiLogDrainsEnabled = useFlag('lokilogdrains')
   const CREATE_DEFAULT_HEADERS = {
     'Content-Type': 'application/json',
   }
@@ -281,18 +280,16 @@ export function LogDrainDestinationSheetForm({
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
                       </SelectTrigger_Shadcn_>
                       <SelectContent_Shadcn_>
-                        {LOG_DRAIN_TYPES.map((type) =>
-                          type.value === 'loki' && !lokiLogDrainsEnabled ? null : (
-                            <SelectItem_Shadcn_
-                              value={type.value}
-                              key={type.value}
-                              id={type.value}
-                              className="text-left"
-                            >
-                              {type.name}
-                            </SelectItem_Shadcn_>
-                          )
-                        )}
+                        {LOG_DRAIN_TYPES.map((type) => (
+                          <SelectItem_Shadcn_
+                            value={type.value}
+                            key={type.value}
+                            id={type.value}
+                            className="text-left"
+                          >
+                            {type.name}
+                          </SelectItem_Shadcn_>
+                        ))}
                       </SelectContent_Shadcn_>
                     </Select_Shadcn_>
                   </FormItemLayout>

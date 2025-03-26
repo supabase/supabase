@@ -2,15 +2,14 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
+import { AppBannerWrapper } from 'components/interfaces/App'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
-import { useFlag } from 'hooks/ui/useFlag'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
-import SettingsLayout from '../SettingsLayout/SettingsLayout'
 import type { SidebarSection } from './AccountLayout.types'
 import WithSidebar from './WithSidebar'
 
@@ -27,7 +26,6 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
   const { data: organizations } = useOrganizationsQuery()
   const selectedOrganization = useSelectedOrganization()
 
-  const navLayoutV2 = useFlag('navigationLayoutV2')
   const { mutateAsync: sendReset } = useSendResetMutation()
 
   const signOut = useSignOut()
@@ -146,23 +144,15 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
       : []),
   ]
 
-  if (navLayoutV2) {
-    return <SettingsLayout>{children}</SettingsLayout>
-  }
-
   return (
     <>
       <Head>
         <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
         <meta name="description" content="Supabase Studio" />
       </Head>
-      <div className="h-screen min-h-[0px] basis-0 flex-1">
-        <WithSidebar
-          hideSidebar={navLayoutV2}
-          title={title}
-          breadcrumbs={breadcrumbs}
-          sections={sectionsWithHeaders}
-        >
+      <div className="flex flex-col h-screen w-screen">
+        <AppBannerWrapper />
+        <WithSidebar title={title} breadcrumbs={breadcrumbs} sections={sectionsWithHeaders}>
           {children}
         </WithSidebar>
       </div>

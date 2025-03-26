@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { sortBy } from 'lodash'
@@ -14,7 +13,8 @@ import { usePgSodiumKeyDeleteMutation } from 'data/pg-sodium-keys/pg-sodium-key-
 import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Key, Loader, Search, Trash, X } from 'lucide-react'
-import { Alert, Button, Form, Input, Listbox, Modal, Separator } from 'ui'
+import { Button, Form, Input, Listbox, Modal, Separator } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 const DEFAULT_KEY_NAME = 'No description provided'
 
@@ -90,11 +90,11 @@ export const EncryptionKeysManagement = () => {
 
   return (
     <>
-      <div className="space-y-4 p-10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+      <div className="space-y-4 p-4 md:p-10">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
+          <div className="flex flex-col md:flex-row md:items-center gap-2">
             <Input
-              className="w-52 input-clear"
+              className="md:w-52 input-clear"
               size="tiny"
               placeholder="Search by name or ID"
               value={searchValue}
@@ -115,7 +115,7 @@ export const EncryptionKeysManagement = () => {
                   : []
               }
             />
-            <div className="w-44">
+            <div className="md:w-44">
               <Listbox size="tiny" value={selectedSort} onChange={setSelectedSort}>
                 <Listbox.Option
                   id="created"
@@ -186,34 +186,21 @@ export const EncryptionKeysManagement = () => {
                         <p className="text-sm text-foreground-light">
                           Added on {dayjs(key.created).format('MMM D, YYYY')}
                         </p>
-                        <Tooltip.Root delayDuration={0}>
-                          <Tooltip.Trigger asChild>
-                            <Button
-                              type="default"
-                              className="py-2"
-                              icon={<Trash />}
-                              disabled={!canManageKeys}
-                              onClick={() => setSelectedKeyToRemove(key)}
-                            />
-                          </Tooltip.Trigger>
-                          {!canManageKeys && (
-                            <Tooltip.Portal>
-                              <Tooltip.Content side="bottom">
-                                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                <div
-                                  className={[
-                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                    'border border-background',
-                                  ].join(' ')}
-                                >
-                                  <span className="text-xs text-foreground">
-                                    You need additional permissions to delete keys
-                                  </span>
-                                </div>
-                              </Tooltip.Content>
-                            </Tooltip.Portal>
-                          )}
-                        </Tooltip.Root>
+                        <ButtonTooltip
+                          type="default"
+                          className="py-2"
+                          icon={<Trash />}
+                          disabled={!canManageKeys}
+                          onClick={() => setSelectedKeyToRemove(key)}
+                          tooltip={{
+                            content: {
+                              side: 'bottom',
+                              text: !canManageKeys
+                                ? 'You need additional permissions to delete keys'
+                                : undefined,
+                            },
+                          }}
+                        />
                       </div>
                     </div>
                     {idx !== keys.length - 1 && <Separator />}
@@ -256,13 +243,12 @@ export const EncryptionKeysManagement = () => {
         header="Confirm to delete key"
       >
         <Modal.Content className="space-y-4">
-          <Alert
-            withIcon
-            variant="warning"
-            title="Deleting a key that's in use will cause any secret or column which depends on it to be unusable."
-          >
-            Do ensure that the key is not currently in use to prevent any issues.
-          </Alert>
+          <Admonition
+            type="warning"
+            title="Deleting a key that's in use will cause any secret or column which depends on it to be
+              unusable."
+            description="Do ensure that the key is not currently in use to prevent any issues."
+          />
           <p className="text-sm">
             The following key will be permanently removed and cannot be recovered.
           </p>

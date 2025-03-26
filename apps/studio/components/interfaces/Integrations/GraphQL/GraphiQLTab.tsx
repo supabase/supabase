@@ -41,7 +41,8 @@ export const GraphiQLTab = () => {
 
   const fetcher = useMemo(() => {
     const fetcherFn = createGraphiQLFetcher({
-      url: `${API_URL}/projects/${projectRef}/api/graphql`,
+      // [Joshen] Opting to hard code /platform for local to match the routes, so that it's clear what's happening
+      url: `${API_URL}${IS_PLATFORM ? '' : '/platform'}/projects/${projectRef}/api/graphql`,
       fetch,
     })
     const customFetcher: Fetcher = async (graphqlParams, opts) => {

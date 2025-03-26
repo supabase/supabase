@@ -1,14 +1,12 @@
 // @ts-check
-import { remarkCodeHike } from '@code-hike/mdx'
 import nextMdx from '@next/mdx'
-import os from 'node:os'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
 import configureBundleAnalyzer from '@next/bundle-analyzer'
 import withYaml from 'next-plugin-yaml'
 
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import remotePatterns from './lib/remotePatterns.js'
 
 const withBundleAnalyzer = configureBundleAnalyzer({
@@ -18,17 +16,7 @@ const withBundleAnalyzer = configureBundleAnalyzer({
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [
-      [
-        remarkCodeHike,
-        {
-          theme: codeHikeTheme,
-          lineNumbers: true,
-          showCopyButton: true,
-        },
-      ],
-      remarkGfm,
-    ],
+    remarkPlugins: [remarkGfm],
     rehypePlugins: [rehypeSlug],
     providerImportSource: '@mdx-js/react',
   },
@@ -37,6 +25,7 @@ const withMDX = nextMdx({
 /** @type {import('next').NextConfig} nextConfig */
 
 const nextConfig = {
+  assetPrefix: getAssetPrefix(),
   // Append the default value with md extensions
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   // reactStrictMode: true,
@@ -54,37 +43,25 @@ const nextConfig = {
       transform: 'lodash/{{member}}',
     },
   },
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.include$/,
+      type: 'asset/source',
+    })
+    return config
+  },
   transpilePackages: ['ui', 'ui-patterns', 'common', 'dayjs', 'shared-data', 'api-types', 'icons'],
   experimental: {
     outputFileTracingIncludes: {
       '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
-      '/guides/**/*': ['./content/guides/**/*', './content/troubleshooting/**/*'],
+      '/guides/**/*': [
+        './content/guides/**/*',
+        './content/troubleshooting/**/*',
+        './examples/**/*',
+      ],
       '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
     },
-  },
-  webpack: (config, options) => {
-    /**
-     * The SQL to REST API translator relies on libpg-query, which packages a
-     * native Node.js module that wraps the Postgres query parser.
-     *
-     * The default webpack config can't load native modules, so we need a custom
-     * loader for it, which calls process.dlopen to load C++ Addons.
-     *
-     * See https://github.com/eisberg-labs/nextjs-node-loader
-     */
-    config.module.rules.push({
-      test: /\.node$/,
-      use: [
-        {
-          loader: 'nextjs-node-loader',
-          options: {
-            flags: os.constants.dlopen.RTLD_NOW,
-            outputPath: config.output.path,
-          },
-        },
-      ],
-    })
-    return config
+    serverComponentsExternalPackages: ['libpg-query', 'twoslash'],
   },
   async headers() {
     return [
@@ -93,7 +70,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Strict-Transport-Security',
-            value: '',
+            value: process.env.VERCEL === '1' ? 'max-age=31536000; includeSubDomains; preload' : '',
           },
           {
             key: 'X-Robots-Tag',
@@ -116,7 +93,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Strict-Transport-Security',
-            value: '',
+            value: process.env.VERCEL === '1' ? 'max-age=31536000; includeSubDomains; preload' : '',
           },
           {
             key: 'X-Robots-Tag',
@@ -133,6 +110,10 @@ const nextConfig = {
             value: '(?:.+\\.vercel\\.app)',
           },
         ],
+      },
+      {
+        source: '/favicon/:slug*',
+        headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
       },
     ]
   },
@@ -191,3 +172,18 @@ const configExport = () => {
 }
 
 export default configExport
+
+function getAssetPrefix() {
+  // If not force enabled, but not production env, disable CDN
+  if (process.env.FORCE_ASSET_CDN !== '1' && process.env.VERCEL_ENV !== 'production') {
+    return undefined
+  }
+
+  // Force disable CDN
+  if (process.env.FORCE_ASSET_CDN === '-1') {
+    return undefined
+  }
+
+  // @ts-ignore
+  return `https://frontend-assets.supabase.com/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 12)}`
+}

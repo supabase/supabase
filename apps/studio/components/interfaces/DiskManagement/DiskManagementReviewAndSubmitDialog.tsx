@@ -45,7 +45,7 @@ import {
 } from './DiskManagement.utils'
 import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
 import { BillingChangeBadge } from './ui/BillingChangeBadge'
-import { DiskType } from './ui/DiskManagement.constants'
+import { DISK_AUTOSCALE_CONFIG_DEFAULTS, DiskType } from './ui/DiskManagement.constants'
 import { DiskMangementCoolDownSection } from './ui/DiskManagementCoolDownSection'
 
 const TableHeaderRow = () => (
@@ -209,6 +209,9 @@ export const DiskManagementReviewAndSubmitDialog = ({
     numReplicas,
   })
 
+  const hasComputeChanges =
+    form.formState.defaultValues?.computeSize !== form.getValues('computeSize')
+
   const hasDiskConfigChanges =
     form.formState.defaultValues?.provisionedIOPS !== form.getValues('provisionedIOPS') ||
     (form.formState.defaultValues?.throughput !== form.getValues('throughput') &&
@@ -248,15 +251,19 @@ export const DiskManagementReviewAndSubmitDialog = ({
           <DialogDescription>Changes will be applied shortly once confirmed.</DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
-        <div className="flex flex-col gap-2 p-5">
-          <DiskMangementRestartRequiredSection
-            visible={form.formState.defaultValues?.computeSize !== form.getValues('computeSize')}
-            title="Resizing your Compute will trigger a project restart"
-            description="Project will restart automatically on confirmation."
-          />
-          <DiskMangementCoolDownSection visible={hasDiskConfigChanges} />
-        </div>
-        <DialogSectionSeparator />
+        {(hasComputeChanges || hasDiskConfigChanges) && (
+          <>
+            <div className="flex flex-col gap-2 p-5">
+              <DiskMangementRestartRequiredSection
+                visible={hasComputeChanges}
+                title="Resizing your Compute will trigger a project restart"
+                description="Project will restart automatically on confirmation."
+              />
+              <DiskMangementCoolDownSection visible={hasDiskConfigChanges} />
+            </div>
+            <DialogSectionSeparator />
+          </>
+        )}
         <Table>
           <TableHeader className="font-mono uppercase text-xs [&_th]:h-auto [&_th]:pb-2 [&_th]:pt-4">
             <TableHeaderRow />
@@ -308,7 +315,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
                   attribute="Throughput"
                   defaultValue={form.formState.defaultValues?.throughput?.toLocaleString() ?? 0}
                   newValue={form.getValues('throughput')?.toLocaleString() ?? 0}
-                  unit="MiB/s"
+                  unit="MB/s"
                   beforePrice={Number(throughputPrice.oldPrice)}
                   afterPrice={Number(throughputPrice.newPrice)}
                   priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
@@ -325,10 +332,55 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
               />
             )}
+            {form.formState.defaultValues?.growthPercent !== form.getValues('growthPercent') && (
+              <TableDataRow
+                attribute="Growth percent"
+                defaultValue={
+                  form.formState.defaultValues?.growthPercent ??
+                  DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
+                }
+                newValue={
+                  form.getValues('growthPercent') ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
+                }
+                unit="%"
+                beforePrice={0}
+                afterPrice={0}
+              />
+            )}
+            {form.formState.defaultValues?.minIncrementGb !== form.getValues('minIncrementGb') && (
+              <TableDataRow
+                attribute="Min increment"
+                defaultValue={
+                  form.formState.defaultValues?.minIncrementGb ??
+                  DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
+                }
+                newValue={
+                  form.getValues('minIncrementGb') ??
+                  DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
+                }
+                unit="GB"
+                beforePrice={0}
+                afterPrice={0}
+              />
+            )}
+            {form.formState.defaultValues?.maxSizeGb !== form.getValues('maxSizeGb') && (
+              <TableDataRow
+                attribute="Max disk size"
+                defaultValue={
+                  form.formState.defaultValues?.maxSizeGb?.toLocaleString() ??
+                  DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
+                }
+                newValue={
+                  form.getValues('maxSizeGb')?.toLocaleString() ??
+                  DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
+                }
+                unit="GB"
+                beforePrice={0}
+                afterPrice={0}
+              />
+            )}
           </TableBody>
         </Table>
-
-        {/* <DialogSectionSeparator /> */}
 
         <DialogFooter>
           <Button block size="large" type="default" onClick={() => setIsDialogOpen(false)}>

@@ -1,3 +1,4 @@
+import { BadgeCheck } from 'lucide-react'
 import Link from 'next/link'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -5,7 +6,9 @@ import { Badge, cn } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { IntegrationDefinition } from './Integrations.constants'
 
-type IntegrationCardProps = IntegrationDefinition & {}
+type IntegrationCardProps = IntegrationDefinition & {
+  isInstalled?: boolean
+}
 
 const INTEGRATION_CARD_STYLE = cn(
   'w-full h-full pl-5 pr-6 py-3 bg-surface-100 hover:bg-surface-200 hover:border-strong',
@@ -28,7 +31,14 @@ export const IntegrationLoadingCard = () => {
   )
 }
 
-export const IntegrationCard = ({ id, beta, name, icon, description }: IntegrationCardProps) => {
+export const IntegrationCard = ({
+  id,
+  status,
+  name,
+  icon,
+  description,
+  isInstalled,
+}: IntegrationCardProps) => {
   const { project } = useProjectContext()
 
   return (
@@ -37,21 +47,29 @@ export const IntegrationCard = ({ id, beta, name, icon, description }: Integrati
         <div className="w-10 h-10 relative bg-white border rounded-md flex items-center justify-center">
           {icon()}
         </div>
-        <div className="grow basis-0 w-full flex flex-col justify-between items-start gap-y-2">
+        <div className="grow basis-0 w-full flex flex-col justify-between items-start gap-y-2 relative">
           <div className="flex-col justify-start items-start gap-y-0.5 flex">
             <div className="flex items-center gap-x-2">
               <p className="text-foreground text-sm">{name}</p>
-              {beta && (
-                <Badge variant="warning" className="py-0 px-1.5">
-                  Beta
+              {status && (
+                <Badge variant="warning" className="py-0 px-1.5 capitalize">
+                  {status}
                 </Badge>
               )}
             </div>
             <p className="text-foreground-light text-xs">{description}</p>
           </div>
-          <Badge className="bg-opacity-100 bg-surface-300 flex items-center gap-x-1.5">
-            <span>Official</span>
-          </Badge>
+          <div className="flex items-center gap-x-4">
+            <Badge className="bg-opacity-100 bg-surface-300 flex items-center gap-x-1.5">
+              <span>Official</span>
+            </Badge>
+            {isInstalled && (
+              <div className="flex items-center gap-x-1">
+                <BadgeCheck size={14} className="text-brand-600" />
+                <span className=" text-brand-600 text-xs">Installed</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </Link>

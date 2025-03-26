@@ -96,6 +96,7 @@ const AuditLogs = () => {
     return () => clearInterval(interval)
   }, [dateRange.from, dateRange.to])
 
+  const activeMembers = (members ?? []).filter((x) => !x.invited_at)
   const roles = [...(rolesData?.org_scoped_roles ?? []), ...(rolesData?.project_scoped_roles ?? [])]
 
   const retentionPeriod = data?.retention_period ?? 0
@@ -150,7 +151,7 @@ const AuditLogs = () => {
                 title="Organization Audit Logs are not available on Free or Pro plans"
               >
                 <WarningIcon />
-                <div className="flex flex-row pt-1">
+                <div className="flex flex-col md:flex-row pt-1 gap-4">
                   <div className="grow">
                     <AlertTitle_Shadcn_>
                       Organization Audit Logs are not available on Free or Pro plans
@@ -165,7 +166,7 @@ const AuditLogs = () => {
 
                   <div className="flex items-center">
                     <Button type="primary" asChild>
-                      <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
+                      <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=auditLogs`}>
                         Upgrade subscription
                       </Link>
                     </Button>
@@ -184,7 +185,7 @@ const AuditLogs = () => {
                   <p className="text-xs prose">Filter by</p>
                   <FilterPopover
                     name="Users"
-                    options={members ?? []}
+                    options={activeMembers}
                     labelKey="username"
                     valueKey="gotrue_id"
                     activeOptions={filters.users}

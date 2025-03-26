@@ -77,7 +77,7 @@ You can usually identify a federated or reference doc because it uses a Next.js 
 Example spec file import:
 
 ```js
-import specFile from '~/spec/transforms/analytics_v0_openapi_deparsed.json' assert { type: 'json' }
+import specFile from '~/spec/transforms/analytics_v0_openapi_deparsed.json' with { type: 'json' }
 ```
 
 Example repo definition:

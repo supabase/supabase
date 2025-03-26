@@ -45,7 +45,7 @@ export const QueuesTab = () => {
 
   return (
     <>
-      <div className="w-full space-y-4 p-10">
+      <div className="w-full space-y-4 p-4 md:p-10">
         {queues.length === 0 ? (
           <div
             className={
@@ -78,6 +78,9 @@ export const QueuesTab = () => {
                   <Table.th key="arguments" className="table-cell">
                     Type
                   </Table.th>
+                  <Table.th key="rls_enabled" className="table-cell">
+                    <div className="flex justify-center">RLS enabled</div>
+                  </Table.th>
                   <Table.th key="created_at" className="table-cell w-60">
                     Created at
                   </Table.th>
@@ -94,7 +97,7 @@ export const QueuesTab = () => {
       </div>
 
       <Sheet open={createQueueSheetShown} onOpenChange={() => setIsClosingCreateQueueSheet(true)}>
-        <SheetContent size="default" tabIndex={undefined}>
+        <SheetContent size="default" className="w-[35%]" tabIndex={undefined}>
           <CreateQueueSheet
             onClose={() => {
               setIsClosingCreateQueueSheet(false)

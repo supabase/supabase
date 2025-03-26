@@ -60,24 +60,26 @@ const EventListItem = ({ event }: Props) => {
   )
 }
 
-const EventDate: React.FC<{ event: PostTypes }> = ({ event }) => (
-  <p className="text-foreground-lighter lg:text-left lg:w-[240px] text-nowrap group-hover:text-foreground-light min-w-20 inline-flex items-center lg:justify-start gap-1.5 w-full">
-    {event.type === 'event'
-      ? dayjs(event.date).format('DD MMM YYYY')
-      : dayjs(event.date).tz(event.timezone).format('DD MMM YYYY')}
-    <span className="min-w-px h-[16px] bg-muted" />
-    <span className="">
-      {event.type === 'event'
-        ? dayjs(event.date).get('minutes') > 0
-          ? dayjs(event.date).format('h:mmA')
-          : dayjs(event.date).format('hA')
-        : dayjs(event.date).get('minutes') > 0
-          ? dayjs(event.date).tz(event.timezone).format('h:mmA')
-          : dayjs(event.date).tz(event.timezone).format('hA')}
-    </span>
-    <span className="min-w-px h-[16px] bg-muted" />
-    {dayjs(event.date).tz(event.timezone).format('z')}
-  </p>
-)
+const EventDate: React.FC<{ event: PostTypes }> = ({ event }) => {
+  const parsedDate = dayjs.utc(event.date)
+
+  /**
+   * If meetups, show absolute time + timezone
+   * otherwise show time based on timezone
+   * */
+  const formattedDate = event.categories?.includes('meetup')
+    ? parsedDate
+        .tz('Europe/London')
+        .format(`DD MMM YY, h${parsedDate.get('minutes') > 0 ? ':mmA' : 'A'}`)
+    : parsedDate.tz(event.timezone).format(`DD MMM YY, h:mmA`)
+
+  return (
+    <p className="text-foreground-lighter font-mono text-xs lg:text-left lg:w-[240px] text-nowrap group-hover:text-foreground-light min-w-20 inline-flex items-center lg:justify-start gap-1.5 w-full leading-relaxed">
+      {formattedDate}
+      <span className="min-w-px h-[16px] mx-1 bg-foreground-muted/50" />
+      {parsedDate.tz(event.timezone).format(' z')}
+    </p>
+  )
+}
 
 export default EventListItem

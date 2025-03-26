@@ -27,8 +27,10 @@ const getUsersCountSql = ({
   const baseQueryCount = `select count(*) from auth.users`
 
   if (hasValidKeywords) {
+    // [Joshen] Escape single quotes properly
+    const formattedKeywords = keywords.replaceAll("'", "''")
     conditions.push(
-      `id::text ilike '%${keywords}%' or email ilike '%${keywords}%' or phone ilike '%${keywords}%'`
+      `id::text ilike '%${formattedKeywords}%' or email ilike '%${formattedKeywords}%' or phone ilike '%${formattedKeywords}%'`
     )
   }
 

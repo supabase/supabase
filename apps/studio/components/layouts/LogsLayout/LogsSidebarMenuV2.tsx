@@ -1,5 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/components/shadcn/ui/tooltip'
+import { ChevronRight, FilePlus, Plus } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+
 import { IS_PLATFORM, useParams } from 'common'
 import { CreateWarehouseCollectionModal } from 'components/interfaces/DataWarehouse/CreateWarehouseCollection'
 import { WarehouseMenuItem } from 'components/interfaces/DataWarehouse/WarehouseMenuItem'
@@ -11,14 +15,7 @@ import { useContentQuery } from 'data/content/content-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
-import { ArrowUpRight, ChevronRight, DatabaseIcon, FilePlus, Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   Button,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
@@ -28,6 +25,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Separator,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import {
   InnerSideBarEmptyPanel,
@@ -36,6 +36,7 @@ import {
   InnerSideMenuItem,
 } from 'ui-patterns/InnerSideMenu'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 
 const SupaIcon = ({ className }: { className?: string }) => {
   return (
@@ -95,8 +96,13 @@ export function LogsSidebarMenuV2() {
     { projectRef: ref },
     { enabled: IS_PLATFORM && warehouseEnabled && !!tenantData }
   )
+  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
+  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
-  const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery(ref)
+  const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery({
+    projectRef: ref,
+    type: 'log_sql',
+  })
 
   const savedQueries = [...(savedQueriesRes?.content ?? [])]
     .filter((c) => c.type === 'log_sql')
@@ -127,13 +133,20 @@ export function LogsSidebarMenuV2() {
     },
     IS_PLATFORM
       ? {
-          name: 'Pooler',
+          name: isFreePlan ? 'Pooler' : 'Shared Pooler',
           key: 'pooler-logs',
           url: `/project/${ref}/logs/pooler-logs`,
           items: [],
         }
       : null,
-    ,
+    !isFreePlan && IS_PLATFORM
+      ? {
+          name: 'Dedicated Pooler',
+          key: 'dedicated-pooler-logs',
+          url: `/project/${ref}/logs/dedicated-pooler-logs`,
+          items: [],
+        }
+      : null,
     authEnabled
       ? {
           name: 'Auth',
@@ -165,9 +178,9 @@ export function LogsSidebarMenuV2() {
       items: [],
     },
     {
-      name: 'Cron Jobs',
-      key: 'cron-logs',
-      url: `/project/${ref}/logs/cron-logs`,
+      name: 'Cron',
+      key: 'pg_cron',
+      url: `/project/${ref}/logs/pgcron-logs`,
       items: [],
     },
   ]
@@ -241,14 +254,6 @@ export function LogsSidebarMenuV2() {
           href={`/project/${ref}/logs/explorer/templates`}
         >
           Templates
-        </InnerSideMenuItem>
-        <InnerSideMenuItem
-          title="Settings"
-          isActive={isActive(`/project/${ref}/settings/warehouse`)}
-          href={`/project/${ref}/settings/warehouse`}
-        >
-          Settings
-          <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
         </InnerSideMenuItem>
       </div>
       <Separator className="my-4" />

@@ -16,7 +16,6 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { AuthConfigResponse } from 'data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from 'data/auth/auth-hooks-update-mutation'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { useFlag } from 'hooks/ui/useFlag'
 import {
   Button,
   FormControl_Shadcn_,
@@ -116,7 +115,6 @@ export const CreateHookSheet = ({
 }: CreateHookSheetProps) => {
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
-  const httpsAuthHooksEnabled = useFlag('httpsAuthHooksEnabled')
 
   const definition = useMemo(
     () => HOOKS_DEFINITIONS.find((d) => d.title === title) || HOOKS_DEFINITIONS[0],
@@ -326,37 +324,35 @@ export const CreateHookSheet = ({
                 )}
               />
               <Separator />
-              {httpsAuthHooksEnabled && (
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="selectedType"
-                  render={({ field }) => (
-                    <FormItemLayout label="Hook type" className="px-5">
-                      <FormControl_Shadcn_>
-                        <RadioGroupStacked
-                          value={field.value}
-                          onValueChange={(value) => field.onChange(value)}
-                        >
-                          <RadioGroupStackedItem
-                            value="postgres"
-                            id="postgres"
-                            key="postgres"
-                            label="Postgres"
-                            description="Used to call a Postgres function."
-                          />
-                          <RadioGroupStackedItem
-                            value="https"
-                            id="https"
-                            key="https"
-                            label="HTTPS"
-                            description="Used to call any HTTPS endpoint."
-                          />
-                        </RadioGroupStacked>
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-              )}
+              <FormField_Shadcn_
+                control={form.control}
+                name="selectedType"
+                render={({ field }) => (
+                  <FormItemLayout label="Hook type" className="px-5">
+                    <FormControl_Shadcn_>
+                      <RadioGroupStacked
+                        value={field.value}
+                        onValueChange={(value) => field.onChange(value)}
+                      >
+                        <RadioGroupStackedItem
+                          value="postgres"
+                          id="postgres"
+                          key="postgres"
+                          label="Postgres"
+                          description="Used to call a Postgres function."
+                        />
+                        <RadioGroupStackedItem
+                          value="https"
+                          id="https"
+                          key="https"
+                          label="HTTPS"
+                          description="Used to call any HTTPS endpoint."
+                        />
+                      </RadioGroupStacked>
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
               {values.selectedType === 'postgres' ? (
                 <>
                   <div className="grid grid-cols-2 gap-8 px-5">
@@ -435,7 +431,7 @@ export const CreateHookSheet = ({
                   </div>
                 </>
               ) : (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-4 px-5">
                   <FormField_Shadcn_
                     key="httpsValues.url"
                     control={form.control}

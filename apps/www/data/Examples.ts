@@ -1,9 +1,11 @@
-import { PRODUCT_NAMES } from 'shared-data/products'
+import { PRODUCT_MODULES_NAMES, PRODUCT_NAMES } from 'shared-data/products'
+
+type ProductsArrayItem = PRODUCT_NAMES | PRODUCT_MODULES_NAMES
 
 export type Example = {
   type: string
   tags: string[]
-  products: PRODUCT_NAMES[]
+  products: ProductsArrayItem[]
   title: string
   description: string
   author?: string
@@ -51,7 +53,7 @@ const Examples: Example[] = [
   {
     type: 'example',
     tags: ['Next.js', 'OpenAI', 'Vercel'],
-    products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.AUTHENTICATION, PRODUCT_NAMES.VECTOR],
+    products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.AUTHENTICATION, PRODUCT_MODULES_NAMES.VECTOR],
     title: 'AI Chatbot',
     description:
       'An open-source AI chatbot app template built with Next.js, the Vercel AI SDK, OpenAI, and Supabase.',
@@ -67,7 +69,7 @@ const Examples: Example[] = [
   {
     type: 'example',
     tags: ['LangChain', 'Next.js'],
-    products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.VECTOR],
+    products: [PRODUCT_NAMES.DATABASE, PRODUCT_MODULES_NAMES.VECTOR],
     title: 'LangChain + Next.js Starter',
     description:
       'Starter template and example use-cases for LangChain projects in Next.js, including chat, agents, and retrieval.',

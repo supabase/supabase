@@ -30,6 +30,7 @@ import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
 import JsonEditor from './RowEditor/JsonEditor/JsonEditor'
 import RowEditor from './RowEditor/RowEditor'
+import { convertByteaToHex } from './RowEditor/RowEditor.utils'
 import { TextEditor } from './RowEditor/TextEditor'
 import SchemaEditor from './SchemaEditor'
 import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
@@ -196,7 +197,11 @@ const SidePanelEditor = ({
     try {
       const { row } = selectedForeignKeyToEdit
       const identifiers = {} as Dictionary<any>
-      selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
+      selectedTable.primary_keys.forEach((column) => {
+        const col = selectedTable.columns?.find((x) => x.name === column.name)
+        identifiers[column.name] =
+          col?.format === 'bytea' ? convertByteaToHex(row![column.name]) : row![column.name]
+      })
 
       const isNewRecord = false
       const configuration = { identifiers, rowIdx: row.idx }

@@ -62,6 +62,7 @@ const BackupsList = () => {
         icon={<Clock size={20} />}
         primaryText="Free Plan does not include project backups."
         secondaryText="Upgrade to the Pro Plan for up to 7 days of scheduled backups."
+        source="backups"
       />
     )
   }

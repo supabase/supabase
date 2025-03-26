@@ -139,8 +139,22 @@ Once you have reclaimed space, you can run the following to disable [read-only](
 set default_transaction_read_only = 'off';
 ```
 
+### Disk size distribution
+
+You can check the distribution of your disk size on your [project's compute and disk page](/dashboard/_/settings/compute-and-disk).
+
+![Disk Size Distribution](/docs/img/guides/platform/database-size/disk-size-distribution.png)
+
+Your disk size usage falls in three categories:
+
+- **Database** - Disk usage by the database. This includes the actual data, indexes, materialized views, ...
+- **WAL** - Disk usage by the write-ahead log. The usage depends on your WAL settings and the amount of data being written to the database.
+- **System** - Disk usage reserved by the system to ensure the database can operate smoothly. Users cannot modify this and it should only take very little space.
+
 ### Reducing disk size
 
 Disks don't automatically downsize during normal operation. Once you have [reduced your database size](/docs/guides/platform/database-size#database-size), they _will_ automatically "right-size" during a [project upgrade](/docs/guides/platform/upgrading). The final disk size after the upgrade is 1.2x the size of the database with a minimum of 8 GB. For example, if your database size is 100GB, and you have a 200GB disk, the size after a project upgrade will be 120 GB.
+
+In case you have a large WAL directory, you may [modify WAL settings](/docs/guides/database/custom-postgres-config) such as `max_wal_size`. Use at your own risk as changing these settings can have side effects. To query your current WAL size, use `SELECT SUM(size) FROM pg_ls_waldir()`.
 
 In the event that your project is already on the latest version of Postgres and cannot be upgraded, a new version of Postgres will be released approximately every week which you can then upgrade to once it becomes available.

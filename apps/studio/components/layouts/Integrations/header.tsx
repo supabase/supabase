@@ -64,7 +64,7 @@ export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) 
               <motion.div
                 layout
                 transition={layoutTransition}
-                className="px-10 flex flex-col gap-5"
+                className="px-4 md:px-10 flex flex-col gap-5"
               >
                 {/* Navigation link back to integrations landing */}
                 <div className="flex items-center gap-0.5">
@@ -157,9 +157,9 @@ export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) 
                       <div className="flex-col justify-start items-start flex">
                         <div className="text-foreground text-sm flex items-center gap-x-2">
                           <span>{integration.name}</span>
-                          {integration.beta && (
-                            <Badge variant="warning" className="py-0 px-1.5">
-                              Beta
+                          {integration.status && (
+                            <Badge variant="warning" className="py-0 px-1.5 capitalize">
+                              {integration.status}
                             </Badge>
                           )}
                         </div>

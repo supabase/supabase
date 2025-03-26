@@ -199,7 +199,7 @@ test.each([
         function_id: '001b0b08-331c-403e-810c-a2004b03a019',
         timestamp: 1659545029083869,
         id: '4475cf6f-2929-4296-ab44-ce2c17069937',
-        level: null,
+        level: undefined,
       },
     ],
     includes: [/uncaughtException/],

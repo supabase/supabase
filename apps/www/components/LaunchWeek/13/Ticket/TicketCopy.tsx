@@ -29,7 +29,7 @@ export default function TicketCopy() {
           }, 2000)
         })
       }}
-      className="font-mono w-full flex-grow px-2 lg:px-3.5 !pr-1 py-1 rounded-md bg-alternative-200 border flex gap-2 relative text-foreground-light hover:text-foreground text-xs pointer-events-auto justify-between items-center hover:border-stronger transition-all"
+      className="font-mono w-full flex-grow px-2 lg:px-3.5 !pr-1 py-1 rounded-md bg-alternative-200 border flex gap-2 relative text-foreground-light hover:text-foreground text-xs pointer-events-auto justify-between items-center hover:border-stronger transition-all max-w-[80vw]"
     >
       <span className="truncate">{displayUrl}</span>
       <div className="w-6 min-w-6 h-6 flex items-center justify-center flex-shrink-0 border border-strong rounded bg-muted hover:bg-selection hover:border-stronger">

@@ -7,6 +7,8 @@ export const CHART_COLORS = {
   AXIS: 'hsl(var(--background-overlay-hover))',
   GREEN_1: 'hsl(var(--brand-default))', // #3ECF8E
   GREEN_2: 'hsl(var(--brand-500))',
+  RED_1: 'hsl(var(--destructive-default))',
+  RED_2: 'hsl(var(--destructive-500))',
 }
 
 // refer to packages/ui/radix-colors.js for full list of colors

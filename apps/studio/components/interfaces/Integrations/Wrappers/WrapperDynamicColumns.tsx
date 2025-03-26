@@ -117,7 +117,7 @@ const WrapperDynamicColumns = ({
       <div className="flex flex-col gap-4">
         {columns.map((column, idx) => (
           <div key={column.id} className="flex flex-col">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-x-2">
               <Input
                 className="flex-1 [&_label]:!p-0"
                 layout="vertical"

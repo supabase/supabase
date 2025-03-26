@@ -11,7 +11,6 @@ import { setProjectStatus } from 'data/projects/projects-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
-  Alert,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -165,14 +164,16 @@ const PITRSelection = () => {
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content>
-          <Alert
-            withIcon
-            variant="warning"
-            title="This action cannot be undone, not canceled once started"
-          >
-            Any changes made to your database after this point in time will be lost. This includes
-            any changes to your project's storage and authentication.
-          </Alert>
+          <Alert_Shadcn_ variant="warning">
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              This action cannot be undone, not canceled once started
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              Any changes made to your database after this point in time will be lost. This includes
+              any changes to your project's storage and authentication.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content>

@@ -6,6 +6,7 @@ import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import type { NextPageWithLayout } from 'types'
 import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -15,12 +16,16 @@ export const LogPage: NextPageWithLayout = () => {
     <LogsPreviewer
       projectRef={ref as string}
       condensedLayout={true}
-      tableName={LogsTableName.CRON_JOBS}
-      queryType={'cron'}
+      tableName={LogsTableName.PG_CRON}
+      queryType={'pg_cron'}
     />
   )
 }
 
-LogPage.getLayout = (page) => <LogsLayout title="Cron Logs">{page}</LogsLayout>
+LogPage.getLayout = (page) => (
+  <DefaultLayout>
+    <LogsLayout title="Cron Logs">{page}</LogsLayout>
+  </DefaultLayout>
+)
 
 export default LogPage

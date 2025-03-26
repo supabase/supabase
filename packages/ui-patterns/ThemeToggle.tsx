@@ -2,7 +2,7 @@
 
 import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,11 +26,18 @@ export const ThemeToggle = ({
   triggerClassName,
   contentClassName,
 }: ThemeToggleProps) => {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme, resolvedTheme } = useTheme()
   const [open, setOpen] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // Conditionally force the theme to 'dark' when disabled is true
   const currentTheme = forceDark ? 'dark' : theme
+
+  if (!isMounted) return null
 
   return (
     <DropdownMenu open={open} onOpenChange={() => setOpen(!open)} modal={false}>
@@ -42,8 +49,11 @@ export const ThemeToggle = ({
             triggerClassName
           )}
         >
-          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          {resolvedTheme === 'dark' ? (
+            <Moon className="h-[20px] w-[20px] rotate-90 transition-all dark:rotate-0" />
+          ) : (
+            <Sun className="w-[20px] h-[20px] rotate-0 transition-all dark:-rotate-90" />
+          )}
           <span className="sr-only">Toggle theme</span>
         </button>
       </DropdownMenuTrigger>

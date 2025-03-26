@@ -145,8 +145,8 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters, limit: n
       if (IS_PLATFORM === false) {
         return `
 -- local dev edge_logs query
-select id, edge_logs.timestamp, event_message, request.method, request.path, response.status_code 
-from edge_logs 
+select id, edge_logs.timestamp, event_message, request.method, request.path, response.status_code
+from edge_logs
 ${joins}
 ${where}
 ${orderBy}
@@ -212,8 +212,19 @@ limit ${limit}
   limit ${limit}
   `
 
-    case 'cron_job_run_details':
-      return `select status, start_time, end_time, jobid from ${table} ${where} ${orderBy} limit ${limit}`
+    case 'pg_cron_logs':
+      const baseWhere = `where (parsed.application_name = 'pg_cron' OR event_message LIKE '%cron job%')`
+
+      const pgCronWhere = where ? `${baseWhere} AND ${where.substring(6)}` : baseWhere
+
+      return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.query
+from postgres_logs
+  cross join unnest(metadata) as m
+  cross join unnest(m.parsed) as parsed
+${pgCronWhere}
+${orderBy}
+limit ${limit}
+`
   }
 }
 
@@ -309,15 +320,26 @@ export const genChartQuery = (
   filters: Filters
 ) => {
   const [startOffset, trunc] = calcChartStart(params)
-  const where = genWhereStatement(table, filters)
+  let where = genWhereStatement(table, filters)
+  const errorCondition = getErrorCondition(table)
+  const warningCondition = getWarningCondition(table)
+
+  // pg_cron logs are a subset of postgres logs
+  // to calculate the chart, we need to query postgres logs
+  if (table === LogsTableName.PG_CRON) {
+    table = LogsTableName.POSTGRES
+    where = `where (parsed.application_name = 'pg_cron' OR event_message LIKE '%cron job%')`
+  }
 
   let joins = genCrossJoinUnnests(table)
 
-  return `
+  const q = `
 SELECT
 -- log-event-chart
   timestamp_trunc(t.timestamp, ${trunc}) as timestamp,
-  count(t.timestamp) as count
+  count(CASE WHEN NOT (${errorCondition} OR ${warningCondition}) THEN 1 END) as ok_count,
+  count(CASE WHEN ${errorCondition} THEN 1 END) as error_count,
+  count(CASE WHEN ${warningCondition} THEN 1 END) as warning_count,
 FROM
   ${table} t
   ${joins}
@@ -331,6 +353,7 @@ timestamp
 ORDER BY
   timestamp ASC
   `
+  return q
 }
 
 type TsPair = [string | '', string | '']
@@ -447,8 +470,18 @@ export const fillTimeseries = (
   valueKey: string | string[],
   defaultValue: number,
   min?: string,
-  max?: string
+  max?: string,
+  minPointsToFill: number = 20
 ) => {
+  // If we have more points than minPointsToFill, just normalize timestamps and return
+  if (timeseriesData.length > minPointsToFill) {
+    return timeseriesData.map((datum) => {
+      const iso = dayjs.utc(datum[timestampKey]).toISOString()
+      datum[timestampKey] = iso
+      return datum
+    })
+  }
+
   if (timeseriesData.length <= 1 && !(min || max)) return timeseriesData
   const dates: unknown[] = timeseriesData.map((datum) => dayjs.utc(datum[timestampKey]))
 
@@ -557,4 +590,40 @@ export function checkForWildcard(query: string) {
 
   const wildcardRegex = /\*/
   return wildcardRegex.test(queryWithoutCount)
+}
+
+function getErrorCondition(table: LogsTableName): string {
+  switch (table) {
+    case 'edge_logs':
+      return 'response.status_code >= 500'
+    case 'postgres_logs':
+      return "parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')"
+    case 'auth_logs':
+      return "metadata.level = 'error' OR metadata.status >= 400"
+    case 'function_edge_logs':
+      return 'response.status_code >= 500'
+    case 'function_logs':
+      return "metadata.level IN ('error', 'fatal')"
+    case 'pg_cron_logs':
+      return "parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')"
+    default:
+      return 'false'
+  }
+}
+
+function getWarningCondition(table: LogsTableName): string {
+  switch (table) {
+    case 'edge_logs':
+      return 'response.status_code >= 400 AND response.status_code < 500'
+    case 'postgres_logs':
+      return "parsed.error_severity IN ('WARNING')"
+    case 'auth_logs':
+      return "metadata.level = 'warning'"
+    case 'function_edge_logs':
+      return 'response.status_code >= 400 AND response.status_code < 500'
+    case 'function_logs':
+      return "metadata.level IN ('warning')"
+    default:
+      return 'false'
+  }
 }

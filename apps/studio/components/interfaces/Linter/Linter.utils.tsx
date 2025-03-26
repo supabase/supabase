@@ -1,4 +1,15 @@
-import { Box, Clock, Eye, Lock, Ruler, Table2, TextSearch, Unlock, User } from 'lucide-react'
+import {
+  Box,
+  Clock,
+  Eye,
+  Lock,
+  LockIcon,
+  Ruler,
+  Table2,
+  TextSearch,
+  Unlock,
+  User,
+} from 'lucide-react'
 import Link from 'next/link'
 
 import { LINTER_LEVELS, LintInfo } from 'components/interfaces/Linter/Linter.constants'
@@ -187,6 +198,79 @@ export const lintInfoMap: LintInfo[] = [
     linkText: 'View docs',
     docsLink:
       'https://supabase.com/docs/guides/database/database-advisors?lint=0018_unsupported_reg_types&queryGroups=lint',
+  },
+  {
+    name: 'ssl_not_enforced',
+    title: 'SSL not enforced',
+    icon: <Ruler className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/settings/database`,
+    linkText: 'View settings',
+    docsLink: 'https://supabase.com/docs/guides/platform/ssl-enforcement',
+  },
+  {
+    name: 'network_restrictions_not_set',
+    title: 'No network restrictions',
+    icon: <Ruler className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/settings/database`,
+    linkText: 'View settings',
+    docsLink: 'https://supabase.com/docs/guides/platform/network-restrictions',
+  },
+  {
+    name: 'password_requirements_min_length',
+    title: 'Minimum password length not set or inadequate',
+    icon: <Ruler className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/settings/auth`,
+    linkText: 'View settings',
+    docsLink: 'https://supabase.com/docs/guides/platform/going-into-prod#security',
+  },
+  {
+    name: 'pitr_not_enabled',
+    title: 'PITR not enabled',
+    icon: <Ruler className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/database/backups/pitr`,
+    linkText: 'View settings',
+    docsLink: 'https://supabase.com/docs/guides/platform/backups#point-in-time-recovery',
+  },
+  {
+    name: 'auth_leaked_password_protection',
+    title: 'Leaked Password Protection Disabled',
+    icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/settings/auth`,
+    linkText: 'View settings',
+    docsLink:
+      'https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection',
+  },
+  {
+    name: 'auth_insufficient_mfa_options',
+    title: 'Insufficient MFA Options',
+    icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/settings/auth`,
+    linkText: 'View settings',
+    docsLink: 'https://supabase.com/docs/guides/auth/auth-mfa',
+  },
+  {
+    name: 'auth_password_policy_missing',
+    title: 'Password Policy Missing',
+    icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/settings/auth`,
+    linkText: 'View settings',
+    docsLink: 'https://supabase.com/docs/guides/auth/password-security',
+  },
+  {
+    name: 'leaked_service_key',
+    title: 'Leaked Service Key Detected',
+    icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/settings/api`,
+    linkText: 'View settings',
+    docsLink: 'https://supabase.com/docs/guides/api/api-keys#the-servicerole-key',
+  },
+  {
+    name: 'no_backup_admin',
+    title: 'No Backup Admin Detected',
+    icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/settings/auth`,
+    linkText: 'View settings',
+    docsLink: 'https://supabase.com/docs/guides/auth/auth-mfa',
   },
 ]
 

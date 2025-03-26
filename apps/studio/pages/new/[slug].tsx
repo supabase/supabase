@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { debounce } from 'lodash'
-import { ChevronRight, ExternalLink } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -16,16 +16,21 @@ import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
 } from 'components/interfaces/Organization/NewProject'
+import { AdvancedConfiguration } from 'components/interfaces/ProjectCreation/AdvancedConfiguration'
 import {
   PostgresVersionSelector,
   extractPostgresVersionDetails,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { SPECIAL_CHARS_REGEX } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
+import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
+import { SpecialSymbolsCallout } from 'components/interfaces/ProjectCreation/SpecialSymbolsCallout'
 import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import Panel from 'components/ui/Panel'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
@@ -38,6 +43,7 @@ import {
 } from 'data/projects/project-create-mutation'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -57,16 +63,10 @@ import type { NextPageWithLayout } from 'types'
 import {
   Badge,
   Button,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormItem_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  RadioGroupStacked,
-  RadioGroupStackedItem,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
@@ -79,7 +79,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -101,13 +100,47 @@ const sizes: DesiredInstanceSize[] = [
   '16xlarge',
 ]
 
+const FormSchema = z.object({
+  organization: z.string({
+    required_error: 'Please select an organization',
+  }),
+  projectName: z
+    .string()
+    .min(1, 'Please enter a project name.') // Required field check
+    .min(3, 'Project name must be at least 3 characters long.') // Minimum length check
+    .max(64, 'Project name must be no longer than 64 characters.'), // Maximum length check
+  postgresVersion: z.string({
+    required_error: 'Please enter a Postgres version.',
+  }),
+  dbRegion: z.string({
+    required_error: 'Please select a region.',
+  }),
+  cloudProvider: z.string({
+    required_error: 'Please select a cloud provider.',
+  }),
+  dbPassStrength: z.number(),
+  dbPass: z
+    .string({ required_error: 'Please enter a database password.' })
+    .min(1, 'Password is required.'),
+  instanceSize: z.string(),
+  dataApi: z.boolean(),
+  useApiSchema: z.boolean(),
+  postgresVersionSelection: z.string(),
+  useOrioleDb: z.boolean(),
+})
+
+export type CreateProjectForm = z.infer<typeof FormSchema>
+
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug, projectName } = useParams()
 
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
+  const allowOrioleDB = useFlag('allowOrioleDb')
   const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
     useFreeProjectLimitCheckQuery({ slug })
 
@@ -117,17 +150,29 @@ const Wizard: NextPageWithLayout = () => {
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
 
+  // TODO: Remove this after project creation experiment
+  const projectCreationExperimentGroup = useFlag<string>('projectCreationExperimentGroup')
+  useEffect(() => {
+    if (currentOrg && projectCreationExperimentGroup === 'group-b') {
+      router.replace(`/new/v2/${currentOrg.slug}`)
+    }
+  }, [currentOrg, projectCreationExperimentGroup, router])
+
   const { data: orgSubscription } = useOrgSubscriptionQuery({ orgSlug: slug })
 
+  const isNotOnTeamOrEnterprisePlan = useMemo(
+    () => !['team', 'enterprise'].includes(orgSubscription?.plan.id ?? ''),
+    [orgSubscription]
+  )
+
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
-    enabled:
-      orgSubscription !== undefined &&
-      !['team', 'enterprise'].includes(orgSubscription?.plan.id ?? ''),
+    enabled: isNotOnTeamOrEnterprisePlan,
   })
+
   const overdueInvoices = (allOverdueInvoices ?? []).filter(
     (x) => x.organization_id === currentOrg?.id
   )
-  const hasOutstandingInvoices = overdueInvoices.length > 0
+  const hasOutstandingInvoices = overdueInvoices.length > 0 && isNotOnTeamOrEnterprisePlan
 
   const { data: allProjects } = useProjectsQuery({})
   const organizationProjects =
@@ -143,6 +188,8 @@ const Wizard: NextPageWithLayout = () => {
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       refetchInterval: false,
+      refetchOnReconnect: false,
+      retry: false,
     }
   )
 
@@ -152,6 +199,9 @@ const Wizard: NextPageWithLayout = () => {
     isSuccess: isSuccessNewProject,
   } = useProjectCreateMutation({
     onSuccess: (res) => {
+      sendEvent({
+        action: 'project_creation_simple_version_submitted',
+      })
       router.push(`/project/${res.ref}/building`)
     },
   })
@@ -186,45 +236,15 @@ const Wizard: NextPageWithLayout = () => {
     setPasswordStrengthMessage(message)
   }
 
-  const FormSchema = z
-    .object({
-      organization: z.string({
-        required_error: 'Please select an organization',
-      }),
-      projectName: z
-        .string()
-        .min(1, 'Please enter a project name.') // Required field check
-        .min(3, 'Project name must be at least 3 characters long.') // Minimum length check
-        .max(64, 'Project name must be no longer than 64 characters.'), // Maximum length check
-      postgresVersion: z.string({
-        required_error: 'Please enter a Postgres version.',
-      }),
-      dbRegion: z.string({
-        required_error: 'Please select a region.',
-      }),
-      cloudProvider: z.string({
-        required_error: 'Please select a cloud provider.',
-      }),
-      dbPassStrength: z.number(),
-      dbPass: z
-        .string({
-          required_error: 'Please enter a database password.',
-        })
-        .min(1, 'Password is required.'),
-      instanceSize: z.string(),
-      dataApi: z.boolean(),
-      useApiSchema: z.boolean(),
-      postgresVersionSelection: z.string(),
-    })
-    .superRefine(({ dbPassStrength }, refinementContext) => {
-      if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
-        refinementContext.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['dbPass'],
-          message: passwordStrengthWarning || 'Password not secure enough',
-        })
-      }
-    })
+  FormSchema.superRefine(({ dbPassStrength }, refinementContext) => {
+    if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
+      refinementContext.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['dbPass'],
+        message: passwordStrengthWarning || 'Password not secure enough',
+      })
+    }
+  })
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -241,10 +261,17 @@ const Wizard: NextPageWithLayout = () => {
       dataApi: true,
       useApiSchema: false,
       postgresVersionSelection: '',
+      useOrioleDb: false,
     },
   })
 
-  const { instanceSize } = form.watch()
+  const { instanceSize, cloudProvider, dbRegion, organization } = form.watch()
+
+  const availableOrioleVersion = useAvailableOrioleImageVersion({
+    cloudProvider: cloudProvider as CloudProvider,
+    dbRegion,
+    organizationSlug: organization,
+  })
 
   // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
   const monthlyComputeCosts =
@@ -278,7 +305,12 @@ const Wizard: NextPageWithLayout = () => {
       dataApi,
       useApiSchema,
       postgresVersionSelection,
+      useOrioleDb,
     } = values
+
+    if (useOrioleDb && !availableOrioleVersion) {
+      return toast.error('No available OrioleDB image found, only Postgres is available')
+    }
 
     const { postgresEngine, releaseChannel } =
       extractPostgresVersionDetails(postgresVersionSelection)
@@ -296,9 +328,10 @@ const Wizard: NextPageWithLayout = () => {
         orgSubscription?.plan.id === 'free' ? undefined : (instanceSize as DesiredInstanceSize),
       dataApiExposedSchemas: !dataApi ? [] : undefined,
       dataApiUseApiSchema: !dataApi ? false : useApiSchema,
-      postgresEngine: postgresEngine,
-      releaseChannel: releaseChannel,
+      postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
+      releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
     }
+
     if (postgresVersion) {
       if (!postgresVersion.match(/1[2-9]\..*/)) {
         toast.error(
@@ -352,6 +385,15 @@ const Wizard: NextPageWithLayout = () => {
 
   const additionalMonthlySpend =
     instanceSizeSpecs[instanceSize as DbInstanceSize]!.priceMonthly - availableComputeCredits
+
+  // TODO: Remove this after project creation experiment as it delays rendering
+  if (
+    !currentOrg ||
+    !projectCreationExperimentGroup ||
+    projectCreationExperimentGroup === 'group-b'
+  ) {
+    return null
+  }
 
   return (
     <Form_Shadcn_ {...form}>
@@ -448,13 +490,7 @@ const Wizard: NextPageWithLayout = () => {
                         render={({ field }) => (
                           <FormItemLayout label="Project name" layout="horizontal">
                             <FormControl_Shadcn_>
-                              <Input_Shadcn_
-                                placeholder="Project name"
-                                {...field}
-                                onChange={(event) => {
-                                  field.onChange(event.target.value.replace(/\./g, ''))
-                                }}
-                              />
+                              <Input_Shadcn_ {...field} placeholder="Project name" />
                             </FormControl_Shadcn_>
                           </FormItemLayout>
                         )}
@@ -531,7 +567,7 @@ const Wizard: NextPageWithLayout = () => {
                                     <Link
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
+                                      href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                                     >
                                       <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
                                         <p className="text-sm m-0">Compute Billing</p>
@@ -744,41 +780,49 @@ const Wizard: NextPageWithLayout = () => {
                       <FormField_Shadcn_
                         control={form.control}
                         name="dbPass"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            label="Database Password"
-                            layout="horizontal"
-                            description={
-                              <PasswordStrengthBar
-                                passwordStrengthScore={form.getValues('dbPassStrength')}
-                                password={field.value}
-                                passwordStrengthMessage={passwordStrengthMessage}
-                                generateStrongPassword={generatePassword}
-                              />
-                            }
-                          >
-                            <FormControl_Shadcn_>
-                              <Input
-                                copy={field.value.length > 0}
-                                type="password"
-                                placeholder="Type in a strong password"
-                                {...field}
-                                autoComplete="off"
-                                onChange={async (event) => {
-                                  field.onChange(event)
-                                  form.trigger('dbPassStrength')
-                                  const value = event.target.value
-                                  if (event.target.value === '') {
-                                    await form.setValue('dbPassStrength', 0)
-                                    await form.trigger('dbPass')
-                                  } else {
-                                    await delayedCheckPasswordStrength(value)
-                                  }
-                                }}
-                              />
-                            </FormControl_Shadcn_>
-                          </FormItemLayout>
-                        )}
+                        render={({ field }) => {
+                          const hasSpecialCharacters =
+                            field.value.length > 0 && !field.value.match(SPECIAL_CHARS_REGEX)
+
+                          return (
+                            <FormItemLayout
+                              label="Database Password"
+                              layout="horizontal"
+                              description={
+                                <>
+                                  {hasSpecialCharacters && <SpecialSymbolsCallout />}
+                                  <PasswordStrengthBar
+                                    passwordStrengthScore={form.getValues('dbPassStrength')}
+                                    password={field.value}
+                                    passwordStrengthMessage={passwordStrengthMessage}
+                                    generateStrongPassword={generatePassword}
+                                  />
+                                </>
+                              }
+                            >
+                              <FormControl_Shadcn_>
+                                <Input
+                                  copy={field.value.length > 0}
+                                  type="password"
+                                  placeholder="Type in a strong password"
+                                  {...field}
+                                  autoComplete="off"
+                                  onChange={async (event) => {
+                                    field.onChange(event)
+                                    form.trigger('dbPassStrength')
+                                    const value = event.target.value
+                                    if (event.target.value === '') {
+                                      await form.setValue('dbPassStrength', 0)
+                                      await form.trigger('dbPass')
+                                    } else {
+                                      await delayedCheckPasswordStrength(value)
+                                    }
+                                  }}
+                                />
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
+                          )
+                        }}
                       />
                     </Panel.Content>
 
@@ -838,144 +882,10 @@ const Wizard: NextPageWithLayout = () => {
                       </Panel.Content>
                     )}
 
-                    <Panel.Content>
-                      <Collapsible_Shadcn_>
-                        <CollapsibleTrigger_Shadcn_ className="group/advanced-trigger font-mono uppercase tracking-widest text-xs flex items-center gap-1 text-foreground-lighter/75 hover:text-foreground-light transition data-[state=open]:text-foreground-light">
-                          Security options
-                          <ChevronRight
-                            size={16}
-                            strokeWidth={1}
-                            className="mr-2 group-data-[state=open]/advanced-trigger:rotate-90 group-hover/advanced-trigger:text-foreground-light transition"
-                          />
-                        </CollapsibleTrigger_Shadcn_>
-                        <CollapsibleContent_Shadcn_
-                          className={cn(
-                            'pt-5 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
-                          )}
-                        >
-                          <FormField_Shadcn_
-                            name="dataApi"
-                            control={form.control}
-                            render={({ field }) => (
-                              <>
-                                <FormItemLayout
-                                  layout="horizontal"
-                                  label="What connections do you plan to use?"
-                                >
-                                  <FormControl_Shadcn_>
-                                    <RadioGroupStacked
-                                      // Due to radio group not supporting boolean values
-                                      // value is converted to boolean
-                                      onValueChange={(value) => field.onChange(value === 'true')}
-                                      defaultValue={field.value.toString()}
-                                    >
-                                      <FormItem_Shadcn_ asChild>
-                                        <FormControl_Shadcn_>
-                                          <RadioGroupStackedItem
-                                            value="true"
-                                            className="[&>div>div>p]:text-left"
-                                            label="Data API + Connection String"
-                                            description="Connect to Postgres via autogenerated HTTP APIs or the Postgres protocol"
-                                          />
-                                        </FormControl_Shadcn_>
-                                      </FormItem_Shadcn_>
-                                      <FormItem_Shadcn_ asChild>
-                                        <FormControl_Shadcn_>
-                                          <RadioGroupStackedItem
-                                            label="Only Connection String"
-                                            value="false"
-                                            description="Use Postgres without the autogenerated APIs"
-                                            className={cn(
-                                              !form.getValues('dataApi') && '!rounded-b-none'
-                                            )}
-                                          />
-                                        </FormControl_Shadcn_>
-                                      </FormItem_Shadcn_>
-                                    </RadioGroupStacked>
-                                  </FormControl_Shadcn_>
-                                  {!form.getValues('dataApi') && (
-                                    <Admonition
-                                      className="rounded-t-none"
-                                      type="warning"
-                                      title="Data API will effectively be disabled"
-                                    >
-                                      PostgREST which powers the Data API will have no schemas
-                                      available to it.
-                                    </Admonition>
-                                  )}
-                                </FormItemLayout>
-                              </>
-                            )}
-                          />
-
-                          {form.getValues('dataApi') && (
-                            <FormField_Shadcn_
-                              name="useApiSchema"
-                              control={form.control}
-                              render={({ field }) => (
-                                <>
-                                  <FormItemLayout
-                                    className="mt-6"
-                                    layout="horizontal"
-                                    label="Data API Configuration"
-                                  >
-                                    <FormControl_Shadcn_>
-                                      <RadioGroupStacked
-                                        defaultValue={field.value.toString()}
-                                        onValueChange={(value) => field.onChange(value === 'true')}
-                                      >
-                                        <FormItem_Shadcn_ asChild>
-                                          <FormControl_Shadcn_>
-                                            <RadioGroupStackedItem
-                                              value="false"
-                                              // @ts-ignore
-                                              label={
-                                                <>
-                                                  Use public schema for Data API
-                                                  <Badge color="scale" className="ml-2">
-                                                    Default
-                                                  </Badge>
-                                                </>
-                                              }
-                                              // @ts-ignore
-                                              description={
-                                                <>
-                                                  Query all tables in the{' '}
-                                                  <code className="text-xs">public</code> schema
-                                                </>
-                                              }
-                                            />
-                                          </FormControl_Shadcn_>
-                                        </FormItem_Shadcn_>
-                                        <FormItem_Shadcn_ asChild>
-                                          <FormControl_Shadcn_>
-                                            <RadioGroupStackedItem
-                                              value="true"
-                                              label="Use dedicated API schema for Data API"
-                                              // @ts-ignore
-                                              description={
-                                                <>
-                                                  Query allowlisted tables in a dedicated{' '}
-                                                  <code className="text-xs">api</code> schema
-                                                </>
-                                              }
-                                            />
-                                          </FormControl_Shadcn_>
-                                        </FormItem_Shadcn_>
-                                      </RadioGroupStacked>
-                                    </FormControl_Shadcn_>
-                                  </FormItemLayout>
-                                </>
-                              )}
-                            />
-                          )}
-                          <p className="text-xs text-foreground-lighter text-right mt-3">
-                            These settings can be changed after the project is created via the
-                            project's settings
-                          </p>
-                        </CollapsibleContent_Shadcn_>
-                      </Collapsible_Shadcn_>
-                    </Panel.Content>
+                    <SecurityOptions form={form} />
+                    {allowOrioleDB && !!availableOrioleVersion && (
+                      <AdvancedConfiguration form={form} />
+                    )}
                   </>
                 )}
 

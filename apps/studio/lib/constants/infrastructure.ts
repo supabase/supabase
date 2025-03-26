@@ -39,10 +39,17 @@ export const PROVIDERS = {
     default_region: AWS_REGIONS_DEFAULT,
     regions: { ...AWS_REGIONS },
   },
+  AWS_NEW: {
+    id: 'AWS_NEW',
+    name: 'AWS (Revamped)',
+    DEFAULT_SSH_KEY: 'supabase-app-instance',
+    default_region: AWS_REGIONS_DEFAULT,
+    regions: { ...AWS_REGIONS },
+  },
 } as const
 
 export const PROJECT_STATUS: {
-  [key: string]: components['schemas']['ResourceWithServicesStatusResponse']['status']
+  [key: string]: components['schemas']['project_status']
 } = {
   INACTIVE: 'INACTIVE',
   ACTIVE_HEALTHY: 'ACTIVE_HEALTHY',

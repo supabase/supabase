@@ -19,6 +19,7 @@ import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 import CTABanner from '~/components/CTABanner'
 import LW11Summary from '~/components/LaunchWeek/11/LW11Summary'
 import LW12Summary from '~/components/LaunchWeek/12/LWSummary'
+import LW13Summary from '~/components/LaunchWeek/13/Releases/LWSummary'
 import BlogLinks from '~/components/LaunchWeek/7/BlogLinks'
 import LWXSummary from '~/components/LaunchWeek/X/LWXSummary'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -106,6 +107,9 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
   const nextPost = allPosts[currentIndex + 1]
   const prevPost = allPosts[currentIndex - 1]
 
+  const tocResult = toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 })
+  const processedContent = tocResult.content.replace(/%23/g, '')
+
   return {
     props: {
       prevPost: currentIndex === 0 ? null : prevPost ? prevPost : null,
@@ -116,7 +120,10 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
         source: content,
         ...data,
         content: mdxSource,
-        toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
+        toc: {
+          ...tocResult,
+          content: processedContent,
+        },
       },
     },
   }
@@ -129,6 +136,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   const isLaunchWeekX = props.blog.launchweek?.toString().toLocaleLowerCase() === 'x'
   const isGAWeek = props.blog.launchweek?.toString().toLocaleLowerCase() === '11'
   const isLaunchWeek12 = props.blog.launchweek?.toString().toLocaleLowerCase() === '12'
+  const isLaunchWeek13 = props.blog.launchweek?.toString().toLocaleLowerCase() === '13'
 
   const author = authorArray
     .map((authorId) => {
@@ -236,7 +244,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout className="overflow-x-hidden">
         <div
           className="
             container mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16
@@ -308,7 +316,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
               </div>
               <div className="grid grid-cols-12 lg:gap-16 xl:gap-8">
                 {/* Content */}
-                <div className="col-span-12 lg:col-span-7 xl:col-span-7 overflow-x-hidden">
+                <div className="col-span-12 lg:col-span-7 xl:col-span-7">
                   <article>
                     <div className={['prose prose-docs'].join(' ')}>
                       {props.blog.youtubeHero ? (
@@ -341,6 +349,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                   {isLaunchWeekX && <LWXSummary />}
                   {isGAWeek && <LW11Summary />}
                   {isLaunchWeek12 && <LW12Summary />}
+                  {isLaunchWeek13 && <LW13Summary />}
                   <div className="block lg:hidden py-8">
                     <div className="text-foreground-lighter text-sm">Share this article</div>
                     <ShareArticleActions title={props.blog.title} slug={props.blog.slug} />

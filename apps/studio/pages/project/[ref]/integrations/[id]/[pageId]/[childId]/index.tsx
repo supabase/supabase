@@ -1,6 +1,7 @@
 import { useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useRouter } from 'next/compat/router'
@@ -53,11 +54,15 @@ const IntegrationPage: NextPageWithLayout = () => {
     return <div>Integration not found</div>
   }
 
-  if (!Component) return <div>Component not found</div>
+  if (!Component) return <div className="p-10 text-sm">Component not found</div>
 
   return <Component />
 }
 
-IntegrationPage.getLayout = (page) => <IntegrationsLayout>{page}</IntegrationsLayout>
+IntegrationPage.getLayout = (page) => (
+  <DefaultLayout>
+    <IntegrationsLayout>{page}</IntegrationsLayout>
+  </DefaultLayout>
+)
 
 export default IntegrationPage

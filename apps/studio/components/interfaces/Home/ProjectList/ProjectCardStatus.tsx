@@ -3,14 +3,7 @@ import { AlertTriangle, Info, PauseCircle, RefreshCcw } from 'lucide-react'
 import { RESOURCE_WARNING_MESSAGES } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.utils'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
-import {
-  Alert_Shadcn_,
-  AlertTitle_Shadcn_,
-  cn,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-} from 'ui'
+import { Alert_Shadcn_, AlertTitle_Shadcn_, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { InferredProjectStatus } from './ProjectCard.utils'
 
 export interface ProjectCardWarningsProps {
@@ -137,12 +130,12 @@ export const ProjectCardStatus = ({
       )}
       <div className="flex justify-between items-center w-full gap-x-1">
         <AlertTitle_Shadcn_ className="text-xs mb-0">{alertTitle}</AlertTitle_Shadcn_>
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_>
+        <Tooltip>
+          <TooltipTrigger>
             <Info size={14} className="text-foreground-light hover:text-foreground" />
-          </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="bottom">{alertDescription}</TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">{alertDescription}</TooltipContent>
+        </Tooltip>
       </div>
     </Alert_Shadcn_>
   )

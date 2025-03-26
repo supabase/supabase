@@ -3,7 +3,7 @@ title: 'Build a User Management App with SolidJS'
 description: 'Learn how to use Supabase in your SolidJS App.'
 ---
 
-<QuickstartIntro />
+<$Partial path="quickstart_intro.mdx" />
 
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
@@ -13,7 +13,7 @@ If you get stuck while working through this guide, refer to the [full example on
 
 </Admonition>
 
-<ProjectSetup />
+<$Partial path="project_setup.mdx" />
 
 ## Building the app
 
@@ -21,7 +21,7 @@ Let's start building the SolidJS app from scratch.
 
 ### Initialize a SolidJS app
 
-We can use [Degit](https://github.com/Rich-Harris/degit) to initialize an app called `supabase-solid`:
+We can use [degit](https://github.com/Rich-Harris/degit) to initialize an app called `supabase-solid`:
 
 ```bash
 npx degit solidjs/templates/ts supabase-solid
@@ -45,7 +45,7 @@ VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 Now that we have the API credentials in place, let's create a helper file to initialize the Supabase client. These variables will be exposed
 on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
-```js src/supabaseClient.jsx
+```tsx src/supabaseClient.tsx
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL

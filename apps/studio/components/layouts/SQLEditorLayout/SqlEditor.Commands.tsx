@@ -35,7 +35,7 @@ import {
   useSetPage,
 } from 'ui-patterns/CommandMenu'
 import { usePrefetchTables, useTablesQuery, type TablesData } from 'data/tables/tables-query'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { useEffect, useRef } from 'react'
 
 export function useSqlEditorGotoCommands(options?: CommandOptions) {
@@ -91,7 +91,16 @@ export function useSnippetCommands() {
 
 function RunSnippetPage() {
   const { ref } = useParams()
-  const { data: snippets, isLoading, isError, isSuccess } = useSqlSnippetsQuery(ref)
+  const {
+    data: snippetPages,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useSqlSnippetsQuery({
+    projectRef: ref,
+  })
+
+  const snippets = snippetPages?.pages.flatMap((page) => page.contents)
 
   const { profile } = useProfile()
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
@@ -109,15 +118,11 @@ function RunSnippetPage() {
       </CommandHeader>
       {isLoading && <LoadingState />}
       {isError && <ErrorState />}
-      {isSuccess && (!snippets || snippets.snippets.length === 0) && (
+      {isSuccess && (!snippets || snippets.length === 0) && (
         <EmptyState projectRef={ref} canCreateNew={canCreateSQLSnippet} />
       )}
-      {isSuccess && !!snippets && snippets.snippets.length > 0 && (
-        <SnippetSelector
-          projectRef={ref}
-          canCreateNew={canCreateSQLSnippet}
-          snippets={snippets.snippets}
-        />
+      {isSuccess && !!snippets && snippets.length > 0 && (
+        <SnippetSelector projectRef={ref} canCreateNew={canCreateSQLSnippet} snippets={snippets} />
       )}
     </CommandWrapper>
   )
@@ -239,7 +244,7 @@ function SnippetSelector({
 function snippetValue(snippet: SqlSnippet) {
   if (snippet.type !== 'sql') return ''
   return escapeAttributeSelector(
-    `${snippet.id}-${snippet.name}-${snippet.content.sql.slice(0, 30)}`
+    `${snippet.id}-${snippet.name}-${snippet?.content?.sql.slice(0, 30)}`
   ).toLowerCase()
 }
 
@@ -356,7 +361,7 @@ from ${formatTableIdentifier(table)}
 }
 
 function excludeSupabaseControlledSchemas(tables: TablesData) {
-  return tables.filter((table) => !EXCLUDED_SCHEMAS.includes(table.schema))
+  return tables.filter((table) => !PROTECTED_SCHEMAS.includes(table.schema))
 }
 
 // Not a perfectly spec-compliant regex , since Postgres also allows non-Latin

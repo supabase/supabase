@@ -12,7 +12,7 @@ export const TROUBLESHOOTING_DATA_ATTRIBUTES = {
 }
 
 export function formatError(error: ITroubleshootingEntry['data']['errors'][number]) {
-  return `${error.http_status_code ?? ''}${!!error.http_status_code && !!error.code && ' '}${error.code ?? ''}`
+  return `${error.http_status_code ?? ''}${!!error.http_status_code && !!error.code ? ' ' : ''}${error.code ?? ''}`
 }
 
 export const troubleshootingSearchParams = {

@@ -197,7 +197,7 @@ export default function InteractiveGridSingle() {
         height={CANVAS_HEIGHT}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="border border-gray-300 shadow-lg"
+        className="border border-gray-300 shadow-lg pointer-events-auto"
       />
 
       {/* Current user cursor */}

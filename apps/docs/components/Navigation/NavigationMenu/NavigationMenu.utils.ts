@@ -109,8 +109,8 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.Api
     case pathname.startsWith('auth'):
       return MenuId.Auth
-    case pathname.startsWith('local-development'):
-      return MenuId.LocalDevelopment
+    case pathname.startsWith('cron'):
+      return MenuId.Cron
     case pathname.startsWith('database'):
       return MenuId.Database
     case pathname.startsWith('deployment'):
@@ -123,18 +123,26 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.Graphql
     case pathname.startsWith('integrations'):
       return MenuId.Integrations
-    case pathname.startsWith('monitoring-troubleshooting'):
-      return MenuId.MonitoringTroubleshooting
+    case pathname.startsWith('local-development'):
+      return MenuId.LocalDevelopment
+    case pathname.startsWith('telemetry'):
+      return MenuId.Telemetry
     case pathname.startsWith('platform'):
       return MenuId.Platform
+    case pathname.startsWith('queues'):
+      return MenuId.Queues
     case pathname.startsWith('realtime'):
       return MenuId.Realtime
     case pathname.startsWith('resources'):
       return MenuId.Resources
+    case pathname.startsWith('security'):
+      return MenuId.Security
     case pathname.startsWith('self-hosting'):
       return MenuId.SelfHosting
     case pathname.startsWith('storage'):
       return MenuId.Storage
+    case pathname.startsWith('/contributing'):
+      return MenuId.Contributing
     default:
       return MenuId.GettingStarted
   }

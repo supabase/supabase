@@ -56,6 +56,7 @@ export function ExpandableVideo({
           text-white
           flex flex-col gap-3
           items-center justify-center
+          bg-alternative
           before:content['']
           before:absolute
           before:inset-0
@@ -108,7 +109,7 @@ export function ExpandableVideo({
             >
               <p className="text-xs">Close</p>
             </button>
-            <div className="video-container !rounded overflow-hidden">
+            <div className="video-container !rounded-lg !border-none !overflow-hidden">
               <iframe
                 src={`https://www.youtube-nocookie.com/embed/${videoId}`}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

@@ -71,9 +71,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
       renderCell: (props) => {
         const value = props.row?.[col.id]
         const isTime = col.name.includes('time')
-        const formattedValue = isTime
-          ? `${Number(value.toFixed(2)).toLocaleString()}ms`
-          : value.toLocaleString()
+        const formattedValue = isTime ? `${value.toFixed(0)}ms` : value.toLocaleString()
         return (
           <div
             className={cn(
@@ -93,7 +91,10 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
   const selectedQuery =
     selectedRow !== undefined ? queryPerformanceQuery.data?.[selectedRow]?.['query'] : undefined
   const query = (selectedQuery ?? '').trim().toLowerCase()
-  const showIndexSuggestions = query.startsWith('select') || query.startsWith('with pgrst_source')
+  const showIndexSuggestions =
+    query.startsWith('select') ||
+    query.startsWith('with pgrst_source') ||
+    query.startsWith('with pgrst_payload')
 
   const onSortChange = (column: string) => {
     let updatedSort = undefined

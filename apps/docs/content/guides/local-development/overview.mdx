@@ -222,17 +222,17 @@ You've been developing your project locally, making changes to your tables via m
 
 ### Log in to the Supabase CLI
 
-<CH.Code>
+<$CodeTabs>
 
-```bash Terminal
+```bash name=Terminal
 supabase login
 ```
 
-```bash npx
+```bash name=npx
 npx supabase login
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 ### Link your project
 
@@ -334,6 +334,29 @@ This will upload files from `supabase/images` directory to a bucket named `image
 ```bash
 supabase seed buckets
 ```
+
+### Sync any schema with `--schema`
+
+You can synchronize your database with a specific schema using the `--schema` option as follows:
+
+```bash
+supabase db pull --schema <schema_name>
+```
+
+<Admonition type="caution">
+
+Using `--schema`
+
+If the local `supabase/migrations` directory is empty, the `db pull` command will ignore the `--schema` parameter.
+
+To fix this, you can pull twice:
+
+```bash
+supabase db pull
+supabase db pull --schema <schema_name>
+```
+
+</Admonition>
 
 ## Limitations and considerations
 

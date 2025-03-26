@@ -1,3 +1,5 @@
+import { useMemo } from 'react'
+
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
@@ -13,6 +15,7 @@ import {
 } from 'ui'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import WrapperRow from './WrapperRow'
+import { wrapperMetaComparator } from './Wrappers.utils'
 
 interface WrapperTableProps {
   isLatest?: boolean
@@ -28,6 +31,14 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
     connectionString: project?.connectionString,
   })
 
+  const wrappers = useMemo(
+    () =>
+      integration && integration.type === 'wrapper' && data
+        ? data.filter((wrapper) => wrapperMetaComparator(integration.meta, wrapper))
+        : [],
+    [data, integration]
+  )
+
   if (!integration || integration.type !== 'wrapper') {
     return (
       <p className="text-foreground-light text-sm">
@@ -35,8 +46,6 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
       </p>
     )
   }
-
-  const wrappers = (data ?? []).filter((x) => x.handler === integration.meta.handlerName) || []
 
   return (
     <Card className="max-w-5xl">
