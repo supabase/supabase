@@ -165,6 +165,18 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
         {command.description && (
           <ReactMarkdown className="prose break-words mb-8">{command.description}</ReactMarkdown>
         )}
+        {command.usage && (
+          <div className="mb-8">
+            <h3 className="mb-2 text-base text-foreground">Usage</h3>
+            <CodeBlock
+              language="bash"
+              className="p-4 rounded-md border bg-surface-100"
+              wrapperClassName="break-all"
+            >
+              {command.usage}
+            </CodeBlock>
+          </div>
+        )}
         {(command.subcommands ?? []).length > 0 && (
           <>
             <h3 className="mb-3 text-base text-foreground">Subcommands</h3>
