@@ -1,12 +1,25 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-import { parseEszip } from 'lib/eszip-parser'
 import { API_URL } from 'lib/constants'
+import { parseEszip } from 'lib/eszip-parser'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
-  }
+  const { method } = req
 
+  switch (method) {
+    case 'POST':
+      return handlePost(req, res)
+    default:
+      return new Response(
+        JSON.stringify({ data: null, error: { message: `Method ${method} Not Allowed` } }),
+        {
+          status: 405,
+          headers: { 'Content-Type': 'application/json', Allow: 'POST' },
+        }
+      )
+  }
+}
+
+async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { projectRef, slug } = req.body || {}
 

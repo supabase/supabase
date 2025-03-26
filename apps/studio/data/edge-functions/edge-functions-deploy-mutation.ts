@@ -22,7 +22,7 @@ export async function deployEdgeFunction({
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await post(`/v1/projects/{ref}/functions/deploy`, {
-    params: { path: { ref: projectRef }, query: { slug: slug ?? metadata.name } },
+    params: { path: { ref: projectRef }, query: { slug: slug } },
     body: {
       file: files as any,
       metadata,

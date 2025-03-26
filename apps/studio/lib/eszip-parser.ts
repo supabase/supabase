@@ -65,7 +65,7 @@ export async function parseEszip(bytes: Uint8Array) {
     }
 
     // Parse bytes in a try-catch block
-    let specifiers
+    let specifiers: string[] = []
     try {
       specifiers = await parser.parseBytes(bytes)
     } catch (parseError) {

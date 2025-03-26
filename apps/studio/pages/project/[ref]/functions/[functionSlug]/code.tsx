@@ -1,3 +1,8 @@
+import { AlertCircle, CornerDownLeft, Loader2 } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+
 import LogoLoader from '@ui/components/LogoLoader'
 import { useParams } from 'common'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -10,10 +15,6 @@ import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { AlertCircle, CornerDownLeft, Loader2 } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
 import { Button } from 'ui'
 
 const CodePage = () => {
@@ -23,13 +24,6 @@ const CodePage = () => {
   const isOptedInToAI = useOrgOptedIntoAi()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
   const edgeFunctionCreate = useFlag('edgeFunctionCreate')
-
-  // TODO (Saxon): Remove this once the flag is fully launched
-  useEffect(() => {
-    if (!edgeFunctionCreate) {
-      router.push(`/project/${ref}/functions`)
-    }
-  }, [edgeFunctionCreate, ref, router])
 
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
   const {
@@ -44,20 +38,6 @@ const CodePage = () => {
   const [files, setFiles] = useState<
     { id: number; name: string; content: string; selected?: boolean }[]
   >([])
-
-  useEffect(() => {
-    // Set files from API response when available
-    if (functionFiles) {
-      setFiles(
-        functionFiles.map((file: { name: string; content: string }, index: number) => ({
-          id: index + 1,
-          name: file.name,
-          content: file.content,
-          selected: index === 0,
-        }))
-      )
-    }
-  }, [functionFiles])
 
   const { mutateAsync: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
@@ -131,6 +111,27 @@ const CodePage = () => {
       />
     )
   }
+
+  // TODO (Saxon): Remove this once the flag is fully launched
+  useEffect(() => {
+    if (!edgeFunctionCreate) {
+      router.push(`/project/${ref}/functions`)
+    }
+  }, [edgeFunctionCreate, ref, router])
+
+  useEffect(() => {
+    // Set files from API response when available
+    if (functionFiles) {
+      setFiles(
+        functionFiles.map((file: { name: string; content: string }, index: number) => ({
+          id: index + 1,
+          name: file.name,
+          content: file.content,
+          selected: index === 0,
+        }))
+      )
+    }
+  }, [functionFiles])
 
   return (
     <div className="flex flex-col h-full">
