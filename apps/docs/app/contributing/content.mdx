@@ -171,15 +171,16 @@ Or, you can use the `<$CodeSample />` component to include code samples from a s
 
 If the file is within the `supabase/supabase` repo's `examples` directory:
 
+{/* prettier-ignore */}
 ```mdx
 <$CodeSample
 path="/relative/path/from/examples/directory.js"
-{/_ Array of [start, end] line numbers to include.
+{/* Array of [start, end] line numbers to include.
 Line numbers are 1-indexed and inclusive.
--1 indicates the final line. _/}
+-1 indicates the final line. */}
 lines={[[1, 3], [5, -1]]}
 {/* Optional, displays as a file name on the code block */}
-meta="display/path.js"
+meta="name=display/path.js"
 />
 ```
 
@@ -193,11 +194,91 @@ repo="cli"
 commit="1623aa9b95ec90e21c5bae5a0d50dcf272abe92f"
 path="/relative/path/from/root.js"
 lines={[[1, 3], [5, -1]]}
-meta="display/path.js"
+meta="name=display/path.js"
 />
 ```
 
 The repo must be public, the org must be on the allow list, and the commit must be an immutable SHA (not a mutable tag or branch name).
+
+#### Multi-file code samples
+
+Multi-file code samples use the `<$CodeTabs>` annotation:
+
+````mdx
+<$CodeTabs>
+
+```js name=a.js
+console.log('Hello, world!')
+```
+
+```js name=b.js
+console.log('Goodbye, world!')
+```
+
+</$CodeTabs>
+````
+
+This produces:
+
+<$CodeTabs>
+
+```js name=a.js
+console.log('Hello, world!')
+```
+
+```js name=b.js
+console.log('Goodbye, world!')
+```
+
+</$CodeTabs>
+
+If you want to give a file name for your code sample, you can also use `<$CodeTabs>` with only one code block.
+
+#### TypeScript type hints
+
+JavaScript and TypeScript code blocks include type hints:
+
+````mdx
+```js
+let hello = 'Hello, world!'
+```
+````
+
+Hover over `hello` to see the hint.
+
+```js
+let hello = 'Hello, world!'
+```
+
+The entire code block must be a valid compilation target for TypeScript. That is, if you have undefined variables or missing imports, type hints won't be shown. You can add extra statements above the cut for variable definitions, etc.
+
+You can also import the `supabase-js` library here:
+
+````mdx
+```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('dummy', 'client')
+
+// ---cut---
+const result = supabase.auth.signInWithPassword({
+  email: 'test@example.com',
+  password: 'test1234',
+})
+```
+````
+
+Note the hidden statements above the cut. Hover over `signInWithPassword` to see the hint:
+
+```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('dummy', 'client')
+
+// ---cut---
+const result = supabase.auth.signInWithPassword({
+  email: 'test@example.com',
+  password: 'test1234',
+})
+```
 
 ### Icons
 
@@ -415,10 +496,10 @@ We incorporate content reuse in the docs to avoid duplication. If you find yours
     >
 
     ```mdx
-    <DatabaseSetup />
+    <$Partial path="database_setup.mdx" />
     ```
 
-    <DatabaseSetup />
+    <$Partial path="database_setup.mdx" />
 
     </AccordionItem>
 
@@ -430,10 +511,10 @@ We incorporate content reuse in the docs to avoid duplication. If you find yours
     >
 
     ```mdx
-    <CreateClientSnippet />
+    <$Partial path="create_client_snippet.mdx" />
     ```
 
-    <CreateClientSnippet />
+    <$Partial path="create_client_snippet.mdx" />
 
     </AccordionItem>
 
@@ -442,8 +523,18 @@ We incorporate content reuse in the docs to avoid duplication. If you find yours
 
 To make a new partial:
 
-1. Make a new MDX file in `apps/docs/components/MDX`.
+1. Make a new MDX file in `apps/docs/content/_partials`.
 1. Write your reusable content.
-1. Inside `apps/docs/components/MDX/partials.tsx`, import and re-export your partial.
-1. Inside `apps/docs/features/docs/mdx.shared.tsx`, import your partial and include it in the `components` object.
-1. You can now use your partial inside any other MDX file by using: `<YourPartialName />`.
+1. You can now use your partial inside any other MDX file by using: `<$Partial path="path/from/_partials/directory.mdx" />`.
+
+If you need compile-time variable replacement, you can define variables that get replaced with strings.
+
+```mdx
+<$Partial path="path/to/file.mdx" variables={{ "substitute": "this" }}>
+```
+
+```mdx
+Here is the partial text to {{ .substitute }}.
+```
+
+Only string replacements are possible at this time. For more complex use cases, consider making a custom component.

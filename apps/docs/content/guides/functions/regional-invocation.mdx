@@ -18,9 +18,9 @@ Supabase provides an option to specify the region when invoking the Function.
 
 Use the `x-region` HTTP header when calling an Edge Function to determine where the Function should be executed:
 
-<CH.Code>
+<$CodeTabs>
 
-```bash cURL
+```bash name=cURL
 # https://supabase.com/docs/guides/functions/deploy#invoking-remote-functions
 curl --request POST 'https://<project_ref>.supabase.co/functions/v1/hello-world' \
   --header 'Authorization: Bearer ANON_KEY' \
@@ -29,7 +29,7 @@ curl --request POST 'https://<project_ref>.supabase.co/functions/v1/hello-world'
   --data '{ "name":"Functions" }'
 ```
 
-```js JavaScript
+```js name=JavaScript
 // https://supabase.com/docs/reference/javascript/installing
 import { createClient } from '@supabase/supabase-js'
 
@@ -43,7 +43,7 @@ const { data, error } = await supabase.functions.invoke('hello-world', {
 })
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 You can verify the execution region by looking at the `x-sb-edge-region` HTTP header in the response. You can also find it as metadata in [Edge Function Logs](/docs/guides/functions/logging).
 

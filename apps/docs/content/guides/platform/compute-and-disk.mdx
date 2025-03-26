@@ -82,21 +82,21 @@ The following sections explain how these attributes affect disk performance.
 
 ### Compute size
 
-The compute size of your project sets the upper limit for disk throughput and IOPS. The table below shows the limits for each instance size. For instance, an 8XL compute instance has a maximum throughput of 9,500 MiB/s and a maximum IOPS of 40,000.
+The compute size of your project sets the upper limit for disk throughput and IOPS. The table below shows the limits for each instance size. For instance, an 8XL compute instance has a maximum throughput of 9,500 Mbps and a maximum IOPS of 40,000.
 
 | Compute Instance | Disk Throughput | IOPS        |
 | ---------------- | --------------- | ----------- |
-| Nano (free)      | 43 MiB/s        | 250 IOPS    |
-| Micro            | 87 MiB/s        | 500 IOPS    |
-| Small            | 174 MiB/s       | 1,000 IOPS  |
-| Medium           | 347 MiB/s       | 2,000 IOPS  |
-| Large            | 630 MiB/s       | 3,600 IOPS  |
-| XL               | 1,188 MiB/s     | 6,000 IOPS  |
-| 2XL              | 2,375 MiB/s     | 12,000 IOPS |
-| 4XL              | 4,750 MiB/s     | 20,000 IOPS |
-| 8XL              | 9,500 MiB/s     | 40,000 IOPS |
-| 12XL             | 14,250 MiB/s    | 50,000 IOPS |
-| 16XL             | 19,000 MiB/s    | 80,000 IOPS |
+| Nano (free)      | 43 Mbps         | 250 IOPS    |
+| Micro            | 87 Mbps         | 500 IOPS    |
+| Small            | 174 Mbps        | 1,000 IOPS  |
+| Medium           | 347 Mbps        | 2,000 IOPS  |
+| Large            | 630 Mbps        | 3,600 IOPS  |
+| XL               | 1,188 Mbps      | 6,000 IOPS  |
+| 2XL              | 2,375 Mbps      | 12,000 IOPS |
+| 4XL              | 4,750 Mbps      | 20,000 IOPS |
+| 8XL              | 9,500 Mbps      | 40,000 IOPS |
+| 12XL             | 14,250 Mbps     | 50,000 IOPS |
+| 16XL             | 19,000 Mbps     | 80,000 IOPS |
 
 Smaller compute instances like Nano, Micro, Small, and Medium have baseline performance levels that can occasionally be exceeded for short periods of time. If it does exceed the baseline, you should consider upgrading your instance size for a more reliable performance.
 
@@ -108,7 +108,7 @@ If you need consistent disk performance, choose the 4XL or larger compute instan
 
 ### Provisioned disk throughput and IOPS
 
-The default disk type is gp3, which comes with a baseline throughput of 125 MiB/s and a default IOPS of 3,000. You can provision additional IOPS and throughput from the [Database Settings](https://supabase.com/dashboard/project/_/settings/compute-and-disk) page, but keep in mind that the effective IOPS and throughput will be limited by the compute instance size. This requires Large compute size or above.
+The default disk type is gp3, which comes with a baseline throughput of 125 MB/s and a default IOPS of 3,000. You can provision additional IOPS and throughput from the [Database Settings](https://supabase.com/dashboard/project/_/settings/compute-and-disk) page, but keep in mind that the effective IOPS and throughput will be limited by the compute instance size. This requires Large compute size or above.
 
 <Admonition type="caution">
 
@@ -125,9 +125,9 @@ When selecting your disk, it's essential to focus on the performance needs of yo
 | **Use Case**      | General workloads, development environments, small to medium databases                                                                        | High-performance needs, large-scale databases, mission-critical applications                         |
 | **Max Disk Size** | 16 TB                                                                                                                                         | 60 TB                                                                                                |
 | **Max IOPS**      | 16,000 IOPS (at 32 GB disk size)                                                                                                              | 80,000 IOPS (at 80 GB disk size)                                                                     |
-| **Throughput**    | 125 MiB/s (default) to 1,000 MiB/s (maximum)                                                                                                  | Automatically scales with IOPS                                                                       |
+| **Throughput**    | 125 MB/s (default) to 1,000 MB/s (maximum)                                                                                                    | Automatically scales with IOPS                                                                       |
 | **Best For**      | Great value for most use cases                                                                                                                | Low latency and very high IOPS requirements                                                          |
-| **Pricing**       | Disk: 8 GB included, then $0.125 per GB<br/>IOPS: 3,000 included, then $0.024 per IOPS<br/>Throughput: 125 Mbps included, then $0.95 per Mbps | Disk: $0.195 per GB<br/>IOPS: $0.119 per IOPS<br/>Throughput: Scales with IOPS at no additional cost |
+| **Pricing**       | Disk: 8 GB included, then $0.125 per GB<br/>IOPS: 3,000 included, then $0.024 per IOPS<br/>Throughput: 125 MB/s included, then $0.95 per MB/s | Disk: $0.195 per GB<br/>IOPS: $0.119 per IOPS<br/>Throughput: Scales with IOPS at no additional cost |
 
 For general, day-to-day operations, gp3 should be more than enough. If you need high throughput and IOPS for critical systems, io2 will provide the performance required.
 
@@ -139,7 +139,7 @@ Compute instance size changes will not change your selected disk type or disk si
 
 ### Disk size
 
-- General Purpose (gp3) disks come with a baseline of 3,000 IOPS and 125 MiB/s. You can provision additional 500 IOPS for every GB of disk size and additional 0.25 MiB/s throughput per provisioned IOPS.
+- General Purpose (gp3) disks come with a baseline of 3,000 IOPS and 125 MB/s. You can provision additional 500 IOPS for every GB of disk size and additional 0.25 MB/s throughput per provisioned IOPS.
 - High Performance (io2) disks can be provisioned with 1,000 IOPS per GB of disk size.
 
 ## Limits and constraints

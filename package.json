@@ -53,7 +53,7 @@
   },
   "pnpm": {
     "overrides": {
-      "@supabase/supabase-js>@supabase/auth-js": "2.68.0-rc.6"
+      "@supabase/supabase-js>@supabase/auth-js": "2.69.0-rc.3"
     }
   },
   "engines": {

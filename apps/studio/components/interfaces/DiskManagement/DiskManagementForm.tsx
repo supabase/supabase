@@ -209,6 +209,7 @@ export function DiskManagementForm() {
     useUpdateDiskAttributesMutation({
       // this is to suppress to toast message
       onError: () => {},
+      onSuccess: () => setRefetchInterval(2000),
     })
   const { mutateAsync: updateSubscriptionAddon, isLoading: isUpdatingCompute } =
     useProjectAddonUpdateMutation({

@@ -110,7 +110,7 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
                   </>
                 }
               >
-                <InputPostTab label="MiB/s">
+                <InputPostTab label="MB/s">
                   {isLoading ? (
                     <div
                       className={cn(

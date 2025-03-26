@@ -9,7 +9,7 @@ hideToc: true
 
   <StepHikeCompact.Step step={1}>
 
-    <QuickstartDbSetup />
+    <$Partial path="quickstart_db_setup.mdx" />
 
   </StepHikeCompact.Step>
 
@@ -26,7 +26,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash
       npx create-next-app -e with-supabase
       ```
 
@@ -46,10 +46,14 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```text .env.local
-      NEXT_PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
-      NEXT_PUBLIC_SUPABASE_ANON_KEY=<SUBSTITUTE_SUPABASE_ANON_KEY>
-      ```
+      <$CodeTabs>
+
+        ```text name=.env.local
+        NEXT_PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+        NEXT_PUBLIC_SUPABASE_ANON_KEY=<SUBSTITUTE_SUPABASE_ANON_KEY>
+        ```
+
+      </$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -66,20 +70,20 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-    <CH.Code className="min-h-[34rem]">
+    <$CodeTabs>
 
-      ```ts app/instruments/page.tsx
-        import { createClient } from '@/utils/supabase/server';
+      ```ts name=app/instruments/page.tsx
+      import { createClient } from '@/utils/supabase/server';
 
-        export default async function Instruments() {
-          const supabase = await createClient();
-          const { data: instruments } = await supabase.from("instruments").select();
+      export default async function Instruments() {
+        const supabase = await createClient();
+        const { data: instruments } = await supabase.from("instruments").select();
 
-          return <pre>{JSON.stringify(instruments, null, 2)}</pre>
-        }
+        return <pre>{JSON.stringify(instruments, null, 2)}</pre>
+      }
       ```
 
-      ```ts utils/supabase/server.ts
+      ```ts name=utils/supabase/server.ts
         import { createServerClient } from '@supabase/ssr'
         import { cookies } from 'next/headers'
 
@@ -111,7 +115,7 @@ hideToc: true
         }
       ```
 
-    </CH.Code>
+    </$CodeTabs>
 
     </StepHikeCompact.Code>
 

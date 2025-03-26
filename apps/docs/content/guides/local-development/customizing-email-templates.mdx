@@ -11,15 +11,15 @@ You can customize the email templates for local development [using the `config.t
 
 You should provide a relative URL to the `content_path` parameter, pointing to an HTML file which contains the template. For example
 
-<CH.Code>
+<$CodeTabs>
 
-```toml supabase/config.toml
+```toml name=supabase/config.toml
 [auth.email.template.invite]
 subject = "You are invited to Acme Inc"
 content_path = "./supabase/templates/invite.html"
 ```
 
-```html supabase/templates/invite.html
+```html name=supabase/templates/invite.html
 <html>
   <body>
     <h2>Confirm your signup</h2>
@@ -28,7 +28,7 @@ content_path = "./supabase/templates/invite.html"
 </html>
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 ## Available email templates
 

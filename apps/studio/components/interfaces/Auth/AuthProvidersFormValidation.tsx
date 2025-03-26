@@ -32,7 +32,7 @@ const PROVIDER_EMAIL = {
     },
     SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: {
       title: 'Secure password change',
-      description: `Users will need to be recently logged in to change their password without requiring reauthentication.
+      description: `Users will need to be recently logged in to change their password without requiring reauthentication. (A user is considered recently logged in if the session was created within the last 24 hours.)
       If disabled, a user can change their password at any time.`,
       type: 'boolean',
     },
