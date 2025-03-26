@@ -3,9 +3,9 @@ import type { Message as MessageType } from 'ai/react'
 import { useChat } from 'ai/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
-import { ArrowDown, FileText, Info, RefreshCw, X, Plus } from 'lucide-react'
+import { ArrowDown, FileText, Info, Plus, RefreshCw, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { memo, useEffect, useMemo, useRef, useState, useCallback } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams, useSearchParamsShallow } from 'common/hooks'
@@ -26,7 +26,7 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   AiIconAnimation,
@@ -40,12 +40,11 @@ import {
 import { Admonition, AssistantChatForm, GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import DotGrid from '../DotGrid'
+import { AIAssistantChatSelector } from './AIAssistantChatSelector'
 import AIOnboarding from './AIOnboarding'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
 import { useAutoScroll } from './hooks'
-import { AIAssistantChatSelector } from './AIAssistantChatSelector'
-import { useAssistant } from 'hooks/useAssistant'
 
 const MemoizedMessage = memo(
   ({ message, isLoading }: { message: MessageType; isLoading: boolean }) => {
@@ -79,19 +78,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
-  const { aiAssistantPanel } = useAppStateSnapshot()
-  const {
-    messages: assistantMessages,
-    saveMessage,
-    clearMessages,
-    closeAssistant,
-    clearSqlSnippets,
-    newChat,
-    clearSuggestions,
-    setSqlSnippets,
-    activeChatId,
-  } = useAssistant({ projectRef: project?.ref })
-  const { open, initialInput, sqlSnippets, suggestions } = aiAssistantPanel
+  const snap = useAiAssistantStateSnapshot()
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const { ref: scrollContainerRef, isSticky, scrollToEnd } = useAutoScroll()
@@ -99,7 +86,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   // Add a ref to store the last user message
   const lastUserMessageRef = useRef<MessageType | null>(null)
 
-  const [value, setValue] = useState<string>(initialInput)
+  const [value, setValue] = useState<string>(snap.initialInput || '')
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
 
   const { data: check, isSuccess } = useCheckOpenAIKeyQuery()
@@ -134,19 +121,16 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   }, [])
 
   // Handle completion of the assistant's response
-  const handleChatFinish = useCallback(
-    (message: MessageType) => {
-      // If we have a user message stored in the ref, save both messages
-      if (lastUserMessageRef.current) {
-        saveMessage([lastUserMessageRef.current, message])
-        lastUserMessageRef.current = null
-      } else {
-        // Otherwise just save the assistant message
-        saveMessage(message)
-      }
-    },
-    [saveMessage]
-  )
+  const handleChatFinish = useCallback((message: MessageType) => {
+    // If we have a user message stored in the ref, save both messages
+    if (lastUserMessageRef.current) {
+      snap.saveMessage([lastUserMessageRef.current, message])
+      lastUserMessageRef.current = null
+    } else {
+      // Otherwise just save the assistant message
+      snap.saveMessage(message)
+    }
+  }, [])
 
   const {
     messages: chatMessages,
@@ -154,10 +138,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     append,
     setMessages,
   } = useChat({
-    id: activeChatId || 'default',
+    id: snap.activeChatId,
     api: `${BASE_PATH}/api/ai/sql/generate-v3`,
     maxSteps: 5,
-    initialMessages: assistantMessages,
+    // [Alaister] typecast is needed here because valtio returns readonly arrays
+    // and useChat expects a mutable array
+    initialMessages: snap.activeChat?.messages as unknown as MessageType[] | undefined,
     body: {
       includeSchemaMetadata,
       projectRef: project?.ref,
@@ -191,7 +177,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const sendMessageToAssistant = async (content: string) => {
     const payload = { role: 'user', createdAt: new Date(), content } as MessageType
     const headerData = await constructHeaders()
-    clearSqlSnippets()
+    snap.clearSqlSnippets()
 
     // Store the user message in the ref before appending
     lastUserMessageRef.current = payload
@@ -240,7 +226,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   }
 
   const handleClearMessages = () => {
-    clearMessages()
+    snap.clearMessages()
     setMessages([])
     lastUserMessageRef.current = null
   }
@@ -257,26 +243,19 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   }, [isChatLoading, isSticky, scrollToEnd])
 
   useEffect(() => {
-    setValue(initialInput)
-    if (inputRef.current) {
+    setValue(snap.initialInput || '')
+    if (inputRef.current && snap.initialInput) {
       inputRef.current.focus()
-      inputRef.current.setSelectionRange(initialInput.length, initialInput.length)
+      inputRef.current.setSelectionRange(snap.initialInput.length, snap.initialInput.length)
     }
-  }, [initialInput])
-
-  // Remove suggestions if sqlSnippets were removed
-  useEffect(() => {
-    if (!sqlSnippets || sqlSnippets.length === 0) {
-      clearSuggestions()
-    }
-  }, [sqlSnippets, suggestions, clearSuggestions])
+  }, [snap.initialInput])
 
   useEffect(() => {
-    if (open && isInSQLEditor && !!snippetContent) {
-      setSqlSnippets([snippetContent])
+    if (snap.open && isInSQLEditor && !!snippetContent) {
+      snap.setSqlSnippets([snippetContent])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, isInSQLEditor, snippetContent])
+  }, [snap.open, isInSQLEditor, snippetContent])
 
   return (
     <>
@@ -310,7 +289,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                       icon={<Plus size={14} />}
                       onClick={() => {
                         if (project?.ref) {
-                          newChat()
+                          snap.newChat()
                         }
                       }}
                       className="h-7 w-7 p-0"
@@ -331,7 +310,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   </TooltipTrigger>
                   <TooltipContent>Clear chat messages</TooltipContent>
                 </Tooltip>
-                <Button type="default" className="w-7 h-7" onClick={closeAssistant} icon={<X />} />
+                <Button
+                  type="default"
+                  className="w-7 h-7"
+                  onClick={snap.closeAssistant}
+                  icon={<X />}
+                />
               </div>
             </div>
             {!includeSchemaMetadata && selectedOrganization && (
@@ -396,14 +380,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               )}
               <div className="h-1" />
             </div>
-          ) : suggestions ? (
+          ) : snap.suggestions ? (
             <div className="w-full h-full px-8 py-0 flex flex-col flex-1 justify-end">
               <h3 className="text-foreground-light font-mono text-sm uppercase mb-3">
                 Suggestions
               </h3>
-              {suggestions.title && <p>{suggestions.title}</p>}
+              {snap.suggestions.title && <p>{snap.suggestions.title}</p>}
               <div className="-mx-3 mt-4 mb-12">
-                {suggestions?.prompts?.map((prompt: string, idx: number) => (
+                {snap.suggestions?.prompts?.map((prompt: string, idx: number) => (
                   <Button
                     key={`suggestion-${idx}`}
                     size="small"
@@ -412,9 +396,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                     className="w-full justify-start py-1 h-auto"
                     onClick={() => {
                       setValue(prompt)
-                      if (inputRef.current) {
+                      if (inputRef.current && snap.initialInput) {
                         inputRef.current.focus()
-                        inputRef.current.setSelectionRange(initialInput.length, initialInput.length)
+                        inputRef.current.setSelectionRange(
+                          snap.initialInput.length,
+                          snap.initialInput.length
+                        )
                       }
                     }}
                   >
@@ -522,17 +509,17 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         </AnimatePresence>
 
         <div className="p-5 pt-0 z-20 relative">
-          {sqlSnippets && sqlSnippets.length > 0 && (
+          {snap.sqlSnippets && snap.sqlSnippets.length > 0 && (
             <div className="mb-2">
-              {sqlSnippets.map((snippet: string, index: number) => (
+              {snap.sqlSnippets.map((snippet: string, index: number) => (
                 <CollapsibleCodeBlock
                   key={index}
                   hideLineNumbers
                   value={snippet}
                   onRemove={() => {
-                    const newSnippets = [...sqlSnippets]
+                    const newSnippets = [...(snap.sqlSnippets ?? [])]
                     newSnippets.splice(index, 1)
-                    setSqlSnippets(newSnippets)
+                    snap.setSqlSnippets(newSnippets)
                   }}
                   className="text-xs"
                 />
@@ -572,7 +559,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             placeholder={
               hasMessages
                 ? 'Reply to the assistant...'
-                : (sqlSnippets ?? [])?.length > 0
+                : (snap.sqlSnippets ?? [])?.length > 0
                   ? 'Ask a question or make a change...'
                   : 'Chat to Postgres...'
             }
@@ -582,7 +569,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               event.preventDefault()
               if (includeSchemaMetadata) {
                 const sqlSnippetsString =
-                  sqlSnippets
+                  snap.sqlSnippets
                     ?.map((snippet: string) => '```sql\n' + snippet + '\n```')
                     .join('\n') || ''
                 const valueWithSnippets = [value, sqlSnippetsString].filter(Boolean).join('\n\n')

@@ -40,7 +40,8 @@ export const STRIPE_PUBLIC_KEY =
 export const USAGE_APPROACHING_THRESHOLD = 0.75
 
 export const LOCAL_STORAGE_KEYS = {
-  AI_ASSISTANT_STATE: 'supabase-ai-assistant-state',
+  AI_ASSISTANT_STATE: (projectRef: string | undefined) =>
+    `supabase-ai-assistant-state-${projectRef}`,
   SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',
   EDITOR_PANEL_STATE: 'supabase-editor-panel-state',
 

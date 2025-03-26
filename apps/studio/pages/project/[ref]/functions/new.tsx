@@ -43,6 +43,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 
 // Array of adjectives and nouns for random function name generation
 const ADJECTIVES = [
@@ -103,7 +104,7 @@ const NewFunctionPage = () => {
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const snap = useAiAssistantStateSnapshot()
   const edgeFunctionCreate = useFlag('edgeFunctionCreate')
   const { mutate: sendEvent } = useSendEventMutation()
   const org = useSelectedOrganization()
@@ -162,7 +163,7 @@ const NewFunctionPage = () => {
 
   const handleChat = () => {
     const selectedFile = files.find((f) => f.selected) ?? files[0]
-    setAiAssistantPanel({
+    snap.newChat({
       open: true,
       sqlSnippets: [selectedFile.content],
       initialInput: 'Help me understand and improve this edge function...',

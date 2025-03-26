@@ -1,7 +1,7 @@
-import { useState } from 'react'
 import { Check, Edit, MessageSquare, Trash, X } from 'lucide-react'
-import { useAssistant } from 'hooks/useAssistant'
-import { useRouter } from 'next/router'
+import { useState } from 'react'
+
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Button,
   cn,
@@ -22,18 +22,14 @@ interface AIAssistantChatSelectorProps {
 }
 
 export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorProps) => {
-  const router = useRouter()
-  const projectRef = typeof router.query.ref === 'string' ? router.query.ref : undefined
-  const { chats, activeChatId, selectChat, deleteChat, renameChat } = useAssistant({
-    projectRef,
-  })
+  const snap = useAiAssistantStateSnapshot()
 
   const [chatSelectorOpen, setChatSelectorOpen] = useState(false)
   const [editingChatId, setEditingChatId] = useState<string | null>(null)
   const [editingChatName, setEditingChatName] = useState('')
 
   const handleSelectChat = (id: string) => {
-    selectChat(id)
+    snap.selectChat(id)
     setChatSelectorOpen(false)
   }
 
@@ -41,7 +37,7 @@ export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorPr
     if (e) {
       e.stopPropagation()
     }
-    deleteChat(id)
+    snap.deleteChat(id)
   }
 
   const handleStartEditChat = (id: string, name: string, e?: React.MouseEvent) => {
@@ -57,7 +53,7 @@ export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorPr
       e.stopPropagation()
     }
     if (editingChatId && editingChatName.trim()) {
-      renameChat(editingChatId, editingChatName.trim())
+      snap.renameChat(editingChatId, editingChatName.trim())
       setEditingChatId(null)
       setEditingChatName('')
     }
@@ -99,7 +95,7 @@ export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorPr
           <CommandList_Shadcn_>
             <CommandEmpty_Shadcn_>No chats found.</CommandEmpty_Shadcn_>
             <CommandGroup_Shadcn_>
-              {chats.map(([id, chat]) => (
+              {Object.entries(snap.chats).map(([id, chat]) => (
                 <CommandItem_Shadcn_
                   key={id}
                   value={id}
@@ -152,7 +148,7 @@ export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorPr
                         <Check
                           className={cn(
                             'mr-2 h-4 w-4 flex-shrink-0',
-                            activeChatId === id ? 'opacity-100' : 'opacity-0'
+                            snap.activeChatId === id ? 'opacity-100' : 'opacity-0'
                           )}
                         />
                         <span className="truncate flex-1 min-w-0 overflow-hidden">{chat.name}</span>
