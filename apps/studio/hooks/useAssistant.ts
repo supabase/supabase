@@ -1,7 +1,6 @@
 import type { Message, Message as MessageType } from 'ai/react'
 import { useCallback, useEffect, useMemo } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
-import { ChatSession } from 'state/app-state'
+import { ChatSession, useAppStateSnapshot } from 'state/app-state'
 
 export interface UseAssistantOptions {
   projectRef?: string
@@ -69,7 +68,7 @@ export function useAssistant(options?: UseAssistantOptions) {
 
           setAiAssistantPanel({
             chats: {
-              ...(aiAssistantPanel.chats || {}),
+              ...(chats || {}),
               [chatId]: newChat,
             } as any,
             activeChatId: chatId,
@@ -93,7 +92,7 @@ export function useAssistant(options?: UseAssistantOptions) {
 
       setAiAssistantPanel({
         chats: {
-          ...(aiAssistantPanel.chats || {}),
+          ...(chats || {}),
           [chatId]: newChat,
         } as any,
         activeChatId: chatId,
@@ -102,7 +101,7 @@ export function useAssistant(options?: UseAssistantOptions) {
       return chatId
     }
     return undefined
-  }, [projectRef, setAiAssistantPanel, aiAssistantPanel.chats])
+  }, [projectRef, setAiAssistantPanel, chats])
 
   const handleSelectChat = useCallback(
     (id: string) => {
@@ -154,16 +153,10 @@ export function useAssistant(options?: UseAssistantOptions) {
         // Create new chats object with the updated chat
         const updatedChats = {
           ...chats,
-          [id]: {
-            ...chat,
-            name,
-            updatedAt: new Date(),
-          },
-        } as Record<string, ChatSession>
+          [id]: { ...chat, name, updatedAt: new Date() },
+        }
 
-        setAiAssistantPanel({
-          chats: updatedChats,
-        })
+        setAiAssistantPanel({ chats: updatedChats as any })
       }
     },
     [projectChatsRecord]
@@ -213,9 +206,21 @@ export function useAssistant(options?: UseAssistantOptions) {
             },
           }
           setAiAssistantPanel({
-            chats: chatUpdate.chats as Record<string, ChatSession>,
+            chats: chatUpdate.chats as any,
           })
         }
+      }
+    },
+    [activeChatId, projectChatsRecord]
+  )
+
+  const handleUpdateMessage = useCallback(
+    ({ id, title, results }: { id: string; title?: string; results: any[] }) => {
+      if (projectRef && currentChatBelongsToProject && activeChatId) {
+        // Get the existing messages for the active chat
+        const existingMessages: readonly MessageType[] =
+          projectChatsRecord[activeChatId]?.messages || []
+        console.log({ existingMessages })
       }
     },
     [activeChatId, projectChatsRecord]
@@ -294,5 +299,6 @@ export function useAssistant(options?: UseAssistantOptions) {
     clearSqlSnippets,
     clearSuggestions,
     setSqlSnippets,
+    updateMessage: handleUpdateMessage,
   }
 }

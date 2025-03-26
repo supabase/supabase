@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { Check, Edit, MessageSquare, Trash, X } from 'lucide-react'
 import { useAssistant } from 'hooks/useAssistant'
+import { Check, Edit, MessageSquare, Trash, X } from 'lucide-react'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 import {
   Button,
   cn,
@@ -16,6 +16,7 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
 } from 'ui'
+import { ButtonTooltip } from '../ButtonTooltip'
 
 interface AIAssistantChatSelectorProps {
   className?: string
@@ -86,11 +87,12 @@ export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorPr
   return (
     <Popover_Shadcn_ open={chatSelectorOpen} onOpenChange={setChatSelectorOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
+        <ButtonTooltip
           type="default"
           size="tiny"
           icon={<MessageSquare size={14} />}
           className={cn('h-7 w-7', className)}
+          tooltip={{ content: { side: 'bottom', text: 'View chats' } }}
         />
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="w-[250px] p-0" align="end">

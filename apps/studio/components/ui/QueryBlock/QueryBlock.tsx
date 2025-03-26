@@ -11,24 +11,15 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { Parameter, parseParameters } from 'lib/sql-parameters'
 import { Dashboards } from 'types'
-import {
-  Button,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  cn,
-  CodeBlock,
-  SQL_ICON,
-} from 'ui'
-import { Admonition } from 'ui-patterns'
+import { ChartContainer, ChartTooltip, ChartTooltipContent, cn, CodeBlock, SQL_ICON } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
 import { ButtonTooltip } from '../ButtonTooltip'
+import SqlWarningAdmonition from '../SqlWarningAdmonition'
 import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
 import { ParametersPopover } from './ParametersPopover'
 import { getCumulativeResults } from './QueryBlock.utils'
-import SqlWarningAdmonition from '../SqlWarningAdmonition'
 
 export const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',
@@ -71,10 +62,12 @@ interface QueryBlockProps {
   tooltip?: ReactNode
   /** Not implemented yet: Will be the next part of ReportsV2 */
   onSetParameter?: (params: Parameter[]) => void
-  /** Optional callback the SQL query is run */
+  /** Optional callback when the SQL query is run */
   onRunQuery?: (queryType: 'select' | 'mutation') => void
   /** Optional callback on drag start */
   onDragStart?: (e: DragEvent<Element>) => void
+  /** Optional: callback when the results are returned from running the SQL query*/
+  onResults?: (results: any[]) => void
 
   // [Joshen] Params below are currently only used by ReportsV2 (Might revisit to see how to improve these)
   /** Optional height set to render the SQL query (Used in Reports) */
@@ -117,6 +110,7 @@ export const QueryBlock = ({
   noResultPlaceholder = null,
   tooltip,
   onRunQuery,
+  onResults,
   onSetParameter,
   onUpdateChartConfig,
   onDragStart,
@@ -141,7 +135,10 @@ export const QueryBlock = ({
   const isReadOnlySelectSQL = isReadOnlySelect(sql ?? '')
 
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess: (data) => setQueryResult(data.result),
+    onSuccess: (data) => {
+      onResults?.(data.result)
+      setQueryResult(data.result)
+    },
   })
 
   const handleExecute = () => {

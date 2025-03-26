@@ -10,12 +10,12 @@ import { useProfile } from 'lib/profile'
 import { Dashboards } from 'types'
 import { Badge, cn, CodeBlock, CodeBlockLang } from 'ui'
 import { DebouncedComponent } from '../DebouncedComponent'
+import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { QueryBlock } from '../QueryBlock/QueryBlock'
 import { AssistantSnippetProps } from './AIAssistant.types'
 import { identifyQueryType } from './AIAssistant.utils'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { MessageContext } from './Message'
-import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 
 export const OrderedList = memo(({ children }: { children: ReactNode }) => (
   <ol className="flex flex-col gap-y-4">{children}</ol>
@@ -62,6 +62,7 @@ const MemoizedQueryBlock = memo(
     isDraggable,
     runQuery,
     onRunQuery,
+    onResults,
     onDragStart,
     onUpdateChartConfig,
   }: {
@@ -74,6 +75,7 @@ const MemoizedQueryBlock = memo(
     isDraggable: boolean
     runQuery: boolean
     onRunQuery: (queryType: 'select' | 'mutation') => void
+    onResults: (results: any[]) => void
     onDragStart: (e: DragEvent<Element>) => void
     onUpdateChartConfig?: ({
       chart,
@@ -84,7 +86,7 @@ const MemoizedQueryBlock = memo(
     }) => void
   }) => (
     <DebouncedComponent
-      delay={500}
+      delay={isLoading ? 500 : 0}
       value={sql}
       fallback={
         <div className="bg-surface-100 border-overlay rounded border shadow-sm px-3 py-2 text-xs">
@@ -119,6 +121,7 @@ const MemoizedQueryBlock = memo(
         draggable={isDraggable}
         runQuery={runQuery}
         onRunQuery={onRunQuery}
+        onResults={onResults}
         onDragStart={onDragStart}
         onUpdateChartConfig={onUpdateChartConfig}
       />
@@ -127,7 +130,13 @@ const MemoizedQueryBlock = memo(
 )
 MemoizedQueryBlock.displayName = 'MemoizedQueryBlock'
 
-export const MarkdownPre = ({ children }: { children: any }) => {
+export const MarkdownPre = ({
+  onResults,
+  children,
+}: {
+  onResults: ({ title, results }: { title?: string; results: any[] }) => void
+  children: any
+}) => {
   const router = useRouter()
   const { profile } = useProfile()
   const { isLoading, readOnly } = useContext(MessageContext)
@@ -213,6 +222,7 @@ export const MarkdownPre = ({ children }: { children: any }) => {
             isDraggable={isDraggableToReports}
             runQuery={runQuery}
             onRunQuery={onRunQuery}
+            onResults={(results) => onResults({ title: snippetProps.title, results })}
             onUpdateChartConfig={({ chartConfig: config }) => {
               chartConfig.current = { ...chartConfig.current, ...config }
             }}

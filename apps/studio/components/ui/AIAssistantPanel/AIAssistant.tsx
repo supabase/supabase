@@ -3,9 +3,9 @@ import type { Message as MessageType } from 'ai/react'
 import { useChat } from 'ai/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
-import { ArrowDown, FileText, Info, RefreshCw, X, Plus } from 'lucide-react'
+import { ArrowDown, FileText, Info, Plus, RefreshCw, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { memo, useEffect, useMemo, useRef, useState, useCallback } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams, useSearchParamsShallow } from 'common/hooks'
@@ -24,6 +24,7 @@ import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
+import { useAssistant } from 'hooks/useAssistant'
 import { BASE_PATH, IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -39,23 +40,33 @@ import {
 } from 'ui'
 import { Admonition, AssistantChatForm, GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ButtonTooltip } from '../ButtonTooltip'
 import DotGrid from '../DotGrid'
+import { AIAssistantChatSelector } from './AIAssistantChatSelector'
 import AIOnboarding from './AIOnboarding'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
 import { useAutoScroll } from './hooks'
-import { AIAssistantChatSelector } from './AIAssistantChatSelector'
-import { useAssistant } from 'hooks/useAssistant'
 
 const MemoizedMessage = memo(
-  ({ message, isLoading }: { message: MessageType; isLoading: boolean }) => {
+  ({
+    message,
+    isLoading,
+    onResults,
+  }: {
+    message: MessageType
+    isLoading: boolean
+    onResults: ({ title, results }: { title?: string; results: any[] }) => void
+  }) => {
     return (
       <Message
         key={message.id}
+        id={message.id}
         role={message.role}
         content={message.content}
         readOnly={message.role === 'user'}
         isLoading={isLoading}
+        onResults={onResults}
       />
     )
   }
@@ -83,6 +94,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const {
     messages: assistantMessages,
     saveMessage,
+    updateMessage,
     clearMessages,
     closeAssistant,
     clearSqlSnippets,
@@ -180,6 +192,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             key={message.id}
             message={message}
             isLoading={isChatLoading && message.id === chatMessages[chatMessages.length - 1].id}
+            onResults={(props) => updateMessage({ id: message.id, ...props })}
           />
         )
       }),
@@ -302,36 +315,32 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               </div>
               <div className="flex gap-2">
                 <AIAssistantChatSelector />
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="default"
-                      size="tiny"
-                      icon={<Plus size={14} />}
-                      onClick={() => {
-                        if (project?.ref) {
-                          newChat()
-                        }
-                      }}
-                      className="h-7 w-7 p-0"
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent>New chat</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="default"
-                      size="tiny"
-                      icon={<RefreshCw size={14} />}
-                      onClick={handleClearMessages}
-                      className="h-7 w-7 p-0"
-                      disabled={isChatLoading}
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent>Clear chat messages</TooltipContent>
-                </Tooltip>
-                <Button type="default" className="w-7 h-7" onClick={closeAssistant} icon={<X />} />
+                <ButtonTooltip
+                  type="default"
+                  size="tiny"
+                  icon={<Plus size={14} />}
+                  onClick={() => {
+                    if (project?.ref) newChat()
+                  }}
+                  tooltip={{ content: { side: 'bottom', text: 'New chat' } }}
+                  className="h-7 w-7 p-0"
+                />
+                <ButtonTooltip
+                  type="default"
+                  size="tiny"
+                  icon={<RefreshCw size={14} />}
+                  onClick={handleClearMessages}
+                  className="h-7 w-7 p-0"
+                  tooltip={{ content: { side: 'bottom', text: 'Clear chat messages' } }}
+                  disabled={isChatLoading}
+                />
+                <ButtonTooltip
+                  type="default"
+                  className="w-7 h-7"
+                  onClick={closeAssistant}
+                  icon={<X />}
+                  tooltip={{ content: { side: 'bottom', text: 'Close Assistant' } }}
+                />
               </div>
             </div>
             {!includeSchemaMetadata && selectedOrganization && (

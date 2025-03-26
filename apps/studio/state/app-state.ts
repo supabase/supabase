@@ -1,9 +1,9 @@
 import type { Message as MessageType } from 'ai/react'
 import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
-import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
+import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
 export type CommonDatabaseEntity = {
   id: number
@@ -23,11 +23,13 @@ export type Template = {
   content: string
 }
 
+type AssistantMessageType = MessageType & { results?: any[] }
+
 export type ChatSession = {
   id: string
   name: string
   projectRef: string
-  messages: readonly MessageType[]
+  messages: readonly AssistantMessageType[]
   createdAt: Date
   updatedAt: Date
 }
