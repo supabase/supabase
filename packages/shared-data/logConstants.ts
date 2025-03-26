@@ -9,7 +9,6 @@ type LogTable =
   | 'postgrest_logs'
   | 'supavisor_logs'
   | 'pgbouncer_logs'
-  | 'warehouse_logs'
   | 'pg_cron_logs'
 
 type LogSchema = {
@@ -23,7 +22,7 @@ type LogSchema = {
 
 const schemas: LogSchema[] = [
   {
-    name: 'API Edge',
+    name: 'API Gateway',
     reference: 'edge_logs',
     fields: [
       { path: 'id', type: 'string' },
