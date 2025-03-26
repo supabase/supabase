@@ -3,7 +3,6 @@ import { useThreeJS } from './helpers'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import SceneRenderer from './utils/SceneRenderer'
 import TicketScene from './scenes/TicketScene'
-import TunnelScene from './scenes/TunnelScene'
 import useConfData from './hooks/use-conf-data'
 import HUDScene from './scenes/HUDScene'
 
@@ -15,8 +14,6 @@ interface TicketCanvasProps {
 
 const TicketCanvas = ({ className, onUpgradeToSecret, narrow }: TicketCanvasProps) => {
   const sceneRef = useRef<TicketScene | null>(null)
-  const tunnelRef = useRef<TunnelScene | null>(null)
-  const [hudObj, setHudObj] = useState<HUDScene | null>(null)
   const initQueue = useRef<{ init: Promise<void>; renderer: SceneRenderer }[]>([])
   const onUpgradeToSecretRef = useRef(onUpgradeToSecret)
   const [state, dispatch] = useConfData()
@@ -57,26 +54,10 @@ const TicketCanvas = ({ className, onUpgradeToSecret, narrow }: TicketCanvasProp
           },
         })
 
-        const tunnel = new TunnelScene({
-          defaultVisible: true,
-        })
-
-        const hud = new HUDScene({
-          defaultVisible: true,
-          defaultLayout: initialSceneDataRef.current.narrow
-            ? 'narrow'
-            : initialSceneDataRef.current.visible
-              ? 'ticket'
-              : 'default',
-        })
 
         await sceneRenderer.activateScene(scene, true)
-        await sceneRenderer.activateScene(tunnel)
-        await sceneRenderer.activateScene(hud)
 
         sceneRef.current = scene
-        tunnelRef.current = tunnel
-        setHudObj(hud)
 
         dispatch({ type: 'TICKET_LOADING_SUCCESS' })
       })
@@ -106,23 +87,8 @@ const TicketCanvas = ({ className, onUpgradeToSecret, narrow }: TicketCanvasProp
 
     if (sceneRef.current) {
       void updateTicket()
-
-      if (state.ticketVisibility) {
-        hudObj?.dimmHud()
-      } else {
-        hudObj?.undimmHud()
-      }
-
-      if (!narrow) {
-        if (state.ticketVisibility) {
-          hudObj?.setLayout('ticket')
-        } else {
-          hudObj?.setLayout('default')
-        }
-      }
     }
   }, [
-    hudObj,
     narrow,
     state.ticketVisibility,
     state.userTicketData.name,
@@ -135,29 +101,6 @@ const TicketCanvas = ({ className, onUpgradeToSecret, narrow }: TicketCanvasProp
   useEffect(() => {
     onUpgradeToSecretRef.current = onUpgradeToSecret
   }, [onUpgradeToSecret])
-
-  useEffect(() => {
-    const isOn = state.partymodeStatus === 'on'
-    const data = state.gaugesData
-    if (data && hudObj) {
-      if (isOn) {
-        hudObj.setPeopleOnlineActive(true, true)
-
-        if (data.peopleOnline) hudObj.setPeopleOnline(data.peopleOnline, true)
-        if (data.payloadSaturation) hudObj.setMeetupsAmount(data.payloadSaturation, true)
-        if (data.payloadFill) hudObj.setPayloadFill(data.payloadFill, true)
-        if (data.meetupsAmount) hudObj.setMeetupsAmount(data.meetupsAmount, true)
-      } else {
-        hudObj.setPeopleOnlineActive(false, true)
-        hudObj.setPeopleOnline(0, true)
-        hudObj.setMeetupsAmount(0, true)
-        hudObj.setPayloadFill(0, true)
-        hudObj.setMeetupsAmount(0, true)
-      }
-
-      hudObj.draw()
-    }
-  }, [state.gaugesData, state.partymodeStatus, hudObj])
 
   const { containerRef } = useThreeJS(setup)
   return (

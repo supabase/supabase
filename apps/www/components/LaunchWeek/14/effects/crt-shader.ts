@@ -4,7 +4,7 @@ export const CRTShader = {
     time: { value: 0 },
     scanlineIntensity: { value: 1 },
     scanlineCount: { value: 320 },
-    vignetteIntensity: { value: 0.9 },
+    vignetteIntensity: { value: 1.5 },
     noiseIntensity: { value: 0.01 },
     flickerIntensity: { value: 0.01 },
     rgbShiftAmount: { value: 0.0 },
@@ -74,32 +74,10 @@ export const CRTShader = {
       // Vignette effect
       vec2 center = vec2(0.5, 0.5);
       float dist = distance(vUv, center);
-      float vignette = smoothstep(0.4, 0.75, dist) * activeVignetteIntensity;
+      float vignette = smoothstep(0.3, 0.85, dist) * activeVignetteIntensity;
       
-      // Apply vignette (darkens edges, not center)
-      vec4 vignetteColor = scanlineColor * (1.0 - vignette * 0.7);
-
-      // Noise - more subtle
-      float noise = random(vUv + time * 0.001) * activeNoiseIntensity;
-      
-      // Apply noise properly - add noise but keep it centered around zero
-      vec4 noiseColor = vignetteColor;
-      noiseColor.rgb += noise - (activeNoiseIntensity * 0.5);
-      
-      // Completely revised flicker implementation that won't fade out
-      // Use modulo time to create a repeating pattern that never diminishes
-      float timeModA = mod(time * 0.7, 10.0);
-      float timeModB = mod(time * 1.5, 5.0);
-      
-      // Create two independent flicker patterns
-      float flickerA = step(0.95, random(vec2(timeModA, 0.0))) * random(vec2(timeModA, 1.0));
-      float flickerB = step(0.98, random(vec2(timeModB, 2.0))) * random(vec2(timeModB, 3.0));
-      
-      // Combine flickers with a constant baseline
-      float flicker = (flickerA * 16.0 + flickerB * 8.0 + 2.0) * activeFlickerIntensity;
-      
-      // Apply flicker with a guaranteed minimum effect
-      vec4 finalColor = noiseColor * (1.0 - flicker);
+      // Apply vignette as the final overlay effect
+      vec4 finalColor = scanlineColor * (1.0 - vignette * 0.7);
       
       // Blend between original and effect based on intensity
       gl_FragColor = mix(originalColor, finalColor, intensity);
