@@ -186,7 +186,7 @@ export default function App() {
       </div>
       
       {/* Main content */}
-      <div className="flex-1 overflow-hidden p-16">
+      <div className="flex-1 overflow-hidden p-12">
         <div className="max-w-4xl mx-auto h-full">
           <div className="h-full text-neutral-200 overflow-hidden">
             <div ref={editorRef} className="h-full"></div>

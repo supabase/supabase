@@ -321,8 +321,8 @@ export default function App() {
     <ExampleLayout
       appJsCode={appJsCode}
       files={todoFiles}
-      title="Todo Example"
-      description="A collaborative task management application where multiple users can create, complete, and delete todos in real-time. This example demonstrates synchronized state management with optimistic UI updates, presence awareness showing who's online, and real-time broadcasting of task changes. Perfect for team collaboration, project management, or learning how to build shared productivity tools."
+      title="Todo List"
+      description="A collaborative task management application where multiple users can create, complete, and delete todos in real-time. This example demonstrates synchronized state management with optimistic UI updates, presence awareness showing who's online, and real-time broadcasting of task changes. "
     />
   )
 }

@@ -111,7 +111,7 @@ export default function App() {
       appJsCode={appJsCode}
       files={presenceFiles}
       title="Presence"
-      description="A simple demonstration of Supabase Realtime Presence, showing which users are currently online and active. This example tracks user presence with avatars and usernames, allowing you to see who's viewing the same content in real-time. Presence is perfect for collaborative applications, showing user activity status, and building features that respond to user availability."
+      description="A simple demonstration of Supabase Realtime Presence, showing which users are currently online and active. This example tracks user presence with avatars and usernames, allowing you to see who's viewing the same content in real-time."
     />
   )
 }

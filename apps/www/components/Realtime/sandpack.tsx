@@ -23,7 +23,7 @@ export default function SandpackWrapper({ files, dependencies = {} }: SandpackPr
   }
 
   return (
-    <div className="flex-1 h-full min-h-96 w-full rounded-lg overflow-hidden border">
+    <div className="h-full w-full">
       <SandpackProvider
         template="react"
         files={completeFiles}
@@ -39,12 +39,12 @@ export default function SandpackWrapper({ files, dependencies = {} }: SandpackPr
           externalResources: ['https://cdn.tailwindcss.com'],
         }}
       >
-        <SandpackLayout className="!h-full !min-h-full sandpack-wrapper !border-none !rounded-none !bg-surface-75 !flex !flex-col">
+        <SandpackLayout className="!h-full !min-h-full !border-none !bg-surface-50 !rounded-none !flex !flex-col">
           <SandpackPreview
             showNavigator={false}
             showRefreshButton={false}
             showOpenInCodeSandbox={false}
-            className="!h-full !flex-1 sandpack-preview !rounded-md"
+            className="!h-full !flex-1 !border-none"
           />
         </SandpackLayout>
       </SandpackProvider>
