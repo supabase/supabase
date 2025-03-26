@@ -1,5 +1,15 @@
 import saveAs from 'file-saver'
-import { Clipboard, ClipboardList, Copy, Download, Edit, Lock, MoreHorizontal, Trash, Unlock } from 'lucide-react'
+import {
+  Clipboard,
+  ClipboardList,
+  Copy,
+  Download,
+  Edit,
+  Lock,
+  MoreHorizontal,
+  Trash,
+  Unlock,
+} from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
@@ -42,8 +52,7 @@ import {
   TreeViewItemVariant,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { useTableDefinitionQuery } from 'data/database/table-definition-query'
-import { useMemo } from 'react'
+import { getTableDefinition } from 'data/database/table-definition-query'
 import { formatSql } from 'lib/formatSql'
 
 export interface EntityListItemProps {
@@ -208,27 +217,22 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     }
   }
 
-  const { data: tableDefinition } = useTableDefinitionQuery(
-    {
-      id: entity?.id,
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    {
-      enabled: true,
-    }
-  )
-
-  const formattedDefinition = useMemo(
-    () => (tableDefinition ? formatSql(tableDefinition) : undefined),
-    [tableDefinition]
-  )
-
   const copyTableDefinition = async () => {
     if (IS_PLATFORM && !project?.connectionString) {
       return console.error('Connection string is required')
     }
-    copyToClipboard(formattedDefinition || '')
+    try {
+      const definition = await getTableDefinition({
+        id: entity.id,
+        projectRef,
+        connectionString: project?.connectionString,
+      })
+      const formattedDefinition = formatSql(definition)
+      copyToClipboard(formattedDefinition || '')
+      toast.success('Definition copied to clipboard')
+    } catch (error: any) {
+      toast.error(`Failed to copy table definition: ${error.message}`)
+    }
   }
 
   return (
