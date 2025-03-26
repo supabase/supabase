@@ -64,25 +64,27 @@ export const RealtimeSettings = () => {
     })
 
   const FormSchema = z.object({
-    allow_public: z.boolean(),
     connection_pool: z.coerce
       .number()
       .min(1)
       .max(maxConn?.maxConnections ?? 100),
     max_concurrent_users: z.coerce.number().min(1).max(50000),
-
     // [Joshen] These fields are temporarily hidden from the UI
     // max_events_per_second: z.coerce.number().min(1).max(50000),
     // max_bytes_per_second: z.coerce.number().min(1).max(10000000),
     // max_channels_per_client: z.coerce.number().min(1).max(10000),
     // max_joins_per_second: z.coerce.number().min(1).max(5000),
+
+    // [Filipe] This field is temporarily hidden from the UI
+    // allow_public: z.boolean(),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       ...REALTIME_DEFAULT_CONFIG,
-      allow_public: !REALTIME_DEFAULT_CONFIG.private_only,
+      // [Filipe] This field is temporarily hidden from the UI
+      // allow_public: !REALTIME_DEFAULT_CONFIG.private_only,
     },
   })
 
@@ -90,7 +92,8 @@ export const RealtimeSettings = () => {
     if (!projectRef) return console.error('Project ref is required')
     updateRealtimeConfig({
       ref: projectRef,
-      private_only: !data.allow_public,
+      // [Filipe] This field is temporarily hidden from the UI
+      // private_only: !data.allow_public,
       connection_pool: data.connection_pool,
       max_concurrent_users: data.max_concurrent_users,
     })
@@ -99,7 +102,10 @@ export const RealtimeSettings = () => {
   useEffect(() => {
     // [Joshen] Temp typed with any - API typing marks all the properties as nullable,
     // but checked with Filipe that they're not supposed to
-    if (data) form.reset({ ...data, allow_public: !data.private_only } as any)
+    // [Filipe] This field is temporarily hidden from the UI
+    // if (data) form.reset({ ...data, allow_public: !data.private_only } as any)
+
+    if (data) form.reset({ ...data } as any)
   }, [isSuccess])
 
   return (
@@ -110,7 +116,10 @@ export const RealtimeSettings = () => {
             <AlertError error={error} subject="Failed to retrieve realtime settings" />
           ) : (
             <Card>
-              <CardContent>
+              {/*
+                [Filipe] We're hidding this field until we implement a 'kill all sockets` on change to be triggered in realtime server
+              */}
+              {/* <CardContent>
                 <FormField_Shadcn_
                   control={form.control}
                   name="allow_public"
@@ -137,7 +146,7 @@ export const RealtimeSettings = () => {
                     </FormSection>
                   )}
                 />
-              </CardContent>
+              </CardContent> */}
               <CardContent>
                 <FormField_Shadcn_
                   control={form.control}
@@ -233,8 +242,8 @@ export const RealtimeSettings = () => {
                 />
               </CardContent>
 
-              {/* 
-                [Joshen] The following fields are hidden from the UI temporarily while we figure out what settings to expose to the users 
+              {/*
+                [Joshen] The following fields are hidden from the UI temporarily while we figure out what settings to expose to the users
                 - Max events per second
                 - Max bytes per second
                 - Max channels per client
