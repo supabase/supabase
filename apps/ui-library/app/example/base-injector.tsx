@@ -10,7 +10,7 @@ export function BaseInjector() {
 
     // Add new base tag
     const base = document.createElement('base')
-    base.href = '/ui/example/password-based-auth/'
+    base.href = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/example/password-based-auth/`
     document.head.prepend(base)
 
     return () => {

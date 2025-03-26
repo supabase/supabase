@@ -41,11 +41,11 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/ui/example/password-based-auth/protected`,
+          emailRedirectTo: `${window.location.origin}${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/protected`,
         },
       })
       if (error) throw error
-      router.push('/example/password-based-auth/sign-up-success') // /sign-up-success
+      router.push('/sign-up-success')
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
