@@ -55,9 +55,10 @@ export const AddIntegrationDropdown = ({
   const isClerkTPAEnabled =
     selectedProject?.ref &&
     isClerkTPAEnabledFlag &&
+    typeof isClerkTPAEnabledFlag === 'string' &&
     isClerkTPAEnabledFlag
       .split(',')
-      .map((it) => it.trim())
+      .map((it: string) => it.trim())
       .includes(selectedProject.ref)
 
   return (
