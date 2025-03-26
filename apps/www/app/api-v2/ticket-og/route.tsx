@@ -27,6 +27,121 @@ const MONO_FONT_URL = '/fonts/launchweek/14/DepartureMono-Regular.otf'
 const LW_TABLE = 'tickets'
 const LW_MATERIALIZED_VIEW = 'tickets_view'
 
+const usernameToLines = (username: string): string[] => {
+  const maxLineLength = 14
+
+  const nonBreakingReplacements = [
+    { regexp: new RegExp(' ', 'g'), replacement: '\u00A0' }, // Space → Non-breaking space
+    { regexp: new RegExp('-', 'g'), replacement: '\u2011' }, // Hyphen → Non-breaking hyphen
+    { regexp: new RegExp('/', 'g'), replacement: '\u2060\u002F\u2060' }, // Slash with word joiners
+    { regexp: new RegExp('\\.', 'g'), replacement: '\u2024' }, // One dot leader (alternative to period)
+  ]
+  const allowList = [...nonBreakingReplacements.map((x) => x.regexp), new RegExp('\\w', 'g')]
+    .map((x) => x.source.replace("-", "\\-"))
+    .join('|')
+  const allowRegexp = new RegExp(`[^${allowList}]`, 'g')
+  const allowdUsername = username.replace(allowRegexp, '')
+  // Split only by spaces, keeping hyphenated words together
+  const words = allowdUsername.split(' ')
+  const lines: string[] = []
+  let currentLine = ''
+
+  // First try to break at word boundaries (spaces only)
+  for (const word of words) {
+    // If adding this word would exceed the line length and we already have content
+    if (
+      currentLine.length + (currentLine ? 1 : 0) + word.length > maxLineLength &&
+      currentLine.length > 0
+    ) {
+      // Add current line to lines array and start a new line
+      lines.push(currentLine)
+      currentLine = word
+    } else {
+      // Add word to current line with a space if needed
+      currentLine = currentLine ? `${currentLine} ${word}` : word
+    }
+  }
+
+  // Add the last line if it has content
+  if (currentLine) {
+    lines.push(currentLine)
+  }
+
+  // If we still have too few lines but some are too long, split them by character
+  // but try to avoid splitting at hyphens
+  let finalLines: string[] = []
+  for (const line of lines) {
+    if (line.length > maxLineLength) {
+      // For long words, try to find good break points
+      let remainingText = line
+      while (remainingText.length > 0) {
+        if (remainingText.length <= maxLineLength) {
+          finalLines.push(remainingText)
+          break
+        }
+
+        // Try to find a good break point that's not a hyphen
+        let breakPoint = maxLineLength
+
+        // Look for a hyphen in the potential break area (a few chars before maxLineLength)
+        const searchArea = remainingText.substring(Math.max(0, breakPoint - 5), breakPoint + 1)
+        const hyphenPos = searchArea.indexOf('-')
+
+        // If we found a hyphen, adjust the break point to keep the hyphenated word together
+        if (hyphenPos >= 0) {
+          // Calculate the actual position in the original string
+          const actualHyphenPos = Math.max(0, breakPoint - 5) + hyphenPos
+
+          // If hyphen is near the beginning, include the whole hyphenated word on next line
+          if (actualHyphenPos < maxLineLength / 2) {
+            breakPoint = actualHyphenPos
+          }
+          // If hyphen is near the end, include the whole hyphenated word on this line
+          else {
+            // Find the end of the hyphenated word
+            const spaceAfterHyphen = remainingText.indexOf(' ', actualHyphenPos)
+            if (spaceAfterHyphen > 0 && spaceAfterHyphen - actualHyphenPos < 10) {
+              // If the rest of the hyphenated word is reasonably short, keep it together
+              breakPoint = spaceAfterHyphen
+            }
+          }
+        }
+
+        finalLines.push(remainingText.substring(0, breakPoint))
+        remainingText = remainingText.substring(breakPoint).trim()
+      }
+    } else {
+      finalLines.push(line)
+    }
+  }
+
+  // Limit to 3 lines maximum
+  if (finalLines.length > 3) {
+    finalLines = finalLines.slice(0, 2)
+    // Truncate the last line if needed and add ellipsis
+    let lastLine = finalLines[2] || ''
+    if (lastLine.length > 8) {
+      lastLine = lastLine.slice(0, 8) + '...'
+    }
+    finalLines.push(lastLine)
+  }
+
+  finalLines = finalLines.map((line, index) => {
+    let result = line
+    nonBreakingReplacements.forEach(({ regexp, replacement }) => {
+      result = result.replace(regexp, replacement)
+    })
+
+    if (index < finalLines.length - 1) {
+      result = result.padEnd(maxLineLength, '\u00A0')
+    }
+    return result
+  })
+
+  // Ensure we don't have more than 3 lines
+  return finalLines.slice(0, 3)
+}
+
 export async function GET(req: Request, res: Response) {
   const url = new URL(req.url)
   const username = url.searchParams.get('username') ?? url.searchParams.get('amp;username')
@@ -141,28 +256,6 @@ export async function GET(req: Request, res: Response) {
       },
     })
 
-    const usernameToLines = (username: string): string[] => {
-      const lineLenght = 12
-
-      const line1 = username.slice(0, lineLenght).trim().replace(/ /g, '\u00A0')
-      const line2 = username
-        .slice(lineLenght, lineLenght * 2)
-        .trim()
-        .replace(/ /g, '\u00A0')
-      let line3 = username
-        .slice(lineLenght * 2)
-        .trim()
-        .replace(/ /g, '\u00A0')
-
-      // NOTE: If third line is too long, trim to 8 characters and add '...'
-      if (line3.length > lineLenght) {
-        line3 = line3.slice(0, 8) + '...'
-      }
-
-      // NOTE: Only include non-empty lines
-      return [line1, line2, line3].filter((line) => line.length > 0)
-    }
-
     const computeBackgroundWidth = (letters: number) => {
       return 100 + (letters * 40 + (letters - 1) * 12)
     }
@@ -174,11 +267,11 @@ export async function GET(req: Request, res: Response) {
     }
 
     const secretTextStyles = {
-      textShadow: '0 0 15px rgba(52,211,153,0.8)'      
+      textShadow: '0 0 15px rgba(52,211,153,0.8)',
     }
 
     const platinumSecretTextStyles = {
-      textShadow: '0 0 15px rgba(255,199,58,0.8)'      
+      textShadow: '0 0 15px rgba(255,199,58,0.8)',
     }
 
     const generatedTicketImage = new ImageResponse(
@@ -223,7 +316,7 @@ export async function GET(req: Request, res: Response) {
                 top: 70,
                 right: 135,
                 ...(secret ? secretTextStyles : {}),
-                ...(platinumSecret ? platinumSecretTextStyles : {})
+                ...(platinumSecret ? platinumSecretTextStyles : {}),
               }}
             >
               {seatCode}
@@ -255,7 +348,7 @@ export async function GET(req: Request, res: Response) {
                     lineHeight: '56px',
                     display: 'flex',
                     ...(secret ? secretTextStyles : {}),
-                    ...(platinumSecret ? platinumSecretTextStyles : {})
+                    ...(platinumSecret ? platinumSecretTextStyles : {}),
                   }}
                 >
                   {line}
