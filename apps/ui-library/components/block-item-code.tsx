@@ -73,7 +73,7 @@ export function BlockItemCode({ files }: BlockItemCodeProps) {
     : null
 
   return (
-    <div className="flex border rounded-lg overflow-hidden h-[652px] not-prose">
+    <div className="flex border rounded-lg overflow-hidden h-[652px] not-prose mt-4">
       {/* File browser sidebar */}
       <div className="w-64 border-r bg-muted/30 overflow-y-auto">
         <div className="border-b bg-muted/50 h-12 items-center flex px-2">

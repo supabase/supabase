@@ -10,7 +10,7 @@ type SignBucketObjectParams = {
   bucketId?: string
   path: string
   expiresIn: number
-  options?: components['schemas']['SignedUrlOptions']
+  options?: components['schemas']['GetSignedUrlBody']['options']
 }
 export const signBucketObject = async (
   { projectRef, bucketId, path, expiresIn, options }: SignBucketObjectParams,
