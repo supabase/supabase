@@ -1,11 +1,11 @@
 'use client'
 
+import { cva, VariantProps } from 'class-variance-authority'
 import { ChevronRight, FolderClosed, FolderOpen, Loader2 } from 'lucide-react'
-import { ComponentPropsWithoutRef, ReactNode, forwardRef, useEffect, useRef, useState } from 'react'
+import { ComponentPropsWithoutRef, forwardRef, ReactNode, useEffect, useRef, useState } from 'react'
 import TreeViewPrimitive, { flattenTree } from 'react-accessible-treeview'
 import { cn } from '../../lib/utils'
 import { Input } from '../shadcn/ui/input'
-import { cva, VariantProps } from 'class-variance-authority'
 
 const TreeView = TreeViewPrimitive
 
@@ -61,6 +61,8 @@ const TreeViewItem = forwardRef<
     onEditSubmit?: (value: string) => void
     /** For asynchronous loading */
     isLoading?: boolean
+    /** Callback for double-click */
+    onDoubleClick?: (e: React.MouseEvent) => void
   }
 >(
   (
@@ -78,6 +80,7 @@ const TreeViewItem = forwardRef<
       icon,
       isEditing = false,
       onEditSubmit,
+      onDoubleClick,
       ...props
     },
     ref
@@ -100,6 +103,25 @@ const TreeViewItem = forwardRef<
     useEffect(() => {
       if (isEditing) {
         inputRef.current?.focus()
+
+        // When editing starts, select text up to the last dot
+        if (inputRef.current) {
+          const input = inputRef.current
+
+          // Need a slight delay to ensure focus is established
+          setTimeout(() => {
+            const fileName = input.value
+            const lastDotIndex = fileName.lastIndexOf('.')
+            const startPos = 0
+            const endPos = lastDotIndex > 0 ? lastDotIndex : fileName.length
+
+            try {
+              input.setSelectionRange(startPos, endPos)
+            } catch (e) {
+              console.error('Could not set selection range', e)
+            }
+          }, 50)
+        }
       } else {
         setLocalValueState(name)
       }
@@ -116,11 +138,16 @@ const TreeViewItem = forwardRef<
       onEditSubmit?.(localValueState)
     }
 
+    const handleBlur = () => {
+      onEditSubmit?.(localValueState)
+    }
+
     return (
       <div
         ref={ref}
         aria-selected={isSelected}
         aria-expanded={!isEditing && isExpanded}
+        onDoubleClick={onDoubleClick}
         {...props}
         className={cn(TreeViewItemVariant({ isSelected, isOpened, isPreview }))}
         style={{
@@ -200,6 +227,7 @@ const TreeViewItem = forwardRef<
             onChange={(e) => {
               setLocalValueState(e.target.value)
             }}
+            onBlur={handleBlur}
             onKeyDownCapture={(e) => {
               // stop keyboard down bubbling up to TreeView.root
               // on enter key, send onEditSubmit callback
@@ -254,4 +282,4 @@ const TreeViewFolderIcon = forwardRef<SVGSVGElement, LucideSVGProps & { isOpen?:
   }
 )
 
-export { TreeView, TreeViewFolderIcon, TreeViewItem, flattenTree, SQL_ICON }
+export { flattenTree, SQL_ICON, TreeView, TreeViewFolderIcon, TreeViewItem }

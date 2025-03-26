@@ -11,9 +11,8 @@ import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import APIDocsButton from 'components/ui/APIDocsButton'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
 import { Button } from 'ui'
@@ -30,9 +29,13 @@ const EdgeFunctionDetailsLayout = ({
 }: PropsWithChildren<EdgeFunctionDetailsLayoutProps>) => {
   const router = useRouter()
   const { functionSlug, ref } = useParams()
+
   const edgeFunctionCreate = useFlag('edgeFunctionCreate')
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
-  const canReadFunctions = useCheckPermissions(PermissionAction.FUNCTIONS_READ, '*')
+  const { isLoading, can: canReadFunctions } = useAsyncCheckProjectPermissions(
+    PermissionAction.FUNCTIONS_READ,
+    '*'
+  )
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -41,7 +44,6 @@ const EdgeFunctionDetailsLayout = ({
     error,
     isError,
   } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
-  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
 
   const name = selectedFunction?.name || ''
 
@@ -66,6 +68,14 @@ const EdgeFunctionDetailsLayout = ({
           label: 'Logs',
           href: `/project/${ref}/functions/${functionSlug}/logs`,
         },
+        ...(edgeFunctionCreate
+          ? [
+              {
+                label: 'Code',
+                href: `/project/${ref}/functions/${functionSlug}/code`,
+              },
+            ]
+          : []),
         {
           label: 'Details',
           href: `/project/${ref}/functions/${functionSlug}/details`,
@@ -86,7 +96,7 @@ const EdgeFunctionDetailsLayout = ({
     }
   }, [isError])
 
-  if (!canReadFunctions) {
+  if (!isLoading && !canReadFunctions) {
     return (
       <ProjectLayout title={title || 'Edge Functions'} product="Edge Functions">
         <NoPermission isFullPage resourceText="access your project's edge functions" />
