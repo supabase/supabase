@@ -3,7 +3,12 @@ import { getAccessToken, gotrueClient, type User } from 'common'
 export const auth = gotrueClient
 export { getAccessToken }
 
-export const validateReturnTo = (returnTo: string, fallback: string = '/projects'): string => {
+export const DEFAULT_FALLBACK_PATH = '/organizations'
+
+export const validateReturnTo = (
+  returnTo: string,
+  fallback: string = DEFAULT_FALLBACK_PATH
+): string => {
   // Block protocol-relative URLs and external URLs
   if (returnTo.startsWith('//') || returnTo.includes('://')) {
     return fallback
@@ -66,7 +71,7 @@ export const buildPathWithParams = (pathname: string) => {
   return queryString ? `${basePath}?${queryString}` : basePath
 }
 
-export const getReturnToPath = (fallback = '/organizations') => {
+export const getReturnToPath = (fallback = DEFAULT_FALLBACK_PATH) => {
   const searchParams = new URLSearchParams(location.search)
 
   let returnTo = searchParams.get('returnTo') ?? fallback
