@@ -395,7 +395,7 @@ export async function GET(req: Request, res: Response) {
     )
 
     // [Note] Uncomment only for local testing to return the image directly and skip storage upload.
-    return await generatedTicketImage
+    // return await generatedTicketImage
 
     // Upload image to storage.
     const { error: storageError } = await supabaseAdminClient.storage
