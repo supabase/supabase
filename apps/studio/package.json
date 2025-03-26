@@ -24,6 +24,7 @@
   "dependencies": {
     "@ai-sdk/openai": "^0.0.72",
     "@dagrejs/dagre": "^1.0.4",
+    "@deno/eszip": "0.83.0",
     "@electric-sql/pglite": "^0.2.15",
     "@graphiql/react": "^0.19.4",
     "@graphiql/toolkit": "^0.9.1",
