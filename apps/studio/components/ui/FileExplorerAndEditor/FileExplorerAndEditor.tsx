@@ -194,7 +194,7 @@ const FileExplorerAndEditor = ({
                         level={level}
                         xPadding={16}
                         name={element.name}
-                        icon={<File size={14} className="text-foreground-light" />}
+                        icon={<File size={14} className="text-foreground-light shrink-0" />}
                         isEditing={Boolean(element.metadata?.isEditing)}
                         onEditSubmit={(value) => {
                           if (originalId !== null) handleFileNameChange(originalId, value)

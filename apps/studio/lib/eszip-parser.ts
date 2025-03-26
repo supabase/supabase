@@ -140,9 +140,7 @@ async function extractEszip(parser: any, specifiers: string[]) {
       const filePath = url2path(specifier)
 
       // Create a file object
-      const file = new File([moduleSource], filePath, {
-        type: 'text/typescript',
-      })
+      const file = new File([moduleSource], filePath)
 
       files.push(file)
     } catch (error) {
