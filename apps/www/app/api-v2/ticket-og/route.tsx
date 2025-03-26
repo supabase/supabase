@@ -385,7 +385,7 @@ export async function GET(req: Request, res: Response) {
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  opacity: "0.1"
+                  opacity: '0.1',
                 }}
               />
             )}

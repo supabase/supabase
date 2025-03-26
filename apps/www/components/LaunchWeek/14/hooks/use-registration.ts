@@ -141,7 +141,7 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
   const handleGithubSignIn = useCallback(async () => {
     let redirectTo = `${LW14_URL}`
 
-    if(referal) {
+    if (referal) {
       redirectTo += `?referal=${referal}`
     }
 
@@ -179,7 +179,7 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       dispatch({ type: 'SESSION_UPDATED', payload: session })
-      
+
       if (session && window.location.hash.includes('access_token')) {
         window.history.replaceState(null, '', window.location.pathname + window.location.search)
       }

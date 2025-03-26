@@ -970,15 +970,15 @@ class HUDScene implements BaseScene {
       // instead of multiplying by ratio change to avoid exponential growth/shrinking
       this.canvasWidth = this.referenceCanvasWidth * this.qualityMultiplier
       this.canvasHeight = this.referenceCanvasHeight * this.qualityMultiplier
-      
+
       this.hudCanvas.width = this.canvasWidth
       this.hudCanvas.height = this.canvasHeight
-      
+
       // Recalculate scaled styles directly from reference styles and new pixel ratio
       this.scaledStyles = JSON.parse(JSON.stringify(this.referenceStyles), (key, value) => {
         return typeof value === 'number' ? value * this.qualityMultiplier : value
       })
-      
+
       // Update layouts with new pixel ratio
       this.layouts = {
         default: Object.fromEntries(
@@ -989,7 +989,7 @@ class HUDScene implements BaseScene {
             }),
           ])
         ) as typeof this.resolutions,
-  
+
         ticket: Object.fromEntries(
           Object.entries(this.resolutionsTicketLayout).map(([key, resolutions]) => [
             key,
@@ -999,11 +999,11 @@ class HUDScene implements BaseScene {
           ])
         ) as typeof this.resolutionsTicketLayout,
       }
-      
+
       // Redraw the HUD with new dimensions
       this._draw()
       if (this.hudTexture) this.hudTexture.needsUpdate = true
-      
+
       // Update the plane geometry with new dimensions if needed
       if (this.hudPlane && this.hudMesh) {
         this.repositionHudElements()

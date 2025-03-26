@@ -6,7 +6,12 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 import useConfData from './hooks/use-conf-data'
-import { LW14_TWEET_TEXT, LW14_TWEET_TEXT_PLATINUM, LW14_TWEET_TEXT_SECRET, LW14_URL } from '~/lib/constants'
+import {
+  LW14_TWEET_TEXT,
+  LW14_TWEET_TEXT_PLATINUM,
+  LW14_TWEET_TEXT_SECRET,
+  LW14_URL,
+} from '~/lib/constants'
 import supabase from './supabase'
 
 export default function TicketShare() {
@@ -20,7 +25,11 @@ export default function TicketShare() {
   const downloadLink = useRef<HTMLAnchorElement>()
   const link = `${LW14_URL}/tickets/${username}&t=${dayjs(new Date()).format('DHHmmss')}`
   const permalink = encodeURIComponent(link)
-  const text = hasSecretTicket ? LW14_TWEET_TEXT_SECRET : platinum ? LW14_TWEET_TEXT_PLATINUM : LW14_TWEET_TEXT
+  const text = hasSecretTicket
+    ? LW14_TWEET_TEXT_SECRET
+    : platinum
+      ? LW14_TWEET_TEXT_PLATINUM
+      : LW14_TWEET_TEXT
   const encodedText = encodeURIComponent(text)
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&text=${encodedText}`
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}&text=${encodedText}`
