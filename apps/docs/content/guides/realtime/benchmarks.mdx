@@ -27,7 +27,7 @@ The proposed workloads are designed to demonstrate Supabase Realtime's throughpu
 
 ## Results
 
-### Broadcast: using WebSockets
+### Broadcast: Using WebSockets
 
 This workload evaluates the system's capacity to handle multiple concurrent WebSocket connections and sending Broadcast messages via the WebSocket. Each virtual user (VU) in the test:
 
@@ -52,7 +52,7 @@ This workload evaluates the system's capacity to handle multiple concurrent WebS
 | New Connection Rate | 320 conn/sec            |
 | Channel Join Rate   | 640 joins/sec           |
 
-### Broadcast: using the database
+### Broadcast: Using the database
 
 This workload evaluates the system's capacity to send Broadcast messages from the database using the `realtime.broadcast_changes` function. Each virtual user (VU) in the test:
 
@@ -77,7 +77,7 @@ This workload evaluates the system's capacity to send Broadcast messages from th
 | New Connection Rate | 2000 conn/sec          |
 | Channel Join Rate   | 4000 joins/sec         |
 
-### Broadcast: impact of payload size
+### Broadcast: Impact of payload size
 
 This workload tests the system's performance with different message payload sizes to understand how data volume affects throughput and latency. Each virtual user (VU) follows the same connection pattern as the broadcast test, but with varying message sizes:
 
@@ -112,7 +112,7 @@ This workload tests the system's performance with different message payload size
 
 > Note: The final column shows results with reduced load (2,000 users) for the 50KB payload test, demonstrating how the system performs with larger payloads under different concurrency levels.
 
-### Broadcast: scalability scenarios
+### Broadcast: Scalability scenarios
 
 This workload demonstrates Realtime's capability to handle high-scale scenarios with a large number of concurrent users and broadcast channels. The test simulates a scenario where each user participates in group communications with periodic message broadcasts. Each virtual user (VU):
 
