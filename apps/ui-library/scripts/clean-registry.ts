@@ -16,7 +16,7 @@ function processJsonFile(filePath: string) {
       .replace(/\/example\/password-based-auth/g, '')
       .replace(
         "import { Link } from '@/registry/default/components/ui/link'",
-        'import Link from "next/link"'
+        "import Link from 'next/link'"
       )
 
     // Write back to file
