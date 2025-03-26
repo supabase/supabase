@@ -88,7 +88,7 @@ Go to your Supabase project's [API Settings](https://supabase.com/dashboard/proj
 
 ### Receiving Broadcast messages
 
-You can provide a callback for the `broadcast` channel to receive message. This example will receive any `broadcast` messages that are sent to the `room-1` channel:
+You can provide a callback for the `broadcast` channel to receive message. This example will receive any `broadcast` messages that are sent to `test-channel`:
 
 <Tabs
   scrollable
@@ -102,7 +102,7 @@ You can provide a callback for the `broadcast` channel to receive message. This 
     {/* prettier-ignore */}
     ```js
     // Join a room/topic. Can be anything except for 'realtime'.
-    const channelA = supabase.channel('room-1')
+    const myChannel = supabase.channel('test-channel')
 
     // Simple function to log any messages we receive
     function messageReceived(payload) {
@@ -110,10 +110,10 @@ You can provide a callback for the `broadcast` channel to receive message. This 
     }
 
     // Subscribe to the Channel
-    channelA
+    myChannel
       .on(
         'broadcast',
-        { event: 'test' },
+        { event: 'shout' }, // Listen for "shout". Can be "*" to listen to all events
         (payload) => messageReceived(payload)
       )
       .subscribe()
@@ -124,7 +124,7 @@ You can provide a callback for the `broadcast` channel to receive message. This 
 
     {/* prettier-ignore */}
     ```dart
-    final channelA = supabase.channel('room-1');
+    final myChannel = supabase.channel('test-channel');
 
     // Simple function to log any messages we receive
     void messageReceived(payload) {
@@ -132,9 +132,9 @@ You can provide a callback for the `broadcast` channel to receive message. This 
     }
 
     // Subscribe to the Channel
-    channelA
+    myChannel
         .onBroadcast(
-            event: 'test',
+            event: 'shout', // Listen for "shout". Can be "*" to listen to all events
             callback: (payload) => messageReceived(payload)
         )
         .subscribe();
@@ -144,12 +144,12 @@ You can provide a callback for the `broadcast` channel to receive message. This 
   <TabPanel id="swift" label="Swift">
 
     ```swift
-    let channelA = await supabase.channel("room-1")
+    let myChannel = await supabase.channel("test-channel")
 
     // Listen for broadcast messages
-    let broadcastStream = await channelA.broadcast(event: "test")
+    let broadcastStream = await myChannel.broadcast(event: "shout") // Listen for "shout". Can be "*" to listen to all events
 
-    await channelA.subscribe()
+    await myChannel.subscribe()
 
     for await event in broadcastStream {
       print(event)
@@ -161,14 +161,15 @@ You can provide a callback for the `broadcast` channel to receive message. This 
 
     {/* prettier-ignore */}
     ```kotlin
-    val channelA = supabase.channel("room-1")
+    val myChannel = supabase.channel("test-channel")
 
-    //Listen for broadcast messages
-    val broadcastFlow: Flow<JsonObject> = channelA.broadcastFlow<JsonObject>("test")
+    / Listen for broadcast messages
+    val broadcastFlow: Flow<JsonObject> = myChannel
+        .broadcastFlow<JsonObject>("shout") // Listen for "shout". Can be "*" to listen to all events
         .onEach { println(it) }
         .launchIn(yourCoroutineScope) // you can also use .collect { } here
 
-    channelA.subscribe()
+    myChannel.subscribe()
     ```
 
   </TabPanel>
@@ -177,15 +178,15 @@ You can provide a callback for the `broadcast` channel to receive message. This 
     {/* prettier-ignore */}
     ```python
     # Join a room/topic. Can be anything except for 'realtime'.
-    channel_a = supabase.channel('room-1')
+    my_channel = supabase.channel('test-channel')
 
     # Simple function to log any messages we receive
     def message_received(payload):
       print(f"Broadcast received: {payload}")
 
     # Subscribe to the Channel
-    channel_a
-      .on_broadcast('test', message_received)
+    my_channel
+      .on_broadcast('shout', message_received) # Listen for "shout". Can be "*" to listen to all events
       .subscribe()
     ```
 
@@ -217,7 +218,7 @@ You can use the Supabase client libraries to send Broadcast messages.
     myChannel
       .send({
         type: 'broadcast',
-        event: 'test',
+        event: 'shout',
         payload: { message: 'Hi' },
       })
       .then((resp) => console.log(resp))
@@ -233,7 +234,7 @@ You can use the Supabase client libraries to send Broadcast messages.
 
       myChannel.send({
         type: 'broadcast',
-        event: 'test',
+        event: 'shout',
         payload: { message: 'Hi' },
       })
     })
@@ -249,7 +250,7 @@ You can use the Supabase client libraries to send Broadcast messages.
 
     // Sending a message before subscribing will use HTTP
     final res = await myChannel.sendBroadcastMessage(
-      event: "test",
+      event: "shout",
       payload: { 'message': 'Hi' },
     );
     print(res);
@@ -261,7 +262,7 @@ You can use the Supabase client libraries to send Broadcast messages.
       }
 
       myChannel.sendBroadcastMessage(
-        event: 'test',
+        event: 'shout',
         payload: { 'message': 'hello, world' },
       );
     });
@@ -277,12 +278,12 @@ You can use the Supabase client libraries to send Broadcast messages.
     }
 
     // Sending a message before subscribing will use HTTP
-    await myChannel.broadcast(event: "test", message: ["message": "HI"])
+    await myChannel.broadcast(event: "shout", message: ["message": "HI"])
 
     // Sending a message after subscribing will use Websockets
     await myChannel.subscribe()
     try await myChannel.broadcast(
-        event: "test",
+        event: "shout",
         message: YourMessage(message: "hello, world!")
     )
     ```
@@ -297,14 +298,14 @@ You can use the Supabase client libraries to send Broadcast messages.
     }
 
     // Sending a message before subscribing will use HTTP
-    myChannel.broadcast(event = "test", buildJsonObject {
+    myChannel.broadcast(event = "shout", buildJsonObject {
       put("message", "Hi")
     })
 
     // Sending a message after subscribing will use Websockets
     myChannel.subscribe(blockUntilSubscribed = true)
     channelB.broadcast(
-      event = "test",
+      event = "shout",
       payload = YourMessage(message = "hello, world!")
     )
     ```
@@ -315,7 +316,7 @@ You can use the Supabase client libraries to send Broadcast messages.
 
     {/* prettier-ignore */}
     ```python
-    my_channel = supabase.channel('room-1')
+    my_channel = supabase.channel('test-channel')
 
     # Sending a message after subscribing will use Websockets
     def on_subscribe(status, err):
@@ -323,7 +324,7 @@ You can use the Supabase client libraries to send Broadcast messages.
         return
 
       my_channel.send_broadcast(
-        'test',
+        'shout',
         { "message": 'hello, world' },
       )
 
