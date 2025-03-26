@@ -669,10 +669,19 @@ class TicketScene implements BaseScene {
   _invisibleScaleVector = new Vector3(0, 0, 0)
 
   private _updateTicketSize() {
-    if (this.state.visible) {
-      this._ticket?.scale.lerp(this._internalState.naturalScale, 0.01)
-    } else {
-      this._ticket?.scale.lerp(this._invisibleScaleVector, 0.01)
+    const targetAlpha = 0.1 // Increased alpha for faster animation
+    const tolerance = 0.001 // Tolerance for considering the animation complete
+
+    if (this.state.visible && this._ticket) {
+      this._ticket.scale.lerp(this._internalState.naturalScale, targetAlpha)
+      if (this._ticket.scale.distanceTo(this._internalState.naturalScale) < tolerance) {
+        this._ticket.scale.copy(this._internalState.naturalScale) // Ensure exact value
+      }
+    } else if (this._ticket) {
+      this._ticket.scale.lerp(this._invisibleScaleVector, targetAlpha)
+      if (this._ticket.scale.distanceTo(this._invisibleScaleVector) < tolerance) {
+        this._ticket.scale.copy(this._invisibleScaleVector) // Ensure exact value
+      }
     }
 
     // Update world matrices after scaling to ensure raycaster works correctly
@@ -1151,7 +1160,6 @@ class TicketScene implements BaseScene {
 
     return this.resolutions[closestResolution]
   }
-
 }
 
 export default TicketScene
