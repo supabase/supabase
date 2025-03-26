@@ -1,21 +1,20 @@
-import { useState, useEffect } from 'react'
-import { CornerDownLeft, Loader2, AlertCircle } from 'lucide-react'
-import { Button } from 'ui'
-import { BASE_PATH } from 'lib/constants'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
-import { IS_PLATFORM } from 'lib/constants'
-import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
-import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body-query'
-import { toast } from 'sonner'
-import { useRouter } from 'next/router'
+import LogoLoader from '@ui/components/LogoLoader'
 import { useParams } from 'common'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
+import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body-query'
+import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
+import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import LogoLoader from '@ui/components/LogoLoader'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { AlertCircle, CornerDownLeft, Loader2 } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import { Button } from 'ui'
 
 const CodePage = () => {
   const router = useRouter()
@@ -79,6 +78,7 @@ const CodePage = () => {
 
       await deployFunction({
         projectRef: ref,
+        slug: selectedFunction.slug,
         metadata: {
           name: selectedFunction.name,
           verify_jwt: selectedFunction.verify_jwt,
