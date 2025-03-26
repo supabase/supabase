@@ -76,6 +76,33 @@ MCP compatible tools can connect to Supabase using the [Postgres MCP server](htt
 
 1. You should see a green active status after the server is successfully connected.
 
+#### Claude Code (CLI)
+
+To add Supabase to Claude Code, use the following command-line instructions. Replace `<connection-string>` with your connection string.
+
+- **Direct Method**: Pass the full connection string as an argument:
+
+   ```shell
+   claude mcp add supabase -- npx -y @modelcontextprotocol/server-postgres "<connection-string>"
+   ```
+
+
+After running either command, the console will respond with:
+
+   ```shell
+   Added stdio MCP server supabase with command: npx -y @modelcontextprotocol/server-postgres "<connection-string>"
+   ```
+
+When you run Claude Code again (e.g., by restarting), you’ll see the following output indicating the connection:
+
+   ```shell
+   MCP Servers:                                                                                
+   │                                                                                               │
+   │   • supabase                                                                        connected │
+   ```
+
+To have Claude use the Supabase MCP server for database queries, include the `supabase:query` tool in your prompt.
+
 #### Cline
 
 1. Open the Cline extension in VS Code and tap the **MCP Servers** icon.
