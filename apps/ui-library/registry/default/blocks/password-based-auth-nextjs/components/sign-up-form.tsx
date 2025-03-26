@@ -12,7 +12,7 @@ import {
 } from '@/registry/default/components/ui/card'
 import { Input } from '@/registry/default/components/ui/input'
 import { Label } from '@/registry/default/components/ui/label'
-import Link from 'next/link'
+import { Link } from '@/registry/default/components/ui/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -40,9 +40,12 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
       const { error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/ui/example/password-based-auth/protected`,
+        },
       })
       if (error) throw error
-      router.push('/sign-up-success')
+      router.push('/example/password-based-auth/sign-up-success')
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {

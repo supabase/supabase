@@ -35,7 +35,6 @@
     "react-syntax-highlighter": "^15.5.0",
     "react-tooltip": "*",
     "react-use": "^17.5.0",
-    "reactflow": "*",
     "recharts": "^2.8.0",
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.0",

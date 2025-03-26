@@ -222,6 +222,18 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     }
+    ,
+    "password-based-auth-demo": {
+      name: "password-based-auth-demo",
+      type: "registry:example",
+      registryDependencies: [],
+      component: React.lazy(() => import("@/registry/default/examples/password-based-auth.tsx")),
+      source: "",
+      files: ["registry/default/examples/password-based-auth.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
     
   },
 }
