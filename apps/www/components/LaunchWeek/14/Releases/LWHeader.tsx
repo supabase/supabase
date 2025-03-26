@@ -22,7 +22,7 @@ const LWHeader = ({ className }: { className?: string }) => {
         <h1 className="text-4xl uppercase tracking-wide pointer-events-none">
           <span className='flex gap-1 items-center'><Image src='/images/launchweek/14/logo-pixel-small-dark.png' width="18" height="20" className="w-auto h-5" alt=""/>Supabase</span>
           LaunchWeek 14
-          <span className="block">31APR-04MAR</span>
+          <span className="block">MAR 31-APR 04</span>
         </h1>
         <p className="text-foreground-lighter max-w-xs md:max-w-sm pointer-events-none">
           A week of new features and new ways to level up your development.
