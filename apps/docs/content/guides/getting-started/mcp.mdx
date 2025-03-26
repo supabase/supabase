@@ -13,6 +13,7 @@ There are a number of popular AI tools that support MCP, including:
 - [Windsurf](https://docs.codeium.com/windsurf) (Codium)
 - [Cline](https://github.com/cline/cline) (VS Code extension)
 - [Claude desktop](https://claude.ai/download)
+- [Claude code](https://claude.ai/code)
 
 Connecting these tools to Supabase will allow you to query your database and perform other SQL operations using natural language commands.
 
@@ -98,6 +99,17 @@ MCP compatible tools can connect to Supabase using the [Postgres MCP server](htt
 1. Save the configuration file and restart Claude desktop.
 
 1. From the new chat screen, you should see a hammer (MCP) icon appear with the new MCP server available.
+
+#### Claude code
+
+1. Create a `.mcp.json` file in your project root if it doesn't exist.
+1. Add the following configuration:
+
+   <$Partial path="mcp_config.mdx" variables={{ "app": "Claude code" }} />
+
+1. Save the configuration file.
+
+1. Restart Claude code to apply the new configuration.
 
 ## Next steps
 
