@@ -15,7 +15,7 @@ const RealtimeCursorDemo = () => {
   }, [])
 
   return (
-    <div className="flex flex-col w-40">
+    <div className="flex flex-col w-40 gap-3">
       <Label>Username</Label>
       <Input value={username} onChange={(e) => setUsername(e.target.value)} />
       <RealtimeCursors roomName="realtime-cursor-example" username={username} />

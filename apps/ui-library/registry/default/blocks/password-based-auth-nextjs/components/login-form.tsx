@@ -37,7 +37,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       if (error) throw error
       console.log('login successful')
       // Update this route to redirect to an authenticated route. The user already has an active session.
-      router.push('/example/password-based-auth/protected')
+      router.push('/example/password-based-auth/protected') // /example/password-based-auth/protected
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
