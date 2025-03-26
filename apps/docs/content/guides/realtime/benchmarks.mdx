@@ -1,23 +1,23 @@
 ---
 title: 'Benchmarks'
-subtitle: 'Scalabillity Benchmarks for Supabase Realtime.'
-description: 'Scalabillity Benchmarks for Supabase Realtime.'
+subtitle: 'Scalability Benchmarks for Supabase Realtime.'
+description: 'Scalability Benchmarks for Supabase Realtime.'
 ---
 
-This guide explores the scalability of Realtime's features: Broadcast, Presence performance, and Postgres Changes.
+This guide explores the scalability of Realtime's features: Broadcast, Presence, and Postgres Changes.
 
 ## Methodology
 
 - The benchmarks are conducted using k6, an open-source load testing tool, against a Realtime Cluster deployed on AWS.
-- The cluster configurations used 2-6 nodes, tested in both single-region and multi-region setups, all connected to a single Supabase project.
+- The cluster configurations use 2-6 nodes, tested in both single-region and multi-region setups, all connected to a single Supabase project.
 - The load generators (k6 servers) are deployed on AWS to minimize network latency impact on the results.
 - Tests are executed with a full load from the start without warm-up runs.
 
-The metrics collected include: message throughput, latency percentiles, CPU and memory utilization, and connection success rates. It's worth noting that performance in production environments may vary based on factors such as network conditions, hardware specifications, and specific usage patterns.
+The metrics collected include: message throughput, latency percentiles, CPU and memory utilization, and connection success rates. Note that performance in production environments may vary based on factors such as network conditions, hardware specifications, and specific usage patterns.
 
 ## Workloads
 
-The proposed workloads are designed to demonstrate Supabase Realtime's throughput and scalability capabilities. These benchmarks focus on core functionality and common usage patterns. The benchmarking results include the following workloads:
+The proposed workloads are designed to demonstrate Supabase Realtime's throughput and scalability. These benchmarks focus on core functionality and common usage patterns. The benchmarking results include the following workloads:
 
 1. **Broadcast Performance**
 2. **Payload Size Impact on Broadcast**

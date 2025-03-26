@@ -9,13 +9,13 @@ sidebar_label: 'Videos'
 You can use Supabase to subscribe to real-time database changes. There are two options available:
 
 1. [Broadcast](/docs/guides/realtime/broadcast). This is the recommended method for scalability and security.
-1. [Postgres Changes](/docs/guides/realtime/postgres-changes). This is a simpler method that requires no setup on your part, although generally less-scalable.
+1. [Postgres Changes](/docs/guides/realtime/postgres-changes). This is a simpler method. It requires less setup, but does not scale as well as Broadcast.
 
 ## Using Broadcast
 
 To automatically send messages when a record is created, updated, or deleted, we can attach a [Postgres trigger](/docs/guides/database/postgres/triggers) to any table. Supabase Realtime provides a `realtime.broadcast_changes()` function which we can use in conjunction with a trigger.
 
-### Broadcast Authorization
+### Broadcast authorization
 
 [Realtime Authorization](/docs/guides/realtime/authorization) is required for receiving Broadcast messages. This is an example of a policy that allows authenticated users to listen to messages from topics:
 
@@ -34,7 +34,7 @@ Let's create a function that we can call any time a record is created, updated, 
 
 {/* prettier-ignore */}
 ```sql
-create or replace public.your_table_changes() 
+create or replace function public.your_table_changes() 
 returns trigger 
 language plpgsql
 as $$
@@ -68,7 +68,7 @@ execute function your_table_changes ();
 
 #### Listening on client side
 
-Finally, client side will requires to be set up to listen to the topic `topic:<record id>` to receive the events. Do not forget that you will need `private` set to true in this scenario as we are using `realtime.broadcast_changes` to send the messages.
+Finally, on the client side, listen to the topic `topic:<record_id>` to receive the events. Remember to set the channel as a private channel, since `realtime.broadcast_changes` uses Realtime Authorization.
 
 ```jsx
 const gameId = 'id'
