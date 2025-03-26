@@ -1,20 +1,26 @@
 import { createClient } from '@/registry/default/clients/react-router/lib/supabase/server'
 import { Button } from '@/registry/default/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/registry/default/components/ui/card'
 import { Input } from '@/registry/default/components/ui/input'
-import { AuthApiError } from '@supabase/supabase-js'
-import { type ActionFunctionArgs, Form, data, useActionData } from 'react-router'
+import { Label } from '@/registry/default/components/ui/label'
+import {
+  type ActionFunctionArgs,
+  data,
+  Link,
+  redirect,
+  useFetcher,
+  useSearchParams,
+} from 'react-router'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
   const email = formData.get('email') as string
-
-  if (!email) {
-    return data({
-      message: 'Please provide an email',
-      errors: { email: 'Email is required' },
-      data: { email: '' },
-    })
-  }
 
   const { supabase, headers } = createClient(request)
   const origin = new URL(request.url).origin
@@ -25,69 +31,81 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   })
 
   if (error) {
-    if (error instanceof AuthApiError && error.status === 400) {
-      return data(
-        {
-          message: 'Invalid credentials.',
-          errors: { email: 'Invalid email address' },
-          data: { email },
-        },
-        { headers }
-      )
-    }
     return data(
       {
-        message: error.message,
-        errors: { email: error.message },
+        error: error instanceof Error ? error.message : 'An error occurred',
         data: { email },
       },
       { headers }
     )
   }
 
-  return data(
-    {
-      message: 'Please check your email for a password reset link to log into the website.',
-      errors: {},
-      data: { email: '' },
-    },
-    { headers }
-  )
+  redirect('/forgot-password?success')
 }
 
 export default function ForgotPassword() {
-  const actionData = useActionData<typeof action>()
+  const fetcher = useFetcher<typeof action>()
+  let [searchParams] = useSearchParams()
+
+  const success = !!searchParams.has('success')
+  const error = fetcher.data?.error
+  const loading = fetcher.state === 'submitting'
 
   return (
-    <div className="max-w-md mx-auto mt-24">
-      {actionData?.message ? (
-        <div className={`alert-error mb-10`}>{actionData?.message}</div>
-      ) : null}
-      <h2 className="font-semibold text-xl mb-4">Forgot Password</h2>
-      <p className="mb-4">Reset your password using your email address</p>
-      <Form method="post">
-        <div className="form-control">
-          <Input
-            id="email"
-            name="email"
-            type="text"
-            placeholder="you@example.com"
-            defaultValue={actionData?.data?.email}
-            className="input input-bordered"
-          />
-        </div>
-        {actionData?.errors &&
-          Object.values(actionData.errors).map((error, index) =>
-            error ? (
-              <div key={index} className="text-error mt-1">
-                {error as string}
-              </div>
-            ) : null
+    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <div className="w-full max-w-sm">
+        <div className="flex flex-col gap-6">
+          {success ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl">Check Your Email</CardTitle>
+                <CardDescription>Password reset instructions sent</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  If you registered using your email and password, you will receive a password reset
+                  email.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl">Reset Your Password</CardTitle>
+                <CardDescription>
+                  Type in your email and we&apos;ll send you a link to reset your password
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <fetcher.Form method="post">
+                  <div className="flex flex-col gap-6">
+                    <div className="grid gap-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="m@example.com"
+                        required
+                      />
+                    </div>
+                    {error && <p className="text-sm text-red-500">{error}</p>}
+                    <Button type="submit" className="w-full" disabled={loading}>
+                      {loading ? 'Sending...' : 'Send reset email'}
+                    </Button>
+                  </div>
+                  <div className="mt-4 text-center text-sm">
+                    Already have an account?{' '}
+                    <Link to="/login" className="underline underline-offset-4">
+                      Login
+                    </Link>
+                  </div>
+                </fetcher.Form>
+              </CardContent>
+            </Card>
           )}
-        <div className="form-control mt-6">
-          <Button className="btn btn-primary no-animation">Send</Button>
         </div>
-      </Form>
+      </div>
     </div>
   )
 }
