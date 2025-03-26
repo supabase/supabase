@@ -45,7 +45,9 @@ export function ComponentPreview({
   const [expand, setExpandState] = React.useState(false)
 
   const Preview = React.useMemo(() => {
-    const Component = Index[config.style][name]?.component
+    console.log(Index)
+    console.log(config.style, name)
+    const Component = Index['default'][name]?.component
 
     if (!Component) {
       return (
