@@ -125,9 +125,15 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
           {isSuccess && (
             <>
               {rules.length === 0 ? (
-                <p className="px-6 py-3 text-sm text-foreground-lighter">
-                  No rules have been created for this lint
-                </p>
+                <div className="px-6 py-3">
+                  <p className="text-sm text-foreground">
+                    Lint is visible to all project members in the{' '}
+                    <span className="capitalize">{lint.category}</span> Advisor.
+                  </p>
+                  <p className="text-sm text-foreground-lighter">
+                    Create a rule to configure the visibility of this lint in your project
+                  </p>
+                </div>
               ) : (
                 rules.map((rule) => {
                   const member = members.find((x) => x.gotrue_id === rule.assigned_to)

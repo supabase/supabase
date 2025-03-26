@@ -126,7 +126,7 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="flex flex-col gap-0">
         <SheetHeader className="shrink-0 flex items-center gap-4">
-          <SheetTitle>Create a rule on Advisor lints</SheetTitle>
+          <SheetTitle>Create a rule for "{lint?.title}"</SheetTitle>
         </SheetHeader>
         <SheetSection className="overflow-auto flex-grow px-0">
           <Form_Shadcn_ {...form}>
@@ -136,37 +136,14 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <FormField_Shadcn_
-                key="lint_name"
-                name="lint_name"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItemLayout layout="vertical" className="px-5" label="Lint name">
-                    <FormControl_Shadcn_>
-                      <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
-                        <SelectTrigger_Shadcn_ className="col-span-8">
-                          <SelectValue_Shadcn_ placeholder="Select a lint name" />
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
-                          {lintInfoMap.map((x) => (
-                            <SelectItem_Shadcn_ key={x.name} value={x.name}>
-                              {x.title}
-                            </SelectItem_Shadcn_>
-                          ))}
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-
-              <FormField_Shadcn_
                 name="is_disabled"
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout
-                    layout="flex"
+                    layout="flex-row-reverse"
                     className="px-5"
                     label={`Disable this lint for ${assigned_to === 'all' ? 'project' : 'the assigned member'}`}
+                    description="Toggles the visiblity of this lint in the Advisor reports"
                   >
                     <Tooltip>
                       <TooltipTrigger type="button">
@@ -180,10 +157,10 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
                       </TooltipTrigger>
                       {assigned_to === 'all' && (
                         <TooltipContent side="bottom" className="w-72">
-                          Assign the rule to a specific project member before toggling this option
-                          off. This will <span className="text-brand">assign the rule</span> to the
-                          selected member, and only that member will see the lint in the advisor
-                          reports.
+                          Assign this rule to a specific project member before toggling this option
+                          off. This will then configure the rule to{' '}
+                          <span className="text-brand">only be visible</span> to that member in the
+                          advisor reports.
                         </TooltipContent>
                       )}
                     </Tooltip>
