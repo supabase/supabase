@@ -229,12 +229,12 @@ class TicketScene implements BaseScene {
 
     1024: {
       ticketPosition: new Vector3(3.0, 0, 0),
-      ticketScale: new Vector3(1.2,1.2,1.2),
+      ticketScale: new Vector3(1.2, 1.2, 1.2),
     },
 
     1280: {
       ticketPosition: new Vector3(4.0, 0, 0),
-      ticketScale: new Vector3(1.4,1.4,1.4),
+      ticketScale: new Vector3(1.4, 1.4, 1.4),
     },
   }
 
@@ -540,7 +540,7 @@ class TicketScene implements BaseScene {
     this._internalState.effectsIntensity = 0
 
     // Enable all passes
-    if (this._glitchPass) this._glitchPass.enabled = true
+    // if (this._glitchPass) this._glitchPass.enabled = true
     if (this._crtPass) this._crtPass.enabled = true
     if (this._bloomPass) this._bloomPass.enabled = true
   }
@@ -646,56 +646,58 @@ class TicketScene implements BaseScene {
     }
 
     const mousePosition = this._sceneRenderer.mousePositionState
-    
+
     if (mousePosition.isWithinContainer) {
       // Get the scene's current position in world space
-      const scenePosition = new THREE.Vector3();
-      scene.getWorldPosition(scenePosition);
-      
+      const scenePosition = new THREE.Vector3()
+      scene.getWorldPosition(scenePosition)
+
       // Convert scene position to normalized device coordinates (NDC)
-      const sceneNDC = scenePosition.clone();
-      sceneNDC.project(this._sceneRenderer.camera);
-      
+      const sceneNDC = scenePosition.clone()
+      sceneNDC.project(this._sceneRenderer.camera)
+
       // Calculate mouse position relative to the scene's position
       // This gives us a vector from the scene center to the mouse
-      const relativeMouseX = mousePosition.containerX - sceneNDC.x;
-      const relativeMouseY = mousePosition.containerY - sceneNDC.y;
-      
+      const relativeMouseX = mousePosition.containerX - sceneNDC.x
+      const relativeMouseY = mousePosition.containerY - sceneNDC.y
+
       // Scale the rotation based on distance from scene center
       // The further from center, the more rotation
-      const distanceScale = Math.min(1.0, 
-        Math.sqrt(relativeMouseX * relativeMouseX + relativeMouseY * relativeMouseY) * 2);
-      
+      const distanceScale = Math.min(
+        1.0,
+        Math.sqrt(relativeMouseX * relativeMouseX + relativeMouseY * relativeMouseY) * 2
+      )
+
       // Calculate rotation angles with distance scaling
       // Limit the rotation angles to a reasonable range
-      const targetRotationX = MathUtils.clamp(relativeMouseY * -0.2 * distanceScale, -0.3, 0.3);
-      const targetRotationZ = MathUtils.clamp(relativeMouseX * -0.3 * distanceScale, -0.4, 0.4);
+      const targetRotationX = MathUtils.clamp(relativeMouseY * -0.2 * distanceScale, -0.3, 0.3)
+      const targetRotationZ = MathUtils.clamp(relativeMouseX * -0.3 * distanceScale, -0.4, 0.4)
 
       // Apply smooth rotation with a smaller lerp factor
-      const lerpFactor = Math.min(dt ?? 0.05, 0.05);
+      const lerpFactor = Math.min(dt ?? 0.05, 0.05)
       scene.rotation.x = MathUtils.lerp(
         scene.rotation.x,
         this._internalState.naturalRotation.x + targetRotationX,
         lerpFactor
-      );
+      )
       scene.rotation.z = MathUtils.lerp(
         scene.rotation.z,
         this._internalState.naturalRotation.z + targetRotationZ,
         lerpFactor
-      );
+      )
     } else {
       // Return to neutral position more slowly
-      const lerpFactor = Math.min(dt ?? 0.03, 0.03);
+      const lerpFactor = Math.min(dt ?? 0.03, 0.03)
       scene.rotation.x = MathUtils.lerp(
         scene.rotation.x,
         this._internalState.naturalRotation.x,
         lerpFactor
-      );
+      )
       scene.rotation.z = MathUtils.lerp(
         scene.rotation.z,
         this._internalState.naturalRotation.z,
         lerpFactor
-      );
+      )
     }
   }
 

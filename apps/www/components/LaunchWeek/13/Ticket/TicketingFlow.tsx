@@ -119,15 +119,27 @@ const TicketingFlow = () => {
                           hasSecretTicket ? (
                             <p>Got the gold ticket, {FIRST_NAME}!</p>
                           ) : (
-                            <p>Good to see you, {FIRST_NAME}!</p>
+                            <p className='font-["Departure_Mono"] uppercase'>
+                              Good to see you, {FIRST_NAME}!
+                            </p>
                           )
                         ) : winningChances !== 2 ? (
                           <>
-                            {hasSecretTicket && <p>{FIRST_NAME}, you're gold!</p>}
-                            {!hasSecretTicket && <p>Good to see you, {FIRST_NAME}!</p>}
+                            {hasSecretTicket && (
+                              <p className='font-["Departure_Mono"] uppercase'>
+                                {FIRST_NAME}, you're gold!
+                              </p>
+                            )}
+                            {!hasSecretTicket && (
+                              <p className='font-["Departure_Mono"] uppercase'>
+                                Good to see you, {FIRST_NAME}!
+                              </p>
+                            )}
                           </>
                         ) : (
-                          <p>Good to see you, {FIRST_NAME}!</p>
+                          <p className='font-["Departure_Mono"] uppercase'>
+                            Good to see you, {FIRST_NAME}!
+                          </p>
                         )}
                       </div>
                     </div>

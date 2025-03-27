@@ -8,6 +8,7 @@ import LWStickyNav from '~/components/LaunchWeek/14/Releases/LWStickyNav'
 import LWHeader from '~/components/LaunchWeek/14/Releases/LWHeader'
 import MainStage from '~/components/LaunchWeek/14/Releases/MainStage'
 import BuildStage from '~/components/LaunchWeek/14/Releases/BuildStage'
+import { Tunnel } from '~/components/LaunchWeek/14/Tunnel'
 
 const Lw14Page = () => {
   const TITLE = `${LW14_TITLE} | ${LW14_DATE}`
@@ -42,12 +43,15 @@ const Lw14Page = () => {
       />
 
       <Lw14ConfDataProvider initState={{ userTicketData: defaultUserData, partymodeStatus: 'on' }}>
-        <DefaultLayout className='font-["Departure_Mono"]'>
-          <LWStickyNav />
+        <DefaultLayout className='font-["Departure_Mono"] lg:pt-32 border-b pb-0 md:pb-16 lg:!pb-[230px]'>
+          {/* <LWStickyNav />
           <LWHeader />
           <MainStage className="relative z-10" />
-          <BuildStage />
+          <BuildStage /> */}
           <LwView />
+          <div className="w-full h-[16vh] md:h-[24vh] lg:h-[32vh] absolute bottom-0 left-0 right-0 max-w-7xl mx-auto px-6 md:px-12 lg:px-16 xl:px-20">
+            <Tunnel className="w-full h-full rotate-180" />
+          </div>
         </DefaultLayout>
       </Lw14ConfDataProvider>
     </>

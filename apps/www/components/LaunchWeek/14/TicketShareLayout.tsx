@@ -19,34 +19,33 @@ export const TicketShareLayout = ({
   return (
     <div
       className={cn(
-        'absolute top-[250px] xs:top-[290px] md:top-auto md:bottom-10 xl:bottom-16 2xl:bottom-20 left-0 right-0 grid justify-center gap-2',
-        {
-          ['lg:left-0 lg:pr-10 xl:pr-0 xl:left-[5%] lg:right-1/2 lg:justify-start lg:pl-10 lg:bottom-0 xl:bottom-0 2xl:bottom-0 lg:top-0 lg:content-center']:
-            narrow,
-        }
+        'absolute lg:relative lg:flex lg:flex-col lg:max-w-[500px] left-0 right-0 grid justify-center gap-2 md:px-5 lg:px-0',
+        narrow
+          ? 'top-[150px] xs:top-[180px] sm:top-[220px] md:top-[260px] lg:top-0 lg:left-0 lg:right-auto lg:justify-start'
+          : 'top-[250px] xs:top-[290px] md:top-auto md:bottom-10 xl:bottom-16 2xl:bottom-20'
       )}
     >
       {narrow && (
         <>
-          <Image
+          {/* <Image
             src={logo}
             alt="LW logo"
             className="size-12 hidden lg:block"
             width="48"
             height="48"
-          />
-          <div className="text-xl py-6 text-center lg:text-start">
+          /> */}
+          <div className='uppercase text-3xl lg:text-4xl py-4 text-left font-["Departure_Mono"]'>
             Good to see you{userWelcomeText}
           </div>
         </>
       )}
       <div
         className={cn(
-          'text-xs text-center pb-2 [text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.50)]',
-          { ['lg:text-start']: narrow }
+          'text-xs pb-2 font-["Departure_Mono"] uppercase text-foreground-lighter',
+          narrow ? 'text-left' : 'text-center'
         )}
       >
-        Share your ticket with friends!
+        Share your ticket to win to win a prize
       </div>
       {children}
     </div>

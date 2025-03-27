@@ -6,7 +6,12 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 import useConfData from './hooks/use-conf-data'
-import { LW14_TWEET_TEXT, LW14_TWEET_TEXT_PLATINUM, LW14_TWEET_TEXT_SECRET, LW14_URL } from '~/lib/constants'
+import {
+  LW14_TWEET_TEXT,
+  LW14_TWEET_TEXT_PLATINUM,
+  LW14_TWEET_TEXT_SECRET,
+  LW14_URL,
+} from '~/lib/constants'
 import supabase from './supabase'
 
 export default function TicketShare() {
@@ -20,7 +25,11 @@ export default function TicketShare() {
   const downloadLink = useRef<HTMLAnchorElement>()
   const link = `${LW14_URL}/tickets/${username}&t=${dayjs(new Date()).format('DHHmmss')}`
   const permalink = encodeURIComponent(link)
-  const text = hasSecretTicket ? LW14_TWEET_TEXT_SECRET : platinum ? LW14_TWEET_TEXT_PLATINUM : LW14_TWEET_TEXT
+  const text = hasSecretTicket
+    ? LW14_TWEET_TEXT_SECRET
+    : platinum
+      ? LW14_TWEET_TEXT_PLATINUM
+      : LW14_TWEET_TEXT
   const encodedText = encodeURIComponent(text)
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&text=${encodedText}`
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}&text=${encodedText}`
@@ -72,13 +81,13 @@ export default function TicketShare() {
   }
 
   return (
-    <div className="flex flex-col xs:flex-row flex-wrap justify-start w-full gap-2 pointer-events-auto">
+    <div className='flex flex-col sm:flex-row flex-wrap justify-start w-full gap-2 max-w-[280px] sm:max-w-full pointer-events-auto font-["Departure_Mono"]'>
       <Button
         onClick={() => handleShare('twitter')}
         type={userData.shared_on_twitter ? 'secondary' : 'default'}
         icon={userData.shared_on_twitter && <Check strokeWidth={2} />}
         size={isLessThanMd ? 'tiny' : 'small'}
-        className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] flex-grow"
+        className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] uppercase"
         asChild
       >
         <Link href={tweetUrl} target="_blank">
@@ -90,7 +99,7 @@ export default function TicketShare() {
         type={userData.shared_on_linkedin ? 'secondary' : 'default'}
         icon={userData.shared_on_linkedin && <Check strokeWidth={2} />}
         size={isLessThanMd ? 'tiny' : 'small'}
-        className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] flex-grow"
+        className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] uppercase"
         asChild
       >
         <Link href={linkedInUrl} target="_blank">
