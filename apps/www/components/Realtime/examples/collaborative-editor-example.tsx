@@ -1,9 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import ExampleLayout from '../example-layout'
+import type { ExampleLayoutProps } from '../example-layout'
 
-export default function CollaborativeEditorExample() {
+type CollaborativeEditorExampleProps = {
+  render: (props: ExampleLayoutProps) => React.ReactNode
+}
+
+export default function CollaborativeEditorExample({ render }: CollaborativeEditorExampleProps) {
   const [instanceId] = useState(() => Math.random().toString(36).substring(2, 9))
 
   const appJsCode = `import { useEffect, useState, useRef } from 'react';
@@ -226,16 +230,17 @@ export default function App() {
 }`,
   }
 
-  return (
-    <ExampleLayout
-      appJsCode={appJsCode}
-      files={editorFiles}
-      dependencies={{
-        yjs: 'latest',
-        quill: 'latest',
-      }}
-      title="Collaborative Editor"
-      description="A real-time collaborative text editor that allows multiple users to edit the same document simultaneously. Built with Quill and Yjs for conflict-free editing, this example demonstrates how to implement Google Docs-like functionality with cursor tracking, presence awareness, and synchronized text operations. Changes made by any user are instantly visible to everyone, making it ideal for collaborative writing, note-taking, or documentation."
-    />
-  )
+  const layoutProps: ExampleLayoutProps = {
+    appJsCode,
+    files: editorFiles,
+    dependencies: {
+      yjs: 'latest',
+      quill: 'latest',
+    },
+    title: 'Collaborative Editor',
+    description:
+      'A real-time collaborative text editor that allows multiple users to edit the same document simultaneously. Built with Quill and Yjs for conflict-free editing, this example demonstrates how to implement Google Docs-like functionality with cursor tracking, presence awareness, and synchronized text operations. Changes made by any user are instantly visible to everyone, making it ideal for collaborative writing, note-taking, or documentation.',
+  }
+
+  return render(layoutProps)
 }

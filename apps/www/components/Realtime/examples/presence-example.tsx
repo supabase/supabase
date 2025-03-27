@@ -1,9 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import ExampleLayout from '../example-layout'
+import type { ExampleLayoutProps } from '../example-layout'
 
-export default function PresenceExample() {
+type PresenceExampleProps = {
+  render: (props: ExampleLayoutProps) => React.ReactNode
+}
+
+export default function PresenceExample({ render }: PresenceExampleProps) {
   const [instanceId] = useState(() => Math.random().toString(36).substring(2, 9))
 
   const appJsCode = `import { useEffect, useState } from 'react';
@@ -106,12 +110,13 @@ export default function App() {
     '/styles.css': `/* No custom CSS needed - using Tailwind */`,
   }
 
-  return (
-    <ExampleLayout
-      appJsCode={appJsCode}
-      files={presenceFiles}
-      title="Presence"
-      description="A simple demonstration of Supabase Realtime Presence, showing which users are currently online and active. This example tracks user presence with avatars and usernames, allowing you to see who's viewing the same content in real-time."
-    />
-  )
+  const layoutProps: ExampleLayoutProps = {
+    appJsCode,
+    files: presenceFiles,
+    title: 'Presence',
+    description:
+      "A simple demonstration of Supabase Realtime Presence, showing which users are currently online and active. This example tracks user presence with avatars and usernames, allowing you to see who's viewing the same content in real-time.",
+  }
+
+  return render(layoutProps)
 }

@@ -1,9 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import ExampleLayout from '../example-layout'
+import type { ExampleLayoutProps } from '../example-layout'
 
-export default function TodoExample() {
+type TodoExampleProps = {
+  render: (props: ExampleLayoutProps) => React.ReactNode
+}
+
+export default function TodoExample({ render }: TodoExampleProps) {
   const [instanceId] = useState(() => Math.random().toString(36).substring(2, 9))
 
   const appJsCode = `import { useEffect, useState } from 'react';
@@ -249,41 +253,59 @@ export default function App() {
               <div className="text-center py-8 text-neutral-500">
                 Loading todos...
               </div>
-            ) : todos.length === 0 ? (
-              <div className="text-center py-8 text-neutral-500">
-                No todos yet. Add one to get started!
-              </div>
             ) : (
               todos.map((todo) => (
                 <div 
-                  key={todo.id} 
-                  className="flex items-center justify-between gap-4 p-3 bg-neutral-800/50 rounded-lg group"
+                  key={todo.id}
+                  className="flex items-center justify-between p-3 rounded-md bg-neutral-800 border border-neutral-700"
                 >
-                  <div className="flex items-center gap-3 flex-1">
-                    <label className="flex items-center cursor-pointer relative">
-                      <input
-                        type="checkbox"
-                        checked={todo.completed}
-                        onChange={() => handleToggleTodo(todo)}
-                        className="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-neutral-600 checked:bg-neutral-600 checked:border-neutral-600"
-                      />
-                      <span className="absolute text-neutral-900 opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" stroke="currentColor" strokeWidth="1">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={() => handleToggleTodo(todo)} 
+                      className={\`w-5 h-5 rounded flex items-center justify-center border \${
+                        todo.completed 
+                          ? 'bg-green-900 border-green-700 text-green-400' 
+                          : 'border-neutral-600'
+                      }\`}
+                    >
+                      {todo.completed && (
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          width="12" 
+                          height="12" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          strokeWidth="2" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12"></polyline>
                         </svg>
-                      </span>
-                    </label>
-                    <span className={\`flex-1 text-sm \${todo.completed ? 'line-through text-neutral-500' : 'text-neutral-200'}\`}>
+                      )}
+                    </button>
+                    <span className={\`text-sm \${todo.completed ? 'line-through text-neutral-500' : 'text-neutral-200'}\`}>
                       {todo.text}
                     </span>
                   </div>
-                  <button
+                  
+                  <button 
                     onClick={() => handleDeleteTodo(todo)}
-                    className="text-neutral-500 hover:text-neutral-300 opacity-0 group-hover:opacity-100 transition-opacity"
-                    aria-label="Delete todo"
+                    className="text-neutral-500 hover:text-neutral-300 transition-colors"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      width="14" 
+                      height="14" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
                   </button>
                 </div>
@@ -291,20 +313,22 @@ export default function App() {
             )}
           </div>
           
-          <form onSubmit={handleAddTodo} className="flex gap-2 mt-2">
+          <form onSubmit={handleAddTodo} className="mt-4 flex gap-2">
             <input
               type="text"
               value={newTodo}
               onChange={(e) => setNewTodo(e.target.value)}
-              placeholder="+ Add a new todo..."
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleAddTodo(e);
-                }
-              }}
+              placeholder="Add a new todo..."
               disabled={!isConnected || !user}
-              className="flex-1 px-4 py-2 bg-transparent border border-neutral-800 text-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-600 focus:border-transparent placeholder-neutral-500"
+              className="flex-1 px-4 py-2 bg-neutral-800 text-neutral-100 border border-neutral-700 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-600 focus:border-transparent placeholder-neutral-500"
             />
+            <button
+              type="submit"
+              disabled={!newTodo.trim() || !isConnected || !user}
+              className="px-4 py-2 bg-neutral-800 text-neutral-300 border border-neutral-700 rounded-md hover:bg-neutral-700 focus:outline-none disabled:opacity-50 disabled:hover:bg-neutral-800"
+            >
+              Add
+            </button>
           </form>
         </div>
       </div>
@@ -317,12 +341,13 @@ export default function App() {
     '/styles.css': `/* No custom CSS needed - using Tailwind */`,
   }
 
-  return (
-    <ExampleLayout
-      appJsCode={appJsCode}
-      files={todoFiles}
-      title="Todo List"
-      description="A collaborative task management application where multiple users can create, complete, and delete todos in real-time. This example demonstrates synchronized state management with optimistic UI updates, presence awareness showing who's online, and real-time broadcasting of task changes. "
-    />
-  )
+  const layoutProps: ExampleLayoutProps = {
+    appJsCode,
+    files: todoFiles,
+    title: 'Todo List',
+    description:
+      "A collaborative todo list application that lets multiple users manage tasks in real-time. Features include adding, completing, and deleting tasks, all synchronized instantly across devices. This example showcases real-time database changes, presence indicators showing who's online, and optimistic UI updates.",
+  }
+
+  return render(layoutProps)
 }

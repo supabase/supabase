@@ -1,9 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import ExampleLayout from '../example-layout'
+import type { ExampleLayoutProps } from '../example-layout'
 
-export default function ChatExample() {
+type ChatExampleProps = {
+  render: (props: ExampleLayoutProps) => React.ReactNode
+}
+
+export default function ChatExample({ render }: ChatExampleProps) {
   const [instanceId] = useState(() => Math.random().toString(36).substring(2, 9))
 
   const appJsCode = `import { useEffect, useState, useRef } from 'react';
@@ -181,12 +185,13 @@ export default function App() {
     '/styles.css': `/* No custom CSS needed - using Tailwind */`,
   }
 
-  return (
-    <ExampleLayout
-      appJsCode={appJsCode}
-      files={chatFiles}
-      title="Chat Example"
-      description="A real-time chat application that enables instant messaging between multiple users. Features include message broadcasting, presence indicators showing who's online, and a clean, responsive UI. This example demonstrates how to implement a complete chat system with user avatars, timestamps, and message history using Supabase Realtime channels."
-    />
-  )
+  const layoutProps: ExampleLayoutProps = {
+    appJsCode,
+    files: chatFiles,
+    title: 'Chat Example',
+    description:
+      "A real-time chat application that enables instant messaging between multiple users. Features include message broadcasting, presence indicators showing who's online, and a clean, responsive UI. This example demonstrates how to implement a complete chat system with user avatars, timestamps, and message history using Supabase Realtime channels.",
+  }
+
+  return render(layoutProps)
 }

@@ -188,10 +188,8 @@ function RealtimePage() {
               Build any kind of Realtime application with ease, including any of these scenarios.
             </p>
           </div>
-        </SectionContainer>
-        <div className="mb-12 mx-8">
           <RealtimeShowcase />
-        </div>
+        </SectionContainer>
         <SectionContainer>
           <APISection
             title="Simple and convenient APIs"
