@@ -105,7 +105,7 @@ const TicketCanvas = ({ className, onUpgradeToSecret, narrow }: TicketCanvasProp
   return (
     <div
       className={cn(
-        'absolute inset-0 flex justify-center items-center overflow-hidden w-full h-full z-0',
+        'absolute sm:inset-0 flex justify-center items-center overflow-hidden w-full h-full z-0',
         className
       )}
     >
