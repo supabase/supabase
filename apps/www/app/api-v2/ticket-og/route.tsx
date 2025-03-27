@@ -147,22 +147,6 @@ export async function GET(req: Request, res: Response) {
 
   // Just here to silence snyk false positives
   // Verify that req.url is from an allowed domain
-  const allowedDomains = ['supabase.com', '-supabase.vercel.app', 'localhost:3000']
-
-  const isAllowedDomain = allowedDomains.some(
-    (domain) =>
-      url.hostname === domain ||
-      (domain.startsWith('-') && url.hostname.endsWith(domain)) ||
-      (url.hostname === 'localhost' && url.port === '3000')
-  )
-
-  if (!isAllowedDomain) {
-    return new Response(JSON.stringify({ error: 'Unauthorized domain' }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 403,
-    })
-  }
-
   const username = url.searchParams.get('username') ?? url.searchParams.get('amp;username')
   const userAgent = req.headers.get('user-agent')
 
