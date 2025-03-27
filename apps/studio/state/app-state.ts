@@ -60,6 +60,7 @@ const getInitialState = () => {
       showGenerateSqlModal: false,
       ongoingQueriesPanelOpen: false,
       mobileMenuOpen: false,
+      showSidebar: true,
     }
   }
 
@@ -89,13 +90,14 @@ const getInitialState = () => {
     showGenerateSqlModal: false,
     ongoingQueriesPanelOpen: false,
     mobileMenuOpen: false,
+    showSidebar: true,
   }
 }
 
 export const appState = proxy({
   ...getInitialState(),
 
-  setDashboardHistory: (ref: string, key: 'sql' | 'editor', id: string) => {
+  setDashboardHistory: (ref: string, key: 'sql' | 'editor', id: string | undefined) => {
     if (appState.dashboardHistory[key] !== id) {
       appState.dashboardHistory[key] = id
       localStorage.setItem(
@@ -149,6 +151,11 @@ export const appState = proxy({
   showGenerateSqlModal: false,
   setShowGenerateSqlModal: (value: boolean) => {
     appState.showGenerateSqlModal = value
+  },
+
+  showSidebar: true,
+  setShowSidebar: (value: boolean) => {
+    appState.showSidebar = value
   },
 
   showOngoingQueriesPanelOpen: false,

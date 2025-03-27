@@ -13,9 +13,11 @@ import {
   isView,
 } from 'data/table-editor/table-editor-types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
+import { makeActiveTabPermanent } from 'state/tabs'
 import { TableGridSkeletonLoader } from './LoadingState'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
@@ -31,6 +33,7 @@ const TableGridEditor = ({
   selectedTable,
 }: TableGridEditorProps) => {
   const router = useRouter()
+  const project = useSelectedProject()
   const { ref: projectRef, id } = useParams()
 
   useLoadTableEditorStateFromLocalStorageIntoUrl({
@@ -74,37 +77,40 @@ const TableGridEditor = ({
    */
 
   return (
-    <TableEditorTableStateContextProvider
-      key={`table-editor-table-${selectedTable.id}`}
-      projectRef={projectRef}
-      table={selectedTable}
-      editable={editable}
-    >
-      <SupabaseGrid
-        key={gridKey}
-        gridProps={{ height: '100%' }}
-        customHeader={
-          (isViewSelected || isTableSelected) && selectedView === 'definition' ? (
-            <div className="flex items-center space-x-2">
-              <p>
-                SQL Definition of <code className="text-sm">{selectedTable.name}</code>{' '}
-              </p>
-              <p className="text-foreground-light text-sm">(Read only)</p>
-            </div>
-          ) : null
-        }
-      >
-        {(isViewSelected || isTableSelected) && selectedView === 'definition' && (
-          <TableDefinition entity={selectedTable} />
-        )}
-      </SupabaseGrid>
-
-      <SidePanelEditor
+    // When any click happens in a table tab, the tab becomes permanent
+    <div className="h-full" onClick={() => makeActiveTabPermanent(project?.ref)}>
+      <TableEditorTableStateContextProvider
+        key={`table-editor-table-${selectedTable.id}`}
+        projectRef={projectRef}
+        table={selectedTable}
         editable={editable}
-        selectedTable={isTableLike(selectedTable) ? selectedTable : undefined}
-        onTableCreated={onTableCreated}
-      />
-    </TableEditorTableStateContextProvider>
+      >
+        <SupabaseGrid
+          key={gridKey}
+          gridProps={{ height: '100%' }}
+          customHeader={
+            (isViewSelected || isTableSelected) && selectedView === 'definition' ? (
+              <div className="flex items-center space-x-2">
+                <p>
+                  SQL Definition of <code className="text-sm">{selectedTable.name}</code>{' '}
+                </p>
+                <p className="text-foreground-light text-sm">(Read only)</p>
+              </div>
+            ) : null
+          }
+        >
+          {(isViewSelected || isTableSelected) && selectedView === 'definition' && (
+            <TableDefinition entity={selectedTable} />
+          )}
+        </SupabaseGrid>
+
+        <SidePanelEditor
+          editable={editable}
+          selectedTable={isTableLike(selectedTable) ? selectedTable : undefined}
+          onTableCreated={onTableCreated}
+        />
+      </TableEditorTableStateContextProvider>
+    </div>
   )
 }
 

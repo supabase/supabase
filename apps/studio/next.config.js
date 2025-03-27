@@ -381,11 +381,6 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/project/:ref/sql',
-        destination: '/project/:ref/sql/new',
-        permanent: true,
-      },
-      {
         permanent: true,
         source: '/project/:ref/reports/linter',
         destination: '/project/:ref/database/linter',
