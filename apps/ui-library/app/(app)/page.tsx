@@ -1,8 +1,6 @@
-import { HomepageSvgHandler } from '@/components/homepage-svg-handler'
 import { BlockPreview } from '@/components/block-preview'
-import Link from 'next/link'
+import { ComponentPreview } from '@/components/component-preview'
 import { Button } from '@/registry/default/components/ui/button'
-
 export default function Home() {
   return (
     <main className="relative lg:-ml-10">
@@ -114,7 +112,39 @@ export default function Home() {
                 className="col-start-3 col-span-8 hover:shadow-xl transition-shadow"
               >
                 <div className="w-full shadow-lg">
-                  <BlockPreview name="dropzone" />
+                  <ComponentPreview name="dropzone-demo" showCode={false} />
+                </div>
+              </div>
+
+              {/* Current User Avatar */}
+              <div
+                data-grid-item
+                className="col-start-3 col-span-8 pt-16 pb-4 text-xs uppercase font-mono text-muted-foreground tracking-wider"
+              >
+                Current User Avatar
+              </div>
+              <div
+                data-grid-item
+                className="col-start-3 col-span-8 hover:shadow-xl transition-shadow"
+              >
+                <div className="w-full shadow-lg">
+                  <ComponentPreview name="current-user-avatar-preview" showCode={false} />
+                </div>
+              </div>
+
+              {/* Realtime Avatar Stack */}
+              <div
+                data-grid-item
+                className="col-start-3 col-span-8 pt-16 pb-4 text-xs uppercase font-mono text-muted-foreground tracking-wider"
+              >
+                Realtime Avatar Stack
+              </div>
+              <div
+                data-grid-item
+                className="col-start-3 col-span-8 hover:shadow-xl transition-shadow"
+              >
+                <div className="w-full shadow-lg">
+                  <ComponentPreview name="realtime-avatar-stack-preview" showCode={false} />
                 </div>
               </div>
 
