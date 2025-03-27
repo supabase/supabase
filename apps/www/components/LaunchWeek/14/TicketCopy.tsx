@@ -2,8 +2,9 @@ import { useState, useRef } from 'react'
 import { LW14_URL } from '~/lib/constants'
 import { Check, Copy } from 'lucide-react'
 import useConfData from './hooks/use-conf-data'
+import { cn } from 'ui'
 
-export default function TicketCopy() {
+export default function TicketCopy({ className }: { className?: string }) {
   const [state] = useConfData()
   const userData = state.userTicketData
   const { username } = userData
@@ -25,7 +26,10 @@ export default function TicketCopy() {
           }, 2000)
         })
       }}
-      className="font-mono w-full max-w-[280px] sm:max-w-[320px] px-2 lg:px-3.5 !pr-1 py-1 rounded-md bg-alternative-200 border flex gap-2 relative text-foreground-light hover:text-foreground text-xs pointer-events-auto justify-between items-center hover:border-stronger transition-all"
+      className={cn(
+        'font-mono w-full px-2 lg:px-3.5 !pr-1 py-1 rounded-md bg-alternative-200 border flex gap-2 relative text-foreground-light hover:text-foreground text-xs pointer-events-auto justify-between items-center hover:border-stronger transition-all',
+        className
+      )}
     >
       <span className="truncate">{displayUrl}</span>
       <div className="w-6 min-w-6 h-6 flex items-center justify-center flex-shrink-0 border border-strong rounded bg-muted hover:bg-selection hover:border-stronger">

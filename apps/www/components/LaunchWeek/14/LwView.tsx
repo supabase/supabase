@@ -37,7 +37,7 @@ export const LwView = () => {
         <TicketCanvas narrow={true} onUpgradeToSecret={register.upgradeTicket} />
         {state.claimFormState === 'visible' && (
           <TicketClaim>
-            <div className="flex flex-col md:flex-row gap-12 lg:gap-2 grow w-full min-w-full max-w-full pt-16 md:pt-32 md:px-6 lg:px-0 lg:py-0">
+            <div className="flex flex-col md:flex-row gap-12 lg:gap-2 grow w-full min-w-full max-w-full pt-16 md:pt-32 md:px-6 lg:px-0 lg:py-0 items-center">
               <div className='flex flex-col gap-2 w-full grow justify-center font-["Departure_Mono"]'>
                 <h1 className="text-4xl uppercase tracking-wide pointer-events-none">
                   <span className="flex gap-1 items-center">

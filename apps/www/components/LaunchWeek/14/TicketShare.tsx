@@ -81,13 +81,13 @@ export default function TicketShare() {
   }
 
   return (
-    <div className='flex flex-col sm:flex-row flex-wrap justify-start w-full gap-2 max-w-[280px] sm:max-w-full pointer-events-auto font-["Departure_Mono"]'>
+    <div className='flex flex-row flex-wrap justify-stretch w-full gap-2 pointer-events-auto font-["Departure_Mono"]'>
       <Button
         onClick={() => handleShare('twitter')}
         type={userData.shared_on_twitter ? 'secondary' : 'default'}
         icon={userData.shared_on_twitter && <Check strokeWidth={2} />}
         size={isLessThanMd ? 'tiny' : 'small'}
-        className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] uppercase"
+        className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] uppercase flex-1 w-full"
         asChild
       >
         <Link href={tweetUrl} target="_blank">
@@ -99,7 +99,7 @@ export default function TicketShare() {
         type={userData.shared_on_linkedin ? 'secondary' : 'default'}
         icon={userData.shared_on_linkedin && <Check strokeWidth={2} />}
         size={isLessThanMd ? 'tiny' : 'small'}
-        className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] uppercase"
+        className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] uppercase flex-1  w-full"
         asChild
       >
         <Link href={linkedInUrl} target="_blank">
