@@ -20,6 +20,7 @@ import { Tunnel } from '~/components/LaunchWeek/14/Tunnel'
 import { TicketShareLayout } from '~/components/LaunchWeek/14/TicketShareLayout'
 import { useRegistration } from '~/components/LaunchWeek/14/hooks/use-registration'
 import useConfData from './hooks/use-conf-data'
+import { cn } from 'ui'
 
 const dates = [new Date('2025-03-31T07:00:00.000-08:00')]
 
@@ -78,7 +79,12 @@ export const LwView = () => {
           </>
         )}
 
-        <div className="w-full absolute bottom-[55%] md:bottom-[25%] lg:-bottom-8 left-0 right-0 -z-20">
+        <div
+          className={cn(
+            'w-full absolute bottom-[50%] md:bottom-[25%] lg:-bottom-8 xl:-bottom-16 left-0 right-0 -z-20 overflow-hidden flex justify-center',
+            { ['hidden']: state.claimFormState === 'visible' }
+          )}
+        >
           <Tunnel />
         </div>
       </TicketLayoutCanvas>

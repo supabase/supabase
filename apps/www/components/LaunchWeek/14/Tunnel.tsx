@@ -9,5 +9,13 @@ interface TunnelProps {
 }
 
 export const Tunnel: React.FC<TunnelProps> = ({ className = '' }) => {
-  return <Image src={tunnelImage} alt="" width="1120" height="380" className="w-full h-auto" />
+  return (
+    <Image
+      src={tunnelImage}
+      alt=""
+      width="1120"
+      height="380"
+      className="w-full h-auto min-w-[700px]"
+    />
+  )
 }
