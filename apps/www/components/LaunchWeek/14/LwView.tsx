@@ -1,27 +1,24 @@
-import TicketCanvas from '~/components/LaunchWeek/14/TicketCanvas'
-import { TicketLayout, TicketLayoutCanvas } from '~/components/LaunchWeek/14/TicketLayout'
+import Image from 'next/image'
+import { ActionButton } from '~/components/LaunchWeek/14/ActionButton'
 import {
   TicketHeader,
   TicketHeaderClaim,
   TicketHeaderDate,
   TicketHeaderRemainingTime,
 } from '~/components/LaunchWeek/14/Header'
+import TicketCanvas from '~/components/LaunchWeek/14/TicketCanvas'
 import {
   TicketClaim,
   TicketClaimButtons,
   TicketClaimContent,
-  TicketClaimLogo,
   TicketClaimMessage,
 } from '~/components/LaunchWeek/14/TicketClaim'
-import { ActionButton } from '~/components/LaunchWeek/14/ActionButton'
-import { TicketShareLayout } from '~/components/LaunchWeek/14/TicketShareLayout'
 import TicketCopy from '~/components/LaunchWeek/14/TicketCopy'
+import { TicketLayout, TicketLayoutCanvas } from '~/components/LaunchWeek/14/TicketLayout'
 import TicketShare from '~/components/LaunchWeek/14/TicketShare'
+import { TicketShareLayout } from '~/components/LaunchWeek/14/TicketShareLayout'
 import { useRegistration } from '~/components/LaunchWeek/14/hooks/use-registration'
 import useConfData from './hooks/use-conf-data'
-import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
-import Image from 'next/image'
-import { Tunnel } from './Tunnel'
 
 const dates = [new Date('2025-03-31T07:00:00.000-08:00')]
 

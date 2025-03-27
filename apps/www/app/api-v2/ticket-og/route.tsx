@@ -132,8 +132,14 @@ export async function GET(req: Request, res: Response) {
       const lineLenght = 12
 
       const line1 = username.slice(0, lineLenght).trim().replace(/ /g, '\u00A0')
-      const line2 = username.slice(lineLenght, lineLenght * 2).trim().replace(/ /g, '\u00A0')
-      let line3 = username.slice(lineLenght * 2).trim().replace(/ /g, '\u00A0')
+      const line2 = username
+        .slice(lineLenght, lineLenght * 2)
+        .trim()
+        .replace(/ /g, '\u00A0')
+      let line3 = username
+        .slice(lineLenght * 2)
+        .trim()
+        .replace(/ /g, '\u00A0')
 
       // NOTE: If third line is too long, trim to 8 characters and add '...'
       if (line3.length > lineLenght) {

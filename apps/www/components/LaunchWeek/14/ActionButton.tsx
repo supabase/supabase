@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import { KeyboardEvent, ReactNode, useEffect, useRef } from 'react'
+import { KeyboardEvent, ReactNode, useRef } from 'react'
 import { useKey } from 'react-use'
 import { cn } from 'ui'
 import { useCommandMenuOpen } from 'ui-patterns'
@@ -52,6 +52,7 @@ const textVariants = cva(
 )
 
 export interface ActionButtonProps extends VariantProps<typeof actionButtonVariants> {
+  variant: string
   icon: string
   children: ReactNode
   onClick?: () => void
