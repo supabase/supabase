@@ -79,7 +79,6 @@ export default async function DocPage({ params }: DocPageProps) {
   }
 
   const toc = await getTableOfContents(doc.body.raw)
-  const slug = params.slug?.join('/') || ''
 
   return (
     <main className="relative lg:gap-10 xl:grid xl:grid-cols-[1fr_200px] pr-6 lg:py-8">

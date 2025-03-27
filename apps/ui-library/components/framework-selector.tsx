@@ -1,6 +1,6 @@
 'use client'
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 import { componentPages, frameworkTitles } from '@/config/docs'
 import { useFramework } from '@/context/framework-context'
@@ -16,7 +16,6 @@ import {
 const frameworks = Object.keys(frameworkTitles)
 
 export function FrameworkSelector() {
-  const searchParams = useSearchParams()
   const pathname = usePathname()
 
   // Extract framework and docTitle from pathname
