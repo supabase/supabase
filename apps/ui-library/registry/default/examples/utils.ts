@@ -48,7 +48,7 @@ const users = [
 ]
 
 export function getRandomUser() {
-  return sample(users)
+  return sample(users)!
 }
 
 export function generateFullName(): string {
