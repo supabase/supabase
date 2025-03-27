@@ -1,14 +1,13 @@
-import React from 'react'
-import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
+import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion'
 import { cn } from 'ui'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 import { LW13_DATE } from '~/lib/constants'
 
 import CanvasSingleMode from '~/components/LaunchWeek/13/Multiplayer/CanvasSingleMode'
 import ThreeTicketCanvas from '~/components/LaunchWeek/13/ThreeTicketCanvas'
-import SectionContainer from '~/components/Layouts/SectionContainer'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import useWinningChances from '~/components/LaunchWeek/hooks/useWinningChances'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 import TicketForm from '~/components/LaunchWeek/13/Ticket/TicketForm'
 import TicketSwagCtaBox from '~/components/LaunchWeek/13/Ticket/TicketSwagCtaBox'
@@ -23,6 +22,8 @@ const TicketingFlow = () => {
   const hasPlatinumTicket = userData.platinum
   const hasSecretTicket = userData.secret
   const ticketType = hasSecretTicket ? 'secret' : hasPlatinumTicket ? 'platinum' : 'regular'
+
+  console.log({ hasPlatinumTicket, hasSecretTicket })
 
   const transition = DEFAULT_TRANSITION
   const initial = INITIAL_BOTTOM
