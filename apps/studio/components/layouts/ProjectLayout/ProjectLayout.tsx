@@ -139,7 +139,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
           <meta name="description" content="Supabase Studio" />
         </Head>
         <div className="flex flex-row h-full w-full">
-          <ResizablePanelGroup className="" direction="horizontal" autoSaveId="project-layout">
+          <ResizablePanelGroup direction="horizontal" autoSaveId="project-layout">
             {showProductMenu && productMenu && (
               <ResizablePanel
                 order={1}
@@ -186,8 +186,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             )}
             <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col w-full">
               <ResizablePanelGroup
-                className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
                 direction="horizontal"
+                className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
                 autoSaveId="project-layout-content"
               >
                 <ResizablePanel
@@ -217,10 +217,11 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                     <ResizableHandle withHandle />
                     <ResizablePanel
                       id="panel-assistant"
+                      minSize={30}
+                      maxSize={50}
                       className={cn(
                         'border-l xl:border-l-0 bg fixed z-40 md:absolute md:z-0 right-0 top-0 md:top-[48px] bottom-0 xl:relative xl:top-0',
-                        'w-screen h-[100dvh] md:h-auto md:w-auto md:min-w-[400px] max-w-[500px]',
-                        '2xl:min-w-[500px] 2xl:max-w-[600px]'
+                        'w-screen h-[100dvh] md:h-auto md:w-auto'
                       )}
                     >
                       {aiSnap.open && (
