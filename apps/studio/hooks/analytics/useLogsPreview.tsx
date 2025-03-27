@@ -138,21 +138,20 @@ function useLogsPreview({
     refresh(newSql)
   }, [JSON.stringify(mergedFilters)])
 
-  // memoize all this calculations stuff
   const { logData, error, oldestTimestamp } = useMemo(() => {
     let logData: LogData[] = []
-
     let error: null | string | object = rqError ? (rqError as any).message : null
-    data?.pages.forEach((response) => {
-      if (response.result) {
+
+    data?.pages?.forEach((response) => {
+      if (response?.result) {
         logData = [...logData, ...response.result]
       }
-      if (!error && response && response.error) {
+      if (!error && response?.error) {
         error = response.error
       }
     })
 
-    const oldestTimestamp = logData[logData.length - 1]?.timestamp
+    const oldestTimestamp = logData.length > 0 ? logData[logData.length - 1]?.timestamp : undefined
 
     return { logData, error, oldestTimestamp }
   }, [data?.pages])
@@ -187,7 +186,7 @@ function useLogsPreview({
       // refresh each minute only
       refetchInterval: 60000,
       // only enable if no errors are found and data has already been loaded
-      enabled: !error && data && data.pages.length > 0 ? true : false,
+      enabled: !error && data && data?.pages?.length > 0 ? true : false,
     }
   )
 

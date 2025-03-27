@@ -3,12 +3,17 @@ import saveAs from 'file-saver'
 import { ArrowUp, ChevronDown, FileText, Trash } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
-import { ReactNode, useState } from 'react'
+import { ReactNode, useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useTrackedState } from 'components/grid/store/Store'
-import type { Filter, Sort, SupaTable } from 'components/grid/types'
+import {
+  filtersToUrlParams,
+  saveTableEditorStateToLocalStorage,
+  sortsToUrlParams,
+} from 'components/grid/SupabaseGrid.utils'
+import type { Filter, Sort } from 'components/grid/types'
+import GridHeaderActions from 'components/interfaces/TableGridEditor/GridHeaderActions'
 import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -32,6 +37,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Separator,
+  SonnerProgress,
 } from 'ui'
 import FilterPopover from './filter/FilterPopover'
 import { SortPopover } from './sort'
@@ -52,26 +58,12 @@ export const MAX_EXPORT_ROW_COUNT_MESSAGE = (
 )
 
 export type HeaderProps = {
-  table: SupaTable
   sorts: Sort[]
   filters: Filter[]
-  onAddColumn?: () => void
-  onAddRow?: () => void
-  onImportData?: () => void
-  headerActions?: ReactNode
   customHeader: ReactNode
 }
 
-const Header = ({
-  table,
-  sorts,
-  filters,
-  onAddColumn,
-  onAddRow,
-  onImportData,
-  headerActions,
-  customHeader,
-}: HeaderProps) => {
+const Header = ({ sorts, filters, customHeader }: HeaderProps) => {
   const snap = useTableEditorTableStateSnapshot()
 
   return (
@@ -82,18 +74,13 @@ const Header = ({
         ) : (
           <>
             {snap.selectedRows.size > 0 ? (
-              <RowHeader table={table} sorts={sorts} filters={filters} />
+              <RowHeader sorts={sorts} filters={filters} />
             ) : (
-              <DefaultHeader
-                table={table}
-                onAddColumn={onAddColumn}
-                onAddRow={onAddRow}
-                onImportData={onImportData}
-              />
+              <DefaultHeader />
             )}
           </>
         )}
-        <div className="sb-grid-header__inner">{headerActions}</div>
+        <GridHeaderActions table={snap.originalTable} />
       </div>
     </div>
   )
@@ -101,15 +88,16 @@ const Header = ({
 
 export default Header
 
-type DefaultHeaderProps = {
-  table: SupaTable
-  onAddColumn?: () => void
-  onAddRow?: () => void
-  onImportData?: () => void
-}
-const DefaultHeader = ({ table, onAddColumn, onAddRow, onImportData }: DefaultHeaderProps) => {
-  const { ref } = useParams()
+const DefaultHeader = () => {
+  const { ref: projectRef } = useParams()
+  const tableEditorSnap = useTableEditorStateSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
   const org = useSelectedOrganization()
+
+  const onAddRow =
+    snap.editable && (snap.table.columns ?? []).length > 0 ? tableEditorSnap.onAddRow : undefined
+  const onAddColumn = snap.editable ? tableEditorSnap.onAddColumn : undefined
+  const onImportData = snap.editable ? tableEditorSnap.onImportData : undefined
 
   const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
@@ -120,13 +108,63 @@ const DefaultHeader = ({ table, onAddColumn, onAddRow, onImportData }: DefaultHe
     arrayKeys: ['sort', 'filter'],
   })
 
+  const onApplyFilters = useCallback(
+    (appliedFilters: Filter[]) => {
+      snap.setEnforceExactCount(false)
+      // Reset page to 1 when filters change
+      snap.setPage(1)
+
+      const filters = filtersToUrlParams(appliedFilters)
+
+      setParams((prevParams) => {
+        return {
+          ...prevParams,
+          filter: filters,
+        }
+      })
+
+      if (projectRef) {
+        saveTableEditorStateToLocalStorage({
+          projectRef,
+          tableName: snap.table.name,
+          schema: snap.table.schema,
+          filters: filters,
+        })
+      }
+    },
+    [projectRef, snap.table.name, snap.table.schema]
+  )
+
+  const onApplySorts = useCallback(
+    (appliedSorts: Sort[]) => {
+      const sorts = sortsToUrlParams(appliedSorts)
+
+      setParams((prevParams) => {
+        return {
+          ...prevParams,
+          sort: sorts,
+        }
+      })
+
+      if (projectRef) {
+        saveTableEditorStateToLocalStorage({
+          projectRef,
+          tableName: snap.table.name,
+          schema: snap.table.schema,
+          sorts: sorts,
+        })
+      }
+    },
+    [projectRef, snap.table.name, snap.table.schema]
+  )
+
   const { mutate: sendEvent } = useSendEventMutation()
 
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <FilterPopover table={table} filters={filters as string[]} setParams={setParams} />
-        <SortPopover table={table} sorts={sorts as string[]} setParams={setParams} />
+        <FilterPopover filters={filters as string[]} onApplyFilters={onApplyFilters} />
+        <SortPopover sorts={sorts as string[]} onApplySorts={onApplySorts} />
       </div>
       {canAddNew && (
         <>
@@ -166,7 +204,7 @@ const DefaultHeader = ({ table, onAddColumn, onAddRow, onImportData }: DefaultHe
                             <div>
                               <p>Insert row</p>
                               <p className="text-foreground-light">
-                                Insert a new row into {table.name}
+                                Insert a new row into {snap.table.name}
                               </p>
                             </div>
                           </DropdownMenuItem>,
@@ -192,7 +230,7 @@ const DefaultHeader = ({ table, onAddColumn, onAddRow, onImportData }: DefaultHe
                             <div>
                               <p>Insert column</p>
                               <p className="text-foreground-light">
-                                Insert a new column into {table.name}
+                                Insert a new column into {snap.table.name}
                               </p>
                             </div>
                           </DropdownMenuItem>,
@@ -209,7 +247,7 @@ const DefaultHeader = ({ table, onAddColumn, onAddRow, onImportData }: DefaultHe
                                 action: 'import_data_button_clicked',
                                 properties: { tableType: 'Existing Table' },
                                 groups: {
-                                  project: ref ?? 'Unknown',
+                                  project: projectRef ?? 'Unknown',
                                   organization: org?.slug ?? 'Unknown',
                                 },
                               })
@@ -249,13 +287,10 @@ const DefaultHeader = ({ table, onAddColumn, onAddRow, onImportData }: DefaultHe
 }
 
 type RowHeaderProps = {
-  table: SupaTable
   sorts: Sort[]
   filters: Filter[]
 }
-const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
-  const state = useTrackedState()
-
+const RowHeader = ({ sorts, filters }: RowHeaderProps) => {
   const { project } = useProjectContext()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
@@ -268,7 +303,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const { data } = useTableRowsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    tableId: table.id,
+    tableId: snap.table.id,
     sorts,
     filters,
     page: snap.page,
@@ -280,13 +315,16 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      tableId: table.id,
+      tableId: snap.table.id,
       filters,
       enforceExactCount: snap.enforceExactCount,
       impersonatedRole: roleImpersonationState.role,
     },
     { keepPreviousData: true }
   )
+
+  const allRows = data?.rows ?? []
+  const totalRows = countData?.count ?? 0
 
   const onSelectAllRows = () => {
     snap.setSelectedRows(new Set(allRows.map((row) => row.idx)), true)
@@ -321,16 +359,49 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       return setIsExporting(false)
     }
 
+    const toastId = snap.allRowsSelected
+      ? toast(
+          <SonnerProgress progress={0} message={`Exporting all rows from ${snap.table.name}`} />,
+          {
+            closeButton: false,
+            duration: Infinity,
+          }
+        )
+      : toast.loading(
+          `Exporting ${snap.selectedRows.size} row${snap.selectedRows.size > 1 ? 's' : ''} from ${snap.table.name}`
+        )
+
     const rows = snap.allRowsSelected
       ? await fetchAllTableRows({
           projectRef: project.ref,
           connectionString: project.connectionString,
-          table,
+          table: snap.table,
           filters,
           sorts,
           impersonatedRole: roleImpersonationState.role,
+          progressCallback: (value: number) => {
+            const progress = Math.min((value / totalRows) * 100, 100)
+            toast(
+              <SonnerProgress
+                progress={progress}
+                message={`Exporting all rows from ${snap.table.name}`}
+              />,
+              {
+                id: toastId,
+                closeButton: false,
+                duration: Infinity,
+              }
+            )
+          },
         })
       : allRows.filter((x) => snap.selectedRows.has(x.idx))
+
+    if (rows.length === 0) {
+      toast.dismiss(toastId)
+      toast.error('Export failed, please try exporting again')
+      setIsExporting(false)
+      return
+    }
 
     const formattedRows = rows.map((row) => {
       const formattedRow = row
@@ -342,10 +413,15 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     })
 
     const csv = Papa.unparse(formattedRows, {
-      columns: state.table!.columns.map((column) => column.name),
+      columns: snap.table!.columns.map((column) => column.name),
     })
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    saveAs(csvData, `${state.table!.name}_rows.csv`)
+    toast.success(`Downloaded ${rows.length} rows to CSV`, {
+      id: toastId,
+      closeButton: true,
+      duration: 4000,
+    })
+    saveAs(csvData, `${snap.table!.name}_rows.csv`)
     setIsExporting(false)
   }
 
@@ -364,29 +440,68 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       return setIsExporting(false)
     }
 
+    if (snap.allRowsSelected && totalRows === 0) {
+      toast.error('Export failed, please try exporting again')
+      return setIsExporting(false)
+    }
+
+    const toastId = snap.allRowsSelected
+      ? toast(
+          <SonnerProgress progress={0} message={`Exporting all rows from ${snap.table.name}`} />,
+          {
+            closeButton: false,
+            duration: Infinity,
+          }
+        )
+      : toast.loading(
+          `Exporting ${snap.selectedRows.size} row${snap.selectedRows.size > 1 ? 's' : ''} from ${snap.table.name}`
+        )
+
     const rows = snap.allRowsSelected
       ? await fetchAllTableRows({
           projectRef: project.ref,
           connectionString: project.connectionString,
-          table,
+          table: snap.table,
           filters,
           sorts,
           impersonatedRole: roleImpersonationState.role,
+          progressCallback: (value: number) => {
+            const progress = Math.min((value / totalRows) * 100, 100)
+            toast(
+              <SonnerProgress
+                progress={progress}
+                message={`Exporting all rows from ${snap.table.name}`}
+              />,
+              {
+                id: toastId,
+                closeButton: false,
+                duration: Infinity,
+              }
+            )
+          },
         })
       : allRows.filter((x) => snap.selectedRows.has(x.idx))
 
-    const sqlStatements = formatTableRowsToSQL(table, rows)
+    if (rows.length === 0) {
+      toast.error('Export failed, please exporting try again')
+      setIsExporting(false)
+      return
+    }
+
+    const sqlStatements = formatTableRowsToSQL(snap.table, rows)
     const sqlData = new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' })
-    saveAs(sqlData, `${state.table!.name}_rows.sql`)
+    toast.success(`Downloading ${rows.length} rows to SQL`, {
+      id: toastId,
+      closeButton: true,
+      duration: 4000,
+    })
+    saveAs(sqlData, `${snap.table!.name}_rows.sql`)
     setIsExporting(false)
   }
+
   function deselectRows() {
     snap.setSelectedRows(new Set())
   }
-
-  const allRows = data?.rows ?? []
-  const totalRows = countData?.count ?? 0
-  const { editable } = state
 
   useSubscribeToImpersonatedRole(() => {
     if (snap.allRowsSelected || snap.selectedRows.size > 0) {
@@ -396,7 +511,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
 
   return (
     <div className="flex items-center gap-x-2">
-      {editable && (
+      {snap.editable && (
         <ButtonTooltip
           type="default"
           size="tiny"

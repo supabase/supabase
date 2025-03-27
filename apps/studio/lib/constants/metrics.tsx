@@ -334,7 +334,7 @@ export const METRICS: Metric[] = [
   /** Supavisor */
   {
     key: 'total_supavisor_egress_bytes',
-    label: 'Supavisor Egress',
+    label: 'Shared Pooler Egress',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.SUPAVISOR,
   },
