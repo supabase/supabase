@@ -3,19 +3,13 @@
 import NavigationItem from '@/components/side-navigation-item'
 import { aiEditorsRules, componentPages, gettingStarted } from '@/config/docs'
 import { useFramework } from '@/context/framework-context'
-import { usePathname, useSearchParams } from 'next/navigation'
-import { SidebarNavItem } from 'types/nav'
 
 function SideNavigation() {
-  const searchParams = useSearchParams()
   const { framework: preferredFramework } = useFramework()
 
-  // Create a function to build URLs while preserving other query params
+  // Create a function to build URLs
   const buildUrl = (slug: string, framework?: string) => {
     if (!framework) return `/docs/${slug}`
-
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('framework', framework)
     return `/docs/${framework}/${slug}`
   }
 
