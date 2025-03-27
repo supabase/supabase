@@ -22,6 +22,7 @@
     "@radix-ui/react-slot": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.0.7",
     "class-variance-authority": "^0.6.0",
+    "common": "workspace:*",
     "contentlayer2": "0.4.6",
     "eslint-config-supabase": "workspace:*",
     "framer-motion": "^11.0.3",

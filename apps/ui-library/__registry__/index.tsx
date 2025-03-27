@@ -330,6 +330,30 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     }
+    ,
+    "current-user-avatar-demo": {
+      name: "current-user-avatar-demo",
+      type: "registry:example",
+      registryDependencies: [],
+      component: React.lazy(() => import("@/registry/default/examples/current-user-avatar-demo.tsx")),
+      source: "",
+      files: ["registry/default/examples/current-user-avatar-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "realtime-avatar-stack-demo": {
+      name: "realtime-avatar-stack-demo",
+      type: "registry:example",
+      registryDependencies: [],
+      component: React.lazy(() => import("@/registry/default/examples/realtime-avatar-stack-demo.tsx")),
+      source: "",
+      files: ["registry/default/examples/realtime-avatar-stack-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
     
   },
 }

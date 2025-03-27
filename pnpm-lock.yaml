@@ -1010,6 +1010,9 @@ importers:
       class-variance-authority:
         specifier: ^0.6.0
         version: 0.6.1
+      common:
+        specifier: workspace:*
+        version: link:../../packages/common
       contentlayer2:
         specifier: 0.4.6
         version: 0.4.6(esbuild@0.25.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)
