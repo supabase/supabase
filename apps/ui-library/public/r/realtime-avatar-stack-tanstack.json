@@ -20,7 +20,7 @@
     },
     {
       "path": "registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx",
-      "content": "import { useMemo } from 'react'\nimport { useRealtimePresenceRoom } from '../hooks/use-realtime-presence-room'\nimport { AvatarStack } from './avatar-stack'\n\nexport const RealtimeAvatarStack = ({ roomName }: { roomName: string }) => {\n  const { users: usersMap } = useRealtimePresenceRoom(roomName)\n  const avatars = useMemo(() => {\n    return Object.values(usersMap).map((user) => ({\n      name: user.name,\n      image: user.image,\n    }))\n  }, [usersMap])\n\n  return <AvatarStack avatars={avatars} />\n}\n",
+      "content": "import { AvatarStack } from '@/registry/default/blocks/realtime-avatar-stack/components/avatar-stack'\nimport { useRealtimePresenceRoom } from '@/registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room'\nimport { useMemo } from 'react'\n\nexport const RealtimeAvatarStack = ({ roomName }: { roomName: string }) => {\n  const { users: usersMap } = useRealtimePresenceRoom(roomName)\n  const avatars = useMemo(() => {\n    return Object.values(usersMap).map((user) => ({\n      name: user.name,\n      image: user.image,\n    }))\n  }, [usersMap])\n\n  return <AvatarStack avatars={avatars} />\n}\n",
       "type": "registry:component"
     },
     {

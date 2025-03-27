@@ -13,7 +13,7 @@
   "files": [
     {
       "path": "registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx",
-      "content": "'use client'\n\nimport { Avatar, AvatarFallback, AvatarImage } from '@/registry/default/components/ui/avatar'\nimport { useCurrentUserImage } from '../hooks/use-current-user-image'\nimport { useCurrentUserName } from '../hooks/use-current-user-name'\n\nexport const CurrentUserAvatar = () => {\n  const profileImage = useCurrentUserImage()\n  const name = useCurrentUserName()\n  const initials = name\n    ?.split(' ')\n    ?.map((word) => word[0])\n    ?.join('')\n    ?.toUpperCase()\n\n  return (\n    <Avatar>\n      {profileImage && <AvatarImage src={profileImage} alt={initials} />}\n      <AvatarFallback>{initials}</AvatarFallback>\n    </Avatar>\n  )\n}\n",
+      "content": "'use client'\n\nimport { useCurrentUserImage } from '@/registry/default/blocks/current-user-avatar/hooks/use-current-user-image'\nimport { useCurrentUserName } from '@/registry/default/blocks/current-user-avatar/hooks/use-current-user-name'\nimport { Avatar, AvatarFallback, AvatarImage } from '@/registry/default/components/ui/avatar'\n\nexport const CurrentUserAvatar = () => {\n  const profileImage = useCurrentUserImage()\n  const name = useCurrentUserName()\n  const initials = name\n    ?.split(' ')\n    ?.map((word) => word[0])\n    ?.join('')\n    ?.toUpperCase()\n\n  return (\n    <Avatar>\n      {profileImage && <AvatarImage src={profileImage} alt={initials} />}\n      <AvatarFallback>{initials}</AvatarFallback>\n    </Avatar>\n  )\n}\n",
       "type": "registry:component"
     },
     {
@@ -28,7 +28,7 @@
     },
     {
       "path": "registry/default/clients/react/lib/supabase/client.ts",
-      "content": "import { createClient as createSupabaseClient } from '@supabase/supabase-js'\n\nexport function createClient() {\n  return createSupabaseClient(process.env.VITE_SUPABASE_URL!, process.env.VITE_SUPABASE_ANON_KEY!)\n}\n",
+      "content": "import { createClient as createSupabaseClient } from '@supabase/supabase-js'\n\nexport function createClient() {\n  return createSupabaseClient(\n    import.meta.env.VITE_SUPABASE_URL!,\n    import.meta.env.VITE_SUPABASE_ANON_KEY!\n  )\n}\n",
       "type": "registry:lib"
     }
   ]
