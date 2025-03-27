@@ -44,7 +44,12 @@ const PromoToast = () => {
       <div className="relative z-10 text-foreground-lighter uppercase flex flex-col text-sm w-full font-mono mb-2">
         <span className="mb-1">31 APR - 04 MAR / 7AM PT</span>
 
-        <p className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7 font-['Departure_Mono']">
+        <p
+          style={{
+            fontFamily: 'Departure Mono, Source Code Pro, Office Code Pro, Menlo, monospace',
+          }}
+          className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7"
+        >
           Launch Week 14
         </p>
         <CountdownComponent date={new Date(announcement.launchDate)} showCard={false} />
