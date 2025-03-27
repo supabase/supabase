@@ -7,6 +7,7 @@ import { edgeFunctionsKeys } from './keys'
 export type EdgeFunctionBodyVariables = {
   projectRef?: string
   slug?: string
+  entrypoint?: string
 }
 
 export type EdgeFunctionFile = {
@@ -19,11 +20,12 @@ export type EdgeFunctionBodyResponse = {
 }
 
 export async function getEdgeFunctionBody(
-  { projectRef, slug }: EdgeFunctionBodyVariables,
+  { projectRef, slug, entrypoint }: EdgeFunctionBodyVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!slug) throw new Error('slug is required')
+  if (!entrypoint) throw new Error('entrypoint is required')
 
   try {
     // Get authorization headers
@@ -34,7 +36,7 @@ export async function getEdgeFunctionBody(
     // Send to our API for processing (the API will handle the fetch from v1 endpoint)
     const parseResponse = await fetch(`${BASE_PATH}/api/edge-functions/body`, {
       method: 'POST',
-      body: JSON.stringify({ projectRef, slug }),
+      body: JSON.stringify({ projectRef, slug, entrypoint }),
       headers,
       credentials: 'include',
       signal,
@@ -59,7 +61,7 @@ export type EdgeFunctionBodyData = Awaited<ReturnType<typeof getEdgeFunctionBody
 export type EdgeFunctionBodyError = ResponseError
 
 export const useEdgeFunctionBodyQuery = <TData = EdgeFunctionBodyData>(
-  { projectRef, slug }: EdgeFunctionBodyVariables,
+  { projectRef, slug, entrypoint }: EdgeFunctionBodyVariables,
   {
     enabled = true,
     ...options
@@ -67,7 +69,7 @@ export const useEdgeFunctionBodyQuery = <TData = EdgeFunctionBodyData>(
 ) =>
   useQuery<EdgeFunctionBodyData, EdgeFunctionBodyError, TData>(
     edgeFunctionsKeys.body(projectRef, slug),
-    ({ signal }) => getEdgeFunctionBody({ projectRef, slug }, signal),
+    ({ signal }) => getEdgeFunctionBody({ projectRef, slug, entrypoint }, signal),
     {
       enabled:
         IS_PLATFORM && enabled && typeof projectRef !== 'undefined' && typeof slug !== 'undefined',

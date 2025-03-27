@@ -34,7 +34,9 @@ const CodePage = () => {
   } = useEdgeFunctionBodyQuery({
     projectRef: ref,
     slug: functionSlug,
+    entrypoint: selectedFunction?.entrypoint_path,
   })
+
   const [files, setFiles] = useState<
     { id: number; name: string; content: string; selected?: boolean }[]
   >([])
@@ -49,12 +51,8 @@ const CodePage = () => {
     if (isDeploying || !ref || !functionSlug || !selectedFunction || files.length === 0) return
 
     try {
-      const parsedEntrypointPath =
-        selectedFunction.entrypoint_path?.replace(/\/tmp\/user_fn_[^/]+\//, '') || 'index.ts'
-      const existingFile = files.find((file) => file.name === parsedEntrypointPath) ||
-        files.find((file) => file.name.endsWith('.ts') || file.name.endsWith('.js')) || {
-          name: 'index.ts',
-        }
+      const newEntrypointPath = selectedFunction.entrypoint_path?.split('/').pop()
+      const newImportMapPath = selectedFunction.import_map_path?.split('/').pop()
 
       await deployFunction({
         projectRef: ref,
@@ -62,8 +60,8 @@ const CodePage = () => {
         metadata: {
           name: selectedFunction.name,
           verify_jwt: selectedFunction.verify_jwt,
-          entrypoint_path: existingFile.name,
-          import_map_path: selectedFunction.import_map_path,
+          entrypoint_path: newEntrypointPath || 'index.ts',
+          import_map_path: newImportMapPath || '',
         },
         files: files.map(({ name, content }) => ({ name, content })),
       })

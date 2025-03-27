@@ -1,6 +1,7 @@
 import { API_URL } from 'lib/constants'
 import { parseEszip } from 'lib/eszip-parser'
 import { NextApiRequest, NextApiResponse } from 'next'
+import path from 'path'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
@@ -10,7 +11,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return handlePost(req, res)
     default:
       return new Response(
-        JSON.stringify({ data: null, error: { message: `Method ${method} Not Allowed` } }),
+        JSON.stringify({
+          data: null,
+          error: { message: `Method ${method} Not Allowed` },
+        }),
         {
           status: 405,
           headers: { 'Content-Type': 'application/json', Allow: 'POST' },
@@ -19,9 +23,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
+function getBasePath(entrypoint: string | undefined): string {
+  if (!entrypoint) {
+    return '/'
+  }
+
+  try {
+    return path.dirname(new URL(entrypoint).pathname)
+  } catch (e) {
+    console.error('failed to parse entrypoint', entrypoint)
+    return '/'
+  }
+}
+
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { projectRef, slug } = req.body || {}
+    const { projectRef, slug, entrypoint } = req.body || {}
 
     if (!projectRef) {
       return res.status(400).json({ error: 'projectRef is required' })
@@ -29,12 +46,17 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     if (!slug) {
       return res.status(400).json({ error: 'slug is required' })
     }
+    if (!entrypoint) {
+      return res.status(400).json({ error: 'entrypoint is required' })
+    }
 
     // Get authorization token from the request
     const authToken = req.headers.authorization
 
     if (!authToken) {
-      return res.status(401).json({ error: 'No authorization token was found' })
+      return res.status(401).json({
+        error: 'No authorization token was found',
+      })
     }
 
     // Fetch the eszip data
@@ -81,7 +103,17 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     const uint8Array = new Uint8Array(arrayBuffer)
 
     // Parse the eszip file using our utility
-    const files = await parseEszip(uint8Array)
+    let files = await parseEszip(uint8Array)
+
+    // ignnore empty files
+    files = files.filter((file: { name: string; content: string }) => !!file.content.length)
+
+    // set file paths relative to entrypoint
+    const base_path = getBasePath(entrypoint)
+    files = files.map((file: { name: string; content: string }) => {
+      file.name = path.relative(base_path, file.name)
+      return file
+    })
 
     return res.status(200).json({
       files,
