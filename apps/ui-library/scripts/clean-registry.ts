@@ -14,7 +14,7 @@ function processJsonFile(filePath: string) {
     stringified = stringified
       .replace(/\/ui\/example\/password-based-auth/g, '')
       .replace(/\/example\/password-based-auth/g, '')
-      .replace(
+      .replaceAll(
         "import { Link } from '@/registry/default/components/ui/link'",
         "import Link from 'next/link'"
       )

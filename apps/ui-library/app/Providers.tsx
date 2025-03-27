@@ -5,12 +5,15 @@ import { ThemeProvider as NextThemesProvider } from 'next-themes'
 import { ThemeProviderProps } from 'next-themes/dist/types'
 
 import { TooltipProvider } from 'ui'
+import { FrameworkProvider } from '@/context/framework-context'
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
     <JotaiProvider>
       <NextThemesProvider {...props}>
-        <TooltipProvider delayDuration={0}>{children}</TooltipProvider>
+        <FrameworkProvider>
+          <TooltipProvider delayDuration={0}>{children}</TooltipProvider>
+        </FrameworkProvider>
       </NextThemesProvider>
     </JotaiProvider>
   )

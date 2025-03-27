@@ -6,120 +6,118 @@ import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock'
 import { useState } from 'react'
 import supabaseTheme from '../lib/themes/supabase-2.json' assert { type: 'json' }
 import { BlockItemPreview } from './block-item'
-import { File, Folder } from './files'
+import { CodeBlock, CodeBlockLang, TreeView, TreeViewItem, flattenTree } from 'ui'
+import { File } from 'lucide-react'
 
 interface BlockItemCodeProps {
   files: RegistryNode[]
 }
 
-const demoUrls: Record<string, string> = {
-  'src/registry/blocks/password-based-auth-nextjs/app/login/page.tsx':
-    '/blocks/password-based-auth-nextjs/login',
-  'src/registry/blocks/password-based-auth-nextjs/app/sign-up/page.tsx':
-    '/blocks/password-based-auth-nextjs/sign-up',
-  'src/registry/blocks/password-based-auth-nextjs/app/sign-up-success/page.tsx':
-    '/blocks/password-based-auth-nextjs/sign-up-success',
-  'src/registry/blocks/password-based-auth-nextjs/app/forgot-password/page.tsx':
-    '/blocks/password-based-auth-nextjs/forgot-password',
-  'src/registry/blocks/password-based-auth-nextjs/app/update-password/page.tsx':
-    '/blocks/password-based-auth-nextjs/update-password',
+interface TreeNode {
+  name: string
+  children: TreeNode[]
+  metadata: { path: string }
 }
 
-function FileTree({
-  items,
-  onFileSelect,
-}: {
-  items: RegistryNode[]
-  onFileSelect: (file: RegistryNode) => void
-}) {
-  if (items.length === 0) {
-    return null
-  }
-
-  return (
-    <>
-      {items.map((item, index) => {
-        if (item.type === 'directory') {
-          return (
-            <Folder key={index} name={item.name} defaultOpen>
-              <FileTree onFileSelect={onFileSelect} items={item.children ?? []} />
-            </Folder>
-          )
-        }
-        return (
-          <File
-            key={index}
-            name={item.name}
-            onClick={() => onFileSelect(item)}
-            className="cursor-pointer"
-          />
-        )
-      })}
-    </>
+const flattenChildren = (files: RegistryNode[]): TreeNode[] => {
+  return files.map(
+    (node): TreeNode => ({
+      name: node.name,
+      children: node.children ? flattenChildren(node.children) : [],
+      metadata: { path: node.path },
+    })
   )
 }
 
+const findFirstFile = (nodes: RegistryNode[]): RegistryNode | null => {
+  for (const node of nodes) {
+    if (node.type === 'file') {
+      return node
+    }
+    if (node.children) {
+      const foundFile = findFirstFile(node.children)
+      if (foundFile) {
+        return foundFile
+      }
+    }
+  }
+  return null
+}
+
 export function BlockItemCode({ files }: BlockItemCodeProps) {
-  const initialFile = files.find((file) => file.type === 'file') || null
-  const [selectedFile, setSelectedFile] = useState(initialFile)
+  // Find the first file to select by default
+  const [selectedFile, setSelectedFile] = useState<RegistryNode | null>(findFirstFile(files))
+  const flattenedData = flattenTree({ name: '', children: flattenChildren(files) })
 
-  const selectedFilePath = selectedFile?.path.startsWith('/')
-    ? selectedFile?.path.slice(1)
-    : selectedFile?.path
-  const selectedFileExtension = (selectedFile?.name.split('.').pop() ?? 'ts') as 'ts' | 'tsx'
+  // Handle file selection from the TreeView
+  const handleNodeSelect = (element: any) => {
+    const findFileByPath = (nodes: RegistryNode[], path: string): RegistryNode | null => {
+      for (const node of nodes) {
+        if (node.path === path) {
+          return node
+        }
+        if (node.children) {
+          const found = findFileByPath(node.children, path)
+          if (found) {
+            return found
+          }
+        }
+      }
+      return null
+    }
 
-  const selectedFileDemoUrl = selectedFile?.originalPath
-    ? demoUrls[selectedFile?.originalPath]
-    : null
+    const filePath = element.metadata.path
+    const foundFile = findFileByPath(files, filePath)
+
+    if (foundFile?.type === 'directory') return
+
+    setSelectedFile(foundFile || null)
+  }
 
   return (
-    <div className="flex border rounded-lg overflow-hidden h-[652px] not-prose mt-4">
+    <div className="flex mt-4 border rounded-lg overflow-hidden h-[652px] not-prose">
       {/* File browser sidebar */}
-      <div className="w-64 border-r bg-muted/30 overflow-y-auto">
-        <div className="border-b bg-muted/50 h-12 items-center flex px-2">
-          <h3 className="font-medium text-sm">Files</h3>
-        </div>
-        <div className="p-2">
-          <FileTree items={files} onFileSelect={setSelectedFile} />
-        </div>
+      <div className="w-64 grow-0 shrink-0 flex-0 py-2 border-r bg-muted/30 overflow-y-auto">
+        <TreeView
+          data={flattenedData}
+          aria-label="file browser"
+          className="w-full"
+          defaultExpandedIds={flattenedData.filter((n) => n.children?.length).map((n) => n.id)}
+          defaultSelectedIds={flattenedData
+            .filter((n) => n.metadata?.path === selectedFile?.path)
+            .map((n) => n.id)}
+          onNodeSelect={({ element }) => handleNodeSelect(element)}
+          nodeRenderer={({ element, isBranch, isExpanded, getNodeProps, level, isSelected }) => (
+            <TreeViewItem
+              {...getNodeProps()}
+              isExpanded={isExpanded}
+              isBranch={isBranch}
+              isSelected={isSelected}
+              level={level}
+              icon={<File strokeWidth={1.5} size={16} className="shrink-0" />}
+              xPadding={16}
+              name={element.name}
+            />
+          )}
+        />
       </div>
 
       {/* Code display area */}
-      <div className="flex-1 overflow-auto bg-muted/10" key={selectedFile?.path}>
-        {selectedFile?.content ? (
-          <div className="h-full">
-            <Tabs defaultValue="code" className="h-full gap-0">
-              <div className="h-12 flex items-center justify-between px-2">
-                <span>{selectedFilePath}</span>
-                {selectedFileDemoUrl && (
-                  <TabsList>
-                    <TabsTrigger value="preview">Preview</TabsTrigger>
-                    <TabsTrigger value="code">Code</TabsTrigger>
-                  </TabsList>
-                )}
-              </div>
-              <TabsContent
-                value="code"
-                className="rounded-none [&_figure]:rounded-none [&_figure]:h-full [&_div[data-radix-scroll-area-viewport]]:min-h-[600px]"
-              >
-                <DynamicCodeBlock
-                  lang={selectedFileExtension}
-                  code={selectedFile?.content}
-                  /* the component supports a theme prop, but it's typed badly */
-                  options={{ theme: supabaseTheme } as any}
-                />
-              </TabsContent>
-              <TabsContent value="preview" className="h-full flex-1">
-                {selectedFileDemoUrl && <BlockItemPreview title="" src={selectedFileDemoUrl} />}
-              </TabsContent>
-            </Tabs>
+      {selectedFile?.content ? (
+        <CodeBlock
+          wrapperClassName="w-full"
+          className="h-full max-w-none !w-full flex-1 font-mono text-xs rounded-none border-none"
+          language={selectedFile.name.split('.').pop() as CodeBlockLang}
+        >
+          {selectedFile?.content}
+        </CodeBlock>
+      ) : (
+        <div className="flex items-center justify-center h-full text-muted-foreground">
+          <div className="flex flex-col items-center gap-2">
+            <p>No file selected or file content unavailable</p>
           </div>
-        ) : (
-          <div className="flex items-center justify-center h-full text-muted-foreground">
-            No file selected or file content unavailable
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }

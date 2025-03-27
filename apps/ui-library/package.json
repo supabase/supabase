@@ -23,6 +23,7 @@
     "class-variance-authority": "^0.6.0",
     "contentlayer2": "0.4.6",
     "eslint-config-supabase": "workspace:*",
+    "framer-motion": "^11.0.3",
     "icons": "workspace:*",
     "jotai": "^2.8.0",
     "lucide-react": "*",
