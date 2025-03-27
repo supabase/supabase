@@ -1,6 +1,6 @@
+import { AvatarStack } from '@/registry/default/blocks/realtime-avatar-stack/components/avatar-stack'
+import { useRealtimePresenceRoom } from '@/registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room'
 import { useMemo } from 'react'
-import { useRealtimePresenceRoom } from '../hooks/use-realtime-presence-room'
-import { AvatarStack } from './avatar-stack'
 
 export const RealtimeAvatarStack = ({ roomName }: { roomName: string }) => {
   const { users: usersMap } = useRealtimePresenceRoom(roomName)

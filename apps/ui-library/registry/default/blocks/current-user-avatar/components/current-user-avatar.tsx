@@ -1,8 +1,8 @@
 'use client'
 
+import { useCurrentUserImage } from '@/registry/default/blocks/current-user-avatar/hooks/use-current-user-image'
+import { useCurrentUserName } from '@/registry/default/blocks/current-user-avatar/hooks/use-current-user-name'
 import { Avatar, AvatarFallback, AvatarImage } from '@/registry/default/components/ui/avatar'
-import { useCurrentUserImage } from '../hooks/use-current-user-image'
-import { useCurrentUserName } from '../hooks/use-current-user-name'
 
 export const CurrentUserAvatar = () => {
   const profileImage = useCurrentUserImage()
