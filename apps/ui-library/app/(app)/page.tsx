@@ -1,112 +1,130 @@
 import { HomepageSvgHandler } from '@/components/homepage-svg-handler'
+import { BlockPreview } from '@/components/block-preview'
 import Link from 'next/link'
+import { Button } from '@/registry/default/components/ui/button'
 
 export default function Home() {
   return (
-    <main className="relative lg:gap-10 pr-6 lg:py-20">
-      <div className="mx-auto w-full min-w-0 max-w-6xl flex flex-col gap-20">
-        <div className="flex flex-col gap-8 justify-start">
-          {/* <div>
-            <DesignSystemMarks />
-          </div> */}
-          <div>
-            <h1 className="text-4xl text-foreground mb-3">Supabase UI Library</h1>
-            <h2 className="text-xl text-foreground-light font-light">
-              Design resources for building consistent user experiences
-            </h2>
-          </div>
-        </div>
+    <main className="relative lg:-ml-10">
+      <div className="mx-auto w-full min-w-0 flex flex-col gap-16">
+        {/* Component Showcase with Grid */}
+        <div className="relative z-10 h-full w-full overflow-y-auto">
+          {/* Top fade effect */}
+          <div className="sticky top-0 left-0 right-0 h-12 -mb-12 bg-gradient-to-b from-background to-transparent z-30"></div>
 
-        {/* Homepage items */}
+          {/* Grid Container */}
+          <div className="relative">
+            {/* Grid Lines - Vertical (Columns) */}
+            {Array.from({ length: 13 }).map((_, i) => (
+              <div
+                key={`col-line-${i}`}
+                className="absolute top-0 bottom-0 w-px bg-border/30 z-10"
+                style={{
+                  left: `${(i / 12) * 100}%`,
+                  height: '100%',
+                }}
+              />
+            ))}
 
-        <div className="grid grid-cols-2 gap-10">
-          <Link href="/docs/components/atom-components">
-            <div className="px-10 py-8 min-h-[18rem] flex flex-col justify-between bg-surface-75/50 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
-              <HomepageSvgHandler name="atoms-illustration" />
-              <div>
-                <h3 className="font-medium text-foreground">Atom components</h3>
-                <p className="text-sm text-foreground-light">Building blocks of User interfaces</p>
-              </div>
-            </div>
-          </Link>
-          <Link href="/docs/components/fragment-components">
-            <div className="px-10 py-8 min-h-[18rem] flex flex-col justify-between bg-surface-75/50 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
-              <HomepageSvgHandler name="fragments-illustration" />
-              <div>
-                <h3 className="font-medium text-foreground">Fragment components</h3>
-                <p className="text-sm text-foreground-light">Components assembled from Atoms</p>
-              </div>
-            </div>
-          </Link>
-          <Link href="/docs/color-usage">
-            <div className="px-10 py-8 min-h-[18rem] flex flex-col justify-between bg-surface-75/50 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
-              <div className="flex flex-col gap-1">
-                <div className="flex flex-row gap-0.5">
-                  <div className="w-3 h-16 rounded border bg-foreground"></div>
-                  <div className="w-3 h-16 rounded border bg-foreground-light"></div>
-                  <div className="w-3 h-16 rounded border bg-foreground-lighter"></div>
-                  <div className="w-3 h-16 rounded border bg-foreground-muted"></div>
-                  <div className="w-3 h-16 rounded border"></div>
+            {/* Grid Lines - Horizontal (Rows) */}
+            <div
+              className="absolute left-0 right-0 h-px bg-border/30 z-10"
+              style={{ top: '0px' }}
+            ></div>
+            <div
+              className="absolute left-0 right-0 h-px bg-border/30 z-10"
+              style={{ top: '200px' }}
+            ></div>
+            <div
+              className="absolute left-0 right-0 h-px bg-border/30 z-10"
+              style={{ top: '440px' }}
+            ></div>
+            <div
+              className="absolute left-0 right-0 h-px bg-border/30 z-10"
+              style={{ top: '740px' }}
+            ></div>
+            <div
+              className="absolute left-0 right-0 h-px bg-border/30 z-10"
+              style={{ top: '1040px' }}
+            ></div>
 
-                  <div className="w-3 h-16 rounded border bg"></div>
-                  <div className="w-3 h-16 rounded border bg-200"></div>
-                  <div className="w-3 h-16 rounded border bg-surface-75"></div>
-                  <div className="w-3 h-16 rounded border bg-surface-100"></div>
-                  <div className="w-3 h-16 rounded border bg-surface-200"></div>
-                  <div className="w-3 h-16 rounded border bg-surface-300"></div>
-                  <div className="w-3 h-16 rounded border"></div>
-
-                  <div className="w-3 h-16 rounded border bg-brand-200"></div>
-                  <div className="w-3 h-16 rounded border bg-brand-300"></div>
-                  <div className="w-3 h-16 rounded border bg-brand-400"></div>
-                  <div className="w-3 h-16 rounded border bg-brand-500"></div>
-                  <div className="w-3 h-16 rounded border bg-brand"></div>
-                  <div className="w-3 h-16 rounded border bg-brand-600"></div>
-                  <div className="w-3 h-16 rounded border"></div>
-
-                  <div className="w-3 h-16 rounded border bg-warning-200"></div>
-                  <div className="w-3 h-16 rounded border bg-warning-300"></div>
-                  <div className="w-3 h-16 rounded border bg-warning-400"></div>
-                  <div className="w-3 h-16 rounded border bg-warning-500"></div>
-                  <div className="w-3 h-16 rounded border bg-warning"></div>
-                  <div className="w-3 h-16 rounded border bg-warning-600"></div>
-                  <div className="w-3 h-16 rounded border"></div>
-
-                  <div className="w-3 h-16 rounded border bg-destructive-200"></div>
-                  <div className="w-3 h-16 rounded border bg-destructive-300"></div>
-                  <div className="w-3 h-16 rounded border bg-destructive-400"></div>
-                  <div className="w-3 h-16 rounded border bg-destructive-500"></div>
-                  <div className="w-3 h-16 rounded border bg-destructive"></div>
-                  <div className="w-3 h-16 rounded border bg-destructive-600"></div>
-                  <div className="w-3 h-16 rounded border"></div>
+            {/* Grid Content */}
+            <div className="grid grid-cols-12 gap-0 relative z-20">
+              {/* Heading Section */}
+              <div data-grid-item className="col-start-3 col-span-8 pt-8 pb-8">
+                <div className="flex flex-col gap-8 justify-start pt-32">
+                  <div className="max-w-2xl">
+                    <h1 className="text-4xl text-foreground mb-3 font-semibold tracking-tight">
+                      UI Blocks for Supabase Projects
+                    </h1>
+                    <h2 className="text-lg text-foreground-light mb-4">
+                      A set of beautifully-designed, accessible components that connect your
+                      Supabase back-end to your front-end. Works with your favorite frameworks. Open
+                      Source. Open Code.
+                    </h2>
+                    <Button variant="secondary" size="lg" className="mt-4">
+                      Get Started
+                    </Button>
+                  </div>
                 </div>
               </div>
-              <div>
-                <h3 className="font-medium text-foreground">Colors</h3>
-                <p className="text-sm text-foreground-light">Building blocks of User interfaces</p>
-              </div>
-            </div>
-          </Link>
 
-          <Link href="/docs/theming">
-            <div className="px-10 py-8 min-h-[18rem] flex flex-col justify-between bg-surface-75/50 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
-              <HomepageSvgHandler name="fragments-illustration" />
-              <div>
-                <h3 className="font-medium text-foreground">Theming</h3>
-                <p className="text-sm text-foreground-light">Components assembled from Atoms</p>
+              {/* Password-based Authentication */}
+              <div
+                data-grid-item
+                className="col-start-3 col-span-8 pt-16 pb-4 text-xs uppercase font-mono text-muted-foreground tracking-wider"
+              >
+                Password-based Authentication
               </div>
-            </div>
-          </Link>
+              <div
+                data-grid-item
+                className="col-start-3 col-span-8 hover:shadow-xl transition-shadow"
+              >
+                <div className="w-full shadow-lg">
+                  <BlockPreview name="password-based-auth/sign-up" />
+                </div>
+              </div>
 
-          <Link href="/docs/icons">
-            <div className="px-10 py-8 min-h-[18rem] flex flex-col justify-between bg-surface-75/50 hover:bg-overlay/50 hover:border-foreground-muted cursor-pointer transition-all border rounded-md">
-              <HomepageSvgHandler name="fragments-illustration" />
-              <div>
-                <h3 className="font-medium text-foreground">Icons</h3>
-                <p className="text-sm text-foreground-light">Components assembled from Atoms</p>
+              {/* Realtime Cursors */}
+              <div
+                data-grid-item
+                className="col-start-3 col-span-8 pt-16 pb-4 text-xs uppercase font-mono text-muted-foreground tracking-wider"
+              >
+                Realtime Cursors
               </div>
+              <div
+                data-grid-item
+                className="col-start-3 col-span-8 hover:shadow-xl transition-shadow"
+              >
+                <div className="w-full shadow-lg flex rounded-lg overflow-hidden">
+                  <BlockPreview name="realtime-cursor" isPair />
+                  <BlockPreview name="realtime-cursor" isPair />
+                </div>
+              </div>
+
+              {/* Dropzone */}
+              <div
+                data-grid-item
+                className="col-start-3 col-span-8 pt-16 pb-4 text-xs uppercase font-mono text-muted-foreground tracking-wider"
+              >
+                File Upload
+              </div>
+              <div
+                data-grid-item
+                className="col-start-3 col-span-8 hover:shadow-xl transition-shadow"
+              >
+                <div className="w-full shadow-lg">
+                  <BlockPreview name="dropzone" />
+                </div>
+              </div>
+
+              {/* Empty row at bottom for padding */}
+              <div data-grid-item className="col-span-12 h-16"></div>
             </div>
-          </Link>
+          </div>
+
+          {/* Bottom fade effect */}
+          <div className="sticky bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-background to-transparent z-30"></div>
         </div>
       </div>
     </main>

@@ -6,9 +6,10 @@ import { cn } from 'ui'
 interface ComponentPreviewProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string
   wide?: boolean
+  isPair?: boolean
 }
 
-export function BlockPreview({ name, wide = false }: ComponentPreviewProps) {
+export function BlockPreview({ name, wide = false, isPair = false }: ComponentPreviewProps) {
   const BlockPreview = React.useMemo(() => {
     return (
       <div className="w-full h-full flex items-center justify-center">
@@ -36,7 +37,14 @@ export function BlockPreview({ name, wide = false }: ComponentPreviewProps) {
 
   return (
     <div className={cn('mt-4 w-full', wideClasses)}>
-      <div className={cn('relative border bg-studio min-h-[350px] h-[600px]')}>{BlockPreview}</div>
+      <div
+        className={cn(
+          'relative border rounded-lg overflow-hidden bg-muted min-h-[350px] h-[600px]',
+          isPair && 'rounded-none'
+        )}
+      >
+        {BlockPreview}
+      </div>
     </div>
   )
 }

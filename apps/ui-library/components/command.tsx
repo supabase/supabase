@@ -1,10 +1,15 @@
+'use client'
+
 import { CommandCopyButton } from './command-copy-button'
+import { motion } from 'framer-motion'
+import { cn } from '../lib/utils'
 
 interface CommandCopyProps {
   name: string
+  highlight?: boolean
 }
 
-export function Command({ name }: CommandCopyProps) {
+export function Command({ name, highlight }: CommandCopyProps) {
   const command = `npx shadcn@latest add ${
     process.env.VERCEL_TARGET_ENV === 'production'
       ? `https://supabase.com`
@@ -15,12 +20,27 @@ export function Command({ name }: CommandCopyProps) {
 
   return (
     <>
-      <div className="relative flex items-center rounded-lg bg-black px-4 py-3">
-        <div className="flex-1 font-mono text-sm text-white">
+      <div className="w-full group relative flex items-center rounded-lg bg-surface-100 px-4 py-2 overflow-hidden">
+        {highlight && (
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-l from-transparent via-white to-transparent opacity-10 z-0"
+            initial={{ x: '100%' }}
+            animate={{ x: '-100%' }}
+            transition={{
+              repeat: Infinity,
+              duration: 2.5,
+              ease: 'linear',
+              repeatType: 'loop',
+            }}
+          />
+        )}
+        <div className="flex-1 font-mono text-sm text-foreground relative z-10">
           <span className="mr-2 text-[#888]">$</span>
           {command}
         </div>
-        <CommandCopyButton command={command} />
+        <div className="relative z-10">
+          <CommandCopyButton command={command} />
+        </div>
       </div>
     </>
   )
