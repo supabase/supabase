@@ -3,7 +3,7 @@ import type { Message as MessageType } from 'ai/react'
 import { useChat } from 'ai/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
-import { ArrowDown, FileText, Info, Plus, RefreshCw, X } from 'lucide-react'
+import { ArrowDown, FileText, Info, RefreshCw, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -39,6 +39,7 @@ import {
 } from 'ui'
 import { Admonition, AssistantChatForm, GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ButtonTooltip } from '../ButtonTooltip'
 import DotGrid from '../DotGrid'
 import { AIAssistantChatSelector } from './AIAssistantChatSelector'
 import AIOnboarding from './AIOnboarding'
@@ -110,6 +111,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const currentTable = tables?.find((t) => t.id.toString() === entityId)
   const currentSchema = searchParams?.get('schema') ?? 'public'
+  const currentChat = snap.chats[snap.activeChatId ?? ''].name
 
   const { ref } = useParams()
   const org = useSelectedOrganization()
@@ -279,43 +281,27 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   </TooltipContent>
                 </Tooltip>
               </div>
-              <div className="flex gap-2">
-                <AIAssistantChatSelector />
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="default"
-                      size="tiny"
-                      icon={<Plus size={14} />}
-                      onClick={() => {
-                        if (project?.ref) {
-                          snap.newChat()
-                        }
-                      }}
-                      className="h-7 w-7 p-0"
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent>New chat</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="default"
-                      size="tiny"
-                      icon={<RefreshCw size={14} />}
-                      onClick={handleClearMessages}
-                      className="h-7 w-7 p-0"
-                      disabled={isChatLoading}
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent>Clear chat messages</TooltipContent>
-                </Tooltip>
-                <Button
-                  type="default"
-                  className="w-7 h-7"
-                  onClick={snap.closeAssistant}
-                  icon={<X />}
-                />
+              <div className="flex items-center gap-x-4">
+                <p className="text-xs text-foreground-light">{currentChat}</p>
+                <div className="flex items-center gap-x-2">
+                  <AIAssistantChatSelector />
+                  <ButtonTooltip
+                    type="default"
+                    size="tiny"
+                    icon={<RefreshCw size={14} />}
+                    onClick={handleClearMessages}
+                    className="h-7 w-7 p-0"
+                    disabled={isChatLoading}
+                    tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
+                  />
+                  <ButtonTooltip
+                    type="default"
+                    className="w-7 h-7"
+                    onClick={snap.closeAssistant}
+                    icon={<X />}
+                    tooltip={{ content: { side: 'bottom', text: 'Close assistant' } }}
+                  />
+                </div>
               </div>
             </div>
             {!includeSchemaMetadata && selectedOrganization && (

@@ -1,4 +1,4 @@
-import { Check, Edit, MessageSquare, Trash, X } from 'lucide-react'
+import { Check, Edit, MessageSquare, Plus, Trash, X } from 'lucide-react'
 import { useState } from 'react'
 
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
@@ -11,11 +11,14 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  CommandSeparator_Shadcn_,
   Input_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
+  ScrollArea,
 } from 'ui'
+import { ButtonTooltip } from '../ButtonTooltip'
 
 interface AIAssistantChatSelectorProps {
   className?: string
@@ -27,6 +30,8 @@ export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorPr
   const [chatSelectorOpen, setChatSelectorOpen] = useState(false)
   const [editingChatId, setEditingChatId] = useState<string | null>(null)
   const [editingChatName, setEditingChatName] = useState('')
+
+  const chats = Object.entries(snap.chats)
 
   const handleSelectChat = (id: string) => {
     snap.selectChat(id)
@@ -82,11 +87,12 @@ export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorPr
   return (
     <Popover_Shadcn_ open={chatSelectorOpen} onOpenChange={setChatSelectorOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
+        <ButtonTooltip
           type="default"
           size="tiny"
           icon={<MessageSquare size={14} />}
           className={cn('h-7 w-7', className)}
+          tooltip={{ content: { side: 'bottom', text: 'View chats' } }}
         />
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="w-[250px] p-0" align="end">
@@ -95,86 +101,109 @@ export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorPr
           <CommandList_Shadcn_>
             <CommandEmpty_Shadcn_>No chats found.</CommandEmpty_Shadcn_>
             <CommandGroup_Shadcn_>
-              {Object.entries(snap.chats).map(([id, chat]) => (
-                <CommandItem_Shadcn_
-                  key={id}
-                  value={id}
-                  onSelect={() => handleSelectChat(id)}
-                  className="flex items-center justify-between gap-2 py-1 w-full overflow-hidden group"
-                  keywords={[chat.name]}
-                >
-                  <div className="flex items-center w-full flex-1 min-w-0">
-                    {editingChatId === id ? (
-                      <div className="flex items-center gap-2 w-full">
-                        <Input_Shadcn_
-                          value={editingChatName}
-                          onChange={(e) => setEditingChatName(e.target.value)}
-                          autoFocus
-                          size="tiny"
-                          className="flex-1 w-full"
-                          onClick={(e) => e.stopPropagation()}
-                          onBlur={handleInputBlur}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault()
-                              e.stopPropagation()
-                              handleSaveEditChat()
-                            } else if (e.key === 'Escape') {
-                              e.preventDefault()
-                              e.stopPropagation()
-                              handleCancelEditChat()
-                            }
-                          }}
-                        />
-                        <div className="flex items-center gap-0">
-                          <Button
-                            type="text"
+              <ScrollArea className={chats.length > 4 ? 'h-40' : ''}>
+                {chats.map(([id, chat]) => (
+                  <CommandItem_Shadcn_
+                    key={id}
+                    value={id}
+                    onSelect={() => handleSelectChat(id)}
+                    className="flex items-center justify-between gap-2 py-1 w-full overflow-hidden group"
+                    keywords={[chat.name]}
+                  >
+                    <div className="flex items-center w-full flex-1 min-w-0">
+                      {editingChatId === id ? (
+                        <div className="flex items-center gap-2 w-full">
+                          <Input_Shadcn_
+                            value={editingChatName}
+                            onChange={(e) => setEditingChatName(e.target.value)}
+                            autoFocus
                             size="tiny"
-                            icon={<Check size={14} />}
-                            onClick={(e) => handleSaveEditChat(e)}
-                            className="h-7 w-7"
+                            className="flex-1 w-full"
+                            onClick={(e) => e.stopPropagation()}
+                            onBlur={handleInputBlur}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                handleSaveEditChat()
+                              } else if (e.key === 'Escape') {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                handleCancelEditChat()
+                              }
+                            }}
                           />
-                          <Button
-                            type="text"
-                            size="tiny"
-                            icon={<X size={14} />}
-                            onClick={(e) => handleCancelEditChat(e)}
-                            className="h-7 w-7"
-                          />
+                          <div className="flex items-center gap-0">
+                            <Button
+                              type="text"
+                              size="tiny"
+                              icon={<Check size={14} />}
+                              onClick={(e) => handleSaveEditChat(e)}
+                              className="h-7 w-7"
+                            />
+                            <Button
+                              type="text"
+                              size="tiny"
+                              icon={<X size={14} />}
+                              onClick={(e) => handleCancelEditChat(e)}
+                              className="h-7 w-7"
+                            />
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <>
-                        <Check
-                          className={cn(
-                            'mr-2 h-4 w-4 flex-shrink-0',
-                            snap.activeChatId === id ? 'opacity-100' : 'opacity-0'
-                          )}
-                        />
-                        <span className="truncate flex-1 min-w-0 overflow-hidden">{chat.name}</span>
-                      </>
-                    )}
-                  </div>
-                  {editingChatId !== id && (
-                    <div className="flex items-center gap-0 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button
-                        type="text"
-                        size="tiny"
-                        icon={<Edit size={14} />}
-                        onClick={(e) => handleStartEditChat(id, chat.name, e)}
-                        className="h-7 w-7"
-                      />
-                      <Button
-                        type="text"
-                        size="tiny"
-                        icon={<Trash size={14} />}
-                        onClick={(e) => handleDeleteChat(id, e)}
-                        className="h-7 w-7"
-                      />
+                      ) : (
+                        <>
+                          <Check
+                            className={cn(
+                              'mr-2 h-4 w-4 flex-shrink-0',
+                              snap.activeChatId === id ? 'opacity-100' : 'opacity-0'
+                            )}
+                          />
+                          <span className="truncate flex-1 min-w-0 overflow-hidden">
+                            {chat.name}
+                          </span>
+                        </>
+                      )}
                     </div>
-                  )}
-                </CommandItem_Shadcn_>
-              ))}
+                    {editingChatId !== id && (
+                      <div className="flex items-center gap-x-0 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          type="text"
+                          size="tiny"
+                          icon={<Edit size={14} />}
+                          onClick={(e) => handleStartEditChat(id, chat.name, e)}
+                          className="h-6 w-6"
+                        />
+                        {chats.length > 1 && (
+                          <Button
+                            type="text"
+                            size="tiny"
+                            icon={<Trash size={14} />}
+                            onClick={(e) => handleDeleteChat(id, e)}
+                            className="h-6 w-6"
+                          />
+                        )}
+                      </div>
+                    )}
+                  </CommandItem_Shadcn_>
+                ))}
+              </ScrollArea>
+            </CommandGroup_Shadcn_>
+            <CommandSeparator_Shadcn_ />
+            <CommandGroup_Shadcn_>
+              <CommandItem_Shadcn_
+                className="cursor-pointer w-full gap-x-2"
+                onSelect={() => {
+                  snap.newChat()
+                  setChatSelectorOpen(false)
+                }}
+                onClick={() => {
+                  snap.newChat()
+                  setChatSelectorOpen(false)
+                }}
+              >
+                <Plus size={14} strokeWidth={1.5} />
+                <span>New chat</span>
+              </CommandItem_Shadcn_>
             </CommandGroup_Shadcn_>
           </CommandList_Shadcn_>
         </Command_Shadcn_>
