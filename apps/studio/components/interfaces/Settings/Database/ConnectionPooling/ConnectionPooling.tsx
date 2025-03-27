@@ -104,6 +104,7 @@ export const ConnectionPooling = () => {
   const defaultPoolSize = poolingOptimizations.poolSize ?? 15
   const defaultMaxClientConn = poolingOptimizations.maxClientConn ?? 200
   const connectionPoolingUnavailable = pgbouncerConfig?.pool_mode === null
+  const ignoreStartupParameters = pgbouncerConfig?.ignore_startup_parameters
 
   const onSubmit: SubmitHandler<z.infer<typeof PoolingConfigurationFormSchema>> = async (data) => {
     const { default_pool_size } = data
@@ -114,6 +115,7 @@ export const ConnectionPooling = () => {
       {
         ref: projectRef,
         default_pool_size: default_pool_size === null ? undefined : default_pool_size,
+        ignore_startup_parameters: ignoreStartupParameters ?? '',
       },
       {
         onSuccess: (data) => {
