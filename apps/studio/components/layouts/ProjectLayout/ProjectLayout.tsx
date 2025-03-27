@@ -1,4 +1,8 @@
 import { useParams } from 'common'
+import {
+  useIsSQLEditorTabsEnabled,
+  useIsTableEditorTabsEnabled,
+} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
 import AISettingsModal from 'components/ui/AISettingsModal'
@@ -18,6 +22,7 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
+import { useEditorType } from '../editors/EditorsLayout.hooks'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import LoadingState from './LoadingState'
@@ -90,8 +95,19 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       setAiAssistantPanel,
       mobileMenuOpen,
       setMobileMenuOpen,
+      showSidebar,
     } = useAppStateSnapshot()
     const { open } = aiAssistantPanel
+
+    const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
+    const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
+
+    // For tabs preview flag logic - only conditionally collapse sidebar for table editor and sql editor if feature flags are on
+    const editor = useEditorType()
+    const tableEditorTabsEnabled = editor === 'table' && isTableEditorTabsEnabled
+    const sqlEditorTabsEnabled = editor === 'sql' && isSQLEditorTabsEnabled
+    const forceShowProductMenu = !tableEditorTabsEnabled && !sqlEditorTabsEnabled
+    const sideBarIsOpen = forceShowProductMenu || showSidebar
 
     const projectName = selectedProject?.name
     const organizationName = selectedOrganization?.name
@@ -123,8 +139,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       return () => window.removeEventListener('keydown', handler)
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open])
-
-    const sideBarIsOpen = true // @mildtomato - var for later to use collapsible sidebar
 
     return (
       <>

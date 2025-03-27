@@ -2,13 +2,17 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
 import { useParams } from 'common/hooks/useParams'
+import { useIsSQLEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { SQLEditor } from 'components/interfaces/SQLEditor/SQLEditor'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
+import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
 import { useContentIdQuery } from 'data/content/content-id-query'
 import { useAppStateSnapshot } from 'state/app-state'
 import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { addTab, createTabId } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
@@ -51,16 +55,36 @@ const SqlEditor: NextPageWithLayout = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, allSnippets, content])
 
-  return (
-    <div className="flex-1 overflow-auto">
-      <SQLEditor />
-    </div>
-  )
+  const isSqlEditorTabsEnabled = useIsSQLEditorTabsEnabled()
+
+  // Watch for route changes
+  useEffect(() => {
+    if (isSqlEditorTabsEnabled) {
+      if (!router.isReady || !id || id === 'new') return
+
+      const tabId = createTabId('sql', { id })
+      const snippet = allSnippets.find((x) => x.id === id)
+
+      addTab(ref, {
+        id: tabId,
+        type: 'sql',
+        label: snippet?.name || 'Untitled Query',
+        metadata: {
+          sqlId: id,
+          name: snippet?.name,
+        },
+      })
+    }
+  }, [router.isReady, id, isSqlEditorTabsEnabled])
+
+  return <SQLEditor />
 }
 
 SqlEditor.getLayout = (page) => (
   <DefaultLayout>
-    <SQLEditorLayout title="SQL">{page}</SQLEditorLayout>
+    <EditorBaseLayout productMenu={<SQLEditorMenu />} product="SQL Editor">
+      <SQLEditorLayout>{page}</SQLEditorLayout>
+    </EditorBaseLayout>
   </DefaultLayout>
 )
 
