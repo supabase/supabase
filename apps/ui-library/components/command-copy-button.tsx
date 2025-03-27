@@ -18,7 +18,6 @@ export function CommandCopyButton({ command }: { command: string }) {
     <Button_Shadcn_
       variant="ghost"
       size="icon"
-      className="text-[#888] hover:text-white"
       onClick={() => {
         navigator.clipboard.writeText(command)
         setCopied(true)

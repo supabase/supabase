@@ -1,3 +1,4 @@
+import { FrameworkSelector } from '@/components/framework-selector'
 import { Mdx } from '@/components/mdx-components'
 import { SourcePanel } from '@/components/source-panel'
 import { DashboardTableOfContents } from '@/components/toc'
@@ -87,15 +88,17 @@ export default async function DocPage({ params }: DocPageProps) {
           <ChevronRight className="h-4 w-4 text-foreground-muted" />
           <div className="text-foreground-lighter">{doc.title}</div>
         </div>
-        <div className="space-y-2 mb-5">
-          <h1 className={cn('scroll-m-20 text-4xl tracking-tight')}>{doc.title}</h1>
-          {doc.description && (
-            <p className="text-lg text-foreground-light">
-              <Balancer>{doc.description}</Balancer>
-            </p>
-          )}
+        <div className="flex items-end justify-between mb-5">
+          <div className="space-y-2 mb-5">
+            <h1 className={cn('scroll-m-20 text-4xl tracking-tight')}>{doc.title}</h1>
+            {doc.description && (
+              <p className="text-lg text-foreground-light">
+                <Balancer>{doc.description}</Balancer>
+              </p>
+            )}
+          </div>
+          <FrameworkSelector />
         </div>
-        <Separator className="mb-6" />
         <SourcePanel doc={doc} />
         <div className="pb-12">
           <Mdx code={doc.body.code} />
