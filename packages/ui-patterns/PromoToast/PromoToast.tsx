@@ -9,7 +9,7 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { useTheme } from 'next-themes'
 import announcement from '../Banners/data.json'
 import CountdownComponent from '../Banners/Countdown'
-import "./styles.css"
+import './styles.css'
 
 const LW14BG = `/docs/img/launchweek/14/promo-banner-bg.png`
 

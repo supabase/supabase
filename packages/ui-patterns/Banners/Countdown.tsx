@@ -23,8 +23,8 @@ const CountdownComponent = ({
           minutes={minutes}
           seconds={seconds}
           showCard={showCard}
-          className='text-emerald-400 [text-shadow:0_0_15px_rgba(52,211,153,0.8)]'
-          dividerClassName='text-emerald-400 [text-shadow:0_0_15px_rgba(52,211,153,0.8)]'
+          className="text-emerald-400 [text-shadow:0_0_15px_rgba(52,211,153,0.8)]"
+          dividerClassName="text-emerald-400 [text-shadow:0_0_15px_rgba(52,211,153,0.8)]"
         />
       )
     }

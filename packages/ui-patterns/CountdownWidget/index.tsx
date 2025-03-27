@@ -24,7 +24,15 @@ export function CountdownWidget({
 }: CountdownWidgetProps) {
   const isLarge = size === 'large'
   const Colon = () => (
-    <span className={cn('text-xs mx-px text-foreground-lighter', isLarge && 'text-lg', dividerClassName)}>:</span>
+    <span
+      className={cn(
+        'text-xs mx-px text-foreground-lighter',
+        isLarge && 'text-lg',
+        dividerClassName
+      )}
+    >
+      :
+    </span>
   )
 
   return (
