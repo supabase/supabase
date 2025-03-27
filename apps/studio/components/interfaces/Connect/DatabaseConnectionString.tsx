@@ -117,6 +117,7 @@ export const DatabaseConnectionString = () => {
   const selectedDatabase = (databases ?? []).find(
     (db) => db.identifier === state.selectedDatabaseId
   )
+  const isReplicaSelected = selectedDatabase?.identifier !== projectRef
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
@@ -145,7 +146,7 @@ export const DatabaseConnectionString = () => {
     connectionInfo,
     poolingInfo: {
       connectionString: sharedPoolerConfig?.connection_string ?? '',
-      db_host: sharedPoolerConfig?.db_host ?? '',
+      db_host: isReplicaSelected ? connectionInfo.db_host : sharedPoolerConfig?.db_host ?? '',
       db_name: sharedPoolerConfig?.db_name ?? '',
       db_port: sharedPoolerConfig?.db_port ?? 0,
       db_user: sharedPoolerConfig?.db_user ?? '',
@@ -158,8 +159,13 @@ export const DatabaseConnectionString = () => {
       ? getConnectionStrings({
           connectionInfo,
           poolingInfo: {
-            connectionString: poolingConfiguration.connection_string,
-            db_host: poolingConfiguration.db_host,
+            connectionString: isReplicaSelected
+              ? poolingConfiguration.connection_string.replace(
+                  poolingConfiguration.db_host,
+                  connectionInfo.db_host
+                )
+              : poolingConfiguration.connection_string,
+            db_host: isReplicaSelected ? connectionInfo.db_host : poolingConfiguration.db_host,
             db_name: poolingConfiguration.db_name,
             db_port: poolingConfiguration.db_port,
             db_user: poolingConfiguration.db_user,

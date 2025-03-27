@@ -940,7 +940,7 @@ class StorageExplorerStore {
       )
 
       const promises = files.map((file) => {
-        const fileMimeType = file.metadata?.mimetype ?? null
+        const fileMimeType = (file.metadata?.mimetype as string) ?? null
         return () => {
           return new Promise<
             | {

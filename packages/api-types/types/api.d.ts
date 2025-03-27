@@ -1643,6 +1643,9 @@ export interface components {
        * @enum {string}
        */
       release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
+      secrets?: {
+        [key: string]: string
+      }
     }
     CreateOrganizationV1Dto: {
       name: string

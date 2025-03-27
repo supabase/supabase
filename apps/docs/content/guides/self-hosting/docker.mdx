@@ -307,9 +307,9 @@ Each system has a number of configuration options which can be found in the rele
 
 These configuration items are generally added to the `env` section of each service, inside the `docker-compose.yml` section. If these configuration items are sensitive, they should be stored in a [secret manager](/docs/guides/self-hosting#managing-your-secrets) or using an `.env` file and then referenced using the `${}` syntax.
 
-<CH.Code>
+<$CodeTabs>
 
-```yml docker-compose.yml
+```yml name=docker-compose.yml
 services:
   rest:
     image: postgrest/postgrest
@@ -317,12 +317,12 @@ services:
       PGRST_JWT_SECRET: ${JWT_SECRET}
 ```
 
-```bash .env
+```bash name=.env
 ## Never check your secrets into version control
 `${JWT_SECRET}`
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 ### Common configuration
 
@@ -360,9 +360,9 @@ You can find all the available options in the [storage repository](https://githu
 
 Configuring the Supabase AI Assistant is optional. By adding your own `OPENAI_API_KEY`, you can enable AI services, which help with writing SQL queries, statements, and policies.
 
-<CH.Code>
+<$CodeTabs>
 
-```yaml docker-compose.yml
+```yaml name=docker-compose.yml
 services:
   studio:
     image: supabase/studio
@@ -370,12 +370,12 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
 ```
 
-```bash .env
+```bash name=.env
 ## Never check your secrets into version control
 `${OPENAI_API_KEY}`
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 #### Setting database's `log_min_messages`
 

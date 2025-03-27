@@ -27,7 +27,7 @@ export const RestrictionBanner = () => {
         {currentOrg.restriction_status === 'restricted' ? <CriticalIcon /> : <WarningIcon />}
         <span>
           {currentOrg.restriction_status === 'grace_period' &&
-            `Your organization has exceeded its quota. You are given a grace period until ${dayjs(currentOrg.restriction_data['grace_period_end']).format('DD MMM, YYYY')}`}
+            `Your organization has exceeded its quota. You are given a grace period until ${dayjs(currentOrg.restriction_data!['grace_period_end']).format('DD MMM, YYYY')}`}
           {currentOrg.restriction_status === 'grace_period_over' &&
             `Your grace period is over and your project will not be able to serve requests when you used up your quota.`}
           {currentOrg.restriction_status === 'restricted' &&

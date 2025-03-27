@@ -71,6 +71,18 @@
         {
           "path": "registry/default/blocks/password-based-auth-nextjs/components/update-password-form.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
         }
       ]
     },
@@ -103,6 +115,89 @@
         }
       ],
       "dependencies": ["@supabase/supabase-js@latest"]
+    },
+    {
+      "name": "password-based-auth-tanstack",
+      "type": "registry:block",
+      "title": "Password Based Auth flow for tanstack and Supabase",
+      "description": "Password Based Auth flow for tanstack and Supabase",
+      "registryDependencies": ["button", "card", "input", "label"],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/login.tsx",
+          "type": "registry:file",
+          "target": "routes/login.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/auth/error.tsx",
+          "type": "registry:file",
+          "target": "routes/auth/error.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/_protected.tsx",
+          "type": "registry:file",
+          "target": "routes/_protected.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/_protected/info.tsx",
+          "type": "registry:file",
+          "target": "routes/_protected/info.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/auth/confirm.ts",
+          "type": "registry:file",
+          "target": "routes/auth/confirm.ts"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/components/login-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/sign-up.tsx",
+          "type": "registry:file",
+          "target": "routes/sign-up.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/sign-up-success.tsx",
+          "type": "registry:file",
+          "target": "routes/sign-up-success.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/components/sign-up-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/forgot-password.tsx",
+          "type": "registry:file",
+          "target": "routes/forgot-password.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/update-password.tsx",
+          "type": "registry:file",
+          "target": "routes/update-password.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/components/forgot-password-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/components/update-password-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/lib/supabase/fetch-user-server-fn.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
@@ -192,7 +287,12 @@
       "title": "Dropzone (File Upload)",
       "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
       "registryDependencies": ["button", "tooltip", "progress"],
-      "dependencies": ["react-dropzone", "lucide-react", "@supabase/ssr@latest"],
+      "dependencies": [
+        "react-dropzone",
+        "lucide-react",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
       "files": [
         {
           "path": "registry/default/blocks/dropzone/components/dropzone.tsx",
@@ -312,7 +412,7 @@
       "title": "Realtime Cursor",
       "description": "Component which renders realtime cursors from other users in a room.",
       "registryDependencies": [],
-      "dependencies": ["lucide-react", "@supabase/ssr@latest"],
+      "dependencies": ["lucide-react", "@supabase/ssr@latest", "@supabase/supabase-js@latest"],
       "files": [
         {
           "path": "registry/default/blocks/realtime-cursor/components/cursor.tsx",
@@ -400,7 +500,7 @@
       "title": "Supabase Client for Tanstack Start",
       "description": "",
       "registryDependencies": [],
-      "dependencies": ["@supabase/ssr@latest"],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
       "files": [
         {
           "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
