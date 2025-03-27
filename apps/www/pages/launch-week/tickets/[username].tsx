@@ -103,7 +103,10 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   return {
     props: {
-      user,
+      user: {
+        ...user,
+        username,
+      },
       ogImageUrl,
       key: username,
     },

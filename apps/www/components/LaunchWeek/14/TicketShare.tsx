@@ -23,7 +23,7 @@ export default function TicketShare() {
   const [_loading, setLoading] = useState(false)
   const isLessThanMd = useBreakpoint()
   const downloadLink = useRef<HTMLAnchorElement>()
-  const link = `${LW14_URL}/tickets/${username}&t=${dayjs(new Date()).format('DHHmmss')}`
+  const link = `${LW14_URL}/tickets/${username}?t=${dayjs(new Date()).format('DHHmmss')}`
   const permalink = encodeURIComponent(link)
   const text = hasSecretTicket
     ? LW14_TWEET_TEXT_SECRET
