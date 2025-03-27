@@ -59,6 +59,7 @@ class GlitchPass extends Pass {
       this.uniforms['distortion_y'].value = MathUtils.randFloat(0, 0.05) * this.intensity
       this.uniforms['seed_x'].value = MathUtils.randFloat(-0.05, 0.05) * this.intensity
       this.uniforms['seed_y'].value = MathUtils.randFloat(-0.05, 0.05) * this.intensity
+      this.curF = 0
     }
 
     this.curF++
@@ -92,7 +93,7 @@ class GlitchPass extends Pass {
   }
 
   setIntensity(amount: number) {
-    this.intensity = amount / 4
+    this.intensity = amount < 0.01 ? 0 : amount / 4
   }
 
   enable(value: boolean) {

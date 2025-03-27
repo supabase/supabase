@@ -2,8 +2,8 @@ export const CRTShader = {
   uniforms: {
     tDiffuse: { value: null },
     time: { value: 0 },
-    scanlineIntensity: { value: 1 },
-    scanlineCount: { value: 320 },
+    scanlineIntensity: { value: 0.8 },
+    scanlineCount: { value: 360 },
     vignetteIntensity: { value: 1.5 },
     noiseIntensity: { value: 0.01 },
     flickerIntensity: { value: 0.01 },
@@ -64,12 +64,13 @@ export const CRTShader = {
 
       vec4 shiftedColor = vec4(r, g, b, originalColor.a);
 
-      // Scanline effect - more subtle
-      float scanline = sin(vUv.y * scanlineCount * 3.14159) * 0.5 + 0.5;
-      scanline = pow(scanline, 1.0) * activeScanlineIntensity;
+      // Scanline effect - thicker and more pronounced
+      float scanlineFreq = scanlineCount * 0.7; // Reduce frequency for thicker lines
+      float scanline = sin(vUv.y * scanlineFreq * 3.14159) * 0.5 + 0.5;
+      scanline = pow(scanline, 0.7) * activeScanlineIntensity * 1.5; // Increase intensity and make lines thicker with lower power
       
-      // Apply scanline as a multiplicative overlay
-      vec4 scanlineColor = mix(shiftedColor, shiftedColor * (1.0 - scanline), activeScanlineIntensity);
+      // Apply scanline as a multiplicative overlay with stronger effect
+      vec4 scanlineColor = mix(shiftedColor, shiftedColor * (1.0 - scanline), activeScanlineIntensity * 1.2);
 
       // Vignette effect
       vec2 center = vec2(0.5, 0.5);

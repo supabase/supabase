@@ -540,7 +540,7 @@ class TicketScene implements BaseScene {
     this._internalState.effectsIntensity = 0
 
     // Enable all passes
-    // if (this._glitchPass) this._glitchPass.enabled = true
+    if (this._glitchPass) this._glitchPass.enabled = true
     if (this._crtPass) this._crtPass.enabled = true
     if (this._bloomPass) this._bloomPass.enabled = true
   }

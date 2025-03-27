@@ -128,11 +128,12 @@ class SceneRenderer {
     this._mouseMoveHandler = this._updateMousePosition.bind(this)
     window.addEventListener('mousemove', this._mouseMoveHandler)
 
-    // Add device pixel ratio change listener
-    this._mediaQueryListHandler = this._handleDevicePixelRatioChange.bind(this)
-    window
-      .matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`)
-      .addEventListener('change', this._mediaQueryListHandler)
+    // Disable it since it brakes Chrome browser
+    // // Add device pixel ratio change listener
+    // this._mediaQueryListHandler = this._handleDevicePixelRatioChange.bind(this)
+    // window
+    //   .matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`)
+    //   .addEventListener('change', this._mediaQueryListHandler)
   }
 
   async activateScene(scene: BaseScene, main?: boolean) {
