@@ -83,6 +83,18 @@ export const componentPages: Record<
     commandItemLabel: 'Realtime Cursor',
     href: '/docs/realtime-cursor',
   },
+  'current-user-avatar': {
+    title: 'Current User Avatar',
+    supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+    commandItemLabel: 'Current User Avatar',
+    href: '/docs/current-user-avatar',
+  },
+  'realtime-avatar-stack': {
+    title: 'Realtime Avatar Stack',
+    supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+    commandItemLabel: 'Realtime Avatar Stack',
+    href: '/docs/realtime-avatar-stack',
+  },
 }
 
 export const COMMAND_ITEMS = [

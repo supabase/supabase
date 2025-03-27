@@ -24,6 +24,7 @@ import MetaFaviconsPagesRouter, {
 import { WwwCommandMenu } from '~/components/CommandMenu'
 import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
+import { LW14Announcement } from 'ui-patterns/Banners/LW14Announcement'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -93,6 +94,7 @@ export default function App({ Component, pageProps }: AppProps) {
           >
             <TooltipProvider delayDuration={0}>
               <CommandProvider>
+                <LW14Announcement />
                 <SonnerToaster position="top-right" />
                 <Component {...pageProps} />
                 <WwwCommandMenu />

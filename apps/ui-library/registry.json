@@ -438,6 +438,286 @@
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "current-user-avatar-nextjs",
+      "type": "registry:component",
+      "title": "Current User Avatar",
+      "description": "Component which renders the current user's avatar.",
+      "registryDependencies": ["avatar"],
+      "dependencies": ["@supabase/ssr@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "current-user-avatar-react",
+      "type": "registry:component",
+      "title": "Current User Avatar",
+      "description": "Component which renders the current user's avatar.",
+      "registryDependencies": ["avatar"],
+      "dependencies": ["@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "current-user-avatar-react-router",
+      "type": "registry:component",
+      "title": "Current User Avatar",
+      "description": "Component which renders the current user's avatar.",
+      "registryDependencies": ["avatar"],
+      "dependencies": ["@supabase/ssr@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase.client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase.server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "current-user-avatar-tanstack",
+      "type": "registry:component",
+      "title": "Current User Avatar",
+      "description": "Component which renders the current user's avatar.",
+      "registryDependencies": ["avatar"],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-avatar-stack-nextjs",
+      "type": "registry:component",
+      "title": "Avatar Stack with Realtime Presence",
+      "description": "Component which stack of avatars, tracked by realtime presence.",
+      "registryDependencies": ["avatar", "tooltip"],
+      "dependencies": ["@supabase/ssr@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-avatar-stack-react",
+      "type": "registry:component",
+      "title": "Avatar Stack with Realtime Presence",
+      "description": "Component which stack of avatars, tracked by realtime presence.",
+      "registryDependencies": ["avatar", "tooltip"],
+      "dependencies": ["@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-avatar-stack-react-router",
+      "type": "registry:component",
+      "title": "Avatar Stack with Realtime Presence",
+      "description": "Component which stack of avatars, tracked by realtime presence.",
+      "registryDependencies": ["avatar", "tooltip"],
+      "dependencies": ["@supabase/ssr@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase.client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase.server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-avatar-stack-tanstack",
+      "type": "registry:component",
+      "title": "Avatar Stack with Realtime Presence",
+      "description": "Component which stack of avatars, tracked by realtime presence.",
+      "registryDependencies": ["avatar", "tooltip"],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
       "name": "supabase-client-nextjs",
       "type": "registry:lib",
       "title": "Supabase Client for Next.js",

@@ -8,6 +8,7 @@ interface CountdownWidgetProps {
   seconds?: string
   showCard?: boolean
   className?: string
+  dividerClassName?: string
   size?: 'small' | 'large'
 }
 
@@ -18,11 +19,20 @@ export function CountdownWidget({
   seconds,
   showCard = true,
   className,
+  dividerClassName,
   size,
 }: CountdownWidgetProps) {
   const isLarge = size === 'large'
   const Colon = () => (
-    <span className={cn('text-xs mx-px text-foreground-lighter', isLarge && 'text-lg')}>:</span>
+    <span
+      className={cn(
+        'text-xs mx-px text-foreground-lighter',
+        isLarge && 'text-lg',
+        dividerClassName
+      )}
+    >
+      :
+    </span>
   )
 
   return (
