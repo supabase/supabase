@@ -4,14 +4,13 @@ import { RealtimeCursors } from '@/registry/default/blocks/realtime-cursor/compo
 import { Input } from '@/registry/default/components/ui/input'
 import { Label } from '@/registry/default/components/ui/label'
 import { useEffect, useState } from 'react'
-
-const names = ['Eren', 'Armin', 'Mikasa', 'Reiner', 'Levi', 'Bertholdt']
+import { generateFullName } from './utils'
 
 const RealtimeCursorDemo = () => {
   const [username, setUsername] = useState('')
 
   useEffect(() => {
-    setUsername(names[Math.floor(Math.random() * names.length)])
+    setUsername(generateFullName())
   }, [])
 
   return (

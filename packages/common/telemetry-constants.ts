@@ -1158,6 +1158,57 @@ export interface EdgeFunctionViaCliButtonClickedEvent {
 }
 
 /**
+ * User clicked the deploy updates button for an edge function.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions/{id}/code
+ */
+export interface EdgeFunctionDeployUpdatesButtonClickedEvent {
+  action: 'edge_function_deploy_updates_button_clicked'
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * User clicked the Send Request button for testing an Edge Function.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions/{id}
+ */
+export interface EdgeFunctionTestSendButtonClickedEvent {
+  action: 'edge_function_test_send_button_clicked'
+  properties: {
+    /**
+     * The HTTP method used for the test request, e.g., GET, POST.
+     */
+    httpMethod: string
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * User opened the side panel for testing an edge function.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions/{id}
+ */
+export interface EdgeFunctionTestSidePanelOpenedEvent {
+  action: 'edge_function_test_side_panel_opened'
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -1227,3 +1278,6 @@ export type TelemetryEvent =
   | EdgeFunctionViaEditorButtonClickedEvent
   | EdgeFunctionTemplateClickedEvent
   | EdgeFunctionViaCliButtonClickedEvent
+  | EdgeFunctionDeployUpdatesButtonClickedEvent
+  | EdgeFunctionTestSendButtonClickedEvent
+  | EdgeFunctionTestSidePanelOpenedEvent

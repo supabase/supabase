@@ -166,7 +166,7 @@ const PublishAppSidePanel = ({
         website,
         redirect_uris,
         scopes,
-        icon: uploadedIconUrl === undefined ? null : uploadedIconUrl,
+        icon: uploadedIconUrl,
       })
     }
   }

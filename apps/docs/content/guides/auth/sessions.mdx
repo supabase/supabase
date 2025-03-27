@@ -107,7 +107,7 @@ This approach has some tradeoffs compared to using a JWT-based approach:
 - A failing authentication server can cause a chain of failures across other systems and APIs, paralyzing the whole application system.
 - All requests that require authentication has to be routed through the authentication, which adds an additional latency overhead to all requests.
 
-Supabase Auth prefers a JWT-based approach using access and refresh tokens are because the session information is encoded in a short-lived token -- the access token -- which can be transferred across APIs and systems without relying on the availability or performance of a central server. An application can thus tolerate transient failures or performance issues a lot better. By trying to refresh the access token ahead of time, your application can safely continue to function even with larger outages.
+Supabase Auth prefers a JWT-based approach using access and refresh tokens because session information is encoded within the short-lived access token, enabling transfer across APIs and systems without dependence on a central server's availability or performance. This approach enhances an application's tolerance to transient failures or performance issues. Furthermore, proactively refreshing the access token allows the application to function reliably even during significant outages.
 
 It's better for cost optimization and scaling as well, as the authentication system's servers and database only handle traffic for this use case.
 
