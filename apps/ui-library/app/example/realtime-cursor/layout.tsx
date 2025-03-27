@@ -9,8 +9,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <>
       <BaseInjector />
-      <div className="flex w-full items-center justify-center p-6 md:p-10 preview">
-        <div className="w-full max-w-sm">{children}</div>
+      <div className="flex w-full items-center justify-center p-6 md:p-10 preview bg-surface-100 h-screen">
+        <div className="w-full max-w-sm flex flex-col gap-4 justify-center items-center">
+          {children}
+        </div>
       </div>
     </>
   )

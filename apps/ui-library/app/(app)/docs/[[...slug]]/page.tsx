@@ -99,7 +99,6 @@ export default async function DocPage({ params }: DocPageProps) {
           </div>
           <FrameworkSelector />
         </div>
-        <Separator className="mb-6" />
         <SourcePanel doc={doc} />
         <div className="pb-12">
           <Mdx code={doc.body.code} />
