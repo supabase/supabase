@@ -98,7 +98,13 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     )
   }
 
-  const ticketType = user?.secret ? 'secret' : user?.platinum ? 'platinum' : 'regular'
+  const ticketType = user?.secret
+    ? user?.platinum
+      ? 'platinumSecret'
+      : 'secret'
+    : user?.platinum
+      ? 'platinum'
+      : 'regular'
   const ogImageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw14/og/${ticketType}/${username}.png?t=${dayjs(new Date()).format('DHHmmss')}`
 
   return {
