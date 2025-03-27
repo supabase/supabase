@@ -6,10 +6,12 @@ import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/cli
 import { useUser } from 'common'
 import { useEffect, useMemo, useState } from 'react'
 import { Label_Shadcn_, Switch } from 'ui'
-import { generateFullName } from './utils'
+import { getRandomUser } from './utils'
 
 const supabase = createClient()
 const roomName = 'realtime-avatar-stack-demo'
+
+const randomUser = getRandomUser()
 
 // This demo is using the supabase.com account to broadcast its data to a realtime channel from a normal Supabase project.
 // This is a workaround to make the more interactive. Don't use it this way in production (it only works on supabase.com)
@@ -20,7 +22,7 @@ const RealtimeAvatarStackDemo = () => {
 
   // generate a random name for the current user or use his supabase.com name
   const currentUserName = useMemo(() => {
-    let name = generateFullName()
+    let name = randomUser.name
     if (dashboardUser) {
       name = user?.user_metadata.full_name as string
     }
@@ -29,7 +31,7 @@ const RealtimeAvatarStackDemo = () => {
 
   // generate a random image for the current user or use his supabase.com avatar
   const currentUserImage = useMemo(() => {
-    let image = `${process.env.NEXT_PUBLIC_BASE_PATH}/img/profile-images/profile-${Math.floor(Math.random() * 6)}.jpg`
+    let image = randomUser.image
     if (dashboardUser) {
       image = (user?.user_metadata.avatar_url as string) ?? null
     }

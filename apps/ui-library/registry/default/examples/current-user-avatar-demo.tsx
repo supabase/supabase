@@ -1,7 +1,7 @@
 'use client'
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/registry/default/components/ui/avatar'
 import { useUser } from 'common'
-import { Avatar, AvatarFallback, AvatarImage } from 'ui'
 
 const CurrentUserAvatarDemo = () => {
   // this demo only works on supabase.com because all apps are on the same domain and share cookies
