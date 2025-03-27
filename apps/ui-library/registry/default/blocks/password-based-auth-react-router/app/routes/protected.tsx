@@ -22,7 +22,7 @@ export default function ProtectedPage() {
         Hello <span className="text-primary font-semibold">{data.user.email}</span>
       </p>
       <a href="/logout">
-        <Button>Logout?</Button>
+        <Button>Logout</Button>
       </a>
     </div>
   )
