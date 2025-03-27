@@ -16,7 +16,7 @@ function SideNavigation() {
 
     const params = new URLSearchParams(searchParams.toString())
     params.set('framework', framework)
-    return `/docs/${slug}?${params.toString()}`
+    return `/docs/${framework}/${slug}`
   }
 
   // Get all component pages

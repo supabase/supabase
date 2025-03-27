@@ -1,9 +1,10 @@
 'use client'
 
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+
 import { componentPages, frameworkTitles } from '@/config/docs'
 import { useFramework } from '@/context/framework-context'
 import { SelectValue } from '@ui/components/shadcn/ui/select'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import {
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -12,25 +13,23 @@ import {
   SelectTrigger_Shadcn_,
 } from 'ui'
 
-interface FrameworkSelectorProps {
-  docTitle: string
-  framework: string
-}
-
 const frameworks = Object.keys(frameworkTitles)
 
-export function FrameworkSelector({ docTitle, framework }: FrameworkSelectorProps) {
-  const router = useRouter()
-  const pathname = usePathname()
+export function FrameworkSelector() {
   const searchParams = useSearchParams()
+  const pathname = usePathname()
+
+  // Extract framework and docTitle from pathname
+  // Example: /ui/docs/nextjs/password-based-auth
+  const pathParts = pathname.split('/')
+  const docTitle = pathParts[pathParts.length - 1]
+  const framework = pathParts[pathParts.length - 2]
+
+  const router = useRouter()
   const { setFramework: setPreferredFramework } = useFramework()
-  const selectedFramework = frameworks.includes(framework) ? framework! : 'nextjs'
+  const selectedFramework = frameworks.includes(framework) ? framework : 'nextjs'
 
-  // Check if this is a component/doc that supports multiple frameworks
-  const isComponentDoc = Object.keys(componentPages).includes(docTitle)
-
-  // Don't show selector for non-framework related docs (Getting Started, etc.)
-  if (!isComponentDoc) {
+  if (!framework) {
     return null
   }
 
@@ -43,10 +42,14 @@ export function FrameworkSelector({ docTitle, framework }: FrameworkSelectorProp
   }
 
   const onSelect = (value: string) => {
-    // Update the framework query parameter
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('framework', value)
-    router.push(`${pathname}?${params.toString()}`)
+    // Get current path parts
+    const currentPathParts = [...pathParts]
+    // Replace the framework part (second to last) with the new framework
+    currentPathParts[currentPathParts.length - 2] = value
+    // Build the new path
+    const newPath = currentPathParts.join('/')
+
+    router.push(newPath)
 
     // Also update the context/localStorage for future use
     setPreferredFramework(value as keyof typeof frameworkTitles)
