@@ -4,7 +4,7 @@ export const CRTShader = {
     time: { value: 0 },
     scanlineIntensity: { value: 0.6 },
     scanlineCount: { value: 360 },
-    vignetteIntensity: { value: 1.5 },
+    vignetteIntensity: { value: 0.5 },
     noiseIntensity: { value: 0.01 },
     flickerIntensity: { value: 0.01 },
     rgbShiftAmount: { value: 0.0 },
@@ -81,7 +81,9 @@ export const CRTShader = {
       vec4 finalColor = scanlineColor * (1.0 - vignette * 0.7);
       
       // Blend between original and effect based on intensity
-      gl_FragColor = mix(originalColor, finalColor, intensity);
+      vec4 final = mix(originalColor, finalColor, intensity);
+      final.a = originalColor.a;
+      gl_FragColor = final;
     }
   `,
 }

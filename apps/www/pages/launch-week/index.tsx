@@ -4,7 +4,6 @@ import { LwView } from '~/components/LaunchWeek/14/LwView'
 import { useRouter } from 'next/router'
 import { Lw14ConfDataProvider } from '~/components/LaunchWeek/14/hooks/use-conf-data'
 import DefaultLayout from '~/components/Layouts/Default'
-import { Tunnel } from '~/components/LaunchWeek/14/Tunnel'
 
 const Lw14Page = () => {
   const TITLE = `${LW14_TITLE} | ${LW14_DATE}`
@@ -41,9 +40,6 @@ const Lw14Page = () => {
       <Lw14ConfDataProvider initState={{ userTicketData: defaultUserData, partymodeStatus: 'on' }}>
         <DefaultLayout className='font-["Departure_Mono"] lg:pt-32 border-b pb-0 md:pb-16 lg:!pb-[230px]'>
           <LwView />
-          <div className="w-full absolute bottom-[calc(60%-50px)] md:bottom-[150px] left-0 right-0 -z-20">
-            <Tunnel />
-          </div>
         </DefaultLayout>
       </Lw14ConfDataProvider>
     </>

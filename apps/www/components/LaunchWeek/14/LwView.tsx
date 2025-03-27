@@ -16,6 +16,7 @@ import {
 import TicketCopy from '~/components/LaunchWeek/14/TicketCopy'
 import { TicketLayout, TicketLayoutCanvas } from '~/components/LaunchWeek/14/TicketLayout'
 import TicketShare from '~/components/LaunchWeek/14/TicketShare'
+import { Tunnel } from '~/components/LaunchWeek/14/Tunnel'
 import { TicketShareLayout } from '~/components/LaunchWeek/14/TicketShareLayout'
 import { useRegistration } from '~/components/LaunchWeek/14/hooks/use-registration'
 import useConfData from './hooks/use-conf-data'
@@ -76,6 +77,10 @@ export const LwView = () => {
             </TicketShareLayout>
           </>
         )}
+
+        <div className="w-full absolute bottom-[55%] md:bottom-[25%] lg:-bottom-8 left-0 right-0 -z-20">
+          <Tunnel />
+        </div>
       </TicketLayoutCanvas>
     </TicketLayout>
   )
