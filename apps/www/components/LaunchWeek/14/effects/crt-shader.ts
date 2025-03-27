@@ -2,7 +2,7 @@ export const CRTShader = {
   uniforms: {
     tDiffuse: { value: null },
     time: { value: 0 },
-    scanlineIntensity: { value: 0.8 },
+    scanlineIntensity: { value: 0.6 },
     scanlineCount: { value: 360 },
     vignetteIntensity: { value: 1.5 },
     noiseIntensity: { value: 0.01 },
