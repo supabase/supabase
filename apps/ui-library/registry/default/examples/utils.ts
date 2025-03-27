@@ -1,6 +1,6 @@
 import { sample } from 'lodash'
 
-const users = [
+export const users = [
   {
     name: 'Gemma Scout',
     image: `${process.env.NEXT_PUBLIC_BASE_PATH}/img/profile-images/profile-0.png`,
