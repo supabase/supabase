@@ -6,6 +6,7 @@ import CMSLayout from '~/components/Layouts/CMSLayout'
 import dayjs from 'dayjs'
 import { Button } from 'ui'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
+import { ExternalLinkIcon } from 'lucide-react'
 
 type Meetup = Database['public']['Tables']['meetups']['Row']
 type MeetupInsert = Database['public']['Tables']['meetups']['Insert']
@@ -14,6 +15,10 @@ export default function MeetupsCMS() {
   const [meetups, setMeetups] = useState<Meetup[]>([])
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [meetupToDelete, setMeetupToDelete] = useState<Meetup | null>(null)
+  const [tempDate, setTempDate] = useState<string | null>(null)
+  const [meetupIdForDate, setMeetupIdForDate] = useState<string | number | null>(null)
+  const [dateError, setDateError] = useState<string | null>(null)
+  const [openDateDropdown, setOpenDateDropdown] = useState<string | number | null>(null)
 
   useEffect(() => {
     fetchMeetups()
@@ -82,6 +87,29 @@ export default function MeetupsCMS() {
     )
   }
 
+  async function handleDateChange(meetupId: string | number, newDate: string) {
+    const { error } = await supabase
+      .from('meetups')
+      .update({ start_at: newDate })
+      .eq('id', meetupId.toString())
+
+    if (error) {
+      console.error('Error updating meetup date:', error)
+      setDateError('Failed to update date. Please try again.')
+      return
+    }
+
+    // Update local state
+    setMeetups(
+      meetups.map((meetup) => (meetup.id === meetupId ? { ...meetup, start_at: newDate } : meetup))
+    )
+    // Reset temporary state and close dropdown
+    setTempDate(null)
+    setMeetupIdForDate(null)
+    setDateError(null)
+    setOpenDateDropdown(null)
+  }
+
   return (
     <CMSLayout>
       <div className="space-y-4">
@@ -101,20 +129,83 @@ export default function MeetupsCMS() {
               className="bg-surface-200 border border-border rounded-lg px-4 py-2 flex items-center justify-between"
             >
               <div className="flex items-center space-x-4">
-                <span className="text-sm flex-2 font-medium text-foreground lg:min-w-[300px] truncate">
+                <span className="text-sm flex-2 font-medium text-foreground lg:min-w-[250px] truncate">
                   {meetup.title || 'Unnamed Meetup'}
                 </span>
                 <span className="text-sm text-foreground-light min-w-[100px]">
                   {meetup.country}
                 </span>
-                <span className="text-sm text-foreground-light min-w-[100px]">
-                  {meetup.start_at ? dayjs(meetup.start_at).format('DD MMM YY') : 'No date'}
+                <DropdownMenu
+                  open={openDateDropdown === meetup.id}
+                  onOpenChange={(open) => {
+                    if (open) {
+                      setOpenDateDropdown(meetup.id)
+                      setDateError(null)
+                    } else {
+                      setOpenDateDropdown(null)
+                      setTempDate(null)
+                      setMeetupIdForDate(null)
+                    }
+                  }}
+                >
+                  <DropdownMenuTrigger asChild>
+                    <button className="text-sm text-foreground-light min-w-[150px] text-left">
+                      {meetup.start_at
+                        ? dayjs(meetup.start_at).format('DD MMM YY HH:mm')
+                        : 'No date'}
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-[300px] p-4">
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-foreground">
+                        Start Date & Time
+                      </label>
+                      <input
+                        type="datetime-local"
+                        value={
+                          meetupIdForDate === meetup.id && tempDate
+                            ? tempDate
+                            : meetup.start_at
+                              ? dayjs(meetup.start_at).format('YYYY-MM-DDTHH:mm')
+                              : ''
+                        }
+                        onChange={(e) => {
+                          setTempDate(e.target.value)
+                          setMeetupIdForDate(meetup.id)
+                          setDateError(null)
+                        }}
+                        className="w-full border border-border rounded-md bg-surface-100 p-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-brand-400"
+                      />
+                      {dateError && <p className="text-sm text-red-500">{dateError}</p>}
+                      <div className="flex justify-end pt-2">
+                        <button
+                          onClick={() => {
+                            if (tempDate && meetupIdForDate === meetup.id) {
+                              handleDateChange(meetup.id, tempDate)
+                            }
+                          }}
+                          className="px-3 py-1.5 text-sm font-medium text-white bg-brand-400 hover:bg-brand-300 rounded-md"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <span className="text-sm text-foreground-light hover:text-foreground min-w-[20px]">
+                  {meetup.link ? (
+                    <a href={meetup.link} target="_blank" rel="noopener noreferrer">
+                      <ExternalLinkIcon className="w-4 h-4" />
+                    </a>
+                  ) : (
+                    '-'
+                  )}
                 </span>
-                <div className="flex items-center space-x-2">
+                <div className="grid grid-cols-2 gap-2">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                        className={`inline-flex justify-center items-center text-center px-2 py-0.5 rounded-full text-xs font-medium ${
                           meetup.is_live
                             ? 'bg-green-100 text-green-800'
                             : 'bg-gray-100 text-gray-800'
