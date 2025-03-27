@@ -17,7 +17,7 @@ export const TicketShareLayout = ({
   return (
     <div
       className={cn(
-        'absolute lg:relative lg:flex lg:flex-col lg:max-w-[450px] xl:max-w-[500px] lg:h-full left-0 right-0 grid justify-center gap-2 md:px-5 lg:px-0',
+        'absolute lg:relative lg:flex lg:flex-col lg:max-w-[450px] xl:max-w-[500px] lg:h-full left-0 right-0 grid justify-center gap-2 md:px-5 lg:px-0 px-6',
         narrow
           ? 'top-[280px] md:top-[360px] lg:top-0 lg:left-0 lg:right-auto lg:justify-center'
           : 'top-[250px] xs:top-[290px] md:top-auto md:bottom-10 xl:bottom-16 2xl:bottom-20'
