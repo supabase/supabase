@@ -677,6 +677,30 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/database/migrations': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * [Beta] List applied migration versions
+     * @description Only available to selected partner OAuth apps
+     */
+    get: operations['v1-list-migrations']
+    put?: never
+    /**
+     * [Beta] Apply a database migration
+     * @description Only available to selected partner OAuth apps
+     */
+    post: operations['v1-apply-a-migration']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/database/query': {
     parameters: {
       query?: never
@@ -1619,6 +1643,7 @@ export interface components {
       branch_name: string
       /** @enum {string} */
       desired_instance_size?:
+        | 'pico'
         | 'nano'
         | 'micro'
         | 'small'
@@ -2632,6 +2657,10 @@ export interface components {
       /** @description Database version */
       version: string
     }
+    V1ListMigrationsResponse: {
+      name?: string
+      version: string
+    }[]
     V1OrganizationMemberResponse: {
       email?: string
       mfa_enabled: boolean
@@ -4704,6 +4733,74 @@ export interface operations {
         }
       }
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-list-migrations': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V1ListMigrationsResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to list database migrations */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-apply-a-migration': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to apply database migration */
+      500: {
         headers: {
           [name: string]: unknown
         }
