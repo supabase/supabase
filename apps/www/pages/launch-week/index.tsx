@@ -38,7 +38,7 @@ const Lw14Page = () => {
       />
 
       <Lw14ConfDataProvider initState={{ userTicketData: defaultUserData, partymodeStatus: 'on' }}>
-        <DefaultLayout className='font-["Departure_Mono"] lg:pt-32 border-b pb-0 md:pb-16 lg:!pb-[230px]'>
+        <DefaultLayout className='font-["Departure_Mono"] lg:py-32 border-b pb-0'>
           <LwView />
         </DefaultLayout>
       </Lw14ConfDataProvider>
