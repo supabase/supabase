@@ -39,7 +39,7 @@ const RealtimeAvatarStackDemo = () => {
     return image
   }, [user, dashboardUser, user?.user_metadata.avatar_url])
 
-  const [usersMap, setUsersMap] = useState<Record<string, RealtimeUser>>({})
+  const [usersMap, setUsersMap] = useState<Record<string, RealtimeUser> | null>(null)
 
   useEffect(() => {
     const room = supabase.channel(roomName)
@@ -73,11 +73,15 @@ const RealtimeAvatarStackDemo = () => {
   }, [currentUserName, currentUserImage, roomName])
 
   const avatars = useMemo(() => {
-    return Object.values(usersMap).map((user) => ({
+    return Object.values(usersMap || {}).map((user) => ({
       name: user.name,
       image: user.image,
     }))
   }, [usersMap])
+
+  if (usersMap === null) {
+    return null
+  }
 
   return (
     <div className="flex flex-col gap-4 items-center justify-center">
@@ -90,8 +94,7 @@ const RealtimeAvatarStackDemo = () => {
         </div>
       ) : user ? (
         <div className="flex items-center space-x-2">
-          <Switch checked={dashboardUser} onCheckedChange={setDashboardUser} />
-          <Switch id="current-user" />
+          <Switch id="current-user" checked={dashboardUser} onCheckedChange={setDashboardUser} />
           <Label_Shadcn_ htmlFor="current-user">Use my supabase.com account instead</Label_Shadcn_>
         </div>
       ) : (
