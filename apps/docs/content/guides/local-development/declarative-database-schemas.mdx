@@ -244,7 +244,9 @@ During development, you may want to rollback a migration to keep your new schema
 supabase db reset --version 20241005112233
 ```
 
-After a reset, you can edit the schema and regenerate a migration file.
+After a reset, you can [edit the schema](#updating-your-schema) and regenerate a new migration file.
+
+Note that you should not reset a version that's already deployed to production.
 
 ## Known caveats
 
