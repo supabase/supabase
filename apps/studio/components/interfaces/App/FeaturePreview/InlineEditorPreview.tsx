@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { BASE_PATH } from 'lib/constants'
 import { Admonition } from 'ui-patterns'
 
-const InlineEditorPreview = () => {
+export const InlineEditorPreview = () => {
   return (
     <div>
       <Image
@@ -29,5 +29,3 @@ const InlineEditorPreview = () => {
     </div>
   )
 }
-
-export default InlineEditorPreview

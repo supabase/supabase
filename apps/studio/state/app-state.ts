@@ -1,9 +1,9 @@
 import type { Message as MessageType } from 'ai/react'
 import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
-import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
+import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
 export type CommonDatabaseEntity = {
   id: number
@@ -100,6 +100,7 @@ const getInitialState = () => {
       showGenerateSqlModal: false,
       ongoingQueriesPanelOpen: false,
       mobileMenuOpen: false,
+      showSidebar: true,
     }
   }
 
@@ -149,13 +150,14 @@ const getInitialState = () => {
     showGenerateSqlModal: false,
     ongoingQueriesPanelOpen: false,
     mobileMenuOpen: false,
+    showSidebar: true,
   }
 }
 
 export const appState = proxy({
   ...getInitialState(),
 
-  setDashboardHistory: (ref: string, key: 'sql' | 'editor', id: string) => {
+  setDashboardHistory: (ref: string, key: 'sql' | 'editor', id: string | undefined) => {
     if (appState.dashboardHistory[key] !== id) {
       appState.dashboardHistory[key] = id
       localStorage.setItem(
@@ -211,6 +213,11 @@ export const appState = proxy({
     appState.showGenerateSqlModal = value
   },
 
+  showSidebar: true,
+  setShowSidebar: (value: boolean) => {
+    appState.showSidebar = value
+  },
+
   resetAiAssistantPanel: () => {
     appState.aiAssistantPanel = {
       ...INITIAL_AI_ASSISTANT,
@@ -232,16 +239,16 @@ export const appState = proxy({
     }
   },
 
+  showOngoingQueriesPanelOpen: false,
+  setOnGoingQueriesPanelOpen: (value: boolean) => {
+    appState.ongoingQueriesPanelOpen = value
+  },
+
   saveLatestMessage: (message: any) => {
     appState.aiAssistantPanel = {
       ...appState.aiAssistantPanel,
       messages: [...appState.aiAssistantPanel.messages, message],
     }
-  },
-
-  showOngoingQueriesPanelOpen: false,
-  setOnGoingQueriesPanelOpen: (value: boolean) => {
-    appState.ongoingQueriesPanelOpen = value
   },
 
   setEditorPanel: (value: Partial<EditorPanelType>) => {
