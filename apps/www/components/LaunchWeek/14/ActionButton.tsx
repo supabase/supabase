@@ -52,7 +52,7 @@ const textVariants = cva(
 )
 
 export interface ActionButtonProps extends VariantProps<typeof actionButtonVariants> {
-  variant: string
+  variant: 'primary' | 'secondary' | null | undefined
   icon: string
   children: ReactNode
   onClick?: () => void
