@@ -30,7 +30,7 @@ interface RegistrationProps {
 }
 
 export const useRegistration = ({ onError, onRegister }: RegistrationProps = {}) => {
-  const [realtimeChannel, setRealtimeChannel] = useState<RealtimeChannel | null>(null)
+  // const [realtimeChannel, setRealtimeChannel] = useState<RealtimeChannel | null>(null)
   const [
     { userTicketData: userData, session, userTicketDataState, urlParamsLoaded, referal },
     dispatch,
@@ -100,35 +100,8 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
       await prefetchData(username)
     }
 
-    if (
-      (!realtimeChannel || realtimeChannel.state === REALTIME_CHANNEL_STATES.closed) &&
-      username
-    ) {
-      const channel = subscribeToTicketChanges(username, (payload) => {
-        const platinum = !!payload.new.shared_on_twitter && !!payload.new.shared_on_linkedin
-        const secret = !!payload.new.game_won_at
-        dispatch({
-          type: 'USER_TICKET_UPDATED',
-          payload: {
-            ...payload.new,
-            platinum,
-            secret,
-          },
-        })
-      })
-      setRealtimeChannel(channel)
-    }
-
     callbacksRef.current.onRegister?.()
-  }, [
-    dispatch,
-    realtimeChannel,
-    referal,
-    sessionUser,
-    urlParamsLoaded,
-    userData.id,
-    userTicketDataState,
-  ])
+  }, [dispatch, referal, sessionUser, urlParamsLoaded, userData.id, userTicketDataState])
 
   async function prefetchData(username: string) {
     // Prefetch GitHub avatar
@@ -163,11 +136,29 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
   useEffect(() => {
     fetchOrCreateUser()
 
-    return () => {
-      // Cleanup realtime subscription on unmount
-      realtimeChannel?.unsubscribe()
+    const username = sessionUser?.user_metadata?.user_name as string | undefined
+
+    if (username) {
+      const channel = subscribeToTicketChanges(username, (payload) => {
+        const platinum = !!payload.new.shared_on_twitter && !!payload.new.shared_on_linkedin
+        const secret = !!payload.new.game_won_at
+
+        dispatch({
+          type: 'USER_TICKET_UPDATED',
+          payload: {
+            ...payload.new,
+            platinum,
+            secret,
+          },
+        })
+      })
+
+      return () => {
+        // Cleanup realtime subscription on unmount
+        channel?.unsubscribe()
+      }
     }
-  }, [fetchOrCreateUser, realtimeChannel])
+  }, [dispatch, fetchOrCreateUser, sessionUser?.user_metadata?.user_name])
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data, error }) => {
@@ -217,7 +208,6 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
   }
 
   return {
-    realtimeChannel,
     signIn: handleGithubSignIn,
     upgradeTicket,
   }
