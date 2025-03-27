@@ -67,7 +67,7 @@ export const componentPages: Record<
   },
   'password-based-auth': {
     title: 'Password-Based Auth',
-    supportedFrameworks: ['nextjs', 'tanstack', 'react'],
+    supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
     commandItemLabel: 'Password-Based Auth',
     href: '/docs/password-based-auth',
   },
