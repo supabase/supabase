@@ -1,0 +1,32 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "realtime-avatar-stack",
+  "type": "registry:component",
+  "title": "Avatar Stack with Realtime Presence",
+  "description": "Component which stack of avatars, tracked by realtime presence.",
+  "registryDependencies": ["avatar", "tooltip"],
+  "dependencies": [],
+  "files": [
+    {
+      "path": "registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts",
+
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+      "type": "registry:hook"
+    }
+  ]
+}

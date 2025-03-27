@@ -1,38 +1,36 @@
 'use client'
 
 import NavigationItem from '@/components/side-navigation-item'
-import { aiEditorsRules, frameworkPages, gettingStarted } from '@/config/docs'
-import { SelectValue } from '@ui/components/shadcn/ui/select'
-import { usePathname, useRouter } from 'next/navigation'
-import {
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-} from 'ui'
-
-const frameworks = Object.keys(frameworkPages)
+import { aiEditorsRules, componentPages, gettingStarted } from '@/config/docs'
+import { useFramework } from '@/context/framework-context'
 
 function SideNavigation() {
-  const router = useRouter()
-  const pathname = usePathname()
+  const { framework: preferredFramework } = useFramework()
 
-  const pathRegex = /\/docs\/([^/]+)/
-  const match = pathname?.match(pathRegex)
-  const selectedFramework = frameworks.includes(match?.[1] ?? '') ? match?.[1]! : 'nextjs'
-
-  const onSelect = (value: string) => {
-    const firstUrl = frameworkPages[value].items[0].href
-    router.push(firstUrl as string)
+  // Create a function to build URLs
+  const buildUrl = (slug: string, framework?: string) => {
+    if (!framework) return `/docs/${slug}`
+    return `/docs/${framework}/${slug}`
   }
 
-  const options = frameworks.map((f) => ({
-    label: frameworkPages[f].title,
-    value: f,
-  }))
+  // Get all component pages
+  const componentItems = Object.entries(componentPages).map(([slug, component]) => {
+    let frameworkToUse = undefined
 
-  const selectedFrameworkConfig = frameworkPages[selectedFramework]
+    // Add framework param only if needed
+    if (preferredFramework && component.supportedFrameworks.includes(preferredFramework)) {
+      frameworkToUse = preferredFramework
+    } else if (component.supportedFrameworks.length > 0) {
+      frameworkToUse = component.supportedFrameworks[0]
+    }
+
+    return {
+      title: component.title,
+      href: buildUrl(slug, frameworkToUse),
+      items: [],
+      commandItemLabel: component.commandItemLabel,
+    }
+  })
 
   return (
     <nav className="min-w-[220px]">
@@ -46,27 +44,12 @@ function SideNavigation() {
       </div>
       <div className="pb-10 space-y-2">
         <div className="font-mono uppercase text-xs text-foreground-lighter/75 mb-2 px-6 tracking-widest">
-          Select a framework
-        </div>
-        <div className="px-6">
-          <Select_Shadcn_ value={selectedFramework} onValueChange={onSelect}>
-            <SelectTrigger_Shadcn_ className="w-[180px]">
-              <SelectValue />
-            </SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
-              <SelectGroup_Shadcn_>
-                {options.map((f) => (
-                  <SelectItem_Shadcn_ key={f.value} value={f.value}>
-                    {f.label}
-                  </SelectItem_Shadcn_>
-                ))}
-              </SelectGroup_Shadcn_>
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+          Blocks
         </div>
         <div className="space-y-0.5">
-          {selectedFrameworkConfig.items.map((item, i) => (
-            <NavigationItem item={item} key={`${item.href}-${i}`} />
+          {/* Render items based on component definitions */}
+          {componentItems.map((item, i) => (
+            <NavigationItem item={item} key={`${item.href?.toString() || item.title}-${i}`} />
           ))}
         </div>
       </div>

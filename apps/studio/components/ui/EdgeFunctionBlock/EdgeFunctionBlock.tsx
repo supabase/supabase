@@ -1,15 +1,16 @@
-import { DragEvent, ReactNode, useState } from 'react'
-import { toast } from 'sonner'
-import { useParams } from 'common'
-import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
-import { Button, CodeBlock, cn, CodeBlockLang } from 'ui'
 import { Code } from 'lucide-react'
 import Link from 'next/link'
+import { DragEvent, ReactNode, useState } from 'react'
+import { toast } from 'sonner'
+
+import { useParams } from 'common'
+import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
+import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { Button, cn, CodeBlock, CodeBlockLang } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 interface EdgeFunctionBlockProps {
@@ -63,8 +64,9 @@ export const EdgeFunctionBlock = ({
     }
 
     try {
-      const deployResult = await deployFunction({
+      await deployFunction({
         projectRef: ref,
+        slug: functionName,
         metadata: {
           entrypoint_path: 'index.ts',
           name: functionName,
@@ -144,6 +146,7 @@ export const EdgeFunctionBlock = ({
                 try {
                   await deployFunction({
                     projectRef: ref,
+                    slug: functionName,
                     metadata: {
                       entrypoint_path: 'index.ts',
                       name: functionName,

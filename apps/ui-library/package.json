@@ -7,7 +7,7 @@
     "preinstall": "npx only-allow pnpm",
     "dev": "next dev --port 3004",
     "build": "pnpm run content:build && pnpm run build:registry && pnpm run build:llms && next build",
-    "build:registry": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-registry.mts && prettier --write registry.json && rimraf -G public/r && shadcn build",
+    "build:registry": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-registry.mts && prettier --write registry.json && rimraf -G public/r && shadcn build && tsx scripts/clean-registry.ts",
     "build:llms": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-llms-txt.ts",
     "start": "next start",
     "lint": "next lint",
@@ -16,13 +16,16 @@
     "typecheck": "contentlayer2 build && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
+    "@radix-ui/react-avatar": "^1.0.4",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-progress": "^1.0.3",
-    "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-slot": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.0.7",
     "class-variance-authority": "^0.6.0",
+    "common": "workspace:*",
     "contentlayer2": "0.4.6",
     "eslint-config-supabase": "workspace:*",
+    "framer-motion": "^11.0.3",
     "icons": "workspace:*",
     "jotai": "^2.8.0",
     "lucide-react": "*",
@@ -50,6 +53,7 @@
     "@shikijs/compat": "^1.1.7",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.49.1",
+    "@tanstack/react-router": "^1.114.27",
     "@tanstack/react-start": "^1.114.25",
     "@types/lodash": "^4.17.16",
     "@types/react": "^18.2.65",
@@ -68,6 +72,7 @@
     "tsconfig": "workspace:*",
     "tsx": "^4.19.3",
     "typescript": "~5.5.0",
-    "unist-builder": "3.0.0"
+    "unist-builder": "3.0.0",
+    "vite": "^6.0.0"
   }
 }

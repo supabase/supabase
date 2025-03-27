@@ -35,6 +35,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { BlockItem } from './block-item'
+import { BlockPreview } from './block-preview'
 import { ComponentProps } from './component-props'
 import { SonnerExpandConfig } from './sonner-expand-config'
 import { SonnerPositionConfig } from './sonner-expand-position'
@@ -166,7 +167,7 @@ const components = {
       <StyleWrapper styleName={__style__}>
         <pre
           className={cn(
-            'mb-4 mt-6 max-h-[650px] overflow-x-auto rounded-lg border bg-surface-75/75 py-4',
+            'mb-4 mt-6 max-h-[650px] overflow-x-auto rounded-lg border bg-surface-75/75 py-4 text-foreground-light',
             className
           )}
           {...props}
@@ -273,6 +274,7 @@ const components = {
   SonnerExpandConfig,
   SonnerPositionConfig,
   BlockItem,
+  BlockPreview,
 }
 
 interface MdxProps {

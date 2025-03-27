@@ -12,9 +12,7 @@ export type ProjectsVariables = {
   ref?: string
 }
 
-export type ProjectInfo = components['schemas']['ProjectInfo'] & {
-  status: components['schemas']['project_status']
-}
+export type ProjectInfo = components['schemas']['ProjectInfo']
 
 export async function getProjects(signal?: AbortSignal) {
   const { data, error } = await get('/platform/projects', { signal })

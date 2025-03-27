@@ -55,7 +55,11 @@ export const useProjectCreationPostgresVersionsQuery = <TData = ProjectCreationP
     ({ signal }) =>
       getPostgresCreationVersions({ organizationSlug, cloudProvider, dbRegion }, signal),
     {
-      enabled: enabled && typeof organizationSlug !== 'undefined',
+      enabled:
+        enabled &&
+        typeof organizationSlug !== 'undefined' &&
+        organizationSlug !== '_' &&
+        typeof dbRegion !== 'undefined',
       ...options,
     }
   )
