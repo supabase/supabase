@@ -13,7 +13,6 @@ interface ComponentPreviewProps extends React.HTMLAttributes<HTMLDivElement> {
   extractClassname?: boolean
   extractedClassNames?: string
   align?: 'center' | 'start' | 'end'
-  peekCode?: boolean
   showGrid?: boolean
   showDottedGrid?: boolean
   wide?: boolean
@@ -26,7 +25,6 @@ export function CodeFragment({
   extractClassname,
   extractedClassNames,
   align = 'center',
-  peekCode = false,
   showGrid = false,
   showDottedGrid = true,
   wide = false,
