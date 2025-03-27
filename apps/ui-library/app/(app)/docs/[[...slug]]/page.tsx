@@ -88,14 +88,13 @@ export default async function DocPage({ params }: DocPageProps) {
           <div className="text-foreground-lighter">{doc.title}</div>
         </div>
         <div className="space-y-2 mb-5">
-          <h1 className={cn('scroll-m-20 text-4xl tracking-tight')}>{doc.title}</h1>
+          <h1 className="scroll-m-20 text-4xl tracking-tight font-semibold">{doc.title}</h1>
           {doc.description && (
             <p className="text-lg text-foreground-light">
               <Balancer>{doc.description}</Balancer>
             </p>
           )}
         </div>
-        <Separator className="mb-6" />
         <SourcePanel doc={doc} />
         <div className="pb-12">
           <Mdx code={doc.body.code} />
