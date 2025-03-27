@@ -11,7 +11,6 @@ import {
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
-  Skeleton,
 } from 'ui'
 
 const frameworks = Object.keys(frameworkTitles)
