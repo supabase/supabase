@@ -145,6 +145,7 @@ const usernameToLines = (username: string): string[] => {
 export async function GET(req: Request, res: Response) {
   const url = new URL(req.url)
 
+  // Just here to silence snyk false positives
   // Verify that req.url is from an allowed domain
   const allowedDomains = ['supabase.com', '-supabase.vercel.app', 'localhost:3000']
 
