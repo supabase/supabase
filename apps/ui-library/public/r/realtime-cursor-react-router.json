@@ -6,7 +6,8 @@
   "description": "Component which renders realtime cursors from other users in a room.",
   "dependencies": [
     "lucide-react",
-    "@supabase/ssr@latest"
+    "@supabase/ssr@latest",
+    "@supabase/supabase-js@latest"
   ],
   "registryDependencies": [],
   "files": [
@@ -26,13 +27,13 @@
       "type": "registry:hook"
     },
     {
-      "path": "registry/default/clients/react-router/lib/supabase.client.ts",
-      "content": "import { createBrowserClient } from '@supabase/ssr'\n\n// Use this function to create a client for the browser. You should pass the env variables through a loader and use them\n// to instantiate the client.\nexport function createClient(supabaseUrl: string, supabaseAnonKey: string) {\n  return createBrowserClient(supabaseUrl, supabaseAnonKey)\n}\n",
+      "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+      "content": "/// <reference types=\"vite/types/importMeta.d.ts\" />\nimport { createBrowserClient } from '@supabase/ssr'\n\nexport function createClient() {\n  return createBrowserClient(\n    import.meta.env.VITE_SUPABASE_URL!,\n    import.meta.env.VITE_SUPABASE_ANON_KEY!\n  )\n}\n",
       "type": "registry:lib"
     },
     {
-      "path": "registry/default/clients/react-router/lib/supabase.server.ts",
-      "content": "import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'\n\nexport function createClient(request: Request) {\n  const headers = new Headers()\n\n  const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {\n    cookies: {\n      getAll() {\n        return parseCookieHeader(request.headers.get('Cookie') ?? '') as {\n          name: string\n          value: string\n        }[]\n      },\n      setAll(cookiesToSet) {\n        cookiesToSet.forEach(({ name, value, options }) =>\n          headers.append('Set-Cookie', serializeCookieHeader(name, value, options))\n        )\n      },\n    },\n  })\n\n  return { supabase, headers }\n}\n",
+      "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+      "content": "import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'\n\nexport function createClient(request: Request) {\n  const headers = new Headers()\n\n  const supabase = createServerClient(\n    process.env.VITE_SUPABASE_URL!,\n    process.env.VITE_SUPABASE_ANON_KEY!,\n    {\n      cookies: {\n        getAll() {\n          return parseCookieHeader(request.headers.get('Cookie') ?? '') as {\n            name: string\n            value: string\n          }[]\n        },\n        setAll(cookiesToSet) {\n          cookiesToSet.forEach(({ name, value, options }) =>\n            headers.append('Set-Cookie', serializeCookieHeader(name, value, options))\n          )\n        },\n      },\n    }\n  )\n\n  return { supabase, headers }\n}\n",
       "type": "registry:lib"
     }
   ]

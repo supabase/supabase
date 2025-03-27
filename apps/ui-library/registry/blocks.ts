@@ -3,6 +3,7 @@ import { clients } from './clients'
 import currentUserAvatar from './default/blocks/current-user-avatar/registry-item.json' assert { type: 'json' }
 import dropzone from './default/blocks/dropzone/registry-item.json' assert { type: 'json' }
 import passwordBasedAuthNextjs from './default/blocks/password-based-auth-nextjs/registry-item.json' assert { type: 'json' }
+import passwordBasedAuthReactRouter from './default/blocks/password-based-auth-react-router/registry-item.json' assert { type: 'json' }
 import passwordBasedAuthReact from './default/blocks/password-based-auth-react/registry-item.json' assert { type: 'json' }
 import passwordBasedAuthTanstack from './default/blocks/password-based-auth-tanstack/registry-item.json' assert { type: 'json' }
 import realtimeAvatarStack from './default/blocks/realtime-avatar-stack/registry-item.json' assert { type: 'json' }
@@ -25,10 +26,12 @@ const combine = (component: Registry['items'][number]) => {
 const nextjsClient = clients.find((client) => client.name === 'supabase-client-nextjs')
 const reactClient = clients.find((client) => client.name === 'supabase-client-react')
 const tanstackClient = clients.find((client) => client.name === 'supabase-client-tanstack')
+const reactRouterClient = clients.find((client) => client.name === 'supabase-client-react-router')
 
 export const blocks = [
   registryItemAppend(passwordBasedAuthNextjs as RegistryItem, [nextjsClient!]),
   registryItemAppend(passwordBasedAuthReact as RegistryItem, [reactClient!]),
+  registryItemAppend(passwordBasedAuthReactRouter as RegistryItem, [reactRouterClient!]),
   registryItemAppend(passwordBasedAuthTanstack as RegistryItem, [tanstackClient!]),
   ...combine(dropzone as RegistryItem),
   ...combine(realtimeCursor as RegistryItem),
