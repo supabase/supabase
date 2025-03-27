@@ -76,7 +76,7 @@ export const ActionButton = ({
   const isCommandMenuOpen = useCommandMenuOpen()
   useKey(icon.toLowerCase(), () => !isCommandMenuOpen && onClick?.(), { event: 'keydown' }, [
     isCommandMenuOpen,
-    onClick
+    onClick,
   ])
 
   return (

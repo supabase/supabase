@@ -674,7 +674,7 @@ class HUDScene implements BaseScene {
     //     labels: ['2005', '2027', '2049', '2071', '2093', '2115', '2137'],
     //   })
     // }
-    
+
     if (sizes.bars.visible) {
       this.drawBarControl(ctx, sizes.bars.coords[0], {
         label: 'PAYLOAD SATURATION',
@@ -1064,7 +1064,7 @@ class HUDScene implements BaseScene {
           ])
         ) as typeof this.resolutionsTicketLayout,
 
-        narrow:  Object.fromEntries(
+        narrow: Object.fromEntries(
           Object.entries(this.resolutionsNarrowLayout).map(([key, resolutions]) => [
             key,
             JSON.parse(JSON.stringify(resolutions), (key, value) => {
@@ -1072,7 +1072,6 @@ class HUDScene implements BaseScene {
             }),
           ])
         ) as typeof this.resolutionsNarrowLayout,
-
       }
 
       // Redraw the HUD with new dimensions

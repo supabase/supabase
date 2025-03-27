@@ -1,4 +1,12 @@
-import { ColorManagement, HalfFloatType, PerspectiveCamera, Scene, SRGBColorSpace, WebGLRenderer, WebGLRenderTarget } from 'three'
+import {
+  ColorManagement,
+  HalfFloatType,
+  PerspectiveCamera,
+  Scene,
+  SRGBColorSpace,
+  WebGLRenderer,
+  WebGLRenderTarget,
+} from 'three'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
 
 export interface MousePositionState {
@@ -87,7 +95,7 @@ class SceneRenderer {
       this.waitFor?.filter((t) => t.renderer !== this).map((t) => t.init) || []
     )
 
-    if(this._isDisposed) {
+    if (this._isDisposed) {
       console.log('SCENE RENDERER: Already disposed before sceneInitializer', this.uuid)
       return
     }
@@ -96,7 +104,7 @@ class SceneRenderer {
 
     await sceneInitializer()
 
-    if(this._isDisposed) {
+    if (this._isDisposed) {
       console.log('SCENE RENDERER: Already disposed after sceneInitializer', this.uuid)
       return
     }
@@ -119,24 +127,23 @@ class SceneRenderer {
 
     this._mouseMoveHandler = this._updateMousePosition.bind(this)
     window.addEventListener('mousemove', this._mouseMoveHandler)
-    
+
     // Add device pixel ratio change listener
     this._mediaQueryListHandler = this._handleDevicePixelRatioChange.bind(this)
-    window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`).addEventListener(
-      'change', 
-      this._mediaQueryListHandler
-    )
+    window
+      .matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`)
+      .addEventListener('change', this._mediaQueryListHandler)
   }
 
   async activateScene(scene: BaseScene, main?: boolean) {
-    if(this._isDisposed) {
+    if (this._isDisposed) {
       console.log('SCENE RENDERER: Already disposed before activateScene', this.uuid)
       return
     }
 
     const threeScene = await scene.setup(this)
 
-    if(this._isDisposed) {
+    if (this._isDisposed) {
       console.log('SCENE RENDERER: Already disposed after activateScene', this.uuid)
       return
     }
@@ -185,17 +192,16 @@ class SceneRenderer {
       window.removeEventListener('resize', this._resizeHandler)
       this._resizeHandler = null
     }
-    
+
     if (this._mouseMoveHandler) {
       window.removeEventListener('mousemove', this._mouseMoveHandler)
       this._mouseMoveHandler = null
     }
-    
+
     if (this._mediaQueryListHandler) {
-      window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`).removeEventListener(
-        'change', 
-        this._mediaQueryListHandler
-      )
+      window
+        .matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`)
+        .removeEventListener('change', this._mediaQueryListHandler)
       this._mediaQueryListHandler = null
     }
 
@@ -220,26 +226,28 @@ class SceneRenderer {
       activeScene.resize(ev)
     }
   }
-  
+
   private _handleDevicePixelRatioChange(ev: MediaQueryListEvent) {
     const oldPixelRatio = this.currentPixelRatio
     const newPixelRatio = window.devicePixelRatio
-    
+
     // Update renderer and composer pixel ratio
     this.renderer.setPixelRatio(newPixelRatio)
     this.composer.setPixelRatio(newPixelRatio)
-    
+
     // Store the new pixel ratio
     this.currentPixelRatio = newPixelRatio
-    
+
     // Notify all active scenes about the pixel ratio change
     for (const activeScene of this.activeScenes) {
       if (typeof activeScene.devicePixelRatioChanged === 'function') {
         activeScene.devicePixelRatioChanged(newPixelRatio, oldPixelRatio)
       }
     }
-    
-    console.log(`SCENE RENDERER: Device pixel ratio changed from ${oldPixelRatio} to ${newPixelRatio}`)
+
+    console.log(
+      `SCENE RENDERER: Device pixel ratio changed from ${oldPixelRatio} to ${newPixelRatio}`
+    )
   }
 
   private _decayMouseIntensity() {

@@ -102,7 +102,7 @@ export const lwReducer = (state: LwState, action: LwAction): LwState => {
       return {
         ...state,
         session: null,
-        ticketState: "registration", 
+        ticketState: 'registration',
         userTicketDataState: 'error',
         userTicketDataError: action.payload,
       }

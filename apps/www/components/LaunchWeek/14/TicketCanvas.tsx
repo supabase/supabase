@@ -54,7 +54,6 @@ const TicketCanvas = ({ className, onUpgradeToSecret, narrow }: TicketCanvasProp
           },
         })
 
-
         await sceneRenderer.activateScene(scene, true)
 
         sceneRef.current = scene
