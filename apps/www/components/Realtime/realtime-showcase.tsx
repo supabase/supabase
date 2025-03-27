@@ -9,13 +9,11 @@ import WhiteboardExample from './examples/whiteboard-example'
 import TicTacToeExample from './examples/tic-tac-toe-example'
 import EmojiPickerExample from './examples/emoji-picker-example'
 import Platformer3DExample from './examples/platformer-3d-example'
-import FPSExample from './examples/fps-example'
 import IframeAnnotationExample from './examples/iframe-annotation-example'
-import CarRacingExample from './examples/car-racing-example'
 import LogViewerExample from './examples/log-viewer-example'
 import FormPresenceExample from './examples/form-presence-example'
 import CursorTrackingExample from './examples/cursor-tracking-example'
-import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import {
   Users,
   MessageSquare,
@@ -26,11 +24,9 @@ import {
   Smile,
   Gamepad2,
   StickyNote,
-  Car,
   FileText,
   ClipboardList,
   MousePointer,
-  Crosshair,
 } from 'lucide-react'
 import { useState, useCallback } from 'react'
 import ExampleLayout from './example-layout'
