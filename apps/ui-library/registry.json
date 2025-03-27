@@ -14,7 +14,7 @@
         {
           "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/login/page.tsx",
           "type": "registry:page",
-          "target": "app/login/page.tsx"
+          "target": "app/auth/login/page.tsx"
         },
         {
           "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/error/page.tsx",
@@ -43,12 +43,12 @@
         {
           "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/sign-up/page.tsx",
           "type": "registry:page",
-          "target": "app/sign-up/page.tsx"
+          "target": "app/auth/sign-up/page.tsx"
         },
         {
           "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/sign-up-success/page.tsx",
           "type": "registry:page",
-          "target": "app/sign-up-success/page.tsx"
+          "target": "app/auth/sign-up-success/page.tsx"
         },
         {
           "path": "registry/default/blocks/password-based-auth-nextjs/components/sign-up-form.tsx",
@@ -57,12 +57,12 @@
         {
           "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/forgot-password/page.tsx",
           "type": "registry:page",
-          "target": "app/forgot-password/page.tsx"
+          "target": "app/auth/forgot-password/page.tsx"
         },
         {
           "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/update-password/page.tsx",
           "type": "registry:page",
-          "target": "app/update-password/page.tsx"
+          "target": "app/auth/update-password/page.tsx"
         },
         {
           "path": "registry/default/blocks/password-based-auth-nextjs/components/forgot-password-form.tsx",
@@ -70,6 +70,10 @@
         },
         {
           "path": "registry/default/blocks/password-based-auth-nextjs/components/update-password-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-nextjs/components/logout-button.tsx",
           "type": "registry:component"
         },
         {
