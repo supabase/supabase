@@ -6,7 +6,7 @@ import { BlockItemCode } from './block-item-code'
 
 export async function RegistryBlock({ itemName }: { itemName: string }) {
   const registryPath = path.join(process.cwd(), 'public', 'r', `${itemName}.json`)
-  const tree = generateRegistryTree(itemName, registryPath)
+  const tree = generateRegistryTree(registryPath)
 
   return <BlockItemCode files={tree} />
 }

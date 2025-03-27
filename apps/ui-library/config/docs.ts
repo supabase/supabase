@@ -46,6 +46,12 @@ export const frameworkPages: Record<string, SidebarNavGroup> = {
     title: 'Next.js',
     items: [
       {
+        title: 'Client',
+        href: '/docs/nextjs/client',
+        items: [],
+        commandItemLabel: 'Supabase Client for Next.js',
+      },
+      {
         title: 'Password-Based Auth',
         href: '/docs/nextjs/password-based-auth',
         items: [],
@@ -69,6 +75,12 @@ export const frameworkPages: Record<string, SidebarNavGroup> = {
     title: 'React Router',
     items: [
       {
+        title: 'Client',
+        href: '/docs/react-router/client',
+        items: [],
+        commandItemLabel: 'Supabase Client for React Router',
+      },
+      {
         title: 'Dropzone',
         href: '/docs/react-router/dropzone',
         items: [],
@@ -86,6 +98,18 @@ export const frameworkPages: Record<string, SidebarNavGroup> = {
     title: 'Tanstack Start',
     items: [
       {
+        title: 'Client',
+        href: '/docs/tanstack/client',
+        items: [],
+        commandItemLabel: 'Supabase Client for Tanstack Start',
+      },
+      {
+        title: 'Password-Based Auth',
+        href: '/docs/tanstack/password-based-auth',
+        items: [],
+        commandItemLabel: 'Password-Based Auth for Tanstack Start',
+      },
+      {
         title: 'Dropzone',
         href: '/docs/tanstack/dropzone',
         items: [],
@@ -100,8 +124,14 @@ export const frameworkPages: Record<string, SidebarNavGroup> = {
     ],
   },
   react: {
-    title: 'React',
+    title: 'React SPA',
     items: [
+      {
+        title: 'Client',
+        href: '/docs/react/client',
+        items: [],
+        commandItemLabel: 'Supabase Client for React SPA',
+      },
       {
         title: 'Password-Based Auth',
         href: '/docs/react/password-based-auth',

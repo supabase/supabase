@@ -3965,7 +3965,17 @@ export interface components {
   schemas: {
     AccessControlPermission: {
       actions: string[] | null
-      condition: Record<string, never>
+      condition:
+        | (
+            | string
+            | number
+            | boolean
+            | unknown[]
+            | {
+                [key: string]: unknown
+              }
+          )
+        | null
       organization_id: number | null
       organization_slug: string
       project_ids: number[] | null
@@ -4032,7 +4042,7 @@ export interface components {
       role_scoped_projects?: string[]
     }
     AuditLogsResponse: {
-      result: Record<string, never>[]
+      result: unknown[]
       retention_period: number
     }
     AuthBackupAdminLintResponseDto: {
@@ -4134,12 +4144,15 @@ export interface components {
     }
     BillingCustomerUpdateBody: {
       additional_emails?: string[]
-      address?: components['schemas']['CustomerBillingAddress']
+      address?: {
+        city?: string
+        country: string
+        line1: string
+        line2?: string
+        postal_code?: string
+        state?: string
+      }
     }
-    /** @enum {string} */
-    BillingPlanChangeType: 'upgrade' | 'downgrade' | 'none'
-    /** @enum {string} */
-    BillingPlanEffectiveAt: 'now' | 'end_of_billing_period' | 'none'
     /** @enum {string} */
     BillingPlanId: 'free' | 'pro' | 'team' | 'enterprise'
     BillingProjectAddonResponse: {
@@ -4379,7 +4392,7 @@ export interface components {
       payment_method?: string
       size?: string
       /** @enum {string} */
-      tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
+      tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | 'tier_enterprise'
     }
     CreatePipelineResponse: {
       id: number
@@ -4494,8 +4507,8 @@ export interface components {
       id: number
     }
     CreateStorageBucketBody: {
-      allowed_mime_types: string[]
-      file_size_limit: number
+      allowed_mime_types?: string[]
+      file_size_limit?: number
       id: string
       public: boolean
     }
@@ -4562,7 +4575,9 @@ export interface components {
       email_change_token_new?: string
       email_confirmed_at?: string
       encrypted_password?: string
+      /** Format: uuid */
       id?: string
+      /** Format: uuid */
       instance_id?: string
       invited_at?: string
       is_anonymous?: boolean
@@ -4574,8 +4589,12 @@ export interface components {
       phone_change_sent_at?: string
       phone_change_token?: string
       phone_confirmed_at?: string
-      raw_app_meta_data?: Record<string, never>
-      raw_user_meta_data?: Record<string, never>
+      raw_app_meta_data?: {
+        [key: string]: unknown
+      }
+      raw_user_meta_data?: {
+        [key: string]: unknown
+      }
       reauthentication_sent_at?: string
       reauthentication_token?: string
       recovery_sent_at?: string
@@ -4622,17 +4641,16 @@ export interface components {
         | 'requires_payment_method'
         | 'succeeded'
     }
-    CustomerBillingAddress: {
-      city?: string
-      country: string
-      line1: string
-      line2?: string
-      postal_code?: string
-      state?: string
-    }
     CustomerResponse: {
       additional_emails: string[] | null
-      address: components['schemas']['CustomerBillingAddress'] | null
+      address?: {
+        city?: string
+        country: string
+        line1: string
+        line2?: string
+        postal_code?: string
+        state?: string
+      }
       balance: number
       billing_via_partner: boolean
       email: string
@@ -4823,13 +4841,20 @@ export interface components {
       fileUrl: string
     }
     DownloadObjectBody: {
-      options?: components['schemas']['DownloadObjectOptions']
+      options?: {
+        download?: boolean
+        downloadName?: string
+        transform?: {
+          /** @enum {string} */
+          format?: 'origin'
+          height?: number
+          quality?: number
+          /** @enum {string} */
+          resize?: 'cover' | 'contain' | 'fill'
+          width?: number
+        }
+      }
       path: string
-    }
-    DownloadObjectOptions: {
-      download?: boolean
-      downloadName?: string
-      transform?: components['schemas']['StorageObjectTransformOptions']
     }
     FormatQueryBody: {
       query: string
@@ -4934,7 +4959,15 @@ export interface components {
       website: string
     }
     GetObjectsBody: {
-      options: components['schemas']['StorageObjectSearchOptions']
+      options?: {
+        limit?: number
+        offset?: number
+        search?: string
+        sortBy?: {
+          column?: string
+          order?: string
+        }
+      }
       path: string
     }
     GetOrganizationByFlyOrganizationIdResponse: {
@@ -5020,26 +5053,52 @@ export interface components {
       title: string
     }[]
     GetPublicUrlBody: {
-      options?: components['schemas']['PublicUrlOptions']
+      options?: {
+        download?: boolean
+        downloadName?: string
+        transform?: {
+          /** @enum {string} */
+          format?: 'origin'
+          height?: number
+          quality?: number
+          /** @enum {string} */
+          resize?: 'cover' | 'contain' | 'fill'
+          width?: number
+        }
+      }
       path: string
     }
     GetSignedUrlBody: {
       expiresIn: number
-      options?: components['schemas']['SignedUrlOptions']
+      options?: {
+        download?: boolean
+        downloadName?: string
+        transform?: {
+          /** @enum {string} */
+          format?: 'origin'
+          height?: number
+          quality?: number
+          /** @enum {string} */
+          resize?: 'cover' | 'contain' | 'fill'
+          width?: number
+        }
+      }
       path: string
     }
     GetSignedUrlsBody: {
       expiresIn: number
-      options?: components['schemas']['SignedUrlsOptions']
+      options?: {
+        download?: boolean
+        downloadName?: string
+      }
       path: string[]
     }
-    GetStorageCredential: {
-      created_at: string
-      description: string
-      id: string
-    }
     GetStorageCredentialsResponse: {
-      data: components['schemas']['GetStorageCredential'][]
+      data: {
+        created_at: string
+        description: string
+        id: string
+      }[]
     }
     GetSubscriptionResponse: {
       addons: components['schemas']['BillingSubscriptionAddon'][]
@@ -5143,7 +5202,7 @@ export interface components {
       }
       projects: components['schemas']['IntegrationVercelProject'][]
     }
-    GitHubAuthorization: {
+    GitHubAuthorizationResponse: {
       id: number
       sender_id: number
       user_id: number
@@ -5341,12 +5400,6 @@ export interface components {
       link?: components['schemas']['VercelProjectLink']
       name: string
     }
-    Invitation: {
-      id: number
-      invited_at: string
-      invited_email: string
-      role_id: number
-    }
     InvitationByTokenResponse: {
       authorized_user: boolean
       email_match: boolean
@@ -5357,7 +5410,12 @@ export interface components {
       token_does_not_exist: boolean
     }
     InvitationResponse: {
-      invitations: components['schemas']['Invitation'][]
+      invitations: {
+        id: number
+        invited_at: string
+        invited_email: string
+        role_id: number
+      }[]
     }
     Invoice: {
       amount_due: number
@@ -5490,14 +5548,13 @@ export interface components {
         project_ref: string
       }[]
     }
-    LoadBalancerDatabase: {
-      identifier: string
-      status: string
-      /** @enum {string} */
-      type: 'PRIMARY' | 'READ_REPLICA'
-    }
     LoadBalancerDetailResponse: {
-      databases: components['schemas']['LoadBalancerDatabase'][]
+      databases: {
+        identifier: string
+        status: string
+        /** @enum {string} */
+        type: 'PRIMARY' | 'READ_REPLICA'
+      }[]
       endpoint: string
     }
     MarkDefaultPaymentMethodBody: {
@@ -5509,7 +5566,9 @@ export interface components {
     Member: {
       gotrue_id: string
       is_sso_user: boolean | null
-      metadata: Record<string, never> | null
+      metadata: {
+        [key: string]: unknown
+      }
       mfa_enabled: boolean
       primary_email: string | null
       role_ids: number[]
@@ -5611,7 +5670,9 @@ export interface components {
       is_owner: boolean
       name: string
       opt_in_tags: string[]
-      restriction_data: Record<string, never>
+      restriction_data: {
+        [key: string]: string
+      } | null
       /** @enum {string|null} */
       restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
       slug: string
@@ -5619,15 +5680,20 @@ export interface components {
       subscription_id: string | null
     }
     OrganizationRoleResponse: {
-      org_scoped_roles: components['schemas']['OrganizationRoleV2'][]
-      project_scoped_roles: components['schemas']['OrganizationRoleV2'][]
-    }
-    OrganizationRoleV2: {
-      base_role_id: number
-      description: string | null
-      id: number
-      name: string
-      project_ids: number[] | null
+      org_scoped_roles: {
+        base_role_id: number
+        description: string | null
+        id: number
+        name: string
+        project_ids: number[] | null
+      }[]
+      project_scoped_roles: {
+        base_role_id: number
+        description: string | null
+        id: number
+        name: string
+        project_ids: number[] | null
+      }[]
     }
     OrganizationSlugAvailableVersionsBodyDto: {
       provider: string
@@ -5681,62 +5747,66 @@ export interface components {
     OrgDocumentUrlResponse: {
       fileUrl: string
     }
-    OrgMetricUsage: {
-      available_in_plan: boolean
-      capped: boolean
-      cost: number
-      /** @enum {string} */
-      metric:
-        | 'EGRESS'
-        | 'DATABASE_SIZE'
-        | 'STORAGE_SIZE'
-        | 'MONTHLY_ACTIVE_USERS'
-        | 'MONTHLY_ACTIVE_SSO_USERS'
-        | 'FUNCTION_INVOCATIONS'
-        | 'STORAGE_IMAGES_TRANSFORMED'
-        | 'REALTIME_MESSAGE_COUNT'
-        | 'REALTIME_PEAK_CONNECTIONS'
-        | 'DISK_SIZE_GB_HOURS_GP3'
-        | 'DISK_SIZE_GB_HOURS_IO2'
-        | 'AUTH_MFA_PHONE'
-        | 'AUTH_MFA_WEB_AUTHN'
-        | 'LOG_DRAIN_EVENTS'
-        | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
-        | 'DISK_THROUGHPUT_GP3'
-        | 'DISK_IOPS_GP3'
-        | 'DISK_IOPS_IO2'
-        | 'COMPUTE_HOURS_BRANCH'
-        | 'COMPUTE_HOURS_XS'
-        | 'COMPUTE_HOURS_SM'
-        | 'COMPUTE_HOURS_MD'
-        | 'COMPUTE_HOURS_L'
-        | 'COMPUTE_HOURS_XL'
-        | 'COMPUTE_HOURS_2XL'
-        | 'COMPUTE_HOURS_4XL'
-        | 'COMPUTE_HOURS_8XL'
-        | 'COMPUTE_HOURS_12XL'
-        | 'COMPUTE_HOURS_16XL'
-        | 'CUSTOM_DOMAIN'
-        | 'PITR_7'
-        | 'PITR_14'
-        | 'PITR_28'
-        | 'IPV4'
-        | 'LOG_DRAIN'
-      pricing_free_units?: number
-      pricing_package_price?: number
-      pricing_package_size?: number
-      pricing_per_unit_price?: number
-      /** @enum {string} */
-      pricing_strategy: 'UNIT' | 'PACKAGE' | 'TIERED' | 'NONE'
-      project_allocations: components['schemas']['ProjectAllocation'][]
-      unit_price_desc: string
-      unlimited: boolean
-      usage: number
-      usage_original: number
-    }
     OrgUsageResponse: {
       usage_billing_enabled: boolean
-      usages: components['schemas']['OrgMetricUsage'][]
+      usages: {
+        available_in_plan: boolean
+        capped: boolean
+        cost: number
+        /** @enum {string} */
+        metric:
+          | 'EGRESS'
+          | 'DATABASE_SIZE'
+          | 'STORAGE_SIZE'
+          | 'MONTHLY_ACTIVE_USERS'
+          | 'MONTHLY_ACTIVE_SSO_USERS'
+          | 'FUNCTION_INVOCATIONS'
+          | 'STORAGE_IMAGES_TRANSFORMED'
+          | 'REALTIME_MESSAGE_COUNT'
+          | 'REALTIME_PEAK_CONNECTIONS'
+          | 'DISK_SIZE_GB_HOURS_GP3'
+          | 'DISK_SIZE_GB_HOURS_IO2'
+          | 'AUTH_MFA_PHONE'
+          | 'AUTH_MFA_WEB_AUTHN'
+          | 'LOG_DRAIN_EVENTS'
+          | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+          | 'DISK_THROUGHPUT_GP3'
+          | 'DISK_IOPS_GP3'
+          | 'DISK_IOPS_IO2'
+          | 'COMPUTE_HOURS_BRANCH'
+          | 'COMPUTE_HOURS_XS'
+          | 'COMPUTE_HOURS_SM'
+          | 'COMPUTE_HOURS_MD'
+          | 'COMPUTE_HOURS_L'
+          | 'COMPUTE_HOURS_XL'
+          | 'COMPUTE_HOURS_2XL'
+          | 'COMPUTE_HOURS_4XL'
+          | 'COMPUTE_HOURS_8XL'
+          | 'COMPUTE_HOURS_12XL'
+          | 'COMPUTE_HOURS_16XL'
+          | 'CUSTOM_DOMAIN'
+          | 'PITR_7'
+          | 'PITR_14'
+          | 'PITR_28'
+          | 'IPV4'
+          | 'LOG_DRAIN'
+        pricing_free_units?: number
+        pricing_package_price?: number
+        pricing_package_size?: number
+        pricing_per_unit_price?: number
+        /** @enum {string} */
+        pricing_strategy: 'UNIT' | 'PACKAGE' | 'TIERED' | 'NONE'
+        project_allocations: {
+          hours?: number
+          name: string
+          ref: string
+          usage: number
+        }[]
+        unit_price_desc: string
+        unlimited: boolean
+        usage: number
+        usage_original: number
+      }[]
     }
     OverdueInvoiceCount: {
       organization_id: number
@@ -5747,11 +5817,11 @@ export interface components {
     }
     PasswordCheckResponse: {
       result: {
-        feedback?: {
-          suggestions?: string[]
-          warning?: string
+        feedback: {
+          suggestions: string[]
+          warning: string
         }
-        score?: number
+        score: number
       }
     }
     PauseStatusResponse: {
@@ -5798,16 +5868,18 @@ export interface components {
     PgbouncerStatusResponse: {
       active: boolean
     }
-    PlanResponse: {
-      change_type: components['schemas']['BillingPlanChangeType']
-      effective_at: components['schemas']['BillingPlanEffectiveAt']
-      id: components['schemas']['BillingPlanId']
-      is_current: boolean
-      name: string
-      price: number
-    }
     PlansResponse: {
-      plans: components['schemas']['PlanResponse'][]
+      plans: {
+        /** @enum {string} */
+        change_type: 'upgrade' | 'downgrade' | 'none'
+        /** @enum {string} */
+        effective_at?: 'now' | 'end_of_billing_period' | 'none'
+        /** @enum {string} */
+        id: 'free' | 'pro' | 'team' | 'enterprise'
+        is_current: boolean
+        name: string
+        price: number
+      }[]
     }
     PointInTimeRestoreBody: {
       recovery_time_target_unix: number
@@ -5878,7 +5950,27 @@ export interface components {
       schema: string | null
     }
     PostgresForeignTable: {
-      columns?: components['schemas']['PostgresColumn'][]
+      columns?: {
+        check: string | null
+        comment: string | null
+        data_type: string
+        default_value: (string | number) | null
+        enums: string[]
+        format: string
+        id: string
+        /** @enum {string|null} */
+        identity_generation: 'BY DEFAULT' | 'ALWAYS' | null
+        is_generated: boolean
+        is_identity: boolean
+        is_nullable: boolean
+        is_unique: boolean
+        is_updatable: boolean
+        name: string
+        ordinal_position: number
+        schema: string
+        table: string
+        table_id: number
+      }[]
       comment: string | null
       id: number
       name: string
@@ -5900,7 +5992,27 @@ export interface components {
       security_definer: boolean
     }
     PostgresMaterializedView: {
-      columns?: components['schemas']['PostgresColumn'][]
+      columns?: {
+        check: string | null
+        comment: string | null
+        data_type: string
+        default_value: (string | number) | null
+        enums: string[]
+        format: string
+        id: string
+        /** @enum {string|null} */
+        identity_generation: 'BY DEFAULT' | 'ALWAYS' | null
+        is_generated: boolean
+        is_identity: boolean
+        is_nullable: boolean
+        is_unique: boolean
+        is_updatable: boolean
+        name: string
+        ordinal_position: number
+        schema: string
+        table: string
+        table_id: number
+      }[]
       comment: string | null
       id: number
       is_populated: boolean
@@ -5980,7 +6092,27 @@ export interface components {
       schema: string
     }
     PostgresView: {
-      columns?: components['schemas']['PostgresColumn'][]
+      columns?: {
+        check: string | null
+        comment: string | null
+        data_type: string
+        default_value: (string | number) | null
+        enums: string[]
+        format: string
+        id: string
+        /** @enum {string|null} */
+        identity_generation: 'BY DEFAULT' | 'ALWAYS' | null
+        is_generated: boolean
+        is_identity: boolean
+        is_nullable: boolean
+        is_unique: boolean
+        is_updatable: boolean
+        name: string
+        ordinal_position: number
+        schema: string
+        table: string
+        table_id: number
+      }[]
       comment: string | null
       id: number
       is_updatable: boolean
@@ -6089,12 +6221,6 @@ export interface components {
       price_description: string
       price_interval: components['schemas']['ProjectAddonPricingInterval']
       price_type: components['schemas']['ProjectAddonVariantPricingType']
-    }
-    ProjectAllocation: {
-      hours?: number
-      name: string
-      ref: string
-      usage: number
     }
     ProjectAppConfigResponse: {
       db_schema: string
@@ -6280,11 +6406,6 @@ export interface components {
       region: string
       status: components['schemas']['project_status']
     }
-    PublicUrlOptions: {
-      download?: boolean
-      downloadName?: string
-      transform?: components['schemas']['StorageObjectTransformOptions']
-    }
     PublicUrlResponse: {
       publicUrl: string
     }
@@ -6427,13 +6548,15 @@ export interface components {
       }[]
     }
     ResetPasswordBody: {
+      /** Format: email */
       email: string
+      /** Format: uri */
       redirectTo?: string
     }
     ResizeBody: {
       volume_size_gb: number
     }
-    RestartProjectBodyDto: {
+    RestartProjectBody: {
       database_identifier?: string
     }
     RestartServiceRequest: {
@@ -6571,19 +6694,14 @@ export interface components {
     }
     SetupIntentResponse: {
       client_secret: string
-      payment_method: Record<string, never>
-    }
-    SignedUrlOptions: {
-      download?: boolean
-      downloadName?: string
-      transform?: components['schemas']['StorageObjectTransformOptions']
+      payment_method:
+        | string
+        | {
+            [key: string]: unknown
+          }
     }
     SignedUrlResponse: {
       signedUrl: string
-    }
-    SignedUrlsOptions: {
-      download?: boolean
-      downloadName?: string
     }
     SignedUrlsResponse: {
       error: string | null
@@ -6591,11 +6709,13 @@ export interface components {
       signedUrl: string
     }
     SignUpBody: {
+      /** Format: email */
       email: string
       password: string
+      /** Format: uri */
       redirectTo?: string
     }
-    StorageBucket: {
+    StorageBucketResponse: {
       created_at: string
       id: string
       name: string
@@ -6620,33 +6740,23 @@ export interface components {
     }
     StorageObject: {
       bucket_id: string
-      buckets: components['schemas']['StorageBucket']
+      buckets: {
+        created_at: string
+        id: string
+        name: string
+        owner: string
+        public: boolean
+        updated_at: string
+      }
       created_at: string
       id: string
       last_accessed_at: string
-      metadata: Record<string, never>
+      metadata: {
+        [key: string]: unknown
+      }
       name: string
       owner: string
       updated_at: string
-    }
-    StorageObjectSearchOptions: {
-      limit?: number
-      offset?: number
-      search?: string
-      sortBy?: components['schemas']['StorageObjectSortBy']
-    }
-    StorageObjectSortBy: {
-      column?: string
-      order?: string
-    }
-    StorageObjectTransformOptions: {
-      /** @enum {string} */
-      format?: 'origin'
-      height?: number
-      quality?: number
-      /** @enum {string} */
-      resize?: 'cover' | 'contain' | 'fill'
-      width?: number
     }
     SupavisorConfigResponse: {
       connection_string: string
@@ -6763,8 +6873,9 @@ export interface components {
       pathname: string
     }
     TransferOrganizationBody: {
+      /** Format: uuid */
       member_gotrue_id: string
-      member_id: number
+      member_id?: number
       org_id: number
     }
     TransferProjectBody: {
@@ -7159,8 +7270,8 @@ export interface components {
       max_rows: number
     }
     UpdateProfileBody: {
-      first_name: string
-      last_name: string
+      first_name?: string
+      last_name?: string
     }
     UpdateProjectBody: {
       name: string
@@ -7230,8 +7341,8 @@ export interface components {
       message: string
     }
     UpdateStorageBucketBody: {
-      allowed_mime_types: string[]
-      file_size_limit: number
+      allowed_mime_types?: string[]
+      file_size_limit?: number
       public: boolean
     }
     UpdateStorageConfigBody: {
@@ -7304,7 +7415,9 @@ export interface components {
       email_change_token_new?: string
       email_confirmed_at?: string
       encrypted_password?: string
+      /** Format: uuid */
       id?: string
+      /** Format: uuid */
       instance_id?: string
       invited_at?: string
       is_anonymous?: boolean
@@ -7316,8 +7429,12 @@ export interface components {
       phone_change_sent_at?: string
       phone_change_token?: string
       phone_confirmed_at?: string
-      raw_app_meta_data?: Record<string, never>
-      raw_user_meta_data?: Record<string, never>
+      raw_app_meta_data?: {
+        [key: string]: unknown
+      }
+      raw_user_meta_data?: {
+        [key: string]: unknown
+      }
       reauthentication_sent_at?: string
       reauthentication_token?: string
       recovery_sent_at?: string
@@ -7346,6 +7463,10 @@ export interface components {
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
     }
+    UserAuditLogsResponse: {
+      result: unknown[]
+      retention_period: number
+    }
     UserBody: {
       aud?: string
       banned_until?: string
@@ -7362,7 +7483,9 @@ export interface components {
       email_change_token_new?: string
       email_confirmed_at?: string
       encrypted_password?: string
+      /** Format: uuid */
       id?: string
+      /** Format: uuid */
       instance_id?: string
       invited_at?: string
       is_anonymous?: boolean
@@ -7374,8 +7497,12 @@ export interface components {
       phone_change_sent_at?: string
       phone_change_token?: string
       phone_confirmed_at?: string
-      raw_app_meta_data?: Record<string, never>
-      raw_user_meta_data?: Record<string, never>
+      raw_app_meta_data?: {
+        [key: string]: unknown
+      }
+      raw_user_meta_data?: {
+        [key: string]: unknown
+      }
       reauthentication_sent_at?: string
       reauthentication_token?: string
       recovery_sent_at?: string
@@ -7434,12 +7561,11 @@ export interface components {
       subject: string
     }
     ValidateSpamResponse: {
-      rules: components['schemas']['ValidateSpamRule'][]
-    }
-    ValidateSpamRule: {
-      desc: string
-      name: string
-      score: number
+      rules: {
+        desc: string
+        name: string
+        score: number
+      }[]
     }
     VercelProjectDeployHooks: {
       createdAt?: number
@@ -7461,7 +7587,7 @@ export interface components {
       branch_id: string
       check_run_id: number | null
       created_at: string
-      git_config: Record<string, never> | null
+      git_config?: unknown
       id: string
       /** @enum {string} */
       status:
@@ -7780,7 +7906,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -7820,7 +7945,6 @@ export interface operations {
       header?: never
       path: {
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -7854,7 +7978,6 @@ export interface operations {
       header?: never
       path: {
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -8355,8 +8478,8 @@ export interface operations {
     parameters: {
       query: {
         id: number
-        limit?: string
-        offset?: string
+        limit: number
+        offset: number
       }
       header: {
         'x-connection-encrypted': string
@@ -8583,7 +8706,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['GitHubAuthorization']
+          'application/json': components['schemas']['GitHubAuthorizationResponse']
         }
       }
       /** @description Failed to get GitHub authorization */
@@ -9188,7 +9311,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Oauth authorization id */
         id: string
       }
       cookie?: never
@@ -9348,11 +9470,9 @@ export interface operations {
   }
   OrgAuditLogsController_getAuditLogs: {
     parameters: {
-      query?: {
-        /** @description End timestamp */
-        iso_timestamp_end?: string
-        /** @description Start timestamp */
-        iso_timestamp_start?: string
+      query: {
+        iso_timestamp_end: string
+        iso_timestamp_start: string
       }
       header?: never
       path: {
@@ -9787,7 +9907,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -9816,7 +9935,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -9998,7 +10116,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10028,7 +10145,6 @@ export interface operations {
       header?: never
       path: {
         gotrue_id: string
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10056,7 +10172,6 @@ export interface operations {
       header?: never
       path: {
         gotrue_id: string
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10089,7 +10204,6 @@ export interface operations {
       path: {
         gotrue_id: string
         role_id: string
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10122,7 +10236,6 @@ export interface operations {
       path: {
         gotrue_id: string
         role_id: string
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10149,7 +10262,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10178,7 +10290,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10210,7 +10321,6 @@ export interface operations {
       header?: never
       path: {
         id: number
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10237,7 +10347,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
         token: string
       }
@@ -10267,7 +10376,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
         token: string
       }
@@ -10326,7 +10434,6 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10354,7 +10461,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10474,9 +10580,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Oauth authorization id */
         id: string
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10504,9 +10608,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Oauth authorization id */
         id: string
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10885,7 +10987,6 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -12831,11 +12932,9 @@ export interface operations {
   }
   UserAuditLogsController_getAuditLogs: {
     parameters: {
-      query?: {
-        /** @description End timestamp */
-        iso_timestamp_end?: string
-        /** @description Start timestamp */
-        iso_timestamp_start?: string
+      query: {
+        iso_timestamp_end: string
+        iso_timestamp_start: string
       }
       header?: never
       path?: never
@@ -12848,7 +12947,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['AuditLogsResponse']
+          'application/json': components['schemas']['UserAuditLogsResponse']
         }
       }
       /** @description Failed to get a user's audit logs */
@@ -15672,7 +15771,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['RestartProjectBodyDto']
+        'application/json': components['schemas']['RestartProjectBody']
       }
     }
     responses: {
@@ -17012,7 +17111,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17024,7 +17122,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['StorageBucket'][]
+          'application/json': components['schemas']['StorageBucketResponse'][]
         }
       }
       403: {
@@ -17047,7 +17145,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17086,9 +17183,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17100,7 +17195,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['StorageBucket']
+          'application/json': components['schemas']['StorageBucketResponse']
         }
       }
       403: {
@@ -17123,9 +17218,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17158,9 +17251,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17197,9 +17288,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17232,9 +17321,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
+        /** @description Bucket ID */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17271,9 +17359,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
+        /** @description Bucket ID */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17312,9 +17399,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
+        /** @description Bucket ID */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17351,9 +17437,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
+        /** @description Bucket ID */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17392,9 +17477,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
+        /** @description Bucket ID */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17431,9 +17515,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
+        /** @description Bucket ID */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17472,9 +17555,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
+        /** @description Bucket ID */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17513,9 +17595,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
+        /** @description Bucket ID */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17554,7 +17635,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17589,7 +17669,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17628,9 +17707,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage credential id */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -18005,7 +18082,6 @@ export interface operations {
   VercelProjectsController_getVercelProjects: {
     parameters: {
       query: {
-        id: string
         teamId: string
       }
       header: {
@@ -18036,7 +18112,6 @@ export interface operations {
   VercelProjectsController_getVercelProject: {
     parameters: {
       query: {
-        id: string
         teamId: string
       }
       header: {
@@ -18044,7 +18119,6 @@ export interface operations {
       }
       path: {
         id: string
-        teamId: string
       }
       cookie?: never
     }
@@ -18071,7 +18145,7 @@ export interface operations {
     parameters: {
       query: {
         projectId: string
-        teamId?: string
+        teamId: string
       }
       header: {
         vercel_authorization: string
@@ -18102,7 +18176,7 @@ export interface operations {
     parameters: {
       query: {
         projectId: string
-        teamId?: string
+        teamId: string
       }
       header: {
         vercel_authorization: string
@@ -18190,11 +18264,9 @@ export interface operations {
   WorkflowRunController_listWorkflowRuns: {
     parameters: {
       query?: {
-        /** @description Branch ID */
         branch_id?: string
         limit?: number
         offset?: number
-        /** @description Project ref */
         project_ref?: string
       }
       header?: never
@@ -18223,9 +18295,7 @@ export interface operations {
   WorkflowRunController_countWorkflowRuns: {
     parameters: {
       query?: {
-        /** @description Branch ID */
         branch_id?: string
-        /** @description Project ref */
         project_ref?: string
       }
       header?: never
@@ -18256,7 +18326,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Workflow run ID */
         workflow_run_id: string
       }
       cookie?: never

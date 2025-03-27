@@ -1,5 +1,4 @@
 // @ts-check
-import { remarkCodeHike } from '@code-hike/mdx'
 import nextMdx from '@next/mdx'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
@@ -7,7 +6,6 @@ import remarkGfm from 'remark-gfm'
 import configureBundleAnalyzer from '@next/bundle-analyzer'
 import withYaml from 'next-plugin-yaml'
 
-import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import remotePatterns from './lib/remotePatterns.js'
 
 const withBundleAnalyzer = configureBundleAnalyzer({
@@ -17,17 +15,7 @@ const withBundleAnalyzer = configureBundleAnalyzer({
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [
-      [
-        remarkCodeHike,
-        {
-          theme: codeHikeTheme,
-          lineNumbers: true,
-          showCopyButton: true,
-        },
-      ],
-      remarkGfm,
-    ],
+    remarkPlugins: [remarkGfm],
     rehypePlugins: [rehypeSlug],
     providerImportSource: '@mdx-js/react',
   },
@@ -54,6 +42,13 @@ const nextConfig = {
       transform: 'lodash/{{member}}',
     },
   },
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.include$/,
+      type: 'asset/source',
+    })
+    return config
+  },
   transpilePackages: ['ui', 'ui-patterns', 'common', 'dayjs', 'shared-data', 'api-types', 'icons'],
   experimental: {
     outputFileTracingIncludes: {
@@ -65,7 +60,7 @@ const nextConfig = {
       ],
       '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
     },
-    serverComponentsExternalPackages: ['libpg-query'],
+    serverComponentsExternalPackages: ['libpg-query', 'twoslash'],
   },
   async headers() {
     return [

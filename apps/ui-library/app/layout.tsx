@@ -25,9 +25,8 @@ export default async function Layout({ children }: RootLayoutProps) {
           defaultTheme="system"
           enableSystem
         >
-          <div vaul-drawer-wrapper="">
-            <div className="relative flex min-h-screen flex-col bg-background">{children}</div>
-          </div>
+          {children}
+
           <SonnerToaster />
         </ThemeProvider>
       </body>

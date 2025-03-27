@@ -25,7 +25,7 @@ const DEFAULT_PATHS = {
 /**
  * Converts a flat registry array into a hierarchical file tree structure
  */
-export function generateRegistryTree(blockName: string, registryPath: string): RegistryNode[] {
+export function generateRegistryTree(registryPath: string): RegistryNode[] {
   const registry = JSON.parse(fs.readFileSync(registryPath, 'utf-8')) as { files: RegistryFile[] }
   const tree: RegistryNode[] = []
 
@@ -45,8 +45,9 @@ export function generateRegistryTree(blockName: string, registryPath: string): R
 
       // Remove any paths in the file content that point to the block directory.
       const content = file.content
-        .replaceAll(/@\/registry\/blocks\/.+?\//gi, '@/')
-        .replaceAll(/@\/registry\//gi, '@/')
+        .replaceAll(/@\/registry\/default\/blocks\/.+?\//gi, '@/')
+        .replaceAll(/@\/registry\/default\//gi, '@/')
+        .replaceAll(/@\/clients\/.+?\//gi, '@/')
 
       if (!node) {
         node = {
@@ -76,7 +77,9 @@ function getDefaultPath(item: RegistryFile): string {
   const type = item.type.toLowerCase() || ''
   const basePath = DEFAULT_PATHS[type as keyof typeof DEFAULT_PATHS] || ''
   // clean all paths that start with paths specific to this repo organization
-  const filePath = item.path.replace(/src\/registry\/blocks\/.+?\//, '')
+  const filePath = item.path
+    .replace(/registry\/default\/blocks\/.+?\//, '')
+    .replace(/registry\/default\/clients\/.+?\//, '')
 
   return `${basePath}/${filePath}`
 }

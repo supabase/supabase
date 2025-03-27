@@ -4,22 +4,6 @@ import { withContentlayer } from 'next-contentlayer2'
 const nextConfig = {
   transpilePackages: ['ui', 'common', 'shared-data', 'icons', 'tsconfig'],
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'avatars.githubusercontent.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'pbs.twimg.com',
-      },
-    ],
-  },
   async redirects() {
     return [
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
