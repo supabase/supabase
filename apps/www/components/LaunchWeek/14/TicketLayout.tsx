@@ -4,7 +4,7 @@ import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 
 export const TicketLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <SectionContainerWithCn height="narrow" className="font-mono">
+    <SectionContainerWithCn height="narrow" className="font-mono z-20 relative">
       {children}
     </SectionContainerWithCn>
   )

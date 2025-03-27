@@ -41,8 +41,8 @@ const Lw14Page = () => {
       <Lw14ConfDataProvider initState={{ userTicketData: defaultUserData, partymodeStatus: 'on' }}>
         <DefaultLayout className='font-["Departure_Mono"] lg:pt-32 border-b pb-0 md:pb-16 lg:!pb-[230px]'>
           <LwView />
-          <div className="w-full h-[16vh] md:h-[24vh] lg:h-[32vh] absolute bottom-0 left-0 right-0 max-w-7xl mx-auto px-6 md:px-12 lg:px-16 xl:px-20">
-            <Tunnel className="w-full h-full rotate-180" />
+          <div className="w-full absolute bottom-[calc(60%-50px)] md:bottom-[150px] left-0 right-0 -z-20">
+            <Tunnel />
           </div>
         </DefaultLayout>
       </Lw14ConfDataProvider>
