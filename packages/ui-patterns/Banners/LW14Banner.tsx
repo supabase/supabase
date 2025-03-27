@@ -2,22 +2,21 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Button } from '../../../components/Button/Button'
-import { cn } from '../../../lib/utils/cn'
-import announcement from '../data/Announcement.json'
+import announcement from './data.json'
 import Image from 'next/image'
 import { useTheme } from 'next-themes'
-// import Countdown from './Countdown'
+import { Button } from 'ui/src/components/Button'
+import { cn } from 'ui'
 
-const LW13BGDark =
+const LW14BGDark =
   'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/images/launch-week/lw13/assets/lw13-banner-dark.png?t=2024-11-22T23%3A10%3A37.646Z'
-const LW13BGLight =
+const LW14BGLight =
   'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/images/launch-week/lw13/assets/lw13-banner-light.png?t=2024-11-22T23%3A10%3A37.646Z'
 
-export function LW13CountdownBanner() {
+export function LW14Banner() {
   const pathname = usePathname()
   const { resolvedTheme } = useTheme()
-  const bgImage = resolvedTheme?.includes('dark') ? LW13BGDark : LW13BGLight
+  const bgImage = resolvedTheme?.includes('dark') ? LW14BGDark : LW14BGLight
   const isHomePage = pathname === '/'
   const isLaunchWeekPage =
     pathname === '/launch-week' || pathname?.includes('/launch-week/tickets/')
@@ -27,7 +26,7 @@ export function LW13CountdownBanner() {
   if (isLaunchWeekPage || isHomePage) return null
 
   return (
-    <div className="relative w-full p-2 flex items-center group justify-center text-foreground bg-alternative border-b border-muted transition-colors overflow-hidden">
+    <div className='relative font-["Departure_Mono"] w-full p-2 flex items-center group justify-center text-foreground bg-alternative border-b border-muted transition-colors overflow-hidden'>
       <div className="relative z-10 flex items-center justify-center">
         <div
           className={cn(
@@ -35,7 +34,7 @@ export function LW13CountdownBanner() {
             isLaunchWeekSection && '!justify-center'
           )}
         >
-          <p className="flex gap-1.5 items-center">{announcement.text}</p>
+          <p className="flex gap-1.5 items-center ">{announcement.text}</p>
           <div className="hidden sm:block text-foreground-lighter">A week of new features</div>
           <Button size="tiny" type="default" className="px-2 !leading-none text-xs" asChild>
             <Link href={announcement.link}>{announcement.cta}</Link>
@@ -55,4 +54,4 @@ export function LW13CountdownBanner() {
   )
 }
 
-export default LW13CountdownBanner
+export default LW14Banner
