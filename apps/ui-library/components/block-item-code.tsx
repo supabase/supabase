@@ -75,7 +75,7 @@ export function BlockItemCode({ files }: BlockItemCodeProps) {
   }
 
   return (
-    <div className="flex mt-8 border rounded-lg overflow-hidden h-[652px] not-prose">
+    <div className="flex mt-4 border rounded-lg overflow-hidden h-[652px] not-prose">
       {/* File browser sidebar */}
       <div className="w-64 grow-0 shrink-0 flex-0 py-2 border-r bg-muted/30 overflow-y-auto">
         <TreeView

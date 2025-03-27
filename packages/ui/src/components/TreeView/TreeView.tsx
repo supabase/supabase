@@ -133,23 +133,35 @@ const TreeViewItem = forwardRef<
       }
     }, [isLoading])
 
+    const handleBlur = () => {
+      onEditSubmit?.(localValueState)
+    }
+
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault()
       onEditSubmit?.(localValueState)
     }
 
-    const handleBlur = () => {
-      onEditSubmit?.(localValueState)
-    }
+    // [Joshen] These properties were causing console errors as they were getting passed as props to the parent div
+    const {
+      isDisabled,
+      isHalfSelected,
+      handleSelect,
+      handleExpand,
+      treeState,
+      dispatch,
+      ...divProps
+    } = props as any
 
     return (
       <div
         ref={ref}
+        {...divProps}
         aria-selected={isSelected}
         aria-expanded={!isEditing && isExpanded}
         onDoubleClick={onDoubleClick}
         {...props}
-        className={cn(TreeViewItemVariant({ isSelected, isOpened, isPreview }))}
+        className={cn(props.className, TreeViewItemVariant({ isSelected, isOpened, isPreview }))}
         style={{
           paddingLeft:
             level === 1 && !isBranch
