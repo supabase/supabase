@@ -90,22 +90,22 @@ class SceneRenderer {
   }
 
   async init(sceneInitializer: () => Promise<void>) {
-    console.log('SCENE RENDERER: Init call', this.waitFor?.length, this.uuid)
+    // console.log('SCENE RENDERER: Init call', this.waitFor?.length, this.uuid)
     await Promise.allSettled(
       this.waitFor?.filter((t) => t.renderer !== this).map((t) => t.init) || []
     )
 
     if (this._isDisposed) {
-      console.log('SCENE RENDERER: Already disposed before sceneInitializer', this.uuid)
+      // console.log('SCENE RENDERER: Already disposed before sceneInitializer', this.uuid)
       return
     }
 
-    console.log('SCENE RENDERER: Waited for all pending inits', this.waitFor?.length, this.uuid)
+    // console.log('SCENE RENDERER: Waited for all pending inits', this.waitFor?.length, this.uuid)
 
     await sceneInitializer()
 
     if (this._isDisposed) {
-      console.log('SCENE RENDERER: Already disposed after sceneInitializer', this.uuid)
+      // console.log('SCENE RENDERER: Already disposed after sceneInitializer', this.uuid)
       return
     }
 
@@ -137,14 +137,14 @@ class SceneRenderer {
 
   async activateScene(scene: BaseScene, main?: boolean) {
     if (this._isDisposed) {
-      console.log('SCENE RENDERER: Already disposed before activateScene', this.uuid)
+      // console.log('SCENE RENDERER: Already disposed before activateScene', this.uuid)
       return
     }
 
     const threeScene = await scene.setup(this)
 
     if (this._isDisposed) {
-      console.log('SCENE RENDERER: Already disposed after activateScene', this.uuid)
+      // console.log('SCENE RENDERER: Already disposed after activateScene', this.uuid)
       return
     }
 
@@ -176,7 +176,7 @@ class SceneRenderer {
   }
 
   cleanup() {
-    console.log('SCENE RENDERER: Cleanup', this.uuid)
+    // console.log('SCENE RENDERER: Cleanup', this.uuid)
 
     this._isDisposed = true
     this.composer.dispose()
@@ -245,9 +245,9 @@ class SceneRenderer {
       }
     }
 
-    console.log(
-      `SCENE RENDERER: Device pixel ratio changed from ${oldPixelRatio} to ${newPixelRatio}`
-    )
+    // console.log(
+    //   `SCENE RENDERER: Device pixel ratio changed from ${oldPixelRatio} to ${newPixelRatio}`
+    // )
   }
 
   private _decayMouseIntensity() {

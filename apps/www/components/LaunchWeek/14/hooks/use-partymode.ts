@@ -49,7 +49,7 @@ export const usePartymode = () => {
         })
       })
       .subscribe(async (status, error) => {
-        console.log('Channel status', status, error)
+        // console.log('Channel status', status, error)
         await channel.track(userStatus)
 
         if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {

@@ -1,14 +1,16 @@
 import { NextSeo } from 'next-seo'
+import dayjs from 'dayjs'
+import Error from 'next/error'
+import { GetStaticPaths, GetStaticProps } from 'next'
 import { LW14_DATE, LW14_TITLE, LW14_URL, SITE_ORIGIN } from '~/lib/constants'
 import { LwView } from '~/components/LaunchWeek/14/LwView'
 import {
   Lw14ConfDataProvider,
   UserTicketData,
 } from '~/components/LaunchWeek/14/hooks/use-conf-data'
-import Error from 'next/error'
-import { GetStaticPaths, GetStaticProps } from 'next'
 import { createClient } from '@supabase/supabase-js'
-import dayjs from 'dayjs'
+import DefaultLayout from '~/components/Layouts/Default'
+import { Tunnel } from '~/components/LaunchWeek/14/Tunnel'
 
 interface Props {
   user: UserTicketData
@@ -16,8 +18,7 @@ interface Props {
 }
 
 const Lw14Page = ({ user, ogImageUrl }: Props) => {
-  const { username } = user
-
+  const username = user?.username
   const TITLE = `${LW14_TITLE} | ${LW14_DATE}`
   const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
   const PAGE_URL = `${LW14_URL}/tickets/${username}`
@@ -46,7 +47,12 @@ const Lw14Page = ({ user, ogImageUrl }: Props) => {
       />
 
       <Lw14ConfDataProvider initState={{ partymodeStatus: 'on' }}>
-        <LwView />
+        <DefaultLayout className='font-["Departure_Mono"] lg:pt-32 border-b pb-0 md:pb-16 lg:!pb-[230px]'>
+          <LwView />
+          <div className="w-full h-[16vh] md:h-[24vh] lg:h-[32vh] absolute bottom-0 left-0 right-0 max-w-7xl mx-auto px-6 md:px-12 lg:px-16 xl:px-20">
+            <Tunnel className="w-full h-full rotate-180" />
+          </div>
+        </DefaultLayout>
       </Lw14ConfDataProvider>
     </>
   )
@@ -72,7 +78,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   // fetch a specific user
   if (username) {
-    const { data } = await supabaseAdmin!
+    const { data, error } = await supabaseAdmin!
       .from('tickets_view')
       .select('name, username, ticket_number, metadata, platinum, secret, role, company, location')
       .eq('launch_week', 'lw14')
@@ -100,10 +106,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   return {
     props: {
-      user: {
-        ...user,
-        username,
-      },
+      user,
       ogImageUrl,
       key: username,
     },

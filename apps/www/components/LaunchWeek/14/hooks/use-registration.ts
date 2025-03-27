@@ -60,7 +60,7 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
     if (!userData.id) {
       dispatch({ type: 'USER_TICKET_FETCH_STARTED' })
 
-      console.log('Inserting ticket for user', username, referal)
+      // console.log('Inserting ticket for user', username, referal)
 
       const { error: ticketInsertError } = await supabase
         .from('tickets')
@@ -186,7 +186,7 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
   const upgradeTicket = async () => {
     if (userData.id) {
       if (userData.secret) {
-        console.log('User already has a secret ticket')
+        // console.log('User already has a secret ticket')
         return
       }
 

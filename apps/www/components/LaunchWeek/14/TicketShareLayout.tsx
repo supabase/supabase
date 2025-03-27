@@ -1,8 +1,6 @@
-import Image from 'next/image'
 import { ReactNode } from 'react'
 import { cn } from 'ui'
 import useLw14ConfData from './hooks/use-conf-data'
-import logo from './assets/logo.png'
 
 export const TicketShareLayout = ({
   children,
@@ -45,7 +43,7 @@ export const TicketShareLayout = ({
           narrow ? 'text-left' : 'text-center'
         )}
       >
-        Share your ticket to win to win a prize
+        Share your ticket for a chance to win swag
       </div>
       {children}
     </div>
