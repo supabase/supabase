@@ -59,6 +59,7 @@ export async function getTables(
   if (Array.isArray(data) && sortByProperty) {
     return sortBy(data, (t) => t[sortByProperty]) as PostgresTable[]
   }
+
   return data as Omit<PostgresTable, 'columns'>[]
 }
 

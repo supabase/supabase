@@ -10,12 +10,9 @@ interface BlockItemProps {
 
 export const BlockItem = ({ name, description }: BlockItemProps) => {
   return (
-    <div className="flex flex-col gap-4 p-4 relative">
-      <Command name={name} />
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm text-muted-foreground sm:pl-3">{description}</h2>
-        <OpenInV0Button name={name} className="w-fit" />
-      </div>
+    <div className="mt-4">
+      <Command name={name} highlight />
+      <OpenInV0Button name={name} className="w-fit shrink-0 mt-4" />
     </div>
   )
 }

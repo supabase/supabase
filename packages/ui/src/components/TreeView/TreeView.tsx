@@ -13,7 +13,7 @@ export type TreeViewItemVariantProps = VariantProps<typeof TreeViewItemVariant>
 export const TreeViewItemVariant = cva(
   // [Joshen Temp]: aria-selected:text-foreground not working as aria-selected property not rendered in DOM,
   // [Joshen Temp]: aria-selected:!bg-selection not working as aria-selected property not rendered in DOM
-  'group relative transition-colors h-[28px] flex items-center gap-3 text-sm cursor-pointer select-none text-foreground-light hover:bg-control aria-expanded:bg-control data-[state=open]:bg-control', // data-[state=open]:bg-control bg state for context menu open
+  'group relative transition-colors h-[28px] flex items-center gap-3 text-sm cursor-pointer select-none text-foreground-light hover:bg-control aria-expanded:bg-transparent data-[state=open]:bg-transparent', // data-[state=open]:bg-control bg state for context menu open
   {
     variants: {
       isSelected: {
@@ -133,23 +133,35 @@ const TreeViewItem = forwardRef<
       }
     }, [isLoading])
 
+    const handleBlur = () => {
+      onEditSubmit?.(localValueState)
+    }
+
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault()
       onEditSubmit?.(localValueState)
     }
 
-    const handleBlur = () => {
-      onEditSubmit?.(localValueState)
-    }
+    // [Joshen] These properties were causing console errors as they were getting passed as props to the parent div
+    const {
+      isDisabled,
+      isHalfSelected,
+      handleSelect,
+      handleExpand,
+      treeState,
+      dispatch,
+      ...divProps
+    } = props as any
 
     return (
       <div
         ref={ref}
+        {...divProps}
         aria-selected={isSelected}
         aria-expanded={!isEditing && isExpanded}
         onDoubleClick={onDoubleClick}
         {...props}
-        className={cn(TreeViewItemVariant({ isSelected, isOpened, isPreview }))}
+        className={cn(props.className, TreeViewItemVariant({ isSelected, isOpened, isPreview }))}
         style={{
           paddingLeft:
             level === 1 && !isBranch

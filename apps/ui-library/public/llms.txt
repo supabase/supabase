@@ -1,5 +1,5 @@
 # Supabase UI Library
-Last updated: 2025-03-23T14:40:10.160Z
+Last updated: 2025-03-27T07:03:14.930Z
 
 ## Overview
 Library of components for your project. The components integrate with Supabase and are shadcn compatible.
@@ -10,7 +10,7 @@ Library of components for your project. The components integrate with Supabase a
 - [FAQ](https://supabase.com/ui/docs/getting-started/faq)
     - Frequently asked questions
 - [Introduction](https://supabase.com/ui/docs/getting-started/introduction)
-    - Components
+    - A flexible, open-source UI component library built on shadcn/ui, designed to simplify Supabase-powered projects with pre-built Auth, Storage, and Realtime features.
 - [Quick Start](https://supabase.com/ui/docs/getting-started/quickstart)
     - Components
 - [Next.js](https://supabase.com/ui/docs/nextjs/client)
@@ -27,12 +27,12 @@ Library of components for your project. The components integrate with Supabase a
     - Displays a control for easier uploading of files directly to Supabase Storage
 - [Realtime Cursor](https://supabase.com/ui/docs/react-router/realtime-cursor)
     - Real-time cursor sharing for collaborative applications
-- [React](https://supabase.com/ui/docs/react/client)
-    - Supabase client for React
+- [React Single Page Applications](https://supabase.com/ui/docs/react/client)
+    - Supabase client for React Single Page Applications
 - [Dropzone (File Upload)](https://supabase.com/ui/docs/react/dropzone)
     - Displays a control for easier uploading of files directly to Supabase Storage
-- [Password-based Auth (React)](https://supabase.com/ui/docs/react/password-based-auth)
-    - Password-based Auth block for React
+- [Password-based Authentication](https://supabase.com/ui/docs/react/password-based-auth)
+    - Password-based authentication block for React Single Page Applications
 - [Realtime Cursor](https://supabase.com/ui/docs/react/realtime-cursor)
     - Real-time cursor sharing for collaborative applications
 - [Tanstack Start](https://supabase.com/ui/docs/tanstack/client)

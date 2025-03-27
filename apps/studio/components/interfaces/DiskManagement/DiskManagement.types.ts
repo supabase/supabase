@@ -30,6 +30,7 @@ export type ComputeInstanceSize =
   | '16XL'
 
 export type InfraInstanceSize =
+  | 'pico'
   | 'nano'
   | 'micro'
   | 'small'
