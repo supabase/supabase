@@ -236,6 +236,16 @@ supabase db dump > supabase/schemas/prod.sql
 
 From there, you can start breaking down your schema into smaller files and generate migrations. You can do this all at once, or incrementally as you make changes to your schema.
 
+### Rolling back a schema change
+
+During development, you may want to rollback a migration to keep your new schema changes in a single migration file. This can be done by resetting your local database to a previous version.
+
+```bash Terminal
+supabase db reset --version 20241005112233
+```
+
+After a reset, you can edit the schema and regenerate a migration file.
+
 ## Known caveats
 
 The `migra` diff tool used for generating schema diff is capable of tracking most database changes. However, there are edge cases where it can fail.
