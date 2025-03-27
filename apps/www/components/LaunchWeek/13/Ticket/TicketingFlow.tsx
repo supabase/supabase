@@ -23,8 +23,6 @@ const TicketingFlow = () => {
   const hasSecretTicket = userData.secret
   const ticketType = hasSecretTicket ? 'secret' : hasPlatinumTicket ? 'platinum' : 'regular'
 
-  console.log({ hasPlatinumTicket, hasSecretTicket })
-
   const transition = DEFAULT_TRANSITION
   const initial = INITIAL_BOTTOM
   const animate = getAnimation({ duration: 1 })
