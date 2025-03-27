@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 
 const supabase = createClient()
 
-type RealtimeUser = {
+export type RealtimeUser = {
   id: string
   name: string
   image: string
