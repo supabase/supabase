@@ -120,6 +120,7 @@ const PolicyRow = ({
                 onClick={() => {
                   const sql = generatePolicyCreateSQL(policy)
                   aiSnap.newChat({
+                    name: `Update policy ${policy.name}`,
                     open: true,
                     sqlSnippets: [sql],
                     initialInput: `Update the policy with name "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table. It should...`,

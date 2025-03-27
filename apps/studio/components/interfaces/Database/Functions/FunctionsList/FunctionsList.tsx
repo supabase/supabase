@@ -150,6 +150,7 @@ const FunctionsList = ({
                     icon={<AiIconAnimation size={16} />}
                     onClick={() =>
                       aiSnap.newChat({
+                        name: 'Create new function',
                         open: true,
                         initialInput: `Create a new function for the schema ${selectedSchema} that does ...`,
                       })

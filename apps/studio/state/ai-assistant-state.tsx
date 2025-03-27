@@ -108,14 +108,14 @@ export const createAiAssistantState = (projectRef: string | undefined) => {
     },
 
     newChat: (
-      options?: Partial<
+      options?: { name?: string } & Partial<
         Pick<AiAssistantData, 'open' | 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
       >
     ) => {
       const chatId = crypto.randomUUID()
       const newChat: ChatSession = {
         id: chatId,
-        name: 'New Chat',
+        name: options?.name ?? 'New Chat',
         messages: [],
         createdAt: new Date(),
         updatedAt: new Date(),

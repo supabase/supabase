@@ -19,7 +19,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,
   Button,
@@ -43,7 +43,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 
 // Array of adjectives and nouns for random function name generation
 const ADJECTIVES = [
@@ -164,6 +163,7 @@ const NewFunctionPage = () => {
   const handleChat = () => {
     const selectedFile = files.find((f) => f.selected) ?? files[0]
     snap.newChat({
+      name: 'Explain edge function',
       open: true,
       sqlSnippets: [selectedFile.content],
       initialInput: 'Help me understand and improve this edge function...',

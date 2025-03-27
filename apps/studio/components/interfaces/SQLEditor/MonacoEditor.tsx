@@ -93,6 +93,7 @@ const MonacoEditor = ({
           .getModel()
           .getValueInRange((editorRef?.current as any)?.getSelection())
         aiSnap.newChat({
+          name: 'Explain code section',
           open: true,
           sqlSnippets: [selectedValue],
           initialInput: 'Can you explain this section to me in more detail?',

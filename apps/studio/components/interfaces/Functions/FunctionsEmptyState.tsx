@@ -79,6 +79,7 @@ export const FunctionsEmptyState = () => {
               type="default"
               onClick={() => {
                 aiSnap.newChat({
+                  name: 'Create new edge function',
                   open: true,
                   initialInput: 'Create a new edge function that ...',
                   suggestions: {

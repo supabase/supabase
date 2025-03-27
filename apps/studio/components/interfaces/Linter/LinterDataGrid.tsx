@@ -244,6 +244,7 @@ const LinterDataGrid = ({
                             icon={<AiIconAnimation className="scale-75 w-3 h-3" />}
                             onClick={() => {
                               snap.newChat({
+                                name: 'Summarize lint',
                                 open: true,
                                 initialInput: `Summarize the issue and suggest fixes: ${lintInfoMap.find((item) => item.name === selectedLint.name)?.title}
                                 \nEntity: ${(selectedLint.metadata && (selectedLint.metadata.entity || (selectedLint.metadata.schema && selectedLint.metadata.name && `${selectedLint.metadata.schema}.${selectedLint.metadata.name}`))) ?? ''}

@@ -132,6 +132,7 @@ const FunctionList = ({
                           className="space-x-2"
                           onClick={() => {
                             aiSnap.newChat({
+                              name: `Update function ${x.name}`,
                               open: true,
                               initialInput: 'Update this function to do...',
                               suggestions: {

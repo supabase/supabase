@@ -119,6 +119,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
       icon={<AiIconAnimation size={16} />}
       onClick={() => {
         snap.newChat({
+          name: 'Create new edge function',
           open: true,
           initialInput: `Create a new edge function that ...`,
           suggestions: {

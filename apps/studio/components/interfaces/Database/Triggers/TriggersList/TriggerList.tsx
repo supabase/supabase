@@ -157,6 +157,7 @@ const TriggerList = ({
                         onClick={() => {
                           const sql = generateTriggerCreateSQL(x)
                           aiSnap.newChat({
+                            name: `Update trigger ${X.name}`,
                             open: true,
                             initialInput: `Update this trigger which exists on the ${x.schema}.${x.table} table to...`,
                             suggestions: {

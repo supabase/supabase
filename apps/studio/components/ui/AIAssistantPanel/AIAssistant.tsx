@@ -282,7 +282,17 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 </Tooltip>
               </div>
               <div className="flex items-center gap-x-4">
-                <p className="text-xs text-foreground-light">{currentChat}</p>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <p
+                      title={currentChat}
+                      className="text-xs text-foreground-light truncate max-w-[145px] 2xl:max-w-full"
+                    >
+                      {currentChat}
+                    </p>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Current chat: {currentChat}</TooltipContent>
+                </Tooltip>
                 <div className="flex items-center gap-x-2">
                   <AIAssistantChatSelector />
                   <ButtonTooltip

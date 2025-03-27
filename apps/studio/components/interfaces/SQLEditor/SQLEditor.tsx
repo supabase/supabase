@@ -367,6 +367,7 @@ export const SQLEditor = () => {
       const snippet = snapV2.snippets[id]
       const result = snapV2.results[id]?.[0]
       aiSnap.newChat({
+        name: 'Debug SQL snippet',
         open: true,
         sqlSnippets: [
           (snippet.snippet.content?.sql ?? '').replace(sqlAiDisclaimerComment, '').trim(),

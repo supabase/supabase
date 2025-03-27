@@ -114,6 +114,7 @@ const PolicyTableRowHeader = ({
               className="px-1"
               onClick={() => {
                 aiSnap.newChat({
+                  name: 'Create new policy',
                   open: true,
                   initialInput: `Create and name a new policy for the ${table.schema} schema on the ${table.name} table that ...`,
                 })
