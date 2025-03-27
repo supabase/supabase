@@ -295,6 +295,7 @@ export const mapComputeSizeNameToAddonVariantId = (
   computeSize: ProjectDetail['infra_compute_size']
 ): ComputeInstanceAddonVariantId => {
   return {
+    pico: 'ci_pico',
     nano: 'ci_nano',
     micro: 'ci_micro',
     small: 'ci_small',
