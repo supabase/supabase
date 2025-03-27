@@ -18,6 +18,7 @@ const Hero = () => {
                 <div className="flex flex-col items-center">
                   <div className="z-40 w-full flex justify-center -mt-4 lg:-mt-12 mb-8">
                     <AnnouncementBadge
+                      className='font-["Departure_Mono"]'
                       url="/launch-week"
                       badge="Launch Week 14"
                       announcement="Claim ticket"

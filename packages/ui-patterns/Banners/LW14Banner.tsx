@@ -26,7 +26,7 @@ export function LW14Banner() {
   if (isLaunchWeekPage || isHomePage) return null
 
   return (
-    <div className="relative w-full p-2 flex items-center group justify-center text-foreground bg-alternative border-b border-muted transition-colors overflow-hidden">
+    <div className='relative font-["Departure_Mono"] w-full p-2 flex items-center group justify-center text-foreground bg-alternative border-b border-muted transition-colors overflow-hidden'>
       <div className="relative z-10 flex items-center justify-center">
         <div
           className={cn(
@@ -34,7 +34,7 @@ export function LW14Banner() {
             isLaunchWeekSection && '!justify-center'
           )}
         >
-          <p className="flex gap-1.5 items-center">{announcement.text}</p>
+          <p className="flex gap-1.5 items-center ">{announcement.text}</p>
           <div className="hidden sm:block text-foreground-lighter">A week of new features</div>
           <Button size="tiny" type="default" className="px-2 !leading-none text-xs" asChild>
             <Link href={announcement.link}>{announcement.cta}</Link>
