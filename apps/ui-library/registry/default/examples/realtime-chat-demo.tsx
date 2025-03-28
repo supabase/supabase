@@ -5,7 +5,21 @@ import { Input } from '@/registry/default/components/ui/input'
 import { Label } from '@/registry/default/components/ui/label'
 import { useEffect, useState } from 'react'
 
-const names = ['Mark S', 'Milchick', 'Irving', 'Gemma', 'Dylan', 'Helly R', 'Harmony']
+const names = [
+  'Mark S',
+  'Milchick',
+  'Irving',
+  'Gemma',
+  'Dylan',
+  'Helly R',
+  'Harmony',
+  'Terry',
+  'Ivan',
+  'Alaister',
+  'Joshen',
+  'Jordi',
+  'Filipe',
+]
 
 const RealtimeChatDemo = () => {
   const [username, setUsername] = useState('')
