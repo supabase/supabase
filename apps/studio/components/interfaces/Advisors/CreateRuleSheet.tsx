@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryState } from 'nuqs'
+// import { useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -68,7 +68,7 @@ const defaultValues = {
 export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  const [_, setExpandedLint] = useQueryState('lint')
+  // const [_, setExpandedLint] = useQueryState('lint')
 
   const routeCategory = router.pathname.split('/').pop()
   const organization = useSelectedOrganization()
@@ -86,7 +86,7 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
             `/project/${projectRef}/advisors/rules/${ruleLintMeta.category}?lint=${ruleLintMeta.name}`
           )
         } else {
-          setExpandedLint(ruleLintMeta?.name)
+          // setExpandedLint(ruleLintMeta?.name)
         }
       }
       onOpenChange(false)
