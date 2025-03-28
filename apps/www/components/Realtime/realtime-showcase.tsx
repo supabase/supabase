@@ -1,6 +1,5 @@
 'use client'
 
-import { UserProvider } from '../contexts/user-context'
 import presenceExample from './examples/presence-example'
 import chatExample from './examples/chat-example'
 import todoExample from './examples/todo-example'
@@ -134,59 +133,57 @@ export default function RealtimeShowcase() {
   const currentExample = EXAMPLES[activeTabIndex]
 
   return (
-    <UserProvider>
-      <div className="bg-surface-75/50 border border-muted rounded-lg h-auto lg:h-[600px]">
-        <Tabs_Shadcn_
-          value={currentExample.value}
-          onValueChange={handleTabChange}
-          className="w-full h-full flex flex-col lg:flex-row border-b border-muted h-full items-stretch"
-        >
-          {/* Desktop sidebar tabs - hidden on mobile */}
-          <div className="hidden lg:block w-48 px-6 py-8 border-r border-muted h-full">
-            <h2 className="text-xs uppercase text-foreground-light font-mono mb-4">Examples</h2>
-            <TabsList_Shadcn_ className="border-none flex flex-col h-auto justify-start items-stretch gap-2 bg-transparent">
-              {EXAMPLES.map((example) => (
-                <TabsTrigger_Shadcn_
-                  key={example.value}
-                  value={example.value}
-                  className="justify-start px-2 py-2 h-auto data-[state=active]:bg-transparent data-[state=active]:border-none border-none p-0 data-[state=active]:text-foreground"
-                >
-                  <example.icon strokeWidth={1.5} size={16} className="mr-3" />
-                  {example.label}
-                </TabsTrigger_Shadcn_>
-              ))}
-            </TabsList_Shadcn_>
-          </div>
+    <div className="bg-surface-75/50 border border-muted rounded-lg h-auto lg:h-[600px]">
+      <Tabs_Shadcn_
+        value={currentExample.value}
+        onValueChange={handleTabChange}
+        className="w-full h-full flex flex-col lg:flex-row border-b border-muted h-full items-stretch"
+      >
+        {/* Desktop sidebar tabs - hidden on mobile */}
+        <div className="hidden lg:block w-48 px-6 py-8 border-r border-muted h-full">
+          <h2 className="text-xs uppercase text-foreground-light font-mono mb-4">Examples</h2>
+          <TabsList_Shadcn_ className="border-none flex flex-col h-auto justify-start items-stretch gap-2 bg-transparent">
+            {EXAMPLES.map((example) => (
+              <TabsTrigger_Shadcn_
+                key={example.value}
+                value={example.value}
+                className="justify-start px-2 py-2 h-auto data-[state=active]:bg-transparent data-[state=active]:border-none border-none p-0 data-[state=active]:text-foreground"
+              >
+                <example.icon strokeWidth={1.5} size={16} className="mr-3" />
+                {example.label}
+              </TabsTrigger_Shadcn_>
+            ))}
+          </TabsList_Shadcn_>
+        </div>
 
-          {/* Mobile horizontal tabs - shown only on mobile */}
-          <div className="lg:hidden px-2 py-2 border-b border-muted w-full overflow-x-auto">
-            <TabsList_Shadcn_ className="border-none flex flex-row h-auto justify-start items-center gap-2 bg-transparent w-max">
-              {EXAMPLES.map((example) => (
-                <TabsTrigger_Shadcn_
-                  key={example.value}
-                  value={example.value}
-                  className="whitespace-nowrap justify-start px-3 py-2 h-auto data-[state=active]:bg-surface-100 data-[state=active]:border-none rounded-md"
-                >
-                  <example.icon strokeWidth={1.5} size={14} className="mr-2" />
-                  {example.label}
-                </TabsTrigger_Shadcn_>
-              ))}
-            </TabsList_Shadcn_>
-          </div>
+        {/* Mobile horizontal tabs - shown only on mobile */}
+        <div className="lg:hidden px-2 py-2 border-b border-muted w-full overflow-x-auto">
+          <TabsList_Shadcn_ className="border-none flex flex-row h-auto justify-start items-center gap-2 bg-transparent w-max">
+            {EXAMPLES.map((example) => (
+              <TabsTrigger_Shadcn_
+                key={example.value}
+                value={example.value}
+                className="whitespace-nowrap justify-start px-3 py-2 h-auto data-[state=active]:bg-surface-100 data-[state=active]:border-none rounded-md"
+              >
+                <example.icon strokeWidth={1.5} size={14} className="mr-2" />
+                {example.label}
+              </TabsTrigger_Shadcn_>
+            ))}
+          </TabsList_Shadcn_>
+        </div>
 
-          {/* Tab Content - render ExampleLayout with props from current example */}
-          <div className="flex-1 h-full overflow-hidden">
-            <div className="mt-0 border-0 p-0 m-0 h-full overflow-hidden">
-              <ExampleLayout
-                key={currentExample.value}
-                {...currentExample.props}
-                onNext={activeTabIndex < EXAMPLES.length - 1 ? handleNext : undefined}
-                onPrevious={activeTabIndex > 0 ? handlePrevious : undefined}
-              />
-            </div>
+        {/* Tab Content - render ExampleLayout with props from current example */}
+        <div className="flex-1 h-full overflow-hidden">
+          <div className="mt-0 border-0 p-0 m-0 h-full overflow-hidden">
+            <ExampleLayout
+              key={currentExample.value}
+              {...currentExample.props}
+              onNext={activeTabIndex < EXAMPLES.length - 1 ? handleNext : undefined}
+              onPrevious={activeTabIndex > 0 ? handlePrevious : undefined}
+            />
           </div>
-        </Tabs_Shadcn_>
-      </div>
-    </UserProvider>
+        </div>
+      </Tabs_Shadcn_>
+    </div>
   )
 }
