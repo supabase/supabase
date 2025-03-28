@@ -12,7 +12,9 @@ import APIDocsButton from 'components/ui/APIDocsButton'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
 import { Button } from 'ui'
@@ -29,6 +31,8 @@ const EdgeFunctionDetailsLayout = ({
 }: PropsWithChildren<EdgeFunctionDetailsLayoutProps>) => {
   const router = useRouter()
   const { functionSlug, ref } = useParams()
+  const org = useSelectedOrganization()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const edgeFunctionCreate = useFlag('edgeFunctionCreate')
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
@@ -123,7 +127,20 @@ const EdgeFunctionDetailsLayout = ({
             )}
             <DocsButton href="https://supabase.com/docs/guides/functions" />
             {edgeFunctionCreate && !!functionSlug && (
-              <Button type="default" icon={<Send />} onClick={() => setIsOpen(true)}>
+              <Button
+                type="default"
+                icon={<Send />}
+                onClick={() => {
+                  setIsOpen(true)
+                  sendEvent({
+                    action: 'edge_function_test_side_panel_opened',
+                    groups: {
+                      project: ref ?? 'Unknown',
+                      organization: org?.slug ?? 'Unknown',
+                    },
+                  })
+                }}
+              >
                 Test
               </Button>
             )}

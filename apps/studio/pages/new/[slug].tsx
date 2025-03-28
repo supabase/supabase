@@ -357,7 +357,7 @@ const Wizard: NextPageWithLayout = () => {
   useEffect(() => {
     // [Joshen] Cause slug depends on router which doesnt load immediately on render
     // While the form data does load immediately
-    if (slug) form.setValue('organization', slug)
+    if (slug && slug !== '_') form.setValue('organization', slug)
     if (projectName) form.setValue('projectName', projectName || '')
   }, [slug])
 
@@ -456,6 +456,7 @@ const Wizard: NextPageWithLayout = () => {
                               field.onChange(slug)
                               router.push(`/new/${slug}`)
                             }}
+                            value={field.value}
                             defaultValue={field.value}
                           >
                             <FormControl_Shadcn_>

@@ -35,7 +35,7 @@ export const SITE_ORIGIN =
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
       : 'http://localhost:3000'
 
-export const LW_URL = `${SITE_ORIGIN}/launch-week`
+export const LW_URL = `${SITE_ORIGIN}/launch-week/13`
 
 export const TWITTER_USER_NAME = 'supabase'
 export const LW7_DATE = 'April 10th 2023'
@@ -58,4 +58,17 @@ export const TWEET_TEXT =
   'Launch Week 13 is just around the corner at @supabase. \nClaim your ticket and stay tuned for all the announcements! \n#launchweek'
 export const TWEET_TEXT_PLATINUM = `Just conquered a platinum @supabase Launch Week 13 ticket. Share twice to get one! \n#launchweek`
 export const TWEET_TEXT_SECRET = `Found the secret golden ticket for @supabase's Launch Week 13. \nCan you find it? \n#launchweek`
+
+// todo: update dates
+export const LW14_DATE = '31 March — 4 April / 7am PT'
+export const LW14_LAUNCH_DATE = '2025-03-31T07:00:00.000-07:00'
+export const LW14_LAUNCH_DATE_END = '2025-04-04T23:59:59.000-07:00'
+export const LW14_TITLE = 'Launch Week 14'
+export const LW14_TWEET_TEXT =
+  'Launch Week 14 is just around the corner at @supabase. \nClaim your ticket and stay tuned for all the announcements! \n#launchweek'
+export const LW14_TWEET_TEXT_PLATINUM =
+  'Just conquered a platinum @supabase Launch Week 14 ticket. Share twice to get one! \n#launchweek'
+export const LW14_TWEET_TEXT_SECRET = `Found the secret golden ticket for @supabase's Launch Week 14. \nCan you find it? \n#launchweek`
+export const LW14_URL = `${SITE_ORIGIN}/launch-week`
+
 export const SITE_NAME = 'Supabase'

@@ -1,8 +1,12 @@
 import { useParams } from 'common'
+import {
+  useIsSQLEditorTabsEnabled,
+  useIsTableEditorTabsEnabled,
+} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
-import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import AISettingsModal from 'components/ui/AISettingsModal'
+import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { Loading } from 'components/ui/Loading'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -18,6 +22,7 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
+import { useEditorType } from '../editors/EditorsLayout.hooks'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import LoadingState from './LoadingState'
@@ -90,8 +95,19 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       setAiAssistantPanel,
       mobileMenuOpen,
       setMobileMenuOpen,
+      showSidebar,
     } = useAppStateSnapshot()
     const { open } = aiAssistantPanel
+
+    const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
+    const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
+
+    // For tabs preview flag logic - only conditionally collapse sidebar for table editor and sql editor if feature flags are on
+    const editor = useEditorType()
+    const tableEditorTabsEnabled = editor === 'table' && isTableEditorTabsEnabled
+    const sqlEditorTabsEnabled = editor === 'sql' && isSQLEditorTabsEnabled
+    const forceShowProductMenu = !tableEditorTabsEnabled && !sqlEditorTabsEnabled
+    const sideBarIsOpen = forceShowProductMenu || showSidebar
 
     const projectName = selectedProject?.name
     const organizationName = selectedOrganization?.name
@@ -124,8 +140,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open])
 
-    const sideBarIsOpen = true // @mildtomato - var for later to use collapsible sidebar
-
     return (
       <>
         <Head>
@@ -143,7 +157,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
           <meta name="description" content="Supabase Studio" />
         </Head>
         <div className="flex flex-row h-full w-full">
-          <ResizablePanelGroup className="" direction="horizontal" autoSaveId="project-layout">
+          <ResizablePanelGroup direction="horizontal" autoSaveId="project-layout">
             {showProductMenu && productMenu && (
               <ResizablePanel
                 order={1}
@@ -190,8 +204,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             )}
             <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col w-full">
               <ResizablePanelGroup
-                className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
                 direction="horizontal"
+                className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
                 autoSaveId="project-layout-content"
               >
                 <ResizablePanel
@@ -221,10 +235,11 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                     <ResizableHandle withHandle />
                     <ResizablePanel
                       id="panel-assistant"
+                      minSize={30}
+                      maxSize={50}
                       className={cn(
                         'border-l xl:border-l-0 bg fixed z-40 md:absolute md:z-0 right-0 top-0 md:top-[48px] bottom-0 xl:relative xl:top-0',
-                        'w-screen h-[100dvh] md:h-auto md:w-auto md:min-w-[400px] max-w-[500px]',
-                        '2xl:min-w-[500px] 2xl:max-w-[600px]'
+                        'w-screen h-[100dvh] md:h-auto md:w-auto'
                       )}
                     >
                       {aiAssistantPanel.open && <AIAssistantPanel />}

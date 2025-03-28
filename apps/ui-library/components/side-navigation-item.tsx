@@ -8,12 +8,27 @@ import React from 'react'
 
 const NavigationItem: React.FC<{ item: SidebarNavItem }> = React.memo(({ item }) => {
   const pathname = usePathname()
+  const pathParts = pathname.split('/')
+  const slug = pathParts[pathParts.length - 1]
+  const framework = pathParts[pathParts.length - 2]
 
-  const isActive = pathname === item.href
+  // Build URL with framework param if provided
+  let href = item.href
+
+  // Handle component items with slug and framework
+  if (!href && slug) {
+    if (framework) {
+      href = `/docs/${framework}/${slug}`
+    } else {
+      href = `/docs/${slug}`
+    }
+  }
+
+  const isActive = pathname === href
 
   return (
     <Link
-      href={`${item.href}`}
+      href={href || '#'}
       className={cn(
         'relative',
         'flex',
@@ -30,7 +45,6 @@ const NavigationItem: React.FC<{ item: SidebarNavItem }> = React.memo(({ item })
         className={cn(
           'transition',
           'absolute left-0 w-1 h-full bg-foreground',
-
           isActive ? 'opacity-100' : 'opacity-0'
         )}
       ></div>

@@ -19,7 +19,7 @@ export default async function Layout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
-      <body className={inter.className}>
+      <body className={`${inter.className} antialiased`}>
         <ThemeProvider
           themes={['dark', 'light', 'classic-dark']}
           defaultTheme="system"
