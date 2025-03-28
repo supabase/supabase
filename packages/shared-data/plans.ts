@@ -136,7 +136,7 @@ export const plans: PricingInformation[] = [
         features: [
           'Designated Support manager',
           'Uptime SLAs',
-          'On-premise support',
+          'BYO Cloud supported',
           '24×7×365 premium enterprise support',
           'Private Slack channel',
           'Custom Security Questionnaires',
