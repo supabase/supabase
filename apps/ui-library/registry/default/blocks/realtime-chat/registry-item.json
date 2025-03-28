@@ -4,8 +4,8 @@
   "type": "registry:component",
   "title": "Realtime Chat",
   "description": "Component which renders realtime chat messages from other users in a room.",
-  "registryDependencies": [],
-  "dependencies": [],
+  "registryDependencies": ["input", "button"],
+  "dependencies": ["lucide-react"],
   "files": [
     {
       "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",

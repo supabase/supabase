@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 
 export function useChatScroll() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -15,5 +15,3 @@ export function useChatScroll() {
 
   return { containerRef, scrollToBottom }
 }
-
-export default useChatScroll

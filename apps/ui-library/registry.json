@@ -269,45 +269,6 @@
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
-      "name": "realtime-chat",
-      "type": "registry:component",
-      "title": "Realtime Chat",
-      "description": "Component which renders realtime chat messages from other users in a room.",
-      "registryDependencies": [],
-      "dependencies": ["@supabase/ssr@latest"],
-      "files": [
-        {
-          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
-          "type": "registry:hook"
-        },
-        {
-          "path": "registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx",
-          "type": "registry:hook"
-        },
-        {
-          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
-          "type": "registry:lib"
-        },
-        {
-          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
-          "type": "registry:lib"
-        },
-        {
-          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
-          "type": "registry:lib"
-        }
-      ]
-    },
-    {
-      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
       "name": "dropzone-nextjs",
       "type": "registry:component",
       "title": "Dropzone (File Upload)",
@@ -834,8 +795,8 @@
       "type": "registry:component",
       "title": "Realtime Chat",
       "description": "Component which renders realtime chat messages from other users in a room.",
-      "registryDependencies": [],
-      "dependencies": ["@supabase/ssr@latest"],
+      "registryDependencies": ["input", "button"],
+      "dependencies": ["lucide-react", "@supabase/ssr@latest"],
       "files": [
         {
           "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
@@ -873,8 +834,8 @@
       "type": "registry:component",
       "title": "Realtime Chat",
       "description": "Component which renders realtime chat messages from other users in a room.",
-      "registryDependencies": [],
-      "dependencies": ["@supabase/supabase-js@latest"],
+      "registryDependencies": ["input", "button"],
+      "dependencies": ["lucide-react", "@supabase/supabase-js@latest"],
       "files": [
         {
           "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
@@ -904,8 +865,8 @@
       "type": "registry:component",
       "title": "Realtime Chat",
       "description": "Component which renders realtime chat messages from other users in a room.",
-      "registryDependencies": [],
-      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "registryDependencies": ["input", "button"],
+      "dependencies": ["lucide-react", "@supabase/ssr@latest", "@supabase/supabase-js@latest"],
       "files": [
         {
           "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
@@ -939,8 +900,8 @@
       "type": "registry:component",
       "title": "Realtime Chat",
       "description": "Component which renders realtime chat messages from other users in a room.",
-      "registryDependencies": [],
-      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "registryDependencies": ["input", "button"],
+      "dependencies": ["lucide-react", "@supabase/ssr@latest", "@supabase/supabase-js@latest"],
       "files": [
         {
           "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
