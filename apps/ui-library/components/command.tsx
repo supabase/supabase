@@ -4,19 +4,11 @@ import { motion } from 'framer-motion'
 import { CommandCopyButton } from './command-copy-button'
 
 interface CommandCopyProps {
-  name: string
+  url: string
   highlight?: boolean
 }
 
-const command = `npx shadcn@latest add ${
-  process.env.VERCEL_TARGET_ENV === 'production'
-    ? `https://supabase.com`
-    : process.env.VERCEL_TARGET_ENV === 'preview'
-      ? `https://${process.env.VERCEL_PROJECT_PREVIEW_URL}`
-      : 'http://localhost:3004'
-}${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/r/${name}.json`
-
-export function Command({ name, highlight }: CommandCopyProps) {
+export function Command({ url, highlight }: CommandCopyProps) {
   return (
     <>
       <div className="w-full group relative flex items-center rounded-lg bg-surface-100 px-4 py-2 overflow-hidden">
@@ -35,10 +27,10 @@ export function Command({ name, highlight }: CommandCopyProps) {
         )}
         <div className="flex-1 font-mono text-sm text-foreground relative z-10">
           <span className="mr-2 text-[#888]">$</span>
-          {command}
+          {url}
         </div>
         <div className="relative z-10">
-          <CommandCopyButton command={command} />
+          <CommandCopyButton command={url} />
         </div>
       </div>
     </>
