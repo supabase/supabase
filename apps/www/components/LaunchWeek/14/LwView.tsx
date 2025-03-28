@@ -47,7 +47,7 @@ export const LwView = () => {
                       src="/images/launchweek/14/logo-pixel-small-dark.png"
                       width="18"
                       height="20"
-                      className="w-auto h-5"
+                      className="w-auto h-5 invert dark:invert-0"
                       alt=""
                     />
                     Supabase
