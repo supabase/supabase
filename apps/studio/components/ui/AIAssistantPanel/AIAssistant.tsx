@@ -48,14 +48,24 @@ import { Message } from './Message'
 import { useAutoScroll } from './hooks'
 
 const MemoizedMessage = memo(
-  ({ message, isLoading }: { message: MessageType; isLoading: boolean }) => {
+  ({
+    message,
+    isLoading,
+    onResults,
+  }: {
+    message: MessageType
+    isLoading: boolean
+    onResults: ({ title, results }: { title?: string; results: any[] }) => void
+  }) => {
     return (
       <Message
         key={message.id}
+        id={message.id}
         role={message.role}
         content={message.content}
         readOnly={message.role === 'user'}
         isLoading={isLoading}
+        onResults={onResults}
       />
     )
   }
@@ -168,6 +178,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             key={message.id}
             message={message}
             isLoading={isChatLoading && message.id === chatMessages[chatMessages.length - 1].id}
+            onResults={(props) => snap.updateMessage({ id: message.id, ...props })}
           />
         )
       }),

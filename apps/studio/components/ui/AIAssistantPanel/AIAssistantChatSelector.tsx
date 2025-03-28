@@ -102,6 +102,7 @@ export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorPr
             <CommandEmpty_Shadcn_>No chats found.</CommandEmpty_Shadcn_>
             <CommandGroup_Shadcn_>
               <ScrollArea className={chats.length > 4 ? 'h-40' : ''}>
+                {/* @ts-ignore */}
                 {chats.map(([id, chat]) => (
                   <CommandItem_Shadcn_
                     key={id}
