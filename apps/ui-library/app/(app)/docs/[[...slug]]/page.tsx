@@ -89,7 +89,7 @@ export default async function DocPage({ params }: DocPageProps) {
           <div className="text-foreground-lighter">{doc.title}</div>
         </div>
         <div className="flex items-end justify-between mb-5">
-          <div className="space-y-2 mb-5">
+          <div className="space-y-2">
             <h1 className={cn('scroll-m-20 text-4xl tracking-tight')}>{doc.title}</h1>
             {doc.description && (
               <p className="text-lg text-foreground-light">
