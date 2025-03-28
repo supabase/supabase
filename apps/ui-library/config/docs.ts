@@ -45,7 +45,7 @@ export const aiEditorsRules: SidebarNavGroup = {
 export const frameworkTitles: Record<string, string> = {
   nextjs: 'Next.js',
   'react-router': 'React Router',
-  tanstack: 'Tanstack Start',
+  tanstack: 'TanStack Start',
   react: 'React SPA',
 }
 
