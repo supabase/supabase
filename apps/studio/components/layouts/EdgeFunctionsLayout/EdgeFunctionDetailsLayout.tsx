@@ -169,7 +169,7 @@ const EdgeFunctionDetailsLayout = ({
               </PopoverTrigger_Shadcn_>
               <PopoverContent_Shadcn_ align="end" className="p-0">
                 <div className="p-3 flex flex-col gap-y-2">
-                  <p className="text-xs text-foreground-light">Download edge function via CLI</p>
+                  <p className="text-xs text-foreground-light">Download via CLI</p>
                   <Input
                     copy
                     showCopyOnHover
