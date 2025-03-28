@@ -6,7 +6,8 @@ import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { lintKeys } from './keys'
 
-type ExceptionPayload = components['schemas']['CreateNotificationExceptionsDto']['exceptions'][0]
+type ExceptionPayload =
+  components['schemas']['CreateNotificationExceptionsBodyDto']['exceptions'][0]
 
 export type LintRuleCreateVariables = {
   projectRef: string

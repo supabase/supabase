@@ -13,11 +13,6 @@ type ProjectLintRulesVariables = {
 type LintDismissalResponse = components['schemas']['ListNotificationExceptionsResponseDto']
 export type LintException = LintDismissalResponse['exceptions'][0]
 
-export type LintCategory =
-  components['schemas']['CreateNotificationExceptionsDto']['exceptions'][0]['lint_category']
-export type LintName =
-  components['schemas']['CreateNotificationExceptionsDto']['exceptions'][0]['lint_name']
-
 export async function getProjectLintRules(
   { projectRef }: ProjectLintRulesVariables,
   signal?: AbortSignal
