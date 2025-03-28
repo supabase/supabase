@@ -11,7 +11,9 @@ import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplo
 import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
@@ -24,6 +26,8 @@ const CodePage = () => {
   const isOptedInToAI = useOrgOptedIntoAi()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
   const edgeFunctionCreate = useFlag('edgeFunctionCreate')
+  const { mutate: sendEvent } = useSendEventMutation()
+  const org = useSelectedOrganization()
 
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
   const {
@@ -143,7 +147,13 @@ const CodePage = () => {
             loading={isDeploying}
             size="medium"
             disabled={files.length === 0 || isLoadingFiles}
-            onClick={onUpdate}
+            onClick={() => {
+              onUpdate()
+              sendEvent({
+                action: 'edge_function_deploy_updates_button_clicked',
+                groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+              })
+            }}
             iconRight={
               isDeploying ? (
                 <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />

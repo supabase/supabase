@@ -3,12 +3,9 @@ import { OpenInV0Button } from '@/components/open-in-v0-button'
 
 interface BlockItemProps {
   name: string
-  title: string
-  description: string
-  src: string
 }
 
-export const BlockItem = ({ name, description }: BlockItemProps) => {
+export const BlockItem = ({ name }: BlockItemProps) => {
   return (
     <div className="mt-4">
       <Command name={name} highlight />

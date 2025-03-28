@@ -31,6 +31,18 @@ export const Index: Record<string, any> = {
       chunks: []
     }
     ,
+    "password-based-auth-react-router": {
+      name: "password-based-auth-react-router",
+      type: "registry:block",
+      registryDependencies: ["button","card","input","label"],
+      component: React.lazy(() => import("@/registry/default/blocks/password-based-auth-react-router/app/routes/auth.confirm.tsx")),
+      source: "",
+      files: ["registry/default/blocks/password-based-auth-react-router/app/routes/auth.confirm.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/auth.error.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/forgot-password.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/login.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/logout.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/protected.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/sign-up.tsx","registry/default/blocks/password-based-auth-react-router/app/routes/update-password.tsx","registry/default/blocks/password-based-auth-react-router/app/routes.ts","registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
     "password-based-auth-tanstack": {
       name: "password-based-auth-tanstack",
       type: "registry:block",
@@ -73,7 +85,7 @@ export const Index: Record<string, any> = {
       registryDependencies: ["button","tooltip","progress"],
       component: React.lazy(() => import("@/registry/default/blocks/dropzone/components/dropzone.tsx")),
       source: "",
-      files: ["registry/default/blocks/dropzone/components/dropzone.tsx","registry/default/blocks/dropzone/hooks/use-supabase-upload.ts","registry/default/clients/react-router/lib/supabase.client.ts","registry/default/clients/react-router/lib/supabase.server.ts"],
+      files: ["registry/default/blocks/dropzone/components/dropzone.tsx","registry/default/blocks/dropzone/hooks/use-supabase-upload.ts","registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -121,7 +133,7 @@ export const Index: Record<string, any> = {
       registryDependencies: [],
       component: React.lazy(() => import("@/registry/default/blocks/realtime-cursor/components/cursor.tsx")),
       source: "",
-      files: ["registry/default/blocks/realtime-cursor/components/cursor.tsx","registry/default/blocks/realtime-cursor/components/realtime-cursors.tsx","registry/default/blocks/realtime-cursor/hooks/use-realtime-cursors.ts","registry/default/clients/react-router/lib/supabase.client.ts","registry/default/clients/react-router/lib/supabase.server.ts"],
+      files: ["registry/default/blocks/realtime-cursor/components/cursor.tsx","registry/default/blocks/realtime-cursor/components/realtime-cursors.tsx","registry/default/blocks/realtime-cursor/hooks/use-realtime-cursors.ts","registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -169,7 +181,7 @@ export const Index: Record<string, any> = {
       registryDependencies: ["avatar"],
       component: React.lazy(() => import("@/registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx")),
       source: "",
-      files: ["registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx","registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts","registry/default/clients/react-router/lib/supabase.client.ts","registry/default/clients/react-router/lib/supabase.server.ts"],
+      files: ["registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx","registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts","registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -217,7 +229,7 @@ export const Index: Record<string, any> = {
       registryDependencies: ["avatar","tooltip"],
       component: React.lazy(() => import("@/registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx")),
       source: "",
-      files: ["registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx","registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx","registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts","registry/default/clients/react-router/lib/supabase.client.ts","registry/default/clients/react-router/lib/supabase.server.ts"],
+      files: ["registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx","registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx","registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts","registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -265,7 +277,7 @@ export const Index: Record<string, any> = {
       registryDependencies: [],
       
       source: "",
-      files: ["registry/default/clients/react-router/lib/supabase.client.ts","registry/default/clients/react-router/lib/supabase.server.ts"],
+      files: ["registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -343,6 +355,18 @@ export const Index: Record<string, any> = {
       chunks: []
     }
     ,
+    "current-user-avatar-preview": {
+      name: "current-user-avatar-preview",
+      type: "registry:example",
+      registryDependencies: [],
+      component: React.lazy(() => import("@/registry/default/examples/current-user-avatar-preview.tsx")),
+      source: "",
+      files: ["registry/default/examples/current-user-avatar-preview.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
     "realtime-avatar-stack-demo": {
       name: "realtime-avatar-stack-demo",
       type: "registry:example",
@@ -350,6 +374,18 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/examples/realtime-avatar-stack-demo.tsx")),
       source: "",
       files: ["registry/default/examples/realtime-avatar-stack-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "realtime-avatar-stack-preview": {
+      name: "realtime-avatar-stack-preview",
+      type: "registry:example",
+      registryDependencies: [],
+      component: React.lazy(() => import("@/registry/default/examples/realtime-avatar-stack-preview.tsx")),
+      source: "",
+      files: ["registry/default/examples/realtime-avatar-stack-preview.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

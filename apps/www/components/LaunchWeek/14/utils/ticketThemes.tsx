@@ -8,4 +8,7 @@ export const themes = () => ({
   secret: {
     TICKET_FOREGROUND: '#1F1F1F',
   },
+  platinumSecret: {
+    TICKET_FOREGROUND: '#1F1F1F',
+  },
 })

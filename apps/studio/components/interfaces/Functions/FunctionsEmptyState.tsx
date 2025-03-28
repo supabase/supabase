@@ -8,7 +8,7 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { Code, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,
   Button,
@@ -27,7 +27,7 @@ import { TerminalInstructions } from './TerminalInstructions'
 export const FunctionsEmptyState = () => {
   const { ref } = useParams()
   const router = useRouter()
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
   const edgeFunctionCreate = useFlag('edgeFunctionCreate')
 
   const { mutate: sendEvent } = useSendEventMutation()
@@ -78,7 +78,8 @@ export const FunctionsEmptyState = () => {
             <Button
               type="default"
               onClick={() => {
-                setAiAssistantPanel({
+                aiSnap.newChat({
+                  name: 'Create new edge function',
                   open: true,
                   initialInput: 'Create a new edge function that ...',
                   suggestions: {

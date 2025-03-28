@@ -2,7 +2,7 @@ import { ReactNode } from 'react'
 import useConfData from './hooks/use-conf-data'
 
 export const TicketClaim = ({ children, narrow }: { children: ReactNode; narrow?: boolean }) => {
-  return <div className={'flex '}>{children}</div>
+  return <div className={'flex px-6'}>{children}</div>
 }
 
 export const TicketClaimContent = ({ children }: { children?: ReactNode }) => {

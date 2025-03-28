@@ -23,8 +23,23 @@ description: Real-time cursor sharing for collaborative applications
 
 ## Introduction
 
-The Realtime Cursor component is designed to allow users to share their cursor positions with other users in a room. It can be used to build real-time collaborative applications.
+The Realtime Cursors component lets users share their cursor position with others in the same room—perfect for real-time collaboration. It handles all the setup and boilerplate for you, so you can add it to your app with minimal effort.
 
 ## Usage
 
 The Realtime Cursor component is designed to be used in a room. It can be used to build real-time collaborative applications. Add the `<RealtimeCursors />` component to your page and it will render realtime cursors from other users in the room.
+
+## Features
+
+- Broadcast cursor position to other users in the same room
+- Customizable cursor appearance
+- Presence detection (automatically joins/leaves users)
+- Low-latency updates using Supabase Realtime
+- Room-based isolation for scoped collaboration
+
+## Props
+
+| Prop       | Type     | Description                                                |
+| ---------- | -------- | ---------------------------------------------------------- |
+| `roomName` | `string` | Unique identifier for the shared room or session.          |
+| `username` | `string` | Name of the current user; used to track and label cursors. |
