@@ -100,7 +100,7 @@ export const PageLayout = ({
         {navigationItems.length > 0 && (
           <NavMenu className={cn(isCompact ? 'mt-2' : 'mt-4', size === 'full' && 'border-none')}>
             {navigationItems.map((item) => (
-              <NavMenuItem key={item.label} active={router.asPath === item.href}>
+              <NavMenuItem key={item.label} active={router.asPath.split('?')[0] === item.href}>
                 {item.href ? (
                   <Link
                     href={item.href}
