@@ -1,8 +1,7 @@
 'use client'
 
-import { CommandCopyButton } from './command-copy-button'
 import { motion } from 'framer-motion'
-import { cn } from '../lib/utils'
+import { CommandCopyButton } from './command-copy-button'
 
 interface CommandCopyProps {
   name: string
@@ -11,10 +10,10 @@ interface CommandCopyProps {
 
 export function Command({ name, highlight }: CommandCopyProps) {
   const command = `npx shadcn@latest add ${
-    process.env.VERCEL_TARGET_ENV === 'production'
+    process.env.NEXT_PUBLIC_VERCEL_TARGET_ENV === 'production'
       ? `https://supabase.com`
-      : process.env.VERCEL_TARGET_ENV === 'preview'
-        ? `https://${process.env.VERCEL_PROJECT_PREVIEW_URL}`
+      : process.env.NEXT_PUBLIC_VERCEL_TARGET_ENV === 'preview'
+        ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
         : 'http://localhost:3004'
   }${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/r/${name}.json`
 

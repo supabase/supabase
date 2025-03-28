@@ -1,13 +1,9 @@
 'use client'
 
 import { RegistryNode } from '@/lib/process-registry'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@ui/components/shadcn/ui/tabs'
-import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock'
-import { useState } from 'react'
-import supabaseTheme from '../lib/themes/supabase-2.json' assert { type: 'json' }
-import { BlockItemPreview } from './block-item'
-import { CodeBlock, CodeBlockLang, TreeView, TreeViewItem, flattenTree } from 'ui'
 import { File } from 'lucide-react'
+import { useState } from 'react'
+import { CodeBlock, TreeView, TreeViewItem, flattenTree } from 'ui'
 
 interface BlockItemCodeProps {
   files: RegistryNode[]
@@ -107,7 +103,7 @@ export function BlockItemCode({ files }: BlockItemCodeProps) {
         <CodeBlock
           wrapperClassName="w-full"
           className="h-full max-w-none !w-full flex-1 font-mono text-xs rounded-none border-none"
-          language={selectedFile.name.split('.').pop() as CodeBlockLang}
+          language="ts"
         >
           {selectedFile?.content}
         </CodeBlock>

@@ -1,0 +1,21 @@
+---
+title: Current User Avatar
+description: Supabase Auth-aware avatar
+---
+
+<ComponentPreview name="current-user-avatar-demo" showCode={false} />
+
+## Installation
+
+<BlockItem name="current-user-avatar-react" description="Renders the avatar of the current user." />
+
+## Folder structure
+
+<RegistryBlock itemName="current-user-avatar-react" />
+
+## Usage
+
+The `CurrentUserAvatar` component connects to Supabase Auth to fetch the user data and show an avatar. It uses the `user_metadata`
+property which gets populated automatically by Supabase Auth if the user logged in via a provider. If the user doesn't have a profile image, it renders their initials. If the user is logged out, it renders a `?`.
+
+The `CurrentUserAvatar` component integrates with Supabase Auth to display user avatars dynamically. It automatically retrieves the profile image from the `user_metadata` field, which Supabase Auth populates when using provider-based authentication. The component also fallbacks to `?` if the user is unauthenticated.
