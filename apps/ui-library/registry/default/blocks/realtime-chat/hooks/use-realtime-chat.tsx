@@ -1,13 +1,23 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
-import { ChatMessage } from '../components/realtime-chat'
+import { useCallback, useEffect, useState } from 'react'
 
 interface UseRealtimeChatProps {
   roomName: string
   username: string
 }
+
+export interface ChatMessage {
+  id: string
+  content: string
+  user: {
+    name: string
+  }
+  createdAt: string
+}
+
+const EVENT_MESSAGE_TYPE = 'message'
 
 export function useRealtimeChat({ roomName, username }: UseRealtimeChatProps) {
   const supabase = createClient()
@@ -16,10 +26,10 @@ export function useRealtimeChat({ roomName, username }: UseRealtimeChatProps) {
   const [isConnected, setIsConnected] = useState(false)
 
   useEffect(() => {
-    const newChannel = supabase.channel(`chat:${roomName}`)
+    const newChannel = supabase.channel(roomName)
 
     newChannel
-      .on('broadcast', { event: 'message' }, (payload) => {
+      .on('broadcast', { event: EVENT_MESSAGE_TYPE }, (payload) => {
         setMessages((current) => [...current, payload.payload as ChatMessage])
       })
       .subscribe(async (status) => {
@@ -35,27 +45,30 @@ export function useRealtimeChat({ roomName, username }: UseRealtimeChatProps) {
     }
   }, [roomName, username, supabase])
 
-  const sendMessage = async (content: string) => {
-    if (!channel || !isConnected) return
+  const sendMessage = useCallback(
+    async (content: string) => {
+      if (!channel || !isConnected) return
 
-    const message: ChatMessage = {
-      id: crypto.randomUUID(),
-      content,
-      user: {
-        name: username,
-      },
-      createdAt: new Date().toISOString(),
-    }
+      const message: ChatMessage = {
+        id: crypto.randomUUID(),
+        content,
+        user: {
+          name: username,
+        },
+        createdAt: new Date().toISOString(),
+      }
 
-    // Update local state immediately for the sender
-    setMessages((current) => [...current, message])
+      // Update local state immediately for the sender
+      setMessages((current) => [...current, message])
 
-    await channel.send({
-      type: 'broadcast',
-      event: 'message',
-      payload: message,
-    })
-  }
+      await channel.send({
+        type: 'broadcast',
+        event: EVENT_MESSAGE_TYPE,
+        payload: message,
+      })
+    },
+    [channel, isConnected, username]
+  )
 
   return { messages, sendMessage, isConnected }
 }
