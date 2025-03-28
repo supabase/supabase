@@ -209,7 +209,7 @@ class TicketScene implements BaseScene {
   narrowResolutions = {
     0: {
       ticketPosition: new Vector3(0, 0, -1.6),
-      ticketScale: new Vector3(0.55, 0.55, 0.55),
+      ticketScale: new Vector3(0.65, 0.65, 0.65),
     },
 
     480: {
@@ -723,9 +723,9 @@ class TicketScene implements BaseScene {
 
   private _updateTicketSize() {
     if (this.state.visible) {
-      this._ticket?.scale.lerp(this._internalState.naturalScale, 0.01)
+      this._ticket?.scale.lerp(this._internalState.naturalScale, 0.1)
     } else {
-      this._ticket?.scale.lerp(this._invisibleScaleVector, 0.01)
+      this._ticket?.scale.lerp(this._invisibleScaleVector, 0.1)
     }
 
     // Update world matrices after scaling to ensure raycaster works correctly
