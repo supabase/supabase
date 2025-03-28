@@ -4,10 +4,8 @@ description: Real-time cursor sharing for collaborative applications
 ---
 
 <div className="flex flex-row -space-x-px w-full">
-
-<BlockPreview name="realtime-cursor" isPair />
-<BlockPreview name="realtime-cursor" isPair />
-
+  <BlockPreview name="realtime-cursor" isPair />
+  <BlockPreview name="realtime-cursor" isPair />
 </div>
 
 ## Installation
@@ -39,7 +37,7 @@ The Realtime Cursor component is designed to be used in a room. It can be used t
 
 ```tsx
 'use client'
-import { RealtimeCursors } from '@/registry/default/blocks/realtime-cursor/components/realtime-cursors'
+import { RealtimeCursors } from '@/components/realtime-cursors'
 
 export default function Page() {
   return (
