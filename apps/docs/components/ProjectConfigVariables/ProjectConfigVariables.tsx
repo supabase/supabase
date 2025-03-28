@@ -283,11 +283,9 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   function isInvalid(apiData: ProjectApiData) {
     switch (variable) {
       case 'url':
-        return !apiData.autoApiService.endpoint
+        return !apiData.app_config?.endpoint
       case 'anonKey':
-        // If the anon key is not available, the backend may return the string:
-        // You're using an older version of Supabase. Create a new project for the latest Auth features.
-        return /older version/.test(apiData.autoApiService.defaultApiKey)
+        return !apiData.service_api_keys?.some((key) => key.tags === 'anon')
     }
   }
 
@@ -307,12 +305,10 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   if (stateSummary === 'loggedIn.selectedProject.dataSuccess') {
     switch (variable) {
       case 'url':
-        variableValue = `${apiData.autoApiService.protocol || 'https'}://${
-          apiData.autoApiService.endpoint
-        }`
+        variableValue = `https://${apiData.app_config!.endpoint}`
         break
       case 'anonKey':
-        variableValue = apiData.autoApiService.defaultApiKey
+        variableValue = apiData.service_api_keys!.find((key) => key.tags === 'anon')!.api_key
         break
     }
   }

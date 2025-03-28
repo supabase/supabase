@@ -2765,6 +2765,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/projects/{ref}/notifications/advisor/exceptions/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Updates advisor notification exceptions */
+    patch: operations['ProjectAdvisorNotificationsController_updateNotificationExceptions']
+    trace?: never
+  }
   '/platform/projects/{ref}/pause': {
     parameters: {
       query?: never
@@ -4032,7 +4049,32 @@ export interface components {
       result?: Record<string, never>[]
     }
     ApiResponse: {
-      autoApiService: components['schemas']['AutoApiService']
+      autoApiService: {
+        app: {
+          id: number
+          name: string
+        }
+        app_config: {
+          [key: string]: unknown
+        }
+        defaultApiKey: string
+        endpoint: string
+        id: number
+        name: string
+        project: {
+          /** @description Project ref */
+          ref: string
+        }
+        /** @enum {string} */
+        protocol: 'https'
+        restUrl: string
+        service_api_keys: {
+          api_key_encrypted?: string
+          name: string
+          tags: string
+        }[]
+        serviceApiKey: string
+      }
     }
     ApproveAuthorizationResponse: {
       url: string
@@ -4097,24 +4139,6 @@ export interface components {
         remediation: string
         title: string
       }[]
-    }
-    AutoApiService: {
-      app: {
-        id?: number
-        name?: string
-      }
-      app_config: Record<string, never>
-      defaultApiKey: string
-      endpoint: string
-      id: number
-      name: string
-      project: {
-        ref?: string
-      }
-      protocol: string
-      restUrl: string
-      service_api_keys: components['schemas']['ServiceApiKey'][]
-      serviceApiKey: string
     }
     AvailableAddonResponse: {
       name: string
@@ -4301,36 +4325,47 @@ export interface components {
       role_id: number
       role_scoped_projects?: string[]
     }
-    CreateNotificationExceptionsDto: {
+    CreateNotificationExceptionsBodyDto: {
       exceptions: {
         /** Format: uuid */
         assigned_to?: string
         is_disabled: boolean
         /** @enum {string} */
-        lint_category?: 'ALL' | 'PERFORMANCE' | 'SECURITY'
-        /** @enum {string} */
+        lint_category?: 'PERFORMANCE' | 'SECURITY'
+        lint_metadata?: {
+          [key: string]: unknown
+        }
         lint_name?:
-          | 'ssl_not_enforced'
-          | 'network_restrictions_not_set'
-          | 'pitr_not_enabled'
-          | 'password_requirements_min_length'
-          | 'unindexed_foreign_keys'
-          | 'auth_users_exposed'
-          | 'auth_rls_initplan'
-          | 'no_primary_key'
-          | 'unused_index'
-          | 'multiple_permissive_policies'
-          | 'policy_exists_rls_disabled'
-          | 'rls_enabled_no_policy'
-          | 'duplicate_index'
-          | 'security_definer_view'
-          | 'function_search_path_mutable'
-          | 'rls_disabled_in_public'
-          | 'extension_in_public'
-          | 'rls_references_user_metadata'
-          | 'materialized_view_in_api'
-          | 'foreign_table_in_api'
-          | 'unsupported_reg_types'
+          | (
+              | 'ssl_not_enforced'
+              | 'network_restrictions_not_set'
+              | 'pitr_not_enabled'
+              | 'password_requirements_min_length'
+              | 'unindexed_foreign_keys'
+              | 'auth_users_exposed'
+              | 'auth_rls_initplan'
+              | 'no_primary_key'
+              | 'unused_index'
+              | 'multiple_permissive_policies'
+              | 'policy_exists_rls_disabled'
+              | 'rls_enabled_no_policy'
+              | 'duplicate_index'
+              | 'security_definer_view'
+              | 'function_search_path_mutable'
+              | 'rls_disabled_in_public'
+              | 'extension_in_public'
+              | 'rls_references_user_metadata'
+              | 'materialized_view_in_api'
+              | 'foreign_table_in_api'
+              | 'unsupported_reg_types'
+              | 'auth_otp_long_expiry'
+              | 'auth_otp_short_length'
+              | 'auth_leaked_password_protection'
+              | 'auth_insufficient_mfa_options'
+              | 'auth_password_policy_missing'
+              | 'no_backup_admin'
+            )
+          | string
         note?: string
       }[]
     }
@@ -4346,6 +4381,9 @@ export interface components {
         /** Format: uuid */
         last_updated_by: string
         lint_category: string | null
+        lint_metadata?: {
+          [key: string]: unknown
+        }
         lint_name: string | null
         note: string | null
         project_ref: string
@@ -4658,22 +4696,6 @@ export interface components {
     CustomSupabaseInternalRequests: {
       ami: components['schemas']['AmiSearchOptions']
     }
-    /** @enum {string} */
-    database_status:
-      | 'ACTIVE_HEALTHY'
-      | 'ACTIVE_UNHEALTHY'
-      | 'COMING_UP'
-      | 'GOING_DOWN'
-      | 'INIT_FAILED'
-      | 'REMOVED'
-      | 'RESTORING'
-      | 'UNKNOWN'
-      | 'INIT_READ_REPLICA'
-      | 'INIT_READ_REPLICA_FAILED'
-      | 'RESTARTING'
-      | 'RESIZING'
-    /** @enum {string} */
-    database_type: 'PRIMARY' | 'READ_REPLICA'
     DatabaseDetailResponse: {
       /** @enum {string} */
       cloud_provider: 'AWS' | 'AWS_K8S' | 'FLY'
@@ -4722,6 +4744,7 @@ export interface components {
     }
     /** @enum {string} */
     DbInstanceSize:
+      | 'pico'
       | 'nano'
       | 'micro'
       | 'small'
@@ -5543,6 +5566,9 @@ export interface components {
         /** Format: uuid */
         last_updated_by: string
         lint_category: string | null
+        lint_metadata?: {
+          [key: string]: unknown
+        }
         lint_name: string | null
         note: string | null
         project_ref: string
@@ -5662,7 +5688,69 @@ export interface components {
       website: string
     }
     OrganizationProjectsResponse: {
-      projects: components['schemas']['ProjectWithDatabases'][]
+      projects: {
+        databases: {
+          cloud_provider: string
+          disk_last_modified_at?: string
+          disk_throughput_mbps?: number
+          /** @enum {string} */
+          disk_type?: 'gp3' | 'io2'
+          disk_volume_size_gb?: number
+          identifier: string
+          /** @enum {string} */
+          infra_compute_size?:
+            | 'pico'
+            | 'nano'
+            | 'micro'
+            | 'small'
+            | 'medium'
+            | 'large'
+            | 'xlarge'
+            | '2xlarge'
+            | '4xlarge'
+            | '8xlarge'
+            | '12xlarge'
+            | '16xlarge'
+          region: string
+          /** @enum {string} */
+          status:
+            | 'ACTIVE_HEALTHY'
+            | 'ACTIVE_UNHEALTHY'
+            | 'COMING_UP'
+            | 'GOING_DOWN'
+            | 'INIT_FAILED'
+            | 'REMOVED'
+            | 'RESTORING'
+            | 'UNKNOWN'
+            | 'INIT_READ_REPLICA'
+            | 'INIT_READ_REPLICA_FAILED'
+            | 'RESTARTING'
+            | 'RESIZING'
+          /** @enum {string} */
+          type: 'PRIMARY' | 'READ_REPLICA'
+        }[]
+        is_branch: boolean
+        name: string
+        ref: string
+        region: string
+        /** @enum {string} */
+        status:
+          | 'INACTIVE'
+          | 'ACTIVE_HEALTHY'
+          | 'ACTIVE_UNHEALTHY'
+          | 'COMING_UP'
+          | 'UNKNOWN'
+          | 'GOING_DOWN'
+          | 'INIT_FAILED'
+          | 'REMOVED'
+          | 'RESTORING'
+          | 'UPGRADING'
+          | 'PAUSING'
+          | 'RESTORE_FAILED'
+          | 'RESTARTING'
+          | 'PAUSE_FAILED'
+          | 'RESIZING'
+      }[]
     }
     OrganizationResponse: {
       billing_email: string | null
@@ -5709,6 +5797,7 @@ export interface components {
       id: number
       /** @enum {string} */
       infra_compute_size?:
+        | 'pico'
         | 'nano'
         | 'micro'
         | 'small'
@@ -5830,21 +5919,19 @@ export interface components {
       max_days_till_restore_disabled: number
       remaining_days_till_restore_disabled: number | null
     }
-    Payment: {
-      card?: components['schemas']['PaymentMethodCard']
-      created: number
-      id: string
-      is_default: boolean
-      type: string
-    }
-    PaymentMethodCard: {
-      brand: string
-      exp_month: number
-      exp_year: number
-      last4: string
-    }
     PaymentsResponse: {
-      data: components['schemas']['Payment'][]
+      data: {
+        card?: {
+          brand: string
+          exp_month: number
+          exp_year: number
+          last4: string
+        }
+        created: number
+        id: string
+        is_default: boolean
+        type: string
+      }[]
       defaultPaymentMethodId: string | null
     }
     PgbouncerConfigResponse: {
@@ -6179,23 +6266,6 @@ export interface components {
       username: string
     }
     /** @enum {string} */
-    project_status:
-      | 'INACTIVE'
-      | 'ACTIVE_HEALTHY'
-      | 'ACTIVE_UNHEALTHY'
-      | 'COMING_UP'
-      | 'UNKNOWN'
-      | 'GOING_DOWN'
-      | 'INIT_FAILED'
-      | 'REMOVED'
-      | 'RESTORING'
-      | 'UPGRADING'
-      | 'PAUSING'
-      | 'RESTORE_FAILED'
-      | 'RESTARTING'
-      | 'PAUSE_FAILED'
-      | 'RESIZING'
-    /** @enum {string} */
     ProjectAddonPricingInterval: 'monthly' | 'hourly'
     ProjectAddonsResponse: {
       available_addons: components['schemas']['AvailableAddonResponse'][]
@@ -6242,19 +6312,6 @@ export interface components {
       postgres_engine: components['schemas']['PostgresEngine']
       release_channel: components['schemas']['ReleaseChannel']
       version: string
-    }
-    ProjectDatabase: {
-      cloud_provider: string
-      disk_last_modified_at?: string
-      disk_throughput_mbps?: number
-      /** @enum {string} */
-      disk_type?: 'gp3' | 'io2'
-      disk_volume_size_gb?: number
-      identifier: string
-      infra_compute_size?: components['schemas']['DbInstanceSize']
-      region: string
-      status: components['schemas']['database_status']
-      type: components['schemas']['database_type']
     }
     ProjectDetailResponse: {
       cloud_provider: string
@@ -6347,23 +6404,6 @@ export interface components {
       need_pitr: 'critical' | 'warning' | null
       project: string
     }
-    ProjectResponse: {
-      cloud_provider: string
-      db_dns_name: string
-      db_host: string
-      db_name: string
-      db_port: string
-      db_user: string
-      id: number
-      inserted_at: string
-      jwt_secret: string
-      name: string
-      ref: string
-      region: string
-      services?: components['schemas']['ServiceResponse'][]
-      ssl_enforced: boolean
-      status: string
-    }
     ProjectSensitivityResponse: {
       is_sensitive: boolean
     }
@@ -6397,14 +6437,6 @@ export interface components {
       /** @enum {string} */
       release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       version: string
-    }
-    ProjectWithDatabases: {
-      databases: components['schemas']['ProjectDatabase'][]
-      is_branch: boolean
-      name: string
-      ref: string
-      region: string
-      status: components['schemas']['project_status']
     }
     PublicUrlResponse: {
       publicUrl: string
@@ -6559,29 +6591,28 @@ export interface components {
     RestartProjectBody: {
       database_identifier?: string
     }
-    RestartServiceRequest: {
-      database_identifier?: string
-      region: string
-      services: (
-        | 'adminapi'
-        | 'api-gateway'
-        | 'envoy'
-        | 'functions'
-        | 'gotrue'
-        | 'kong'
-        | 'pgbouncer'
-        | 'pgsodium'
-        | 'postgresql'
-        | 'postgrest'
-        | 'realtime'
-        | 'storage'
-        | 'walg'
-        | 'autoshutdown'
-      )[]
-      source_notification_id?: string
-    }
     RestartServicesBody: {
-      restartRequest: components['schemas']['RestartServiceRequest']
+      restartRequest: {
+        database_identifier?: string
+        region: string
+        services: (
+          | 'adminapi'
+          | 'api-gateway'
+          | 'envoy'
+          | 'functions'
+          | 'gotrue'
+          | 'kong'
+          | 'pgbouncer'
+          | 'pgsodium'
+          | 'postgresql'
+          | 'postgrest'
+          | 'realtime'
+          | 'storage'
+          | 'walg'
+          | 'autoshutdown'
+        )[]
+        source_notification_id?: string
+      }
     }
     RestoreCancellation: Record<string, never>
     RestoreLogicalBackupBody: {
@@ -6662,35 +6693,62 @@ export interface components {
       prevPlan?: string
       reasons: string[]
     }
-    ServiceApiKey: {
-      api_key_encrypted?: string
-      name: string
-      tags: string
-    }
-    ServiceApiKeyResponse: {
-      api_key?: string
-      api_key_encrypted?: string
-      name: string
-      tags: string
-    }
-    ServiceResponse: {
-      app: {
-        id?: number
-        name?: string
-      }
-      app_config: Record<string, never>
-      id: number
-      name: string
-      service_api_keys: components['schemas']['ServiceApiKeyResponse'][]
-    }
     ServiceVersions: {
       gotrue?: string
       postgrest?: string
       'supabase-postgres': string
     }
     SettingsResponse: {
-      project: components['schemas']['ProjectResponse']
-      services: components['schemas']['ServiceResponse'][]
+      project: {
+        cloud_provider: string
+        db_dns_name: string
+        db_host: string
+        db_name: string
+        db_port: number
+        db_user: string
+        id: number
+        inserted_at: string
+        jwt_secret: string
+        name: string
+        ref: string
+        region: string
+        services?: {
+          app: {
+            id: number
+            name: string
+          }
+          app_config: {
+            [key: string]: unknown
+          }
+          id: number
+          name: string
+          service_api_keys: {
+            api_key?: string
+            api_key_encrypted?: string
+            name: string
+            tags: string
+          }[]
+        }[]
+        ssl_enforced: boolean
+        status: string
+      }
+      services: {
+        app: {
+          id: number
+          name: string
+        }
+        app_config: {
+          [key: string]: unknown
+        }
+        id: number
+        name: string
+        service_api_keys: {
+          api_key?: string
+          api_key_encrypted?: string
+          name: string
+          tags: string
+        }[]
+      }[]
     }
     SetupIntentResponse: {
       client_secret: string
@@ -6716,7 +6774,9 @@ export interface components {
       redirectTo?: string
     }
     StorageBucketResponse: {
+      allowed_mime_types?: string[]
       created_at: string
+      file_size_limit?: number
       id: string
       name: string
       owner: string
@@ -6741,7 +6801,9 @@ export interface components {
     StorageObject: {
       bucket_id: string
       buckets: {
+        allowed_mime_types?: string[]
         created_at: string
+        file_size_limit?: number
         id: string
         name: string
         owner: string
@@ -6799,13 +6861,12 @@ export interface components {
       target_project_id: number
       updated_at: string | null
     }
-    TaxId: {
-      country: string
-      type: string
-      value: string
-    }
     TaxIdResponse: {
-      tax_id: components['schemas']['TaxId'] | null
+      tax_id: {
+        country: string
+        type: string
+        value: string
+      } | null
     }
     TelemetryCallFeatureFlagsResponseDto: {
       [key: string]: unknown
@@ -7179,6 +7240,12 @@ export interface components {
       /** @enum {string} */
       status: 'new' | 'seen' | 'archived'
     }
+    UpdateNotificationExceptionParamsDto: {
+      /** Format: uuid */
+      id: string
+      /** @description Project ref */
+      ref: string
+    }
     UpdateNotificationsBodyV1: {
       ids: string[]
     }
@@ -7341,8 +7408,8 @@ export interface components {
       message: string
     }
     UpdateStorageBucketBody: {
-      allowed_mime_types?: string[]
-      file_size_limit?: number
+      allowed_mime_types?: string[] | null
+      file_size_limit?: number | null
       public: boolean
     }
     UpdateStorageConfigBody: {
@@ -7715,7 +7782,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -7754,7 +7820,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -7793,7 +7858,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -7832,7 +7896,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -8017,7 +8080,6 @@ export interface operations {
       header?: never
       path: {
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -10636,7 +10698,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10671,7 +10732,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10708,7 +10768,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10784,7 +10843,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10848,7 +10906,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10883,7 +10940,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10922,7 +10978,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -13371,7 +13426,6 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -15159,12 +15213,11 @@ export interface operations {
           | 'total_storage_patch_requests'
           | 'total_logdrain_egress'
         endDate: string
-        interval: string
+        interval?: string
         startDate: string
       }
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -15507,7 +15560,6 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -15625,7 +15677,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateNotificationExceptionsDto']
+        'application/json': components['schemas']['CreateNotificationExceptionsBodyDto']
       }
     }
     responses: {
@@ -15666,6 +15718,37 @@ export interface operations {
         content?: never
       }
       /** @description Failed to delete advisor notification exceptions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ProjectAdvisorNotificationsController_updateNotificationExceptions: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateNotificationExceptionParamsDto']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update advisor notification exceptions */
       500: {
         headers: {
           [name: string]: unknown
@@ -16280,7 +16363,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
