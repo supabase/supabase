@@ -1,3 +1,5 @@
+'use client'
+
 import { ChevronRight, Trash } from 'lucide-react'
 import { useQueryState } from 'nuqs'
 import { useState } from 'react'
