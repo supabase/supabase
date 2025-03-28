@@ -1,7 +1,7 @@
 import { BlockPreview } from '@/components/block-preview'
 import { ComponentPreview } from '@/components/component-preview'
-import { Button } from '@/registry/default/components/ui/button'
 import Link from 'next/link'
+import { Button_Shadcn_ } from 'ui'
 
 // Horizontal grid line component
 const HorizontalGridLine = () => <div className="col-span-12 h-px bg-border/30" />
@@ -43,9 +43,9 @@ export default function Home() {
                       Supabase back-end to your front-end. Works with your favorite frameworks. Open
                       Source. Open Code.
                     </h2>
-                    <Button variant="secondary" size="lg" className="mt-4">
+                    <Button_Shadcn_ variant="secondary" size="lg" className="mt-4">
                       <Link href="/docs/getting-started/quickstart">Get Started</Link>
-                    </Button>
+                    </Button_Shadcn_>
                   </div>
                 </div>
               </div>
@@ -63,7 +63,7 @@ export default function Home() {
                 className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative"
               >
                 <div className="-mt-4">
-                  <BlockPreview name="password-based-auth/sign-up" />
+                  <BlockPreview name="password-based-auth/auth/sign-up" />
                 </div>
               </div>
               <HorizontalGridLine />

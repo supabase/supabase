@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 
+import { LogoutButton } from '@/registry/default/blocks/password-based-auth-nextjs/components/logout-button'
 import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/server'
 
 export default async function ProtectedPage() {
@@ -10,5 +11,12 @@ export default async function ProtectedPage() {
     redirect('/login')
   }
 
-  return <p>Hello {data.user.email}</p>
+  return (
+    <div className="flex h-svh w-full items-center justify-center gap-2">
+      <p>
+        Hello <span>{data.user.email}</span>
+      </p>
+      <LogoutButton />
+    </div>
+  )
 }

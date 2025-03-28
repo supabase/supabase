@@ -61,12 +61,6 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
                 {isLoading ? 'Saving...' : 'Save new password'}
               </Button>
             </div>
-            <div className="mt-4 text-center text-sm">
-              Already have an account?{' '}
-              <a href="/login" className="underline underline-offset-4">
-                Login
-              </a>
-            </div>
           </form>
         </CardContent>
       </Card>
