@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Download, Send } from 'lucide-react'
+import { Download, FileArchive, Send } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState, type PropsWithChildren } from 'react'
 import { toast } from 'sonner'
@@ -19,7 +19,14 @@ import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
-import { Button } from 'ui'
+import {
+  Button,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Separator,
+} from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
 
@@ -57,6 +64,7 @@ const EdgeFunctionDetailsLayout = ({
   })
 
   const name = selectedFunction?.name || ''
+  const cliCommand = `supabase functions download ${functionSlug}`
 
   const breadcrumbItems = [
     {
@@ -153,9 +161,37 @@ const EdgeFunctionDetailsLayout = ({
               />
             )}
             <DocsButton href="https://supabase.com/docs/guides/functions" />
-            <Button type="default" icon={<Download />} onClick={downloadFunction}>
-              Download
-            </Button>
+            <Popover_Shadcn_>
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button type="default" icon={<Download />}>
+                  Download
+                </Button>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_ align="end" className="p-0">
+                <div className="p-3 flex flex-col gap-y-2">
+                  <p className="text-xs text-foreground-light">Download edge function via CLI</p>
+                  <Input
+                    copy
+                    showCopyOnHover
+                    readOnly
+                    containerClassName=""
+                    className="text-xs font-mono tracking-tighter"
+                    value={`supabase functions download ${functionSlug}`}
+                  />
+                </div>
+                <Separator className="!bg-border-overlay" />
+                <div className="py-2 px-1">
+                  <Button
+                    type="text"
+                    className="w-min hover:bg-transparent"
+                    icon={<FileArchive />}
+                    onClick={downloadFunction}
+                  >
+                    Download as ZIP
+                  </Button>
+                </div>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
             {edgeFunctionCreate && !!functionSlug && (
               <Button
                 type="default"
