@@ -28,7 +28,10 @@ export default function Home() {
             {/* Grid Content */}
             <div className="grid grid-cols-12 gap-0 relative z-20 pb-32">
               {/* Heading Section */}
-              <div data-grid-item className="col-start-3 col-span-8 pt-8 pb-8">
+              <div
+                data-grid-item
+                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-8 pb-8"
+              >
                 <div className="flex flex-col gap-8 justify-start pt-32">
                   <div className="max-w-2xl">
                     <h1 className="text-4xl text-foreground mb-3 font-semibold tracking-tight">
@@ -49,12 +52,15 @@ export default function Home() {
               {/* Password-based Authentication */}
               <div
                 data-grid-item
-                className="col-start-3 col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative"
+                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative"
               >
                 Password-based Authentication
               </div>
               <HorizontalGridLine />
-              <div data-grid-item className="col-start-3 col-span-8 relative">
+              <div
+                data-grid-item
+                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative"
+              >
                 <div className="-mt-4">
                   <BlockPreview name="password-based-auth/sign-up" />
                 </div>
@@ -64,12 +70,15 @@ export default function Home() {
               {/* Realtime Cursors */}
               <div
                 data-grid-item
-                className="col-start-3 col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative"
+                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative"
               >
                 Realtime Cursors
               </div>
               <HorizontalGridLine />
-              <div data-grid-item className="col-start-3 col-span-8 relative">
+              <div
+                data-grid-item
+                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative"
+              >
                 <div className="-mt-4 flex rounded-lg overflow-hidden">
                   <BlockPreview name="realtime-cursor" isPair />
                   <BlockPreview name="realtime-cursor" isPair />
@@ -80,12 +89,15 @@ export default function Home() {
               {/* Dropzone */}
               <div
                 data-grid-item
-                className="col-start-3 col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative"
+                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative"
               >
                 File Upload
               </div>
               <HorizontalGridLine />
-              <div data-grid-item className="col-start-3 col-span-8 relative">
+              <div
+                data-grid-item
+                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative"
+              >
                 <div className="-mt-4 -mb-12">
                   <ComponentPreview name="dropzone-demo" showCode={false} />
                 </div>
@@ -95,12 +107,15 @@ export default function Home() {
               {/* Current User Avatar */}
               <div
                 data-grid-item
-                className="col-start-3 col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative"
+                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative"
               >
                 Current User Avatar
               </div>
               <HorizontalGridLine />
-              <div data-grid-item className="col-start-3 col-span-8 relative">
+              <div
+                data-grid-item
+                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative"
+              >
                 <div className="-mt-4 -mb-12">
                   <ComponentPreview name="current-user-avatar-preview" showCode={false} />
                 </div>
@@ -110,12 +125,15 @@ export default function Home() {
               {/* Realtime Avatar Stack */}
               <div
                 data-grid-item
-                className="col-start-3 col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative"
+                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative"
               >
                 Realtime Avatar Stack
               </div>
               <HorizontalGridLine />
-              <div data-grid-item className="col-start-3 col-span-8 relative">
+              <div
+                data-grid-item
+                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative"
+              >
                 <div className="-mt-4 -mb-12">
                   <ComponentPreview name="realtime-avatar-stack-preview" showCode={false} />
                 </div>
