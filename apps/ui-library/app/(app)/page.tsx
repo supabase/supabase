@@ -3,7 +3,7 @@ import { ComponentPreview } from '@/components/component-preview'
 import { Button } from '@/registry/default/components/ui/button'
 
 // Horizontal grid line component
-const HorizontalGridLine = () => <div className="col-span-12 h-px bg-border-muted" />
+const HorizontalGridLine = () => <div className="col-span-12 h-px bg-border/30" />
 
 export default function Home() {
   return (
@@ -17,7 +17,7 @@ export default function Home() {
             {Array.from({ length: 13 }).map((_, i) => (
               <div
                 key={`col-line-${i}`}
-                className="absolute top-0 bottom-0 w-px bg-border/30 z-10"
+                className="absolute top-0 bottom-0 w-px bg-border/30 z-10 first:hidden last:hidden"
                 style={{
                   left: `${(i / 12) * 100}%`,
                   height: '100%',
@@ -34,7 +34,7 @@ export default function Home() {
               >
                 <div className="flex flex-col gap-8 justify-start pt-32">
                   <div className="max-w-2xl">
-                    <h1 className="text-4xl text-foreground mb-3 font-semibold tracking-tight">
+                    <h1 className="text-4xl text-foreground mb-3 font-medium tracking-tight">
                       UI Blocks for Supabase Projects
                     </h1>
                     <h2 className="text-lg text-foreground-light mb-4">
