@@ -21,7 +21,7 @@ Read Replicas are additional databases that are kept in sync with your Primary d
 
 The database you start with when launching a Supabase project is your Primary database. Read Replicas are kept in sync with the Primary through a process called "replication." Replication is asynchronous to ensure that transactions on the Primary aren't blocked. There is a delay between an update on the Primary and the time that a Read Replica receives the change. This delay is called "replication lag."
 
-You can only read data from a Read Replica. This is in contrast to a Primary database, where you can both read and write
+You can only read data from a Read Replica. This is in contrast to a Primary database, where you can both read and write:
 
 |              | select | insert | update | delete |
 | ------------ | ------ | ------ | ------ | ------ |
