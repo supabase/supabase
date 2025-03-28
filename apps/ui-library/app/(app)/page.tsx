@@ -1,6 +1,7 @@
 import { BlockPreview } from '@/components/block-preview'
 import { ComponentPreview } from '@/components/component-preview'
 import { Button } from '@/registry/default/components/ui/button'
+import Link from 'next/link'
 
 // Horizontal grid line component
 const HorizontalGridLine = () => <div className="col-span-12 h-px bg-border/30" />
@@ -43,7 +44,7 @@ export default function Home() {
                       Source. Open Code.
                     </h2>
                     <Button variant="secondary" size="lg" className="mt-4">
-                      Get Started
+                      <Link href="/docs/getting-started/quickstart">Get Started</Link>
                     </Button>
                   </div>
                 </div>
