@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
@@ -70,7 +71,7 @@ const PITRSidePanel = () => {
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const hasHipaaAddon = true // subscriptionHasHipaaAddon(subscription)
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
@@ -105,7 +106,8 @@ const PITRSidePanel = () => {
   const selectedPitr = availableOptions.find((option) => option.identifier === selectedOption)
   const blockDowngradeDueToReadReplicas =
     hasChanges && hasReadReplicas && selectedCategory === 'off' && selectedOption === 'pitr_0'
-  const blockDowngradeDueToHipaa = hasHipaaAddon && !!subscriptionPitr && !selectedPitr
+  const blockDowngradeDueToHipaa =
+    hasHipaaAddon && !!subscriptionPitr && hasChanges && !selectedPitr
 
   useEffect(() => {
     if (visible) {
@@ -148,11 +150,13 @@ const PITRSidePanel = () => {
       tooltip={
         blockDowngradeDueToHipaa
           ? 'Unable to disable PITR with HIPAA add-on'
-          : isFreePlan
-            ? 'Unable to enable point in time recovery on a Free Plan'
-            : !canUpdatePitr
-              ? 'You do not have permission to update PITR'
-              : undefined
+          : blockDowngradeDueToReadReplicas
+            ? 'Remove all read replicas before disabling PITR'
+            : isFreePlan
+              ? 'Unable to enable point in time recovery on a Free Plan'
+              : !canUpdatePitr
+                ? 'You do not have permission to update PITR'
+                : undefined
       }
       header={
         <div className="flex items-center justify-between">
@@ -252,7 +256,9 @@ const PITRSidePanel = () => {
           ) : blockDowngradeDueToReadReplicas ? (
             <Alert_Shadcn_>
               <WarningIcon />
-              <AlertTitle_Shadcn_>Remove all read replicas before downgrading</AlertTitle_Shadcn_>
+              <AlertTitle_Shadcn_>
+                Remove all read replicas before disabling PITR
+              </AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
                 You currently have active read replicas. The minimum compute size for using read
                 replicas is the Small Compute. You need to remove all read replicas before
