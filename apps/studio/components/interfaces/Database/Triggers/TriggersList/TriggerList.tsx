@@ -7,7 +7,7 @@ import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Badge,
   Button,
@@ -37,7 +37,7 @@ const TriggerList = ({
   deleteTrigger,
 }: TriggerListProps) => {
   const { project } = useProjectContext()
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
 
   const { data: triggers } = useDatabaseTriggersQuery({
     projectRef: project?.ref,
@@ -156,7 +156,8 @@ const TriggerList = ({
                         className="space-x-2"
                         onClick={() => {
                           const sql = generateTriggerCreateSQL(x)
-                          setAiAssistantPanel({
+                          aiSnap.newChat({
+                            name: `Update trigger ${X.name}`,
                             open: true,
                             initialInput: `Update this trigger which exists on the ${x.schema}.${x.table} table to...`,
                             suggestions: {
