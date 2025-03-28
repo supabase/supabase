@@ -40,6 +40,38 @@ The File Upload component makes it easy to add file uploads to your app, with bu
 - Simply add this `<Dropzone />` component to your page and it will handle the rest.
 - For control over file upload, you can pass in a `props` object to the component.
 
+```tsx
+'use client'
+
+import {
+  Dropzone,
+  DropzoneContent,
+  DropzoneEmptyState,
+} from '@/components/blocks/dropzone/components/dropzone'
+import { useSupabaseUpload } from '@/components/blocks/dropzone/hooks/use-supabase-upload'
+
+const FileUploadDemo = () => {
+  const props = useSupabaseUpload({
+    bucketName: 'test',
+    path: 'test',
+    allowedMimeTypes: ['image/*'],
+    maxFiles: 2,
+    maxFileSize: 1000 * 1000 * 10, // 10MB,
+  })
+
+  return (
+    <div className="w-[500px]">
+      <Dropzone {...props}>
+        <DropzoneEmptyState />
+        <DropzoneContent />
+      </Dropzone>
+    </div>
+  )
+}
+
+export FileUploadDemo
+```
+
 ## Props
 
 | Prop               | Type       | Default | Description                                          |
