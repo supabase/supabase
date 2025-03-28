@@ -1,3 +1,5 @@
+'use client'
+
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryState } from 'nuqs'
 import { useEffect } from 'react'
