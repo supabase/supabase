@@ -3,16 +3,16 @@ title: Realtime Cursor
 description: Real-time cursor sharing for collaborative applications
 ---
 
-<ComponentPreview
-  name="realtime-cursor-demo"
-  description="An alert with an icon, title and description. The title says 'Heads up!' and the description is 'You can add components to your app using the cli.'."
-/>
+<div className="flex flex-row -space-x-px w-full">
+  <BlockPreview name="realtime-cursor" isPair />
+  <BlockPreview name="realtime-cursor" isPair />
+</div>
 
 ## Installation
 
 <BlockItem
   name="realtime-cursor-react"
-  description="Component which renders realtime cursors from other users in a room."
+  description="Renders realtime cursors from other users in a room."
 />
 
 ## Folder structure
@@ -36,7 +36,7 @@ The Realtime Cursors component lets users share their cursor position with other
 The Realtime Cursor component is designed to be used in a room. It can be used to build real-time collaborative applications. Add the `<RealtimeCursors />` component to your page and it will render realtime cursors from other users in the room.
 
 ```tsx
-import { RealtimeCursors } from '@/registry/default/blocks/realtime-cursor/components/realtime-cursors'
+import { RealtimeCursors } from '@/components/realtime-cursors'
 
 export default function Page() {
   return (
