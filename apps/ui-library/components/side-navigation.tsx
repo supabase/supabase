@@ -95,7 +95,7 @@ function SideNavigation() {
         {/* <TopNavigationSearch /> */}
         <CommandMenu />
       </div>
-      <div className="pb-6">
+      <div className="pb-6 space-y-0.5">
         <div className="font-mono uppercase text-xs text-foreground-lighter/75 mb-2 px-6 tracking-widest">
           {gettingStarted.title}
         </div>
