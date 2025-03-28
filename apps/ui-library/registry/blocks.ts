@@ -4,8 +4,8 @@ import dropzone from './default/blocks/dropzone/registry-item.json' assert { typ
 import passwordBasedAuthNextjs from './default/blocks/password-based-auth-nextjs/registry-item.json' assert { type: 'json' }
 import passwordBasedAuthReact from './default/blocks/password-based-auth-react/registry-item.json' assert { type: 'json' }
 import passwordBasedAuthTanstack from './default/blocks/password-based-auth-tanstack/registry-item.json' assert { type: 'json' }
-
 import realtimeCursor from './default/blocks/realtime-cursor/registry-item.json' assert { type: 'json' }
+import realtimeChat from './default/blocks/realtime-chat/registry-item.json' assert { type: 'json' }
 import { registryItemAppend } from './utils'
 
 const combine = (component: Registry['items'][number]) => {
@@ -30,4 +30,5 @@ export const blocks = [
   registryItemAppend(passwordBasedAuthTanstack as RegistryItem, [tanstackClient!]),
   ...combine(dropzone as RegistryItem),
   ...combine(realtimeCursor as RegistryItem),
+  ...combine(realtimeChat as RegistryItem),
 ] as Registry['items']
