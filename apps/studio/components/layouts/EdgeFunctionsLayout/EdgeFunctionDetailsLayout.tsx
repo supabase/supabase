@@ -1,9 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Send } from 'lucide-react'
+import { Download, Send } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState, type PropsWithChildren } from 'react'
 import { toast } from 'sonner'
 
+import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { EdgeFunctionTesterSheet } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
@@ -11,6 +12,7 @@ import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import APIDocsButton from 'components/ui/APIDocsButton'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
+import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
@@ -49,6 +51,11 @@ const EdgeFunctionDetailsLayout = ({
     isError,
   } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
 
+  const { data: functionFiles = [], error: filesError } = useEdgeFunctionBodyQuery({
+    projectRef: ref,
+    slug: functionSlug,
+  })
+
   const name = selectedFunction?.name || ''
 
   const breadcrumbItems = [
@@ -86,6 +93,26 @@ const EdgeFunctionDetailsLayout = ({
         },
       ]
     : []
+
+  const downloadFunction = async () => {
+    if (filesError) return toast.error('Failed to retrieve edge function files')
+
+    const zipFileWriter = new BlobWriter('application/zip')
+    const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
+    functionFiles.forEach((file) => {
+      const fileName = file.name.split('/').pop() ?? file.name
+      const fileBlob = new Blob([file.content])
+      zipWriter.add(fileName, new BlobReader(fileBlob))
+    })
+
+    const blobURL = URL.createObjectURL(await zipWriter.close())
+    const link = document.createElement('a')
+    link.href = blobURL
+    link.setAttribute('download', `${functionSlug}.zip`)
+    document.body.appendChild(link)
+    link.click()
+    link.parentNode?.removeChild(link)
+  }
 
   useEffect(() => {
     let cancel = false
@@ -126,6 +153,9 @@ const EdgeFunctionDetailsLayout = ({
               />
             )}
             <DocsButton href="https://supabase.com/docs/guides/functions" />
+            <Button type="default" icon={<Download />} onClick={downloadFunction}>
+              Download
+            </Button>
             {edgeFunctionCreate && !!functionSlug && (
               <Button
                 type="default"

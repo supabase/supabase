@@ -34,6 +34,7 @@ const CodePage = () => {
     data: functionFiles,
     isLoading: isLoadingFiles,
     isError: isErrorLoadingFiles,
+    isSuccess: isSuccessLoadingFiles,
     error: filesError,
   } = useEdgeFunctionBodyQuery({
     projectRef: ref,
@@ -127,7 +128,7 @@ const CodePage = () => {
     // Set files from API response when available
     if (functionFiles) {
       setFiles(
-        functionFiles.map((file: { name: string; content: string }, index: number) => ({
+        functionFiles.map((file, index: number) => ({
           id: index + 1,
           name: file.name,
           content: file.content,
