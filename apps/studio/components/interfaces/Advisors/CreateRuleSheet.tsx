@@ -7,7 +7,6 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { useLintRuleCreateMutation } from 'data/lint/create-lint-rule-mutation'
-import { LintName } from 'data/lint/lint-rules-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useRouter } from 'next/router'
@@ -112,7 +111,7 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
       exception: {
         ...values,
         lint_category: undefined,
-        lint_name: values.lint_name as LintName,
+        lint_name: values.lint_name,
         assigned_to: values.assigned_to === 'all' ? undefined : values.assigned_to,
       },
     })
