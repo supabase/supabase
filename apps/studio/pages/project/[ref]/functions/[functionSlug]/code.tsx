@@ -1,5 +1,6 @@
 import { AlertCircle, CornerDownLeft, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -16,9 +17,11 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { Button } from 'ui'
+import { edgeFunctionsKeys } from 'data/edge-functions/keys'
 
 const CodePage = () => {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const { ref, functionSlug } = useParams()
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
@@ -42,7 +45,8 @@ const CodePage = () => {
   >([])
 
   const { mutateAsync: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
+      // refresh edge function
       toast.success('Successfully updated edge function')
     },
   })
@@ -54,14 +58,43 @@ const CodePage = () => {
       const newEntrypointPath = selectedFunction.entrypoint_path?.split('/').pop()
       const newImportMapPath = selectedFunction.import_map_path?.split('/').pop()
 
+      const fallbackEntrypointPath = () => {
+        // when there's no matching entrypoint path is set,
+        // we use few heuristics to find an entrypoint file
+        // 1. If the function has only a single TS / JS file, if so set it as entrypoint
+        const jsFiles = files.filter(({ name }) => name.endsWith('.js') || name.endsWith('.ts'))
+        if (jsFiles.length === 1) {
+          return jsFiles[0].name
+        } else if (jsFiles.length) {
+          // 2. If function has a `index` or `main` file use it as the entrypoint
+          const regex = /^.*?(index|main).*$/i
+          const matchingFile = jsFiles.find(({ name }) => regex.test(name))
+          // 3. if no valid index / main file found, we set the entrypoint expliclty to first JS file
+          return matchingFile ? matchingFile.name : jsFiles[0].name
+        } else {
+          // no potential entrypoint files found, this will most likely result in an error on deploy
+          return 'index.ts'
+        }
+      }
+
+      const fallbackImportMapPath = () => {
+        // try to find a deno.json or import_map.json file
+        const regex = /^.*?(deno|import_map).json*$/i
+        return files.find(({ name }) => regex.test(name))?.name
+      }
+
       await deployFunction({
         projectRef: ref,
         slug: selectedFunction.slug,
         metadata: {
           name: selectedFunction.name,
           verify_jwt: selectedFunction.verify_jwt,
-          entrypoint_path: newEntrypointPath || 'index.ts',
-          import_map_path: newImportMapPath || '',
+          entrypoint_path: files.some(({ name }) => name === newEntrypointPath)
+            ? (newEntrypointPath as string)
+            : fallbackEntrypointPath(),
+          import_map_path: files.some(({ name }) => name === newImportMapPath)
+            ? newImportMapPath
+            : fallbackImportMapPath(),
         },
         files: files.map(({ name, content }) => ({ name, content })),
       })
