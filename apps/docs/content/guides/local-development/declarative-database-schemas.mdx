@@ -244,9 +244,15 @@ During development, you may want to rollback a migration to keep your new schema
 supabase db reset --version 20241005112233
 ```
 
-After a reset, you can [edit the schema](#updating-your-schema) and regenerate a new migration file.
+After a reset, you can [edit the schema](#updating-your-schema) and regenerate a new migration file. Note that you should not reset a version that's already deployed to production.
 
-Note that you should not reset a version that's already deployed to production.
+If you need to rollback a migration that's already deployed, you should first revert changes to the schema files. Then you can generate a new migration file containing the down migration. This ensures your production migrations are always rolling forward.
+
+<Admonition type="warning">
+
+SQL statements generated in a down migration are usually destructive. You must review them carefully to avoid unintentional data loss.
+
+</Admonition>
 
 ## Known caveats
 
