@@ -7,3 +7,59 @@ description: Real-time chat component for collaborative applications
   <BlockPreview name="realtime-chat" isPair />
   <BlockPreview name="realtime-chat" isPair />
 </div>
+
+## Installation
+
+<BlockItem
+  name="realtime-chat-nextjs"
+  description="Renders a real-time chat interface for users in a shared room."
+/>
+
+## Folder structure
+
+<RegistryBlock itemName="realtime-chat-nextjs" />
+
+## Introduction
+
+The Realtime Chat component provides a complete chat interface that enables users to exchange messages in real-time within a shared room.
+
+## Usage
+
+```tsx
+import { RealtimeChat } from '@/components/realtime-chat'
+
+export default function ChatPage() {
+  return <RealtimeChat roomName="my-chat-room" username="john_doe" />
+}
+```
+
+## Features
+
+- Real-time message synchronization
+- Message persistence support with `onMessage` and `messages` props
+- Customizable message appearance
+- Automatic scroll-to-bottom on new messages
+- Room-based isolation for scoped conversations
+- Low-latency updates using Supabase Realtime
+
+## Props
+
+| Prop         | Type                                | Description                                                   |
+| ------------ | ----------------------------------- | ------------------------------------------------------------- |
+| `roomName`   | `string`                            | Unique identifier for the shared chat room.                   |
+| `username`   | `string`                            | Name of the current user; used to identify message senders.   |
+| `onMessage?` | `(messages: ChatMessage[]) => void` | Optional callback to handle messages, useful for persistence. |
+| `messages?`  | `ChatMessage[]`                     | Optional initial messages to display in the chat.             |
+
+### ChatMessage Type
+
+```typescript
+interface ChatMessage {
+  id: string
+  content: string
+  user: {
+    name: string
+  }
+  createdAt: string
+}
+```

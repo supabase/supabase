@@ -289,6 +289,10 @@
           "type": "registry:hook"
         },
         {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx",
+          "type": "registry:hook"
+        },
+        {
           "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
           "type": "registry:lib"
         },
@@ -846,6 +850,10 @@
           "type": "registry:hook"
         },
         {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx",
+          "type": "registry:hook"
+        },
+        {
           "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
           "type": "registry:lib"
         },
@@ -881,6 +889,10 @@
           "type": "registry:hook"
         },
         {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx",
+          "type": "registry:hook"
+        },
+        {
           "path": "registry/default/clients/react/lib/supabase/client.ts",
           "type": "registry:lib"
         }
@@ -905,6 +917,10 @@
         },
         {
           "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx",
           "type": "registry:hook"
         },
         {
@@ -936,6 +952,10 @@
         },
         {
           "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx",
           "type": "registry:hook"
         },
         {

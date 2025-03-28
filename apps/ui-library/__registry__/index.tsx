@@ -61,7 +61,7 @@ export const Index: Record<string, any> = {
       registryDependencies: [],
       component: React.lazy(() => import("@/registry/default/blocks/realtime-chat/components/chat-message.tsx")),
       source: "",
-      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/clients/nextjs/lib/supabase/client.ts","registry/default/clients/nextjs/lib/supabase/middleware.ts","registry/default/clients/nextjs/lib/supabase/server.ts"],
+      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx","registry/default/clients/nextjs/lib/supabase/client.ts","registry/default/clients/nextjs/lib/supabase/middleware.ts","registry/default/clients/nextjs/lib/supabase/server.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -265,7 +265,7 @@ export const Index: Record<string, any> = {
       registryDependencies: [],
       component: React.lazy(() => import("@/registry/default/blocks/realtime-chat/components/chat-message.tsx")),
       source: "",
-      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/clients/nextjs/lib/supabase/client.ts","registry/default/clients/nextjs/lib/supabase/middleware.ts","registry/default/clients/nextjs/lib/supabase/server.ts"],
+      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx","registry/default/clients/nextjs/lib/supabase/client.ts","registry/default/clients/nextjs/lib/supabase/middleware.ts","registry/default/clients/nextjs/lib/supabase/server.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -277,7 +277,7 @@ export const Index: Record<string, any> = {
       registryDependencies: [],
       component: React.lazy(() => import("@/registry/default/blocks/realtime-chat/components/chat-message.tsx")),
       source: "",
-      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/clients/react/lib/supabase/client.ts"],
+      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx","registry/default/clients/react/lib/supabase/client.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -289,7 +289,7 @@ export const Index: Record<string, any> = {
       registryDependencies: [],
       component: React.lazy(() => import("@/registry/default/blocks/realtime-chat/components/chat-message.tsx")),
       source: "",
-      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
+      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx","registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -301,7 +301,7 @@ export const Index: Record<string, any> = {
       registryDependencies: [],
       component: React.lazy(() => import("@/registry/default/blocks/realtime-chat/components/chat-message.tsx")),
       source: "",
-      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/clients/tanstack/lib/supabase/client.ts","registry/default/clients/tanstack/lib/supabase/server.ts"],
+      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx","registry/default/clients/tanstack/lib/supabase/client.ts","registry/default/clients/tanstack/lib/supabase/server.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
