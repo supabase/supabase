@@ -32,7 +32,6 @@ export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorPr
   const [editingChatName, setEditingChatName] = useState('')
 
   const chats = Object.entries(snap.chats)
-  console.log(snap.chats)
 
   const handleSelectChat = (id: string) => {
     snap.selectChat(id)
@@ -110,7 +109,7 @@ export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorPr
                     value={id}
                     onSelect={() => handleSelectChat(id)}
                     className="flex items-center justify-between gap-2 py-1 w-full overflow-hidden group"
-                    keywords={[chat.name ?? '']}
+                    keywords={!!chat.name ? [chat.name] : undefined}
                   >
                     <div className="flex items-center w-full flex-1 min-w-0">
                       {editingChatId === id ? (

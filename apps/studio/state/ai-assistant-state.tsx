@@ -212,7 +212,6 @@ export const createAiAssistantState = (projectRef: string | undefined) => {
       const existingMessages = chat.messages
       const updatedMessages = existingMessages.map((msg) => {
         if (msg.id === id) {
-          console.log(msg)
           return { ...msg, results: { ...(msg.results ?? {}), [resultId]: results } }
         } else {
           return msg
@@ -283,16 +282,15 @@ export const AiAssistantStateContextProvider = ({
           open: snap.open,
           activeChatId: snap.activeChatId,
           chats: snap.chats
-            ? Object.entries(snap.chats).reduce((prev, next) => {
-                const [chatId, chat] = next
+            ? Object.entries(snap.chats).reduce((acc, [chatId, chat]) => {
                 return {
-                  ...prev,
+                  ...acc,
                   [chatId]: {
                     ...chat,
                     messages: chat.messages?.slice(-20) || [], // Only keep last 20 messages
                   },
                 }
-              })
+              }, {})
             : {},
         }
 
