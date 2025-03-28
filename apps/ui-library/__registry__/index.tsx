@@ -55,6 +55,18 @@ export const Index: Record<string, any> = {
       chunks: []
     }
     ,
+    "realtime-chat": {
+      name: "realtime-chat",
+      type: "registry:component",
+      registryDependencies: [],
+      component: React.lazy(() => import("@/registry/default/blocks/realtime-chat/components/chat-message.tsx")),
+      source: "",
+      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/clients/nextjs/lib/supabase/client.ts","registry/default/clients/nextjs/lib/supabase/middleware.ts","registry/default/clients/nextjs/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
     "dropzone-nextjs": {
       name: "dropzone-nextjs",
       type: "registry:component",
@@ -151,15 +163,6 @@ export const Index: Record<string, any> = {
       chunks: []
     }
     ,
-<<<<<<< HEAD
-    "realtime-chat-nextjs": {
-      name: "realtime-chat-nextjs",
-      type: "registry:component",
-      registryDependencies: [],
-      component: React.lazy(() => import("@/registry/default/blocks/realtime-chat/components/chat-message.tsx")),
-      source: "",
-      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/clients/nextjs/lib/supabase/client.ts","registry/default/clients/nextjs/lib/supabase/middleware.ts","registry/default/clients/nextjs/lib/supabase/server.ts"],
-=======
     "current-user-avatar-nextjs": {
       name: "current-user-avatar-nextjs",
       type: "registry:component",
@@ -167,21 +170,11 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx")),
       source: "",
       files: ["registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx","registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts","registry/default/clients/nextjs/lib/supabase/client.ts","registry/default/clients/nextjs/lib/supabase/middleware.ts","registry/default/clients/nextjs/lib/supabase/server.ts"],
->>>>>>> bab200db858aee8f4a25b96b78718e350da20eaf
       category: "undefined",
       subcategory: "undefined",
       chunks: []
     }
     ,
-<<<<<<< HEAD
-    "realtime-chat-react": {
-      name: "realtime-chat-react",
-      type: "registry:component",
-      registryDependencies: [],
-      component: React.lazy(() => import("@/registry/default/blocks/realtime-chat/components/chat-message.tsx")),
-      source: "",
-      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/clients/react/lib/supabase/client.ts"],
-=======
     "current-user-avatar-react": {
       name: "current-user-avatar-react",
       type: "registry:component",
@@ -189,21 +182,11 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx")),
       source: "",
       files: ["registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx","registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts","registry/default/clients/react/lib/supabase/client.ts"],
->>>>>>> bab200db858aee8f4a25b96b78718e350da20eaf
       category: "undefined",
       subcategory: "undefined",
       chunks: []
     }
     ,
-<<<<<<< HEAD
-    "realtime-chat-react-router": {
-      name: "realtime-chat-react-router",
-      type: "registry:component",
-      registryDependencies: [],
-      component: React.lazy(() => import("@/registry/default/blocks/realtime-chat/components/chat-message.tsx")),
-      source: "",
-      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/clients/react-router/lib/supabase.client.ts","registry/default/clients/react-router/lib/supabase.server.ts"],
-=======
     "current-user-avatar-react-router": {
       name: "current-user-avatar-react-router",
       type: "registry:component",
@@ -211,21 +194,11 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx")),
       source: "",
       files: ["registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx","registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts","registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
->>>>>>> bab200db858aee8f4a25b96b78718e350da20eaf
       category: "undefined",
       subcategory: "undefined",
       chunks: []
     }
     ,
-<<<<<<< HEAD
-    "realtime-chat-tanstack": {
-      name: "realtime-chat-tanstack",
-      type: "registry:component",
-      registryDependencies: [],
-      component: React.lazy(() => import("@/registry/default/blocks/realtime-chat/components/chat-message.tsx")),
-      source: "",
-      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/clients/tanstack/lib/supabase/client.ts","registry/default/clients/tanstack/lib/supabase/server.ts"],
-=======
     "current-user-avatar-tanstack": {
       name: "current-user-avatar-tanstack",
       type: "registry:component",
@@ -281,7 +254,54 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx")),
       source: "",
       files: ["registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx","registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx","registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts","registry/default/clients/tanstack/lib/supabase/client.ts","registry/default/clients/tanstack/lib/supabase/server.ts"],
->>>>>>> bab200db858aee8f4a25b96b78718e350da20eaf
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "realtime-chat-nextjs": {
+      name: "realtime-chat-nextjs",
+      type: "registry:component",
+      registryDependencies: [],
+      component: React.lazy(() => import("@/registry/default/blocks/realtime-chat/components/chat-message.tsx")),
+      source: "",
+      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/clients/nextjs/lib/supabase/client.ts","registry/default/clients/nextjs/lib/supabase/middleware.ts","registry/default/clients/nextjs/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "realtime-chat-react": {
+      name: "realtime-chat-react",
+      type: "registry:component",
+      registryDependencies: [],
+      component: React.lazy(() => import("@/registry/default/blocks/realtime-chat/components/chat-message.tsx")),
+      source: "",
+      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/clients/react/lib/supabase/client.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "realtime-chat-react-router": {
+      name: "realtime-chat-react-router",
+      type: "registry:component",
+      registryDependencies: [],
+      component: React.lazy(() => import("@/registry/default/blocks/realtime-chat/components/chat-message.tsx")),
+      source: "",
+      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "realtime-chat-tanstack": {
+      name: "realtime-chat-tanstack",
+      type: "registry:component",
+      registryDependencies: [],
+      component: React.lazy(() => import("@/registry/default/blocks/realtime-chat/components/chat-message.tsx")),
+      source: "",
+      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/clients/tanstack/lib/supabase/client.ts","registry/default/clients/tanstack/lib/supabase/server.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

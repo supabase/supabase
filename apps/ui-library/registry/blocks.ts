@@ -34,8 +34,10 @@ export const blocks = [
   registryItemAppend(passwordBasedAuthReact as RegistryItem, [reactClient!]),
   registryItemAppend(passwordBasedAuthReactRouter as RegistryItem, [reactRouterClient!]),
   registryItemAppend(passwordBasedAuthTanstack as RegistryItem, [tanstackClient!]),
+  registryItemAppend(realtimeChat as RegistryItem, [nextjsClient!]),
   ...combine(dropzone as RegistryItem),
   ...combine(realtimeCursor as RegistryItem),
   ...combine(currentUserAvatar as RegistryItem),
   ...combine(realtimeAvatarStack as RegistryItem),
+  ...combine(realtimeChat as RegistryItem),
 ] as Registry['items']

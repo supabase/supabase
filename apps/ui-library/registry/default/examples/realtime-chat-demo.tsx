@@ -15,16 +15,16 @@ const RealtimeChatDemo = () => {
   }, [])
 
   return (
-    <div className="flex flex-col w-full max-w-2xl h-[600px] border rounded-lg">
-      <div className="p-4 border-b">
-        <Label>Username</Label>
-        <Input value={username} onChange={(e) => setUsername(e.target.value)} />
+    <div className="flex flex-col w-full h-[600px] p-4">
+      <div className="p-4">
+        <Label className="text-xs font-medium mb-1 ml-1 text-foreground-light">Username</Label>
+        <Input className="text-sm" value={username} onChange={(e) => setUsername(e.target.value)} />
       </div>
-      <div className="flex-1">
+      <div className="flex-1 border rounded-lg overflow-hidden">
         <RealtimeChat roomName="chat-demo" username={username} />
       </div>
     </div>
   )
 }
 
-export default ChatDemo
+export default RealtimeChatDemo

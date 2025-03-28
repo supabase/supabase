@@ -95,6 +95,12 @@ export const componentPages: Record<
     commandItemLabel: 'Realtime Avatar Stack',
     href: '/docs/nextjs/realtime-avatar-stack',
   },
+  'realtime-chat': {
+    title: 'Realtime Chat',
+    supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+    commandItemLabel: 'Realtime Chat',
+    href: '/docs/nextjs/realtime-chat',
+  },
 }
 
 export const COMMAND_ITEMS = [

@@ -18,6 +18,10 @@
     {
       "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
       "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx",
+      "type": "registry:hook"
     }
   ]
 }

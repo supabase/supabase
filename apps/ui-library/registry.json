@@ -269,6 +269,41 @@
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-chat",
+      "type": "registry:component",
+      "title": "Realtime Chat",
+      "description": "Component which renders realtime chat messages from other users in a room.",
+      "registryDependencies": [],
+      "dependencies": ["@supabase/ssr@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
       "name": "dropzone-nextjs",
       "type": "registry:component",
       "title": "Dropzone (File Upload)",
@@ -511,25 +546,6 @@
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
-<<<<<<< HEAD
-      "name": "realtime-chat-nextjs",
-      "type": "registry:component",
-      "title": "Realtime Chat",
-      "description": "Component which renders realtime chat messages from other users in a room.",
-      "registryDependencies": [],
-      "dependencies": ["@supabase/ssr@latest"],
-      "files": [
-        {
-          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
-=======
       "name": "current-user-avatar-nextjs",
       "type": "registry:component",
       "title": "Current User Avatar",
@@ -547,7 +563,6 @@
         },
         {
           "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
->>>>>>> bab200db858aee8f4a25b96b78718e350da20eaf
           "type": "registry:hook"
         },
         {
@@ -566,25 +581,6 @@
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
-<<<<<<< HEAD
-      "name": "realtime-chat-react",
-      "type": "registry:component",
-      "title": "Realtime Chat",
-      "description": "Component which renders realtime chat messages from other users in a room.",
-      "registryDependencies": [],
-      "dependencies": ["@supabase/supabase-js@latest"],
-      "files": [
-        {
-          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
-=======
       "name": "current-user-avatar-react",
       "type": "registry:component",
       "title": "Current User Avatar",
@@ -602,7 +598,6 @@
         },
         {
           "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
->>>>>>> bab200db858aee8f4a25b96b78718e350da20eaf
           "type": "registry:hook"
         },
         {
@@ -613,33 +608,6 @@
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
-<<<<<<< HEAD
-      "name": "realtime-chat-react-router",
-      "type": "registry:component",
-      "title": "Realtime Chat",
-      "description": "Component which renders realtime chat messages from other users in a room.",
-      "registryDependencies": [],
-      "dependencies": ["@supabase/ssr@latest"],
-      "files": [
-        {
-          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
-          "type": "registry:hook"
-        },
-        {
-          "path": "registry/default/clients/react-router/lib/supabase.client.ts",
-          "type": "registry:lib"
-        },
-        {
-          "path": "registry/default/clients/react-router/lib/supabase.server.ts",
-=======
       "name": "current-user-avatar-react-router",
       "type": "registry:component",
       "title": "Current User Avatar",
@@ -665,32 +633,12 @@
         },
         {
           "path": "registry/default/clients/react-router/lib/supabase/server.ts",
->>>>>>> bab200db858aee8f4a25b96b78718e350da20eaf
           "type": "registry:lib"
         }
       ]
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
-<<<<<<< HEAD
-      "name": "realtime-chat-tanstack",
-      "type": "registry:component",
-      "title": "Realtime Chat",
-      "description": "Component which renders realtime chat messages from other users in a room.",
-      "registryDependencies": [],
-      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
-      "files": [
-        {
-          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
-=======
       "name": "current-user-avatar-tanstack",
       "type": "registry:component",
       "title": "Current User Avatar",
@@ -864,7 +812,130 @@
         },
         {
           "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
->>>>>>> bab200db858aee8f4a25b96b78718e350da20eaf
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-chat-nextjs",
+      "type": "registry:component",
+      "title": "Realtime Chat",
+      "description": "Component which renders realtime chat messages from other users in a room.",
+      "registryDependencies": [],
+      "dependencies": ["@supabase/ssr@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-chat-react",
+      "type": "registry:component",
+      "title": "Realtime Chat",
+      "description": "Component which renders realtime chat messages from other users in a room.",
+      "registryDependencies": [],
+      "dependencies": ["@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-chat-react-router",
+      "type": "registry:component",
+      "title": "Realtime Chat",
+      "description": "Component which renders realtime chat messages from other users in a room.",
+      "registryDependencies": [],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-chat-tanstack",
+      "type": "registry:component",
+      "title": "Realtime Chat",
+      "description": "Component which renders realtime chat messages from other users in a room.",
+      "registryDependencies": [],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
           "type": "registry:hook"
         },
         {
