@@ -10,9 +10,9 @@ const actionButtonVariants = cva(
     variants: {
       variant: {
         primary:
-          'bg-gradient-to-b from-emerald-400/0 via-emerald-400/30 to-emerald-400/0 shadow-[0px_0px_6px_0px_rgba(44,244,148,0.40)] outline-emerald-400/60',
+          'dark:bg-gradient-to-b from-emerald-400/0 via-emerald-400/30 to-emerald-400/0 dark:shadow-[0px_0px_6px_0px_rgba(44,244,148,0.40)] outline-emerald-400/60',
         secondary:
-          'bg-gradient-to-b from-neutral-600/0 via-neutral-600/30 to-neutral-600/0 shadow-[0px_0px_6px_0px_rgba(255,255,255,0.10)] outline-white/10',
+          'dark:bg-gradient-to-b from-neutral-600/0 via-neutral-600/30 to-neutral-600/0 dark:shadow-[0px_0px_6px_0px_rgba(255,255,255,0.10)] outline-white/10',
       },
     },
     defaultVariants: {
@@ -37,12 +37,12 @@ const iconVariants = cva(
 )
 
 const textVariants = cva(
-  'justify-center text-white text-xs leading-[20px] font-normal min-w-[108.25px] [@media(pointer:coarse)]:pl-2 text-nowrap',
+  'justify-center text-foreground text-xs leading-[20px] font-normal min-w-[108.25px] [@media(pointer:coarse)]:pl-2 text-nowrap',
   {
     variants: {
       variant: {
-        primary: '[text-shadow:_0px_0px_10px_rgb(255_255_255_/_1.00)]',
-        secondary: '[text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.44)]',
+        primary: 'dark:[text-shadow:_0px_0px_10px_rgb(255_255_255_/_1.00)]',
+        secondary: 'dark:[text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.44)]',
       },
     },
     defaultVariants: {
@@ -91,7 +91,7 @@ export const ActionButton = ({
       ref={buttonRef}
     >
       <div className={cn(iconVariants({ variant }), '[@media(pointer:coarse)]:hidden')}>
-        <div className="text-center justify-center text-neutral-50 text-xs font-normal leading-none [text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.25)]">
+        <div className="text-center justify-center text-neutral-50 text-xs font-normal leading-none dark:[text-shadow:_0px_0px_4px_rgb(255_255_255_/_0.25)]">
           {icon}
         </div>
       </div>
