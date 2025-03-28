@@ -25,11 +25,44 @@ The Realtime Chat component provides a complete chat interface that enables user
 
 ## Usage
 
+### Basic usage
+
 ```tsx
 import { RealtimeChat } from '@/components/realtime-chat'
 
 export default function ChatPage() {
   return <RealtimeChat roomName="my-chat-room" username="john_doe" />
+}
+```
+
+### With initial messages
+
+```tsx
+import { RealtimeChat } from '@/components/realtime-chat'
+import { useMessagesQuery } from '@/hooks/use-messages-query'
+
+export default function ChatPage() {
+  const { data: messages } = useMessagesQuery()
+
+  return <RealtimeChat roomName="my-chat-room" username="john_doe" messages={messages} />
+}
+```
+
+### Storing messages
+
+```tsx
+import { RealtimeChat } from '@/components/realtime-chat'
+import { useMessagesQuery } from '@/hooks/use-messages-query'
+import { storeMessages } from '@/lib/store-messages'
+
+export default function ChatPage() {
+  const { data: messages } = useMessagesQuery()
+  const handleMessage = (messages: ChatMessage[]) => {
+    // Store messages in your database
+    await storeMessages(messages)
+  }
+
+  return <RealtimeChat roomName="my-chat-room" username="john_doe" onMessage={handleMessage} />
 }
 ```
 
