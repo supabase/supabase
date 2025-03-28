@@ -2,6 +2,7 @@ import { AlertCircle, CornerDownLeft, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { dirname, common, relative } from '@std/path/posix'
 
 import LogoLoader from '@ui/components/LogoLoader'
 import { useParams } from 'common'
@@ -53,12 +54,33 @@ const CodePage = () => {
     if (isDeploying || !ref || !functionSlug || !selectedFunction || files.length === 0) return
 
     try {
-      const parsedEntrypointPath =
-        selectedFunction.entrypoint_path?.replace(/\/tmp\/user_fn_[^/]+\//, '') || 'index.ts'
-      const existingFile = files.find((file) => file.name === parsedEntrypointPath) ||
-        files.find((file) => file.name.endsWith('.ts') || file.name.endsWith('.js')) || {
-          name: 'index.ts',
+      const newEntrypointPath = selectedFunction.entrypoint_path?.split('/').pop()
+      const newImportMapPath = selectedFunction.import_map_path?.split('/').pop()
+
+      const fallbackEntrypointPath = () => {
+        // when there's no matching entrypoint path is set,
+        // we use few heuristics to find an entrypoint file
+        // 1. If the function has only a single TS / JS file, if so set it as entrypoint
+        const jsFiles = files.filter(({ name }) => name.endsWith('.js') || name.endsWith('.ts'))
+        if (jsFiles.length === 1) {
+          return jsFiles[0].name
+        } else if (jsFiles.length) {
+          // 2. If function has a `index` or `main` file use it as the entrypoint
+          const regex = /^.*?(index|main).*$/i
+          const matchingFile = jsFiles.find(({ name }) => regex.test(name))
+          // 3. if no valid index / main file found, we set the entrypoint expliclty to first JS file
+          return matchingFile ? matchingFile.name : jsFiles[0].name
+        } else {
+          // no potential entrypoint files found, this will most likely result in an error on deploy
+          return 'index.ts'
         }
+      }
+
+      const fallbackImportMapPath = () => {
+        // try to find a deno.json or import_map.json file
+        const regex = /^.*?(deno|import_map).json*$/i
+        return files.find(({ name }) => regex.test(name))?.name
+      }
 
       await deployFunction({
         projectRef: ref,
@@ -66,8 +88,12 @@ const CodePage = () => {
         metadata: {
           name: selectedFunction.name,
           verify_jwt: selectedFunction.verify_jwt,
-          entrypoint_path: existingFile.name,
-          import_map_path: selectedFunction.import_map_path,
+          entrypoint_path: files.some(({ name }) => name === newEntrypointPath)
+            ? (newEntrypointPath as string)
+            : fallbackEntrypointPath(),
+          import_map_path: files.some(({ name }) => name === newImportMapPath)
+            ? newImportMapPath
+            : fallbackImportMapPath(),
         },
         files: files.map(({ name, content }) => ({ name, content })),
       })
@@ -116,6 +142,19 @@ const CodePage = () => {
     )
   }
 
+  function getBasePath(entrypoint: string | undefined): string {
+    if (!entrypoint) {
+      return '/'
+    }
+
+    try {
+      return dirname(new URL(entrypoint).pathname)
+    } catch (e) {
+      console.error('failed to parse entrypoint', entrypoint)
+      return '/'
+    }
+  }
+
   // TODO (Saxon): Remove this once the flag is fully launched
   useEffect(() => {
     if (!edgeFunctionCreate) {
@@ -125,9 +164,32 @@ const CodePage = () => {
 
   useEffect(() => {
     // Set files from API response when available
-    if (functionFiles) {
+    if (selectedFunction?.entrypoint_path && functionFiles) {
+      const base_path = getBasePath(selectedFunction?.entrypoint_path)
+      const filesWithRelPath = functionFiles
+        // ignore empty files
+        .filter((file: { name: string; content: string }) => !!file.content.length)
+        // set file paths relative to entrypoint
+        .map((file: { name: string; content: string }) => {
+          try {
+            // if the current file and base path doesn't share a common path,
+            // return unmodified file
+            const common_path = common([base_path, file.name])
+            if (common_path === '' || common_path === '/tmp/') {
+              return file
+            }
+
+            file.name = relative(base_path, file.name)
+            return file
+          } catch (e) {
+            console.error(e)
+            // return unmodified file
+            return file
+          }
+        })
+
       setFiles(
-        functionFiles.map((file: { name: string; content: string }, index: number) => ({
+        filesWithRelPath.map((file: { name: string; content: string }, index: number) => ({
           id: index + 1,
           name: file.name,
           content: file.content,
@@ -135,7 +197,7 @@ const CodePage = () => {
         }))
       )
     }
-  }, [functionFiles])
+  }, [functionFiles, selectedFunction])
 
   return (
     <div className="flex flex-col h-full">
