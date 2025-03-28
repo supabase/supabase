@@ -1,5 +1,4 @@
 import { ChevronRight, Trash } from 'lucide-react'
-import { useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -33,7 +32,10 @@ interface AdvisorRuleItemProps {
 export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
-  const [expandedLint, setExpandedLint] = useQueryState('lint')
+  // const [expandedLint, setExpandedLint] = useQueryState('lint')
+
+  const expandedLint = 'lint'
+  const setExpandedLint = (value: string | null) => {}
 
   const [open, setOpen] = useState(false)
   const [selectedRuleToDelete, setSelectedRuleToDelete] = useState<string>()
