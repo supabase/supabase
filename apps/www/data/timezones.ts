@@ -227,6 +227,7 @@ export const timezones = [
   'Asia/Beirut',
   'Asia/Bishkek',
   'Asia/Brunei',
+  'Asia/Calcutta',
   'Asia/Chita',
   'Asia/Choibalsan',
   'Asia/Colombo',

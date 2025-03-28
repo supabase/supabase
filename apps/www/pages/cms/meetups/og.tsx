@@ -47,9 +47,9 @@ export default function MeetupsCMS() {
   // Calculate how many countries should go in each column
   const countriesPerColumn = Math.ceil(countryGroups.length / 3)
   const columns = [
-    countryGroups.slice(0, countriesPerColumn + 1),
-    countryGroups.slice(countriesPerColumn + 1, countriesPerColumn * 2 - 4),
-    countryGroups.slice(countriesPerColumn * 2 - 4),
+    countryGroups.slice(0, countriesPerColumn),
+    countryGroups.slice(countriesPerColumn - 1, countriesPerColumn * 2 - 5),
+    countryGroups.slice(countriesPerColumn * 2 - 5),
   ]
 
   return (
@@ -64,7 +64,7 @@ export default function MeetupsCMS() {
           </div>
         </div>
 
-        <div className="relative font-['DepartureMono'] text-foreground-lighter w-[1200px] h-[780px] bg-alternative text-lg border flex items-start justify-center gap-2 p-10">
+        <div className="relative font-['DepartureMono'] text-foreground-lighter w-[1200px] h-fit bg-alternative text-lg border flex items-start justify-center gap-2 p-10">
           <Image
             src={`${basePath}/images/launchweek/14/meetups-og-bg.png`}
             alt="meetups bg"
@@ -120,10 +120,10 @@ export default function MeetupsCMS() {
                     <div className="">{country === 'Saudi Arabia' ? 'S. Arabia' : country}</div>
                     <div className="gap-1">
                       {[...countryMeetups]
-                        .sort((a, b) => (a.title || '').localeCompare(b.title || ''))
+                        .sort((a, b) => (a.city || '').localeCompare(b.city || ''))
                         .map((meetup) => (
                           <div key={meetup.id} className="text-foreground flex items-center gap-2">
-                            {meetup.title || 'Unnamed Meetup'}
+                            {meetup.city || 'Unnamed Meetup'}
                             {meetup.is_live && (
                               <Badge variant="brand" className="!py-0">
                                 New

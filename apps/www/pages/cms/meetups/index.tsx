@@ -38,18 +38,6 @@ export default function MeetupsCMS() {
     setMeetups(data as Meetup[])
   }
 
-  async function handleImport(meetups: MeetupInsert[]) {
-    const { error } = await supabase.from('meetups').insert(meetups)
-
-    if (error) {
-      console.error('Error importing meetups:', error)
-      return
-    }
-
-    // Refresh the list after import
-    fetchMeetups()
-  }
-
   async function handleDelete() {
     if (!meetupToDelete) return
 
@@ -114,7 +102,12 @@ export default function MeetupsCMS() {
     <CMSLayout>
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <h1 className="h1">Meetups CMS</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="h1">Meetups CMS</h1>
+            <span className="text-sm text-foreground-lighter">
+              {meetups.length} meetup{meetups.length !== 1 ? 's' : ''}
+            </span>
+          </div>
           <div className="flex items-center space-x-4">
             <Button asChild>
               <Link href="/cms/meetups/new">Add Meetup</Link>
@@ -201,7 +194,7 @@ export default function MeetupsCMS() {
                     '-'
                   )}
                 </span>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 md:w-[146px]">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button
@@ -231,7 +224,7 @@ export default function MeetupsCMS() {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                        className={`inline-flex justify-center items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                           meetup.is_published
                             ? 'bg-blue-100 text-blue-800'
                             : 'bg-yellow-100 text-yellow-800'
