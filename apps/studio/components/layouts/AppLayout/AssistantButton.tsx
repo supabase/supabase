@@ -1,8 +1,8 @@
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Button } from 'ui'
 
 const AssistantButton = () => {
-  const { setAiAssistantPanel, aiAssistantPanel } = useAppStateSnapshot()
+  const snap = useAiAssistantStateSnapshot()
 
   return (
     <Button
@@ -11,7 +11,7 @@ const AssistantButton = () => {
       id="assistant-trigger"
       className="h-full w-full rounded-none"
       onClick={() => {
-        setAiAssistantPanel({ open: !aiAssistantPanel.open })
+        snap.toggleAssistant()
       }}
     >
       <AiIconAnimation allowHoverEffect size={20} />
