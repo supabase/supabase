@@ -14,7 +14,6 @@ export interface ChatMessage {
   content: string
   user: {
     name: string
-    avatar?: string
   }
   createdAt: string
 }
@@ -22,18 +21,30 @@ export interface ChatMessage {
 interface RealtimeChatProps {
   roomName: string
   username: string
-  avatar?: string
+  onMessage?: (messages: ChatMessage[]) => void
 }
 
-export const RealtimeChat = ({ roomName, username, avatar }: RealtimeChatProps) => {
+/**
+ * Realtime chat component
+ * @param roomName - The name of the room to join. Each room is a unique chat.
+ * @param username - The username of the user
+ * @param onMessage - The callback function to handle the messages. Useful if you want to store the messages in a database.
+ * @returns The chat component
+ */
+export const RealtimeChat = ({ roomName, username, onMessage }: RealtimeChatProps) => {
   const { containerRef, scrollToBottom } = useChatScroll()
 
-  const { messages, sendMessage, onlineUsers, isConnected } = useRealtimeChat({
+  const { messages, sendMessage, isConnected } = useRealtimeChat({
     roomName,
     username,
-    avatar,
   })
   const [newMessage, setNewMessage] = useState('')
+
+  useEffect(() => {
+    if (onMessage) {
+      onMessage(messages)
+    }
+  }, [messages, onMessage])
 
   useEffect(() => {
     // Scroll to bottom whenever messages change
