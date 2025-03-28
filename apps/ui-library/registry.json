@@ -795,6 +795,146 @@
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-chat-nextjs",
+      "type": "registry:component",
+      "title": "Realtime Chat",
+      "description": "Component which renders realtime chat messages from other users in a room.",
+      "registryDependencies": ["input", "button"],
+      "dependencies": ["lucide-react", "@supabase/ssr@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-chat-react",
+      "type": "registry:component",
+      "title": "Realtime Chat",
+      "description": "Component which renders realtime chat messages from other users in a room.",
+      "registryDependencies": ["input", "button"],
+      "dependencies": ["lucide-react", "@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-chat-react-router",
+      "type": "registry:component",
+      "title": "Realtime Chat",
+      "description": "Component which renders realtime chat messages from other users in a room.",
+      "registryDependencies": ["input", "button"],
+      "dependencies": ["lucide-react", "@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-chat-tanstack",
+      "type": "registry:component",
+      "title": "Realtime Chat",
+      "description": "Component which renders realtime chat messages from other users in a room.",
+      "registryDependencies": ["input", "button"],
+      "dependencies": ["lucide-react", "@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
       "name": "supabase-client-nextjs",
       "type": "registry:lib",
       "title": "Supabase Client for Next.js",
