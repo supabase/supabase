@@ -1,13 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import ExampleLayout from '../example-layout'
-import { MousePointer2 } from 'lucide-react'
+import ExampleLayout, { ExampleLayoutProps } from '../example-layout'
 
-export default function CursorTrackingExample() {
-  const [instanceId] = useState(() => Math.random().toString(36).substring(2, 9))
+const instanceId = Math.random().toString(36).substring(2, 9)
 
-  const appJsCode = `import { useEffect, useState, useRef, useCallback } from 'react';
+const appJsCode = `import { useEffect, useState, useRef, useCallback } from 'react';
 import './styles.css';
 import { createClient } from '@supabase/supabase-js';
 import { MousePointer2 } from 'lucide-react';
@@ -308,20 +306,17 @@ export default function App() {
   );
 }`
 
-  const cursorTrackingFiles = {
-    '/App.js': appJsCode,
-    '/styles.css': `/* No custom CSS needed - using Tailwind */`,
-  }
-
-  return (
-    <ExampleLayout
-      appJsCode={appJsCode}
-      files={cursorTrackingFiles}
-      dependencies={{
-        'lucide-react': 'latest',
-      }}
-      title="Cursor Tracking"
-      description="A collaborative example that tracks and displays user cursors in real-time using Supabase Presence. See where other users are pointing with ultra-smooth cursor animations powered by position interpolation. Features include hidden native cursor, optimized update batching, and a custom animation loop for the most natural cursor movement possible."
-    />
-  )
+const cursorTrackingFiles = {
+  '/App.js': appJsCode,
+  '/styles.css': `/* No custom CSS needed - using Tailwind */`,
 }
+
+const layoutProps: ExampleLayoutProps = {
+  appJsCode,
+  files: cursorTrackingFiles,
+  title: 'Cursor Tracking',
+  description:
+    "A multi-user cursor tracking application that uses Supabase Realtime's broadcast and presence features to show real-time cursor movements of all connected users.",
+}
+
+export default layoutProps

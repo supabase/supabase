@@ -1,12 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import ExampleLayout from '../example-layout'
+import ExampleLayout, { ExampleLayoutProps } from '../example-layout'
 
-export default function Platformer3DExample() {
-  const [instanceId] = useState(() => Math.random().toString(36).substring(2, 9))
+const instanceId = Math.random().toString(36).substring(2, 9)
 
-  const appJsCode = `import { useEffect, useState, useRef } from 'react';
+const appJsCode = `import { useEffect, useState, useRef } from 'react';
 import './styles.css';
 import { createClient } from '@supabase/supabase-js';
 import { Canvas, useFrame } from '@react-three/fiber';
@@ -1046,9 +1045,9 @@ function Player({ player, isLocal, keysPressed, setLocalPlayer }) {
   );
 }`
 
-  const platformer3DFiles = {
-    '/App.js': appJsCode,
-    '/styles.css': `/* No custom CSS needed - using Tailwind */
+const platformer3DFiles = {
+  '/App.js': appJsCode,
+  '/styles.css': `/* No custom CSS needed - using Tailwind */
 
 /* Game-specific styles that can't be handled by Tailwind */
 canvas {
@@ -1064,23 +1063,20 @@ canvas {
   z-index: 100;
 }
 `,
-  }
-
-  return (
-    <ExampleLayout
-      appJsCode={appJsCode}
-      files={platformer3DFiles}
-      dependencies={{
-        '@react-three/fiber': 'latest',
-        '@react-three/cannon': 'latest',
-        '@react-three/drei': 'latest',
-        three: 'latest',
-        tailwindcss: 'latest',
-        postcss: 'latest',
-        autoprefixer: 'latest',
-      }}
-      title="3D Platformer Example"
-      description="An immersive 3D multiplayer platformer game where players navigate a physics-based environment, collect coins, and interact with each other. This advanced example demonstrates real-time position synchronization, 3D physics with jumping and collision detection, projectile shooting mechanics, and player presence with usernames. Built with Three.js and React Three Fiber, it showcases sophisticated game development concepts including interpolated movement, optimized network updates, and responsive controls in a 3D space."
-    />
-  )
 }
+
+const layoutProps: ExampleLayoutProps = {
+  appJsCode,
+  files: platformer3DFiles,
+  dependencies: {
+    three: 'latest',
+    '@react-three/fiber': 'latest',
+    '@react-three/drei': 'latest',
+    '@react-three/cannon': 'latest',
+  },
+  title: '3D Platformer Example',
+  description:
+    'An immersive 3D multiplayer platformer game where players navigate a physics-based environment, collect coins, and interact with each other. This advanced example demonstrates real-time position synchronization, 3D physics with jumping and collision detection, projectile shooting mechanics, and player presence with usernames. Built with Three.js and React Three Fiber, it showcases sophisticated game development concepts including interpolated movement, optimized network updates, and responsive controls in a 3D space.',
+}
+
+export default layoutProps

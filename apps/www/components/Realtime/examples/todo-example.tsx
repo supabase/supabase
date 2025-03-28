@@ -3,14 +3,9 @@
 import { useState } from 'react'
 import type { ExampleLayoutProps } from '../example-layout'
 
-type TodoExampleProps = {
-  render: (props: ExampleLayoutProps) => React.ReactNode
-}
+const instanceId = Math.random().toString(36).substring(2, 9)
 
-export default function TodoExample({ render }: TodoExampleProps) {
-  const [instanceId] = useState(() => Math.random().toString(36).substring(2, 9))
-
-  const appJsCode = `import { useEffect, useState } from 'react';
+const appJsCode = `import { useEffect, useState } from 'react';
 import './styles.css';
 import { createClient } from '@supabase/supabase-js';
 
@@ -336,18 +331,17 @@ export default function App() {
   );
 }`
 
-  const todoFiles = {
-    '/App.js': appJsCode,
-    '/styles.css': `/* No custom CSS needed - using Tailwind */`,
-  }
-
-  const layoutProps: ExampleLayoutProps = {
-    appJsCode,
-    files: todoFiles,
-    title: 'Todo List',
-    description:
-      "A collaborative todo list application that lets multiple users manage tasks in real-time. Features include adding, completing, and deleting tasks, all synchronized instantly across devices. This example showcases real-time database changes, presence indicators showing who's online, and optimistic UI updates.",
-  }
-
-  return render(layoutProps)
+const todoFiles = {
+  '/App.js': appJsCode,
+  '/styles.css': `/* No custom CSS needed - using Tailwind */`,
 }
+
+const layoutProps: ExampleLayoutProps = {
+  appJsCode,
+  files: todoFiles,
+  title: 'Todo List',
+  description:
+    "A collaborative todo list application that lets multiple users manage tasks in real-time. Features include adding, completing, and deleting tasks, all synchronized instantly across devices. This example showcases real-time database changes and presence indicators showing who's online.",
+}
+
+export default layoutProps

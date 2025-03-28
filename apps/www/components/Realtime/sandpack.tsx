@@ -34,7 +34,9 @@ export default function SandpackWrapper({ files, dependencies = {} }: SandpackPr
           },
         }}
         options={{
+          experimental_enableServiceWorker: true,
           visibleFiles: ['/App.js'],
+          initMode: 'user-visible',
           activeFile: '/App.js',
           externalResources: ['https://cdn.tailwindcss.com'],
         }}

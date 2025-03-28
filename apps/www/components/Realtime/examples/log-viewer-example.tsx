@@ -1,11 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import ExampleLayout from '../example-layout'
+import ExampleLayout, { ExampleLayoutProps } from '../example-layout'
 import supabase from '../../../lib/supabase'
 
-export default function LogViewerExample() {
-  const appJsCode = `import { useEffect, useState, useCallback, useRef } from 'react';
+const appJsCode = `import { useEffect, useState, useCallback, useRef } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { AutoSizer, Table, Column, InfiniteLoader } from 'react-virtualized';
 import 'react-virtualized/styles.css';
@@ -399,20 +398,20 @@ export default function App() {
   );
 }`
 
-  const logViewerFiles = {
-    '/App.js': appJsCode,
-    '/styles.css': `/* No custom CSS needed - using Tailwind */`,
-  }
-
-  return (
-    <ExampleLayout
-      appJsCode={appJsCode}
-      files={logViewerFiles}
-      dependencies={{
-        'react-virtualized': 'latest',
-      }}
-      title="Log Viewer Example"
-      description="A high-performance log monitoring system that displays and updates logs in real-time. This example demonstrates how to build a scalable log viewer with virtualized rendering for handling large datasets, automatic scrolling to new entries, and filtering by log level. It showcases Supabase Realtime's ability to stream database changes efficiently, making it perfect for monitoring application logs, system events, or any time-series data that requires immediate visibility."
-    />
-  )
+const logViewerFiles = {
+  '/App.js': appJsCode,
+  '/styles.css': `/* No custom CSS needed - using Tailwind */`,
 }
+
+const layoutProps: ExampleLayoutProps = {
+  appJsCode,
+  files: logViewerFiles,
+  dependencies: {
+    'react-virtualized': 'latest',
+  },
+  title: 'Log Viewer',
+  description:
+    "A real-time log viewer that uses Supabase Realtime's broadcast channel to stream and display log entries as they occur across multiple instances.",
+}
+
+export default layoutProps

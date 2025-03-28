@@ -1,12 +1,11 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import ExampleLayout from '../example-layout'
+import ExampleLayout, { ExampleLayoutProps } from '../example-layout'
 
-export default function FormPresenceExample() {
-  const [instanceId] = useState(() => Math.random().toString(36).substring(2, 9))
+const instanceId = Math.random().toString(36).substring(2, 9)
 
-  const appJsCode = `import { useEffect, useState, useRef } from 'react';
+const appJsCode = `import { useEffect, useState, useRef } from 'react';
 import './styles.css';
 import { createClient } from '@supabase/supabase-js';
 import { useForm, Controller } from 'react-hook-form';
@@ -459,20 +458,20 @@ export default function App() {
   );
 }`
 
-  const formPresenceFiles = {
-    '/App.js': appJsCode,
-    '/styles.css': `/* No custom CSS needed - using Tailwind */`,
-  }
-
-  return (
-    <ExampleLayout
-      appJsCode={appJsCode}
-      files={formPresenceFiles}
-      dependencies={{
-        'react-hook-form': 'latest',
-      }}
-      title="Form Presence"
-      description="A collaborative form example showing real-time presence indicators. Multiple users can work on the same form simultaneously, with fields being edited by other users locked to prevent conflicts. Form data is synchronized in real-time across all connected clients without flickering. When submitted, the success state is visible to all connected clients."
-    />
-  )
+const formPresenceFiles = {
+  '/App.js': appJsCode,
+  '/styles.css': `/* No custom CSS needed - using Tailwind */`,
 }
+
+const layoutProps: ExampleLayoutProps = {
+  appJsCode,
+  files: formPresenceFiles,
+  title: 'Form Presence',
+  dependencies: {
+    'react-hook-form': 'latest',
+  },
+  description:
+    "A multi-user form that uses Supabase Realtime's presence feature to show which fields are currently being edited by other users in real-time.",
+}
+
+export default layoutProps

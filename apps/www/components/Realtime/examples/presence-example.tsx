@@ -3,14 +3,9 @@
 import { useState } from 'react'
 import type { ExampleLayoutProps } from '../example-layout'
 
-type PresenceExampleProps = {
-  render: (props: ExampleLayoutProps) => React.ReactNode
-}
+const instanceId = Math.random().toString(36).substring(2, 9)
 
-export default function PresenceExample({ render }: PresenceExampleProps) {
-  const [instanceId] = useState(() => Math.random().toString(36).substring(2, 9))
-
-  const appJsCode = `import { useEffect, useState } from 'react';
+const appJsCode = `import { useEffect, useState } from 'react';
 import './styles.css';
 import { createClient } from '@supabase/supabase-js';
 
@@ -105,18 +100,17 @@ export default function App() {
   );
 }`
 
-  const presenceFiles = {
-    '/App.js': appJsCode,
-    '/styles.css': `/* No custom CSS needed - using Tailwind */`,
-  }
-
-  const layoutProps: ExampleLayoutProps = {
-    appJsCode,
-    files: presenceFiles,
-    title: 'Presence',
-    description:
-      "A simple demonstration of Supabase Realtime Presence, showing which users are currently online and active. This example tracks user presence with avatars and usernames, allowing you to see who's viewing the same content in real-time.",
-  }
-
-  return render(layoutProps)
+const presenceFiles = {
+  '/App.js': appJsCode,
+  '/styles.css': `/* No custom CSS needed - using Tailwind */`,
 }
+
+const layoutProps: ExampleLayoutProps = {
+  appJsCode,
+  files: presenceFiles,
+  title: 'Presence',
+  description:
+    "A demonstration of Supabase Realtime's presence feature that tracks and displays online users in real-time with their avatars and usernames.",
+}
+
+export default layoutProps

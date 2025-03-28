@@ -1,18 +1,18 @@
 'use client'
 
 import { UserProvider } from '../contexts/user-context'
-import PresenceExample from './examples/presence-example'
-import ChatExample from './examples/chat-example'
-import TodoExample from './examples/todo-example'
-import CollaborativeEditorExample from './examples/collaborative-editor-example'
-import WhiteboardExample from './examples/whiteboard-example'
-import TicTacToeExample from './examples/tic-tac-toe-example'
-import EmojiPickerExample from './examples/emoji-picker-example'
-import Platformer3DExample from './examples/platformer-3d-example'
-import IframeAnnotationExample from './examples/iframe-annotation-example'
-import LogViewerExample from './examples/log-viewer-example'
-import FormPresenceExample from './examples/form-presence-example'
-import CursorTrackingExample from './examples/cursor-tracking-example'
+import presenceExample from './examples/presence-example'
+import chatExample from './examples/chat-example'
+import todoExample from './examples/todo-example'
+import collaborativeEditorExample from './examples/collaborative-editor-example'
+import whiteboardExample from './examples/whiteboard-example'
+import ticTacToeExample from './examples/tic-tac-toe-example'
+import emojiPickerExample from './examples/emoji-picker-example'
+import platformer3DExample from './examples/platformer-3d-example'
+import iframeAnnotationExample from './examples/iframe-annotation-example'
+import logViewerExample from './examples/log-viewer-example'
+import formPresenceExample from './examples/form-presence-example'
+import cursorTrackingExample from './examples/cursor-tracking-example'
 import { Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import {
   Users,
@@ -37,73 +37,73 @@ const EXAMPLES = [
     value: 'presence',
     label: 'Presence',
     icon: Users,
-    component: PresenceExample,
+    props: presenceExample,
   },
   {
     value: 'chat',
     label: 'Chat',
     icon: MessageSquare,
-    component: ChatExample,
+    props: chatExample,
   },
   {
     value: 'todo',
     label: 'Todo List',
     icon: CheckSquare,
-    component: TodoExample,
+    props: todoExample,
   },
   {
     value: 'editor',
     label: 'Editor',
     icon: Edit,
-    component: CollaborativeEditorExample,
+    props: collaborativeEditorExample,
   },
   {
     value: 'formPresence',
     label: 'Form',
     icon: ClipboardList,
-    component: FormPresenceExample,
+    props: formPresenceExample,
   },
   {
     value: 'cursorTracking',
     label: 'Cursor',
     icon: MousePointer,
-    component: CursorTrackingExample,
+    props: cursorTrackingExample,
   },
   {
     value: 'whiteboard',
     label: 'Whiteboard',
     icon: PenTool,
-    component: WhiteboardExample,
+    props: whiteboardExample,
   },
   {
     value: 'tictactoe',
     label: 'XO',
     icon: Hash,
-    component: TicTacToeExample,
+    props: ticTacToeExample,
   },
   {
     value: 'emoji',
     label: 'Reactions',
     icon: Smile,
-    component: EmojiPickerExample,
+    props: emojiPickerExample,
   },
   {
     value: 'platformer',
     label: 'Platformer',
     icon: Gamepad2,
-    component: Platformer3DExample,
+    props: platformer3DExample,
   },
   {
     value: 'annotation',
     label: 'Annotation',
     icon: StickyNote,
-    component: IframeAnnotationExample,
+    props: iframeAnnotationExample,
   },
   {
     value: 'logs',
     label: 'Logs',
     icon: FileText,
-    component: LogViewerExample,
+    props: logViewerExample,
   },
 ]
 
@@ -132,7 +132,6 @@ export default function RealtimeShowcase() {
 
   // Get the current example from the index
   const currentExample = EXAMPLES[activeTabIndex]
-  const ExampleComponent = currentExample.component
 
   return (
     <UserProvider>
@@ -178,14 +177,11 @@ export default function RealtimeShowcase() {
           {/* Tab Content - render ExampleLayout with props from current example */}
           <div className="flex-1 h-full overflow-hidden">
             <div className="mt-0 border-0 p-0 m-0 h-full overflow-hidden">
-              <ExampleComponent
-                render={(layoutProps) => (
-                  <ExampleLayout
-                    {...layoutProps}
-                    onNext={activeTabIndex < EXAMPLES.length - 1 ? handleNext : undefined}
-                    onPrevious={activeTabIndex > 0 ? handlePrevious : undefined}
-                  />
-                )}
+              <ExampleLayout
+                key={currentExample.value}
+                {...currentExample.props}
+                onNext={activeTabIndex < EXAMPLES.length - 1 ? handleNext : undefined}
+                onPrevious={activeTabIndex > 0 ? handlePrevious : undefined}
               />
             </div>
           </div>

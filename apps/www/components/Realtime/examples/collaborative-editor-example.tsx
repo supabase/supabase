@@ -3,14 +3,9 @@
 import { useState } from 'react'
 import type { ExampleLayoutProps } from '../example-layout'
 
-type CollaborativeEditorExampleProps = {
-  render: (props: ExampleLayoutProps) => React.ReactNode
-}
+const instanceId = Math.random().toString(36).substring(2, 9)
 
-export default function CollaborativeEditorExample({ render }: CollaborativeEditorExampleProps) {
-  const [instanceId] = useState(() => Math.random().toString(36).substring(2, 9))
-
-  const appJsCode = `import { useEffect, useState, useRef } from 'react';
+const appJsCode = `import { useEffect, useState, useRef } from 'react';
 import './styles.css';
 import { createClient } from '@supabase/supabase-js';
 import * as Y from 'yjs';
@@ -201,9 +196,9 @@ export default function App() {
   );
 }`
 
-  const editorFiles = {
-    '/App.js': appJsCode,
-    '/styles.css': `/* No custom CSS needed - using Tailwind */
+const editorFiles = {
+  '/App.js': appJsCode,
+  '/styles.css': `/* No custom CSS needed - using Tailwind */
 
 /* Override Quill styles for dark theme */
 .ql-editor.ql-blank::before {
@@ -228,19 +223,18 @@ export default function App() {
   line-height: 1.6 !important;
   font-family: 'Inter', sans-serif !important;
 }`,
-  }
-
-  const layoutProps: ExampleLayoutProps = {
-    appJsCode,
-    files: editorFiles,
-    dependencies: {
-      yjs: 'latest',
-      quill: 'latest',
-    },
-    title: 'Collaborative Editor',
-    description:
-      'A real-time collaborative text editor that allows multiple users to edit the same document simultaneously. Built with Quill and Yjs for conflict-free editing, this example demonstrates how to implement Google Docs-like functionality with cursor tracking, presence awareness, and synchronized text operations. Changes made by any user are instantly visible to everyone, making it ideal for collaborative writing, note-taking, or documentation.',
-  }
-
-  return render(layoutProps)
 }
+
+const layoutProps: ExampleLayoutProps = {
+  appJsCode,
+  files: editorFiles,
+  dependencies: {
+    yjs: 'latest',
+    quill: 'latest',
+  },
+  title: 'Collaborative Editor',
+  description:
+    "A real-time collaborative text editor that uses Supabase Realtime's broadcast channel to sync document changes between users via YJS CRDT.",
+}
+
+export default layoutProps

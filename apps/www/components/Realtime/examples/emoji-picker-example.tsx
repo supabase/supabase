@@ -1,12 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import ExampleLayout from '../example-layout'
+import ExampleLayout, { ExampleLayoutProps } from '../example-layout'
 
-export default function EmojiPickerExample() {
-  const [instanceId] = useState(() => Math.random().toString(36).substring(2, 9))
+const instanceId = Math.random().toString(36).substring(2, 9)
 
-  const appJsCode = `import { useEffect, useState, useRef } from 'react';
+const appJsCode = `import { useEffect, useState, useRef } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
@@ -204,9 +203,9 @@ export default function App() {
   );
 }`
 
-  const emojiPickerFiles = {
-    '/App.js': appJsCode,
-    '/styles.css': `@keyframes float-up {
+const emojiPickerFiles = {
+  '/App.js': appJsCode,
+  '/styles.css': `@keyframes float-up {
   0% {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
@@ -220,14 +219,14 @@ export default function App() {
 .animate-float-up {
   animation: float-up 2s ease-out forwards;
 }`,
-  }
-
-  return (
-    <ExampleLayout
-      appJsCode={appJsCode}
-      files={emojiPickerFiles}
-      title="Emoji Picker Example"
-      description="An interactive emoji reaction system where users can send animated emoji expressions that float across the screen. This fun example demonstrates real-time broadcasting of user interactions, presence tracking, and animated UI elements. Perfect for adding engagement to live streams, presentations, or any collaborative space where users want to express reactions without interrupting the main content."
-    />
-  )
 }
+
+const layoutProps: ExampleLayoutProps = {
+  appJsCode,
+  files: emojiPickerFiles,
+  title: 'Emoji Picker',
+  description:
+    "An interactive emoji reaction system that uses Supabase Realtime's broadcast channel to sync emoji reactions across multiple users in real-time.",
+}
+
+export default layoutProps

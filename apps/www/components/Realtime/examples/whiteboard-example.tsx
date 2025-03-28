@@ -1,12 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import ExampleLayout from '../example-layout'
+import ExampleLayout, { ExampleLayoutProps } from '../example-layout'
 
-export default function WhiteboardExample() {
-  const [instanceId] = useState(() => Math.random().toString(36).substring(2, 9))
+const instanceId = Math.random().toString(36).substring(2, 9)
 
-  const appJsCode = `import { useEffect, useState, useRef } from 'react';
+const appJsCode = `import { useEffect, useState, useRef } from 'react';
 import './styles.css';
 import { createClient } from '@supabase/supabase-js';
 import { Trash2 } from "lucide-react";
@@ -406,16 +405,16 @@ export default function App() {
   );
 }`
 
-  const whiteboardFiles = {
-    '/App.js': appJsCode,
-  }
-
-  return (
-    <ExampleLayout
-      appJsCode={appJsCode}
-      files={whiteboardFiles}
-      title="Whiteboard Example"
-      description="A collaborative drawing canvas where multiple users can draw together in real-time. Features include color selection, presence awareness showing who's online, and optimized drawing with batched updates for smooth performance. Perfect for brainstorming sessions, design collaboration, or just having fun drawing together."
-    />
-  )
+const whiteboardFiles = {
+  '/App.js': appJsCode,
 }
+
+const layoutProps: ExampleLayoutProps = {
+  appJsCode,
+  files: whiteboardFiles,
+  title: 'Whiteboard',
+  description:
+    "A collaborative whiteboard that uses Supabase Realtime's broadcast channel to synchronize drawing strokes and cursor positions between multiple users in real-time.",
+}
+
+export default layoutProps

@@ -1,7 +1,6 @@
 'use client'
 import SandpackWrapper from './sandpack'
 import { Button, CodeBlock } from 'ui'
-import Image from 'next/image'
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight, Code, Eye } from 'lucide-react'
 

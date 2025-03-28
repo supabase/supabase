@@ -1,12 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import ExampleLayout from '../example-layout'
+import ExampleLayout, { ExampleLayoutProps } from '../example-layout'
 
-export default function IframeAnnotationExample() {
-  const [instanceId] = useState(() => Math.random().toString(36).substring(2, 9))
+const instanceId = Math.random().toString(36).substring(2, 9)
 
-  const appJsCode = `import { useEffect, useState, useRef } from 'react';
+const appJsCode = `import { useEffect, useState, useRef } from 'react';
 import './styles.css';
 import { createClient } from '@supabase/supabase-js';
 import { X } from 'lucide-react';
@@ -339,17 +338,17 @@ export default function App() {
   );
 }`
 
-  const imageAnnotationFiles = {
-    '/App.js': appJsCode,
-    '/styles.css': `/* No custom CSS needed - using Tailwind */`,
-  }
-
-  return (
-    <ExampleLayout
-      appJsCode={appJsCode}
-      files={imageAnnotationFiles}
-      title="Image Annotation Example"
-      description="A collaborative image annotation tool that allows multiple users to add comments to specific points on an image. This example demonstrates position-based annotations, real-time comment synchronization, and presence awareness. Users can click anywhere on the image to leave comments, see other users' annotations instantly, and engage in discussions about specific parts of the visual content. Ideal for design feedback, educational materials, or collaborative visual analysis."
-    />
-  )
+const imageAnnotationFiles = {
+  '/App.js': appJsCode,
+  '/styles.css': `/* No custom CSS needed - using Tailwind */`,
 }
+
+const layoutProps: ExampleLayoutProps = {
+  appJsCode,
+  files: imageAnnotationFiles,
+  title: 'IFrame Annotation',
+  description:
+    "A collaborative annotation tool that uses Supabase Realtime's broadcast channel to synchronize annotations and comments on embedded web content across multiple users.",
+}
+
+export default layoutProps

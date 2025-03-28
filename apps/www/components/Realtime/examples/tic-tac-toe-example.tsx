@@ -1,13 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import ExampleLayout from '../example-layout'
-import { X, Circle } from 'lucide-react'
+import ExampleLayout, { ExampleLayoutProps } from '../example-layout'
 
-export default function TicTacToeExample() {
-  const [instanceId] = useState(() => Math.random().toString(36).substring(2, 9))
+const instanceId = Math.random().toString(36).substring(2, 9)
 
-  const appJsCode = `import { useEffect, useState, useRef } from 'react';
+const appJsCode = `import { useEffect, useState, useRef } from 'react';
 import './styles.css';
 import { createClient } from '@supabase/supabase-js';
 import { X, Circle } from 'lucide-react';
@@ -334,17 +332,17 @@ export default function App() {
   );
 }`
 
-  const ticTacToeFiles = {
-    '/App.js': appJsCode,
-    '/styles.css': `/* No custom CSS needed - using Tailwind */`,
-  }
-
-  return (
-    <ExampleLayout
-      appJsCode={appJsCode}
-      files={ticTacToeFiles}
-      title="Tic Tac Toe Example"
-      description="A multiplayer Tic Tac Toe game where two players can compete in real-time. This example demonstrates game state synchronization, turn management, win detection, and player presence. Players are automatically assigned X or O symbols, with the game tracking moves, determining winners, and allowing for game resets. Perfect for learning how to build simple multiplayer games with Supabase Realtime."
-    />
-  )
+const ticTacToeFiles = {
+  '/App.js': appJsCode,
+  '/styles.css': `/* No custom CSS needed - using Tailwind */`,
 }
+
+const layoutProps: ExampleLayoutProps = {
+  appJsCode,
+  files: ticTacToeFiles,
+  title: 'Tic Tac Toe',
+  description:
+    "A multiplayer Tic Tac Toe game that uses Supabase Realtime's broadcast and presence features to synchronize game state and player turns between opponents.",
+}
+
+export default layoutProps
