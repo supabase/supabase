@@ -14,6 +14,33 @@ const RealtimeChatDemo = () => {
     setUsername(names[Math.floor(Math.random() * names.length)])
   }, [])
 
+  const messages = [
+    {
+      id: '1',
+      content: 'Where are you Dylan?',
+      user: {
+        name: 'Harmony',
+      },
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: '2',
+      content: 'in the bathroom',
+      user: {
+        name: 'Dylan',
+      },
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: '3',
+      content: "Please don't tell us what you're doing in the bathroom",
+      user: {
+        name: 'Mark S',
+      },
+      createdAt: new Date().toISOString(),
+    },
+  ]
+
   return (
     <div className="flex flex-col w-full h-[600px] p-4">
       <div className="p-4">
@@ -21,7 +48,7 @@ const RealtimeChatDemo = () => {
         <Input className="text-sm" value={username} onChange={(e) => setUsername(e.target.value)} />
       </div>
       <div className="flex-1 border rounded-lg overflow-hidden">
-        <RealtimeChat roomName="chat-demo" username={username} />
+        <RealtimeChat roomName="chat-demo" username={username} messages={messages} />
       </div>
     </div>
   )

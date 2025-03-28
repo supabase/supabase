@@ -22,6 +22,7 @@ interface RealtimeChatProps {
   roomName: string
   username: string
   onMessage?: (messages: ChatMessage[]) => void
+  messages?: ChatMessage[]
 }
 
 /**
@@ -29,27 +30,52 @@ interface RealtimeChatProps {
  * @param roomName - The name of the room to join. Each room is a unique chat.
  * @param username - The username of the user
  * @param onMessage - The callback function to handle the messages. Useful if you want to store the messages in a database.
+ * @param messages - The messages to display in the chat. Useful if you want to display messages from a database.
  * @returns The chat component
  */
-export const RealtimeChat = ({ roomName, username, onMessage }: RealtimeChatProps) => {
+export const RealtimeChat = ({
+  roomName,
+  username,
+  onMessage,
+  messages: initialMessages = [],
+}: RealtimeChatProps) => {
   const { containerRef, scrollToBottom } = useChatScroll()
+  const [allMessages, setAllMessages] = useState<ChatMessage[]>(initialMessages)
 
-  const { messages, sendMessage, isConnected } = useRealtimeChat({
+  const {
+    messages: realtimeMessages,
+    sendMessage,
+    isConnected,
+  } = useRealtimeChat({
     roomName,
     username,
   })
   const [newMessage, setNewMessage] = useState('')
 
+  // Merge realtime messages with initial messages
+  useEffect(() => {
+    const mergedMessages = [...initialMessages, ...realtimeMessages]
+    // Remove duplicates based on message id
+    const uniqueMessages = mergedMessages.filter(
+      (message, index, self) => index === self.findIndex((m) => m.id === message.id)
+    )
+    // Sort by creation date
+    const sortedMessages = uniqueMessages.sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    )
+    setAllMessages(sortedMessages)
+  }, [initialMessages, realtimeMessages])
+
   useEffect(() => {
     if (onMessage) {
-      onMessage(messages)
+      onMessage(allMessages)
     }
-  }, [messages, onMessage])
+  }, [allMessages, onMessage])
 
   useEffect(() => {
     // Scroll to bottom whenever messages change
     scrollToBottom()
-  }, [messages, scrollToBottom])
+  }, [allMessages, scrollToBottom])
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault()
@@ -63,14 +89,14 @@ export const RealtimeChat = ({ roomName, username, onMessage }: RealtimeChatProp
     <div className="flex flex-col h-full w-full bg-background text-foreground antialiased">
       {/* Messages */}
       <div ref={containerRef} className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[400px]">
-        {messages.length === 0 ? (
+        {allMessages.length === 0 ? (
           <div className="text-center text-sm text-muted-foreground">
             No messages yet. Start the conversation!
           </div>
         ) : null}
         <div className="space-y-1">
-          {messages.map((message, index) => {
-            const prevMessage = index > 0 ? messages[index - 1] : null
+          {allMessages.map((message, index) => {
+            const prevMessage = index > 0 ? allMessages[index - 1] : null
             const showHeader = !prevMessage || prevMessage.user.name !== message.user.name
 
             return (
