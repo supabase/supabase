@@ -1,10 +1,10 @@
 'use client'
 
 import { SidebarNavItem } from '@/types/nav'
-import { cn } from 'ui/src/lib/utils/cn'
-import { usePathname } from 'next/navigation'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import React from 'react'
+import { cn } from 'ui'
 
 const NavigationItem: React.FC<{ item: SidebarNavItem }> = React.memo(({ item }) => {
   const pathname = usePathname()
