@@ -119,10 +119,10 @@ const CodePage = () => {
 
   // TODO (Saxon): Remove this once the flag is fully launched
   useEffect(() => {
-    if (!edgeFunctionCreate) {
+    if (edgeFunctionCreate !== undefined && !edgeFunctionCreate) {
       router.push(`/project/${ref}/functions`)
     }
-  }, [edgeFunctionCreate, ref, router])
+  }, [edgeFunctionCreate])
 
   useEffect(() => {
     // Set files from API response when available

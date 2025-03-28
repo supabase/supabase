@@ -108,7 +108,10 @@ const EdgeFunctionDetailsLayout = ({
     const zipFileWriter = new BlobWriter('application/zip')
     const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
     functionFiles.forEach((file) => {
-      const fileName = file.name.split('/').pop() ?? file.name
+      const nameSections = file.name.split('/')
+      const slugIndex = nameSections.indexOf(functionSlug ?? '')
+      const fileName = nameSections.slice(slugIndex + 1).join('/')
+
       const fileBlob = new Blob([file.content])
       zipWriter.add(fileName, new BlobReader(fileBlob))
     })
