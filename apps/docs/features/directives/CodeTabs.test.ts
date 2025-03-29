@@ -26,7 +26,7 @@ console.log('Hello, world!');
 
     expect(output).toEqual(
       `
-<Tabs listClassNames="flex-nowrap overflow-x-auto">
+<Tabs listClassNames="flex-nowrap overflow-x-auto -mb-6">
   <TabPanel id="a.js" label="a.js">
     \`\`\`js name=a.js
     console.log('Hello, world!');

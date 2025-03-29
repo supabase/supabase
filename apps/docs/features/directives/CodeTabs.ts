@@ -71,7 +71,7 @@ function rewriteNodes(tree: Root) {
         {
           type: 'mdxJsxAttribute',
           name: 'listClassNames',
-          value: 'flex-nowrap overflow-x-auto',
+          value: 'flex-nowrap overflow-x-auto -mb-6',
         },
       ],
       children: remappedChildren,
