@@ -1,3 +1,5 @@
+'use client'
+
 import { ChevronRight, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
