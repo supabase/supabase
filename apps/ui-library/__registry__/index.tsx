@@ -11,9 +11,9 @@ export const Index: Record<string, any> = {
       name: "password-based-auth-nextjs",
       type: "registry:block",
       registryDependencies: ["button","card","input","label"],
-      component: React.lazy(() => import("@/registry/default/blocks/password-based-auth-nextjs/app/login/page.tsx")),
+      component: React.lazy(() => import("@/registry/default/blocks/password-based-auth-nextjs/app/auth/login/page.tsx")),
       source: "",
-      files: ["registry/default/blocks/password-based-auth-nextjs/app/login/page.tsx","registry/default/blocks/password-based-auth-nextjs/app/error/page.tsx","registry/default/blocks/password-based-auth-nextjs/app/protected/page.tsx","registry/default/blocks/password-based-auth-nextjs/app/confirm/route.ts","registry/default/blocks/password-based-auth-nextjs/components/login-form.tsx","registry/default/blocks/password-based-auth-nextjs/middleware.ts","registry/default/blocks/password-based-auth-nextjs/app/sign-up/page.tsx","registry/default/blocks/password-based-auth-nextjs/app/sign-up-success/page.tsx","registry/default/blocks/password-based-auth-nextjs/components/sign-up-form.tsx","registry/default/blocks/password-based-auth-nextjs/app/forgot-password/page.tsx","registry/default/blocks/password-based-auth-nextjs/app/update-password/page.tsx","registry/default/blocks/password-based-auth-nextjs/components/forgot-password-form.tsx","registry/default/blocks/password-based-auth-nextjs/components/update-password-form.tsx","registry/default/clients/nextjs/lib/supabase/client.ts","registry/default/clients/nextjs/lib/supabase/middleware.ts","registry/default/clients/nextjs/lib/supabase/server.ts"],
+      files: ["registry/default/blocks/password-based-auth-nextjs/app/auth/login/page.tsx","registry/default/blocks/password-based-auth-nextjs/app/auth/error/page.tsx","registry/default/blocks/password-based-auth-nextjs/app/protected/page.tsx","registry/default/blocks/password-based-auth-nextjs/app/auth/confirm/route.ts","registry/default/blocks/password-based-auth-nextjs/components/login-form.tsx","registry/default/blocks/password-based-auth-nextjs/middleware.ts","registry/default/blocks/password-based-auth-nextjs/app/auth/sign-up/page.tsx","registry/default/blocks/password-based-auth-nextjs/app/auth/sign-up-success/page.tsx","registry/default/blocks/password-based-auth-nextjs/components/sign-up-form.tsx","registry/default/blocks/password-based-auth-nextjs/app/auth/forgot-password/page.tsx","registry/default/blocks/password-based-auth-nextjs/app/auth/update-password/page.tsx","registry/default/blocks/password-based-auth-nextjs/components/forgot-password-form.tsx","registry/default/blocks/password-based-auth-nextjs/components/update-password-form.tsx","registry/default/blocks/password-based-auth-nextjs/components/logout-button.tsx","registry/default/clients/nextjs/lib/supabase/client.ts","registry/default/clients/nextjs/lib/supabase/middleware.ts","registry/default/clients/nextjs/lib/supabase/server.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -242,6 +242,54 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx")),
       source: "",
       files: ["registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx","registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx","registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts","registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts","registry/default/clients/tanstack/lib/supabase/client.ts","registry/default/clients/tanstack/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "realtime-chat-nextjs": {
+      name: "realtime-chat-nextjs",
+      type: "registry:component",
+      registryDependencies: ["input","button"],
+      component: React.lazy(() => import("@/registry/default/blocks/realtime-chat/components/chat-message.tsx")),
+      source: "",
+      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx","registry/default/clients/nextjs/lib/supabase/client.ts","registry/default/clients/nextjs/lib/supabase/middleware.ts","registry/default/clients/nextjs/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "realtime-chat-react": {
+      name: "realtime-chat-react",
+      type: "registry:component",
+      registryDependencies: ["input","button"],
+      component: React.lazy(() => import("@/registry/default/blocks/realtime-chat/components/chat-message.tsx")),
+      source: "",
+      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx","registry/default/clients/react/lib/supabase/client.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "realtime-chat-react-router": {
+      name: "realtime-chat-react-router",
+      type: "registry:component",
+      registryDependencies: ["input","button"],
+      component: React.lazy(() => import("@/registry/default/blocks/realtime-chat/components/chat-message.tsx")),
+      source: "",
+      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx","registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "realtime-chat-tanstack": {
+      name: "realtime-chat-tanstack",
+      type: "registry:component",
+      registryDependencies: ["input","button"],
+      component: React.lazy(() => import("@/registry/default/blocks/realtime-chat/components/chat-message.tsx")),
+      source: "",
+      files: ["registry/default/blocks/realtime-chat/components/chat-message.tsx","registry/default/blocks/realtime-chat/components/realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx","registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx","registry/default/clients/tanstack/lib/supabase/client.ts","registry/default/clients/tanstack/lib/supabase/server.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

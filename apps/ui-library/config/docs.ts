@@ -45,7 +45,7 @@ export const aiEditorsRules: SidebarNavGroup = {
 export const frameworkTitles: Record<string, string> = {
   nextjs: 'Next.js',
   'react-router': 'React Router',
-  tanstack: 'Tanstack Start',
+  tanstack: 'TanStack Start',
   react: 'React SPA',
 }
 
@@ -94,6 +94,12 @@ export const componentPages: Record<
     supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
     commandItemLabel: 'Realtime Avatar Stack',
     href: '/docs/nextjs/realtime-avatar-stack',
+  },
+  'realtime-chat': {
+    title: 'Realtime Chat',
+    supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+    commandItemLabel: 'Realtime Chat',
+    href: '/docs/nextjs/realtime-chat',
   },
 }
 

@@ -8,6 +8,7 @@ import passwordBasedAuthReact from './default/blocks/password-based-auth-react/r
 import passwordBasedAuthTanstack from './default/blocks/password-based-auth-tanstack/registry-item.json' assert { type: 'json' }
 import realtimeAvatarStack from './default/blocks/realtime-avatar-stack/registry-item.json' assert { type: 'json' }
 
+import realtimeChat from './default/blocks/realtime-chat/registry-item.json' assert { type: 'json' }
 import realtimeCursor from './default/blocks/realtime-cursor/registry-item.json' assert { type: 'json' }
 import { registryItemAppend } from './utils'
 
@@ -37,4 +38,5 @@ export const blocks = [
   ...combine(realtimeCursor as RegistryItem),
   ...combine(currentUserAvatar as RegistryItem),
   ...combine(realtimeAvatarStack as RegistryItem),
+  ...combine(realtimeChat as RegistryItem),
 ] as Registry['items']

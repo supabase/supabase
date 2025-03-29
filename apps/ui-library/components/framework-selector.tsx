@@ -4,13 +4,13 @@ import { usePathname, useRouter } from 'next/navigation'
 
 import { componentPages, frameworkTitles } from '@/config/docs'
 import { useFramework } from '@/context/framework-context'
-import { SelectValue } from '@ui/components/shadcn/ui/select'
 import {
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
 } from 'ui'
 
 const frameworks = Object.keys(frameworkTitles)
@@ -62,7 +62,7 @@ export function FrameworkSelector() {
   return (
     <Select_Shadcn_ value={selectedFramework} onValueChange={onSelect}>
       <SelectTrigger_Shadcn_ className="w-[180px]">
-        <SelectValue />
+        <SelectValue_Shadcn_ />
       </SelectTrigger_Shadcn_>
       <SelectContent_Shadcn_>
         <SelectGroup_Shadcn_>

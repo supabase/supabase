@@ -49,14 +49,14 @@ Library of components for your project. The components integrate with Supabase a
     - Avatar stack in realtime
 - [Realtime Cursor](https://supabase.com/ui/docs/react/realtime-cursor)
     - Real-time cursor sharing for collaborative applications
-- [Tanstack Start](https://supabase.com/ui/docs/tanstack/client)
-    - Supabase client for Tanstack Start
+- [TanStack Start](https://supabase.com/ui/docs/tanstack/client)
+    - Supabase client for TanStack Start
 - [Current User Avatar](https://supabase.com/ui/docs/tanstack/current-user-avatar)
     - Supabase Auth-aware avatar
 - [Dropzone (File Upload)](https://supabase.com/ui/docs/tanstack/dropzone)
     - Displays a control for easier uploading of files directly to Supabase Storage
-- [Tanstack Start](https://supabase.com/ui/docs/tanstack/password-based-auth)
-    - Supabase client for Tanstack Start
+- [TanStack Start](https://supabase.com/ui/docs/tanstack/password-based-auth)
+    - Supabase client for TanStack Start
 - [Realtime Avatar Stack](https://supabase.com/ui/docs/tanstack/realtime-avatar-stack)
     - Avatar stack in realtime
 - [Realtime Cursor](https://supabase.com/ui/docs/tanstack/realtime-cursor)

@@ -62,7 +62,6 @@
     "@types/react-dom": "^18.2.22",
     "autoprefixer": "^10.0.1",
     "config": "workspace:^",
-    "fumadocs-ui": "^15.1.0",
     "lodash": "^4.17.21",
     "mdast-util-toc": "^6.1.1",
     "postcss": "^8",
