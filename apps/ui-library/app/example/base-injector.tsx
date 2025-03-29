@@ -13,6 +13,12 @@ export function BaseInjector() {
     base.href = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/example/password-based-auth/`
     document.head.prepend(base)
 
+    // Add preview class to body to use shadcn theme vars
+    const bodyElement = document.querySelector('body')
+    if (bodyElement) {
+      bodyElement.classList.add('preview')
+    }
+
     return () => {
       base.remove()
     }
