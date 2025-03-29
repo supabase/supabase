@@ -63,15 +63,15 @@ You will need the [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.h
 
    Use `pg_dump` with your Postgres credentials to export your database to a file (e.g., `dump.sql`).
 
-```bash
-pg_dump "$OLD_DB_URL" \
-  --clean \
-  --if-exists \
-  --quote-all-identifiers \
-  --no-owner \
-  --no-privileges \
-  > dump.sql
-```
+      ```bash
+      pg_dump "$OLD_DB_URL" \
+      --clean \
+      --if-exists \
+      --quote-all-identifiers \
+      --no-owner \
+      --no-privileges \
+      > dump.sql
+      ```
 
 2. Import the database to your Supabase project
 
