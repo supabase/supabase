@@ -14,6 +14,7 @@ export const HIDDEN_PLACEHOLDER = '**** **** **** ****'
 
 export interface Props extends Omit<ComponentProps<typeof Input_Shadcn_>, 'size' | 'onCopy'> {
   copy?: boolean
+  showCopyOnHover?: boolean
   onCopy?: () => void
   icon?: any
   reveal?: boolean
@@ -29,6 +30,7 @@ const Input = forwardRef<
   (
     {
       copy,
+      showCopyOnHover = false,
       icon,
       reveal = false,
       actions,
@@ -69,7 +71,7 @@ const Input = forwardRef<
     if (icon) inputClasses.push(__styles.with_icon)
 
     return (
-      <div className={cn('relative', containerClassName)}>
+      <div className={cn('relative group', containerClassName)}>
         <Input_Shadcn_
           ref={ref}
           {...props}
@@ -85,6 +87,7 @@ const Input = forwardRef<
               <Button
                 size="tiny"
                 type="default"
+                className={cn(showCopyOnHover && 'opacity-0 group-hover:opacity-100 transition')}
                 icon={<Copy size={16} className="text-foreground-muted" />}
                 onClick={() => _onCopy(props.value)}
               >

@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { handleError, constructHeaders } from 'data/fetchers'
-import { IS_PLATFORM, BASE_PATH } from 'lib/constants'
+import { constructHeaders, handleError } from 'data/fetchers'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { ResponseError } from 'types'
 import { edgeFunctionsKeys } from './keys'
 
@@ -46,7 +46,7 @@ export async function getEdgeFunctionBody(
     }
 
     const { files } = await parseResponse.json()
-    return files
+    return files as EdgeFunctionFile[]
   } catch (error) {
     console.error('Failed to parse edge function code:', error)
     throw new Error(
