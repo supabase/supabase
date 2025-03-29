@@ -427,11 +427,11 @@ export function DiskManagementForm() {
                   </div>
                   <Separator />
                   <div className="px-8 flex flex-col gap-y-8">
-                    <StorageTypeField form={form} disableInput={disableDiskInputs} />
                     <NoticeBar
                       type="default"
                       visible={disableIopsThroughputConfig}
-                      title={`IOPS ${form.getValues('storageType') === 'gp3' ? 'and Throughput ' : ''}configuration requires LARGE Compute size or above`}
+                      title="Adjusting disk configuration requires LARGE Compute size or above"
+                      description={`Increase your compute size to adjust your disk's storage type, ${form.getValues('storageType') === 'gp3' ? 'IOPS, ' : ''} and throughput`}
                       actions={
                         <Button
                           type="default"
@@ -442,6 +442,10 @@ export function DiskManagementForm() {
                           Change to LARGE Compute
                         </Button>
                       }
+                    />
+                    <StorageTypeField
+                      form={form}
+                      disableInput={disableIopsThroughputConfig || disableDiskInputs}
                     />
                     <IOPSField
                       form={form}
