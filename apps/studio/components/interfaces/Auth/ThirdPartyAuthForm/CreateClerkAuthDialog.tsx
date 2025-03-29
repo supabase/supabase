@@ -106,8 +106,11 @@ export const CreateClerkAuthIntegrationDialog = ({
           <Form_Shadcn_ {...form}>
             <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <p className="text-sm text-foreground-light">
-                This will enable a Clerk session token (JWT) from a specific access data from this
-                Supabase project.{' '}
+                Register your Clerk domain. Visit{' '}
+                <a href="https://dashboard.clerk.com/setup/supabase" target="_blank" rel="noopener">
+                  Clerk's Connect with Supabase page
+                </a>{' '}
+                to configure your Clerk instance.
               </p>
               <FormField_Shadcn_
                 key="domain"
@@ -119,7 +122,7 @@ export const CreateClerkAuthIntegrationDialog = ({
                       <Input_Shadcn_
                         {...field}
                         placeholder={
-                          'https://clerk.example.com / https://example.clerk.accounts.dev'
+                          'https://clerk.example.com or https://example.clerk.accounts.dev'
                         }
                       />
                     </FormControl_Shadcn_>
