@@ -277,7 +277,7 @@
       "type": "registry:component",
       "title": "Dropzone (File Upload)",
       "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
-      "registryDependencies": ["button", "tooltip", "progress"],
+      "registryDependencies": ["button"],
       "dependencies": ["react-dropzone", "lucide-react", "@supabase/ssr@latest"],
       "files": [
         {
@@ -308,7 +308,7 @@
       "type": "registry:component",
       "title": "Dropzone (File Upload)",
       "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
-      "registryDependencies": ["button", "tooltip", "progress"],
+      "registryDependencies": ["button"],
       "dependencies": ["react-dropzone", "lucide-react", "@supabase/supabase-js@latest"],
       "files": [
         {
@@ -331,7 +331,7 @@
       "type": "registry:component",
       "title": "Dropzone (File Upload)",
       "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
-      "registryDependencies": ["button", "tooltip", "progress"],
+      "registryDependencies": ["button"],
       "dependencies": [
         "react-dropzone",
         "lucide-react",
@@ -363,7 +363,7 @@
       "type": "registry:component",
       "title": "Dropzone (File Upload)",
       "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
-      "registryDependencies": ["button", "tooltip", "progress"],
+      "registryDependencies": ["button"],
       "dependencies": [
         "react-dropzone",
         "lucide-react",
