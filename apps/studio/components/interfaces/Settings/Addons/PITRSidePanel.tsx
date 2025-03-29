@@ -17,6 +17,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
+import { ExternalLink } from 'lucide-react'
 import { useAddonsPagePanel } from 'state/addons-page'
 import {
   Alert,
@@ -30,7 +31,6 @@ import {
   WarningIcon,
   cn,
 } from 'ui'
-import { ExternalLink, AlertTriangle } from 'lucide-react'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -102,10 +102,12 @@ const PITRSidePanel = () => {
 
   const hasReadReplicas = (databases ?? []).length > 1
   const hasChanges = selectedOption !== (subscriptionPitr?.variant.identifier ?? 'pitr_0')
-  const selectedPitr = availableOptions.find((option) => option.identifier === selectedOption)
   const isFreePlan = subscription?.plan?.id === 'free'
+  const selectedPitr = availableOptions.find((option) => option.identifier === selectedOption)
   const blockDowngradeDueToReadReplicas =
     hasChanges && hasReadReplicas && selectedCategory === 'off' && selectedOption === 'pitr_0'
+  const blockDowngradeDueToHipaa =
+    hasHipaaAddon && !!subscriptionPitr && hasChanges && !selectedPitr
 
   useEffect(() => {
     if (visible) {
@@ -142,17 +144,19 @@ const PITRSidePanel = () => {
         !hasChanges ||
         isSubmitting ||
         !canUpdatePitr ||
-        hasHipaaAddon ||
+        blockDowngradeDueToHipaa ||
         blockDowngradeDueToReadReplicas
       }
       tooltip={
-        hasHipaaAddon
-          ? 'Unable to change PITR with HIPAA add-on'
-          : isFreePlan
-            ? 'Unable to enable point in time recovery on a Free Plan'
-            : !canUpdatePitr
-              ? 'You do not have permission to update PITR'
-              : undefined
+        blockDowngradeDueToHipaa
+          ? 'Unable to disable PITR with HIPAA add-on'
+          : blockDowngradeDueToReadReplicas
+            ? 'Remove all read replicas before disabling PITR'
+            : isFreePlan
+              ? 'Unable to enable point in time recovery on a Free Plan'
+              : !canUpdatePitr
+                ? 'You do not have permission to update PITR'
+                : undefined
       }
       header={
         <div className="flex items-center justify-between">
@@ -170,20 +174,6 @@ const PITRSidePanel = () => {
       }
     >
       <SidePanel.Content>
-        {hasHipaaAddon && (
-          <Alert_Shadcn_>
-            <AlertTitle_Shadcn_>PITR cannot be changed with HIPAA</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              All projects should have PITR enabled by default and cannot be changed with HIPAA
-              enabled. Contact support for further assistance.
-            </AlertDescription_Shadcn_>
-            <div className="mt-4">
-              <Button type="default" asChild>
-                <Link href="/support/new">Contact support</Link>
-              </Button>
-            </div>
-          </Alert_Shadcn_>
-        )}
         <div className="py-6 space-y-4">
           <p className="text-sm">
             Point-in-Time Recovery (PITR) allows a project to be backed up at much shorter
@@ -250,10 +240,25 @@ const PITRSidePanel = () => {
             </Alert_Shadcn_>
           )}
 
-          {blockDowngradeDueToReadReplicas && (
+          {blockDowngradeDueToHipaa ? (
+            <Alert_Shadcn_>
+              <AlertTitle_Shadcn_>PITR cannot be disabled with HIPAA</AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                All projects should have PITR enabled by default and cannot be disabled with HIPAA
+                enabled. Contact support for further assistance.
+              </AlertDescription_Shadcn_>
+              <div className="mt-4">
+                <Button type="default" asChild>
+                  <Link href="/support/new">Contact support</Link>
+                </Button>
+              </div>
+            </Alert_Shadcn_>
+          ) : blockDowngradeDueToReadReplicas ? (
             <Alert_Shadcn_>
               <WarningIcon />
-              <AlertTitle_Shadcn_>Remove all read replicas before downgrading</AlertTitle_Shadcn_>
+              <AlertTitle_Shadcn_>
+                Remove all read replicas before disabling PITR
+              </AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
                 You currently have active read replicas. The minimum compute size for using read
                 replicas is the Small Compute. You need to remove all read replicas before
@@ -267,7 +272,7 @@ const PITRSidePanel = () => {
                 </Button>
               </AlertDescription_Shadcn_>
             </Alert_Shadcn_>
-          )}
+          ) : null}
 
           {selectedCategory === 'on' && (
             <div className="!mt-8 pb-4">
