@@ -7,7 +7,12 @@ import Link from 'next/link'
 import { CommandMenu } from './command-menu'
 import { ThemeSwitcherDropdown } from './theme-switcher-dropdown'
 
-function SideNavigation() {
+interface SideNavigationProps {
+  setMobileMenuOpen?: (open: boolean) => void
+  hideLogo?: boolean
+}
+
+function SideNavigation({ setMobileMenuOpen, hideLogo = false }: SideNavigationProps) {
   const { framework: preferredFramework } = useFramework()
 
   // Create a function to build URLs
@@ -38,7 +43,7 @@ function SideNavigation() {
   return (
     <nav className="flex flex-col h-full min-w-[220px]">
       <div className="p-6">
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between mb-4">
           <Link href="/">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -46,7 +51,7 @@ function SideNavigation() {
               height="113"
               viewBox="0 0 109 113"
               fill="none"
-              className="w-6 h-6 mb-4"
+              className="w-6 h-6"
             >
               <path
                 d="M63.7076 110.284C60.8481 113.885 55.0502 111.912 54.9813 107.314L53.9738 40.0625L99.1935 40.0625C107.384 40.0625 111.952 49.5226 106.859 55.9372L63.7076 110.284Z"
@@ -100,7 +105,11 @@ function SideNavigation() {
           {gettingStarted.title}
         </div>
         {gettingStarted.items.map((item, i) => (
-          <NavigationItem item={item} key={`${item.href}-${i}`} />
+          <NavigationItem
+            item={item}
+            key={`${item.href}-${i}`}
+            onClick={() => setMobileMenuOpen?.(false)}
+          />
         ))}
       </div>
       <div className="pb-6">
@@ -110,7 +119,11 @@ function SideNavigation() {
         <div className="space-y-0.5">
           {/* Render items based on component definitions */}
           {componentItems.map((item, i) => (
-            <NavigationItem item={item} key={`${item.href?.toString() || item.title}-${i}`} />
+            <NavigationItem
+              item={item}
+              key={`${item.href?.toString() || item.title}-${i}`}
+              onClick={() => setMobileMenuOpen?.(false)}
+            />
           ))}
         </div>
       </div>
@@ -120,7 +133,11 @@ function SideNavigation() {
           {aiEditorsRules.title}
         </div>
         {aiEditorsRules.items.map((item, i) => (
-          <NavigationItem item={item} key={`${item.href}-${i}`} />
+          <NavigationItem
+            item={item}
+            key={`${item.href}-${i}`}
+            onClick={() => setMobileMenuOpen?.(false)}
+          />
         ))}
       </div>
     </nav>

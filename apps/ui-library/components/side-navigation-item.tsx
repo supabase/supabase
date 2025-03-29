@@ -6,7 +6,12 @@ import { usePathname } from 'next/navigation'
 import React from 'react'
 import { cn } from 'ui'
 
-const NavigationItem: React.FC<{ item: SidebarNavItem }> = React.memo(({ item }) => {
+interface NavigationItemProps {
+  item: SidebarNavItem
+  onClick?: () => void
+}
+
+const NavigationItem: React.FC<NavigationItemProps> = React.memo(({ item, onClick }) => {
   const pathname = usePathname()
   const pathParts = pathname.split('/')
   const slug = pathParts[pathParts.length - 1]
@@ -29,6 +34,7 @@ const NavigationItem: React.FC<{ item: SidebarNavItem }> = React.memo(({ item })
   return (
     <Link
       href={href || '#'}
+      onClick={onClick}
       className={cn(
         'relative',
         'flex',

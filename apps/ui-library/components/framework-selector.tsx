@@ -61,7 +61,7 @@ export function FrameworkSelector() {
 
   return (
     <Select_Shadcn_ value={selectedFramework} onValueChange={onSelect}>
-      <SelectTrigger_Shadcn_ className="w-[180px]">
+      <SelectTrigger_Shadcn_ className="w-[180px] mt-4 lg:mt-0">
         <SelectValue_Shadcn_ />
       </SelectTrigger_Shadcn_>
       <SelectContent_Shadcn_>
