@@ -53,8 +53,8 @@ For example, C++ supports header files and has a declaration-before-use rule. Th
 #include <iostream>
 // end of header
 
-// if the user types below, we just have to re-analyze three lines. 
-// Everything else, including types and definitions from other files, 
+// if the user types below, we just have to re-analyze three lines.
+// Everything else, including types and definitions from other files,
 // can be read from cache.
 void main() {
   std::cout << "Hello, World!" << std::
@@ -72,14 +72,14 @@ export type Foo = {
 // bar.ts
 import { Foo } from './foo'
 
-const bar: Foo = { bar: "I am a string" };
+const bar: Foo = { bar: 'I am a string' }
 ```
 
-Many languages use variations of this. 
+Many languages use variations of this.
 
-But for most parts of Postgres (or any SQL dialect, really), the rules are different: While types can be defined within the source code (e.g., within a migration file by using [declarative schema management](https://supabase.com/docs/guides/local-development/declarative-database-schemas)), the database itself is the single source of truth, and there is no relation between files. 
+But for most parts of Postgres (or any SQL dialect, really), the rules are different: While types can be defined within the source code (e.g., within a migration file by using [declarative schema management](https://supabase.com/docs/guides/local-development/declarative-database-schemas)), the database itself is the single source of truth, and there is no relation between files.
 
-Besides, the variety of schema and migration management tools employed today means we cannot make assumptions about how the source code is structured and whether it reflects the current state. 
+Besides, the variety of schema and migration management tools employed today means we cannot make assumptions about how the source code is structured and whether it reflects the current state.
 
 For our Postgres Language Server, we can therefore assume that
 
@@ -89,11 +89,11 @@ For our Postgres Language Server, we can therefore assume that
 
 ## Technical Challenges
 
-For this project, the most challenging part is the parser – both when initially parsing the document and when processing user input. 
+For this project, the most challenging part is the parser – both when initially parsing the document and when processing user input.
 
-As laid out in a [previous blog post](https://supabase.com/blog/postgres-language-server-implementing-parser), implementing a parser for Postgres is hard because of the ever-evolving and complex syntax of Postgres. It's also one of the reasons why existing Postgres tooling is scarce, hardly maintained, and often does not work very well. 
+As laid out in a [previous blog post](https://supabase.com/blog/postgres-language-server-implementing-parser), implementing a parser for Postgres is hard because of the ever-evolving and complex syntax of Postgres. It's also one of the reasons why existing Postgres tooling is scarce, hardly maintained, and often does not work very well.
 
-This is why we decided not to create a custom parser. Instead, we leverage the existing [libpg_query](https://github.com/pganalyze/libpg_query) library to parse SQL code reliably. The pganalyze team has published a great blog post on [why this approach is preferred](https://pganalyze.com/blog/parse-postgresql-queries-in-ruby). 
+This is why we decided not to create a custom parser. Instead, we leverage the existing [libpg_query](https://github.com/pganalyze/libpg_query) library to parse SQL code reliably. The pganalyze team has published a great blog post on [why this approach is preferred](https://pganalyze.com/blog/parse-postgresql-queries-in-ruby).
 
 However, `libpg_query` is designed to parse *executable* SQL — not to provide language intelligence. This limitation posed several challenges, requiring us to find pragmatic solutions along the way. The biggest challenge of this project has been (and continues to be) resisting the urge to chase perfection, avoiding unnecessary complexity, and prioritizing practical solutions instead.
 
@@ -107,19 +107,19 @@ To understand how everything works, let’s see how a document is processed.
 
 ## Splitting the Source
 
-Whenever a user opens a new document, we first run it through our custom statement splitter. 
+Whenever a user opens a new document, we first run it through our custom statement splitter.
 
-It is responsible for cutting a SQL file with potentially invalid or incomplete statements into individual statements. We need this because the `libpg_query` parser is built to parse *executable* SQL – it will return an error on the first invalid token it encounters. When we first cut the SQL file, we can run the parser on each statement individually. If a statement cannot be parsed, we report the syntax error to the user.
+It is responsible for cutting a SQL file with potentially invalid or incomplete statements into individual statements. We need this because the `libpg_query` parser is built to parse _executable_ SQL – it will return an error on the first invalid token it encounters. When we first cut the SQL file, we can run the parser on each statement individually. If a statement cannot be parsed, we report the syntax error to the user.
 
 At first, we spend months trying to chase perfection by implementing a “light” Postgres parser.
 
-The idea was to just care about the tokens that are distinct for a specific statement. For example, if we saw a `CREATE` token followed by a `FUNCTION` token, we could be relatively sure this was going to be a `CREATE FUNCTION` statement, and we could expect `(` and `)` to follow it. This approach almost worked, but eventually became a rabbit hole of never ending edge-cases (damn you, recursion!). 
+The idea was to just care about the tokens that are distinct for a specific statement. For example, if we saw a `CREATE` token followed by a `FUNCTION` token, we could be relatively sure this was going to be a `CREATE FUNCTION` statement, and we could expect `(` and `)` to follow it. This approach almost worked, but eventually became a rabbit hole of never ending edge-cases (damn you, recursion!).
 
-We had once again learned an important lesson: If anything requires an implementation per statement type or per syntax element, we better find another way. 
+We had once again learned an important lesson: If anything requires an implementation per statement type or per syntax element, we better find another way.
 
-After some time off, we decided to make another attempt focusing on the simplest approach. 
+After some time off, we decided to make another attempt focusing on the simplest approach.
 
-The goal was to make the statement splitter work well for 80% of cases, and to provide a reasonable fallback for the rest. Inspired by [this blog post by matklad](https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html), we implemented a simple Pratt Parser. 
+The goal was to make the statement splitter work well for 80% of cases, and to provide a reasonable fallback for the rest. Inspired by [this blog post by matklad](https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html), we implemented a simple Pratt Parser.
 
 The splitter now tries to be “smart” about common statement types. For example, it knows that a `SELECT` cannot be followed by another `SELECT`, unless the latter is within a sub-statement. Hence, the following is cut into two statements:
 
@@ -130,11 +130,11 @@ SELECT 1;
 -- is cut into
 
 SELECT a FROM (SELECT a FROM b) sub WHERE
--- 
+--
 SELECT 1;
 ```
 
-We hope that this custom implementation will suffice for 80% of use cases. 
+We hope that this custom implementation will suffice for 80% of use cases.
 
 For everything else, we’ve built a simple fallback: We always split statements at semi-colons or double newlines. This means that the following works, too – it will be cut into two statements, and we report a syntax error for the first.
 
@@ -144,7 +144,7 @@ i like to use my sql file as a notepad -- Error!
 select 1;
 ```
 
-There might still be cases we did not think about - which is where we need your help: please try it out and report any issues you find. If our solution is not good enough, we will go back to the drawing board. 
+There might still be cases we did not think about - which is where we need your help: please try it out and report any issues you find. If our solution is not good enough, we will go back to the drawing board.
 
 ## Identifying Statements
 
@@ -169,31 +169,31 @@ Now that we have identified the document's statements, we can parse them into wo
 
 To do this, we run both `tree-sitter` and `libpg_query` on them.
 
-`libpg_query` provides precise parsing, helps to detect syntax errors, extracts statement types, and analyzes their structure for diagnostics and linting. But it cannot handle invalid or incomplete SQL, which often appears during live editing. 
+`libpg_query` provides precise parsing, helps to detect syntax errors, extracts statement types, and analyzes their structure for diagnostics and linting. But it cannot handle invalid or incomplete SQL, which often appears during live editing.
 
-This is where `tree-sitter` comes in. While not as precise, it can always produce a syntax tree, even for malformed statements. This is very useful, especially for handling incomplete statements in autocompletion. 
+This is where `tree-sitter` comes in. While not as precise, it can always produce a syntax tree, even for malformed statements. This is very useful, especially for handling incomplete statements in autocompletion.
 
 With both parsers combined, we get accurate results for valid SQL and can also deal with incomplete input. The idea to use `tree-sitter` in addition to `libpg_query` came from feedback on our previous HN post, so thank you for that:
 
 ![Hacker News comment](/images/blog/lw14-postgres-language-server/hacker-news-comment.png)
 
-Ironically, the parser we wrote [an entire blog post about](https://supabase.com/blog/postgres-language-server-implementing-parser) isn't even in use anymore. 
+Ironically, the parser we wrote [an entire blog post about](https://supabase.com/blog/postgres-language-server-implementing-parser) isn't even in use anymore.
 
 It did enable us to pin-point the exact location of a node within the abstract syntax tree (AST). For example, in the following statement, we could show the diagnostics only on `DROP COLUMN test` instead of the entire `ALTER TABLE` statement:
 
 ```rust
-ALTER TABLE contact 
+ALTER TABLE contact
 	DROP COLUMN test,
 	ALTER COLUMN another DROP NOT NULL;
 ```
 
-While that is certainly a nice feature, the implementation effort was simply not justified. We might revisit it later, but for now, we've decided that the combination of `libpg_query` and `tree-sitter` is good enough. 
+While that is certainly a nice feature, the implementation effort was simply not justified. We might revisit it later, but for now, we've decided that the combination of `libpg_query` and `tree-sitter` is good enough.
 
 With this and the statement splitter, we are coming out of a deep rabbit hole with a clearer path ahead of us.
 
 ## Loading Schema Information
 
-Now that we have opened a document and parsed its statements, the missing piece for analysis is schema information. 
+Now that we have opened a document and parsed its statements, the missing piece for analysis is schema information.
 
 To provide this, we lazily populate a schema cache. Similar to PostgREST, this cache is a simple in-memory data structure that stores details about tables, columns, functions, and other schema elements.
 
@@ -212,11 +212,11 @@ We only load the schema cache when it is first needed (e.g. for autocompletion).
 
 ## Providing Diagnostics
 
-When the client asks for diagnostics, we load all statements alongside their ranges and text content from a document. With the statement identifier, we check if the `libpg_query` AST is available. If it is not available, we collect the emitted syntax errors instead. If it is available, on the other hand, we pass it to both the type checker and the linter. 
+When the client asks for diagnostics, we load all statements alongside their ranges and text content from a document. With the statement identifier, we check if the `libpg_query` AST is available. If it is not available, we collect the emitted syntax errors instead. If it is available, on the other hand, we pass it to both the type checker and the linter.
 
-Again, the type checker is very simple: Since we maintain a database connection, we can just ask Postgres to do the heavy lifting by `PREPARE`-ing the statement. If the statement contains a type issue, such as a missing column, the error is returned as diagnostics to the user. 
+Again, the type checker is very simple: Since we maintain a database connection, we can just ask Postgres to do the heavy lifting by `PREPARE`-ing the statement. If the statement contains a type issue, such as a missing column, the error is returned as diagnostics to the user.
 
-Our linter is heavily inspired by [Squawk](https://squawkhq.com). It takes the AST emitted by `libpg_query` and runs all configured rules on them. We spent some time optimizing the infrastructure of the linter in order to lower the barrier of contributing new rules and ask that the community [can support us there](https://github.com/supabase-community/postgres_lsp/issues/131). 
+Our linter is heavily inspired by [Squawk](https://squawkhq.com). It takes the AST emitted by `libpg_query` and runs all configured rules on them. We spent some time optimizing the infrastructure of the linter in order to lower the barrier of contributing new rules and ask that the community [can support us there](https://github.com/supabase-community/postgres_lsp/issues/131).
 
 In the end, providing diagnostics happens without noticeable delay for the user (we promise the GIF was not edited 🤞):
 
@@ -224,11 +224,14 @@ In the end, providing diagnostics happens without noticeable delay for the user 
 
 ## Processing Changes
 
-Now that we've successfully reported diagnostics, the user will want to fix the issues. 
+Now that we've successfully reported diagnostics, the user will want to fix the issues.
 
 For an IDE to feel responsive, these changes must be processed within milliseconds. To achieve this, we take advantage of the fact that all SQL statements are independent of each other, which allows us to invalidate only those statements that have actually changed.
 
-<Admonition type="note">If you want to dive deeper into how snappy IDEs are built, check out [this blog post](https://rust-analyzer.github.io/blog/2020/07/20/three-architectures-for-responsive-ide.html).</Admonition>
+<Admonition type="note">
+  If you want to dive deeper into how snappy IDEs are built, check out [this blog
+  post](https://rust-analyzer.github.io/blog/2020/07/20/three-architectures-for-responsive-ide.html).
+</Admonition>
 
 Let’s look at an example.
 
@@ -238,7 +241,7 @@ select seond from test; -- a typo we want to fix
 select third from test;
 ```
 
-The last time we checked, "second" was spelled somewhat differently, so that's a typo we need to fix. Before going ahead and adding the missing `c`, we need to understand how text files are usually stored and processed in IDEs. 
+The last time we checked, "second" was spelled somewhat differently, so that's a typo we need to fix. Before going ahead and adding the missing `c`, we need to understand how text files are usually stored and processed in IDEs.
 
 From the user’s perspective, inserting a character simply makes the current line longer. However, an IDE doesn’t inherently work with lines—it instead processes raw strings that may contain `\n` characters. When a character is inserted, everything after the cursor position shifts to the right, affecting not only the current line, but the subsequent lines as well.
 
@@ -268,11 +271,14 @@ The above example is intentionally simplified. There are other cases to consider
 
 The one feature where developers will truly notice efficient change processing is autocompletion, so we try to be as efficient as possible providing suggestions.
 
-<Admonition type="note">Since autocompletion is primarily needed for incomplete statements, we cannot use `libpg_query`. We rely only on `tree-sitter` for parsing.</Admonition>
+<Admonition type="note">
+  Since autocompletion is primarily needed for incomplete statements, we cannot use `libpg_query`.
+  We rely only on `tree-sitter` for parsing.
+</Admonition>
 
 When you change a character in your `SELECT` clause, we update the existing `tree-sitter` Concrete Syntax Tree (CST) instead of re-parsing it. We then read the relevant suggestion types (columns, tables, etc.) from our `SchemaCache` , so no database query is necessary. This approach of updating and reading from existing data structures lets us provide suggestions without any noticeable delay. (Some would call it – drumroll – "blazingly fast".)
 
-In order to choose which suggestions are the most relevant, we take the changed node and the CST and then iterate over the possible items using a simple scoring algorithm. 
+In order to choose which suggestions are the most relevant, we take the changed node and the CST and then iterate over the possible items using a simple scoring algorithm.
 
 Some examples:
 
@@ -285,7 +291,7 @@ While the hard part is gathering the information about the current statement, th
 ```rust
 fn check_matches_schema(
   /// `self` is the currently investigated suggestion item.
-	&mut self, 
+	&mut self,
   /// `ctx` contains the information about the changed CST node and the
   /// containing statement.
 	ctx: &CompletionContext
