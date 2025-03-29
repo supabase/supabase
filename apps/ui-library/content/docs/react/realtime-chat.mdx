@@ -4,20 +4,20 @@ description: Real-time chat component for collaborative applications
 ---
 
 <div className="flex flex-row -space-x-px w-full">
-  <BlockPreview name="realtime-chat" isPair />
-  <BlockPreview name="realtime-chat" isPair />
+  <BlockPreview name="realtime-chat-demo" isPair />
+  <BlockPreview name="realtime-chat-demo" isPair />
 </div>
 
 ## Installation
 
 <BlockItem
-  name="realtime-chat-nextjs"
+  name="realtime-chat-react"
   description="Renders a real-time chat interface for users in a shared room."
 />
 
 ## Folder structure
 
-<RegistryBlock itemName="realtime-chat-nextjs" />
+<RegistryBlock itemName="realtime-chat-react" />
 
 ## Introduction
 
@@ -84,7 +84,7 @@ export default function ChatPage() {
 | `onMessage?` | `(messages: ChatMessage[]) => void` | Optional callback to handle messages, useful for persistence. |
 | `messages?`  | `ChatMessage[]`                     | Optional initial messages to display in the chat.             |
 
-### ChatMessage Type
+### ChatMessage type
 
 ```typescript
 interface ChatMessage {

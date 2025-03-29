@@ -10,9 +10,7 @@
     "@supabase/supabase-js@latest"
   ],
   "registryDependencies": [
-    "button",
-    "tooltip",
-    "progress"
+    "button"
   ],
   "files": [
     {

@@ -11,6 +11,7 @@
     "build:llms": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-llms-txt.ts",
     "start": "next start",
     "lint": "next lint",
+    "lint:mdx": "supa-mdx-lint content --config ../../supa-mdx-lint.config.toml",
     "content:build": "contentlayer2 build",
     "clean": "rimraf node_modules .next .turbo",
     "typecheck": "contentlayer2 build && tsc --noEmit -p tsconfig.json"
@@ -22,6 +23,7 @@
     "@radix-ui/react-slot": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@react-router/fs-routes": "^7.4.0",
+    "@supabase/supa-mdx-lint": "0.2.6-alpha",
     "class-variance-authority": "^0.6.0",
     "common": "workspace:*",
     "contentlayer2": "0.4.6",

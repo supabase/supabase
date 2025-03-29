@@ -10,9 +10,7 @@
     "@supabase/ssr@latest"
   ],
   "registryDependencies": [
-    "button",
-    "tooltip",
-    "progress"
+    "button"
   ],
   "files": [
     {

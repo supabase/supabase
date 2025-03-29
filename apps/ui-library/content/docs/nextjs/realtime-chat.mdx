@@ -4,8 +4,8 @@ description: Real-time chat component for collaborative applications
 ---
 
 <div className="flex flex-row -space-x-px w-full">
-  <BlockPreview name="realtime-chat" isPair />
-  <BlockPreview name="realtime-chat" isPair />
+  <BlockPreview name="realtime-chat-demo" isPair />
+  <BlockPreview name="realtime-chat-demo" isPair />
 </div>
 
 ## Installation
@@ -84,7 +84,7 @@ export default function ChatPage() {
 | `onMessage?` | `(messages: ChatMessage[]) => void` | Optional callback to handle messages, useful for persistence. |
 | `messages?`  | `ChatMessage[]`                     | Optional initial messages to display in the chat.             |
 
-### ChatMessage Type
+### ChatMessage type
 
 ```typescript
 interface ChatMessage {

@@ -26,6 +26,8 @@ const CurrentUserAvatarDemo = () => {
         <span className="text-sm text-foreground-light">
           It seems like you&apos;re not logged in. Login via the{' '}
           <a
+            target="_blank"
+            rel="noopener noreferrer"
             href="https://supabase.com/dashboard/sign-in"
             className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2"
           >

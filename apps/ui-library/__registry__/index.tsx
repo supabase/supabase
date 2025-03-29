@@ -58,7 +58,7 @@ export const Index: Record<string, any> = {
     "dropzone-nextjs": {
       name: "dropzone-nextjs",
       type: "registry:component",
-      registryDependencies: ["button","tooltip","progress"],
+      registryDependencies: ["button"],
       component: React.lazy(() => import("@/registry/default/blocks/dropzone/components/dropzone.tsx")),
       source: "",
       files: ["registry/default/blocks/dropzone/components/dropzone.tsx","registry/default/blocks/dropzone/hooks/use-supabase-upload.ts","registry/default/clients/nextjs/lib/supabase/client.ts","registry/default/clients/nextjs/lib/supabase/middleware.ts","registry/default/clients/nextjs/lib/supabase/server.ts"],
@@ -70,7 +70,7 @@ export const Index: Record<string, any> = {
     "dropzone-react": {
       name: "dropzone-react",
       type: "registry:component",
-      registryDependencies: ["button","tooltip","progress"],
+      registryDependencies: ["button"],
       component: React.lazy(() => import("@/registry/default/blocks/dropzone/components/dropzone.tsx")),
       source: "",
       files: ["registry/default/blocks/dropzone/components/dropzone.tsx","registry/default/blocks/dropzone/hooks/use-supabase-upload.ts","registry/default/clients/react/lib/supabase/client.ts"],
@@ -82,7 +82,7 @@ export const Index: Record<string, any> = {
     "dropzone-react-router": {
       name: "dropzone-react-router",
       type: "registry:component",
-      registryDependencies: ["button","tooltip","progress"],
+      registryDependencies: ["button"],
       component: React.lazy(() => import("@/registry/default/blocks/dropzone/components/dropzone.tsx")),
       source: "",
       files: ["registry/default/blocks/dropzone/components/dropzone.tsx","registry/default/blocks/dropzone/hooks/use-supabase-upload.ts","registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
@@ -94,7 +94,7 @@ export const Index: Record<string, any> = {
     "dropzone-tanstack": {
       name: "dropzone-tanstack",
       type: "registry:component",
-      registryDependencies: ["button","tooltip","progress"],
+      registryDependencies: ["button"],
       component: React.lazy(() => import("@/registry/default/blocks/dropzone/components/dropzone.tsx")),
       source: "",
       files: ["registry/default/blocks/dropzone/components/dropzone.tsx","registry/default/blocks/dropzone/hooks/use-supabase-upload.ts","registry/default/clients/tanstack/lib/supabase/client.ts","registry/default/clients/tanstack/lib/supabase/server.ts"],
