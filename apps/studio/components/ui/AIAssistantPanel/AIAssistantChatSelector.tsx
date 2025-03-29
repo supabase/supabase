@@ -102,13 +102,14 @@ export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorPr
             <CommandEmpty_Shadcn_>No chats found.</CommandEmpty_Shadcn_>
             <CommandGroup_Shadcn_>
               <ScrollArea className={chats.length > 4 ? 'h-40' : ''}>
+                {/* @ts-ignore */}
                 {chats.map(([id, chat]) => (
                   <CommandItem_Shadcn_
                     key={id}
                     value={id}
                     onSelect={() => handleSelectChat(id)}
                     className="flex items-center justify-between gap-2 py-1 w-full overflow-hidden group"
-                    keywords={[chat.name]}
+                    keywords={!!chat.name ? [chat.name] : undefined}
                   >
                     <div className="flex items-center w-full flex-1 min-w-0">
                       {editingChatId === id ? (
