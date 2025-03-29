@@ -55,9 +55,9 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
       errors.name = 'Please provide a name for your bucket'
     }
 
-    if (values.name && !/^[a-z0-9.-]+$/.test(values.name)) {
+    if (values.name && !/^[a-z0-9._-]+$/.test(values.name)) {
       errors.name =
-        'The name of the bucket must only container lowercase letters, numbers, dots, and hyphens'
+        'The name of the bucket must only container lowercase letters, numbers, dots, hyphens and underscores'
     }
 
     if (values.name && values.name.endsWith(' ')) {
@@ -123,7 +123,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                   layout="vertical"
                   label="Name of bucket"
                   labelOptional="Buckets cannot be renamed once created."
-                  descriptionText="Only lowercase letters, numbers, dots, and hyphens"
+                  descriptionText="Only lowercase letters, numbers, dots, hyphens and underscores"
                 />
                 <div className="space-y-2 mt-6">
                   <Toggle
