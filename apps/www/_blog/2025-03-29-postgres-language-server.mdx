@@ -173,7 +173,7 @@ To do this, we run both `tree-sitter` and `libpg_query` on them.
 
 This is where `tree-sitter` comes in. While not as precise, it can always produce a syntax tree, even for malformed statements. This is very useful, especially for handling incomplete statements in autocompletion.
 
-With both parsers combined, we get accurate results for valid SQL and can also deal with incomplete input. The idea to use `tree-sitter` in addition to `libpg_query` came from feedback on our previous HN post, so thank you for that:
+With both parsers combined, we get accurate results for valid SQL and can also deal with incomplete input. The idea to use `tree-sitter` in addition to `libpg_query` came from [a comment on our previous Hacker News post](https://news.ycombinator.com/item?id=38570680), so thank you for that:
 
 ![Hacker News comment](/images/blog/lw14-postgres-language-server/hacker-news-comment.png)
 
