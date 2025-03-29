@@ -13,7 +13,7 @@
     "clean": "rimraf node_modules",
     "typecheck": "pnpm run content:build && tsc --noEmit",
     "content:build": "contentlayer2 build && node scripts/generateStaticContent.mjs",
-    "prettier": "prettier --write \"./{pages,components,lib,stores,styles,tests}/**/*.{ts,tsx,md,js,jsx,json}\"",
+    "prettier": "prettier --cache --write \"./{pages,components,lib,stores,styles,tests}/**/*.{ts,tsx,md,js,jsx,json}\"",
     "postbuild": "node ./internals/generate-sitemap.mjs && ./../../scripts/upload-static-assets.sh"
   },
   "dependencies": {
