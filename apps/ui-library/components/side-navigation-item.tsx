@@ -1,25 +1,33 @@
 'use client'
 
-import { SidebarNavItem } from '@/types/nav'
-import Link from 'next/link'
+import Link, { LinkProps } from 'next/link'
 import { usePathname } from 'next/navigation'
 import React from 'react'
+
+import { SidebarNavItem } from '@/types/nav'
 import { cn } from 'ui'
 
-interface NavigationItemProps {
+// We extend:
+// 1. LinkProps - for Next.js Link component props (href, prefetch, etc)
+// 2. AnchorHTMLAttributes - for standard HTML anchor props (className, etc)
+// We omit 'href' from AnchorHTMLAttributes to avoid conflict with LinkProps href
+interface NavigationItemProps
+  extends LinkProps,
+    Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
   item: SidebarNavItem
-  onClick?: () => void
 }
 
-const NavigationItem: React.FC<NavigationItemProps> = React.memo(({ item, onClick }) => {
+const NavigationItem: React.FC<NavigationItemProps> = ({ item, href: propHref, ...props }) => {
   const pathname = usePathname()
   const pathParts = pathname.split('/')
   const slug = pathParts[pathParts.length - 1]
   const framework = pathParts[pathParts.length - 2]
 
-  // Build URL with framework param if provided
-  let href = item.href
-
+  // Build URL with priority:
+  // 1. item.href if available
+  // 2. Computed from current path (slug + framework)
+  // 3. Override href prop if provided
+  let href = propHref || item.href
   // Handle component items with slug and framework
   if (!href && slug) {
     if (framework) {
@@ -34,7 +42,7 @@ const NavigationItem: React.FC<NavigationItemProps> = React.memo(({ item, onClic
   return (
     <Link
       href={href || '#'}
-      onClick={onClick}
+      {...props}
       className={cn(
         'relative',
         'flex',
@@ -44,7 +52,8 @@ const NavigationItem: React.FC<NavigationItemProps> = React.memo(({ item, onClic
         'text-foreground-lighter px-6',
         !isActive && 'hover:bg-surface-100 hover:text-foreground',
         isActive && 'bg-surface-200 text-foreground',
-        'transition-all'
+        'transition-all',
+        props.className
       )}
     >
       <div
@@ -57,7 +66,7 @@ const NavigationItem: React.FC<NavigationItemProps> = React.memo(({ item, onClic
       {item.title}
     </Link>
   )
-})
+}
 
 NavigationItem.displayName = 'NavigationItem'
 

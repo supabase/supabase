@@ -1,19 +1,17 @@
 'use client'
 
+import Link from 'next/link'
+
 import NavigationItem from '@/components/side-navigation-item'
 import { aiEditorsRules, componentPages, gettingStarted } from '@/config/docs'
 import { useFramework } from '@/context/framework-context'
-import Link from 'next/link'
+import { useMobileMenu } from '@/hooks/use-mobile-menu'
 import { CommandMenu } from './command-menu'
 import { ThemeSwitcherDropdown } from './theme-switcher-dropdown'
 
-interface SideNavigationProps {
-  setMobileMenuOpen?: (open: boolean) => void
-  hideLogo?: boolean
-}
-
-function SideNavigation({ setMobileMenuOpen, hideLogo = false }: SideNavigationProps) {
+function SideNavigation() {
   const { framework: preferredFramework } = useFramework()
+  const { close: closeMobileMenu } = useMobileMenu()
 
   // Create a function to build URLs
   const buildUrl = (slug: string, framework?: string) => {
@@ -105,11 +103,7 @@ function SideNavigation({ setMobileMenuOpen, hideLogo = false }: SideNavigationP
           {gettingStarted.title}
         </div>
         {gettingStarted.items.map((item, i) => (
-          <NavigationItem
-            item={item}
-            key={`${item.href}-${i}`}
-            onClick={() => setMobileMenuOpen?.(false)}
-          />
+          <NavigationItem item={item} key={`${item.href}-${i}`} onClick={closeMobileMenu} />
         ))}
       </div>
       <div className="pb-6">
@@ -122,7 +116,7 @@ function SideNavigation({ setMobileMenuOpen, hideLogo = false }: SideNavigationP
             <NavigationItem
               item={item}
               key={`${item.href?.toString() || item.title}-${i}`}
-              onClick={() => setMobileMenuOpen?.(false)}
+              onClick={closeMobileMenu}
             />
           ))}
         </div>
@@ -133,11 +127,7 @@ function SideNavigation({ setMobileMenuOpen, hideLogo = false }: SideNavigationP
           {aiEditorsRules.title}
         </div>
         {aiEditorsRules.items.map((item, i) => (
-          <NavigationItem
-            item={item}
-            key={`${item.href}-${i}`}
-            onClick={() => setMobileMenuOpen?.(false)}
-          />
+          <NavigationItem item={item} key={`${item.href}-${i}`} onClick={closeMobileMenu} />
         ))}
       </div>
     </nav>
