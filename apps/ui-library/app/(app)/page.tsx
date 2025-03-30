@@ -33,15 +33,14 @@ export default function Home() {
                 data-grid-item
                 className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-8 pb-8"
               >
-                <div className="flex flex-col gap-8 justify-start pt-32">
+                <div className="flex flex-col gap-8 justify-start pt-16 md:pt-32">
                   <div className="max-w-2xl">
                     <h1 className="text-4xl text-foreground mb-3 font-medium tracking-tight">
                       UI Blocks for Supabase Projects
                     </h1>
                     <h2 className="text-lg text-foreground-light mb-4">
-                      A set of beautifully-designed, accessible components that connect your
-                      Supabase back-end to your front-end. Works with your favorite frameworks. Open
-                      Source. Open Code.
+                      A collection of components and blocks built on the Shadcn UI library that
+                      connect your front-end to your Supabase back-end via a single command.
                     </h2>
                     <Button_Shadcn_ variant="secondary" size="lg" className="mt-4">
                       <Link href="/docs/getting-started/quickstart">Get Started</Link>

@@ -2,8 +2,8 @@
 
 import Demo from '@/registry/default/examples/realtime-chat-demo'
 
-const RealtimeChatPage = () => {
+const RealtimeChatDemoPage = () => {
   return <Demo />
 }
 
-export default RealtimeChatPage
+export default RealtimeChatDemoPage
