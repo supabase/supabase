@@ -1,4 +1,3 @@
-import type { PostgresFunction } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
 import { Search } from 'lucide-react'
@@ -12,7 +11,10 @@ import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
+import {
+  DatabaseFunction,
+  useDatabaseFunctionsQuery,
+} from 'data/database-functions/database-functions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
@@ -21,11 +23,10 @@ import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Input } from 'ui'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
-
 interface FunctionsListProps {
   createFunction: () => void
-  editFunction: (fn: PostgresFunction) => void
-  deleteFunction: (fn: PostgresFunction) => void
+  editFunction: (fn: DatabaseFunction) => void
+  deleteFunction: (fn: DatabaseFunction) => void
 }
 
 const FunctionsList = ({
