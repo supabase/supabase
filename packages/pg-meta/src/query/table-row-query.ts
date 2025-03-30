@@ -26,6 +26,7 @@ export interface BuildTableRowsQueryArgs {
 // Text and JSON types that should be truncated
 export const TEXT_TYPES = ['text', 'varchar', 'char', 'character varying', 'character']
 export const JSON_TYPES = ['json', 'jsonb']
+const JSON_SET = new Set(JSON_TYPES)
 
 // Additional PostgreSQL types that can hold large values and should be truncated
 export const ADDITIONAL_LARGE_TYPES = [
@@ -112,7 +113,7 @@ export const getTableRowsSql = ({
 
   const allColumnNames = table.columns
     .sort((a, b) => a.ordinal_position - b.ordinal_position)
-    .map((column) => column.name)
+    .map((column) => ({ name: column.name, format: column.format.toLowerCase() }))
 
   // Identify columns that might need truncation
   const columnsToTruncate = table.columns
@@ -120,7 +121,7 @@ export const getTableRowsSql = ({
     .map((column) => column.name)
 
   // Create select expressions for each column, applying truncation only to needed columns
-  const selectExpressions = allColumnNames.map((columnName) => {
+  const selectExpressions = allColumnNames.map(({ name: columnName }) => {
     const escapedColumnName = ident(columnName)
 
     if (columnsToTruncate.includes(columnName)) {
@@ -135,16 +136,21 @@ export const getTableRowsSql = ({
   })
 
   // Handle array-based columns
-  const arrayBasedColumnNames = table.columns
+  const arrayBasedColumns = table.columns
     .filter((column) => column.data_type.toLowerCase() === 'array')
-    .map((column) => column.name)
+    // remove the _ prefix for array based format
+    .map((column) => ({ name: column.name, format: column.format.toLowerCase().slice(1) }))
 
   // Add array casting for array-based enum columns
-  arrayBasedColumnNames.forEach((columnName) => {
+  arrayBasedColumns.forEach(({ name: columnName, format }) => {
     // Find this column in our select expressions
     const index = selectExpressions.findIndex(
       (expr) => expr === ident(columnName) // if the column is selected without any truncation applied to it
     )
+    // If the column is a json, the final cast remain an array of json
+    const typeCast = JSON_SET.has(format) ? `${format}[]` : 'text[]'
+    const lastElement =
+      typeCast === 'text[]' ? `array['...']` : `array['{"truncated": true}'::json]`
     if (index >= 0) {
       // We cast to text[] but limit the array size if the total size of the array is too large (same logic than for text fields)
       // This returns the first MAX_ARRAY_SIZE elements of the array (adjustable) and adds '...' if truncated
@@ -153,8 +159,8 @@ export const getTableRowsSql = ({
       selectExpressions[index] = `
         case 
           when octet_length(${ident(columnName)}::text) > ${maxCharacters} 
-          then (select array_cat(${ident(columnName)}[1:${maxArraySize}]::text[], array['...']))::text[]
-          else ${ident(columnName)}::text[]
+          then (select array_cat(${ident(columnName)}[1:${maxArraySize}]::${typeCast}, ${lastElement}::${typeCast}))::${typeCast}
+          else ${ident(columnName)}::${typeCast}
         end
       `
     }
