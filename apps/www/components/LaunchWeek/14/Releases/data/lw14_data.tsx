@@ -61,8 +61,8 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-1',
     d: 1,
     dd: 'Mon',
-    shipped: false,
-    isToday: false,
+    shipped: true,
+    isToday: true,
     hasCountdown: true,
     blog: '',
     date: '31 March',
@@ -76,7 +76,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       // },
       // {
       //   type: 'xSpace',
-      //   href: 'https://twitter.com/i/spaces/1yoJMyjzVWRJQ',
+      //   href: '',
       // },
     ],
     steps: [],
@@ -100,7 +100,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       // },
       // {
       //   type: 'xSpace',
-      //   href: 'https://twitter.com/i/spaces/1yoJMyjzVWRJQ',
+      //   href: '',
       // },
     ],
     steps: [],
@@ -124,7 +124,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       // },
       // {
       //   type: 'xSpace',
-      //   href: 'https://twitter.com/i/spaces/1yoJMyjzVWRJQ',
+      //   href: '',
       // },
     ],
     steps: [],
@@ -148,7 +148,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       // },
       // {
       //   type: 'xSpace',
-      //   href: 'https://twitter.com/i/spaces/1yoJMyjzVWRJQ',
+      //   href: '',
       // },
     ],
     steps: [],
@@ -172,7 +172,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       // },
       // {
       //   type: 'xSpace',
-      //   href: 'https://twitter.com/i/spaces/1yoJMyjzVWRJQ',
+      //   href: '',
       // },
     ],
     steps: [],
