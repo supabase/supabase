@@ -139,6 +139,7 @@ export default function Home() {
                 </div>
               </div>
               <HorizontalGridLine />
+
               {/* Realtime Chat */}
               <div
                 data-grid-item
