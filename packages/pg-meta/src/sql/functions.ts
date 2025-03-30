@@ -46,6 +46,20 @@ select
   nullif(rt.typrelid, 0) as return_type_relation_id,
   f.proretset as is_set_returning_function,
   case
+    when f.proretset and rt.typrelid != 0 then true
+    else false
+  end as returns_set_of_table,
+  case
+    when f.proretset and rt.typrelid != 0 then
+      (select relname from pg_class where oid = rt.typrelid)
+    else null
+  end as return_table_name,
+  case
+    when f.proretset then
+      coalesce(f.prorows, 0) > 1
+    else false
+  end as returns_multiple_rows,
+  case
     when f.provolatile = 'i' then 'IMMUTABLE'
     when f.provolatile = 's' then 'STABLE'
     when f.provolatile = 'v' then 'VOLATILE'

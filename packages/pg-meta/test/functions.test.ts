@@ -31,8 +31,7 @@ withTestDatabase('list functions', async ({ executeQuery }) => {
   // Test for the 'add' function created in init.sql
   const addFunction = res.find(({ name }) => name === 'add')
   expect(addFunction).toMatchInlineSnapshot(
-    { id: expect.any(Number) },
-    `
+    { id: expect.any(Number) }, `
     {
       "args": [
         {
@@ -63,14 +62,16 @@ withTestDatabase('list functions', async ({ executeQuery }) => {
       "is_set_returning_function": false,
       "language": "sql",
       "name": "add",
+      "return_table_name": null,
       "return_type": "integer",
       "return_type_id": 23,
       "return_type_relation_id": null,
+      "returns_multiple_rows": false,
+      "returns_set_of_table": false,
       "schema": "public",
       "security_definer": false,
     }
-    `
-  )
+  `)
 })
 
 withTestDatabase('list functions with included schemas', async ({ executeQuery }) => {
@@ -137,8 +138,7 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
   const res = retrieveZod.parse(retrieve[0])
   const functionId = res!.id
   expect({ data: res, error: null }).toMatchInlineSnapshot(
-    { data: { id: expect.any(Number) } },
-    `
+    { data: { id: expect.any(Number) } }, `
     {
       "data": {
         "args": [
@@ -175,16 +175,18 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
         "is_set_returning_function": false,
         "language": "sql",
         "name": "test_func",
+        "return_table_name": null,
         "return_type": "integer",
         "return_type_id": 23,
         "return_type_relation_id": null,
+        "returns_multiple_rows": false,
+        "returns_set_of_table": false,
         "schema": "public",
         "security_definer": true,
       },
       "error": null,
     }
-  `
-  )
+  `)
   // create test_schema to move the function into:
   const { sql: createSchemaSql } = await pgMeta.schemas.create({ name: 'test_schema' })
   await executeQuery(createSchemaSql)
@@ -199,8 +201,7 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
   const retrieveRenamed = await executeQuery(retrieveRenamedSql)
   const resUpdated = retrieveZod.parse(retrieveRenamed[0])
   expect({ data: resUpdated, error: null }).toMatchInlineSnapshot(
-    { data: { id: expect.any(Number) } },
-    `
+    { data: { id: expect.any(Number) } }, `
     {
       "data": {
         "args": [
@@ -237,16 +238,18 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
         "is_set_returning_function": false,
         "language": "sql",
         "name": "test_func_renamed",
+        "return_table_name": null,
         "return_type": "integer",
         "return_type_id": 23,
         "return_type_relation_id": null,
+        "returns_multiple_rows": false,
+        "returns_set_of_table": false,
         "schema": "test_schema",
         "security_definer": true,
       },
       "error": null,
     }
-  `
-  )
+  `)
 
   // Remove function
   const { sql: removeSql } = await pgMeta.functions.remove(resUpdated!)
@@ -271,8 +274,7 @@ withTestDatabase('retrieve set-returning function', async ({ executeQuery }) => 
       id: expect.any(Number),
       return_type_id: expect.any(Number),
       return_type_relation_id: expect.any(Number),
-    },
-    `
+    }, `
     {
       "args": [],
       "argument_types": "",
@@ -294,14 +296,16 @@ withTestDatabase('retrieve set-returning function', async ({ executeQuery }) => 
       "is_set_returning_function": true,
       "language": "sql",
       "name": "function_returning_set_of_rows",
+      "return_table_name": "users",
       "return_type": "SETOF users",
       "return_type_id": Any<Number>,
       "return_type_relation_id": Any<Number>,
+      "returns_multiple_rows": true,
+      "returns_set_of_table": true,
       "schema": "public",
       "security_definer": false,
     }
-  `
-  )
+  `)
 })
 
 withTestDatabase('create function with various config_params values', async ({ executeQuery }) => {
