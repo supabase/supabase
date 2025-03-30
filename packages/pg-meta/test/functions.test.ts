@@ -31,7 +31,8 @@ withTestDatabase('list functions', async ({ executeQuery }) => {
   // Test for the 'add' function created in init.sql
   const addFunction = res.find(({ name }) => name === 'add')
   expect(addFunction).toMatchInlineSnapshot(
-    { id: expect.any(Number) }, `
+    { id: expect.any(Number) },
+    `
     {
       "args": [
         {
@@ -73,7 +74,8 @@ withTestDatabase('list functions', async ({ executeQuery }) => {
       "schema": "public",
       "security_definer": false,
     }
-  `)
+  `
+  )
 })
 
 withTestDatabase(
@@ -84,7 +86,8 @@ withTestDatabase(
 
     const singleRowFunction = res.find(({ name }) => name === 'get_user_audit_setof_single_row')
     expect(singleRowFunction).toMatchInlineSnapshot(
-      { id: expect.any(Number) }, `
+      { id: expect.any(Number) },
+      `
       {
         "args": [
           {
@@ -123,7 +126,8 @@ withTestDatabase(
         "schema": "public",
         "security_definer": false,
       }
-    `)
+    `
+    )
   }
 )
 
@@ -135,7 +139,9 @@ withTestDatabase(
 
     const multipleRowsFunctions = res.filter(({ name }) => name === 'get_todos_setof_rows')
     expect(multipleRowsFunctions).toMatchInlineSnapshot(
-      multipleRowsFunctions.map((func) => ({ ...func, id: expect.any(Number) })),
+      expect.arrayContaining(
+        multipleRowsFunctions.map((func) => ({ ...func, id: expect.any(Number) }))
+      ),
       `
     [
       {
@@ -144,6 +150,7 @@ withTestDatabase(
             "has_default": false,
             "mode": "in",
             "name": "user_row",
+            "table_name": "users",
             "type_id": 16395,
           },
         ],
@@ -161,7 +168,7 @@ withTestDatabase(
         "definition": "
       SELECT * FROM public.todos WHERE "user-id" = user_row.id;
     ",
-        "id": Any<Number>,
+        "id": 16492,
         "identity_argument_types": "user_row users",
         "is_set_returning_function": true,
         "language": "sql",
@@ -181,6 +188,7 @@ withTestDatabase(
             "has_default": false,
             "mode": "in",
             "name": "todo_row",
+            "table_name": "todos",
             "type_id": 16404,
           },
         ],
@@ -198,7 +206,7 @@ withTestDatabase(
         "definition": "
       SELECT * FROM public.todos WHERE "user-id" = todo_row."user-id";
     ",
-        "id": Any<Number>,
+        "id": 16493,
         "identity_argument_types": "todo_row todos",
         "is_set_returning_function": true,
         "language": "sql",
@@ -282,86 +290,59 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
   const res = retrieveZod.parse(retrieve[0])
   const functionId = res!.id
   expect({ data: res, error: null }).toMatchInlineSnapshot(
-    { data: { id: expect.any(Number) } }, `
-      [
-        {
-          "args": [
-            {
-              "has_default": false,
-              "mode": "in",
-              "name": "user_row",
-              "table_name": "users",
-              "type_id": 16395,
-            },
-          ],
-          "argument_types": "user_row users",
-          "behavior": "STABLE",
-          "complete_statement": "CREATE OR REPLACE FUNCTION public.get_todos_setof_rows(user_row users)
-       RETURNS SETOF todos
-       LANGUAGE sql
-       STABLE
-      AS $function$
-        SELECT * FROM public.todos WHERE "user-id" = user_row.id;
-      $function$
-      ",
-          "config_params": null,
-          "definition": "
-        SELECT * FROM public.todos WHERE "user-id" = user_row.id;
-      ",
-          "id": Any<Number>,
-          "identity_argument_types": "user_row users",
-          "is_set_returning_function": true,
-          "language": "sql",
-          "name": "get_todos_setof_rows",
-          "return_table_name": "todos",
-          "return_type": "SETOF todos",
-          "return_type_id": 16404,
-          "return_type_relation_id": 16402,
-          "returns_multiple_rows": true,
-          "returns_set_of_table": true,
-          "schema": "public",
-          "security_definer": false,
+    { data: { id: expect.any(Number) } },
+    `
+    {
+      "data": {
+        "args": [
+          {
+            "has_default": false,
+            "mode": "in",
+            "name": "a",
+            "table_name": null,
+            "type_id": 21,
+          },
+          {
+            "has_default": false,
+            "mode": "in",
+            "name": "b",
+            "table_name": null,
+            "type_id": 21,
+          },
+        ],
+        "argument_types": "a smallint, b smallint",
+        "behavior": "STABLE",
+        "complete_statement": "CREATE OR REPLACE FUNCTION public.test_func(a smallint, b smallint)
+     RETURNS integer
+     LANGUAGE sql
+     STABLE SECURITY DEFINER
+     SET search_path TO 'hooks', 'auth'
+     SET role TO 'postgres'
+    AS $function$select a + b$function$
+    ",
+        "config_params": {
+          "role": "postgres",
+          "search_path": "hooks, auth",
         },
-        {
-          "args": [
-            {
-              "has_default": false,
-              "mode": "in",
-              "name": "todo_row",
-              "table_name": "todos",
-              "type_id": 16404,
-            },
-          ],
-          "argument_types": "todo_row todos",
-          "behavior": "STABLE",
-          "complete_statement": "CREATE OR REPLACE FUNCTION public.get_todos_setof_rows(todo_row todos)
-       RETURNS SETOF todos
-       LANGUAGE sql
-       STABLE
-      AS $function$
-        SELECT * FROM public.todos WHERE "user-id" = todo_row."user-id";
-      $function$
-      ",
-          "config_params": null,
-          "definition": "
-        SELECT * FROM public.todos WHERE "user-id" = todo_row."user-id";
-      ",
-          "id": Any<Number>,
-          "identity_argument_types": "todo_row todos",
-          "is_set_returning_function": true,
-          "language": "sql",
-          "name": "get_todos_setof_rows",
-          "return_table_name": "todos",
-          "return_type": "SETOF todos",
-          "return_type_id": 16404,
-          "return_type_relation_id": 16402,
-          "returns_multiple_rows": true,
-          "returns_set_of_table": true,
-          "schema": "public",
-          "security_definer": false,
-        },
-      ]
-    `)
+        "definition": "select a + b",
+        "id": Any<Number>,
+        "identity_argument_types": "a smallint, b smallint",
+        "is_set_returning_function": false,
+        "language": "sql",
+        "name": "test_func",
+        "return_table_name": null,
+        "return_type": "integer",
+        "return_type_id": 23,
+        "return_type_relation_id": null,
+        "returns_multiple_rows": false,
+        "returns_set_of_table": false,
+        "schema": "public",
+        "security_definer": true,
+      },
+      "error": null,
+    }
+  `
+  )
   // create test_schema to move the function into:
   const { sql: createSchemaSql } = await pgMeta.schemas.create({ name: 'test_schema' })
   await executeQuery(createSchemaSql)
@@ -376,7 +357,8 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
   const retrieveRenamed = await executeQuery(retrieveRenamedSql)
   const resUpdated = retrieveZod.parse(retrieveRenamed[0])
   expect({ data: resUpdated, error: null }).toMatchInlineSnapshot(
-    { data: { id: expect.any(Number) } }, `
+    { data: { id: expect.any(Number) } },
+    `
     {
       "data": {
         "args": [
@@ -426,7 +408,8 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
       },
       "error": null,
     }
-  `)
+  `
+  )
 
   // Remove function
   const { sql: removeSql } = await pgMeta.functions.remove(resUpdated!)
