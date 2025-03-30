@@ -23,6 +23,7 @@ export const pgFunctionZod = z.object({
       name: z.string(),
       type_id: z.number(),
       has_default: z.boolean(),
+      table_name: z.union([z.string(), z.null()]),
     })
   ),
   argument_types: z.string(),

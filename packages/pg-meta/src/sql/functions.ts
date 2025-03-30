@@ -91,36 +91,49 @@ from
     select
       oid,
       jsonb_agg(jsonb_build_object(
-        'mode', t2.mode,
+        'mode', mode,
         'name', name,
         'type_id', type_id,
-        -- Cast null into false boolean
-        'has_default', COALESCE(has_default, false)
+        'has_default', coalesce(has_default, false),
+        'table_name', table_name
       )) as args
     from
       (
         select
-          oid,
-          unnest(arg_modes) as mode,
-          unnest(arg_names) as name,
-          -- Coming from: coalesce(p.proallargtypes, p.proargtypes) postgres won't automatically assume
-          -- integer, we need to cast it to be properly parsed
-          unnest(arg_types)::int8 as type_id,
-          unnest(arg_has_defaults) as has_default
+          t1.oid,
+          t2.mode,
+          t1.name,
+          t1.type_id,
+          t1.has_default,
+          case 
+            when pt.typrelid != 0 then pc.relname 
+            else null 
+          end as table_name
         from
-          functions
-      ) as t1,
-      lateral (
-        select
-          case
-            when t1.mode = 'i' then 'in'
-            when t1.mode = 'o' then 'out'
-            when t1.mode = 'b' then 'inout'
-            when t1.mode = 'v' then 'variadic'
-            else 'table'
-          end as mode
-      ) as t2
+          (
+            select
+              oid,
+              unnest(arg_modes) as mode,
+              unnest(arg_names) as name,
+              unnest(arg_types)::int8 as type_id,
+              unnest(arg_has_defaults) as has_default
+            from
+              functions
+          ) as t1
+          cross join lateral (
+            select
+              case
+                when t1.mode = 'i' then 'in'
+                when t1.mode = 'o' then 'out'
+                when t1.mode = 'b' then 'inout'
+                when t1.mode = 'v' then 'variadic'
+                else 'table'
+              end as mode
+          ) as t2
+          left join pg_type pt on pt.oid = t1.type_id
+          left join pg_class pc on pc.oid = pt.typrelid
+      ) sub
     group by
-      t1.oid
+      oid
   ) f_args on f_args.oid = f.oid
 `
