@@ -17,8 +17,13 @@ export default function MeetupsCMS() {
     fetchMeetups()
   }, [])
 
+  const Monday = new Date('2025-03-31 00:00:00')
+
   async function fetchMeetups() {
-    const { data, error } = await supabase.from('meetups').select('*')
+    const { data, error } = await supabase
+      .from('meetups')
+      .select('*')
+      .gte('start_at', '2025-03-31 00:00:00')
 
     if (error) {
       console.error('Error fetching meetups:', error)
@@ -48,8 +53,8 @@ export default function MeetupsCMS() {
   const countriesPerColumn = Math.ceil(countryGroups.length / 3)
   const columns = [
     countryGroups.slice(0, countriesPerColumn),
-    countryGroups.slice(countriesPerColumn, countriesPerColumn * 2 - 6),
-    countryGroups.slice(countriesPerColumn * 2 - 6),
+    countryGroups.slice(countriesPerColumn, countriesPerColumn * 2 - 4),
+    countryGroups.slice(countriesPerColumn * 2 - 4),
   ]
 
   return (
@@ -76,7 +81,7 @@ export default function MeetupsCMS() {
           {columns.map((column, columnIndex) => (
             <div key={columnIndex} className="relative z-10 flex-1 flex flex-col">
               {columnIndex === 0 && (
-                <div className="text-2xl mb-[80px] flex items-center gap-3 text-foreground">
+                <div className="text-2xl mb-[53px] flex items-center gap-3 text-foreground">
                   <svg
                     width="27"
                     height="25"
