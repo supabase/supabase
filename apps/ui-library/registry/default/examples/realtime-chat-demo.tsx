@@ -58,10 +58,10 @@ const RealtimeChatDemo = () => {
   return (
     <div className="flex flex-col w-full h-[600px] p-4">
       <div className="p-4">
-        <Label className="text-xs font-medium mb-1 ml-1 text-foreground-light">Username</Label>
+        <Label className="text-xs font-medium mb-1 -ml-4 text-foreground-light">Username</Label>
         <Input
           autoComplete="off"
-          className="text-sm"
+          className="text-sm -ml-4"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
