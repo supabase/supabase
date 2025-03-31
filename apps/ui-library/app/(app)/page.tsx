@@ -6,6 +6,9 @@ import { Button_Shadcn_ } from 'ui'
 // Horizontal grid line component
 const HorizontalGridLine = () => <div className="col-span-12 h-px bg-border/30" />
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default function Home() {
   const roomName = `room-${Math.floor(Math.random() * 1000)}`
 
