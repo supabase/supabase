@@ -64,7 +64,6 @@ const EdgeFunctionDetailsLayout = ({
   })
 
   const name = selectedFunction?.name || ''
-  const cliCommand = `supabase functions download ${functionSlug}`
 
   const breadcrumbItems = [
     {

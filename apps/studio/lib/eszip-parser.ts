@@ -4,28 +4,7 @@ import path from 'path'
 function url2path(url: string) {
   try {
     // Parse the URL
-    const parsedUrl = new URL(url)
-    // Get the pathname and split it
-    const pathParts = parsedUrl.pathname.split('/').filter(Boolean)
-
-    // For user function paths like "user_fn_ukekbxwcwofeosgskskm_66727868-6415-49d7-b518-2a057c8377cb_1/data.json"
-    // Just return the filename (data.json)
-    if (pathParts.length > 0) {
-      // Check if it's a user function path with UUID
-      if (pathParts[0].startsWith('user_fn_')) {
-        // Get just the filename (last part)
-        return pathParts[pathParts.length - 1]
-      }
-
-      // If it starts with 'tmp/' or similar, remove that prefix
-      if (pathParts[0] === 'tmp' || pathParts[0] === 'deno') {
-        // Get just the filename (last part)
-        return pathParts[pathParts.length - 1]
-      }
-    }
-
-    // Otherwise, return the full path without leading/trailing slashes
-    return pathParts.join('/')
+    return new URL(url).pathname
   } catch (error) {
     // If URL parsing fails, fallback to extracting just the filename
     console.warn('Failed to parse URL:', url)
