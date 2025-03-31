@@ -2,6 +2,7 @@ export type SupportedAssistantEntities = 'rls-policies' | 'functions'
 export type SupportedAssistantQuickPromptTypes = 'suggest' | 'examples' | 'ask'
 
 export interface AssistantSnippetProps {
+  id?: string
   title?: string
   isChart?: string
   runQuery?: string
