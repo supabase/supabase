@@ -34,6 +34,7 @@ const CodePage = () => {
     data: functionFiles,
     isLoading: isLoadingFiles,
     isError: isErrorLoadingFiles,
+    isSuccess: isSuccessLoadingFiles,
     error: filesError,
   } = useEdgeFunctionBodyQuery({
     projectRef: ref,
@@ -118,16 +119,16 @@ const CodePage = () => {
 
   // TODO (Saxon): Remove this once the flag is fully launched
   useEffect(() => {
-    if (!edgeFunctionCreate) {
+    if (edgeFunctionCreate !== undefined && !edgeFunctionCreate) {
       router.push(`/project/${ref}/functions`)
     }
-  }, [edgeFunctionCreate, ref, router])
+  }, [edgeFunctionCreate])
 
   useEffect(() => {
     // Set files from API response when available
     if (functionFiles) {
       setFiles(
-        functionFiles.map((file: { name: string; content: string }, index: number) => ({
+        functionFiles.map((file, index: number) => ({
           id: index + 1,
           name: file.name,
           content: file.content,
