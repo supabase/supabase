@@ -64,6 +64,7 @@ const SecretRow = ({ secret, appId }: SecretRowProps) => {
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-2">
+                {isNew && <Check size={14} className="text-brand" strokeWidth={3} />}
                 <p className="font-mono text-sm">
                   {isNew ? secret.client_secret : `${secret.client_secret_alias}${'*'.repeat(36)}`}
                 </p>
@@ -71,7 +72,6 @@ const SecretRow = ({ secret, appId }: SecretRowProps) => {
                   <CopyButton text={secret.client_secret} type="default" iconOnly />
                 )}
               </div>
-              {isNew && <Check size={14} className="text-brand" strokeWidth={3} />}
             </div>
             <div className="flex flex-col gap-0">
               <p className="text-sm text-foreground-lighter">

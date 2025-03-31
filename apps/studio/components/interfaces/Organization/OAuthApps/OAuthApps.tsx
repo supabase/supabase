@@ -161,7 +161,6 @@ const OAuthApps = () => {
                     <Table.th key="icon" className="w-[30px]"></Table.th>,
                     <Table.th key="name">Name</Table.th>,
                     <Table.th key="client-id">Client ID</Table.th>,
-                    <Table.th key="client-secret">Client Secret</Table.th>,
                     <Table.th key="created-at">Created at</Table.th>,
                     <Table.th key="delete-action"></Table.th>,
                   ]}
