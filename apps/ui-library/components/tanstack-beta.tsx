@@ -1,6 +1,5 @@
-import React from 'react'
-import { Callout } from './callout'
 import { TriangleAlert } from 'lucide-react'
+import { Callout } from './callout'
 
 export default function TanStackBeta() {
   return (
@@ -19,7 +18,7 @@ export default function TanStackBeta() {
             href="https://tanstack.com/start/latest/docs/framework/react/quick-start"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary underline mt-1"
+            className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2"
           >
             TanStack Quickstart guide
           </a>
