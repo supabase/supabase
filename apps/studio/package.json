@@ -40,6 +40,7 @@
     "@next/bundle-analyzer": "^14.2.3",
     "@number-flow/react": "^0.3.2",
     "@sentry/nextjs": "^8.52.1",
+    "@std/path": "npm:@jsr/std__path@^1.0.8",
     "@stripe/react-stripe-js": "^3.1.1",
     "@stripe/stripe-js": "^5.5.0",
     "@supabase/auth-js": "catalog:",
