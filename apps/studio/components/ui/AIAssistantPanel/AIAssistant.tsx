@@ -191,7 +191,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       resultId?: string
       results: any[]
     }) => {
-      console.log('Update message', { id: messageId, resultId, results })
       snap.updateMessage({ id: messageId, resultId, results })
     },
     [snap]
