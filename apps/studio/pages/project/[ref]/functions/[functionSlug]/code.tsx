@@ -1,27 +1,27 @@
+import { common, dirname, relative } from '@std/path/posix'
 import { AlertCircle, CornerDownLeft, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { dirname, common, relative } from '@std/path/posix'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import LogoLoader from '@ui/components/LogoLoader'
 import { useParams } from 'common'
+import { DeployEdgeFunctionWarningModal } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
-import { DeployEdgeFunctionWarningModal } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
 import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
 import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { Button } from 'ui'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const CodePage = () => {
   const router = useRouter()
@@ -41,6 +41,7 @@ const CodePage = () => {
     data: functionFiles,
     isLoading: isLoadingFiles,
     isError: isErrorLoadingFiles,
+    isSuccess: isSuccessLoadingFiles,
     error: filesError,
   } = useEdgeFunctionBodyQuery(
     {
@@ -170,10 +171,10 @@ const CodePage = () => {
 
   // TODO (Saxon): Remove this once the flag is fully launched
   useEffect(() => {
-    if (!edgeFunctionCreate) {
+    if (edgeFunctionCreate !== undefined && !edgeFunctionCreate) {
       router.push(`/project/${ref}/functions`)
     }
-  }, [edgeFunctionCreate, ref, router])
+  }, [edgeFunctionCreate])
 
   useEffect(() => {
     // Set files from API response when available
@@ -228,6 +229,7 @@ const CodePage = () => {
   const handleDeployConfirm = () => {
     sendEvent({
       action: 'edge_function_deploy_updates_confirm_clicked',
+      properties: { origin: 'functions_editor' },
       groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
     onUpdate()
