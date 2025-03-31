@@ -66,7 +66,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     hasCountdown: false,
     blog: '/blog/supabase-ui-library',
     date: '31 March',
-    published_at: '2025-03-31T08:00:00.000-07:00',
+    published_at: '2025-03-31T07:00:00.000-07:00',
     title: 'Supabase UI Library',
     description: 'Supabase UI Library',
     links: [
@@ -104,7 +104,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     hasCountdown: true,
     blog: '',
     date: '01 April',
-    published_at: '2025-04-01T08:00:00.000-07:00',
+    published_at: '2025-04-01T07:00:00.000-07:00',
     title: '',
     description: null,
     links: [
@@ -128,7 +128,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     hasCountdown: false,
     blog: '',
     date: '02 April',
-    published_at: '2025-04-02T08:00:00.000-07:00',
+    published_at: '2025-04-02T07:00:00.000-07:00',
     title: '',
     description: null,
     links: [
@@ -152,7 +152,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     hasCountdown: false,
     blog: '',
     date: '03 April',
-    published_at: '2025-04-03T08:00:00.000-07:00',
+    published_at: '2025-04-03T07:00:00.000-07:00',
     title: '',
     description: null,
     links: [
@@ -176,7 +176,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     hasCountdown: false,
     blog: '',
     date: '04 April',
-    published_at: '2025-04-04T08:00:00.000-07:00',
+    published_at: '2025-04-04T07:00:00.000-07:00',
     title: '',
     description: null,
     links: [
