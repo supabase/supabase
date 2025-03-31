@@ -33,7 +33,7 @@ export function Command({ name, highlight }: CommandCopyProps) {
   const commands: Record<PackageManager, string> = {
     npm: `npx shadcn@latest add ${baseUrl}${componentPath}`,
     pnpm: `pnpm dlx shadcn@latest add ${baseUrl}${componentPath}`,
-    yarn: `npx shadcn@latest add ${baseUrl}${componentPath}`,
+    yarn: `yarn dlx shadcn@latest add ${baseUrl}${componentPath}`,
     bun: `bunx --bun shadcn@latest add ${baseUrl}${componentPath}`,
   }
 
