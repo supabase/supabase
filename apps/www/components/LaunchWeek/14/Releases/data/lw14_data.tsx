@@ -64,7 +64,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     shipped: true,
     isToday: true,
     hasCountdown: false,
-    blog: '',
+    blog: '/blog/supabase-ui-library',
     date: '31 March',
     published_at: '2025-03-31T08:00:00.000-07:00',
     title: '',
