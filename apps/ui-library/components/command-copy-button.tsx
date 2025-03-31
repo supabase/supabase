@@ -59,7 +59,7 @@ export function CommandCopyButton({ command }: { command: string }) {
         const { framework, packageManager, title } = parseCommandForTelemetry(command)
 
         sendTelemetryEvent({
-          action: 'supabase_ui_command_copied',
+          action: 'supabase_ui_command_copy_button_clicked',
           properties: {
             templateTitle: title,
             command: command,

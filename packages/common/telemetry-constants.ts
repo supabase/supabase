@@ -1230,8 +1230,8 @@ export interface EdgeFunctionTestSidePanelOpenedEvent {
  * @source supabase-ui
  * @page /ui/docs/{framework}/{templateTitle}
  */
-export interface SupabaseUiCommandCopiedEvent {
-  action: 'supabase_ui_command_copied'
+export interface SupabaseUiCommandCopyButtonClickedEvent {
+  action: 'supabase_ui_command_copy_button_clicked'
   properties: {
     templateTitle: string
     command: string
@@ -1314,4 +1314,4 @@ export type TelemetryEvent =
   | EdgeFunctionDeployUpdatesButtonClickedEvent
   | EdgeFunctionTestSendButtonClickedEvent
   | EdgeFunctionTestSidePanelOpenedEvent
-  | SupabaseUiCommandCopiedEvent
+  | SupabaseUiCommandCopyButtonClickedEvent
