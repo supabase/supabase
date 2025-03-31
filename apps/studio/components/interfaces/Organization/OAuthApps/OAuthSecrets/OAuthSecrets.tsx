@@ -9,6 +9,7 @@ import { OAuthApp } from 'data/oauth/oauth-apps-query'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, InfoIcon } from 'ui'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { CreatedSecret } from './OAuthSecrets.types'
 import SecretRow from './SecretRow'
 
@@ -56,14 +57,19 @@ const OAuthSecrets = ({ selectedApp }: Props) => {
         </div>
 
         {canManageSecrets && (
-          <Button
+          <ButtonTooltip
             type="default"
-            disabled={!appId}
+            disabled={!appId || secrets.length >= 5}
             onClick={handleCreateSecret}
             loading={isCreatingSecret}
+            tooltip={{
+              content: {
+                text: secrets.length >= 5 ? 'You can only have up to 5 client secrets' : undefined,
+              },
+            }}
           >
             Generate a new client secret
-          </Button>
+          </ButtonTooltip>
         )}
       </div>
 
