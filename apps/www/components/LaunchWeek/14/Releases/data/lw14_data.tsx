@@ -67,8 +67,8 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     blog: '/blog/supabase-ui-library',
     date: '31 March',
     published_at: '2025-03-31T08:00:00.000-07:00',
-    title: '',
-    description: null,
+    title: 'Supabase UI Library',
+    description: 'Supabase UI Library',
     links: [
       {
         type: 'video',
@@ -86,10 +86,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
         blog: '#',
         bg_layers: [
           {
-            img: '',
-            mobileImg: '',
-            imgLight: '',
-            mobileImgLight: '',
+            img: '/images/launchweek/14/releases/d1/day-1-dark.svg',
+            mobileImg: '/images/launchweek/14/releases/d1/day-1-dark-mobile.svg',
+            imgLight: '/images/launchweek/14/releases/d1/day-1-light.svg',
+            mobileImgLight: '/images/launchweek/14/releases/d1/day-1-light-mobile.svg',
           },
         ],
       },
