@@ -1,5 +1,6 @@
-import '@/styles/globals.css'
 import type { Metadata } from 'next'
+
+import '@/styles/globals.css'
 import { Inter } from 'next/font/google'
 import { ThemeProvider } from './Providers'
 import { SonnerToaster } from './SonnerToast'
@@ -26,7 +27,6 @@ export default async function Layout({ children }: RootLayoutProps) {
           enableSystem
         >
           {children}
-
           <SonnerToaster />
         </ThemeProvider>
       </body>
