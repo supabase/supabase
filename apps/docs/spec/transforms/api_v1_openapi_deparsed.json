@@ -374,6 +374,54 @@
         ]
       }
     },
+    "/v1/branches/{branch_id}/merge": {
+      "post": {
+        "operationId": "v1-merge-a-branch",
+        "summary": "Merges a database branch",
+        "description": "Merges the specified database branch",
+        "parameters": [
+          {
+            "name": "branch_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "workflow_run_id": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string",
+                      "enum": ["ok"]
+                    }
+                  },
+                  "required": ["workflow_run_id", "message"]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to merge database branch"
+          }
+        },
+        "tags": ["Environments"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/v1/branches/{branch_id}/reset": {
       "post": {
         "operationId": "v1-reset-a-branch",
@@ -874,7 +922,6 @@
                     "type": "string"
                   }
                 },
-                "required": ["grant_type"],
                 "additionalProperties": false
               }
             }
@@ -1952,6 +1999,7 @@
                   "desired_instance_size": {
                     "type": "string",
                     "enum": [
+                      "pico",
                       "nano",
                       "micro",
                       "small",
@@ -1974,6 +2022,12 @@
                     "type": "string",
                     "enum": ["15", "17-oriole"],
                     "description": "Postgres engine version. If not provided, the latest version will be used."
+                  },
+                  "secrets": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
                   }
                 },
                 "required": ["branch_name"]
@@ -9154,6 +9208,99 @@
         ]
       }
     },
+    "/v1/projects/{ref}/database/migrations": {
+      "get": {
+        "operationId": "v1-list-migrations",
+        "summary": "[Beta] List applied migration versions",
+        "description": "Only available to selected partner OAuth apps",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "version": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["version"]
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to list database migrations"
+          }
+        },
+        "tags": ["Database"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "v1-apply-a-migration",
+        "summary": "[Beta] Apply a database migration",
+        "description": "Only available to selected partner OAuth apps",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to apply database migration"
+          }
+        },
+        "tags": ["Database"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/v1/projects/{ref}/database/query": {
       "post": {
         "operationId": "v1-run-a-query",
@@ -11846,7 +11993,6 @@
             "type": "string"
           }
         },
-        "required": ["grant_type"],
         "additionalProperties": false
       },
       "OAuthTokenResponse": {
@@ -12313,6 +12459,7 @@
           "desired_instance_size": {
             "type": "string",
             "enum": [
+              "pico",
               "nano",
               "micro",
               "small",
@@ -12335,6 +12482,12 @@
             "type": "string",
             "enum": ["15", "17-oriole"],
             "description": "Postgres engine version. If not provided, the latest version will be used."
+          },
+          "secrets": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
           }
         },
         "required": ["branch_name"]
@@ -12859,7 +13012,7 @@
         },
         "required": ["db_schema", "max_rows", "db_extra_search_path", "db_pool"]
       },
-      "UpdatePostgrestConfigBody": {
+      "V1UpdatePostgrestConfigBody": {
         "type": "object",
         "properties": {
           "db_extra_search_path": {
@@ -15646,6 +15799,22 @@
               "type": "object"
             }
           }
+        }
+      },
+      "V1ListMigrationsResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": ["version"]
         }
       },
       "V1RunQueryBody": {

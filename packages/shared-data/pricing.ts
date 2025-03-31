@@ -574,7 +574,7 @@ export const pricing: Pricing = {
     features: [
       {
         key: 'security.byoc',
-        title: 'On Premises / BYO cloud',
+        title: 'BYO cloud',
         plans: {
           free: false,
           pro: false,

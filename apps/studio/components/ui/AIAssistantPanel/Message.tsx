@@ -19,19 +19,29 @@ const baseMarkdownComponents: Partial<Components> = {
   h3: Heading3,
   code: InlineCode,
   a: Link,
-  pre: MarkdownPre,
 }
 
 interface MessageProps {
+  id: string
   role: 'function' | 'system' | 'user' | 'assistant' | 'data' | 'tool'
   content?: string
   isLoading: boolean
   readOnly?: boolean
   action?: React.ReactNode
   variant?: 'default' | 'warning'
+  onResults: ({
+    messageId,
+    resultId,
+    results,
+  }: {
+    messageId: string
+    resultId?: string
+    results: any[]
+  }) => void
 }
 
 export const Message = function Message({
+  id,
   role,
   content,
   isLoading,
@@ -39,10 +49,19 @@ export const Message = function Message({
   children,
   action = null,
   variant = 'default',
+  onResults,
 }: PropsWithChildren<MessageProps>) {
   const isUser = role === 'user'
-  const allMarkdownComponents = useMemo(
-    () => ({ ...markdownComponents, ...baseMarkdownComponents }),
+  const allMarkdownComponents: Partial<Components> = useMemo(
+    () => ({
+      ...markdownComponents,
+      ...baseMarkdownComponents,
+      pre: ({ children }) => (
+        <MarkdownPre id={id} onResults={onResults}>
+          {children}
+        </MarkdownPre>
+      ),
+    }),
     []
   )
 

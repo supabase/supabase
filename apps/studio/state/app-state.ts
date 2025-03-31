@@ -1,40 +1,13 @@
-import type { Message as MessageType } from 'ai/react'
-import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
-import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
-import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
-export type CommonDatabaseEntity = {
-  id: number
-  name: string
-  schema: string
-  [key: string]: any
-}
-
-export type SuggestionsType = {
-  title: string
-  prompts?: string[]
-}
+import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
+import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 export type Template = {
   name: string
   description: string
   content: string
-}
-
-type AiAssistantPanelType = {
-  open: boolean
-  messages: MessageType[]
-  initialInput: string
-  sqlSnippets?: string[]
-  suggestions?: SuggestionsType
-  editor?: SupportedAssistantEntities | null
-  // Raw string content for the monaco editor, currently used to retain where the user left off when toggling off the panel
-  content?: string
-  // Mainly used for editing a database entity (e.g editing a function, RLS policy etc)
-  entity?: CommonDatabaseEntity
-  tables: { schema: string; name: string }[]
 }
 
 type EditorPanelType = {
@@ -51,18 +24,6 @@ type EditorPanelType = {
 type DashboardHistoryType = {
   sql?: string
   editor?: string
-}
-
-const INITIAL_AI_ASSISTANT: AiAssistantPanelType = {
-  open: false,
-  messages: [],
-  sqlSnippets: undefined,
-  initialInput: '',
-  suggestions: undefined,
-  editor: null,
-  content: '',
-  entity: undefined,
-  tables: [],
 }
 
 const INITIAL_EDITOR_PANEL: EditorPanelType = {
@@ -86,7 +47,6 @@ const EMPTY_DASHBOARD_HISTORY: DashboardHistoryType = {
 const getInitialState = () => {
   if (typeof window === 'undefined') {
     return {
-      aiAssistantPanel: INITIAL_AI_ASSISTANT,
       editorPanel: INITIAL_EDITOR_PANEL,
       dashboardHistory: EMPTY_DASHBOARD_HISTORY,
       activeDocsSection: ['introduction'],
@@ -104,24 +64,11 @@ const getInitialState = () => {
     }
   }
 
-  const stored = localStorage.getItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE)
   const storedEditor = localStorage.getItem(LOCAL_STORAGE_KEYS.EDITOR_PANEL_STATE)
 
-  const urlParams = new URLSearchParams(window.location.search)
-  const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
-
-  let parsedAiAssistant = INITIAL_AI_ASSISTANT
   let parsedEditorPanel = INITIAL_EDITOR_PANEL
 
   try {
-    if (stored) {
-      parsedAiAssistant = JSON.parse(stored, (key, value) => {
-        if (key === 'createdAt' && value) {
-          return new Date(value)
-        }
-        return value
-      })
-    }
     if (storedEditor) {
       parsedEditorPanel = JSON.parse(storedEditor)
     }
@@ -130,13 +77,6 @@ const getInitialState = () => {
   }
 
   return {
-    aiAssistantPanel: {
-      ...parsedAiAssistant,
-      open:
-        aiAssistantPanelOpenParam !== null
-          ? aiAssistantPanelOpenParam === 'true'
-          : parsedAiAssistant.open,
-    },
     editorPanel: parsedEditorPanel,
     dashboardHistory: EMPTY_DASHBOARD_HISTORY,
     activeDocsSection: ['introduction'],
@@ -218,45 +158,12 @@ export const appState = proxy({
     appState.showSidebar = value
   },
 
-  resetAiAssistantPanel: () => {
-    appState.aiAssistantPanel = {
-      ...INITIAL_AI_ASSISTANT,
-      open: appState.aiAssistantPanel.open,
-    }
-  },
-
-  setAiAssistantPanel: (value: Partial<AiAssistantPanelType>) => {
-    // Close Editor panel if AI Assistant panel is being opened
-    if (value.open && appState.editorPanel.open) {
-      appState.editorPanel.open = false
-    }
-
-    const hasEntityChanged = value.entity?.id !== appState.aiAssistantPanel.entity?.id
-    appState.aiAssistantPanel = {
-      ...appState.aiAssistantPanel,
-      content: hasEntityChanged ? '' : appState.aiAssistantPanel.content,
-      ...value,
-    }
-  },
-
   showOngoingQueriesPanelOpen: false,
   setOnGoingQueriesPanelOpen: (value: boolean) => {
     appState.ongoingQueriesPanelOpen = value
   },
 
-  saveLatestMessage: (message: any) => {
-    appState.aiAssistantPanel = {
-      ...appState.aiAssistantPanel,
-      messages: [...appState.aiAssistantPanel.messages, message],
-    }
-  },
-
   setEditorPanel: (value: Partial<EditorPanelType>) => {
-    // Close AI Assistant panel if editor panel is being opened
-    if (value.open && appState.aiAssistantPanel.open) {
-      appState.aiAssistantPanel.open = false
-    }
-
     // Reset templates to initial if initialValue is empty
     if (value.initialValue === '') {
       value.templates = INITIAL_EDITOR_PANEL.templates
@@ -281,15 +188,6 @@ export const appState = proxy({
 // Set up localStorage subscriptions
 if (typeof window !== 'undefined') {
   subscribe(appState, () => {
-    // Save AI assistant state with limited message history
-    const aiAssistantState = {
-      ...appState.aiAssistantPanel,
-      // limit to 20 messages so as to not overflow the context window
-      messages: appState.aiAssistantPanel.messages?.slice(-20),
-    }
-    localStorage.setItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE, JSON.stringify(aiAssistantState))
-
-    // Save editor panel state
     localStorage.setItem(
       LOCAL_STORAGE_KEYS.EDITOR_PANEL_STATE,
       JSON.stringify(appState.editorPanel)

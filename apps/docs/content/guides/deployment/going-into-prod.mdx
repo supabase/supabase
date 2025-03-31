@@ -50,7 +50,7 @@ After developing your project and deciding it's Production Ready, you should run
 - Use your own SMTP credentials so that you have full control over the deliverability of your transactional auth emails (see Settings > Auth)
   - you can grab SMTP credentials from any major email provider such as SendGrid, AWS SES, etc. You can refer to our [SMTP guide](/docs/guides/auth/auth-smtp) for more details.
   - The default rate limit for auth emails when using a custom SMTP provider is 30 new users per hour, if doing a major public announcement you will likely require more than this.
-- If your application is on the Free Plan and is **not** expected to be queried at least once every 7 days, then it may be paused by Supabase to save on server resources.
+- Applications on the Free Plan that exhibit extremely low activity in a 7 day period may be paused by Supabase to save on server resources.
   - You can restore paused projects from the Supabase dashboard.
   - Upgrade to Pro to guarantee that your project will not be paused for inactivity.
 - Database backups are not available for download on the Free Plan.
