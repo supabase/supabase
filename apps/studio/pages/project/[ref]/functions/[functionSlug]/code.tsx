@@ -7,7 +7,6 @@ import { toast } from 'sonner'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import LogoLoader from '@ui/components/LogoLoader'
 import { useParams } from 'common'
-import { DeployEdgeFunctionWarningModal } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
@@ -118,44 +117,6 @@ const CodePage = () => {
     }
   }
 
-  const renderContent = () => {
-    if (isLoadingFiles) {
-      return (
-        <div className="flex flex-col items-center justify-center h-full bg-surface-200">
-          <LogoLoader />
-        </div>
-      )
-    }
-
-    if (isErrorLoadingFiles) {
-      return (
-        <div className="flex flex-col items-center justify-center h-full bg-surface-200">
-          <div className="flex flex-col items-center text-center gap-2 max-w-md">
-            <AlertCircle size={24} strokeWidth={1.5} className="text-amber-900" />
-            <h3 className="text-md mt-4">Failed to load function code</h3>
-            <p className="text-sm text-foreground-light">
-              {filesError?.message ||
-                'There was an error loading the function code. The format may be invalid or the function may be corrupted.'}
-            </p>
-          </div>
-        </div>
-      )
-    }
-
-    return (
-      <FileExplorerAndEditor
-        files={files}
-        onFilesChange={setFiles}
-        aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete`}
-        aiMetadata={{
-          projectRef: project?.ref,
-          connectionString: project?.connectionString,
-          includeSchemaMetadata,
-        }}
-      />
-    )
-  }
-
   function getBasePath(entrypoint: string | undefined): string {
     if (!entrypoint) {
       return '/'
@@ -164,7 +125,7 @@ const CodePage = () => {
     try {
       return dirname(new URL(entrypoint).pathname)
     } catch (e) {
-      console.error('failed to parse entrypoint', entrypoint)
+      console.error('Failed to parse entrypoint', entrypoint)
       return '/'
     }
   }
@@ -202,70 +163,80 @@ const CodePage = () => {
           }
         })
 
-      setFiles(
-        filesWithRelPath.map((file: { name: string; content: string }, index: number) => ({
-          id: index + 1,
-          name: file.name,
-          content: file.content,
-          selected: index === 0,
-        }))
-      )
+      setFiles((prev) => {
+        return filesWithRelPath.map((file: { name: string; content: string }, index: number) => {
+          const prevState = prev.find((x) => x.name === file.name)
+          return {
+            id: index + 1,
+            name: file.name,
+            content: file.content,
+            selected: prevState?.selected ?? index === 0,
+          }
+        })
+      })
     }
-  }, [functionFiles, selectedFunction])
-
-  const handleDeployClick = () => {
-    if (files.length === 0 || isLoadingFiles) return
-    setShowDeployWarning(true)
-    sendEvent({
-      action: 'edge_function_deploy_updates_button_clicked',
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
-  }
-
-  const handleDeployCancel = () => {
-    setShowDeployWarning(false)
-  }
-
-  const handleDeployConfirm = () => {
-    sendEvent({
-      action: 'edge_function_deploy_updates_confirm_clicked',
-      properties: { origin: 'functions_editor' },
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
-    onUpdate()
-    setShowDeployWarning(false)
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [functionFiles])
 
   return (
     <div className="flex flex-col h-full">
-      {renderContent()}
-
-      <DeployEdgeFunctionWarningModal
-        visible={showDeployWarning}
-        onCancel={handleDeployCancel}
-        onConfirm={handleDeployConfirm}
-      />
-
-      {!isErrorLoadingFiles && canDeployFunction && (
-        <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 shrink-0">
-          <Button
-            loading={isDeploying}
-            size="medium"
-            disabled={files.length === 0 || isLoadingFiles}
-            onClick={handleDeployClick}
-            iconRight={
-              isDeploying ? (
-                <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
-              ) : (
-                <div className="flex items-center space-x-1">
-                  <CornerDownLeft size={10} strokeWidth={1.5} />
-                </div>
-              )
-            }
-          >
-            Deploy updates
-          </Button>
+      {isLoadingFiles && (
+        <div className="flex flex-col items-center justify-center h-full bg-surface-200">
+          <LogoLoader />
         </div>
+      )}
+
+      {isErrorLoadingFiles && (
+        <div className="flex flex-col items-center justify-center h-full bg-surface-200">
+          <div className="flex flex-col items-center text-center gap-2 max-w-md">
+            <AlertCircle size={24} strokeWidth={1.5} className="text-amber-900" />
+            <h3 className="text-md mt-4">Failed to load function code</h3>
+            <p className="text-sm text-foreground-light">
+              {filesError?.message ||
+                'There was an error loading the function code. The format may be invalid or the function may be corrupted.'}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {isSuccessLoadingFiles && (
+        <>
+          <FileExplorerAndEditor
+            files={files}
+            onFilesChange={setFiles}
+            aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete`}
+            aiMetadata={{
+              projectRef: project?.ref,
+              connectionString: project?.connectionString,
+              includeSchemaMetadata,
+            }}
+          />
+          <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 shrink-0">
+            <Button
+              loading={isDeploying}
+              size="medium"
+              disabled={files.length === 0 || isLoadingFiles}
+              onClick={() => {
+                onUpdate()
+                sendEvent({
+                  action: 'edge_function_deploy_updates_button_clicked',
+                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+                })
+              }}
+              iconRight={
+                isDeploying ? (
+                  <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
+                ) : (
+                  <div className="flex items-center space-x-1">
+                    <CornerDownLeft size={10} strokeWidth={1.5} />
+                  </div>
+                )
+              }
+            >
+              Deploy updates
+            </Button>
+          </div>
+        </>
       )}
     </div>
   )
