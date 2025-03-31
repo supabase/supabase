@@ -112,7 +112,7 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
   }
 
   const handleGithubSignIn = useCallback(async () => {
-    let redirectTo = `${LW14_URL}`
+    let redirectTo = `${LW14_URL}#ticket`
 
     if (referal) {
       redirectTo += `?referal=${referal}`
