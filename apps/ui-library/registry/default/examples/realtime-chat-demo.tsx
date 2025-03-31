@@ -22,7 +22,12 @@ const names = [
 ]
 
 const RealtimeChatDemo = () => {
+  const [roomName, setRoomName] = useState('')
   const [username, setUsername] = useState('')
+
+  useEffect(() => {
+    setRoomName(`room-${names[Math.floor(Math.random() * 1000)]}`)
+  }, [])
 
   useEffect(() => {
     setUsername(names[Math.floor(Math.random() * names.length)])
@@ -67,7 +72,7 @@ const RealtimeChatDemo = () => {
         />
       </div>
       <div className="flex-1 border rounded-lg overflow-hidden">
-        <RealtimeChat roomName="chat-demo" username={username} messages={messages} />
+        {roomName && <RealtimeChat roomName={roomName} username={username} messages={messages} />}
       </div>
     </div>
   )
