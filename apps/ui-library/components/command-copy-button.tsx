@@ -37,7 +37,7 @@ export function CommandCopyButton({ command }: { command: string }) {
 
     // Extract title from URL
     const titleMatch = cmd.match(/\/ui\/r\/(.*?)-\w+\.json/)
-    const title = titleMatch ? titleMatch[1].replace(/-/g, ' ') : ''
+    const title = titleMatch ? titleMatch[1] : ''
 
     return {
       framework,
