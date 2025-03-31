@@ -1,5 +1,6 @@
 import { Sidebar } from '@/components/sidebar'
 import { SiteFooter } from '@/components/site-footer'
+import { TelemetryWrapper } from './telemetry-wrapper'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -24,6 +25,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </main>
       </div>
       <SiteFooter />
+      <TelemetryWrapper />
     </>
   )
 }

@@ -130,6 +130,7 @@
         "NEXT_PUBLIC_APP_URL",
         "NEXT_PUBLIC_VERCEL_TARGET_ENV",
         "NEXT_PUBLIC_VERCEL_BRANCH_URL",
+        "NEXT_PUBLIC_API_URL",
         "NODE_ENV",
         "HIDE_TAILWIND_INDICATOR",
         // These envs are used in the packages
