@@ -1,5 +1,14 @@
 import { useRouter } from 'next/router'
-import { DragEvent, memo, ReactNode, useContext, useEffect, useMemo, useRef } from 'react'
+import {
+  DragEvent,
+  memo,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
@@ -7,15 +16,16 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { Dashboards } from 'types'
 import { Badge, cn, CodeBlock, CodeBlockLang } from 'ui'
 import { DebouncedComponent } from '../DebouncedComponent'
+import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { QueryBlock } from '../QueryBlock/QueryBlock'
 import { AssistantSnippetProps } from './AIAssistant.types'
 import { identifyQueryType } from './AIAssistant.utils'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { MessageContext } from './Message'
-import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 
 export const OrderedList = memo(({ children }: { children: ReactNode }) => (
   <ol className="flex flex-col gap-y-4">{children}</ol>
@@ -61,7 +71,9 @@ const MemoizedQueryBlock = memo(
     isLoading,
     isDraggable,
     runQuery,
+    results,
     onRunQuery,
+    onResults,
     onDragStart,
     onUpdateChartConfig,
   }: {
@@ -73,7 +85,9 @@ const MemoizedQueryBlock = memo(
     isLoading: boolean
     isDraggable: boolean
     runQuery: boolean
+    results?: any[]
     onRunQuery: (queryType: 'select' | 'mutation') => void
+    onResults: (results: any[]) => void
     onDragStart: (e: DragEvent<Element>) => void
     onUpdateChartConfig?: ({
       chart,
@@ -84,7 +98,7 @@ const MemoizedQueryBlock = memo(
     }) => void
   }) => (
     <DebouncedComponent
-      delay={500}
+      delay={isLoading ? 500 : 0}
       value={sql}
       fallback={
         <div className="bg-surface-100 border-overlay rounded border shadow-sm px-3 py-2 text-xs">
@@ -118,7 +132,9 @@ const MemoizedQueryBlock = memo(
         isLoading={isLoading}
         draggable={isDraggable}
         runQuery={runQuery}
+        results={results}
         onRunQuery={onRunQuery}
+        onResults={onResults}
         onDragStart={onDragStart}
         onUpdateChartConfig={onUpdateChartConfig}
       />
@@ -127,11 +143,28 @@ const MemoizedQueryBlock = memo(
 )
 MemoizedQueryBlock.displayName = 'MemoizedQueryBlock'
 
-export const MarkdownPre = ({ children }: { children: any }) => {
+export const MarkdownPre = ({
+  children,
+  id,
+  onResults,
+}: {
+  children: any
+  id: string
+  onResults: ({
+    messageId,
+    resultId,
+    results,
+  }: {
+    messageId: string
+    resultId?: string
+    results: any[]
+  }) => void
+}) => {
   const router = useRouter()
   const { profile } = useProfile()
   const { isLoading, readOnly } = useContext(MessageContext)
   const { mutate: sendEvent } = useSendEventMutation()
+  const snap = useAiAssistantStateSnapshot()
   const supportSQLBlocks = useFlag('reportsV2')
 
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
@@ -158,9 +191,11 @@ export const MarkdownPre = ({ children }: { children: any }) => {
   )
 
   const { xAxis, yAxis } = snippetProps
+  const snippetId = snippetProps.id
   const title = snippetProps.title || (language === 'edge' ? 'Edge Function' : 'SQL Query')
   const isChart = snippetProps.isChart === 'true'
   const runQuery = snippetProps.runQuery === 'true'
+  const results = snap.getCachedSQLResults({ messageId: id, snippetId })
 
   // Strip props from the content for both SQL and edge functions
   const cleanContent = rawContent.replace(/(?:--|\/\/)\s*props:\s*\{[^}]+\}/, '').trim()
@@ -177,6 +212,13 @@ export const MarkdownPre = ({ children }: { children: any }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snippetProps])
+
+  const onResultsReturned = useCallback(
+    (results: any[]) => {
+      onResults({ messageId: id, resultId: snippetProps.id, results })
+    },
+    [onResults, snippetProps.id]
+  )
 
   const onRunQuery = async (queryType: 'select' | 'mutation') => {
     sendEvent({
@@ -211,8 +253,10 @@ export const MarkdownPre = ({ children }: { children: any }) => {
             isChart={isChart}
             isLoading={isLoading}
             isDraggable={isDraggableToReports}
-            runQuery={runQuery}
+            runQuery={!results && runQuery}
+            results={results}
             onRunQuery={onRunQuery}
+            onResults={onResultsReturned}
             onUpdateChartConfig={({ chartConfig: config }) => {
               chartConfig.current = { ...chartConfig.current, ...config }
             }}
