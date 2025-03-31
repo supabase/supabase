@@ -163,7 +163,8 @@ const CodePage = () => {
         })
       })
     }
-  }, [functionFiles, selectedFunction])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [functionFiles])
 
   return (
     <div className="flex flex-col h-full">
