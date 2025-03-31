@@ -76,7 +76,7 @@ export default function Home() {
               </div>
               <HorizontalGridLine />
               <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative">
-                <div className="-mt-4 flex rounded-lg overflow-hidden">
+                <div className="-mt-4 grid md:flex rounded-lg overflow-hidden">
                   <BlockPreview name="realtime-cursor-demo" isPair />
                   <BlockPreview name="realtime-cursor-demo" isPair />
                 </div>
@@ -149,7 +149,7 @@ export default function Home() {
               </div>
               <HorizontalGridLine />
               <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative">
-                <div className="-mt-4 flex rounded-lg overflow-hidden">
+                <div className="-mt-4 grid md:flex rounded-lg overflow-hidden">
                   <BlockPreview name="realtime-chat-demo" isPair />
                   <BlockPreview name="realtime-chat-demo" isPair />
                 </div>
