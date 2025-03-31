@@ -39,7 +39,7 @@ export function BlockPreview({ name, wide = false, isPair = false }: ComponentPr
     <div className={cn('mt-4 w-full', wideClasses)}>
       <div
         className={cn(
-          'relative border rounded-lg overflow-hidden bg-muted min-h-[350px] h-[600px]',
+          'relative border rounded-lg overflow-hidden bg-muted min-h-[150px] h-[600px]',
           isPair && 'rounded-none'
         )}
       >

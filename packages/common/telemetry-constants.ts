@@ -1072,6 +1072,21 @@ export interface EdgeFunctionDeployButtonClickedEvent {
 }
 
 /**
+ * User clicked the confirm deploy updates button for an Edge Function in the code page within the warning model.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions/{id}/code
+ */
+export interface EdgeFunctionDeployUpdatesConfirmClickedEvent {
+  action: 'edge_function_deploy_updates_confirm_clicked'
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
  * User clicked the AI Assistant button to create an Edge Function.
  *
  * @group Events
@@ -1209,6 +1224,23 @@ export interface EdgeFunctionTestSidePanelOpenedEvent {
 }
 
 /**
+ * User copied the command for a Supabase UI component.
+ *
+ * @group Events
+ * @source supabase-ui
+ * @page /ui/docs/{framework}/{templateTitle}
+ */
+export interface SupabaseUiCommandCopyButtonClickedEvent {
+  action: 'supabase_ui_command_copy_button_clicked'
+  properties: {
+    templateTitle: string
+    command: string
+    framework: 'nextjs' | 'react-router' | 'tanstack' | 'react'
+    packageManager: 'npm' | 'pnpm' | 'yarn' | 'bun'
+  }
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -1274,6 +1306,7 @@ export type TelemetryEvent =
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
   | EdgeFunctionDeployButtonClickedEvent
+  | EdgeFunctionDeployUpdatesConfirmClickedEvent
   | EdgeFunctionAiAssistantButtonClickedEvent
   | EdgeFunctionViaEditorButtonClickedEvent
   | EdgeFunctionTemplateClickedEvent
@@ -1281,3 +1314,4 @@ export type TelemetryEvent =
   | EdgeFunctionDeployUpdatesButtonClickedEvent
   | EdgeFunctionTestSendButtonClickedEvent
   | EdgeFunctionTestSidePanelOpenedEvent
+  | SupabaseUiCommandCopyButtonClickedEvent

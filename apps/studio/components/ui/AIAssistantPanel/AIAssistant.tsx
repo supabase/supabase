@@ -48,14 +48,32 @@ import { Message } from './Message'
 import { useAutoScroll } from './hooks'
 
 const MemoizedMessage = memo(
-  ({ message, isLoading }: { message: MessageType; isLoading: boolean }) => {
+  ({
+    message,
+    isLoading,
+    onResults,
+  }: {
+    message: MessageType
+    isLoading: boolean
+    onResults: ({
+      messageId,
+      resultId,
+      results,
+    }: {
+      messageId: string
+      resultId?: string
+      results: any[]
+    }) => void
+  }) => {
     return (
       <Message
         key={message.id}
+        id={message.id}
         role={message.role}
         content={message.content}
         readOnly={message.role === 'user'}
         isLoading={isLoading}
+        onResults={onResults}
       />
     )
   }
@@ -134,6 +152,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     }
   }, [])
 
+  // TODO(refactor): This useChat hook should be moved down into each chat session.
+  // That way we won't have to disable switching chats while the chat is loading,
+  // and don't run the risk of messages getting mixed up between chats.
   const {
     messages: chatMessages,
     isLoading: isChatLoading,
@@ -160,6 +181,21 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
+  const updateMessage = useCallback(
+    ({
+      messageId,
+      resultId,
+      results,
+    }: {
+      messageId: string
+      resultId?: string
+      results: any[]
+    }) => {
+      snap.updateMessage({ id: messageId, resultId, results })
+    },
+    [snap]
+  )
+
   const renderedMessages = useMemo(
     () =>
       chatMessages.map((message) => {
@@ -168,6 +204,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             key={message.id}
             message={message}
             isLoading={isChatLoading && message.id === chatMessages[chatMessages.length - 1].id}
+            onResults={updateMessage}
           />
         )
       }),
@@ -294,7 +331,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   <TooltipContent side="bottom">Current chat: {currentChat}</TooltipContent>
                 </Tooltip>
                 <div className="flex items-center gap-x-2">
-                  <AIAssistantChatSelector />
+                  <AIAssistantChatSelector disabled={isChatLoading} />
                   <ButtonTooltip
                     type="default"
                     size="tiny"

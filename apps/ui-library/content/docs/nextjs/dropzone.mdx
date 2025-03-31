@@ -43,11 +43,7 @@ The File Upload component makes it easy to add file uploads to your app, with bu
 ```tsx
 'use client'
 
-import {
-  Dropzone,
-  DropzoneContent,
-  DropzoneEmptyState,
-} from '@/components/dropzone'
+import { Dropzone, DropzoneContent, DropzoneEmptyState } from '@/components/dropzone'
 import { useSupabaseUpload } from '@/hooks/use-supabase-upload'
 
 const FileUploadDemo = () => {
@@ -69,7 +65,7 @@ const FileUploadDemo = () => {
   )
 }
 
-export FileUploadDemo
+export { FileUploadDemo }
 ```
 
 ## Props
@@ -81,3 +77,9 @@ export FileUploadDemo
 | `allowedMimeTypes` | `string[]` | `[]`    | The MIME types to allow for upload                   |
 | `maxFiles`         | `number`   | `1`     | Maximum number of files to upload                    |
 | `maxFileSize`      | `number`   | `1000`  | Maximum file size in bytes                           |
+
+## Further reading
+
+- [Creating buckets](https://supabase.com/docs/guides/storage/buckets/creating-buckets)
+- [Access control](https://supabase.com/docs/guides/storage/security/access-control)
+- [Standard uploads](https://supabase.com/docs/guides/storage/uploads/standard-uploads)
