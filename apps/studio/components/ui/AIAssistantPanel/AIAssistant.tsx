@@ -305,7 +305,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   <TooltipContent side="bottom">Current chat: {currentChat}</TooltipContent>
                 </Tooltip>
                 <div className="flex items-center gap-x-2">
-                  <AIAssistantChatSelector />
+                  <AIAssistantChatSelector disabled={isChatLoading} />
                   <ButtonTooltip
                     type="default"
                     size="tiny"
