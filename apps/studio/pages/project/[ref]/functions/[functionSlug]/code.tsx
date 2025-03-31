@@ -58,9 +58,10 @@ const CodePage = () => {
     { id: number; name: string; content: string; selected?: boolean }[]
   >([])
 
-  const { mutateAsync: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
+  const { mutate: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
       toast.success('Successfully updated edge function')
+      setShowDeployWarning(false)
     },
   })
 
@@ -96,7 +97,7 @@ const CodePage = () => {
         return files.find(({ name }) => regex.test(name))?.name
       }
 
-      await deployFunction({
+      deployFunction({
         projectRef: ref,
         slug: selectedFunction.slug,
         metadata: {
@@ -147,7 +148,6 @@ const CodePage = () => {
       groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
     onUpdate()
-    setShowDeployWarning(false)
   }
 
   // TODO (Saxon): Remove this once the flag is fully launched
