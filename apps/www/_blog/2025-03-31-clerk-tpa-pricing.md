@@ -8,7 +8,7 @@ tags:
   - auth
 date: '2025-05-31'
 toc_depth: 3
-author: hf
+author: stojan
 image: lw14-clerk-tpa-pricing/clerk-tpa-pricing-og.png
 thumb: lw14-clerk-tpa-pricing/clerk-tpa-pricing-thumb.png
 ---
