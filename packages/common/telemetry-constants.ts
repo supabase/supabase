@@ -1072,11 +1072,11 @@ export interface EdgeFunctionDeployButtonClickedEvent {
 }
 
 /**
- * User clicked the confirm deploy button for an Edge Function.
+ * User clicked the confirm deploy updates button for an Edge Function in the code page within the warning model.
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/functions/new
+ * @page /dashboard/project/{ref}/functions/{id}/code
  */
 export interface EdgeFunctionDeployUpdatesConfirmClickedEvent {
   action: 'edge_function_deploy_updates_confirm_clicked'
