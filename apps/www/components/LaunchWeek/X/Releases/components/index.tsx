@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { IconDocumentation, IconMicSolid, IconProductHunt, IconYoutubeSolid, cn } from 'ui'
 
+import { Documentation, Mic, ProductHunt, Youtube } from 'icons'
 import Link from 'next/link'
-import { StepLink } from '../data/lwx_data'
+import { cn } from 'ui'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+import { StepLink } from '../data/lwx_data'
 
 interface DayLink extends StepLink {
   className?: string
@@ -20,23 +21,23 @@ export const DayLink = ({ type, icon, text, href = '', className }: DayLink) => 
 
   const linkTypes = {
     blog: {
-      icon: IconDocumentation,
+      icon: Documentation,
       text: 'Blog Post',
     },
     docs: {
-      icon: IconDocumentation,
+      icon: Documentation,
       text: 'Docs',
     },
     productHunt: {
-      icon: IconProductHunt,
+      icon: ProductHunt,
       text: 'Product Hunt',
     },
     video: {
-      icon: IconYoutubeSolid,
+      icon: Youtube,
       text: 'Watch video',
     },
     xSpace: {
-      icon: IconMicSolid,
+      icon: Mic,
       text: 'X Space',
     },
   }

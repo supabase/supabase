@@ -5,12 +5,10 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { Broadcast, DatabaseChanges, Presence } from 'icons'
 import {
   Badge,
   Button,
-  IconBroadcast,
-  IconDatabaseChanges,
-  IconPresence,
   Input,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -76,10 +74,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
           <div className="py-3 px-4 border-b border-overlay">
             <div className="flex items-center justify-between gap-2">
               <div className="flex gap-2.5 items-center">
-                <IconPresence
-                  size="xlarge"
-                  className="bg-foreground rounded text-background-muted"
-                />
+                <Presence size="xlarge" className="bg-foreground rounded text-background-muted" />
                 <label htmlFor="toggle-presence" className="text-sm">
                   Presence
                 </label>
@@ -100,10 +95,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
           <div className="py-3 px-4 border-b border-overlay">
             <div className="flex items-center justify-between">
               <div className="flex gap-2.5 items-center">
-                <IconBroadcast
-                  size="xlarge"
-                  className="bg-foreground rounded text-background-muted"
-                />
+                <Broadcast size="xlarge" className="bg-foreground rounded text-background-muted" />
                 <label htmlFor="toggle-broadcast" className="text-sm">
                   Broadcast
                 </label>
@@ -124,7 +116,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
           <div className="py-3 px-4 border-b border-overlay">
             <div className="flex items-center justify-between">
               <div className="flex gap-2.5 items-center">
-                <IconDatabaseChanges
+                <DatabaseChanges
                   size="xlarge"
                   className="bg-foreground rounded text-background-muted"
                 />

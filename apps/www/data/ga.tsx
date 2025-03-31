@@ -1,6 +1,6 @@
 import { KeyIcon, RewindIcon, ShieldCheckIcon, UserGroupIcon } from '@heroicons/react/outline'
+import { Discord, Github, Twitter, Youtube } from 'icons'
 import { Activity } from 'lucide-react'
-import { IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
 
 export const data = (isDark: boolean) => ({
   hero: {
@@ -77,25 +77,25 @@ We're committed to our Free Plan - we know the importance of this for testing ho
         number: '65,000',
         text: 'GitHub stars',
         url: 'https://github.com/supabase',
-        icon: <IconGitHubSolid />,
+        icon: <Github />,
       },
       {
         number: '106,000',
         text: 'Twitter followers',
         url: 'https://twitter.com/supabase',
-        icon: <IconTwitterX />,
+        icon: <Twitter />,
       },
       {
         number: '25,000',
         text: 'Discord members',
         url: 'https://discord.com/invite/R7bSpeBSJE',
-        icon: <IconDiscord />,
+        icon: <Discord />,
       },
       {
         number: '23,000',
         text: 'YouTube subscribers',
         url: 'https://www.youtube.com/c/supabase',
-        icon: <IconYoutubeSolid />,
+        icon: <Youtube />,
       },
       {
         number: '10,000',

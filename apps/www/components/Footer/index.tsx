@@ -2,14 +2,15 @@ import { CheckIcon } from '@heroicons/react/outline'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
-import SectionContainer from '../Layouts/SectionContainer'
 
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import footerData from 'data/Footer'
+import { Discord, Github, Twitter, Youtube } from 'icons'
+import { Badge, cn } from 'ui'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
+import SectionContainer from '../Layouts/SectionContainer'
 
 interface Props {
   className?: string
@@ -88,7 +89,7 @@ const Footer = (props: Props) => {
                 className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Twitter</span>
-                <IconTwitterX size={22} />
+                <Twitter size={22} />
               </a>
 
               <a
@@ -96,7 +97,7 @@ const Footer = (props: Props) => {
                 className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">GitHub</span>
-                <IconGitHubSolid size={22} />
+                <Github size={22} />
               </a>
 
               <a
@@ -104,7 +105,7 @@ const Footer = (props: Props) => {
                 className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Discord</span>
-                <IconDiscord size={22} />
+                <Discord size={22} />
               </a>
 
               <a
@@ -112,7 +113,7 @@ const Footer = (props: Props) => {
                 className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Youtube</span>
-                <IconYoutubeSolid size={22} />
+                <Youtube size={22} />
               </a>
             </div>
           </div>

@@ -1,0 +1,25 @@
+<svg 
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path
+    stroke="currentColor"
+    stroke-linejoin="round"
+    stroke-miterlimit="10"
+    d="m10.649 11.499 3.424 7.83a.5.5 0 0 0 .942-.074l.74-2.868a.5.5 0 0 1 .364-.36l3.039-.756a.5.5 0 0 0 .08-.943l-7.93-3.487a.5.5 0 0 0-.66.658Z"
+  />
+  <path
+    stroke="currentColor"
+    stroke-linejoin="round"
+    stroke-miterlimit="10"
+    d="M12.044 20.746h-5.623a3 3 0 0 1-3-3V6.5a3 3 0 0 1 3-3h11.247a3 3 0 0 1 3 3v5.623"
+    opacity="0.45"
+  />
+</svg>

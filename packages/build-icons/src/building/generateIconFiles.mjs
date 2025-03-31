@@ -3,7 +3,7 @@ import path from 'path'
 import prettier from 'prettier'
 import { readSvg, toPascalCase } from '../utils/helpers.mjs'
 
-export default ({
+export default async ({
   iconNodes,
   outputDirectory,
   template,
@@ -25,9 +25,10 @@ export default ({
   const icons = Object.keys(iconNodes)
   const iconsDistDirectory = path.join(outputDirectory, `icons`)
 
-  if (!fs.existsSync(iconsDistDirectory)) {
-    fs.mkdirSync(iconsDistDirectory)
-  }
+  // delete the existing folder so that it can be recreated from scratch. This helps with removing
+  // accidentally misnamed files.
+  fs.rmdirSync(iconsDistDirectory, { recursive: true })
+  fs.mkdirSync(iconsDistDirectory)
 
   // TO DO -- START
   //
@@ -44,7 +45,7 @@ export const Index: Record<string, any> = [`
 
   const registryOutput = path.join(registryDir, 'index.tsx')
 
-  const writeIconFiles = icons.map(async (iconName, i) => {
+  for (const [i, iconName] of icons.entries()) {
     const location = path.join(iconsDistDirectory, `${iconName}${iconFileExtension}`)
 
     const componentName = toPascalCase(iconName)
@@ -58,7 +59,7 @@ export const Index: Record<string, any> = [`
 
     const elementTemplate = template({ componentName, iconName, children, getSvg, deprecated })
     const output = pretty
-      ? prettier.format(elementTemplate, {
+      ? await prettier.format(elementTemplate, {
           singleQuote: true,
           trailingComma: 'all',
           printWidth: 100,
@@ -92,7 +93,7 @@ export const Index: Record<string, any> = [`
 
     console.log('Created ' + componentName)
     await fs.promises.writeFile(location, output, 'utf-8')
-  })
+  }
 
   // TO DO -- START
   //
@@ -100,7 +101,7 @@ export const Index: Record<string, any> = [`
   // with all the other build scripts
   // @mildtomato
   async function writeRegistry() {
-    console.log(registryIndex)
+    // console.log(registryIndex)
 
     registryIndex += `\n}`
     // close index
@@ -111,16 +112,7 @@ export const Index: Record<string, any> = [`
   }
   // TO DO -- END
 
-  Promise.all([writeIconFiles])
-
-    // TO DO -- START
-    //
-    // move this to ./build-registry in design-system
-    // with all the other build scripts
-    // @mildtomato
-    .then(() => writeRegistry())
-    // TO DO -- END
-
+  await writeRegistry()
     .then(() => {
       if (showLog) {
         console.log('Successfully built', icons.length, 'icons.')

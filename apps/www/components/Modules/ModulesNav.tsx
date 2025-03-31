@@ -1,8 +1,8 @@
-import React from 'react'
-import { cn, IconDocumentation } from 'ui'
 import Link from 'next/link'
 import { PRODUCT_MODULES_NAMES } from 'shared-data/products'
 
+import { Documentation } from 'icons'
+import { cn } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductModules from '~/data/ProductModules'
 
@@ -57,7 +57,7 @@ function ModulesNav({ activePage, docsUrl }: Props) {
               )}
               href={docsUrl}
             >
-              <IconDocumentation size={14} strokeWidth={1.2} /> Docs
+              <Documentation size={14} strokeWidth={1.2} /> Docs
             </Link>
           )}
         </div>
