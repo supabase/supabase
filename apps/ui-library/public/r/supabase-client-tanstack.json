@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "supabase-client-tanstack",
   "type": "registry:lib",
-  "title": "Supabase Client for Tanstack Start",
+  "title": "Supabase Client for TanStack Start",
   "description": "",
   "dependencies": [
     "@supabase/ssr@latest",

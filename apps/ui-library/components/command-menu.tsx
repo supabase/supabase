@@ -55,7 +55,7 @@ export function CommandMenu({ ...props }: DialogProps) {
       <Button
         type="outline"
         className={cn(
-          `relative h-8 w-full justify-start rounded-[0.5rem] bg-background text-sm font-normal text-foreground-muted shadow-none sm:pr-12 md:w-40 lg:w-64
+          `relative h-8 w-full justify-start rounded-[0.5rem] bg-background text-sm font-normal text-foreground-muted shadow-none sm:pr-12
             hover:border-foreground-muted hover:bg-surface-100 hover:text-foreground-lighter
           `
         )}

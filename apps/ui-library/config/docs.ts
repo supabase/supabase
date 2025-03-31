@@ -45,7 +45,7 @@ export const aiEditorsRules: SidebarNavGroup = {
 export const frameworkTitles: Record<string, string> = {
   nextjs: 'Next.js',
   'react-router': 'React Router',
-  tanstack: 'Tanstack Start',
+  tanstack: 'TanStack Start',
   react: 'React SPA',
 }
 
@@ -63,37 +63,43 @@ export const componentPages: Record<
     title: 'Client',
     supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
     commandItemLabel: 'Supabase Client',
-    href: '/docs/client',
+    href: '/docs/nextjs/client',
   },
   'password-based-auth': {
     title: 'Password-Based Auth',
     supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
     commandItemLabel: 'Password-Based Auth',
-    href: '/docs/password-based-auth',
+    href: '/docs/nextjs/password-based-auth',
   },
   dropzone: {
     title: 'Dropzone',
     supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
     commandItemLabel: 'Dropzone (File Upload)',
-    href: '/docs/dropzone',
+    href: '/docs/nextjs/dropzone',
   },
   'realtime-cursor': {
     title: 'Realtime Cursor',
     supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
     commandItemLabel: 'Realtime Cursor',
-    href: '/docs/realtime-cursor',
+    href: '/docs/nextjs/realtime-cursor',
   },
   'current-user-avatar': {
     title: 'Current User Avatar',
     supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
     commandItemLabel: 'Current User Avatar',
-    href: '/docs/current-user-avatar',
+    href: '/docs/nextjs/current-user-avatar',
   },
   'realtime-avatar-stack': {
     title: 'Realtime Avatar Stack',
     supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
     commandItemLabel: 'Realtime Avatar Stack',
-    href: '/docs/realtime-avatar-stack',
+    href: '/docs/nextjs/realtime-avatar-stack',
+  },
+  'realtime-chat': {
+    title: 'Realtime Chat',
+    supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+    commandItemLabel: 'Realtime Chat',
+    href: '/docs/nextjs/realtime-chat',
   },
 }
 

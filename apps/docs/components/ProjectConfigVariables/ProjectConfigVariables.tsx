@@ -33,8 +33,9 @@ import {
 import { useCopy } from '~/hooks/useCopy'
 import { useBranchesQuery } from '~/lib/fetch/branches'
 import { useOrganizationsQuery } from '~/lib/fetch/organizations'
+import { type SupavisorConfigData, useSupavisorConfigQuery } from '~/lib/fetch/pooler'
 import { useProjectApiQuery } from '~/lib/fetch/projectApi'
-import { useProjectsQuery } from '~/lib/fetch/projects'
+import { isProjectPaused, type ProjectsData, useProjectsQuery } from '~/lib/fetch/projects'
 import { LOCAL_STORAGE_KEYS, retrieve, storeOrRemoveNull } from '~/lib/storage'
 import { useOnLogout } from '~/lib/userAuth'
 
@@ -59,6 +60,7 @@ type VariableDataState =
   | 'userLoading'
   | 'loggedOut'
   | 'loggedIn.noSelectedProject'
+  | 'loggedIn.selectedProject.projectPaused'
   | 'loggedIn.selectedProject.dataPending'
   | 'loggedIn.selectedProject.dataError'
   | 'loggedIn.selectedProject.dataSuccess'
@@ -187,18 +189,19 @@ function BranchSelector() {
 
   const { selectedProject, selectedBranch, setSelectedBranch } = useSnapshot(projectsStore)
 
+  const projectPaused = isProjectPaused(selectedProject)
   const hasBranches = selectedProject?.is_branch_enabled ?? false
 
   const { data, isPending, isError } = useBranchesQuery(
     { projectRef: selectedProject?.ref },
-    { enabled: isLoggedIn && hasBranches }
+    { enabled: isLoggedIn && !projectPaused && hasBranches }
   )
 
   const stateSummary: BranchesDataState = userLoading
     ? 'userLoading'
     : !isLoggedIn
       ? 'loggedOut'
-      : !hasBranches
+      : !hasBranches || projectPaused
         ? 'loggedIn.noBranches'
         : isPending
           ? 'loggedIn.branches.dataPending'
@@ -265,22 +268,36 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   const isLoggedIn = useIsLoggedIn()
 
   const { selectedProject, selectedBranch } = useSnapshot(projectsStore)
-
+  const projectPaused = isProjectPaused(selectedProject)
   const hasBranches = selectedProject?.is_branch_enabled ?? false
   const ref = hasBranches ? selectedBranch?.project_ref : selectedProject?.ref
 
+  const needsApiQuery = variable === 'anonKey' || variable === 'url'
+  const needsSupavisorQuery = variable === 'sessionPooler'
+
   const {
     data: apiData,
-    isPending,
-    isError,
+    isPending: isApiPending,
+    isError: isApiError,
   } = useProjectApiQuery(
     {
       projectRef: ref,
     },
-    { enabled: isLoggedIn && !!ref }
+    { enabled: isLoggedIn && !!ref && !projectPaused && needsApiQuery }
   )
 
-  function isInvalid(apiData: ProjectApiData) {
+  const {
+    data: supavisorConfig,
+    isPending: isSupavisorPending,
+    isError: isSupavisorError,
+  } = useSupavisorConfigQuery(
+    {
+      projectRef: ref,
+    },
+    { enabled: isLoggedIn && !!ref && !projectPaused && needsSupavisorQuery }
+  )
+
+  function isInvalidApiData(apiData: ProjectApiData) {
     switch (variable) {
       case 'url':
         return !apiData.app_config?.endpoint
@@ -289,17 +306,27 @@ function VariableView({ variable, className }: { variable: Variable; className?:
     }
   }
 
+  function isInvalidSupavisorData(supavisorData: SupavisorConfigData) {
+    return supavisorData.length === 0
+  }
+
   const stateSummary: VariableDataState = isUserLoading
     ? 'userLoading'
     : !isLoggedIn
       ? 'loggedOut'
       : !ref
         ? 'loggedIn.noSelectedProject'
-        : isPending
-          ? 'loggedIn.selectedProject.dataPending'
-          : isError || isInvalid(apiData)
-            ? 'loggedIn.selectedProject.dataError'
-            : 'loggedIn.selectedProject.dataSuccess'
+        : projectPaused
+          ? 'loggedIn.selectedProject.projectPaused'
+          : (needsApiQuery ? isApiPending : isSupavisorPending)
+            ? 'loggedIn.selectedProject.dataPending'
+            : (
+                  needsApiQuery
+                    ? isApiError || isInvalidApiData(apiData)
+                    : isSupavisorError || isInvalidSupavisorData(supavisorConfig)
+                )
+              ? 'loggedIn.selectedProject.dataError'
+              : 'loggedIn.selectedProject.dataSuccess'
 
   let variableValue: string = null
   if (stateSummary === 'loggedIn.selectedProject.dataSuccess') {
@@ -310,6 +337,8 @@ function VariableView({ variable, className }: { variable: Variable; className?:
       case 'anonKey':
         variableValue = apiData.service_api_keys!.find((key) => key.tags === 'anon')!.api_key
         break
+      case 'sessionPooler':
+        variableValue = supavisorConfig[0].connection_string
     }
   }
 
@@ -326,9 +355,11 @@ function VariableView({ variable, className }: { variable: Variable; className?:
             stateSummary === 'userLoading' ||
             stateSummary === 'loggedIn.selectedProject.dataPending'
               ? 'Loading...'
-              : stateSummary === 'loggedIn.selectedProject.dataSuccess'
-                ? variableValue
-                : `YOUR ${prettyFormatVariable[variable].toUpperCase()}`
+              : stateSummary === 'loggedIn.selectedProject.projectPaused'
+                ? 'PROJECT PAUSED'
+                : stateSummary === 'loggedIn.selectedProject.dataSuccess'
+                  ? variableValue
+                  : `YOUR ${prettyFormatVariable[variable].toUpperCase()}`
           }
         />
         <CopyToClipboard text={variableValue ?? ''}>
