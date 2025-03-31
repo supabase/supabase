@@ -19,8 +19,8 @@ const Hero = () => {
                   <div className="z-40 w-full flex justify-center -mt-4 lg:-mt-12 mb-8">
                     <AnnouncementBadge
                       url="/launch-week#day-1"
-                      badge="Launch Week 14"
-                      announcement="Day 1"
+                      badge="LW14: Day 1"
+                      announcement="Supabase UI Library"
                       style={{
                         fontFamily:
                           'Departure Mono, Source Code Pro, Office Code Pro, Menlo, monospace',

@@ -8,7 +8,6 @@ import { Button } from 'ui/src/components/Button/Button'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useTheme } from 'next-themes'
 import announcement from '../Banners/data.json'
-import CountdownComponent from '../Banners/Countdown'
 import './styles.css'
 
 const LW14BG = `/docs/img/launchweek/14/promo-banner-bg.png`
@@ -42,23 +41,21 @@ const PromoToast = () => {
       )}
     >
       <div className="relative z-10 text-foreground-lighter uppercase flex flex-col text-sm w-full font-mono mb-2">
-        <span className="mb-1">MAR 31 - APR 04 / 7AM PT</span>
-
+        <span className="mb-1">LW14: Day 1</span>
         <p
           style={{
             fontFamily: 'Departure Mono, Source Code Pro, Office Code Pro, Menlo, monospace',
           }}
           className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7"
         >
-          Launch Week 14
+          Supabase UI Library
         </p>
-        <CountdownComponent date={new Date(announcement.launchDate)} showCard={false} />
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
         <Button asChild type="secondary">
           <Link target="_blank" rel="noreferrer" href={`https://supabase.com${announcement.link}`}>
-            Claim ticket
+            Learn more
           </Link>
         </Button>
         <Button type="default" onClick={handleHide}>

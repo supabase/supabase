@@ -25,7 +25,7 @@ const BuildStage: FC = () => {
   return (
     <>
       <SectionContainer className="!max-w-none lg:!container lw-nav-anchor" id="build-stage">
-        <div className="flex flex-col md:flex-row md:gap-2 pb-4 md:pb-8 text-sm tracking-widest font-mono uppercase">
+        <div className="flex flex-col md:flex-row md:gap-2 pb-4 md:pb-8 text-sm tracking-widest uppercase">
           <h3 className="text-foreground ">Build Stage</h3>
           <p className="text-foreground-lighter">A collection of surprise releases</p>
         </div>

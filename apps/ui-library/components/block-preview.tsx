@@ -19,7 +19,7 @@ export function BlockPreview({ name, wide = false, isPair = false }: ComponentPr
           }
         >
           <iframe
-            src={`/ui/example/${name}`}
+            src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/example/${name}`}
             style={{
               border: 'none',
               width: '100%',

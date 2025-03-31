@@ -20,5 +20,6 @@
       "content": "import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'\n\nexport function createClient(request: Request) {\n  const headers = new Headers()\n\n  const supabase = createServerClient(\n    process.env.VITE_SUPABASE_URL!,\n    process.env.VITE_SUPABASE_ANON_KEY!,\n    {\n      cookies: {\n        getAll() {\n          return parseCookieHeader(request.headers.get('Cookie') ?? '') as {\n            name: string\n            value: string\n          }[]\n        },\n        setAll(cookiesToSet) {\n          cookiesToSet.forEach(({ name, value, options }) =>\n            headers.append('Set-Cookie', serializeCookieHeader(name, value, options))\n          )\n        },\n      },\n    }\n  )\n\n  return { supabase, headers }\n}\n",
       "type": "registry:lib"
     }
-  ]
+  ],
+  "docs": "You'll need to add a `.env` file with the following environment variables to your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`."
 }

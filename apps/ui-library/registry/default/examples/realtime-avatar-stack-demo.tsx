@@ -27,7 +27,7 @@ const RealtimeAvatarStackDemo = () => {
       name = user?.user_metadata.full_name as string
     }
     return name ?? '?'
-  }, [user, dashboardUser, user?.user_metadata.full_name])
+  }, [dashboardUser, user?.user_metadata.full_name])
 
   // generate a random image for the current user or use his supabase.com avatar
   const currentUserImage = useMemo(() => {
@@ -37,7 +37,7 @@ const RealtimeAvatarStackDemo = () => {
     }
 
     return image
-  }, [user, dashboardUser, user?.user_metadata.avatar_url])
+  }, [dashboardUser, user?.user_metadata.avatar_url])
 
   const [usersMap, setUsersMap] = useState<Record<string, RealtimeUser> | null>(null)
 
@@ -70,7 +70,7 @@ const RealtimeAvatarStackDemo = () => {
     return () => {
       room.unsubscribe()
     }
-  }, [currentUserName, currentUserImage, roomName])
+  }, [currentUserName, currentUserImage])
 
   const avatars = useMemo(() => {
     return Object.values(usersMap || {}).map((user) => ({
@@ -89,7 +89,7 @@ const RealtimeAvatarStackDemo = () => {
 
       {avatars.length < 2 ? (
         <div className="flex flex-col text-sm text-foreground-light">
-          <span>It seems like you're the only person viewing this page.</span>
+          <span>It seems like you&apos;re the only person viewing this page.</span>
           <span>Open this page in another browser tab to see it in action.</span>
         </div>
       ) : user ? (
@@ -101,6 +101,8 @@ const RealtimeAvatarStackDemo = () => {
         <span className="text-sm text-foreground-light">
           It seems like you&apos;re not logged in. Login via the{' '}
           <a
+            target="_blank"
+            rel="noopener noreferrer"
             href="https://supabase.com/dashboard/sign-in"
             className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2"
           >

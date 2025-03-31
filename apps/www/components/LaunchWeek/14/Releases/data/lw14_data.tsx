@@ -63,23 +63,37 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     dd: 'Mon',
     shipped: true,
     isToday: true,
-    hasCountdown: true,
-    blog: '',
+    hasCountdown: false,
+    blog: '/blog/supabase-ui-library',
     date: '31 March',
     published_at: '2025-03-31T08:00:00.000-07:00',
-    title: '',
-    description: null,
+    title: 'Supabase UI Library',
+    description: 'Supabase UI Library',
     links: [
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
-      // {
-      //   type: 'xSpace',
-      //   href: '',
-      // },
+      {
+        type: 'video',
+        href: 'https://youtu.be/2TIuUjkCDFE',
+      },
+      {
+        type: 'xSpace',
+        href: 'https://twitter.com/i/spaces/1BdGYqbwZEZGX',
+      },
     ],
-    steps: [],
+    steps: [
+      {
+        title: 'TBD',
+        url: '#',
+        blog: '#',
+        bg_layers: [
+          {
+            img: '/images/launchweek/14/releases/d1/day-1-dark.svg',
+            mobileImg: '/images/launchweek/14/releases/d1/day-1-dark-mobile.svg',
+            imgLight: '/images/launchweek/14/releases/d1/day-1-light.svg',
+            mobileImgLight: '/images/launchweek/14/releases/d1/day-1-light-mobile.svg',
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'day-2',
@@ -87,7 +101,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     dd: 'Tue',
     shipped: false,
     isToday: false,
-    hasCountdown: false,
+    hasCountdown: true,
     blog: '',
     date: '01 April',
     published_at: '2025-04-01T08:00:00.000-07:00',
@@ -98,10 +112,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       //   type: 'video',
       //   href: '',
       // },
-      // {
-      //   type: 'xSpace',
-      //   href: '',
-      // },
+      {
+        type: 'xSpace',
+        href: 'https://twitter.com/i/spaces/1rmxPyVkLjbKN',
+      },
     ],
     steps: [],
   },
@@ -122,10 +136,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       //   type: 'video',
       //   href: '',
       // },
-      // {
-      //   type: 'xSpace',
-      //   href: '',
-      // },
+      {
+        type: 'xSpace',
+        href: 'https://twitter.com/i/spaces/1zqKVjoPQzLKB',
+      },
     ],
     steps: [],
   },
@@ -146,10 +160,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       //   type: 'video',
       //   href: '',
       // },
-      // {
-      //   type: 'xSpace',
-      //   href: '',
-      // },
+      {
+        type: 'xSpace',
+        href: 'https://twitter.com/i/spaces/1MnGnwOpYgkJO',
+      },
     ],
     steps: [],
   },
@@ -170,10 +184,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       //   type: 'video',
       //   href: '',
       // },
-      // {
-      //   type: 'xSpace',
-      //   href: '',
-      // },
+      {
+        type: 'xSpace',
+        href: 'https://twitter.com/i/spaces/1OwxWXywakQKQ',
+      },
     ],
     steps: [],
   },

@@ -31,7 +31,7 @@ const LWHeader = ({ className }: { className?: string }) => {
           LaunchWeek 14
           <span className="block">MAR 31-APR 04</span>
         </h1>
-        <p className="text-foreground-lighter max-w-xs md:max-w-sm pointer-events-none">
+        <p className="text-foreground-lighter max-w-xs md:max-w-sm pointer-events-none uppercase">
           A week of new features and new ways to level up your development.
         </p>
       </SectionContainer>
