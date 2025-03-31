@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import { ChatMessageItem } from '@/registry/default/blocks/realtime-chat/components/chat-message'
 import { useChatScroll } from '@/registry/default/blocks/realtime-chat/hooks/use-chat-scroll'
 import {
-  ChatMessage,
+  type ChatMessage,
   useRealtimeChat,
 } from '@/registry/default/blocks/realtime-chat/hooks/use-realtime-chat'
 import { Button } from '@/registry/default/components/ui/button'
