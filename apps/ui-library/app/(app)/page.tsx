@@ -29,10 +29,7 @@ export default function Home() {
             {/* Grid Content */}
             <div className="grid grid-cols-12 gap-0 relative z-20 pb-32">
               {/* Heading Section */}
-              <div
-                data-grid-item
-                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-8 pb-8"
-              >
+              <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-8 pb-8">
                 <div className="flex flex-col gap-8 justify-start pt-16 md:pt-32">
                   <div className="max-w-2xl">
                     <h1 className="text-4xl text-foreground mb-3 font-medium tracking-tight">
@@ -50,17 +47,17 @@ export default function Home() {
               </div>
 
               {/* Password-based Authentication */}
-              <div
-                data-grid-item
-                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative"
-              >
-                Password-based Authentication
+              <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative flex justify-between items-center">
+                <span>Password-based Authentication</span>
+                <Link
+                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2"
+                  href="/docs/nextjs/password-based-auth"
+                >
+                  Go to block ➔
+                </Link>
               </div>
               <HorizontalGridLine />
-              <div
-                data-grid-item
-                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative"
-              >
+              <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative">
                 <div className="-mt-4">
                   <BlockPreview name="password-based-auth/auth/sign-up" />
                 </div>
@@ -68,17 +65,17 @@ export default function Home() {
               <HorizontalGridLine />
 
               {/* Realtime Cursors */}
-              <div
-                data-grid-item
-                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative"
-              >
-                Realtime Cursors
+              <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative flex justify-between items-center">
+                <span>Realtime Cursors</span>
+                <Link
+                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2"
+                  href="/docs/nextjs/realtime-cursor"
+                >
+                  Go to block ➔
+                </Link>
               </div>
               <HorizontalGridLine />
-              <div
-                data-grid-item
-                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative"
-              >
+              <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative">
                 <div className="-mt-4 flex rounded-lg overflow-hidden">
                   <BlockPreview name="realtime-cursor-demo" isPair />
                   <BlockPreview name="realtime-cursor-demo" isPair />
@@ -87,17 +84,17 @@ export default function Home() {
               <HorizontalGridLine />
 
               {/* Dropzone */}
-              <div
-                data-grid-item
-                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative"
-              >
-                File Upload
+              <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative  flex justify-between items-center">
+                <span>File Upload</span>
+                <Link
+                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2"
+                  href="/docs/nextjs/dropzone"
+                >
+                  Go to block ➔
+                </Link>
               </div>
               <HorizontalGridLine />
-              <div
-                data-grid-item
-                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative"
-              >
+              <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative">
                 <div className="-mt-4 -mb-12">
                   <ComponentPreview name="dropzone-demo" showCode={false} />
                 </div>
@@ -105,17 +102,17 @@ export default function Home() {
               <HorizontalGridLine />
 
               {/* Current User Avatar */}
-              <div
-                data-grid-item
-                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative"
-              >
-                Current User Avatar
+              <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative flex justify-between items-center">
+                <span>Current User Avatar</span>
+                <Link
+                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2"
+                  href="/docs/nextjs/current-user-avatar"
+                >
+                  Go to block ➔
+                </Link>
               </div>
               <HorizontalGridLine />
-              <div
-                data-grid-item
-                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative"
-              >
+              <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative">
                 <div className="-mt-4 -mb-12">
                   <ComponentPreview name="current-user-avatar-preview" showCode={false} />
                 </div>
@@ -123,17 +120,17 @@ export default function Home() {
               <HorizontalGridLine />
 
               {/* Realtime Avatar Stack */}
-              <div
-                data-grid-item
-                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative"
-              >
-                Realtime Avatar Stack
+              <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative flex justify-between items-center">
+                <span>Realtime Avatar Stack</span>
+                <Link
+                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2"
+                  href="/docs/nextjs/realtime-avatar-stack"
+                >
+                  Go to block ➔
+                </Link>
               </div>
               <HorizontalGridLine />
-              <div
-                data-grid-item
-                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative"
-              >
+              <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative">
                 <div className="-mt-4 -mb-12">
                   <ComponentPreview name="realtime-avatar-stack-preview" showCode={false} />
                 </div>
@@ -141,22 +138,23 @@ export default function Home() {
               <HorizontalGridLine />
 
               {/* Realtime Chat */}
-              <div
-                data-grid-item
-                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative"
-              >
-                Realtime Chat
+              <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative flex justify-between items-center">
+                <span>Realtime Chat</span>
+                <Link
+                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2"
+                  href="/docs/nextjs/realtime-chat"
+                >
+                  Go to block ➔
+                </Link>
               </div>
               <HorizontalGridLine />
-              <div
-                data-grid-item
-                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative"
-              >
+              <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative">
                 <div className="-mt-4 flex rounded-lg overflow-hidden">
                   <BlockPreview name="realtime-chat-demo" isPair />
                   <BlockPreview name="realtime-chat-demo" isPair />
                 </div>
               </div>
+              <HorizontalGridLine />
             </div>
           </div>
         </div>
