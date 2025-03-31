@@ -75,7 +75,7 @@ export function CommandMenu({ ...props }: DialogProps) {
           <CommandGroup_Shadcn_ key="pages" heading="Pages">
             {COMMAND_ITEMS.map((navItem) => (
               <CommandItem_Shadcn_
-                key={`${navItem.label}-${navItem.href}`}
+                key={navItem.href}
                 value={navItem.label}
                 onSelect={() => runCommand(() => router.push(navItem.href as string))}
               >
