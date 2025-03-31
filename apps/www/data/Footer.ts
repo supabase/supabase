@@ -33,6 +33,9 @@ const footerData = [
         url: '/modules/cron',
       },
       {
+        text: 'UI Library',
+        url: '/ui',
+      {
         text: 'Pricing',
         url: '/pricing',
       },
