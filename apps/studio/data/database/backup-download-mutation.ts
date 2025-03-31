@@ -13,14 +13,9 @@ export type BackupDownloadVariables = {
 export async function downloadBackup({ ref, backup }: BackupDownloadVariables) {
   const { data, error } = await post('/platform/database/{ref}/backups/download', {
     params: { path: { ref } },
+    // @ts-ignore TODO(kamil): Remove ts-ignore once `DownloadBackupBody` changes lands
     body: {
-      id: backup.id, // this is the only one needed actually
-      inserted_at: backup.inserted_at,
-      project_id: backup.project_id,
-      data: {},
-      s3_bucket: 'deprecated',
-      s3_path: 'deprecated',
-      status: 'deprecated',
+      id: backup.id,
     },
   })
   if (error) handleError(error)

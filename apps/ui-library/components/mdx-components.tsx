@@ -13,8 +13,10 @@ import { CopyButton } from '@/components/copy-button'
 import { cn } from 'ui'
 // import { FrameworkDocs } from '@/components/framework-docs'
 import { CodeFragment } from '@/components/code-fragment'
+import { DualRealtimeChat } from '@/components/dual-realtime-chat'
 import { Icons } from '@/components/icons'
 import { RegistryBlock } from '@/components/registry-block'
+import TanStackBeta from '@/components/tanstack-beta'
 import { ThemeSettings } from '@/components/theme-settings'
 import { Style } from '@/registry/styles'
 import {
@@ -31,7 +33,6 @@ import {
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
-import TanStackBeta from '@/components/tanstack-beta'
 import { Admonition } from 'ui-patterns/admonition'
 import { BlockItem } from './block-item'
 import { BlockPreview } from './block-preview'
@@ -273,6 +274,7 @@ const components = {
   SonnerPositionConfig,
   BlockItem,
   BlockPreview,
+  DualRealtimeChat,
 }
 
 interface MdxProps {
