@@ -22,6 +22,7 @@ import {
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { InlineLink } from 'components/ui/InlineLink'
 
 interface CreateClerkAuthIntegrationProps {
   visible: boolean
@@ -107,9 +108,13 @@ export const CreateClerkAuthIntegrationDialog = ({
             <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <p className="text-sm text-foreground-light">
                 Register your Clerk domain. Visit{' '}
-                <a href="https://dashboard.clerk.com/setup/supabase" target="_blank" rel="noopener">
+                <InlineLink
+                  href="https://dashboard.clerk.com/setup/supabase"
+                  target="_blank"
+                  rel="noopener"
+                >
                   Clerk's Connect with Supabase page
-                </a>{' '}
+                </InlineLink>{' '}
                 to configure your Clerk instance.
               </p>
               <FormField_Shadcn_
