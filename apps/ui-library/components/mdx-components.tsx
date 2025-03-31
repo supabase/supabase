@@ -257,7 +257,7 @@ const components = {
   LinkedCard: ({ className, ...props }: React.ComponentProps<typeof Link>) => (
     <Link
       className={cn(
-        'flex w-full flex-col items-center rounded-xl border bg-surface-100 text-card-background p-6 shadow transition-colors hover:bg-muted/50 sm:p-10',
+        'flex w-full flex-col items-center rounded-xl border bg-surface-100 text-card-background py-6 px-4 shadow transition-colors hover:bg-muted/50 sm:p-10',
         className
       )}
       {...props}
