@@ -1,8 +1,10 @@
+import { SqlEditor } from 'icons'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Button } from 'ui'
-import { SqlEditor } from 'icons'
 
 const InlineEditorButton = () => {
+  const { closeAssistant } = useAiAssistantStateSnapshot()
   const { setEditorPanel, editorPanel } = useAppStateSnapshot()
 
   return (
@@ -12,6 +14,7 @@ const InlineEditorButton = () => {
       id="editor-trigger"
       className="h-full w-full rounded-none text-foreground-light"
       onClick={() => {
+        closeAssistant()
         setEditorPanel({ open: !editorPanel.open })
       }}
     >

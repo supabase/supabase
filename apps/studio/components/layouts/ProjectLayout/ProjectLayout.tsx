@@ -237,10 +237,11 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                         'w-screen h-[100dvh] md:h-auto md:w-auto'
                       )}
                     >
-                      {aiSnap.open && (
+                      {aiSnap.open ? (
                         <AIAssistant className="w-full h-[100dvh] md:h-full max-h-[100dvh]" />
-                      )}
-                      {editorPanel.open && <EditorPanel />}
+                      ) : editorPanel.open ? (
+                        <EditorPanel />
+                      ) : null}
                     </ResizablePanel>
                   </>
                 )}
