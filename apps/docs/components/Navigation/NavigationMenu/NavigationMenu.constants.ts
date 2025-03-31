@@ -1314,8 +1314,12 @@ export const functions: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Create an Edge Function',
+          name: 'Quickstart',
           url: '/guides/functions/quickstart',
+        },
+        {
+          name: 'Create an Edge Function Locally',
+          url: '/guides/functions/local-quickstart',
         },
         {
           name: 'Deploy to Production',
@@ -1379,6 +1383,14 @@ export const functions: NavMenuConstant = {
         {
           name: 'Integrating with Log Drains',
           url: '/guides/platform/log-drains',
+        },
+        {
+          name: 'About Deno 2',
+          url: '/guides/functions/deno2',
+        },
+        {
+          name: 'Testing with Deno 2',
+          url: '/guides/functions/tests',
         },
       ],
     },
