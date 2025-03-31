@@ -4,21 +4,24 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import LogoLoader from '@ui/components/LogoLoader'
 import { useParams } from 'common'
+import { DeployEdgeFunctionWarningModal } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
 import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { Button } from 'ui'
 
 const CodePage = () => {
   const router = useRouter()
@@ -29,6 +32,9 @@ const CodePage = () => {
   const edgeFunctionCreate = useFlag('edgeFunctionCreate')
   const { mutate: sendEvent } = useSendEventMutation()
   const org = useSelectedOrganization()
+  const [showDeployWarning, setShowDeployWarning] = useState(false)
+
+  const canDeployFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
 
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
   const {
@@ -37,17 +43,25 @@ const CodePage = () => {
     isError: isErrorLoadingFiles,
     isSuccess: isSuccessLoadingFiles,
     error: filesError,
-  } = useEdgeFunctionBodyQuery({
-    projectRef: ref,
-    slug: functionSlug,
-  })
+  } = useEdgeFunctionBodyQuery(
+    {
+      projectRef: ref,
+      slug: functionSlug,
+    },
+    {
+      retry: false,
+      refetchOnWindowFocus: false,
+      retryOnMount: false,
+    }
+  )
   const [files, setFiles] = useState<
     { id: number; name: string; content: string; selected?: boolean }[]
   >([])
 
-  const { mutateAsync: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
+  const { mutate: deployFunction, isLoading: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
       toast.success('Successfully updated edge function')
+      setShowDeployWarning(false)
     },
   })
 
@@ -83,7 +97,7 @@ const CodePage = () => {
         return files.find(({ name }) => regex.test(name))?.name
       }
 
-      await deployFunction({
+      deployFunction({
         projectRef: ref,
         slug: selectedFunction.slug,
         metadata: {
@@ -113,9 +127,26 @@ const CodePage = () => {
     try {
       return dirname(new URL(entrypoint).pathname)
     } catch (e) {
-      console.error('failed to parse entrypoint', entrypoint)
+      console.error('Failed to parse entrypoint', entrypoint)
       return '/'
     }
+  }
+
+  const handleDeployClick = () => {
+    if (files.length === 0 || isLoadingFiles) return
+    setShowDeployWarning(true)
+    sendEvent({
+      action: 'edge_function_deploy_updates_button_clicked',
+      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+    })
+  }
+
+  const handleDeployConfirm = () => {
+    sendEvent({
+      action: 'edge_function_deploy_updates_confirm_clicked',
+      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+    })
+    onUpdate()
   }
 
   // TODO (Saxon): Remove this once the flag is fully launched
@@ -130,7 +161,7 @@ const CodePage = () => {
     if (selectedFunction?.entrypoint_path && functionFiles) {
       const base_path = getBasePath(selectedFunction?.entrypoint_path)
       const filesWithRelPath = functionFiles
-        // ignore empty filesq
+        // ignore empty files
         .filter((file: { name: string; content: string }) => !!file.content.length)
         // set file paths relative to entrypoint
         .map((file: { name: string; content: string }) => {
@@ -200,17 +231,11 @@ const CodePage = () => {
             }}
           />
           <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 shrink-0">
-            <Button
+            <ButtonTooltip
               loading={isDeploying}
               size="medium"
-              disabled={files.length === 0 || isLoadingFiles}
-              onClick={() => {
-                onUpdate()
-                sendEvent({
-                  action: 'edge_function_deploy_updates_button_clicked',
-                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-                })
-              }}
+              disabled={!canDeployFunction || files.length === 0 || isLoadingFiles}
+              onClick={handleDeployClick}
               iconRight={
                 isDeploying ? (
                   <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
@@ -220,12 +245,26 @@ const CodePage = () => {
                   </div>
                 )
               }
+              tooltip={{
+                content: {
+                  side: 'top',
+                  text: !canDeployFunction
+                    ? 'You need additional permissions to update edge functions'
+                    : undefined,
+                },
+              }}
             >
               Deploy updates
-            </Button>
+            </ButtonTooltip>
           </div>
         </>
       )}
+
+      <DeployEdgeFunctionWarningModal
+        visible={showDeployWarning}
+        onCancel={() => setShowDeployWarning(false)}
+        onConfirm={handleDeployConfirm}
+      />
     </div>
   )
 }
