@@ -21,13 +21,8 @@ const names = [
   'Filipe',
 ]
 
-const RealtimeChatDemo = () => {
-  const [roomName, setRoomName] = useState('')
+const RealtimeChatDemo = ({ roomName }: { roomName: string }) => {
   const [username, setUsername] = useState('')
-
-  useEffect(() => {
-    setRoomName(`room-${names[Math.floor(Math.random() * 1000)]}`)
-  }, [])
 
   useEffect(() => {
     setUsername(names[Math.floor(Math.random() * names.length)])
