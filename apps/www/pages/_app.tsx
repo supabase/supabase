@@ -86,7 +86,7 @@ export default function App({ Component, pageProps }: AppProps) {
       />
 
       <AuthProvider>
-        <FeatureFlagProvider API_URL={API_URL}>
+        <FeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM}>
           <ThemeProvider
             themes={themes.map((theme) => theme.value)}
             enableSystem
