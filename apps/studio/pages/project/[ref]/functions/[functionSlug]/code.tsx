@@ -20,6 +20,8 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { Button } from 'ui'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const CodePage = () => {
   const router = useRouter()
@@ -31,6 +33,8 @@ const CodePage = () => {
   const { mutate: sendEvent } = useSendEventMutation()
   const org = useSelectedOrganization()
   const [showDeployWarning, setShowDeployWarning] = useState(false)
+
+  const canDeployFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
 
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
   const {
@@ -160,7 +164,7 @@ const CodePage = () => {
   // TODO (Saxon): Remove this once the flag is fully launched
   useEffect(() => {
     if (!edgeFunctionCreate) {
-      // router.push(`/project/${ref}/functions`)
+      router.push(`/project/${ref}/functions`)
     }
   }, [edgeFunctionCreate, ref, router])
 
@@ -233,7 +237,7 @@ const CodePage = () => {
         onConfirm={handleDeployConfirm}
       />
 
-      {!isErrorLoadingFiles && (
+      {!isErrorLoadingFiles && canDeployFunction && (
         <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 shrink-0">
           <Button
             loading={isDeploying}
