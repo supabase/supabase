@@ -101,9 +101,9 @@ export const COMMAND_ITEMS = [
     label: item.commandItemLabel,
     href: item.href,
   })),
-  ...Object.entries(componentPages).map(([_, component]) => ({
-    label: component.commandItemLabel,
-    href: component.href,
+  ...componentPages.items.map((item) => ({
+    label: item.commandItemLabel,
+    href: item.href,
   })),
 ]
 
