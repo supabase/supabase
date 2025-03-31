@@ -28,6 +28,7 @@ import {
 } from 'ui'
 import AuthorizeRequesterDetails from '../AuthorizeRequesterDetails'
 import { ScopesPanel } from './Scopes'
+import OAuthSecrets from '../OAuthSecrets/OAuthSecrets'
 
 export interface PublishAppSidePanelProps {
   visible: boolean
@@ -325,11 +326,18 @@ const PublishAppSidePanel = ({
                         {errors.urls && <p className="text-red-900 text-sm">{errors.urls}</p>}
                       </div>
                     </SidePanel.Content>
+
+                    <SidePanel.Separator />
+
+                    <SidePanel.Content className="py-4">
+                      <OAuthSecrets selectedApp={selectedApp} />
+                    </SidePanel.Content>
+
                     <SidePanel.Separator />
                     <div className="p-6 ">
                       <div className="flex items-start justify-between space-x-4 pb-4">
                         <div className="flex flex-col">
-                          <span className="prose text-sm">Application permissions</span>
+                          <span className="text-sm text-foreground">Application permissions</span>
                           <span className="text-sm text-foreground-light">
                             The application permissions are organized in scopes and will be
                             presented to the user when adding an app to their organization and all
