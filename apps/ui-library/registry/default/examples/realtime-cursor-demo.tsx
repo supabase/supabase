@@ -18,7 +18,7 @@ const RealtimeCursorDemo = () => {
   return (
     <div className="flex flex-col w-44">
       <Label>Username</Label>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 mt-1">
         <Input value={username} onChange={(e) => setUsername(e.target.value)} disabled />
         <Button
           variant="secondary"
