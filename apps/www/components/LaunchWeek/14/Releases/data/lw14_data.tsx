@@ -62,7 +62,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 1,
     dd: 'Mon',
     shipped: true,
-    isToday: true,
+    isToday: false,
     hasCountdown: false,
     blog: '/blog/supabase-ui-library',
     date: '31 March',
@@ -81,7 +81,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     ],
     steps: [
       {
-        title: 'TBD',
+        title: '',
         url: '#',
         blog: '#',
         bg_layers: [
@@ -99,9 +99,9 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-2',
     d: 2,
     dd: 'Tue',
-    shipped: false,
-    isToday: false,
-    hasCountdown: true,
+    shipped: true,
+    isToday: true,
+    hasCountdown: false,
     blog: '',
     date: '01 April',
     published_at: '2025-04-01T07:00:00.000-07:00',
@@ -117,7 +117,21 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
         href: 'https://twitter.com/i/spaces/1rmxPyVkLjbKN',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        url: '#',
+        blog: '#',
+        bg_layers: [
+          {
+            img: '',
+            mobileImg: '',
+            imgLight: '',
+            mobileImgLight: '',
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'day-3',
@@ -125,7 +139,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     dd: 'Wed',
     shipped: false,
     isToday: false,
-    hasCountdown: false,
+    hasCountdown: true,
     blog: '',
     date: '02 April',
     published_at: '2025-04-02T07:00:00.000-07:00',
