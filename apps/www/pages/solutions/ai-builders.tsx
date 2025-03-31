@@ -5,8 +5,8 @@ import { NextSeo } from 'next-seo'
 import Layout from '~/components/Layouts/Default'
 import ProductHeader from '~/components/Sections/ProductHeader2'
 
-import content from '~/data/solutions/enterprise'
-import EnterpriseLogos from '../components/Enterprise/EnterpriseLogos'
+import content from '~/data/solutions/ai-builders'
+import EnterpriseLogos from '../../components/Enterprise/EnterpriseLogos'
 
 const EnterpriseUseCases = dynamic(() => import('components/Enterprise/UseCases'))
 const EnterprisePerformance = dynamic(() => import('components/Enterprise/Performance'))
@@ -40,11 +40,11 @@ const Enterprise: NextPage = () => (
         footerPosition="left"
       />
       <EnterpriseUseCases {...content['use-cases']} />
-      <EnterprisePerformance {...content.performance} />
-      <EnterpriseSecurity {...content.security} />
       <EnterpriseSupport {...content.support} />
-      <EnterpriseQuote {...content.quote} />
-      <CTAForm />
+      {/* <EnterprisePerformance {...content.performance} /> */}
+      {/* <EnterpriseSecurity {...content.security} /> */}
+      {/* <EnterpriseQuote {...content.quote} /> */}
+      {/* <CTAForm /> */}
     </Layout>
   </>
 )
