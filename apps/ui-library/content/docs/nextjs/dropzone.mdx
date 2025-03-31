@@ -43,11 +43,7 @@ The File Upload component makes it easy to add file uploads to your app, with bu
 ```tsx
 'use client'
 
-import {
-  Dropzone,
-  DropzoneContent,
-  DropzoneEmptyState,
-} from '@/components/dropzone'
+import { Dropzone, DropzoneContent, DropzoneEmptyState } from '@/components/dropzone'
 import { useSupabaseUpload } from '@/hooks/use-supabase-upload'
 
 const FileUploadDemo = () => {
@@ -69,7 +65,7 @@ const FileUploadDemo = () => {
   )
 }
 
-export FileUploadDemo
+export { FileUploadDemo }
 ```
 
 ## Props
