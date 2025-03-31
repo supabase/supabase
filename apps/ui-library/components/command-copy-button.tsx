@@ -18,13 +18,13 @@ export function CommandCopyButton({ command }: { command: string }) {
   }, [copied])
 
   const parseCommandForTelemetry = (cmd: string) => {
-    // Extract framework from URL
+    // Extract framework from URL (e.g., 'nextjs' from 'password-based-auth-nextjs.json')
     const frameworkMatch = cmd.match(/\/ui\/r\/.*?-(\w+)\.json/)
     const framework = frameworkMatch
       ? (frameworkMatch[1] as 'nextjs' | 'react-router' | 'tanstack' | 'react')
       : 'nextjs'
 
-    // Extract package manager from command
+    // Extract package manager from command prefix (npx, pnpm, yarn, bun)
     const packageManager = cmd.startsWith('npx')
       ? ('npm' as const)
       : cmd.startsWith('pnpm')
@@ -35,7 +35,7 @@ export function CommandCopyButton({ command }: { command: string }) {
             ? ('bun' as const)
             : ('npm' as const)
 
-    // Extract title from URL
+    // Extract template title from URL (e.g., 'password-based-auth' from 'password-based-auth-nextjs.json')
     const titleMatch = cmd.match(/\/ui\/r\/(.*?)-\w+\.json/)
     const title = titleMatch ? titleMatch[1] : ''
 
@@ -51,10 +51,13 @@ export function CommandCopyButton({ command }: { command: string }) {
       variant="ghost"
       size="icon"
       onClick={() => {
+        // Copy command to clipboard
         navigator.clipboard.writeText(command)
         setCopied(true)
+
+        // Parse command and send telemetry event
         const { framework, packageManager, title } = parseCommandForTelemetry(command)
-        console.log('Command parsed:', { command, framework, packageManager, title })
+
         sendTelemetryEvent({
           action: 'supabase_ui_command_copied',
           properties: {
