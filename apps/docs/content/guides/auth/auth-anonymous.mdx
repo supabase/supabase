@@ -189,7 +189,7 @@ response = supabase.auth.update_user({
 >
 <TabPanel id="js" label="JavaScript">
 
-You can use the [`linkIdentity()`](/docs/reference/javascript/auth-linkidentity) method to link an oauth identity to the anonymous user.
+You can use the [`linkIdentity()`](/docs/reference/javascript/auth-linkidentity) method to link an OAuth identity to the anonymous user.
 
 ```js
 const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
@@ -216,7 +216,7 @@ try await supabase.auth.linkIdentity(provider: .google)
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-You can use the [`linkIdentity()`](/docs/reference/kotlin/auth-linkidentity) method to link an oauth identity to the anonymous user.
+You can use the [`linkIdentity()`](/docs/reference/kotlin/auth-linkidentity) method to link an OAuth identity to the anonymous user.
 
 ```kotlin
 supabase.auth.linkIdentity(Google)
@@ -225,7 +225,7 @@ supabase.auth.linkIdentity(Google)
 </TabPanel>
 <TabPanel id="python" label="Python">
 
-You can use the [`link_identity()`](/docs/reference/python/auth-linkidentity) method to link an oauth identity to the anonymous user.
+You can use the [`link_identity()`](/docs/reference/python/auth-linkidentity) method to link an OAuth identity to the anonymous user.
 
 ```python
 response = supabase.auth.link_identity({'provider': 'google'})
@@ -250,7 +250,7 @@ to authenticated
 using ( true );
 ```
 
-<Admonition variant="note" label="Use restrictive policies">
+<Admonition type="note" label="Use restrictive policies">
 
 RLS policies are permissive by default, which means that they are combined using an "OR" operator when multiple policies are applied. It is important to construct restrictive policies to ensure that the checks for an anonymous user are always enforced when combined with other policies.
 
@@ -313,7 +313,7 @@ async function resolveDataConflicts(anonymousUserId, existingUserId) {
 
 ## Abuse prevention and rate limits
 
-Since anonymous users are stored in your database, bad actors can abuse the endpoint to increase your database size drastically. It is strongly recommended to [enable invisible Captcha or Cloudflare Turnstile](/docs/guides/auth/auth-captcha) to prevent abuse for anonymous sign-ins. An IP-based rate limit is enforced at 30 requests per hour which can be modified in your [dashboard](/dashboard/project/_/auth/rate-limits). You can refer to the full list of rate limits [here](/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention).
+Since anonymous users are stored in your database, bad actors can abuse the endpoint to increase your database size drastically. It is strongly recommended to [enable invisible CAPTCHA or Cloudflare Turnstile](/docs/guides/auth/auth-captcha) to prevent abuse for anonymous sign-ins. An IP-based rate limit is enforced at 30 requests per hour which can be modified in your [dashboard](/dashboard/project/_/auth/rate-limits). You can refer to the full list of rate limits [here](/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention).
 
 ## Automatic cleanup
 

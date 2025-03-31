@@ -12,7 +12,7 @@ export const generatePolicyCreateSQL = (policy: PostgresPolicy) => {
   }
 
   return `
-CREATE POLICY "${policy.name}" 
+ALTER POLICY "${policy.name}" 
 ON "${policy.schema}"."${policy.table}"
 AS ${policy.action}
 FOR ${policy.command}

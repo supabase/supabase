@@ -1,7 +1,7 @@
 import { debounce, memoize } from 'lodash'
 import { toast } from 'sonner'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
-import { devtools, proxySet } from 'valtio/utils'
+import { devtools, proxyMap } from 'valtio/utils'
 
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import { upsertContent, UpsertContentPayload } from 'data/content/content-upsert-mutation'
@@ -53,7 +53,8 @@ export const sqlEditorState = proxy({
     }[]
   },
   // Synchronous saving of folders and snippets (debounce behavior)
-  needsSaving: proxySet<string>([]),
+  // key is the snippet id, value is shouldInvalidate
+  needsSaving: proxyMap<string, boolean>([]),
   // Stores the state of each snippet
   savingStates: {} as {
     [snippetId: string]: 'IDLE' | 'UPDATING' | 'UPDATING_FAILED'
@@ -98,7 +99,7 @@ export const sqlEditorState = proxy({
         ...sqlEditorState.snippets[id].snippet,
         ...snippet,
       }
-      if (!skipSave) sqlEditorState.needsSaving.add(id)
+      if (!skipSave) sqlEditorState.needsSaving.set(id, true)
     }
   },
 
@@ -107,7 +108,7 @@ export const sqlEditorState = proxy({
     if (storedSnippet) {
       if (!storedSnippet.snippet.content) {
         storedSnippet.snippet.content = snippet.content
-        sqlEditorState.needsSaving.add(storedSnippet.snippet.id)
+        sqlEditorState.needsSaving.set(storedSnippet.snippet.id, true)
       }
     } else {
       sqlEditorState.addSnippet({ projectRef: projectRef, snippet })
@@ -118,7 +119,7 @@ export const sqlEditorState = proxy({
     let snippet = sqlEditorState.snippets[id]?.snippet
     if (snippet?.content) {
       snippet.content.sql = sql
-      sqlEditorState.needsSaving.add(id)
+      sqlEditorState.needsSaving.set(id, false)
     }
   },
 
@@ -135,6 +136,8 @@ export const sqlEditorState = proxy({
     if (snippet) {
       snippet.name = name
       snippet.description = description
+
+      sqlEditorState.needsSaving.set(id, true)
     }
   },
 
@@ -194,7 +197,7 @@ export const sqlEditorState = proxy({
 
     if (hasChanges) {
       sqlEditorState.lastUpdatedFolderName = originalFolderName
-      sqlEditorState.needsSaving.add(id)
+      sqlEditorState.needsSaving.set(id, true)
     }
   },
 
@@ -205,14 +208,13 @@ export const sqlEditorState = proxy({
 
   setLimit: (value: number) => (sqlEditorState.limit = value),
 
-  addNeedsSaving: (id: string) => sqlEditorState.needsSaving.add(id),
+  addNeedsSaving: (id: string) => sqlEditorState.needsSaving.set(id, true),
 
   addFavorite: (id: string) => {
     const storeSnippet = sqlEditorState.snippets[id]
     if (storeSnippet) {
       storeSnippet.snippet.favorite = true
-
-      sqlEditorState.needsSaving.add(id)
+      sqlEditorState.needsSaving.set(id, true)
     }
   },
 
@@ -220,8 +222,7 @@ export const sqlEditorState = proxy({
     const storeSnippet = sqlEditorState.snippets[id]
     if (storeSnippet.snippet) {
       storeSnippet.snippet.favorite = false
-
-      sqlEditorState.needsSaving.add(id)
+      sqlEditorState.needsSaving.set(id, true)
     }
   },
 
@@ -284,17 +285,24 @@ export const useSnippets = (projectRef: string) => {
 // ## Below are all the asynchronous saving logic for the SQL Editor
 // ========================================================================
 
-async function upsertSnippet(id: string, projectRef: string, payload: UpsertContentPayload) {
+async function upsertSnippet(
+  id: string,
+  projectRef: string,
+  payload: UpsertContentPayload,
+  shouldInvalidate = true
+) {
   try {
     sqlEditorState.savingStates[id] = 'UPDATING'
     await upsertContent({ projectRef, payload })
 
-    const queryClient = getQueryClient()
-    await Promise.all([
-      queryClient.invalidateQueries(contentKeys.count(projectRef, 'sql')),
-      queryClient.invalidateQueries(contentKeys.sqlSnippets(projectRef)),
-      queryClient.invalidateQueries(contentKeys.folders(projectRef)),
-    ])
+    if (shouldInvalidate) {
+      const queryClient = getQueryClient()
+      await Promise.all([
+        queryClient.invalidateQueries(contentKeys.count(projectRef, 'sql')),
+        queryClient.invalidateQueries(contentKeys.sqlSnippets(projectRef)),
+        queryClient.invalidateQueries(contentKeys.folders(projectRef)),
+      ])
+    }
 
     sqlEditorState.savingStates[id] = 'IDLE'
   } catch (error) {
@@ -304,8 +312,12 @@ async function upsertSnippet(id: string, projectRef: string, payload: UpsertCont
 
 const memoizedUpdateSnippet = memoize((_id: string) => debounce(upsertSnippet, 1000))
 
-const debouncedUpdateSnippet = (id: string, projectRef: string, payload: UpsertContentPayload) =>
-  memoizedUpdateSnippet(id)(id, projectRef, payload)
+const debouncedUpdateSnippet = (
+  id: string,
+  projectRef: string,
+  payload: UpsertContentPayload,
+  shouldInvalidate = false
+) => memoizedUpdateSnippet(id)(id, projectRef, payload, shouldInvalidate)
 
 async function upsertFolder(id: string, projectRef: string, name: string) {
   try {
@@ -347,7 +359,7 @@ if (typeof window !== 'undefined') {
   subscribe(sqlEditorState.needsSaving, () => {
     const state = getSqlEditorV2StateSnapshot()
 
-    Array.from(state.needsSaving).forEach((id) => {
+    state.needsSaving.forEach((shouldInvalidate, id) => {
       const snippet = state.snippets[id]
       const folder = state.folders[id]
 
@@ -366,21 +378,26 @@ if (typeof window !== 'undefined') {
         if (visibility === 'project' && !!folder_id) {
           toast.error('Shared snippet cannot be within a folder')
         } else {
-          debouncedUpdateSnippet(id, snippet.projectRef, {
+          debouncedUpdateSnippet(
             id,
-            type: 'sql',
-            name: name ?? 'Untitled',
-            description: description ?? '',
-            visibility: visibility ?? 'user',
-            project_id: project_id ?? 0,
-            owner_id: owner_id,
-            folder_id: folder_id ?? undefined,
-            content: {
-              ...content!,
-              content_id: id,
-              favorite: favorite ?? false,
+            snippet.projectRef,
+            {
+              id,
+              type: 'sql',
+              name: name ?? 'Untitled',
+              description: description ?? '',
+              visibility: visibility ?? 'user',
+              project_id: project_id ?? 0,
+              owner_id: owner_id,
+              folder_id: folder_id ?? undefined,
+              content: {
+                ...content!,
+                content_id: id,
+                favorite: favorite ?? false,
+              },
             },
-          })
+            shouldInvalidate
+          )
           sqlEditorState.needsSaving.delete(id)
         }
       } else if (folder) {

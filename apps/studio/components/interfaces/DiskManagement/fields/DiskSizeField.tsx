@@ -2,10 +2,13 @@ import { UseFormReturn } from 'react-hook-form'
 
 import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import dayjs from 'dayjs'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { GB } from 'lib/constants'
 import { Button, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Skeleton, cn } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -19,9 +22,6 @@ import { DiskTypeRecommendationSection } from '../ui/DiskTypeRecommendationSecti
 import FormMessage from '../ui/FormMessage'
 import { InputPostTab } from '../ui/InputPostTab'
 import { InputResetButton } from '../ui/InputResetButton'
-import { Admonition } from 'ui-patterns'
-import Markdown from 'markdown-to-jsx'
-import { DocsButton } from 'components/ui/DocsButton'
 
 type DiskSizeFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -37,6 +37,7 @@ export function DiskSizeField({
   const { ref: projectRef } = useParams()
   const { control, formState, setValue, trigger, getValues, resetField, watch } = form
   const org = useSelectedOrganization()
+  const project = useSelectedProject()
 
   const {
     isLoading: isLoadingDiskAttributes,
@@ -45,7 +46,6 @@ export function DiskSizeField({
   } = useDiskAttributesQuery({ projectRef })
   const {
     data: subscription,
-    isLoading: isSubscriptionLoading,
     error: subscriptionError,
     isError: isSubscriptionError,
   } = useOrgSubscriptionQuery({
@@ -53,16 +53,20 @@ export function DiskSizeField({
   })
   const {
     data: diskUtil,
-    isLoading: isDiskUtilizationLoading,
     error: diskUtilError,
     isError: isDiskUtilizationError,
   } = useDiskUtilizationQuery({
     projectRef: projectRef,
   })
 
-  const isLoading = isSubscriptionLoading || isDiskUtilizationLoading || isLoadingDiskAttributes
   const error = subscriptionError || diskUtilError || diskAttributesError
   const isError = isSubscriptionError || isDiskUtilizationError || isDiskAttributesError
+
+  // coming up typically takes 5 minutes, and the request is cached for 5 mins
+  // so doing less than 10 mins to account for both
+  const isProjectNew =
+    dayjs.utc().diff(dayjs.utc(project?.inserted_at), 'minute') < 10 ||
+    project?.status === 'COMING_UP'
 
   const watchedStorageType = watch('storageType')
   const watchedTotalSize = watch('totalSize')
@@ -94,7 +98,7 @@ export function DiskSizeField({
             <FormItemLayout label="Disk Size" layout="vertical" id={field.name}>
               <div className="relative flex gap-2 items-center">
                 <InputPostTab label="GB">
-                  {isLoading ? (
+                  {isLoadingDiskAttributes ? (
                     <div
                       className={cn(
                         InputVariants({ size: 'small' }),
@@ -179,11 +183,20 @@ export function DiskSizeField({
       </div>
       <div className="col-span-8">
         <DiskSpaceBar form={form} />
-        {error && (
-          <FormMessage message="Failed to load disk size data" type="error">
-            {error?.message}
-          </FormMessage>
+
+        {isProjectNew ? (
+          <FormMessage
+            message="Disk size data is not available for ~10 minutes after project creation"
+            type="error"
+          />
+        ) : (
+          error && (
+            <FormMessage message="Failed to load disk size data" type="error">
+              {error?.message}
+            </FormMessage>
+          )
         )}
+
         <DiskManagementDiskSizeReadReplicas
           isDirty={formState.dirtyFields.totalSize !== undefined}
           totalSize={(formState.defaultValues?.totalSize || 0) * 1.25}

@@ -2,6 +2,7 @@ import React, { Fragment, useMemo } from 'react'
 import pricingAddOn from '~/data/PricingAddOnTable.json'
 import { IconPricingIncludedCheck, IconPricingMinus } from './PricingIcons'
 import { cn } from 'ui'
+import Link from 'next/link'
 
 const ComputePricingTable = () => {
   const columnNames = useMemo(
@@ -50,6 +51,14 @@ const ComputePricingTable = () => {
                         ) : (
                           <IconPricingMinus plan="Free Plan" />
                         )
+                      ) : column.url ? (
+                        <Link
+                          href={column.url}
+                          className="underline text-brand hover:text-brand-600"
+                          target="_blank"
+                        >
+                          {column.value}
+                        </Link>
                       ) : (
                         column.value
                       )}

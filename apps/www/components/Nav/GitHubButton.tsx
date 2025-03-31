@@ -1,6 +1,8 @@
-import React from 'react'
 import { Button } from 'ui'
-import { githubStars } from '~/.contentlayer/generated/staticContent/_index.json' with { type: 'json' }
+import staticContent from '~/.contentlayer/generated/staticContent/_index.json' with { type: 'json' }
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+
+const { githubStars } = staticContent
 
 const GitHubButton = () => {
   const kFormatter = (num: number) => {
@@ -19,12 +21,14 @@ const GitHubButton = () => {
       ? `${kFormat}.${decimalPart >= 8 ? hundreds + 1 : hundreds}K`
       : `${isAlmostNextThousand ? kFormat + 1 : kFormat}K`
   }
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
     <Button
       className="hidden group lg:flex text-foreground-light hover:text-foreground"
       type="text"
       asChild
+      onClick={() => sendTelemetryEvent({ action: 'homepage_github_button_clicked' })}
     >
       <a type={undefined} href="https://github.com/supabase/supabase" target="_blank">
         <span className="flex items-center gap-1">

@@ -76,7 +76,7 @@ export const SchemaFlow = ({ nodes: initialNodes, edges: initialEdges }: SchemaF
       >
         <Background
           gap={16}
-          className="[&>*]:stroke-foreground-muted opacity-[25%]"
+          className="[&>*]:stroke-foreground-muted opacity-[50%]"
           variant={BackgroundVariant.Dots}
           color={'inherit'}
         />

@@ -43,7 +43,7 @@ Example:
 {/* prettier-ignore */}
 ```sql
 select from pgmq.create('my_queue');
- create 
+ create
 --------
 ```
 
@@ -69,7 +69,7 @@ Example:
 {/* prettier-ignore */}
 ```sql
 select pgmq.create_unlogged('my_unlogged');
- create_unlogged 
+ create_unlogged
 -----------------
 ```
 
@@ -96,7 +96,7 @@ Example:
 {/* prettier-ignore */}
 ```sql
 select * from pgmq.detach_archive('my_queue');
- detach_archive 
+ detach_archive
 ----------------
 ```
 
@@ -123,7 +123,7 @@ Example:
 {/* prettier-ignore */}
 ```sql
 select * from pgmq.drop_queue('my_unlogged');
- drop_queue 
+ drop_queue
 ------------
  t
 ```
@@ -146,18 +146,18 @@ returns setof bigint
 
 **Parameters:**
 
-| Parameter  | Type    | Description                                                        |
-| :--------- | :------ | :----------------------------------------------------------------- |
-| queue_name | text    | The name of the queue                                              |
-| msg        | jsonb   | The message to send to the queue                                   |
-| delay      | integer | Time in seconds before the message becomes visible. Defaults to 0. |
+| Parameter    | Type      | Description                                                        |
+| :----------- | :-------- | :----------------------------------------------------------------- |
+| `queue_name` | `text`    | The name of the queue                                              |
+| `msg`        | `jsonb`   | The message to send to the queue                                   |
+| `delay`      | `integer` | Time in seconds before the message becomes visible. Defaults to 0. |
 
 Example:
 
 {/* prettier-ignore */}
 ```sql
 select * from pgmq.send('my_queue', '{"hello": "world"}');
- send 
+ send
 ------
     4
 ```
@@ -180,11 +180,11 @@ returns setof bigint
 
 **Parameters:**
 
-| Parameter  | Type    | Description                                                         |
-| :--------- | :------ | :------------------------------------------------------------------ |
-| queue_name | text    | The name of the queue                                               |
-| msgs       | jsonb[] | Array of messages to send to the queue                              |
-| delay      | integer | Time in seconds before the messages becomes visible. Defaults to 0. |
+| Parameter    | Type      | Description                                                         |
+| :----------- | :-------- | :------------------------------------------------------------------ |
+| `queue_name` | `text`    | The name of the queue                                               |
+| `msgs`       | `jsonb[]` | Array of messages to send to the queue                              |
+| `delay`      | `integer` | Time in seconds before the messages becomes visible. Defaults to 0. |
 
 {/* prettier-ignore */}
 ```sql
@@ -195,7 +195,7 @@ select * from pgmq.send_batch(
       '{"hello": "world_1"}'::jsonb
     ]
 );
- send_batch 
+ send_batch
 ------------
           1
           2
@@ -222,18 +222,18 @@ returns setof pgmq.message_record
 
 **Parameters:**
 
-| Parameter  | Type    | Description                                                     |
-| :--------- | :------ | :-------------------------------------------------------------- |
-| queue_name | text    | The name of the queue                                           |
-| vt         | integer | Time in seconds that the message become invisible after reading |
-| qty        | integer | The number of messages to read from the queue. Defaults to 1    |
+| Parameter    | Type      | Description                                                     |
+| :----------- | :-------- | :-------------------------------------------------------------- |
+| `queue_name` | `text`    | The name of the queue                                           |
+| `vt`         | `integer` | Time in seconds that the message become invisible after reading |
+| `qty`        | `integer` | The number of messages to read from the queue. Defaults to 1    |
 
 Example:
 
 {/* prettier-ignore */}
 ```sql
 select * from pgmq.read('my_queue', 10, 2);
- msg_id | read_ct |          enqueued_at          |              vt               |       message        
+ msg_id | read_ct |          enqueued_at          |              vt               |       message
 --------+---------+-------------------------------+-------------------------------+----------------------
       1 |       1 | 2023-10-28 19:14:47.356595-05 | 2023-10-28 19:17:08.608922-05 | {"hello": "world_0"}
       2 |       1 | 2023-10-28 19:14:47.356595-05 | 2023-10-28 19:17:08.608974-05 | {"hello": "world_1"}
@@ -262,20 +262,20 @@ returns setof pgmq.message_record
 
 **Parameters:**
 
-| Parameter        | Type    | Description                                                                 |
-| :--------------- | :------ | :-------------------------------------------------------------------------- |
-| queue_name       | text    | The name of the queue                                                       |
-| vt               | integer | Time in seconds that the message become invisible after reading.            |
-| qty              | integer | The number of messages to read from the queue. Defaults to 1.               |
-| max_poll_seconds | integer | Time in seconds to wait for new messages to reach the queue. Defaults to 5. |
-| poll_interval_ms | integer | Milliseconds between the internal poll operations. Defaults to 100.         |
+| Parameter          | Type      | Description                                                                 |
+| :----------------- | :-------- | :-------------------------------------------------------------------------- |
+| `queue_name`       | `text`    | The name of the queue                                                       |
+| `vt`               | `integer` | Time in seconds that the message become invisible after reading.            |
+| `qty`              | `integer` | The number of messages to read from the queue. Defaults to 1.               |
+| `max_poll_seconds` | `integer` | Time in seconds to wait for new messages to reach the queue. Defaults to 5. |
+| `poll_interval_ms` | `integer` | Milliseconds between the internal poll operations. Defaults to 100.         |
 
 Example:
 
 {/* prettier-ignore */}
 ```sql
 select * from pgmq.read_with_poll('my_queue', 1, 1, 5, 100);
- msg_id | read_ct |          enqueued_at          |              vt               |      message       
+ msg_id | read_ct |          enqueued_at          |              vt               |      message
 --------+---------+-------------------------------+-------------------------------+--------------------
       1 |       1 | 2023-10-28 19:09:09.177756-05 | 2023-10-28 19:27:00.337929-05 | {"hello": "world"}
 ```
@@ -305,7 +305,7 @@ Example:
 {/* prettier-ignore */}
 ```sql
 pgmq=# select * from pgmq.pop('my_queue');
- msg_id | read_ct |          enqueued_at          |              vt               |      message       
+ msg_id | read_ct |          enqueued_at          |              vt               |      message
 --------+---------+-------------------------------+-------------------------------+--------------------
       1 |       2 | 2023-10-28 19:09:09.177756-05 | 2023-10-28 19:27:00.337929-05 | {"hello": "world"}
 ```
@@ -326,17 +326,17 @@ returns boolean
 
 **Parameters:**
 
-| Parameter  | Type   | Description                         |
-| :--------- | :----- | :---------------------------------- |
-| queue_name | text   | The name of the queue               |
-| msg_id     | bigint | Message ID of the message to delete |
+| Parameter    | Type     | Description                         |
+| :----------- | :------- | :---------------------------------- |
+| `queue_name` | `text`   | The name of the queue               |
+| `msg_id`     | `bigint` | Message ID of the message to delete |
 
 Example:
 
 {/* prettier-ignore */}
 ```sql
 select pgmq.delete('my_queue', 5);
- delete 
+ delete
 --------
  t
 ```
@@ -355,10 +355,10 @@ returns setof bigint
 
 **Parameters:**
 
-| Parameter  | Type     | Description                    |
-| :--------- | :------- | :----------------------------- |
-| queue_name | text     | The name of the queue          |
-| msg_ids    | bigint[] | Array of message IDs to delete |
+| Parameter    | Type       | Description                    |
+| :----------- | :--------- | :----------------------------- |
+| `queue_name` | `text`     | The name of the queue          |
+| `msg_ids`    | `bigint[]` | Array of message IDs to delete |
 
 Examples:
 
@@ -367,7 +367,7 @@ Delete two messages that exist.
 {/* prettier-ignore */}
 ```sql
 select * from pgmq.delete('my_queue', array[2, 3]);
- delete 
+ delete
 --------
       2
       3
@@ -406,7 +406,7 @@ Purge the queue when it contains 8 messages;
 {/* prettier-ignore */}
 ```sql
 select * from pgmq.purge_queue('my_queue');
- purge_queue 
+ purge_queue
 -------------
            8
 ```
@@ -425,10 +425,10 @@ returns boolean
 
 **Parameters:**
 
-| Parameter  | Type   | Description                          |
-| :--------- | :----- | :----------------------------------- |
-| queue_name | text   | The name of the queue                |
-| msg_id     | bigint | Message ID of the message to archive |
+| Parameter    | Type     | Description                          |
+| :----------- | :------- | :----------------------------------- |
+| `queue_name` | `text`   | The name of the queue                |
+| `msg_id`     | `bigint` | Message ID of the message to archive |
 
 Returns
 Boolean value indicating success or failure of the operation.
@@ -438,7 +438,7 @@ Example; remove message with ID 1 from queue `my_queue` and archive it:
 {/* prettier-ignore */}
 ```sql
 select * from pgmq.archive('my_queue', 1);
- archive 
+ archive
 ---------
        t
 ```
@@ -457,10 +457,10 @@ RETURNS SETOF bigint
 
 **Parameters:**
 
-| Parameter  | Type     | Description                     |
-| :--------- | :------- | :------------------------------ |
-| queue_name | text     | The name of the queue           |
-| msg_ids    | bigint[] | Array of message IDs to archive |
+| Parameter    | Type       | Description                     |
+| :----------- | :--------- | :------------------------------ |
+| `queue_name` | `text`     | The name of the queue           |
+| `msg_ids`    | `bigint[]` | Array of message IDs to archive |
 
 Examples:
 
@@ -469,7 +469,7 @@ Delete messages with ID 1 and 2 from queue `my_queue` and move to the archive.
 {/* prettier-ignore */}
 ```sql
 select * from pgmq.archive('my_queue', array[1, 2]);
- archive 
+ archive
 ---------
        1
        2
@@ -480,7 +480,7 @@ Delete messages 4, which exists and 999, which does not exist.
 {/* prettier-ignore */}
 ```sql
 select * from pgmq.archive('my_queue', array[4, 999]);
- archive 
+ archive
 ---------
        4
 ```
@@ -505,11 +505,11 @@ returns pgmq.message_record
 
 **Parameters:**
 
-| Parameter  | Type    | Description                                                           |
-| :--------- | :------ | :-------------------------------------------------------------------- |
-| queue_name | text    | The name of the queue                                                 |
-| msg_id     | bigint  | ID of the message to set visibility time                              |
-| vt_offset  | integer | Duration from now, in seconds, that the message's VT should be set to |
+| Parameter    | Type      | Description                                                           |
+| :----------- | :-------- | :-------------------------------------------------------------------- |
+| `queue_name` | `text`    | The name of the queue                                                 |
+| `msg_id`     | `bigint`  | ID of the message to set visibility time                              |
+| `vt_offset`  | `integer` | Duration from now, in seconds, that the message's VT should be set to |
 
 Example:
 
@@ -544,7 +544,7 @@ Example:
 {/* prettier-ignore */}
 ```sql
 select * from pgmq.list_queues();
-      queue_name      |          created_at           | is_partitioned | is_unlogged 
+      queue_name      |          created_at           | is_partitioned | is_unlogged
 ----------------------+-------------------------------+----------------+-------------
  my_queue             | 2023-10-28 14:13:17.092576-05 | f              | f
  my_partitioned_queue | 2023-10-28 19:47:37.098692-05 | t              | f
@@ -578,21 +578,21 @@ returns table(
 
 **Returns:**
 
-| Attribute          | Type                     | Description                                                               |
-| :----------------- | :----------------------- | :------------------------------------------------------------------------ |
-| queue_name         | text                     | The name of the queue                                                     |
-| queue_length       | bigint                   | Number of messages currently in the queue                                 |
-| newest_msg_age_sec | integer \| null          | Age of the newest message in the queue, in seconds                        |
-| oldest_msg_age_sec | integer \| null          | Age of the oldest message in the queue, in seconds                        |
-| total_messages     | bigint                   | Total number of messages that have passed through the queue over all time |
-| scrape_time        | timestamp with time zone | The current timestamp                                                     |
+| Attribute            | Type                       | Description                                                               |
+| :------------------- | :------------------------- | :------------------------------------------------------------------------ | -------------------------------------------------- |
+| `queue_name`         | `text`                     | The name of the queue                                                     |
+| `queue_length`       | `bigint`                   | Number of messages currently in the queue                                 |
+| `newest_msg_age_sec` | `integer                   | null`                                                                     | Age of the newest message in the queue, in seconds |
+| `oldest_msg_age_sec` | `integer                   | null`                                                                     | Age of the oldest message in the queue, in seconds |
+| `total_messages`     | `bigint`                   | Total number of messages that have passed through the queue over all time |
+| `scrape_time`        | `timestamp with time zone` | The current timestamp                                                     |
 
 Example:
 
 {/* prettier-ignore */}
 ```sql
 select * from pgmq.metrics('my_queue');
- queue_name | queue_length | newest_msg_age_sec | oldest_msg_age_sec | total_messages |          scrape_time          
+ queue_name | queue_length | newest_msg_age_sec | oldest_msg_age_sec | total_messages |          scrape_time
 ------------+--------------+--------------------+--------------------+----------------+-------------------------------
  my_queue   |           16 |               2445 |               2447 |             35 | 2023-10-28 20:23:08.406259-05
 ```
@@ -617,19 +617,19 @@ RETURNS TABLE(
 
 **Returns:**
 
-| Attribute          | Type                     | Description                                                               |
-| :----------------- | :----------------------- | :------------------------------------------------------------------------ |
-| queue_name         | text                     | The name of the queue                                                     |
-| queue_length       | bigint                   | Number of messages currently in the queue                                 |
-| newest_msg_age_sec | integer \| null          | Age of the newest message in the queue, in seconds                        |
-| oldest_msg_age_sec | integer \| null          | Age of the oldest message in the queue, in seconds                        |
-| total_messages     | bigint                   | Total number of messages that have passed through the queue over all time |
-| scrape_time        | timestamp with time zone | The current timestamp                                                     |
+| Attribute            | Type                       | Description                                                               |
+| :------------------- | :------------------------- | :------------------------------------------------------------------------ | -------------------------------------------------- |
+| `queue_name`         | `text`                     | The name of the queue                                                     |
+| `queue_length`       | `bigint`                   | Number of messages currently in the queue                                 |
+| `newest_msg_age_sec` | `integer                   | null`                                                                     | Age of the newest message in the queue, in seconds |
+| `oldest_msg_age_sec` | `integer                   | null`                                                                     | Age of the oldest message in the queue, in seconds |
+| `total_messages`     | `bigint`                   | Total number of messages that have passed through the queue over all time |
+| `scrape_time`        | `timestamp with time zone` | The current timestamp                                                     |
 
 {/* prettier-ignore */}
 ```sql
 select * from pgmq.metrics_all();
-      queue_name      | queue_length | newest_msg_age_sec | oldest_msg_age_sec | total_messages |          scrape_time          
+      queue_name      | queue_length | newest_msg_age_sec | oldest_msg_age_sec | total_messages |          scrape_time
 ----------------------+--------------+--------------------+--------------------+----------------+-------------------------------
  my_queue             |           16 |               2563 |               2565 |             35 | 2023-10-28 20:25:07.016413-05
  my_partitioned_queue |            1 |                 11 |                 11 |              1 | 2023-10-28 20:25:07.016413-05
@@ -642,19 +642,19 @@ select * from pgmq.metrics_all();
 
 The complete representation of a message in a queue.
 
-| Attribute Name | Type                     | Description                                                            |
-| :------------- | :----------------------- | :--------------------------------------------------------------------- |
-| msg_id         | bigint                   | Unique ID of the message                                               |
-| read_ct        | bigint                   | Number of times the message has been read. Increments on read().       |
-| enqueued_at    | timestamp with time zone | time that the message was inserted into the queue                      |
-| vt             | timestamp with time zone | Timestamp when the message will become available for consumers to read |
-| message        | jsonb                    | The message payload                                                    |
+| Attribute Name | Type                       | Description                                                            |
+| :------------- | :------------------------- | :--------------------------------------------------------------------- |
+| `msg_id`       | `bigint`                   | Unique ID of the message                                               |
+| `read_ct`      | `bigint`                   | Number of times the message has been read. Increments on read().       |
+| `enqueued_at`  | `timestamp with time zone` | time that the message was inserted into the queue                      |
+| `vt`           | `timestamp with time zone` | Timestamp when the message will become available for consumers to read |
+| `message`      | `jsonb`                    | The message payload                                                    |
 
 Example:
 
 {/* prettier-ignore */}
 ```sql
- msg_id | read_ct |          enqueued_at          |              vt               |      message       
+ msg_id | read_ct |          enqueued_at          |              vt               |      message
 --------+---------+-------------------------------+-------------------------------+--------------------
       1 |       1 | 2023-10-28 19:06:19.941509-05 | 2023-10-28 19:06:27.419392-05 | {"hello": "world"}
 ```

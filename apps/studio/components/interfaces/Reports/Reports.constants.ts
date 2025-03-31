@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import type { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
 
-export const LAYOUT_COLUMN_COUNT = 24
+export const LAYOUT_COLUMN_COUNT = 2
 
 export const REPORTS_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
@@ -388,3 +388,16 @@ select
     },
   },
 }
+
+export const DEPRECATED_REPORTS = [
+  'total_realtime_ingress',
+  'total_rest_options_requests',
+  'total_auth_ingress',
+  'total_auth_get_requests',
+  'total_auth_post_requests',
+  'total_auth_patch_requests',
+  'total_auth_options_requests',
+  'total_storage_options_requests',
+  'total_storage_patch_requests',
+  'total_options_requests',
+]

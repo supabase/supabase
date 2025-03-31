@@ -7,7 +7,7 @@ subtitle: 'How to use WebAssembly in Edge Functions.'
 
 Edge Functions supports running [WebAssembly (Wasm)](https://developer.mozilla.org/en-US/docs/WebAssembly) modules. WebAssembly is useful if you want to optimize code that's slower to run in JavaScript or require low-level manipulation.
 
-It also gives you the option to port existing libraries written in other languages to be used with JavaScript. For example, [MagickWasm](https://supabase.com/docs/guides/functions/examples/image-manipulation), which does image manipulation and transforms, is a port of an existing C library to WebAssembly.
+It also gives you the option to port existing libraries written in other languages to be used with JavaScript. For example, [magick-wasm](https://supabase.com/docs/guides/functions/examples/image-manipulation), which does image manipulation and transforms, is a port of an existing C library to WebAssembly.
 
 ### Writing a Wasm module
 
@@ -62,7 +62,7 @@ lines={[[1, -1]]}
 meta="index.ts"
 />
 
-<Admonition type="info">
+<Admonition type="note">
   Supabase Edge Functions currently use Deno 1.46. From [Deno 2.1, importing Wasm
   modules](https://deno.com/blog/v2.1) will require even less boilerplate code.
 </Admonition>
@@ -71,13 +71,13 @@ meta="index.ts"
 
 Before deploying the Edge Function, we need to ensure it bundles the Wasm module with it. We can do this by defining it in the `static_files` for the function in `superbase/config.toml`.
 
-<Admonition type="info">
+<Admonition type="note">
   You will need update Supabase CLI to 2.7.0 or higher for the `static_files` support.
 </Admonition>
 
 ```toml
 [functions.wasm-add]
-static_files = [ "./functions/wasm-add/add-wasm/pkg/*.wasm"]
+static_files = [ "./functions/wasm-add/add-wasm/pkg/*"]
 ```
 
 Deploy the function by running:

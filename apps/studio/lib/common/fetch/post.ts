@@ -1,9 +1,11 @@
-import { handleError, handleResponse, handleResponseError, constructHeaders } from './base'
 import { uuidv4 } from 'lib/helpers'
 import type { SupaResponse } from 'types/base'
+import { constructHeaders, handleError, handleResponse, handleResponseError } from './base'
 
 /**
- * @deprecated please use post method from data/fetchers instead
+ * @deprecated Please use post method from data/fetchers instead
+ *
+ * Exception for bucket-object-download-mutation as openapi-fetch doesn't support octet-stream responses
  */
 export async function post<T = any>(
   url: string,

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "supabase-client-react-router",
+  "type": "registry:lib",
+  "title": "Supabase Client for React Router",
+  "description": "",
+  "registryDependencies": [],
+  "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+  "files": [
+    {
+      "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+      "type": "registry:lib"
+    }
+  ]
+}

@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { Markdown } from 'components/interfaces/Markdown'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { BASE_PATH } from 'lib/constants'
-import { TelemetryActions } from 'lib/constants/telemetry'
 import { AiIconAnimation, Button, Label_Shadcn_, Textarea } from 'ui'
 
 interface SupabaseService {
@@ -172,14 +171,14 @@ export const SchemaGenerator = ({
                 // distinguish between initial step or second step
                 if (step === 'initial') {
                   sendEvent({
-                    action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_PROMPT_INTENDED,
+                    action: 'project_creation_initial_step_prompt_intended',
                     properties: {
                       isNewPrompt,
                     },
                   })
                 } else {
                   sendEvent({
-                    action: TelemetryActions.PROJECT_CREATION_SECOND_STEP_PROMPT_INTENDED,
+                    action: 'project_creation_second_step_prompt_intended',
                     properties: {
                       isNewPrompt,
                     },

@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+
+import { handleError, post } from 'data/fetchers'
 import { projectKeys } from './keys'
 
 export type ProjectTransferPreviewVariables = {
@@ -10,40 +10,6 @@ export type ProjectTransferPreviewVariables = {
 
 export type PlanId = 'free' | 'pro' | 'team' | 'enterprise'
 
-type MemberExceedingFreeProjectLimit = {
-  name: string
-  limit: number
-}
-
-type PreviewTransferInfo = {
-  key: string
-  message: string
-}
-
-export type PreviewProjectTransferResponse = {
-  valid: boolean
-
-  warnings: PreviewTransferInfo[]
-  errors: PreviewTransferInfo[]
-
-  members_exceeding_free_project_limit: MemberExceedingFreeProjectLimit[]
-
-  has_permissions_on_source_organization: boolean
-  has_access_to_target_organization: boolean
-
-  source_project_eligible: boolean
-
-  target_organization_eligible: boolean | null
-  target_organization_has_free_project_slots: boolean | null
-
-  credits_on_source_organization: number
-  costs_on_target_organization: number
-  charge_on_target_organization: number
-
-  source_subscription_plan: PlanId
-  target_subscription_plan: PlanId | null
-}
-
 export async function previewProjectTransfer(
   { projectRef, targetOrganizationSlug }: ProjectTransferPreviewVariables,
   signal?: AbortSignal
@@ -51,16 +17,14 @@ export async function previewProjectTransfer(
   if (!projectRef) throw new Error('projectRef is required')
   if (!targetOrganizationSlug) throw new Error('targetOrganizationSlug is required')
 
-  const response = await post(
-    `${API_URL}/projects/${projectRef}/transfer/preview`,
-    {
-      target_organization_slug: targetOrganizationSlug,
-    },
-    { signal }
-  )
-  if (response.error) throw response.error
+  const { data, error } = await post('/platform/projects/{ref}/transfer/preview', {
+    params: { path: { ref: projectRef } },
+    body: { target_organization_slug: targetOrganizationSlug },
+    signal,
+  })
 
-  return response as PreviewProjectTransferResponse
+  if (error) handleError(error)
+  return data
 }
 
 export type ProjectTransferPreviewData = Awaited<ReturnType<typeof previewProjectTransfer>>

@@ -31,9 +31,9 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import {
@@ -74,6 +74,8 @@ const ColumnType = ({
   const isAvailableType = value ? availableTypes.includes(value) : true
   const recommendation = RECOMMENDED_ALTERNATIVE_DATA_TYPE[value]
 
+  const unsupportedDataTypeText = `This column's data type cannot be changed via the Table Editor as it is not supported yet. You can do so through the SQL Editor instead.`
+
   const getOptionByName = (name: string) => {
     // handle built in types
     const pgOption = POSTGRES_DATA_TYPE_OPTIONS.find((option) => option.name === name)
@@ -113,8 +115,8 @@ const ColumnType = ({
 
   if (!isAvailableType) {
     return (
-      <Tooltip_Shadcn_>
-        <TooltipTrigger_Shadcn_>
+      <Tooltip>
+        <TooltipTrigger>
           <Input
             readOnly
             disabled
@@ -124,27 +126,22 @@ const ColumnType = ({
             size="small"
             icon={inferIcon(POSTGRES_DATA_TYPE_OPTIONS.find((x) => x.name === value)?.type ?? '')}
             value={value}
-            descriptionText={
-              showLabel
-                ? 'Custom non-native psql data types currently cannot be changed to a different data type via Supabase Studio'
-                : ''
-            }
+            descriptionText={showLabel ? unsupportedDataTypeText : undefined}
           />
-        </TooltipTrigger_Shadcn_>
+        </TooltipTrigger>
         {!showLabel && (
-          <TooltipContent_Shadcn_ side="bottom" className="w-80">
-            Custom non-native psql data types currently cannot be changed to a different data type
-            via Supabase Studio
-          </TooltipContent_Shadcn_>
+          <TooltipContent side="bottom" className="w-80">
+            {unsupportedDataTypeText}
+          </TooltipContent>
         )}
-      </Tooltip_Shadcn_>
+      </Tooltip>
     )
   }
 
   if (disabled && !showLabel) {
     return (
-      <Tooltip_Shadcn_>
-        <TooltipTrigger_Shadcn_>
+      <Tooltip>
+        <TooltipTrigger>
           <Input
             readOnly
             disabled
@@ -154,13 +151,13 @@ const ColumnType = ({
             size="small"
             value={value}
           />
-        </TooltipTrigger_Shadcn_>
+        </TooltipTrigger>
         {!showLabel && description && (
-          <TooltipContent_Shadcn_ side="bottom">
+          <TooltipContent side="bottom">
             <div className="w-80">{description}</div>
-          </TooltipContent_Shadcn_>
+          </TooltipContent>
         )}
-      </Tooltip_Shadcn_>
+      </Tooltip>
     )
   }
 

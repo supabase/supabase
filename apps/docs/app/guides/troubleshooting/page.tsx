@@ -41,11 +41,14 @@ export default async function GlobalTroubleshootingPage() {
         />
         <TroubleshootingListController />
         <TroubleshootingFilterEmptyState />
-        <div id={TROUBLESHOOTING_CONTAINER_ID}>
+        <div id={TROUBLESHOOTING_CONTAINER_ID} className="@container/troubleshooting">
           <h2 className="sr-only">Matching troubleshooting entries</h2>
-          <ul>
+          <ul className="grid @4xl/troubleshooting:grid-cols-[78%_15%_7%]">
             {troubleshootingEntries.map((entry) => (
-              <li key={entry.data.database_id}>
+              <li
+                key={entry.data.database_id}
+                className="grid grid-cols-subgrid @4xl/troubleshooting:col-span-3"
+              >
                 <TroubleshootingPreview entry={entry} />
               </li>
             ))}

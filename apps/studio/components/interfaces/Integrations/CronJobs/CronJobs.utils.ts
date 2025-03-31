@@ -5,29 +5,28 @@ import dayjs from 'dayjs'
 import { CronJobType } from './CreateCronJobSheet'
 import { HTTPHeader } from './CronJobs.constants'
 
-export const buildCronQuery = (name: string, schedule: string, command: string) => {
-  return `select cron.schedule('${name}','${schedule}',${command});`
+export function buildCronQuery(name: string, schedule: string, command: string) {
+  const escapedName = name.replace(/'/g, "''")
+  return `select cron.schedule('${escapedName}', '${schedule}', ${command});`
 }
 
 export const buildHttpRequestCommand = (
   method: 'GET' | 'POST',
   url: string,
-  headers: HTTPHeader[],
+  headers: HTTPHeader[] = [],
   body: string | undefined,
   timeout: number
 ) => {
-  return `$$
-    select
-      net.${method === 'GET' ? 'http_get' : 'http_post'}(
-          url:='${url}',
-          headers:=jsonb_build_object(${headers
-            .filter((v) => v.name && v.value)
-            .map((v) => `'${v.name}', '${v.value}'`)
-            .join(', ')}),
-          ${method === 'POST' && body ? `body:='${body}',` : ''}
-          timeout_milliseconds:=${timeout}
-      );
-    $$`
+  return `
+select
+  net.${method === 'GET' ? 'http_get' : 'http_post'}(
+      url:='${url}',
+      headers:=jsonb_build_object(${headers
+        .filter((v) => v.name && v.value)
+        .map((v) => `'${v.name}', '${v.value}'`)
+        .join(', ')}), ${method === 'POST' && body ? `\n      body:='${body}',` : ''}
+      timeout_milliseconds:=${timeout}
+  );`
 }
 
 const DEFAULT_CRONJOB_COMMAND = {
@@ -39,7 +38,7 @@ const DEFAULT_CRONJOB_COMMAND = {
   httpBody: '',
 } as const
 
-export const parseCronJobCommand = (originalCommand: string): CronJobType => {
+export const parseCronJobCommand = (originalCommand: string, projectRef: string): CronJobType => {
   const command = originalCommand
     .replaceAll('$$', ' ')
     .replaceAll(/\n/g, ' ')
@@ -47,58 +46,73 @@ export const parseCronJobCommand = (originalCommand: string): CronJobType => {
     .trim()
 
   if (command.toLocaleLowerCase().startsWith('select net.')) {
-    let matches =
-      command.match(
-        /select net\.([^']+)\(\s*url:='([^']+)',\s*headers:=jsonb_build_object\(([^)]*)\),(?:\s*body:='(.*)',)?\s*timeout_milliseconds:=(\d+) \)/i
-      ) || []
+    const methodMatch = command.match(/select net\.([^']+)\(\s*url:=/i)
+    const method = methodMatch?.[1] || ''
 
-    // if the match has been unsuccessful, the cron may be created with the previous encoding/parsing.
-    if (matches.length === 0) {
-      matches =
-        command.match(
-          /select net\.([^']+)\(\s*url:='([^']+)',\s*headers:=jsonb_build_object\(([^)]*)\),\s*body:=jsonb_build_object\(([^]*)\s*\),\s*timeout_milliseconds:=(\d+) \)/i
-        ) || []
-    }
+    const urlMatch = command.match(/url:='([^']+)'/i)
+    const url = urlMatch?.[1] || ''
 
-    // convert the header string to array of objects, clean up the values, trim them of spaces and remove the quotation marks at start and end
-    const headers = (matches[3] || '').split(',').map((s) => s.trim().replace(/^'|'$/g, ''))
-    const headersObjs: { name: string; value: string }[] = []
-    for (let i = 0; i < headers.length; i += 2) {
-      if (headers[i] && headers[i].length > 0) {
-        headersObjs.push({ name: headers[i], value: headers[i + 1] })
+    const bodyMatch = command.match(/body:='(.*)'/i)
+    const body = bodyMatch?.[1] || ''
+
+    const timeoutMatch = command.match(/timeout_milliseconds:=(\d+)/i)
+    const timeout = timeoutMatch?.[1] || ''
+
+    const headersJsonBuildObjectMatch = command.match(/headers:=jsonb_build_object\(([^)]*)/i)
+    const headersJsonBuildObject = headersJsonBuildObjectMatch?.[1] || ''
+
+    let headersObjs: { name: string; value: string }[] = []
+    if (headersJsonBuildObject) {
+      // convert the header string to array of objects, clean up the values, trim them of spaces and remove the quotation marks at start and end
+      const headers = headersJsonBuildObject.split(',').map((s) => s.trim().replace(/^'|'$/g, ''))
+
+      for (let i = 0; i < headers.length; i += 2) {
+        if (headers[i] && headers[i].length > 0) {
+          headersObjs.push({ name: headers[i], value: headers[i + 1] })
+        }
+      }
+    } else {
+      const headersStringMatch = command.match(/headers:='([^']*)'/i)
+      const headersString = headersStringMatch?.[1] || ''
+      try {
+        const parsedHeaders = JSON.parse(headersString)
+        headersObjs = Object.entries(parsedHeaders).map(([name, value]) => ({
+          name,
+          value: value as string,
+        }))
+      } catch (error) {
+        console.error('Error parsing headers:', error)
       }
     }
 
-    const url = matches[2] || ''
-    const body = matches[4] || ''
-
-    if (url.includes('.supabase.') && url.includes('/functions/v1/')) {
+    if (url.includes(`${projectRef}.supabase.`) && url.includes('/functions/v1/')) {
       return {
         type: 'edge_function',
-        method: matches[1] === 'http_get' ? 'GET' : 'POST',
+        method: method === 'http_get' ? 'GET' : 'POST',
         edgeFunctionName: url,
         httpHeaders: headersObjs,
         httpBody: body,
-        // @ts-ignore
-        timeoutMs: +matches[5] ?? 1000,
+        timeoutMs: Number(timeout ?? 1000),
+        snippet: originalCommand,
       }
     }
 
     return {
       type: 'http_request',
-      method: matches[1] === 'http_get' ? 'GET' : 'POST',
+      method: method === 'http_get' ? 'GET' : 'POST',
       endpoint: url,
       httpHeaders: headersObjs,
       httpBody: body,
-      // @ts-ignore
-      timeoutMs: +matches[5] ?? 1000,
+      timeoutMs: Number(timeout ?? 1000),
+      snippet: originalCommand,
     }
   }
 
-  if (command.toLocaleLowerCase().startsWith('call ')) {
+  const regexDBFunction = /select\s+[a-zA-Z-_]*\.?[a-zA-Z-_]*\s*\(.+/g
+  if (command.toLocaleLowerCase().match(regexDBFunction)) {
     const [schemaName, functionName] = command
-      .replace('CALL ', '')
-      .replace('()', '')
+      .replace('SELECT ', '')
+      .replace(/\(.*\)/, '')
       .trim()
       .split('.')
 
@@ -106,6 +120,7 @@ export const parseCronJobCommand = (originalCommand: string): CronJobType => {
       type: 'sql_function',
       schema: schemaName,
       functionName: functionName,
+      snippet: originalCommand,
     }
   }
 

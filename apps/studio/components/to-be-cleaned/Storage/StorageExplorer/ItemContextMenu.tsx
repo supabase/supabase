@@ -17,7 +17,6 @@ interface ItemContextMenuProps {
 const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
   const storageExplorerStore = useStorageStore()
   const {
-    getFileUrl,
     downloadFile,
     selectedBucket,
     setSelectedItemsToDelete,
@@ -25,7 +24,7 @@ const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
     setSelectedItemsToMove,
     setSelectedFileCustomExpiry,
   } = storageExplorerStore
-  const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
+  const { onCopyUrl } = useCopyUrl()
   const isPublic = selectedBucket.public
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
@@ -34,7 +33,7 @@ const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
     switch (event) {
       case 'copy':
         if (expiresIn !== undefined && expiresIn < 0) return setSelectedFileCustomExpiry(item)
-        else return onCopyUrl(item.name, getFileUrl(item, expiresIn))
+        else return onCopyUrl(item.name, expiresIn)
       case 'rename':
         return setSelectedItemToRename(item)
       case 'move':

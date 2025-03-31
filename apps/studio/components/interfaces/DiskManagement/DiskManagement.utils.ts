@@ -104,8 +104,8 @@ export const calculateIOPSPrice = ({
       0,
       newProvisionedIOPS - DISK_LIMITS[DiskType.GP3].includedIops
     )
-    const oldPrice = oldChargeableIOPS * DISK_PRICING[oldStorageType]?.iops ?? 0
-    const newPrice = newChargeableIOPS * DISK_PRICING[newStorageType]?.iops ?? 0
+    const oldPrice = oldChargeableIOPS * (DISK_PRICING[oldStorageType]?.iops ?? 0)
+    const newPrice = newChargeableIOPS * (DISK_PRICING[newStorageType]?.iops ?? 0)
 
     return {
       oldPrice: (oldPrice * (1 + numReplicas)).toFixed(2),
@@ -116,8 +116,8 @@ export const calculateIOPSPrice = ({
       oldStorageType === 'gp3'
         ? (oldProvisionedIOPS - DISK_LIMITS[oldStorageType].includedIops) *
           DISK_PRICING[oldStorageType].iops
-        : oldProvisionedIOPS * DISK_PRICING[oldStorageType]?.iops ?? 0
-    const newPrice = newProvisionedIOPS * DISK_PRICING[newStorageType]?.iops ?? 0
+        : oldProvisionedIOPS * (DISK_PRICING[oldStorageType]?.iops ?? 0)
+    const newPrice = newProvisionedIOPS * (DISK_PRICING[newStorageType]?.iops ?? 0)
     return {
       oldPrice: (oldPrice * (1 + numReplicas)).toFixed(2),
       newPrice: (newPrice * (1 + numReplicas)).toFixed(2),
@@ -295,6 +295,7 @@ export const mapComputeSizeNameToAddonVariantId = (
   computeSize: ProjectDetail['infra_compute_size']
 ): ComputeInstanceAddonVariantId => {
   return {
+    pico: 'ci_pico',
     nano: 'ci_nano',
     micro: 'ci_micro',
     small: 'ci_small',

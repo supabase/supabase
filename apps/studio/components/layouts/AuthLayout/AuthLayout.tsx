@@ -1,27 +1,22 @@
-import { useParams } from 'common'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
+import { useParams } from 'common'
 import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
 import { withAuth } from 'hooks/misc/withAuth'
-import Link from 'next/link'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateAuthMenu } from './AuthLayout.utils'
 
-export interface AuthLayoutProps {
-  title?: string
-}
-
 const AuthProductMenu = () => {
+  const router = useRouter()
   const { ref: projectRef = 'default' } = useParams()
   const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
 
   useAuthConfigPrefetch({ projectRef })
-
-  const router = useRouter()
   const page = router.pathname.split('/')[4]
 
   return (
@@ -48,10 +43,10 @@ const AuthProductMenu = () => {
   )
 }
 
-const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => {
+const AuthLayout = ({ children }: PropsWithChildren<{}>) => {
   return (
     <ProjectLayout
-      title={title || 'Authentication'}
+      title="Authentication"
       product="Authentication"
       productMenu={<AuthProductMenu />}
       isBlocking={false}
@@ -61,4 +56,9 @@ const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => 
   )
 }
 
+/**
+ * Layout for all auth pages on the dashboard, wrapped with withAuth to verify logged in state
+ *
+ * Handles rendering the navigation for each section under the auth pages.
+ */
 export default withAuth(AuthLayout)

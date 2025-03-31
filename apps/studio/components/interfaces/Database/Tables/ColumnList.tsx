@@ -22,9 +22,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Input,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 
@@ -61,7 +61,7 @@ const ColumnList = ({
   const columns =
     (filterString.length === 0
       ? selectedTable?.columns ?? []
-      : selectedTable?.columns?.filter((column: any) => column.name.includes(filterString))) ?? []
+      : selectedTable?.columns?.filter((column) => column.name.includes(filterString))) ?? []
 
   const isLocked = PROTECTED_SCHEMAS.includes(selectedTable?.schema ?? '')
   const canUpdateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
@@ -127,7 +127,7 @@ const ColumnList = ({
                   <Table.th key="format">Format</Table.th>,
                   <Table.th key="buttons"></Table.th>,
                 ]}
-                body={columns.map((x: any, i: number) => (
+                body={columns.map((x) => (
                   <Table.tr className="border-t" key={x.name}>
                     <Table.td>
                       <p>{x.name}</p>
@@ -152,8 +152,8 @@ const ColumnList = ({
                             <Button type="default" className="px-1" icon={<MoreVertical />} />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent side="bottom" align="end" className="w-32">
-                            <Tooltip_Shadcn_>
-                              <TooltipTrigger_Shadcn_>
+                            <Tooltip>
+                              <TooltipTrigger>
                                 <DropdownMenuItem
                                   disabled={!canUpdateColumns}
                                   onClick={() => onEditColumn(x)}
@@ -162,16 +162,16 @@ const ColumnList = ({
                                   <Edit size={12} />
                                   <p>Edit column</p>
                                 </DropdownMenuItem>
-                              </TooltipTrigger_Shadcn_>
+                              </TooltipTrigger>
                               {!canUpdateColumns && (
-                                <TooltipContent_Shadcn_ side="bottom">
+                                <TooltipContent side="bottom">
                                   Additional permissions required to edit column
-                                </TooltipContent_Shadcn_>
+                                </TooltipContent>
                               )}
-                            </Tooltip_Shadcn_>
+                            </Tooltip>
 
-                            <Tooltip_Shadcn_>
-                              <TooltipTrigger_Shadcn_>
+                            <Tooltip>
+                              <TooltipTrigger>
                                 <DropdownMenuItem
                                   disabled={!canUpdateColumns || isLocked}
                                   onClick={() => onDeleteColumn(x)}
@@ -180,13 +180,13 @@ const ColumnList = ({
                                   <Trash stroke="red" size={12} />
                                   <p>Delete column</p>
                                 </DropdownMenuItem>
-                              </TooltipTrigger_Shadcn_>
+                              </TooltipTrigger>
                               {!canUpdateColumns && (
-                                <TooltipContent_Shadcn_ side="bottom">
+                                <TooltipContent side="bottom">
                                   Additional permissions required to delete column
-                                </TooltipContent_Shadcn_>
+                                </TooltipContent>
                               )}
-                            </Tooltip_Shadcn_>
+                            </Tooltip>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       )}

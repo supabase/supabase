@@ -1,8 +1,7 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import type { User } from './users-infinite-query'
 
@@ -12,9 +11,14 @@ export type UserResetPasswordVariables = {
 }
 
 export async function resetPassword({ projectRef, user }: UserResetPasswordVariables) {
-  const response = await post(`${API_URL}/auth/${projectRef}/recover`, user)
-  if (response.error) throw response.error
-  return response
+  const { data, error } = await post('/platform/auth/{ref}/recover', {
+    params: { path: { ref: projectRef } },
+    body: { email: user.email },
+  })
+
+  if (error) handleError(error)
+
+  return data
 }
 
 type UserResetPasswordData = Awaited<ReturnType<typeof resetPassword>>

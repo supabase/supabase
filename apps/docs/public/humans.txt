@@ -37,6 +37,7 @@ Greg Richardson
 Guilherme Souza
 Haydn Maley
 Hieu Pham
+Illia Basalaiev
 Inian P
 Ivan Vasilov
 Jenny Kibiri
@@ -45,6 +46,7 @@ John Pena
 Jon M
 Jonny Summers-Muir
 Jordi Enric
+José Luis Ledesma
 Joshen Lim
 Julien Goux
 Kamil Ogórek
@@ -56,11 +58,13 @@ Kevin Grüneberg
 Lakshan Perera
 Laura C
 Laurence Isla
+Lenny Urbanowski
 Long Hoang
 Łukasz Niemier
 Margarita Sandomirskaia
 Mark Burggraf
-Monica El Khoury
+Monica Khoury
+Nyannyacha
 Oli R
 Pamela Chia
 Paul Caselton

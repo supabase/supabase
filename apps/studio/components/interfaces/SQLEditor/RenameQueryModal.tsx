@@ -4,13 +4,18 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { getContentById } from 'data/content/content-id-query'
-import { useContentUpdateMutation } from 'data/content/content-update-mutation'
+import {
+  UpsertContentPayload,
+  useContentUpsertMutation,
+} from 'data/content/content-upsert-mutation'
 import { Snippet } from 'data/content/sql-folders-query'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { createTabId, renameTab } from 'state/tabs'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
+import { useIsSQLEditorTabsEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 
 export interface RenameQueryModalProps {
@@ -32,6 +37,7 @@ const RenameQueryModal = ({
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const isSQLSnippet = snippet.type === 'sql'
+  const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   // Customers on HIPAA plans should not have access to Supabase AI
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
@@ -73,7 +79,7 @@ const RenameQueryModal = ({
     return errors
   }
 
-  const { mutateAsync: updateContent } = useContentUpdateMutation()
+  const { mutateAsync: upsertContent } = useContentUpsertMutation()
 
   const onSubmit = async (values: any, { setSubmitting }: any) => {
     if (!ref) return console.error('Project ref is required')
@@ -90,21 +96,20 @@ const RenameQueryModal = ({
         snapV2.addSnippet({ projectRef: ref, snippet: localSnippet })
       }
 
-      const updatedSnippet = await updateContent({
+      await upsertContent({
         projectRef: ref,
-        id,
-        type: localSnippet.type,
-        content: (localSnippet as any).content,
-        name: nameInput,
-        description: descriptionInput,
+        payload: {
+          ...localSnippet,
+          name: nameInput,
+          description: descriptionInput,
+        } as UpsertContentPayload,
       })
 
-      snapV2.renameSnippet({
-        id,
-        name: updatedSnippet.name,
-        description: updatedSnippet.description,
-      })
-
+      snapV2.renameSnippet({ id, name: nameInput, description: descriptionInput })
+      if (isSQLEditorTabsEnabled && ref) {
+        const tabId = createTabId('sql', { id })
+        renameTab(ref, tabId, nameInput)
+      }
       toast.success('Successfully renamed snippet!')
       if (onComplete) onComplete()
     } catch (error: any) {

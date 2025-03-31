@@ -22,9 +22,9 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 
@@ -151,21 +151,21 @@ const DatabaseSelector = ({
                       : 'not healthy'
 
                     return (
-                      <Tooltip_Shadcn_ key={database.identifier}>
-                        <TooltipTrigger_Shadcn_ asChild>
+                      <Tooltip key={database.identifier}>
+                        <TooltipTrigger asChild>
                           <div className="px-2 py-1.5 w-full flex items-center justify-between">
                             <p className="text-xs text-foreground-lighter">
                               Read replica ({region} - {id})
                             </p>
                           </div>
-                        </TooltipTrigger_Shadcn_>
-                        <TooltipContent_Shadcn_ side="right" className="w-80">
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="w-80">
                           <Markdown
                             className="text-xs text-foreground"
                             content={`Replica unable to accept requests as its ${status}. [View infrastructure settings](/project/${projectRef}/settings/infrastructure) for more information.`}
                           />
-                        </TooltipContent_Shadcn_>
-                      </Tooltip_Shadcn_>
+                        </TooltipContent>
+                      </Tooltip>
                     )
                   }
 

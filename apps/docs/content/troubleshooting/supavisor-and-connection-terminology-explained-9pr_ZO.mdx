@@ -21,7 +21,7 @@ A single application server can create multiple connections. A client connection
 
 This represents a direct connection to the database.
 
-Your application servers can directly connect using the db connection string:
+Your application servers can directly connect using the DB connection string:
 
 ```md
 postgresql://postgres:[PASSWORD]@db.[PROJECT REF].supabase.co:5432/postgres
@@ -31,7 +31,7 @@ When connecting through the pooler, it will establish db/direct connections on b
 
 ## Max_connections:
 
-Configured with the max_connections system variable, it represents how many direct/database connections postgres will tolerate. You can view your instance's settings by running this SQL:
+Configured with the max_connections system variable, it represents how many direct/database connections Postgres will tolerate. You can view your instance's settings by running this SQL:
 
 ```sql
 SHOW max_connections;
@@ -52,7 +52,7 @@ Transaction mode gives the pooler permission to share direct connections among m
 postgres://postgres.obfwhevidiamwdwki:[YPASSWORD]@aws-0-ca-central-1.pooler.supabase.com:**6543**/postgres
 ```
 
-Postgres connections use the Postgres Wire Protocol (PWP) rather than HTTP. PWP acts like a websocket: once a connection is made, it stays open and active until the client disconnects.
+Postgres connections use the Postgres Wire Protocol (PWP) rather than HTTP. PWP acts like a WebSocket: once a connection is made, it stays open and active until the client disconnects.
 
 If too many connections are held by idle or greedy clients, other application servers won’t be able to connect to your database. Transaction mode helps avoid this problem by allowing clients to access the database connections only when they are running a query. This reduces the chances of hitting the maximum direct connection limit.
 

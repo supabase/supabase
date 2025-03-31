@@ -4,6 +4,8 @@ import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
+import { useIsTableEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
@@ -11,6 +13,7 @@ import { useDatabasePublicationUpdateMutation } from 'data/database-publications
 import type { Constraint } from 'data/database/constraints-query'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { databaseKeys } from 'data/database/keys'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import { isTableLike } from 'data/table-editor/table-editor-types'
@@ -22,6 +25,7 @@ import { getTables } from 'data/tables/tables-query'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { createTabId, renameTab } from 'state/tabs'
 import type { Dictionary } from 'types'
 import { SonnerProgress } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -30,6 +34,7 @@ import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
 import JsonEditor from './RowEditor/JsonEditor/JsonEditor'
 import RowEditor from './RowEditor/RowEditor'
+import { convertByteaToHex } from './RowEditor/RowEditor.utils'
 import { TextEditor } from './RowEditor/TextEditor'
 import SchemaEditor from './SchemaEditor'
 import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
@@ -62,7 +67,9 @@ const SidePanelEditor = ({
   includeColumns = false,
   onTableCreated = noop,
 }: SidePanelEditorProps) => {
+  const { ref } = useParams()
   const snap = useTableEditorStateSnapshot()
+  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
 
   const queryClient = useQueryClient()
@@ -196,7 +203,11 @@ const SidePanelEditor = ({
     try {
       const { row } = selectedForeignKeyToEdit
       const identifiers = {} as Dictionary<any>
-      selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
+      selectedTable.primary_keys.forEach((column) => {
+        const col = selectedTable.columns?.find((x) => x.name === column.name)
+        identifiers[column.name] =
+          col?.format === 'bytea' ? convertByteaToHex(row![column.name]) : row![column.name]
+      })
 
       const isNewRecord = false
       const configuration = { identifiers, rowIdx: row.idx }
@@ -473,6 +484,11 @@ const SidePanelEditor = ({
         if (hasError) {
           toast(`Table ${table.name} has been updated, but there were some errors`, { id: toastId })
         } else {
+          if (isTableEditorTabsEnabled && ref && payload.name) {
+            // [Joshen] Only table entities can be updated via the dashboard
+            const tabId = createTabId(ENTITY_TYPE.TABLE, { id: selectedTable.id })
+            renameTab(ref, tabId, payload.name)
+          }
           toast.success(`Successfully updated ${table.name}!`, { id: toastId })
         }
       }

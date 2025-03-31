@@ -4,8 +4,14 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import {
+  ScaffoldSection,
+  ScaffoldSectionDescription,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { DocsButton } from 'components/ui/DocsButton'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useDeleteThirdPartyAuthIntegrationMutation } from 'data/third-party-auth/integration-delete-mutation'
 import {
   ThirdPartyAuthIntegration,
@@ -17,6 +23,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AddIntegrationDropdown } from './AddIntegrationDropdown'
 import { CreateAuth0IntegrationDialog } from './CreateAuth0Dialog'
 import { CreateAwsCognitoAuthIntegrationDialog } from './CreateAwsCognitoAuthDialog'
+import { CreateClerkAuthIntegrationDialog } from './CreateClerkAuthDialog'
 import { CreateFirebaseAuthIntegrationDialog } from './CreateFirebaseAuthDialog'
 import { IntegrationCard } from './IntegrationCard'
 import {
@@ -53,26 +60,29 @@ export const ThirdPartyAuthForm = () => {
   }
 
   return (
-    <div className="pb-4">
-      <FormHeader
-        title="Third Party Auth"
-        className="mb-1"
-        description="Use third-party authentication (TPA) systems based on JWTs to access your project."
-        actions={
-          integrations.length !== 0 ? (
+    <ScaffoldSection isFullWidth>
+      <div className="flex justify-between gap-4">
+        <div>
+          <ScaffoldSectionTitle>Third Party Auth</ScaffoldSectionTitle>
+          <ScaffoldSectionDescription className="mb-6">
+            Use third-party authentication (TPA) systems based on JWTs to access your project.
+            <br />
+            Billing is based on the number of monthly active users (MAUs) requesting your API
+            throughout the billing period. Refer to our{' '}
+            <InlineLink href="https://supabase.com/docs/guides/platform/manage-your-usage/monthly-active-users-third-party">
+              billing docs
+            </InlineLink>{' '}
+            for more information.
+          </ScaffoldSectionDescription>
+        </div>
+        <div className="flex items-center gap-2 ">
+          <DocsButton href="https://supabase.com/docs/guides/auth/third-party/overview" />
+          {integrations.length !== 0 && (
             <AddIntegrationDropdown onSelectIntegrationType={setSelectedIntegration} />
-          ) : null
-        }
-        docsUrl="https://supabase.com/docs/guides/auth/third-party/overview"
-      />
-      <div className="prose text-sm mb-6 max-w-full">
-        <span>
-          Billing is based on the number of monthly active users (MAUs) requesting your API
-          throughout the billing period (50 included then you'll be charged{' '}
-        </span>
-        <span className="text-brand">$0.00325</span>
-        <span> per MAU).</span>
+          )}
+        </div>
       </div>
+
       {isLoading && (
         <div
           className={cn(
@@ -132,6 +142,12 @@ export const ThirdPartyAuthForm = () => {
         onClose={() => setSelectedIntegration(undefined)}
       />
 
+      <CreateClerkAuthIntegrationDialog
+        visible={selectedIntegration === 'clerk'}
+        onDelete={() => {}}
+        onClose={() => setSelectedIntegration(undefined)}
+      />
+
       <ConfirmationModal
         visible={!!selectedIntegrationForDeletion}
         variant="destructive"
@@ -162,6 +178,6 @@ export const ThirdPartyAuthForm = () => {
           {`Are you sure you want to delete the ${getIntegrationTypeLabel(getIntegrationType(selectedIntegrationForDeletion))} integration?`}
         </p>
       </ConfirmationModal>
-    </div>
+    </ScaffoldSection>
   )
 }

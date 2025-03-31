@@ -184,6 +184,19 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
     ```
 
   </TabPanel>
+  <TabPanel id="kotlin" label="Kotlin">
+    ```kotlin
+    val channel = supabase.channel("room-1") {
+        isPrivate = true
+    }
+    channel.broadcastFlow<MyPayload>(event = "test").onEach {
+        println(it)
+    }.launchIn(scope) // launch in your coroutine scope
+    channel.subscribe(blockUntilSubscribed = true)
+    println("Connected!")
+    ```
+
+  </TabPanel>
   <TabPanel id="python" label="Python">
     ```py
     channel = realtime.channel(

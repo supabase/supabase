@@ -24,9 +24,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import {
@@ -254,19 +254,19 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                 status === REPLICA_STATUS.INIT_READ_REPLICA_FAILED ? (
                 <>
                   <Badge variant="destructive">Init failed</Badge>
-                  <Tooltip_Shadcn_>
-                    <TooltipTrigger_Shadcn_>
+                  <Tooltip>
+                    <TooltipTrigger>
                       <HelpCircle size={16} />
-                    </TooltipTrigger_Shadcn_>
-                    <TooltipContent_Shadcn_
+                    </TooltipTrigger>
+                    <TooltipContent
                       side="bottom"
                       align="end"
                       alignOffset={-70}
                       className="w-60 text-center"
                     >
                       Replica failed to initialize. Please drop this replica and spin up a new one.
-                    </TooltipContent_Shadcn_>
-                  </Tooltip_Shadcn_>
+                    </TooltipContent>
+                  </Tooltip>
                 </>
               ) : status === REPLICA_STATUS.GOING_DOWN ? (
                 <Badge>Going down</Badge>
@@ -294,8 +294,8 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               </p>
             </div>
             {initStatus === ReplicaInitializationStatus.InProgress && progress !== undefined ? (
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <div className="w-56">
                     <SparkBar
                       labelBottom={INIT_PROGRESS[progress as keyof typeof INIT_PROGRESS]}
@@ -306,9 +306,9 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                       barClass="bg-brand"
                     />
                   </div>
-                </TooltipTrigger_Shadcn_>
+                </TooltipTrigger>
                 {estimations !== undefined && (
-                  <TooltipContent_Shadcn_ asChild side="bottom">
+                  <TooltipContent asChild side="bottom">
                     <div className="w-56">
                       <p className="text-foreground-light mb-0.5">Duration estimates:</p>
                       {estimations.baseBackupDownloadEstimateSeconds !== undefined && (
@@ -324,9 +324,9 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                         </p>
                       )}
                     </div>
-                  </TooltipContent_Shadcn_>
+                  </TooltipContent>
                 )}
-              </Tooltip_Shadcn_>
+              </Tooltip>
             ) : error !== undefined ? (
               <p className="text-sm text-foreground-light">
                 Error: {ERROR_STATES[error as keyof typeof ERROR_STATES]}
@@ -370,8 +370,8 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
                 Resize replica
               </DropdownMenuItem> */}
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <DropdownMenuItem
                   className="gap-x-2 !pointer-events-auto"
                   disabled={!canManageReplicas}
@@ -381,13 +381,13 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                 >
                   Drop replica
                 </DropdownMenuItem>
-              </TooltipTrigger_Shadcn_>
+              </TooltipTrigger>
               {!canManageReplicas && (
-                <TooltipContent_Shadcn_ side="left">
+                <TooltipContent side="left">
                   You need additional permissions to drop replicas
-                </TooltipContent_Shadcn_>
+                </TooltipContent>
               )}
-            </Tooltip_Shadcn_>
+            </Tooltip>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

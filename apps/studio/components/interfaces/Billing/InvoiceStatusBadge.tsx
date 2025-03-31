@@ -1,4 +1,4 @@
-import { Badge, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { InvoiceStatus } from './Invoices.types'
 
 interface InvoiceStatusBadgeProps {
@@ -43,8 +43,8 @@ const InvoiceStatusBadge = ({ status, paymentAttempted }: InvoiceStatusBadgeProp
   const statusMapping = invoiceStatusMapping[status]
 
   return (
-    <Tooltip_Shadcn_>
-      <TooltipTrigger_Shadcn_>
+    <Tooltip>
+      <TooltipTrigger>
         <Badge
           size="small"
           className="capitalize"
@@ -52,8 +52,8 @@ const InvoiceStatusBadge = ({ status, paymentAttempted }: InvoiceStatusBadgeProp
         >
           {statusMapping?.label || status}
         </Badge>
-      </TooltipTrigger_Shadcn_>
-      <TooltipContent_Shadcn_ side="bottom">
+      </TooltipTrigger>
+      <TooltipContent side="bottom">
         {[InvoiceStatus.OPEN, InvoiceStatus.ISSUED, InvoiceStatus.UNCOLLECTIBLE].includes(status) &&
           (paymentAttempted ? (
             <p className="text-xs text-foreground">
@@ -86,8 +86,8 @@ const InvoiceStatusBadge = ({ status, paymentAttempted }: InvoiceStatusBadgeProp
             This invoice has been forgiven. No action is required on your side.
           </p>
         )}
-      </TooltipContent_Shadcn_>
-    </Tooltip_Shadcn_>
+      </TooltipContent>
+    </Tooltip>
   )
 }
 

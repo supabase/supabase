@@ -15,8 +15,8 @@ const unitMap = {
 
 const CustomExpiryModal = () => {
   const storageExplorerStore = useStorageStore()
-  const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
-  const { getFileUrl, selectedFileCustomExpiry, setSelectedFileCustomExpiry } = storageExplorerStore
+  const { onCopyUrl } = useCopyUrl()
+  const { selectedFileCustomExpiry, setSelectedFileCustomExpiry } = storageExplorerStore
 
   const visible = selectedFileCustomExpiry !== undefined
   const onClose = () => setSelectedFileCustomExpiry(undefined)
@@ -38,10 +38,7 @@ const CustomExpiryModal = () => {
           setSubmitting(true)
           await onCopyUrl(
             selectedFileCustomExpiry!.name,
-            getFileUrl(
-              selectedFileCustomExpiry!,
-              values.expiresIn * unitMap[values.units as 'days' | 'weeks' | 'months' | 'years']
-            )
+            values.expiresIn * unitMap[values.units as 'days' | 'weeks' | 'months' | 'years']
           )
           setSubmitting(false)
           onClose()

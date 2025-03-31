@@ -55,18 +55,18 @@ JOIN pg_stat_activity
 
 Interpreting the query:
 
-| Column           | Description                                       |
-| ---------------- | ------------------------------------------------- |
-| pid              | connection id                                     |
-| ssl              | Indicates if SSL is in use                        |
-| datname          | Name of the connected database (usually postgres) |
-| usename          | Role of the connected user                        |
-| application_name | Name of the connecting application                |
-| client_addr      | IP address of the connecting server               |
-| query            | Last query executed by the connection             |
-| query_start      | Time when the last query was executed             |
-| state            | Querying state: active or idle                    |
-| backend_start    | Timestamp of the connection's establishment       |
+| Column             | Description                                         |
+| ------------------ | --------------------------------------------------- |
+| `pid`              | connection id                                       |
+| `ssl`              | Indicates if SSL is in use                          |
+| `datname`          | Name of the connected database (usually `postgres`) |
+| `usename`          | Role of the connected user                          |
+| `application_name` | Name of the connecting application                  |
+| `client_addr`      | IP address of the connecting server                 |
+| `query`            | Last query executed by the connection               |
+| `query_start`      | Time when the last query was executed               |
+| `state`            | Querying state: active or idle                      |
+| `backend_start`    | Timestamp of the connection's establishment         |
 
 - Note: If you are unfamiliar with the Supabase database roles, check this [reference](https://gist.github.com/TheOtherBrian1/d6e862a65e03049eb4f102f6ca809401)
 
@@ -88,7 +88,7 @@ In cases where you see significantly more pooler connections than direct connect
 
 The general rule is that if you are using the PostgREST database API, you should avoid raising your pool size past 40%. Otherwise, you can commit 80% to the pool. This leaves adequate room for the Authentication server and other utilities.
 
-These numbers are generalizations and assume a certain level of activity from all connected servers. The actual values depend on your peak connection usage. For instance, if you were only using 80 connections in a week period and your database could support 500 connections, then realistically you could allocate the remaining 420 (minus a reasonable buffer) to service more demand.
+These numbers are generalizations and assume a certain level of activity from all connected servers. The actual values depend on your concurrent peak connection usage. For instance, if you were only using 80 connections in a week period and your database could support 500 connections, then realistically you could allocate the remaining 420 (minus a reasonable buffer) to service more demand.
 
 ## Secondary issues:
 

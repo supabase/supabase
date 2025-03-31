@@ -76,16 +76,16 @@ Be careful when using this flag, as it will allow anyone to invoke your Edge Fun
 
 You can now invoke your Edge Function using the project's `ANON_KEY`, which can be found in the [API settings](https://supabase.com/dashboard/project/_/settings/api) of the Supabase Dashboard.
 
-<CH.Code>
+<$CodeTabs>
 
-```bash cURL
+```bash name=cURL
 curl --request POST 'https://<project_id>.supabase.co/functions/v1/hello-world' \
   --header 'Authorization: Bearer ANON_KEY' \
   --header 'Content-Type: application/json' \
   --data '{ "name":"Functions" }'
 ```
 
-```js JavaScript
+```js name=JavaScript
 import { createClient } from '@supabase/supabase-js'
 
 // Create a single supabase client for interacting with your database
@@ -96,6 +96,6 @@ const { data, error } = await supabase.functions.invoke('hello-world', {
 })
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 You should receive the response `{ "message":"Hello Functions!" }`.

@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import SqlEditor from 'components/ui/SqlEditor'
 import { usePrevious } from 'hooks/deprecated'
 import { HelpCircle } from 'lucide-react'
-import { Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface PolicyDefinitionProps {
   operation: string
@@ -40,12 +40,12 @@ const PolicyDefinition = ({
               <label className="text-base text-foreground-light" htmlFor="policy-name">
                 USING expression
               </label>
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_>
+              <Tooltip>
+                <TooltipTrigger>
                   <HelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
-                </TooltipTrigger_Shadcn_>
+                </TooltipTrigger>
 
-                <TooltipContent_Shadcn_ side="bottom">
+                <TooltipContent side="bottom">
                   <div className="w-[300px] space-y-2">
                     <p className="text-xs text-foreground">
                       This expression will be added to queries that refer to the table if row-level
@@ -60,8 +60,8 @@ const PolicyDefinition = ({
                       Such rows are silently suppressed - no error is reported.
                     </p>
                   </div>
-                </TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+                </TooltipContent>
+              </Tooltip>
             </div>
             <p className="text-sm text-foreground-lighter">
               Provide a SQL conditional expression that returns a boolean.
@@ -79,12 +79,12 @@ const PolicyDefinition = ({
               <label className="text-base text-foreground-light" htmlFor="policy-name">
                 WITH CHECK expression
               </label>
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_>
+              <Tooltip>
+                <TooltipTrigger>
                   <HelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
-                </TooltipTrigger_Shadcn_>
+                </TooltipTrigger>
 
-                <TooltipContent_Shadcn_ side="bottom">
+                <TooltipContent side="bottom">
                   <div className="w-[300px] space-y-2">
                     <p className="text-xs text-foreground">
                       This expression will be used in INSERT and UPDATE queries against the table if
@@ -100,8 +100,8 @@ const PolicyDefinition = ({
                       the row, not the original contents.
                     </p>
                   </div>
-                </TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+                </TooltipContent>
+              </Tooltip>
             </div>
             <p className="text-sm text-foreground-lighter">
               Provide a SQL conditional expression that returns a boolean.

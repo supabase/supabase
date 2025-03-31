@@ -3,8 +3,19 @@ import type { SqlSnippet } from './sql-snippets-query'
 
 export const contentKeys = {
   allContentLists: (projectRef: string | undefined) => ['projects', projectRef, 'content'] as const,
-  list: (projectRef: string | undefined, type: ContentType | undefined) =>
-    ['projects', projectRef, 'content', type] as const,
+  infiniteList: (
+    projectRef: string | undefined,
+    options: {
+      type: ContentType | undefined
+      name: string | undefined
+      limit?: number
+      sort?: string
+    }
+  ) => ['projects', projectRef, 'content-infinite', options] as const,
+  list: (
+    projectRef: string | undefined,
+    options: { type?: ContentType; name?: string; limit?: number }
+  ) => ['projects', projectRef, 'content', options] as const,
   sqlSnippets: (
     projectRef: string | undefined,
     options?: {
@@ -28,6 +39,11 @@ export const contentKeys = {
   count: (
     projectRef: string | undefined,
     type?: string,
-    options?: { visibility?: SqlSnippet['visibility']; favorite?: boolean; name?: string }
+    options?: {
+      cumulative?: boolean
+      visibility?: SqlSnippet['visibility']
+      favorite?: boolean
+      name?: string
+    }
   ) => ['projects', projectRef, 'content', 'count', type, options].filter(Boolean),
 }

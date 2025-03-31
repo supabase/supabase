@@ -4,10 +4,12 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { DocsButton } from 'components/ui/DocsButton'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -20,8 +22,6 @@ import {
   WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 
 const orioleExtCallOuts = ['vector', 'postgis']
 
@@ -43,7 +43,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
   })
   const { mutate: enableExtension, isLoading: isEnabling } = useDatabaseExtensionEnableMutation({
     onSuccess: () => {
-      toast.success(`${extension.name} is on.`)
+      toast.success(`Extension "${extension.name}" is now enabled`)
       onCancel()
     },
     onError: (error) => {

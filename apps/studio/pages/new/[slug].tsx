@@ -21,13 +21,16 @@ import {
   PostgresVersionSelector,
   extractPostgresVersionDetails,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { SPECIAL_CHARS_REGEX } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
+import { SpecialSymbolsCallout } from 'components/interfaces/ProjectCreation/SpecialSymbolsCallout'
 import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import Panel from 'components/ui/Panel'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
@@ -40,6 +43,7 @@ import {
 } from 'data/projects/project-create-mutation'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -80,7 +84,6 @@ import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -117,9 +120,7 @@ const FormSchema = z.object({
   }),
   dbPassStrength: z.number(),
   dbPass: z
-    .string({
-      required_error: 'Please enter a database password.',
-    })
+    .string({ required_error: 'Please enter a database password.' })
     .min(1, 'Password is required.'),
   instanceSize: z.string(),
   dataApi: z.boolean(),
@@ -133,6 +134,8 @@ export type CreateProjectForm = z.infer<typeof FormSchema>
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug, projectName } = useParams()
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
@@ -185,6 +188,8 @@ const Wizard: NextPageWithLayout = () => {
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       refetchInterval: false,
+      refetchOnReconnect: false,
+      retry: false,
     }
   )
 
@@ -194,6 +199,9 @@ const Wizard: NextPageWithLayout = () => {
     isSuccess: isSuccessNewProject,
   } = useProjectCreateMutation({
     onSuccess: (res) => {
+      sendEvent({
+        action: 'project_creation_simple_version_submitted',
+      })
       router.push(`/project/${res.ref}/building`)
     },
   })
@@ -349,7 +357,7 @@ const Wizard: NextPageWithLayout = () => {
   useEffect(() => {
     // [Joshen] Cause slug depends on router which doesnt load immediately on render
     // While the form data does load immediately
-    if (slug) form.setValue('organization', slug)
+    if (slug && slug !== '_') form.setValue('organization', slug)
     if (projectName) form.setValue('projectName', projectName || '')
   }, [slug])
 
@@ -448,6 +456,7 @@ const Wizard: NextPageWithLayout = () => {
                               field.onChange(slug)
                               router.push(`/new/${slug}`)
                             }}
+                            value={field.value}
                             defaultValue={field.value}
                           >
                             <FormControl_Shadcn_>
@@ -559,7 +568,7 @@ const Wizard: NextPageWithLayout = () => {
                                     <Link
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
+                                      href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                                     >
                                       <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
                                         <p className="text-sm m-0">Compute Billing</p>
@@ -772,41 +781,49 @@ const Wizard: NextPageWithLayout = () => {
                       <FormField_Shadcn_
                         control={form.control}
                         name="dbPass"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            label="Database Password"
-                            layout="horizontal"
-                            description={
-                              <PasswordStrengthBar
-                                passwordStrengthScore={form.getValues('dbPassStrength')}
-                                password={field.value}
-                                passwordStrengthMessage={passwordStrengthMessage}
-                                generateStrongPassword={generatePassword}
-                              />
-                            }
-                          >
-                            <FormControl_Shadcn_>
-                              <Input
-                                copy={field.value.length > 0}
-                                type="password"
-                                placeholder="Type in a strong password"
-                                {...field}
-                                autoComplete="off"
-                                onChange={async (event) => {
-                                  field.onChange(event)
-                                  form.trigger('dbPassStrength')
-                                  const value = event.target.value
-                                  if (event.target.value === '') {
-                                    await form.setValue('dbPassStrength', 0)
-                                    await form.trigger('dbPass')
-                                  } else {
-                                    await delayedCheckPasswordStrength(value)
-                                  }
-                                }}
-                              />
-                            </FormControl_Shadcn_>
-                          </FormItemLayout>
-                        )}
+                        render={({ field }) => {
+                          const hasSpecialCharacters =
+                            field.value.length > 0 && !field.value.match(SPECIAL_CHARS_REGEX)
+
+                          return (
+                            <FormItemLayout
+                              label="Database Password"
+                              layout="horizontal"
+                              description={
+                                <>
+                                  {hasSpecialCharacters && <SpecialSymbolsCallout />}
+                                  <PasswordStrengthBar
+                                    passwordStrengthScore={form.getValues('dbPassStrength')}
+                                    password={field.value}
+                                    passwordStrengthMessage={passwordStrengthMessage}
+                                    generateStrongPassword={generatePassword}
+                                  />
+                                </>
+                              }
+                            >
+                              <FormControl_Shadcn_>
+                                <Input
+                                  copy={field.value.length > 0}
+                                  type="password"
+                                  placeholder="Type in a strong password"
+                                  {...field}
+                                  autoComplete="off"
+                                  onChange={async (event) => {
+                                    field.onChange(event)
+                                    form.trigger('dbPassStrength')
+                                    const value = event.target.value
+                                    if (event.target.value === '') {
+                                      await form.setValue('dbPassStrength', 0)
+                                      await form.trigger('dbPass')
+                                    } else {
+                                      await delayedCheckPasswordStrength(value)
+                                    }
+                                  }}
+                                />
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
+                          )
+                        }}
                       />
                     </Panel.Content>
 

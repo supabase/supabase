@@ -2,11 +2,11 @@ import { isUndefined } from 'lodash'
 import { ArrowUpRight, LogOut } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren, ReactNode, useState } from 'react'
-
-import { Badge, cn, Menu, Sheet, SheetContent } from 'ui'
+import { Badge, cn, Menu } from 'ui'
+import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import { LayoutHeader } from '../ProjectLayout/LayoutHeader'
 import type { SidebarLink, SidebarSection } from './AccountLayout.types'
-import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
+import { useAppStateSnapshot } from 'state/app-state'
 
 interface WithSidebarProps {
   title: string
@@ -31,11 +31,7 @@ const WithSidebar = ({
   customSidebarContent,
 }: PropsWithChildren<WithSidebarProps>) => {
   const noContent = !sections && !customSidebarContent
-  const [isSheetOpen, setIsSheetOpen] = useState(false)
-
-  const handleMobileMenu = () => {
-    setIsSheetOpen(true)
-  }
+  const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
 
   return (
     <div className="flex flex-col md:flex-row h-full">
@@ -51,14 +47,10 @@ const WithSidebar = ({
         />
       )}
       <div className="flex flex-1 flex-col">
-        <LayoutHeader
-          breadcrumbs={breadcrumbs}
-          showProductMenu={!hideSidebar && !noContent}
-          handleMobileMenu={handleMobileMenu}
-        />
+        <LayoutHeader breadcrumbs={breadcrumbs} />
         <div className="flex-1 flex-grow overflow-y-auto">{children}</div>
       </div>
-      <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+      <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SidebarContent
           title={title}
           header={header}

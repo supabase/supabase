@@ -9,19 +9,17 @@ import { copyToClipboard } from 'lib/helpers'
 import { BookOpen, Check, ChevronDown, Clipboard, ExternalLink, X } from 'lucide-react'
 import { logConstants } from 'shared-data'
 import {
-  Alert,
   Badge,
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Popover,
   SidePanel,
   Tabs,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import {
   EXPLORER_DATEPICKER_HELPERS,
@@ -31,24 +29,21 @@ import {
 import DatePickers from './Logs.DatePickers'
 import { LogsWarning, LogTemplate, WarehouseCollection } from './Logs.types'
 import { WarehouseQueryTemplate } from './Warehouse.utils'
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 
 export type SourceType = 'logs' | 'warehouse'
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
   warehouseTemplates?: WarehouseQueryTemplate[]
-  onSelectTemplate: (template: LogTemplate) => void
-  onSelectWarehouseTemplate: (template: WarehouseQueryTemplate) => void
-  onSelectSource: (source: string) => void
-  onClear: () => void
-  onSave?: () => void
-  hasEditorValue: boolean
-  isLoading: boolean
-  onDateChange: React.ComponentProps<typeof DatePickers>['onChange']
-  defaultTo: string
   defaultFrom: string
+  defaultTo: string
   warnings: LogsWarning[]
   warehouseCollections: WarehouseCollection[]
   dataSource: SourceType
+  onSelectTemplate: (template: LogTemplate) => void
+  onSelectWarehouseTemplate: (template: WarehouseQueryTemplate) => void
+  onSelectSource: (source: string) => void
+  onDateChange: React.ComponentProps<typeof DatePickers>['onChange']
   onDataSourceChange: (sourceType: SourceType) => void
 }
 
@@ -64,15 +59,15 @@ function DropdownMenuItemContent({ name, desc }: { name: ReactNode; desc?: strin
 const LogsQueryPanel = ({
   templates = [],
   warehouseTemplates = [],
-  onSelectTemplate,
-  onSelectWarehouseTemplate,
-  onSelectSource,
   defaultFrom,
   defaultTo,
-  onDateChange,
   warnings,
   warehouseCollections,
   dataSource,
+  onSelectTemplate,
+  onSelectWarehouseTemplate,
+  onSelectSource,
+  onDateChange,
   onDataSourceChange,
 }: LogsQueryPanelProps) => {
   const [showReference, setShowReference] = useState(false)
@@ -90,6 +85,7 @@ const LogsQueryPanel = ({
       if (key === 'AUTH') return authEnabled
       if (key === 'STORAGE') return storageEnabled
       if (key === 'FN_EDGE') return edgeFunctionsEnabled
+      if (key === 'PG_CRON') return false
       if (key === 'WAREHOUSE') return false
       return true
     })
@@ -216,29 +212,27 @@ const LogsQueryPanel = ({
 
             <div className="overflow-hidden">
               <div
+                data-testid="log-explorer-warnings"
                 className={` transition-all duration-300 ${
                   warnings.length > 0 ? 'opacity-100' : 'invisible h-0 w-0 opacity-0'
                 }`}
               >
-                <Popover
-                  overlay={
-                    <Alert variant="warning" title="">
-                      <div className="flex flex-col gap-3">
-                        {warnings.map((warning, index) => (
-                          <p key={index}>
-                            {warning.text}{' '}
-                            {warning.link && (
-                              <Link href={warning.link}>{warning.linkText || 'View'}</Link>
-                            )}
-                          </p>
-                        ))}
-                      </div>
-                    </Alert>
-                  }
-                >
-                  <Badge variant="warning">
-                    {warnings.length} {warnings.length > 1 ? 'warnings' : 'warning'}
-                  </Badge>
+                <Popover>
+                  <PopoverTrigger>
+                    <Badge variant="warning">
+                      {warnings.length} {warnings.length > 1 ? 'warnings' : 'warning'}
+                    </Badge>
+                    <PopoverContent className="p-0 divide-y">
+                      {warnings.map((warning, index) => (
+                        <p key={index} className="p-3 text-xs text-foreground-light text-left">
+                          {warning.text}{' '}
+                          {warning.link && (
+                            <Link href={warning.link}>{warning.linkText || 'View'}</Link>
+                          )}
+                        </p>
+                      ))}
+                    </PopoverContent>
+                  </PopoverTrigger>
                 </Popover>
               </div>
             </div>
@@ -359,19 +353,19 @@ const Field = ({
       >
         <span>{field.path}</span>
         {isCopied ? (
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_>
+          <Tooltip>
+            <TooltipTrigger>
               <Check size={14} strokeWidth={3} className="text-brand" />
-            </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ side="bottom">Copied</TooltipContent_Shadcn_>
-          </Tooltip_Shadcn_>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Copied</TooltipContent>
+          </Tooltip>
         ) : (
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_>
+          <Tooltip>
+            <TooltipTrigger>
               <Clipboard size={14} strokeWidth={1.5} />
-            </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ side="bottom">Copy value</TooltipContent_Shadcn_>
-          </Tooltip_Shadcn_>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Copy value</TooltipContent>
+          </Tooltip>
         )}
       </Table.td>
       <Table.td className="font-mono text-xs !p-2">{field.type}</Table.td>

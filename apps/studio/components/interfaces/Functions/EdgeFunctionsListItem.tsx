@@ -8,13 +8,13 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import Table from 'components/to-be-cleaned/Table'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
-import { Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
 }
 
-const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) => {
+export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const { project } = useProjectContext()
@@ -46,7 +46,9 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
       </Table.td>
       <Table.td>
         <div className="text-xs text-foreground-light flex gap-2 items-center truncate">
-          <p className="font-mono truncate hidden md:inline">{endpoint}</p>
+          <p title={endpoint} className="font-mono truncate hidden md:inline max-w-[30rem]">
+            {endpoint}
+          </p>
           <button
             type="button"
             className="text-foreground-lighter hover:text-foreground transition"
@@ -82,16 +84,16 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
         </p>
       </Table.td>
       <Table.td className="lg:table-cell">
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_>
+        <Tooltip>
+          <TooltipTrigger>
             <div className="flex items-center space-x-2">
               <p className="text-sm text-foreground-light">{dayjs(item.updated_at).fromNow()}</p>
             </div>
-          </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="bottom">
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
             Last updated on {dayjs(item.updated_at).format('DD MMM, YYYY HH:mm')}
-          </TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+          </TooltipContent>
+        </Tooltip>
       </Table.td>
       <Table.td className="lg:table-cell">
         <p className="text-foreground-light">{item.version}</p>
@@ -99,5 +101,3 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
     </Table.tr>
   )
 }
-
-export default EdgeFunctionsListItem

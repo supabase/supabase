@@ -1,8 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { Query } from 'components/grid/query/Query'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { quoteLiteral } from 'lib/pg-format'
 import type { ResponseError, VaultSecret } from 'types'
 import { vaultSecretsKeys } from './keys'
 
@@ -17,10 +17,14 @@ export async function createVaultSecret({
   ...newSecret
 }: VaultSecretCreateVariables) {
   const { name, description, secret, key_id } = newSecret
-  const sql = new Query()
-    .from('secrets', 'vault')
-    .insert([{ name, description, secret, key_id }], { returning: true })
-    .toSql()
+  const sql = /* SQL */ `
+select vault.create_secret(
+    new_secret := ${quoteLiteral(secret)}
+  ${name ? `, new_name := ${quoteLiteral(name)}` : ''}
+  ${description ? `, new_description := ${quoteLiteral(description)}` : ''}
+  ${key_id ? `, new_key_id := ${quoteLiteral(key_id)}` : ''}
+)
+`
 
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result

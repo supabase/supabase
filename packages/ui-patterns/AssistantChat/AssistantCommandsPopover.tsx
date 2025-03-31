@@ -39,6 +39,8 @@ const AssistantCommandsPopover = forwardRef<
     suggestions?: string[]
     /* Whether an icon is being used in the AssistantChatForm */
     usingIcon?: boolean
+    /* Available commands in suggestions popover */
+    commands?: string[]
   }
 >(
   (
@@ -51,6 +53,7 @@ const AssistantCommandsPopover = forwardRef<
       setOpen,
       suggestions,
       usingIcon = false,
+      commands = ['fix', 'improve', 'explain', 'help'],
       ...props
     },
     ref
@@ -115,8 +118,6 @@ const AssistantCommandsPopover = forwardRef<
     }
 
     const resultArray = value.split(/(\s+)/).filter(Boolean)
-
-    const commands = ['fix', 'improve', 'explain', 'help']
 
     return (
       <>

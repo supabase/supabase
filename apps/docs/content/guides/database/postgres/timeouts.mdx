@@ -61,7 +61,7 @@ The default role timeouts are:
 
 - `anon`: 3s
 - `authenticated`: 8s
-- `service_role`: none (capped by API to be 60s)
+- `service_role`: none (defaults to the `authenticator` role's 8s timeout if unset)
 - `postgres`: none (capped by default global timeout to be 2min)
 
 Run the following query to change a role's timeout:
@@ -71,8 +71,7 @@ alter role example_role set statement_timeout = '10min'; -- could also use secon
 ```
 
 <Admonition type="tip">
-  If you are changing the timeout for the Supabase Client API calls, you will need to reload
-  postgREST to reflect the timeout changes by running the following script:
+  If you are changing the timeout for the Supabase Client API calls, you will need to reload PostgREST to reflect the timeout changes by running the following script:
 
 ```sql
 NOTIFY pgrst, 'reload config';
@@ -161,16 +160,16 @@ Go to the [Query Performance page](/dashboard/project/_/advisors/query-performan
 
 Each API server uses a designated user for connecting to the database:
 
-| Role                       | API/Tool                                                                  |
-| -------------------------- | ------------------------------------------------------------------------- |
-| supabase_admin             | Used by Supabase to configure projects and for monitoring                 |
-| authenticator              | PostgREST                                                                 |
-| supabase_auth_admin        | Auth                                                                      |
-| supabase_storage_admin     | Storage                                                                   |
-| supabase_realtime_admin    | Realtime                                                                  |
-| supabase_replication_admin | Synchronizes Read Replicas                                                |
-| postgres                   | Supabase Dashboard and External Tools (e.g., Prisma, SQLAlchemy, PSQL...) |
-| Custom roles               | External Tools (e.g., Prisma, SQLAlchemy, PSQL...)                        |
+| Role                         | API/Tool                                                                  |
+| ---------------------------- | ------------------------------------------------------------------------- |
+| `supabase_admin`             | Used by Supabase to configure projects and for monitoring                 |
+| `authenticator`              | PostgREST                                                                 |
+| `supabase_auth_admin`        | Auth                                                                      |
+| `supabase_storage_admin`     | Storage                                                                   |
+| `supabase_realtime_admin`    | Realtime                                                                  |
+| `supabase_replication_admin` | Synchronizes Read Replicas                                                |
+| `postgres`                   | Supabase Dashboard and External Tools (e.g., Prisma, SQLAlchemy, PSQL...) |
+| Custom roles                 | External Tools (e.g., Prisma, SQLAlchemy, PSQL...)                        |
 
 Filter by the `parsed.user_name` field to only retrieve logs made by specific users:
 

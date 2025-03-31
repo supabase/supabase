@@ -9,13 +9,14 @@ type PartnerData = {
   overview: string // The Markdown content for indexing
 }
 
+const supabaseUrl = process.env.NEXT_PUBLIC_MISC_USE_URL ?? process.env.NEXT_PUBLIC_MISC_URL
+const supabaseAnonKey =
+  process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY ?? process.env.NEXT_PUBLIC_MISC_ANON_KEY
+
 let supabaseClient: SupabaseClient
 function getSupabaseClient() {
   if (!supabaseClient) {
-    supabaseClient = createClient(
-      process.env.NEXT_PUBLIC_MISC_USE_URL!,
-      process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
-    )
+    supabaseClient = createClient(supabaseUrl, supabaseAnonKey)
     return supabaseClient
   }
 }

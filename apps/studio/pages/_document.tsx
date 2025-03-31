@@ -24,7 +24,6 @@ class MyDocument extends Document {
                 : `${BASE_PATH}/monaco-editor/editor/editor.main.css`
             }
           />
-          <link rel="stylesheet" type="text/css" href={`${BASE_PATH}/css/fonts.css`} />
         </Head>
         <body>
           <Main />

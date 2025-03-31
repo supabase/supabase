@@ -10,14 +10,7 @@ import SparkBar from 'components/ui/SparkBar'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import {
-  Badge,
-  Button,
-  Input,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-} from 'ui'
+import { Badge, Button, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import CreateRolePanel from './CreateRolePanel'
 import DeleteRoleModal from './DeleteRoleModal'
 import RoleRow from './RoleRow'
@@ -115,8 +108,8 @@ const RolesList = () => {
           </div>
         </div>
         <div className="flex items-center space-x-6">
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_>
+          <Tooltip>
+            <TooltipTrigger>
               <div className="w-42">
                 <SparkBar
                   type="horizontal"
@@ -143,16 +136,16 @@ const RolesList = () => {
                   labelBottomClass="text-xs"
                 />
               </div>
-            </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ align="start" side="bottom" className="space-y-1">
+            </TooltipTrigger>
+            <TooltipContent align="start" side="bottom" className="space-y-1">
               <p className="text-foreground-light pr-2">Connections by roles:</p>
               {rolesWithActiveConnections.map((role) => (
                 <div key={role.id}>
                   {role.name}: {role.activeConnections}
                 </div>
               ))}
-            </TooltipContent_Shadcn_>
-          </Tooltip_Shadcn_>
+            </TooltipContent>
+          </Tooltip>
           <ButtonTooltip
             type="primary"
             disabled={!canUpdateRoles}

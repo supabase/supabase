@@ -7,13 +7,13 @@ keywords = [ "index", "hnsw", "vector", "performance", "speed" ]
 database_id = "7d755701-747f-4c3a-b8be-236c5518e4eb"
 ---
 
-> Although this guide is specifically for HSNW indexes, it can be generalized to work for any index type
+> Although this guide is specifically for HNSW indexes, it can be generalized to work for any index type
 
 > Building an index without the `CONCURRENTLY` modifier will lock the table, but it will also increase build times. For general advice about indexes, check out this [guide](https://github.com/orgs/supabase/discussions/22449).
 
 ### **To speed up queries, it is ideal to create an HSNW index on your embedded column**
 
-The general structure for creating an hsnw index follows this pattern:
+The general structure for creating an HNSW index follows this pattern:
 
 ```sql
 CREATE INDEX <custom name of index> ON <table name> USING hnsw (<vectorized column> <search type>);
@@ -100,7 +100,7 @@ show statement_timeout;
 
 **6. Consider temporarily upgrading your compute size (optional)**
 
-If your task is particularly long, you can speed it up by boosting your computing power temporarily. Compute size is charged by the hour, so you can increase it for an hour or two to finish your task faster, then scale it back afterward. Here is a list of [compute add-ons](https://supabase.com/docs/guides/platform/compute-add-ons). If you want to temporarily upgrade, you can find the add-ons for your project in your [Dashboard's Add-Ons Settings.](https://supabase.green/dashboard/project/_/settings/addons)
+If your task is particularly long, you can speed it up by boosting your computing power temporarily. Compute size is charged by the hour, so you can increase it for an hour or two to finish your task faster, then scale it back afterwards. Here is a list of [compute add-ons](https://supabase.com/docs/guides/platform/compute-add-ons). If you want to temporarily upgrade, you can find the add-ons for your project in your [Dashboard's Add-ons Settings.](https://supabase.green/dashboard/project/_/settings/addons)
 
 **7. Consider increasing disk size (optional)**
 

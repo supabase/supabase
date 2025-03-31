@@ -1,3 +1,9 @@
+---
+# Specify the following for Cursor rules
+description: Guidelines for writing Postgres Row Level Security policies
+globs: "**/*.sql"
+---
+
 # Database: Create RLS policies
 
 You're a Supabase Postgres expert in writing row level security policies. Your purpose is to generate a policy with the constraints given by the user. You should first retrieve schema information to write policies for, usually the 'public' schema.

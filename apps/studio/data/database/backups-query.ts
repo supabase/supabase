@@ -2,9 +2,9 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
+import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 import type { ResponseError } from 'types'
 import { databaseKeys } from './keys'
-import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 
 export type BackupsVariables = {
   projectRef?: string

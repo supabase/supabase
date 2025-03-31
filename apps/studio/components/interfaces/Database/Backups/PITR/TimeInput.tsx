@@ -3,7 +3,7 @@ import { isNaN, noop } from 'lodash'
 import { Clock } from 'lucide-react'
 import { ChangeEvent, useEffect, useState } from 'react'
 
-import { Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import type { Time } from './PITR.types'
 import { formatNumberToTwoDigits, formatTimeToTimeString } from './PITR.utils'
 
@@ -91,8 +91,8 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
         ].join(' ')}
       >
         <Clock className="text-foreground-light" size={18} strokeWidth={1.5} />
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ className="w-1/4" tabIndex={-1}>
+        <Tooltip>
+          <TooltipTrigger className="w-1/4" tabIndex={-1}>
             <input
               type="text"
               maxLength={2}
@@ -105,13 +105,13 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
               onChange={(event) => onInputChange(event, 'h')}
               className="w-full text-sm bg-transparent p-0 text-center outline-none border-none focus:ring-0"
             />
-          </TooltipTrigger_Shadcn_>
+          </TooltipTrigger>
 
-          <TooltipContent_Shadcn_ side="bottom">Hours (HH)</TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+          <TooltipContent side="bottom">Hours (HH)</TooltipContent>
+        </Tooltip>
         <span>:</span>
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ className="w-1/4" tabIndex={-1}>
+        <Tooltip>
+          <TooltipTrigger className="w-1/4" tabIndex={-1}>
             <input
               type="text"
               maxLength={2}
@@ -124,13 +124,13 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
               onChange={(event) => onInputChange(event, 'm')}
               className="w-full text-sm bg-transparent p-0 text-center outline-none border-none focus:ring-0"
             />
-          </TooltipTrigger_Shadcn_>
+          </TooltipTrigger>
 
-          <TooltipContent_Shadcn_ side="bottom">Minutes (MM)</TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+          <TooltipContent side="bottom">Minutes (MM)</TooltipContent>
+        </Tooltip>
         <span>:</span>
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ className="w-1/4" tabIndex={-1}>
+        <Tooltip>
+          <TooltipTrigger className="w-1/4" tabIndex={-1}>
             <input
               type="text"
               maxLength={2}
@@ -143,9 +143,9 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
               onChange={(event) => onInputChange(event, 's')}
               className="w-full text-sm bg-transparent p-0 text-center outline-none border-none focus:ring-0"
             />
-          </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="bottom">Seconds (SS)</TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Seconds (SS)</TooltipContent>
+        </Tooltip>
       </div>
       {error && <p className="text-sm text-red-900">{error}</p>}
     </>

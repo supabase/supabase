@@ -365,6 +365,7 @@ export enum LogsTableName {
   STORAGE = 'storage_logs',
   POSTGREST = 'postgrest_logs',
   SUPAVISOR = 'supavisor_logs',
+  PGBOUNCER = 'pgbouncer_logs',
   WAREHOUSE = 'warehouse_logs',
   PG_CRON = 'pg_cron_logs',
 }
@@ -381,6 +382,7 @@ export const LOGS_TABLES = {
   supavisor: LogsTableName.SUPAVISOR,
   warehouse: LogsTableName.WAREHOUSE,
   pg_cron: LogsTableName.POSTGRES,
+  pgbouncer: LogsTableName.PGBOUNCER,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
@@ -392,22 +394,12 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.REALTIME]: 'Realtime server for Postgres logical replication broadcasting',
   [LogsTableName.STORAGE]: 'Object storage logs',
   [LogsTableName.POSTGREST]: 'RESTful API web server logs',
-  [LogsTableName.SUPAVISOR]: 'Cloud-native Postgres connection pooler logs',
+  [LogsTableName.SUPAVISOR]: 'Shared connection pooler logs for PostgreSQL',
+  [LogsTableName.PGBOUNCER]: 'Dedicated connection pooler for PostgreSQL',
   [LogsTableName.WAREHOUSE]: 'Logs obtained from a data warehouse collection',
   [LogsTableName.PG_CRON]: 'Postgres logs from pg_cron cron jobs',
 }
 
-export const genQueryParams = (params: { [k: string]: string }) => {
-  // remove keys which are empty strings, null, or undefined
-  for (const k in params) {
-    const v = params[k]
-    if (v === null || v === '' || v === undefined) {
-      delete params[k]
-    }
-  }
-  const qs = new URLSearchParams(params).toString()
-  return qs
-}
 export const FILTER_OPTIONS: FilterTableSet = {
   // Postgres logs
   postgres_logs: {

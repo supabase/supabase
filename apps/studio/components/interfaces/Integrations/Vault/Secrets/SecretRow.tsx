@@ -10,9 +10,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Input,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -108,8 +108,8 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
             <Button type="text" className="px-1" icon={<MoreVertical />} />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end" className="w-32">
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_>
+            <Tooltip>
+              <TooltipTrigger>
                 <DropdownMenuItem
                   className="space-x-2"
                   disabled={!canManageSecrets}
@@ -118,16 +118,16 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
                   <Edit3 size="14" />
                   <p>Edit</p>
                 </DropdownMenuItem>
-              </TooltipTrigger_Shadcn_>
+              </TooltipTrigger>
               {!canManageSecrets && (
-                <TooltipContent_Shadcn_ side="bottom">
+                <TooltipContent side="bottom">
                   You need additional permissions to edit secrets
-                </TooltipContent_Shadcn_>
+                </TooltipContent>
               )}
-            </Tooltip_Shadcn_>
+            </Tooltip>
 
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_>
+            <Tooltip>
+              <TooltipTrigger>
                 <DropdownMenuItem
                   className="space-x-2"
                   disabled={!canManageSecrets}
@@ -136,13 +136,13 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
                   <Trash stroke="red" size="14" />
                   <p className="text-foreground-light">Delete</p>
                 </DropdownMenuItem>
-              </TooltipTrigger_Shadcn_>
+              </TooltipTrigger>
               {!canManageSecrets && (
-                <TooltipContent_Shadcn_ side="bottom">
+                <TooltipContent side="bottom">
                   You need additional permissions to delete secrets
-                </TooltipContent_Shadcn_>
+                </TooltipContent>
               )}
-            </Tooltip_Shadcn_>
+            </Tooltip>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

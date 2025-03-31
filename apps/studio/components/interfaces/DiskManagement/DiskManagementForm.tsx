@@ -209,6 +209,7 @@ export function DiskManagementForm() {
     useUpdateDiskAttributesMutation({
       // this is to suppress to toast message
       onError: () => {},
+      onSuccess: () => setRefetchInterval(2000),
     })
   const { mutateAsync: updateSubscriptionAddon, isLoading: isUpdatingCompute } =
     useProjectAddonUpdateMutation({
@@ -241,7 +242,10 @@ export function DiskManagementForm() {
       ) {
         willUpdateDiskConfiguration = true
 
-        if (RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(payload.computeSize)) {
+        if (
+          payload.storageType === 'gp3' &&
+          RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(payload.computeSize)
+        ) {
           payload.provisionedIOPS = IOPS_RANGE[DiskType.GP3].min
         }
 
@@ -292,10 +296,10 @@ export function DiskManagementForm() {
 
   useEffect(() => {
     // Initialize field values properly when data has been loaded, preserving any user changes
-    if (isSuccess) {
+    if (isDiskAttributesSuccess || isSuccess) {
       form.reset(defaultValues, {})
     }
-  }, [isSuccess])
+  }, [isSuccess, isDiskAttributesSuccess])
 
   // Redirect logic incase disk and compute feature is not live yet
   useEffect(() => {
@@ -314,7 +318,11 @@ export function DiskManagementForm() {
             title="Compute and Disk configuration is not available on the Free Plan"
             actions={
               <Button type="default" asChild>
-                <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
+                <Link
+                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=diskManagementConfigure`}
+                >
+                  Upgrade plan
+                </Link>
               </Button>
             }
             description="You will need to upgrade to at least the Pro Plan to configure compute and disk"

@@ -11,13 +11,7 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { GB } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useMemo } from 'react'
-import {
-  badgeVariants,
-  cn,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-} from 'ui'
+import { badgeVariants, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { AUTOSCALING_THRESHOLD } from './DiskManagement.constants'
 
@@ -187,13 +181,13 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
                 className="absolute top-0 -left-0 h-full flex items-center transition-all duration-500 ease-in-out"
                 style={{ left: `${showNewSize ? newResizePercentage : resizePercentage}%` }}
               >
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild>
+                <Tooltip>
+                  <TooltipTrigger asChild>
                     <div className="absolute right-full bottom-0 border mr-2 px-2 py-1 bg-surface-400 rounded text-xs text-foreground-light whitespace-nowrap flex items-center gap-x-1">
                       Autoscaling <Info size={12} />
                     </div>
-                  </TooltipTrigger_Shadcn_>
-                  <TooltipContent_Shadcn_ side="bottom" className="w-[310px] flex flex-col gap-y-1">
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="w-[310px] flex flex-col gap-y-1">
                     <p>
                       Supabase expands your disk storage automatically when the database reached 90%
                       of the disk size. However, any disk modifications, including auto-scaling, can
@@ -203,8 +197,8 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
                       If within those 6 hours you reach 95% of the disk space, your project{' '}
                       <span className="text-destructive-600">will enter read-only mode.</span>
                     </p>
-                  </TooltipContent_Shadcn_>
-                </Tooltip_Shadcn_>
+                  </TooltipContent>
+                </Tooltip>
                 <div className="w-px h-full bg-border" />
               </div>
             </motion.div>
@@ -265,14 +259,14 @@ const LegendItem = ({
   color: string
   size: number
 }) => (
-  <Tooltip_Shadcn_>
-    <TooltipTrigger_Shadcn_ asChild>
+  <Tooltip>
+    <TooltipTrigger asChild>
       <div className="flex items-center hover:cursor-help z-10">
         <div className={cn('w-2 h-2 rounded-full mr-2', color)} />
         <span>{name}</span>
       </div>
-    </TooltipTrigger_Shadcn_>
-    <TooltipContent_Shadcn_ side="bottom" className="flex flex-col gap-y-1 max-w-xs">
+    </TooltipTrigger>
+    <TooltipContent side="bottom" className="flex flex-col gap-y-1 max-w-xs">
       <div className="flex items-center">
         <div className={cn('w-2 h-2 rounded-full mr-2', color)} />
         <span>
@@ -280,6 +274,6 @@ const LegendItem = ({
         </span>
       </div>
       <p>{description}</p>
-    </TooltipContent_Shadcn_>
-  </Tooltip_Shadcn_>
+    </TooltipContent>
+  </Tooltip>
 )

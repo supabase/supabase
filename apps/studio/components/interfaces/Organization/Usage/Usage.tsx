@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { ScaffoldContainer, ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
-import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import AlertError from 'components/ui/AlertError'
+import { DateRangePicker } from 'components/ui/DateRangePicker'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -190,7 +190,7 @@ const Usage = () => {
           >
             <DocsButton
               abbrev={false}
-              href="https://supabase.com/docs/guides/platform/org-based-billing"
+              href="https://supabase.com/docs/guides/platform/billing-on-supabase#organization-based-billing"
             />
           </Admonition>
         </ScaffoldContainer>

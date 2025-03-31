@@ -34,9 +34,9 @@ import {
   Modal,
   Radio,
   SidePanel,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   WarningIcon,
 } from 'ui'
 
@@ -282,7 +282,9 @@ const ComputeInstanceSidePanel = () => {
                   title="Changing your compute size is only available on the Pro Plan"
                   actions={
                     <Button asChild type="default">
-                      <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
+                      <Link
+                        href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=computeInstanceSidePanel`}
+                      >
                         View available plans
                       </Link>
                     </Button>
@@ -341,19 +343,19 @@ const ComputeInstanceSidePanel = () => {
                             </span>
                           </div>
                           {option.price_interval === 'hourly' && (
-                            <Tooltip_Shadcn_>
-                              <TooltipTrigger_Shadcn_>
+                            <Tooltip>
+                              <TooltipTrigger>
                                 <Info
                                   size={14}
                                   strokeWidth={2}
                                   className="hover:text-foreground-light"
                                 />
-                              </TooltipTrigger_Shadcn_>
-                              <TooltipContent_Shadcn_ side="bottom">
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom">
                                 ${Number(option.price * 672).toFixed(0)} - $
                                 {Number(option.price * 744).toFixed(0)} per month
-                              </TooltipContent_Shadcn_>
-                            </Tooltip_Shadcn_>
+                              </TooltipContent>
+                            </Tooltip>
                           )}
                         </div>
                       </div>
@@ -369,7 +371,7 @@ const ComputeInstanceSidePanel = () => {
                 usage-based item and you're billed at the end of your billing cycle based on your
                 compute usage. Read more about{' '}
                 <Link
-                  href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
+                  href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                   target="_blank"
                   rel="noreferrer"
                   className="underline"

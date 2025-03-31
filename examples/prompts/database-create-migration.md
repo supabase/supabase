@@ -1,4 +1,8 @@
-<!-- SUGGESTION: include the `code-format-sql.md` prompt for coding style. -->
+---
+# Specify the following for Cursor rules
+description: Guidelines for writing Postgres migrations
+globs: "supabase/migrations/**/*.sql"
+---
 
 # Database: Create migration
 

@@ -11,6 +11,7 @@ import {
   TotalRequestsChartRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
 import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useApiReport } from 'data/reports/api-report-query'
@@ -22,11 +23,23 @@ export const ApiReport: NextPageWithLayout = () => {
   const report = useApiReport()
   const organization = useSelectedOrganization()
 
+  const {
+    data,
+    error,
+    filters,
+    isLoading,
+    params,
+    mergeParams,
+    removeFilters,
+    addFilter,
+    refresh,
+  } = report
+
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const plan = subscription?.plan
 
   const handleDatepickerChange = ({ from, to }: DatePickerToFrom) => {
-    report.mergeParams({
+    mergeParams({
       iso_timestamp_start: from || '',
       iso_timestamp_end: to || '',
     })
@@ -37,71 +50,77 @@ export const ApiReport: NextPageWithLayout = () => {
       <ReportHeader title="API" />
       <div className="w-full flex flex-col gap-1">
         <ReportFilterBar
-          onRemoveFilters={report.removeFilters}
+          onRemoveFilters={removeFilters}
           onDatepickerChange={handleDatepickerChange}
-          datepickerFrom={report.params.totalRequests.iso_timestamp_start}
-          datepickerTo={report.params.totalRequests.iso_timestamp_end}
-          onAddFilter={report.addFilter}
-          filters={report.filters}
+          datepickerFrom={params.totalRequests.iso_timestamp_start}
+          datepickerTo={params.totalRequests.iso_timestamp_end}
+          onAddFilter={addFilter}
+          onRefresh={refresh}
+          isLoading={isLoading}
+          filters={filters}
           datepickerHelpers={REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
             ...helper,
             disabled: (index > 0 && plan?.id === 'free') || (index > 1 && plan?.id !== 'pro'),
           }))}
         />
         <div className="h-2 w-full">
-          <ShimmerLine active={report.isLoading} />
+          <ShimmerLine active={isLoading} />
         </div>
       </div>
 
       <ReportWidget
-        isLoading={report.isLoading}
-        params={report.params.totalRequests}
+        isLoading={isLoading}
+        params={params.totalRequests}
         title="Total Requests"
-        data={report.data.totalRequests || []}
-        error={report.error.totalRequest}
+        data={data.totalRequests || []}
+        error={error.totalRequest}
         renderer={TotalRequestsChartRenderer}
         append={TopApiRoutesRenderer}
-        appendProps={{ data: report.data.topRoutes || [], params: report.params.topRoutes }}
+        appendProps={{ data: data.topRoutes || [], params: params.topRoutes }}
       />
       <ReportWidget
-        isLoading={report.isLoading}
-        params={report.params.errorCounts}
+        isLoading={isLoading}
+        params={params.errorCounts}
         title="Response Errors"
         tooltip="Error responses with 4XX or 5XX status codes"
-        data={report.data.errorCounts || []}
-        error={report.error.errorCounts}
+        data={data.errorCounts || []}
+        error={error.errorCounts}
         renderer={ErrorCountsChartRenderer}
         appendProps={{
-          data: report.data.topErrorRoutes || [],
-          params: report.params.topErrorRoutes,
+          data: data.topErrorRoutes || [],
+          params: params.topErrorRoutes,
         }}
         append={TopApiRoutesRenderer}
       />
       <ReportWidget
-        isLoading={report.isLoading}
-        params={report.params.responseSpeed}
+        isLoading={isLoading}
+        params={params.responseSpeed}
         title="Response Speed"
         tooltip="Average response speed (in miliseconds) of a request"
-        data={report.data.responseSpeed || []}
-        error={report.error.responseSpeed}
+        data={data.responseSpeed || []}
+        error={error.responseSpeed}
         renderer={ResponseSpeedChartRenderer}
-        appendProps={{ data: report.data.topSlowRoutes || [], params: report.params.topSlowRoutes }}
+        appendProps={{ data: data.topSlowRoutes || [], params: params.topSlowRoutes }}
         append={TopApiRoutesRenderer}
       />
 
       <ReportWidget
-        isLoading={report.isLoading}
-        params={report.params.networkTraffic}
-        error={report.error.networkTraffic}
+        isLoading={isLoading}
+        params={params.networkTraffic}
+        error={error.networkTraffic}
         title="Network Traffic"
         tooltip="Ingress and egress of requests and responses respectively"
-        data={report.data.networkTraffic || []}
+        data={data.networkTraffic || []}
         renderer={NetworkTrafficRenderer}
       />
     </ReportPadding>
   )
 }
 
-ApiReport.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
+ApiReport.getLayout = (page) => (
+  <DefaultLayout>
+    <ReportsLayout>{page}</ReportsLayout>
+  </DefaultLayout>
+)
 
 export default ApiReport

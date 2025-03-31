@@ -23,7 +23,7 @@ The guide focuses on [psql](https://supabase.com/docs/guides/database/psql) but 
 
 Some other options include:
 
-- [pgadmin](https://supabase.com/docs/guides/database/pgadmin)
+- [pgAdmin](https://supabase.com/docs/guides/database/pgadmin)
 - [DBeaver](https://supabase.com/docs/guides/database/dbeaver)
 
 You can install PSQL in [macOS](https://stackoverflow.com/a/49689589/2188186) and [Windows](https://www.postgresql.org/download/windows/) by following these links and instructions. For Linux (Debian) you can run the following:
@@ -33,7 +33,7 @@ sudo apt-get update
 sudo apt-get install postgresql-client
 ```
 
-Once installed, you can find your PSQL string in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database). Please make sure if you are using the pooler connection that it is in session mode (port 5432).
+Once installed, you can find your PSQL string in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database). Make sure if you are using the pooler connection that it is in session mode (port 5432).
 
 <Admonition type="tip">
 
@@ -57,6 +57,6 @@ Disable timeout
 set statement_timeout = '0';
 ```
 
-If your task is particularly long, you can may want to consider boosting your computing power temporarily. Compute size on Supabase is charged by the hour, so you can increase it for an hour or two, complete your task faster, then scale it back afterward.
+If your task is particularly long, you can may want to consider boosting your computing power temporarily. Compute size on Supabase is charged by the hour, so you can increase it for an hour or two, complete your task faster, then scale it back afterwards.
 
-If you want to temporarily upgrade, you can find the add-ons for your project in your [Dashboard's Add-Ons Settings.](https://supabase.green/dashboard/project/_/settings/addons)
+If you want to temporarily upgrade, you can find the add-ons for your project in your [Dashboard's Add-ons Settings.](https://supabase.green/dashboard/project/_/settings/addons)

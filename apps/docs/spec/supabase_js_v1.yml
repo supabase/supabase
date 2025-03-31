@@ -956,9 +956,9 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Middle Earth' })
-            .match({ name: 'Auckland' })
+            .from('characters')
+            .update({ name: 'Han Solo' })
+            .match({ name: 'Han' })
           ```
       - id: updating-json-data
         name: Updating JSON data
@@ -1639,7 +1639,7 @@ functions:
           const { data, error } = await supabase
             .from('countries')
             .select('name, cities(name)')
-            .eq('name', 'United States')
+            .eq('name', 'The Shire')
             .limit(1, { foreignTable: 'cities' })
           ```
 
@@ -1664,7 +1664,7 @@ functions:
           const { data, error } = await supabase
             .from('countries')
             .select('name, cities(name)')
-            .eq('name', 'United States')
+            .eq('name', 'The Shire')
             .order('name', {foreignTable: 'cities'})
           ```
       - id: ordering-multiple-columns
@@ -1718,9 +1718,9 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .eq('name', 'Singapore')
+            .from('instruments')
+            .select('name, section_id')
+            .eq('name', 'violin')
             .maybeSingle()
           ```
 
@@ -1807,9 +1807,9 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)')
+            .from('characters')
+            .select('name, book_id')
+            .or('id.gt.20,and(name.eq.Harry,name.eq.Frodo)')
           ```
       - id: use-or-on-foreign-tables
         name: Use `or` on foreign tables
@@ -1817,9 +1817,9 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('countries')
-            .select('id, cities(*)')
-            .or('name.eq.Wellington,name.eq.Paris', { foreignTable: "cities" })
+            .from('books')
+            .select('id, characters(*)')
+            .or('name.eq.Luke,name.eq.Leia', { foreignTable: "characters" })
           ```
 
   - id: not
@@ -1829,7 +1829,7 @@ functions:
       - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
 
         ```js
-          .not('name','eq','Paris')
+          .not('name','eq','Luke')
           .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
           .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
           .not('id','in','(6,7)')  // Use Postgres list () for in filter.
@@ -1842,27 +1842,27 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .select('name, country_id')
-            .not('name', 'eq', 'Paris')
+            .not('name', 'eq', 'The Shire')
           ```
       - id: with-update
         name: With `update()`
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .update({ name: 'Mordor' })
-            .not('name', 'eq', 'Paris')
+            .not('name', 'eq', 'Rohan')
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .delete()
-            .not('name', 'eq', 'Paris')
+            .not('name', 'eq', 'The Shire')
           ```
       - id: with-rpc
         name: With `rpc()`
@@ -1870,8 +1870,8 @@ functions:
           ```js
           // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .not('name', 'eq', 'Paris')
+            .rpc('echo_all_countries')
+            .not('name', 'eq', 'The Shire')
           ```
 
   - id: match
@@ -1884,27 +1884,27 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .match({name: 'Beijing', country_id: 156})
+            .from('characters')
+            .select('name, book_id')
+            .match({name: 'Harry', book_id: 156})
           ```
       - id: with-update
         name: With `update()`
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
-            .update({ name: 'Mordor' })
-            .match({name: 'Beijing', country_id: 156})
+            .from('instruments')
+            .update({ name: 'piano' })
+            .match({name: 'harpsichord', section_id: 2})
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .delete()
-            .match({name: 'Beijing', country_id: 156})
+            .match({name: 'The Shire', country_id: 156})
           ```
       - id: with-rpc
         name: With `rpc()`
@@ -1912,8 +1912,8 @@ functions:
           ```js
           // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .match({name: 'Beijing', country_id: 156})
+            .rpc('echo_all_characters')
+            .match({name: 'Frodo', book_id: 156})
           ```
 
   - id: eq
@@ -1935,16 +1935,16 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .update({ name: 'Mordor' })
-            .eq('name', 'San Francisco')
+            .eq('name', 'Rohan')
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .delete()
             .eq('name', 'Mordor')
           ```
@@ -1954,8 +1954,8 @@ functions:
           ```js
           // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .eq('name', 'San Francisco')
+            .rpc('echo_all_countries')
+            .eq('name', 'Mordor')
           ```
 
   - id: neq
@@ -1977,16 +1977,16 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .update({ name: 'Mordor' })
-            .neq('name', 'San Francisco')
+            .neq('name', 'Gondor')
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .delete()
             .neq('name', 'Mordor')
           ```
@@ -1996,8 +1996,8 @@ functions:
           ```js
           // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .neq('name', 'Lagos')
+            .rpc('echo_all_countries')
+            .neq('name', 'Mordor')
           ```
 
   - id: gt
@@ -2304,27 +2304,27 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .in('name', ['Rio de Janeiro', 'San Francisco'])
+            .from('characters')
+            .select('name, book_id')
+            .in('name', ['Harry', 'Hermione'])
           ```
       - id: with-update
         name: With `update()`
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .update({ name: 'Mordor' })
-            .in('name', ['Rio de Janeiro', 'San Francisco'])
+            .in('name', ['Gondor', 'Rohan'])
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('characters')
             .delete()
-            .in('name', ['Rio de Janeiro', 'San Francisco'])
+            .in('name', ['Dumbledore', 'Snape'])
           ```
       - id: with-rpc
         name: With `rpc()`
@@ -2332,8 +2332,8 @@ functions:
           ```js
           // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .in('name', ['Rio de Janeiro', 'San Francisco'])
+            .rpc('echo_all_characters')
+            .in('name', ['Luke', 'Leia'])
           ```
 
   - id: contains
@@ -2781,27 +2781,27 @@ functions:
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .filter('name', 'in', '("Paris","Tokyo")')
+            .from('characters')
+            .select('name, book_id')
+            .filter('name', 'in', '("Harry","Hermione")')
           ```
       - id: with-update
         name: With `update()`
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .update({ name: 'Mordor' })
-            .filter('name', 'in', '("Paris","Tokyo")')
+            .filter('name', 'in', '("Gondor","Rohan")')
           ```
       - id: with-delete
         name: With `delete()`
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
+            .from('countries')
             .delete()
-            .filter('name', 'in', '("Paris","Tokyo")')
+            .filter('name', 'in', '("Mordor","The Shire")')
           ```
       - id: with-rpc
         name: With `rpc()`
@@ -2809,15 +2809,15 @@ functions:
           ```js
           // Only valid if the Postgres function returns a table type.
           const { data, error } = await supabase
-            .rpc('echo_all_cities')
-            .filter('name', 'in', '("Paris","Tokyo")')
+            .rpc('echo_all_countries')
+            .filter('name', 'in', '("Mordor","The Shire")')
           ```
       - id: filter-embedded-resources
         name: Filter embedded resources
         code: |
           ```js
           const { data, error } = await supabase
-            .from('cities')
-            .select('name, countries ( name )')
-            .filter('countries.name', 'in', '("France","Japan")')
+            .from('instruments')
+            .select('name, orchestral_sections ( name )')
+            .filter('orchestral_sections.name', 'in', '("strings","woodwinds")')
           ```

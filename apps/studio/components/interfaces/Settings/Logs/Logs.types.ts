@@ -35,6 +35,7 @@ export interface PreviewLogData extends CustomLogData {
   timestamp: number
   event_message: string
   metadata?: Metadata
+  [key: string]: string | number | Metadata | undefined
 }
 export type LogData = CustomLogData & PreviewLogData
 
@@ -52,6 +53,7 @@ export interface CountData {
 
 export interface EventChartData extends Datum {
   error_count: number
+  warning_count: number
   ok_count: number
   timestamp: string
 }
@@ -90,6 +92,7 @@ export type QueryType =
   | 'postgrest'
   | 'warehouse'
   | 'pg_cron'
+  | 'pgbouncer'
 
 export type Mode = 'simple' | 'custom'
 

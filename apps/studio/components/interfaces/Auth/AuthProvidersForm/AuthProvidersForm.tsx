@@ -2,21 +2,26 @@ import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
+import {
+  ScaffoldSection,
+  ScaffoldSectionDescription,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
+import { ResourceList } from 'components/ui/Resource/ResourceList'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers/Shimmers'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   WarningIcon,
 } from 'ui'
 import { getPhoneProviderValidationSchema, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
-import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
-import ProviderForm from './ProviderForm'
+import type { Provider } from './AuthProvidersForm.types'
+import { ProviderForm } from './ProviderForm'
 
-const AuthProvidersForm = () => {
+export const AuthProvidersForm = () => {
   const { ref: projectRef } = useParams()
   const {
     isLoading,
@@ -27,11 +32,11 @@ const AuthProvidersForm = () => {
   } = useAuthConfigQuery({ projectRef })
 
   return (
-    <div>
-      <FormHeader
-        title="Auth Providers"
-        description="Authenticate your users through a suite of providers and login methods"
-      />
+    <ScaffoldSection isFullWidth>
+      <ScaffoldSectionTitle>Auth Providers</ScaffoldSectionTitle>
+      <ScaffoldSectionDescription className="mb-4">
+        Authenticate your users through a suite of providers and login methods
+      </ScaffoldSectionDescription>
 
       <div className="-space-y-px">
         {authConfig?.EXTERNAL_EMAIL_ENABLED && authConfig?.MAILER_OTP_EXP > 3600 && (
@@ -56,41 +61,54 @@ const AuthProvidersForm = () => {
             </div>
           </Alert_Shadcn_>
         )}
-        {isLoading &&
-          PROVIDERS_SCHEMAS.map((provider) => {
-            return (
+        <ResourceList>
+          {isLoading &&
+            PROVIDERS_SCHEMAS.map((provider) => (
               <div
                 key={`provider_${provider.title}`}
-                className={[...ProviderCollapsibleClasses, 'px-6 py-3'].join(' ')}
+                className="py-4 px-6 border-b last:border-b-none"
               >
                 <HorizontalShimmerWithIcon />
               </div>
-            )
-          })}
-        {isError && (
-          <Alert_Shadcn_ variant="destructive">
-            <WarningIcon />
-            <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-        )}
-        {isSuccess &&
-          PROVIDERS_SCHEMAS.map((provider) => {
-            const providerSchema =
-              provider.title === 'Phone'
-                ? { ...provider, validationSchema: getPhoneProviderValidationSchema(authConfig) }
-                : provider
-            return (
-              <ProviderForm
-                key={`provider_${providerSchema.title}`}
-                config={authConfig}
-                provider={providerSchema as any}
-              />
-            )
-          })}
+            ))}
+          {isSuccess &&
+            PROVIDERS_SCHEMAS.map((provider) => {
+              const providerSchema =
+                provider.title === 'Phone'
+                  ? { ...provider, validationSchema: getPhoneProviderValidationSchema(authConfig) }
+                  : provider
+              let isActive = false
+              if (providerSchema.title === 'SAML 2.0') {
+                isActive = authConfig && (authConfig as any)['SAML_ENABLED']
+              } else if (providerSchema.title === 'LinkedIn (OIDC)') {
+                isActive = authConfig && (authConfig as any)['EXTERNAL_LINKEDIN_OIDC_ENABLED']
+              } else if (providerSchema.title === 'Slack (OIDC)') {
+                isActive = authConfig && (authConfig as any)['EXTERNAL_SLACK_OIDC_ENABLED']
+              } else {
+                isActive =
+                  authConfig &&
+                  (authConfig as any)[`EXTERNAL_${providerSchema.title.toUpperCase()}_ENABLED`]
+              }
+              return (
+                <ProviderForm
+                  key={`provider_${providerSchema.title}`}
+                  config={authConfig!}
+                  provider={providerSchema as unknown as Provider}
+                  isActive={isActive}
+                />
+              )
+            })}
+          {isError && (
+            <Alert_Shadcn_ variant="destructive">
+              <WarningIcon />
+              <AlertTitle_Shadcn_>Failed to retrieve auth configuration</AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                {(authConfigError as any)?.message}
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          )}
+        </ResourceList>
       </div>
-    </div>
+    </ScaffoldSection>
   )
 }
-
-export default AuthProvidersForm

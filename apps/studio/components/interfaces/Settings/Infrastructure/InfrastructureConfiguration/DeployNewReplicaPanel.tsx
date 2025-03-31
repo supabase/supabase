@@ -301,7 +301,7 @@ const DeployNewReplicaPanel = ({
                   <Link
                     href={
                       isFreePlan
-                        ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
+                        ? `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelSmallCompute`
                         : diskAndComputeFormEnabled
                           ? `/project/${projectRef}/settings/compute-and-disk`
                           : `/project/${projectRef}/settings/addons?panel=computeInstance`
@@ -400,7 +400,7 @@ const DeployNewReplicaPanel = ({
                       <Link
                         href={
                           isFreePlan
-                            ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
+                            ? `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelMaxReplicas`
                             : diskAndComputeFormEnabled
                               ? `/project/${projectRef}/settings/compute-and-disk`
                               : `/project/${projectRef}/settings/addons?panel=computeInstance`
@@ -528,7 +528,7 @@ const DeployNewReplicaPanel = ({
             <p className="text-foreground-light text-sm">
               Read more about{' '}
               <Link
-                href="https://supabase.com/docs/guides/platform/org-based-billing#read-replicas"
+                href="https://supabase.com/docs/guides/platform/manage-your-usage/read-replicas"
                 target="_blank"
                 rel="noreferrer"
                 className="underline hover:text-foreground transition"
