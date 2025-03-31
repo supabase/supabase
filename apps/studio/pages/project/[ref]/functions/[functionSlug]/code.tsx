@@ -8,6 +8,7 @@ import LogoLoader from '@ui/components/LogoLoader'
 import { useParams } from 'common'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
+import { DeployEdgeFunctionWarningModal } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
 import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
 import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
@@ -29,6 +30,7 @@ const CodePage = () => {
   const edgeFunctionCreate = useFlag('edgeFunctionCreate')
   const { mutate: sendEvent } = useSendEventMutation()
   const org = useSelectedOrganization()
+  const [showDeployWarning, setShowDeployWarning] = useState(false)
 
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
   const {
@@ -158,7 +160,7 @@ const CodePage = () => {
   // TODO (Saxon): Remove this once the flag is fully launched
   useEffect(() => {
     if (!edgeFunctionCreate) {
-      router.push(`/project/${ref}/functions`)
+      // router.push(`/project/${ref}/functions`)
     }
   }, [edgeFunctionCreate, ref, router])
 
@@ -199,9 +201,37 @@ const CodePage = () => {
     }
   }, [functionFiles, selectedFunction])
 
+  const handleDeployClick = () => {
+    if (files.length === 0 || isLoadingFiles) return
+    setShowDeployWarning(true)
+    sendEvent({
+      action: 'edge_function_deploy_updates_button_clicked',
+      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+    })
+  }
+
+  const handleDeployCancel = () => {
+    setShowDeployWarning(false)
+  }
+
+  const handleDeployConfirm = () => {
+    sendEvent({
+      action: 'edge_function_deploy_updates_confirm_clicked',
+      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+    })
+    onUpdate()
+    setShowDeployWarning(false)
+  }
+
   return (
     <div className="flex flex-col h-full">
       {renderContent()}
+
+      <DeployEdgeFunctionWarningModal
+        visible={showDeployWarning}
+        onCancel={handleDeployCancel}
+        onConfirm={handleDeployConfirm}
+      />
 
       {!isErrorLoadingFiles && (
         <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 shrink-0">
@@ -209,13 +239,7 @@ const CodePage = () => {
             loading={isDeploying}
             size="medium"
             disabled={files.length === 0 || isLoadingFiles}
-            onClick={() => {
-              onUpdate()
-              sendEvent({
-                action: 'edge_function_deploy_updates_button_clicked',
-                groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-              })
-            }}
+            onClick={handleDeployClick}
             iconRight={
               isDeploying ? (
                 <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />

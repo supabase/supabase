@@ -1072,6 +1072,28 @@ export interface EdgeFunctionDeployButtonClickedEvent {
 }
 
 /**
+ * User clicked the confirm deploy button for an Edge Function.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions/new
+ */
+export interface EdgeFunctionDeployUpdatesConfirmClickedEvent {
+  action: 'edge_function_deploy_updates_confirm_clicked'
+  properties: {
+    /**
+     * Click on Deploy Confirm happens:
+     *   1. in the functions editor page within the warning modal
+     */
+    origin: 'functions_editor'
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
  * User clicked the AI Assistant button to create an Edge Function.
  *
  * @group Events
@@ -1274,6 +1296,7 @@ export type TelemetryEvent =
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
   | EdgeFunctionDeployButtonClickedEvent
+  | EdgeFunctionDeployUpdatesConfirmClickedEvent
   | EdgeFunctionAiAssistantButtonClickedEvent
   | EdgeFunctionViaEditorButtonClickedEvent
   | EdgeFunctionTemplateClickedEvent
