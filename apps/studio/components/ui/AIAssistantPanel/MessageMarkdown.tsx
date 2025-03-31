@@ -150,7 +150,15 @@ export const MarkdownPre = ({
 }: {
   children: any
   id: string
-  onResults: ({ resultId, results }: { resultId?: string; results: any[] }) => void
+  onResults: ({
+    messageId,
+    resultId,
+    results,
+  }: {
+    messageId: string
+    resultId?: string
+    results: any[]
+  }) => void
 }) => {
   const router = useRouter()
   const { profile } = useProfile()
@@ -207,7 +215,7 @@ export const MarkdownPre = ({
 
   const onResultsReturned = useCallback(
     (results: any[]) => {
-      onResults({ resultId: snippetProps.id, results })
+      onResults({ messageId: id, resultId: snippetProps.id, results })
     },
     [onResults, snippetProps.id]
   )
@@ -248,7 +256,7 @@ export const MarkdownPre = ({
             runQuery={!results && runQuery}
             results={results}
             onRunQuery={onRunQuery}
-            onResults={(results) => onResultsReturned(results)}
+            onResults={onResultsReturned}
             onUpdateChartConfig={({ chartConfig: config }) => {
               chartConfig.current = { ...chartConfig.current, ...config }
             }}

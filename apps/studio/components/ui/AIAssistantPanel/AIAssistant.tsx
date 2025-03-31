@@ -55,7 +55,15 @@ const MemoizedMessage = memo(
   }: {
     message: MessageType
     isLoading: boolean
-    onResults: ({ resultId, results }: { resultId?: string; results: any[] }) => void
+    onResults: ({
+      messageId,
+      resultId,
+      results,
+    }: {
+      messageId: string
+      resultId?: string
+      results: any[]
+    }) => void
   }) => {
     return (
       <Message
@@ -183,6 +191,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       resultId?: string
       results: any[]
     }) => {
+      console.log('Update message', { id: messageId, resultId, results })
       snap.updateMessage({ id: messageId, resultId, results })
     },
     [snap]
@@ -196,7 +205,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             key={message.id}
             message={message}
             isLoading={isChatLoading && message.id === chatMessages[chatMessages.length - 1].id}
-            onResults={(props) => updateMessage({ messageId: message.id, ...props })}
+            onResults={updateMessage}
           />
         )
       }),

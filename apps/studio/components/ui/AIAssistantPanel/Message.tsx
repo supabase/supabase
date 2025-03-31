@@ -29,7 +29,15 @@ interface MessageProps {
   readOnly?: boolean
   action?: React.ReactNode
   variant?: 'default' | 'warning'
-  onResults: ({ resultId, results }: { resultId?: string; results: any[] }) => void
+  onResults: ({
+    messageId,
+    resultId,
+    results,
+  }: {
+    messageId: string
+    resultId?: string
+    results: any[]
+  }) => void
 }
 
 export const Message = function Message({
