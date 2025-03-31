@@ -76,7 +76,7 @@ response = supabase.auth.link_identity({'provider': 'google'})
 </TabPanel>
 </Tabs>
 
-In the example above, the user will be redirected to Google to complete the OAuth2.0 flow. Once the OAuth2.0 flow has completed successfully, the user will be redirected back to the application and the Google identity will be linked to the user. You can enable manual linking from your project's authentication [configuration options](/dashboard/project/_/settings/auth) or by setting the environment variable `GOTRUE_SECURITY_MANUAL_LINKING_ENABLED: true` when self-hosting.
+In the example above, the user will be redirected to Google to complete the OAuth2.0 flow. Once the OAuth2.0 flow has completed successfully, the user will be redirected back to the application and the Google identity will be linked to the user. You can enable manual linking from your project's authentication [configuration options](/dashboard/project/_/settings/auth) or by setting the environment variable `enable_manual_linking = true` in the `config.toml` when self-hosting.
 
 ## Unlink an identity
 
