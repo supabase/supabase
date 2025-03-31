@@ -1,7 +1,7 @@
 type supportedFrameworks = 'nextjs' | 'react-router' | 'tanstack' | 'react'
 export interface NavItem {
   title: string
-  href: string
+  href?: string
   disabled?: boolean
   external?: boolean
   icon?: any // to do: clean up later | keyof typeof Icons
