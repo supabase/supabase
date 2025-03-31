@@ -1,8 +1,5 @@
-import SideNavigation from '@/components/side-navigation'
-import Sidebar from '@/components/sidebar'
+import { Sidebar } from '@/components/sidebar'
 import { SiteFooter } from '@/components/site-footer'
-// import ThemeSettings from '@/components/theme-settings'
-import TopNavigation from '@/components/top-navigation'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -11,7 +8,6 @@ interface AppLayoutProps {
 export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <>
-      {/* <TopNavigation /> */}
       {/* main container */}
       <div className="pt-10 md:pt-0">
         {/* main content */}

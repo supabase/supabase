@@ -1,0 +1,65 @@
+---
+title: 'Supabase Auth: Bring Your Own Clerk'
+description: Use Clerk with Supabase via official third-party auth support
+categories:
+  - product
+  - launch-week
+tags:
+  - launch-week
+  - auth
+date: '2025-03-31'
+toc_depth: 3
+author: stojan
+image: lw14-clerk-tpa-pricing/clerk-tpa-pricing-og.png
+thumb: lw14-clerk-tpa-pricing/clerk-tpa-pricing-thumb.png
+---
+
+Supabase is a modular platform. You can choose which products you use: one or all. Using Supabase Auth is one way to add authentication to your application, but it’s not the only choice. This is why today we're expanding our [third-party auth integrations](https://supabase.com/docs/guides/auth/third-party/overview) to officially include [Clerk](https://clerk.com).
+
+![Clerk TPA diagram](/images/blog/lw14-clerk-tpa-pricing/clerk-tpa-diagram.png)
+
+If you already have a Clerk instance, just visit Clerk’s [Connect with Supabase](https://dashboard.clerk.com/setup/supabase) page to get it set up in a few clicks.
+
+Register your instance's domain [in the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/third-party) or in the CLI:
+
+```toml
+[auth.third_party.clerk]
+enabled = true
+domain = "example.clerk.accounts.dev"
+```
+
+In your JavaScript app all you need to do is write the following code:
+
+```tsx
+import { createClient } from '@supabase/supabase-js'
+
+const SUPABASE_URL = 'https://<supabase-project>.supabase.co'
+const SUPABASE_ANON_KEY = '<SUPABASE_ANON_KEY>'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  accessToken: () => {
+    return Clerk.session?.getToken()
+  },
+})
+```
+
+[Read the docs](https://supabase.com/docs/guides/auth/third-party/clerk) on how to set up your app in Flutter or Swift (iOS), and how to use Postgres row-level security (RLS) policies.
+
+Some of you already know, but using Clerk with Supabase was [already possible](https://supabase.com/partners/integrations/clerk). It wasn't ideal though. Sharing the project's secret (not great for security) and JWT templates from Clerk were odd requirements. This new integration does not suffer from the same flaws. Now you can enjoy better security, and the same developer experience you’ve come to expect from all Supabase products.
+
+## Third-Party Auth is now a lot cheaper
+
+One more thing. Today we're making third-party auth cheaper. Third-party auth providers with Supabase now has pricing parity with Supabase Auth. This means up to 50,000 MAU on the Free plan, or 100,000 MAU on the Pro plan and $0.00325 per MAU above that number.
+
+|            | Free Plan        | Pro Plan              |
+| ---------- | ---------------- | --------------------- |
+| Previously | 50 MAUs included | 50,000 MAUs included  |
+| Now        | 50 MAUs included | 100,000 MAUs included |
+
+## Get started today
+
+Supabase Auth makes it easy to implement authentication and authorization in your app. We provide client SDKs and API endpoints to help you create and manage users.
+
+- [Read the documentation](https://supabase.com/docs/guides/auth) for Supabase Auth
+- [Learn how to use Clerk with Supabase](https://supabase.com/docs/guides/auth/third-party/clerk)
+- [Sign up for Supabase](https://supabase.com/dashboard/sign-up) and get started today

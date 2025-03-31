@@ -39,7 +39,7 @@ export default function Home() {
                       UI Blocks for Supabase Projects
                     </h1>
                     <h2 className="text-lg text-foreground-light mb-4">
-                      A collection of components and blocks built on the Shadcn UI library that
+                      A collection of components and blocks built on the shadcn/ui library that
                       connect your front-end to your Supabase back-end via a single command.
                     </h2>
                     <Button_Shadcn_ variant="secondary" size="lg" className="mt-4">
@@ -80,8 +80,8 @@ export default function Home() {
                 className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative"
               >
                 <div className="-mt-4 flex rounded-lg overflow-hidden">
-                  <BlockPreview name="realtime-cursor" isPair />
-                  <BlockPreview name="realtime-cursor" isPair />
+                  <BlockPreview name="realtime-cursor-demo" isPair />
+                  <BlockPreview name="realtime-cursor-demo" isPair />
                 </div>
               </div>
               <HorizontalGridLine />
@@ -139,6 +139,24 @@ export default function Home() {
                 </div>
               </div>
               <HorizontalGridLine />
+
+              {/* Realtime Chat */}
+              <div
+                data-grid-item
+                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative"
+              >
+                Realtime Chat
+              </div>
+              <HorizontalGridLine />
+              <div
+                data-grid-item
+                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative"
+              >
+                <div className="-mt-4 flex rounded-lg overflow-hidden">
+                  <BlockPreview name="realtime-chat-demo" isPair />
+                  <BlockPreview name="realtime-chat-demo" isPair />
+                </div>
+              </div>
             </div>
           </div>
         </div>

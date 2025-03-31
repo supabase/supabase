@@ -6,7 +6,8 @@
   "description": "Component which renders realtime cursors from other users in a room.",
   "dependencies": [
     "lucide-react",
-    "@supabase/ssr@latest"
+    "@supabase/ssr@latest",
+    "@supabase/supabase-js@latest"
   ],
   "registryDependencies": [],
   "files": [
