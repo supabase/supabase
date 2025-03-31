@@ -32,7 +32,7 @@ export function LW14Banner() {
           )}
         >
           <p className="flex gap-1.5 items-center ">{announcement.text}</p>
-          <div className="hidden sm:block text-foreground-lighter">A week of new features</div>
+          <div className="hidden sm:block text-foreground-lighter">Supabase UI Library</div>
           <Button size="tiny" type="default" className="px-2 !leading-none text-xs" asChild>
             <Link href={announcement.link}>{announcement.cta}</Link>
           </Button>
