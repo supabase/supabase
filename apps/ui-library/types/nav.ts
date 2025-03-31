@@ -1,5 +1,4 @@
-// import { Icons } from '@/components/icons'
-
+type supportedFrameworks = 'nextjs' | 'react-router' | 'tanstack' | 'react'
 export interface NavItem {
   title: string
   href?: string
@@ -7,6 +6,7 @@ export interface NavItem {
   external?: boolean
   icon?: any // to do: clean up later | keyof typeof Icons
   label?: string
+  supportedFrameworks?: supportedFrameworks[]
 }
 
 export interface NavItemWithChildren extends NavItem {

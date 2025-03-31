@@ -8,15 +8,9 @@ import { useTheme } from 'next-themes'
 import { Button } from 'ui/src/components/Button'
 import { cn } from 'ui'
 
-const LW14BGDark =
-  'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/images/launch-week/lw13/assets/lw13-banner-dark.png?t=2024-11-22T23%3A10%3A37.646Z'
-const LW14BGLight =
-  'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/images/launch-week/lw13/assets/lw13-banner-light.png?t=2024-11-22T23%3A10%3A37.646Z'
-
 export function LW14Banner() {
   const pathname = usePathname()
   const { resolvedTheme } = useTheme()
-  const bgImage = resolvedTheme?.includes('dark') ? LW14BGDark : LW14BGLight
   const isHomePage = pathname === '/'
   const isLaunchWeekPage =
     pathname === '/launch-week' || pathname?.includes('/launch-week/tickets/')
@@ -44,15 +38,6 @@ export function LW14Banner() {
           </Button>
         </div>
       </div>
-      <Image
-        src={bgImage}
-        alt=""
-        fill
-        sizes="100%"
-        quality={100}
-        aria-hidden
-        className="absolute not-sr-only object-cover z-0 inset-0 w-full h-auto"
-      />
     </div>
   )
 }

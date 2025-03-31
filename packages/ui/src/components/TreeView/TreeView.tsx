@@ -9,6 +9,9 @@ import { Input } from '../shadcn/ui/input'
 
 const TreeView = TreeViewPrimitive
 
+const CHEVRON_ICON_SIZE = 14
+const ENTITY_ICON_SIZE = 16
+
 export type TreeViewItemVariantProps = VariantProps<typeof TreeViewItemVariant>
 export const TreeViewItemVariant = cva(
   // [Joshen Temp]: aria-selected:text-foreground not working as aria-selected property not rendered in DOM,
@@ -50,7 +53,7 @@ const TreeViewItem = forwardRef<
     /** Specifies if the item is selected */
     isSelected?: boolean
     /** The horizontal padding of the item */
-    xPadding: number
+    xPadding?: number
     /** name of entity */
     name: string
     /** icon of entity */
@@ -68,7 +71,7 @@ const TreeViewItem = forwardRef<
   (
     {
       level = 1,
-      levelPadding = 56,
+      levelPadding = 38,
       isExpanded = false,
       isOpened = false,
       isBranch = false,
@@ -161,32 +164,24 @@ const TreeViewItem = forwardRef<
         aria-expanded={!isEditing && isExpanded}
         onDoubleClick={onDoubleClick}
         {...props}
-        className={cn(props.className, TreeViewItemVariant({ isSelected, isOpened, isPreview }))}
+        className={cn(TreeViewItemVariant({ isSelected, isOpened, isPreview }), props.className)}
         style={{
-          paddingLeft:
-            level === 1 && !isBranch
-              ? xPadding
-              : level
-                ? levelPadding * (level - 1) + xPadding + (!isBranch ? 0 : 0)
-                : levelPadding,
+          paddingLeft: xPadding + ((level - 1) * levelPadding) / 2,
           ...props.style,
         }}
         data-treeview-is-branch={isBranch}
         data-treeview-level={level}
       >
-        {level && level > 1 && (
+        {Array.from({ length: level - 1 }).map((_, i) => (
           <div
+            key={i}
             style={{
-              left: (levelPadding / 2 + 4) * (level - 1) + xPadding,
+              left: xPadding + (i * levelPadding) / 2 + CHEVRON_ICON_SIZE / 2,
             }}
-            className={
-              'absolute h-full w-px group-data-[treeview-is-branch=false]:bg-border-strong'
-            }
+            className={'absolute h-full w-px bg-border-strong'}
           ></div>
-        )}
-        {/* [Joshen] Temp fix as the white border on the left was not showing up via group-aria-selected */}
+        ))}
         {isSelected && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
-        {/* <div className="absolute left-0 h-full w-0.5 group-aria-selected:bg-foreground" /> */}
         {isBranch ? (
           <>
             {isLoading ? (
@@ -200,7 +195,8 @@ const TreeViewItem = forwardRef<
                   'transition-transform duration-200',
                   'group-aria-expanded:rotate-90'
                 )}
-                size={14}
+                size={CHEVRON_ICON_SIZE}
+                strokeWidth={1.5}
               />
             )}
             <TreeViewFolderIcon
@@ -211,7 +207,7 @@ const TreeViewItem = forwardRef<
                 'group-aria-expanded:text-foreground-light'
               )}
               isOpen={isExpanded}
-              size={16}
+              size={ENTITY_ICON_SIZE}
               strokeWidth={1.5}
             />
           </>
@@ -225,7 +221,7 @@ const TreeViewItem = forwardRef<
                 'w-5 h-5 shrink-0',
                 '-ml-0.5'
               )}
-              size={16}
+              size={ENTITY_ICON_SIZE}
               strokeWidth={1.5}
             />
           )

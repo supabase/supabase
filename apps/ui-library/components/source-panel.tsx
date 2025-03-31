@@ -3,9 +3,8 @@ import Link from 'next/link'
 import { forwardRef } from 'react'
 
 import { ExternalLink } from 'lucide-react'
-import { Button } from 'ui'
-import { cn } from 'ui/src/lib/utils/cn'
 import Image from 'next/image'
+import { Button, cn } from 'ui'
 
 const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> & { doc: Doc }>(
   ({ doc, children, ...props }, ref) => {

@@ -15,6 +15,13 @@
   <pubDate>Mon, 31 Mar 2025 00:00:00 -0700</pubDate>
 </item>
 <item>
+  <guid>https://supabase.com/blog/postgres-language-server</guid>
+  <title>Postgres Language Server: Initial Release</title>
+  <link>https://supabase.com/blog/postgres-language-server</link>
+  <description>Language Server Protocol and collection of language tools for Postgres</description>
+  <pubDate>Sat, 29 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/migrating-from-fauna-to-supabase</guid>
   <title>Migrating from Fauna to Supabase</title>
   <link>https://supabase.com/blog/migrating-from-fauna-to-supabase</link>

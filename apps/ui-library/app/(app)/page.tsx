@@ -1,7 +1,7 @@
 import { BlockPreview } from '@/components/block-preview'
 import { ComponentPreview } from '@/components/component-preview'
-import { Button } from '@/registry/default/components/ui/button'
 import Link from 'next/link'
+import { Button_Shadcn_ } from 'ui'
 
 // Horizontal grid line component
 const HorizontalGridLine = () => <div className="col-span-12 h-px bg-border/30" />
@@ -33,19 +33,18 @@ export default function Home() {
                 data-grid-item
                 className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-8 pb-8"
               >
-                <div className="flex flex-col gap-8 justify-start pt-32">
+                <div className="flex flex-col gap-8 justify-start pt-16 md:pt-32">
                   <div className="max-w-2xl">
                     <h1 className="text-4xl text-foreground mb-3 font-medium tracking-tight">
                       UI Blocks for Supabase Projects
                     </h1>
                     <h2 className="text-lg text-foreground-light mb-4">
-                      A set of beautifully-designed, accessible components that connect your
-                      Supabase back-end to your front-end. Works with your favorite frameworks. Open
-                      Source. Open Code.
+                      A collection of components and blocks built on the shadcn/ui library that
+                      connect your front-end to your Supabase back-end via a single command.
                     </h2>
-                    <Button variant="secondary" size="lg" className="mt-4">
+                    <Button_Shadcn_ variant="secondary" size="lg" className="mt-4">
                       <Link href="/docs/getting-started/quickstart">Get Started</Link>
-                    </Button>
+                    </Button_Shadcn_>
                   </div>
                 </div>
               </div>
@@ -63,7 +62,7 @@ export default function Home() {
                 className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative"
               >
                 <div className="-mt-4">
-                  <BlockPreview name="password-based-auth/sign-up" />
+                  <BlockPreview name="password-based-auth/auth/sign-up" />
                 </div>
               </div>
               <HorizontalGridLine />
@@ -81,8 +80,8 @@ export default function Home() {
                 className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative"
               >
                 <div className="-mt-4 flex rounded-lg overflow-hidden">
-                  <BlockPreview name="realtime-cursor" isPair />
-                  <BlockPreview name="realtime-cursor" isPair />
+                  <BlockPreview name="realtime-cursor-demo" isPair />
+                  <BlockPreview name="realtime-cursor-demo" isPair />
                 </div>
               </div>
               <HorizontalGridLine />
@@ -140,6 +139,24 @@ export default function Home() {
                 </div>
               </div>
               <HorizontalGridLine />
+
+              {/* Realtime Chat */}
+              <div
+                data-grid-item
+                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative"
+              >
+                Realtime Chat
+              </div>
+              <HorizontalGridLine />
+              <div
+                data-grid-item
+                className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative"
+              >
+                <div className="-mt-4 flex rounded-lg overflow-hidden">
+                  <BlockPreview name="realtime-chat-demo" isPair />
+                  <BlockPreview name="realtime-chat-demo" isPair />
+                </div>
+              </div>
             </div>
           </div>
         </div>
