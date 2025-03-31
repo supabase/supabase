@@ -42,10 +42,17 @@ const CodePage = () => {
     isLoading: isLoadingFiles,
     isError: isErrorLoadingFiles,
     error: filesError,
-  } = useEdgeFunctionBodyQuery({
-    projectRef: ref,
-    slug: functionSlug,
-  })
+  } = useEdgeFunctionBodyQuery(
+    {
+      projectRef: ref,
+      slug: functionSlug,
+    },
+    {
+      retry: false,
+      refetchOnWindowFocus: false,
+      retryOnMount: false,
+    }
+  )
   const [files, setFiles] = useState<
     { id: number; name: string; content: string; selected?: boolean }[]
   >([])
