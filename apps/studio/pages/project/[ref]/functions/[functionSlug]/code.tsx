@@ -144,7 +144,6 @@ const CodePage = () => {
   const handleDeployConfirm = () => {
     sendEvent({
       action: 'edge_function_deploy_updates_confirm_clicked',
-      properties: { origin: 'functions_editor' },
       groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
     onUpdate()

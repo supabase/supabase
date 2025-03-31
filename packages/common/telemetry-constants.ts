@@ -1080,13 +1080,6 @@ export interface EdgeFunctionDeployButtonClickedEvent {
  */
 export interface EdgeFunctionDeployUpdatesConfirmClickedEvent {
   action: 'edge_function_deploy_updates_confirm_clicked'
-  properties: {
-    /**
-     * Click on Deploy Confirm happens:
-     *   1. in the functions editor page within the warning modal
-     */
-    origin: 'functions_editor'
-  }
   groups: {
     project: string
     organization: string
