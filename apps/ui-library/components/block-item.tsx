@@ -1,5 +1,8 @@
-import { Command } from '@/components/command'
 import { OpenInV0Button } from '@/components/open-in-v0-button'
+
+import dynamic from 'next/dynamic'
+
+const Command = dynamic(() => import('./command').then((mod) => mod.Command), { ssr: false })
 
 interface BlockItemProps {
   name: string

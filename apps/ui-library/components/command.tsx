@@ -1,8 +1,9 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { CommandCopyButton } from './command-copy-button'
 import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { CommandCopyButton } from './command-copy-button'
+import { useLocalStorage } from './use-local-storage'
 
 interface CommandCopyProps {
   name: string
@@ -11,7 +12,11 @@ interface CommandCopyProps {
 
 type PackageManager = 'npm' | 'pnpm' | 'yarn' | 'bun'
 
+const LOCAL_STORAGE_KEY = 'package-manager-copy-command'
+
 export function Command({ name, highlight }: CommandCopyProps) {
+  const [value, setValue] = useLocalStorage(LOCAL_STORAGE_KEY, 'npm')
+
   const getBaseUrl = () => {
     if (process.env.NEXT_PUBLIC_VERCEL_TARGET_ENV === 'production') {
       return `https://supabase.com`
@@ -33,7 +38,7 @@ export function Command({ name, highlight }: CommandCopyProps) {
   }
 
   return (
-    <Tabs_Shadcn_ defaultValue="npm" className="w-full">
+    <Tabs_Shadcn_ value={value} onValueChange={setValue} className="w-full">
       <div className="w-full group relative rounded-lg bg-surface-100 px-4 py-2 overflow-hidden">
         {highlight && (
           <motion.div
