@@ -1224,6 +1224,23 @@ export interface EdgeFunctionTestSidePanelOpenedEvent {
 }
 
 /**
+ * User copied the command for a Supabase UI component.
+ *
+ * @group Events
+ * @source supabase-ui
+ * @page /ui/docs/{framework}/{templateTitle}
+ */
+export interface SupabaseUiCommandCopiedEvent {
+  action: 'supabase_ui_command_copied'
+  properties: {
+    templateTitle: string
+    command: string
+    framework: 'nextjs' | 'react-router' | 'tanstack' | 'react'
+    packageManager: 'npm' | 'pnpm' | 'yarn' | 'bun'
+  }
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -1297,3 +1314,4 @@ export type TelemetryEvent =
   | EdgeFunctionDeployUpdatesButtonClickedEvent
   | EdgeFunctionTestSendButtonClickedEvent
   | EdgeFunctionTestSidePanelOpenedEvent
+  | SupabaseUiCommandCopiedEvent
