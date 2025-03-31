@@ -55,7 +55,7 @@ const MemoizedMessage = memo(
   }: {
     message: MessageType
     isLoading: boolean
-    onResults: ({ title, results }: { title?: string; results: any[] }) => void
+    onResults: ({ resultId, results }: { resultId?: string; results: any[] }) => void
   }) => {
     return (
       <Message
@@ -173,6 +173,21 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
+  const updateMessage = useCallback(
+    ({
+      messageId,
+      resultId,
+      results,
+    }: {
+      messageId: string
+      resultId?: string
+      results: any[]
+    }) => {
+      snap.updateMessage({ id: messageId, resultId, results })
+    },
+    [snap]
+  )
+
   const renderedMessages = useMemo(
     () =>
       chatMessages.map((message) => {
@@ -181,7 +196,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             key={message.id}
             message={message}
             isLoading={isChatLoading && message.id === chatMessages[chatMessages.length - 1].id}
-            onResults={(props) => snap.updateMessage({ id: message.id, ...props })}
+            onResults={(props) => updateMessage({ messageId: message.id, ...props })}
           />
         )
       }),

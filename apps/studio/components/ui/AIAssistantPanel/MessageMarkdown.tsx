@@ -1,5 +1,14 @@
 import { useRouter } from 'next/router'
-import { DragEvent, memo, ReactNode, useContext, useEffect, useMemo, useRef } from 'react'
+import {
+  DragEvent,
+  memo,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
@@ -196,6 +205,13 @@ export const MarkdownPre = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snippetProps])
 
+  const onResultsReturned = useCallback(
+    (results: any[]) => {
+      onResults({ resultId: snippetProps.id, results })
+    },
+    [onResults, snippetProps.id]
+  )
+
   const onRunQuery = async (queryType: 'select' | 'mutation') => {
     sendEvent({
       action: 'assistant_suggestion_run_query_clicked',
@@ -232,7 +248,7 @@ export const MarkdownPre = ({
             runQuery={!results && runQuery}
             results={results}
             onRunQuery={onRunQuery}
-            onResults={(results) => onResults({ resultId: snippetProps.id, results })}
+            onResults={(results) => onResultsReturned(results)}
             onUpdateChartConfig={({ chartConfig: config }) => {
               chartConfig.current = { ...chartConfig.current, ...config }
             }}
