@@ -1,6 +1,5 @@
 import { Sidebar } from '@/components/sidebar'
 import { SiteFooter } from '@/components/site-footer'
-// import ThemeSettings from '@/components/theme-settings'
 
 interface AppLayoutProps {
   children: React.ReactNode

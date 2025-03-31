@@ -16,13 +16,11 @@ export function MobileMenuProvider({ children }: MobileMenuProviderProps) {
 
   // Use useCallback for stable function references
   const handleSetOpen = useCallback((value: boolean) => {
-    console.log('MobileMenu: Setting open state to', value)
     setOpen(value)
   }, [])
 
   const toggle = useCallback(() => {
     setOpen((prev) => {
-      console.log('MobileMenu: Toggling state from', prev, 'to', !prev)
       return !prev
     })
   }, [])
