@@ -361,3 +361,9 @@ th code {
   font-weight: var(--shiki-dark-font-weight) !important;
   text-decoration: var(--shiki-dark-text-decoration) !important;
 }
+
+// Code blocks need margin applied when in content container
+
+.prose :where(.shiki) {
+  margin-block: 2rem;
+}
