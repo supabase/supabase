@@ -44,16 +44,15 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props
   // 2. Computed from current path considering framework support
   let href = item.href
 
-  // If we have a direct href, we need to ensure it uses the current framework
-  if (href && href.startsWith('/docs/')) {
-    const hrefParts = href.split('/')
-    if (hrefParts.length >= 3) {
-      // Only modify the URL if the current framework is supported by this item
-      if (framework && isFrameworkSupported(item, framework)) {
-        // Handle URLs in the format /docs/framework/page
-        // We keep the page part but update the framework part
-        if (hrefParts.length >= 4) {
-          href = `/docs/${framework}/${hrefParts[3]}`
+  // Only modify URLs for items that explicitly support frameworks
+  if (item.supportedFrameworks) {
+    if (href && href.startsWith('/docs/')) {
+      const hrefParts = href.split('/')
+      if (hrefParts.length >= 3) {
+        if (framework && isFrameworkSupported(item, framework)) {
+          if (hrefParts.length >= 4) {
+            href = `/docs/${framework}/${hrefParts[3]}`
+          }
         }
       }
     }
