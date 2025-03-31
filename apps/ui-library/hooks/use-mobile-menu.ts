@@ -1,60 +1,35 @@
-import { useState } from 'react'
+'use client'
 
-interface MobileMenuHook {
+import { createContext, useContext } from 'react'
+
+/**
+ * Context type for mobile menu state and controls
+ */
+export interface MobileMenuContextType {
   /** Current state of the mobile menu */
-  isOpen: boolean
-  /** Function to open the mobile menu */
-  open: () => void
-  /** Function to close the mobile menu */
-  close: () => void
+  open: boolean
+  /** Function to set the mobile menu state */
+  setOpen: (open: boolean) => void
   /** Function to toggle the mobile menu state */
   toggle: () => void
 }
 
+// Create context with null as default value to indicate it's not provided
+export const MobileMenuContext = createContext<MobileMenuContextType | null>(null)
+
 /**
- * A custom hook for managing mobile menu state in the application.
- * This hook provides a simple interface for controlling the mobile navigation menu,
- * commonly used in responsive layouts where the navigation collapses into a mobile menu.
- *
- * @returns An object containing the mobile menu state and control functions
- *
- * @example
- * ```tsx
- * const { isOpen, open, close, toggle } = useMobileMenu()
- *
- * // Open menu
- * open()
- *
- * // Close menu
- * close()
- *
- * // Toggle menu
- * toggle()
- * ```
+ * Hook to access the mobile menu state and controls
+ * Must be used within a MobileMenuProvider
  */
-export function useMobileMenu(): MobileMenuHook {
-  const [isOpen, setIsOpen] = useState(false)
+export function useMobileMenu(): MobileMenuContextType {
+  const context = useContext(MobileMenuContext)
 
-  /**
-   * Opens the mobile menu by setting isOpen to true
-   */
-  const open = () => setIsOpen(true)
-
-  /**
-   * Closes the mobile menu by setting isOpen to false
-   */
-  const close = () => setIsOpen(false)
-
-  /**
-   * Toggles the mobile menu state between open and closed
-   * @returns {void}
-   */
-  const toggle = () => setIsOpen((prev) => !prev)
-
-  return {
-    isOpen,
-    open,
-    close,
-    toggle,
+  if (context === null) {
+    throw new Error(
+      'useMobileMenu must be used within a MobileMenuProvider. ' +
+        'Ensure your component is wrapped with MobileMenuProvider.'
+    )
   }
+
+  return context
 }

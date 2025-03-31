@@ -1,43 +1,11 @@
-'use client'
-
 import Link from 'next/link'
 
 import NavigationItem from '@/components/side-navigation-item'
 import { aiEditorsRules, componentPages, gettingStarted } from '@/config/docs'
-import { useFramework } from '@/context/framework-context'
-import { useMobileMenu } from '@/hooks/use-mobile-menu'
 import { CommandMenu } from './command-menu'
 import { ThemeSwitcherDropdown } from './theme-switcher-dropdown'
 
 function SideNavigation() {
-  const { framework: preferredFramework } = useFramework()
-  const { close: closeMobileMenu } = useMobileMenu()
-
-  // Create a function to build URLs
-  const buildUrl = (slug: string, framework?: string) => {
-    if (!framework) return `/docs/${slug}`
-    return `/docs/${framework}/${slug}`
-  }
-
-  // Get all component pages
-  const componentItems = Object.entries(componentPages).map(([slug, component]) => {
-    let frameworkToUse = undefined
-
-    // Add framework param only if needed
-    if (preferredFramework && component.supportedFrameworks.includes(preferredFramework)) {
-      frameworkToUse = preferredFramework
-    } else if (component.supportedFrameworks.length > 0) {
-      frameworkToUse = component.supportedFrameworks[0]
-    }
-
-    return {
-      title: component.title,
-      href: buildUrl(slug, frameworkToUse),
-      items: [],
-      commandItemLabel: component.commandItemLabel,
-    }
-  })
-
   return (
     <nav className="flex flex-col h-full min-w-[220px]">
       <div className="p-6">
@@ -103,7 +71,7 @@ function SideNavigation() {
           {gettingStarted.title}
         </div>
         {gettingStarted.items.map((item, i) => (
-          <NavigationItem item={item} key={`${item.href}-${i}`} onClick={closeMobileMenu} />
+          <NavigationItem item={item} key={`${item.href}-${i}`} />
         ))}
       </div>
       <div className="pb-6">
@@ -112,11 +80,10 @@ function SideNavigation() {
         </div>
         <div className="space-y-0.5">
           {/* Render items based on component definitions */}
-          {componentItems.map((item, i) => (
+          {componentPages.items.map((component, i) => (
             <NavigationItem
-              item={item}
-              key={`${item.href?.toString() || item.title}-${i}`}
-              onClick={closeMobileMenu}
+              item={component}
+              key={`${component.href?.toString() || component.title}-${i}`}
             />
           ))}
         </div>
@@ -127,7 +94,7 @@ function SideNavigation() {
           {aiEditorsRules.title}
         </div>
         {aiEditorsRules.items.map((item, i) => (
-          <NavigationItem item={item} key={`${item.href}-${i}`} onClick={closeMobileMenu} />
+          <NavigationItem item={item} key={`${item.href}-${i}`} />
         ))}
       </div>
     </nav>

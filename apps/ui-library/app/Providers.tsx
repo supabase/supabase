@@ -7,15 +7,18 @@ import { ThemeProviderProps } from 'next-themes/dist/types'
 
 import { FrameworkProvider } from '@/context/framework-context'
 import { TooltipProvider } from 'ui'
+import { MobileMenuProvider } from '@/components/mobile-menu-provider'
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
     <AuthProvider>
       <JotaiProvider>
         <NextThemesProvider {...props}>
-          <FrameworkProvider>
-            <TooltipProvider delayDuration={0}>{children}</TooltipProvider>
-          </FrameworkProvider>
+          <MobileMenuProvider>
+            <FrameworkProvider>
+              <TooltipProvider delayDuration={0}>{children}</TooltipProvider>
+            </FrameworkProvider>
+          </MobileMenuProvider>
         </NextThemesProvider>
       </JotaiProvider>
     </AuthProvider>
