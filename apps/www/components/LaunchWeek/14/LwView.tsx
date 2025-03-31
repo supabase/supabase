@@ -53,9 +53,9 @@ export const LwView = () => {
                     Supabase
                   </span>
                   LaunchWeek 14
-                  <span className="block mt-6 text-foreground-lighter">MAR 31 — APR 04</span>
+                  <span className="block mt-2 text-foreground-lighter">MAR 31 — APR 04</span>
                 </h1>
-                <span className="block mt-4 text-foreground-lighter">7 AM PT</span>
+                <span className="block mt-2 text-foreground-lighter">7 AM PT</span>
               </div>
               <div className="flex flex-row gap-2 z-10 w-full grow justify-start lg:justify-end">
                 <TicketClaimContent>
