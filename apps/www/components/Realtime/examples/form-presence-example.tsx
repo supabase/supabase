@@ -10,8 +10,8 @@ import { createClient } from '@supabase/supabase-js';
 import { useForm, Controller } from 'react-hook-form';
 
 // Initialize Supabase client
-const supabaseUrl = '${process.env.NEXT_PUBLIC_SUPABASE_URL}';
-const supabaseKey = '${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}';
+const supabaseUrl = '${process.env.NEXT_PUBLIC_EXAMPLES_SUPABASE_URL}';
+const supabaseKey = '${process.env.NEXT_PUBLIC_EXAMPLES_SUPABASE_ANON_KEY}';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Generate a random user ID and name

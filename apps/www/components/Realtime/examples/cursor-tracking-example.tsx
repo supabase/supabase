@@ -10,8 +10,8 @@ import { createClient } from '@supabase/supabase-js';
 import { MousePointer2 } from 'lucide-react';
 
 // Initialize Supabase client
-const supabaseUrl = '${process.env.NEXT_PUBLIC_SUPABASE_URL}';
-const supabaseKey = '${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}';
+const supabaseUrl = '${process.env.NEXT_PUBLIC_EXAMPLES_SUPABASE_URL}';
+const supabaseKey = '${process.env.NEXT_PUBLIC_EXAMPLES_SUPABASE_ANON_KEY}';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Channel name - using a unique ID to ensure both instances connect to the same channel
