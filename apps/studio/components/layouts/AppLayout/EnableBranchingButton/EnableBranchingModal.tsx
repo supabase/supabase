@@ -11,12 +11,12 @@ import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
-import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { DollarSign, FileText, GitBranch } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Button, Form_Shadcn_, Modal } from 'ui'
@@ -48,17 +48,9 @@ const EnableBranchingModal = () => {
     { enabled: snap.showEnableBranchingModal }
   )
 
-  const {
-    data,
-    error: upgradeEligibilityError,
-    isLoading: isLoadingUpgradeEligibility,
-    isError: isErrorUpgradeEligibility,
-    isSuccess: isSuccessUpgradeEligibility,
-  } = useProjectUpgradeEligibilityQuery({
-    projectRef: ref,
-  })
+  const project = useSelectedProject()
   const hasMinimumPgVersion =
-    Number(last(data?.current_app_version.split('-') ?? [])?.split('.')[0] ?? 0) >= 15
+    Number(last(project?.dbVersion?.split('-') ?? [])?.split('.')[0] ?? 0) >= 15
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
   const isFreePlan = subscription?.plan.id === 'free'
@@ -112,9 +104,9 @@ const EnableBranchingModal = () => {
     defaultValues: { branchName: '' },
   })
 
-  const isLoading = isLoadingConnections || isLoadingUpgradeEligibility
-  const isError = isErrorConnections || isErrorUpgradeEligibility
-  const isSuccess = isSuccessConnections && isSuccessUpgradeEligibility
+  const isLoading = isLoadingConnections
+  const isError = isErrorConnections
+  const isSuccess = isSuccessConnections
 
   const canSubmit = form.getValues('branchName').length > 0 && !isChecking && isValid
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
@@ -171,11 +163,6 @@ const EnableBranchingModal = () => {
                 <Modal.Content className="px-7 py-6">
                   {isErrorConnections ? (
                     <AlertError error={connectionsError} subject="Failed to retrieve connections" />
-                  ) : isErrorUpgradeEligibility ? (
-                    <AlertError
-                      error={upgradeEligibilityError}
-                      subject="Failed to retrieve Postgres version"
-                    />
                   ) : null}
                 </Modal.Content>
                 <Modal.Separator />
