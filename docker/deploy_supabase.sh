@@ -248,29 +248,55 @@ else
     sed -i "s/container_name: realtime-dev.supabase-realtime/container_name: realtime-dev.${STACK_NAME}-realtime/g" "$TARGET_DIR/docker-compose.yml"
 fi
 
-# Thêm port cho Studio
+# Thêm port cho Studio và chỉnh sửa file docker-compose.yml
 echo "Adjusting port configurations in docker-compose.yml..."
 
-# Sử dụng tệp tạm thời để sửa đổi file docker-compose.yml để tránh vấn đề với sed trên macOS
+# Tạo file docker-compose mới với các thay đổi cần thiết
 TEMPFILE=$(mktemp)
 
-# Tìm dòng có chứa "image: supabase/studio:" và thêm cấu hình ports và environment
+# Tìm và thay thế cấu hình Studio
 awk -v port="$STUDIO_PORT" -v stack="$STACK_NAME" -v password="$DASHBOARD_PASSWORD" '
-/image: supabase\/studio:/ {
+BEGIN { in_studio = 0; found_env = 0; }
+
+/\s+studio:/ { in_studio = 1; }
+
+/\s+environment:/ {
+  if (in_studio) { found_env = 1; }
+}
+
+{
+  if (in_studio && /image: supabase\/studio:/) {
     print $0;
     print "    ports:";
     print "      - " port ":3000";
-    print "    environment:";
+    if (!found_env) {
+      print "    environment:";
+      print "      - STUDIO_DEFAULT_PROJECT=" stack;
+      print "      - DASHBOARD_SECURE=true";
+    }
+    next;
+  }
+  else if (in_studio && found_env && /\s+environment:/) {
+    print $0;
     print "      - STUDIO_DEFAULT_PROJECT=" stack;
     print "      - DASHBOARD_SECURE=true";
     next;
-}
-/4000:4000/ {
+  }
+  else if (/4000:4000/) {
     gsub("4000:4000", "'$ANALYTICS_PORT':4000");
     print $0;
     next;
+  }
+  else if (/\s+[^-]/) {
+    if (in_studio && found_env) {
+      found_env = 0;
+    }
+    if ($0 !~ /\s+studio:/) {
+      in_studio = 0;
+    }
+  }
+  print $0;
 }
-{print}
 ' "$TARGET_DIR/docker-compose.yml" > "$TEMPFILE"
 
 # Thay thế file gốc với file đã sửa
@@ -319,10 +345,19 @@ rm -rf ./volumes/db/data
 echo "${STACK_NAME} stack has been reset!"
 EOL
 
-# Phân quyền thực thi cho các script
+# Phân quyền thực thi cho các script và các tệp quan trọng
 chmod +x "$TARGET_DIR/start.sh"
 chmod +x "$TARGET_DIR/stop.sh"
 chmod +x "$TARGET_DIR/reset.sh"
+chmod 644 "$TARGET_DIR/docker-compose.yml"
+chmod 644 "$TARGET_DIR/docker-compose.s3.yml"
+chmod 644 "$TARGET_DIR/.env"
+chmod 644 "$TARGET_DIR/dev/docker-compose.dev.yml"
+
+# Đảm bảo quyền đọc cho mọi người đối với tất cả các tệp dữ liệu
+find "$TARGET_DIR/volumes" -type f -exec chmod 644 {} \;
+# Đảm bảo quyền thực thi cho tất cả thư mục
+find "$TARGET_DIR" -type d -exec chmod 755 {} \;
 
 echo "Stack ${STACK_NAME} has been prepared successfully!"
 echo "To start your Supabase stack, run:"
