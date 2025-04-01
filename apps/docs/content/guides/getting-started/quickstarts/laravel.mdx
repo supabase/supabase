@@ -18,7 +18,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-     ```bash Terminal
+     ```bash name=Terminal
      composer create-project laravel/laravel example-app
      ```
 
@@ -35,7 +35,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-    ```bash Terminal
+    ```bash name=Terminal
     composer require laravel/breeze --dev
     php artisan breeze:install
     ```
@@ -61,7 +61,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-    ```bash .env
+    ```bash name=.env
     DB_CONNECTION=pgsql
     DB_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
     ```
@@ -83,7 +83,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-    ```php app/config/database.php
+    ```php name=app/config/database.php
     'pgsql' => [
         'driver' => 'pgsql',
         'url' => env('DB_URL'),
@@ -115,7 +115,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-    ```bash Terminal
+    ```bash name=Terminal
     php artisan migrate
     ```
 
@@ -132,7 +132,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       php artisan serve
       ```
 

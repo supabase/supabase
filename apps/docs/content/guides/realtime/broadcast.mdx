@@ -101,6 +101,11 @@ You can provide a callback for the `broadcast` channel to receive message. This 
 
     {/* prettier-ignore */}
     ```js
+    // @noImplicitAny: false
+    import { createClient } from '@supabase/supabase-js'
+    const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+
+    // ---cut---
     // Join a room/topic. Can be anything except for 'realtime'.
     const myChannel = supabase.channel('test-channel')
 
@@ -210,6 +215,10 @@ You can use the Supabase client libraries to send Broadcast messages.
 
     {/* prettier-ignore */}
     ```js
+    import { createClient } from '@supabase/supabase-js'
+    const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+    // ---cut---
     const myChannel = supabase.channel('test-channel')
 
     /**
@@ -576,6 +585,10 @@ You can pass configuration options while initializing the Supabase Client.
 
     {/* prettier-ignore */}
     ```js
+    import { createClient } from '@supabase/supabase-js'
+    const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+    // ---cut---
     const myChannel = supabase.channel('room-3', {
       config: {
         broadcast: { ack: true },
