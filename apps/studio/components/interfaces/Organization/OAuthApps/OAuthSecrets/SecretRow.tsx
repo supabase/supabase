@@ -1,37 +1,33 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
-import { Check, Key } from 'lucide-react'
+import { Check, Key, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import CopyButton from 'components/ui/CopyButton'
 import { useClientSecretDeleteMutation } from 'data/oauth-secrets/client-secret-delete-mutation'
 import { useClientSecretsQuery } from 'data/oauth-secrets/client-secrets-query'
+import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { SecretRowProps } from './OAuthSecrets.types'
 
-/**
- * SecretRow component displays a single client secret with its metadata and delete functionality.
- * It includes a confirmation modal for deletion and shows special warnings if it's the last secret.
- */
 const SecretRow = ({ secret, appId }: SecretRowProps) => {
-  // Get the current organization slug from URL params
   const { slug } = useParams()
-  // State to control the visibility of the delete confirmation modal
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const canManageSecrets = useCheckPermissions(PermissionAction.UPDATE, 'oauth_apps')
 
-  // We need to fetch all secrets to determine if this is the last one
-  // This helps us show appropriate warnings in the delete modal
   const { data } = useClientSecretsQuery({ slug, appId })
   const secrets = data?.client_secrets ?? []
   const isLast = secrets.length === 1
 
-  // Mutation hook for deleting a client secret
+  const { data: members = [] } = useOrganizationMembersQuery({ slug })
+  const generatedBy = members.find((x) => x.gotrue_id === secret.created_by)
+  const generatedByName = generatedBy?.username ?? generatedBy?.primary_email ?? secret.created_by
+
   const { mutate: deleteSecret, isLoading: isDeleting } = useClientSecretDeleteMutation({
     onSuccess: () => {
       // Show success toast and close modal after successful deletion
@@ -40,19 +36,15 @@ const SecretRow = ({ secret, appId }: SecretRowProps) => {
     },
   })
 
-  // Handler for the delete action
   const handleDelete = () => {
     if (!appId) return
     deleteSecret({ slug, appId, secretId: secret.id })
   }
 
-  console.log(secret)
-
   const isNew = secret.client_secret !== undefined
 
   return (
     <>
-      {/* Main row displaying the secret information */}
       <div
         className={cn(
           'flex items-center justify-between p-4 border first:rounded-t last:rounded-b',
@@ -75,31 +67,33 @@ const SecretRow = ({ secret, appId }: SecretRowProps) => {
             </div>
             <div className="flex flex-col gap-0">
               <p className="text-sm text-foreground-lighter">
-                Added {isNew ? 'now' : dayjs(secret.created_at).fromNow()}
+                Added {isNew ? 'now' : dayjs(secret.created_at).fromNow()} by {generatedByName}
               </p>
-              <p className="text-sm text-foreground-lighter">Added by {secret.created_by}</p>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <ButtonTooltip
             type="default"
-            disabled={!appId || !canManageSecrets}
+            className="w-7"
+            icon={<Trash />}
+            disabled={!appId || !canManageSecrets || isLast}
             onClick={() => setShowDeleteModal(true)}
             tooltip={{
               content: {
+                className: 'w-64 text-center',
+                side: 'bottom',
                 text: !canManageSecrets
                   ? 'You need additional permissions to delete client secrets'
-                  : undefined,
+                  : isLast
+                    ? 'You must have at least one client secret for the OAuth application to function.'
+                    : undefined,
               },
             }}
-          >
-            Delete
-          </ButtonTooltip>
+          />
         </div>
       </div>
 
-      {/* Confirmation modal for delete action */}
       <ConfirmationModal
         visible={showDeleteModal}
         variant="destructive"
@@ -111,10 +105,8 @@ const SecretRow = ({ secret, appId }: SecretRowProps) => {
         onConfirm={handleDelete}
         disabled={isLast}
         alert={{
-          title: isLast ? 'Cannot delete the last client secret' : 'This action cannot be undone',
-          description: isLast
-            ? 'You must have at least one client secret for the OAuth application to function.'
-            : 'The client secret will be permanently removed and cannot be recovered.',
+          title: 'This action cannot be undone',
+          description: 'The client secret will be permanently removed and cannot be recovered.',
         }}
       >
         <p className="text-sm text-foreground-light">

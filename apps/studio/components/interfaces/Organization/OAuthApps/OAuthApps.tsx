@@ -7,19 +7,19 @@ import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import CopyButton from 'components/ui/CopyButton'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { AuthorizedApp, useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import { OAuthAppCreateResponse } from 'data/oauth/oauth-app-create-mutation'
 import { OAuthApp, useOAuthAppsQuery } from 'data/oauth/oauth-apps-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Alert, Button, cn, Input } from 'ui'
-import AuthorizedAppRow from './AuthorizedAppRow'
-import DeleteAppModal from './DeleteAppModal'
-import OAuthAppRow from './OAuthAppRow'
-import PublishAppModal from './PublishAppSidePanel'
-import RevokeAppModal from './RevokeAppModal'
-import CopyButton from 'components/ui/CopyButton'
+import { Button, cn } from 'ui'
+import { AuthorizedAppRow } from './AuthorizedAppRow'
+import { DeleteAppModal } from './DeleteAppModal'
+import { OAuthAppRow } from './OAuthAppRow'
+import { PublishAppSidePanel } from './PublishAppSidePanel'
+import { RevokeAppModal } from './RevokeAppModal'
 
 // [Joshen] Note on nav UX
 // Kang Ming mentioned that it might be better to split Published Apps and Authorized Apps into 2 separate tabs
@@ -240,7 +240,7 @@ const OAuthApps = () => {
         </div>
       </ScaffoldContainerLegacy>
 
-      <PublishAppModal
+      <PublishAppSidePanel
         visible={showPublishModal}
         selectedApp={selectedAppToUpdate}
         onClose={() => {

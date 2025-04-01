@@ -1,26 +1,22 @@
-import dayjs from 'dayjs'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useClientSecretCreateMutation } from 'data/oauth-secrets/client-secret-create-mutation'
 import { useClientSecretsQuery } from 'data/oauth-secrets/client-secrets-query'
 import { OAuthApp } from 'data/oauth/oauth-apps-query'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, InfoIcon } from 'ui'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { Alert_Shadcn_, AlertTitle_Shadcn_, InfoIcon } from 'ui'
 import { CreatedSecret } from './OAuthSecrets.types'
 import SecretRow from './SecretRow'
 
-dayjs.extend(relativeTime)
-
 interface Props {
-  // The unique identifier for the OAuth application
   selectedApp?: OAuthApp
 }
 
-const OAuthSecrets = ({ selectedApp }: Props) => {
+export const OAuthSecrets = ({ selectedApp }: Props) => {
   const { slug } = useParams()
   const [createdSecret, setCreatedSecret] = useState<CreatedSecret>()
   const canManageSecrets = useCheckPermissions(PermissionAction.UPDATE, 'oauth_apps')
@@ -45,13 +41,10 @@ const OAuthSecrets = ({ selectedApp }: Props) => {
         <div className="flex flex-col">
           <span className="text-sm text-foreground">Client secrets</span>
           <span className="text-sm text-foreground-light">
-            Learn more{' '}
-            <a
-              href="https://supabase.com/docs/guides/integrations/build-a-supabase-integration#handling-the-callback"
-              className="text-foreground underline"
-            >
+            For handling callbacks in the OAuth 2.0 flow. Learn more{' '}
+            <InlineLink href="https://supabase.com/docs/guides/integrations/build-a-supabase-integration#handling-the-callback">
               here
-            </a>
+            </InlineLink>
             .
           </span>
         </div>
@@ -64,11 +57,12 @@ const OAuthSecrets = ({ selectedApp }: Props) => {
             loading={isCreatingSecret}
             tooltip={{
               content: {
+                side: 'bottom',
                 text: secrets.length >= 5 ? 'You can only have up to 5 client secrets' : undefined,
               },
             }}
           >
-            Generate a new client secret
+            Generate new secret
           </ButtonTooltip>
         )}
       </div>
@@ -96,5 +90,3 @@ const OAuthSecrets = ({ selectedApp }: Props) => {
     </div>
   )
 }
-
-export default OAuthSecrets

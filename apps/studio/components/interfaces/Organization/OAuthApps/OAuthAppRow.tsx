@@ -24,7 +24,7 @@ export interface OAuthAppRowProps {
   onSelectDelete: () => void
 }
 
-const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) => {
+export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) => {
   const canUpdateOAuthApps = useCheckPermissions(PermissionAction.UPDATE, 'approved_oauth_apps')
   const canDeleteOAuthApps = useCheckPermissions(PermissionAction.DELETE, 'approved_oauth_apps')
 
@@ -63,7 +63,7 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
           <DropdownMenuTrigger asChild>
             <Button type="default" icon={<MoreVertical />} className="px-1" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" side="bottom">
+          <DropdownMenuContent align="end" side="bottom" className="w-32">
             <Tooltip>
               <TooltipTrigger asChild>
                 <DropdownMenuItem
@@ -111,5 +111,3 @@ const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) =>
     </Table.tr>
   )
 }
-
-export default OAuthAppRow
