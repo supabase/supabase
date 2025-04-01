@@ -1,0 +1,43 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "infinite-list-nextjs",
+  "type": "registry:block",
+  "title": "Infinite List (Next.js + Supabase)",
+  "description": "List component with infinite scrolling using Supabase. Includes Next.js Supabase client setup.",
+  "dependencies": [
+    "lucide-react",
+    "@supabase/ssr@latest",
+    "@supabase/supabase-js@latest",
+    "@supabase/postgrest-js"
+  ],
+  "registryDependencies": [
+    "skeleton"
+  ],
+  "files": [
+    {
+      "path": "registry/default/blocks/infinite-list/components/infinite-list.tsx",
+      "content": "'use client'\n\nimport * as React from 'react'\nimport { type PostgrestFilterBuilder } from '@supabase/postgrest-js'\n\nimport { cn } from '@/lib/utils'\nimport { useInfiniteQuery } from '@/registry/default/blocks/infinite-list/hooks/use-infinite-query'\nimport { Skeleton } from '@/registry/default/components/ui/skeleton'\n\ninterface InfiniteListProps<TData> {\n  tableName: string\n  selectQuery?: string\n  pageSize?: number\n  filterBuilder?: (query: PostgrestFilterBuilder<any, any, any>) => PostgrestFilterBuilder<any, any, any>\n  renderItem: (item: TData, index: number) => React.ReactNode\n  className?: string\n  listClassName?: string\n  skeletonCount?: number\n  skeletonHeightClass?: string\n  endMessage?: React.ReactNode\n}\n\nexport function InfiniteList<TData>({\n  tableName,\n  selectQuery = '*'\n  pageSize = 20,\n  filterBuilder,\n  renderItem,\n  className,\n  listClassName,\n  skeletonCount = 3,\n  skeletonHeightClass = 'h-10'\n  endMessage = \"You've reached the end.\"\n}: InfiniteListProps<TData>) {\n  const {\n    data,\n    loading,\n    hasMore,\n    fetchNextPage\n  } = useInfiniteQuery<TData>({\n    tableName,\n    selectQuery,\n    pageSize,\n    filterBuilder,\n  })\n\n  const scrollContainerRef = React.useRef<HTMLDivElement>(null)\n\n  const loadMoreSentinelRef = React.useRef<HTMLDivElement>(null)\n  const observer = React.useRef<IntersectionObserver | null>(null)\n\n  React.useEffect(() => {\n    if (observer.current) observer.current.disconnect()\n\n    observer.current = new IntersectionObserver(\n      (entries) => {\n        if (entries[0].isIntersecting && hasMore && !loading) {\n          fetchNextPage()\n        }\n      },\n      {\n        root: scrollContainerRef.current,\n        threshold: 0.1,\n        rootMargin: '0px 0px 100px 0px'\n      }\n    )\n\n    if (loadMoreSentinelRef.current) {\n      observer.current.observe(loadMoreSentinelRef.current)\n    }\n\n    return () => {\n      if (observer.current) observer.current.disconnect()\n    }\n  }, [loading, hasMore, fetchNextPage])\n\n  return (\n    <div\n      ref={scrollContainerRef}\n      className={cn('relative h-[600px] overflow-auto rounded-md border', className)}\n    >\n      <div className={cn('p-4 space-y-2', listClassName)}>\n        {data.length === 0 && !loading && (\n          <div className=\"text-center text-muted-foreground py-10\">No results.</div>\n        )}\n        {data.map((item, index) => (\n          <div key={(item as any)?.id ?? index}>\n            {renderItem(item, index)}\n          </div>\n        ))}\n\n        {loading && (\n          Array.from({ length: skeletonCount }).map((_, i) => (\n            <Skeleton key={`loading-${i}`} className={cn('w-full', skeletonHeightClass)} />\n          ))\n        )}\n\n        <div ref={loadMoreSentinelRef} style={{ height: '1px' }} />\n\n        {!hasMore && data.length > 0 && (\n           <div className=\"text-center text-muted-foreground py-4 text-sm\">\n            {endMessage}\n          </div>\n        )}\n      </div>\n    </div>\n  )\n}\n",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/infinite-list/hooks/use-infinite-query.ts",
+      "content": "'use client'\n\nimport { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'\nimport { type PostgrestFilterBuilder } from '@supabase/postgrest-js'\nimport { useCallback, useEffect, useRef, useState } from 'react'\n\ninterface UseInfiniteQueryProps<TData> {\n  tableName: string\n  selectQuery?: string\n  pageSize?: number\n  filterBuilder?: (\n    query: PostgrestFilterBuilder<any, any, any>\n  ) => PostgrestFilterBuilder<any, any, any>\n}\n\nexport function useInfiniteQuery<TData>({\n  tableName,\n  selectQuery = '*'\n  pageSize = 10,\n  filterBuilder,\n}: UseInfiniteQueryProps<TData>) {\n  const supabase = createClient()\n  const [data, setData] = useState<TData[]>([])\n  const [loading, setLoading] = useState(false)\n  const [hasMore, setHasMore] = useState(true)\n  const [offset, setOffset] = useState(0)\n  const isFetching = useRef(false)\n\n  const fetchNextPage = useCallback(async () => {\n    if (isFetching.current || !hasMore) return\n\n    isFetching.current = true\n    setLoading(true)\n\n    try {\n      let query = supabase.from(tableName).select(selectQuery, { count: 'exact' })\n\n      if (filterBuilder) {\n        query = filterBuilder(query)\n      }\n\n      const { data: newData, error, count } = await query.range(offset, offset + pageSize - 1)\n\n      if (error) {\n        console.error('Error fetching data:', error)\n        setHasMore(false)\n        return\n      }\n\n      if (newData) {\n        const validData = newData.filter(\n          (item): item is TData => typeof item === 'object' && item !== null && !('error' in item)\n        )\n        setData((prevData) => [...prevData, ...validData])\n        const currentTotalFetched = offset + validData.length\n        setOffset(currentTotalFetched)\n        setHasMore(validData.length === pageSize)\n      }\n    } catch (error) {\n      console.error('An unexpected error occurred:', error)\n      setHasMore(false)\n    } finally {\n      setLoading(false)\n      isFetching.current = false\n    }\n  }, [tableName, selectQuery, pageSize, offset, hasMore, supabase, filterBuilder])\n\n  useEffect(() => {\n    setData([])\n    setOffset(0)\n    setHasMore(true)\n    fetchNextPage()\n  }, [tableName, selectQuery, pageSize, filterBuilder])\n\n  return { data, loading, hasMore, fetchNextPage }\n}\n",
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+      "content": "import { createBrowserClient } from '@supabase/ssr'\n\nexport function createClient() {\n  return createBrowserClient(\n    process.env.NEXT_PUBLIC_SUPABASE_URL!,\n    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!\n  )\n}\n",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+      "content": "import { createServerClient } from '@supabase/ssr'\nimport { NextResponse, type NextRequest } from 'next/server'\n\nexport async function updateSession(request: NextRequest) {\n  let supabaseResponse = NextResponse.next({\n    request,\n  })\n\n  const supabase = createServerClient(\n    process.env.NEXT_PUBLIC_SUPABASE_URL!,\n    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,\n    {\n      cookies: {\n        getAll() {\n          return request.cookies.getAll()\n        },\n        setAll(cookiesToSet) {\n          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))\n          supabaseResponse = NextResponse.next({\n            request,\n          })\n          cookiesToSet.forEach(({ name, value, options }) =>\n            supabaseResponse.cookies.set(name, value, options)\n          )\n        },\n      },\n    }\n  )\n\n  const {\n    data: { user },\n  } = await supabase.auth.getUser()\n\n  if (\n    !user &&\n    !request.nextUrl.pathname.startsWith('/login') &&\n    !request.nextUrl.pathname.startsWith('/auth')\n  ) {\n    const url = request.nextUrl.clone()\n    url.pathname = '/auth/login'\n    return NextResponse.redirect(url)\n  }\n\n  return supabaseResponse\n}\n",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+      "content": "import { createServerClient } from '@supabase/ssr'\nimport { cookies } from 'next/headers'\n\nexport async function createClient() {\n  const cookieStore = await cookies()\n\n  return createServerClient(\n    process.env.NEXT_PUBLIC_SUPABASE_URL!,\n    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,\n    {\n      cookies: {\n        getAll() {\n          return cookieStore.getAll()\n        },\n        setAll(cookiesToSet) {\n          try {\n            cookiesToSet.forEach(({ name, value, options }) =>\n              cookieStore.set(name, value, options)\n            )\n          } catch {\n          }\n        },\n      },\n    }\n  )\n}\n",
+      "type": "registry:lib"
+    }
+  ]
+}

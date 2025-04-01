@@ -89,6 +89,13 @@ export const componentPages: SidebarNavGroup = {
       items: [],
       commandItemLabel: 'Realtime Chat',
     },
+    {
+      title: 'Infinite List',
+      supportedFrameworks: ['nextjs'],
+      href: '/docs/nextjs/infinite-list',
+      items: [],
+      commandItemLabel: 'Infinite List',
+    },
   ],
 }
 
