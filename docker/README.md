@@ -22,12 +22,16 @@ Script triển khai `deploy_supabase.sh` cho phép bạn:
 
 ```bash
 cd docker
-./deploy_supabase.sh <tên_stack>
+./deploy_supabase.sh <tên_stack> [port_offset]
 ```
 
 Ví dụ:
 ```bash
+# Triển khai với tự động tính toán port offset
 ./deploy_supabase.sh project1
+
+# Triển khai với port offset chỉ định
+./deploy_supabase.sh project2 2000
 ```
 
 Script sẽ:
@@ -66,11 +70,27 @@ cd docker/stacks/<tên_stack>
 ./reset.sh
 ```
 
+### 5. Xóa stack và giải phóng bộ nhớ
+
+Để xóa hoàn toàn một stack và giải phóng tài nguyên:
+```bash
+cd docker
+./remove_stack.sh <tên_stack>
+```
+
+Script này sẽ:
+1. Dừng các container đang chạy của stack
+2. Xóa tất cả các container liên quan đến stack
+3. Xóa tất cả các volume dữ liệu liên quan
+4. Xóa thư mục stack
+5. Hiển thị thông tin về tài nguyên đã được giải phóng
+
 ## Cấu trúc thư mục
 
 ```
 docker/
   ├── deploy_supabase.sh      # Script triển khai chính
+  ├── remove_stack.sh         # Script để xóa stack và giải phóng bộ nhớ
   ├── docker-compose.yml      # File cấu hình Docker Compose gốc
   ├── docker-compose.s3.yml   # File cấu hình tùy chọn cho S3
   ├── reset.sh                # Script reset gốc
@@ -108,3 +128,4 @@ Mỗi stack mới sẽ được cấp một dải port khác nhau (cách nhau 10
 - Mỗi stack có dữ liệu riêng biệt và không chia sẻ với nhau
 - Sao lưu thông tin đăng nhập từ màn hình kết quả triển khai
 - Các stack có thể chạy đồng thời mà không gây xung đột
+- Khi không cần một stack nữa, hãy sử dụng `remove_stack.sh` để giải phóng tài nguyên hệ thống
