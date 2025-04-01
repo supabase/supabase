@@ -327,11 +327,14 @@ const PublishAppSidePanel = ({
                       </div>
                     </SidePanel.Content>
 
-                    <SidePanel.Separator />
-
-                    <SidePanel.Content className="py-4">
-                      <OAuthSecrets selectedApp={selectedApp} />
-                    </SidePanel.Content>
+                    {selectedApp !== undefined && (
+                      <>
+                        <SidePanel.Separator />
+                        <SidePanel.Content className="py-4">
+                          <OAuthSecrets selectedApp={selectedApp} />
+                        </SidePanel.Content>
+                      </>
+                    )}
 
                     <SidePanel.Separator />
                     <div className="p-6 ">
