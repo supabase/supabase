@@ -577,7 +577,7 @@ withTestDatabase('primary keys', async ({ executeQuery }) => {
 
 // /** Additional tests */
 withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
-  const { sql, zod } = await pgMeta.tables.retrieve({ id: 16516 })
+  const { sql, zod } = await pgMeta.tables.retrieve({ id: 16526 })
   const res = zod.parse((await executeQuery(sql))[0])
   expect(res).toMatchInlineSnapshot(
     {
@@ -586,8 +586,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
       id: expect.any(Number),
       live_rows_estimate: expect.any(Number),
       size: expect.any(String),
-    },
-    `
+    }, `
     {
       "bytes": Any<Number>,
       "columns": [
@@ -598,7 +597,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "text",
-          "id": "16516.2",
+          "id": "16526.2",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -609,7 +608,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "ordinal_position": 2,
           "schema": "public",
           "table": "memes",
-          "table_id": 16516,
+          "table_id": 16526,
         },
         {
           "check": null,
@@ -618,7 +617,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "int4",
-          "id": "16516.3",
+          "id": "16526.3",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -629,7 +628,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "ordinal_position": 3,
           "schema": "public",
           "table": "memes",
-          "table_id": 16516,
+          "table_id": 16526,
         },
         {
           "check": null,
@@ -638,7 +637,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "jsonb",
-          "id": "16516.4",
+          "id": "16526.4",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -649,7 +648,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "ordinal_position": 4,
           "schema": "public",
           "table": "memes",
-          "table_id": 16516,
+          "table_id": 16526,
         },
         {
           "check": null,
@@ -658,7 +657,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "timestamp",
-          "id": "16516.5",
+          "id": "16526.5",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -669,7 +668,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "ordinal_position": 5,
           "schema": "public",
           "table": "memes",
-          "table_id": 16516,
+          "table_id": 16526,
         },
         {
           "check": null,
@@ -678,7 +677,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "default_value": "nextval('memes_id_seq'::regclass)",
           "enums": [],
           "format": "int4",
-          "id": "16516.1",
+          "id": "16526.1",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -689,7 +688,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "ordinal_position": 1,
           "schema": "public",
           "table": "memes",
-          "table_id": 16516,
+          "table_id": 16526,
         },
         {
           "check": null,
@@ -702,7 +701,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
             "retired",
           ],
           "format": "meme_status",
-          "id": "16516.6",
+          "id": "16526.6",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -713,7 +712,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "ordinal_position": 6,
           "schema": "public",
           "table": "memes",
-          "table_id": 16516,
+          "table_id": 16526,
         },
       ],
       "comment": null,
@@ -725,14 +724,14 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
         {
           "name": "id",
           "schema": "public",
-          "table_id": 16516,
+          "table_id": 16526,
           "table_name": "memes",
         },
       ],
       "relationships": [
         {
           "constraint_name": "memes_category_fkey",
-          "id": 16525,
+          "id": 16535,
           "source_column_name": "category",
           "source_schema": "public",
           "source_table_name": "memes",
@@ -747,8 +746,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
       "schema": "public",
       "size": Any<String>,
     }
-  `
-  )
+  `)
 })
 
 withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) => {
@@ -774,7 +772,7 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
           "default_value": null,
           "enums": [],
           "format": "text",
-          "id": "16516.2",
+          "id": "16526.2",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -785,7 +783,7 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
           "ordinal_position": 2,
           "schema": "public",
           "table": "memes",
-          "table_id": 16516,
+          "table_id": 16526,
         },
         {
           "check": null,
@@ -794,7 +792,7 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
           "default_value": null,
           "enums": [],
           "format": "int4",
-          "id": "16516.3",
+          "id": "16526.3",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -805,7 +803,7 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
           "ordinal_position": 3,
           "schema": "public",
           "table": "memes",
-          "table_id": 16516,
+          "table_id": 16526,
         },
         {
           "check": null,
@@ -814,7 +812,7 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
           "default_value": null,
           "enums": [],
           "format": "jsonb",
-          "id": "16516.4",
+          "id": "16526.4",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -825,7 +823,7 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
           "ordinal_position": 4,
           "schema": "public",
           "table": "memes",
-          "table_id": 16516,
+          "table_id": 16526,
         },
         {
           "check": null,
@@ -834,7 +832,7 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
           "default_value": null,
           "enums": [],
           "format": "timestamp",
-          "id": "16516.5",
+          "id": "16526.5",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -845,7 +843,7 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
           "ordinal_position": 5,
           "schema": "public",
           "table": "memes",
-          "table_id": 16516,
+          "table_id": 16526,
         },
         {
           "check": null,
@@ -854,7 +852,7 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
           "default_value": "nextval('memes_id_seq'::regclass)",
           "enums": [],
           "format": "int4",
-          "id": "16516.1",
+          "id": "16526.1",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -865,7 +863,7 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
           "ordinal_position": 1,
           "schema": "public",
           "table": "memes",
-          "table_id": 16516,
+          "table_id": 16526,
         },
         {
           "check": null,
@@ -878,7 +876,7 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
             "retired",
           ],
           "format": "meme_status",
-          "id": "16516.6",
+          "id": "16526.6",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -889,7 +887,7 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
           "ordinal_position": 6,
           "schema": "public",
           "table": "memes",
-          "table_id": 16516,
+          "table_id": 16526,
         },
       ],
       "comment": null,
@@ -901,14 +899,14 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
         {
           "name": "id",
           "schema": "public",
-          "table_id": 16516,
+          "table_id": 16526,
           "table_name": "memes",
         },
       ],
       "relationships": [
         {
           "constraint_name": "memes_category_fkey",
-          "id": 16525,
+          "id": 16535,
           "source_column_name": "category",
           "source_schema": "public",
           "source_table_name": "memes",

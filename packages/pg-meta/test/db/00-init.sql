@@ -57,6 +57,18 @@ CREATE VIEW todos_view AS SELECT * FROM public.todos;
 -- For testing typegen on view-to-view relationships
 create view users_view as select * from public.users;
 
+-- Create a more complex view for testing
+CREATE VIEW user_todos_summary_view AS
+SELECT 
+    u.id as user_id,
+    u.name as user_name,
+    u.status as user_status,
+    COUNT(t.id) as todo_count,
+    array_agg(t.details) FILTER (WHERE t.details IS NOT NULL) as todo_details
+FROM public.users u
+LEFT JOIN public.todos t ON t."user-id" = u.id
+GROUP BY u.id, u.name, u.status;
+
 create materialized view todos_matview as select * from public.todos;
 
 create function public.blurb(public.todos) returns text as
@@ -189,4 +201,82 @@ RETURNS SETOF bigint
 LANGUAGE SQL STABLE
 AS $$
   SELECT id FROM public.users;
+$$;
+
+-- SETOF composite_type - Returns multiple rows of a custom composite type
+CREATE OR REPLACE FUNCTION public.get_composite_type_data()
+RETURNS SETOF composite_type_with_array_attribute
+LANGUAGE SQL STABLE
+AS $$
+  SELECT ROW(ARRAY['hello', 'world']::text[])::composite_type_with_array_attribute
+  UNION ALL
+  SELECT ROW(ARRAY['foo', 'bar']::text[])::composite_type_with_array_attribute;
+$$;
+
+-- SETOF record - Returns multiple rows with structure defined in the function
+CREATE OR REPLACE FUNCTION public.get_user_summary()
+RETURNS SETOF record
+LANGUAGE SQL STABLE
+AS $$
+  SELECT u.id, name, count(t.id) as todo_count
+  FROM public.users u
+  LEFT JOIN public.todos t ON t."user-id" = u.id
+  GROUP BY u.id, u.name;
+$$;
+
+-- SETOF scalar_type - Returns multiple values of a basic type
+CREATE OR REPLACE FUNCTION public.get_user_ids()
+RETURNS SETOF bigint
+LANGUAGE SQL STABLE
+AS $$
+  SELECT id FROM public.users;
+$$;
+
+
+-- Function returning view using scalar as input
+CREATE OR REPLACE FUNCTION public.get_single_user_summary_from_view(search_user_id bigint)
+RETURNS SETOF user_todos_summary_view
+LANGUAGE SQL STABLE
+ROWS 1
+AS $$
+  SELECT * FROM user_todos_summary_view WHERE user_id = search_user_id;
+$$;
+-- Function returning view using table row as input
+CREATE OR REPLACE FUNCTION public.get_single_user_summary_from_view(user_row users)
+RETURNS SETOF user_todos_summary_view
+LANGUAGE SQL STABLE
+ROWS 1 
+AS $$
+  SELECT * FROM user_todos_summary_view WHERE user_id = user_row.id;
+$$;
+-- Function returning view using another view row as input
+CREATE OR REPLACE FUNCTION public.get_single_user_summary_from_view(userview_row users_view)
+RETURNS SETOF user_todos_summary_view
+LANGUAGE SQL STABLE
+ROWS 1 
+AS $$
+  SELECT * FROM user_todos_summary_view WHERE user_id = userview_row.id;
+$$;
+
+
+-- Function returning view using scalar as input
+CREATE OR REPLACE FUNCTION public.get_todos_from_user(search_user_id bigint)
+RETURNS SETOF todos
+LANGUAGE SQL STABLE
+AS $$
+  SELECT * FROM todos WHERE "user-id" = search_user_id;
+$$;
+-- Function returning view using table row as input
+CREATE OR REPLACE FUNCTION public.get_todos_from_user(user_row users)
+RETURNS SETOF todos
+LANGUAGE SQL STABLE
+AS $$
+  SELECT * FROM todos WHERE "user-id" = user_row.id;
+$$;
+-- Function returning view using another view row as input
+CREATE OR REPLACE FUNCTION public.get_todos_from_user(userview_row users_view)
+RETURNS SETOF todos
+LANGUAGE SQL STABLE
+AS $$
+  SELECT * FROM todos WHERE "user-id" = userview_row.id;
 $$;
