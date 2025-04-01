@@ -9,7 +9,7 @@ Testing is an essential step in the development process to ensure the correctnes
 
 Deno 2 offers testing, linting, and type checking capabilities out of the box. Here’s how to use them.
 
-## Setting Up Deno 2 for Your Supabase Edge Functions
+## Setting up Deno 2 for your Supabase Edge Functions
 
 ### Installing Deno 2
 
@@ -48,7 +48,7 @@ Within your Supabase project, set up a proper structure for testing:
     └── config.toml
 ```
 
-## Creating Tests for Edge Functions
+## Creating tests for Edge Functions
 
 Here's an example test file for a simple edge function:
 
@@ -90,7 +90,7 @@ Deno.test('Function One - Basic functionality', async () => {
 })
 ```
 
-## Environment Variables for Testing
+## Environment variables for testing
 
 For local testing, you'll need to set up environment variables. You can create a script to set these variables in your terminal:
 
@@ -112,7 +112,7 @@ Alternatively, you can pass the environment variables directly when running test
 SUPABASE_URL="http://localhost:54321" SUPABASE_ANON_KEY="your-key" deno test --allow-net --allow-env --allow-read ./functions/tests/
 ```
 
-## Running the Tests
+## Running the tests
 
 Execute your tests using the Deno task system:
 
@@ -139,11 +139,11 @@ deno lint ./functions/
 deno check ./functions/**/*.ts
 ```
 
-## Running Edge Functions Locally
+## Running Edge Functions locally
 
 If you want to run your tests locally to validate their functionality, do the following:
 
-1. **Configure your local edge runtime** to use deno 2. This requires CLI version v2.20.5 and above.
+1. **Configure your local edge runtime** to use Deno 2. This requires CLI version v2.20.5 and above.
 
    ```toml
    [edge_runtime]
