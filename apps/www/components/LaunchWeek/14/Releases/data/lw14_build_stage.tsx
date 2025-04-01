@@ -94,7 +94,7 @@ export const days: AdventDay[] = [
   },
   {
     title: 'Automatic Embeddings in Postgres',
-    description: 'Automatic embeddings moves the vector generation step into Postgres',
+    description: 'Automatic embeddings move the vector generation step into Postgres',
     id: 'automatic-embeddings',
     is_shipped: true,
     links: [
