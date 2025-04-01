@@ -8,7 +8,7 @@ tocVideo: '5OWH9c4u68M'
 
 In this guide we'll cover how to create a basic Edge Function on the Supabase dashboard, and access it using the Supabase CLI.
 
-## Deploy From Dashboard
+## Deploy from Dashboard
 
 Go to your project > Edge Functions > Deploy a new function > Via Editor
 
@@ -34,9 +34,9 @@ This will scaffold a new function for you.
 
 Modify the function as needed, name it, and click `Deploy function`
 
-That's it! Your function is now active. Use the endpoint on the Details page to access the edge function
+That's it! Your function is now active. Use the endpoint on the function's Details page to call the edge function.
 
-## Access Deployed Functions via Supabase CLI
+## Access deployed functions via Supabase CLI
 
 <Admonition type="tip" label="CLI not installed?">
 
@@ -81,7 +81,7 @@ Here's how:
    supabase functions deploy function-name
    ```
 
-## Deploy Via Assistant
+## Deploy via Assistant
 
 You can also leverage the Supabase Assistant to help you write and deploy edge functions.
 
@@ -97,77 +97,47 @@ Go to your project > Edge Functions > Click on the Assistant icon to Create with
 />
 
 This brings up an assistant window with a pre-filled prompt for generating edge functions.
-Write up your Edge Function requirement
+Write up your Edge Function requirement, and let Supabase Assistant do the rest.
 
-<Image
-  alt="Write up your Edge Function requirements for the assistant"
-  src={{
-    light: '/docs/img/guides/functions/dashboard/assistant-description--light.png',
-    dark: '/docs/img/guides/functions/dashboard/assistant-description--light.png',
-  }}
-  zoomable
-/>
+<div style={{ width: '75%', position: 'relative', aspectRatio: 'auto' }}>
+  <Image
+    alt="Generate a function with the assistant"
+    src={{
+      light: '/docs/img/guides/functions/dashboard/assistant-function-gen--light.png',
+      dark: '/docs/img/guides/functions/dashboard/assistant-function-gen--light.png',
+    }}
+    zoomable
+  />
+</div>
 
-And let Supabase Assistant do the rest
+Click Deploy and the Assistant will automatically deploy your function.
 
-<Image
-  alt="Generate a function with the assistant"
-  src={{
-    light: '/docs/img/guides/functions/dashboard/assistant-function-gen--light.png',
-    dark: '/docs/img/guides/functions/dashboard/assistant-function-gen--light.png',
-  }}
-  zoomable
-/>
+This function requires an OpenAI API key. You can add the key in your Edge Functions secrets page, or ask Assistant for help.
 
-Click Deploy and the Assistant will automatically deploy your function
+1. Navigate to your Edge Functions > Secrets page.
+2. Look for the option to add environment variables.
+3. Add a new environment variable with the key `OPENAI_API_KEY` and set its value to your actual OpenAI API key.
 
-<Image
-  alt="Deploy functions from the assistant"
-  src={{
-    light: '/docs/img/guides/functions/dashboard/assistant-function-deploy--light.png',
-    dark: '/docs/img/guides/functions/dashboard/assistant-function-deploy--light.png',
-  }}
-  zoomable
-/>
+Once you've set this environment variable, your edge functions will be able to access the OPENAI_API_KEY securely without hardcoding it into the function code. This is a best practice for keeping sensitive information safe.
 
-As you can see, this function requires an openAI API key. You can add the key in your Edge Functions secrets page, or ask Assistant for help.
+With your variable set, you can test by sending a request via the dashboard. Navigate to the function's details page, and click on the test button. Then provide a Request Body your function expects.
 
-<Image
-  alt="Store API keys for Edge Functions"
-  src={{
-    light: '/docs/img/guides/functions/dashboard/function-keys--light.png',
-    dark: '/docs/img/guides/functions/dashboard/function-keys--light.png',
-  }}
-  zoomable
-/>
+<div style={{ width: '60%', position: 'relative', aspectRatio: 'auto' }}>
+  <Image
+    alt="Provide a request body to test your function"
+    src={{
+      light: '/docs/img/guides/functions/dashboard/test-request-body--light.png',
+      dark: '/docs/img/guides/functions/dashboard/test-request-body--light.png',
+    }}
+    zoomable
+  />
+</div>
 
-Once your variable is set, you can test by sending a request via the dashboard.
-
-<Image
-  alt="Test your function from the dashboard"
-  src={{
-    light: '/docs/img/guides/functions/dashboard/test--light.png',
-    dark: '/docs/img/guides/functions/dashboard/test--light.png',
-  }}
-  zoomable
-/>
-
-Click on test, then provide a Request Body your function expects.
-
-<Image
-  alt="Provide a request body to test your function"
-  src={{
-    light: '/docs/img/guides/functions/dashboard/test-request-body--light.png',
-    dark: '/docs/img/guides/functions/dashboard/test-request-body--light.png',
-  }}
-  zoomable
-/>
-
-## Editing Functions From Dashboard
+## Editing functions from the Dashboard
 
 <Admonition type="caution" label="Be careful: there is currently no version control for edits">
 
-We currently do not offer version control for functions. If you make edits and redeploy a function, you will irrecoverably overwrite the existing deployment.
+The Dashboard's Edge Function editor currently does not support versioning or rollbacks. We recommend using it only for quick testing and prototypes. When you’re ready to go to production, store Edge Functions code in a source code repository (e.g., git) and deploy it using one of the [CI integrations](https://supabase.com/docs/guides/functions/cicd-workflow).
 
 </Admonition>
 
