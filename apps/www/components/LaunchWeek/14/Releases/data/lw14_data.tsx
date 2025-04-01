@@ -102,16 +102,16 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     shipped: true,
     isToday: true,
     hasCountdown: false,
-    blog: '',
+    blog: '/blog/supabase-edge-functions-deploy-dashboard-deno-2-1',
     date: '01 April',
     published_at: '2025-04-01T07:00:00.000-07:00',
-    title: '',
-    description: null,
+    title: 'Supabase Edge Functions: Deploy from the Dashboard + Deno 2.1',
+    description: <>Supabase Edge Functions: Deploy from the Dashboard + Deno 2.1</>,
     links: [
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
+      {
+        type: 'video',
+        href: 'Pn7xyTbsxPI',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1rmxPyVkLjbKN',
