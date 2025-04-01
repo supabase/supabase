@@ -124,10 +124,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
         blog: '#',
         bg_layers: [
           {
-            img: '',
-            mobileImg: '',
-            imgLight: '',
-            mobileImgLight: '',
+            img: '/images/launchweek/14/releases/d2/day-2-dark.svg',
+            mobileImg: '/images/launchweek/14/releases/d2/day-2-dark-mobile.svg',
+            imgLight: '/images/launchweek/14/releases/d2/day-2-light.svg',
+            mobileImgLight: '/images/launchweek/14/releases/d2/day-2-light-mobile.svg',
           },
         ],
       },
