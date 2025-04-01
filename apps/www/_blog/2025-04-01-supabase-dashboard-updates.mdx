@@ -1,0 +1,209 @@
+---
+title: "Keeping Tabs: What's New in Supabase Studio"
+description: 'You guessed it: Tabs! And a bunch of upgrades to Logs, SQL, and the AI Assistant.'
+author: jordi,jonny,saxon_fletcher
+image: launch-week-14/day-1-supabase-ui-library/og.jpg
+thumb: launch-week-14/day-1-supabase-ui-library/thumb.jpg
+categories:
+  - launch-week
+tags:
+  - launch-week
+  - Studio
+date: '2025-04-01T00:00:00'
+toc_depth: 3
+launchweek: 14
+---
+
+We've had a busy few months working on Studio improvements and new features—some big, some small, all designed to help you build, debug, and ship faster.
+
+Here's a quick rundown of what's new:
+
+<ul>
+  <li>
+    [**Tabs!**](#tabs): The Table Editor and SQL Editor now have tabs!
+  </li>
+<li>
+  [**Customizable Reports**](#customizable-reports): create reports to show
+  data exactly how you need to see it
+</li>
+<li>
+  [**SQL Blocks in Custom reports**](#sql-blocks-in-custom-reports): use SQL Snippets in blocks inside custom reports
+</li>
+<li>
+  [**Inline SQL Editor**](#inline-sql-editor): use a mini SQL Editor from anywhere in the Dashboard
+</li>
+<li>
+  [**Multiple assistant chats**](#----): maintain history of your Assistant chats
+</li>
+<li>
+  [**Multiple assistant chats**](#----): maintain history of your Assistant chats
+</li>
+<li>
+  [**Logs improvements**](#----): more detailed inspect panel and stacked charts
+</li>
+
+</ul>
+
+### Tabs!
+
+This has been a common request for a long time, and should make working with data much easier. We've added Tabs to our two most-used tools: the Table Editor and the SQL Editor.
+
+### Tabs in the Table Editor
+
+In the Table Editor, you can open multiple tables at a time and easily switch between them using tabs. This makes it easier to compare data, edit schemas, or reference related tables without losing your place.
+
+<Img
+  wide
+  alt="Table Editor tabs"
+  src={{
+    dark: '/images/blog/launch-week-14/day-3/build-stage/table-editor-tabs.jpg',
+    light: '/images/blog/launch-week-14/day-3/build-stage/table-editor-tabs-light.jpg',
+  }}
+/>
+
+Tabs work the same as in VS Code, opening in preview mode. This is useful if you're quickly browsing files and don't want every visited file to have its own tab. A new tab will only be dedicated to that file when you start editing or simply click into it. Preview mode is indicated by _italics_ in the tab heading.
+
+The New Tab page also gives you quick access to create a new table or open a recently visited one.
+
+<Img
+  wide
+  alt="Creating a new tab"
+  src={{
+    dark: '/images/blog/launch-week-14/day-3/build-stage/new-tab.jpg',
+    light: '/images/blog/launch-week-14/day-3/build-stage/new-tab-light.jpg',
+  }}
+/>
+
+### Tabs in the SQL Editor
+
+In the SQL Editor, you can now write and run multiple scripts at a time, without having to constantly change between snippets. The SQL Editor tabs also have preview mode, so you can quickly flip through snippets without leaving a bunch of tabs to clean up after.
+
+<Img
+  wide
+  alt="SQL Editor tabs"
+  src={{
+    dark: '/images/blog/launch-week-14/day-3/build-stage/sql-editor-tabs.jpg',
+    light: '/images/blog/launch-week-14/day-3/build-stage/sql-editor-tabs-light.jpg',
+  }}
+/>
+
+Multiple tabs will make it easier to work across datasets, debug, or compare different queries, all without losing your place.
+
+## Customizable reports
+
+Reports in the Dashboard recently got a refresh. You can now resize and reorder chart blocks, giving you full control over the layout. It's perfect for crafting reports that look exactly how you want.
+
+<Img
+  wide
+  alt="Customizable reports"
+  src={{
+    dark: '/images/blog/launch-week-14/day-3/build-stage/customizable-reports.jpg',
+    light: '/images/blog/launch-week-14/day-3/build-stage/customizable-reports-light.jpg',
+  }}
+/>
+
+## SQL Blocks in custom reports
+
+We've also added inline SQL execution within blocks, so you can run your own queries directly and build fully customized, data-driven reports.
+
+<Img
+  wide
+  alt="Customizable reports"
+  src={{
+    dark: '/images/blog/launch-week-14/day-3/build-stage/custom-reports-sql.jpg',
+    light: '/images/blog/launch-week-14/day-3/build-stage/custom-reports-sql-light.jpg',
+  }}
+/>
+
+You can also show your data as a table of results:
+
+<Img
+  wide
+  alt="Customizable reports"
+  src={{
+    dark: '/images/blog/launch-week-14/day-3/build-stage/custom-reports-sql-query.jpg',
+    light: '/images/blog/launch-week-14/day-3/build-stage/custom-reports-sql-query-light.jpg',
+  }}
+/>
+
+Or view them as a chart:
+
+<Img
+  wide
+  alt="Customizable reports"
+  src={{
+    dark: '/images/blog/launch-week-14/day-3/build-stage/refinements-completed.jpg',
+    light: '/images/blog/launch-week-14/day-3/build-stage/refinements-completed-light.jpg',
+  }}
+/>
+
+The sky is the limit for these. You could query a Foreign Data Wrapper, join multiple tables, create a View to highlight key information, and much more.
+
+## Inline SQL Editor
+
+You can now run SQL from anywhere in the Dashboard via the Inline SQL Editor. You can query and modify tables, add triggers, functions, RLS policies, and anything else you can do from the main SQL Editor, anywhere in the Dashboard.
+
+<Img
+  wide
+  alt="Customizable reports"
+  src={{
+    dark: '/images/blog/launch-week-14/day-3/build-stage/inline-sql-editor.jpg',
+    light: '/images/blog/launch-week-14/day-3/build-stage/inline-sql-editor-light.jpg',
+  }}
+/>
+
+## Multiple AI Assistant chats
+
+You can now create and store multiple chats in the AI Assistant. Create, rename, switch to and delete chats, all without losing your place. Chats are scoped to the current project, so switching project also switches chat. The chat history is stored in local storage.
+
+<Img
+  wide
+  alt="Customizable reports"
+  src={{
+    dark: '/images/blog/launch-week-14/day-3/build-stage/chat-history.jpg',
+    light: '/images/blog/launch-week-14/day-3/build-stage/chat-history-light.jpg',
+  }}
+/>
+
+## Logs improvements
+
+We've improved the Logs experience over the past few months.
+
+First, we've updated the [log detail panel](https://github.com/supabase/supabase/pull/33536) to shows more info in the API log detail
+
+<Img
+  wide
+  alt="Customizable reports"
+  src={{
+    dark: '/images/blog/launch-week-14/day-3/build-stage/log-detail-panel.jpg',
+    light: '/images/blog/launch-week-14/day-3/build-stage/log-detail-panel-light.jpg',
+  }}
+/>
+
+You can now quickly add a property to search and filter the results:
+
+<Img
+  wide
+  alt="Customizable reports"
+  src={{
+    dark: '/images/blog/launch-week-14/day-3/build-stage/log-detail-panel.jpg',
+    light: '/images/blog/launch-week-14/day-3/build-stage/log-detail-panel-light.jpg',
+  }}
+/>
+
+Add http status to available filters:
+
+<Img
+  wide
+  alt="Customizable reports"
+  src={{
+    dark: '/images/blog/launch-week-14/day-3/build-stage/http-filters.jpg',
+    light: '/images/blog/launch-week-14/day-3/build-stage/http-filters-light.jpg',
+  }}
+/>
+
+## Get started
+
+You can see all these improvements in the Supabase Dashboard now.
+
+- [Get started with Supabase](https://supabase.com/dashboard/sign-in?returnTo=%2Fprojects) and try it out today
