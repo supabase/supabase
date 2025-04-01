@@ -151,7 +151,7 @@ const nextConfig = {
             },
             {
               source: '/',
-              destination: '/organizations',
+              destination: '/projects',
               permanent: false,
             },
             {

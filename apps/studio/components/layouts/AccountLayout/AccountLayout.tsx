@@ -1,15 +1,16 @@
+import { ArrowLeft } from 'lucide-react'
 import Head from 'next/head'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
+import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
-import { ArrowLeft } from 'lucide-react'
-import Link from 'next/link'
 import { cn, NavMenu, NavMenuItem } from 'ui'
 import {
   MAX_WIDTH_CLASSES,
@@ -17,7 +18,6 @@ import {
   ScaffoldContainerLegacy,
   ScaffoldTitle,
 } from '../Scaffold'
-import { useNewLayout } from 'hooks/ui/useNewLayout'
 
 export interface AccountLayoutProps {
   title: string

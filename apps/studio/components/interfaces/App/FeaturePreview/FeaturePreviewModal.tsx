@@ -2,31 +2,31 @@ import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
+import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
+import { removeTabsByEditor } from 'state/tabs'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
-import { useParams } from 'common'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 const FeaturePreviewModal = () => {
-  const enableFunctionsAssistant = useFlag('functionsAssistantV2')
-  const enableNewLayoutPreview = useFlag('newLayoutPreview')
-
+  const { ref } = useParams()
   const snap = useAppStateSnapshot()
+  const org = useSelectedOrganization()
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
-  const { ref: projectRef } = useParams()
-  const org = useSelectedOrganization()
+
+  const enableNewLayoutPreview = useFlag('newLayoutPreview')
+  const isFeaturePreviewTabsTableEditorFlag = useFlag('featurePreviewTabsTableEditor')
+  const isFeaturePreviewTabsSqlEditorFlag = useFlag('featurePreviewSqlEditorTabs')
 
   const selectedFeaturePreview =
     snap.selectedFeaturePreview === '' ? FEATURE_PREVIEWS[0].key : snap.selectedFeaturePreview
 
   const [selectedFeatureKey, setSelectedFeatureKey] = useState<string>(selectedFeaturePreview)
-  const isNotReleased =
-    selectedFeatureKey === 'supabase-ui-functions-assistant' && !enableFunctionsAssistant
 
   const { flags, onUpdateFlag } = featurePreviewContext
   const selectedFeature = FEATURE_PREVIEWS.find((preview) => preview.key === selectedFeatureKey)
@@ -37,8 +37,15 @@ const FeaturePreviewModal = () => {
     sendEvent({
       action: isSelectedFeatureEnabled ? 'feature_preview_disabled' : 'feature_preview_enabled',
       properties: { feature: selectedFeatureKey },
-      groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
+
+    if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS) {
+      removeTabsByEditor(ref as string | undefined, 'table')
+    }
+    if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS) {
+      removeTabsByEditor(ref as string | undefined, 'sql')
+    }
   }
 
   function handleCloseFeaturePreviewModal() {
@@ -46,8 +53,21 @@ const FeaturePreviewModal = () => {
     snap.setSelectedFeaturePreview(FEATURE_PREVIEWS[0].key)
   }
 
+  function isReleasedToPublic(feature: (typeof FEATURE_PREVIEWS)[number]) {
+    switch (feature.key) {
+      case LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS:
+        return isFeaturePreviewTabsTableEditorFlag
+      case LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS:
+        return isFeaturePreviewTabsSqlEditorFlag
+      case LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW:
+        return enableNewLayoutPreview
+      default:
+        return true
+    }
+  }
   // this modal can be triggered on other pages
   // Update local state when valtio state changes
+
   useEffect(() => {
     if (snap.selectedFeaturePreview !== '') {
       setSelectedFeatureKey(snap.selectedFeaturePreview)
@@ -58,26 +78,17 @@ const FeaturePreviewModal = () => {
     if (snap.showFeaturePreviewModal) {
       sendEvent({
         action: 'feature_previews_clicked',
-        groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
     }
   }, [snap.showFeaturePreviewModal])
-
-  function isReleasedToPublic(feature: (typeof FEATURE_PREVIEWS)[number]) {
-    switch (feature.key) {
-      case LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW:
-        return enableNewLayoutPreview
-      default:
-        return true
-    }
-  }
 
   return (
     <Modal
       hideFooter
       showCloseButton
       size="xlarge"
-      className="max-w-4xl"
+      className="!max-w-4xl"
       header="Dashboard feature previews"
       visible={snap.showFeaturePreviewModal}
       onCancel={handleCloseFeaturePreviewModal}
@@ -128,15 +139,9 @@ const FeaturePreviewModal = () => {
                     </Link>
                   </Button>
                 )}
-                {isNotReleased ? (
-                  <Button disabled type="default">
-                    Coming soon
-                  </Button>
-                ) : (
-                  <Button type="default" onClick={() => toggleFeature()}>
-                    {isSelectedFeatureEnabled ? 'Disable' : 'Enable'} feature
-                  </Button>
-                )}
+                <Button type="default" onClick={() => toggleFeature()}>
+                  {isSelectedFeatureEnabled ? 'Disable' : 'Enable'} feature
+                </Button>
               </div>
             </div>
             {selectedFeature?.content}

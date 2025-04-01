@@ -2,8 +2,8 @@ import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
+import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
-import { useNewLayout } from 'hooks/ui/useNewLayout'
 import { cn, NavMenu, NavMenuItem } from 'ui'
 import { ScaffoldContainerLegacy, ScaffoldTitle } from '../Scaffold'
 

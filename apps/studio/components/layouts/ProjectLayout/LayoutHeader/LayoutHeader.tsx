@@ -4,12 +4,17 @@ import { useRouter } from 'next/router'
 import { ReactNode, useMemo } from 'react'
 
 import { useParams } from 'common'
-import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import {
+  useIsInlineEditorEnabled,
+  useNewLayout,
+} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import Connect from 'components/interfaces/Connect/Connect'
+import { ThemeDropdown } from 'components/interfaces/ThemeDropdown'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
 import AssistantButton from 'components/layouts/AppLayout/AssistantButton'
 import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
 import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
+import InlineEditorButton from 'components/layouts/AppLayout/InlineEditorButton'
 import OrganizationDropdown from 'components/layouts/AppLayout/OrganizationDropdown'
 import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
@@ -18,8 +23,8 @@ import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useShowLayoutHeader } from 'hooks/misc/useShowLayoutHeader'
-import { useNewLayout } from 'hooks/ui/useNewLayout'
 import { IS_PLATFORM } from 'lib/constants'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
 import BreadcrumbsView from './BreadcrumbsView'
@@ -27,7 +32,6 @@ import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
-import { ThemeDropdown } from 'components/interfaces/ThemeDropdown'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -69,7 +73,9 @@ const LayoutHeader = ({
   const selectedOrganization = useSelectedOrganization()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
   const isOrgPage = router.pathname.startsWith('/org/') // Add this check
-  const { aiAssistantPanel, setMobileMenuOpen } = useAppStateSnapshot()
+  const { setMobileMenuOpen } = useAppStateSnapshot()
+
+  const { open: isAiAssistantOpen } = useAiAssistantStateSnapshot()
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
   const { data: subscription } = useOrgSubscriptionQuery({
@@ -202,27 +208,34 @@ const LayoutHeader = ({
               <FeedbackDropdown />
               <NotificationsPopoverV2 />
               <HelpPopover />
+              <UserDropdown />
             </>
           ) : (
             <ThemeDropdown />
           )}
         </div>
       </div>
+
       <AnimatePresence initial={false}>
-        {!!projectRef && !aiAssistantPanel.open && (
-          <motion.div
-            className="border-l h-full flex items-center justify-center flex-shrink-0"
-            initial={{ opacity: 0, x: 0, width: 0 }}
-            animate={{ opacity: 1, x: 0, width: 48 }}
-            exit={{ opacity: 0, x: 0, width: 0 }}
-            transition={{
-              duration: 0.15,
-              ease: 'easeOut',
-            }}
-          >
-            <AssistantButton />
-          </motion.div>
-        )}
+        {!!projectRef &&
+          (isInlineEditorEnabled || (!isInlineEditorEnabled && !isAiAssistantOpen)) && (
+            <motion.div
+              className="border-l h-full flex items-center justify-center flex-shrink-0"
+              initial={{ opacity: 0, x: 0, width: 0 }}
+              animate={{ opacity: 1, x: 0, width: isInlineEditorEnabled ? 'auto' : 48 }}
+              exit={{ opacity: 0, x: 0, width: 0 }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
+            >
+              {isInlineEditorEnabled && (
+                <div className="border-r h-full flex items-center justify-center px-2">
+                  <InlineEditorButton />
+                </div>
+              )}
+              <div className="px-2">
+                <AssistantButton />
+              </div>
+            </motion.div>
+          )}
       </AnimatePresence>
     </header>
   )

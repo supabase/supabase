@@ -1,6 +1,6 @@
 import { usePathname } from 'next/navigation'
 
-import { useNewLayout } from 'hooks/ui/useNewLayout'
+import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 export function useHideSidebar() {
   const newLayoutPreview = useNewLayout()

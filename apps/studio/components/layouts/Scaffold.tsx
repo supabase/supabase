@@ -1,6 +1,6 @@
 import { forwardRef, HTMLAttributes } from 'react'
 
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { cn } from 'ui'
 
 export const MAX_WIDTH_CLASSES = 'mx-auto w-full max-w-[1200px]'
@@ -25,8 +25,7 @@ export const ScaffoldContainer = forwardRef<
     size?: 'small' | 'default' | 'large' | 'full'
   }
 >(({ className, bottomPadding, size = 'default', ...props }, ref) => {
-  const { aiAssistantPanel } = useAppStateSnapshot()
-  const { open } = aiAssistantPanel
+  const snap = useAiAssistantStateSnapshot()
 
   const maxWidthClass = {
     small: 'max-w-[768px]',
@@ -44,7 +43,7 @@ export const ScaffoldContainer = forwardRef<
         maxWidthClass,
         PADDING_CLASSES,
         bottomPadding && 'pb-16',
-        open ? 'xl:px-6' : '',
+        snap.open ? 'xl:px-6' : '',
         className
       )}
     />

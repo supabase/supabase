@@ -2,18 +2,17 @@ import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
 
+import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
 import { useVercelRedirectQuery } from 'data/integrations/vercel-redirect-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useNewLayout } from 'hooks/ui/useNewLayout'
 import { IS_PLATFORM } from 'lib/constants'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
 import { SidebarSection } from './AccountLayout/AccountLayout.types'
 import WithSidebar from './AccountLayout/WithSidebar'
 import LayoutHeader from './ProjectLayout/LayoutHeader/LayoutHeader'
-import { ScaffoldContainer } from './Scaffold'
 
 const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const newLayoutPreview = useNewLayout()

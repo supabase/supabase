@@ -10,13 +10,14 @@ export type PgbouncerConfigurationUpdateVariables = {
   ref: string
 } & Pick<
   components['schemas']['UpdatePgbouncerConfigBody'],
-  'default_pool_size' | 'max_client_conn'
+  'default_pool_size' | 'max_client_conn' | 'ignore_startup_parameters'
 >
 
 export async function updatePgbouncerConfiguration({
   ref,
   default_pool_size,
   max_client_conn,
+  ignore_startup_parameters,
 }: PgbouncerConfigurationUpdateVariables) {
   if (!ref) return console.error('Project ref is required')
 
@@ -25,7 +26,7 @@ export async function updatePgbouncerConfiguration({
     body: {
       default_pool_size,
       max_client_conn,
-      ignore_startup_parameters: '',
+      ignore_startup_parameters,
     },
   })
 

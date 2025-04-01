@@ -1072,6 +1072,21 @@ export interface EdgeFunctionDeployButtonClickedEvent {
 }
 
 /**
+ * User clicked the confirm deploy updates button for an Edge Function in the code page within the warning model.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions/{id}/code
+ */
+export interface EdgeFunctionDeployUpdatesConfirmClickedEvent {
+  action: 'edge_function_deploy_updates_confirm_clicked'
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
  * User clicked the AI Assistant button to create an Edge Function.
  *
  * @group Events
@@ -1158,6 +1173,74 @@ export interface EdgeFunctionViaCliButtonClickedEvent {
 }
 
 /**
+ * User clicked the deploy updates button for an edge function.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions/{id}/code
+ */
+export interface EdgeFunctionDeployUpdatesButtonClickedEvent {
+  action: 'edge_function_deploy_updates_button_clicked'
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * User clicked the Send Request button for testing an Edge Function.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions/{id}
+ */
+export interface EdgeFunctionTestSendButtonClickedEvent {
+  action: 'edge_function_test_send_button_clicked'
+  properties: {
+    /**
+     * The HTTP method used for the test request, e.g., GET, POST.
+     */
+    httpMethod: string
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * User opened the side panel for testing an edge function.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions/{id}
+ */
+export interface EdgeFunctionTestSidePanelOpenedEvent {
+  action: 'edge_function_test_side_panel_opened'
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * User copied the command for a Supabase UI component.
+ *
+ * @group Events
+ * @source supabase-ui
+ * @page /ui/docs/{framework}/{templateTitle}
+ */
+export interface SupabaseUiCommandCopyButtonClickedEvent {
+  action: 'supabase_ui_command_copy_button_clicked'
+  properties: {
+    templateTitle: string
+    command: string
+    framework: 'nextjs' | 'react-router' | 'tanstack' | 'react'
+    packageManager: 'npm' | 'pnpm' | 'yarn' | 'bun'
+  }
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -1223,7 +1306,12 @@ export type TelemetryEvent =
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
   | EdgeFunctionDeployButtonClickedEvent
+  | EdgeFunctionDeployUpdatesConfirmClickedEvent
   | EdgeFunctionAiAssistantButtonClickedEvent
   | EdgeFunctionViaEditorButtonClickedEvent
   | EdgeFunctionTemplateClickedEvent
   | EdgeFunctionViaCliButtonClickedEvent
+  | EdgeFunctionDeployUpdatesButtonClickedEvent
+  | EdgeFunctionTestSendButtonClickedEvent
+  | EdgeFunctionTestSidePanelOpenedEvent
+  | SupabaseUiCommandCopyButtonClickedEvent

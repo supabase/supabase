@@ -9,15 +9,15 @@
       "title": "Password Based Auth flow for Nextjs and Supabase",
       "description": "Password Based Auth flow for Nextjs and Supabase",
       "registryDependencies": ["button", "card", "input", "label"],
-      "dependencies": ["@supabase/ssr@latest"],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
       "files": [
         {
-          "path": "registry/default/blocks/password-based-auth-nextjs/app/login/page.tsx",
+          "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/login/page.tsx",
           "type": "registry:page",
-          "target": "app/login/page.tsx"
+          "target": "app/auth/login/page.tsx"
         },
         {
-          "path": "registry/default/blocks/password-based-auth-nextjs/app/error/page.tsx",
+          "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/error/page.tsx",
           "type": "registry:page",
           "target": "app/auth/error/page.tsx"
         },
@@ -27,7 +27,7 @@
           "target": "app/protected/page.tsx"
         },
         {
-          "path": "registry/default/blocks/password-based-auth-nextjs/app/confirm/route.ts",
+          "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/confirm/route.ts",
           "type": "registry:page",
           "target": "app/auth/confirm/route.ts"
         },
@@ -41,28 +41,28 @@
           "target": "middleware.ts"
         },
         {
-          "path": "registry/default/blocks/password-based-auth-nextjs/app/sign-up/page.tsx",
+          "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/sign-up/page.tsx",
           "type": "registry:page",
-          "target": "app/sign-up/page.tsx"
+          "target": "app/auth/sign-up/page.tsx"
         },
         {
-          "path": "registry/default/blocks/password-based-auth-nextjs/app/sign-up-success/page.tsx",
+          "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/sign-up-success/page.tsx",
           "type": "registry:page",
-          "target": "app/sign-up-success/page.tsx"
+          "target": "app/auth/sign-up-success/page.tsx"
         },
         {
           "path": "registry/default/blocks/password-based-auth-nextjs/components/sign-up-form.tsx",
           "type": "registry:component"
         },
         {
-          "path": "registry/default/blocks/password-based-auth-nextjs/app/forgot-password/page.tsx",
+          "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/forgot-password/page.tsx",
           "type": "registry:page",
-          "target": "app/forgot-password/page.tsx"
+          "target": "app/auth/forgot-password/page.tsx"
         },
         {
-          "path": "registry/default/blocks/password-based-auth-nextjs/app/update-password/page.tsx",
+          "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/update-password/page.tsx",
           "type": "registry:page",
-          "target": "app/update-password/page.tsx"
+          "target": "app/auth/update-password/page.tsx"
         },
         {
           "path": "registry/default/blocks/password-based-auth-nextjs/components/forgot-password-form.tsx",
@@ -71,6 +71,22 @@
         {
           "path": "registry/default/blocks/password-based-auth-nextjs/components/update-password-form.tsx",
           "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-nextjs/components/logout-button.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
         }
       ]
     },
@@ -105,13 +121,169 @@
       "dependencies": ["@supabase/supabase-js@latest"]
     },
     {
+      "name": "password-based-auth-react-router",
+      "type": "registry:block",
+      "title": "Password Based Auth flow for React Router and Supabase",
+      "description": "Password Based Auth flow for React Router and Supabase",
+      "registryDependencies": ["button", "card", "input", "label"],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@react-router/dev@latest",
+        "@react-router/fs-routes@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/password-based-auth-react-router/app/routes/auth.confirm.tsx",
+          "type": "registry:file",
+          "target": "app/routes/auth.confirm.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-react-router/app/routes/auth.error.tsx",
+          "type": "registry:file",
+          "target": "app/routes/auth.error.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-react-router/app/routes/forgot-password.tsx",
+          "type": "registry:file",
+          "target": "app/routes/forgot-password.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-react-router/app/routes/login.tsx",
+          "type": "registry:file",
+          "target": "app/routes/login.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-react-router/app/routes/logout.tsx",
+          "type": "registry:file",
+          "target": "app/routes/logout.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-react-router/app/routes/protected.tsx",
+          "type": "registry:file",
+          "target": "app/routes/protected.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-react-router/app/routes/sign-up.tsx",
+          "type": "registry:file",
+          "target": "app/routes/sign-up.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-react-router/app/routes/update-password.tsx",
+          "type": "registry:file",
+          "target": "app/routes/update-password.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-react-router/app/routes.ts",
+          "type": "registry:file",
+          "target": "app/routes.ts"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "password-based-auth-tanstack",
+      "type": "registry:block",
+      "title": "Password Based Auth flow for tanstack and Supabase",
+      "description": "Password Based Auth flow for tanstack and Supabase",
+      "registryDependencies": ["button", "card", "input", "label"],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/login.tsx",
+          "type": "registry:file",
+          "target": "routes/login.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/auth/error.tsx",
+          "type": "registry:file",
+          "target": "routes/auth/error.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/_protected.tsx",
+          "type": "registry:file",
+          "target": "routes/_protected.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/_protected/info.tsx",
+          "type": "registry:file",
+          "target": "routes/_protected/info.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/auth/confirm.ts",
+          "type": "registry:file",
+          "target": "routes/auth/confirm.ts"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/components/login-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/sign-up.tsx",
+          "type": "registry:file",
+          "target": "routes/sign-up.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/sign-up-success.tsx",
+          "type": "registry:file",
+          "target": "routes/sign-up-success.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/components/sign-up-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/forgot-password.tsx",
+          "type": "registry:file",
+          "target": "routes/forgot-password.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/routes/update-password.tsx",
+          "type": "registry:file",
+          "target": "routes/update-password.tsx"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/components/forgot-password-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/components/update-password-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/password-based-auth-tanstack/lib/supabase/fetch-user-server-fn.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
       "name": "dropzone-nextjs",
       "type": "registry:component",
       "title": "Dropzone (File Upload)",
       "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
-      "registryDependencies": ["button", "tooltip", "progress"],
-      "dependencies": ["react-dropzone", "lucide-react", "@supabase/ssr@latest"],
+      "registryDependencies": ["button"],
+      "dependencies": [
+        "react-dropzone",
+        "lucide-react",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
       "files": [
         {
           "path": "registry/default/blocks/dropzone/components/dropzone.tsx",
@@ -141,7 +313,7 @@
       "type": "registry:component",
       "title": "Dropzone (File Upload)",
       "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
-      "registryDependencies": ["button", "tooltip", "progress"],
+      "registryDependencies": ["button"],
       "dependencies": ["react-dropzone", "lucide-react", "@supabase/supabase-js@latest"],
       "files": [
         {
@@ -164,8 +336,13 @@
       "type": "registry:component",
       "title": "Dropzone (File Upload)",
       "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
-      "registryDependencies": ["button", "tooltip", "progress"],
-      "dependencies": ["react-dropzone", "lucide-react", "@supabase/ssr@latest"],
+      "registryDependencies": ["button"],
+      "dependencies": [
+        "react-dropzone",
+        "lucide-react",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
       "files": [
         {
           "path": "registry/default/blocks/dropzone/components/dropzone.tsx",
@@ -176,11 +353,11 @@
           "type": "registry:hook"
         },
         {
-          "path": "registry/default/clients/react-router/lib/supabase.client.ts",
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
           "type": "registry:lib"
         },
         {
-          "path": "registry/default/clients/react-router/lib/supabase.server.ts",
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
           "type": "registry:lib"
         }
       ]
@@ -191,8 +368,13 @@
       "type": "registry:component",
       "title": "Dropzone (File Upload)",
       "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
-      "registryDependencies": ["button", "tooltip", "progress"],
-      "dependencies": ["react-dropzone", "lucide-react", "@supabase/ssr@latest"],
+      "registryDependencies": ["button"],
+      "dependencies": [
+        "react-dropzone",
+        "lucide-react",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
       "files": [
         {
           "path": "registry/default/blocks/dropzone/components/dropzone.tsx",
@@ -219,7 +401,7 @@
       "title": "Realtime Cursor",
       "description": "Component which renders realtime cursors from other users in a room.",
       "registryDependencies": [],
-      "dependencies": ["lucide-react", "@supabase/ssr@latest"],
+      "dependencies": ["lucide-react", "@supabase/ssr@latest", "@supabase/supabase-js@latest"],
       "files": [
         {
           "path": "registry/default/blocks/realtime-cursor/components/cursor.tsx",
@@ -281,7 +463,7 @@
       "title": "Realtime Cursor",
       "description": "Component which renders realtime cursors from other users in a room.",
       "registryDependencies": [],
-      "dependencies": ["lucide-react", "@supabase/ssr@latest"],
+      "dependencies": ["lucide-react", "@supabase/ssr@latest", "@supabase/supabase-js@latest"],
       "files": [
         {
           "path": "registry/default/blocks/realtime-cursor/components/cursor.tsx",
@@ -296,11 +478,11 @@
           "type": "registry:hook"
         },
         {
-          "path": "registry/default/clients/react-router/lib/supabase.client.ts",
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
           "type": "registry:lib"
         },
         {
-          "path": "registry/default/clients/react-router/lib/supabase.server.ts",
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
           "type": "registry:lib"
         }
       ]
@@ -312,7 +494,7 @@
       "title": "Realtime Cursor",
       "description": "Component which renders realtime cursors from other users in a room.",
       "registryDependencies": [],
-      "dependencies": ["lucide-react", "@supabase/ssr@latest"],
+      "dependencies": ["lucide-react", "@supabase/ssr@latest", "@supabase/supabase-js@latest"],
       "files": [
         {
           "path": "registry/default/blocks/realtime-cursor/components/cursor.tsx",
@@ -338,12 +520,433 @@
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "current-user-avatar-nextjs",
+      "type": "registry:component",
+      "title": "Current User Avatar",
+      "description": "Component which renders the current user's avatar.",
+      "registryDependencies": ["avatar"],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "current-user-avatar-react",
+      "type": "registry:component",
+      "title": "Current User Avatar",
+      "description": "Component which renders the current user's avatar.",
+      "registryDependencies": ["avatar"],
+      "dependencies": ["@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "current-user-avatar-react-router",
+      "type": "registry:component",
+      "title": "Current User Avatar",
+      "description": "Component which renders the current user's avatar.",
+      "registryDependencies": ["avatar"],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "current-user-avatar-tanstack",
+      "type": "registry:component",
+      "title": "Current User Avatar",
+      "description": "Component which renders the current user's avatar.",
+      "registryDependencies": ["avatar"],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-avatar-stack-nextjs",
+      "type": "registry:component",
+      "title": "Avatar Stack with Realtime Presence",
+      "description": "Component which stack of avatars, tracked by realtime presence.",
+      "registryDependencies": ["avatar", "tooltip"],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-avatar-stack-react",
+      "type": "registry:component",
+      "title": "Avatar Stack with Realtime Presence",
+      "description": "Component which stack of avatars, tracked by realtime presence.",
+      "registryDependencies": ["avatar", "tooltip"],
+      "dependencies": ["@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-avatar-stack-react-router",
+      "type": "registry:component",
+      "title": "Avatar Stack with Realtime Presence",
+      "description": "Component which stack of avatars, tracked by realtime presence.",
+      "registryDependencies": ["avatar", "tooltip"],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-avatar-stack-tanstack",
+      "type": "registry:component",
+      "title": "Avatar Stack with Realtime Presence",
+      "description": "Component which stack of avatars, tracked by realtime presence.",
+      "registryDependencies": ["avatar", "tooltip"],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/components/realtime-avatar-stack.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-avatar-stack/hooks/use-realtime-presence-room.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-name.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/current-user-avatar/hooks/use-current-user-image.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-chat-nextjs",
+      "type": "registry:component",
+      "title": "Realtime Chat",
+      "description": "Component which renders realtime chat messages from other users in a room.",
+      "registryDependencies": ["input", "button"],
+      "dependencies": ["lucide-react", "@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-chat-react",
+      "type": "registry:component",
+      "title": "Realtime Chat",
+      "description": "Component which renders realtime chat messages from other users in a room.",
+      "registryDependencies": ["input", "button"],
+      "dependencies": ["lucide-react", "@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-chat-react-router",
+      "type": "registry:component",
+      "title": "Realtime Chat",
+      "description": "Component which renders realtime chat messages from other users in a room.",
+      "registryDependencies": ["input", "button"],
+      "dependencies": ["lucide-react", "@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-chat-tanstack",
+      "type": "registry:component",
+      "title": "Realtime Chat",
+      "description": "Component which renders realtime chat messages from other users in a room.",
+      "registryDependencies": ["input", "button"],
+      "dependencies": ["lucide-react", "@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
       "name": "supabase-client-nextjs",
       "type": "registry:lib",
       "title": "Supabase Client for Next.js",
       "description": "",
       "registryDependencies": [],
-      "dependencies": ["@supabase/ssr@latest"],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "docs": "You'll need to add a `.env` file with the following environment variables to your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.",
       "files": [
         {
           "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
@@ -367,6 +970,7 @@
       "description": "",
       "registryDependencies": [],
       "dependencies": ["@supabase/supabase-js@latest"],
+      "docs": "You'll need to add a `.env` file with the following environment variables to your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.",
       "files": [
         {
           "path": "registry/default/clients/react/lib/supabase/client.ts",
@@ -381,14 +985,15 @@
       "title": "Supabase Client for React Router",
       "description": "",
       "registryDependencies": [],
-      "dependencies": ["@supabase/ssr@latest"],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "docs": "You'll need to add a `.env` file with the following environment variables to your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.",
       "files": [
         {
-          "path": "registry/default/clients/react-router/lib/supabase.client.ts",
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
           "type": "registry:lib"
         },
         {
-          "path": "registry/default/clients/react-router/lib/supabase.server.ts",
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
           "type": "registry:lib"
         }
       ]
@@ -397,10 +1002,11 @@
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
       "name": "supabase-client-tanstack",
       "type": "registry:lib",
-      "title": "Supabase Client for Tanstack Start",
+      "title": "Supabase Client for TanStack Start",
       "description": "",
       "registryDependencies": [],
-      "dependencies": ["@supabase/ssr@latest"],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "docs": "You'll need to add a `.env` file with the following environment variables to your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.",
       "files": [
         {
           "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
@@ -424,27 +1030,27 @@
         {
           "path": "registry/default/ai-editor-rules/create-db-functions.md",
           "type": "registry:file",
-          "target": ".rules/create-db-functions.md"
+          "target": ".cursor/rules/create-db-functions.md"
         },
         {
           "path": "registry/default/ai-editor-rules/create-migration.md",
           "type": "registry:file",
-          "target": ".rules/create-migration.md"
+          "target": ".cursor/rules/create-migration.md"
         },
         {
           "path": "registry/default/ai-editor-rules/create-rls-policies.md",
           "type": "registry:file",
-          "target": ".rules/create-rls-policies.md"
+          "target": ".cursor/rules/create-rls-policies.md"
         },
         {
           "path": "registry/default/ai-editor-rules/postgres-sql-style-guide.md",
           "type": "registry:file",
-          "target": ".rules/postgres-sql-style-guide.md"
+          "target": ".cursor/rules/postgres-sql-style-guide.md"
         },
         {
           "path": "registry/default/ai-editor-rules/writing-supabase-edge-functions.md",
           "type": "registry:file",
-          "target": ".rules/writing-supabase-edge-functions.md"
+          "target": ".cursor/rules/writing-supabase-edge-functions.md"
         }
       ]
     }

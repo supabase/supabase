@@ -1,19 +1,22 @@
 'use client'
 
+import { cva, VariantProps } from 'class-variance-authority'
 import { ChevronRight, FolderClosed, FolderOpen, Loader2 } from 'lucide-react'
-import { ComponentPropsWithoutRef, ReactNode, forwardRef, useEffect, useRef, useState } from 'react'
+import { ComponentPropsWithoutRef, forwardRef, ReactNode, useEffect, useRef, useState } from 'react'
 import TreeViewPrimitive, { flattenTree } from 'react-accessible-treeview'
 import { cn } from '../../lib/utils'
 import { Input } from '../shadcn/ui/input'
-import { cva, VariantProps } from 'class-variance-authority'
 
 const TreeView = TreeViewPrimitive
+
+const CHEVRON_ICON_SIZE = 14
+const ENTITY_ICON_SIZE = 16
 
 export type TreeViewItemVariantProps = VariantProps<typeof TreeViewItemVariant>
 export const TreeViewItemVariant = cva(
   // [Joshen Temp]: aria-selected:text-foreground not working as aria-selected property not rendered in DOM,
   // [Joshen Temp]: aria-selected:!bg-selection not working as aria-selected property not rendered in DOM
-  'group relative transition-colors h-[28px] flex items-center gap-3 text-sm cursor-pointer select-none text-foreground-light hover:bg-control aria-expanded:bg-control data-[state=open]:bg-control', // data-[state=open]:bg-control bg state for context menu open
+  'group relative transition-colors h-[28px] flex items-center gap-3 text-sm cursor-pointer select-none text-foreground-light hover:bg-control aria-expanded:bg-transparent data-[state=open]:bg-transparent', // data-[state=open]:bg-control bg state for context menu open
   {
     variants: {
       isSelected: {
@@ -50,7 +53,7 @@ const TreeViewItem = forwardRef<
     /** Specifies if the item is selected */
     isSelected?: boolean
     /** The horizontal padding of the item */
-    xPadding: number
+    xPadding?: number
     /** name of entity */
     name: string
     /** icon of entity */
@@ -61,12 +64,14 @@ const TreeViewItem = forwardRef<
     onEditSubmit?: (value: string) => void
     /** For asynchronous loading */
     isLoading?: boolean
+    /** Callback for double-click */
+    onDoubleClick?: (e: React.MouseEvent) => void
   }
 >(
   (
     {
       level = 1,
-      levelPadding = 56,
+      levelPadding = 38,
       isExpanded = false,
       isOpened = false,
       isBranch = false,
@@ -78,6 +83,7 @@ const TreeViewItem = forwardRef<
       icon,
       isEditing = false,
       onEditSubmit,
+      onDoubleClick,
       ...props
     },
     ref
@@ -100,6 +106,25 @@ const TreeViewItem = forwardRef<
     useEffect(() => {
       if (isEditing) {
         inputRef.current?.focus()
+
+        // When editing starts, select text up to the last dot
+        if (inputRef.current) {
+          const input = inputRef.current
+
+          // Need a slight delay to ensure focus is established
+          setTimeout(() => {
+            const fileName = input.value
+            const lastDotIndex = fileName.lastIndexOf('.')
+            const startPos = 0
+            const endPos = lastDotIndex > 0 ? lastDotIndex : fileName.length
+
+            try {
+              input.setSelectionRange(startPos, endPos)
+            } catch (e) {
+              console.error('Could not set selection range', e)
+            }
+          }, 50)
+        }
       } else {
         setLocalValueState(name)
       }
@@ -111,43 +136,52 @@ const TreeViewItem = forwardRef<
       }
     }, [isLoading])
 
+    const handleBlur = () => {
+      onEditSubmit?.(localValueState)
+    }
+
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault()
       onEditSubmit?.(localValueState)
     }
 
+    // [Joshen] These properties were causing console errors as they were getting passed as props to the parent div
+    const {
+      isDisabled,
+      isHalfSelected,
+      handleSelect,
+      handleExpand,
+      treeState,
+      dispatch,
+      ...divProps
+    } = props as any
+
     return (
       <div
         ref={ref}
+        {...divProps}
         aria-selected={isSelected}
         aria-expanded={!isEditing && isExpanded}
+        onDoubleClick={onDoubleClick}
         {...props}
-        className={cn(TreeViewItemVariant({ isSelected, isOpened, isPreview }))}
+        className={cn(TreeViewItemVariant({ isSelected, isOpened, isPreview }), props.className)}
         style={{
-          paddingLeft:
-            level === 1 && !isBranch
-              ? xPadding
-              : level
-                ? levelPadding * (level - 1) + xPadding + (!isBranch ? 0 : 0)
-                : levelPadding,
+          paddingLeft: xPadding + ((level - 1) * levelPadding) / 2,
           ...props.style,
         }}
         data-treeview-is-branch={isBranch}
         data-treeview-level={level}
       >
-        {level && level > 1 && (
+        {Array.from({ length: level - 1 }).map((_, i) => (
           <div
+            key={i}
             style={{
-              left: (levelPadding / 2 + 4) * (level - 1) + xPadding,
+              left: xPadding + (i * levelPadding) / 2 + CHEVRON_ICON_SIZE / 2,
             }}
-            className={
-              'absolute h-full w-px group-data-[treeview-is-branch=false]:bg-border-strong'
-            }
+            className={'absolute h-full w-px bg-border-strong'}
           ></div>
-        )}
-        {/* [Joshen] Temp fix as the white border on the left was not showing up via group-aria-selected */}
+        ))}
         {isSelected && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
-        {/* <div className="absolute left-0 h-full w-0.5 group-aria-selected:bg-foreground" /> */}
         {isBranch ? (
           <>
             {isLoading ? (
@@ -161,7 +195,8 @@ const TreeViewItem = forwardRef<
                   'transition-transform duration-200',
                   'group-aria-expanded:rotate-90'
                 )}
-                size={14}
+                size={CHEVRON_ICON_SIZE}
+                strokeWidth={1.5}
               />
             )}
             <TreeViewFolderIcon
@@ -172,7 +207,7 @@ const TreeViewItem = forwardRef<
                 'group-aria-expanded:text-foreground-light'
               )}
               isOpen={isExpanded}
-              size={16}
+              size={ENTITY_ICON_SIZE}
               strokeWidth={1.5}
             />
           </>
@@ -186,7 +221,7 @@ const TreeViewItem = forwardRef<
                 'w-5 h-5 shrink-0',
                 '-ml-0.5'
               )}
-              size={16}
+              size={ENTITY_ICON_SIZE}
               strokeWidth={1.5}
             />
           )
@@ -200,6 +235,7 @@ const TreeViewItem = forwardRef<
             onChange={(e) => {
               setLocalValueState(e.target.value)
             }}
+            onBlur={handleBlur}
             onKeyDownCapture={(e) => {
               // stop keyboard down bubbling up to TreeView.root
               // on enter key, send onEditSubmit callback
@@ -254,4 +290,4 @@ const TreeViewFolderIcon = forwardRef<SVGSVGElement, LucideSVGProps & { isOpen?:
   }
 )
 
-export { TreeView, TreeViewFolderIcon, TreeViewItem, flattenTree, SQL_ICON }
+export { flattenTree, SQL_ICON, TreeView, TreeViewFolderIcon, TreeViewItem }

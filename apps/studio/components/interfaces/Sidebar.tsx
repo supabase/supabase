@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, MotionProps } from 'framer-motion'
 import { isUndefined } from 'lodash'
-import { Blocks, Boxes, ChartArea, Command, PanelLeftDashed, Settings, Users } from 'lucide-react'
+import { Blocks, Boxes, ChartArea, PanelLeftDashed, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ComponentPropsWithoutRef, FC, useEffect } from 'react'
@@ -19,9 +19,8 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLints } from 'hooks/misc/useLints'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useFlag } from 'hooks/ui/useFlag'
-import { useNewLayout } from 'hooks/ui/useNewLayout'
 import { Home } from 'icons'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
@@ -44,9 +43,11 @@ import {
   useSidebar,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns'
-import { useIsAPIDocsSidePanelEnabled } from './App/FeaturePreview/FeaturePreviewContext'
-import { ThemeDropdown } from './ThemeDropdown'
-import { UserDropdown } from './UserDropdown'
+import {
+  useIsAPIDocsSidePanelEnabled,
+  useIsSQLEditorTabsEnabled,
+  useNewLayout,
+} from './App/FeaturePreview/FeaturePreviewContext'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
@@ -245,7 +246,9 @@ function ProjectLinks() {
   const snap = useAppStateSnapshot()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { securityLints, errorLints } = useLints()
+
   const showWarehouse = useFlag('warehouse')
+  const isSqlEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -261,7 +264,9 @@ function ProjectLinks() {
     'realtime:all',
   ])
 
-  const toolRoutes = generateToolRoutes(ref, project)
+  const toolRoutes = generateToolRoutes(ref, project, {
+    sqlEditorTabs: isSqlEditorTabsEnabled,
+  })
   const productRoutes = generateProductRoutes(ref, project, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,

@@ -35,6 +35,7 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
         const method = log?.metadata?.[0]?.request?.[0]?.method
         const path = log?.metadata?.[0]?.request?.[0]?.path
         const user_agent = log?.metadata?.[0]?.request?.[0]?.headers[0].user_agent
+        const error_code = log?.metadata?.[0]?.response?.[0]?.headers?.[0]?.x_sb_error_code
         const { id, metadata, timestamp, event_message, ...rest } = log
 
         const apiLog = {
@@ -46,6 +47,7 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
           timestamp,
           event_message,
           metadata,
+          ...(error_code ? { error_code } : null),
           ...rest,
         }
 

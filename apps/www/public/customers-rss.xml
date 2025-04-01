@@ -9,10 +9,17 @@
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/customers/quilia</guid>
-  <title>Quilia Empowers Personal Injury Clients with Streamlined Data Management using Supabase</title>
+  <title>Quilia Saves 75% in Development Time with Supabase’s Data API and RLS Features</title>
   <link>https://supabase.com/customers/quilia</link>
-  <description>Migrating to Supabase resulted in a 75% reduction in development time, 50% lower costs, and enhanced security for sensitive client data.</description>
+  <description>Discover how Quilia leveraged Supabase’s built-in Data API and Row Level Security to accelerate development, enhance data protection, and halve infrastructure costs.</description>
   <pubDate>Sat, 08 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/deriv</guid>
+  <title>Deriv&apos;s Journey with Supabase</title>
+  <link>https://supabase.com/customers/deriv</link>
+  <description>Accelerating Online Trading with a Scalable Postgres Backend</description>
+  <pubDate>Thu, 06 Mar 2025 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/customers/asap-work</guid>

@@ -4,18 +4,17 @@ import { useEffect, useState } from 'react'
 import { ProjectList } from 'components/interfaces/Home/ProjectList'
 import HomePageActions from 'components/interfaces/HomePageActions'
 
+import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import OrganizationLayout from 'components/layouts/OrganizationLayout'
+import { MAX_WIDTH_CLASSES, PADDING_CLASSES } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 import { cn } from 'ui'
-import { MAX_WIDTH_CLASSES, PADDING_CLASSES } from 'components/layouts/Scaffold'
-import { useNewLayout } from 'hooks/ui/useNewLayout'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const newLayoutPreview = useNewLayout()

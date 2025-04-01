@@ -167,7 +167,7 @@ const SupportPage: NextPageWithLayout = () => {
 
 SupportPage.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout product="Support">{page}</DefaultLayout>
+    <DefaultLayout>{page}</DefaultLayout>
   </AppLayout>
 )
 

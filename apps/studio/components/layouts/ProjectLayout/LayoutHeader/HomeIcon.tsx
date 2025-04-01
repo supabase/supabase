@@ -2,11 +2,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
+import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useShowLayoutHeader } from 'hooks/misc/useShowLayoutHeader'
-import { useNewLayout } from 'hooks/ui/useNewLayout'
 import { IS_PLATFORM } from 'lib/constants'
 
 export const HomeIcon = () => {

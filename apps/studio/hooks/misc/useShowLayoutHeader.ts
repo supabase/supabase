@@ -1,6 +1,7 @@
 import { useParams } from 'common'
-import { useNewLayout } from 'hooks/ui/useNewLayout'
+import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useRouter } from 'next/router'
+
 export function useShowLayoutHeader() {
   const newLayoutPreview = useNewLayout()
   const { ref } = useParams()
@@ -13,8 +14,6 @@ export function useShowLayoutHeader() {
     pathname === '/sign-in' ||
     newLayoutPreview ||
     Boolean(ref)
-
-  console.log('shouldShow', shouldShow)
 
   return shouldShow
 }

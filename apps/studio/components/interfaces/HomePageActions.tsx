@@ -3,8 +3,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { IS_PLATFORM } from 'common'
+import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
 import {
@@ -22,8 +24,6 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-import { useFlag } from 'hooks/ui/useFlag'
-import { useNewLayout } from 'hooks/ui/useNewLayout'
 
 interface HomePageActionsProps {
   organizations: { name: string; slug: string }[]

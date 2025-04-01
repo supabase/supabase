@@ -3,16 +3,15 @@ import { PropsWithChildren } from 'react'
 import { useParams } from 'common'
 import { AppBannerWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
+import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Sidebar } from 'components/interfaces/Sidebar'
 import { useShowLayoutHeader } from 'hooks/misc/useShowLayoutHeader'
-import { useNewLayout } from 'hooks/ui/useNewLayout'
 import { SidebarProvider } from 'ui'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 
 export interface DefaultLayoutProps {
-  showProductMenu?: boolean
   headerTitle?: string
 }
 
@@ -27,11 +26,7 @@ export interface DefaultLayoutProps {
  * - First level side navigation bar (e.g For navigating to Table Editor, SQL Editor, Database page, etc)
  * @param showProductMenu - (Mobile only) Show button to toggle visiblity of product menu (Default: true)
  */
-const DefaultLayout = ({
-  children,
-  showProductMenu,
-  headerTitle,
-}: PropsWithChildren<DefaultLayoutProps>) => {
+const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayoutProps>) => {
   const newLayoutPreview = useNewLayout()
   const showLayoutHeader = useShowLayoutHeader()
 

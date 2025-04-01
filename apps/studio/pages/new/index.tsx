@@ -5,13 +5,13 @@ import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useState } from 'react'
 
 import { NewOrgForm } from 'components/interfaces/Organization'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import WizardLayout from 'components/layouts/WizardLayout'
 import { SetupIntentResponse, useSetupIntent } from 'data/stripe/setup-intent-mutation'
 import { STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import type { NextPageWithLayout } from 'types'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -107,7 +107,7 @@ const Wizard: NextPageWithLayout = () => {
 
 Wizard.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout product="New Organization" hasProductMenu={false} headerTitle="New organization">
+    <DefaultLayout headerTitle="New organization">
       <WizardLayout organization={null} project={null}>
         {page}
       </WizardLayout>

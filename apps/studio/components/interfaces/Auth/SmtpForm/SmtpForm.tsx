@@ -6,15 +6,13 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as yup from 'yup'
 
-import {
-  ScaffoldContainer,
-  ScaffoldSection,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { AlertTriangle, Eye, EyeOff } from 'lucide-react'
+import Link from 'next/link'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -35,8 +33,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
-import { AlertTriangle, Eye, EyeOff } from 'lucide-react'
-import Link from 'next/link'
 
 interface SmtpFormValues {
   SMTP_ADMIN_EMAIL?: string
@@ -51,13 +47,7 @@ interface SmtpFormValues {
 
 const SmtpForm = () => {
   const { ref: projectRef } = useParams()
-  const {
-    data: authConfig,
-    error: authConfigError,
-    isLoading,
-    isError,
-    isSuccess,
-  } = useAuthConfigQuery({ projectRef })
+  const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const [enableSmtp, setEnableSmtp] = useState(false)

@@ -5,20 +5,21 @@ description: 'Connect AI tools to Supabase using MCP'
 sidebar_label: 'Model context protocol (MCP)'
 ---
 
-The [Model Context Protocol](https://modelcontextprotocol.io/introduction) (MCP) is a standard for connecting Large Language Models (LLMs) to external services. This guide will walk you through how to connect AI tools to Supabase using MCP.
+The [Model Context Protocol](https://modelcontextprotocol.io/introduction) (MCP) is a standard for connecting Large Language Models (LLMs) to external services.
 
-There are a number of popular AI tools that support MCP, including:
+This guide covers how to connect Supabase to the following AI tools using MCP:
 
 - [Cursor](https://www.cursor.com/)
 - [Windsurf](https://docs.codeium.com/windsurf) (Codium)
 - [Cline](https://github.com/cline/cline) (VS Code extension)
 - [Claude desktop](https://claude.ai/download)
+- [Claude code](https://claude.ai/code)
 
-Connecting these tools to Supabase will allow you to query your database and perform other SQL operations using natural language commands.
+Once connected, you can use natural language commands to run read-only database queries in the AI tool.
 
 ## Connect to Supabase using MCP
 
-We will use the [Postgres MCP server](https://github.com/modelcontextprotocol/servers/tree/main/src/postgres) to connect AI tools to Supabase.
+Supabase uses the [Postgres MCP server](https://github.com/modelcontextprotocol/servers/tree/main/src/postgres) to provide MCP access to your database. The MCP server runs all queries as read-only transactions.
 
 ### Step 1: Find your database connection string
 
@@ -26,10 +27,18 @@ To get started, you will need to retrieve your database connection string. These
 
 #### For a hosted Supabase instance
 
-When running a hosted instance of Supabase, you can find your connection string by:
+<ProjectConfigVariables variable="sessionPooler" />
+
+Log in and choose a project above to find your connection string, or find it in the Dashboard:
 
 1. Navigating to your project's [Connection settings](/dashboard/project/_/settings/database?showConnect=true)
 1. Copying the connection string found under **Session pooler**.
+
+<Admonition type="note">
+
+Be sure to replace `[YOUR-PASSWORD]` with your database password.
+
+</Admonition>
 
 #### For a local Supabase instance
 
@@ -99,6 +108,17 @@ MCP compatible tools can connect to Supabase using the [Postgres MCP server](htt
 
 1. From the new chat screen, you should see a hammer (MCP) icon appear with the new MCP server available.
 
+#### Claude code
+
+1. Create a `.mcp.json` file in your project root if it doesn't exist.
+1. Add the following configuration:
+
+   <$Partial path="mcp_config.mdx" variables={{ "app": "Claude code" }} />
+
+1. Save the configuration file.
+
+1. Restart Claude code to apply the new configuration.
+
 ## Next steps
 
-You are now connected to Supabase using MCP! You can now interact with your database using natural language commands. Try asking your AI tool to query your database, create a new table, or perform other SQL operations.
+Your AI tool is now connected to Supabase using MCP. Try asking the AI tool to query your database using natural language commands.

@@ -60,7 +60,7 @@ const DatabaseTables: NextPageWithLayout = () => {
 }
 
 DatabaseTables.getLayout = (page) => (
-  <DefaultLayout product="Tables">
+  <DefaultLayout>
     <DatabaseLayout title="Database">{page}</DatabaseLayout>
   </DefaultLayout>
 )

@@ -14,7 +14,7 @@ console.info('server started');
 Deno.serve(async (req: Request) => {
   const { name }: reqPayload = await req.json();
   const data = {
-    message: \`Hello \${name} from foo!\`,
+    message: \`Hello \${name}!\`,
   };
 
   return new Response(
@@ -39,6 +39,7 @@ Deno.serve(async (req) => {
       { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
     )
 
+    // TODO: Change the table_name to your table
     const { data, error } = await supabase.from('table_name').select('*')
 
     if (error) {
@@ -50,7 +51,10 @@ Deno.serve(async (req) => {
       status: 200,
     })
   } catch (err) {
-    return new Response(String(err?.message ?? err), { status: 500 })
+    return new Response(JSON.stringify({ message: err?.message ?? err }), {
+      headers: { 'Content-Type': 'application/json' },
+      status: 500 
+    })
   }
 })`,
   },
@@ -61,6 +65,7 @@ Deno.serve(async (req) => {
     content: `// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from 'jsr:@supabase/supabase-js@2'
+import { randomUUID } from 'node:crypto'
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL') ?? '',
@@ -70,11 +75,13 @@ const supabase = createClient(
 Deno.serve(async (req) => {
   const formData = await req.formData()
   const file = formData.get('file')
+  
+  // TODO: update your-bucket to the bucket you want to write files
   const { data, error } = await supabase
     .storage
     .from('your-bucket')
     .upload(
-      \`files/\${crypto.randomUUID()}\`,
+      \`\${file.name}-\${randomUUID()}\`,
       file,
       { contentType: file.type }
     )
@@ -120,7 +127,9 @@ import express from "npm:express@4.18.2";
 
 const app = express();
 
-app.get(/(.*)/, (req, res) => {
+// TODO: replace slug with Function's slug
+// https://supabase.com/docs/guides/functions/routing?queryGroups=framework&framework=expressjs
+app.get(/slug/(.*)/, (req, res) => {
   res.send("Welcome to Supabase");
 });
 
@@ -161,32 +170,38 @@ Deno.serve(async (req) => {
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import Stripe from 'npm:stripe@12.0.0'
 
-const stripe = new Stripe(Deno.env.get('STRIPE_API_KEY')!)
-const endpointSecret = Deno.env.get('STRIPE_WEBHOOK_SIGNING_SECRET')!
+const stripe = new Stripe(Deno.env.get('STRIPE_API_KEY') as string, {
+  // This is needed to use the Fetch API rather than relying on the Node http
+  // package.
+  apiVersion: '2024-11-20'
+})
 
-Deno.serve(async (req) => {
-  const signature = req.headers.get('stripe-signature')
+// This is needed in order to use the Web Crypto API in Deno.
+const cryptoProvider = Stripe.createSubtleCryptoProvider()
+
+console.log('Stripe Webhook Function booted!')
+
+Deno.serve(async (request) => {
+  const signature = request.headers.get('Stripe-Signature')
+
+  // First step is to verify the event. The .text() method must be used as the
+  // verification relies on the raw request body rather than the parsed JSON.
+  const body = await request.text()
+  let receivedEvent
   try {
-    const event = stripe.webhooks.constructEvent(
-      await req.text(),
+    receivedEvent = await stripe.webhooks.constructEventAsync(
+      body,
       signature!,
-      endpointSecret
+      Deno.env.get('STRIPE_WEBHOOK_SIGNING_SECRET')!,
+      undefined,
+      cryptoProvider
     )
-    switch (event.type) {
-      case 'payment_intent.succeeded':
-        // Handle successful payment
-        break
-    }
-    return new Response(JSON.stringify({ received: true }), {
-      headers: { 'Content-Type': 'application/json' },
-    })
   } catch (err) {
-    return new Response(
-      JSON.stringify({ error: err.message }), 
-      { status: 400 }
-    )
+    return new Response(err.message, { status: 400 })
   }
-})`,
+  console.log(\`🔔 Event received: \${receivedEvent.id}\`)
+  return new Response(JSON.stringify({ ok: true }), { status: 200 })
+});`,
   },
   {
     value: 'resend-email',
@@ -243,35 +258,6 @@ Deno.serve(async (req) => {
   return new Response(
     result,
     { headers: { 'Content-Type': 'image/png' }}
-  )
-})`,
-  },
-  {
-    value: 'discord-bot',
-    name: 'Discord Bot Example',
-    description: 'Build a Slash Command Discord Bot',
-    content: `// Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { verifyDiscordRequest } from './_shared/discord.ts'
-
-Deno.serve(async (req) => {
-  const { valid } = await verifyDiscordRequest(req)
-  if (!valid) {
-    return new Response('Invalid request', { status: 401 })
-  }
-  const message = await req.json()
-  if (message.type === 1) {
-    return new Response(
-      JSON.stringify({ type: 1 }),
-      { headers: { 'Content-Type': 'application/json' }}
-    )
-  }
-  return new Response(
-    JSON.stringify({
-      type: 4,
-      data: { content: 'Hello from Supabase Edge Functions!' }
-    }),
-    { headers: { 'Content-Type': 'application/json' }}
   )
 })`,
   },

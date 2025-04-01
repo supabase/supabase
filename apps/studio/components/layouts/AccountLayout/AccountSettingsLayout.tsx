@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { PropsWithChildren } from 'react'
+
+import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Button, cn } from 'ui'
 import { ScaffoldContainerLegacy } from '../Scaffold'
-import { useNewLayout } from 'hooks/ui/useNewLayout'
 
 const AccountSettingsLayout = ({ children }: PropsWithChildren) => {
   const newLayoutPreview = useNewLayout()

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   ScaffoldActionsContainer,
   ScaffoldActionsGroup,
@@ -25,7 +26,6 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { InviteMemberButton } from './InviteMemberButton'
 import MembersView from './MembersView'
 import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
-import { useNewLayout } from 'hooks/ui/useNewLayout'
 
 const TeamSettings = () => {
   const newLayoutPreview = useNewLayout()

@@ -40,7 +40,8 @@ export const STRIPE_PUBLIC_KEY =
 export const USAGE_APPROACHING_THRESHOLD = 0.75
 
 export const LOCAL_STORAGE_KEYS = {
-  AI_ASSISTANT_STATE: 'supabase-ai-assistant-state',
+  AI_ASSISTANT_STATE: (projectRef: string | undefined) =>
+    `supabase-ai-assistant-state-${projectRef}`,
   SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',
   EDITOR_PANEL_STATE: 'supabase-editor-panel-state',
 
@@ -52,7 +53,6 @@ export const LOCAL_STORAGE_KEYS = {
 
   UI_TABLE_EDITOR_TABS: 'supabase-ui-table-editor-tabs',
   UI_SQL_EDITOR_TABS: 'supabase-ui-sql-editor-tabs',
-
   UI_NEW_LAYOUT_PREVIEW: 'supabase-ui-new-layout-preview',
 
   SQL_SCRATCH_PAD_BANNER_ACKNOWLEDGED: 'supabase-sql-scratch-pad-banner-acknowledged',

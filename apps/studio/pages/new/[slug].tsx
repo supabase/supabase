@@ -25,7 +25,6 @@ import { SPECIAL_CHARS_REGEX } from 'components/interfaces/ProjectCreation/Proje
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
 import { SpecialSymbolsCallout } from 'components/interfaces/ProjectCreation/SpecialSymbolsCallout'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
@@ -359,7 +358,7 @@ const Wizard: NextPageWithLayout = () => {
   useEffect(() => {
     // [Joshen] Cause slug depends on router which doesnt load immediately on render
     // While the form data does load immediately
-    if (slug) form.setValue('organization', slug)
+    if (slug && slug !== '_') form.setValue('organization', slug)
     if (projectName) form.setValue('projectName', projectName || '')
   }, [slug])
 
@@ -458,6 +457,7 @@ const Wizard: NextPageWithLayout = () => {
                               field.onChange(slug)
                               router.push(`/new/${slug}`)
                             }}
+                            value={field.value}
                             defaultValue={field.value}
                           >
                             <FormControl_Shadcn_>
@@ -971,7 +971,7 @@ const PageLayout = withAuth(({ children }: PropsWithChildren) => {
 })
 
 Wizard.getLayout = (page) => (
-  <DefaultLayout product="New Project" headerTitle="New project">
+  <DefaultLayout headerTitle="New project">
     <PageLayout>{page}</PageLayout>
   </DefaultLayout>
 )

@@ -45,17 +45,19 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const isPhoneAuth = user.phone !== null
   const isBanned = user.banned_until !== null
 
-  const providers = (user.raw_app_meta_data?.providers ?? []).map((provider: string) => {
-    return {
-      name: provider.startsWith('sso') ? 'SAML' : provider,
-      icon:
-        provider === 'email'
-          ? `${BASE_PATH}/img/icons/email-icon2.svg`
-          : providerIconMap[provider]
-            ? `${BASE_PATH}/img/icons/${providerIconMap[provider]}.svg`
-            : undefined,
+  const providers = ((user.raw_app_meta_data?.providers as string[]) ?? []).map(
+    (provider: string) => {
+      return {
+        name: provider.startsWith('sso') ? 'SAML' : provider,
+        icon:
+          provider === 'email'
+            ? `${BASE_PATH}/img/icons/email-icon2.svg`
+            : providerIconMap[provider]
+              ? `${BASE_PATH}/img/icons/${providerIconMap[provider]}.svg`
+              : undefined,
+      }
     }
-  })
+  )
 
   const canUpdateUser = useCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
   const canSendMagicLink = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_magic_link')
@@ -338,7 +340,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         <div className={cn('flex flex-col -space-y-1 !pt-0', PANEL_PADDING)}>
           <RowAction
             title="Remove MFA factors"
-            description="This will log the user out of all active sessions"
+            description="Removes all MFA factors associated with the user"
             button={{
               icon: <ShieldOff />,
               text: 'Remove MFA factors',
@@ -407,12 +409,13 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         onConfirm={() => handleDeleteFactors()}
         alert={{
           base: { variant: 'warning' },
-          title: 'Removing MFA factors is irreversible',
-          description: 'This will log the user out of all active sessions.',
+          title:
+            "Removing MFA factors will drop the user's authentication assurance level (AAL) to AAL1",
+          description: 'Note that this does not sign the user out',
         }}
       >
         <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to remove the MFA factors for the user{' '}
+          Are you sure you want to remove the MFA factors for the user{' '}
           <span className="text-foreground">{user.email ?? user.phone ?? 'this user'}</span>?
         </p>
       </ConfirmationModal>

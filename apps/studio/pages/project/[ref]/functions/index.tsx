@@ -18,7 +18,7 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import type { NextPageWithLayout } from 'types'
 import {
   AiIconAnimation,
@@ -35,7 +35,7 @@ import {
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const snap = useAiAssistantStateSnapshot()
   const router = useRouter()
   const {
     data: functions,
@@ -58,24 +58,6 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80">
-        <Dialog>
-          <DialogTrigger asChild>
-            <DropdownMenuItem className="gap-4" onSelect={(e) => e.preventDefault()}>
-              <Terminal className="shrink-0" size={16} strokeWidth={1.5} />
-              <div>
-                <span className="text-foreground">Via CLI</span>
-                <p>
-                  Create an edge function locally and then deploy your function via the Supabase CLI
-                </p>
-              </div>
-            </DropdownMenuItem>
-          </DialogTrigger>
-          <DialogContent size="large">
-            <DialogSection padding="small">
-              <TerminalInstructions />
-            </DialogSection>
-          </DialogContent>
-        </Dialog>
         {edgeFunctionCreate && (
           <DropdownMenuItem
             onSelect={() => {
@@ -97,6 +79,24 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
             </div>
           </DropdownMenuItem>
         )}
+        <Dialog>
+          <DialogTrigger asChild>
+            <DropdownMenuItem className="gap-4" onSelect={(e) => e.preventDefault()}>
+              <Terminal className="shrink-0" size={16} strokeWidth={1.5} />
+              <div>
+                <span className="text-foreground">Via CLI</span>
+                <p>
+                  Create an edge function locally and then deploy your function via the Supabase CLI
+                </p>
+              </div>
+            </DropdownMenuItem>
+          </DialogTrigger>
+          <DialogContent size="large">
+            <DialogSection padding="small">
+              <TerminalInstructions />
+            </DialogSection>
+          </DialogContent>
+        </Dialog>
       </DropdownMenuContent>
     </DropdownMenu>
   )
@@ -118,7 +118,8 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
       className="px-1 pointer-events-auto"
       icon={<AiIconAnimation size={16} />}
       onClick={() => {
-        setAiAssistantPanel({
+        snap.newChat({
+          name: 'Create new edge function',
           open: true,
           initialInput: `Create a new edge function that ...`,
           suggestions: {

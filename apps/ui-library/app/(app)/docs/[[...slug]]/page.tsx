@@ -1,3 +1,4 @@
+import { FrameworkSelector } from '@/components/framework-selector'
 import { Mdx } from '@/components/mdx-components'
 import { SourcePanel } from '@/components/source-panel'
 import { DashboardTableOfContents } from '@/components/toc'
@@ -80,22 +81,24 @@ export default async function DocPage({ params }: DocPageProps) {
   const toc = await getTableOfContents(doc.body.raw)
 
   return (
-    <main className="relative lg:gap-10 xl:grid xl:grid-cols-[1fr_200px] pr-6 lg:py-8">
+    <main className="relative lg:gap-10 xl:grid xl:grid-cols-[1fr_200px] px-8 md:px-16 py-20">
       <div className="mx-auto w-full min-w-0 max-w-4xl">
         <div className="mb-4 flex items-center space-x-1 text-sm text-foreground-muted">
           <div className="overflow-hidden text-ellipsis whitespace-nowrap">Docs</div>
           <ChevronRight className="h-4 w-4 text-foreground-muted" />
           <div className="text-foreground-lighter">{doc.title}</div>
         </div>
-        <div className="space-y-2 mb-5">
-          <h1 className={cn('scroll-m-20 text-4xl tracking-tight')}>{doc.title}</h1>
-          {doc.description && (
-            <p className="text-lg text-foreground-light">
-              <Balancer>{doc.description}</Balancer>
-            </p>
-          )}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-5">
+          <div className="space-y-2">
+            <h1 className={cn('scroll-m-20 text-2xl lg:text-4xl tracking-tight')}>{doc.title}</h1>
+            {doc.description && (
+              <p className="text-base lg:text-lg text-foreground-light">
+                <Balancer>{doc.description}</Balancer>
+              </p>
+            )}
+          </div>
+          <FrameworkSelector />
         </div>
-        <Separator className="mb-6" />
         <SourcePanel doc={doc} />
         <div className="pb-12">
           <Mdx code={doc.body.code} />

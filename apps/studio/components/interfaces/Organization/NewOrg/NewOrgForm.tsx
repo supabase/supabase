@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { z } from 'zod'
 
 import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
 import Panel from 'components/ui/Panel'
@@ -43,6 +44,24 @@ interface NewOrgFormProps {
   onPaymentMethodReset: () => void
 }
 
+const formSchema = z.object({
+  plan: z
+    .string()
+    .transform((val) => val.toUpperCase())
+    .pipe(z.enum(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'] as const)),
+  name: z.string().min(1),
+  kind: z
+    .string()
+    .transform((val) => val.toUpperCase())
+    .pipe(
+      z.enum(['PERSONAL', 'EDUCATIONAL', 'STARTUP', 'AGENCY', 'COMPANY', 'UNDISCLOSED'] as const)
+    ),
+  size: z.enum(['1', '10', '50', '100', '300'] as const),
+  spend_cap: z.boolean(),
+})
+
+type FormState = z.infer<typeof formSchema>
+
 /**
  * No org selected yet, create a new one
  */
@@ -53,37 +72,54 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const stripe = useStripe()
   const elements = useElements()
   const queryClient = useQueryClient()
-  const [state, setState] = useQueryStates({
-    plan: parseAsStringLiteral(Object.keys(PRICING_TIER_LABELS_ORG)).withDefault('FREE'),
-    name: parseAsString.withDefault(''),
-    kind: parseAsStringLiteral(Object.keys(ORG_KIND_TYPES)).withDefault(ORG_KIND_DEFAULT),
-    size: parseAsString.withDefault(ORG_SIZE_DEFAULT),
-    spend_cap: parseAsBoolean.withDefault(true),
+
+  const [formState, setFormState] = useState<FormState>({
+    plan: 'FREE',
+    name: '',
+    kind: ORG_KIND_DEFAULT,
+    size: ORG_SIZE_DEFAULT,
+    spend_cap: true,
+  })
+
+  const [searchParams] = useQueryStates({
     returnTo: parseAsString.withDefault(''),
     auth_id: parseAsString.withDefault(''),
   })
-  const {
-    name: orgName,
-    kind: orgKind,
-    spend_cap: isSpendCapEnabled,
-    plan: dbPricingTierKey,
-    size: orgSize,
-    returnTo,
-    auth_id,
-  } = state
 
-  // [Joshen] Separate loading state here as there's 2 async processes
+  const updateForm = (key: keyof FormState, value: unknown) => {
+    try {
+      const result = formSchema.shape[key].safeParse(value)
+      if (result.success) {
+        setFormState((prev) => ({ ...prev, [key]: result.data }))
+      }
+    } catch {
+      // Invalid value, ignore
+    }
+  }
+
+  useEffect(() => {
+    if (!router.isReady) return
+
+    const { name, kind, plan, size, spend_cap } = router.query
+
+    if (typeof name === 'string') updateForm('name', name)
+    if (typeof kind === 'string') updateForm('kind', kind)
+    if (typeof plan === 'string') updateForm('plan', plan)
+    if (typeof size === 'string') updateForm('size', size)
+    if (typeof spend_cap === 'string') updateForm('spend_cap', spend_cap === 'true')
+  }, [router.isReady])
+
+  useEffect(() => {
+    if (!formState.name && organizations?.length === 0 && !user.isLoading) {
+      const prefilledOrgName = user.profile?.username ? user.profile.username + `'s Org` : 'My Org'
+      updateForm('name', prefilledOrgName)
+    }
+  }, [isSuccess])
+
   const [newOrgLoading, setNewOrgLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>()
 
   const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
-
-  useEffect(() => {
-    if (!orgName && organizations?.length === 0 && !user.isLoading) {
-      const prefilledOrgName = user.profile?.username ? user.profile.username + `'s Org` : 'My Org'
-      setState({ ...state, name: prefilledOrgName })
-    }
-  }, [isSuccess])
 
   const { mutate: createOrganization } = useOrganizationCreateMutation({
     onSuccess: async (org) => {
@@ -92,8 +128,10 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         ? user.profile.username + `'s Project`
         : 'My Project'
 
-      if (returnTo && auth_id) {
-        router.push(`${returnTo}?auth_id=${auth_id}`, undefined, { shallow: false })
+      if (searchParams.returnTo && searchParams.auth_id) {
+        router.push(`${searchParams.returnTo}?auth_id=${searchParams.auth_id}`, undefined, {
+          shallow: false,
+        })
       } else {
         router.push(`/new/${org.slug}?projectName=${prefilledProjectName}`)
       }
@@ -109,35 +147,19 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     return value.length >= 1
   }
 
-  function onOrgNameChange(e: any) {
-    setState({ ...state, name: e.target.value })
-  }
-
-  function onOrgKindChange(value: any) {
-    setState({ ...state, kind: value })
-  }
-
-  function onOrgSizeChange(value: any) {
-    setState({ ...state, size: value })
-  }
-
-  function onDbPricingPlanChange(value: string) {
-    setState({ ...state, plan: value as any })
-  }
-
   async function createOrg(paymentMethodId?: string) {
-    const dbTier = dbPricingTierKey === 'PRO' && !isSpendCapEnabled ? 'PAYG' : dbPricingTierKey
+    const dbTier = formState.plan === 'PRO' && !formState.spend_cap ? 'PAYG' : formState.plan
 
     createOrganization({
-      name: orgName,
-      kind: orgKind,
+      name: formState.name,
+      kind: formState.kind,
       tier: ('tier_' + dbTier.toLowerCase()) as
         | 'tier_payg'
         | 'tier_pro'
         | 'tier_free'
         | 'tier_team'
         | 'tier_enterprise',
-      ...(orgKind == 'COMPANY' ? { size: orgSize } : {}),
+      ...(formState.kind == 'COMPANY' ? { size: formState.size } : {}),
       payment_method: paymentMethodId,
     })
   }
@@ -145,7 +167,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const handleSubmit = async (event: any) => {
     event.preventDefault()
 
-    const isOrgNameValid = validateOrgName(orgName)
+    const isOrgNameValid = validateOrgName(formState.name)
     if (!isOrgNameValid) {
       return toast.error('Organization name is empty')
     }
@@ -155,7 +177,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     }
     setNewOrgLoading(true)
 
-    if (dbPricingTierKey === 'FREE') {
+    if (formState.plan === 'FREE') {
       await createOrg()
     } else if (!paymentMethod) {
       const { error, setupIntent } = await stripe.confirmSetup({
@@ -234,48 +256,42 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
             layout="horizontal"
             placeholder="Organization name"
             descriptionText="What's the name of your company or team?"
-            value={orgName}
-            onChange={onOrgNameChange}
+            value={formState.name}
+            onChange={(e) => updateForm('name', e.target.value)}
           />
         </Panel.Content>
         <Panel.Content className="Form section-block--body has-inputs-centered">
           <Listbox
             label="Type of organization"
             layout="horizontal"
-            value={orgKind}
-            onChange={onOrgKindChange}
+            value={formState.kind}
+            onChange={(value) => updateForm('kind', value)}
             descriptionText="What would best describe your organization?"
           >
-            {Object.entries(ORG_KIND_TYPES).map(([k, v]) => {
-              return (
-                <Listbox.Option key={k} label={v} value={k}>
-                  {v}
-                </Listbox.Option>
-              )
-            })}
+            {Object.entries(ORG_KIND_TYPES).map(([k, v]) => (
+              <Listbox.Option key={k} label={v} value={k}>
+                {v}
+              </Listbox.Option>
+            ))}
           </Listbox>
         </Panel.Content>
 
-        {orgKind == 'COMPANY' ? (
+        {formState.kind == 'COMPANY' && (
           <Panel.Content className="Form section-block--body has-inputs-centered">
             <Listbox
               label="Company size"
               layout="horizontal"
-              value={orgSize}
-              onChange={onOrgSizeChange}
+              value={formState.size}
+              onChange={(value) => updateForm('size', value)}
               descriptionText="How many people are in your company?"
             >
-              {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => {
-                return (
-                  <Listbox.Option key={k} label={v} value={k}>
-                    {v}
-                  </Listbox.Option>
-                )
-              })}
+              {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => (
+                <Listbox.Option key={k} label={v} value={k}>
+                  {v}
+                </Listbox.Option>
+              ))}
             </Listbox>
           </Panel.Content>
-        ) : (
-          <></>
         )}
 
         <Panel.Content>
@@ -296,12 +312,10 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
               </div>
             }
             layout="horizontal"
-            value={dbPricingTierKey}
-            // @ts-ignore
-            onChange={onDbPricingPlanChange}
-            // @ts-ignore
+            value={formState.plan}
+            onChange={(value) => updateForm('plan', value)}
             descriptionText={
-              dbPricingTierKey !== 'FREE' ? (
+              formState.plan !== 'FREE' ? (
                 <p>
                   The plan applies only to this new organization. To upgrade an existing
                   organization,{' '}
@@ -316,17 +330,15 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
               ) : undefined
             }
           >
-            {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => {
-              return (
-                <Listbox.Option key={k} label={v} value={k}>
-                  {v}
-                </Listbox.Option>
-              )
-            })}
+            {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => (
+              <Listbox.Option key={k} label={v} value={k}>
+                {v}
+              </Listbox.Option>
+            ))}
           </Listbox>
         </Panel.Content>
 
-        {dbPricingTierKey === 'PRO' && (
+        {formState.plan === 'PRO' && (
           <>
             <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
               <Toggle
@@ -343,8 +355,8 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                     />
                   </div>
                 }
-                checked={isSpendCapEnabled}
-                onChange={() => setState({ ...state, spend_cap: !isSpendCapEnabled })}
+                checked={formState.spend_cap}
+                onChange={() => updateForm('spend_cap', !formState.spend_cap)}
                 descriptionText={
                   <div>
                     <p>
@@ -364,7 +376,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
           </>
         )}
 
-        {dbPricingTierKey !== 'FREE' && (
+        {formState.plan !== 'FREE' && (
           <Panel.Content>
             {paymentMethod?.card !== undefined ? (
               <div key={paymentMethod.id} className="flex items-center justify-between">

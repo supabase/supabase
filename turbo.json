@@ -84,6 +84,7 @@
         "NEXT_PUBLIC_STUDIO_URL",
         "NEXT_PUBLIC_DOCS_URL",
         "NEXT_PUBLIC_REFERENCE_DOCS_URL",
+        "NEXT_PUBLIC_UI_LIBRARY_URL",
         "NEXT_PUBLIC_SUPABASE_URL",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
         "NEXT_PUBLIC_VERCEL_ENV",
@@ -127,9 +128,9 @@
       "env": [
         "NEXT_PUBLIC_BASE_PATH",
         "NEXT_PUBLIC_APP_URL",
-        "VERCEL_TARGET_ENV",
-        "VERCEL_PROJECT_PRODUCTION_URL",
-        "VERCEL_PROJECT_PREVIEW_URL",
+        "NEXT_PUBLIC_VERCEL_TARGET_ENV",
+        "NEXT_PUBLIC_VERCEL_BRANCH_URL",
+        "NEXT_PUBLIC_API_URL",
         "NODE_ENV",
         "HIDE_TAILWIND_INDICATOR",
         // These envs are used in the packages

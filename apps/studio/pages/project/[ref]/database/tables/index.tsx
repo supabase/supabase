@@ -46,7 +46,7 @@ const DatabaseTables: NextPageWithLayout = () => {
 }
 
 DatabaseTables.getLayout = (page) => (
-  <DefaultLayout product="Tables">
+  <DefaultLayout>
     <DatabaseLayout title="Database">
       {/* <ProjectPageNavigation navKey="postgres-items"> */}
       {page}

@@ -1,9 +1,4 @@
-import { MainNavItem, SidebarNavGroup, SidebarNavItem } from 'types/nav'
-
-interface DocsConfig {
-  mainNav?: MainNavItem[]
-  sidebarNav: SidebarNavItem[]
-}
+import { SidebarNavGroup } from 'types/nav'
 
 export const gettingStarted: SidebarNavGroup = {
   title: 'Getting Started',
@@ -41,87 +36,60 @@ export const aiEditorsRules: SidebarNavGroup = {
   ],
 }
 
-export const frameworkPages: Record<string, SidebarNavGroup> = {
-  nextjs: {
-    title: 'Next.js',
-    items: [
-      {
-        title: 'Password-Based Auth',
-        href: '/docs/nextjs/password-based-auth',
-        items: [],
-        commandItemLabel: 'Password-Based Auth for Next.js',
-      },
-      {
-        title: 'Dropzone',
-        href: '/docs/nextjs/dropzone',
-        items: [],
-        commandItemLabel: 'Dropzone for Next.js',
-      },
-      {
-        title: 'Realtime Cursor',
-        href: '/docs/nextjs/realtime-cursor',
-        items: [],
-        commandItemLabel: 'Realtime Cursor for Next.js',
-      },
-    ],
-  },
-  'react-router': {
-    title: 'React Router',
-    items: [
-      {
-        title: 'Dropzone',
-        href: '/docs/react-router/dropzone',
-        items: [],
-        commandItemLabel: 'Dropzone for React Router',
-      },
-      {
-        title: 'Realtime Cursor',
-        href: '/docs/react-router/realtime-cursor',
-        items: [],
-        commandItemLabel: 'Realtime Cursor for React Router',
-      },
-    ],
-  },
-  tanstack: {
-    title: 'Tanstack Start',
-    items: [
-      {
-        title: 'Dropzone',
-        href: '/docs/tanstack/dropzone',
-        items: [],
-        commandItemLabel: 'Dropzone for Tanstack Start',
-      },
-      {
-        title: 'Realtime Cursor',
-        href: '/docs/tanstack/realtime-cursor',
-        items: [],
-        commandItemLabel: 'Realtime Cursor for Tanstack Start',
-      },
-    ],
-  },
-  react: {
-    title: 'React',
-    items: [
-      {
-        title: 'Password-Based Auth',
-        href: '/docs/react/password-based-auth',
-        items: [],
-        commandItemLabel: 'Password-Based Auth for React',
-      },
-      {
-        title: 'Dropzone',
-        href: '/docs/react/dropzone',
-        items: [],
-        commandItemLabel: 'Dropzone for React',
-      },
-      {
-        title: 'Realtime Cursor',
-        href: '/docs/react/realtime-cursor',
-        items: [],
-        commandItemLabel: 'Realtime Cursor for React',
-      },
-    ],
-  },
+// Component definitions with supported frameworks
+export const componentPages: SidebarNavGroup = {
+  title: 'Components',
+  items: [
+    {
+      title: 'Client',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/client',
+      items: [],
+      commandItemLabel: 'Supabase Client',
+    },
+    {
+      title: 'Password-Based Auth',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/password-based-auth',
+      items: [],
+      commandItemLabel: 'Password-Based Auth',
+    },
+    {
+      title: 'Dropzone',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/dropzone',
+      items: [],
+      commandItemLabel: 'Dropzone (File Upload)',
+    },
+    {
+      title: 'Realtime Cursor',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/realtime-cursor',
+      items: [],
+      commandItemLabel: 'Realtime Cursor',
+    },
+    {
+      title: 'Current User Avatar',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/current-user-avatar',
+      items: [],
+      commandItemLabel: 'Current User Avatar',
+    },
+    {
+      title: 'Realtime Avatar Stack',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/realtime-avatar-stack',
+      items: [],
+      commandItemLabel: 'Realtime Avatar Stack',
+    },
+    {
+      title: 'Realtime Chat',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/realtime-chat',
+      items: [],
+      commandItemLabel: 'Realtime Chat',
+    },
+  ],
 }
 
 export const COMMAND_ITEMS = [
@@ -133,10 +101,16 @@ export const COMMAND_ITEMS = [
     label: item.commandItemLabel,
     href: item.href,
   })),
-  ...Object.values(frameworkPages).flatMap((group) =>
-    group.items.map((item) => ({
-      label: item.commandItemLabel,
-      href: item.href,
-    }))
-  ),
+  ...componentPages.items.map((item) => ({
+    label: item.commandItemLabel,
+    href: item.href,
+  })),
 ]
+
+// Framework titles for display
+export const frameworkTitles: Record<string, string> = {
+  nextjs: 'Next.js',
+  'react-router': 'React Router',
+  tanstack: 'TanStack Start',
+  react: 'React SPA',
+}

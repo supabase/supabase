@@ -24,6 +24,7 @@ export const generateToolRoutes = (
   project?: Project,
   features?: { sqlEditorTabs: boolean }
 ): Route[] => {
+  const { sqlEditorTabs } = features ?? {}
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
 
@@ -42,9 +43,7 @@ export const generateToolRoutes = (
       link: !IS_PLATFORM
         ? `/project/${ref}/sql/1`
         : ref &&
-          (isProjectBuilding
-            ? buildingUrl
-            : `/project/${ref}/sql${features?.sqlEditorTabs ? '' : '/new'}`),
+          (isProjectBuilding ? buildingUrl : `/project/${ref}/sql${!!sqlEditorTabs ? '' : '/new'}`),
     },
   ]
 }
@@ -71,14 +70,12 @@ export const generateProductRoutes = (
       label: 'Database',
       icon: <Database size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link:
-        // ref
-        //  &&
-        // (isProjectBuilding
-        //   ? buildingUrl
-        //   : isProjectActive
-        // ?
-        `/project/${ref}/database/schemas`,
-      // : `/project/${ref}/database/backups/scheduled`),
+        ref &&
+        (isProjectBuilding
+          ? buildingUrl
+          : isProjectActive
+            ? `/project/${ref}/database/schemas`
+            : `/project/${ref}/database/backups/scheduled`),
       items: databaseMenu,
     },
     ...(authEnabled
@@ -88,7 +85,7 @@ export const generateProductRoutes = (
             label: 'Authentication',
             icon: <Auth size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/auth/users`),
-            // items: authMenu,
+            items: authMenu,
           },
         ]
       : []),
@@ -168,6 +165,7 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
 }
 
 export const generateSettingsRoutes = (ref?: string, project?: Project): Route[] => {
+  const settingsMenu = generateSettingsMenu(ref as string)
   return [
     ...(IS_PLATFORM
       ? [
@@ -176,7 +174,7 @@ export const generateSettingsRoutes = (ref?: string, project?: Project): Route[]
             label: 'Project Settings',
             icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && `/project/${ref}/settings/general`,
-            items: generateSettingsMenu(ref as string),
+            items: settingsMenu,
           },
         ]
       : []),
