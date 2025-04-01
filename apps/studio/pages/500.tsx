@@ -33,6 +33,7 @@ const Error500: NextPage = () => {
                   }
                   alt=""
                   height={24}
+                  tetsesetsetsetsetsetset
                   width={120}
                 />
               </Link>
