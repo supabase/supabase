@@ -48,7 +48,7 @@ const PromoToast = () => {
           }}
           className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7"
         >
-          Supabase Edge Functions: Deploy from the Dashboard + Deno 2.1
+          Supabase Edge Functions: Deploy from Dashboard + Deno 2.1
         </p>
       </div>
 
