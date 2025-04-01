@@ -1,32 +1,19 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 import { del, handleError } from 'data/fetchers'
+import { toast } from 'sonner'
 import { ResponseError } from 'types'
 import { clientSecretKeys } from './keys'
 
 export type ClientSecretDeleteVariables = {
-  slug?: string
+  slug: string
   appId: string
   secretId: string
 }
 
 export async function deleteClientSecret({ slug, appId, secretId }: ClientSecretDeleteVariables) {
-  if (!slug) {
-    throw new Error('slug is required')
-  }
-  if (!appId) {
-    throw new Error('appId is required')
-  }
-  if (!secretId) {
-    throw new Error('secretId is required')
-  }
   const { error } = await del(
     '/platform/organizations/{slug}/oauth/apps/{app_id}/client-secrets/{secret_id}',
-    {
-      params: {
-        path: { slug, app_id: appId, secret_id: secretId },
-      },
-    }
+    { params: { path: { slug, app_id: appId, secret_id: secretId } } }
   )
   if (error) handleError(error)
   return true

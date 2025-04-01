@@ -31,7 +31,8 @@ export const OAuthSecrets = ({ selectedApp }: Props) => {
   })
 
   const handleCreateSecret = () => {
-    if (!appId) return
+    if (!slug) return console.error('Slug is required')
+    if (!appId) return console.error('App ID is required')
     createSecret({ slug, appId })
   }
 

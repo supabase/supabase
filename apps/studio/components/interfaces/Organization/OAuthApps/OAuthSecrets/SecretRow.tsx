@@ -37,7 +37,8 @@ const SecretRow = ({ secret, appId }: SecretRowProps) => {
   })
 
   const handleDelete = () => {
-    if (!appId) return
+    if (!slug) return console.error('Slug is required')
+    if (!appId) return console.error('App ID is required')
     deleteSecret({ slug, appId, secretId: secret.id })
   }
 

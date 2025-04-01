@@ -1,29 +1,18 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { handleError, post } from 'data/fetchers'
 import { toast } from 'sonner'
-import { post, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { clientSecretKeys } from './keys'
 
 export type ClientSecretCreateVariables = {
-  slug?: string
+  slug: string
   appId: string
 }
 
 export async function createClientSecret({ slug, appId }: ClientSecretCreateVariables) {
-  if (!slug) {
-    throw new Error('slug is required')
-  }
-  if (!appId) {
-    throw new Error('appId is required')
-  }
-
   const { data, error } = await post(
     '/platform/organizations/{slug}/oauth/apps/{app_id}/client-secrets',
-    {
-      params: {
-        path: { slug, app_id: appId },
-      },
-    }
+    { params: { path: { slug, app_id: appId } } }
   )
   if (error) handleError(error)
   return data
