@@ -27,6 +27,7 @@ import BranchingPlanNotice from './BranchingPlanNotice'
 import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
 import GithubRepositorySelection from './GithubRepositorySelection'
 import { DocsButton } from 'components/ui/DocsButton'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
 const EnableBranchingModal = () => {
   const { ref } = useParams()
@@ -38,8 +39,6 @@ const EnableBranchingModal = () => {
   // and makes the validation run onChange instead. This is a workaround
   const [isValid, setIsValid] = useState(false)
 
-  const canCreateBranches = useCheckPermissions(PermissionAction.CREATE, 'preview_branches')
-
   const {
     data: connections,
     error: connectionsError,
@@ -48,17 +47,9 @@ const EnableBranchingModal = () => {
     isError: isErrorConnections,
   } = useGitHubConnectionsQuery({ organizationId: selectedOrg?.id })
 
-  const {
-    data,
-    error: upgradeEligibilityError,
-    isLoading: isLoadingUpgradeEligibility,
-    isError: isErrorUpgradeEligibility,
-    isSuccess: isSuccessUpgradeEligibility,
-  } = useProjectUpgradeEligibilityQuery({
-    projectRef: ref,
-  })
+  const project = useSelectedProject()
   const hasMinimumPgVersion =
-    Number(last(data?.current_app_version.split('-') ?? [])?.split('.')[0] ?? 0) >= 15
+    Number(last(project?.dbVersion?.split('-') ?? [])?.split('.')[0] ?? 0) >= 15
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
   const isFreePlan = subscription?.plan.id === 'free'
@@ -112,9 +103,9 @@ const EnableBranchingModal = () => {
     defaultValues: { branchName: '' },
   })
 
-  const isLoading = isLoadingConnections || isLoadingUpgradeEligibility
-  const isError = isErrorConnections || isErrorUpgradeEligibility
-  const isSuccess = isSuccessConnections && isSuccessUpgradeEligibility
+  const isLoading = isLoadingConnections
+  const isError = isErrorConnections
+  const isSuccess = isSuccessConnections
 
   const canSubmit = form.getValues('branchName').length > 0 && !isChecking && isValid
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
@@ -171,11 +162,6 @@ const EnableBranchingModal = () => {
                 <Modal.Content className="px-7 py-6">
                   {isErrorConnections ? (
                     <AlertError error={connectionsError} subject="Failed to retrieve connections" />
-                  ) : isErrorUpgradeEligibility ? (
-                    <AlertError
-                      error={upgradeEligibilityError}
-                      subject="Failed to retrieve Postgres version"
-                    />
                   ) : null}
                 </Modal.Content>
                 <Modal.Separator />
