@@ -32,7 +32,7 @@ export function LW14Banner() {
           )}
         >
           <p className="flex gap-1.5 items-center ">{announcement.text}</p>
-          <div className="hidden md:block text-foreground-lighter">
+          <div className="hidden lg:block text-foreground-lighter">
             Supabase Edge Functions: Deploy from the Dashboard + Deno 2.1
           </div>
           <Button size="tiny" type="default" className="px-2 !leading-none text-xs" asChild>
