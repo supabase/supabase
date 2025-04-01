@@ -5,6 +5,7 @@ import { type PostgrestFilterBuilder } from '@supabase/postgrest-js'
 
 import { cn } from '@/lib/utils'
 import { useInfiniteQuery } from '@/registry/default/blocks/infinite-list/hooks/use-infinite-query'
+import { Skeleton } from '@/registry/default/components/ui/skeleton'
 
 interface InfiniteListProps<TData> {
   tableName: string
@@ -16,10 +17,32 @@ interface InfiniteListProps<TData> {
   renderItem: (item: TData, index: number) => React.ReactNode
   className?: string
   listClassName?: string
-  skeletonCount?: number
-  skeletonHeightClass?: string
-  endMessage?: React.ReactNode
+  renderNoResults?: () => React.ReactNode
+  renderEndMessage?: () => React.ReactNode
+  renderSkeleton?: (count: number) => React.ReactNode
 }
+
+const DefaultNoResults = () => (
+  <div className="text-center text-muted-foreground py-10">No results.</div>
+)
+
+const DefaultEndMessage = () => (
+  <div className="text-center text-muted-foreground py-4 text-sm">You&apos;ve reached the end.</div>
+)
+
+const DefaultSkeleton = ({
+  count = 3,
+  heightClass = 'h-10',
+}: {
+  count?: number
+  heightClass?: string
+}) => (
+  <>
+    {Array.from({ length: count }).map((_, i) => (
+      <Skeleton key={i} className={`${heightClass} w-full`} />
+    ))}
+  </>
+)
 
 export function InfiniteList<TData>({
   tableName,
@@ -29,9 +52,9 @@ export function InfiniteList<TData>({
   renderItem,
   className,
   listClassName,
-  skeletonCount = 3,
-  skeletonHeightClass = 'h-10',
-  endMessage = "You've reached the end.",
+  renderNoResults = DefaultNoResults,
+  renderEndMessage = DefaultEndMessage,
+  renderSkeleton = () => <DefaultSkeleton />,
 }: InfiniteListProps<TData>) {
   const { data, loading, hasMore, fetchNextPage } = useInfiniteQuery<TData>({
     tableName,
@@ -73,31 +96,19 @@ export function InfiniteList<TData>({
   }, [loading, hasMore, fetchNextPage])
 
   return (
-    <div
-      ref={scrollContainerRef}
-      className={cn('relative h-[600px] overflow-auto rounded-md border', className)}
-    >
-      <div className={cn('p-4 space-y-2', listClassName)}>
-        {data.length === 0 && !loading && (
-          <div className="text-center text-muted-foreground py-10">No results.</div>
-        )}
+    <div ref={scrollContainerRef} className={cn('relative h-full overflow-auto', className)}>
+      <div className={cn(listClassName)}>
+        {data.length === 0 && !loading && renderNoResults()}
+
         {data.map((item, index) => (
-          <div key={(item as any)?.id ?? index}>
-            {' '}
-            {/* Use item id if available, otherwise index */}
-            {renderItem(item, index)}
-          </div>
+          <div key={(item as any)?.id ?? index}>{renderItem(item, index)}</div>
         ))}
 
-        {/* Loading skeleton items */}
-        {loading && Array.from({ length: skeletonCount }).map((_, i) => 'Skeleton')}
+        {loading && renderSkeleton(pageSize)}
 
-        {/* Sentinel element to trigger loading more */}
         <div ref={loadMoreSentinelRef} style={{ height: '1px' }} />
 
-        {!hasMore && data.length > 0 && (
-          <div className="text-center text-muted-foreground py-4 text-sm">{endMessage}</div>
-        )}
+        {!hasMore && data.length > 0 && renderEndMessage()}
       </div>
     </div>
   )

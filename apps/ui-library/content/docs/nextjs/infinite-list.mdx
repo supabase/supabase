@@ -22,46 +22,123 @@ The Infinite List component provides a scrollable container that loads data prog
 
 ## Prerequisites
 
-1.  **Supabase Project:** You need a Supabase project set up.
-2.  **Supabase Table:** A table in your Supabase database that you want to display.
-3.  **Environment Variables:** Ensure your Next.js application has the following environment variables set up (usually in a `.env.local` file):
-    ```env
-    NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
-    NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
-    ```
+1. **Supabase Project:** You need a Supabase project set up.
+2. **Supabase Table:** A table in your Supabase database that you want to display.
+3. **Environment Variables:** Ensure your Next.js application has the following environment variables set up (usually in a `.env.local` file):
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+   ```
+4. **Required Packages:** Make sure you have the following packages installed:
+   ```bash
+   npm install @supabase/supabase-js @supabase/ssr @supabase/postgrest-js
+   ```
 
 ## Usage
 
-Import the `InfiniteList` component and provide the necessary props, including a function to render each item.
+### Basic usage
 
-```tsx {1,4-6,10-12,18}
+```tsx
 import { InfiniteList } from '@/registry/default/blocks/infinite-list/components/infinite-list'
 
-// 1. Define your data type (matching your Supabase table structure)
-type YourDataType = {
+// Define your data type (matching your Supabase table structure)
+type Log = {
   id: number
-  name: string
-  // ... other columns
+  log_message: string
+  log_level: string
+  created_at: string
 }
 
-// 2. Define a function to render each item
-const renderMyItem = (item: YourDataType) => {
+export default function LogsPage() {
+  // Define how each item should be rendered
+  const renderLogItem = (log: Log) => {
+    return (
+      <div className="border-b py-3 px-4 hover:bg-muted flex items-center justify-between">
+        <div>
+          <span className="font-medium text-sm text-foreground">
+            {log.log_message} (ID: {log.id})
+          </span>
+          <div className="text-sm text-foreground-light">
+            {new Date(log.created_at).toLocaleDateString()}
+          </div>
+        </div>
+        <span className="text-xs text-foreground-light rounded-lg py-2 px-3 bg-muted">
+          {log.log_level}
+        </span>
+      </div>
+    )
+  }
+
   return (
-    <div className="border p-2 rounded">
-      <p>ID: {item.id}</p>
-      <p>Name: {item.name}</p>
+    <div className="h-[600px]">
+      <InfiniteList<Log> tableName="logging_data" renderItem={renderLogItem} pageSize={15} />
     </div>
   )
 }
+```
 
-export default function MyPage() {
+### With filtering
+
+```tsx
+import { InfiniteList } from '@/registry/default/blocks/infinite-list/components/infinite-list'
+import { type PostgrestFilterBuilder } from '@supabase/postgrest-js'
+
+// Define your data type
+type Log = {
+  id: number
+  log_message: string
+  log_level: string
+  created_at: string
+}
+
+export default function InfoLogsPage() {
+  const renderLogItem = (log: Log) => {
+    // Render implementation
+  }
+
+  // Define a filter to only show logs with log_level = 'INFO'
+  const filterLogsToInfo = (query: PostgrestFilterBuilder<any, any, any>) => {
+    return query.eq('log_level', 'INFO')
+  }
+
   return (
-    <InfiniteList<YourDataType>
-      tableName="your_supabase_table_name" // <-- Replace with your actual table name
-      renderItem={renderMyItem} // Pass your render function
-      pageSize={25} // Optional: Adjust the number of items fetched per page
-      // selectQuery="id, name" // Optional: Specify columns to fetch
-      // filterBuilder={(query) => query.order('name', { ascending: true })} // Optional: Add initial filters/sorting
+    <div className="h-[600px]">
+      <InfiniteList<Log>
+        tableName="logging_data"
+        renderItem={renderLogItem}
+        pageSize={15}
+        filterBuilder={filterLogsToInfo}
+      />
+    </div>
+  )
+}
+```
+
+### Custom appearance
+
+```tsx
+import { InfiniteList } from '@/registry/default/blocks/infinite-list/components/infinite-list'
+
+export default function CustomLogsPage() {
+  // Render implementation...
+
+  return (
+    <InfiniteList<Log>
+      tableName="logging_data"
+      renderItem={renderLogItem}
+      className="h-[800px] border-2 border-primary"
+      listClassName="space-y-4 p-6"
+      renderNoResults={() => (
+        <div className="text-center p-8 bg-muted rounded-lg">No logs found</div>
+      )}
+      renderEndMessage={() => <div className="text-center p-4 text-primary">All logs loaded!</div>}
+      renderSkeleton={(count) => (
+        <div className="space-y-2 animate-pulse">
+          {Array.from({ length: count }).map((_, i) => (
+            <div key={i} className="h-20 bg-muted rounded-md" />
+          ))}
+        </div>
+      )}
     />
   )
 }
@@ -69,72 +146,85 @@ export default function MyPage() {
 
 ## Features
 
-- **Infinite Scrolling:** Automatically fetches more data as the user scrolls.
-- **Supabase Integration:** Uses a custom hook to fetch data directly from your Supabase table.
-- **Flexible Rendering:** Uses a `renderItem` prop to allow rendering any custom component for each list item.
-- **Loading State:** Shows skeleton loaders while fetching data.
-- **Customizable:** Accepts table name, page size, select query, filter builder, skeleton appearance, and end message props.
+- **Infinite Scrolling:** Automatically fetches more data as the user scrolls
+- **Supabase Integration:** Direct integration with Supabase tables
+- **Flexible Rendering:** Highly customizable item rendering
+- **Server-side Filtering:** Apply filters directly to your Supabase queries
+- **Loading States:** Customizable loading skeletons and status messages
+- **Optimized Performance:** Efficient intersection observer implementation
+- **Full Customization:** All aspects of the list appearance can be adjusted
 
 ## Props
 
-| Prop                   | Type                                                        | Description                                                                                                                         |
-| ---------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `tableName`            | `string`                                                    | **Required.** The name of the Supabase table to fetch data from.                                                                    |
-| `renderItem`           | `(item: TData, index: number) => React.ReactNode`           | **Required.** A function that receives an item and its index, returning the React node to render for that item.                     |
-| `pageSize?`            | `number`                                                    | The number of rows to fetch per page. Defaults to `20`.                                                                             |
-| `selectQuery?`         | `string`                                                    | The `select` string for the Supabase query (e.g., `'id, name, status'`). Defaults to `'*'`.                                         |
-| `filterBuilder?`       | `(query: PostgrestFilterBuilder) => PostgrestFilterBuilder` | A function that receives the Supabase query builder (`PostgrestFilterBuilder`) and returns it after applying filters, sorting, etc. |
-| `className?`           | `string`                                                    | Optional class name for the outer scrollable container `div`.                                                                       |
-| `listClassName?`       | `string`                                                    | Optional class name for the inner `div` containing the list items.                                                                  |
-| `skeletonCount?`       | `number`                                                    | Number of skeleton items to show while loading. Defaults to `3`.                                                                    |
-| `skeletonHeightClass?` | `string`                                                    | Tailwind height class for skeleton items (e.g., `h-10`, `h-20`). Defaults to `h-10`.                                                |
-| `endMessage?`          | `React.ReactNode`                                           | Content to display when the end of the list is reached. Defaults to `"You've reached the end."`.                                    |
+| Prop               | Type                                                        | Description                                                                                          |
+| ------------------ | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `tableName`        | `string`                                                    | **Required.** The name of the Supabase table to fetch data from.                                     |
+| `renderItem`       | `(item: TData, index: number) => React.ReactNode`           | **Required.** Function that renders each item in the list.                                           |
+| `pageSize`         | `number`                                                    | Number of items to fetch per page. Defaults to `20`.                                                 |
+| `selectQuery`      | `string`                                                    | Columns to select from the table. Defaults to `'*'`.                                                 |
+| `filterBuilder`    | `(query: PostgrestFilterBuilder) => PostgrestFilterBuilder` | Function to apply filters or sorting to the Supabase query.                                          |
+| `className`        | `string`                                                    | Class name for the outer scrollable container.                                                       |
+| `listClassName`    | `string`                                                    | Class name for the inner div containing list items.                                                  |
+| `renderNoResults`  | `() => React.ReactNode`                                     | Function to render content when no results are found. Default: "No results."                         |
+| `renderEndMessage` | `() => React.ReactNode`                                     | Function to render message at the end of the list. Default: "You've reached the end."                |
+| `renderSkeleton`   | `(count: number) => React.ReactNode`                        | Function to render loading skeletons. Default: `count` number of skeleton items with default height. |
 
-## Customization
+## TData interface
 
-### Rendering Items
+The component is generic and accepts any data type that matches your Supabase table structure. For example:
 
-The primary customization happens via the `renderItem` prop. Define a function that takes your data item and returns the desired JSX for display.
+```typescript
+type Log = {
+  id: number
+  log_message: string
+  log_level: string
+  created_at: string
+}
+
+// Then use it with the generic parameter
+<InfiniteList<Log> ... />
+```
+
+## Advanced usage
+
+### Custom filtering and sorting
 
 ```tsx
-const renderProduct = (product: Product) => (
-  <article className="flex gap-4">
-    <img src={product.imageUrl} alt={product.name} className="w-16 h-16 object-cover" />
-    <div>
-      <h3 className="font-semibold">{product.name}</h3>
-      <p className="text-sm text-muted-foreground">{product.description}</p>
-      <p className="font-bold mt-1">${product.price.toFixed(2)}</p>
-    </div>
-  </article>
+const advancedFilter = (query: PostgrestFilterBuilder<any, any, any>) => {
+  return query
+    .eq('status', 'active')
+    .gte('created_at', '2023-01-01')
+    .order('created_at', { ascending: false })
+}
+
+;<InfiniteList tableName="users" renderItem={renderUser} filterBuilder={advancedFilter} />
+```
+
+### Custom skeleton rendering
+
+```tsx
+const renderCustomSkeleton = (count: number) => (
+  <div className="space-y-4">
+    {Array.from({ length: count }).map((_, i) => (
+      <div key={i} className="flex gap-4">
+        <div className="rounded-full bg-muted h-12 w-12" />
+        <div className="space-y-2 flex-1">
+          <div className="h-4 bg-muted rounded w-3/4" />
+          <div className="h-3 bg-muted rounded w-1/2" />
+        </div>
+      </div>
+    ))}
+  </div>
 )
 
-<InfiniteList<Product>
-  tableName="products"
-  renderItem={renderProduct}
-/>
-```
-
-### Server-Side Filtering/Sorting
-
-Use the `filterBuilder` prop to apply server-side filtering and sorting directly in the Supabase query.
-
-```tsx
 <InfiniteList
-  tableName="posts"
-  renderItem={renderPost}
-  filterBuilder={
-    (query) =>
-      query
-        .eq('published', true) // Filter by status
-        .order('created_at', { ascending: false }) // Order by creation date
-  }
+  renderSkeleton={renderCustomSkeleton}
+  // other props...
 />
 ```
 
-## Dependencies
+## Further reading
 
-- `@supabase/supabase-js`
-- `@supabase/ssr` (for Next.js setup)
-- `@supabase/postgrest-js`
-- `lucide-react`
-- `shadcn/ui` components (`skeleton`)
+- [Supabase PostgreSQL API](https://supabase.com/docs/reference/javascript/introduction)
+- [Supabase Pagination](https://supabase.com/docs/reference/javascript/select#pagination)
+- [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)

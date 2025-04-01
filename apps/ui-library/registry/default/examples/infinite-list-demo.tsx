@@ -1,54 +1,55 @@
 'use client'
 
 import { InfiniteList } from '@/registry/default/blocks/infinite-list/components/infinite-list'
-
-console.log('hello')
+import { type PostgrestFilterBuilder } from '@supabase/postgrest-js'
 
 // Example Task data structure (Adapt to your actual data)
-export type Task = {
+export type Log = {
   id: number
-  title: string
-  status: 'todo' | 'in progress' | 'done' | 'canceled'
-  label: 'bug' | 'feature' | 'documentation'
-  priority: 'low' | 'medium' | 'high'
+  log_message: string
+  log_level: string
   created_at: string // Assuming ISO string format from Supabase
 }
 
 // IMPORTANT: Replace 'your_table_name' with the actual name of your Supabase table
-const YOUR_SUPABASE_TABLE_NAME = 'tasks' // <<<--- CHANGE THIS
+const YOUR_SUPABASE_TABLE_NAME = 'logging_data' // <<<--- CHANGE THIS
 
 const InfiniteListDemo = () => {
   // Define how each item should be rendered
-  const renderTaskItem = (task: Task) => {
+  const renderLogItem = (log: Log) => {
     return (
-      <div className="border p-3 rounded-md hover:bg-muted transition-colors">
-        <div className="flex justify-between items-center">
-          <span className="font-medium">
-            {task.title} (ID: {task.id})
+      <div className="border-b py-3 px-4 hover:bg-muted flex items-center justify-between">
+        <div>
+          <span className="font-medium text-sm text-foreground">
+            {log.log_message} (ID: {log.id})
           </span>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground">
-            {task.priority}
-          </span>
+          <div className="text-sm text-foreground-light">
+            {new Date(log.created_at).toLocaleDateString()}
+          </div>
         </div>
-        <div className="text-sm text-muted-foreground mt-1">
-          Status: {task.status} | Label: {task.label} | Created:{' '}
-          {new Date(task.created_at).toLocaleDateString()}
-        </div>
+        <span className="text-xs text-foreground-light rounded-lg py-2 px-3 bg-muted">
+          {log.log_level}
+        </span>
       </div>
     )
   }
 
+  // Define a filter to only show logs with log_level = 'info'
+  const filterLogsToInfo = (query: PostgrestFilterBuilder<any, any, any>) => {
+    return query.eq('log_level', 'INFO')
+  }
+
   return (
-    <div className="p-4">
-      <h2 className="text-lg font-semibold mb-4">Infinite Scroll Tasks List</h2>
+    <div className="bg-surface-100 h-[600px]">
       {/* 
         Ensure your Supabase instance has a table named `YOUR_SUPABASE_TABLE_NAME` 
-        with columns matching the 'Task' type.
+        with columns matching the 'Log' type.
       */}
-      <InfiniteList<Task>
+      <InfiniteList<Log>
         tableName={YOUR_SUPABASE_TABLE_NAME}
-        renderItem={renderTaskItem}
+        renderItem={renderLogItem}
         pageSize={15}
+        filterBuilder={filterLogsToInfo}
       />
     </div>
   )
