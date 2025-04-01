@@ -30,8 +30,34 @@ generate_jwt() {
 # Tạo các giá trị cần thiết
 POSTGRES_PASSWORD=$(generate_random_string 30)
 JWT_SECRET=$(generate_jwt)
-ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UiLAogICAgImlhdCI6IDE2NDE3NjkyMDAsCiAgICAiZXhwIjogMTc5OTUzNTYwMAp9.${JWT_SECRET}"
-SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9zZSI6ICJzZXJ2aWNlX3JvbGUiLAogICAgImlzcyI6ICJzdXBhYmFzZSIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.${JWT_SECRET}"
+
+# Sử dụng giá trị iat cố định và tính toán exp chính xác 5 năm sau
+IAT_TIMESTAMP=1743440400
+EXPIRY_TIMESTAMP=$((IAT_TIMESTAMP + 157680000)) # 5 năm tính bằng giây (60*60*24*365*5)
+
+# Generate properly signed JWT tokens
+generate_jwt_token() {
+    local role=$1
+    local secret=$2
+    
+    # Create header and payload (as JSON) với iat cố định
+    local header='{"alg":"HS256","typ":"JWT"}'
+    local payload="{\"role\":\"$role\",\"iss\":\"supabase\",\"iat\":${IAT_TIMESTAMP},\"exp\":${EXPIRY_TIMESTAMP}}"
+    
+    # Base64url encode header và payload
+    local base64_header=$(echo -n "$header" | base64 | tr '+/' '-_' | tr -d '=')
+    local base64_payload=$(echo -n "$payload" | base64 | tr '+/' '-_' | tr -d '=')
+    
+    # Tạo chữ ký
+    local signature=$(echo -n "$base64_header.$base64_payload" | openssl dgst -binary -sha256 -hmac "$secret" | base64 | tr '+/' '-_' | tr -d '=')
+    
+    # Trả về JWT hoàn chỉnh
+    echo "$base64_header.$base64_payload.$signature"
+}
+
+ANON_KEY=$(generate_jwt_token "anon" "$JWT_SECRET")
+SERVICE_ROLE_KEY=$(generate_jwt_token "service_role" "$JWT_SECRET")
+
 DASHBOARD_PASSWORD=$(generate_random_string 16)
 SECRET_KEY_BASE=$(generate_random_string 64)
 VAULT_ENC_KEY=$(generate_random_string 32)

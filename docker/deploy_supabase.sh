@@ -51,8 +51,35 @@ generate_jwt() {
 # Tạo các giá trị cần thiết
 POSTGRES_PASSWORD=$(generate_random_string 30)
 JWT_SECRET=$(generate_jwt)
-ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UiLAogICAgImlhdCI6IDE2NDE3NjkyMDAsCiAgICAiZXhwIjogMTc5OTUzNTYwMAp9.${JWT_SECRET}"
-SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9zZSI6ICJzZXJ2aWNlX3JvbGUiLAogICAgImlzcyI6ICJzdXBhYmFzZSIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.${JWT_SECRET}"
+
+# Sử dụng giá trị iat cố định và tính toán exp chính xác 5 năm sau
+IAT_TIMESTAMP=1743440400
+EXPIRY_TIMESTAMP=$((IAT_TIMESTAMP + 157680000)) # 5 năm tính bằng giây (60*60*24*365*5)
+
+# Generate properly signed JWT tokens
+generate_jwt_token() {
+    local role=$1
+    local secret=$2
+    
+    # Create header and payload (as JSON) với iat cố định
+    local header='{"alg":"HS256","typ":"JWT"}'
+    local payload="{\"role\":\"$role\",\"iss\":\"supabase\",\"iat\":${IAT_TIMESTAMP},\"exp\":${EXPIRY_TIMESTAMP}}"
+    
+    # Base64url encode header và payload (tương thích với macOS)
+    local base64_header=$(printf "%s" "$header" | openssl base64 -A | tr '+/' '-_' | tr -d '=')
+    local base64_payload=$(printf "%s" "$payload" | openssl base64 -A | tr '+/' '-_' | tr -d '=')
+    
+    # Tạo chữ ký
+    local signature=$(printf "%s.%s" "$base64_header" "$base64_payload" | openssl dgst -binary -sha256 -hmac "$secret" | openssl base64 -A | tr '+/' '-_' | tr -d '=')
+    
+    # Trả về JWT hoàn chỉnh
+    echo "$base64_header.$base64_payload.$signature"
+}
+
+ANON_KEY=$(generate_jwt_token "anon" "$JWT_SECRET")
+SERVICE_ROLE_KEY=$(generate_jwt_token "service_role" "$JWT_SECRET")
+
+DASHBOARD_USERNAME="supabase"
 DASHBOARD_PASSWORD=$(generate_random_string 16)
 SECRET_KEY_BASE=$(generate_random_string 64)
 VAULT_ENC_KEY=$(generate_random_string 32)
@@ -134,7 +161,7 @@ POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 JWT_SECRET=${JWT_SECRET}
 ANON_KEY=${ANON_KEY}
 SERVICE_ROLE_KEY=${SERVICE_ROLE_KEY}
-DASHBOARD_USERNAME=supabase
+DASHBOARD_USERNAME=${DASHBOARD_USERNAME}
 DASHBOARD_PASSWORD=${DASHBOARD_PASSWORD}
 SECRET_KEY_BASE=${SECRET_KEY_BASE}
 VAULT_ENC_KEY=${VAULT_ENC_KEY}
@@ -248,6 +275,21 @@ else
     sed -i "s/container_name: realtime-dev.supabase-realtime/container_name: realtime-dev.${STACK_NAME}-realtime/g" "$TARGET_DIR/docker-compose.yml"
 fi
 
+# Sửa đổi file kong.yml để cập nhật thông tin xác thực của dashboard
+echo "Updating authentication configuration in kong.yml..."
+KONG_CONFIG_FILE="$TARGET_DIR/volumes/api/kong.yml"
+
+# Cập nhật trực tiếp các biến trong file kong.yml
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS - sử dụng sed tương thích với macOS
+    sed -i '' "s/\$DASHBOARD_USERNAME/${DASHBOARD_USERNAME}/g" "$KONG_CONFIG_FILE"
+    sed -i '' "s/\$DASHBOARD_PASSWORD/${DASHBOARD_PASSWORD}/g" "$KONG_CONFIG_FILE"
+else
+    # Linux/Unix
+    sed -i "s/\$DASHBOARD_USERNAME/${DASHBOARD_USERNAME}/g" "$KONG_CONFIG_FILE"
+    sed -i "s/\$DASHBOARD_PASSWORD/${DASHBOARD_PASSWORD}/g" "$KONG_CONFIG_FILE"
+fi
+
 # Thêm port cho Studio và chỉnh sửa file docker-compose.yml
 echo "Adjusting port configurations in docker-compose.yml..."
 
@@ -255,7 +297,7 @@ echo "Adjusting port configurations in docker-compose.yml..."
 TEMPFILE=$(mktemp)
 
 # Tìm và thay thế cấu hình Studio
-awk -v port="$STUDIO_PORT" -v stack="$STACK_NAME" -v password="$DASHBOARD_PASSWORD" '
+awk -v port="$STUDIO_PORT" -v stack="$STACK_NAME" '
 BEGIN { in_studio = 0; found_env = 0; }
 
 /\s+studio:/ { in_studio = 1; }
@@ -313,7 +355,7 @@ echo "API: http://localhost:${KONG_HTTP_PORT}"
 echo "Database: localhost:${POSTGRES_PORT}"
 echo
 echo "Dashboard login credentials:"
-echo "Username: supabase"
+echo "Username: ${DASHBOARD_USERNAME}"
 echo "Password: ${DASHBOARD_PASSWORD}"
 EOL
 
@@ -345,10 +387,31 @@ rm -rf ./volumes/db/data
 echo "${STACK_NAME} stack has been reset!"
 EOL
 
+# Tạo script để khởi động lại Kong và xem logs sau deploy
+cat > "$TARGET_DIR/restart_kong.sh" << EOL
+#!/bin/bash
+cd "\$(dirname "\$0")"
+echo "Restarting Kong container to apply authentication settings..."
+docker compose restart kong
+echo "Kong restarted. Waiting for 5 seconds before showing logs..."
+sleep 5
+docker compose logs --tail=50 kong
+echo
+echo "If you still don't see a login prompt for Supabase Studio, please try:"
+echo "1. Clear your browser cache and cookies"
+echo "2. Try accessing Studio in a private/incognito browser window"
+echo "3. Run './restart_kong.sh' again if needed"
+echo
+echo "Dashboard login credentials:"
+echo "Username: ${DASHBOARD_USERNAME}"
+echo "Password: ${DASHBOARD_PASSWORD}"
+EOL
+
 # Phân quyền thực thi cho các script và các tệp quan trọng
 chmod +x "$TARGET_DIR/start.sh"
 chmod +x "$TARGET_DIR/stop.sh"
 chmod +x "$TARGET_DIR/reset.sh"
+chmod +x "$TARGET_DIR/restart_kong.sh"
 chmod 644 "$TARGET_DIR/docker-compose.yml"
 chmod 644 "$TARGET_DIR/docker-compose.s3.yml"
 chmod 644 "$TARGET_DIR/.env"
@@ -369,7 +432,7 @@ echo "API URL: http://localhost:${KONG_HTTP_PORT}"
 echo "Database: localhost:${POSTGRES_PORT}"
 echo
 echo "Dashboard login credentials:"
-echo "Username: supabase"
+echo "Username: ${DASHBOARD_USERNAME}"
 echo "Password: ${DASHBOARD_PASSWORD}"
 echo
 echo "All settings are saved in ${TARGET_DIR}/.env"
