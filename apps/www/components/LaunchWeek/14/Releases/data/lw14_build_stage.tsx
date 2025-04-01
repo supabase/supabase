@@ -125,11 +125,17 @@ export const days: AdventDay[] = [
     ),
   },
   {
-    title: '',
-    description: '',
-    id: '',
-    is_shipped: false,
-    links: [],
+    title: "Keeping Tabs: What's New in Supabase Studio",
+    description: 'Tabs in the Editors! And upgrades to AI Assistant, SQL, and Logs',
+    id: 'tabs',
+    is_shipped: true,
+    links: [
+      {
+        url: '/blog/tabs-dashboard-updates',
+        label: 'Blog post',
+        target: '_blank',
+      },
+    ],
     icon: null,
   },
 ]
