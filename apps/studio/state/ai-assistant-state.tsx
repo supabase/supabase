@@ -117,7 +117,7 @@ export const createAiAssistantState = (projectRef: string | undefined) => {
       const chatId = crypto.randomUUID()
       const newChat: ChatSession = {
         id: chatId,
-        name: options?.name ?? 'New Chat',
+        name: options?.name ?? 'Untitled',
         messages: [],
         createdAt: new Date(),
         updatedAt: new Date(),
