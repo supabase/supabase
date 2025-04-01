@@ -41,14 +41,14 @@ const PromoToast = () => {
       )}
     >
       <div className="relative z-10 text-foreground-lighter uppercase flex flex-col text-sm w-full font-mono mb-2">
-        <span className="mb-1">LW14: Day 1</span>
+        <span className="mb-1">{announcement.text}</span>
         <p
           style={{
             fontFamily: 'Departure Mono, Source Code Pro, Office Code Pro, Menlo, monospace',
           }}
           className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7"
         >
-          Supabase UI Library
+          Supabase Edge Functions: Deploy from Dashboard + Deno 2.1
         </p>
       </div>
 
