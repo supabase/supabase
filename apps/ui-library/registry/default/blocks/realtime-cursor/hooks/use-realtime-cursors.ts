@@ -1,23 +1,39 @@
 import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
 import { RealtimeChannel } from '@supabase/supabase-js'
-import { DependencyList, useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
+/**
+ * Throttle a callback to a certain delay, It will only call the callback if the delay has passed, with the arguments
+ * from the last call
+ */
 const useThrottleCallback = <Params extends unknown[], Return>(
   callback: (...args: Params) => Return,
-  limit: number,
-  deps: DependencyList
+  delay: number
 ) => {
-  const lastRun = useRef<number>(0)
+  const lastCall = useRef(0)
+  const timeout = useRef<NodeJS.Timeout | null>(null)
 
   return useCallback(
     (...args: Params) => {
       const now = Date.now()
-      if (now - lastRun.current >= limit) {
-        lastRun.current = now
+      const remainingTime = delay - (now - lastCall.current)
+
+      if (remainingTime <= 0) {
+        if (timeout.current) {
+          clearTimeout(timeout.current)
+          timeout.current = null
+        }
+        lastCall.current = now
         callback(...args)
+      } else if (!timeout.current) {
+        timeout.current = setTimeout(() => {
+          lastCall.current = Date.now()
+          timeout.current = null
+          callback(...args)
+        }, remainingTime)
       }
     },
-    [...deps, limit]
+    [callback, delay]
   )
 }
 
@@ -45,11 +61,11 @@ type CursorEventPayload = {
 export const useRealtimeCursors = ({
   roomName,
   username,
-  throttleMs = 70,
+  throttleMs,
 }: {
   roomName: string
   username: string
-  throttleMs?: number
+  throttleMs: number
 }) => {
   const [color] = useState(generateRandomColor())
   const [userId] = useState(generateRandomNumber())
@@ -57,7 +73,7 @@ export const useRealtimeCursors = ({
 
   const channelRef = useRef<RealtimeChannel | null>(null)
 
-  const handleMouseMove = useThrottleCallback(
+  const callback = useCallback(
     (event: MouseEvent) => {
       const { clientX, clientY } = event
 
@@ -80,9 +96,10 @@ export const useRealtimeCursors = ({
         payload: payload,
       })
     },
-    throttleMs,
     [color, userId, username]
   )
+
+  const handleMouseMove = useThrottleCallback(callback, throttleMs)
 
   useEffect(() => {
     const channel = supabase.channel(roomName)
