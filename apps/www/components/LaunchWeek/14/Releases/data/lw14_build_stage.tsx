@@ -57,7 +57,7 @@ export const days: AdventDay[] = [
     ),
   },
   {
-    title: 'Supabase Auth: Bring your own Clerk',
+    title: 'Supabase Auth: Bring Your Own Clerk',
     // description: '',
     id: 'clerk',
     is_shipped: true,
@@ -92,11 +92,17 @@ export const days: AdventDay[] = [
     ),
   },
   {
-    title: '',
-    description: '',
-    id: '',
-    is_shipped: false,
-    links: [],
+    title: 'Automatic Embeddings in Postgres',
+    description: 'Automatic embeddings moves the vector generation step into Postgres',
+    id: 'automatic-embeddings',
+    is_shipped: true,
+    links: [
+      {
+        url: '/blog/automatic-embeddings',
+        label: 'Blog post',
+        target: '_blank',
+      },
+    ],
     icon: null,
   },
   {
