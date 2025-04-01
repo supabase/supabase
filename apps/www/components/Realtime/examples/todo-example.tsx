@@ -18,6 +18,7 @@ const instanceId = '${instanceId}';
 
 // Channel name for the todos in this instance
 const CHANNEL = \`todos:\${instanceId}\`;
+const TABLE = 'example_todos';
 
 export default function App() {
   const [todos, setTodos] = useState([]);
@@ -60,7 +61,7 @@ export default function App() {
     const fetchTodos = async () => {
       try {
         const { data, error } = await supabase
-          .from('todos')
+          .from(TABLE)
           .select('*')
           .eq('channel', instanceId)
           
@@ -157,7 +158,7 @@ export default function App() {
       // Insert the todo into the Supabase table
       // The database trigger will handle broadcasting
       const { error } = await supabase
-        .from('todos')
+        .from(TABLE)
         .insert({
           text: newTodo.trim(),
           completed: false,
@@ -184,7 +185,7 @@ export default function App() {
       // Update the todo in the database
       // The database trigger will handle broadcasting
       const { error } = await supabase
-        .from('todos')
+        .from(TABLE)
         .update({ completed: !todo.completed })
         .eq('id', todo.id)
         .eq('channel', instanceId);
@@ -204,7 +205,7 @@ export default function App() {
       // Delete the todo from the database
       // The database trigger will handle broadcasting
       const { error } = await supabase
-        .from('todos')
+        .from(TABLE)
         .delete()
         .eq('id', todo.id)
         

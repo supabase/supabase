@@ -1,24 +1,6 @@
-
-
 CREATE EXTENSION IF NOT EXISTS "pg_cron" WITH SCHEMA "pg_catalog";
 
-CREATE EXTENSION IF NOT EXISTS "pgsodium";
-
-COMMENT ON SCHEMA "public" IS 'standard public schema';
-
-CREATE EXTENSION IF NOT EXISTS "pg_graphql" WITH SCHEMA "graphql";
-
-CREATE EXTENSION IF NOT EXISTS "pg_stat_statements" WITH SCHEMA "extensions";
-
-CREATE EXTENSION IF NOT EXISTS "pgcrypto" WITH SCHEMA "extensions";
-
-CREATE EXTENSION IF NOT EXISTS "pgjwt" WITH SCHEMA "extensions";
-
-CREATE EXTENSION IF NOT EXISTS "supabase_vault" WITH SCHEMA "vault";
-
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA "extensions";
-
-CREATE OR REPLACE FUNCTION "public"."insert_random_logging_data"() RETURNS "void"
+CREATE OR REPLACE FUNCTION "public"."insert_random_example_logging_data"() RETURNS "void"
     LANGUAGE "plpgsql"
     AS $$
 DECLARE
@@ -36,19 +18,19 @@ BEGIN
     END;
 
     -- Insert the new record into logging_data
-    INSERT INTO public.logging_data (log_message, log_level, created_at)
+    INSERT INTO public.example_logging_data (log_message, log_level, created_at)
     VALUES (random_message, random_level, NOW());
 END;
 $$;
 
-ALTER FUNCTION "public"."insert_random_logging_data"() OWNER TO "postgres";
+ALTER FUNCTION "public"."insert_random_example_logging_data"() OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."logging_data_changes"() RETURNS "trigger"
+CREATE OR REPLACE FUNCTION "public"."example_logging_data_changes"() RETURNS "trigger"
     LANGUAGE "plpgsql"
     AS $$
 BEGIN
     PERFORM realtime.broadcast_changes(
-        'logs',   -- topic
+        'logs',                      -- topic
         TG_OP,                       -- event
         TG_OP,                       -- operation
         TG_TABLE_NAME,               -- table
@@ -60,9 +42,9 @@ BEGIN
 END;
 $$;
 
-ALTER FUNCTION "public"."logging_data_changes"() OWNER TO "postgres";
+ALTER FUNCTION "public"."example_logging_data_changes"() OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."todos_changes"() RETURNS "trigger"
+CREATE OR REPLACE FUNCTION "public"."example_todos_changes"() RETURNS "trigger"
     LANGUAGE "plpgsql"
     AS $$
 BEGIN
@@ -80,23 +62,19 @@ END;
 $$;
 
 
-ALTER FUNCTION "public"."todos_changes"() OWNER TO "postgres";
+ALTER FUNCTION "public"."example_todos_changes"() OWNER TO "postgres";
 
-SET default_tablespace = '';
-
-SET default_table_access_method = "heap";
-
-CREATE TABLE IF NOT EXISTS "public"."logging_data" (
+CREATE TABLE IF NOT EXISTS "public"."example_logging_data" (
     "id" bigint NOT NULL,
     "log_message" "text" NOT NULL,
     "log_level" "text" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"()
 );
 
-ALTER TABLE "public"."logging_data" OWNER TO "postgres";
+ALTER TABLE "public"."example_logging_data" OWNER TO "postgres";
 
-ALTER TABLE "public"."logging_data" ALTER COLUMN "id" ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME "public"."logging_data_id_seq"
+ALTER TABLE "public"."example_logging_data" ALTER COLUMN "id" ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME "public"."example_logging_data_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -104,7 +82,9 @@ ALTER TABLE "public"."logging_data" ALTER COLUMN "id" ADD GENERATED ALWAYS AS ID
     CACHE 1
 );
 
-CREATE TABLE IF NOT EXISTS "public"."todos" (
+ALTER TABLE ONLY "public"."example_logging_data" ADD CONSTRAINT "example_logging_data_pkey" PRIMARY KEY ("id");
+
+CREATE TABLE IF NOT EXISTS "public"."example_todos" (
     "id" bigint NOT NULL,
     "created_by" "uuid",
     "completed" boolean DEFAULT false NOT NULL,
@@ -112,10 +92,10 @@ CREATE TABLE IF NOT EXISTS "public"."todos" (
     "channel" "text" NOT NULL
 );
 
-ALTER TABLE "public"."todos" OWNER TO "postgres";
+ALTER TABLE "public"."example_todos" OWNER TO "postgres";
 
-ALTER TABLE "public"."todos" ALTER COLUMN "id" ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME "public"."todos_id_seq"
+ALTER TABLE "public"."example_todos" ALTER COLUMN "id" ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME "public"."example_todos_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -123,81 +103,65 @@ ALTER TABLE "public"."todos" ALTER COLUMN "id" ADD GENERATED ALWAYS AS IDENTITY 
     CACHE 1
 );
 
-ALTER TABLE ONLY "public"."logging_data"
-    ADD CONSTRAINT "logging_data_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "public"."example_todos" ADD CONSTRAINT "example_todos_pkey" PRIMARY KEY ("id");
 
-ALTER TABLE ONLY "public"."todos"
-    ADD CONSTRAINT "todos_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "public"."example_todos" ADD CONSTRAINT "example_todos_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
-CREATE INDEX "idx_created_by" ON "public"."todos" USING "btree" ("created_by");
+CREATE INDEX "idx_created_by" ON "public"."example_todos" USING "btree" ("created_by");
 
-CREATE OR REPLACE TRIGGER "broadcast_changes_for_logging_data_trigger" AFTER INSERT ON "public"."logging_data" FOR EACH ROW EXECUTE FUNCTION "public"."logging_data_changes"();
+CREATE OR REPLACE TRIGGER "broadcast_changes_for_example_logging_data_trigger" AFTER INSERT ON "public"."example_logging_data" FOR EACH ROW EXECUTE FUNCTION "public"."example_logging_data_changes"();
 
-CREATE OR REPLACE TRIGGER "broadcast_changes_for_todos_trigger" AFTER INSERT OR DELETE OR UPDATE ON "public"."todos" FOR EACH ROW EXECUTE FUNCTION "public"."todos_changes"();
+CREATE OR REPLACE TRIGGER "broadcast_changes_for_example_todos_trigger" AFTER INSERT OR DELETE OR UPDATE ON "public"."example_todos" FOR EACH ROW EXECUTE FUNCTION "public"."example_todos_changes"();
 
-ALTER TABLE ONLY "public"."todos"
-    ADD CONSTRAINT "todos_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+CREATE POLICY "Allow delete example_todos by channel" ON "public"."example_todos" FOR DELETE TO "authenticated" USING (("channel" = ( SELECT (("auth"."jwt"() -> 'user_metadata'::"text") ->> 'instanceId'::"text"))));
 
-CREATE POLICY "Allow delete todos by channel" ON "public"."todos" FOR DELETE TO "authenticated" USING (("channel" = ( SELECT (("auth"."jwt"() -> 'user_metadata'::"text") ->> 'instanceId'::"text"))));
+CREATE POLICY "Allow insert example_todos by channel" ON "public"."example_todos" FOR INSERT TO "authenticated" WITH CHECK (("channel" = ( SELECT (("auth"."jwt"() -> 'user_metadata'::"text") ->> 'instanceId'::"text"))));
 
-CREATE POLICY "Allow insert todos by channel" ON "public"."todos" FOR INSERT TO "authenticated" WITH CHECK (("channel" = ( SELECT (("auth"."jwt"() -> 'user_metadata'::"text") ->> 'instanceId'::"text"))));
+CREATE POLICY "Allow select example_todos by channel" ON "public"."example_todos" FOR SELECT TO "authenticated" USING (("channel" = ( SELECT (("auth"."jwt"() -> 'user_metadata'::"text") ->> 'instanceId'::"text"))));
 
-CREATE POLICY "Allow read access for all users" ON "public"."logging_data" FOR SELECT TO "authenticated", "anon" USING (true);
+CREATE POLICY "Allow update example_todos by channel" ON "public"."example_todos" FOR UPDATE TO "authenticated" USING (("channel" = ( SELECT (("auth"."jwt"() -> 'user_metadata'::"text") ->> 'instanceId'::"text")))) WITH CHECK (("channel" = ( SELECT (("auth"."jwt"() -> 'user_metadata'::"text") ->> 'instanceId'::"text"))));
 
-CREATE POLICY "Allow select todos by channel" ON "public"."todos" FOR SELECT TO "authenticated" USING (("channel" = ( SELECT (("auth"."jwt"() -> 'user_metadata'::"text") ->> 'instanceId'::"text"))));
+CREATE POLICY "Allow read access for all users" ON "public"."example_logging_data" FOR SELECT TO "authenticated", "anon" USING (true);
 
-CREATE POLICY "Allow update todos by channel" ON "public"."todos" FOR UPDATE TO "authenticated" USING (("channel" = ( SELECT (("auth"."jwt"() -> 'user_metadata'::"text") ->> 'instanceId'::"text")))) WITH CHECK (("channel" = ( SELECT (("auth"."jwt"() -> 'user_metadata'::"text") ->> 'instanceId'::"text"))));
+CREATE POLICY "Allow listening for SELECT broadcasts from the example_todos channel" ON "realtime"."messages" FOR SELECT TO "authenticated", "anon" USING (((extension = 'broadcast'::text) AND (realtime.topic() LIKE 'todos:%')));
 
-ALTER TABLE "public"."logging_data" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow listening for INSERT broadcasts from the example_todos channel" ON "realtime"."messages" FOR INSERT TO "authenticated", "anon" WITH CHECK (((extension = 'broadcast'::text) AND (realtime.topic() LIKE 'todos:%')));
 
-ALTER TABLE "public"."todos" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow listening for SELECT broadcasts from the logs channel" ON "realtime"."messages" FOR SELECT TO "authenticated", "anon" USING (((extension = 'broadcast'::text) AND (realtime.topic() = 'logs'::text)));
 
-ALTER PUBLICATION "supabase_realtime" OWNER TO "postgres";
+ALTER TABLE "public"."example_logging_data" ENABLE ROW LEVEL SECURITY;
 
-GRANT USAGE ON SCHEMA "public" TO "postgres";
-GRANT USAGE ON SCHEMA "public" TO "anon";
-GRANT USAGE ON SCHEMA "public" TO "authenticated";
-GRANT USAGE ON SCHEMA "public" TO "service_role";
+ALTER TABLE "public"."example_todos" ENABLE ROW LEVEL SECURITY;
 
-GRANT ALL ON FUNCTION "public"."insert_random_logging_data"() TO "anon";
-GRANT ALL ON FUNCTION "public"."insert_random_logging_data"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."insert_random_logging_data"() TO "service_role";
+GRANT ALL ON FUNCTION "public"."insert_random_example_logging_data"() TO "postgres";
+GRANT ALL ON FUNCTION "public"."insert_random_example_logging_data"() TO "anon";
+GRANT ALL ON FUNCTION "public"."insert_random_example_logging_data"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."insert_random_example_logging_data"() TO "service_role";
 
-GRANT ALL ON FUNCTION "public"."logging_data_changes"() TO "anon";
-GRANT ALL ON FUNCTION "public"."logging_data_changes"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."logging_data_changes"() TO "service_role";
+GRANT ALL ON FUNCTION "public"."example_logging_data_changes"() TO "postgres";
+GRANT ALL ON FUNCTION "public"."example_logging_data_changes"() TO "anon";
+GRANT ALL ON FUNCTION "public"."example_logging_data_changes"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."example_logging_data_changes"() TO "service_role";
 
-GRANT ALL ON FUNCTION "public"."todos_changes"() TO "anon";
-GRANT ALL ON FUNCTION "public"."todos_changes"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."todos_changes"() TO "service_role";
+GRANT ALL ON FUNCTION "public"."example_todos_changes"() TO "anon";
+GRANT ALL ON FUNCTION "public"."example_todos_changes"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."example_todos_changes"() TO "service_role";
 
-GRANT ALL ON TABLE "public"."logging_data" TO "anon";
-GRANT ALL ON TABLE "public"."logging_data" TO "authenticated";
-GRANT ALL ON TABLE "public"."logging_data" TO "service_role";
+GRANT ALL ON TABLE "public"."example_logging_data" TO "anon";
+GRANT ALL ON TABLE "public"."example_logging_data" TO "authenticated";
+GRANT ALL ON TABLE "public"."example_logging_data" TO "service_role";
 
-GRANT ALL ON SEQUENCE "public"."logging_data_id_seq" TO "anon";
-GRANT ALL ON SEQUENCE "public"."logging_data_id_seq" TO "authenticated";
-GRANT ALL ON SEQUENCE "public"."logging_data_id_seq" TO "service_role";
+GRANT ALL ON SEQUENCE "public"."example_logging_data_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."example_logging_data_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."example_logging_data_id_seq" TO "service_role";
 
-GRANT ALL ON TABLE "public"."todos" TO "anon";
-GRANT ALL ON TABLE "public"."todos" TO "authenticated";
-GRANT ALL ON TABLE "public"."todos" TO "service_role";
+GRANT ALL ON TABLE "public"."example_todos" TO "anon";
+GRANT ALL ON TABLE "public"."example_todos" TO "authenticated";
+GRANT ALL ON TABLE "public"."example_todos" TO "service_role";
 
-GRANT ALL ON SEQUENCE "public"."todos_id_seq" TO "anon";
-GRANT ALL ON SEQUENCE "public"."todos_id_seq" TO "authenticated";
-GRANT ALL ON SEQUENCE "public"."todos_id_seq" TO "service_role";
+GRANT ALL ON SEQUENCE "public"."example_todos_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."example_todos_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."example_todos_id_seq" TO "service_role";
 
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES  TO "postgres";
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES  TO "anon";
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES  TO "authenticated";
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES  TO "service_role";
-
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS  TO "postgres";
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS  TO "anon";
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS  TO "authenticated";
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS  TO "service_role";
-
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "postgres";
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "anon";
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "authenticated";
-ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "service_role";
+SELECT cron.schedule('Log Viewer Example Cron', '5 seconds', 'SELECT public.insert_random_example_logging_data();');
+SELECT cron.schedule('Log Viewer Cleanup', '0 0 * * *', 'truncate public.example_logging_data');

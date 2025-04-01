@@ -14,7 +14,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Constants
 const PAGE_SIZE = 50;
-const TABLE_NAME = 'logging_data';
+const TABLE_NAME = 'example_logging_data';
 
 // Log level colors
 const LOG_LEVEL_COLORS = {
