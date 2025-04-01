@@ -6,7 +6,6 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
-import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -19,13 +18,13 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { DollarSign, FileText, GitBranch } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
-import { Button, Form_Shadcn_, Modal } from 'ui'
+import { Button, DialogFooter, DialogSection, DialogSectionSeparator, Form_Shadcn_ } from 'ui'
 import BranchingPITRNotice from './BranchingPITRNotice'
 import BranchingPlanNotice from './BranchingPlanNotice'
 import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
 import GithubRepositorySelection from './GithubRepositorySelection'
 
-const EnableBranchingModal = () => {
+export const EnableBranchingModal = () => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
   const selectedOrg = useSelectedOrganization()
@@ -118,138 +117,119 @@ const EnableBranchingModal = () => {
 
   return (
     <>
-      <Modal
-        hideFooter
-        visible={snap.showEnableBranchingModal}
-        onCancel={() => snap.setShowEnableBranchingModal(false)}
-        className="block"
-        size="medium"
-        hideClose
-      >
-        <Form_Shadcn_ {...form}>
-          <form
-            id={formId}
-            onSubmit={form.handleSubmit(onSubmit)}
-            onChange={() => setIsValid(false)}
-          >
-            <Modal.Content className="flex items-center justify-between space-x-4">
-              <div className="flex items-center gap-x-4">
-                <GitBranch strokeWidth={2} size={20} />
-                <div>
-                  <p className="text-foreground">Enable database branching</p>
-                  <p className="text-sm text-foreground-light">Manage environments in Supabase</p>
-                </div>
+      <Form_Shadcn_ {...form}>
+        <form id={formId} onSubmit={form.handleSubmit(onSubmit)} onChange={() => setIsValid(false)}>
+          <DialogSection className="flex items-center justify-between space-x-4">
+            <div className="flex items-center gap-x-4">
+              <GitBranch strokeWidth={2} size={20} />
+              <div>
+                <p className="text-foreground">Enable database branching</p>
+                <p className="text-sm text-foreground-light">Manage environments in Supabase</p>
               </div>
-              <DocsButton href="https://supabase.com/docs/guides/platform/branching" />
-            </Modal.Content>
+            </div>
+            <DocsButton href="https://supabase.com/docs/guides/platform/branching" />
+          </DialogSection>
 
-            {isLoading && (
-              <>
-                <Modal.Separator />
-                <Modal.Content className="px-7 py-6">
-                  <GenericSkeletonLoader />
-                </Modal.Content>
-                <Modal.Separator />
-              </>
-            )}
-            {isError && (
-              <>
-                <Modal.Separator />
-                <Modal.Content className="px-7 py-6">
-                  {isErrorConnections ? (
-                    <AlertError error={connectionsError} subject="Failed to retrieve connections" />
-                  ) : null}
-                </Modal.Content>
-                <Modal.Separator />
-              </>
-            )}
-            {isSuccess && (
-              <>
-                {isFreePlan ? (
-                  <BranchingPlanNotice />
-                ) : !hasMinimumPgVersion ? (
-                  <BranchingPostgresVersionNotice />
-                ) : (
-                  <>
-                    <GithubRepositorySelection
-                      form={form}
-                      isChecking={isChecking}
-                      isValid={canSubmit}
-                      githubConnection={githubConnection}
-                    />
-                    {!hasPitrEnabled && <BranchingPITRNotice />}
-                  </>
-                )}
-                <Modal.Content className="py-6 flex flex-col gap-3">
-                  <p className="text-sm text-foreground-light">
-                    Please keep in mind the following:
-                  </p>
-                  <div className="flex flex-row gap-4">
-                    <div>
-                      <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
-                        <DollarSign className="text-info" size={20} strokeWidth={2} />
-                      </figure>
-                    </div>
-                    <div className="flex flex-col gap-y-1">
-                      <p className="text-sm text-foreground">
-                        Preview branches are billed $0.32 per day
-                      </p>
-                      <p className="text-sm text-foreground-light">
-                        This cost will continue for as long as the branch has not been removed.
-                      </p>
-                    </div>
+          {isLoading && (
+            <>
+              <DialogSectionSeparator />
+              <DialogSection className="px-7 py-6">
+                <GenericSkeletonLoader />
+              </DialogSection>
+              <DialogSectionSeparator />
+            </>
+          )}
+          {isError && (
+            <>
+              <DialogSectionSeparator />
+              <DialogSection className="px-7 py-6">
+                {isErrorConnections ? (
+                  <AlertError error={connectionsError} subject="Failed to retrieve connections" />
+                ) : null}
+              </DialogSection>
+              <DialogSectionSeparator />
+            </>
+          )}
+          {isSuccess && (
+            <>
+              {isFreePlan ? (
+                <BranchingPlanNotice />
+              ) : !hasMinimumPgVersion ? (
+                <BranchingPostgresVersionNotice />
+              ) : (
+                <>
+                  <GithubRepositorySelection
+                    form={form}
+                    isChecking={isChecking}
+                    isValid={canSubmit}
+                    githubConnection={githubConnection}
+                  />
+                  {!hasPitrEnabled && <BranchingPITRNotice />}
+                </>
+              )}
+              <DialogSection className="py-6 flex flex-col gap-3">
+                <p className="text-sm text-foreground-light">Please keep in mind the following:</p>
+                <div className="flex flex-row gap-4">
+                  <div>
+                    <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
+                      <DollarSign className="text-info" size={20} strokeWidth={2} />
+                    </figure>
                   </div>
-                  <div className="flex flex-row gap-4 mt-2">
-                    <div>
-                      <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
-                        <FileText className="text-info" size={20} strokeWidth={2} />
-                      </figure>
-                    </div>
-                    <div className="flex flex-col gap-y-1">
-                      <p className="text-sm text-foreground">
-                        Migrations are applied from your GitHub repository
-                      </p>
-                      <p className="text-sm text-foreground-light">
-                        Migration files in your <code className="text-xs">./supabase</code>{' '}
-                        directory will run on both Preview Branches and Production when pushing and
-                        merging branches.
-                      </p>
-                    </div>
+                  <div className="flex flex-col gap-y-1">
+                    <p className="text-sm text-foreground">
+                      Preview branches are billed $0.32 per day
+                    </p>
+                    <p className="text-sm text-foreground-light">
+                      This cost will continue for as long as the branch has not been removed.
+                    </p>
                   </div>
-                </Modal.Content>
-                <Modal.Separator />
-              </>
-            )}
+                </div>
+                <div className="flex flex-row gap-4 mt-2">
+                  <div>
+                    <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
+                      <FileText className="text-info" size={20} strokeWidth={2} />
+                    </figure>
+                  </div>
+                  <div className="flex flex-col gap-y-1">
+                    <p className="text-sm text-foreground">
+                      Migrations are applied from your GitHub repository
+                    </p>
+                    <p className="text-sm text-foreground-light">
+                      Migration files in your <code className="text-xs">./supabase</code> directory
+                      will run on both Preview Branches and Production when pushing and merging
+                      branches.
+                    </p>
+                  </div>
+                </div>
+              </DialogSection>
+              <DialogSectionSeparator />
+            </>
+          )}
 
-            <Modal.Content className="flex items-center gap-3">
-              <Button
-                size="medium"
-                block
-                disabled={isCreating}
-                type="default"
-                onClick={() => snap.setShowEnableBranchingModal(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                block
-                size="medium"
-                form={formId}
-                disabled={!isSuccess || isCreating || !canSubmit}
-                loading={isCreating}
-                type="primary"
-                htmlType="submit"
-              >
-                I understand, enable branching
-              </Button>
-            </Modal.Content>
-          </form>
-        </Form_Shadcn_>
-      </Modal>
-
-      <SidePanelGitHubRepoLinker projectRef={ref} />
+          <DialogFooter className="flex items-center gap-3">
+            <Button
+              size="medium"
+              block
+              disabled={isCreating}
+              type="default"
+              onClick={() => snap.setShowEnableBranchingModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              block
+              size="medium"
+              form={formId}
+              disabled={!isSuccess || isCreating || !canSubmit}
+              loading={isCreating}
+              type="primary"
+              htmlType="submit"
+            >
+              I understand, enable branching
+            </Button>
+          </DialogFooter>
+        </form>
+      </Form_Shadcn_>
     </>
   )
 }
-
-export default EnableBranchingModal

@@ -8,6 +8,7 @@ import {
   useIsSQLEditorTabsEnabled,
   useIsTableEditorTabsEnabled,
 } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
 import AISettingsModal from 'components/ui/AISettingsModal'
@@ -21,9 +22,9 @@ import { PROJECT_STATUS } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
+import { cn, Dialog, DialogContent, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
-import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
+import { EnableBranchingModal } from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
@@ -134,6 +135,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       return () => window.removeEventListener('keydown', handler)
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [aiSnap.open])
+    const snap = useAppStateSnapshot()
 
     return (
       <>
@@ -249,7 +251,17 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
-        <EnableBranchingModal />
+
+        <Dialog
+          open={snap.showEnableBranchingModal}
+          onOpenChange={() => snap.setShowEnableBranchingModal(false)}
+        >
+          <DialogContent hideClose>
+            <EnableBranchingModal />
+          </DialogContent>
+        </Dialog>
+
+        <SidePanelGitHubRepoLinker projectRef={selectedProject?.ref} />
         <AISettingsModal />
         <ProjectAPIDocs />
         <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
