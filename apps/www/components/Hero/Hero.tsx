@@ -18,9 +18,15 @@ const Hero = () => {
                 <div className="flex flex-col items-center">
                   <div className="z-40 w-full flex justify-center -mt-4 lg:-mt-12 mb-8">
                     <AnnouncementBadge
-                      url="/launch-week#day-1"
-                      badge="LW14: Day 1"
-                      announcement="Supabase UI Library"
+                      url="/launch-week#day-2"
+                      badge="LW14: Day 2"
+                      announcement={
+                        <>
+                          <span className="hidden sm:inline">Deploy </span>Edge Functions
+                          <span className="hidden sm:inline"> from Dashboard + Deno 2.1</span>
+                        </>
+                      }
+                      className="[&_.announcement-badge]:!text-xs [&_.announcement-text]:!text-xs"
                       style={{
                         fontFamily:
                           'Departure Mono, Source Code Pro, Office Code Pro, Menlo, monospace',
