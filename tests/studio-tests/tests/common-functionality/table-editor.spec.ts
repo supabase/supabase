@@ -106,7 +106,7 @@ test.describe('Table Editor', () => {
     await expect(rows.nth(1)).toContainText('2')
     await expect(rows.nth(2)).toContainText('100')
     // remove the sorting
-    await page.getByTestId('table-editor-sort-button').click()
+    await page.getByRole('button', { name: 'Sorted by 1 rule' }).click()
     await page.getByRole('dialog').getByRole('button').nth(1).click()
 
     // filter by a column
