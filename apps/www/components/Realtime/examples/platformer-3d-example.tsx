@@ -1,7 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-import ExampleLayout, { ExampleLayoutProps } from '../example-layout'
+import { ExampleLayoutProps } from '../example-layout'
 
 const instanceId = Math.random().toString(36).substring(2, 9)
 
@@ -10,7 +9,7 @@ import './styles.css';
 import { createClient } from '@supabase/supabase-js';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Physics, useBox, usePlane } from '@react-three/cannon';
-import { OrbitControls, Text } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import { Vector3, MathUtils } from 'three';
 
 // Initialize Supabase client
@@ -1027,20 +1026,6 @@ function Player({ player, isLocal, keysPressed, setLocalPlayer }) {
         />
       </mesh>
       
-      {/* Player name */}
-      <Text
-        position={[
-          player.position[0], 
-          player.position[1] + 1.2, 
-          player.position[2]
-        ]}
-        fontSize={0.5}
-        color={player.isAlive === false ? '#555555' : '#cccccc'}
-        anchorX="center"
-        anchorY="middle"
-      >
-        {player.username}
-      </Text>
     </group>
   );
 }`
