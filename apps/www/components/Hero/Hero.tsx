@@ -20,7 +20,7 @@ const Hero = () => {
                     <AnnouncementBadge
                       url="/launch-week#day-2"
                       badge="LW14: Day 2"
-                      announcement="Edge Functions Deno 2.1"
+                      announcement="Deploy Edge Functions from Dashboard + Deno 2.1"
                       style={{
                         fontFamily:
                           'Departure Mono, Source Code Pro, Office Code Pro, Menlo, monospace',
