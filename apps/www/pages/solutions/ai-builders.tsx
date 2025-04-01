@@ -8,12 +8,8 @@ import ProductHeader from '~/components/Sections/ProductHeader2'
 import content from '~/data/solutions/ai-builders'
 import EnterpriseLogos from '../../components/Enterprise/EnterpriseLogos'
 
-const EnterpriseUseCases = dynamic(() => import('components/Enterprise/UseCases'))
-const EnterprisePerformance = dynamic(() => import('components/Enterprise/Performance'))
-const EnterpriseSecurity = dynamic(() => import('components/Enterprise/Security'))
-const EnterpriseSupport = dynamic(() => import('components/Enterprise/Support'))
-const EnterpriseQuote = dynamic(() => import('components/Enterprise/SingleQuote'))
-const CTAForm = dynamic(() => import('components/Enterprise/CTAForm'))
+const UseCases = dynamic(() => import('components/Solutions/UseCases'))
+const WhySupabase = dynamic(() => import('~/components/Solutions/FeaturesSection'))
 
 const Enterprise: NextPage = () => (
   <>
@@ -39,8 +35,8 @@ const Enterprise: NextPage = () => (
         footer={<EnterpriseLogos className="lg:max-w-xs xl:max-w-none" />}
         footerPosition="left"
       />
-      <EnterpriseUseCases {...content['use-cases']} />
-      <EnterpriseSupport {...content.why} />
+      <UseCases {...content['use-cases']} />
+      <WhySupabase {...content.why} />
       {/* <EnterprisePerformance {...content.performance} /> */}
       {/* <EnterpriseSecurity {...content.security} /> */}
       {/* <EnterpriseQuote {...content.quote} /> */}

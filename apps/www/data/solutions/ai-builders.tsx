@@ -1,6 +1,6 @@
 import { Timer } from 'lucide-react'
 import { CubeIcon } from '@heroicons/react/outline'
-import Image from 'next/image'
+import { Image } from 'ui'
 
 export default {
   metadata: {
@@ -21,7 +21,10 @@ export default {
     ],
     image: (
       <Image
-        src="/images/solutions/ai-builders/ai-builders-agent-dark.svg"
+        src={{
+          dark: '/images/solutions/ai-builders/ai-builders-agent-dark.svg',
+          light: '/images/solutions/ai-builders/ai-builders-agent-light.svg',
+        }}
         alt="AI agent for ai builders"
         width={1000}
         height={1000}
@@ -31,12 +34,12 @@ export default {
       {
         label: 'Start your project',
         href: 'https://supabase.com/dashboard',
-        type: 'primary',
+        type: 'primary' as any,
       },
       {
         label: 'Request a demo',
         href: '/contact',
-        type: 'default',
+        type: 'default' as any,
       },
     ],
     logos: [
