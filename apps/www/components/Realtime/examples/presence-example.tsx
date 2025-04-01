@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import type { ExampleLayoutProps } from '../example-layout'
 
 const instanceId = Math.random().toString(36).substring(2, 9)
@@ -10,8 +9,8 @@ import './styles.css';
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
-const supabaseUrl = '${process.env.NEXT_PUBLIC_SUPABASE_REALTIME_URL}';
-const supabaseKey = '${process.env.NEXT_PUBLIC_SUPABASE_REALTIME_ANON_KEY}';
+const supabaseUrl = '${process.env.NEXT_PUBLIC_SUPABASE_URL}';
+const supabaseKey = '${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Generate a random user ID and avatar

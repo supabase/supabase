@@ -1,7 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-import ExampleLayout, { ExampleLayoutProps } from '../example-layout'
+import { ExampleLayoutProps } from '../example-layout'
 
 const instanceId = Math.random().toString(36).substring(2, 9)
 
@@ -11,8 +10,8 @@ import { createClient } from '@supabase/supabase-js';
 import { X, Circle } from 'lucide-react';
 
 // Initialize Supabase client
-const supabaseUrl = '${process.env.NEXT_PUBLIC_SUPABASE_REALTIME_URL}';
-const supabaseKey = '${process.env.NEXT_PUBLIC_SUPABASE_REALTIME_ANON_KEY}';
+const supabaseUrl = '${process.env.NEXT_PUBLIC_SUPABASE_URL}';
+const supabaseKey = '${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Channel name - using a unique ID to ensure both instances connect to the same channel

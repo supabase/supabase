@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import type { ExampleLayoutProps } from '../example-layout'
 
 const instanceId = Math.random().toString(36).substring(2, 9)
@@ -13,8 +12,8 @@ import Quill from 'quill';
 import 'quill/dist/quill.bubble.css'; // Using bubble theme without toolbar
 
 // Initialize Supabase client
-const supabaseUrl = '${process.env.NEXT_PUBLIC_SUPABASE_REALTIME_URL}';
-const supabaseKey = '${process.env.NEXT_PUBLIC_SUPABASE_REALTIME_ANON_KEY}';
+const supabaseUrl = '${process.env.NEXT_PUBLIC_SUPABASE_URL}';
+const supabaseKey = '${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Channel name - using a unique ID to ensure both instances connect to the same channel

@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import ExampleLayout, { ExampleLayoutProps } from '../example-layout'
+import { ExampleLayoutProps } from '../example-layout'
 
 const instanceId = Math.random().toString(36).substring(2, 9)
 
@@ -11,8 +10,8 @@ import { createClient } from '@supabase/supabase-js';
 import { useForm, Controller } from 'react-hook-form';
 
 // Initialize Supabase client
-const supabaseUrl = '${process.env.NEXT_PUBLIC_SUPABASE_REALTIME_URL}';
-const supabaseKey = '${process.env.NEXT_PUBLIC_SUPABASE_REALTIME_ANON_KEY}';
+const supabaseUrl = '${process.env.NEXT_PUBLIC_SUPABASE_URL}';
+const supabaseKey = '${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Generate a random user ID and name

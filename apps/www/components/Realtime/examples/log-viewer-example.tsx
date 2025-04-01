@@ -1,8 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import ExampleLayout, { ExampleLayoutProps } from '../example-layout'
-import supabase from '../../../lib/supabase'
+import { ExampleLayoutProps } from '../example-layout'
 
 const appJsCode = `import { useEffect, useState, useCallback, useRef } from 'react';
 import { createClient } from '@supabase/supabase-js';
@@ -10,8 +8,8 @@ import { AutoSizer, Table, Column, InfiniteLoader } from 'react-virtualized';
 import 'react-virtualized/styles.css';
 
 // Initialize Supabase client
-const supabaseUrl = '${process.env.NEXT_PUBLIC_SUPABASE_REALTIME_URL}';
-const supabaseKey = '${process.env.NEXT_PUBLIC_SUPABASE_REALTIME_ANON_KEY}';
+const supabaseUrl = '${process.env.NEXT_PUBLIC_SUPABASE_URL}';
+const supabaseKey = '${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Constants
