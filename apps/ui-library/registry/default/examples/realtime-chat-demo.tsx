@@ -21,7 +21,7 @@ const names = [
   'Filipe',
 ]
 
-const RealtimeChatDemo = () => {
+const RealtimeChatDemo = ({ roomName }: { roomName: string }) => {
   const [username, setUsername] = useState('')
 
   useEffect(() => {
@@ -67,7 +67,7 @@ const RealtimeChatDemo = () => {
         />
       </div>
       <div className="flex-1 border rounded-lg overflow-hidden">
-        <RealtimeChat roomName="chat-demo" username={username} messages={messages} />
+        {roomName && <RealtimeChat roomName={roomName} username={username} messages={messages} />}
       </div>
     </div>
   )
