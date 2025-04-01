@@ -218,7 +218,6 @@ const ServiceStatus = () => {
 
       timer = setTimeout(() => {
         refetchServiceStatus()
-        refetchPostgresServiceStatus()
         refetchEdgeFunctionServiceStatus()
       }, remainingTimeTillNextCheck * 1000)
     }
