@@ -206,10 +206,12 @@ ENABLE_PHONE_AUTOCONFIRM=true
 
 STUDIO_DEFAULT_ORGANIZATION=Default Organization
 STUDIO_DEFAULT_PROJECT=${STACK_NAME}
-
 STUDIO_PORT=${STUDIO_PORT}
 # replace if you intend to use Studio outside of localhost
 SUPABASE_PUBLIC_URL=http://localhost:${KONG_HTTP_PORT}
+
+# Kích hoạt bảo vệ mật khẩu cho dashboard
+DASHBOARD_SECURE=true
 
 # Enable webp support
 IMGPROXY_ENABLE_WEBP_DETECTION=true
@@ -252,12 +254,15 @@ echo "Adjusting port configurations in docker-compose.yml..."
 # Sử dụng tệp tạm thời để sửa đổi file docker-compose.yml để tránh vấn đề với sed trên macOS
 TEMPFILE=$(mktemp)
 
-# Tìm dòng có chứa "image: supabase/studio:" và thêm cấu hình ports
-awk -v port="$STUDIO_PORT" '
+# Tìm dòng có chứa "image: supabase/studio:" và thêm cấu hình ports và environment
+awk -v port="$STUDIO_PORT" -v stack="$STACK_NAME" -v password="$DASHBOARD_PASSWORD" '
 /image: supabase\/studio:/ {
     print $0;
     print "    ports:";
     print "      - " port ":3000";
+    print "    environment:";
+    print "      - STUDIO_DEFAULT_PROJECT=" stack;
+    print "      - DASHBOARD_SECURE=true";
     next;
 }
 /4000:4000/ {
@@ -280,6 +285,10 @@ echo "${STACK_NAME} stack started on:"
 echo "Studio: http://localhost:${STUDIO_PORT}"
 echo "API: http://localhost:${KONG_HTTP_PORT}"
 echo "Database: localhost:${POSTGRES_PORT}"
+echo
+echo "Dashboard login credentials:"
+echo "Username: supabase"
+echo "Password: ${DASHBOARD_PASSWORD}"
 EOL
 
 cat > "$TARGET_DIR/stop.sh" << EOL
@@ -323,6 +332,9 @@ echo "Access information:"
 echo "Studio URL: http://localhost:${STUDIO_PORT}"
 echo "API URL: http://localhost:${KONG_HTTP_PORT}"
 echo "Database: localhost:${POSTGRES_PORT}"
-echo "Database Password: ${POSTGRES_PASSWORD}"
+echo
+echo "Dashboard login credentials:"
+echo "Username: supabase"
+echo "Password: ${DASHBOARD_PASSWORD}"
 echo
 echo "All settings are saved in ${TARGET_DIR}/.env"
