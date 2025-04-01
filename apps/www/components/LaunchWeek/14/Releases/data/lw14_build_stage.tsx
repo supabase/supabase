@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react'
 import { type ClassValue } from 'clsx'
+import { PRODUCT_MODULES } from 'shared-data/products'
 
 export interface AdventDay {
   icon?: ReactNode // use svg jsx with 34x34px viewport
@@ -103,7 +104,25 @@ export const days: AdventDay[] = [
         target: '_blank',
       },
     ],
-    icon: null,
+    icon: (
+      <svg
+        width="32"
+        height="32"
+        viewBox="0 0 24 24"
+        className="text-foreground-light group-hover/menu-item:text-foreground group-focus-visible/menu-item:text-foreground"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1"
+          d={PRODUCT_MODULES.vector.icon[24]}
+          stroke="currentColor"
+        />
+      </svg>
+    ),
   },
   {
     title: '',
