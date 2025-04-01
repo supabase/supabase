@@ -1,6 +1,25 @@
 import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
 import { RealtimeChannel } from '@supabase/supabase-js'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { DependencyList, useCallback, useEffect, useRef, useState } from 'react'
+
+const useThrottleCallback = <Params extends unknown[], Return>(
+  callback: (...args: Params) => Return,
+  limit: number,
+  deps: DependencyList
+) => {
+  const lastRun = useRef<number>(0)
+
+  return useCallback(
+    (...args: Params) => {
+      const now = Date.now()
+      if (now - lastRun.current >= limit) {
+        lastRun.current = now
+        callback(...args)
+      }
+    },
+    [...deps, limit]
+  )
+}
 
 const supabase = createClient()
 
@@ -26,9 +45,11 @@ type CursorEventPayload = {
 export const useRealtimeCursors = ({
   roomName,
   username,
+  throttleMs = 70,
 }: {
   roomName: string
   username: string
+  throttleMs?: number
 }) => {
   const [color] = useState(generateRandomColor())
   const [userId] = useState(generateRandomNumber())
@@ -36,7 +57,7 @@ export const useRealtimeCursors = ({
 
   const channelRef = useRef<RealtimeChannel | null>(null)
 
-  const handleMouseMove = useCallback(
+  const handleMouseMove = useThrottleCallback(
     (event: MouseEvent) => {
       const { clientX, clientY } = event
 
@@ -59,6 +80,7 @@ export const useRealtimeCursors = ({
         payload: payload,
       })
     },
+    throttleMs,
     [color, userId, username]
   )
 
