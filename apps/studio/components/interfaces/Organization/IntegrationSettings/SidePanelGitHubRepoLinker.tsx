@@ -72,9 +72,14 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     [githubReposData]
   )
 
-  const { data: connections } = useGitHubConnectionsQuery({
-    organizationId: selectedOrganization?.id,
-  })
+  const { data: connections } = useGitHubConnectionsQuery(
+    {
+      organizationId: selectedOrganization?.id,
+    },
+    {
+      enabled: visible,
+    }
+  )
 
   const { mutate: createConnection, isLoading: isCreatingConnection } =
     useGitHubConnectionCreateMutation({
