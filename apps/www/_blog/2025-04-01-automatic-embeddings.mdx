@@ -66,7 +66,7 @@ A number of use cases get easier when embeddings are automatically managed:
 
 There are two approaches to automatic embeddings today:
 
-### 1. Generated columns
+### Generated columns
 
 ```sql
 create table documents (
@@ -78,7 +78,7 @@ create table documents (
 
 This uses a generated column to call an embedding function on write. It only works if your model is local and fast. In practice, this approach with the `embed()` function blocks the write path and doesn’t scale well.
 
-### 2. Trigger-based asynchronous embeddings
+### Trigger-based asynchronous embeddings
 
 This is the pattern we use at Supabase. It uses a few common extensions:
 
