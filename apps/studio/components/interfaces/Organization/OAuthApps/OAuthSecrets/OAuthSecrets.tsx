@@ -5,11 +5,10 @@ import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useClientSecretCreateMutation } from 'data/oauth-secrets/client-secret-create-mutation'
-import { useClientSecretsQuery } from 'data/oauth-secrets/client-secrets-query'
+import { CreatedSecret, useClientSecretsQuery } from 'data/oauth-secrets/client-secrets-query'
 import { OAuthApp } from 'data/oauth/oauth-apps-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, InfoIcon } from 'ui'
-import { CreatedSecret } from './OAuthSecrets.types'
 import SecretRow from './SecretRow'
 
 interface Props {

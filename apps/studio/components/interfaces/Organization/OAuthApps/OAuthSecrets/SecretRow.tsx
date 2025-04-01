@@ -8,12 +8,17 @@ import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import CopyButton from 'components/ui/CopyButton'
 import { useClientSecretDeleteMutation } from 'data/oauth-secrets/client-secret-delete-mutation'
-import { useClientSecretsQuery } from 'data/oauth-secrets/client-secrets-query'
+import { Secret, useClientSecretsQuery } from 'data/oauth-secrets/client-secrets-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { SecretRowProps } from './OAuthSecrets.types'
+
+export interface SecretRowProps {
+  secret: Secret
+  appId?: string
+  isNew?: boolean
+}
 
 const SecretRow = ({ secret, appId }: SecretRowProps) => {
   const { slug } = useParams()
