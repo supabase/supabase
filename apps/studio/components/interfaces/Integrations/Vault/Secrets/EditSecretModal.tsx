@@ -122,7 +122,7 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
               id: selectedSecret?.id!,
               connectionString: project?.connectionString,
             },
-            { enabled: !!(project?.ref && selectedSecret?.id) }
+            { enabled: selectedSecret !== undefined && !!(project?.ref && selectedSecret?.id) }
           )
 
           // [Joshen] JFYI this is breaking rules of hooks, will be fixed once we move to

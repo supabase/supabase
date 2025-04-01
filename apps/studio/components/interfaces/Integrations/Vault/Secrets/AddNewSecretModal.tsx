@@ -23,10 +23,15 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
   const { mutateAsync: addKeyMutation } = usePgSodiumKeyCreateMutation()
   const { mutateAsync: addSecret } = useVaultSecretCreateMutation()
 
-  const { data: keys } = usePgSodiumKeysQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data: keys } = usePgSodiumKeysQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      enabled: visible,
+    }
+  )
 
   useEffect(() => {
     if (visible && keys) {
