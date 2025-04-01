@@ -5,7 +5,7 @@ author: saxon_fletcher,nyannyacha,laktek
 image: launch-week-14/day-1-supabase-ui-library/og.jpg
 thumb: launch-week-14/day-1-supabase-ui-library/thumb.jpg
 categories:
-  -launch-week
+  - launch-week
   - product
 tags:
   - launch-week
@@ -22,7 +22,6 @@ You can now create, test, edit, and deploy Edge Functions directly from the Supa
 To write an Edge Functions previously, you had to install the Supabase CLI and then set up your editor to use Deno. Those steps are no longer necessary. The Edge Functions editor has built-in syntax highlighting and type-checking for Deno and Supabase-specific APIs.
 
 <Img
-  wide
   alt="Create a Function from Dashboard"
   src={{
     dark: '/images/blog/launch-week-14/day-2-edge-functions/create-function.png',
@@ -30,10 +29,9 @@ To write an Edge Functions previously, you had to install the Supabase CLI and t
   }}
 />
 
-The Edge Functions editor includes templates for common use cases, such as Stripe WebHooks, OpenAI proxying, uploading files to Supabase Storage, and sending emails. 
+The Edge Functions editor includes templates for common use cases, such as Stripe WebHooks, OpenAI proxying, uploading files to Supabase Storage, and sending emails.
 
 <Img
-  wide
   alt="Function Templates"
   src={{
     dark: '/images/blog/launch-week-14/day-2-edge-functions/function-templates.png',
@@ -44,7 +42,6 @@ The Edge Functions editor includes templates for common use cases, such as Strip
 Once a Function has been deployed you can make edits directly within the dashboard, and if you get stuck you can summon an inline AI Assistant to explain, debug or write code.
 
 <Img
-  wide
   alt="Edit Functions from Dashboard"
   src={{
     dark: '/images/blog/launch-week-14/day-2-edge-functions/edit-function.png',
@@ -57,7 +54,6 @@ Once a Function has been deployed you can make edits directly within the dashboa
 You can download Edge Functions source code via Supabase CLI using `supabase functions download FUNCTION_NAME` or by clicking the Download button in the dashboard.
 
 <Img
-  wide
   alt="Download Functions from Dashboard"
   src={{
     dark: '/images/blog/launch-week-14/day-2-edge-functions/download-function.png',
@@ -71,13 +67,11 @@ The Dashboard's Edge Function editor currently does not support versioning or ro
 
 </Admonition>
 
-
 ## Testing Edge Functions from the Supabase Dashboard
 
-We are introducing a built-in tool for testing your Edge Functions from the Supabase Dashboard. You can execute your Edge Function with different request payloads, headers, and query parameters. The built-in tester returns the response status, headers, and body. 
+We are introducing a built-in tool for testing your Edge Functions from the Supabase Dashboard. You can execute your Edge Function with different request payloads, headers, and query parameters. The built-in tester returns the response status, headers, and body.
 
 <Img
-  wide
   alt="Test Functions from Dashboard"
   src={{
     dark: '/images/blog/launch-week-14/day-2-edge-functions/test-function.png',
@@ -89,7 +83,7 @@ With the built-in editor and tester, you have a streamlined workflow for creatin
 
 ## Deploying Edge Functions no longer requires Docker
 
-By popular request, you can now deploy Edge Functions from the Supabase CLI with the `--use-api` flag, which will not use Docker. We will make this the default behavior in future releases (with a `--use-docker` flag as a fallback option.)  
+By popular request, you can now deploy Edge Functions from the Supabase CLI with the `--use-api` flag, which will not use Docker. We will make this the default behavior in future releases (with a `--use-docker` flag as a fallback option.)
 
 ```bash
 supabase functions deploy MY_FUNCTION --use-api
@@ -99,7 +93,7 @@ supabase functions deploy MY_FUNCTION --use-api
 
 The ability to deploy without Docker in both the Edge Functions editor and Supabase CLI are made possible by new APIs we introduced to deploy and update Edge Functions. These APIs are publicly available for you to build custom integrations and workflows.
 
-You can check [the Changelog announcement](https://github.com/orgs/supabase/discussions/33720) for more details and official references to these API endpoints. 
+You can check [the Changelog announcement](https://github.com/orgs/supabase/discussions/33720) for more details and official references to these API endpoints.
 
 ## Deno 2.1 Preview
 
