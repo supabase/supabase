@@ -9,7 +9,7 @@ import { CreatedSecret, useClientSecretsQuery } from 'data/oauth-secrets/client-
 import { OAuthApp } from 'data/oauth/oauth-apps-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, InfoIcon } from 'ui'
-import SecretRow from './SecretRow'
+import { SecretRow } from './SecretRow'
 
 interface Props {
   selectedApp?: OAuthApp

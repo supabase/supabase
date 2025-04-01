@@ -17,10 +17,9 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 export interface SecretRowProps {
   secret: Secret
   appId?: string
-  isNew?: boolean
 }
 
-const SecretRow = ({ secret, appId }: SecretRowProps) => {
+export const SecretRow = ({ secret, appId }: SecretRowProps) => {
   const { slug } = useParams()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const canManageSecrets = useCheckPermissions(PermissionAction.UPDATE, 'oauth_apps')
@@ -124,5 +123,3 @@ const SecretRow = ({ secret, appId }: SecretRowProps) => {
     </>
   )
 }
-
-export default SecretRow
