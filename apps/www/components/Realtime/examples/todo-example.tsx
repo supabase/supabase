@@ -18,7 +18,7 @@ const instanceId = '${instanceId}';
 
 // Channel name for the todos in this instance
 const CHANNEL = \`todos:\${instanceId}\`;
-const TABLE = 'example_todos';
+const TABLE = 'todos';
 
 export default function App() {
   const [todos, setTodos] = useState([]);
