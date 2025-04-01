@@ -32,7 +32,7 @@ Deno 2 will soon become the default choice for creating new functions. For now, 
 
 Here's how you can build and deploy a function with Deno 2:
 
-- Install Deno 2.1 or newer version on your machine (https://docs.deno.com/runtime/getting_started/installation/)
+- [Install Deno 2.1](https://docs.deno.com/runtime/getting_started/installation/) or newer version on your machine
 
 - Go to your Supabase project. `cd my-supabase-project`
 
@@ -45,7 +45,7 @@ deno_version = 2
 
 - All your existing functions should work as before.
 
-\*To scaffold a new function as a Deno 2 project:
+To scaffold a new function as a Deno 2 project:
 
 ```bash
 deno init --serve hello-world
@@ -74,7 +74,7 @@ if (url.pathname === "/hello-world") {
 
 For a comprehensive migration guide, see the [official Deno 1.x to 2.x migration guide](https://docs.deno.com/runtime/reference/migration_guide/#content).
 
-Most Deno 1 Edge Functions will be compatible out of the box with Deno 2, and no action needs to be taken. When we upgrade our hosted runtime, your functions will automatically be deployed on Deno 2 cluster.
+Most Deno 1 Edge Functions will be compatible out of the box with Deno 2, and no action needs to be taken. When we upgrade our hosted runtime, your functions will automatically be deployed on a Deno 2 cluster.
 
 However, for a small number of functions, this may break existing functionality.
 
@@ -100,4 +100,4 @@ The best way to validate your APIs are up to date is to use the Deno lint, which
     deno lint
     ```
 
-For a full list of API changes, see the official Deno 2 list [here](https://docs.deno.com/runtime/reference/migration_guide/#api-changes).
+For a full list of API changes, see the [official Deno 2 list](https://docs.deno.com/runtime/reference/migration_guide/#api-changes).
