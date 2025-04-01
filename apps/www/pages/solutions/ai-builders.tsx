@@ -40,7 +40,7 @@ const Enterprise: NextPage = () => (
         footerPosition="left"
       />
       <EnterpriseUseCases {...content['use-cases']} />
-      <EnterpriseSupport {...content.support} />
+      <EnterpriseSupport {...content.why} />
       {/* <EnterprisePerformance {...content.performance} /> */}
       {/* <EnterpriseSecurity {...content.security} /> */}
       {/* <EnterpriseQuote {...content.quote} /> */}
