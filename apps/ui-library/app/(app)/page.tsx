@@ -6,7 +6,12 @@ import { Button_Shadcn_ } from 'ui'
 // Horizontal grid line component
 const HorizontalGridLine = () => <div className="col-span-12 h-px bg-border/30" />
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default function Home() {
+  const roomName = `room-${Math.floor(Math.random() * 1000)}`
+
   return (
     <main className="relative lg:-ml-10">
       <div className="mx-auto w-full min-w-0 flex flex-col gap-16">
@@ -76,7 +81,7 @@ export default function Home() {
               </div>
               <HorizontalGridLine />
               <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative">
-                <div className="-mt-4 flex rounded-lg overflow-hidden">
+                <div className="-mt-4 grid md:flex rounded-lg overflow-hidden">
                   <BlockPreview name="realtime-cursor-demo" isPair />
                   <BlockPreview name="realtime-cursor-demo" isPair />
                 </div>
@@ -149,9 +154,9 @@ export default function Home() {
               </div>
               <HorizontalGridLine />
               <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative">
-                <div className="-mt-4 flex rounded-lg overflow-hidden">
-                  <BlockPreview name="realtime-chat-demo" isPair />
-                  <BlockPreview name="realtime-chat-demo" isPair />
+                <div className="-mt-4 grid md:flex rounded-lg overflow-hidden">
+                  <BlockPreview name={`realtime-chat-demo?roomName=${roomName}`} isPair />
+                  <BlockPreview name={`realtime-chat-demo?roomName=${roomName}`} isPair />
                 </div>
               </div>
               <HorizontalGridLine />

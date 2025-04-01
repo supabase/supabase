@@ -24,7 +24,7 @@ function CountdownStep({ value, unit, showCard = true, size = 'small' }: Countdo
   return (
     <div
       className={cn(
-        'font-mono uppercase tracking-[0.05rem] text-sm',
+        'uppercase tracking-[0.05rem] text-sm',
         showCard
           ? 'rounded-md p-[1px] overflow-hidden bg-gradient-to-b from-border-muted to-border-muted/20'
           : 'tracking-[0.1rem]',

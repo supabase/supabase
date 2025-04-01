@@ -29,7 +29,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
       >
         <div
           className={cn(
-            'text-sm inline uppercase font-mono dark:text-foreground-muted tracking-[0.1rem]',
+            'text-sm inline uppercase dark:text-foreground-muted tracking-[0.1rem]',
             day.shipped && '!text-foreground'
           )}
         >
@@ -126,7 +126,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
             className={cn(
               `min-h-[210px] group aspect-[3.67/1] relative overflow-hidden flex-1 flex flex-col justify-between
               bg-default border border-dashed border-strong dark:border-background-surface-300
-              rounded-xl p-4 sm:p-6 md:p-8 text-2xl bg-contain`,
+              rounded-md p-4 sm:p-6 md:p-8 text-2xl bg-contain`,
               cssGroup
             )}
           >

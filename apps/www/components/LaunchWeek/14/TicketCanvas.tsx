@@ -1,10 +1,9 @@
 import { cn } from 'ui'
 import { useThreeJS } from './helpers'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import SceneRenderer from './utils/SceneRenderer'
 import TicketScene from './scenes/TicketScene'
 import useConfData from './hooks/use-conf-data'
-import HUDScene from './scenes/HUDScene'
 
 interface TicketCanvasProps {
   className?: string
