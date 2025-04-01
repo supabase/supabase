@@ -1329,6 +1329,10 @@ export const functions: NavMenuConstant = {
           name: 'Setting up your editor',
           url: '/guides/functions/local-development',
         },
+        {
+          name: 'Development tips',
+          url: '/guides/functions/development-tips',
+        },
       ],
     },
     {
@@ -1385,12 +1389,8 @@ export const functions: NavMenuConstant = {
           url: '/guides/platform/log-drains',
         },
         {
-          name: 'About Deno 2',
+          name: 'Using Deno 2',
           url: '/guides/functions/deno2',
-        },
-        {
-          name: 'Testing with Deno 2',
-          url: '/guides/functions/tests',
         },
       ],
     },

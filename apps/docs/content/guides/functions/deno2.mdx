@@ -1,6 +1,6 @@
 ---
 id: 'deno2'
-title: 'About Deno 2'
+title: 'Using Deno 2'
 description: 'Everything you need to know about the Deno 2 runtime'
 subtitle: 'Everything you need to know about the Deno 2 runtime'
 ---
@@ -28,7 +28,47 @@ While these improvements are exciting, they come with some changes that may affe
 
 ### How to use Deno 2
 
-Deno 2 will soon become the default choice for creating new functions. For now, Deno 2 is available in preview mode for local development. If you would like to try it out you can follow the instructions in [this changelog](https://github.com/orgs/supabase/discussions/34054) post.
+Deno 2 will soon become the default choice for creating new functions. For now, Deno 2 is available in preview mode for local development.
+
+Here's how you can build and deploy a function with Deno 2:
+
+- Install Deno 2.1 or newer version on your machine (https://docs.deno.com/runtime/getting_started/installation/)
+
+- Go to your Supabase project. `cd my-supabase-project`
+
+- Open `supabase/config.toml` and set `deno_version = 2`
+
+```toml
+[edge_runtime]
+deno_version = 2
+```
+
+- All your existing functions should work as before.
+
+\*To scaffold a new function as a Deno 2 project:
+
+```bash
+deno init --serve hello-world
+```
+
+- Open `supabase/config.toml` and add the following:
+
+```
+[functions.hello-world]
+entrypoint = "./functions/hello-world/main.ts"
+```
+
+- Open supabase/functions/hello-world/main.ts and modify line 10 to:
+
+```typescript
+if (url.pathname === "/hello-world") {
+```
+
+- Use `npx supabase@beta functions serve --no-verify-jwt` to start the dev server.
+
+- Visit http://localhost:54321/functions/v1/hello-world.
+
+- To run built-in tests, `cd supabase/functions/hello-world; deno test`
 
 ### How to migrate existing functions from Deno 1 to Deno 2
 
