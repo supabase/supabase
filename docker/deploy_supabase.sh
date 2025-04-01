@@ -1,14 +1,16 @@
 #!/bin/bash
 
 # Script để triển khai nhiều stack Supabase trên cùng một VM mà không xung đột
-# Usage: ./deploy_supabase.sh <stack_name>
+# Usage: ./deploy_supabase.sh <stack_name> [port_offset]
+# Example: ./deploy_supabase.sh project1 2000 
 
 set -e
 
 # Kiểm tra tham số dòng lệnh
 if [ $# -lt 1 ]; then
-    echo "Usage: $0 <stack_name>"
-    echo "Example: $0 project1"
+    echo "Usage: $0 <stack_name> [port_offset]"
+    echo "Example: $0 project1 2000"
+    echo "The port_offset is optional. If not provided, it will be calculated automatically."
     exit 1
 fi
 
@@ -16,6 +18,23 @@ STACK_NAME=$1
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOCKER_DIR="${SCRIPT_DIR}"
 TARGET_DIR="${SCRIPT_DIR}/stacks/${STACK_NAME}"
+
+# Kiểm tra nếu có tham số port offset được truyền vào
+if [ $# -ge 2 ] && [[ $2 =~ ^[0-9]+$ ]]; then
+    PORT_OFFSET=$2
+    echo "Using provided port offset: $PORT_OFFSET"
+else
+    # Tính toán ports cho stack mới (mỗi stack tăng 1000 port)
+    # Lấy danh sách các stack đã tồn tại để tính toán port offset
+    PORT_OFFSET=0
+    for d in "${SCRIPT_DIR}"/stacks/*/; do
+        if [ -d "$d" ] && [ -f "${d}/docker-compose.yml" ]; then
+            PORT_OFFSET=$((PORT_OFFSET + 1))
+        fi
+    done
+    PORT_OFFSET=$((PORT_OFFSET * 1000))
+    echo "Calculated port offset: $PORT_OFFSET"
+fi
 
 # Tạo các password và token ngẫu nhiên
 generate_random_string() {
@@ -61,15 +80,6 @@ mkdir -p "$TARGET_DIR/volumes/storage"
 mkdir -p "$TARGET_DIR/volumes/functions"
 mkdir -p "$TARGET_DIR/dev"
 
-# Tính toán ports cho stack mới (mỗi stack tăng 1000 port)
-# Lấy danh sách các stack đã tồn tại để tính toán port offset
-PORT_OFFSET=0
-for d in "${SCRIPT_DIR}"/stacks/*/; do
-    if [ -d "$d" ] && [ -f "${d}/docker-compose.yml" ]; then
-        PORT_OFFSET=$((PORT_OFFSET + 1))
-    fi
-done
-
 # Base ports
 BASE_KONG_HTTP_PORT=8000
 BASE_KONG_HTTPS_PORT=8443
@@ -79,12 +89,12 @@ BASE_POOLER_PORT=6543
 BASE_ANALYTICS_PORT=4000
 
 # Calculate ports for new stack
-KONG_HTTP_PORT=$((BASE_KONG_HTTP_PORT + PORT_OFFSET * 1000))
-KONG_HTTPS_PORT=$((BASE_KONG_HTTPS_PORT + PORT_OFFSET * 1000))
-POSTGRES_PORT=$((BASE_POSTGRES_PORT + PORT_OFFSET * 1000))
-STUDIO_PORT=$((BASE_STUDIO_PORT + PORT_OFFSET * 1000))
-POOLER_PORT=$((BASE_POOLER_PORT + PORT_OFFSET * 1000))
-ANALYTICS_PORT=$((BASE_ANALYTICS_PORT + PORT_OFFSET * 1000))
+KONG_HTTP_PORT=$((BASE_KONG_HTTP_PORT + PORT_OFFSET))
+KONG_HTTPS_PORT=$((BASE_KONG_HTTPS_PORT + PORT_OFFSET))
+POSTGRES_PORT=$((BASE_POSTGRES_PORT + PORT_OFFSET))
+STUDIO_PORT=$((BASE_STUDIO_PORT + PORT_OFFSET))
+POOLER_PORT=$((BASE_POOLER_PORT + PORT_OFFSET))
+ANALYTICS_PORT=$((BASE_ANALYTICS_PORT + PORT_OFFSET))
 
 echo "This stack will use the following ports:"
 echo "Kong HTTP: ${KONG_HTTP_PORT}"
