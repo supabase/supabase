@@ -146,7 +146,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     title: 'Realtime Broadcast from Database',
     description: (
       <>
-        Realtime Broadcast <br className="hidden sm:block" /> from Database
+        Introducing Realtime Broadcast <br className="hidden sm:block" /> from Database
       </>
     ),
     links: [
