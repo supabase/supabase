@@ -342,7 +342,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                     tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
                   />
                   <ButtonTooltip
-                    type="text"
+                    type="default"
                     className="w-7 h-7"
                     onClick={snap.closeAssistant}
                     icon={<X />}
