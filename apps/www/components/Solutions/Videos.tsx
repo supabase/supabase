@@ -7,16 +7,10 @@ import Panel from '../Panel'
 
 interface Props {
   id: string
-  label: string | JSX.Element
-  heading: string | JSX.Element
-  subheading: string | JSX.Element
+  heading?: string | JSX.Element
   videos: {
     lovable: FeatureProps
     bolt: FeatureProps
-  }
-  cta: {
-    label: string
-    url: string
   }
 }
 
