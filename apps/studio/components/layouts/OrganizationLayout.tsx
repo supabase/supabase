@@ -28,9 +28,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   })
 
   const Content = () => (
-    // <div className="flex flex-row h-full w-full">
     <div className={cn('w-full flex flex-col overflow-hidden')}>
-      {/* <OrganizationResourceBanner /> */}
       {selectedOrganization && selectedOrganization?.managed_by !== 'supabase' && (
         <Alert_Shadcn_ variant="default" className="flex items-center gap-4">
           <PartnerIcon organization={selectedOrganization} showTooltip={false} size="medium" />
@@ -46,7 +44,6 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
       )}
       <main className="h-full w-full overflow-y-auto">{children}</main>
     </div>
-    // </div>
   )
 
   if (!newLayoutPreview) {
