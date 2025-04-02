@@ -1,32 +1,31 @@
 ---
-title: 'Realtime Broadcast from Database'
-description: 'Realtime can send messages based on changes in the Database, directly from the Database itself'
+title: 'Realtime: Broadcast from Database'
+description: 'Use Realtime Broadcast to scale sending database changes to clients'
 author: filipe
 image: launch-week-14/day-3-realtime-broadcast-from-database/broadcast-database-og.png
 thumb: launch-week-14/day-3-realtime-broadcast-from-database/broadcast-database-og-thumb.png
 categories:
   - launch-week
+  - product
 tags:
   - launch-week
-  - design
+  - realtime
 date: '2025-04-02T00:00:01'
 toc_depth: 3
 launchweek: 14
 ---
 
-Now Realtime can send messages based on changes in the Database, directly from the Database itself
+Now you can use Realtime Broadcast to scale database changes sent to clients with [Broadcast from Database](/docs/guides/realtime/broadcast#broadcast-from-the-database).
 
 <div className="video-container mb-8">
   <iframe
     className="w-full"
     src="https://www.youtube-nocookie.com/embed/vRorVm_UbhA"
-    title="Introducing Broadcast from Database: a more efficient way to subscribe to changes"
+    title="Introducing Realtime Broadcast from Database"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
     allowfullscreen
   />
 </div>
-
-Supabase Realtime Broadcast now supports sending messages directly [from your Database](https://supabase.com/docs/guides/realtime/broadcast#broadcast-from-the-database). Broadcasting from the Database can scale to tens of thousands of users.
 
 ## What is Supabase Realtime?
 
@@ -40,14 +39,14 @@ Realtime includes the following features:
 
 Broadcasting from the Database is our latest improvement. It requires more initial setup than Postgres Changes, but offers more benefits:
 
-- You can target specific actions (DELETE, INSERT, UPDATE, etc)
+- You can target specific actions (`INSERT`, `UPDATE`, `DELETE`, `TRUNCATE`)
 - Choose which columns to send in the body of the message instead of the full record
 - Use SQL to selectively send data to specific channels
 
-You now have two options for building realtime applications using database changes:
+You now have two options for building real-time applications using database changes:
 
-- **Broadcast from the Database**, to send messages triggered by changes within the Database itself
-- **Postgres Changes**, for client-side logic to poll a Database for changes
+- **Broadcast from Database**, to send messages triggered by changes within the Database itself
+- **Postgres Changes**, polling Database for changes
 
 <Img
   wide
@@ -59,15 +58,15 @@ You now have two options for building realtime applications using database chang
   }}
 />
 
-## Broadcast from the database
+## Broadcast from Database
 
-There are several scenarios where you will want to use Broadcast from the Database instead of Postgres Changes, including:
+There are several scenarios where you will want to use Broadcast from Database instead of Postgres Changes, including:
 
 - Applications with many connected users
 - Sanitizing the payload of a message instead of providing the full record
 - Reduction in latency of sent messages
 
-Let’s walk through how to set up Broadcast from the Database.
+Let’s walk through how to set up Broadcast from Database.
 
 First, set up Row-Level Security (RLS) policies to control user access to relevant messages:
 
@@ -125,11 +124,11 @@ const changes = supabase
   .subscribe()
 ```
 
-Be sure to read [the full Realtime documentation](https://supabase.com/docs/guides/realtime/broadcast) for more information and example use cases.
+Be sure to read the [docs](https://supabase.com/docs/guides/realtime/broadcast) for more information and example use cases.
 
-## How does Broadcast from the Database work?
+## How does Broadcast from Database work?
 
-Realtime Broadcast from the Database sets up a replication slot against a publication created for the `realtime.messages` table. This lets Realtime listen for Write Ahead Log (WAL) changes whenever new rows are inserted.
+Realtime Broadcast from Database sets up a replication slot against a publication created for the `realtime.messages` table. This lets Realtime listen for Write Ahead Log (WAL) changes whenever new rows are inserted.
 
 When Realtime spots a new insert in the WAL, it broadcasts that message to the target channel right away.
 
@@ -152,7 +151,7 @@ The `realtime.send` function is designed to work safely inside triggers. It catc
 
 ![broadcast-database-dark.png]()
 
-These improvements let us scale Database broadcasts to tens of thousands of connected users at once. They also enable new uses like:
+These improvements let us scale subscribing to database changes to tens of thousands of connected users at once. They also enable new uses like:
 
 1. Broadcasting directly from Database functions
 2. Sending only specific fields to connected clients
@@ -160,13 +159,10 @@ These improvements let us scale Database broadcasts to tens of thousands of conn
 
 All this makes your real-time applications faster and more flexible.
 
-_Note: Broadcast from the Database was previously known as Broadcast Changes._
-
 ## Get started with Supabase Realtime
 
 Supabase Realtime can help you build more compelling experiences for your applications.
 
 - [Discover use cases](https://supabase.com/realtime) for Supabase Realtime
 - Read the [Supabase Realtime documentation](https://supabase.com/docs/guides/realtime) to learn more
-- Watch the Realtime changes video
 - [Sign up for Supabase](https://supabase.com/dashboard/sign-up) and get started today
