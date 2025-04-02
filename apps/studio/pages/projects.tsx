@@ -12,12 +12,17 @@ import AlertError from 'components/ui/AlertError'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { cn } from 'ui'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const newLayoutPreview = useNewLayout()
+  const [lastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
 
   const router = useRouter()
   const [search, setSearch] = useState('')
@@ -46,7 +51,10 @@ const ProjectsPage: NextPageWithLayout = () => {
   useEffect(() => {
     // [Joshen] Adding the redirect here, but once the nav changes are permanenet
     // we should be doing the redirect in next.config instead
-    if (hasWindowLoaded && newLayoutPreview) router.push('/organizations')
+    if (hasWindowLoaded && newLayoutPreview) {
+      if (lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
+      else router.push('/organizations')
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasWindowLoaded, newLayoutPreview])
 
