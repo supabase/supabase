@@ -80,9 +80,6 @@ importers:
       jotai:
         specifier: ^2.8.0
         version: 2.8.1(@types/react@18.3.3)(react@18.2.0)
-      lodash.template:
-        specifier: 4.5.0
-        version: 4.5.0
       lucide-react:
         specifier: '*'
         version: 0.436.0(react@18.2.0)
