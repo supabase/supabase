@@ -36,6 +36,10 @@ else
     echo "Calculated port offset: $PORT_OFFSET"
 fi
 
+# Kiểm tra sử dụng Nginx hay Kong
+USE_NGINX_AUTH=${USE_NGINX_AUTH:-true}
+echo "Using Nginx for authentication: $USE_NGINX_AUTH"
+
 # Tạo các password và token ngẫu nhiên
 generate_random_string() {
     local length=$1
@@ -237,8 +241,8 @@ STUDIO_PORT=${STUDIO_PORT}
 # replace if you intend to use Studio outside of localhost
 SUPABASE_PUBLIC_URL=http://localhost:${KONG_HTTP_PORT}
 
-# Kích hoạt bảo vệ mật khẩu cho dashboard
-DASHBOARD_SECURE=true
+# Kích hoạt bảo vệ mật khẩu cho dashboard - Sẽ sử dụng Nginx thay vì Kong nên có thể tắt
+DASHBOARD_SECURE=${USE_NGINX_AUTH}
 
 # Enable webp support
 IMGPROXY_ENABLE_WEBP_DETECTION=true
@@ -275,19 +279,32 @@ else
     sed -i "s/container_name: realtime-dev.supabase-realtime/container_name: realtime-dev.${STACK_NAME}-realtime/g" "$TARGET_DIR/docker-compose.yml"
 fi
 
-# Sửa đổi file kong.yml để cập nhật thông tin xác thực của dashboard
-echo "Updating authentication configuration in kong.yml..."
-KONG_CONFIG_FILE="$TARGET_DIR/volumes/api/kong.yml"
-
-# Cập nhật trực tiếp các biến trong file kong.yml
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    # macOS - sử dụng sed tương thích với macOS
-    sed -i '' "s/\$DASHBOARD_USERNAME/${DASHBOARD_USERNAME}/g" "$KONG_CONFIG_FILE"
-    sed -i '' "s/\$DASHBOARD_PASSWORD/${DASHBOARD_PASSWORD}/g" "$KONG_CONFIG_FILE"
+# Nếu sử dụng Nginx, cập nhật kong.yml để tắt basic auth
+if [ "$USE_NGINX_AUTH" = true ]; then
+    KONG_CONFIG_FILE="$TARGET_DIR/volumes/api/kong.yml"
+    
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS
+        sed -i '' '/name: basic-auth/,+2 s/^/#/' "$KONG_CONFIG_FILE"
+    else
+        # Linux/Unix
+        sed -i '/name: basic-auth/,+2 s/^/#/' "$KONG_CONFIG_FILE"
+    fi
+    echo "Disabled Kong basic auth (will use Nginx instead)"
 else
-    # Linux/Unix
-    sed -i "s/\$DASHBOARD_USERNAME/${DASHBOARD_USERNAME}/g" "$KONG_CONFIG_FILE"
-    sed -i "s/\$DASHBOARD_PASSWORD/${DASHBOARD_PASSWORD}/g" "$KONG_CONFIG_FILE"
+    # Vẫn sử dụng Kong Basic Auth, cập nhật thông tin đăng nhập
+    KONG_CONFIG_FILE="$TARGET_DIR/volumes/api/kong.yml"
+    
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS - sử dụng sed tương thích với macOS
+        sed -i '' "s/\$DASHBOARD_USERNAME/${DASHBOARD_USERNAME}/g" "$KONG_CONFIG_FILE"
+        sed -i '' "s/\$DASHBOARD_PASSWORD/${DASHBOARD_PASSWORD}/g" "$KONG_CONFIG_FILE"
+    else
+        # Linux/Unix
+        sed -i "s/\$DASHBOARD_USERNAME/${DASHBOARD_USERNAME}/g" "$KONG_CONFIG_FILE"
+        sed -i "s/\$DASHBOARD_PASSWORD/${DASHBOARD_PASSWORD}/g" "$KONG_CONFIG_FILE"
+    fi
+    echo "Updated Kong basic auth credentials"
 fi
 
 # Thêm port cho Studio và chỉnh sửa file docker-compose.yml
@@ -314,14 +331,12 @@ BEGIN { in_studio = 0; found_env = 0; }
     if (!found_env) {
       print "    environment:";
       print "      - STUDIO_DEFAULT_PROJECT=" stack;
-      print "      - DASHBOARD_SECURE=true";
     }
     next;
   }
   else if (in_studio && found_env && /\s+environment:/) {
     print $0;
     print "      - STUDIO_DEFAULT_PROJECT=" stack;
-    print "      - DASHBOARD_SECURE=true";
     next;
   }
   else if (/4000:4000/) {
@@ -344,8 +359,169 @@ BEGIN { in_studio = 0; found_env = 0; }
 # Thay thế file gốc với file đã sửa
 mv "$TEMPFILE" "$TARGET_DIR/docker-compose.yml"
 
-# Tạo script khởi động và tắt cho stack này
-cat > "$TARGET_DIR/start.sh" << EOL
+# Thiết lập Nginx nếu được yêu cầu
+if [ "$USE_NGINX_AUTH" = true ]; then
+    # Thiết lập Nginx
+    echo "Setting up Nginx with Basic Auth..."
+    
+    # Tạo thư mục cho nginx config
+    NGINX_DIR="${TARGET_DIR}/nginx"
+    mkdir -p "$NGINX_DIR"
+    
+    # Sử dụng thông tin đăng nhập từ biến môi trường để đồng bộ với .env
+    # Giữ nguyên DASHBOARD_USERNAME và DASHBOARD_PASSWORD đã được thiết lập ở trên
+    echo "Using credentials for Nginx Basic Auth:"
+    echo "Username: ${DASHBOARD_USERNAME}"
+    echo "Password: [hidden]"
+    
+    # Tạo file htpasswd cho Basic Auth
+    if command -v htpasswd &> /dev/null; then
+        # Sử dụng htpasswd nếu có sẵn
+        htpasswd -bc "${NGINX_DIR}/.htpasswd" "$DASHBOARD_USERNAME" "$DASHBOARD_PASSWORD"
+    else
+        # Nếu không có htpasswd, tạo password hash bằng openssl
+        PASSWORD_HASH=$(openssl passwd -apr1 "$DASHBOARD_PASSWORD")
+        echo "${DASHBOARD_USERNAME}:${PASSWORD_HASH}" > "${NGINX_DIR}/.htpasswd"
+    fi
+    
+    # Tạo config cho Nginx
+    cat > "${NGINX_DIR}/nginx.conf" << EOL
+user  nginx;
+worker_processes  auto;
+
+error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '\$remote_addr - \$remote_user [\$time_local] "\$request" '
+                      '\$status \$body_bytes_sent "\$http_referer" '
+                      '"\$http_user_agent" "\$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    keepalive_timeout  65;
+
+    #gzip  on;
+    
+    # Supabase Studio Configuration
+    server {
+        listen 80;
+        server_name studio.${STACK_NAME}.local;
+        
+        location / {
+            auth_basic "Restricted Access";
+            auth_basic_user_file /etc/nginx/.htpasswd;
+            
+            proxy_pass http://host.docker.internal:${STUDIO_PORT};
+            proxy_set_header Host \$host;
+            proxy_set_header X-Real-IP \$remote_addr;
+            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto \$scheme;
+        }
+    }
+
+    # Supabase API Configuration (no authentication required)
+    server {
+        listen 80;
+        server_name api.${STACK_NAME}.local;
+        
+        location / {
+            proxy_pass http://host.docker.internal:${KONG_HTTP_PORT};
+            proxy_set_header Host \$host;
+            proxy_set_header X-Real-IP \$remote_addr;
+            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto \$scheme;
+        }
+    }
+}
+EOL
+
+    # Tạo docker-compose.nginx.yml
+    cat > "${TARGET_DIR}/docker-compose.nginx.yml" << EOL
+version: '3'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: ${STACK_NAME}-nginx
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/.htpasswd:/etc/nginx/.htpasswd:ro
+    restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - ${STACK_NAME}
+
+networks:
+  ${STACK_NAME}:
+    external: true
+EOL
+
+    # Tạo script start_with_nginx.sh
+    cat > "${TARGET_DIR}/start.sh" << EOL
+#!/bin/bash
+
+cd "\$(dirname "\$0")"
+
+# Khởi động Supabase stack
+echo "Starting Supabase stack..."
+docker compose up -d
+
+# Chờ một chút để đảm bảo network đã được tạo
+sleep 5
+
+# Khởi động Nginx
+echo "Starting Nginx reverse proxy with Basic Auth..."
+docker compose -f docker-compose.nginx.yml up -d
+
+echo "${STACK_NAME} stack started with Nginx authentication!"
+echo
+echo "Access information:"
+echo "Studio URL: http://studio.${STACK_NAME}.local"
+echo "API URL: http://api.${STACK_NAME}.local"
+echo "Database: localhost:${POSTGRES_PORT}"
+echo
+echo "Dashboard login credentials:"
+echo "Username: ${DASHBOARD_USERNAME}"
+echo "Password: ${DASHBOARD_PASSWORD}"
+echo
+echo "Note: You may need to add the following lines to your /etc/hosts file:"
+echo "127.0.0.1 studio.${STACK_NAME}.local api.${STACK_NAME}.local"
+EOL
+
+    # Tạo script stop.sh
+    cat > "${TARGET_DIR}/stop.sh" << EOL
+#!/bin/bash
+
+cd "\$(dirname "\$0")"
+
+# Dừng Nginx
+echo "Stopping Nginx reverse proxy..."
+docker compose -f docker-compose.nginx.yml down
+
+# Dừng Supabase stack
+echo "Stopping Supabase stack..."
+docker compose down
+
+echo "${STACK_NAME} stack and Nginx stopped!"
+EOL
+else
+    # Tạo script khởi động và tắt cho stack này khi không sử dụng Nginx
+    cat > "$TARGET_DIR/start.sh" << EOL
 #!/bin/bash
 cd "\$(dirname "\$0")"
 docker compose up -d
@@ -359,13 +535,15 @@ echo "Username: ${DASHBOARD_USERNAME}"
 echo "Password: ${DASHBOARD_PASSWORD}"
 EOL
 
-cat > "$TARGET_DIR/stop.sh" << EOL
+    cat > "$TARGET_DIR/stop.sh" << EOL
 #!/bin/bash
 cd "\$(dirname "\$0")"
 docker compose down
 echo "${STACK_NAME} stack stopped"
 EOL
+fi
 
+# Tạo script reset cho stack (giống nhau dù có dùng Nginx hay không)
 cat > "$TARGET_DIR/reset.sh" << EOL
 #!/bin/bash
 cd "\$(dirname "\$0")"
@@ -378,6 +556,12 @@ then
     exit 1
 fi
 
+# Dừng Nginx nếu đang chạy
+if [ -f "docker-compose.nginx.yml" ]; then
+    echo "Stopping Nginx reverse proxy..."
+    docker compose -f docker-compose.nginx.yml down
+fi
+
 echo "Stopping and removing all containers..."
 docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down -v --remove-orphans
 
@@ -387,35 +571,33 @@ rm -rf ./volumes/db/data
 echo "${STACK_NAME} stack has been reset!"
 EOL
 
-# Tạo script để khởi động lại Kong và xem logs sau deploy
-cat > "$TARGET_DIR/restart_kong.sh" << EOL
-#!/bin/bash
-cd "\$(dirname "\$0")"
-echo "Restarting Kong container to apply authentication settings..."
-docker compose restart kong
-echo "Kong restarted. Waiting for 5 seconds before showing logs..."
-sleep 5
-docker compose logs --tail=50 kong
-echo
-echo "If you still don't see a login prompt for Supabase Studio, please try:"
-echo "1. Clear your browser cache and cookies"
-echo "2. Try accessing Studio in a private/incognito browser window"
-echo "3. Run './restart_kong.sh' again if needed"
-echo
-echo "Dashboard login credentials:"
-echo "Username: ${DASHBOARD_USERNAME}"
-echo "Password: ${DASHBOARD_PASSWORD}"
-EOL
-
-# Phân quyền thực thi cho các script và các tệp quan trọng
+# Thiết lập quyền thực thi cho các script và các tệp quan trọng
 chmod +x "$TARGET_DIR/start.sh"
 chmod +x "$TARGET_DIR/stop.sh"
 chmod +x "$TARGET_DIR/reset.sh"
-chmod +x "$TARGET_DIR/restart_kong.sh"
 chmod 644 "$TARGET_DIR/docker-compose.yml"
 chmod 644 "$TARGET_DIR/docker-compose.s3.yml"
 chmod 644 "$TARGET_DIR/.env"
 chmod 644 "$TARGET_DIR/dev/docker-compose.dev.yml"
+
+if [ "$USE_NGINX_AUTH" = true ]; then
+    chmod 644 "$TARGET_DIR/docker-compose.nginx.yml"
+    chmod 644 "$TARGET_DIR/nginx/nginx.conf"
+    chmod 644 "$TARGET_DIR/nginx/.htpasswd"
+    
+    # Tạo thêm một script để cập nhật thông tin hosts
+    cat > "$TARGET_DIR/update_hosts.sh" << EOL
+#!/bin/bash
+echo "This script will add entries to your /etc/hosts file for the ${STACK_NAME} stack."
+echo "You will be prompted for your password as this requires sudo access."
+
+sudo sh -c "echo '# ${STACK_NAME} Supabase stack hosts' >> /etc/hosts"
+sudo sh -c "echo '127.0.0.1 studio.${STACK_NAME}.local api.${STACK_NAME}.local' >> /etc/hosts"
+
+echo "Hosts added successfully."
+EOL
+    chmod +x "$TARGET_DIR/update_hosts.sh"
+fi
 
 # Đảm bảo quyền đọc cho mọi người đối với tất cả các tệp dữ liệu
 find "$TARGET_DIR/volumes" -type f -exec chmod 644 {} \;
@@ -423,12 +605,29 @@ find "$TARGET_DIR/volumes" -type f -exec chmod 644 {} \;
 find "$TARGET_DIR" -type d -exec chmod 755 {} \;
 
 echo "Stack ${STACK_NAME} has been prepared successfully!"
-echo "To start your Supabase stack, run:"
-echo "  cd ${TARGET_DIR} && ./start.sh"
-echo
-echo "Access information:"
-echo "Studio URL: http://localhost:${STUDIO_PORT}"
-echo "API URL: http://localhost:${KONG_HTTP_PORT}"
+if [ "$USE_NGINX_AUTH" = true ]; then
+    echo "This stack is configured to use Nginx for Basic Auth authentication."
+    echo
+    echo "To start your Supabase stack with Nginx authentication, run:"
+    echo "  cd ${TARGET_DIR} && ./start.sh"
+    echo
+    echo "Before starting, you may want to update your hosts file by running:"
+    echo "  ${TARGET_DIR}/update_hosts.sh"
+    echo
+    echo "Access information after starting:"
+    echo "Studio URL: http://studio.${STACK_NAME}.local"
+    echo "API URL: http://api.${STACK_NAME}.local"
+else
+    echo "This stack is configured to use Kong for Basic Auth authentication."
+    echo
+    echo "To start your Supabase stack, run:"
+    echo "  cd ${TARGET_DIR} && ./start.sh"
+    echo
+    echo "Access information after starting:"
+    echo "Studio URL: http://localhost:${STUDIO_PORT}"
+    echo "API URL: http://localhost:${KONG_HTTP_PORT}"
+fi
+
 echo "Database: localhost:${POSTGRES_PORT}"
 echo
 echo "Dashboard login credentials:"
