@@ -46,8 +46,13 @@ select
   nullif(rt.typrelid, 0) as return_type_relation_id,
   f.proretset as is_set_returning_function,
   case
-    when f.proretset and rt.typrelid != 0 then true
-    else false
+    when f.proretset and rt.typrelid != 0 and exists (
+      select 1 from pg_class c 
+      where c.oid = rt.typrelid 
+      -- exclude custom types relation from what is considered a set of table
+      and c.relkind in ('r', 'p', 'v', 'm', 'f')
+    ) then true
+  else false
   end as returns_set_of_table,
   case
     when f.proretset and rt.typrelid != 0 then
