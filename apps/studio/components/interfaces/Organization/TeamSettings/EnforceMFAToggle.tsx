@@ -1,4 +1,13 @@
-import { Toggle } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Toggle,
+  WarningIcon,
+} from 'ui'
+import Link from 'next/link'
+import AlertError from 'components/ui/AlertError'
 import { useParams } from 'common'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import Panel from 'components/ui/Panel'
@@ -30,6 +39,39 @@ const EnforceMFAToggle = () => {
   return (
     <>
       {isLoadingMfa && <GenericSkeletonLoader />}
+      {isErrorMfa ? (
+        mfaError.message.endsWith('upgrade to Pro, Team or Enterprise Plan to enforce MFA.') ? (
+          <Alert_Shadcn_
+            variant="default"
+            title="Organization MFA enforcement is not available on the Free plan"
+          >
+            <WarningIcon />
+            <div className="flex flex-col md:flex-row pt-1 gap-4">
+              <div className="grow">
+                <AlertTitle_Shadcn_>
+                  Organization MFA enforcement is not available on the Free plan
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
+                  <p>
+                    Upgrade to Pro, Team, or Enterprise to enforce MFA for all members in your
+                    organization.
+                  </p>
+                </AlertDescription_Shadcn_>
+              </div>
+
+              <div className="flex items-center">
+                <Button type="primary" asChild>
+                  <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=memberMFA`}>
+                    Upgrade subscription
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </Alert_Shadcn_>
+        ) : (
+          <AlertError error={mfaError} subject="Failed to retrieve MFA enforcement status" />
+        )
+      ) : null}
       {isSuccessMfa && (
         <Panel title={<h5 key="panel-title">Team Settings</h5>}>
           <Panel.Content>
