@@ -144,7 +144,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     date: '02 April',
     published_at: '2025-04-02T07:00:00.000-07:00',
     title: 'Realtime Broadcast from Database',
-    description: <>Introducing Realtime Broadcast from Database</>,
+    description: <>Realtime: Broadcast from Database</>,
     links: [
       {
         type: 'video',
