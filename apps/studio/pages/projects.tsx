@@ -33,7 +33,7 @@ const ProjectsPage: NextPageWithLayout = () => {
   const hasWindowLoaded = typeof window !== 'undefined'
 
   useEffect(() => {
-    if (isSuccess && hasWindowLoaded) {
+    if (hasWindowLoaded && isSuccess) {
       const hasNoOrg = organizations.length === 0
       const hasShownNewPage = localStorage.getItem(LOCAL_STORAGE_KEYS.UI_ONBOARDING_NEW_PAGE_SHOWN)
       if (hasNoOrg && !hasShownNewPage) {
@@ -41,14 +41,14 @@ const ProjectsPage: NextPageWithLayout = () => {
         router.push('/new')
       }
     }
-  }, [isSuccess, hasWindowLoaded])
+  }, [hasWindowLoaded, isSuccess])
 
   useEffect(() => {
     // [Joshen] Adding the redirect here, but once the nav changes are permanenet
     // we should be doing the redirect in next.config instead
-    if (newLayoutPreview) router.push('/organizations')
+    if (hasWindowLoaded && newLayoutPreview) router.push('/organizations')
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newLayoutPreview])
+  }, [hasWindowLoaded, newLayoutPreview])
 
   return (
     <div className={cn(newLayoutPreview && [MAX_WIDTH_CLASSES, PADDING_CLASSES])}>

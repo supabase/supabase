@@ -2,6 +2,7 @@ import { groupBy } from 'lodash'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
 
+import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import PartnerIcon from 'components/ui/PartnerIcon'
@@ -16,17 +17,16 @@ import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
 import type { Organization, ResponseError } from 'types'
 import { Button, cn } from 'ui'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
-import { useParams } from 'common'
 
 export interface ProjectListProps {
   rewriteHref?: (projectRef: string) => string
-  search: string
+  search?: string
   filterStatus?: string[]
   resetFilterStatus?: () => void
   // if true, only show projects for the current organization
@@ -34,7 +34,7 @@ export interface ProjectListProps {
 }
 
 const ProjectList = ({
-  search,
+  search = '',
   rewriteHref,
   filterStatus,
   resetFilterStatus,

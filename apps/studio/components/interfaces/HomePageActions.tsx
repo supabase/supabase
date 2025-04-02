@@ -2,7 +2,7 @@ import { Filter, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -26,7 +26,7 @@ import {
 } from 'ui'
 
 interface HomePageActionsProps {
-  organizations: { name: string; slug: string }[]
+  organizations?: { name: string; slug: string }[]
   search: string
   filterStatus: string[]
   setSearch: (value: string) => void
@@ -43,7 +43,9 @@ const HomePageActions = ({
   const newLayoutPreview = useNewLayout()
 
   const router = useRouter()
+  const { slug } = useParams()
 
+  const projectCreationEnabled = useIsFeatureEnabled('projects:create')
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
   const { isSuccess: orgsLoaded } = useOrganizationsQuery()
 
@@ -52,7 +54,13 @@ const HomePageActions = ({
 
   return (
     <div className="flex flex-col gap-2 md:gap-3 md:flex-row">
-      {!newLayoutPreview && (
+      {newLayoutPreview ? (
+        projectCreationEnabled ? (
+          <Link href={`/new/${slug}`}>
+            <Button type="primary">New project</Button>
+          </Link>
+        ) : null
+      ) : (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button type="primary">

@@ -7,7 +7,6 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
 import { removeTabsByEditor } from 'state/tabs'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
@@ -15,7 +14,6 @@ import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewCont
 
 const FeaturePreviewModal = () => {
   const { ref } = useParams()
-  const router = useRouter()
   const snap = useAppStateSnapshot()
   const org = useSelectedOrganization()
   const featurePreviewContext = useFeaturePreviewContext()
@@ -47,9 +45,6 @@ const FeaturePreviewModal = () => {
     }
     if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS) {
       removeTabsByEditor(ref as string | undefined, 'sql')
-    }
-    if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW) {
-      if (router.pathname === '/organizations') router.push('/projects')
     }
   }
 
