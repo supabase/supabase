@@ -47,7 +47,6 @@ const ComputeInstanceSidePanel = () => {
   const { project: selectedProject } = useProjectContext()
   const organization = useSelectedOrganization()
   const computeSizeChangesDisabled = useFlag('disableComputeSizeChanges')
-  const diskAndComputeForm = useFlag('diskAndComputeForm')
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
   const canUpdateCompute = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
@@ -209,10 +208,10 @@ const ComputeInstanceSidePanel = () => {
   }, [visible, isLoading])
 
   useEffect(() => {
-    if (visible && diskAndComputeForm) {
+    if (visible) {
       router.push(`/project/${projectRef}/settings/compute-and-disk`)
     }
-  }, [visible, diskAndComputeForm, router, projectRef])
+  }, [visible, router, projectRef])
 
   return (
     <>

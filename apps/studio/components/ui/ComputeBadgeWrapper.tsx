@@ -37,8 +37,6 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
   // once open it will fetch the addons
   const [open, setOpenState] = useState(false)
 
-  const diskAndComputeFormEnabled = useFlag('diskAndComputeForm')
-
   // returns hardcoded values for infra
   const cpuArchitecture = getCloudProviderArchitecture(project.cloud_provider)
 
@@ -70,11 +68,7 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
     e.preventDefault()
     e.stopPropagation()
 
-    if (diskAndComputeFormEnabled) {
-      router.push(`/project/${project?.ref}/settings/compute-and-disk`)
-    } else {
-      router.push(`/project/${project?.ref}/settings/addons?panel=computeInstance`)
-    }
+    router.push(`/project/${project?.ref}/settings/compute-and-disk`)
   }
 
   const highestComputeAvailable = availableCompute?.[availableCompute.length - 1].identifier

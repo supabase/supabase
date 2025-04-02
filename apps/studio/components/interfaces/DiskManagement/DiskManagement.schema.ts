@@ -8,7 +8,7 @@ import {
   calculateMaxIopsAllowedForDiskSizeWithio2,
   formatNumber,
 } from './DiskManagement.utils'
-import { DISK_LIMITS, DiskType, IOPS_RANGE, THROUGHPUT_RANGE } from './ui/DiskManagement.constants'
+import { DISK_LIMITS, DiskType } from './ui/DiskManagement.constants'
 
 const baseSchema = z.object({
   storageType: z.enum(['io2', 'gp3']).describe('Type of storage: io2 or gp3'),
@@ -68,20 +68,20 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
     if (storageType === 'io2') {
       // Validation rules for io2
 
-      if (provisionedIOPS > IOPS_RANGE[DiskType.IO2].max) {
+      if (provisionedIOPS > DISK_LIMITS[DiskType.IO2].maxIops) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `IOPS can not exceed ${formatNumber(IOPS_RANGE[DiskType.IO2].max)} for io2 Disk type. Please reach out to support if you need higher IOPS than this.`,
+          message: `IOPS can not exceed ${formatNumber(DISK_LIMITS[DiskType.IO2].maxIops)} for io2 Disk type. Please reach out to support if you need higher IOPS than this.`,
           path: ['provisionedIOPS'],
         })
       }
 
       const maxIOPSforDiskSizeWithio2 = calculateMaxIopsAllowedForDiskSizeWithio2(totalSize)
 
-      if (provisionedIOPS < IOPS_RANGE[DiskType.IO2].min) {
+      if (provisionedIOPS < DISK_LIMITS[DiskType.IO2].minIops) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Provisioned IOPS must be at least ${formatNumber(IOPS_RANGE[DiskType.IO2].min)}`,
+          message: `Provisioned IOPS must be at least ${formatNumber(DISK_LIMITS[DiskType.IO2].minIops)}`,
           path: ['provisionedIOPS'],
         })
       } else if (provisionedIOPS > maxIOPSforDiskSizeWithio2) {
@@ -125,18 +125,18 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
     if (storageType === 'gp3') {
       const maxIopsAllowedForDiskSizeWithGp3 = calculateMaxIopsAllowedForDiskSizeWithGp3(totalSize)
 
-      if (provisionedIOPS > IOPS_RANGE[DiskType.GP3].max) {
+      if (provisionedIOPS > DISK_LIMITS[DiskType.GP3].maxIops) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `IOPS can not exceed ${formatNumber(IOPS_RANGE[DiskType.GP3].max)} for GP3 Disk. Change the Disk type to io2 for higher IOPS support.`,
+          message: `IOPS can not exceed ${formatNumber(DISK_LIMITS[DiskType.GP3].maxIops)} for GP3 Disk. Change the Disk type to io2 for higher IOPS support.`,
           path: ['provisionedIOPS'],
         })
       }
 
-      if (provisionedIOPS < IOPS_RANGE[DiskType.GP3].min) {
+      if (provisionedIOPS < DISK_LIMITS[DiskType.GP3].minIops) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `IOPS must be at least ${formatNumber(IOPS_RANGE[DiskType.GP3].min)}`,
+          message: `IOPS must be at least ${formatNumber(DISK_LIMITS[DiskType.GP3].minIops)}`,
           path: ['provisionedIOPS'],
         })
       } else if (provisionedIOPS > maxIopsAllowedForDiskSizeWithGp3) {
@@ -161,7 +161,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
       if (throughput !== undefined) {
         const maxThroughput = Math.min(0.25 * provisionedIOPS, 1000)
 
-        if (throughput > THROUGHPUT_RANGE['gp3'].max) {
+        if (throughput > DISK_LIMITS['gp3'].maxThroughput) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: `Throughput can not exceed ${formatNumber(maxThroughput)} MB/s`,
@@ -176,10 +176,10 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
             path: ['throughput'],
           })
         }
-        if (throughput < THROUGHPUT_RANGE[DiskType.GP3].min) {
+        if (throughput < DISK_LIMITS[DiskType.GP3].minThroughput) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Throughput must be at least ${formatNumber(THROUGHPUT_RANGE[DiskType.GP3].min)} MB/s`,
+            message: `Throughput must be at least ${formatNumber(DISK_LIMITS[DiskType.GP3].minThroughput)} MB/s`,
             path: ['throughput'],
           })
         }

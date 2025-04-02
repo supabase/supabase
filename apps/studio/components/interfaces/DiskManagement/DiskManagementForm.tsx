@@ -56,8 +56,8 @@ import { StorageTypeField } from './fields/StorageTypeField'
 import { ThroughputField } from './fields/ThroughputField'
 import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
 import {
+  DISK_LIMITS,
   DiskType,
-  IOPS_RANGE,
   RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
@@ -69,8 +69,6 @@ export function DiskManagementForm() {
   const org = useSelectedOrganization()
   const { ref: projectRef } = useParams()
   const queryClient = useQueryClient()
-  const router = useRouter()
-  const diskAndComputeForm = useFlag('diskAndComputeForm')
 
   const { data: resourceWarnings } = useResourceWarningsQuery()
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
@@ -242,13 +240,6 @@ export function DiskManagementForm() {
       ) {
         willUpdateDiskConfiguration = true
 
-        if (
-          payload.storageType === 'gp3' &&
-          RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(payload.computeSize)
-        ) {
-          payload.provisionedIOPS = IOPS_RANGE[DiskType.GP3].min
-        }
-
         await updateDiskConfiguration({
           ref: projectRef,
           provisionedIOPS: payload.provisionedIOPS,
@@ -300,13 +291,6 @@ export function DiskManagementForm() {
       form.reset(defaultValues, {})
     }
   }, [isSuccess, isDiskAttributesSuccess])
-
-  // Redirect logic incase disk and compute feature is not live yet
-  useEffect(() => {
-    if (diskAndComputeForm !== undefined && !diskAndComputeForm && projectRef) {
-      router.push(`/project/${projectRef}/settings/addons?panel=computeInstance`)
-    }
-  }, [diskAndComputeForm, projectRef, router])
 
   return (
     <Form_Shadcn_ {...form}>
