@@ -1,9 +1,9 @@
-import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { RESTRICTION_MESSAGES } from 'components/interfaces/Organization/restriction.constants'
 import dayjs from 'dayjs'
+
+import { RESTRICTION_MESSAGES } from 'components/interfaces/Organization/restriction.constants'
+import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 export type WarningBannerProps = {
   type: 'danger' | 'warning' | 'note'
@@ -13,10 +13,10 @@ export type WarningBannerProps = {
 }
 
 export function useOrganizationRestrictions() {
-  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const org = useSelectedOrganization()
+
   const { data: overdueInvoices } = useOverdueInvoicesQuery()
   const { data: organizations } = useOrganizationsQuery()
-  const org = useSelectedOrganization()
 
   const warnings: WarningBannerProps[] = []
 

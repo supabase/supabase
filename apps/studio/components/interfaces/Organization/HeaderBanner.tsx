@@ -11,13 +11,13 @@ const bannerMotionProps = {
   transition: { duration: 0.2, delay: 0.5 },
 } as const
 
-export function OrganizationResourceBanner({ headerBanner }: { headerBanner?: boolean }) {
+export const OrganizationResourceBanner = () => {
   const { warnings } = useOrganizationRestrictions()
 
   return (
     <AnimatePresence initial={false}>
       {warnings.map((warning, i) => (
-        <HeaderBanner key={i} {...warning} headerBanner={headerBanner} />
+        <HeaderBanner key={i} {...warning} />
       ))}
     </AnimatePresence>
   )
@@ -28,16 +28,12 @@ export const HeaderBanner = ({
   title,
   message,
   link,
-  headerBanner,
 }: {
   type: 'danger' | 'warning' | 'note' | 'incident'
   title: string
   message: string
   link?: string
-  headerBanner?: boolean
 }) => {
-  // const { ref: isProject } = useParams()
-
   const bannerStyles =
     type === 'danger'
       ? 'bg-destructive-300 dark:bg-destructive-200'
@@ -51,7 +47,6 @@ export const HeaderBanner = ({
       {...bannerMotionProps}
       className={cn(
         `relative ${bannerStyles} border-b border-muted py-1 flex items-center justify-center flex-shrink-0 px-0`,
-        // headerBanner && 'last:rounded-b-[7px] mx-2 border-default border-l border-r',
         type === 'incident' && 'hover:bg-brand-300',
         'flex-shrink-0'
       )}
