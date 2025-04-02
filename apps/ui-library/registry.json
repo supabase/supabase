@@ -940,6 +940,129 @@
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "infinite-list-nextjs",
+      "type": "registry:block",
+      "title": "Infinite List",
+      "description": "List component with infinite scrolling capabilities, fetching data from Supabase using a render prop.",
+      "dependencies": [
+        "lucide-react",
+        "@supabase/postgrest-js",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/infinite-list/components/infinite-list.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/infinite-list/hooks/use-infinite-query.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "registryDependencies": []
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "infinite-list-react",
+      "type": "registry:block",
+      "title": "Infinite List",
+      "description": "List component with infinite scrolling capabilities, fetching data from Supabase using a render prop.",
+      "dependencies": ["lucide-react", "@supabase/postgrest-js", "@supabase/supabase-js@latest"],
+      "files": [
+        {
+          "path": "registry/default/blocks/infinite-list/components/infinite-list.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/infinite-list/hooks/use-infinite-query.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "registryDependencies": []
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "infinite-list-react-router",
+      "type": "registry:block",
+      "title": "Infinite List",
+      "description": "List component with infinite scrolling capabilities, fetching data from Supabase using a render prop.",
+      "dependencies": [
+        "lucide-react",
+        "@supabase/postgrest-js",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/infinite-list/components/infinite-list.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/infinite-list/hooks/use-infinite-query.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "registryDependencies": []
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "infinite-list-tanstack",
+      "type": "registry:block",
+      "title": "Infinite List",
+      "description": "List component with infinite scrolling capabilities, fetching data from Supabase using a render prop.",
+      "dependencies": [
+        "lucide-react",
+        "@supabase/postgrest-js",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/infinite-list/components/infinite-list.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/infinite-list/hooks/use-infinite-query.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "registryDependencies": []
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
       "name": "supabase-client-nextjs",
       "type": "registry:lib",
       "title": "Supabase Client for Next.js",

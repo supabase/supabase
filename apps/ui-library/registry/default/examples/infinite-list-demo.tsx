@@ -1,7 +1,7 @@
 'use client'
 
 import { InfiniteList } from '@/registry/default/blocks/infinite-list/components/infinite-list'
-import { type PostgrestFilterBuilder } from '@supabase/postgrest-js'
+import { SupabaseFilterBuilder } from '@/registry/default/blocks/infinite-list/hooks/use-infinite-query'
 
 // Example Task data structure (Adapt to your actual data)
 export type Log = {
@@ -35,8 +35,8 @@ const InfiniteListDemo = () => {
   }
 
   // Define a filter to only show logs with log_level = 'info'
-  const filterLogsToInfo = (query: PostgrestFilterBuilder<any, any, any>) => {
-    return query.eq('log_level', 'INFO')
+  const filterLogsToInfo = (query: SupabaseFilterBuilder) => {
+    return query.eq('log_level', 'INFO') as SupabaseFilterBuilder
   }
 
   return (

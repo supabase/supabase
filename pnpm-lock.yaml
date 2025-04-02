@@ -88,10 +88,10 @@ importers:
         version: 1.2.0
       next:
         specifier: 'catalog:'
-        version: 14.2.26(@babel/core@7.24.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
+        version: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       next-contentlayer2:
         specifier: 0.4.6
-        version: 0.4.6(contentlayer2@0.4.6(esbuild@0.25.1)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.25.1)(markdown-wasm@1.2.0)(next@14.2.26(@babel/core@7.24.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(supports-color@8.1.1)
+        version: 0.4.6(contentlayer2@0.4.6(esbuild@0.25.1)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.25.1)(markdown-wasm@1.2.0)(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(supports-color@8.1.1)
       next-themes:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -1013,6 +1013,9 @@ importers:
       '@react-router/fs-routes':
         specifier: ^7.4.0
         version: 7.4.0(@react-router/dev@7.4.0(@types/node@22.13.10)(jiti@2.4.2)(react-router@7.4.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(sass@1.72.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.2.1(@types/node@22.13.10)(jiti@2.4.2)(sass@1.72.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(yaml@2.4.5))(typescript@5.5.2)
+      '@supabase/postgrest-js':
+        specifier: ^1.19.4
+        version: 1.19.4
       '@supabase/supa-mdx-lint':
         specifier: 0.2.6-alpha
         version: 0.2.6-alpha
@@ -1042,10 +1045,10 @@ importers:
         version: 0.436.0(react@18.2.0)
       next:
         specifier: 'catalog:'
-        version: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
+        version: 14.2.26(@babel/core@7.24.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       next-contentlayer2:
         specifier: 0.4.6
-        version: 0.4.6(contentlayer2@0.4.6(esbuild@0.25.1)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.25.1)(markdown-wasm@1.2.0)(next@14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(supports-color@8.1.1)
+        version: 0.4.6(contentlayer2@0.4.6(esbuild@0.25.1)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.25.1)(markdown-wasm@1.2.0)(next@14.2.26(@babel/core@7.24.7(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(supports-color@8.1.1)
       next-themes:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -1531,7 +1534,7 @@ importers:
         version: 0.7.12
       '@vercel/flags':
         specifier: ^2.6.0
-        version: 2.6.0(next@14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        version: 2.6.0(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       api-types:
         specifier: workspace:*
         version: link:../api-types
@@ -1873,7 +1876,7 @@ importers:
         version: 3.6.1
       '@testing-library/jest-dom':
         specifier: ^6.1.3
-        version: 6.4.6(@jest/globals@29.7.0(supports-color@8.1.1))(@types/jest@29.5.5)(jest@29.7.0(@types/node@20.12.11)(supports-color@8.1.1))(vitest@3.0.4)
+        version: 6.4.6(@jest/globals@29.7.0(supports-color@8.1.1))(@types/jest@29.5.5)(jest@29.7.0(@types/node@20.12.11)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2)))(vitest@3.0.4)
       '@testing-library/react':
         specifier: ^14.0.0
         version: 14.0.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -2048,7 +2051,7 @@ importers:
         version: 10.1.0
       '@testing-library/jest-dom':
         specifier: ^6.4.6
-        version: 6.4.6(@jest/globals@29.7.0(supports-color@8.1.1))(@types/jest@29.5.5)(jest@29.7.0(@types/node@20.12.11)(supports-color@8.1.1))(vitest@3.0.4)
+        version: 6.4.6(@jest/globals@29.7.0(supports-color@8.1.1))(@types/jest@29.5.5)(jest@29.7.0(@types/node@20.12.11)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2)))(vitest@3.0.4)
       '@testing-library/react':
         specifier: ^16.0.0
         version: 16.0.0(@testing-library/dom@10.1.0)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -5968,6 +5971,9 @@ packages:
   '@supabase/postgrest-js@1.19.2':
     resolution: {integrity: sha512-MXRbk4wpwhWl9IN6rIY1mR8uZCCG4MZAEji942ve6nMwIqnBgBnZhZlON6zTTs6fgveMnoCILpZv1+K91jN+ow==}
 
+  '@supabase/postgrest-js@1.19.4':
+    resolution: {integrity: sha512-O4soKqKtZIW3olqmbXXbKugUtByD2jPa8kL2m2c1oozAO11uCcGrRhkZL0kVxjBLrXHE0mdSkFsMj7jDSfyNpw==}
+
   '@supabase/realtime-js@2.11.2':
     resolution: {integrity: sha512-u/XeuL2Y0QEhXSoIPZZwR6wMXgB+RQbJzG9VErA3VghVt7uRfSVsjeqd7m5GhX3JR6dM/WRmLbVR8URpDWG4+w==}
 
@@ -8759,7 +8765,6 @@ packages:
     resolution: {integrity: sha512-t0q23FIpvHDTtnORW+bDJziGsal5uh9RJTJ1fyH8drd4lICOoXhJ5pLMUZ5C0VQei6dNmwTzzoTRgMkO9JgHEQ==}
     peerDependencies:
       eslint: '>= 5'
-    bundledDependencies: []
 
   eslint-plugin-import@2.29.1:
     resolution: {integrity: sha512-BbPC0cuExzhiMo4Ff1BTVwHpjjv28C5R+btTOGaCRC7UEz801up0JadwkeSk5Ued6TG34uaczuVuH6qyy5YUxw==}
@@ -19850,6 +19855,10 @@ snapshots:
     dependencies:
       '@supabase/node-fetch': 2.6.15
 
+  '@supabase/postgrest-js@1.19.4':
+    dependencies:
+      '@supabase/node-fetch': 2.6.15
+
   '@supabase/realtime-js@2.11.2':
     dependencies:
       '@supabase/node-fetch': 2.6.15
@@ -20563,22 +20572,6 @@ snapshots:
       '@jest/globals': 29.7.0(supports-color@8.1.1)
       '@types/jest': 29.5.5
       jest: 29.7.0(@types/node@20.12.11)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2))
-      vitest: 3.0.4(@types/node@20.12.11)(@vitest/ui@3.0.4)(jiti@2.4.2)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.4.11(typescript@5.5.2))(sass@1.72.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
-
-  '@testing-library/jest-dom@6.4.6(@jest/globals@29.7.0(supports-color@8.1.1))(@types/jest@29.5.5)(jest@29.7.0(@types/node@20.12.11)(supports-color@8.1.1))(vitest@3.0.4)':
-    dependencies:
-      '@adobe/css-tools': 4.4.0
-      '@babel/runtime': 7.24.7
-      aria-query: 5.3.0
-      chalk: 3.0.0
-      css.escape: 1.5.1
-      dom-accessibility-api: 0.6.3
-      lodash: 4.17.21
-      redent: 3.0.0
-    optionalDependencies:
-      '@jest/globals': 29.7.0(supports-color@8.1.1)
-      '@types/jest': 29.5.5
-      jest: 29.7.0(@types/node@20.12.11)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2))
       vitest: 3.0.4(@types/node@20.12.11)(@vitest/ui@3.0.4)(jiti@2.4.2)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.7.3(@types/node@20.12.11)(typescript@5.5.2))(sass@1.72.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
 
   '@testing-library/react@14.0.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
@@ -21214,6 +21207,14 @@ snapshots:
       jose: 5.2.1
     optionalDependencies:
       next: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+
+  '@vercel/flags@2.6.0(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
+    dependencies:
+      jose: 5.2.1
+    optionalDependencies:
+      next: 14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
 
@@ -27395,12 +27396,12 @@ snapshots:
       - markdown-wasm
       - supports-color
 
-  next-contentlayer2@0.4.6(contentlayer2@0.4.6(esbuild@0.25.1)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.25.1)(markdown-wasm@1.2.0)(next@14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(supports-color@8.1.1):
+  next-contentlayer2@0.4.6(contentlayer2@0.4.6(esbuild@0.25.1)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.25.1)(markdown-wasm@1.2.0)(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(supports-color@8.1.1):
     dependencies:
       '@contentlayer2/core': 0.4.3(esbuild@0.25.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)
       '@contentlayer2/utils': 0.4.3
       contentlayer2: 0.4.6(esbuild@0.25.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)
-      next: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
+      next: 14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     transitivePeerDependencies:
@@ -27414,7 +27415,7 @@ snapshots:
       '@contentlayer2/core': 0.5.3(esbuild@0.25.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)
       '@contentlayer2/utils': 0.5.3
       contentlayer2: 0.5.3(esbuild@0.25.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)
-      next: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
+      next: 14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     transitivePeerDependencies:
@@ -27445,7 +27446,7 @@ snapshots:
 
   next-seo@6.5.0(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
-      next: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
+      next: 14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
 
@@ -27483,6 +27484,34 @@ snapshots:
       - babel-plugin-macros
 
   next@14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0):
+    dependencies:
+      '@next/env': 14.2.26
+      '@swc/helpers': 0.5.5
+      busboy: 1.6.0
+      caniuse-lite: 1.0.30001695
+      graceful-fs: 4.2.11
+      postcss: 8.4.31
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      styled-jsx: 5.1.1(@babel/core@7.26.10(supports-color@8.1.1))(react@18.2.0)
+    optionalDependencies:
+      '@next/swc-darwin-arm64': 14.2.26
+      '@next/swc-darwin-x64': 14.2.26
+      '@next/swc-linux-arm64-gnu': 14.2.26
+      '@next/swc-linux-arm64-musl': 14.2.26
+      '@next/swc-linux-x64-gnu': 14.2.26
+      '@next/swc-linux-x64-musl': 14.2.26
+      '@next/swc-win32-arm64-msvc': 14.2.26
+      '@next/swc-win32-ia32-msvc': 14.2.26
+      '@next/swc-win32-x64-msvc': 14.2.26
+      '@opentelemetry/api': 1.9.0
+      '@playwright/test': 1.49.1
+      sass: 1.72.0
+    transitivePeerDependencies:
+      - '@babel/core'
+      - babel-plugin-macros
+
+  next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0):
     dependencies:
       '@next/env': 14.2.26
       '@swc/helpers': 0.5.5
@@ -27800,7 +27829,7 @@ snapshots:
   nuqs@1.19.1(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)):
     dependencies:
       mitt: 3.0.1
-      next: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
+      next: 14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
 
   nuqs@2.4.1(next@14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-router@7.4.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0):
     dependencies:

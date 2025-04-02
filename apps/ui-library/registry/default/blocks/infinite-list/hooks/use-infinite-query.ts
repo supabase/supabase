@@ -1,16 +1,17 @@
 'use client'
 
 import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
-import { type PostgrestFilterBuilder } from '@supabase/postgrest-js'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { type PostgrestFilterBuilder as PFB } from '@supabase/postgrest-js'
+
+// Create a more flexible type alias that works with multiple versions
+export type SupabaseFilterBuilder = PFB<any, any, any, any, any> | PFB<any, any, any>
 
 interface UseInfiniteQueryProps<TData> {
   tableName: string
   selectQuery?: string
   pageSize?: number
-  filterBuilder?: (
-    query: PostgrestFilterBuilder<any, any, any>
-  ) => PostgrestFilterBuilder<any, any, any> // Optional filter function
+  filterBuilder?: (query: SupabaseFilterBuilder) => SupabaseFilterBuilder
 }
 
 export function useInfiniteQuery<TData>({
@@ -37,7 +38,7 @@ export function useInfiniteQuery<TData>({
 
       // Apply filters if filterBuilder is provided
       if (filterBuilder) {
-        query = filterBuilder(query)
+        query = filterBuilder(query as unknown as SupabaseFilterBuilder) as any
       }
 
       const { data: newData, error, count } = await query.range(offset, offset + pageSize - 1)
@@ -52,9 +53,9 @@ export function useInfiniteQuery<TData>({
         // The Supabase client might return an error object within the data array on failure for specific rows,
         // filter those out and ensure the resulting array matches TData[].
         const validData = newData.filter(
-          (item): item is TData => typeof item === 'object' && item !== null && !('error' in item)
-        )
-        setData((prevData) => [...prevData, ...validData])
+          (item) => typeof item === 'object' && item !== null && !('error' in item)
+        ) as TData[]
+        setData((prevData) => [...prevData, ...validData] as TData[])
         const currentTotalFetched = offset + validData.length // Use validData length
         setOffset(currentTotalFetched)
         // Check if the *fetched* batch size was less than requested, indicating the end

@@ -1,19 +1,17 @@
 'use client'
 
 import * as React from 'react'
-import { type PostgrestFilterBuilder } from '@supabase/postgrest-js'
-
 import { cn } from '@/lib/utils'
-import { useInfiniteQuery } from '@/registry/default/blocks/infinite-list/hooks/use-infinite-query'
-import { Skeleton } from '@/registry/default/components/ui/skeleton'
+import {
+  useInfiniteQuery,
+  SupabaseFilterBuilder,
+} from '@/registry/default/blocks/infinite-list/hooks/use-infinite-query'
 
 interface InfiniteListProps<TData> {
   tableName: string
   selectQuery?: string
   pageSize?: number
-  filterBuilder?: (
-    query: PostgrestFilterBuilder<any, any, any>
-  ) => PostgrestFilterBuilder<any, any, any>
+  filterBuilder?: (query: SupabaseFilterBuilder) => SupabaseFilterBuilder
   renderItem: (item: TData, index: number) => React.ReactNode
   className?: string
   listClassName?: string
@@ -30,20 +28,6 @@ const DefaultEndMessage = () => (
   <div className="text-center text-muted-foreground py-4 text-sm">You&apos;ve reached the end.</div>
 )
 
-const DefaultSkeleton = ({
-  count = 3,
-  heightClass = 'h-10',
-}: {
-  count?: number
-  heightClass?: string
-}) => (
-  <>
-    {Array.from({ length: count }).map((_, i) => (
-      <Skeleton key={i} className={`${heightClass} w-full`} />
-    ))}
-  </>
-)
-
 export function InfiniteList<TData>({
   tableName,
   selectQuery = '*',
@@ -54,7 +38,7 @@ export function InfiniteList<TData>({
   listClassName,
   renderNoResults = DefaultNoResults,
   renderEndMessage = DefaultEndMessage,
-  renderSkeleton = () => <DefaultSkeleton />,
+  renderSkeleton,
 }: InfiniteListProps<TData>) {
   const { data, loading, hasMore, fetchNextPage } = useInfiniteQuery<TData>({
     tableName,
@@ -104,7 +88,7 @@ export function InfiniteList<TData>({
           <div key={(item as any)?.id ?? index}>{renderItem(item, index)}</div>
         ))}
 
-        {loading && renderSkeleton(pageSize)}
+        {loading && renderSkeleton && renderSkeleton(pageSize)}
 
         <div ref={loadMoreSentinelRef} style={{ height: '1px' }} />
 

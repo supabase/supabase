@@ -4,7 +4,6 @@
   "type": "registry:block",
   "title": "Infinite List",
   "description": "List component with infinite scrolling capabilities, fetching data from Supabase using a render prop.",
-  "registryDependencies": ["skeleton"],
   "dependencies": ["lucide-react", "@supabase/postgrest-js"],
   "files": [
     {
@@ -15,6 +14,5 @@
       "path": "registry/default/blocks/infinite-list/hooks/use-infinite-query.ts",
       "type": "registry:hook"
     }
-  ],
-  "exampleDependencies": ["@/registry/default/clients/nextjs/lib/supabase/client"]
+  ]
 }
