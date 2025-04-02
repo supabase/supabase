@@ -98,7 +98,8 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
 
   const showUpgradeBadge = showMicroUpgrade(
     subscription?.plan.id ?? 'free',
-    project?.infra_compute_size ?? 'nano'
+    project?.infra_compute_size ?? 'nano',
+    project?.cloud_provider ?? 'AWS'
   )
 
   return (
@@ -153,7 +154,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                   type="default"
                   className="mt-3 border-violet-900 bg-violet-200 [&_h5]:text-violet-1100"
                   visible={showUpgradeBadge && form.watch('computeSize') === 'ci_nano'}
-                  title={'Upgrade to Micro Compute at no additional charge'}
+                  title={'Upgrade to Micro Compute'}
                   description="This Project is already paying for Micro Compute. You can upgrade to Micro Compute at any time when convenient."
                 />
               </>

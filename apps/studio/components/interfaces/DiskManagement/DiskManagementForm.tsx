@@ -4,7 +4,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -30,7 +29,7 @@ import { AddonVariantId } from 'data/subscriptions/types'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { GB, PROJECT_STATUS } from 'lib/constants'
+import { GB, PROJECT_STATUS, PROVIDERS } from 'lib/constants'
 import {
   Button,
   cn,
@@ -70,6 +69,7 @@ export function DiskManagementForm() {
     (warning) => warning.project === project?.ref
   )
   const isReadOnlyMode = projectResourceWarnings?.is_readonly_mode_enabled
+  const isFlyArchitecture = project?.cloud_provider === PROVIDERS.FLY.id
 
   /**
    * Permissions
@@ -123,14 +123,17 @@ export function DiskManagementForm() {
     useRemainingDurationForDiskAttributeUpdate({
       projectRef,
     })
-  const { data: diskUtil, isSuccess: isDiskUtilizationSuccess } = useDiskUtilizationQuery({
-    projectRef,
-  })
+  const { data: diskUtil, isSuccess: isDiskUtilizationSuccess } = useDiskUtilizationQuery(
+    {
+      projectRef,
+    },
+    { enabled: !isFlyArchitecture }
+  )
   const { data: subscription, isSuccess: isSubscriptionSuccess } = useOrgSubscriptionQuery({
     orgSlug: org?.slug,
   })
   const { data: diskAutoscaleConfig, isSuccess: isDiskAutoscaleConfigSuccess } =
-    useDiskAutoscaleCustomConfigQuery({ projectRef })
+    useDiskAutoscaleCustomConfigQuery({ projectRef }, { enabled: !isFlyArchitecture })
 
   /**
    * Handle default values
@@ -180,10 +183,11 @@ export function DiskManagementForm() {
   const totalSize = formState.defaultValues?.totalSize || 0
   const usedPercentage = (usedSize / totalSize) * 100
 
-  const isFlyArchitecture = project?.cloud_provider === 'FLY'
   const disableIopsThroughputConfig =
     RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(form.watch('computeSize')) &&
     subscription?.plan.id !== 'free'
+
+  const isBranch = project?.parent_project_ref !== undefined
 
   const disableDiskInputs =
     isRequestingChanges ||
@@ -336,7 +340,11 @@ export function DiskManagementForm() {
             type="default"
             visible={isFlyArchitecture}
             title="Disk configuration is not available on Fly Postgres"
-            description="Please contact Fly support if you need to update your disk configuration"
+            description={
+              isBranch
+                ? 'Please recreate your branch to configure disk size and ensure your branch gets launched on the latest branching infrastructure.'
+                : 'The Fly Postgres offering is deprecated - please migrate your instance to Supabase to configure your disk.'
+            }
           />
           {!isFlyArchitecture && (
             <>
