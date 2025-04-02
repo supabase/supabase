@@ -295,6 +295,54 @@ export const Index: Record<string, any> = {
       chunks: []
     }
     ,
+    "infinite-list-nextjs": {
+      name: "infinite-list-nextjs",
+      type: "registry:block",
+      registryDependencies: [],
+      component: React.lazy(() => import("@/registry/default/blocks/infinite-list/components/infinite-list.tsx")),
+      source: "",
+      files: ["registry/default/blocks/infinite-list/components/infinite-list.tsx","registry/default/blocks/infinite-list/hooks/use-infinite-query.ts","registry/default/clients/nextjs/lib/supabase/client.ts","registry/default/clients/nextjs/lib/supabase/middleware.ts","registry/default/clients/nextjs/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "infinite-list-react": {
+      name: "infinite-list-react",
+      type: "registry:block",
+      registryDependencies: [],
+      component: React.lazy(() => import("@/registry/default/blocks/infinite-list/components/infinite-list.tsx")),
+      source: "",
+      files: ["registry/default/blocks/infinite-list/components/infinite-list.tsx","registry/default/blocks/infinite-list/hooks/use-infinite-query.ts","registry/default/clients/react/lib/supabase/client.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "infinite-list-react-router": {
+      name: "infinite-list-react-router",
+      type: "registry:block",
+      registryDependencies: [],
+      component: React.lazy(() => import("@/registry/default/blocks/infinite-list/components/infinite-list.tsx")),
+      source: "",
+      files: ["registry/default/blocks/infinite-list/components/infinite-list.tsx","registry/default/blocks/infinite-list/hooks/use-infinite-query.ts","registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "infinite-list-tanstack": {
+      name: "infinite-list-tanstack",
+      type: "registry:block",
+      registryDependencies: [],
+      component: React.lazy(() => import("@/registry/default/blocks/infinite-list/components/infinite-list.tsx")),
+      source: "",
+      files: ["registry/default/blocks/infinite-list/components/infinite-list.tsx","registry/default/blocks/infinite-list/hooks/use-infinite-query.ts","registry/default/clients/tanstack/lib/supabase/client.ts","registry/default/clients/tanstack/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
     "supabase-client-nextjs": {
       name: "supabase-client-nextjs",
       type: "registry:lib",
@@ -434,6 +482,18 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/examples/realtime-avatar-stack-preview.tsx")),
       source: "",
       files: ["registry/default/examples/realtime-avatar-stack-preview.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "infinite-list-demo": {
+      name: "infinite-list-demo",
+      type: "registry:example",
+      registryDependencies: [],
+      component: React.lazy(() => import("@/registry/default/examples/infinite-list-demo.tsx")),
+      source: "",
+      files: ["registry/default/examples/infinite-list-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

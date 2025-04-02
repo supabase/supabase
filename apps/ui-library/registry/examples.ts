@@ -78,4 +78,15 @@ export const examples: Registry['items'] = [
       },
     ],
   },
+  {
+    name: 'infinite-list-demo',
+    type: 'registry:example',
+    registryDependencies: [],
+    files: [
+      {
+        path: 'registry/default/examples/infinite-list-demo.tsx',
+        type: 'registry:example',
+      },
+    ],
+  },
 ]
