@@ -11,7 +11,7 @@
   <guid>https://supabase.com/blog/broadcast-from-the-database</guid>
   <title>Realtime: Broadcast from Database</title>
   <link>https://supabase.com/blog/broadcast-from-the-database</link>
-  <description>Realtime can send messages based on changes in the Database, directly from the Database itself</description>
+  <description>Use Realtime Broadcast to scale sending database changes to clients</description>
   <pubDate>Wed, 02 Apr 2025 00:00:00 -0700</pubDate>
 </item>
 <item>
