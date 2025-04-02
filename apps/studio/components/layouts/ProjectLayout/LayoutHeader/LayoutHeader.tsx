@@ -1,6 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { ReactNode, useMemo } from 'react'
 
 import { useParams } from 'common'
@@ -68,11 +67,9 @@ const LayoutHeader = ({
 
   const showLayoutHeader = useShowLayoutHeader()
   const { ref: projectRef, slug } = useParams()
-  const router = useRouter()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
-  const isOrgPage = router.pathname.startsWith('/org/') // Add this check
   const { setMobileMenuOpen } = useAppStateSnapshot()
 
   const { open: isAiAssistantOpen } = useAiAssistantStateSnapshot()

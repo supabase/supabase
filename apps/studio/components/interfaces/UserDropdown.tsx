@@ -3,6 +3,7 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
+import { ProfileImage } from 'components/ui/ProfileImage'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import { useProfile } from 'lib/profile'
@@ -24,15 +25,12 @@ import {
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 export function UserDropdown() {
-  const { profile } = useProfile()
-  const appStateSnapshot = useAppStateSnapshot()
-  const { theme, setTheme } = useTheme()
-  const signOut = useSignOut()
   const router = useRouter()
-
+  const signOut = useSignOut()
+  const { profile } = useProfile()
+  const { theme, setTheme } = useTheme()
+  const appStateSnapshot = useAppStateSnapshot()
   const setCommandMenuOpen = useSetCommandMenuOpen()
-
-  // const { setAiAssistantPanel, aiAssistantPanel } = useAppStateSnapshot()
 
   return (
     <DropdownMenu>
@@ -41,10 +39,10 @@ export function UserDropdown() {
           type="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
         >
-          <img
-            className="aspect-square h-8 w-8 rounded-md border"
-            alt="shadcn"
-            src="https://avatars.githubusercontent.com/u/8291514?s=96&v=4"
+          <ProfileImage
+            alt={profile?.username}
+            src={profile?.profileImageUrl}
+            className="w-8 h-8 rounded-md"
           />
         </Button>
       </DropdownMenuTrigger>
