@@ -333,7 +333,6 @@ const SessionsAuthSettingsForm = () => {
                           <PrePostTab postTab={<HoursOrNeverText value={field.value || 0} />}>
                             <Input_Shadcn_
                               type="number"
-                              // min={0}
                               {...field}
                               disabled={!canUpdateConfig || !isProPlanAndUp}
                             />
