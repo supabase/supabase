@@ -57,9 +57,12 @@ const ComputeInstanceSidePanel = () => {
   const { panel, setPanel, closePanel } = useAddonsPagePanel()
   const visible = panel === 'computeInstance'
 
-  const { data: databases } = useReadReplicasQuery({ projectRef })
-  const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const { data: databases } = useReadReplicasQuery({ projectRef }, { enabled: visible })
+  const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef }, { enabled: visible })
+  const { data: subscription } = useOrgSubscriptionQuery(
+    { orgSlug: organization?.slug },
+    { enabled: visible }
+  )
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(

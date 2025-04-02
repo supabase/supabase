@@ -30,7 +30,10 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
       onClose()
     },
   })
-  const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
+  const { data } = useProjectStorageConfigQuery(
+    { projectRef: ref },
+    { enabled: IS_PLATFORM && visible }
+  )
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
 

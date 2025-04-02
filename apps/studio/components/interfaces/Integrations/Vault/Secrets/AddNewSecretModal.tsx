@@ -3,12 +3,13 @@ import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import InformationBox from 'components/ui/InformationBox'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
 import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
 import { useVaultSecretCreateMutation } from 'data/vault/vault-secret-create-mutation'
+import { Eye, EyeOff, HelpCircle } from 'lucide-react'
 import { Button, Form, Input, Modal } from 'ui'
 import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
-import { EyeOff, Eye, HelpCircle } from 'lucide-react'
 
 interface AddNewSecretModalProps {
   visible: boolean
@@ -23,10 +24,15 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
   const { mutateAsync: addKeyMutation } = usePgSodiumKeyCreateMutation()
   const { mutateAsync: addSecret } = useVaultSecretCreateMutation()
 
-  const { data: keys } = usePgSodiumKeysQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data: keys, isLoading } = usePgSodiumKeysQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      enabled: visible,
+    }
+  )
 
   useEffect(() => {
     if (visible && keys) {
@@ -87,76 +93,81 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
       onCancel={onClose}
       header="Add new secret"
     >
-      <Form
-        id="add-new-secret-form"
-        initialValues={{ name: '', description: '', secret: '', keyId: '', keyName: '' }}
-        validate={validate}
-        validateOnBlur={false}
-        onSubmit={onAddNewSecret}
-      >
-        {({ isSubmitting }: any) => {
-          return (
-            <>
-              <Modal.Content className="space-y-4">
-                <Input id="name" label="Name" />
-                <Input id="description" label="Description" labelOptional="Optional" />
-                <Input
-                  id="secret"
-                  type={showSecretValue ? 'text' : 'password'}
-                  label="Secret value"
-                  actions={
-                    <div className="mr-1">
-                      <Button
-                        type="default"
-                        icon={showSecretValue ? <EyeOff /> : <Eye />}
-                        onClick={() => setShowSecretValue(!showSecretValue)}
-                      />
-                    </div>
-                  }
-                />
-              </Modal.Content>
-              <Modal.Separator />
-              <Modal.Content className="space-y-4">
-                <EncryptionKeySelector
-                  id="keyId"
-                  nameId="keyName"
-                  label="Select a key to encrypt your secret with"
-                  labelOptional="Optional"
-                  selectedKeyId={selectedKeyId}
-                  onSelectKey={setSelectedKeyId}
-                />
-                <InformationBox
-                  icon={<HelpCircle size={18} strokeWidth={2} />}
-                  url="https://github.com/supabase/vault"
-                  urlLabel="Vault documentation"
-                  title="What is a key?"
-                  description={
-                    <div className="space-y-2">
-                      <p>
-                        Keys are used to encrypt data inside your database, and every secret in the
-                        Vault is encrypted with a key.
-                      </p>
-                      <p>
-                        You may create different keys for different purposes, such as one for
-                        encrypting user data, and another for application data.
-                      </p>
-                    </div>
-                  }
-                />
-              </Modal.Content>
-              <Modal.Separator />
-              <Modal.Content className="flex items-center justify-end space-x-2">
-                <Button type="default" disabled={isSubmitting} onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
-                  Add secret
-                </Button>
-              </Modal.Content>
-            </>
-          )
-        }}
-      </Form>
+      {isLoading ? (
+        <Modal.Content>
+          <GenericSkeletonLoader />
+        </Modal.Content>
+      ) : (
+        <Form
+          id="add-new-secret-form"
+          initialValues={{ name: '', description: '', secret: '', keyId: '', keyName: '' }}
+          validate={validate}
+          validateOnBlur={false}
+          onSubmit={onAddNewSecret}
+        >
+          {({ isSubmitting }: any) => {
+            return (
+              <>
+                <Modal.Content className="space-y-4">
+                  <Input id="name" label="Name" />
+                  <Input id="description" label="Description" labelOptional="Optional" />
+                  <Input
+                    id="secret"
+                    type={showSecretValue ? 'text' : 'password'}
+                    label="Secret value"
+                    actions={
+                      <div className="mr-1">
+                        <Button
+                          type="default"
+                          icon={showSecretValue ? <EyeOff /> : <Eye />}
+                          onClick={() => setShowSecretValue(!showSecretValue)}
+                        />
+                      </div>
+                    }
+                  />
+                </Modal.Content>
+                <Modal.Separator />
+                <Modal.Content className="space-y-4">
+                  <EncryptionKeySelector
+                    nameId="keyName"
+                    label="Select a key to encrypt your secret with"
+                    labelOptional="Optional"
+                    selectedKeyId={selectedKeyId}
+                    onSelectKey={setSelectedKeyId}
+                  />
+                  <InformationBox
+                    icon={<HelpCircle size={18} strokeWidth={2} />}
+                    url="https://github.com/supabase/vault"
+                    urlLabel="Vault documentation"
+                    title="What is a key?"
+                    description={
+                      <div className="space-y-2">
+                        <p>
+                          Keys are used to encrypt data inside your database, and every secret in
+                          the Vault is encrypted with a key.
+                        </p>
+                        <p>
+                          You may create different keys for different purposes, such as one for
+                          encrypting user data, and another for application data.
+                        </p>
+                      </div>
+                    }
+                  />
+                </Modal.Content>
+                <Modal.Separator />
+                <Modal.Content className="flex items-center justify-end space-x-2">
+                  <Button type="default" disabled={isSubmitting} onClick={onClose}>
+                    Cancel
+                  </Button>
+                  <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
+                    Add secret
+                  </Button>
+                </Modal.Content>
+              </>
+            )
+          }}
+        </Form>
+      )}
     </Modal>
   )
 }
