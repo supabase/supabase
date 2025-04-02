@@ -6,9 +6,9 @@ import InformationBox from 'components/ui/InformationBox'
 import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
 import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
 import { useVaultSecretCreateMutation } from 'data/vault/vault-secret-create-mutation'
+import { Eye, EyeOff, HelpCircle } from 'lucide-react'
 import { Button, Form, Input, Modal } from 'ui'
 import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
-import { EyeOff, Eye, HelpCircle } from 'lucide-react'
 
 interface AddNewSecretModalProps {
   visible: boolean
@@ -79,14 +79,7 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
   }
 
   return (
-    <Modal
-      closable
-      hideFooter
-      size="medium"
-      visible={visible}
-      onCancel={onClose}
-      header="Add new secret"
-    >
+    <Modal hideFooter size="medium" visible={visible} onCancel={onClose} header="Add new secret">
       <Form
         id="add-new-secret-form"
         initialValues={{ name: '', description: '', secret: '', keyId: '', keyName: '' }}

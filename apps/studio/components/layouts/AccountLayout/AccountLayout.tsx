@@ -5,12 +5,9 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
 import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
-import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
 import { cn, NavMenu, NavMenuItem } from 'ui'
 import {
   MAX_WIDTH_CLASSES,
@@ -21,34 +18,13 @@ import {
 
 export interface AccountLayoutProps {
   title: string
-  breadcrumbs: {
-    key: string
-    label: string
-  }[]
 }
 
-const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<AccountLayoutProps>) => {
+const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps>) => {
   const newLayoutPreview = useNewLayout()
 
   const router = useRouter()
-  const { data: organizations } = useOrganizationsQuery()
-  const selectedOrganization = useSelectedOrganization()
-
-  const { mutateAsync: sendReset } = useSendResetMutation()
-
-  const signOut = useSignOut()
-
-  const onClickLogout = async () => {
-    await sendReset()
-    await signOut()
-    await router.push('/sign-in')
-  }
-
-  useEffect(() => {
-    if (!IS_PLATFORM) {
-      router.push('/project/default')
-    }
-  }, [router])
+  const appSnap = useAppStateSnapshot()
 
   const accountLinks = [
     {
@@ -65,6 +41,12 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
 
   const currentPath = router.pathname
 
+  useEffect(() => {
+    if (!IS_PLATFORM) {
+      router.push('/project/default')
+    }
+  }, [router])
+
   if (!newLayoutPreview) {
     return children
   }
@@ -78,7 +60,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
       <div className="flex flex-col h-screen w-screen">
         <ScaffoldContainerLegacy>
           <Link
-            href={`/org/${selectedOrganization?.slug}`}
+            href={appSnap.lastRouteBeforeVisitingAccountPage ?? '/'}
             className="flex text-xs flex-row gap-2 items-center text-foreground-lighter focus-visible:text-foreground hover:text-foreground"
           >
             <ArrowLeft strokeWidth={1.5} size={14} />

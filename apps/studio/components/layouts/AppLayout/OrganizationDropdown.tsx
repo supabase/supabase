@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
+import { useParams } from 'common'
 import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -10,7 +11,6 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
   Badge,
   Button,
@@ -32,8 +32,8 @@ const OrganizationDropdown = () => {
   const newLayoutPreview = useNewLayout()
 
   const router = useRouter()
+  const { slug: routeSlug } = useParams()
   const selectedOrganization = useSelectedOrganization()
-  const project = useSelectedProject()
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
 
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
@@ -76,7 +76,9 @@ const OrganizationDropdown = () => {
               <CommandGroup_Shadcn_>
                 <ScrollArea className={(organizations || []).length > 7 ? 'h-[210px]' : ''}>
                   {organizations?.map((org) => {
-                    const href = `/org/${org.slug}`
+                    const href = !!routeSlug
+                      ? router.pathname.replace('[slug]', org.slug)
+                      : `/org/${org.slug}`
                     return (
                       <CommandItem_Shadcn_
                         key={org.slug}

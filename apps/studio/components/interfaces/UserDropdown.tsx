@@ -1,7 +1,7 @@
 import { Command, FlaskConical, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/router'
 
 import { ProfileImage } from 'components/ui/ProfileImage'
 import { useSignOut } from 'lib/auth'
@@ -73,7 +73,14 @@ export function UserDropdown() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem className="flex gap-2" asChild>
-                <Link href="/account/me">
+                <Link
+                  href="/account/me"
+                  onClick={() => {
+                    if (router.pathname !== '/account/me') {
+                      appStateSnapshot.setLastRouteBeforeVisitingAccountPage(router.asPath)
+                    }
+                  }}
+                >
                   <Settings size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                   Account preferences
                 </Link>

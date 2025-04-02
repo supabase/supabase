@@ -134,7 +134,7 @@ const ProjectDropdown = ({ isNewNav = true }: ProjectDropdownProps) => {
             size="tiny"
             className={cn('px-0.25 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
             iconRight={<ChevronsUpDown strokeWidth={1.5} />}
-          ></Button>
+          />
         </PopoverTrigger_Shadcn_>
         <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
           <Command_Shadcn_>

@@ -62,6 +62,7 @@ const getInitialState = () => {
       ongoingQueriesPanelOpen: false,
       mobileMenuOpen: false,
       showSidebar: true,
+      lastRouteBeforeVisitingAccountPage: '',
     }
   }
 
@@ -93,6 +94,7 @@ const getInitialState = () => {
     ongoingQueriesPanelOpen: false,
     mobileMenuOpen: false,
     showSidebar: true,
+    lastRouteBeforeVisitingAccountPage: '',
   }
 }
 
@@ -184,6 +186,11 @@ export const appState = proxy({
   mobileMenuOpen: false,
   setMobileMenuOpen: (value: boolean) => {
     appState.mobileMenuOpen = value
+  },
+
+  lastRouteBeforeVisitingAccountPage: '',
+  setLastRouteBeforeVisitingAccountPage: (value: string) => {
+    appState.lastRouteBeforeVisitingAccountPage = value
   },
 })
 

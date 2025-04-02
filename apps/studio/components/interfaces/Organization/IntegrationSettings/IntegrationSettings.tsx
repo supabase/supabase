@@ -155,7 +155,6 @@ The GitHub app will watch for changes in your repository such as file changes, b
 
               <EmptyIntegrationConnection
                 onClick={onAddGitHubConnection}
-                orgSlug={org?.slug}
                 showNode={false}
                 disabled={!canCreateGitHubConnection}
               >

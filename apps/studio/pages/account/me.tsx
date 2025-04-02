@@ -46,15 +46,7 @@ User.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout headerTitle="Account">
       <OrganizationLayout>
-        <AccountLayout
-          title="Preferences"
-          breadcrumbs={[
-            {
-              key: `supabase-settings`,
-              label: 'Preferences',
-            },
-          ]}
-        >
+        <AccountLayout title="Preferences">
           <AccountSettingsLayout>{page}</AccountSettingsLayout>
         </AccountLayout>
       </OrganizationLayout>

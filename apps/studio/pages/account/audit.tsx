@@ -41,17 +41,7 @@ Audit.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout headerTitle="Account">
       <OrganizationLayout>
-        <AccountLayout
-          title="Audit Logs"
-          breadcrumbs={[
-            {
-              key: `supabase-settings`,
-              label: 'Audit Logs',
-            },
-          ]}
-        >
-          {page}
-        </AccountLayout>
+        <AccountLayout title="Audit Logs">{page}</AccountLayout>
       </OrganizationLayout>
     </DefaultLayout>
   </AppLayout>

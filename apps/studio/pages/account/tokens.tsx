@@ -117,10 +117,7 @@ UserAccessTokens.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout headerTitle="Account">
       <OrganizationLayout>
-        <AccountLayout
-          title="Access Tokens"
-          breadcrumbs={[{ key: 'supabase-account-tokens', label: 'Access Tokens' }]}
-        >
+        <AccountLayout title="Access Tokens">
           <AccountSettingsLayout>{page}</AccountSettingsLayout>
         </AccountLayout>
       </OrganizationLayout>

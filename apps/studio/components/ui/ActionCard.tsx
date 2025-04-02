@@ -1,4 +1,4 @@
-import { Badge, Card } from 'ui'
+import { Badge, Card, cn } from 'ui'
 
 export const ActionCard = (card: {
   icon: JSX.Element
@@ -6,11 +6,15 @@ export const ActionCard = (card: {
   bgColor?: string
   description?: string
   isBeta?: boolean
+  className?: string
   onClick?: () => void
 }) => {
   return (
     <Card
-      className="grow bg-surface-100 p-3 transition-colors hover:bg-surface-200 border border-light hover:border-default cursor-pointer"
+      className={cn(
+        'grow bg-surface-100 p-3 transition-colors hover:bg-surface-200 border border-light hover:border-default cursor-pointer',
+        card.className
+      )}
       onClick={card.onClick}
     >
       <div className={`relative flex items-start gap-3`}>

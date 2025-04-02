@@ -38,6 +38,7 @@ const OrganizationsPage: NextPageWithLayout = () => {
             organizations?.map((organization) => (
               <ActionCard
                 bgColor="bg border"
+                className="[&>div]:items-center"
                 key={organization.id}
                 icon={<Boxes size={18} strokeWidth={1} className="text-foreground" />}
                 title={organization.name}

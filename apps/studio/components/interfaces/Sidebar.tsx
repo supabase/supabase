@@ -416,6 +416,7 @@ const OrganizationLinks = () => {
       <SidebarGroup className="gap-0.5">
         {navMenuItems.map((item, i) => (
           <SideBarNavLink
+            key={item.key}
             active={
               i === 0
                 ? activeRoute === undefined

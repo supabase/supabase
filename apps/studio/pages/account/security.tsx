@@ -87,7 +87,7 @@ Security.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout headerTitle="Account">
       <OrganizationLayout>
-        <AccountLayout title="Security" breadcrumbs={[{ key: 'security', label: 'Security' }]}>
+        <AccountLayout title="Security">
           <AccountSettingsLayout>{page}</AccountSettingsLayout>
         </AccountLayout>
       </OrganizationLayout>
