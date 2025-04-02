@@ -29,7 +29,7 @@ import { AddonVariantId } from 'data/subscriptions/types'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { GB, PROJECT_STATUS, PROVIDERS } from 'lib/constants'
+import { GB, PROJECT_STATUS } from 'lib/constants'
 import {
   Button,
   cn,
@@ -70,7 +70,7 @@ export function DiskManagementForm() {
     (warning) => warning.project === project?.ref
   )
   const isReadOnlyMode = projectResourceWarnings?.is_readonly_mode_enabled
-  const isFlyArchitecture = project?.cloud_provider === PROVIDERS.FLY.id
+  const isFlyArchitecture = project?.cloud_provider === 'FLY'
 
   /**
    * Permissions
