@@ -350,7 +350,7 @@ export function DiskManagementForm() {
             title="Disk configuration is not available on Fly Postgres"
             description={
               isBranch
-                ? 'Please recreate your branch to configure disk size and ensure your branch gets launched on the latest branching infrastructure.'
+                ? 'Delete and recreate your Preview Branch to configure disk size. It was deployed on an older branching infrastructure.'
                 : 'The Fly Postgres offering is deprecated - please migrate your instance to Supabase to configure your disk.'
             }
           />
