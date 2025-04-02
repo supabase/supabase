@@ -12,6 +12,7 @@ import SectionContainer from '../../components/Layouts/SectionContainer'
 const UseCases = dynamic(() => import('components/Solutions/UseCases'))
 const WhySupabase = dynamic(() => import('~/components/Solutions/FeaturesSection'))
 const FeaturesGrid = dynamic(() => import('~/components/Solutions/FeaturesGrid'))
+const VideosSection = dynamic(() => import('~/components/Solutions/Videos'))
 
 const Enterprise: NextPage = () => (
   <>
@@ -40,7 +41,7 @@ const Enterprise: NextPage = () => (
       <UseCases {...content['use-cases']} />
       <WhySupabase {...content.why} />
       <FeaturesGrid {...content.features} />
-      {/* <EnterpriseSecurity {...content.security} /> */}
+      <VideosSection {...content.testimonials} />
       {/* <EnterpriseQuote {...content.quote} /> */}
       {/* <CTAForm /> */}
     </Layout>

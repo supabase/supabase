@@ -5,9 +5,6 @@ import Panel from '~/components/Panel'
 import SectionContainer from '../Layouts/SectionContainer'
 
 export default function FeaturesGrid(props: any) {
-  const mgmt = props.features['mgmt-api']
-  console.log('mgmt', mgmt)
-
   return (
     <SectionContainer className="flex flex-col gap-4">
       <div className="flex flex-col gap-2 max-w-xl">
@@ -43,49 +40,23 @@ export default function FeaturesGrid(props: any) {
   )
 }
 
-const Content = ({
-  card,
-  outerClassName,
-  innerClassName,
-  cardClassName,
-}: {
-  card: any
-  outerClassName?: string
-  innerClassName?: string
-  cardClassName?: string
-}) => {
-  const hasImg = !!card.image
-
+const Content = ({ card, innerClassName }: { card: any; innerClassName?: string }) => {
   return (
     <Panel
       key={card.heading}
       hasActiveOnHover={false}
-      outerClassName={cn('w-full group hover:shadow-none', outerClassName)}
-      innerClassName={cn(
-        'relative flex flex-col justify-between xl:min-h-[250px]',
-        // hasImg && 'xl:flex-row xl:items-end',
-        innerClassName
-      )}
+      outerClassName="w-full group hover:shadow-none"
+      innerClassName={cn('relative flex flex-col justify-between xl:min-h-[250px]', innerClassName)}
       style={{ gridArea: card.id }}
     >
       {card.img && (
-        <div
-          className={cn(
-            'image-container relative h-full w-full inline-flex items-start p-6'
-            // hasImg && 'xl:order-last flex-1 h-full'
-          )}
-        >
+        <div className="image-container relative h-full w-full inline-flex items-start p-6">
           {card.img}
         </div>
       )}
-      <div
-        className={cn(
-          'content-container flex flex-col justify-between gap-3 p-6 flex-1'
-          // hasImg && 'xl:w-2/5'
-        )}
-      >
+      <div className="content-container flex flex-col justify-between gap-3 p-6 flex-1">
         <h3 className="text-foreground-lighter flex items-center gap-2">{card.heading}</h3>
-        <div className={cn('flex flex-col justify-between gap-2', hasImg && 'flex-auto')}>
+        <div className="flex flex-col justify-between gap-2">
           <p className="text-sm text-foreground-lighter">{card.subheading}</p>
         </div>
       </div>

@@ -156,7 +156,6 @@ export default {
   },
   features: {
     id: 'features',
-    label: '',
     heading: (
       <>
         Supabase powers <span className="text-foreground block">next generation tools</span>
@@ -544,8 +543,6 @@ export default {
         Powerful tools, <span className="text-foreground block">powered by Supabase</span>
       </>
     ),
-    subheading:
-      'Build a delightful application building experience backed seamlessly by a powerful application backend.',
     videos: {
       lovable: {
         url: '',
