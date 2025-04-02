@@ -35,8 +35,8 @@ const EnterpriseSecurity: FC<Props> = (props) => {
           <div className="video-container !rounded-md">
             <iframe
               className="w-full"
-              src="https://www.youtube-nocookie.com/embed/"
-              title="Introducing Supabase UI Library"
+              src="https://www.youtube-nocookie.com/embed/9GQtXXERnqU"
+              title="Supabase + Lovable"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
               allowFullScreen
             />
@@ -46,8 +46,8 @@ const EnterpriseSecurity: FC<Props> = (props) => {
           <div className="video-container !rounded-md">
             <iframe
               className="w-full"
-              src="https://www.youtube-nocookie.com/embed/"
-              title="Introducing Supabase UI Library"
+              src="https://www.youtube-nocookie.com/embed/LfAV5fmRybg"
+              title="Supabase + Bolt"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
               allowFullScreen
             />

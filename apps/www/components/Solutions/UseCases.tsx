@@ -83,7 +83,7 @@ const UseCases: FC<Props> = (props) => (
         </div>
       </SectionContainer>
     </div>
-    <SectionContainer className="!pt-0">
+    <SectionContainer className="!py-0">
       <ul className="grid grid-cols-2 gap-4 sm:gap-10 gap-y-10 lg:grid-cols-4 md:gap-12 lg:gap-x-8 mt-8">
         {props.highlights?.map((highlight) => (
           <HighlightCard highlight={highlight} key={highlight.heading} />

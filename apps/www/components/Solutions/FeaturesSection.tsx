@@ -20,7 +20,7 @@ type Feature = {
 
 const Support: FC<Props> = (props) => {
   return (
-    <SectionContainer id={props.id} className="flex flex-col gap-4 md:gap-8 !pt-0">
+    <SectionContainer id={props.id} className="flex flex-col gap-4 md:gap-8">
       <div className="flex flex-col gap-2">
         <span className="label">{props.label}</span>
         <h2 className="h2 text-foreground-lighter">{props.heading}</h2>

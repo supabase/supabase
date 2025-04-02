@@ -545,10 +545,10 @@ export default {
     ),
     videos: {
       lovable: {
-        url: '',
+        url: 'https://www.youtube.com/watch?v=9GQtXXERnqU',
       },
       bolt: {
-        url: '',
+        url: 'https://www.youtube.com/watch?v=LfAV5fmRybg',
       },
     },
   },
