@@ -40,7 +40,6 @@ import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
 import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
-import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
@@ -600,7 +599,6 @@ const Addons = () => {
         </>
       )}
 
-      <ComputeInstanceSidePanel />
       <PITRSidePanel />
       <CustomDomainSidePanel />
       <IPv4SidePanel />

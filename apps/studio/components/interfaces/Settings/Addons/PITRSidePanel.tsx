@@ -30,7 +30,8 @@ import {
   WarningIcon,
   cn,
 } from 'ui'
-import { ExternalLink, AlertTriangle } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
+import { useRouter } from 'next/router'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -57,6 +58,7 @@ const PITRSidePanel = () => {
   const { resolvedTheme } = useTheme()
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
+  const router = useRouter()
 
   const [selectedCategory, setSelectedCategory] = useState<'on' | 'off'>('off')
   const [selectedOption, setSelectedOption] = useState<string>('pitr_0')
@@ -299,7 +301,9 @@ const PITRSidePanel = () => {
                     <Button
                       key="change-compute"
                       type="default"
-                      onClick={() => setPanel('computeInstance')}
+                      onClick={() =>
+                        router.push(`/project/${projectRef}/settings/compute-and-disk`)
+                      }
                     >
                       Change compute size
                     </Button>,

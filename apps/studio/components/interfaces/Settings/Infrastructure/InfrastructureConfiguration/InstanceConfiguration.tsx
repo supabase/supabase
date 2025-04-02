@@ -29,7 +29,6 @@ import {
   DropdownMenuTrigger,
   cn,
 } from 'ui'
-import ComputeInstanceSidePanel from '../../Addons/ComputeInstanceSidePanel'
 import DeployNewReplicaPanel from './DeployNewReplicaPanel'
 import DropAllReplicasConfirmationModal from './DropAllReplicasConfirmationModal'
 import DropReplicaConfirmationModal from './DropReplicaConfirmationModal'
@@ -40,6 +39,7 @@ import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './Instan
 import MapView from './MapView'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
 import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+import { useRouter } from 'next/router'
 
 const InstanceConfigurationUI = () => {
   const reactFlow = useReactFlow()
@@ -49,6 +49,7 @@ const InstanceConfigurationUI = () => {
   const numTransition = useRef<number>()
   const { project, isLoading: isLoadingProject } = useProjectContext()
   const { setPanel } = useAddonsPagePanel()
+  const router = useRouter()
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
   const [showDeleteAllModal, setShowDeleteAllModal] = useState(false)
@@ -253,7 +254,11 @@ const InstanceConfigurationUI = () => {
                       />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-52 *:space-x-2">
-                      <DropdownMenuItem onClick={() => setPanel('computeInstance')}>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          router.push(`/project/${projectRef}/settings/compute-and-disk`)
+                        }
+                      >
                         <div>Resize databases</div>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -346,8 +351,6 @@ const InstanceConfigurationUI = () => {
         onSuccess={() => setRefetchInterval(5000)}
         onCancel={() => setSelectedReplicaToRestart(undefined)}
       />
-
-      <ComputeInstanceSidePanel />
     </div>
   )
 }
