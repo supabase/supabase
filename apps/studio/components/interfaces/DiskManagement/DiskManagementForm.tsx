@@ -56,6 +56,7 @@ import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
 import { DiskType, RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
+import { CloudProvider } from 'shared-data'
 
 export function DiskManagementForm() {
   // isLoading is used to avoid a useCheckPermissions() race condition
@@ -116,25 +117,29 @@ export function DiskManagementForm() {
           }
         }
       },
-      enabled: project && !isFlyArchitecture,
+      enabled: project != null && !isFlyArchitecture,
     }
   )
   const { isSuccess: isAddonsSuccess } = useProjectAddonsQuery({ projectRef })
   const { isWithinCooldownWindow, isSuccess: isCooldownSuccess } =
     useRemainingDurationForDiskAttributeUpdate({
       projectRef,
+      enabled: project != null && !isFlyArchitecture,
     })
   const { data: diskUtil, isSuccess: isDiskUtilizationSuccess } = useDiskUtilizationQuery(
     {
       projectRef,
     },
-    { enabled: project && !isFlyArchitecture }
+    { enabled: project != null && !isFlyArchitecture }
   )
   const { data: subscription, isSuccess: isSubscriptionSuccess } = useOrgSubscriptionQuery({
     orgSlug: org?.slug,
   })
   const { data: diskAutoscaleConfig, isSuccess: isDiskAutoscaleConfigSuccess } =
-    useDiskAutoscaleCustomConfigQuery({ projectRef }, { enabled: project && !isFlyArchitecture })
+    useDiskAutoscaleCustomConfigQuery(
+      { projectRef },
+      { enabled: project != null && !isFlyArchitecture }
+    )
 
   /**
    * Handle default values
@@ -156,7 +161,9 @@ export function DiskManagementForm() {
   }
 
   const form = useForm<DiskStorageSchemaType>({
-    resolver: zodResolver(CreateDiskStorageSchema(defaultValues.totalSize)),
+    resolver: zodResolver(
+      CreateDiskStorageSchema(defaultValues.totalSize, project?.cloud_provider as CloudProvider)
+    ),
     defaultValues,
     mode: 'onBlur',
     reValidateMode: 'onChange',
@@ -242,9 +249,9 @@ export function DiskManagementForm() {
 
         await updateDiskConfiguration({
           ref: projectRef,
-          provisionedIOPS: payload.provisionedIOPS,
+          provisionedIOPS: payload.provisionedIOPS!,
           storageType: payload.storageType,
-          totalSize: payload.totalSize,
+          totalSize: payload.totalSize!,
           throughput: payload.throughput,
         })
       }

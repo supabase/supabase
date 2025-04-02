@@ -9,15 +9,17 @@ import {
   formatNumber,
 } from './DiskManagement.utils'
 import { DISK_LIMITS, DiskType } from './ui/DiskManagement.constants'
+import { CloudProvider } from 'shared-data'
 
 const baseSchema = z.object({
   storageType: z.enum(['io2', 'gp3']).describe('Type of storage: io2 or gp3'),
   totalSize: z
     .number()
     .int('Value must be an integer')
-    .min(8, { message: 'Allocated disk size must be at least 8 GB.' })
-    .describe('Allocated disk size in GB'),
-  provisionedIOPS: z.number().describe('Provisioned IOPS for storage type'),
+    .describe('Allocated disk size in GB')
+    .optional()
+    .nullable(),
+  provisionedIOPS: z.number().describe('Provisioned IOPS for storage type').optional().nullable(),
   throughput: z.number().optional().describe('Throughput in MB/s for gp3'),
   computeSize: z
     .custom<ComputeInstanceAddonVariantId>((val): val is ComputeInstanceAddonVariantId => true)
@@ -44,11 +46,35 @@ const baseSchema = z.object({
     .nullable(),
 })
 
-export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
+export const CreateDiskStorageSchema = (defaultTotalSize: number, cloudProvider: CloudProvider) => {
   const schema = baseSchema.superRefine((data, ctx) => {
     const { storageType, totalSize, provisionedIOPS, throughput, maxSizeGb } = data
 
-    if (totalSize < defaultTotalSize) {
+    if (!totalSize && cloudProvider !== 'FLY') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Total size is required',
+        path: ['totalSize'],
+      })
+    }
+
+    if (!provisionedIOPS && cloudProvider !== 'FLY') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Provisioned IOPS is required',
+        path: ['provisionedIOPS'],
+      })
+    }
+
+    if (totalSize && totalSize < 8) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Allocated disk size must be at least 8 GB.',
+        path: ['totalSize'],
+      })
+    }
+
+    if (totalSize && totalSize < defaultTotalSize) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `Disk size cannot be reduced in size. Reduce your database size and then head to the Infrastructure settings and go through a Postgres version upgrade to right-size your disk.`,
@@ -57,7 +83,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
     }
 
     // Validate maxSizeGb cannot be lower than totalSize
-    if (!!maxSizeGb && maxSizeGb < totalSize) {
+    if (totalSize && !!maxSizeGb && maxSizeGb < totalSize) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `Max disk size cannot be lower than the current disk size. Must be at least ${formatNumber(totalSize)} GB.`,
@@ -65,7 +91,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
       })
     }
 
-    if (storageType === 'io2') {
+    if (provisionedIOPS && totalSize && storageType === 'io2') {
       // Validation rules for io2
 
       if (provisionedIOPS > DISK_LIMITS[DiskType.IO2].maxIops) {
@@ -122,7 +148,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
       }
     }
 
-    if (storageType === 'gp3') {
+    if (provisionedIOPS && totalSize && storageType === 'gp3') {
       const maxIopsAllowedForDiskSizeWithGp3 = calculateMaxIopsAllowedForDiskSizeWithGp3(totalSize)
 
       if (provisionedIOPS > DISK_LIMITS[DiskType.GP3].maxIops) {

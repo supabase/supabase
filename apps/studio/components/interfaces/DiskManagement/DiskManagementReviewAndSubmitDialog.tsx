@@ -228,7 +228,6 @@ export const DiskManagementReviewAndSubmitDialog = ({
           onClick={async (e) => {
             e.preventDefault()
             const isValid = await form.trigger()
-            console.log({ isValid, errors: form.formState.errors })
             if (isValid) setIsDialogOpen(true)
           }}
           disabled={disabled || !isDirty}
