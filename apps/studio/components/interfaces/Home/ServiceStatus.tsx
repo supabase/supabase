@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
-import { usePostgresServiceStatusQuery } from 'data/service-status/postgres-service-status-query'
 import {
   ProjectServiceStatus,
   useProjectServiceStatusQuery,
@@ -112,24 +111,12 @@ const ServiceStatus = () => {
         refetchInterval: (data) => (!data?.healthy ? 5000 : false),
       }
     )
-  const {
-    isLoading: isLoadingPostgres,
-    isSuccess: isSuccessPostgres,
-    refetch: refetchPostgresServiceStatus,
-  } = usePostgresServiceStatusQuery(
-    {
-      projectRef: ref,
-      connectionString: project?.connectionString,
-    },
-    {
-      refetchInterval: (data) => (data === null ? 5000 : false),
-    }
-  )
 
   const authStatus = status?.find((service) => service.name === 'auth')
   const restStatus = status?.find((service) => service.name === 'rest')
   const realtimeStatus = status?.find((service) => service.name === 'realtime')
   const storageStatus = status?.find((service) => service.name === 'storage')
+  const dbStatus = status?.find((service) => service.name === 'db')
 
   // [Joshen] Need individual troubleshooting docs for each service eventually for users to self serve
   const services: {
@@ -145,8 +132,9 @@ const ServiceStatus = () => {
       name: 'Database',
       error: undefined,
       docsUrl: undefined,
-      isLoading: isLoadingPostgres,
-      isSuccess: isSuccessPostgres,
+      isLoading: isLoading,
+      isSuccess: dbStatus?.healthy,
+      status: dbStatus?.status,
       logsUrl: '/logs/postgres-logs',
     },
     {
@@ -230,7 +218,6 @@ const ServiceStatus = () => {
 
       timer = setTimeout(() => {
         refetchServiceStatus()
-        refetchPostgresServiceStatus()
         refetchEdgeFunctionServiceStatus()
       }, remainingTimeTillNextCheck * 1000)
     }

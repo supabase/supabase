@@ -3,6 +3,7 @@
 import { ReactNode } from 'react'
 import { type ClassValue } from 'clsx'
 import { PRODUCT_MODULES } from 'shared-data/products'
+import { AppWindow } from 'lucide-react'
 
 export interface AdventDay {
   icon?: ReactNode // use svg jsx with 34x34px viewport
@@ -125,11 +126,17 @@ export const days: AdventDay[] = [
     ),
   },
   {
-    title: '',
-    description: '',
-    id: '',
-    is_shipped: false,
-    links: [],
-    icon: null,
+    title: "Keeping Tabs: What's New in Supabase Studio",
+    description: 'Tabs in the Editors! And upgrades to AI Assistant, SQL, and Logs',
+    id: 'tabs',
+    is_shipped: true,
+    links: [
+      {
+        url: '/blog/tabs-dashboard-updates',
+        label: 'Blog post',
+        target: '_blank',
+      },
+    ],
+    icon: <AppWindow size={30} />,
   },
 ]
