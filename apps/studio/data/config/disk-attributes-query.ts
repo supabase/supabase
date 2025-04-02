@@ -25,6 +25,8 @@ export async function getDiskAttributes(
     signal,
   })
 
+  data!.last_modified_at = new Date('2025-01-01')
+
   if (error) handleError(error)
   return data
 }
