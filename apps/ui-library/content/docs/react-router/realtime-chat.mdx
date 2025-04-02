@@ -3,10 +3,7 @@ title: Realtime Chat
 description: Real-time chat component for collaborative applications
 ---
 
-<div className="flex flex-row -space-x-px w-full">
-  <BlockPreview name="realtime-chat-demo" isPair />
-  <BlockPreview name="realtime-chat-demo" isPair />
-</div>
+<DualRealtimeChat />
 
 ## Installation
 
@@ -96,3 +93,8 @@ interface ChatMessage {
   createdAt: string
 }
 ```
+
+## Further reading
+
+- [Realtime Broadcast](https://supabase.com/docs/guides/realtime/broadcast)
+- [Realtime authorization](https://supabase.com/docs/guides/realtime/authorization)

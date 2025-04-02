@@ -30,7 +30,7 @@ const AddRestrictionModal = ({
   const formId = 'add-restriction-form'
   const { ref } = useParams()
 
-  const { data } = useNetworkRestrictionsQuery({ projectRef: ref })
+  const { data } = useNetworkRestrictionsQuery({ projectRef: ref }, { enabled: type !== undefined })
   const ipv4Restrictions = data?.config?.dbAllowedCidrs ?? []
   // @ts-ignore [Joshen] API typing issue
   const ipv6Restrictions = data?.config?.dbAllowedCidrsV6 ?? []

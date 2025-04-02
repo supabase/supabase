@@ -35,20 +35,24 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
   const selectedOrganization = useSelectedOrganization()
   const sidePanelStateSnapshot = useSidePanelsStateSnapshot()
 
+  const visible = sidePanelStateSnapshot.githubConnectionsOpen
+
   const { data: gitHubAuthorization, isLoading: isLoadingGitHubAuthorization } =
-    useGitHubAuthorizationQuery({ enabled: sidePanelStateSnapshot.githubConnectionsOpen })
+    useGitHubAuthorizationQuery({ enabled: visible })
 
   // [Alaister]: temp override with <any> until the typegen is fixed
   const { data: githubReposData, isLoading: isLoadingGitHubRepos } = useGitHubRepositoriesQuery<
     any[]
   >({
-    enabled: Boolean(gitHubAuthorization),
+    enabled: visible && Boolean(gitHubAuthorization),
   })
 
   /**
    * Supabase projects available
    */
-  const { data: supabaseProjectsData, isLoading: isLoadingSupabaseProjects } = useProjectsQuery()
+  const { data: supabaseProjectsData, isLoading: isLoadingSupabaseProjects } = useProjectsQuery({
+    enabled: visible,
+  })
 
   const supabaseProjects = useMemo(
     () =>
@@ -68,9 +72,14 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     [githubReposData]
   )
 
-  const { data: connections } = useGitHubConnectionsQuery({
-    organizationId: selectedOrganization?.id,
-  })
+  const { data: connections } = useGitHubConnectionsQuery(
+    {
+      organizationId: selectedOrganization?.id,
+    },
+    {
+      enabled: visible,
+    }
+  )
 
   const { mutate: createConnection, isLoading: isCreatingConnection } =
     useGitHubConnectionCreateMutation({
@@ -116,7 +125,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     <SidePanel
       header={'Add GitHub repository'}
       size="large"
-      visible={sidePanelStateSnapshot.githubConnectionsOpen}
+      visible={visible}
       hideFooter
       onCancel={() => sidePanelStateSnapshot.setGithubConnectionsOpen(false)}
     >

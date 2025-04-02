@@ -13,8 +13,10 @@ import { CopyButton } from '@/components/copy-button'
 import { cn } from 'ui'
 // import { FrameworkDocs } from '@/components/framework-docs'
 import { CodeFragment } from '@/components/code-fragment'
+import { DualRealtimeChat } from '@/components/dual-realtime-chat'
 import { Icons } from '@/components/icons'
 import { RegistryBlock } from '@/components/registry-block'
+import TanStackBeta from '@/components/tanstack-beta'
 import { ThemeSettings } from '@/components/theme-settings'
 import { Style } from '@/registry/styles'
 import {
@@ -248,6 +250,7 @@ const components = {
       {...props}
     />
   ),
+  TanStackBeta,
   // FrameworkDocs: ({ className, ...props }: React.ComponentProps<typeof FrameworkDocs>) => (
   //   <FrameworkDocs className={cn(className)} {...props} />
   // ),
@@ -257,7 +260,7 @@ const components = {
   LinkedCard: ({ className, ...props }: React.ComponentProps<typeof Link>) => (
     <Link
       className={cn(
-        'flex w-full flex-col items-center rounded-xl border bg-surface-100 text-card-background p-6 shadow transition-colors hover:bg-muted/50 sm:p-10',
+        'flex w-full flex-col items-center rounded-xl border bg-surface-100 text-card-background py-6 px-4 shadow transition-colors hover:bg-muted/50 sm:p-10',
         className
       )}
       {...props}
@@ -271,6 +274,7 @@ const components = {
   SonnerPositionConfig,
   BlockItem,
   BlockPreview,
+  DualRealtimeChat,
 }
 
 interface MdxProps {

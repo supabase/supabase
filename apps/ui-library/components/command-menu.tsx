@@ -72,30 +72,12 @@ export function CommandMenu({ ...props }: DialogProps) {
         <CommandInput_Shadcn_ placeholder="Type a command or search..." />
         <CommandList_Shadcn_>
           <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-          {/* <CommandGroup_Shadcn_ heading="Links">
-            {docsConfig.mainNav
-              .filter((navitem) => !navitem.external)
-              .map((navItem) => (
-                <CommandItem_Shadcn_
-                  key={navItem.href}
-                  value={navItem.title}
-                  onSelect={() => {
-                    runCommand(() => router.push(navItem.href as string))
-                  }}
-                >
-                  <FileIcon className="mr-2 h-4 w-4" strokeWidth={1} />
-                  {navItem.title}
-                </CommandItem_Shadcn_>
-              ))}
-          </CommandGroup_Shadcn_> */}
           <CommandGroup_Shadcn_ key="pages" heading="Pages">
             {COMMAND_ITEMS.map((navItem) => (
               <CommandItem_Shadcn_
                 key={navItem.href}
                 value={navItem.label}
-                onSelect={() => {
-                  runCommand(() => router.push(navItem.href as string))
-                }}
+                onSelect={() => runCommand(() => router.push(navItem.href as string))}
               >
                 <div className="mr-2 flex h-4 w-4 items-center justify-center">
                   <CircleIcon className="h-3 w-3" strokeWidth={1} />

@@ -5,7 +5,8 @@
   "title": "Supabase Client for Next.js",
   "description": "",
   "dependencies": [
-    "@supabase/ssr@latest"
+    "@supabase/ssr@latest",
+    "@supabase/supabase-js@latest"
   ],
   "registryDependencies": [],
   "files": [
@@ -24,5 +25,6 @@
       "content": "import { createServerClient } from '@supabase/ssr'\nimport { cookies } from 'next/headers'\n\nexport async function createClient() {\n  const cookieStore = await cookies()\n\n  return createServerClient(\n    process.env.NEXT_PUBLIC_SUPABASE_URL!,\n    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,\n    {\n      cookies: {\n        getAll() {\n          return cookieStore.getAll()\n        },\n        setAll(cookiesToSet) {\n          try {\n            cookiesToSet.forEach(({ name, value, options }) =>\n              cookieStore.set(name, value, options)\n            )\n          } catch {\n            // The `setAll` method was called from a Server Component.\n            // This can be ignored if you have middleware refreshing\n            // user sessions.\n          }\n        },\n      },\n    }\n  )\n}\n",
       "type": "registry:lib"
     }
-  ]
+  ],
+  "docs": "You'll need to add a `.env` file with the following environment variables to your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`."
 }
