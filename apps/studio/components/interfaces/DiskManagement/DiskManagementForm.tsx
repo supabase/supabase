@@ -116,7 +116,7 @@ export function DiskManagementForm() {
           }
         }
       },
-      enabled: !isFlyArchitecture,
+      enabled: project && !isFlyArchitecture,
     }
   )
   const { isSuccess: isAddonsSuccess } = useProjectAddonsQuery({ projectRef })
@@ -128,13 +128,13 @@ export function DiskManagementForm() {
     {
       projectRef,
     },
-    { enabled: !isFlyArchitecture }
+    { enabled: project && !isFlyArchitecture }
   )
   const { data: subscription, isSuccess: isSubscriptionSuccess } = useOrgSubscriptionQuery({
     orgSlug: org?.slug,
   })
   const { data: diskAutoscaleConfig, isSuccess: isDiskAutoscaleConfigSuccess } =
-    useDiskAutoscaleCustomConfigQuery({ projectRef }, { enabled: !isFlyArchitecture })
+    useDiskAutoscaleCustomConfigQuery({ projectRef }, { enabled: project && !isFlyArchitecture })
 
   /**
    * Handle default values
