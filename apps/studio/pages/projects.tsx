@@ -44,6 +44,8 @@ const ProjectsPage: NextPageWithLayout = () => {
   }, [isSuccess, hasWindowLoaded])
 
   useEffect(() => {
+    // [Joshen] Adding the redirect here, but once the nav changes are permanenet
+    // we should be doing the redirect in next.config instead
     if (newLayoutPreview) router.push('/organizations')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newLayoutPreview])

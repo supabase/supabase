@@ -2,7 +2,6 @@ import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainerLegacy, ScaffoldTitle } from 'components/layouts/Scaffold'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useRouter } from 'next/router'
 import { NextPageWithLayout } from 'types'
 
@@ -13,11 +12,6 @@ import { Skeleton } from 'ui'
 const OrganizationsPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { data: organizations, isLoading, error } = useOrganizationsQuery()
-  const selectedOrganization = useSelectedOrganization()
-
-  //   if (selectedOrganization) {
-  //     router.push(`/org/${selectedOrganization.id}`)
-  //   }
 
   return (
     <>
