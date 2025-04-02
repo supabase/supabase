@@ -52,7 +52,7 @@ create table "employees" (
 <$CodeTabs>
 
 ```bash name=Terminal
-supabase db diff -f employees_table
+supabase db diff -f create_employees_table
 ```
 
 </$CodeTabs>
@@ -247,7 +247,7 @@ Your schema files are run in lexicographic order by default. The order is import
     │   ├── employees.sql
     │   └── managers.sql
     └── migrations/
-        ├── 20241004112233_employees_table.sql
+        ├── 20241004112233_create_employees_table.sql
         ├── 20241005112233_add_employee_age.sql
         └── 20241006112233_add_managers_table.sql
 ```
