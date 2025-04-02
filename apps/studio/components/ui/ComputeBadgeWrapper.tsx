@@ -11,7 +11,6 @@ import { INSTANCE_MICRO_SPECS } from 'lib/constants'
 import { Button, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import ShimmeringLoader from './ShimmeringLoader'
-import { useFlag } from 'hooks/ui/useFlag'
 
 const Row = ({ label, stat }: { label: string; stat: React.ReactNode | string }) => {
   return (
