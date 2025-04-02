@@ -32,7 +32,7 @@ export const useOrgIntegrationsQuery = <TData = IntegrationsData>(
     ({ signal }) => getIntegrations({ orgSlug }, signal),
     {
       enabled: enabled && typeof orgSlug !== 'undefined',
-      ...options,
       staleTime: 30 * 60 * 1000, // 30 minutes
+      ...options,
     }
   )

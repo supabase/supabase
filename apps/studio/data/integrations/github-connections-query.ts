@@ -44,8 +44,8 @@ export const useGitHubConnectionsQuery = <TData = GitHubConnectionsData>(
     ({ signal }) => getGitHubConnections({ organizationId }, signal),
     {
       enabled: enabled && typeof organizationId !== 'undefined',
-      ...options,
       staleTime: 30 * 60 * 1000, // 30 minutes
+      ...options,
     }
   )
 }

@@ -27,7 +27,7 @@ export const useOverdueInvoicesQuery = <TData = OverdueInvoicesData>({
     ({ signal }) => getOverdueInvoices(signal),
     {
       enabled: enabled && IS_PLATFORM,
-      ...options,
       staleTime: 30 * 60 * 1000, // 30 minutes
+      ...options,
     }
   )

@@ -27,7 +27,7 @@ export const useIntegrationsQuery = <TData = IntegrationsData>({
     ({ signal }) => getIntegrations(signal),
     {
       enabled: enabled,
-      ...options,
       staleTime: 30 * 60 * 1000, // 30 minutes
+      ...options,
     }
   )
