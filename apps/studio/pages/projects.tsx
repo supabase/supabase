@@ -43,6 +43,11 @@ const ProjectsPage: NextPageWithLayout = () => {
     }
   }, [isSuccess, hasWindowLoaded])
 
+  useEffect(() => {
+    if (newLayoutPreview) router.push('/organizations')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [newLayoutPreview])
+
   return (
     <div className={cn(newLayoutPreview && [MAX_WIDTH_CLASSES, PADDING_CLASSES])}>
       {isError && (
