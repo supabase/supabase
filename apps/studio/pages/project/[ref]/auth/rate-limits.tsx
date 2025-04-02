@@ -1,7 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ReactNode } from 'react'
 
-import { useParams } from 'common'
 import RateLimits from 'components/interfaces/Auth/RateLimits/RateLimits'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -12,30 +10,6 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
-
-interface RateLimitsLayoutProps {
-  children: ReactNode
-}
-
-export const RateLimitsLayout = ({ children }: RateLimitsLayoutProps) => {
-  const { ref } = useParams()
-
-  return (
-    <DefaultLayout>
-      <AuthLayout>
-        <PageLayout
-          title="Rate Limits"
-          subtitle="Safeguard against bursts of incoming traffic to prevent abuse and maximize stability"
-          primaryActions={
-            <DocsButton href="https://supabase.com/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention" />
-          }
-        >
-          {children}
-        </PageLayout>
-      </AuthLayout>
-    </DefaultLayout>
-  )
-}
 
 const RateLimitsPage: NextPageWithLayout = () => {
   const isPermissionsLoaded = usePermissionsLoaded()
@@ -52,6 +26,20 @@ const RateLimitsPage: NextPageWithLayout = () => {
   )
 }
 
-RateLimitsPage.getLayout = (page) => <RateLimitsLayout>{page}</RateLimitsLayout>
+RateLimitsPage.getLayout = (page) => (
+  <DefaultLayout>
+    <AuthLayout>
+      <PageLayout
+        title="Rate Limits"
+        subtitle="Safeguard against bursts of incoming traffic to prevent abuse and maximize stability"
+        primaryActions={
+          <DocsButton href="https://supabase.com/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention" />
+        }
+      >
+        {page}
+      </PageLayout>
+    </AuthLayout>
+  </DefaultLayout>
+)
 
 export default RateLimitsPage
