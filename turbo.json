@@ -102,6 +102,8 @@
         "NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL",
         "NEXT_PUBLIC_GOTRUE_URL",
         "NEXT_PUBLIC_BASE_PATH",
+        "NEXT_PUBLIC_EXAMPLES_SUPABASE_ANON_KEY",
+        "NEXT_PUBLIC_EXAMPLES_SUPABASE_URL",
         // These envs are technically passthrough env vars because they're only used on the server side of Nextjs
         "LIVE_SUPABASE_COM_SERVICE_ROLE_KEY",
         "GITHUB_CHANGELOG_APP_ID",
