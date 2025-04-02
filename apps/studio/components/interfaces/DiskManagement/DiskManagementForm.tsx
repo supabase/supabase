@@ -145,7 +145,7 @@ export function DiskManagementForm() {
    * Handle default values
    */
   // @ts-ignore
-  const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0 }
+  const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0, iops: 0 }
   const { growth_percent, max_size_gb, min_increment_gb } = diskAutoscaleConfig ?? {}
   const defaultValues = {
     storageType: type ?? DiskType.GP3,

@@ -13,13 +13,8 @@ import { CloudProvider } from 'shared-data'
 
 const baseSchema = z.object({
   storageType: z.enum(['io2', 'gp3']).describe('Type of storage: io2 or gp3'),
-  totalSize: z
-    .number()
-    .int('Value must be an integer')
-    .describe('Allocated disk size in GB')
-    .optional()
-    .nullable(),
-  provisionedIOPS: z.number().describe('Provisioned IOPS for storage type').optional().nullable(),
+  totalSize: z.number().int('Value must be an integer').describe('Allocated disk size in GB'),
+  provisionedIOPS: z.number().describe('Provisioned IOPS for storage type'),
   throughput: z.number().optional().describe('Throughput in MB/s for gp3'),
   computeSize: z
     .custom<ComputeInstanceAddonVariantId>((val): val is ComputeInstanceAddonVariantId => true)
