@@ -8,9 +8,10 @@ set -e
 
 # Kiểm tra tham số dòng lệnh
 if [ $# -lt 1 ]; then
-    echo "Usage: $0 <stack_name> [port_offset]"
-    echo "Example: $0 project1 2000"
+    echo "Usage: $0 <stack_name> [port_offset] [domain_or_ip]"
+    echo "Example: $0 project1 2000 20.255.61.202"
     echo "The port_offset is optional. If not provided, it will be calculated automatically."
+    echo "The domain_or_ip is optional. If provided, it will be used for external access."
     exit 1
 fi
 
@@ -34,6 +35,16 @@ else
     done
     PORT_OFFSET=$((PORT_OFFSET * 1000))
     echo "Calculated port offset: $PORT_OFFSET"
+fi
+
+# Kiểm tra nếu có tham số domain_or_ip được truyền vào
+if [ $# -ge 3 ]; then
+    EXTERNAL_DOMAIN=$3
+    echo "Using provided domain/IP for external access: $EXTERNAL_DOMAIN"
+    USE_EXTERNAL_URL=true
+else
+    USE_EXTERNAL_URL=false
+    EXTERNAL_DOMAIN="localhost"
 fi
 
 # Kiểm tra sử dụng Nginx hay Kong
@@ -204,11 +215,31 @@ PGRST_DB_SCHEMAS=public,storage,graphql_public
 ############
 
 ## General
+EOL
+
+# Thêm cấu hình URL dựa vào thông tin domain hoặc IP đã cung cấp
+if [ "$USE_EXTERNAL_URL" = true ]; then
+    cat >> "$TARGET_DIR/.env" << EOL
+# Cấu hình cho truy cập từ bên ngoài
+SITE_URL=http://${EXTERNAL_DOMAIN}:${STUDIO_PORT}
+ADDITIONAL_REDIRECT_URLS=
+JWT_EXPIRY=3600
+DISABLE_SIGNUP=false
+API_EXTERNAL_URL=http://${EXTERNAL_DOMAIN}:${KONG_HTTP_PORT}
+EOL
+else
+    cat >> "$TARGET_DIR/.env" << EOL
+# Cấu hình cho truy cập local
 SITE_URL=http://localhost:${STUDIO_PORT}
 ADDITIONAL_REDIRECT_URLS=
 JWT_EXPIRY=3600
 DISABLE_SIGNUP=false
 API_EXTERNAL_URL=http://localhost:${KONG_HTTP_PORT}
+EOL
+fi
+
+# Tiếp tục với phần còn lại của file .env
+cat >> "$TARGET_DIR/.env" << EOL
 
 ## Mailer Config
 MAILER_URLPATHS_CONFIRMATION="/auth/v1/verify"
@@ -238,10 +269,25 @@ ENABLE_PHONE_AUTOCONFIRM=true
 STUDIO_DEFAULT_ORGANIZATION=Default Organization
 STUDIO_DEFAULT_PROJECT=${STACK_NAME}
 STUDIO_PORT=${STUDIO_PORT}
-# replace if you intend to use Studio outside of localhost
-SUPABASE_PUBLIC_URL=http://localhost:${KONG_HTTP_PORT}
+EOL
 
-# Kích hoạt bảo vệ mật khẩu cho dashboard - Sẽ sử dụng Nginx thay vì Kong nên có thể tắt
+# Cập nhật SUPABASE_PUBLIC_URL dựa trên tham số domain hoặc IP
+if [ "$USE_EXTERNAL_URL" = true ]; then
+    cat >> "$TARGET_DIR/.env" << EOL
+# URL cho truy cập từ bên ngoài
+SUPABASE_PUBLIC_URL=http://${EXTERNAL_DOMAIN}:${KONG_HTTP_PORT}
+EOL
+else
+    cat >> "$TARGET_DIR/.env" << EOL
+# URL cho truy cập local
+SUPABASE_PUBLIC_URL=http://localhost:${KONG_HTTP_PORT}
+EOL
+fi
+
+# Tiếp tục với phần còn lại của file .env
+cat >> "$TARGET_DIR/.env" << EOL
+
+# Kích hoạt bảo vệ mật khẩu cho dashboard
 DASHBOARD_SECURE=${USE_NGINX_AUTH}
 
 # Enable webp support

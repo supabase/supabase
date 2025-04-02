@@ -10,6 +10,7 @@ Script triển khai `deploy_supabase.sh` cho phép bạn:
 - Gán các port khác nhau cho mỗi stack để tránh xung đột
 - Tạo các tên container khác nhau để dễ quản lý
 - Hỗ trợ xác thực bằng Nginx với Basic Auth cho Supabase Studio Dashboard
+- Hỗ trợ cấu hình URL truy cập từ bên ngoài qua IP hoặc domain
 
 ## Yêu cầu hệ thống
 
@@ -23,7 +24,7 @@ Script triển khai `deploy_supabase.sh` cho phép bạn:
 
 ```bash
 cd docker
-./deploy_supabase.sh <tên_stack> [port_offset]
+./deploy_supabase.sh <tên_stack> [port_offset] [domain_or_ip]
 ```
 
 Ví dụ:
@@ -34,8 +35,8 @@ Ví dụ:
 # Triển khai với port offset chỉ định
 ./deploy_supabase.sh project2 2000
 
-# Triển khai với Nginx Basic Auth (mặc định)
-USE_NGINX_AUTH=true ./deploy_supabase.sh project3
+# Triển khai với Nginx Basic Auth (mặc định) và IP/domain bên ngoài
+./deploy_supabase.sh project3 3000 20.255.61.202
 
 # Triển khai với Kong Basic Auth (chế độ xác thực cũ)
 USE_NGINX_AUTH=false ./deploy_supabase.sh project4
@@ -47,7 +48,8 @@ Script sẽ:
 3. Tự động tính toán và gán các port không xung đột
 4. Điều chỉnh cấu hình để stack chạy độc lập
 5. Cấu hình phương thức xác thực (Nginx hoặc Kong) cho Supabase Studio Dashboard
-6. Tạo các script tiện ích (start.sh, stop.sh, reset.sh)
+6. Nếu cung cấp IP/domain, cấu hình URLs cho truy cập từ bên ngoài
+7. Tạo các script tiện ích (start.sh, stop.sh, reset.sh)
 
 ### 2. Khởi động stack
 
@@ -89,6 +91,11 @@ Sau khi khởi động thành công, bạn có thể truy cập:
 - **API Endpoint**: http://api.<tên_stack>.local
 - **Database**: localhost:<postgres_port>
 
+**Khi cấu hình với domain/IP bên ngoài:**
+- **Studio UI**: http://<domain_or_ip>:<studio_port>
+- **API Endpoint**: http://<domain_or_ip>:<kong_http_port>
+- **Database**: localhost:<postgres_port>
+
 Thông tin đăng nhập sẽ được hiển thị sau khi triển khai và trong script start.sh.
 
 ### 5. Dừng và reset stack
@@ -121,7 +128,29 @@ Script sẽ:
 2. Thiết lập Nginx với Basic Auth sử dụng thông tin đăng nhập đó
 3. Tạo các script khởi động và dừng mới
 
-### 7. Xóa stack và giải phóng bộ nhớ
+### 7. Cập nhật stack hiện có
+
+Nếu bạn muốn cập nhật stack hiện có với các tính năng mới (hỗ trợ URL bên ngoài, Nginx Auth):
+
+```bash
+cd docker
+./update_existing_stack.sh <tên_stack> [domain_or_ip]
+```
+
+Ví dụ:
+```bash
+# Cập nhật stack hiện có với URL bên ngoài
+./update_existing_stack.sh project1 20.255.61.202
+```
+
+Script sẽ:
+1. Tạo bản sao lưu của các file cấu hình quan trọng
+2. Cập nhật file .env với URL truy cập từ bên ngoài
+3. Hỏi bạn có muốn thêm Nginx Basic Auth nếu chưa có
+4. Cập nhật các script khởi động và dừng
+5. Tự động xử lý xung đột giữa Nginx và Kong auth
+
+### 8. Xóa stack và giải phóng bộ nhớ
 
 Để xóa hoàn toàn một stack và giải phóng tài nguyên:
 ```bash
@@ -136,12 +165,36 @@ Script này sẽ:
 4. Xóa thư mục stack
 5. Hiển thị thông tin về tài nguyên đã được giải phóng
 
+## Truy cập từ bên ngoài
+
+Để truy cập Supabase Studio từ bên ngoài (internet), bạn có hai cách:
+
+### 1. Triển khai mới với domain/IP
+
+```bash
+./deploy_supabase.sh your_stack 2000 20.255.61.202
+```
+
+Các URL sẽ được cấu hình như sau:
+- SITE_URL=http://20.255.61.202:3000
+- API_EXTERNAL_URL=http://20.255.61.202:8000
+- SUPABASE_PUBLIC_URL=http://20.255.61.202:8000
+
+### 2. Cập nhật stack hiện có
+
+```bash
+./update_existing_stack.sh your_stack 20.255.61.202
+```
+
+Điều này sẽ cập nhật các URL trong file .env để hỗ trợ truy cập từ bên ngoài.
+
 ## Cấu trúc thư mục
 
 ```
 docker/
   ├── deploy_supabase.sh      # Script triển khai chính
   ├── setup_nginx_auth.sh     # Script thêm Nginx Basic Auth vào stack hiện có
+  ├── update_existing_stack.sh # Script cập nhật stack hiện có
   ├── remove_stack.sh         # Script để xóa stack và giải phóng bộ nhớ
   ├── docker-compose.yml      # File cấu hình Docker Compose gốc
   ├── docker-compose.s3.yml   # File cấu hình tùy chọn cho S3
@@ -229,7 +282,7 @@ Nếu bạn gặp vấn đề xác thực không hoạt động với Kong:
 2. Khởi động stack với Nginx:
    ```bash
    cd docker/stacks/<tên_stack>
-   ./start_with_nginx.sh
+   ./start.sh
    ```
 
 ### Không thể truy cập domain .local
@@ -242,3 +295,22 @@ Nếu không thể truy cập studio.<tên_stack>.local:
    ```
 
 2. Xóa cache DNS của trình duyệt hoặc sử dụng chế độ ẩn danh
+
+### URL truy cập bên ngoài không hoạt động
+
+Nếu bạn gặp vấn đề khi truy cập từ IP/domain bên ngoài:
+
+1. Kiểm tra cấu hình URL trong file .env:
+   ```bash
+   cat stacks/<tên_stack>/.env | grep URL
+   ```
+
+2. Kiểm tra xem port có được mở trên firewall không:
+   ```bash
+   sudo ufw status
+   ```
+
+3. Cập nhật lại cấu hình URL:
+   ```bash
+   ./update_existing_stack.sh <tên_stack> <ip_or_domain>
+   ```
