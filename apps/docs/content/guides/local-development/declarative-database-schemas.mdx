@@ -7,7 +7,9 @@ subtitle: 'Manage your database schemas in one place and generate versioned migr
 
 ## Overview
 
-Declarative schemas allow you to reduce code duplications in managing [schema migrations](/docs/guides/local-development/overview#database-migrations). As your database schema evolves over time, declaring it in one place will help you iterate faster by referring to a single source of truth.
+Declarative schemas provide a developer-friendly way to maintain <InfoTooltip tooltipContent={<><p>Files of SQL statements that track the evolution of your database schema over time.<br />They allow you to version control your database schema alongside your application code.</p><p>See the <Link href="/guides/deployment/database-migrations" className="underline">database migrations</Link> guide to learn more.</p></>}>schema migrations</InfoTooltip>.
+
+[Migrations](/docs/guides/deployment/database-migrations) are traditionally managed imperatively (you provide the instructions on how exactly to change the database). This can lead to related information being scattered over multiple migration files. With declarative schemas, you instead declare the state you want your database to be in, and the instructions are generated for you.
 
 ## Schema migrations
 
@@ -202,6 +204,68 @@ alter table "public"."employees" add column "age" smallint not null;
 
 ```bash name=Terminal
 supabase start && supabase migration up
+```
+
+</$CodeTabs>
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+### Deploying your schema changes
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Log in to the Supabase CLI">
+      [Log in](/docs/reference/cli/supabase-login) via the Supabase CLI.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+<$CodeTabs>
+
+```bash name=Terminal
+supabase login
+```
+
+</$CodeTabs>
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Link your remote project">
+      Follow the on-screen prompts to [link](/docs/reference/cli/supabase-link) your remote project.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+<$CodeTabs>
+
+```bash name=Terminal
+supabase link
+```
+
+</$CodeTabs>
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Deploy database changes">
+      [Push](/docs/reference/cli/supabase-db-push) your changes to the remote database.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+<$CodeTabs>
+
+```bash name=Terminal
+supabase db push
 ```
 
 </$CodeTabs>
