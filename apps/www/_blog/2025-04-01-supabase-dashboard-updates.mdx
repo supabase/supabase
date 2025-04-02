@@ -1,7 +1,7 @@
 ---
-title: "Keeping Tabs: What's New in Supabase Studio"
+title: "Keeping Tabs on What's New in Supabase Studio"
 description: 'You guessed it: Tabs! And a bunch of upgrades to Logs, SQL, and the AI Assistant.'
-author: jordi,jonny,saxon_fletcher
+author: jordi,jonny,joshenlim,saxon_fletcher
 image: launch-week-14/day-1-supabase-ui-library/og.jpg
 thumb: launch-week-14/day-1-supabase-ui-library/thumb.jpg
 categories:
@@ -9,12 +9,12 @@ categories:
 tags:
   - launch-week
   - Studio
-date: '2025-04-01T00:00:00'
+date: '2025-04-02T00:00:00'
 toc_depth: 3
 launchweek: 14
 ---
 
-We've had a busy few months working on Studio improvements and new features—some big, some small, all designed to help you build, debug, and ship faster.
+We've had a busy few months working on Studio improvements and new features—big and small—to help you build, debug, and ship faster.
 
 Here's a quick rundown of what's new:
 
@@ -24,23 +24,18 @@ Here's a quick rundown of what's new:
   </li>
 <li>
   [**Customizable Reports**](#customizable-reports): create reports to show
-  data exactly how you need to see it
+  data exactly how you want to see it
 </li>
 <li>
-  [**SQL Blocks in Custom reports**](#sql-blocks-in-custom-reports): use SQL Snippets in blocks inside custom reports
+  [**SQL Blocks in Custom reports**](#sql-blocks-in-custom-reports): use SQL Snippets in blocks inside your custom reports
 </li>
 <li>
-  [**Inline SQL Editor**](#inline-sql-editor): use a mini SQL Editor from anywhere in the Dashboard
+  [**Inline SQL Editor**](#inline-sql-editor): use a mini SQL Editor anywhere in the Dashboard
 </li>
 <li>
-  [**Multiple assistant chats**](#----): maintain history of your Assistant chats
+  [**Multiple AI Assistant chats**](#multiple-ai-assistant-chats): maintain history of your Assistant chats
 </li>
-<li>
-  [**Multiple assistant chats**](#----): maintain history of your Assistant chats
-</li>
-<li>
-  [**Logs improvements**](#----): more detailed inspect panel and stacked charts
-</li>
+<li>[**Logs improvements**](#logs-improvements): more detailed inspect panel, and stacked charts</li>
 
 </ul>
 
@@ -50,7 +45,7 @@ This has been a common request for a long time, and should make working with dat
 
 ### Tabs in the Table Editor
 
-In the Table Editor, you can open multiple tables at a time and easily switch between them using tabs. This makes it easier to compare data, edit schemas, or reference related tables without losing your place.
+In the Table Editor, you can open multiple tables at a time and easily switch between them using tabs. This makes it easier to compare data, edit schemas, or reference related tables without losing your place. Enabled under Feature Previews ([see below](#enabling-feature-previews))
 
 <Img
   wide
@@ -76,7 +71,7 @@ The New Tab page also gives you quick access to create a new table or open a rec
 
 ### Tabs in the SQL Editor
 
-In the SQL Editor, you can now write and run multiple scripts at a time, without having to constantly change between snippets. The SQL Editor tabs also have preview mode, so you can quickly flip through snippets without leaving a bunch of tabs to clean up after.
+In the SQL Editor, you can now write and run multiple scripts at a time, without having to constantly change between snippets. The SQL Editor tabs also have preview mode, so you can quickly flip through snippets without leaving a bunch of tabs to clean up after. Enabled under Feature Previews ([see below](#enabling-feature-previews))
 
 <Img
   wide
@@ -104,7 +99,7 @@ Reports in the Dashboard recently got a refresh. You can now resize and reorder 
 
 ## SQL Blocks in custom reports
 
-We've also added inline SQL execution within blocks, so you can run your own queries directly and build fully customized, data-driven reports.
+We've also added inline SQL execution within blocks, so you can run your own queries directly and build fully customized, data-driven reports. Just create a snippet in the SQL Editor and it will be available to use here.
 
 <Img
   wide
@@ -115,7 +110,7 @@ We've also added inline SQL execution within blocks, so you can run your own que
   }}
 />
 
-You can also show your data as a table of results:
+You can show your data as a table of results:
 
 <Img
   wide
@@ -126,7 +121,7 @@ You can also show your data as a table of results:
   }}
 />
 
-Or view them as a chart:
+Or display them as a chart:
 
 <Img
   wide
@@ -141,7 +136,7 @@ The sky is the limit for these. You could query a Foreign Data Wrapper, join mul
 
 ## Inline SQL Editor
 
-You can now run SQL from anywhere in the Dashboard via the Inline SQL Editor. You can query and modify tables, add triggers, functions, RLS policies, and anything else you can do from the main SQL Editor, anywhere in the Dashboard.
+You can now run SQL from anywhere in the Dashboard via the Inline SQL Editor. You can query and modify tables, add triggers, functions, RLS policies, and anything else you can do from the main SQL Editor, anywhere in the Dashboard. Enabled under Feature Previews ([see below](#enabling-feature-previews)).
 
 <Img
   wide
@@ -154,10 +149,9 @@ You can now run SQL from anywhere in the Dashboard via the Inline SQL Editor. Yo
 
 ## Multiple AI Assistant chats
 
-You can now create and store multiple chats in the AI Assistant. Create, rename, switch to and delete chats, all without losing your place. Chats are scoped to the current project, so switching project also switches chat. The chat history is stored in local storage.
+The AI Assistant now lets you create and store multiple chats. Create, rename, switch to and delete chats, all without losing your place. Chats are scoped to the current project, so switching your project also switches chat history. The chat history is stored in local storage.
 
 <Img
-  wide
   alt="Customizable reports"
   src={{
     dark: '/images/blog/launch-week-14/day-3/build-stage/chat-history.jpg',
@@ -167,38 +161,56 @@ You can now create and store multiple chats in the AI Assistant. Create, rename,
 
 ## Logs improvements
 
-We've improved the Logs experience over the past few months.
+We've been working hard at improving the Logs experience over the past few months.
 
-First, we've updated the [log detail panel](https://github.com/supabase/supabase/pull/33536) to shows more info in the API log detail
+First, we've updated the [Log detail panel](https://github.com/supabase/supabase/pull/33536) to shows more info in the API log detail:
 
 <Img
   wide
-  alt="Customizable reports"
+  alt="New Logs detail panel"
   src={{
     dark: '/images/blog/launch-week-14/day-3/build-stage/log-detail-panel.jpg',
     light: '/images/blog/launch-week-14/day-3/build-stage/log-detail-panel-light.jpg',
   }}
 />
 
-You can now quickly add a property to search and filter the results:
+You can also quickly add a property or value from the detail panel to search and filter the results:
 
 <Img
-  wide
-  alt="Customizable reports"
+  alt="Logs property search"
   src={{
-    dark: '/images/blog/launch-week-14/day-3/build-stage/log-detail-panel.jpg',
-    light: '/images/blog/launch-week-14/day-3/build-stage/log-detail-panel-light.jpg',
+    dark: '/images/blog/launch-week-14/day-3/build-stage/logs-search.jpg',
+    light: '/images/blog/launch-week-14/day-3/build-stage/logs-search-light.jpg',
   }}
 />
 
-Add http status to available filters:
+And we've added http status to available filters to help you narrow in on specific logs while debugging:
 
 <Img
-  wide
   alt="Customizable reports"
   src={{
     dark: '/images/blog/launch-week-14/day-3/build-stage/http-filters.jpg',
     light: '/images/blog/launch-week-14/day-3/build-stage/http-filters-light.jpg',
+  }}
+/>
+
+## Enabling Feature Previews
+
+Tabs and the Inline SQL Editor can be enabled via Feature Preview. Click your user avatar in the bottom right and click Feature previews.
+
+<Img
+  alt="Click your user avatar"
+  src={{
+    dark: '/images/blog/launch-week-14/day-3/build-stage/avatar.jpg',
+    light: '/images/blog/launch-week-14/day-3/build-stage/avatar-light.jpg',
+  }}
+/>
+
+<Img
+  alt="Enable features via Preview"
+  src={{
+    dark: '/images/blog/launch-week-14/day-3/build-stage/feature-preview.jpg',
+    light: '/images/blog/launch-week-14/day-3/build-stage/feature-preview-light.jpg',
   }}
 />
 
