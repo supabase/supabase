@@ -140,10 +140,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     shipped: true,
     isToday: true,
     hasCountdown: false,
-    blog: '/blog/realtime-database-broadcast',
+    blog: '/blog/realtime-broadcast-from-database',
     date: '02 April',
     published_at: '2025-04-02T07:00:00.000-07:00',
-    title: 'Realtime Broadcast from Database',
+    title: 'Realtime: Broadcast from Database',
     description: <>Realtime: Broadcast from Database</>,
     links: [
       {
