@@ -116,6 +116,7 @@ export function DiskManagementForm() {
           }
         }
       },
+      enabled: !isFlyArchitecture,
     }
   )
   const { isSuccess: isAddonsSuccess } = useProjectAddonsQuery({ projectRef })

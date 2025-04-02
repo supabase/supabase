@@ -332,10 +332,6 @@ export const formatNumber = (num: number): string => {
   return num.toLocaleString('en-US')
 }
 
-export const showMicroUpgrade = (
-  plan: PlanId,
-  infraComputeSize: InfraInstanceSize,
-  cloudProvider: string
-): boolean => {
-  return plan !== 'free' && infraComputeSize === 'nano' && cloudProvider !== 'FLY'
+export const showMicroUpgrade = (plan: PlanId, infraComputeSize: InfraInstanceSize): boolean => {
+  return plan !== 'free' && infraComputeSize === 'nano'
 }

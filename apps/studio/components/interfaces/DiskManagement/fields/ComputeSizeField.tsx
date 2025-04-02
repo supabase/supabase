@@ -98,8 +98,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
 
   const showUpgradeBadge = showMicroUpgrade(
     subscription?.plan.id ?? 'free',
-    project?.infra_compute_size ?? 'nano',
-    project?.cloud_provider ?? 'AWS'
+    project?.infra_compute_size ?? 'nano'
   )
 
   return (
