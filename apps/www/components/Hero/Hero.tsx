@@ -20,8 +20,13 @@ const Hero = () => {
                     <AnnouncementBadge
                       url="/launch-week#day-3"
                       badge="LW14: Day 3"
-                      announcement={<></>}
-                      className="[&_.announcement-badge]:!text-xs [&_.announcement-text]:!text-xs"
+                      announcement={
+                        <>
+                          Realtime Broadcast{' '}
+                          <span className="hidden sm:inline"> from Database</span>
+                        </>
+                      }
+                      className="[&_a]:sm:gap-4 [&_.announcement-badge]:!text-xs [&_.announcement-text]:!text-xs [&_.announcement-badge]:sm:!text-sm [&_.announcement-text]:sm:!text-sm"
                       style={{
                         fontFamily:
                           'Departure Mono, Source Code Pro, Office Code Pro, Menlo, monospace',

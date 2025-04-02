@@ -140,22 +140,36 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     shipped: true,
     isToday: true,
     hasCountdown: false,
-    blog: '',
+    blog: '/blog/realtime-database-broadcast',
     date: '02 April',
     published_at: '2025-04-02T07:00:00.000-07:00',
-    title: '',
-    description: null,
+    title: 'Realtime Broadcast from Database',
+    description: 'Realtime Broadcast from Database',
     links: [
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
+      {
+        type: 'video',
+        href: 'vRorVm_UbhA',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1zqKVjoPQzLKB',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        url: '#',
+        blog: '#',
+        bg_layers: [
+          {
+            img: '/images/launchweek/14/releases/d3/day-3-dark.svg',
+            mobileImg: '/images/launchweek/14/releases/d3/day-3-dark-mobile.svg',
+            imgLight: '/images/launchweek/14/releases/d3/day-3-light.svg',
+            mobileImgLight: '/images/launchweek/14/releases/d3/day-3-light-mobile.svg',
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'day-4',
