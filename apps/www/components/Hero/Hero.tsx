@@ -18,15 +18,10 @@ const Hero = () => {
                 <div className="flex flex-col items-center">
                   <div className="z-40 w-full flex justify-center -mt-4 lg:-mt-12 mb-8">
                     <AnnouncementBadge
-                      url="/launch-week#day-2"
-                      badge="LW14: Day 2"
-                      announcement={
-                        <>
-                          <span className="hidden sm:inline">Deploy </span>Edge Functions
-                          <span className="hidden sm:inline"> from Dashboard + Deno 2.1</span>
-                        </>
-                      }
-                      className="[&_.announcement-badge]:!text-xs [&_.announcement-text]:!text-xs"
+                      url="/launch-week#day-3"
+                      badge="LW14: Day 3"
+                      announcement="Realtime: Broadcast from Database"
+                      className="[&_a]:sm:gap-4 [&_.announcement-badge]:!text-xs [&_.announcement-text]:!text-xs [&_.announcement-badge]:sm:!text-sm [&_.announcement-text]:sm:!text-sm"
                       style={{
                         fontFamily:
                           'Departure Mono, Source Code Pro, Office Code Pro, Menlo, monospace',
