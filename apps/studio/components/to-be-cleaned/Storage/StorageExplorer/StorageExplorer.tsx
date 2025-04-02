@@ -24,7 +24,6 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   const storageExplorerStore = useStorageStore()
   const {
     columns,
-    selectedFilePreview,
     closeFilePreview,
     selectedItems,
     setSelectedItems,
@@ -182,7 +181,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
     <div
       ref={storageExplorerRef}
       className="
-        bg-studio
+        bg-studio border rounded-md
         border-overlay flex
         h-full w-full flex-col"
     >
