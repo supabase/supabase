@@ -3,21 +3,18 @@ title: Realtime Chat
 description: Real-time chat component for collaborative applications
 ---
 
-<div className="flex flex-row -space-x-px w-full">
-  <BlockPreview name="realtime-chat" isPair />
-  <BlockPreview name="realtime-chat" isPair />
-</div>
+<DualRealtimeChat />
 
 ## Installation
 
 <BlockItem
-  name="realtime-chat-nextjs"
+  name="realtime-chat-react-router"
   description="Renders a real-time chat interface for users in a shared room."
 />
 
 ## Folder structure
 
-<RegistryBlock itemName="realtime-chat-nextjs" />
+<RegistryBlock itemName="realtime-chat-react-router" />
 
 ## Introduction
 
@@ -84,7 +81,7 @@ export default function ChatPage() {
 | `onMessage?` | `(messages: ChatMessage[]) => void` | Optional callback to handle messages, useful for persistence. |
 | `messages?`  | `ChatMessage[]`                     | Optional initial messages to display in the chat.             |
 
-### ChatMessage Type
+### ChatMessage type
 
 ```typescript
 interface ChatMessage {
@@ -96,3 +93,8 @@ interface ChatMessage {
   createdAt: string
 }
 ```
+
+## Further reading
+
+- [Realtime Broadcast](https://supabase.com/docs/guides/realtime/broadcast)
+- [Realtime authorization](https://supabase.com/docs/guides/realtime/authorization)

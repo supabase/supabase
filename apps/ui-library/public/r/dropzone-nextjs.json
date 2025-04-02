@@ -7,12 +7,11 @@
   "dependencies": [
     "react-dropzone",
     "lucide-react",
-    "@supabase/ssr@latest"
+    "@supabase/ssr@latest",
+    "@supabase/supabase-js@latest"
   ],
   "registryDependencies": [
-    "button",
-    "tooltip",
-    "progress"
+    "button"
   ],
   "files": [
     {

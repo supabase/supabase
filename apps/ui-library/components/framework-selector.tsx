@@ -33,10 +33,18 @@ export function FrameworkSelector() {
   }
 
   // Get the supported frameworks for this component
-  const supportedFrameworks = componentPages[docTitle]?.supportedFrameworks || []
+  const componentItem = componentPages.items.find(
+    (item) => item.href?.split('/').pop() === docTitle.toLowerCase()
+  )
+  // Use the supportedFrameworks property if it exists, otherwise default to all frameworks
+  const supportedFrameworks = componentItem?.supportedFrameworks
+
+  if (!supportedFrameworks) {
+    return null
+  }
 
   // Don't show selector if component only supports one framework
-  if (supportedFrameworks.length <= 1) {
+  if (supportedFrameworks && supportedFrameworks.length <= 1) {
     return null
   }
 
@@ -54,14 +62,15 @@ export function FrameworkSelector() {
     setPreferredFramework(value as keyof typeof frameworkTitles)
   }
 
-  const options = supportedFrameworks.map((f) => ({
-    label: frameworkTitles[f],
-    value: f,
-  }))
+  const options =
+    supportedFrameworks?.map((f) => ({
+      label: frameworkTitles[f],
+      value: f,
+    })) || []
 
   return (
     <Select_Shadcn_ value={selectedFramework} onValueChange={onSelect}>
-      <SelectTrigger_Shadcn_ className="w-[180px]">
+      <SelectTrigger_Shadcn_ className="w-[180px] mt-4 lg:mt-0">
         <SelectValue_Shadcn_ />
       </SelectTrigger_Shadcn_>
       <SelectContent_Shadcn_>

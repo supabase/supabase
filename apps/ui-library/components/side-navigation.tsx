@@ -1,44 +1,15 @@
-'use client'
+import Link from 'next/link'
 
 import NavigationItem from '@/components/side-navigation-item'
 import { aiEditorsRules, componentPages, gettingStarted } from '@/config/docs'
-import { useFramework } from '@/context/framework-context'
-import Link from 'next/link'
 import { CommandMenu } from './command-menu'
 import { ThemeSwitcherDropdown } from './theme-switcher-dropdown'
 
 function SideNavigation() {
-  const { framework: preferredFramework } = useFramework()
-
-  // Create a function to build URLs
-  const buildUrl = (slug: string, framework?: string) => {
-    if (!framework) return `/docs/${slug}`
-    return `/docs/${framework}/${slug}`
-  }
-
-  // Get all component pages
-  const componentItems = Object.entries(componentPages).map(([slug, component]) => {
-    let frameworkToUse = undefined
-
-    // Add framework param only if needed
-    if (preferredFramework && component.supportedFrameworks.includes(preferredFramework)) {
-      frameworkToUse = preferredFramework
-    } else if (component.supportedFrameworks.length > 0) {
-      frameworkToUse = component.supportedFrameworks[0]
-    }
-
-    return {
-      title: component.title,
-      href: buildUrl(slug, frameworkToUse),
-      items: [],
-      commandItemLabel: component.commandItemLabel,
-    }
-  })
-
   return (
     <nav className="flex flex-col h-full min-w-[220px]">
       <div className="p-6">
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between mb-4">
           <Link href="/">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -46,7 +17,7 @@ function SideNavigation() {
               height="113"
               viewBox="0 0 109 113"
               fill="none"
-              className="w-6 h-6 mb-4"
+              className="w-6 h-6"
             >
               <path
                 d="M63.7076 110.284C60.8481 113.885 55.0502 111.912 54.9813 107.314L53.9738 40.0625L99.1935 40.0625C107.384 40.0625 111.952 49.5226 106.859 55.9372L63.7076 110.284Z"
@@ -109,8 +80,11 @@ function SideNavigation() {
         </div>
         <div className="space-y-0.5">
           {/* Render items based on component definitions */}
-          {componentItems.map((item, i) => (
-            <NavigationItem item={item} key={`${item.href?.toString() || item.title}-${i}`} />
+          {componentPages.items.map((component, i) => (
+            <NavigationItem
+              item={component}
+              key={`${component.href?.toString() || component.title}-${i}`}
+            />
           ))}
         </div>
       </div>

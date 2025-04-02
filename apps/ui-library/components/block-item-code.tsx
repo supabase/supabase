@@ -91,8 +91,8 @@ export function BlockItemCode({ files }: BlockItemCodeProps) {
               isSelected={isSelected}
               level={level}
               icon={<File strokeWidth={1.5} size={16} className="shrink-0" />}
-              xPadding={16}
               name={element.name}
+              className="gap-1.5"
             />
           )}
         />

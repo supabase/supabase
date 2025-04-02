@@ -242,7 +242,10 @@ export function DiskManagementForm() {
       ) {
         willUpdateDiskConfiguration = true
 
-        if (RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(payload.computeSize)) {
+        if (
+          payload.storageType === 'gp3' &&
+          RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(payload.computeSize)
+        ) {
           payload.provisionedIOPS = IOPS_RANGE[DiskType.GP3].min
         }
 

@@ -277,8 +277,13 @@
       "type": "registry:component",
       "title": "Dropzone (File Upload)",
       "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
-      "registryDependencies": ["button", "tooltip", "progress"],
-      "dependencies": ["react-dropzone", "lucide-react", "@supabase/ssr@latest"],
+      "registryDependencies": ["button"],
+      "dependencies": [
+        "react-dropzone",
+        "lucide-react",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
       "files": [
         {
           "path": "registry/default/blocks/dropzone/components/dropzone.tsx",
@@ -308,7 +313,7 @@
       "type": "registry:component",
       "title": "Dropzone (File Upload)",
       "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
-      "registryDependencies": ["button", "tooltip", "progress"],
+      "registryDependencies": ["button"],
       "dependencies": ["react-dropzone", "lucide-react", "@supabase/supabase-js@latest"],
       "files": [
         {
@@ -331,7 +336,7 @@
       "type": "registry:component",
       "title": "Dropzone (File Upload)",
       "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
-      "registryDependencies": ["button", "tooltip", "progress"],
+      "registryDependencies": ["button"],
       "dependencies": [
         "react-dropzone",
         "lucide-react",
@@ -363,7 +368,7 @@
       "type": "registry:component",
       "title": "Dropzone (File Upload)",
       "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
-      "registryDependencies": ["button", "tooltip", "progress"],
+      "registryDependencies": ["button"],
       "dependencies": [
         "react-dropzone",
         "lucide-react",
@@ -396,7 +401,7 @@
       "title": "Realtime Cursor",
       "description": "Component which renders realtime cursors from other users in a room.",
       "registryDependencies": [],
-      "dependencies": ["lucide-react", "@supabase/ssr@latest"],
+      "dependencies": ["lucide-react", "@supabase/ssr@latest", "@supabase/supabase-js@latest"],
       "files": [
         {
           "path": "registry/default/blocks/realtime-cursor/components/cursor.tsx",
@@ -520,7 +525,7 @@
       "title": "Current User Avatar",
       "description": "Component which renders the current user's avatar.",
       "registryDependencies": ["avatar"],
-      "dependencies": ["@supabase/ssr@latest"],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
       "files": [
         {
           "path": "registry/default/blocks/current-user-avatar/components/current-user-avatar.tsx",
@@ -644,7 +649,7 @@
       "title": "Avatar Stack with Realtime Presence",
       "description": "Component which stack of avatars, tracked by realtime presence.",
       "registryDependencies": ["avatar", "tooltip"],
-      "dependencies": ["@supabase/ssr@latest"],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
       "files": [
         {
           "path": "registry/default/blocks/realtime-avatar-stack/components/avatar-stack.tsx",
@@ -800,7 +805,7 @@
       "title": "Realtime Chat",
       "description": "Component which renders realtime chat messages from other users in a room.",
       "registryDependencies": ["input", "button"],
-      "dependencies": ["lucide-react", "@supabase/ssr@latest"],
+      "dependencies": ["lucide-react", "@supabase/ssr@latest", "@supabase/supabase-js@latest"],
       "files": [
         {
           "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
@@ -940,7 +945,8 @@
       "title": "Supabase Client for Next.js",
       "description": "",
       "registryDependencies": [],
-      "dependencies": ["@supabase/ssr@latest"],
+      "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "docs": "You'll need to add a `.env` file with the following environment variables to your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.",
       "files": [
         {
           "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
@@ -964,6 +970,7 @@
       "description": "",
       "registryDependencies": [],
       "dependencies": ["@supabase/supabase-js@latest"],
+      "docs": "You'll need to add a `.env` file with the following environment variables to your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.",
       "files": [
         {
           "path": "registry/default/clients/react/lib/supabase/client.ts",
@@ -979,6 +986,7 @@
       "description": "",
       "registryDependencies": [],
       "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "docs": "You'll need to add a `.env` file with the following environment variables to your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.",
       "files": [
         {
           "path": "registry/default/clients/react-router/lib/supabase/client.ts",
@@ -998,6 +1006,7 @@
       "description": "",
       "registryDependencies": [],
       "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+      "docs": "You'll need to add a `.env` file with the following environment variables to your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.",
       "files": [
         {
           "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
@@ -1021,27 +1030,27 @@
         {
           "path": "registry/default/ai-editor-rules/create-db-functions.md",
           "type": "registry:file",
-          "target": ".rules/create-db-functions.md"
+          "target": ".cursor/rules/create-db-functions.md"
         },
         {
           "path": "registry/default/ai-editor-rules/create-migration.md",
           "type": "registry:file",
-          "target": ".rules/create-migration.md"
+          "target": ".cursor/rules/create-migration.md"
         },
         {
           "path": "registry/default/ai-editor-rules/create-rls-policies.md",
           "type": "registry:file",
-          "target": ".rules/create-rls-policies.md"
+          "target": ".cursor/rules/create-rls-policies.md"
         },
         {
           "path": "registry/default/ai-editor-rules/postgres-sql-style-guide.md",
           "type": "registry:file",
-          "target": ".rules/postgres-sql-style-guide.md"
+          "target": ".cursor/rules/postgres-sql-style-guide.md"
         },
         {
           "path": "registry/default/ai-editor-rules/writing-supabase-edge-functions.md",
           "type": "registry:file",
-          "target": ".rules/writing-supabase-edge-functions.md"
+          "target": ".cursor/rules/writing-supabase-edge-functions.md"
         }
       ]
     }
