@@ -3,6 +3,7 @@
 import { ReactNode } from 'react'
 import { type ClassValue } from 'clsx'
 import { PRODUCT_MODULES } from 'shared-data/products'
+import { AppWindow } from 'lucide-react'
 
 export interface AdventDay {
   icon?: ReactNode // use svg jsx with 34x34px viewport
@@ -136,39 +137,6 @@ export const days: AdventDay[] = [
         target: '_blank',
       },
     ],
-    icon: (
-      <svg
-        width="166"
-        height="166"
-        viewBox="0 0 166 166"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M28 34.875C24.203 34.875 21.125 37.953 21.125 41.75V124.25C21.125 128.047 24.203 131.125 28 131.125H138C141.797 131.125 144.875 128.047 144.875 124.25V41.75C144.875 37.953 141.797 34.875 138 34.875H28ZM7.375 41.75C7.375 30.3591 16.6091 21.125 28 21.125H138C149.391 21.125 158.625 30.3591 158.625 41.75V124.25C158.625 135.641 149.391 144.875 138 144.875H28C16.6091 144.875 7.375 135.641 7.375 124.25V41.75Z"
-          fill="#FAFAFA"
-        />
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M69.25 21.125C73.047 21.125 76.125 24.203 76.125 28V55.5C76.125 59.297 73.047 62.375 69.25 62.375C65.453 62.375 62.375 59.297 62.375 55.5V28C62.375 24.203 65.453 21.125 69.25 21.125Z"
-          fill="#FAFAFA"
-        />
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M7.375 55.5C7.375 51.703 10.453 48.625 14.25 48.625H151.75C155.547 48.625 158.625 51.703 158.625 55.5C158.625 59.297 155.547 62.375 151.75 62.375H14.25C10.453 62.375 7.375 59.297 7.375 55.5Z"
-          fill="#FAFAFA"
-        />
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M41.75 21.125C45.547 21.125 48.625 24.203 48.625 28V55.5C48.625 59.297 45.547 62.375 41.75 62.375C37.953 62.375 34.875 59.297 34.875 55.5V28C34.875 24.203 37.953 21.125 41.75 21.125Z"
-          fill="#FAFAFA"
-        />
-      </svg>
-    ),
+    icon: <AppWindow size={30} />,
   },
 ]
