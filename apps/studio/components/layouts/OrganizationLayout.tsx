@@ -8,6 +8,7 @@ import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
 import { useVercelRedirectQuery } from 'data/integrations/vercel-redirect-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { withAuth } from 'hooks/misc/withAuth'
 import { IS_PLATFORM } from 'lib/constants'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
 import { SidebarSection } from './AccountLayout/AccountLayout.types'
@@ -153,4 +154,4 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   }
 }
 
-export default OrganizationLayout
+export default withAuth(OrganizationLayout)
