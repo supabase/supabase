@@ -7,9 +7,11 @@ import ProductHeader from '~/components/Sections/ProductHeader2'
 
 import content from '~/data/solutions/ai-builders'
 import EnterpriseLogos from '../../components/Enterprise/EnterpriseLogos'
+import SectionContainer from '../../components/Layouts/SectionContainer'
 
 const UseCases = dynamic(() => import('components/Solutions/UseCases'))
 const WhySupabase = dynamic(() => import('~/components/Solutions/FeaturesSection'))
+const FeaturesGrid = dynamic(() => import('~/components/Solutions/FeaturesGrid'))
 
 const Enterprise: NextPage = () => (
   <>
@@ -37,7 +39,7 @@ const Enterprise: NextPage = () => (
       />
       <UseCases {...content['use-cases']} />
       <WhySupabase {...content.why} />
-      {/* <EnterprisePerformance {...content.performance} /> */}
+      <FeaturesGrid {...content.features} />
       {/* <EnterpriseSecurity {...content.security} /> */}
       {/* <EnterpriseQuote {...content.quote} /> */}
       {/* <CTAForm /> */}
