@@ -14,7 +14,7 @@ interface UpgradeToProProps {
   icon?: ReactNode
   primaryText: string
   secondaryText: string
-  addon?: 'pitr' | 'customDomain' | 'computeInstance'
+  addon?: 'pitr' | 'customDomain'
   buttonText?: string
   source?: string
   disabled?: boolean
