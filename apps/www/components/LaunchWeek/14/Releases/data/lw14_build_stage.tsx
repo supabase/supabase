@@ -30,6 +30,7 @@ export const days: AdventDay[] = [
     description: 'Initial Release',
     id: 'clerk',
     is_shipped: true,
+    className: 'sm:col-span-2',
     links: [
       {
         url: '/blog/postgres-language-server',
@@ -138,12 +139,14 @@ export const days: AdventDay[] = [
       },
     ],
     icon: <AppWindow size={30} />,
+    className: 'xl:col-span-2',
   },
   {
     title: 'Dedicated Poolers',
     description: 'Dedicated pgbouncer instance co-located with your database',
     id: 'dedicated-poolers',
     is_shipped: true,
+    className: 'xl:col-span-2',
     links: [
       {
         url: '/blog/dedicated-poolers',
