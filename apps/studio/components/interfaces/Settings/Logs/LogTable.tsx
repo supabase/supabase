@@ -1,32 +1,20 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { isEqual } from 'lodash'
-import { ChevronDown, Clipboard, Download, Eye, EyeOff, Play } from 'lucide-react'
-import Papa from 'papaparse'
-import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Clipboard, Eye, EyeOff, Play } from 'lucide-react'
+import { Key, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { Item, Menu, useContextMenu } from 'react-contexify'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import { createPortal } from 'react-dom'
-import { toast } from 'sonner'
 
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import CSVButton from 'components/ui/CSVButton'
+import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { copyToClipboard } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { ResponseError } from 'types'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-  cn,
-} from 'ui'
+import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
 import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
 import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresColumnRender'
@@ -93,11 +81,11 @@ const LogTable = ({
   selectedLogError,
   onSelectedLogChange,
 }: Props) => {
+  const { ref } = useParams()
   const { profile } = useProfile()
   const [selectedLogId] = useSelectedLog()
   const { show: showContextMenu } = useContextMenu()
 
-  const downloadCsvRef = useRef<HTMLDivElement>(null)
   const [cellPosition, setCellPosition] = useState<any>()
   const [selectionOpen, setSelectionOpen] = useState(false)
   const [selectedRow, setSelectedRow] = useState<LogData | null>(null)
@@ -188,7 +176,6 @@ const LogTable = ({
     }
   }
 
-  const stringData = useMemo(() => JSON.stringify(data), [data])
   const [dedupedData, logMap] = useMemo<[LogData[], LogMap]>(() => {
     const deduped = [...new Set(data)] as LogData[]
 
@@ -245,54 +232,12 @@ const LogTable = ({
       )}
     >
       <div className="flex items-center gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button type="text" iconRight={<ChevronDown size={14} />}>
-              Results {data && data.length ? `(${data.length})` : ''}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuItem
-              onClick={() => {
-                downloadCsvRef.current?.click()
-              }}
-              className="space-x-2"
-            >
-              <Download size={14} />
-              <div>Download CSV</div>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                const csvData = Papa.unparse(data)
-                copyToClipboard(csvData, () => {
-                  toast.success('Results copied to clipboard')
-                })
-              }}
-              className="space-x-2"
-            >
-              <Clipboard size={14} />
-              <div>Copy as CSV</div>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                copyToClipboard(stringData, () => {
-                  toast.success('Results copied to clipboard')
-                })
-              }}
-              className="space-x-2"
-            >
-              <Clipboard size={14} />
-              <div>Copy as JSON</div>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      {/* Using .hidden with a ref so I don't have to duplicate the code to download the CSV - Jordi */}
-      <div className="hidden">
-        <CSVButton buttonType={'text'} data={data}>
-          <div ref={downloadCsvRef}>Download CSV</div>
-        </CSVButton>
+        <DownloadResultsButton
+          type="text"
+          text={`Results ${data && data.length ? `(${data.length})` : ''}`}
+          results={data}
+          fileName={`supabase-logs-${ref}.csv`}
+        />
       </div>
 
       {showHistogramToggle && (
