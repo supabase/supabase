@@ -33,7 +33,10 @@ const ConnectCallout: FC<{ className?: string }> = ({ className }) => (
     <p className="text-foreground-lighter">
       Set up a Supabase OAuth app so your users can start interacting with their Supabase Project.
     </p>
-    <TextLink url="https://supabase.com/docs/guides/auth/auth-google" label="View docs" />
+    <TextLink
+      url="https://supabase.com/docs/guides/integrations/build-a-supabase-integration"
+      label="View docs"
+    />
   </div>
 )
 
