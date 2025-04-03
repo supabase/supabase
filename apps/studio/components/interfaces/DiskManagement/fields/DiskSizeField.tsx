@@ -43,7 +43,10 @@ export function DiskSizeField({
     isLoading: isLoadingDiskAttributes,
     error: diskAttributesError,
     isError: isDiskAttributesError,
-  } = useDiskAttributesQuery({ projectRef })
+  } = useDiskAttributesQuery(
+    { projectRef },
+    { enabled: project && project.cloud_provider !== 'FLY' }
+  )
   const {
     data: subscription,
     error: subscriptionError,
@@ -55,9 +58,12 @@ export function DiskSizeField({
     data: diskUtil,
     error: diskUtilError,
     isError: isDiskUtilizationError,
-  } = useDiskUtilizationQuery({
-    projectRef: projectRef,
-  })
+  } = useDiskUtilizationQuery(
+    {
+      projectRef: projectRef,
+    },
+    { enabled: project && project.cloud_provider !== 'FLY' }
+  )
 
   const error = subscriptionError || diskUtilError || diskAttributesError
   const isError = isSubscriptionError || isDiskUtilizationError || isDiskAttributesError

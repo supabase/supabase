@@ -207,6 +207,9 @@ const Wizard: NextPageWithLayout = () => {
     onSuccess: (res) => {
       sendEvent({
         action: 'project_creation_simple_version_submitted',
+        properties: {
+          instanceSize: form.getValues('instanceSize'),
+        },
       })
       router.push(`/project/${res.ref}/building`)
     },
@@ -303,6 +306,12 @@ const Wizard: NextPageWithLayout = () => {
       values.instanceSize &&
       !sizesWithNoCostConfirmationRequired.includes(values.instanceSize as DesiredInstanceSize)
     ) {
+      sendEvent({
+        action: 'project_creation_simple_version_confirm_modal_opened',
+        properties: {
+          instanceSize: values.instanceSize,
+        },
+      })
       setIsComputeCostsConfirmationModalVisible(true)
     } else {
       await onSubmit(values)
