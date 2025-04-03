@@ -1,3 +1,4 @@
+import saveAs from 'file-saver'
 import { ChevronDown, Clipboard, Download } from 'lucide-react'
 import { markdownTable } from 'markdown-table'
 import Papa from 'papaparse'
@@ -54,17 +55,9 @@ export const DownloadResultsButton = ({
   }, [results])
 
   const downloadAsCSV = () => {
-    const csv = Papa.unparse(formattedResults)
-    const blob = new Blob([csv], { type: 'text/csv' })
-    const a = document.createElement('a')
-    a.download = fileName
-    a.href = URL.createObjectURL(blob)
-    a.dataset.downloadurl = ['text/csv', a.download, a.href].join(':')
-    a.style.display = 'none'
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-
+    const csv = Papa.unparse(formattedResults, { columns: headers })
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    saveAs(blob, `${fileName}.csv`)
     toast.success('Downloading results as CSV')
     onDownloadAsCSV?.()
   }
