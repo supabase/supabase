@@ -15,6 +15,7 @@ import {
   ContextMenuSeparator_Shadcn_,
   ContextMenuTrigger_Shadcn_,
 } from 'ui'
+import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { HeaderCell } from './UsersGridComponents'
 import { ColumnConfiguration, USERS_TABLE_COLUMNS } from './UsersV2'
 
@@ -298,7 +299,16 @@ export const formatUserColumns = ({
           value !== null && ['created_at', 'last_sign_in_at'].includes(col.id)
             ? dayjs(value).format('ddd DD MMM YYYY HH:mm:ss [GMT]ZZ')
             : Array.isArray(value)
-              ? value.join(', ')
+              ? col.id === 'providers'
+                ? value
+                    .map((x) => {
+                      const meta = PROVIDERS_SCHEMAS.find(
+                        (y) => ('key' in y && y.key === x) || y.title.toLowerCase() === x
+                      )
+                      return meta?.title
+                    })
+                    .join(', ')
+                : value.join(', ')
               : value
         const isConfirmed = !!user?.confirmed_at
 
