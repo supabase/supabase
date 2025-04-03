@@ -120,19 +120,21 @@ const InputField = ({
         error={errors[field.name]}
         onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         actions={
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button type="default" icon={<Edit />} className="px-1.5" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-28">
-              {field.isNullable && (
-                <DropdownMenuItem onClick={() => onUpdateField({ [field.name]: null })}>
-                  Set to NULL
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem onClick={onSelectForeignKey}>Select record</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          isEditable && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button type="default" icon={<Edit />} className="px-1.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-28">
+                {field.isNullable && (
+                  <DropdownMenuItem onClick={() => onUpdateField({ [field.name]: null })}>
+                    Set to NULL
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={onSelectForeignKey}>Select record</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )
         }
       />
     )
@@ -175,21 +177,23 @@ const InputField = ({
                   : `NULL (Default: ${field.defaultValue})`
           }
           actions={
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="default" icon={<Edit />} className="px-1.5" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-28">
-                <DropdownMenuItem onClick={() => onUpdateField({ [field.name]: null })}>
-                  Set to NULL
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => onEditText({ column: field.name, value: field.value || '' })}
-                >
-                  Expand editor
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            isEditable && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button type="default" icon={<Edit />} className="px-1.5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-28">
+                  <DropdownMenuItem onClick={() => onUpdateField({ [field.name]: null })}>
+                    Set to NULL
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => onEditText({ column: field.name, value: field.value || '' })}
+                  >
+                    Expand editor
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )
           }
           onChange={(event) => onUpdateField({ [field.name]: event.target.value })}
         />
@@ -223,14 +227,16 @@ const InputField = ({
         error={errors[field.name]}
         onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         actions={
-          <Button
-            type="default"
-            htmlType="button"
-            onClick={() => onEditJson({ column: field.name, value: field.value })}
-            icon={<Edit2 />}
-          >
-            Edit JSON
-          </Button>
+          isEditable && (
+            <Button
+              type="default"
+              htmlType="button"
+              onClick={() => onEditJson({ column: field.name, value: field.value })}
+              icon={<Edit2 />}
+            >
+              Edit JSON
+            </Button>
+          )
         }
       />
     )
@@ -250,6 +256,7 @@ const InputField = ({
           </>
         }
         onChange={(value: any) => onUpdateField({ [field.name]: value })}
+        disabled={!isEditable}
       />
     )
   }
@@ -275,6 +282,7 @@ const InputField = ({
         <Select_Shadcn_
           value={defaultValue === null ? 'null' : defaultValue}
           onValueChange={(value: string) => onUpdateField({ [field.name]: value })}
+          disabled={!isEditable}
         >
           <SelectTrigger_Shadcn_>
             <SelectValue_Shadcn_ placeholder="Select a value" />
