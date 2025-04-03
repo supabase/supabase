@@ -55,7 +55,7 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
         payload.description = values.description
       if (selectedKeyId !== selectedSecret?.key_id) {
         let encryptionKeyId = selectedKeyId
-        if (values.keyId === 'create-new') {
+        if (encryptionKeyId === 'create-new') {
           const addKeyRes = await addKeyMutation({
             projectRef: project?.ref!,
             connectionString: project?.connectionString,
@@ -122,7 +122,7 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
               id: selectedSecret?.id!,
               connectionString: project?.connectionString,
             },
-            { enabled: !!(project?.ref && selectedSecret?.id) }
+            { enabled: selectedSecret !== undefined && !!(project?.ref && selectedSecret?.id) }
           )
 
           // [Joshen] JFYI this is breaking rules of hooks, will be fixed once we move to
@@ -164,7 +164,6 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
               <Modal.Separator />
               <Modal.Content className="space-y-4">
                 <EncryptionKeySelector
-                  id="keyId"
                   nameId="keyName"
                   label="Select a key to encrypt your secret with"
                   labelOptional="Optional"

@@ -42,6 +42,10 @@ export const useGitHubConnectionsQuery = <TData = GitHubConnectionsData>(
   return useQuery<GitHubConnectionsData, GitHubConnectionsError, TData>(
     integrationKeys.githubConnectionsList(organizationId),
     ({ signal }) => getGitHubConnections({ organizationId }, signal),
-    { enabled: enabled && typeof organizationId !== 'undefined', ...options }
+    {
+      enabled: enabled && typeof organizationId !== 'undefined',
+      staleTime: 30 * 60 * 1000, // 30 minutes
+      ...options,
+    }
   )
 }

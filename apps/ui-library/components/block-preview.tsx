@@ -19,7 +19,7 @@ export function BlockPreview({ name, wide = false, isPair = false }: ComponentPr
           }
         >
           <iframe
-            src={`/ui/example/${name}`}
+            src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/example/${name}`}
             style={{
               border: 'none',
               width: '100%',
@@ -39,7 +39,7 @@ export function BlockPreview({ name, wide = false, isPair = false }: ComponentPr
     <div className={cn('mt-4 w-full', wideClasses)}>
       <div
         className={cn(
-          'relative border rounded-lg overflow-hidden bg-muted min-h-[350px] h-[600px]',
+          'relative border rounded-lg overflow-hidden bg-muted min-h-[150px] h-[600px]',
           isPair && 'rounded-none'
         )}
       >

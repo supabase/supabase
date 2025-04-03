@@ -3,7 +3,7 @@ title: Realtime Avatar Stack
 description: Avatar stack in realtime
 ---
 
-<ComponentPreview name="realtime-avatar-stack-demo" showCode={false} />
+<BlockPreview name="realtime-avatar-stack-demo" />
 
 ## Installation
 
@@ -18,4 +18,28 @@ description: Avatar stack in realtime
 
 ## Usage
 
-The `RealtimeAvatarStack` renders stacked avatars which are connected to Supabase Realtime. Specifically, it uses the Presence feature. You can use this to show currently online users in a chatroom, game session or collaborative app.
+The `RealtimeAvatarStack` component renders stacked avatars which are connected to Supabase Realtime. It uses the Presence feature of Supabase Realtime. You can use this to show currently online users in a chatroom, game session or collaborative app.
+
+```tsx
+import { RealtimeAvatarStack } from '@/components/realtime-avatar-stack'
+
+export default function Page() {
+  return (
+    <Header className="flex items-center justify-between">
+      <h1>Lumon Industries</h1>
+      <RealtimeAvatarStack roomName="break_room" />
+    </Header>
+  )
+}
+```
+
+## Props
+
+| Prop       | Type     | Default | Description                                          |
+| ---------- | -------- | ------- | ---------------------------------------------------- |
+| `roomName` | `string` | `null`  | The name of the Supabase Realtime room to connect to |
+
+## Further reading
+
+- [Realtime Presence](https://supabase.com/docs/guides/realtime/presence)
+- [Realtime authorization](https://supabase.com/docs/guides/realtime/authorization)

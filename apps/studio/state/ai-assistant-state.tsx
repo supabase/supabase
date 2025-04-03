@@ -9,10 +9,12 @@ type SuggestionsType = {
   prompts?: string[]
 }
 
+type AssistantMessageType = MessageType & { results?: { [id: string]: any[] } }
+
 type ChatSession = {
   id: string
   name: string
-  messages: readonly MessageType[]
+  messages: readonly AssistantMessageType[]
   createdAt: Date
   updatedAt: Date
 }
@@ -115,7 +117,7 @@ export const createAiAssistantState = (projectRef: string | undefined) => {
       const chatId = crypto.randomUUID()
       const newChat: ChatSession = {
         id: chatId,
-        name: options?.name ?? 'New Chat',
+        name: options?.name ?? 'Untitled',
         messages: [],
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -195,6 +197,29 @@ export const createAiAssistantState = (projectRef: string | undefined) => {
       }
     },
 
+    updateMessage: ({
+      id,
+      resultId,
+      results,
+    }: {
+      id: string
+      resultId?: string
+      results: any[]
+    }) => {
+      let chat = state.activeChat
+      if (!chat || !resultId) return
+
+      const existingMessages = chat.messages
+      const updatedMessages = existingMessages.map((msg) => {
+        if (msg.id === id) {
+          return { ...msg, results: { ...(msg.results ?? {}), [resultId]: results } }
+        } else {
+          return msg
+        }
+      })
+      chat.messages = updatedMessages
+    },
+
     setSqlSnippets: (snippets: string[]) => {
       state.sqlSnippets = snippets
     },
@@ -204,6 +229,15 @@ export const createAiAssistantState = (projectRef: string | undefined) => {
       state.sqlSnippets = undefined
       // Remove suggestions if sqlSnippets were removed
       state.suggestions = undefined
+    },
+
+    getCachedSQLResults: ({ messageId, snippetId }: { messageId: string; snippetId?: string }) => {
+      let chat = state.activeChat
+      if (!chat || !snippetId) return
+
+      const message = chat.messages.find((msg) => msg.id === messageId)
+      const results = (message?.results ?? {})[snippetId]
+      return results
     },
   })
 

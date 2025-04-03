@@ -91,6 +91,7 @@ All of the services should have a status `running (healthy)`. If you see a statu
 
 Your app is now running with default credentials.
 [Secure your services](#securing-your-services) as soon as possible using the instructions below.
+
 </Admonition>
 
 ### Accessing Supabase Studio
@@ -211,7 +212,8 @@ basicauth_credentials:
 ```
 
 To enable all dashboard features outside of `localhost`, update the following value in the `./docker/.env` file:
- - `SUPABASE_PUBLIC_URL`: The URL or IP used to access the dashboard
+
+- `SUPABASE_PUBLIC_URL`: The URL or IP used to access the dashboard
 
 You will need to [restart](#restarting-all-services) the services for the changes to take effect.
 
@@ -230,6 +232,7 @@ docker compose up -d
 {/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 
 Be aware that this will result in downtime. Simply restarting the services does not apply configuration changes.
+
 ## Stopping all services
 
 You can stop Supabase by running `docker compose stop` in same directory as your `docker-compose.yml` file.

@@ -15,6 +15,7 @@ import { useProfileAuditLogsQuery } from 'data/profile/profile-audit-logs-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { Alert, Button } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+import { formatSelectedDateRange } from '../Organization/AuditLogs/AuditLogs.utils'
 
 const AuditLogs = () => {
   const currentTime = dayjs().utc().set('millisecond', 0)
@@ -70,6 +71,9 @@ const AuditLogs = () => {
       }
     })
 
+  const minDate = dayjs().subtract(retentionPeriod, 'days')
+  const maxDate = dayjs()
+
   return (
     <>
       <div className="space-y-4 flex flex-col pb-8">
@@ -91,47 +95,12 @@ const AuditLogs = () => {
               triggerButtonTitle=""
               from={dateRange.from}
               to={dateRange.to}
-              minDate={dayjs().subtract(retentionPeriod, 'days').toDate()}
-              maxDate={dayjs().toDate()}
+              minDate={minDate.toDate()}
+              maxDate={maxDate.toDate()}
               onChange={(value) => {
                 if (value.from !== null && value.to !== null) {
-                  const current = dayjs()
-                  const from = dayjs(value.from)
-                    .hour(current.hour())
-                    .minute(current.minute())
-                    .second(current.second())
-                  const to = dayjs(value.to)
-                    .hour(current.hour())
-                    .minute(current.minute())
-                    .second(current.second())
-
-                  if (from.date() === to.date()) {
-                    // [Joshen] If a single date is selected, we either set the "from" to start from 00:00
-                    // or "to" to end at 23:59 depending on which date was selected
-                    if (from.date() === current.date()) {
-                      setDateRange({
-                        from: from
-                          .set('hour', 0)
-                          .set('minute', 0)
-                          .set('second', 0)
-                          .utc()
-                          .toISOString(),
-                        to: to.utc().toISOString(),
-                      })
-                    } else {
-                      setDateRange({
-                        from: from.utc().toISOString(),
-                        to: to
-                          .set('hour', 23)
-                          .set('minute', 59)
-                          .set('second', 59)
-                          .utc()
-                          .toISOString(),
-                      })
-                    }
-                  } else {
-                    setDateRange({ from: from.utc().toISOString(), to: to.utc().toISOString() })
-                  }
+                  const { from, to } = formatSelectedDateRange(value)
+                  setDateRange({ from, to })
                 }
               }}
               renderFooter={() => {

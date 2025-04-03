@@ -1,7 +1,8 @@
-import { DatePicker } from 'components/ui/DatePicker'
 import dayjs from 'dayjs'
-import { useEffect, useState } from 'react'
+import { Clock } from 'lucide-react'
+import { ComponentProps, PropsWithChildren, useEffect, useState } from 'react'
 
+import { DatePicker } from 'components/ui/DatePicker'
 import {
   Alert,
   Button,
@@ -13,15 +14,14 @@ import {
 } from 'ui'
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD, getDefaultHelper } from './Logs.constants'
 import type { DatetimeHelper } from './Logs.types'
-import { Clock } from 'lucide-react'
 
 interface Props {
   to: string
   from: string
-  onChange: React.ComponentProps<typeof DatePicker>['onChange']
+  onChange: ComponentProps<typeof DatePicker>['onChange']
   helpers: DatetimeHelper[]
 }
-const DatePickers: React.FC<Props> = ({ to, from, onChange, helpers }) => {
+const DatePickers = ({ to, from, onChange, helpers }: PropsWithChildren<Props>) => {
   const defaultHelper = getDefaultHelper(helpers)
   const [helperValue, setHelperValue] = useState<string>(to || from ? '' : defaultHelper.text)
 

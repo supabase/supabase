@@ -134,7 +134,6 @@ const TableEditorMenu = () => {
             onSelectSchema={(name: string) => {
               setSearchText('')
               setSelectedSchema(name)
-              router.push(`/project/${project?.ref}/editor?schema=${name}`)
             }}
             onSelectCreateSchema={() => snap.onAddSchema()}
           />

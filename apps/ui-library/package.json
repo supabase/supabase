@@ -11,6 +11,7 @@
     "build:llms": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-llms-txt.ts",
     "start": "next start",
     "lint": "next lint",
+    "lint:mdx": "supa-mdx-lint content --config ../../supa-mdx-lint.config.toml",
     "content:build": "contentlayer2 build",
     "clean": "rimraf node_modules .next .turbo",
     "typecheck": "contentlayer2 build && tsc --noEmit -p tsconfig.json"
@@ -22,6 +23,7 @@
     "@radix-ui/react-slot": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@react-router/fs-routes": "^7.4.0",
+    "@supabase/supa-mdx-lint": "0.2.6-alpha",
     "class-variance-authority": "^0.6.0",
     "common": "workspace:*",
     "contentlayer2": "0.4.6",
@@ -62,7 +64,6 @@
     "@types/react-dom": "^18.2.22",
     "autoprefixer": "^10.0.1",
     "config": "workspace:^",
-    "fumadocs-ui": "^15.1.0",
     "lodash": "^4.17.21",
     "mdast-util-toc": "^6.1.1",
     "postcss": "^8",
@@ -76,6 +77,6 @@
     "tsx": "^4.19.3",
     "typescript": "~5.5.0",
     "unist-builder": "3.0.0",
-    "vite": "^6.0.0"
+    "vite": "^6.2.4"
   }
 }

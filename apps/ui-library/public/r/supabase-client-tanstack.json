@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "supabase-client-tanstack",
   "type": "registry:lib",
-  "title": "Supabase Client for Tanstack Start",
+  "title": "Supabase Client for TanStack Start",
   "description": "",
   "dependencies": [
     "@supabase/ssr@latest",
@@ -20,5 +20,6 @@
       "content": "import { createServerClient } from '@supabase/ssr'\nimport { parseCookies, setCookie } from '@tanstack/react-start/server'\n\nexport function createClient() {\n  return createServerClient(process.env.VITE_SUPABASE_URL!, process.env.VITE_SUPABASE_ANON_KEY!, {\n    cookies: {\n      getAll() {\n        return Object.entries(parseCookies()).map(\n          ([name, value]) =>\n            ({\n              name,\n              value,\n            }) as { name: string; value: string }\n        )\n      },\n      setAll(cookies) {\n        cookies.forEach((cookie) => {\n          setCookie(cookie.name, cookie.value)\n        })\n      },\n    },\n  })\n}\n",
       "type": "registry:lib"
     }
-  ]
+  ],
+  "docs": "You'll need to add a `.env` file with the following environment variables to your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`."
 }

@@ -22,9 +22,13 @@ import { ButtonTooltip } from '../ButtonTooltip'
 
 interface AIAssistantChatSelectorProps {
   className?: string
+  disabled?: boolean
 }
 
-export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorProps) => {
+export const AIAssistantChatSelector = ({
+  className,
+  disabled = false,
+}: AIAssistantChatSelectorProps) => {
   const snap = useAiAssistantStateSnapshot()
 
   const [chatSelectorOpen, setChatSelectorOpen] = useState(false)
@@ -102,13 +106,15 @@ export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorPr
             <CommandEmpty_Shadcn_>No chats found.</CommandEmpty_Shadcn_>
             <CommandGroup_Shadcn_>
               <ScrollArea className={chats.length > 4 ? 'h-40' : ''}>
+                {/* @ts-ignore */}
                 {chats.map(([id, chat]) => (
                   <CommandItem_Shadcn_
                     key={id}
                     value={id}
                     onSelect={() => handleSelectChat(id)}
                     className="flex items-center justify-between gap-2 py-1 w-full overflow-hidden group"
-                    keywords={[chat.name]}
+                    keywords={!!chat.name ? [chat.name] : undefined}
+                    disabled={disabled}
                   >
                     <div className="flex items-center w-full flex-1 min-w-0">
                       {editingChatId === id ? (
@@ -200,6 +206,7 @@ export const AIAssistantChatSelector = ({ className }: AIAssistantChatSelectorPr
                   snap.newChat()
                   setChatSelectorOpen(false)
                 }}
+                disabled={disabled}
               >
                 <Plus size={14} strokeWidth={1.5} />
                 <span>New chat</span>

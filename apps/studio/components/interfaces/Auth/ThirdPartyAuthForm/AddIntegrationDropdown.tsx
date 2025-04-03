@@ -1,8 +1,6 @@
 import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import {
   Button,
   cn,
@@ -49,17 +47,6 @@ const ProviderDropdownItem = ({
 export const AddIntegrationDropdown = ({
   onSelectIntegrationType,
 }: AddIntegrationDropdownProps) => {
-  const selectedProject = useSelectedProject()
-
-  const isClerkTPAEnabledFlag = useFlag<string>('isClerkTPAEnabledOnProjects')
-  const isClerkTPAEnabled =
-    selectedProject?.ref &&
-    isClerkTPAEnabledFlag &&
-    isClerkTPAEnabledFlag
-      .split(',')
-      .map((it) => it.trim())
-      .includes(selectedProject.ref)
-
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
@@ -72,10 +59,7 @@ export const AddIntegrationDropdown = ({
         <DropdownMenuSeparator />
 
         <ProviderDropdownItem type="firebase" onSelectIntegrationType={onSelectIntegrationType} />
-
-        {isClerkTPAEnabled && (
-          <ProviderDropdownItem type="clerk" onSelectIntegrationType={onSelectIntegrationType} />
-        )}
+        <ProviderDropdownItem type="clerk" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="auth0" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="awsCognito" onSelectIntegrationType={onSelectIntegrationType} />
       </DropdownMenuContent>
