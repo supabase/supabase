@@ -29,6 +29,7 @@ export type GuideFrontmatter = {
   /** @deprecated */
   hide_table_of_contents?: boolean
   tocVideo?: string
+  recipe?: string
 }
 
 /**
@@ -64,6 +65,9 @@ export function isValidGuideFrontmatter(obj: object): obj is GuideFrontmatter {
   }
   if ('tocVideo' in obj && typeof obj.tocVideo !== 'string') {
     throw Error(`Invalid guide frontmatter: tocVideo must be a string. Received ${obj.tocVideo}`)
+  }
+  if ('recipe' in obj && typeof obj.recipe !== 'string') {
+    throw Error(`Invalid guide frontmatter: recipe must be a string. Received ${obj.recipe}`)
   }
   return true
 }
