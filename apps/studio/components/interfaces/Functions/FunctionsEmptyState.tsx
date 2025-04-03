@@ -121,6 +121,7 @@ export const FunctionsEmptyState = () => {
                   onClick={() =>
                     sendEvent({
                       action: 'edge_function_via_cli_button_clicked',
+                      properties: { origin: 'no_functions_block' },
                       groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
                     })
                   }

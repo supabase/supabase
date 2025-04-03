@@ -1166,6 +1166,14 @@ export interface EdgeFunctionTemplateClickedEvent {
  */
 export interface EdgeFunctionViaCliButtonClickedEvent {
   action: 'edge_function_via_cli_button_clicked'
+  properties: {
+    /**
+     * Click on Via CLI can either happen:
+     *   1. on the main block when there are no functions
+     *   2. in the secondary action section of the page
+     */
+    origin: 'no_functions_block' | 'secondary_action'
+  }
   groups: {
     project: string
     organization: string

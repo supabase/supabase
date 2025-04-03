@@ -81,7 +81,17 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
         )}
         <Dialog>
           <DialogTrigger asChild>
-            <DropdownMenuItem className="gap-4" onSelect={(e) => e.preventDefault()}>
+            <DropdownMenuItem
+              className="gap-4"
+              onSelect={(e) => {
+                e.preventDefault()
+                sendEvent({
+                  action: 'edge_function_via_cli_button_clicked',
+                  properties: { origin: 'secondary_action' },
+                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+                })
+              }}
+            >
               <Terminal className="shrink-0" size={16} strokeWidth={1.5} />
               <div>
                 <span className="text-foreground">Via CLI</span>

@@ -58,3 +58,7 @@ export default function Page() {
 
 - [Realtime Broadcast](https://supabase.com/docs/guides/realtime/broadcast)
 - [Realtime authorization](https://supabase.com/docs/guides/realtime/authorization)
+
+### Smoother cursors
+
+While our Realtime Cursor component aims to keep things simple and lightweight, you may want to add smoother cursor animations for a more polished experience. Libraries like [perfect-cursors](https://github.com/steveruizok/perfect-cursors) can be integrated to add sophisticated interpolation between cursor positions. This is especially useful when dealing with network latency, as it creates fluid cursor movements even when position updates are received at longer intervals (e.g., every 50-80ms). The library handles the complex math of creating natural-looking cursor paths while maintaining performance.
