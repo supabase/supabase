@@ -33,7 +33,7 @@ const isCompanyEmail = (email: string): boolean => {
 
 export async function POST(req: Request) {
   const HUBSPOT_PORTAL_ID = process.env.HUBSPOT_PORTAL_ID
-  const HUBSPOT_FORM_GUID = process.env.HUBSPOT_ENTERPRISE_FORM_GUID
+  const HUBSPOT_FORM_GUID = process.env.HUBSPOT_PARTNERSHIP_FORM_GUID
 
   const body = await req.json()
   const { firstName, secondName, companyEmail } = body

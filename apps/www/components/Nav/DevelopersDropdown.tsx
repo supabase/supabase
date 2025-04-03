@@ -16,7 +16,7 @@ type LinkProps = {
 
 const DevelopersDropdown = () => (
   <div className="flex flex-col xl:flex-row">
-    <div className="w-[550px] xl:w-[500px] py-8 px-8 bg-background grid gap-3 grid-cols-2">
+    <div className="w-[550px] xl:w-[470px] py-8 px-8 bg-background grid gap-3 grid-cols-2">
       {DevelopersData['navigation'].map((column) => (
         <div key={column.label} className="p-0 flex flex-col gap-6">
           <label className="text-foreground-lighter text-xs uppercase tracking-widest font-mono">
