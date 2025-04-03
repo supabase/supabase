@@ -745,9 +745,6 @@ importers:
       react-copy-to-clipboard:
         specifier: ^5.1.0
         version: 5.1.0(react@18.2.0)
-      react-csv:
-        specifier: ^2.0.3
-        version: 2.2.2
       react-data-grid:
         specifier: 7.0.0-beta.41
         version: 7.0.0-beta.41(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -905,9 +902,6 @@ importers:
       '@types/react-copy-to-clipboard':
         specifier: ^5.0.4
         version: 5.0.5
-      '@types/react-csv':
-        specifier: ^1.1.2
-        version: 1.1.6
       '@types/react-datepicker':
         specifier: ^4.3.4
         version: 4.15.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -6504,9 +6498,6 @@ packages:
   '@types/react-copy-to-clipboard@5.0.5':
     resolution: {integrity: sha512-en3JGqPA4RX4aUlo6q6uUbnqLp31Dhm2E/thiMvFTIvU+dUDG249jBG2MJ0rPMXE/MbKVrpmi/1r1G4QLhIHKQ==}
 
-  '@types/react-csv@1.1.6':
-    resolution: {integrity: sha512-D8MmuwIrqVr1ilgCEhB5U7uyMeojPC+Ffr/Zg/galVEFMDy/dbmegj38Bs5hWwgC3VVjCyo9GR+YHrC1fnFm1w==}
-
   '@types/react-datepicker@4.15.1':
     resolution: {integrity: sha512-6/LthK0pTDBKjjVJqA2ygY3jJsHH7uZXIk8WPQcGHUiFOQLOKIv3krOxFZ2mt3BB3guMB6jVTc6ansQAd0r7xQ==}
 
@@ -9004,9 +8995,6 @@ packages:
     resolution: {integrity: sha512-OHx4Qwrrt0E4jEIcI5/Xb+f+QmJYNj2rrK8wiIdQOIrB9WrrJL8cjZvXdXuBTkkEwEqLycb5BeZDV1o2i9bTew==}
     engines: {node: '>=12.0.0'}
 
-  flatted@3.3.1:
-    resolution: {integrity: sha512-X8cqMLLie7KsNUDSdzeN8FYK9rEt4Dt67OsG/DNGnYTSDBG4uFAJFBnUeiV+zCVAvwFy56IjM9sH51jVaEhNxw==}
-
   flatted@3.3.2:
     resolution: {integrity: sha512-AiwGJM8YcNOaobumgtng+6NHuOqC3A7MixFeDafM3X9cIUM+xUXoS5Vfgf+OihAYe20fxqNM9yPBXJzRtZ/4eA==}
 
@@ -9900,9 +9888,6 @@ packages:
 
   is-reference@1.2.1:
     resolution: {integrity: sha512-U82MsXXiFIrjCK4otLT+o2NA2Cd2g5MLoOVXUZjIOhLurrRxpEXzI8O0KZHr3IjLvlAH1kTPYSuqer5T9ZVBKQ==}
-
-  is-reference@3.0.2:
-    resolution: {integrity: sha512-v3rht/LgVcsdZa3O2Nqs+NMowLOxeOm7Ay9+/ARQ2F+qEoANRcqrjAZKGN0v8ymUetZGgkp26LTnGT7H0Qo9Pg==}
 
   is-reference@3.0.3:
     resolution: {integrity: sha512-ixkJoqQvAP88E6wLydLGGqCJsrFUnqoH6HnaczB8XmDH1oaWU+xxdptvikTgaEhtZ53Ky6YXiBuUI2WXLMCwjw==}
@@ -12393,9 +12378,6 @@ packages:
     peerDependencies:
       react: '>= 15'
       react-dom: '>= 15'
-
-  react-csv@2.2.2:
-    resolution: {integrity: sha512-RG5hOcZKZFigIGE8LxIEV/OgS1vigFQT4EkaHeKgyuCbUAu9Nbd/1RYq++bJcJJ9VOqO/n9TZRADsXNDR4VEpw==}
 
   react-data-grid@7.0.0-beta.41:
     resolution: {integrity: sha512-WmTP/PV+vtVjIaGVLgyG6WAhqvuPBM8I54bsR7oJZl6w43+mIasZM9rEBWjQ52XHJEy41/tjcMBIMNiWqoEbrQ==}
@@ -20914,10 +20896,6 @@ snapshots:
     dependencies:
       '@types/react': 18.3.3
 
-  '@types/react-csv@1.1.6':
-    dependencies:
-      '@types/react': 18.3.3
-
   '@types/react-datepicker@4.15.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
       '@popperjs/core': 2.11.8
@@ -23556,8 +23534,8 @@ snapshots:
 
   espree@9.6.1:
     dependencies:
-      acorn: 8.11.3
-      acorn-jsx: 5.3.2(acorn@8.11.3)
+      acorn: 8.14.1
+      acorn-jsx: 5.3.2(acorn@8.14.1)
       eslint-visitor-keys: 3.4.3
 
   esprima@4.0.1: {}
@@ -23904,11 +23882,9 @@ snapshots:
 
   flat-cache@3.1.0:
     dependencies:
-      flatted: 3.3.1
+      flatted: 3.3.2
       keyv: 4.5.3
       rimraf: 3.0.2
-
-  flatted@3.3.1: {}
 
   flatted@3.3.2: {}
 
@@ -25008,10 +24984,6 @@ snapshots:
   is-primitive@3.0.1: {}
 
   is-reference@1.2.1:
-    dependencies:
-      '@types/estree': 1.0.5
-
-  is-reference@3.0.2:
     dependencies:
       '@types/estree': 1.0.5
 
@@ -28084,9 +28056,9 @@ snapshots:
 
   periscopic@3.1.0:
     dependencies:
-      '@types/estree': 1.0.5
+      '@types/estree': 1.0.7
       estree-walker: 3.0.3
-      is-reference: 3.0.2
+      is-reference: 3.0.3
 
   pg-cloudflare@1.1.1:
     optional: true
@@ -28587,8 +28559,6 @@ snapshots:
       prop-types: 15.8.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
-
-  react-csv@2.2.2: {}
 
   react-data-grid@7.0.0-beta.41(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
@@ -29491,9 +29461,9 @@ snapshots:
 
   sass@1.72.0:
     dependencies:
-      chokidar: 3.5.3
+      chokidar: 3.6.0
       immutable: 4.3.4
-      source-map-js: 1.2.0
+      source-map-js: 1.2.1
 
   satori@0.10.9:
     dependencies:
