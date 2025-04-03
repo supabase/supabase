@@ -77,7 +77,7 @@ export async function POST(req: Request) {
           ],
           context: {
             pageUri: 'https://supabase.com/solutions/ai-builders',
-            pageName: 'Solutions -AI Builders',
+            pageName: 'Solutions / AI Builders',
           },
           legalConsentOptions: {
             consent: {
