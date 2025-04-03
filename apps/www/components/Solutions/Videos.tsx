@@ -1,29 +1,13 @@
 import React, { FC } from 'react'
-import type { LucideIcon } from 'lucide-react'
 
-import { TextLink } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '../Panel'
 import type { Testimonials } from '~/data/solutions/solutions.types'
-
-interface Props extends Testimonials {
-  id: string
-  heading?: string | JSX.Element
-  videos: {
-    [key: string]: {
-      url: string
-    }
-  }
-}
 
 export type Story = {
   url: string
   heading: string
   subheading: string | JSX.Element
-}
-
-type FeatureProps = {
-  url: string
 }
 
 const EnterpriseSecurity: FC<Testimonials> = (props) => {
