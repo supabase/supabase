@@ -98,7 +98,6 @@ const AuditLogs = () => {
               minDate={minDate.toDate()}
               maxDate={maxDate.toDate()}
               onChange={(value) => {
-                console.log('onChange', value)
                 if (value.from !== null && value.to !== null) {
                   const { from, to } = formatSelectedDateRange(value)
                   setDateRange({ from, to })
