@@ -1289,7 +1289,7 @@ export type TelemetryEvent =
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
   | ProjectCreationSimpleVersionSubmittedEvent
-  | ProjectCreationSimpleVersionConfirmModalTriggeredEvent
+  | ProjectCreationSimpleVersionConfirmModalOpenedEvent
   | ProjectCreationInitialStepPromptIntendedEvent
   | ProjectCreationInitialStepSubmittedEvent
   | ProjectCreationSecondStepPromptIntendedEvent
