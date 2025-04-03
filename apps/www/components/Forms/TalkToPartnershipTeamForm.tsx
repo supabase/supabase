@@ -261,7 +261,7 @@ const TalkToPartnershipTeamForm: FC<Props> = ({ className }) => {
                 })
               }
             >
-              Request a demo
+              Submit
             </Button>
             <p className="text-foreground-lighter text-sm col-span-full">
               By submitting this form, I confirm that I have read and understood the{' '}
