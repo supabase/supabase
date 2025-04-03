@@ -1,0 +1,263 @@
+[
+  {
+    "id": "basic-setup",
+    "name": "Basic Project Setup Recipe",
+    "introduction": {
+      "title": "Welcome to the Basic Setup Recipe!",
+      "description": "This recipe will guide you through setting up a basic table, an edge function to interact with it, and some manual verification steps."
+    },
+    "steps": [
+      {
+        "id": "create-table-var",
+        "title": "Create a table named {{tableName}}",
+        "description": "Run this SQL script to create a simple table named according to the variable below.",
+        "type": "sql",
+        "action": "CREATE TABLE {{tableName}} (\n  id serial primary key,\n  name text,\n  created_at timestamptz default now()\n);"
+      },
+      {
+        "id": "insert-user-var",
+        "title": "Insert user {{userName}} into {{tableName}}",
+        "description": "Run this SQL script to insert a sample user into the newly created table. Define the user name and ensure the table name matches the previous step.",
+        "type": "sql",
+        "action": "INSERT INTO {{tableName}} (name) VALUES ('{{userName}}');"
+      },
+      {
+        "id": "create-edge-function",
+        "title": "Deploy an Edge Function for {{tableName}}",
+        "description": "This step deploys a simple edge function that retrieves data from the specified table.",
+        "type": "edge_function",
+        "action": {
+          "slug": "get-data-recipe",
+          "name": "get-data-recipe",
+          "verify_jwt": true,
+          "entrypoint_path": "index.ts",
+          "files": [
+            {
+              "name": "index.ts",
+              "content": "import { createClient } from '@supabase/supabase-js'\n\nconsole.log('Hello from Functions!')\n\nconst supabaseUrl = process.env.SUPABASE_URL\nconst supabaseKey = process.env.SUPABASE_ANON_KEY\n\nconst supabase = createClient(supabaseUrl, supabaseKey)\n\nDeno.serve(async (req) => {\n  try {\n    const { data, error } = await supabase.from('{{tableName}}').select('*')\n    if (error) throw error\n\n    return new Response(\n      JSON.stringify(data),\n      { headers: { 'Content-Type': 'application/json' } }\n    )\n  } catch (error) {\n    return new Response(\n      JSON.stringify({ error: error.message }),\n      { status: 500, headers: { 'Content-Type': 'application/json' } }\n    )\n  }\n})\n"
+            }
+          ]
+        }
+      },
+      {
+        "id": "manual-verify-table",
+        "title": "Verify {{tableName}} Data",
+        "description": "Go to the Table Editor in the Supabase Studio and confirm that the table named {{tableName}} exists and contains the sample user {{userName}}.",
+        "type": "manual",
+        "action": null
+      },
+      {
+        "id": "manual-invoke-function",
+        "title": "Invoke Edge Function for {{tableName}}",
+        "description": "Use the 'Invoke' button in the Edge Function details page (for 'get-data-recipe') or a tool like cURL/Postman to call the function endpoint and verify it returns the data from {{tableName}}.",
+        "type": "manual",
+        "action": null
+      },
+      {
+        "id": "final-step",
+        "title": "Recipe Complete!",
+        "description": "You have successfully completed the basic project setup recipe. You now have a table named {{tableName}} and an edge function interacting with it.",
+        "type": "final",
+        "action": null
+      }
+    ]
+  },
+  {
+    "id": "automatic-embeddings",
+    "name": "Automatic Embeddings Setup",
+    "introduction": {
+      "title": "Set up Automatic Embeddings",
+      "description": "This recipe guides you through automating vector embedding generation and updates using Supabase Edge Functions, pgmq, pg_net, and pg_cron, based on the official Supabase guide.",
+      "image": "/img/recipes/vector-dark.svg"
+    },
+    "steps": [
+      {
+        "id": "ae-enable-extensions",
+        "title": "Enable Required Extensions",
+        "description": "Enable the necessary Postgres extensions for vector operations, job queuing, HTTP requests, scheduled tasks, and hstore.",
+        "type": "sql",
+        "action": "-- For vector operations\ncreate extension if not exists vector with schema extensions;\n\n-- For queueing and processing jobs\n-- (pgmq will create its own schema)\ncreate extension if not exists pgmq;\n\n-- For async HTTP requests\ncreate extension if not exists pg_net with schema extensions;\n\n-- For scheduled processing and retries\n-- (pg_cron will create its own schema)\ncreate extension if not exists pg_cron;\n\n-- For clearing embeddings during updates\ncreate extension if not exists hstore with schema extensions;"
+      },
+      {
+        "id": "ae-create-util-schema",
+        "title": "Create Utility Schema",
+        "description": "Create a dedicated schema `util` to house helper functions for the embedding process.",
+        "type": "sql",
+        "action": "-- Schema for utility functions\ncreate schema if not exists util;"
+      },
+      {
+        "id": "ae-create-project-url-func",
+        "title": "Create Project URL Function",
+        "description": "Create a utility function to securely retrieve your Supabase project URL from Vault. This URL is needed to invoke Edge Functions.",
+        "type": "sql",
+        "action": "-- Utility function to get the Supabase project URL (required for Edge Functions)\ncreate or replace function util.project_url()\nreturns text\nlanguage plpgsql\nsecurity definer\nas $$ \ndeclare \n  secret_value text;\nbegin \n  -- Retrieve the project URL from Vault \n  select decrypted_secret into secret_value from vault.decrypted_secrets where name = 'project_url'; \n  return secret_value; \nend; \n$$;"
+      },
+      {
+        "id": "ae-create-invoke-edge-func",
+        "title": "Create Edge Function Invoker",
+        "description": "Create a generic utility function to invoke any Edge Function asynchronously via HTTP POST, passing along authorization headers if available.",
+        "type": "sql",
+        "action": "-- Generic function to invoke any Edge Function\ncreate or replace function util.invoke_edge_function(\n  name text,\n  body jsonb,\n  timeout_milliseconds int = 5 * 60 * 1000  -- default 5 minute timeout\n)\nreturns void\nlanguage plpgsql\nas $$ \ndeclare \n  headers_raw text; \n  auth_header text; \nbegin \n  -- If we're in a PostgREST session, reuse the request headers for authorization \n  headers_raw := current_setting('request.headers', true); \n  -- Only try to parse if headers are present \n  auth_header := case \n    when headers_raw is not null then \n      (headers_raw::json->>'authorization') \n    else \n      null \n  end; \n  -- Perform async HTTP request to the edge function \n  perform net.http_post( \n    url => util.project_url() || '/functions/v1/' || name, \n    headers => jsonb_build_object( \n      'Content-Type', 'application/json', \n      'Authorization', auth_header \n    ), \n    body => body, \n    timeout_milliseconds => timeout_milliseconds \n  ); \nend; \n$$;"
+      },
+      {
+        "id": "ae-create-clear-column-func",
+        "title": "Create Clear Column Trigger Function",
+        "description": "Create a generic trigger function that can be used to set a specific column's value to NULL during an UPDATE operation.",
+        "type": "sql",
+        "action": "-- Generic trigger function to clear a column on update\ncreate or replace function util.clear_column()\nreturns trigger\nlanguage plpgsql as $$ \ndeclare \n    clear_column text := TG_ARGV[0]; \nbegin \n    NEW := NEW #= hstore(clear_column, NULL); \n    return NEW; \nend; \n$$;"
+      },
+      {
+        "id": "ae-deploy-embed-function",
+        "title": "Deploy Embedding Edge Function",
+        "description": "Deploy the `embed` Edge Function which receives job batches, generates embeddings using an external API (like OpenAI), and updates the corresponding table rows.",
+        "type": "edge_function",
+        "action": {
+          "slug": "{{functionSlug}}",
+          "name": "{{functionName}}",
+          "verify_jwt": false,
+          "entrypoint_path": "index.ts",
+          "files": [
+            {
+              "name": "index.ts",
+              "content": "// Setup type definitions for built-in Supabase Runtime APIs\nimport 'jsr:@supabase/functions-js/edge-runtime.d.ts'\n\n// We'll use the OpenAI API to generate embeddings\nimport OpenAI from 'jsr:@openai/openai'\n\nimport { z } from 'npm:zod'\n\n// We'll make a direct Postgres connection to update the document\nimport postgres from 'https://deno.land/x/postgresjs@v3.4.5/mod.js'\n\n// Initialize OpenAI client\nconst openai = new OpenAI({\n  // We'll need to manually set the `OPENAI_API_KEY` environment variable\n  apiKey: Deno.env.get('OPENAI_API_KEY'),\n})\n\n// Initialize Postgres client\nconst sql = postgres(\n  // `SUPABASE_DB_URL` is a built-in environment variable\n  Deno.env.get('SUPABASE_DB_URL')!\n)\n\n// Define embedding model and dimensions\nconst EMBEDDING_MODEL = '{{modelName}}'\nconst EMBEDDING_DIMENSIONS = {{embeddingDimension}}\n\nconst jobSchema = z.object({\n  jobId: z.number(),\n  id: z.number(),\n  schema: z.string(),\n  table: z.string(),\n  contentFunction: z.string(),\n  embeddingColumn: z.string(),\n})\n\nconst failedJobSchema = jobSchema.extend({\n  error: z.string(),\n})\n\ntype Job = z.infer<typeof jobSchema>\ntype FailedJob = z.infer<typeof failedJobSchema>\n\ntype Row = {\n  id: string\n  content: unknown\n}\n\nconst QUEUE_NAME = 'embedding_jobs'\n\n// Listen for HTTP requests\nDeno.serve(async (req) => {\n  if (req.method !== 'POST') {\n    return new Response('expected POST request', { status: 405 })\n  }\n\n  if (req.headers.get('content-type') !== 'application/json') {\n    return new Response('expected json body', { status: 400 })\n  }\n\n  // Use Zod to parse and validate the request body\n  const parseResult = z.array(jobSchema).safeParse(await req.json())\n\n  if (parseResult.error) {\n    return new Response(`invalid request body: ${parseResult.error.message}`, {\n      status: 400,\n    })\n  }\n\n  const pendingJobs = parseResult.data\n\n  // Track jobs that completed successfully\n  const completedJobs: Job[] = []\n\n  // Track jobs that failed due to an error\n  const failedJobs: FailedJob[] = []\n\n  async function processJobs() {\n    let currentJob: Job | undefined\n\n    while ((currentJob = pendingJobs.shift()) !== undefined) {\n      try {\n        await processJob(currentJob)\n        completedJobs.push(currentJob)\n      } catch (error) {\n        failedJobs.push({\n          ...currentJob,\n          error: error instanceof Error ? error.message : JSON.stringify(error),\n        })\n      }\n    }\n  }\n\n  try {\n    // Process jobs while listening for worker termination\n    await Promise.race([processJobs(), catchUnload()])\n  } catch (error) {\n    // If the worker is terminating (e.g. wall clock limit reached),\n    // add pending jobs to fail list with termination reason\n    failedJobs.push(\n      ...pendingJobs.map((job) => ({\n        ...job,\n        error: error instanceof Error ? error.message : JSON.stringify(error),\n      }))\n    )\n  }\n\n  // Log completed and failed jobs for traceability\n  console.log('finished processing jobs:', {\n    completedJobs: completedJobs.length,\n    failedJobs: failedJobs.length,\n  })\n\n  return new Response(\n    JSON.stringify({\n      completedJobs,\n      failedJobs,\n    }),\n    {\n      // 200 OK response\n      status: 200,\n\n      // Custom headers to report job status\n      headers: {\n        'content-type': 'application/json',\n        'x-completed-jobs': completedJobs.length.toString(),\n        'x-failed-jobs': failedJobs.length.toString(),\n      },\n    }\n  )\n})\n\n/**\n * Generates an embedding for the given text.\n */\nasync function generateEmbedding(text: string) {\n  const response = await openai.embeddings.create({\n    model: EMBEDDING_MODEL,\n    input: text,\n  })\n  const [data] = response.data\n\n  if (!data) {\n    throw new Error('failed to generate embedding')\n  }\n\n  return data.embedding\n}\n\n/**\n * Processes an embedding job.\n */\nasync function processJob(job: Job) {\n  const { jobId, id, schema, table, contentFunction, embeddingColumn } = job\n\n  // Fetch content for the schema/table/row combination\n  const [row]: [Row] = await sql`\n    select\n      id,\n      ${sql(contentFunction)}(t) as content\n    from\n      ${sql(schema)}.${sql(table)} t\n    where\n      id = ${id}\n  `\n\n  if (!row) {\n    throw new Error(`row not found: ${schema}.${table}/${id}`)\n  }\n\n  if (typeof row.content !== 'string') {\n    throw new Error(`invalid content - expected string: ${schema}.${table}/${id}`)\n  }\n\n  const embedding = await generateEmbedding(row.content)\n\n  await sql`\n    update\n      ${sql(schema)}.${sql(table)}\n    set\n      ${sql(embeddingColumn)} = ${JSON.stringify(embedding)}\n    where\n      id = ${id}\n  `\n\n  await sql`\n    select pgmq.delete(${QUEUE_NAME}, ${jobId}::bigint)\n  `\n}\n\n/**\n * Returns a promise that rejects if the worker is terminating.\n */\nfunction catchUnload() {\n  return new Promise((reject) => {\n    addEventListener('beforeunload', (ev: any) => {\n      reject(new Error(ev.detail?.reason))\n    })\n  })\n}"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ae-install-dropzone-component",
+        "title": "Install Dropzone UI Component",
+        "description": "Install the pre-built Dropzone component using the Shadcn UI CLI command. This component provides a user interface for file uploads.",
+        "type": "front",
+        "command": "dropzone-react",
+        "skippable": true,
+        "files": [
+          {
+            "path": "registry/default/blocks/dropzone/components/dropzone.tsx",
+            "content": "'use client'\n\nimport { cn } from '@/lib/utils'\nimport { type UseSupabaseUploadReturn } from '@/registry/default/blocks/dropzone/hooks/use-supabase-upload'\nimport { Button } from '@/registry/default/components/ui/button'\nimport { CheckCircle, File, Loader2, Upload, X } from 'lucide-react'\nimport { createContext, type PropsWithChildren, useCallback, useContext } from 'react'\n\nexport const formatBytes = (\n  bytes: number,\n  decimals = 2,\n  size?: 'bytes' | 'KB' | 'MB' | 'GB' | 'TB' | 'PB' | 'EB' | 'ZB' | 'YB'\n) => {\n  const k = 1000\n  const dm = decimals < 0 ? 0 : decimals\n  const sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']\n\n  if (bytes === 0 || bytes === undefined) return size !== undefined ? `0 ${size}` : '0 bytes'\n  const i = size !== undefined ? sizes.indexOf(size) : Math.floor(Math.log(bytes) / Math.log(k))\n  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]\n}\n\ntype DropzoneContextType = Omit<UseSupabaseUploadReturn, 'getRootProps' | 'getInputProps'>\n\nconst DropzoneContext = createContext<DropzoneContextType | undefined>(undefined)\n\ntype DropzoneProps = UseSupabaseUploadReturn & {\n  className?: string\n}\n\nconst Dropzone = ({\n  className,\n  children,\n  getRootProps,\n  getInputProps,\n  ...restProps\n}: PropsWithChildren<DropzoneProps>) => {\n  const isSuccess = restProps.isSuccess\n  const isActive = restProps.isDragActive\n  const isInvalid =\n    (restProps.isDragActive && restProps.isDragReject) ||\n    (restProps.errors.length > 0 && !restProps.isSuccess) ||\n    restProps.files.some((file) => file.errors.length !== 0)\n\n  return (\n    <DropzoneContext.Provider value={{ ...restProps }}>\n      <div\n        {...getRootProps({\n          className: cn(\n            'border-2 border-gray-300 rounded-lg p-6 text-center bg-card transition-colors duration-300 text-foreground',\n            className,\n            isSuccess ? 'border-solid' : 'border-dashed',\n            isActive && 'border-primary bg-primary/10',\n            isInvalid && 'border-destructive bg-destructive/10'\n          ),\n        })}\n      >\n        <input {...getInputProps()} />\n        {children}\n      </div>\n    </DropzoneContext.Provider>\n  )\n}\nconst DropzoneContent = ({ className }: { className?: string }) => {\n  const {\n    files,\n    setFiles,\n    onUpload,\n    loading,\n    successes,\n    errors,\n    maxFileSize,\n    maxFiles,\n    isSuccess,\n  } = useDropzoneContext()\n\n  const exceedMaxFiles = files.length > maxFiles\n\n  const handleRemoveFile = useCallback(\n    (fileName: string) => {\n      setFiles(files.filter((file) => file.name !== fileName))\n    },\n    [files, setFiles]\n  )\n\n  if (isSuccess) {\n    return (\n      <div className={cn('flex flex-row items-center gap-x-2 justify-center', className)}>\n        <CheckCircle size={16} className=\"text-primary\" />\n        <p className=\"text-primary text-sm\">\n          Successfully uploaded {files.length} file{files.length > 1 ? 's' : ''}\n        </p>\n      </div>\n    )\n  }\n\n  return (\n    <div className={cn('flex flex-col', className)}>\n      {files.map((file, idx) => {\n        const fileError = errors.find((e) => e.name === file.name)\n        const isSuccessfullyUploaded = !!successes.find((e) => e === file.name)\n\n        return (\n          <div\n            key={`${file.name}-${idx}`}\n            className=\"flex items-center gap-x-4 border-b py-2 first:mt-4 last:mb-4 \"\n          >\n            {file.type.startsWith('image/') ? (\n              <div className=\"h-10 w-10 rounded border overflow-hidden shrink-0 bg-muted flex items-center justify-center\">\n                <img src={file.preview} alt={file.name} className=\"object-cover\" />\n              </div>\n            ) : (\n              <div className=\"h-10 w-10 rounded border bg-muted flex items-center justify-center\">\n                <File size={18} />\n              </div>\n            )}\n\n            <div className=\"shrink grow flex flex-col items-start truncate\">\n              <p title={file.name} className=\"text-sm truncate max-w-full\">\n                {file.name}\n              </p>\n              {file.errors.length > 0 ? (\n                <p className=\"text-xs text-destructive\">\n                  {file.errors\n                    .map((e) =>\n                      e.message.startsWith('File is larger than')\n                        ? `File is larger than ${formatBytes(maxFileSize, 2)} (Size: ${formatBytes(file.size, 2)})`\n                        : e.message\n                    )\n                    .join(', ')}\n                </p>\n              ) : loading && !isSuccessfullyUploaded ? (\n                <p className=\"text-xs text-muted-foreground\">Uploading file...</p>\n              ) : !!fileError ? (\n                <p className=\"text-xs text-destructive\">Failed to upload: {fileError.message}</p>\n              ) : isSuccessfullyUploaded ? (\n                <p className=\"text-xs text-primary\">Successfully uploaded file</p>\n              ) : (\n                <p className=\"text-xs text-muted-foreground\">{formatBytes(file.size, 2)}</p>\n              )}\n            </div>\n\n            {!loading && !isSuccessfullyUploaded && (\n              <Button\n                size=\"icon\"\n                variant=\"link\"\n                className=\"shrink-0 justify-self-end text-muted-foreground hover:text-foreground\"\n                onClick={() => handleRemoveFile(file.name)}\n              >\n                <X />\n              </Button>\n            )}\n          </div>\n        )\n      })}\n      {exceedMaxFiles && (\n        <p className=\"text-sm text-left mt-2 text-destructive\">\n          You may upload only up to {maxFiles} files, please remove {files.length - maxFiles} file\n          {files.length - maxFiles > 1 ? 's' : ''}.\n        </p>\n      )}\n      {files.length > 0 && !exceedMaxFiles && (\n        <div className=\"mt-2\">\n          <Button\n            variant=\"outline\"\n            onClick={onUpload}\n            disabled={files.some((file) => file.errors.length !== 0) || loading}\n          >\n            {loading ? (\n              <>\n                <Loader2 className=\"mr-2 h-4 w-4 animate-spin\" />\n                Uploading...\n              </>\n            ) : (\n              <>Upload files</>\n            )}\n          </Button>\n        </div>\n      )}\n    </div>\n  )\n}\n\nconst DropzoneEmptyState = ({ className }: { className?: string }) => {\n  const { maxFiles, maxFileSize, inputRef, isSuccess } = useDropzoneContext()\n\n  if (isSuccess) {\n    return null\n  }\n\n  return (\n    <div className={cn('flex flex-col items-center gap-y-2', className)}>\n      <Upload size={20} className=\"text-muted-foreground\" />\n      <p className=\"text-sm\">\n        Upload{!!maxFiles && maxFiles > 1 ? ` ${maxFiles}` : ''} file\n        {!maxFiles || maxFiles > 1 ? 's' : ''}\n      </p>\n      <div className=\"flex flex-col items-center gap-y-1\">\n        <p className=\"text-xs text-muted-foreground\">\n          Drag and drop or{' '}\n          <a\n            onClick={() => inputRef.current?.click()}\n            className=\"underline cursor-pointer transition hover:text-foreground\"\n          >\n            select {maxFiles === 1 ? `file` : 'files'}\n          </a>{' '}\n          to upload\n        </p>\n        {maxFileSize !== Number.POSITIVE_INFINITY && (\n          <p className=\"text-xs text-muted-foreground\">\n            Maximum file size: {formatBytes(maxFileSize, 2)}\n          </p>\n        )}\n      </div>\n    </div>\n  )\n}\n\nconst useDropzoneContext = () => {\n  const context = useContext(DropzoneContext)\n\n  if (!context) {\n    throw new Error('useDropzoneContext must be used within a Dropzone')\n  }\n\n  return context\n}\n\nexport { Dropzone, DropzoneContent, DropzoneEmptyState, useDropzoneContext }\n"
+          },
+          {
+            "path": "registry/default/blocks/dropzone/hooks/use-supabase-upload.ts",
+            "content": "import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'\nimport { useCallback, useEffect, useMemo, useState } from 'react'\nimport { type FileError, type FileRejection, useDropzone } from 'react-dropzone'\n\nconst supabase = createClient()\n\ninterface FileWithPreview extends File {\n  preview?: string\n  errors: readonly FileError[]\n}\n\ntype UseSupabaseUploadOptions = {\n  /**\n   * Name of bucket to upload files to in your Supabase project\n   */\n  bucketName: string\n  /**\n   * Folder to upload files to in the specified bucket within your Supabase project.\n   *\n   * Defaults to uploading files to the root of the bucket\n   *\n   * e.g If specified path is `test`, your file will be uploaded as `test/file_name`\n   */\n  path?: string\n  /**\n   * Allowed MIME types for each file upload (e.g `image/png`, `text/html`, etc). Wildcards are also supported (e.g `image/*`).\n   *\n   * Defaults to allowing uploading of all MIME types.\n   */\n  allowedMimeTypes?: string[]\n  /**\n   * Maximum upload size of each file allowed in bytes. (e.g 1000 bytes = 1 KB)\n   */\n  maxFileSize?: number\n  /**\n   * Maximum number of files allowed per upload.\n   */\n  maxFiles?: number\n  /**\n   * The number of seconds the asset is cached in the browser and in the Supabase CDN.\n   *\n   * This is set in the Cache-Control: max-age=<seconds> header. Defaults to 3600 seconds.\n   */\n  cacheControl?: number\n  /**\n   * When set to true, the file is overwritten if it exists.\n   *\n   * When set to false, an error is thrown if the object already exists. Defaults to `false`\n   */\n  upsert?: boolean\n}\n\ntype UseSupabaseUploadReturn = ReturnType<typeof useSupabaseUpload>\n\nconst useSupabaseUpload = (options: UseSupabaseUploadOptions) => {\n  const {\n    bucketName,\n    path,\n    allowedMimeTypes = [],\n    maxFileSize = Number.POSITIVE_INFINITY,\n    maxFiles = 1,\n    cacheControl = 3600,\n    upsert = false,\n  } = options\n\n  const [files, setFiles] = useState<FileWithPreview[]>([])\n  const [loading, setLoading] = useState<boolean>(false)\n  const [errors, setErrors] = useState<{ name: string; message: string }[]>([])\n  const [successes, setSuccesses] = useState<string[]>([])\n\n  const isSuccess = useMemo(() => {\n    if (errors.length === 0 && successes.length === 0) {\n      return false\n    }\n    if (errors.length === 0 && successes.length === files.length) {\n      return true\n    }\n    return false\n  }, [errors.length, successes.length, files.length])\n\n  const onDrop = useCallback(\n    (acceptedFiles: File[], fileRejections: FileRejection[]) => {\n      const validFiles = acceptedFiles\n        .filter((file) => !files.find((x) => x.name === file.name))\n        .map((file) => {\n          ;(file as FileWithPreview).preview = URL.createObjectURL(file)\n          ;(file as FileWithPreview).errors = []\n          return file as FileWithPreview\n        })\n\n      const invalidFiles = fileRejections.map(({ file, errors }) => {\n        ;(file as FileWithPreview).preview = URL.createObjectURL(file)\n        ;(file as FileWithPreview).errors = errors\n        return file as FileWithPreview\n      })\n\n      const newFiles = [...files, ...validFiles, ...invalidFiles]\n\n      setFiles(newFiles)\n    },\n    [files, setFiles]\n  )\n\n  const dropzoneProps = useDropzone({\n    onDrop,\n    noClick: true,\n    accept: allowedMimeTypes.reduce((acc, type) => ({ ...acc, [type]: [] }), {}),\n    maxSize: maxFileSize,\n    maxFiles: maxFiles,\n    multiple: maxFiles !== 1,\n  })\n\n  const onUpload = useCallback(async () => {\n    setLoading(true)\n\n    // [Joshen] This is to support handling partial successes\n    // If any files didn't upload for any reason, hitting \"Upload\" again will only upload the files that had errors\n    const filesWithErrors = errors.map((x) => x.name)\n    const filesToUpload =\n      filesWithErrors.length > 0\n        ? [\n            ...files.filter((f) => filesWithErrors.includes(f.name)),\n            ...files.filter((f) => !successes.includes(f.name)),\n          ]\n        : files\n\n    const responses = await Promise.all(\n      filesToUpload.map(async (file) => {\n        const { error } = await supabase.storage\n          .from(bucketName)\n          .upload(!!path ? `${path}/${file.name}` : file.name, file, {\n            cacheControl: cacheControl.toString(),\n            upsert,\n          })\n        if (error) {\n          return { name: file.name, message: error.message }\n        } else {\n          return { name: file.name, message: undefined }\n        }\n      })\n    )\n\n    const responseErrors = responses.filter((x) => x.message !== undefined)\n    // if there were errors previously, this function tried to upload the files again so we should clear/overwrite the existing errors.\n    setErrors(responseErrors)\n\n    const responseSuccesses = responses.filter((x) => x.message === undefined)\n    const newSuccesses = Array.from(\n      new Set([...successes, ...responseSuccesses.map((x) => x.name)])\n    )\n    setSuccesses(newSuccesses)\n\n    setLoading(false)\n  }, [files, path, bucketName, errors, successes])\n\n  useEffect(() => {\n    if (files.length === 0) {\n      setErrors([])\n    }\n\n    // If the number of files doesn't exceed the maxFiles parameter, remove the error 'Too many files' from each file\n    if (files.length <= maxFiles) {\n      let changed = false\n      const newFiles = files.map((file) => {\n        if (file.errors.some((e) => e.code === 'too-many-files')) {\n          file.errors = file.errors.filter((e) => e.code !== 'too-many-files')\n          changed = true\n        }\n        return file\n      })\n      if (changed) {\n        setFiles(newFiles)\n      }\n    }\n  }, [files.length, setFiles, maxFiles])\n\n  return {\n    files,\n    setFiles,\n    successes,\n    isSuccess,\n    loading,\n    errors,\n    setErrors,\n    onUpload,\n    maxFileSize: maxFileSize,\n    maxFiles: maxFiles,\n    allowedMimeTypes,\n    ...dropzoneProps,\n  }\n}\n\nexport { useSupabaseUpload, type UseSupabaseUploadOptions, type UseSupabaseUploadReturn }\n"
+          },
+          {
+            "path": "registry/default/clients/react/lib/supabase/client.ts",
+            "content": "import { createClient as createSupabaseClient } from '@supabase/supabase-js'\n\nexport function createClient() {\n  return createSupabaseClient(\n    import.meta.env.VITE_SUPABASE_URL!,\n    import.meta.env.VITE_SUPABASE_ANON_KEY!\n  )\n}\n"
+          }
+        ]
+      },
+      {
+        "id": "ae-manual-add-env-vars",
+        "title": "Add Environment Variables",
+        "description": "Add the required environment variables for the Edge Function: OPENAI_API_KEY (your OpenAI API key), `SUPABASE_URL`, and `SUPABASE_SERVICE_ROLE_KEY`. For local development, add these to `.env.local`. For cloud deployment, add them in Project Settings > Edge Functions > Add new variable.",
+        "type": "manual",
+        "action": "Environment Variables Needed:\n- OPENAI_API_KEY: Your OpenAI API key.\n- `SUPABASE_URL`: Your project URL.\n- `SUPABASE_SERVICE_ROLE_KEY`: Your project's service_role key."
+      },
+      {
+        "id": "ae-add-project-url-secret",
+        "title": "Add Project URL to Vault",
+        "description": "Securely store your project's API URL in Vault. If running locally via `supabase start`, add the first command to `supabase/seed.sql`. If deploying to the cloud, run the second command in the SQL Editor, replacing {{projectUrl}} with your actual Project API URL (found in Project Settings > API).",
+        "type": "sql",
+        "action": "-- For cloud deployment (run in SQL Editor):\nselect vault.create_secret('{{projectUrl}}', 'project_url');"
+      },
+      {
+        "id": "ae-create-pgmq-queue",
+        "title": "Create Embedding Job Queue",
+        "description": "Create a `pgmq` message queue named {{queueName}} to manage embedding generation jobs.",
+        "type": "sql",
+        "action": "-- Queue for processing embedding jobs\nselect pgmq.create('{{queueName}}');"
+      },
+      {
+        "id": "ae-create-queue-embeddings-func",
+        "title": "Create Queue Embeddings Trigger Function",
+        "description": "Create a generic trigger function `util.queue_embeddings` that sends a job to the {{queueName}} queue. This job contains information needed to generate an embedding for a specific row.",
+        "type": "sql",
+        "action": "-- Generic trigger function to queue embedding jobs\ncreate or replace function util.queue_embeddings()\nreturns trigger\nlanguage plpgsql\nas $$ \ndeclare \n  content_function text = TG_ARGV[0]; \n  embedding_column text = TG_ARGV[1]; \n  queue_name text = TG_ARGV[2];\n  record_schema text = TG_TABLE_SCHEMA; \n  record_table text = TG_TABLE_NAME; \n  record_id text = NEW.id::text; -- Assumes an 'id' column \nbegin \n  -- Send job to the queue \n  perform pgmq.send( \n    queue_name, \n    jsonb_build_object( \n      'id', record_id, \n      'schema', record_schema, \n      'table', record_table, \n      'contentFunction', content_function, \n      'embeddingColumn', embedding_column \n    ) \n  ); \n  return NEW; \nend; \n$$;"
+      },
+      {
+        "id": "ae-create-process-jobs-func",
+        "title": "Create Job Processing Function",
+        "description": "Create the `util.process_embedding_jobs` function. This function reads jobs from the {{queueName}} queue, invokes the {{functionSlug}} Edge Function to process them in batches, and archives completed jobs.",
+        "type": "sql",
+        "action": "-- Function to process embedding jobs from the queue\ncreate or replace function util.process_embedding_jobs(queue_name text, function_name text, batch_size int default 10)\nreturns jsonb\nlanguage plpgsql\nas $$ \ndeclare \n  messages record; \n  batch jsonb = '[]'::jsonb; \n  batch_count int = 0; \n  job_ids bigint[] = '{}'; \nbegin \n  -- Read messages from the queue \n  select * into messages from pgmq.read(queue_name, 1, batch_size); \n \n  -- If no messages, return \n  if messages.read_ct = 0 then \n    return jsonb_build_object('processed_jobs', 0); \n  end if; \n \n  -- Process messages in batches \n  for batch_count in 1..messages.read_ct loop \n    batch := batch || messages.msgs[batch_count]->'msg'; \n    job_ids := array_append(job_ids, (messages.msgs[batch_count]->>'msg_id')::bigint); \n  end loop; \n \n  -- Invoke edge function with the batch \n  perform util.invoke_edge_function(function_name, batch); \n \n  -- Archive completed jobs \n  perform pgmq.archive(queue_name, job_ids); \n \n  return jsonb_build_object('processed_jobs', batch_count, 'job_ids', job_ids); \nend; \n$$;"
+      },
+      {
+        "id": "ae-schedule-cron-job",
+        "title": "Schedule Job Processing",
+        "description": "Use `pg_cron` to schedule the `util.process_embedding_jobs` function to run periodically (e.g., every minute). This automatically processes new jobs and retries failed ones. Adjust the schedule {{cronSchedule}} if needed.",
+        "type": "sql",
+        "action": "-- Schedule job processing every minute ('* * * * *'). Adjust {{cronSchedule}} if needed.\nselect cron.schedule(\n  'process-embeddings',\n  '{{cronSchedule}}',\n  $$ select util.process_embedding_jobs('{{queueName}}', '{{functionSlug}}') $$ \n);"
+      },
+      {
+        "id": "ae-create-example-table",
+        "title": "Create Example Table",
+        "description": "Create an example table {{tableName}} with an `id`, content columns ({{contentColumn1}}, {{contentColumn2}}), and a vector column {{embeddingColumn}} to store the generated embeddings.",
+        "type": "sql",
+        "action": "-- Example table to store documents and their embeddings\ncreate table public.{{tableName}} (\n  id bigserial primary key,\n  {{contentColumn1}} text,\n  {{contentColumn2}} text,\n  {{embeddingColumn}} vector({{embeddingDimension}})\n);"
+      },
+      {
+        "id": "ae-create-embedding-input-func",
+        "title": "Create Embedding Input Function",
+        "description": "Create a function {{embeddingInputFunction}} that takes a row from {{tableName}} and formats its content ({{contentColumn1}}, {{contentColumn2}}) into a single text string suitable for the embedding model.",
+        "type": "sql",
+        "action": "-- Function to generate input text for embedding\n-- Customize this based on your table structure and desired input format\ncreate or replace function public.{{embeddingInputFunction}}(doc public.{{tableName}})\nreturns text \nlanguage plpgsql \nimmutable \nas $$ \nbegin \n  -- Example: Combine title and content with formatting \n  return '# ' || doc.{{contentColumn1}} || E'\\n\\n' || doc.{{contentColumn2}}; \nend; \n$$;"
+      },
+      {
+        "id": "ae-create-insert-trigger",
+        "title": "Create Insert Trigger",
+        "description": "Create a trigger that calls `util.queue_embeddings` whenever a new row is inserted into {{tableName}}, queuing a job to generate its embedding.",
+        "type": "sql",
+        "action": "-- Trigger for insert events\ncreate trigger embed_documents_on_insert\n  after insert\n  on public.{{tableName}}\n  for each row\n  execute function util.queue_embeddings('{{embeddingInputFunction}}', '{{embeddingColumn}}', '{{queueName}}');"
+      },
+      {
+        "id": "ae-create-update-trigger",
+        "title": "Create Update Trigger",
+        "description": "Create a trigger that calls `util.queue_embeddings` whenever the content columns ({{contentColumn1}}, {{contentColumn2}}) of a row in {{tableName}} are updated, queuing a job to regenerate its embedding.",
+        "type": "sql",
+        "action": "-- Trigger for update events\ncreate trigger embed_documents_on_update\n  after update of {{contentColumn1}}, {{contentColumn2}} -- must match the columns in embedding_input()\n  on public.{{tableName}}\n  for each row\n  execute function util.queue_embeddings('{{embeddingInputFunction}}', '{{embeddingColumn}}', '{{queueName}}');"
+      },
+      {
+        "id": "ae-create-clear-trigger-optional",
+        "title": "(Optional) Create Clear Embedding Trigger",
+        "description": "Optionally, create a `BEFORE UPDATE` trigger to clear the {{embeddingColumn}} when content columns ({{contentColumn1}}, {{contentColumn2}}) change. This ensures accuracy but causes temporary gaps in search results.",
+        "type": "sql",
+        "action": "-- Trigger to clear the embedding column on update\ncreate trigger clear_document_embedding_on_update\n  before update of {{contentColumn1}}, {{contentColumn2}} -- must match the columns in embedding_input()\n  on public.{{tableName}}\n  for each row\n  execute function util.clear_column('{{embeddingColumn}}');"
+      },
+      {
+        "id": "ae-insert-test-data",
+        "title": "Insert Test Document",
+        "description": "Insert a sample document into {{tableName}} to trigger the embedding generation process.",
+        "type": "sql",
+        "action": "-- Insert a new document\ninsert into public.{{tableName}} ({{contentColumn1}}, {{contentColumn2}})\nvalues \n  ('{{testTitle}}', '{{testContent}}');"
+      },
+      {
+        "id": "ae-manual-verify-embedding",
+        "title": "Verify Embedding Generation",
+        "description": "Wait for the cron job to run (up to the interval defined in {{cronSchedule}}), then check the {{tableName}} table. The {{embeddingColumn}} for the test document should now be populated.",
+        "type": "manual",
+        "action": "Check the {{tableName}} table in the Table Editor. The row with title {{testTitle}} should have a value in the {{embeddingColumn}} column."
+      },
+      {
+        "id": "ae-update-test-data",
+        "title": "Update Test Document",
+        "description": "Update the content of the sample document in {{tableName}} to trigger the embedding regeneration process.",
+        "type": "sql",
+        "action": "-- Update the content of the document\nupdate public.{{tableName}}\nset {{contentColumn2}} = '{{newTestContent}}'\nwhere {{contentColumn1}} = '{{testTitle}}';"
+      },
+      {
+        "id": "ae-manual-verify-update",
+        "title": "Verify Embedding Regeneration",
+        "description": "Wait for the cron job to run again. Check the {{tableName}} table. The {{embeddingColumn}} for the test document should have been updated (or cleared and then repopulated if the optional clear trigger was added). You can compare the embedding value before and after the update.",
+        "type": "manual",
+        "action": "Check the {{tableName}} table again. The {{embeddingColumn}} for the row with title {{testTitle}} should reflect the updated content {{newTestContent}}."
+      },
+      {
+        "id": "ae-final-step",
+        "title": "Automatic Embeddings Setup Complete!",
+        "description": "You have successfully set up automatic embedding generation for the {{tableName}} table. New inserts and updates to {{contentColumn1}} or {{contentColumn2}} will now automatically trigger embedding generation/updates.",
+        "type": "final",
+        "action": null
+      }
+    ]
+  }
+]
