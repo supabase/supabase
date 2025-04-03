@@ -62,7 +62,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 1,
     dd: 'Mon',
     shipped: true,
-    isToday: true,
+    isToday: false,
     hasCountdown: false,
     blog: '/blog/supabase-ui-library',
     date: '31 March',
@@ -81,7 +81,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     ],
     steps: [
       {
-        title: 'TBD',
+        title: '',
         url: '#',
         blog: '#',
         bg_layers: [
@@ -99,49 +99,77 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-2',
     d: 2,
     dd: 'Tue',
-    shipped: false,
+    shipped: true,
     isToday: false,
-    hasCountdown: true,
-    blog: '',
+    hasCountdown: false,
+    blog: '/blog/supabase-edge-functions-deploy-dashboard-deno-2-1',
     date: '01 April',
     published_at: '2025-04-01T07:00:00.000-07:00',
-    title: '',
-    description: null,
+    title: 'Supabase Edge Functions: Deploy from the Dashboard + Deno 2.1',
+    description: <>Supabase Edge Functions: Deploy from the Dashboard + Deno 2.1</>,
     links: [
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
+      {
+        type: 'video',
+        href: 'Pn7xyTbsxPI',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1rmxPyVkLjbKN',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        url: '#',
+        blog: '#',
+        bg_layers: [
+          {
+            img: '/images/launchweek/14/releases/d2/day-2-dark.svg',
+            mobileImg: '/images/launchweek/14/releases/d2/day-2-dark-mobile.svg',
+            imgLight: '/images/launchweek/14/releases/d2/day-2-light.svg',
+            mobileImgLight: '/images/launchweek/14/releases/d2/day-2-light-mobile.svg',
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'day-3',
     d: 3,
     dd: 'Wed',
-    shipped: false,
-    isToday: false,
+    shipped: true,
+    isToday: true,
     hasCountdown: false,
-    blog: '',
+    blog: '/blog/realtime-broadcast-from-database',
     date: '02 April',
     published_at: '2025-04-02T07:00:00.000-07:00',
-    title: '',
-    description: null,
+    title: 'Realtime: Broadcast from Database',
+    description: <>Realtime: Broadcast from Database</>,
     links: [
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
+      {
+        type: 'video',
+        href: 'vRorVm_UbhA',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1zqKVjoPQzLKB',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        url: '#',
+        blog: '#',
+        bg_layers: [
+          {
+            img: '/images/launchweek/14/releases/d3/day-3-dark.svg',
+            mobileImg: '/images/launchweek/14/releases/d3/day-3-dark-mobile.svg',
+            imgLight: '/images/launchweek/14/releases/d3/day-3-light.svg',
+            mobileImgLight: '/images/launchweek/14/releases/d3/day-3-light-mobile.svg',
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'day-4',
@@ -149,7 +177,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     dd: 'Thu',
     shipped: false,
     isToday: false,
-    hasCountdown: false,
+    hasCountdown: true,
     blog: '',
     date: '03 April',
     published_at: '2025-04-03T07:00:00.000-07:00',
