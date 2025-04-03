@@ -176,7 +176,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 4,
     dd: 'Thu',
     shipped: true,
-    isToday: true,
+    isToday: false,
     hasCountdown: false,
     blog: '/blog/declarative-schemas',
     date: '03 April',
@@ -213,25 +213,39 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-5',
     d: 5,
     dd: 'Fri',
-    shipped: false,
-    isToday: false,
-    hasCountdown: true,
+    shipped: true,
+    isToday: true,
+    hasCountdown: false,
     blog: '',
     date: '04 April',
     published_at: '2025-04-04T07:00:00.000-07:00',
     title: '',
     description: null,
     links: [
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
+      {
+        type: 'video',
+        href: '',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1OwxWXywakQKQ',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        url: '#',
+        blog: '#',
+        bg_layers: [
+          {
+            img: '/images/launchweek/14/releases/d5/day-5-dark.svg',
+            mobileImg: '/images/launchweek/14/releases/d5/day-5-dark-mobile.svg',
+            imgLight: '/images/launchweek/14/releases/d5/day-5-light.svg',
+            mobileImgLight: '/images/launchweek/14/releases/d5/day-5-light-mobile.svg',
+          },
+        ],
+      },
+    ],
   },
 ]
 
