@@ -266,6 +266,29 @@ export interface FeaturePreviewDisabledEvent {
  */
 export interface ProjectCreationSimpleVersionSubmittedEvent {
   action: 'project_creation_simple_version_submitted'
+  /**
+   * the instance size selected in the project creation form
+   */
+  properties: {
+    instanceSize: string
+  }
+}
+
+/**
+ * Existing project creation form confirm modal was triggered.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface ProjectCreationSimpleVersionConfirmModalTriggeredEvent {
+  action: 'project_creation_simple_version_confirm_modal_triggered'
+  /**
+   * the instance size selected in the project creation form
+   */
+  properties: {
+    instanceSize: string
+  }
 }
 
 /**
@@ -1266,6 +1289,7 @@ export type TelemetryEvent =
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
   | ProjectCreationSimpleVersionSubmittedEvent
+  | ProjectCreationSimpleVersionConfirmModalTriggeredEvent
   | ProjectCreationInitialStepPromptIntendedEvent
   | ProjectCreationInitialStepSubmittedEvent
   | ProjectCreationSecondStepPromptIntendedEvent
