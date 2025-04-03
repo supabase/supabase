@@ -4,13 +4,15 @@ import type { LucideIcon } from 'lucide-react'
 import { TextLink } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '../Panel'
+import type { Testimonials } from '~/data/solutions/solutions.types'
 
-interface Props {
+interface Props extends Testimonials {
   id: string
   heading?: string | JSX.Element
   videos: {
-    lovable: FeatureProps
-    bolt: FeatureProps
+    [key: string]: {
+      url: string
+    }
   }
 }
 
@@ -24,7 +26,7 @@ type FeatureProps = {
   url: string
 }
 
-const EnterpriseSecurity: FC<Props> = (props) => {
+const EnterpriseSecurity: FC<Testimonials> = (props) => {
   return (
     <SectionContainer id={props.id} className="flex flex-col gap-4">
       <div className="flex flex-col gap-2 max-w-xl">

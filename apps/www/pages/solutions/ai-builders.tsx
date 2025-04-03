@@ -10,6 +10,7 @@ import EnterpriseLogos from '../../components/Enterprise/EnterpriseLogos'
 import SectionContainer from '../../components/Layouts/SectionContainer'
 
 const UseCases = dynamic(() => import('components/Solutions/UseCases'))
+const Quotes = dynamic(() => import('components/Solutions/Quotes'))
 const WhySupabase = dynamic(() => import('~/components/Solutions/FeaturesSection'))
 const FeaturesGrid = dynamic(() => import('~/components/Solutions/FeaturesGrid'))
 const VideosSection = dynamic(() => import('~/components/Solutions/Videos'))
@@ -35,10 +36,11 @@ const Enterprise: NextPage = () => (
         {...content.heroSection}
         className="[&_h1]:2xl:!text-5xl bg-default border-0 lg:pb-8 [&_.ph-footer]:mt-0 [&_.ph-footer]:lg:mt-16 [&_.ph-footer]:xl:mt-32"
         sectionContainerClassName="lg:gap-4"
-        footer={<EnterpriseLogos className="lg:max-w-xs xl:max-w-none" />}
+        // to do: get logos for page
+        // footer={<EnterpriseLogos className="lg:max-w-xs xl:max-w-none" />}
         footerPosition="left"
       />
-      <UseCases {...content['use-cases']} />
+      <Quotes {...content['quotes']} />
       <WhySupabase {...content.why} />
       <FeaturesGrid {...content.features} />
       <VideosSection {...content.testimonials} />

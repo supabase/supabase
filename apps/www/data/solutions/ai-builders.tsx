@@ -1,8 +1,9 @@
 import { Timer } from 'lucide-react'
 import { CubeIcon } from '@heroicons/react/outline'
 import { Image } from 'ui'
+import { AIData } from './solutions.types'
 
-export default {
+const data: AIData = {
   metadata: {
     metaTitle: 'Supabase for AI Builders',
     metaDescription:
@@ -53,17 +54,15 @@ export default {
       },
     ],
   },
-  'use-cases': {
-    id: 'use-cases',
-    // label: <>Build with Supabase</>,
-    // heading: <>Stay on the forefront</>,
-    stories: [
+  quotes: {
+    id: 'quotes',
+    items: [
       {
-        // icon: '/images/customers/logos/light/lovable.png',
-        // url: '',
-        target: '_blank',
-        // author: '',
-        subheading: (
+        icon: '/images/customers/logos/light/lovable.png',
+        avatar: '/images/avatars/alexander-pesant.jpg',
+        author: 'Alexander Pesant',
+        authorTitle: 'CEO Lovable',
+        quote: (
           <>
             We chose Supabase to supercharge the ability of Lovable.{' '}
             <span className="text-foreground">
@@ -75,11 +74,11 @@ export default {
         ),
       },
       {
-        // icon: '/images/customers/logos/light/lovable.png',
-        // url: '',
-        target: '_blank',
-        // author: 'Eric Simmons, CEO Stackblitz',
-        subheading: (
+        icon: '/images/customers/logos/light/bolt.png',
+        avatar: '/images/avatars/eric-simons.jpg',
+        author: 'Eric Simmons',
+        authorTitle: 'CEO Stackblitz',
+        quote: (
           <>
             Supabase is awesome. Supabase is the key database integration that we have. Really, the
             primary and only one we’re pointing people at because{' '}
@@ -91,11 +90,11 @@ export default {
         ),
       },
       {
-        // icon: '/images/customers/logos/light/lovable.png',
-        // url: '',
-        target: '_blank',
-        // author: 'Jared Palmer, VP of AI Vercel',
-        subheading: (
+        icon: '/images/customers/logos/light/v0.png',
+        avatar: '/images/avatars/jared-palmer.jpg',
+        author: 'Jared Palmer',
+        authorTitle: 'VP of AI Vercel',
+        quote: (
           <>
             <span className="text-foreground">v0 integrates with Supabase seamlessly.</span> If you
             ask v0 to generate an application and it needs Supabase, you’ll be prompted to create a
@@ -104,7 +103,6 @@ export default {
         ),
       },
     ],
-    // highlights: [],
   },
   why: {
     id: 'why-supabase',
@@ -565,3 +563,5 @@ export default {
     },
   },
 }
+
+export default data
