@@ -2,8 +2,7 @@ import Link from 'next/link'
 
 import { useParams } from 'common'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { Button, Input_Shadcn_ as Input, TooltipTrigger } from 'ui'
-
+import { Button } from 'ui'
 import { NoticeBar } from './ui/NoticeBar'
 
 // [Joshen] Only used for non AWS projects

@@ -17,9 +17,10 @@ import {
   useReadReplicasStatusesQuery,
 } from 'data/read-replicas/replicas-status-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 import { timeout } from 'lib/helpers'
+import Link from 'next/link'
 import { type AWS_REGIONS_KEYS } from 'shared-data'
-import { useAddonsPagePanel } from 'state/addons-page'
 import {
   Button,
   DropdownMenu,
@@ -38,8 +39,6 @@ import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceCo
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
-import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
-import { useRouter } from 'next/router'
 
 const InstanceConfigurationUI = () => {
   const reactFlow = useReactFlow()
@@ -48,8 +47,6 @@ const InstanceConfigurationUI = () => {
   const { ref: projectRef } = useParams()
   const numTransition = useRef<number>()
   const { project, isLoading: isLoadingProject } = useProjectContext()
-  const { setPanel } = useAddonsPagePanel()
-  const router = useRouter()
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
   const [showDeleteAllModal, setShowDeleteAllModal] = useState(false)
@@ -254,12 +251,10 @@ const InstanceConfigurationUI = () => {
                       />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-52 *:space-x-2">
-                      <DropdownMenuItem
-                        onClick={() =>
-                          router.push(`/project/${projectRef}/settings/compute-and-disk`)
-                        }
-                      >
-                        <div>Resize databases</div>
+                      <DropdownMenuItem asChild>
+                        <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                          Resize databases
+                        </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => setShowDeleteAllModal(true)}>

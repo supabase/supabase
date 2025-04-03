@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ExternalLink } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -30,8 +31,6 @@ import {
   WarningIcon,
   cn,
 } from 'ui'
-import { ExternalLink } from 'lucide-react'
-import { useRouter } from 'next/router'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -58,7 +57,6 @@ const PITRSidePanel = () => {
   const { resolvedTheme } = useTheme()
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
-  const router = useRouter()
 
   const [selectedCategory, setSelectedCategory] = useState<'on' | 'off'>('off')
   const [selectedOption, setSelectedOption] = useState<string>('pitr_0')
@@ -298,14 +296,10 @@ const PITRSidePanel = () => {
                   className="mb-4"
                   title="Your project is required to minimally be on a Small compute size to enable PITR"
                   actions={[
-                    <Button
-                      key="change-compute"
-                      type="default"
-                      onClick={() =>
-                        router.push(`/project/${projectRef}/settings/compute-and-disk`)
-                      }
-                    >
-                      Change compute size
+                    <Button asChild key="change-compute" type="default">
+                      <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                        Change compute size
+                      </Link>
                     </Button>,
                   ]}
                 >
