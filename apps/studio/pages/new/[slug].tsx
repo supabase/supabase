@@ -307,7 +307,7 @@ const Wizard: NextPageWithLayout = () => {
       !sizesWithNoCostConfirmationRequired.includes(values.instanceSize as DesiredInstanceSize)
     ) {
       sendEvent({
-        action: 'project_creation_simple_version_confirm_modal_triggered',
+        action: 'project_creation_simple_version_confirm_modal_opened',
         properties: {
           instanceSize: values.instanceSize,
         },

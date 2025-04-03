@@ -275,14 +275,14 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
 }
 
 /**
- * Existing project creation form confirm modal was triggered.
+ * Existing project creation form confirm modal was triggered and opened.
  *
  * @group Events
  * @source studio
  * @page new/{slug}
  */
-export interface ProjectCreationSimpleVersionConfirmModalTriggeredEvent {
-  action: 'project_creation_simple_version_confirm_modal_triggered'
+export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
+  action: 'project_creation_simple_version_confirm_modal_opened'
   /**
    * the instance size selected in the project creation form
    */
