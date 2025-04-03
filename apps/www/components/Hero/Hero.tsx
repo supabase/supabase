@@ -20,7 +20,7 @@ const Hero = () => {
                     <AnnouncementBadge
                       url="/launch-week#day-4"
                       badge="LW14: Day 4"
-                      announcement=""
+                      announcement="Introducing declarative schemas"
                       className="[&_a]:sm:gap-4 [&_.announcement-badge]:!text-xs [&_.announcement-text]:!text-xs [&_.announcement-badge]:sm:!text-sm [&_.announcement-text]:sm:!text-sm"
                       style={{
                         fontFamily:
