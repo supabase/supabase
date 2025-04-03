@@ -66,20 +66,18 @@ const QuoteCard: FC<Quote> = ({ quote, author, avatar, authorTitle }) => {
         <q className="text-base">{quote}</q>
       </div>
 
-      <div className="flex flex-row gap-3 w-full items-start">
-        <div>
-          <Image
-            src={avatar}
-            alt={author}
-            width={32}
-            height={32}
-            className="bg-surface-200 rounded-full border flex-shrink-0"
-          />
-        </div>
+      <div className="flex flex-row gap-3 w-full items-center">
+        <Image
+          src={avatar}
+          alt={author}
+          width={32}
+          height={32}
+          className="bg-surface-200 rounded-full border flex-shrink-0"
+        />
         <div className="flex flex-col gap-0">
-          <span className="text-base text-foreground-light">{author}</span>
+          <span className="text-base text-foreground-light leading-snug">{author}</span>
           {authorTitle && (
-            <span className="uppercase font-mono text-sm text-foreground-lighter">
+            <span className="uppercase font-mono text-sm text-foreground-lighter leading-tight">
               {authorTitle}
             </span>
           )}

@@ -1,6 +1,6 @@
 import { Timer } from 'lucide-react'
 import { CubeIcon } from '@heroicons/react/outline'
-import { Image } from 'ui'
+import { cn, Image } from 'ui'
 import { AIData } from './solutions.types'
 
 const data: AIData = {
@@ -126,13 +126,14 @@ const data: AIData = {
           'Supabase offers a fully integrated suite of tools including authentication, storage, edge functions, real-time subscriptions, and vector search. Use one or all.',
       },
       {
-        icon: () => (
+        icon: (props: any) => (
           <svg
             width="23"
             height="23"
-            viewBox="0 0 34 32"
+            viewBox="0 0 40 32"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
+            {...props}
           >
             <path
               fillRule="evenodd"
@@ -503,7 +504,7 @@ const data: AIData = {
                 d="M9.00391 1.67476C4.95842 1.67476 1.67891 4.95427 1.67891 8.99975C1.67891 13.0452 4.95842 16.3248 9.00391 16.3248C13.0494 16.3248 16.3289 13.0452 16.3289 8.99975C16.3289 4.95427 13.0494 1.67476 9.00391 1.67476ZM1.32891 8.99975C1.32891 4.76097 4.76512 1.32476 9.00391 1.32476C13.2427 1.32476 16.6789 4.76097 16.6789 8.99975C16.6789 13.2385 13.2427 16.6748 9.00391 16.6748C4.76512 16.6748 1.32891 13.2385 1.32891 8.99975Z"
                 fill="black"
                 stroke="currentColor"
-                strokeWidth="1.15"
+                strokeWidth="1"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />

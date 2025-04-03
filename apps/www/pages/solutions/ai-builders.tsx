@@ -6,14 +6,12 @@ import Layout from '~/components/Layouts/Default'
 import ProductHeader from '~/components/Sections/ProductHeader2'
 
 import content from '~/data/solutions/ai-builders'
-import EnterpriseLogos from '../../components/Enterprise/EnterpriseLogos'
-import SectionContainer from '../../components/Layouts/SectionContainer'
 
-const UseCases = dynamic(() => import('components/Solutions/UseCases'))
 const Quotes = dynamic(() => import('components/Solutions/Quotes'))
 const WhySupabase = dynamic(() => import('~/components/Solutions/FeaturesSection'))
 const FeaturesGrid = dynamic(() => import('~/components/Solutions/FeaturesGrid'))
 const VideosSection = dynamic(() => import('~/components/Solutions/Videos'))
+const CTAForm = dynamic(() => import('~/components/Solutions/CTAForm'))
 
 const Enterprise: NextPage = () => (
   <>
@@ -45,7 +43,7 @@ const Enterprise: NextPage = () => (
       <FeaturesGrid {...content.features} />
       <VideosSection {...content.testimonials} />
       {/* <EnterpriseQuote {...content.quote} /> */}
-      {/* <CTAForm /> */}
+      <CTAForm />
     </Layout>
   </>
 )
