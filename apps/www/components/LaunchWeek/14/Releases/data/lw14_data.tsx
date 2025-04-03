@@ -181,8 +181,8 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     blog: '/blog/declarative-schemas',
     date: '03 April',
     published_at: '2025-04-03T07:00:00.000-07:00',
-    title: 'Simplify database management with declarative schemas',
-    description: <>Simplify database management with declarative schemas</>,
+    title: 'Declarative Schemas for Simpler Database Management',
+    description: <>Declarative Schemas for Simpler Database Management</>,
     links: [
       {
         type: 'video',
