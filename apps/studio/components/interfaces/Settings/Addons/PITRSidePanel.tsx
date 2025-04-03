@@ -71,7 +71,7 @@ const PITRSidePanel = () => {
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+  const hasHipaaAddon = true
 
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
@@ -242,10 +242,10 @@ const PITRSidePanel = () => {
 
           {blockDowngradeDueToHipaa ? (
             <Alert_Shadcn_>
-              <AlertTitle_Shadcn_>PITR cannot be disabled with HIPAA</AlertTitle_Shadcn_>
+              <AlertTitle_Shadcn_>PITR cannot be disabled on HIPAA projects</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
-                All projects should have PITR enabled by default and cannot be disabled with HIPAA
-                enabled. Contact support for further assistance.
+                PITR is enabled by default for all HIPAA projects and cannot be turned off. Contact
+                support for further assistance.
               </AlertDescription_Shadcn_>
               <div className="mt-4">
                 <Button type="default" asChild>
