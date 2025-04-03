@@ -2974,6 +2974,11 @@ module.exports = [
     source: '/docs/guides/project-management/api',
     destination: '/docs/reference/api/introduction',
   },
+  {
+    permanent: false,
+    source: '/mcp',
+    destination: '/docs/guides/getting-started/mcp',
+  },
 
   // marketing
 
