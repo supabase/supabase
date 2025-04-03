@@ -13,6 +13,7 @@ interface CSVButtonProps {
   title?: string
 }
 
+// [Joshen] Let's use Papaparse instead and remove react-csv as a dependency, refer to DownloadResultsButton
 const CSVButton = ({
   onClick,
   buttonType = 'default',
@@ -23,9 +24,11 @@ const CSVButton = ({
   title,
 }: PropsWithChildren<CSVButtonProps>) => {
   const csvRef = useRef(null)
+
   const handleDownload = () => {
     ;(csvRef.current as any)?.link.click()
   }
+
   const formattedData = useMemo(() => {
     const first = data?.[0]
     if (!first || !data) return
