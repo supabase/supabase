@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -31,7 +32,6 @@ import {
   WarningIcon,
   cn,
 } from 'ui'
-import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -109,12 +109,12 @@ const PITRSidePanel = () => {
 
   // These are illegal states. If they are true, we should block the user from saving them.
   const blockDowngradeDueToReadReplicas =
-    hasReadReplicas && selectedCategory === 'off' && selectedOption === 'pitr_0'
+    hasChanges && hasReadReplicas && selectedCategory === 'off' && selectedOption === 'pitr_0'
   const blockDowngradeDueToHipaa =
     hasHipaaAddon &&
-    !!subscriptionPitr &&
-    // If the project is HIPAA, we don't allow the user to downgrade below 28 days
-    selectedPitr?.identifier !== 'pitr_28'
+    (selectedCategory !== 'on' ||
+      // If the project is HIPAA, we don't allow the user to downgrade below 28 days
+      selectedPitr?.identifier !== 'pitr_28')
 
   useEffect(() => {
     if (visible) {
