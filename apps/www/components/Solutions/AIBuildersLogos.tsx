@@ -3,29 +3,34 @@ import { cn } from 'ui'
 
 const logos = [
   {
-    image: `/images/logos/publicity/github.svg`,
-    alt: 'github',
-    name: 'github',
+    image: `/images/logos/publicity/v0.svg`,
+    alt: 'v0',
+    name: 'v0',
   },
   {
-    image: `/images/logos/publicity/mozilla.svg`,
-    alt: 'mozilla',
-    name: 'mozilla',
+    image: `/images/logos/publicity/bolt.svg`,
+    alt: 'bolt',
+    name: 'bolt',
   },
   {
-    image: `/images/logos/publicity/1password.svg`,
-    alt: '1password',
-    name: '1password',
+    image: `/images/logos/publicity/lovable.svg`,
+    alt: 'lovable',
+    name: 'lovable',
   },
   {
-    image: `/images/logos/publicity/pwc.svg`,
-    alt: 'pwc',
-    name: 'pwc',
+    image: `/images/logos/publicity/tempo-labs.svg`,
+    alt: 'tempo labs',
+    name: 'tempo-labs',
   },
   {
-    image: `/images/logos/publicity/langchain.svg`,
-    alt: 'langchain',
-    name: 'langchain',
+    image: `/images/logos/publicity/co-com.svg`,
+    alt: 'co.com',
+    name: 'co-com',
+  },
+  {
+    image: `/images/logos/publicity/gumloop.svg`,
+    alt: 'gumloop',
+    name: 'gumloop',
   },
 ]
 
@@ -50,8 +55,8 @@ const EnterpriseLogos: React.FC<Props> = ({ className }) => {
             className="
               w-auto block
               h-10 !min-h-10
-              md:h-12 md:!min-h-12
-              lg:h-11 lg:!min-h-11
+              md:h-10 md:!min-h-10
+              lg:h-7 lg:!min-h-7
               2xl:h-12 2xl:!min-h-12
             "
             draggable={false}
