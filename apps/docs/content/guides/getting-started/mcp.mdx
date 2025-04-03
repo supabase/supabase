@@ -1,13 +1,12 @@
 ---
 id: 'ai-tools-mcp'
 title: 'Model context protocol (MCP)'
-description: 'Connect AI tools to Supabase using MCP'
+subtitle: 'Connect your AI tools to Supabase using MCP'
+description: 'Connect your AI tools to Supabase using MCP'
 sidebar_label: 'Model context protocol (MCP)'
 ---
 
-The [Model Context Protocol](https://modelcontextprotocol.io/introduction) (MCP) is a standard for connecting Large Language Models (LLMs) to external services.
-
-This guide covers how to connect Supabase to the following AI tools using MCP:
+The [Model Context Protocol](https://modelcontextprotocol.io/introduction) (MCP) is a standard for connecting Large Language Models (LLMs) to platforms like Supabase. This guide covers how to connect Supabase to the following AI tools using MCP:
 
 - [Cursor](https://www.cursor.com/)
 - [Windsurf](https://docs.codeium.com/windsurf) (Codium)
@@ -15,34 +14,88 @@ This guide covers how to connect Supabase to the following AI tools using MCP:
 - [Claude desktop](https://claude.ai/download)
 - [Claude code](https://claude.ai/code)
 
-Once connected, you can use natural language commands to run read-only database queries in the AI tool.
+Once connected, your AI assistants can interact with and query your Supabase projects on your behalf.
 
-## Connect to Supabase using MCP
+## Step 1: Create a personal access token (PAT)
 
-Supabase uses the [Postgres MCP server](https://github.com/modelcontextprotocol/servers/tree/main/src/postgres) to provide MCP access to your database. The MCP server runs all queries as read-only transactions.
+First, go to your [Supabase settings](https://supabase.com/dashboard/account/tokens) and create a personal access token. Give it a name that describes its purpose, like "Cursor MCP Server". This will be used to authenticate the MCP server with your Supabase account.
+
+## Step 2: Configure in your AI tool
+
+MCP compatible tools can connect to Supabase using the [Supabase MCP server](https://github.com/supabase-community/supabase-mcp). Below are instructions for connecting to this server using popular AI tools:
+
+### Cursor
+
+1.  Open Cursor and create a `.cursor` directory in your project root if it doesn't exist.
+1.  Create a `.cursor/mcp.json` file if it doesn't exist and open it.
+1.  Add the following configuration:
+
+    <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Cursor" }} />
+
+1.  Save the configuration file.
+
+1.  Open Cursor and navigate to **Settings/MCP**. You should see a green active status after the server is successfully connected.
+
+### Windsurf
+
+1. Open Windsurf and navigate to the Cascade assistant.
+1. Tap on the hammer (MCP) icon, then **Configure** to open the configuration file.
+1. Add the following configuration:
+
+   <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Windsurf" }} />
+
+1. Save the configuration file and reload by tapping **Refresh** in the Cascade assistant.
+
+1. You should see a green active status after the server is successfully connected.
+
+### Cline
+
+1. Open the Cline extension in VS Code and tap the **MCP Servers** icon.
+1. Tap **Configure MCP Servers** to open the configuration file.
+1. Add the following configuration:
+
+   <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "VS Code" }} />
+
+1. Save the configuration file. Cline should automatically reload the configuration.
+
+1. You should see a green active status after the server is successfully connected.
+
+### Claude desktop
+
+1. Open Claude desktop and navigate to **Settings**.
+1. Under the **Developer** tab, tap **Edit Config** to open the configuration file.
+1. Add the following configuration:
+
+   <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Claude desktop" }} />
+
+1. Save the configuration file and restart Claude desktop.
+
+1. From the new chat screen, you should see a hammer (MCP) icon appear with the new MCP server available.
+
+### Claude code
+
+1. Create a `.mcp.json` file in your project root if it doesn't exist.
+1. Add the following configuration:
+
+   <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Claude code" }} />
+
+1. Save the configuration file.
+
+1. Restart Claude code to apply the new configuration.
+
+### Next steps
+
+Your AI tool is now connected to Supabase using MCP. Try asking your AI assistant to create a new project, create a table, or fetch project config.
+
+For a full list of tools available, see the [GitHub README](https://github.com/supabase-community/supabase-mcp#tools). If you experience any issues, [submit an bug report](https://github.com/supabase-community/supabase-mcp/issues/new?template=1.Bug_report.md).
+
+## MCP for local Supabase instances
+
+The Supabase MCP server connects directly to the cloud platform to access your database. If you are running a local instance of Supabase, you can instead use the [Postgres MCP server](https://github.com/modelcontextprotocol/servers/tree/main/src/postgres) to connect to your local database. This MCP server runs all queries as read-only transactions.
 
 ### Step 1: Find your database connection string
 
-To get started, you will need to retrieve your database connection string. These will differ depending on whether you are using a hosted or local instance of Supabase.
-
-#### For a hosted Supabase instance
-
-<ProjectConfigVariables variable="sessionPooler" />
-
-Log in and choose a project above to find your connection string, or find it in the Dashboard:
-
-1. Navigating to your project's [Connection settings](/dashboard/project/_/settings/database?showConnect=true)
-1. Copying the connection string found under **Session pooler**.
-
-<Admonition type="note">
-
-Be sure to replace `[YOUR-PASSWORD]` with your database password.
-
-</Admonition>
-
-#### For a local Supabase instance
-
-When running a local instance of Supabase via the [CLI](/docs/reference/cli/introduction), you can find your connection string by running:
+To connect to your local Supabase instance, you need to get the connection string for your local database. You can find your connection string by running:
 
 ```shell
 supabase status
@@ -56,69 +109,12 @@ npx supabase status
 
 This will output a list of details about your local Supabase instance. Copy the `DB URL` field in the output.
 
-### Step 2: Configure in your AI tool
+### Step 2: Configure the MCP server
 
-MCP compatible tools can connect to Supabase using the [Postgres MCP server](https://github.com/modelcontextprotocol/servers/tree/main/src/postgres). Below are instructions on to connect to the Postgres MCP server using popular AI tools:
+Configure your client with the following:
 
-#### Cursor
+<$Partial path="mcp_postgres_config.mdx" variables={{ "app": "your MCP client" }} />
 
-1.  Open Cursor and create a `.cursor` directory in your project root if it doesn't exist.
-1.  Create a `.cursor/mcp.json` file if it doesn't exist and open it.
-1.  Add the following configuration:
+### Next steps
 
-    <$Partial path="mcp_config.mdx" variables={{ "app": "Cursor" }} />
-
-1.  Save the configuration file.
-
-1.  Open Cursor and navigate to **Settings/MCP**. You should see a green active status after the server is successfully connected.
-
-#### Windsurf
-
-1. Open Windsurf and navigate to the Cascade assistant.
-1. Tap on the hammer (MCP) icon, then **Configure** to open the configuration file.
-1. Add the following configuration:
-
-   <$Partial path="mcp_config.mdx" variables={{ "app": "Windsurf" }} />
-
-1. Save the configuration file and reload by tapping **Refresh** in the Cascade assistant.
-
-1. You should see a green active status after the server is successfully connected.
-
-#### Cline
-
-1. Open the Cline extension in VS Code and tap the **MCP Servers** icon.
-1. Tap **Configure MCP Servers** to open the configuration file.
-1. Add the following configuration:
-
-   <$Partial path="mcp_config.mdx" variables={{ "app": "VS Code" }} />
-
-1. Save the configuration file. Cline should automatically reload the configuration.
-
-1. You should see a green active status after the server is successfully connected.
-
-#### Claude desktop
-
-1. Open Claude desktop and navigate to **Settings**.
-1. Under the **Developer** tab, tap **Edit Config** to open the configuration file.
-1. Add the following configuration:
-
-   <$Partial path="mcp_config.mdx" variables={{ "app": "Claude desktop" }} />
-
-1. Save the configuration file and restart Claude desktop.
-
-1. From the new chat screen, you should see a hammer (MCP) icon appear with the new MCP server available.
-
-#### Claude code
-
-1. Create a `.mcp.json` file in your project root if it doesn't exist.
-1. Add the following configuration:
-
-   <$Partial path="mcp_config.mdx" variables={{ "app": "Claude code" }} />
-
-1. Save the configuration file.
-
-1. Restart Claude code to apply the new configuration.
-
-## Next steps
-
-Your AI tool is now connected to Supabase using MCP. Try asking the AI tool to query your database using natural language commands.
+Your AI tool is now connected to your local Supabase instance using MCP. Try asking the AI tool to query your database using natural language commands.
