@@ -18,7 +18,6 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
-import { ExternalLink } from 'lucide-react'
 import { useAddonsPagePanel } from 'state/addons-page'
 import {
   Alert,
@@ -32,6 +31,7 @@ import {
   WarningIcon,
   cn,
 } from 'ui'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -58,6 +58,7 @@ const PITRSidePanel = () => {
   const { resolvedTheme } = useTheme()
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
+  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
 
   const [selectedCategory, setSelectedCategory] = useState<'on' | 'off'>('off')
   const [selectedOption, setSelectedOption] = useState<string>('pitr_0')
@@ -66,13 +67,13 @@ const PITRSidePanel = () => {
   const isBranchingEnabled =
     project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
 
-  const { panel, setPanel, closePanel } = useAddonsPagePanel()
+  const { panel, closePanel } = useAddonsPagePanel()
   const visible = panel === 'pitr'
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
 
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
@@ -108,7 +109,12 @@ const PITRSidePanel = () => {
   const blockDowngradeDueToReadReplicas =
     hasChanges && hasReadReplicas && selectedCategory === 'off' && selectedOption === 'pitr_0'
   const blockDowngradeDueToHipaa =
-    hasHipaaAddon && !!subscriptionPitr && hasChanges && !selectedPitr
+    hasHipaaAddon &&
+    !!subscriptionPitr &&
+    hasChanges &&
+    !selectedPitr &&
+    // If the project is HIPAA, we don't allow the user to downgrade below 28 days
+    selectedOption !== 'pitr_28'
 
   useEffect(() => {
     if (visible) {
@@ -197,7 +203,11 @@ const PITRSidePanel = () => {
                       } else if (subscriptionPitr?.variant.identifier !== undefined) {
                         setSelectedOption(subscriptionPitr.variant.identifier)
                       } else {
-                        setSelectedOption('pitr_7')
+                        if (hasHipaaAddon) {
+                          setSelectedOption('pitr_28')
+                        } else {
+                          setSelectedOption('pitr_7')
+                        }
                       }
                     }}
                   >
