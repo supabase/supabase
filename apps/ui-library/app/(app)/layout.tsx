@@ -1,8 +1,6 @@
-import SideNavigation from '@/components/side-navigation'
+import { Sidebar } from '@/components/sidebar'
 import { SiteFooter } from '@/components/site-footer'
-// import ThemeSettings from '@/components/theme-settings'
-import TopNavigation from '@/components/top-navigation'
-import { ScrollArea } from 'ui'
+import { TelemetryWrapper } from './telemetry-wrapper'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -11,19 +9,14 @@ interface AppLayoutProps {
 export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <>
-      {/* <TopNavigation /> */}
       {/* main container */}
-      <div className="">
+      <div className="pt-10 md:pt-0">
         {/* main content */}
-        <main className="flex-1 max-w-site mx-auto w-full">
+        <main className="flex-1 max-w-site mx-auto w-full p-0">
           {/* {children} */}
           <div className="border-b">
-            <div className="flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
-              <aside className="fixed z-30 top-0 hidden h-screen w-full shrink-0 md:sticky md:block bg-black/10 border-r border-muted/50">
-                <ScrollArea className="h-full">
-                  <SideNavigation />
-                </ScrollArea>
-              </aside>
+            <div className="flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] lg:grid-cols-[240px_minmax(0,1fr)]">
+              <Sidebar />
               <div vaul-drawer-wrapper="">
                 <div className="relative flex min-h-screen flex-col bg-background">{children}</div>
               </div>
@@ -32,6 +25,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </main>
       </div>
       <SiteFooter />
+      <TelemetryWrapper />
     </>
   )
 }

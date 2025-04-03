@@ -199,18 +199,15 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           {providers.map((provider) => {
             const providerMeta = PROVIDERS_SCHEMAS.find(
               (x) =>
-                x.title.toLowerCase() ===
-                (provider.name === 'linkedin' ? 'linkedin (oidc)' : provider.name)
+                ('key' in x && x.key === provider.name) || x.title.toLowerCase() === provider.name
             )
             const enabledProperty = Object.keys(providerMeta?.properties ?? {}).find((x) =>
               x.toLowerCase().endsWith('_enabled')
             )
             const providerName =
               provider.name === 'email'
-                ? 'email'
-                : provider.name === 'linkedin'
-                  ? 'LinkedIn'
-                  : providerMeta?.title ?? provider.name
+                ? provider.name.toLowerCase()
+                : providerMeta?.title ?? provider.name
             const isActive = data?.[enabledProperty as keyof typeof data] ?? false
 
             return (
@@ -340,7 +337,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         <div className={cn('flex flex-col -space-y-1 !pt-0', PANEL_PADDING)}>
           <RowAction
             title="Remove MFA factors"
-            description="This will log the user out of all active sessions"
+            description="Removes all MFA factors associated with the user"
             button={{
               icon: <ShieldOff />,
               text: 'Remove MFA factors',
@@ -409,12 +406,13 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         onConfirm={() => handleDeleteFactors()}
         alert={{
           base: { variant: 'warning' },
-          title: 'Removing MFA factors is irreversible',
-          description: 'This will log the user out of all active sessions.',
+          title:
+            "Removing MFA factors will drop the user's authentication assurance level (AAL) to AAL1",
+          description: 'Note that this does not sign the user out',
         }}
       >
         <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to remove the MFA factors for the user{' '}
+          Are you sure you want to remove the MFA factors for the user{' '}
           <span className="text-foreground">{user.email ?? user.phone ?? 'this user'}</span>?
         </p>
       </ConfirmationModal>

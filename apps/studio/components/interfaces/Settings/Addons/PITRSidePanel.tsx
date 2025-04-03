@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ExternalLink } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -301,12 +302,10 @@ const PITRSidePanel = () => {
                   className="mb-4"
                   title="Your project is required to minimally be on a Small compute size to enable PITR"
                   actions={[
-                    <Button
-                      key="change-compute"
-                      type="default"
-                      onClick={() => setPanel('computeInstance')}
-                    >
-                      Change compute size
+                    <Button asChild key="change-compute" type="default">
+                      <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                        Change compute size
+                      </Link>
                     </Button>,
                   ]}
                 >

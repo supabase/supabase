@@ -6,6 +6,7 @@
   "description": "",
   "registryDependencies": [],
   "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+  "docs": "You'll need to add a `.env` file with the following environment variables to your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.",
   "files": [
     {
       "path": "registry/default/clients/react-router/lib/supabase/client.ts",
