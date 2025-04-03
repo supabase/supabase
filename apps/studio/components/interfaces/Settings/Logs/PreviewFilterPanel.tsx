@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import CSVButton from 'components/ui/CSVButton'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { Button, Input, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
@@ -69,6 +69,8 @@ const PreviewFilterPanel = ({
   const router = useRouter()
   const { ref } = useParams()
   const [search, setSearch] = useState('')
+
+  const logName = router.pathname.split('/').pop()
 
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
 
@@ -233,7 +235,15 @@ const PreviewFilterPanel = ({
             Chart
           </Button>
         </div>
-        <CSVButton data={csvData} disabled={!Boolean(csvData)} title="Download data" />
+        {Boolean(csvData) && (
+          <DownloadResultsButton
+            iconOnly
+            type="default"
+            align="center"
+            results={csvData ?? []}
+            fileName={`supabase-${logName}-${ref}.csv`}
+          />
+        )}
       </div>
 
       {showDatabaseSelector ? (

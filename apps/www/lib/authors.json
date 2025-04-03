@@ -621,5 +621,13 @@
     "position": "Guest Author",
     "author_url": "https://x.com/juleswritescode",
     "author_image_url": "https://avatars.githubusercontent.com/u/68325451?v=4"
+  },
+  {
+    "author_id": "jordi",
+    "author": "Jordi Enric",
+    "username": "jordienr",
+    "position": "Engineering",
+    "author_url": "https://x.com/jordienr",
+    "author_image_url": "https://avatars.githubusercontent.com/u/37541088?v=4"
   }
 ]

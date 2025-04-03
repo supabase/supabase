@@ -35,7 +35,10 @@ const RenameQueryModal = ({
   const organization = useSelectedOrganization()
 
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const { data: subscription } = useOrgSubscriptionQuery(
+    { orgSlug: organization?.slug },
+    { enabled: visible }
+  )
   const isSQLSnippet = snippet.type === 'sql'
   const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 

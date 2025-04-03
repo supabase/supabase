@@ -21,7 +21,6 @@
     "eslint-config-supabase": "workspace:*",
     "icons": "workspace:*",
     "jotai": "^2.8.0",
-    "lodash.template": "4.5.0",
     "lucide-react": "*",
     "markdown-wasm": "^1.2.0",
     "next": "catalog:",

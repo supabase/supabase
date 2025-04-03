@@ -155,7 +155,14 @@ export const Grid = memo(
                   {isLoading && <TableGridInnerLoadingState />}
                   {isError && (
                     <div className="p-2 col-span-full">
-                      <AlertError error={error} subject="Failed to retrieve rows from table" />
+                      <AlertError error={error} subject="Failed to retrieve rows from table">
+                        {filters.length > 0 && (
+                          <p>
+                            Verify that the filter values are correct, as the error may stem from an
+                            incorrectly applied filter
+                          </p>
+                        )}
+                      </AlertError>
                     </div>
                   )}
                   {isSuccess && (
