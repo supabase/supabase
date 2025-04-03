@@ -5,6 +5,7 @@ import Param from 'components/interfaces/Docs/Param'
 import Snippets from 'components/interfaces/Docs/Snippets'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { ProjectJsonSchemaPaths } from 'data/docs/project-json-schema-query'
+import { useRouter } from 'next/navigation'
 
 /**
  * TODO: need to support rpc with the same name and different params type
@@ -27,6 +28,7 @@ const RpcContent = ({
   showApiKey,
   refreshDocs,
 }: RpcContentProps) => {
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const protocol = settings?.app_config?.protocol ?? 'https'
@@ -38,6 +40,11 @@ const RpcContent = ({
   const path = paths && pathKey in paths ? paths[pathKey] : undefined
   const keyToShow = !!showApiKey ? showApiKey : 'SUPABASE_KEY'
 
+  if (!path) {
+    router.push(`/project/${projectRef}/api?page=rpc-intro`)
+    return null
+  }
+
   const { post } = path!
   const { parameters, summary } = post || {}
   const rpcParamsObject =
@@ -47,8 +54,6 @@ const RpcContent = ({
   const rpcParams = Object.entries(rpcParamsObject)
     .map(([k, v]: any) => ({ name: k, ...v }))
     .filter((x) => !!x.name)
-
-  if (!path) return null
 
   return (
     <>
