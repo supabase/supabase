@@ -41,7 +41,12 @@ const EnableBranchingModal = () => {
     isLoading: isLoadingConnections,
     isSuccess: isSuccessConnections,
     isError: isErrorConnections,
-  } = useGitHubConnectionsQuery({ organizationId: selectedOrg?.id })
+  } = useGitHubConnectionsQuery(
+    {
+      organizationId: selectedOrg?.id,
+    },
+    { enabled: snap.showEnableBranchingModal }
+  )
 
   const project = useSelectedProject()
   const hasMinimumPgVersion =

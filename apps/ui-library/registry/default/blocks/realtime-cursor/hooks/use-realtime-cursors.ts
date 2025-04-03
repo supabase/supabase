@@ -2,6 +2,41 @@ import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/cli
 import { RealtimeChannel } from '@supabase/supabase-js'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+/**
+ * Throttle a callback to a certain delay, It will only call the callback if the delay has passed, with the arguments
+ * from the last call
+ */
+const useThrottleCallback = <Params extends unknown[], Return>(
+  callback: (...args: Params) => Return,
+  delay: number
+) => {
+  const lastCall = useRef(0)
+  const timeout = useRef<NodeJS.Timeout | null>(null)
+
+  return useCallback(
+    (...args: Params) => {
+      const now = Date.now()
+      const remainingTime = delay - (now - lastCall.current)
+
+      if (remainingTime <= 0) {
+        if (timeout.current) {
+          clearTimeout(timeout.current)
+          timeout.current = null
+        }
+        lastCall.current = now
+        callback(...args)
+      } else if (!timeout.current) {
+        timeout.current = setTimeout(() => {
+          lastCall.current = Date.now()
+          timeout.current = null
+          callback(...args)
+        }, remainingTime)
+      }
+    },
+    [callback, delay]
+  )
+}
+
 const supabase = createClient()
 
 const generateRandomColor = () => `hsl(${Math.floor(Math.random() * 360)}, 100%, 70%)`
@@ -26,9 +61,11 @@ type CursorEventPayload = {
 export const useRealtimeCursors = ({
   roomName,
   username,
+  throttleMs,
 }: {
   roomName: string
   username: string
+  throttleMs: number
 }) => {
   const [color] = useState(generateRandomColor())
   const [userId] = useState(generateRandomNumber())
@@ -36,7 +73,7 @@ export const useRealtimeCursors = ({
 
   const channelRef = useRef<RealtimeChannel | null>(null)
 
-  const handleMouseMove = useCallback(
+  const callback = useCallback(
     (event: MouseEvent) => {
       const { clientX, clientY } = event
 
@@ -61,6 +98,8 @@ export const useRealtimeCursors = ({
     },
     [color, userId, username]
   )
+
+  const handleMouseMove = useThrottleCallback(callback, throttleMs)
 
   useEffect(() => {
     const channel = supabase.channel(roomName)

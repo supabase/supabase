@@ -2,6 +2,8 @@
 
 import { ReactNode } from 'react'
 import { type ClassValue } from 'clsx'
+import { PRODUCT_MODULES } from 'shared-data/products'
+import { AppWindow } from 'lucide-react'
 
 export interface AdventDay {
   icon?: ReactNode // use svg jsx with 34x34px viewport
@@ -57,7 +59,7 @@ export const days: AdventDay[] = [
     ),
   },
   {
-    title: 'Supabase Auth: Bring your own Clerk',
+    title: 'Supabase Auth: Bring Your Own Clerk',
     // description: '',
     id: 'clerk',
     is_shipped: true,
@@ -92,19 +94,49 @@ export const days: AdventDay[] = [
     ),
   },
   {
-    title: '',
-    description: '',
-    id: '',
-    is_shipped: false,
-    links: [],
-    icon: null,
+    title: 'Automatic Embeddings in Postgres',
+    description: 'Move the vector generation step into Postgres',
+    id: 'automatic-embeddings',
+    is_shipped: true,
+    links: [
+      {
+        url: '/blog/automatic-embeddings',
+        label: 'Blog post',
+        target: '_blank',
+      },
+    ],
+    icon: (
+      <svg
+        width="32"
+        height="32"
+        viewBox="0 0 24 24"
+        className="text-foreground-light group-hover/menu-item:text-foreground group-focus-visible/menu-item:text-foreground"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1"
+          d={PRODUCT_MODULES.vector.icon[24]}
+          stroke="currentColor"
+        />
+      </svg>
+    ),
   },
   {
-    title: '',
-    description: '',
-    id: '',
-    is_shipped: false,
-    links: [],
-    icon: null,
+    title: "Keeping Tabs: What's New in Supabase Studio",
+    description: 'And upgrades to AI Assistant, SQL, and Logs',
+    id: 'tabs',
+    is_shipped: true,
+    links: [
+      {
+        url: '/blog/tabs-dashboard-updates',
+        label: 'Blog post',
+        target: '_blank',
+      },
+    ],
+    icon: <AppWindow size={30} />,
   },
 ]
