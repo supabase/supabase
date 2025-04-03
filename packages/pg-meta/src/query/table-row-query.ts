@@ -1,10 +1,10 @@
 import { ident } from '../pg-format'
-import { PGTable } from '../pg-meta-tables'
-import { Query } from './Query'
-import { Sort, Filter } from './types'
-import { PGView } from '../pg-meta-views'
 import { PGForeignTable } from '../pg-meta-foreign-tables'
 import { PGMaterializedView } from '../pg-meta-materialized-views'
+import { PGTable } from '../pg-meta-tables'
+import { PGView } from '../pg-meta-views'
+import { Query } from './Query'
+import { Filter, Sort } from './types'
 
 // Constants
 export const MAX_CHARACTERS = 10 * 1024 // 10KB
@@ -172,7 +172,13 @@ export const getTableRowsSql = ({
   let queryChains = query.from(table.name, table.schema).select(selectClause)
 
   filters.forEach((x) => {
-    queryChains = queryChains.filter(x.column, x.operator, x.value)
+    const col = table.columns?.find((y) => y.name === x.column)
+    const isStringTypeColumn = !!col ? TEXT_TYPES.includes(col.format) : true
+    queryChains = queryChains.filter(
+      x.column,
+      x.operator,
+      !isStringTypeColumn && x.value === '' ? null : x.value
+    )
   })
 
   // If sorts is empty and table row count is within threshold, use the primary key as the default sort
