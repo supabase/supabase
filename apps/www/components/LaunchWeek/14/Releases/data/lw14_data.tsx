@@ -178,7 +178,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     shipped: true,
     isToday: true,
     hasCountdown: false,
-    blog: '',
+    blog: '/blog/declarative-schemas',
     date: '03 April',
     published_at: '2025-04-03T07:00:00.000-07:00',
     title: 'Simplify database management with declarative schemas',
