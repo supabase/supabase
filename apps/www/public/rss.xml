@@ -7,7 +7,14 @@
       <language>en</language>
       <lastBuildDate>Wed, 02 Apr 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
-      <item>
+<item>
+  <guid>https://supabase.com/blog/declarative-schemas</guid>
+  <title>Simplify managing and maintaining complex database schemas</title>
+  <link>https://supabase.com/blog/declarative-schemas</link>
+  <description>Simplify managing and maintaining complex database schemas</description>
+  <pubDate>Wed, 03 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/realtime-broadcast-from-database</guid>
   <title>Realtime: Broadcast from Database</title>
   <link>https://supabase.com/blog/realtime-broadcast-from-database</link>
