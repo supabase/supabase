@@ -3,7 +3,7 @@
 import { ReactNode } from 'react'
 import { type ClassValue } from 'clsx'
 import { PRODUCT_MODULES } from 'shared-data/products'
-import { AppWindow, Database, ArrowUpDown } from 'lucide-react'
+import { AppWindow, Database, Globe } from 'lucide-react'
 
 export interface AdventDay {
   icon?: ReactNode // use svg jsx with 34x34px viewport
@@ -169,6 +169,6 @@ export const days: AdventDay[] = [
         target: '_blank',
       },
     ],
-    icon: <ArrowUpDown size={30} />,
+    icon: <Globe size={30} />,
   },
 ]
