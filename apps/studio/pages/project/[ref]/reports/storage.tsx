@@ -1,9 +1,7 @@
-import { useMemo } from 'react'
-
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { REPORTS_DATEPICKER_HELPERS } from 'components/interfaces/Reports/Reports.constants'
+import { createFilteredDatePickerHelpers } from 'components/interfaces/Reports/Reports.constants'
 import {
   CacheHitRateChartRenderer,
   TopCacheMissesRenderer,
@@ -36,14 +34,7 @@ export const StorageReport: NextPageWithLayout = () => {
     })
   }
 
-  const datepickerHelpers = useMemo(
-    () =>
-      REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
-        ...helper,
-        disabled: (index > 0 && plan?.id === 'free') || (index > 1 && plan?.id !== 'pro'),
-      })),
-    []
-  )
+  const datepickerHelpers = createFilteredDatePickerHelpers(plan?.id || 'free')
 
   return (
     <ReportPadding>
