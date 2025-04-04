@@ -90,14 +90,16 @@ const data: AIData = {
       },
       {
         icon: '/images/customers/logos/light/v0.png',
-        avatar: '/images/avatars/jared-palmer.jpg',
-        author: 'Jared Palmer',
-        authorTitle: 'Vercel (v0) - VP of AI',
+        avatar: '/images/avatars/kevin-michael.jpg',
+        author: 'Kevin Michael',
+        authorTitle: 'Tempo - CEO',
         quote: (
           <>
-            <span className="text-foreground">v0 integrates with Supabase seamlessly.</span> If you
-            ask v0 to generate an application and it needs Supabase, you’ll be prompted to create a
-            Supabase account right there in the application.
+            <span className="text-foreground">
+              Supabase is the missing piece for building full-stack react apps and has been our
+              go-to for a long time.
+            </span>{' '}
+            We love Supabase and so do our customers. Also a fellow YC company.
           </>
         ),
       },
