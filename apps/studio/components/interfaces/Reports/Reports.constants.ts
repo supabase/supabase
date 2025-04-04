@@ -7,10 +7,20 @@ export const LAYOUT_COLUMN_COUNT = 2
 
 export const REPORTS_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
+    text: 'Last 60 minutes',
+    calcFrom: () => dayjs().subtract(1, 'hour').startOf('day').toISOString(),
+    calcTo: () => '',
+    default: true,
+  },
+  {
+    text: 'Last 3 hours',
+    calcFrom: () => dayjs().subtract(3, 'hour').startOf('day').toISOString(),
+    calcTo: () => '',
+  },
+  {
     text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
     calcTo: () => '',
-    default: true,
   },
   {
     text: 'Last 7 days',
