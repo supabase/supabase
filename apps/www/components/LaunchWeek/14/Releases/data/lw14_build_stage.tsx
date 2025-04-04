@@ -139,14 +139,12 @@ export const days: AdventDay[] = [
       },
     ],
     icon: <AppWindow size={30} />,
-    className: 'xl:col-span-2',
   },
   {
     title: 'Dedicated Poolers',
     description: 'Dedicated pgbouncer instance co-located with your database',
     id: 'dedicated-poolers',
     is_shipped: true,
-    className: 'xl:col-span-2',
     links: [
       {
         url: '/blog/dedicated-poolers',
@@ -161,7 +159,7 @@ export const days: AdventDay[] = [
     // description: '',
     id: 'data-api-routes',
     is_shipped: true,
-    className: 'xl:col-span-2',
+    className: 'sm:col-span-2',
     links: [
       {
         url: '/blog/data-api-nearest-read-replica',
