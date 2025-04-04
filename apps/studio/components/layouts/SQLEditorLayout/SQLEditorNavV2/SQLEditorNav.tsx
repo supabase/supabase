@@ -561,7 +561,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {isLoadingSharedSqlSnippets ? (
             <SQLEditorLoadingSnippets />
-          ) : numProjectSnippets === 0 ? (
+          ) : sharedSnippets.length === 0 ? (
             <InnerSideBarEmptyPanel
               className="mx-2"
               title="No shared queries"
@@ -638,7 +638,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {isLoadingFavoriteSqlSnippets ? (
             <SQLEditorLoadingSnippets />
-          ) : numFavoriteSnippets === 0 ? (
+          ) : favoriteSnippets.length === 0 ? (
             <InnerSideBarEmptyPanel
               title="No favorite queries"
               className="mx-2 px-3"
@@ -722,7 +722,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {isLoading ? (
             <EditorMenuListSkeleton />
-          ) : folders.length === 0 && numPrivateSnippets === 0 ? (
+          ) : folders.length === 0 && privateSnippets.length === 0 ? (
             <EmptyPrivateQueriesPanel />
           ) : (
             <TreeView
