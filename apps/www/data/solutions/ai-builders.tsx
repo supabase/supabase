@@ -96,7 +96,7 @@ const data: AIData = {
         quote: (
           <>
             <span className="text-foreground">
-              Supabase is the missing piece for building full-stack react apps and has been our
+              Supabase is the missing piece for building full-stack React apps and has been our
               go-to for a long time.
             </span>{' '}
             We love Supabase and so do our customers. Also a fellow YC company.
