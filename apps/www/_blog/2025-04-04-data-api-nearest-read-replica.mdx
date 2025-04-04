@@ -23,6 +23,15 @@ It’s an impactful improvement that will minimize request latency for your glob
 
 Geo-aware routing automatically directs your Data API requests to the geographically closest read replica of your database, reducing latency and improving response times for your users around the world.
 
+<Img
+  wide
+  alt="Geo-aware routing diagram"
+  src={{
+    dark: '/images/blog/lw14-data-api-nearest-rr/geo-aware-routing.png',
+    light: '/images/blog/lw14-data-api-nearest-rr/geo-aware-routing-light.png',
+  }}
+/>
+
 Previously, if you had read replicas in Frankfurt, Singapore, and Virginia, a user located in Europe may experience dramatically different latencies because they could be making requests to any of the replicas.
 
 Our new geo-aware routing automatically connects users to the nearest read replica so the same user would only make requests to the read replica in the Frankfurt region.

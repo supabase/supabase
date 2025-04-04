@@ -164,7 +164,7 @@ export const days: AdventDay[] = [
     className: 'xl:col-span-2',
     links: [
       {
-        url: '/blog/data-api-nearest-replica',
+        url: '/blog/data-api-nearest-read-replica',
         label: 'Blog post',
         target: '_blank',
       },
