@@ -58,48 +58,66 @@ const data: AIData = {
     id: 'quotes',
     items: [
       {
-        icon: '/images/customers/logos/light/lovable.png',
-        avatar: '/images/avatars/antonosika.jpg',
+        icon: '/images/logos/publicity/lovable.svg',
+        avatar: '/images/avatars/anton-osika.jpg',
         author: 'Anton Osika',
         authorTitle: 'Lovable - CEO',
         quote: (
           <>
-            We chose Supabase because{' '}
+            We chose Supabase because it's{' '}
+            <span className="text-foreground">extremely user friendly</span> and{' '}
             <span className="text-foreground">
-              it’s extremely user friendly and covers all the needs to build full stack applications
+              covers all the needs to build full-stack applications
             </span>
             .
           </>
         ),
       },
       {
-        icon: '/images/customers/logos/light/bolt.png',
+        icon: '/images/logos/publicity/bolt.svg',
         avatar: '/images/avatars/eric-simons.jpg',
         author: 'Eric Simmons',
-        authorTitle: 'Stackblitz (Bolt.new) - CEO',
+        authorTitle: 'Bolt.new - CEO',
         quote: (
           <>
-            Supabase is awesome. Supabase is the key database integration that we have. Really, the
-            primary and only one we’re pointing people at because{' '}
+            Supabase is awesome. Supabase is the{' '}
+            <span className="text-foreground">key database integration</span> that we have...because
+            it’s the{' '}
             <span className="text-foreground">
-              it’s the best product in the world for storing and retrieving data
+              best product in the world for storing and retrieving data
             </span>
             .
           </>
         ),
       },
       {
-        icon: '/images/customers/logos/light/v0.png',
+        icon: '/images/logos/publicity/v0.svg',
+        avatar: '/images/avatars/guillermo-rauch.jpg',
+        author: 'Guillermo Rauch',
+        authorTitle: 'Vercel (v0) - CEO',
+        quote: (
+          <>
+            <span className="text-foreground">v0 integrates with Supabase seamlessly.</span> If you
+            ask v0 to generate an application and it needs Supabase,{' '}
+            <span className="text-foreground">
+              you’ll be prompted to create a Supabase account right there in the application
+            </span>
+            .
+          </>
+        ),
+      },
+      {
+        icon: '/images/logos/publicity/tempo.svg',
         avatar: '/images/avatars/kevin-michael.jpg',
         author: 'Kevin Michael',
         authorTitle: 'Tempo - CEO',
         quote: (
           <>
             <span className="text-foreground">
-              Supabase is the missing piece for building full-stack React apps and has been our
-              go-to for a long time.
+              Supabase is the missing piece for building full-stack React apps
             </span>{' '}
-            We love Supabase and so do our customers. Also a fellow YC company.
+            and has been <span className="text-foreground">our go-to for a long time</span>. We love
+            Supabase and so do our customers.
           </>
         ),
       },
