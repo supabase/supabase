@@ -2,6 +2,7 @@ import { Clipboard, Expand } from 'lucide-react'
 import { useState } from 'react'
 import DataGrid, { CalculatedColumn } from 'react-data-grid'
 
+import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
 import { copyToClipboard } from 'lib/helpers'
 import {
   cn,
@@ -121,14 +122,7 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
             className="h-full flex-grow border-t-0"
             rowClass={() => '[&>.rdg-cell]:items-center'}
             onSelectedCellChange={setCellPosition}
-            onCellKeyDown={({ column, row }, event) => {
-              if (event.code === 'KeyC' && event.metaKey) {
-                const colKey = column.key
-                const cellValue = row[colKey] ?? ''
-                const value = formatClipboardValue(cellValue)
-                copyToClipboard(value)
-              }
-            }}
+            onCellKeyDown={handleCopyCell}
           />
           <CellDetailPanel
             column={cellPosition?.column.name ?? ''}

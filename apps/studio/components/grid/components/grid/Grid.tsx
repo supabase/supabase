@@ -1,7 +1,7 @@
 import { forwardRef, memo, useRef } from 'react'
 import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
 
-import { formatClipboardValue } from 'components/grid/utils/common'
+import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
 import { TableGridInnerLoadingState } from 'components/interfaces/TableGridEditor/LoadingState'
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -9,7 +9,6 @@ import AlertError from 'components/ui/AlertError'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { copyToClipboard } from 'lib/helpers'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, cn } from 'ui'
@@ -201,14 +200,7 @@ export const Grid = memo(
             onSelectedCellChange={onSelectedCellChange}
             onSelectedRowsChange={onSelectedRowsChange}
             onCellDoubleClick={(props) => onRowDoubleClick(props.row, props.column)}
-            onCellKeyDown={({ column, row }, event) => {
-              if (event.code === 'KeyC' && event.metaKey) {
-                const colKey = column.key
-                const cellValue = row[colKey] ?? ''
-                const value = formatClipboardValue(cellValue)
-                copyToClipboard(value)
-              }
-            }}
+            onCellKeyDown={handleCopyCell}
           />
         </div>
       )
