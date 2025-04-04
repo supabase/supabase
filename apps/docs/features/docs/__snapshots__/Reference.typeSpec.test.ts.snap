@@ -1715,6 +1715,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   "isOptional": true
                                 },
                                 {
+                                  "name": "is_sso_user",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
                                   "name": "last_sign_in_at",
                                   "type": {
                                     "type": "intrinsic",
@@ -2145,6 +2153,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 },
                                 {
                                   "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_sso_user",
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "boolean"
@@ -2877,6 +2893,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   "isOptional": true
                                 },
                                 {
+                                  "name": "is_sso_user",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
                                   "name": "last_sign_in_at",
                                   "type": {
                                     "type": "intrinsic",
@@ -3304,6 +3328,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 },
                                 {
                                   "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_sso_user",
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "boolean"
@@ -3764,6 +3796,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 },
                                 {
                                   "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_sso_user",
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "boolean"
@@ -4509,6 +4549,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 },
                                 {
                                   "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_sso_user",
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "boolean"
@@ -5272,6 +5320,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         "isOptional": true
                                       },
                                       {
+                                        "name": "is_sso_user",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "boolean"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
                                         "name": "last_sign_in_at",
                                         "type": {
                                           "type": "intrinsic",
@@ -5618,6 +5674,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 },
                                 {
                                   "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_sso_user",
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "boolean"
@@ -6347,6 +6411,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         "isOptional": true
                                       },
                                       {
+                                        "name": "is_sso_user",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "boolean"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
                                         "name": "last_sign_in_at",
                                         "type": {
                                           "type": "intrinsic",
@@ -6799,6 +6871,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 },
                                 {
                                   "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_sso_user",
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "boolean"
@@ -7957,6 +8037,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   "isOptional": true
                                 },
                                 {
+                                  "name": "is_sso_user",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
                                   "name": "last_sign_in_at",
                                   "type": {
                                     "type": "intrinsic",
@@ -8505,6 +8593,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                 "isOptional": true
                                               },
                                               {
+                                                "name": "is_sso_user",
+                                                "type": {
+                                                  "type": "intrinsic",
+                                                  "name": "boolean"
+                                                },
+                                                "isOptional": true
+                                              },
+                                              {
                                                 "name": "last_sign_in_at",
                                                 "type": {
                                                   "type": "intrinsic",
@@ -9014,6 +9110,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             "isOptional": true
                                           },
                                           {
+                                            "name": "is_sso_user",
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "boolean"
+                                            },
+                                            "isOptional": true
+                                          },
+                                          {
                                             "name": "last_sign_in_at",
                                             "type": {
                                               "type": "intrinsic",
@@ -9369,6 +9473,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                     },
                                     {
                                       "name": "is_anonymous",
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "boolean"
+                                      },
+                                      "isOptional": true
+                                    },
+                                    {
+                                      "name": "is_sso_user",
                                       "type": {
                                         "type": "intrinsic",
                                         "name": "boolean"
@@ -9922,6 +10034,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             "isOptional": true
                                           },
                                           {
+                                            "name": "is_sso_user",
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "boolean"
+                                            },
+                                            "isOptional": true
+                                          },
+                                          {
                                             "name": "last_sign_in_at",
                                             "type": {
                                               "type": "intrinsic",
@@ -10277,6 +10397,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                     },
                                     {
                                       "name": "is_anonymous",
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "boolean"
+                                      },
+                                      "isOptional": true
+                                    },
+                                    {
+                                      "name": "is_sso_user",
                                       "type": {
                                         "type": "intrinsic",
                                         "name": "boolean"
@@ -11167,6 +11295,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             "isOptional": true
                                           },
                                           {
+                                            "name": "is_sso_user",
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "boolean"
+                                            },
+                                            "isOptional": true
+                                          },
+                                          {
                                             "name": "last_sign_in_at",
                                             "type": {
                                               "type": "intrinsic",
@@ -11522,6 +11658,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                     },
                                     {
                                       "name": "is_anonymous",
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "boolean"
+                                      },
+                                      "isOptional": true
+                                    },
+                                    {
+                                      "name": "is_sso_user",
                                       "type": {
                                         "type": "intrinsic",
                                         "name": "boolean"
@@ -12098,6 +12242,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             "isOptional": true
                                           },
                                           {
+                                            "name": "is_sso_user",
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "boolean"
+                                            },
+                                            "isOptional": true
+                                          },
+                                          {
                                             "name": "last_sign_in_at",
                                             "type": {
                                               "type": "intrinsic",
@@ -12453,6 +12605,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                     },
                                     {
                                       "name": "is_anonymous",
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "boolean"
+                                      },
+                                      "isOptional": true
+                                    },
+                                    {
+                                      "name": "is_sso_user",
                                       "type": {
                                         "type": "intrinsic",
                                         "name": "boolean"
@@ -13078,6 +13238,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         "isOptional": true
                                       },
                                       {
+                                        "name": "is_sso_user",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "boolean"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
                                         "name": "last_sign_in_at",
                                         "type": {
                                           "type": "intrinsic",
@@ -13424,6 +13592,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 },
                                 {
                                   "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_sso_user",
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "boolean"
@@ -14764,6 +14940,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         "isOptional": true
                                       },
                                       {
+                                        "name": "is_sso_user",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "boolean"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
                                         "name": "last_sign_in_at",
                                         "type": {
                                           "type": "intrinsic",
@@ -15110,6 +15294,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 },
                                 {
                                   "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_sso_user",
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "boolean"
@@ -16084,6 +16276,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             "isOptional": true
                                           },
                                           {
+                                            "name": "is_sso_user",
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "boolean"
+                                            },
+                                            "isOptional": true
+                                          },
+                                          {
                                             "name": "last_sign_in_at",
                                             "type": {
                                               "type": "intrinsic",
@@ -16439,6 +16639,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                     },
                                     {
                                       "name": "is_anonymous",
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "boolean"
+                                      },
+                                      "isOptional": true
+                                    },
+                                    {
+                                      "name": "is_sso_user",
                                       "type": {
                                         "type": "intrinsic",
                                         "name": "boolean"
@@ -17118,6 +17326,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 },
                                 {
                                   "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_sso_user",
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "boolean"
@@ -17882,6 +18098,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             "isOptional": true
                                           },
                                           {
+                                            "name": "is_sso_user",
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "boolean"
+                                            },
+                                            "isOptional": true
+                                          },
+                                          {
                                             "name": "last_sign_in_at",
                                             "type": {
                                               "type": "intrinsic",
@@ -18237,6 +18461,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                     },
                                     {
                                       "name": "is_anonymous",
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "boolean"
+                                      },
+                                      "isOptional": true
+                                    },
+                                    {
+                                      "name": "is_sso_user",
                                       "type": {
                                         "type": "intrinsic",
                                         "name": "boolean"
@@ -19166,6 +19398,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                 },
                                 {
                                   "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_sso_user",
                                   "type": {
                                     "type": "intrinsic",
                                     "name": "boolean"
@@ -20877,6 +21117,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   "isOptional": true
                                 },
                                 {
+                                  "name": "is_sso_user",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
                                   "name": "last_sign_in_at",
                                   "type": {
                                     "type": "intrinsic",
@@ -21403,6 +21651,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                           },
                           {
                             "name": "is_anonymous",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "boolean"
+                            },
+                            "isOptional": true
+                          },
+                          {
+                            "name": "is_sso_user",
                             "type": {
                               "type": "intrinsic",
                               "name": "boolean"

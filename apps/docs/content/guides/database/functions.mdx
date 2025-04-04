@@ -392,6 +392,7 @@ $$;
 ```
 
 It is best practice to use `security invoker` (which is also the default). If you ever use `security definer`, you _must_ set the `search_path`.
+If you use an empty search path (`search_path = ''`), you must explicitly state the schema for every relation in the function body (e.g. `from public.table`).
 This limits the potential damage if you allow access to schemas which the user executing the function should not have.
 
 ### Function privileges

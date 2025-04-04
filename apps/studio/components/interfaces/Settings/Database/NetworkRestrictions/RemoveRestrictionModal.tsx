@@ -19,7 +19,7 @@ const RemoveRestrictionModal = ({
 }: RemoveRestrictionModalProps) => {
   const { ref } = useParams()
 
-  const { data } = useNetworkRestrictionsQuery({ projectRef: ref })
+  const { data } = useNetworkRestrictionsQuery({ projectRef: ref }, { enabled: visible })
   const ipv4Restrictions = data?.config?.dbAllowedCidrs ?? []
   // @ts-ignore [Joshen] API typing issue
   const ipv6Restrictions: string[] = data?.config?.dbAllowedCidrsV6 ?? []

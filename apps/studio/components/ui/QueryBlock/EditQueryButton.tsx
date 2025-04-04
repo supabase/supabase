@@ -2,11 +2,15 @@ import { Edit } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
+import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import useNewQuery from 'components/interfaces/SQLEditor/hooks'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import Link from 'next/link'
 import { ComponentProps } from 'react'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   cn,
@@ -17,9 +21,6 @@ import {
   TooltipContent,
 } from 'ui'
 import { ButtonTooltip } from '../ButtonTooltip'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useAppStateSnapshot } from 'state/app-state'
-import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 interface EditQueryButtonProps {
   id?: string
@@ -39,8 +40,11 @@ export const EditQueryButton = ({
   const router = useRouter()
   const { ref } = useParams()
   const { newQuery } = useNewQuery()
+
   const sqlEditorSnap = useSqlEditorV2StateSnapshot()
   const { setEditorPanel } = useAppStateSnapshot()
+  const snap = useAiAssistantStateSnapshot()
+
   const isInSQLEditor = router.pathname.includes('/sql')
   const isInNewSnippet = router.pathname.endsWith('/sql')
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
@@ -50,16 +54,6 @@ export const EditQueryButton = ({
 
   const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
-
-  const handleEditInSQLEditor = () => {
-    if (sql) {
-      if (isInSQLEditor) {
-        sqlEditorSnap.setDiffContent(sql, DiffType.Addition)
-      } else {
-        newQuery(sql, title)
-      }
-    }
-  }
 
   if (id !== undefined) {
     return (
@@ -88,8 +82,9 @@ export const EditQueryButton = ({
             open: true,
             initialValue: sql,
           })
+          snap.closeAssistant()
         } else {
-          handleEditInSQLEditor()
+          if (sql) newQuery(sql, title)
         }
         sendEvent({
           action: 'assistant_edit_in_sql_editor_clicked',
@@ -124,7 +119,7 @@ export const EditQueryButton = ({
           >
             Replace code
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => sqlEditorSnap.setDiffContent(sql, DiffType.NewSnippet)}>
+          <DropdownMenuItem onClick={() => newQuery(sql, title)}>
             Create new snippet
           </DropdownMenuItem>
         </DropdownMenuContent>

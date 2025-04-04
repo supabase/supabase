@@ -280,7 +280,7 @@ const nextConfig = {
             value: 'computeInstance',
           },
         ],
-        destination: '/project/:ref/settings/addons?panel=computeInstance',
+        destination: '/project/:ref/settings/compute-and-disk',
         permanent: true,
       },
       {
@@ -378,11 +378,6 @@ const nextConfig = {
       {
         source: '/project/:ref/settings/billing/update/enterprise',
         destination: '/org/_/billing',
-        permanent: true,
-      },
-      {
-        source: '/project/:ref/sql',
-        destination: '/project/:ref/sql/new',
         permanent: true,
       },
       {

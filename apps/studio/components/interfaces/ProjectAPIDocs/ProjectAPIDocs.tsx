@@ -42,8 +42,14 @@ const ProjectAPIDocs = () => {
   const [showKeys, setShowKeys] = useState(false)
   const language = snap.docsLanguage
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
+  const { data: settings } = useProjectSettingsV2Query(
+    { projectRef: ref },
+    { enabled: snap.showProjectApiDocs }
+  )
+  const { data: customDomainData } = useCustomDomainsQuery(
+    { projectRef: ref },
+    { enabled: snap.showProjectApiDocs }
+  )
 
   const { anonKey } = getAPIKeys(settings)
   const apikey = showKeys

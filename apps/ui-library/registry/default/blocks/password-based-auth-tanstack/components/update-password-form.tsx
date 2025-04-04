@@ -18,10 +18,10 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
-  const supabase = createClient()
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault()
+    const supabase = createClient()
     setIsLoading(true)
     setError(null)
 
@@ -62,12 +62,6 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? 'Saving...' : 'Save new password'}
               </Button>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              Already have an account?{' '}
-              <a href="/login" className="underline underline-offset-4">
-                Login
-              </a>
             </div>
           </form>
         </CardContent>

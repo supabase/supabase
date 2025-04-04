@@ -13,12 +13,12 @@ import { CopyButton } from '@/components/copy-button'
 import { cn } from 'ui'
 // import { FrameworkDocs } from '@/components/framework-docs'
 import { CodeFragment } from '@/components/code-fragment'
-import { Colors } from '@/components/colors'
+import { DualRealtimeChat } from '@/components/dual-realtime-chat'
 import { Icons } from '@/components/icons'
 import { RegistryBlock } from '@/components/registry-block'
+import TanStackBeta from '@/components/tanstack-beta'
 import { ThemeSettings } from '@/components/theme-settings'
 import { Style } from '@/registry/styles'
-import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock'
 import {
   Accordion_Shadcn_ as Accordion,
   AccordionContent_Shadcn_ as AccordionContent,
@@ -35,13 +35,13 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { BlockItem } from './block-item'
+import { BlockPreview } from './block-preview'
 import { ComponentProps } from './component-props'
 import { SonnerExpandConfig } from './sonner-expand-config'
 import { SonnerPositionConfig } from './sonner-expand-position'
 import { StyleWrapper } from './style-wrapper'
 
 const components = {
-  DynamicCodeBlock,
   RegistryBlock,
   Accordion,
   AccordionContent,
@@ -96,10 +96,10 @@ const components = {
     />
   ),
   ul: ({ className, ...props }: React.HTMLAttributes<HTMLUListElement>) => (
-    <ul className={cn('my-6 ml-6 list-disc', className)} {...props} />
+    <ul className={cn('my-6 ml-6 list-disc text-foreground-light', className)} {...props} />
   ),
   ol: ({ className, ...props }: React.HTMLAttributes<HTMLOListElement>) => (
-    <ol className={cn('my-6 ml-6 list-decimal', className)} {...props} />
+    <ol className={cn('my-6 ml-6 list-decimal text-foreground-light', className)} {...props} />
   ),
   li: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
     <li className={cn('mt-2', className)} {...props} />
@@ -166,7 +166,7 @@ const components = {
       <StyleWrapper styleName={__style__}>
         <pre
           className={cn(
-            'mb-4 mt-6 max-h-[650px] overflow-x-auto rounded-lg border bg-surface-75/75 py-4',
+            'mb-4 mt-6 max-h-[650px] overflow-x-auto rounded-lg border bg-surface-75/75 py-4 text-foreground-light',
             className
           )}
           {...props}
@@ -250,6 +250,7 @@ const components = {
       {...props}
     />
   ),
+  TanStackBeta,
   // FrameworkDocs: ({ className, ...props }: React.ComponentProps<typeof FrameworkDocs>) => (
   //   <FrameworkDocs className={cn(className)} {...props} />
   // ),
@@ -259,13 +260,12 @@ const components = {
   LinkedCard: ({ className, ...props }: React.ComponentProps<typeof Link>) => (
     <Link
       className={cn(
-        'flex w-full flex-col items-center rounded-xl border bg-card p-6 text-card-foreground shadow transition-colors hover:bg-muted/50 sm:p-10',
+        'flex w-full flex-col items-center rounded-xl border bg-surface-100 text-card-background py-6 px-4 shadow transition-colors hover:bg-muted/50 sm:p-10',
         className
       )}
       {...props}
     />
   ),
-  Colors,
   Icons,
   ThemeSettings,
   CodeFragment,
@@ -273,6 +273,8 @@ const components = {
   SonnerExpandConfig,
   SonnerPositionConfig,
   BlockItem,
+  BlockPreview,
+  DualRealtimeChat,
 }
 
 interface MdxProps {

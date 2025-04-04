@@ -1,9 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Send } from 'lucide-react'
+import { Download, FileArchive, Send } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState, type PropsWithChildren } from 'react'
 import { toast } from 'sonner'
 
+import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { EdgeFunctionTesterSheet } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
@@ -11,12 +12,21 @@ import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import APIDocsButton from 'components/ui/APIDocsButton'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
-import { Button } from 'ui'
+import {
+  Button,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Separator,
+} from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
 
@@ -30,9 +40,15 @@ const EdgeFunctionDetailsLayout = ({
 }: PropsWithChildren<EdgeFunctionDetailsLayoutProps>) => {
   const router = useRouter()
   const { functionSlug, ref } = useParams()
+  const org = useSelectedOrganization()
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const edgeFunctionCreate = useFlag('edgeFunctionCreate')
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
-  const canReadFunctions = useCheckPermissions(PermissionAction.FUNCTIONS_READ, '*')
+  const { isLoading, can: canReadFunctions } = useAsyncCheckProjectPermissions(
+    PermissionAction.FUNCTIONS_READ,
+    '*'
+  )
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -41,7 +57,11 @@ const EdgeFunctionDetailsLayout = ({
     error,
     isError,
   } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
-  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
+
+  const { data: functionFiles = [], error: filesError } = useEdgeFunctionBodyQuery({
+    projectRef: ref,
+    slug: functionSlug,
+  })
 
   const name = selectedFunction?.name || ''
 
@@ -66,12 +86,43 @@ const EdgeFunctionDetailsLayout = ({
           label: 'Logs',
           href: `/project/${ref}/functions/${functionSlug}/logs`,
         },
+        ...(edgeFunctionCreate
+          ? [
+              {
+                label: 'Code',
+                href: `/project/${ref}/functions/${functionSlug}/code`,
+              },
+            ]
+          : []),
         {
           label: 'Details',
           href: `/project/${ref}/functions/${functionSlug}/details`,
         },
       ]
     : []
+
+  const downloadFunction = async () => {
+    if (filesError) return toast.error('Failed to retrieve edge function files')
+
+    const zipFileWriter = new BlobWriter('application/zip')
+    const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
+    functionFiles.forEach((file) => {
+      const nameSections = file.name.split('/')
+      const slugIndex = nameSections.indexOf(functionSlug ?? '')
+      const fileName = nameSections.slice(slugIndex + 1).join('/')
+
+      const fileBlob = new Blob([file.content])
+      zipWriter.add(fileName, new BlobReader(fileBlob))
+    })
+
+    const blobURL = URL.createObjectURL(await zipWriter.close())
+    const link = document.createElement('a')
+    link.href = blobURL
+    link.setAttribute('download', `${functionSlug}.zip`)
+    document.body.appendChild(link)
+    link.click()
+    link.parentNode?.removeChild(link)
+  }
 
   useEffect(() => {
     let cancel = false
@@ -86,7 +137,7 @@ const EdgeFunctionDetailsLayout = ({
     }
   }, [isError])
 
-  if (!canReadFunctions) {
+  if (!isLoading && !canReadFunctions) {
     return (
       <ProjectLayout title={title || 'Edge Functions'} product="Edge Functions">
         <NoPermission isFullPage resourceText="access your project's edge functions" />
@@ -112,8 +163,52 @@ const EdgeFunctionDetailsLayout = ({
               />
             )}
             <DocsButton href="https://supabase.com/docs/guides/functions" />
+            <Popover_Shadcn_>
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button type="default" icon={<Download />}>
+                  Download
+                </Button>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_ align="end" className="p-0">
+                <div className="p-3 flex flex-col gap-y-2">
+                  <p className="text-xs text-foreground-light">Download via CLI</p>
+                  <Input
+                    copy
+                    showCopyOnHover
+                    readOnly
+                    containerClassName=""
+                    className="text-xs font-mono tracking-tighter"
+                    value={`supabase functions download ${functionSlug}`}
+                  />
+                </div>
+                <Separator className="!bg-border-overlay" />
+                <div className="py-2 px-1">
+                  <Button
+                    type="text"
+                    className="w-min hover:bg-transparent"
+                    icon={<FileArchive />}
+                    onClick={downloadFunction}
+                  >
+                    Download as ZIP
+                  </Button>
+                </div>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
             {edgeFunctionCreate && !!functionSlug && (
-              <Button type="default" icon={<Send />} onClick={() => setIsOpen(true)}>
+              <Button
+                type="default"
+                icon={<Send />}
+                onClick={() => {
+                  setIsOpen(true)
+                  sendEvent({
+                    action: 'edge_function_test_side_panel_opened',
+                    groups: {
+                      project: ref ?? 'Unknown',
+                      organization: org?.slug ?? 'Unknown',
+                    },
+                  })
+                }}
+              >
                 Test
               </Button>
             )}

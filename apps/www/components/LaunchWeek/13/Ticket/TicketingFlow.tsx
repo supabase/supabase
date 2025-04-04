@@ -1,14 +1,13 @@
-import React from 'react'
-import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
+import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion'
 import { cn } from 'ui'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 import { LW13_DATE } from '~/lib/constants'
 
 import CanvasSingleMode from '~/components/LaunchWeek/13/Multiplayer/CanvasSingleMode'
 import ThreeTicketCanvas from '~/components/LaunchWeek/13/ThreeTicketCanvas'
-import SectionContainer from '~/components/Layouts/SectionContainer'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import useWinningChances from '~/components/LaunchWeek/hooks/useWinningChances'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 import TicketForm from '~/components/LaunchWeek/13/Ticket/TicketForm'
 import TicketSwagCtaBox from '~/components/LaunchWeek/13/Ticket/TicketSwagCtaBox'
@@ -119,15 +118,27 @@ const TicketingFlow = () => {
                           hasSecretTicket ? (
                             <p>Got the gold ticket, {FIRST_NAME}!</p>
                           ) : (
-                            <p>Good to see you, {FIRST_NAME}!</p>
+                            <p className='font-["Departure_Mono"] uppercase'>
+                              Good to see you, {FIRST_NAME}!
+                            </p>
                           )
                         ) : winningChances !== 2 ? (
                           <>
-                            {hasSecretTicket && <p>{FIRST_NAME}, you're gold!</p>}
-                            {!hasSecretTicket && <p>Good to see you, {FIRST_NAME}!</p>}
+                            {hasSecretTicket && (
+                              <p className='font-["Departure_Mono"] uppercase'>
+                                {FIRST_NAME}, you're gold!
+                              </p>
+                            )}
+                            {!hasSecretTicket && (
+                              <p className='font-["Departure_Mono"] uppercase'>
+                                Good to see you, {FIRST_NAME}!
+                              </p>
+                            )}
                           </>
                         ) : (
-                          <p>Good to see you, {FIRST_NAME}!</p>
+                          <p className='font-["Departure_Mono"] uppercase'>
+                            Good to see you, {FIRST_NAME}!
+                          </p>
                         )}
                       </div>
                     </div>

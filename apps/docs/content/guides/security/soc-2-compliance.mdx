@@ -68,6 +68,11 @@ Even though Supabase’s SOC 2 compliance does not transfer outside of the produ
 
 This defines the boundary or border between Supabase and customer responsibility for data security within the Shared Responsibility Model. Customer data stored within the Supabase product, on the Supabase side of the security boundary, is managed and secured by Supabase. Supabase ensures the safe handling and storage of data within this environment. This includes controls for preventing unauthorized access, monitoring data access, alerting, data backups and redundancy. Data on the customer side of the boundary, the data that enters and leaves the Supabase product, is the responsibility of the customer. Management and possible storage of such data outside of Supabase should be performed by the customer, and any security and compliance controls are the responsibility of the customer.
 
+**We have strong data residency requirements. Does Supabase SOC 2 cover data residency?**
+
+While SOC 2 itself does not mandate specific data residency requirements, organizations may still need to comply with other regulatory frameworks, such as GDPR, that do have such requirements. Ensuring projects are deployed in the correct region is a customer responsibility as each Supabase project is deployed into the region the customer specifies at creation time. All data will remain within the chosen region.
+[Read replicas](/docs/guides/platform/read-replicas) can be created for multi-region availability, it remains the customer's responsibility to ensure regions chosen for read replicas are within the geographic area required by any additional regulatory frameworks.
+
 **Does SOC 2 cover health related data (HIPAA)?**
 
 SOC 2 is non-industry specific and provides a framework for the security and privacy of data. This is however not sufficient in most cases when dealing with Protected Healthcare Information (PHI), which requires additional privacy and legal controls.
