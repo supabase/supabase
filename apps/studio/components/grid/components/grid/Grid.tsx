@@ -14,7 +14,6 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, cn } from 'ui'
 import type { Filter, GridProps, SupaRow } from '../../types'
-import { useKeyboardShortcuts } from '../common/Hooks'
 import { useOnRowsChange } from './Grid.utils'
 import RowRenderer from './RowRenderer'
 
@@ -62,28 +61,6 @@ export const Grid = memo(
       }
 
       const selectedCellRef = useRef<{ rowIdx: number; row: any; column: any } | null>(null)
-
-      function copyCellValue() {
-        const selectedCellValue =
-          selectedCellRef.current?.row?.[selectedCellRef.current?.column?.key]
-        const text = formatClipboardValue(selectedCellValue)
-        if (!text) return
-        copyToClipboard(text)
-      }
-
-      useKeyboardShortcuts(
-        {
-          'Command+c': (event: KeyboardEvent) => {
-            event.stopPropagation()
-            copyCellValue()
-          },
-          'Control+c': (event: KeyboardEvent) => {
-            event.stopPropagation()
-            copyCellValue()
-          },
-        },
-        ['INPUT', 'TEXTAREA']
-      )
 
       function onSelectedCellChange(args: { rowIdx: number; row: any; column: any }) {
         selectedCellRef.current = args
@@ -224,6 +201,14 @@ export const Grid = memo(
             onSelectedCellChange={onSelectedCellChange}
             onSelectedRowsChange={onSelectedRowsChange}
             onCellDoubleClick={(props) => onRowDoubleClick(props.row, props.column)}
+            onCellKeyDown={({ column, row }, event) => {
+              if (event.code === 'KeyC' && event.metaKey) {
+                const colKey = column.key
+                const cellValue = row[colKey] ?? ''
+                const value = formatClipboardValue(cellValue)
+                copyToClipboard(value)
+              }
+            }}
           />
         </div>
       )
