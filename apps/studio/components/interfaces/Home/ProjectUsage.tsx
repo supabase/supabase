@@ -15,6 +15,7 @@ import {
 } from 'data/analytics/project-log-stats-query'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import type { ChartIntervals } from 'types'
 import {
   Button,
@@ -29,13 +30,44 @@ import {
 const CHART_INTERVALS: ChartIntervals[] = [
   {
     key: 'minutely',
-    label: '60 minutes',
+    label: 'Last 60 minutes',
     startValue: 1,
     startUnit: 'hour',
     format: 'MMM D, h:mma',
+    availableIn: ['free', 'pro', 'enterprise', 'team'],
   },
-  { key: 'hourly', label: '24 hours', startValue: 24, startUnit: 'hour', format: 'MMM D, ha' },
-  { key: 'daily', label: '7 days', startValue: 7, startUnit: 'day', format: 'MMM D' },
+  {
+    key: '3-hours',
+    label: 'Last 3 hours',
+    startValue: 3,
+    startUnit: 'hour',
+    format: 'MMM D, h:mma',
+    availableIn: ['free', 'pro', 'enterprise', 'team'],
+  },
+  {
+    key: 'hourly',
+    label: 'Last 24 hours',
+    startValue: 24,
+    startUnit: 'hour',
+    format: 'MMM D, ha',
+    availableIn: ['free', 'pro', 'enterprise', 'team'],
+  },
+  {
+    key: '3-days',
+    label: 'Last 3 days',
+    startValue: 3,
+    startUnit: 'day',
+    format: 'MMM D',
+    availableIn: ['pro', 'enterprise', 'team'],
+  },
+  {
+    key: 'daily',
+    label: 'Last 7 days',
+    startValue: 7,
+    startUnit: 'day',
+    format: 'MMM D',
+    availableIn: ['pro', 'enterprise', 'team'],
+  },
 ]
 
 const ProjectUsage = () => {
@@ -47,7 +79,9 @@ const ProjectUsage = () => {
     'project_storage:all',
   ])
 
-  const [interval, setInterval] = useState<ProjectLogStatsVariables['interval']>('hourly')
+  const { data: plan } = useCurrentOrgPlan()
+
+  const [interval, setInterval] = useState<ProjectLogStatsVariables['interval']>('3-hours')
 
   const { data, isLoading } = useProjectLogStatsQuery({ projectRef, interval })
 
@@ -103,7 +137,11 @@ const ProjectUsage = () => {
               }
             >
               {CHART_INTERVALS.map((i) => (
-                <DropdownMenuRadioItem key={i.key} value={i.key}>
+                <DropdownMenuRadioItem
+                  key={i.key}
+                  value={i.key}
+                  disabled={!i.availableIn?.includes(plan?.id || 'free')}
+                >
                   {i.label}
                 </DropdownMenuRadioItem>
               ))}

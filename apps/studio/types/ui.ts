@@ -21,6 +21,7 @@ export interface ChartIntervals {
   startValue: number
   startUnit: 'minute' | 'hour' | 'day'
   format?: 'MMM D, h:mm:ssa' | 'MMM D, h:mma' | 'MMM D, ha' | 'MMM D'
+  availableIn?: PlanId[]
 }
 
 export interface VaultSecret {
