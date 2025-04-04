@@ -64,12 +64,11 @@ const data: AIData = {
         authorTitle: 'Lovable - CEO',
         quote: (
           <>
-            We chose Supabase to supercharge the ability of Lovable.{' '}
+            We chose Supabase because{' '}
             <span className="text-foreground">
-              {' '}
-              It has almost everything you want from your backend and database.
-            </span>{' '}
-            And this is where our growth took off even more.
+              it’s extremely user friendly and covers all the needs to build full stack applications
+            </span>
+            .
           </>
         ),
       },
@@ -80,9 +79,10 @@ const data: AIData = {
         authorTitle: 'CEO Stackblitz (Bolt.new)',
         quote: (
           <>
-            We chose Supabase because{' '}
+            Supabase is awesome. Supabase is the key database integration that we have. Really, the
+            primary and only one we’re pointing people at because{' '}
             <span className="text-foreground">
-              it’s extremely user friendly and covers all the needs to build full stack applications
+              it’s the best product in the world for storing and retrieving data
             </span>
             .
           </>
