@@ -1,36 +1,44 @@
+import Link from 'next/link'
 import React from 'react'
 import { cn } from 'ui'
 
 const logos = [
   {
-    image: `/images/logos/publicity/v0.svg`,
-    alt: 'v0',
-    name: 'v0',
+    image: `/images/logos/publicity/lovable.svg`,
+    alt: 'lovable',
+    name: 'lovable',
+    href: 'https://lovable.dev/',
   },
   {
     image: `/images/logos/publicity/bolt.svg`,
     alt: 'bolt',
     name: 'bolt',
+    href: 'https://bolt.new',
   },
   {
-    image: `/images/logos/publicity/lovable.svg`,
-    alt: 'lovable',
-    name: 'lovable',
+    image: `/images/logos/publicity/v0.svg`,
+    alt: 'v0',
+    name: 'v0',
+    href: 'https://v0.dev',
   },
+
   {
     image: `/images/logos/publicity/tempo-labs.svg`,
     alt: 'tempo labs',
     name: 'tempo-labs',
-  },
-  {
-    image: `/images/logos/publicity/co-com.svg`,
-    alt: 'co.com',
-    name: 'co-com',
+    href: 'https://www.tempo.new/',
   },
   {
     image: `/images/logos/publicity/gumloop.svg`,
     alt: 'gumloop',
     name: 'gumloop',
+    href: 'https://gumloop.com',
+  },
+  {
+    image: `/images/logos/publicity/co-com.svg`,
+    alt: 'co.com',
+    name: 'co-com',
+    href: 'https://co.dev',
   },
 ]
 
@@ -48,7 +56,12 @@ const EnterpriseLogos: React.FC<Props> = ({ className }) => {
       suppressHydrationWarning
     >
       {logos.map((logo) => (
-        <div key={`ent-logo-${logo.name}`} className="h-12 lg:h-12 w-max">
+        <Link
+          href={logo.href}
+          target="_blank"
+          key={`ent-logo-${logo.name}`}
+          className="h-12 lg:h-12 w-max hover:opacity-100 opacity-80 transition-opacity"
+        >
           <img
             src={logo.image}
             alt={logo.alt}
@@ -61,7 +74,7 @@ const EnterpriseLogos: React.FC<Props> = ({ className }) => {
             "
             draggable={false}
           />
-        </div>
+        </Link>
       ))}
     </div>
   )

@@ -1,6 +1,6 @@
 import { Timer } from 'lucide-react'
 import { CubeIcon } from '@heroicons/react/outline'
-import { cn, Image } from 'ui'
+import { Image } from 'ui'
 import { AIData } from './solutions.types'
 
 const data: AIData = {
@@ -59,9 +59,9 @@ const data: AIData = {
     items: [
       {
         icon: '/images/customers/logos/light/lovable.png',
-        avatar: '/images/avatars/alexander-pesant.jpg',
-        author: 'Alexander Pesant',
-        authorTitle: 'CEO Lovable',
+        avatar: '/images/avatars/antonosika.jpg',
+        author: 'Anton Osika',
+        authorTitle: 'Lovable - CEO',
         quote: (
           <>
             We chose Supabase to supercharge the ability of Lovable.{' '}
@@ -77,13 +77,12 @@ const data: AIData = {
         icon: '/images/customers/logos/light/bolt.png',
         avatar: '/images/avatars/eric-simons.jpg',
         author: 'Eric Simmons',
-        authorTitle: 'CEO Stackblitz',
+        authorTitle: 'CEO Stackblitz (Bolt.new)',
         quote: (
           <>
-            Supabase is awesome. Supabase is the key database integration that we have. Really, the
-            primary and only one we’re pointing people at because{' '}
+            We chose Supabase because{' '}
             <span className="text-foreground">
-              it’s the best product in the world for storing and retrieving data
+              it’s extremely user friendly and covers all the needs to build full stack applications
             </span>
             .
           </>
@@ -93,7 +92,7 @@ const data: AIData = {
         icon: '/images/customers/logos/light/v0.png',
         avatar: '/images/avatars/jared-palmer.jpg',
         author: 'Jared Palmer',
-        authorTitle: 'VP of AI Vercel',
+        authorTitle: 'Vercel (v0) - VP of AI',
         quote: (
           <>
             <span className="text-foreground">v0 integrates with Supabase seamlessly.</span> If you

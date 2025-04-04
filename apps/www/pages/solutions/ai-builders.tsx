@@ -24,7 +24,7 @@ const Enterprise: NextPage = () => (
         url: `https://supabase.com/enterprise`,
         images: [
           {
-            url: `/images/enterprise/enterprise-og.png`,
+            url: `/images/solutions/ai-builders/ai-builders-og.png`,
           },
         ],
       }}
