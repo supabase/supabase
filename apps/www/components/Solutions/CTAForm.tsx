@@ -13,7 +13,7 @@ const UseCases: FC<Props> = () => {
           <h1 className="h1 !m-0">
             Talk to our
             <br className="hidden md:block" />
-            partnership team
+            {' '}partnership team
           </h1>
           <p className="md:text-lg text-foreground-lighter">
             Explore custom pricing and infrastructure options.
