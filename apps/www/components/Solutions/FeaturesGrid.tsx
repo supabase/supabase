@@ -6,7 +6,7 @@ import SectionContainer from '../Layouts/SectionContainer'
 
 export default function FeaturesGrid(props: any) {
   return (
-    <SectionContainer className="flex flex-col gap-4">
+    <SectionContainer className="flex flex-col gap-4 xl:pt-20">
       <div className="flex flex-col gap-2 max-w-xl">
         <h2 className="h2 text-foreground-lighter !m-0">{props.heading}</h2>
         <p className="p !text-foreground-lighter max-w-md">{props.subheading}</p>

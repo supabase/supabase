@@ -7,7 +7,7 @@ interface Props {}
 
 const UseCases: FC<Props> = () => {
   return (
-    <SectionContainer className="text grid gap-8 lg:gap-12 md:grid-cols-2">
+    <SectionContainer className="text grid gap-8 lg:gap-12 md:grid-cols-2 xl:pt-20">
       <div className="md:h-full w-full flex flex-col justify-between gap-4 lg:gap-8">
         <div className="flex flex-col gap-2 md:max-w-md">
           <h1 className="h1 !m-0">

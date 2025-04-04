@@ -12,7 +12,7 @@ export type Story = {
 
 const EnterpriseSecurity: FC<Testimonials> = (props) => {
   return (
-    <SectionContainer id={props.id} className="flex flex-col gap-4">
+    <SectionContainer id={props.id} className="flex flex-col gap-4 xl:pt-20">
       <div className="flex flex-col gap-2 max-w-xl">
         <h2 className="h2 text-foreground-lighter !m-0">{props.heading}</h2>
       </div>
