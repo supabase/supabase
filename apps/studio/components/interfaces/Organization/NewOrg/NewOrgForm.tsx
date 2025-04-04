@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Edit2, ExternalLink, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { parseAsString, useQueryStates } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -18,7 +19,6 @@ import {
 import { BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { parseAsBoolean, parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs'
 import { Button, Input, Listbox, Toggle } from 'ui'
 
 const ORG_KIND_TYPES = {
@@ -64,6 +64,7 @@ type FormState = z.infer<typeof formSchema>
 
 /**
  * No org selected yet, create a new one
+ * [Joshen] Need to refactor to use Form_Shadcn here
  */
 const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const router = useRouter()
@@ -87,14 +88,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   })
 
   const updateForm = (key: keyof FormState, value: unknown) => {
-    try {
-      const result = formSchema.shape[key].safeParse(value)
-      if (result.success) {
-        setFormState((prev) => ({ ...prev, [key]: result.data }))
-      }
-    } catch {
-      // Invalid value, ignore
-    }
+    setFormState((prev) => ({ ...prev, [key]: value }))
   }
 
   useEffect(() => {
