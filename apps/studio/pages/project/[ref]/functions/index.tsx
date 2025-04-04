@@ -73,9 +73,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
             <Code className="shrink-0" size={16} strokeWidth={1.5} />
             <div>
               <span className="text-foreground">Via Editor</span>
-              <p>
-                Create an edge function in the Supabase Studio editor and then deploy your function
-              </p>
+              <p>Write and deploy in the browser</p>
             </div>
           </DropdownMenuItem>
         )}
@@ -95,9 +93,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
               <Terminal className="shrink-0" size={16} strokeWidth={1.5} />
               <div>
                 <span className="text-foreground">Via CLI</span>
-                <p>
-                  Create an edge function locally and then deploy your function via the Supabase CLI
-                </p>
+                <p>Write locally, deploy with the CLI</p>
               </div>
             </DropdownMenuItem>
           </DialogTrigger>
