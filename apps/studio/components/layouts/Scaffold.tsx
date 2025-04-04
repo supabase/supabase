@@ -4,7 +4,7 @@ import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { cn } from 'ui'
 
 export const MAX_WIDTH_CLASSES = 'mx-auto w-full max-w-[1200px]'
-export const PADDING_CLASSES = 'px-4 @lg:px-6 @xl:px-14 @2xl:px-24 @3xl:px-28'
+export const PADDING_CLASSES = 'px-4 @lg:px-6 @xl:px-12 @2xl:px-20 @3xl:px-24'
 export const MAX_WIDTH_CLASSES_COLUMN = 'min-w-[420px]'
 
 /**
