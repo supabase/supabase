@@ -23,10 +23,10 @@ const logos = [
   },
 
   {
-    image: `/images/logos/publicity/tempo-labs.svg`,
-    alt: 'tempo labs',
-    name: 'tempo-labs',
-    href: 'https://www.tempo.new/',
+    image: `/images/logos/publicity/tempo.svg`,
+    alt: 'tempo',
+    name: 'tempo',
+    href: 'https://tempo.new',
   },
   {
     image: `/images/logos/publicity/gumloop.svg`,
