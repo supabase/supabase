@@ -588,6 +588,7 @@ const SidePanelEditor = ({
           row={snap.sidePanel?.type === 'row' ? snap.sidePanel.row : undefined}
           selectedTable={selectedTable}
           visible={snap.sidePanel?.type === 'row'}
+          editable={editable}
           closePanel={onClosePanel}
           saveChanges={saveRow}
           updateEditorDirty={() => setIsEdited(true)}

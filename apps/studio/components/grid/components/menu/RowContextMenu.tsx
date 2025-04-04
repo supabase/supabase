@@ -1,6 +1,6 @@
 import { Clipboard, Edit, Trash } from 'lucide-react'
 import { useCallback } from 'react'
-import { Item, ItemParams, Menu, PredicateParams, Separator } from 'react-contexify'
+import { Item, ItemParams, Menu } from 'react-contexify'
 
 import type { SupaRow } from 'components/grid/types'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
@@ -27,13 +27,7 @@ const RowContextMenu = ({ rows }: RowContextMenuProps) => {
     const { props } = p
     const { rowIdx } = props
     const row = rows[rowIdx]
-    if (tableEditorSnap.onEditRow) tableEditorSnap.onEditRow(row)
-  }
-
-  function isItemHidden({ data }: PredicateParams) {
-    if (data === 'edit') return tableEditorSnap.onEditRow == undefined
-    if (data === 'delete') return !snap.editable
-    return false
+    tableEditorSnap.onEditRow(row)
   }
 
   const onCopyCellContent = useCallback(
@@ -64,12 +58,11 @@ const RowContextMenu = ({ rows }: RowContextMenuProps) => {
           <Clipboard size={14} />
           <span className="ml-2 text-xs">Copy cell content</span>
         </Item>
-        <Item onClick={onEditRowClick} hidden={isItemHidden} data="edit">
+        <Item onClick={onEditRowClick} hidden={!snap.editable} data="edit">
           <Edit size={14} />
           <span className="ml-2 text-xs">Edit row</span>
         </Item>
-        {snap.editable && <Separator />}
-        <Item onClick={onDeleteRow} hidden={isItemHidden} data="delete">
+        <Item onClick={onDeleteRow} hidden={!snap.editable} data="delete">
           <Trash size={14} stroke="red" />
           <span className="ml-2 text-xs">Delete row</span>
         </Item>

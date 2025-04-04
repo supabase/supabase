@@ -48,7 +48,7 @@ const PromoToast = () => {
           }}
           className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7"
         >
-          Realtime: Broadcast from Database
+          Declarative Schemas for Simpler Database Management
         </p>
       </div>
 

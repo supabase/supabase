@@ -84,6 +84,7 @@ import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -99,6 +100,8 @@ const sizes: DesiredInstanceSize[] = [
   '12xlarge',
   '16xlarge',
 ]
+
+const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 
 const FormSchema = z.object({
   organization: z.string({
@@ -146,6 +149,9 @@ const Wizard: NextPageWithLayout = () => {
 
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
+
+  const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
+    useState(false)
 
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
@@ -201,6 +207,9 @@ const Wizard: NextPageWithLayout = () => {
     onSuccess: (res) => {
       sendEvent({
         action: 'project_creation_simple_version_submitted',
+        properties: {
+          instanceSize: form.getValues('instanceSize'),
+        },
       })
       router.push(`/project/${res.ref}/building`)
     },
@@ -290,6 +299,23 @@ const Wizard: NextPageWithLayout = () => {
     const password = generateStrongPassword()
     form.setValue('dbPass', password)
     delayedCheckPasswordStrength(password)
+  }
+
+  const onSubmitWithComputeCostsConfirmation = async (values: z.infer<typeof FormSchema>) => {
+    if (
+      values.instanceSize &&
+      !sizesWithNoCostConfirmationRequired.includes(values.instanceSize as DesiredInstanceSize)
+    ) {
+      sendEvent({
+        action: 'project_creation_simple_version_confirm_modal_opened',
+        properties: {
+          instanceSize: values.instanceSize,
+        },
+      })
+      setIsComputeCostsConfirmationModalVisible(true)
+    } else {
+      await onSubmit(values)
+    }
   }
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
@@ -397,7 +423,7 @@ const Wizard: NextPageWithLayout = () => {
 
   return (
     <Form_Shadcn_ {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation)}>
         <Panel
           loading={!isOrganizationsSuccess || isLoadingFreeProjectLimitCheck}
           title={
@@ -937,6 +963,27 @@ const Wizard: NextPageWithLayout = () => {
             )}
           </>
         </Panel>
+
+        <ConfirmationModal
+          size="large"
+          loading={false}
+          visible={isComputeCostsConfirmationModalVisible}
+          title={<>Confirm compute costs</>}
+          confirmLabel="Confirm"
+          onCancel={() => setIsComputeCostsConfirmationModalVisible(false)}
+          onConfirm={async () => {
+            const values = form.getValues()
+            await onSubmit(values)
+            setIsComputeCostsConfirmationModalVisible(false)
+          }}
+          variant={'warning'}
+        >
+          <p className="text-sm text-foreground-light">
+            Launching a project on compute size "{instanceLabel(instanceSize)}" increases your
+            monthly compute costs by ${additionalMonthlySpend}. By clicking "Confirm", you agree to
+            the additional costs and the project creation starts.
+          </p>
+        </ConfirmationModal>
       </form>
     </Form_Shadcn_>
   )
