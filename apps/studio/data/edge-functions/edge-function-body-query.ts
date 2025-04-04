@@ -41,8 +41,14 @@ export async function getEdgeFunctionBody(
     })
 
     if (!parseResponse.ok) {
-      const error = await parseResponse.json()
-      handleError(error)
+      const { error } = await parseResponse.json()
+      handleError(
+        typeof error === 'object'
+          ? error
+          : typeof error === 'string'
+            ? { message: error }
+            : { message: 'Unknown error' }
+      )
     }
 
     const { files } = await parseResponse.json()
