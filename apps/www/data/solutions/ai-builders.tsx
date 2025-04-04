@@ -38,8 +38,8 @@ const data: AIData = {
         type: 'primary' as any,
       },
       {
-        label: 'Request a demo',
-        href: '/contact',
+        label: 'Connect your app',
+        href: 'https://supabase.com/docs/guides/integrations/build-a-supabase-integration',
         type: 'default' as any,
       },
     ],
