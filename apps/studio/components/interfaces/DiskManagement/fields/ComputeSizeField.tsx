@@ -123,7 +123,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
             layout="horizontal"
             label={'Compute size'}
             id={field.name}
-            className="md:flex lg:grid gap-4 lg:gap-2"
+            className="gap-5"
             labelOptional={
               <>
                 <BillingChangeBadge
@@ -159,7 +159,13 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
               </>
             }
           >
-            <div className={!addonsError ? 'grid grid-cols-2 xl:grid-cols-3 flex-wrap gap-3' : ''}>
+            <div
+              className={
+                !addonsError
+                  ? 'grid gap-4 grid-cols-[repeat(auto-fit,minmax(min(100%,13em),1fr))]'
+                  : ''
+              }
+            >
               {isLoading ? (
                 Array(10)
                   .fill(0)
