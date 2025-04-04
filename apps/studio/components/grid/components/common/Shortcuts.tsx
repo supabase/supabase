@@ -1,13 +1,12 @@
-import { useMemo } from 'react'
+import { RefObject, useMemo } from 'react'
 import type { DataGridHandle } from 'react-data-grid'
 
 import { SupaRow } from 'components/grid/types'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { copyToClipboard, formatClipboardValue } from '../../utils/common'
 import { useKeyboardShortcuts } from './Hooks'
 
 type ShortcutsProps = {
-  gridRef: React.RefObject<DataGridHandle>
+  gridRef: RefObject<DataGridHandle>
   rows: SupaRow[]
 }
 
@@ -66,18 +65,6 @@ export function Shortcuts({ gridRef, rows }: ShortcutsProps) {
           idx: snap.gridColumns.length - 2, // -2 because we don't want to select the end extra col
           rowIdx: snap.selectedCellPosition?.rowIdx ?? 0,
         })
-      },
-      [`${metaKey}+c`]: (event) => {
-        event.stopPropagation()
-        if (snap.selectedCellPosition) {
-          const { idx, rowIdx } = snap.selectedCellPosition
-          if (idx > 0) {
-            const colKey = snap.gridColumns[idx].key
-            const cellValue = rows[rowIdx]?.[colKey] ?? ''
-            const value = formatClipboardValue(cellValue)
-            copyToClipboard(value)
-          }
-        }
       },
     },
     ['INPUT', 'TEXTAREA', 'SELECT']
