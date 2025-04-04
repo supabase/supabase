@@ -76,7 +76,7 @@ const data: AIData = {
         icon: '/images/customers/logos/light/bolt.png',
         avatar: '/images/avatars/eric-simons.jpg',
         author: 'Eric Simmons',
-        authorTitle: 'CEO Stackblitz (Bolt.new)',
+        authorTitle: 'Stackblitz (Bolt.new) - CEO',
         quote: (
           <>
             Supabase is awesome. Supabase is the key database integration that we have. Really, the
