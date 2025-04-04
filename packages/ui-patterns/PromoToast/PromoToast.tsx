@@ -48,7 +48,7 @@ const PromoToast = () => {
           }}
           className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7"
         >
-          Declarative Schemas for Simpler Database Management
+          Supabase MCP Server
         </p>
       </div>
 
