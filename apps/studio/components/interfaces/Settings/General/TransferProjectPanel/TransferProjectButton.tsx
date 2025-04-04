@@ -246,6 +246,15 @@ const TransferProjectButton = () => {
                     )}
                   </Admonition>
                 )}
+                {transferPreviewData && transferPreviewData.info.length > 0 && (
+                  <Admonition type="note" title="Info for project transfer" className="mt-3">
+                    <div className="space-y-1">
+                      {transferPreviewData.info.map((info) => (
+                        <p key={info.key}>{info.message}</p>
+                      ))}
+                    </div>
+                  </Admonition>
+                )}
                 {transferPreviewError && !transferError && (
                   <Admonition
                     type="danger"
