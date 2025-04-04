@@ -1,0 +1,23 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "realtime-tiptap",
+  "type": "registry:component",
+  "title": "Realtime Tiptap Editor",
+  "description": "Tiptap Editor with Supabase Realtime Collaboration",
+  "registryDependencies": [],
+  "dependencies": ["lucide-react"],
+  "files": [
+    {
+      "path": "registry/default/blocks/realtime-tiptap/components/tiptap.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/realtime-tiptap/components/realtime-tiptaps.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/realtime-tiptap/hooks/use-realtime-tiptaps.ts",
+      "type": "registry:hook"
+    }
+  ]
+}
