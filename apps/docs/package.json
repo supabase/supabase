@@ -139,7 +139,7 @@
     "twoslash": "^0.3.1",
     "typescript": "~5.5.0",
     "unist-util-visit-parents": "5.1.3",
-    "vite": "^6.2.4",
+    "vite": "^6.2.5",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^3.0.5"
   }
