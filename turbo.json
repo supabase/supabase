@@ -114,6 +114,7 @@
         "EMAIL_ABUSE_SERVICE_KEY",
         "HUBSPOT_PORTAL_ID",
         "HUBSPOT_ENTERPRISE_FORM_GUID",
+        "HUBSPOT_PARTNERSHIP_FORM_GUID",
         "OPENAI_API_KEY",
         "EMAIL_REPORT_SLACK_WEBHOOK",
         "npm_lifecycle_event",

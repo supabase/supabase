@@ -5,6 +5,8 @@ import ProductIcon from '../ProductIcon'
 import SectionContainer from '../Layouts/SectionContainer'
 import { CTA } from '~/types/common'
 
+// to do: move types to be global
+// then solutions.types.ts should extend this
 interface Props {
   label?: string | React.ReactNode
   h1: string | React.ReactNode
@@ -70,7 +72,7 @@ const ProductHeader = (props: Props) => (
         )}
       </div>
       {props.image && (
-        <div className="relative min-h-[300px] col-span-12 mt-8 lg:col-span-7 lg:mt-0 xl:col-span-6 xl:col-start-7">
+        <div className="image-container relative min-h-[300px] col-span-12 mt-8 lg:col-span-7 lg:mt-0 xl:col-span-6 xl:col-start-7">
           {props.image}
         </div>
       )}
