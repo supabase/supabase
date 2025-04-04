@@ -47,7 +47,9 @@ const PromoToast = () => {
             fontFamily: 'Departure Mono, Source Code Pro, Office Code Pro, Menlo, monospace',
           }}
           className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7"
-        ></p>
+        >
+          Supabase MCP Server
+        </p>
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">

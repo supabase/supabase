@@ -216,15 +216,15 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     shipped: true,
     isToday: true,
     hasCountdown: false,
-    blog: '',
+    blog: '/blog/mcp-server',
     date: '04 April',
     published_at: '2025-04-04T07:00:00.000-07:00',
-    title: '',
-    description: null,
+    title: 'Supabase MCP Server',
+    description: 'Supabase MCP Server',
     links: [
       {
         type: 'video',
-        href: '',
+        href: '1SMldLoOhbg',
       },
       {
         type: 'xSpace',

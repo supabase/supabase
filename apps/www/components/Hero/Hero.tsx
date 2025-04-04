@@ -20,7 +20,7 @@ const Hero = () => {
                     <AnnouncementBadge
                       url="/launch-week#day-5"
                       badge="LW14: Day 5"
-                      announcement=""
+                      announcement="Supabase MCP Server"
                       className="[&_a]:sm:gap-4 [&_.announcement-badge]:!text-xs [&_.announcement-text]:!text-xs [&_.announcement-badge]:sm:!text-sm [&_.announcement-text]:sm:!text-sm"
                       style={{
                         fontFamily:
