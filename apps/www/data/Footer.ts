@@ -40,6 +40,10 @@ const footerData = [
         text: 'Launch Week',
         url: '/launch-week',
       },
+      {
+        text: 'AI Builders',
+        url: '/solutions/ai-builders',
+      },
     ],
   },
   {
