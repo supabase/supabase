@@ -2447,6 +2447,23 @@ export interface paths {
     patch: operations['SecretsConfigController_updateConfig']
     trace?: never
   }
+  '/platform/projects/{ref}/config/secrets/update-status': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the last JWT secret update status */
+    get: operations['SecretsConfigController_getJwtSecretUpdateStatus']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/projects/{ref}/config/storage': {
     parameters: {
       query?: never
@@ -4894,6 +4911,17 @@ export interface components {
       favorites: number
       private: number
       shared: number
+    }
+    GetJwtSecretUpdateStatus: {
+      update_status: {
+        change_tracking_id: string
+        /** @enum {number} */
+        error?: 0 | 1 | 2 | 3 | 4 | 5
+        /** @enum {number} */
+        progress: 0 | 1 | 2 | 3 | 4 | 5
+        /** @enum {number} */
+        status: 0 | 1 | 2
+      } | null
     }
     GetLeakedServiceKeyLintResponseDto: {
       lints: {
@@ -14665,6 +14693,35 @@ export interface operations {
         content?: never
       }
       /** @description Failed to update project's secrets config */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SecretsConfigController_getJwtSecretUpdateStatus: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetJwtSecretUpdateStatus']
+        }
+      }
+      /** @description Failed to retrieve JWT secret update status */
       500: {
         headers: {
           [name: string]: unknown
