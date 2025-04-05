@@ -9,6 +9,7 @@ sidebar_label: 'Model context protocol (MCP)'
 The [Model Context Protocol](https://modelcontextprotocol.io/introduction) (MCP) is a standard for connecting Large Language Models (LLMs) to platforms like Supabase. This guide covers how to connect Supabase to the following AI tools using MCP:
 
 - [Cursor](https://www.cursor.com/)
+- [VSCode](https://code.visualstudio.com/)
 - [Windsurf](https://docs.codeium.com/windsurf) (Codium)
 - [Cline](https://github.com/cline/cline) (VS Code extension)
 - [Claude desktop](https://claude.ai/download)
@@ -35,6 +36,18 @@ MCP compatible tools can connect to Supabase using the [Supabase MCP server](htt
 1.  Save the configuration file.
 
 1.  Open Cursor and navigate to **Settings/MCP**. You should see a green active status after the server is successfully connected.
+
+### VSCode
+1.  **Update VSCode** to the latest.
+1.  Open VSCode, search MCP from the settings page and **enable MCP**.
+1.  Search chat agent and **enable Agent mode** for copilot.
+1.  Add the following configuration:
+
+    <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "VSCode" }} />
+
+1.  Save the file and start the server. VSCode should automatically reload the configuration.
+
+1. You should the see **a tool icon with the total tools available** in the chat after the server is successfully connected.
 
 ### Windsurf
 
