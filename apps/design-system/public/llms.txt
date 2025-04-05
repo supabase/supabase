@@ -1,5 +1,5 @@
 # Supabase Design System
-Last updated: 2025-03-05T12:59:50.911Z
+Last updated: 2025-04-05T09:38:35.676Z
 
 ## Overview
 The Design System used in Supabase Studio.
@@ -144,6 +144,8 @@ The Design System used in Supabase Studio.
     - Multiple selection component.
 - [Text Confirm Dialog](https://supabase-design-system.vercel.app/design-system/docs/fragments/text-confirm-dialog)
     - A modal dialog that interrupts the user with important content and expects a response.
+- [Table of Contents (TOC)](https://supabase-design-system.vercel.app/design-system/docs/fragments/toc)
+    - List of page anchors for the current page.
 - [Icons](https://supabase-design-system.vercel.app/design-system/docs/icons)
     - Icons system breakdown. Copy values of Icons.
 - [Introduction](https://supabase-design-system.vercel.app/design-system/docs/index)
