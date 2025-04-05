@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactNode } from 'react'
 
+import { useParams } from 'common'
 import { Button, cn, NavMenu, NavMenuItem } from 'ui'
 import { ScaffoldContainer } from '../Scaffold'
 import { PageHeader } from './PageHeader'
@@ -68,6 +69,7 @@ export const PageLayout = ({
   size = 'default',
   isCompact = false,
 }: PageLayoutProps) => {
+  const { ref } = useParams()
   const router = useRouter()
 
   return (
@@ -103,7 +105,11 @@ export const PageLayout = ({
               <NavMenuItem key={item.label} active={router.asPath.split('?')[0] === item.href}>
                 {item.href ? (
                   <Link
-                    href={item.href}
+                    href={
+                      item.href.includes('[ref]') && !!ref
+                        ? item.href.replace('[ref]', ref)
+                        : item.href
+                    }
                     className={cn(
                       'inline-flex items-center gap-2',
                       router.asPath === item.href && 'text-foreground'

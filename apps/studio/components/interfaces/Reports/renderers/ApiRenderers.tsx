@@ -175,7 +175,7 @@ export const TopApiRoutesRenderer = (
         body={
           <>
             {props.data.map((datum, index) => (
-              <Fragment key={datum.method + datum.path + (datum.search || '')}>
+              <Fragment key={index + datum.method + datum.path + (datum.search || '')}>
                 <Table.tr
                   className={[
                     'p-0 transition transform cursor-pointer hover:bg-surface-200',

@@ -3,7 +3,12 @@ import { AccountIdentities } from 'components/interfaces/Account/Preferences/Acc
 import { AnalyticsSettings } from 'components/interfaces/Account/Preferences/AnalyticsSettings'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import { ThemeSettings } from 'components/interfaces/Account/Preferences/ThemeSettings'
+import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import AccountSettingsLayout from 'components/layouts/AccountLayout/AccountSettingsLayout'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import {
   ScaffoldContainer,
   ScaffoldDescription,
@@ -18,6 +23,12 @@ import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
 
 const User: NextPageWithLayout = () => {
+  const newLayoutPreview = useNewLayout()
+
+  if (newLayoutPreview) {
+    return <ProfileCard />
+  }
+
   return (
     <ScaffoldContainer>
       <ScaffoldHeader>
@@ -32,17 +43,15 @@ const User: NextPageWithLayout = () => {
 }
 
 User.getLayout = (page) => (
-  <AccountLayout
-    title="Preferences"
-    breadcrumbs={[
-      {
-        key: `supabase-settings`,
-        label: 'Preferences',
-      },
-    ]}
-  >
-    {page}
-  </AccountLayout>
+  <AppLayout>
+    <DefaultLayout headerTitle="Account">
+      <OrganizationLayout>
+        <AccountLayout title="Preferences">
+          <AccountSettingsLayout>{page}</AccountSettingsLayout>
+        </AccountLayout>
+      </OrganizationLayout>
+    </DefaultLayout>
+  </AppLayout>
 )
 
 export default User

@@ -252,9 +252,9 @@ export const S3Connection = () => {
               <div className="overflow-x-auto">
                 <Table
                   head={[
-                    <Table.th key="">Description</Table.th>,
-                    <Table.th key="">Access key ID</Table.th>,
-                    <Table.th key="">Created at</Table.th>,
+                    <Table.th key="description">Description</Table.th>,
+                    <Table.th key="access-key-id">Access key ID</Table.th>,
+                    <Table.th key="created-at">Created at</Table.th>,
                     <Table.th key="actions" />,
                   ]}
                   body={

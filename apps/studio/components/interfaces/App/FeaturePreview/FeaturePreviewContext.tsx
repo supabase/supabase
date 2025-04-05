@@ -11,6 +11,13 @@ import { TableEditorTabsPreview } from './TableEditorTabs'
 
 export const FEATURE_PREVIEWS = [
   {
+    key: LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW,
+    name: 'Dashboard layout update',
+    content: <APISidePanelPreview />,
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
+    isNew: false,
+  },
+  {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
     name: 'Inline SQL Editor',
     content: <InlineEditorPreview />,
@@ -113,4 +120,9 @@ export const useIsTableEditorTabsEnabled = () => {
 export const useIsSQLEditorTabsEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
+}
+
+export const useNewLayout = (): boolean => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW]
 }

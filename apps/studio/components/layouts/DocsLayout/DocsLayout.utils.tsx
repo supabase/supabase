@@ -24,8 +24,8 @@ export const generateDocsMenu = (
           ? [
               {
                 name: 'User Management',
-                key: 'users',
-                url: `/project/${ref}/api?page=users`,
+                key: 'users-management',
+                url: `/project/${ref}/api?page=users-management`,
                 items: [],
               },
             ]

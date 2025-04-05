@@ -25,6 +25,9 @@
   --sidebar-ring: 217.2 91.2% 59.8%;
 }
 
+[data-theme='deep-dark'],
+.deep-dark,
+[data-theme='dark'],
 .dark {
   --chart-1: hsl(var(--brand-default));
   --chart-2: 160 60% 45%;
@@ -62,7 +65,7 @@ html,
 body,
 #__next,
 .main {
-  @apply bg-studio relative;
+  @apply bg-dash-sidebar relative;
   @apply text-foreground;
   @apply overflow-x-clip;
   -moz-osx-font-smoothing: grayscale;

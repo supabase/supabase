@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ReactNode } from 'react'
 
 import { SessionsAuthSettingsForm } from 'components/interfaces/Auth'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
@@ -10,25 +9,6 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
-
-interface SessionsLayoutProps {
-  children: ReactNode
-}
-
-export const SessionsLayout = ({ children }: SessionsLayoutProps) => {
-  return (
-    <DefaultLayout>
-      <AuthLayout>
-        <PageLayout
-          title="User Sessions"
-          subtitle="Configure settings for user sessions and refresh tokens"
-        >
-          {children}
-        </PageLayout>
-      </AuthLayout>
-    </DefaultLayout>
-  )
-}
 
 const SessionsPage: NextPageWithLayout = () => {
   const isPermissionsLoaded = usePermissionsLoaded()
@@ -51,6 +31,17 @@ const SessionsPage: NextPageWithLayout = () => {
   )
 }
 
-SessionsPage.getLayout = (page) => <SessionsLayout>{page}</SessionsLayout>
+SessionsPage.getLayout = (page) => (
+  <DefaultLayout>
+    <AuthLayout>
+      <PageLayout
+        title="User Sessions"
+        subtitle="Configure settings for user sessions and refresh tokens"
+      >
+        {page}
+      </PageLayout>
+    </AuthLayout>
+  </DefaultLayout>
+)
 
 export default SessionsPage

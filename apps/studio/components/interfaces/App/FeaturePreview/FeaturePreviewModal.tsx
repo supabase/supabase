@@ -19,6 +19,7 @@ const FeaturePreviewModal = () => {
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
 
+  const enableNewLayoutPreview = useFlag('newLayoutPreview')
   const isFeaturePreviewTabsTableEditorFlag = useFlag('featurePreviewTabsTableEditor')
   const isFeaturePreviewTabsSqlEditorFlag = useFlag('featurePreviewSqlEditorTabs')
 
@@ -58,6 +59,8 @@ const FeaturePreviewModal = () => {
         return isFeaturePreviewTabsTableEditorFlag
       case LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS:
         return isFeaturePreviewTabsSqlEditorFlag
+      case LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW:
+        return enableNewLayoutPreview
       default:
         return true
     }

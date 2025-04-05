@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ReactNode } from 'react'
 
 import { HooksListing } from 'components/interfaces/Auth/Hooks/HooksListing'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
@@ -9,25 +8,6 @@ import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
-
-interface HooksLayoutProps {
-  children: ReactNode
-}
-
-export const HooksLayout = ({ children }: HooksLayoutProps) => {
-  return (
-    <DefaultLayout>
-      <AuthLayout>
-        <PageLayout
-          title="Auth Hooks"
-          subtitle="Use Postgres functions or HTTP endpoints to customize the behavior of Supabase Auth to meet your needs"
-        >
-          {children}
-        </PageLayout>
-      </AuthLayout>
-    </DefaultLayout>
-  )
-}
 
 const Hooks: NextPageWithLayout = () => {
   const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
@@ -44,6 +24,17 @@ const Hooks: NextPageWithLayout = () => {
   )
 }
 
-Hooks.getLayout = (page) => <HooksLayout>{page}</HooksLayout>
+Hooks.getLayout = (page) => (
+  <DefaultLayout>
+    <AuthLayout>
+      <PageLayout
+        title="Auth Hooks"
+        subtitle="Use Postgres functions or HTTP endpoints to customize the behavior of Supabase Auth to meet your needs"
+      >
+        {page}
+      </PageLayout>
+    </AuthLayout>
+  </DefaultLayout>
+)
 
 export default Hooks

@@ -35,7 +35,6 @@ const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) 
 
   return (
     <Modal
-      closable
       size="small"
       alignFooter="right"
       visible={selectedSecret !== undefined}

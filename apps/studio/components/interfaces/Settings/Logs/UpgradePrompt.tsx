@@ -16,7 +16,6 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
     <Modal
       hideFooter
       visible={show}
-      closable
       size="medium"
       header="Log retention"
       onCancel={() => setShowUpgradePrompt(false)}

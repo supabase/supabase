@@ -64,14 +64,14 @@ export const ReportMenuItem = ({
 
       {canUpdateCustomReport && (
         <DropdownMenu>
-          <DropdownMenuTrigger>
+          <DropdownMenuTrigger asChild>
             <Button
               type="text"
               className="px-1 opacity-50 hover:opacity-100"
               icon={<ChevronDown size={12} strokeWidth={2} />}
             />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-52 *:space-x-2">
+          <DropdownMenuContent align="start" className="w-32 *:gap-x-2">
             <DropdownMenuItem
               onClick={() => {
                 if (!item.id) return
@@ -79,7 +79,7 @@ export const ReportMenuItem = ({
               }}
             >
               <Edit2 size={12} />
-              <div>Rename</div>
+              <div>Rename report</div>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -89,7 +89,7 @@ export const ReportMenuItem = ({
               }}
             >
               <Trash size={12} />
-              <div>Delete</div>
+              <div>Delete report</div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

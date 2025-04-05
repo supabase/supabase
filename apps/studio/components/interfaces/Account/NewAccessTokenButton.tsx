@@ -82,7 +82,6 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
       </div>
 
       <Modal
-        closable
         hideFooter
         size="small"
         visible={isOpen}

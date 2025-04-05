@@ -41,14 +41,11 @@ export const ClockSkewBanner = () => {
   if (!clockSkew) return null
 
   return (
-    <div
-      style={{ height: '44px' }}
-      className="flex items-center justify-center gap-x-4 bg-destructive-400 py-3 transition text-foreground box-border border-b border-default"
-    >
+    <div className="flex items-center justify-center gap-x-4 bg-destructive-400 py-0.5 transition text-foreground box-border border-b border-default">
       <p className="text-sm">
         Your computer's clock appears to be inaccurate. This can cause issues with certain features.
       </p>
-      <Button asChild type="default">
+      <Button asChild type="text">
         <a href="https://supabase.com/docs" target="_blank">
           More information
         </a>

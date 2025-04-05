@@ -7,6 +7,7 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import useLatest from 'hooks/misc/useLatest'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { DEFAULT_HOME, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 
@@ -18,9 +19,16 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const isLoggedIn = useIsLoggedIn()
   const snap = useAppStateSnapshot()
 
+  const organization = useSelectedOrganization()
+
   const [dashboardHistory, _, { isSuccess: isSuccessStorage }] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.DASHBOARD_HISTORY(ref ?? ''),
     { editor: undefined, sql: undefined }
+  )
+
+  const [__, setLastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
   )
 
   /**
@@ -108,7 +116,13 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
       snap.setDashboardHistory(ref, 'editor', dashboardHistory.editor)
       snap.setDashboardHistory(ref, 'sql', dashboardHistory.sql)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccessStorage, ref])
+
+  useEffect(() => {
+    if (organization) setLastVisitedOrganization(organization.slug)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [organization])
 
   return <>{children}</>
 }

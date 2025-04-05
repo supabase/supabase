@@ -1,7 +1,7 @@
-import { Command, FlaskConical, Palette, Settings } from 'lucide-react'
+import { Command, FlaskConical, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/router'
 
 import { ProfileImage } from 'components/ui/ProfileImage'
 import { useSignOut } from 'lib/auth'
@@ -9,6 +9,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
+  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -18,52 +19,35 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  SidebarMenuButton,
   Theme,
-  cn,
   singleThemes,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
-import { ICON_SIZE, ICON_STROKE_WIDTH, SideBarNavLink } from './Sidebar'
 
-export const UserDropdown = () => {
-  const { profile } = useProfile()
-  const appStateSnapshot = useAppStateSnapshot()
-  const { theme, setTheme } = useTheme()
-  const signOut = useSignOut()
+export function UserDropdown() {
   const router = useRouter()
-
+  const signOut = useSignOut()
+  const { profile } = useProfile()
+  const { theme, setTheme } = useTheme()
+  const appStateSnapshot = useAppStateSnapshot()
   const setCommandMenuOpen = useSetCommandMenuOpen()
+
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <SidebarMenuButton
-          className={cn(
-            'text-sm',
-            'group-data-[state=expanded]:h-10',
-            'p-0.5 group-data-[state=expanded]:pr-2 group-data-[state=expanded]:pl-1'
-          )}
-          size={'default'}
-          hasIcon={false}
-          asChild
-          isActive={false}
+      <DropdownMenuTrigger className="border flex-shrink-0 px-3" asChild>
+        <Button
+          type="default"
+          className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
         >
-          <button>
-            <div className="aspect-square h-7 w-7 rounded-md border flex-shrink-0">
-              <ProfileImage
-                alt={profile?.username}
-                src={profile?.profileImageUrl}
-                className="w-7 h-7 rounded-md"
-              />
-            </div>
-            <span className="flex flex-col gap-0">
-              {profile?.username}
-              <span className="text-foreground-lighter text-xs">{profile?.primary_email}</span>
-            </span>
-          </button>
-        </SidebarMenuButton>
+          <ProfileImage
+            alt={profile?.username}
+            src={profile?.profileImageUrl}
+            className="w-8 h-8 rounded-md"
+          />
+        </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="top" align="start">
+
+      <DropdownMenuContent side="bottom" align="end">
         {IS_PLATFORM && (
           <>
             <div className="px-2 py-1 flex flex-col gap-0 text-sm">
@@ -89,7 +73,14 @@ export const UserDropdown = () => {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem className="flex gap-2" asChild>
-                <Link href="/account/me">
+                <Link
+                  href="/account/me"
+                  onClick={() => {
+                    if (router.pathname !== '/account/me') {
+                      appStateSnapshot.setLastRouteBeforeVisitingAccountPage(router.asPath)
+                    }
+                  }}
+                >
                   <Settings size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                   Account preferences
                 </Link>
