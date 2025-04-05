@@ -40,7 +40,7 @@ withTestDatabase('list foreign tables', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "int8",
-          "id": "16451.1",
+          "id": "16455.1",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -51,7 +51,7 @@ withTestDatabase('list foreign tables', async ({ executeQuery }) => {
           "ordinal_position": 1,
           "schema": "public",
           "table": "foreign_table",
-          "table_id": 16451,
+          "table_id": 16455,
         },
         {
           "check": null,
@@ -60,7 +60,7 @@ withTestDatabase('list foreign tables', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "text",
-          "id": "16451.2",
+          "id": "16455.2",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -71,7 +71,7 @@ withTestDatabase('list foreign tables', async ({ executeQuery }) => {
           "ordinal_position": 2,
           "schema": "public",
           "table": "foreign_table",
-          "table_id": 16451,
+          "table_id": 16455,
         },
         {
           "check": null,
@@ -83,7 +83,7 @@ withTestDatabase('list foreign tables', async ({ executeQuery }) => {
             "INACTIVE",
           ],
           "format": "user_status",
-          "id": "16451.3",
+          "id": "16455.3",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -94,7 +94,7 @@ withTestDatabase('list foreign tables', async ({ executeQuery }) => {
           "ordinal_position": 3,
           "schema": "public",
           "table": "foreign_table",
-          "table_id": 16451,
+          "table_id": 16455,
         },
       ],
       "comment": null,
@@ -141,7 +141,7 @@ withTestDatabase('retrieve foreign table by name', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "int8",
-          "id": "16451.1",
+          "id": "16455.1",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -152,7 +152,7 @@ withTestDatabase('retrieve foreign table by name', async ({ executeQuery }) => {
           "ordinal_position": 1,
           "schema": "public",
           "table": "foreign_table",
-          "table_id": 16451,
+          "table_id": 16455,
         },
         {
           "check": null,
@@ -161,7 +161,7 @@ withTestDatabase('retrieve foreign table by name', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "text",
-          "id": "16451.2",
+          "id": "16455.2",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -172,7 +172,7 @@ withTestDatabase('retrieve foreign table by name', async ({ executeQuery }) => {
           "ordinal_position": 2,
           "schema": "public",
           "table": "foreign_table",
-          "table_id": 16451,
+          "table_id": 16455,
         },
         {
           "check": null,
@@ -184,7 +184,7 @@ withTestDatabase('retrieve foreign table by name', async ({ executeQuery }) => {
             "INACTIVE",
           ],
           "format": "user_status",
-          "id": "16451.3",
+          "id": "16455.3",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -195,7 +195,7 @@ withTestDatabase('retrieve foreign table by name', async ({ executeQuery }) => {
           "ordinal_position": 3,
           "schema": "public",
           "table": "foreign_table",
-          "table_id": 16451,
+          "table_id": 16455,
         },
       ],
       "comment": null,
@@ -209,12 +209,11 @@ withTestDatabase('retrieve foreign table by name', async ({ executeQuery }) => {
 
 withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
   const { sql: retrieveSql, zod: retrieveZod } = pgMeta.foreignTables.retrieve({
-    id: 16451,
+    id: 16455,
   })
   const table = retrieveZod.parse((await executeQuery(retrieveSql))[0])
   expect(table).toMatchInlineSnapshot(
-    { id: expect.any(Number) },
-    `
+    { id: expect.any(Number) }, `
     {
       "columns": [
         {
@@ -224,7 +223,7 @@ withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "int8",
-          "id": "16451.1",
+          "id": "16455.1",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -235,7 +234,7 @@ withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
           "ordinal_position": 1,
           "schema": "public",
           "table": "foreign_table",
-          "table_id": 16451,
+          "table_id": 16455,
         },
         {
           "check": null,
@@ -244,7 +243,7 @@ withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "text",
-          "id": "16451.2",
+          "id": "16455.2",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -255,7 +254,7 @@ withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
           "ordinal_position": 2,
           "schema": "public",
           "table": "foreign_table",
-          "table_id": 16451,
+          "table_id": 16455,
         },
         {
           "check": null,
@@ -267,7 +266,7 @@ withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
             "INACTIVE",
           ],
           "format": "user_status",
-          "id": "16451.3",
+          "id": "16455.3",
           "identity_generation": null,
           "is_generated": false,
           "is_identity": false,
@@ -278,7 +277,7 @@ withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
           "ordinal_position": 3,
           "schema": "public",
           "table": "foreign_table",
-          "table_id": 16451,
+          "table_id": 16455,
         },
       ],
       "comment": null,
@@ -286,6 +285,5 @@ withTestDatabase('retrieve foreign table by id', async ({ executeQuery }) => {
       "name": "foreign_table",
       "schema": "public",
     }
-  `
-  )
+  `)
 })
