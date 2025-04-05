@@ -62,7 +62,7 @@ enable_signup = true
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
-enable_confirmations = false
+enable_confirmations = true
 
 # Uncomment the following to use gh oAuth app locally with your own test app
 # to use env vars locally, run > `source ./supabase/.env && supabase [command...]`
@@ -88,3 +88,7 @@ url = ""
 
 [functions.search-embeddings]
 verify_jwt = false
+
+[auth.email.template.magic_link]
+subject = "Your Magic Link to Sign In"
+content_path = "./supabase/auth/email/magic-link.html"
