@@ -71,7 +71,9 @@ These are the currently supported region values you can provide for `x-region` h
 You can also specify the region when invoking a Function using the Supabase client library:
 
 ```js
-const { createClient, FunctionRegion } = require('@supabase/supabase-js')
+import { createClient, FunctionRegion } from '@supabase/supabase-js'
+const supabase = createClient('SUPABASE_URL', 'SUPABASE_ANON_KEY')
+
 const { data: ret, error } = await supabase.functions.invoke('my-function-name', {
   headers: { 'Content-Type': 'application/json' },
   method: 'GET',

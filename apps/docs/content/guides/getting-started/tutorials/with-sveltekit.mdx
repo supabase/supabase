@@ -553,7 +553,7 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 Now create the associated `src/routes/account/+page.server.ts` file that will handle loading our data from the server through the `load` function
 and handle all our form actions through the `actions` object.
 
-```ts
+```ts name=src/routes/account/+page.server.ts
 import { fail, redirect } from '@sveltejs/kit'
 import type { Actions, PageServerLoad } from './$types'
 

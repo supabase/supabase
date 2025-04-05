@@ -59,6 +59,10 @@ Setting up Discord logins for your application consists of 3 parts:
 When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `discord` as the `provider`:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project-id.supabase.co', 'your-anon-key')
+
+// ---cut---
 async function signInWithDiscord() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'discord',
@@ -112,6 +116,10 @@ If your user is already signed in, Discord prompts the user again for authorizat
 When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project-id.supabase.co', 'your-anon-key')
+
+// ---cut---
 async function signOut() {
   const { error } = await supabase.auth.signOut()
 }

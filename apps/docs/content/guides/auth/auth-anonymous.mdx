@@ -56,6 +56,10 @@ For self-hosting, you can update your project configuration using the files and 
 Call the [`signInAnonymously()`](/docs/reference/javascript/auth-signinanonymously) method:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project.supabase.co', 'your-anon-key')
+
+// ---cut---
 const { data, error } = await supabase.auth.signInAnonymously()
 ```
 
@@ -116,13 +120,21 @@ Converting an anonymous user to a permanent user requires [linking an identity](
 You can use the [`updateUser()`](/docs/reference/javascript/auth-updateuser) method to link an email or phone identity to the anonymous user. To add a password for the anonymous user, the user's email or phone number needs to be verified first.
 
 ```js
-const { data, error } = await supabase.auth.updateUser({ email: 'valid.email@supabase.io' })
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project.supabase.co', 'your-anon-key')
+
+// ---cut---
+const { data: updateEmailData, error: updateEmailError } = await supabase.auth.updateUser({
+  email: 'valid.email@supabase.io',
+})
 
 // verify the user's email by clicking on the email change link
 // or entering the 6-digit OTP sent to the email address
 
 // once the user has been verified, update the password
-const { data, error } = await supabase.auth.updateUser({ password: 'password' })
+const { data: updatePasswordData, error: updatePasswordError } = await supabase.auth.updateUser({
+  password: 'password',
+})
 ```
 
 </TabPanel>
@@ -192,6 +204,10 @@ response = supabase.auth.update_user({
 You can use the [`linkIdentity()`](/docs/reference/javascript/auth-linkidentity) method to link an OAuth identity to the anonymous user.
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project.supabase.co', 'your-anon-key')
+
+// ---cut---
 const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
 ```
 

@@ -70,7 +70,11 @@ execute function your_table_changes ();
 
 Finally, on the client side, listen to the topic `topic:<record_id>` to receive the events. Remember to set the channel as a private channel, since `realtime.broadcast_changes` uses Realtime Authorization.
 
-```jsx
+```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 const gameId = 'id'
 await supabase.realtime.setAuth() // Needed for Realtime Authorization
 const changes = supabase
@@ -122,10 +126,11 @@ alter
 You can use the `INSERT` event to stream all new rows.
 
 ```js
+// @noImplicitAny: false
 import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
-
+// ---cut---
 const channel = supabase
   .channel('schema-db-changes')
   .on(
@@ -144,10 +149,11 @@ const channel = supabase
 You can use the `UPDATE` event to stream all updated rows.
 
 ```js
+// @noImplicitAny: false
 import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
-
+// ---cut---
 const channel = supabase
   .channel('schema-db-changes')
   .on(

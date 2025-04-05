@@ -130,9 +130,15 @@ Because of this, the Supabase JavaScript libraries provide only limited support.
 ```typescript
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+const supabase = createClient('SUPABASE_URL', 'SUPABASE_ANON_KEY', {
   auth: {
-    storage: customStorageObject,
+    storage: {
+      getItem: () => {
+        return Promise.resolve('FETCHED_COOKIE')
+      },
+      setItem: () => {},
+      removeItem: () => {},
+    },
   },
 })
 ```

@@ -130,6 +130,10 @@ Supabase Auth requires that Azure returns a valid email address. Therefore you m
 When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `azure` as the `provider`:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project.supabase.co', 'your-anon-key')
+
+// ---cut---
 async function signInWithAzure() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'azure',
@@ -186,6 +190,10 @@ suspend fun signInWithAzure() {
 When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project.supabase.co', 'your-anon-key')
+
+// ---cut---
 async function signOut() {
   const { error } = await supabase.auth.signOut()
 }
@@ -230,6 +238,10 @@ Azure OAuth2.0 doesn't return the `provider_refresh_token` by default. If you ne
 <TabPanel id="js" label="JavaScript">
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project.supabase.co', 'your-anon-key')
+
+// ---cut---
 async function signInWithAzure() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'azure',

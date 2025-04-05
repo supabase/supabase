@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } })
   } catch (error) {
-    console.error(`Error processing request: ${error.message}`)
+    console.error(`Error processing request: ${error}`)
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
@@ -108,7 +108,7 @@ Deno.serve(async (req) => {
 
 This results in something like:
 
-```ts index.ts
+```
 Request headers: {
     "accept": "*/*",
     "accept-encoding": "gzip",

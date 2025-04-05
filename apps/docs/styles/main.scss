@@ -364,6 +364,6 @@ th code {
 
 // Code blocks need margin applied when in content container
 
-.prose :where(.shiki) {
+.prose :where(.shiki:not(.shiki-wrapper *), .shiki-wrapper) {
   margin-block: 2rem;
 }

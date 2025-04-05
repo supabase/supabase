@@ -99,6 +99,10 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 Listen to the `sync`, `join`, and `leave` events triggered whenever any client joins or leaves the channel or changes their slice of state:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 const roomOne = supabase.channel('room_01')
 
 roomOne
@@ -201,6 +205,10 @@ You can send state to all subscribers using `track()`:
 
 {/* prettier-ignore */}
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 const roomOne = supabase.channel('room_01')
 
 const userStatus = {
@@ -315,6 +323,11 @@ You can stop tracking presence using the `untrack()` method. This will trigger t
 <TabPanel id="js" label="JavaScript">
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+const roomOne = supabase.channel('room_01')
+
+// ---cut---
 const untrackPresence = async () => {
   const presenceUntrackStatus = await roomOne.untrack()
   console.log(presenceUntrackStatus)
@@ -384,6 +397,7 @@ By default, Presence will generate a unique `UUIDv1` key on the server to track 
 
 ```js
 import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('SUPABASE_URL', 'SUPABASE_ANON_KEY')
 
 const channelC = supabase.channel('test', {
   config: {

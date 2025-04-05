@@ -12,6 +12,11 @@ For a PKCE flow, for example in Server-Side Auth, you need an extra step to hand
 In the browser, `signInWithOAuth` automatically redirects to the OAuth provider's authentication endpoint, which then redirects to your endpoint.
 
 ```js
+import { createClient, type Provider } from '@supabase/supabase-js';
+const supabase = createClient('url', 'anonKey')
+const provider = 'provider' as Provider
+
+// ---cut---
 await supabase.auth.signInWithOAuth({
   provider,
   options: {
@@ -27,6 +32,12 @@ await supabase.auth.signInWithOAuth({
 In the server, you need to handle the redirect to the OAuth provider's authentication endpoint. The `signInWithOAuth` method returns the endpoint URL, which you can redirect to.
 
 ```js
+import { createClient, type Provider } from '@supabase/supabase-js'
+const supabase = createClient('url', 'anonKey')
+const provider = 'provider' as Provider
+const redirect = (url: string) => {}
+
+// ---cut---
 const { data, error } = await supabase.auth.signInWithOAuth({
   provider,
   options: {
@@ -56,7 +67,7 @@ At the callback endpoint, handle the code exchange to save the user session.
 
 Create a new file at `app/auth/callback/route.ts` and populate with the following:
 
-```ts app/auth/callback/route.ts
+```ts name=app/auth/callback/route.ts
 import { NextResponse } from 'next/server'
 // The client you created from the Server-Side Auth instructions
 import { createClient } from '@/utils/supabase/server'
@@ -94,7 +105,7 @@ export async function GET(request: Request) {
 
 Create a new file at `src/routes/auth/callback/+server.js` and populate with the following:
 
-```js src/routes/auth/callback/+server.js
+```js name=src/routes/auth/callback/+server.js
 import { redirect } from '@sveltejs/kit';
 
 export const GET = async (event) => {
@@ -123,7 +134,7 @@ export const GET = async (event) => {
 
 Create a new file at `src/pages/auth/callback.ts` and populate with the following:
 
-```ts src/pages/auth/callback.ts
+```ts name=src/pages/auth/callback.ts
 import { createServerClient, parseCookieHeader } from '@supabase/ssr'
 import { type APIRoute } from 'astro'
 
@@ -168,7 +179,7 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
 
 Create a new file at `app/routes/auth.callback.tsx` and populate with the following:
 
-```ts app/routes/auth.callback.tsx
+```ts name=app/routes/auth.callback.tsx
 import { redirect, type LoaderFunctionArgs } from '@remix-run/node'
 import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
 
@@ -209,7 +220,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 Create a new route in your express app and populate with the following:
 
-```js app.js
+```js name=app.js
 ...
 app.get("/auth/callback", async function (req, res) {
   const code = req.query.code

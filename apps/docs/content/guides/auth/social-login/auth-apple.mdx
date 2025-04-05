@@ -42,6 +42,10 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     To initiate sign in, you can use the `signInWithOAuth()` method from the Supabase JavaScript library:
 
     ```ts
+    import { createClient } from '@supabase/supabase-js'
+    const supabase = createClient('https://your-project.supabase.co', 'your-anon-key')
+
+    // ---cut---
     supabase.auth.signInWithOAuth({
       provider: 'apple',
     })
@@ -127,7 +131,7 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
 
     Follow the [Expo docs](https://docs.expo.dev/versions/latest/sdk/apple-authentication/#installation) for installation and configuration instructions. See the [supabase-js reference](/docs/reference/javascript/initializing?example=react-native-options-async-storage) for instructions on initializing the supabase-js client in React Native.
 
-    ```tsx ./components/Auth.native.tsx
+    ```tsx name=./components/Auth.native.tsx
     import { Platform } from 'react-native'
     import * as AppleAuthentication from 'expo-apple-authentication'
     import { supabase } from 'app/utils/supabase'
