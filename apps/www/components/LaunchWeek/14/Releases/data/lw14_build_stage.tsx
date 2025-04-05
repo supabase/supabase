@@ -3,7 +3,7 @@
 import { ReactNode } from 'react'
 import { type ClassValue } from 'clsx'
 import { PRODUCT_MODULES } from 'shared-data/products'
-import { AppWindow } from 'lucide-react'
+import { AppWindow, Database, Globe } from 'lucide-react'
 
 export interface AdventDay {
   icon?: ReactNode // use svg jsx with 34x34px viewport
@@ -30,6 +30,7 @@ export const days: AdventDay[] = [
     description: 'Initial Release',
     id: 'clerk',
     is_shipped: true,
+    className: 'sm:col-span-2',
     links: [
       {
         url: '/blog/postgres-language-server',
@@ -138,5 +139,34 @@ export const days: AdventDay[] = [
       },
     ],
     icon: <AppWindow size={30} />,
+  },
+  {
+    title: 'Dedicated Poolers',
+    description: 'Dedicated pgbouncer instance co-located with your database',
+    id: 'dedicated-poolers',
+    is_shipped: true,
+    links: [
+      {
+        url: '/blog/dedicated-poolers',
+        label: 'Blog post',
+        target: '_blank',
+      },
+    ],
+    icon: <Database size={30} />,
+  },
+  {
+    title: 'Data API Routes to Nearest Read Replica',
+    // description: '',
+    id: 'data-api-routes',
+    is_shipped: true,
+    className: 'sm:col-span-2',
+    links: [
+      {
+        url: '/blog/data-api-nearest-read-replica',
+        label: 'Blog post',
+        target: '_blank',
+      },
+    ],
+    icon: <Globe size={30} />,
   },
 ]

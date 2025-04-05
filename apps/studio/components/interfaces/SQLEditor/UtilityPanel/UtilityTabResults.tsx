@@ -4,11 +4,12 @@ import { forwardRef } from 'react'
 
 import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import CopyButton from 'components/ui/CopyButton'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { AiIconAnimation, Button } from 'ui'
+import { AiIconAnimation, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import Results from './Results'
 
 export type UtilityTabResultsProps = {
@@ -136,6 +137,16 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
                 >
                   Switch to primary database
                 </Button>
+              )}
+              {formattedError.length > 0 && (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <CopyButton iconOnly type="default" text={formattedError.join('\n')} />
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" align="center">
+                    <span>Copy error</span>
+                  </TooltipContent>
+                </Tooltip>
               )}
               {!hasHipaaAddon && (
                 <Button

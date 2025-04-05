@@ -2,7 +2,7 @@ import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { REPORTS_DATEPICKER_HELPERS } from 'components/interfaces/Reports/Reports.constants'
+import { createFilteredDatePickerHelpers } from 'components/interfaces/Reports/Reports.constants'
 import {
   ErrorCountsChartRenderer,
   NetworkTrafficRenderer,
@@ -58,10 +58,7 @@ export const ApiReport: NextPageWithLayout = () => {
           onRefresh={refresh}
           isLoading={isLoading}
           filters={filters}
-          datepickerHelpers={REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
-            ...helper,
-            disabled: (index > 0 && plan?.id === 'free') || (index > 1 && plan?.id !== 'pro'),
-          }))}
+          datepickerHelpers={createFilteredDatePickerHelpers(plan?.id || 'free')}
         />
         <div className="h-2 w-full">
           <ShimmerLine active={isLoading} />

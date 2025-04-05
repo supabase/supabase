@@ -199,18 +199,15 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           {providers.map((provider) => {
             const providerMeta = PROVIDERS_SCHEMAS.find(
               (x) =>
-                x.title.toLowerCase() ===
-                (provider.name === 'linkedin' ? 'linkedin (oidc)' : provider.name)
+                ('key' in x && x.key === provider.name) || x.title.toLowerCase() === provider.name
             )
             const enabledProperty = Object.keys(providerMeta?.properties ?? {}).find((x) =>
               x.toLowerCase().endsWith('_enabled')
             )
             const providerName =
               provider.name === 'email'
-                ? 'email'
-                : provider.name === 'linkedin'
-                  ? 'LinkedIn'
-                  : providerMeta?.title ?? provider.name
+                ? provider.name.toLowerCase()
+                : providerMeta?.title ?? provider.name
             const isActive = data?.[enabledProperty as keyof typeof data] ?? false
 
             return (

@@ -27,7 +27,6 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { AWS_REGIONS_DEFAULT, BASE_PATH } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
@@ -71,7 +70,6 @@ const DeployNewReplicaPanel = ({
   const { ref: projectRef } = useParams()
   const project = useSelectedProject()
   const org = useSelectedOrganization()
-  const diskAndComputeFormEnabled = useFlag('diskAndComputeForm')
 
   const { data } = useReadReplicasQuery({ projectRef })
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
@@ -302,9 +300,7 @@ const DeployNewReplicaPanel = ({
                     href={
                       isFreePlan
                         ? `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelSmallCompute`
-                        : diskAndComputeFormEnabled
-                          ? `/project/${projectRef}/settings/compute-and-disk`
-                          : `/project/${projectRef}/settings/addons?panel=computeInstance`
+                        : `/project/${projectRef}/settings/compute-and-disk`
                     }
                   >
                     {isFreePlan ? 'Upgrade to Pro' : 'Change compute size'}
@@ -401,9 +397,7 @@ const DeployNewReplicaPanel = ({
                         href={
                           isFreePlan
                             ? `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelMaxReplicas`
-                            : diskAndComputeFormEnabled
-                              ? `/project/${projectRef}/settings/compute-and-disk`
-                              : `/project/${projectRef}/settings/addons?panel=computeInstance`
+                            : `/project/${projectRef}/settings/compute-and-disk`
                         }
                       >
                         Upgrade compute size

@@ -1,14 +1,16 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { compact } from 'lodash'
 import { useEffect } from 'react'
-import { CalculatedColumn } from 'react-data-grid'
+import { CalculatedColumn, CellKeyboardEvent } from 'react-data-grid'
 
 import type { Filter, SavedState } from 'components/grid/types'
 import { Entity, isTableLike } from 'data/table-editor/table-editor-types'
 import { useUrlState } from 'hooks/ui/useUrlState'
+import { copyToClipboard } from 'ui'
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
 import type { Sort, SupaColumn, SupaTable } from './types'
+import { formatClipboardValue } from './utils/common'
 
 export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] {
   if (Array.isArray(sort)) {
@@ -209,4 +211,16 @@ export function useLoadTableEditorStateFromLocalStorageIntoUrl({
       setParams((prevParams) => ({ ...prevParams, ...params }))
     }
   }, [projectRef, table])
+}
+
+export const handleCopyCell = (
+  { column, row }: { column: CalculatedColumn<any, unknown>; row: any },
+  event: CellKeyboardEvent
+) => {
+  if (event.code === 'KeyC' && (event.metaKey || event.ctrlKey)) {
+    const colKey = column.key
+    const cellValue = row[colKey] ?? ''
+    const value = formatClipboardValue(cellValue)
+    copyToClipboard(value)
+  }
 }

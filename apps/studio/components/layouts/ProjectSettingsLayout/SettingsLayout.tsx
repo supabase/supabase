@@ -46,7 +46,6 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     'billing:invoices',
   ])
 
-  const diskAndComputeEnabled = useFlag('diskAndComputeForm')
   const newApiKeys = useFlag('newApiKeys')
 
   const menuRoutes = generateSettingsMenu(ref, project, organization, {
@@ -54,7 +53,6 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     invoices: invoicesEnabled,
-    diskAndCompute: diskAndComputeEnabled,
     newApiKeys,
   })
 
