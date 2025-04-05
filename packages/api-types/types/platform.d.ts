@@ -1251,6 +1251,41 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/oauth/apps/{app_id}/client-secrets': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List oauth app client secrets */
+    get: operations['OAuthAppClientSecretsController_listClientSecrets']
+    put?: never
+    /** Create oauth app client secret */
+    post: operations['OAuthAppClientSecretsController_CreateClientSecret']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/oauth/apps/{app_id}/client-secrets/{secret_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Remove oauth app client secret */
+    delete: operations['OAuthAppClientSecretsController_RemoveClientSecret']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/oauth/apps/{id}': {
     parameters: {
       query?: never
@@ -4419,6 +4454,18 @@ export interface components {
       )[]
       website: string
     }
+    CreateOAuthAppClientSecretResponseDto: {
+      client_secret: string
+      client_secret_alias: string
+      /** Format: date-time */
+      created_at: string
+      /** Format: uuid */
+      created_by: string
+      /** Format: uuid */
+      id: string
+      /** Format: uuid */
+      oauth_app_id: string
+    }
     CreateOAuthAppResponse: {
       client_id: string
       client_secret: string
@@ -4777,6 +4824,7 @@ export interface components {
     }
     /** @enum {string} */
     DesiredInstanceSize:
+      | 'pico'
       | 'micro'
       | 'small'
       | 'medium'
@@ -5572,6 +5620,19 @@ export interface components {
         lint_name: string | null
         note: string | null
         project_ref: string
+      }[]
+    }
+    ListOAuthAppClientSecretsResponseDto: {
+      client_secrets: {
+        client_secret_alias: string
+        /** Format: date-time */
+        created_at: string
+        /** Format: uuid */
+        created_by: string
+        /** Format: uuid */
+        id: string
+        /** Format: uuid */
+        oauth_app_id: string
       }[]
     }
     LoadBalancerDetailResponse: {
@@ -6774,9 +6835,7 @@ export interface components {
       redirectTo?: string
     }
     StorageBucketResponse: {
-      allowed_mime_types?: string[]
       created_at: string
-      file_size_limit?: number
       id: string
       name: string
       owner: string
@@ -6801,9 +6860,7 @@ export interface components {
     StorageObject: {
       bucket_id: string
       buckets: {
-        allowed_mime_types?: string[]
         created_at: string
-        file_size_limit?: number
         id: string
         name: string
         owner: string
@@ -7408,8 +7465,8 @@ export interface components {
       message: string
     }
     UpdateStorageBucketBody: {
-      allowed_mime_types?: string[] | null
-      file_size_limit?: number | null
+      allowed_mime_types?: string[]
+      file_size_limit?: number
       public: boolean
     }
     UpdateStorageConfigBody: {
@@ -10540,6 +10597,89 @@ export interface operations {
         content: {
           'application/json': components['schemas']['CreateOAuthAppResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OAuthAppClientSecretsController_listClientSecrets: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        app_id: string
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListOAuthAppClientSecretsResponseDto']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OAuthAppClientSecretsController_CreateClientSecret: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        app_id: string
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateOAuthAppClientSecretResponseDto']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OAuthAppClientSecretsController_RemoveClientSecret: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        app_id: string
+        secret_id: string
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       403: {
         headers: {
