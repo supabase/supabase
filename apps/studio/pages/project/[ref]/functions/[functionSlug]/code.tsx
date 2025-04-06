@@ -1,4 +1,4 @@
-import { common, dirname, relative } from '@std/path/posix'
+import { common, dirname, relative, extname } from '@std/path/posix'
 import { AlertCircle, CornerDownLeft, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -97,6 +97,12 @@ const CodePage = () => {
         return files.find(({ name }) => regex.test(name))?.name
       }
 
+      const validSourceExtensions = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.json']
+      const static_patterns = [...new Set(files.map(({ name }) => {
+        const ext = extname(name)
+        return validSourceExtensions.includes(ext) ? null : `*${ext}`
+      }).filter(item => item !== null && item !== undefined))]
+
       deployFunction({
         projectRef: ref,
         slug: selectedFunction.slug,
@@ -109,6 +115,7 @@ const CodePage = () => {
           import_map_path: files.some(({ name }) => name === newImportMapPath)
             ? newImportMapPath
             : fallbackImportMapPath(),
+          static_patterns,
         },
         files: files.map(({ name, content }) => ({ name, content })),
       })

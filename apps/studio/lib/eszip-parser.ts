@@ -92,7 +92,6 @@ async function extractEszip(parser: any, specifiers: string[]) {
     const shouldSkip =
       specifier.startsWith('---') ||
       specifier.startsWith('npm:') ||
-      specifier.startsWith('static:') ||
       specifier.startsWith('vfs:') ||
       specifier.startsWith('https:') ||
       specifier.startsWith('jsr:')
