@@ -5,6 +5,7 @@ import { ParsedUrlQuery } from 'querystring'
 import { useState } from 'react'
 
 import { useParams } from 'common'
+import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -92,6 +93,8 @@ interface ProjectDropdownProps {
 }
 
 const ProjectDropdown = ({ isNewNav = true }: ProjectDropdownProps) => {
+  const newLayoutPreview = useNewLayout()
+
   const router = useRouter()
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
@@ -118,21 +121,31 @@ const ProjectDropdown = ({ isNewNav = true }: ProjectDropdownProps) => {
 
   return IS_PLATFORM ? (
     <>
-      <Link
-        href={`/project/${project?.ref}`}
-        className="flex items-center gap-2 flex-shrink-0 text-sm"
-      >
-        <Box size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-        <span className="text-foreground max-w-32 lg:max-w-none truncate">{project?.name}</span>
-      </Link>
+      {newLayoutPreview && (
+        <Link
+          href={`/project/${project?.ref}`}
+          className="flex items-center gap-2 flex-shrink-0 text-sm"
+        >
+          <Box size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+          <span className="text-foreground max-w-32 lg:max-w-none truncate">{project?.name}</span>
+        </Link>
+      )}
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>
-          <Button
-            type="text"
-            size="tiny"
-            className={cn('px-0.25 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
-            iconRight={<ChevronsUpDown strokeWidth={1.5} />}
-          />
+          {newLayoutPreview ? (
+            <Button
+              type="text"
+              size="tiny"
+              className={cn('px-0.25 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
+              iconRight={<ChevronsUpDown strokeWidth={1.5} />}
+            />
+          ) : (
+            <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
+              <div className="flex items-center space-x-2">
+                <p className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedProject?.name}</p>
+              </div>
+            </Button>
+          )}
         </PopoverTrigger_Shadcn_>
         <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
           <Command_Shadcn_>

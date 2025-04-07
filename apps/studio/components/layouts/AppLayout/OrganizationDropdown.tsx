@@ -50,23 +50,31 @@ const OrganizationDropdown = () => {
 
   return (
     <>
-      <Link
-        href={newLayoutPreview ? `/org/${slug}` : `/org/${slug}/general`}
-        className="flex items-center gap-2 flex-shrink-0 text-sm"
-      >
-        <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-        <span className="text-foreground max-w-32 lg:max-w-none truncate hidden md:block">
-          {orgName}
-        </span>
-        {isSuccess && <Badge variant="default">{subscription?.plan.name}</Badge>}
-      </Link>
+      {newLayoutPreview && (
+        <Link href={`/org/${slug}`} className="flex items-center gap-2 flex-shrink-0 text-sm">
+          <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+          <span className="text-foreground max-w-32 lg:max-w-none truncate hidden md:block">
+            {orgName}
+          </span>
+          {isSuccess && <Badge variant="default">{subscription?.plan.name}</Badge>}
+        </Link>
+      )}
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>
-          <Button
-            type="text"
-            className={cn('px-0.25 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
-            iconRight={<ChevronsUpDown strokeWidth={1.5} />}
-          ></Button>
+          {newLayoutPreview ? (
+            <Button
+              type="text"
+              className={cn('px-0.25 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
+              iconRight={<ChevronsUpDown strokeWidth={1.5} />}
+            />
+          ) : (
+            <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
+              <div className="flex items-center space-x-2">
+                <p className={'text-xs'}>{orgName}</p>
+                {isSuccess && <Badge variant="default">{subscription?.plan.name}</Badge>}
+              </div>
+            </Button>
+          )}
         </PopoverTrigger_Shadcn_>
         <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
           <Command_Shadcn_>
