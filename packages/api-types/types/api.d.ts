@@ -1970,7 +1970,7 @@ export interface components {
       code?: string
       code_verifier?: string
       /** @enum {string} */
-      grant_type: 'authorization_code' | 'refresh_token'
+      grant_type?: 'authorization_code' | 'refresh_token'
       redirect_uri?: string
       refresh_token?: string
     }
