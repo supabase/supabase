@@ -1,4 +1,4 @@
-import { MousePointerClick, X } from 'lucide-react'
+import { MousePointerClick, X, Clipboard, Check } from 'lucide-react'
 import {
   Button,
   CodeBlock,
@@ -7,10 +7,13 @@ import {
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
   cn,
+  copyToClipboard,
 } from 'ui'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 import type { LogData, QueryType } from './Logs.types'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useEffect, useState } from 'react'
 
 export interface LogSelectionProps {
   log?: LogData
@@ -23,6 +26,14 @@ export interface LogSelectionProps {
 }
 
 const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectionProps) => {
+  const [showCopied, setShowCopied] = useState(false)
+
+  useEffect(() => {
+    if (!showCopied) return
+    const timer = setTimeout(() => setShowCopied(false), 2000)
+    return () => clearTimeout(timer)
+  }, [showCopied])
+
   const LogDetails = () => {
     if (error) return <LogErrorState error={error} />
     if (!log) return <LogDetailEmptyState />
@@ -61,20 +72,38 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
     <div className="relative flex h-full flex-grow flex-col overflow-y-scroll bg-surface-100 border-t">
       <div className="relative flex-grow flex flex-col h-full">
         <Tabs_Shadcn_ defaultValue="details" className="flex flex-col h-full">
-          <TabsList_Shadcn_ className="px-2 pt-2">
+          <TabsList_Shadcn_ className="px-2 pt-2 relative">
             <TabsTrigger_Shadcn_ className="px-3" value="details">
               Details
             </TabsTrigger_Shadcn_>
             <TabsTrigger_Shadcn_ disabled={!log} className="px-3" value="raw">
               Raw
             </TabsTrigger_Shadcn_>
-            <Button
-              type="text"
-              className="ml-auto absolute top-2 right-2 cursor-pointer transition hover:text-foreground h-6 w-6 px-0 py-0 flex items-center justify-center"
-              onClick={onClose}
-            >
-              <X size={14} strokeWidth={2} className="text-foreground-lighter" />
-            </Button>
+            <div className="*:px-1.5 *:text-foreground-lighter ml-auto flex gap-1 absolute right-2 top-2">
+              <ButtonTooltip
+                disabled={!log || isLoading}
+                type="text"
+                tooltip={{
+                  content: {
+                    text: isLoading ? 'Loading log...' : 'Copy as JSON',
+                  },
+                }}
+                onClick={() => {
+                  setShowCopied(true)
+                  copyToClipboard(JSON.stringify(log, null, 2))
+                }}
+              >
+                {showCopied ? (
+                  <Check size={14} strokeWidth={2} />
+                ) : (
+                  <Clipboard size={14} strokeWidth={2} />
+                )}
+              </ButtonTooltip>
+
+              <Button type="text" onClick={onClose}>
+                <X size={14} strokeWidth={2} />
+              </Button>
+            </div>
           </TabsList_Shadcn_>
           <div className="flex-1 h-full">
             {isLoading ? (
