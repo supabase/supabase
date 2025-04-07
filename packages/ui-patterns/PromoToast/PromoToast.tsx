@@ -48,7 +48,7 @@ const PromoToast = () => {
           }}
           className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7"
         >
-          Supabase MCP Server
+          Top 10 Launches
         </p>
       </div>
 
