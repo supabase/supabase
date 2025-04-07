@@ -17,7 +17,7 @@ launchweek: 14
 
 Today we’re releasing Data API requests routing to the nearest Read Replica by extending our [API load balancer](/docs/guides/platform/read-replicas#api-load-balancer) to handle geo-routing.
 
-It’s an impactful improvement that will minimize request latency for your globally distributed applications. It’s only available today when [experimental routing](/docs/guides/platform/read-replicas#experimental-routing) is enabled.
+It’s an impactful improvement that will minimize request latency for your globally distributed applications. It’s available by default when using a load balancer endpoint.
 
 ## What is geo-routing?
 
@@ -55,14 +55,10 @@ To get the most from geo-routing, deploy read replicas in regions where your use
 As an initial release, geo-routing is available with the following limitations:
 
 - Currently limited to read-only Data API (PostgREST) requests
-- Only available via experimental routing
 
-If you're already using our API load balancer with experimental routing enabled, there's nothing you need to do; geo-routing is automatically applied to your Data API requests.
+If you're already using our API load balancer there's nothing you need to do; geo-routing is automatically applied to your Data API requests.
 
-Otherwise, you can enable this feature:
-
-1. Ensure your project is using the API load balancer endpoint (`<project_ref>-all.supabase.co`)
-2. Enable experimental routing (see [experimental routing](/docs/guides/platform/read-replicas#experimental-routing))
+Otherwise, you can enable this feature by ensuring your project is using the API load balancer endpoint (`<project_ref>-all.supabase.co`)
 
 We're actively working on expanding geo-routing support to other Supabase products, such as Auth, Storage, and Realtime. Stay tuned for updates.
 
@@ -70,5 +66,4 @@ We're actively working on expanding geo-routing support to other Supabase produc
 
 As always, we welcome your feedback, let us know what you think!
 
-- Check out the docs on [experimental routing](/docs/guides/platform/read-replicas#experimental-routing)
 - [Sign up for Supabase](/dashboard/sign-up) and get started today
