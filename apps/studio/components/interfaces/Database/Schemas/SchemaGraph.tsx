@@ -1,6 +1,6 @@
 import type { PostgresSchema } from '@supabase/postgres-meta'
 import { toPng } from 'html-to-image'
-import { Download, Loader2 } from 'lucide-react'
+import { Check, Download, Loader2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useState } from 'react'
 import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
@@ -20,7 +20,8 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
-
+import { Clipboard } from 'lucide-react'
+import { copyToClipboard } from 'ui'
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
 export const SchemaGraph = () => {
@@ -28,6 +29,13 @@ export const SchemaGraph = () => {
   const { resolvedTheme } = useTheme()
   const { project } = useProjectContext()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+
+  const [copied, setCopied] = useState(false)
+  useEffect(() => {
+    if (copied) {
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }, [copied])
 
   const [isDownloading, setIsDownloading] = useState(false)
 
@@ -127,6 +135,14 @@ export const SchemaGraph = () => {
       })
   }
 
+  function tablesToSQL(t: any) {
+    return t
+      .map((table: any) => {
+        return `CREATE TABLE ${table.schema}.${table.name} (\n${table.columns.map((c: any) => `  ${c.name} ${c.data_type}`).join(',\n')}\n);`
+      })
+      .join('\n')
+  }
+
   useEffect(() => {
     if (isSuccessTables && isSuccessSchemas && tables.length > 0) {
       const schema = schemas.find((s) => s.name === selectedSchema) as PostgresSchema
@@ -159,6 +175,18 @@ export const SchemaGraph = () => {
               onSelectSchema={setSelectedSchema}
             />
             <div className="flex items-center gap-x-2">
+              <ButtonTooltip
+                type="text"
+                className="px-1.5"
+                icon={copied ? <Check /> : <Clipboard />}
+                onClick={() => {
+                  if (tables) {
+                    copyToClipboard(tablesToSQL(tables))
+                    setCopied(true)
+                  }
+                }}
+                tooltip={{ content: { side: 'bottom', text: 'Copy schema as SQL' } }}
+              />
               <ButtonTooltip
                 type="default"
                 loading={isDownloading}
