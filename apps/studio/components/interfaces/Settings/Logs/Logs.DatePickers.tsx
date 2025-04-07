@@ -197,7 +197,8 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
   }, [startDate, endDate])
 
   const isLargeRange =
-    Math.abs(dayjs(startDate).diff(dayjs(endDate), 'days')) > LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD
+    Math.abs(dayjs(startDate).diff(dayjs(endDate), 'days')) >
+    LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD - 1
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
