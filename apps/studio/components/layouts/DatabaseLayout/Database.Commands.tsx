@@ -114,144 +114,48 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/database/schemas`,
         icon: () => <Search />,
       },
-    ],
-    {
-      ...options,
-      deps: [ref],
-      orderSection: orderCommandSectionsByPriority,
-      sectionMeta: { priority: 3 },
-    }
-  )
-
-  useRegisterCommands(
-    COMMAND_MENU_SECTIONS.DATABASE,
-    [
       {
         id: 'run-view-database-functions',
         name: 'View and create functions',
         route: `/project/${ref}/database/functions`,
         icon: () => <Database />,
       },
-    ],
-    {
-      ...options,
-      deps: [ref],
-      orderSection: orderCommandSectionsByPriority,
-      sectionMeta: { priority: 3 },
-    }
-  )
-
-  useRegisterCommands(
-    COMMAND_MENU_SECTIONS.DATABASE,
-    [
       {
         id: 'run-view-database-triggers',
         name: 'View and create triggers',
         route: `/project/${ref}/database/triggers`,
         icon: () => <Database />,
       },
-    ],
-    {
-      ...options,
-      deps: [ref],
-      orderSection: orderCommandSectionsByPriority,
-      sectionMeta: { priority: 3 },
-    }
-  )
-
-  useRegisterCommands(
-    COMMAND_MENU_SECTIONS.DATABASE,
-    [
       {
         id: 'run-view-database-enumerated-types',
         name: 'View and create enumerated types',
         route: `/project/${ref}/database/types`,
         icon: () => <Database />,
       },
-    ],
-    {
-      ...options,
-      deps: [ref],
-      orderSection: orderCommandSectionsByPriority,
-      sectionMeta: { priority: 3 },
-    }
-  )
-
-  useRegisterCommands(
-    COMMAND_MENU_SECTIONS.DATABASE,
-    [
       {
         id: 'run-view-database-extensions',
         name: 'View your extensions',
         route: `/project/${ref}/database/extensions`,
         icon: () => <Blocks />,
       },
-    ],
-    {
-      ...options,
-      deps: [ref],
-      orderSection: orderCommandSectionsByPriority,
-      sectionMeta: { priority: 3 },
-    }
-  )
-
-  useRegisterCommands(
-    COMMAND_MENU_SECTIONS.DATABASE,
-    [
       {
         id: 'run-view-database-indexes',
         name: 'View and create indexes',
         route: `/project/${ref}/database/indexes`,
         icon: () => <Database />,
       },
-    ],
-    {
-      ...options,
-      deps: [ref],
-      orderSection: orderCommandSectionsByPriority,
-      sectionMeta: { priority: 3 },
-    }
-  )
-
-  useRegisterCommands(
-    COMMAND_MENU_SECTIONS.DATABASE,
-    [
       {
         id: 'run-view-database-roles',
         name: 'View your roles',
         route: `/project/${ref}/database/roles`,
         icon: () => <Database />,
       },
-    ],
-    {
-      ...options,
-      deps: [ref],
-      orderSection: orderCommandSectionsByPriority,
-      sectionMeta: { priority: 3 },
-    }
-  )
-
-  useRegisterCommands(
-    COMMAND_MENU_SECTIONS.DATABASE,
-    [
       {
         id: 'run-view-database-backups',
         name: 'View your backups',
         route: `/project/${ref}/database/backup/scheduled`,
         icon: () => <Database />,
       },
-    ],
-    {
-      ...options,
-      deps: [ref],
-      orderSection: orderCommandSectionsByPriority,
-      sectionMeta: { priority: 3 },
-    }
-  )
-
-  useRegisterCommands(
-    COMMAND_MENU_SECTIONS.DATABASE,
-    [
       {
         id: 'run-view-database-migraitons',
         name: 'View your migrations',
