@@ -36,14 +36,14 @@ const CHART_INTERVALS: ChartIntervals[] = [
     format: 'MMM D, h:mma',
     availableIn: ['free', 'pro', 'enterprise', 'team'],
   },
-  {
-    key: '3-hours',
-    label: 'Last 3 hours',
-    startValue: 3,
-    startUnit: 'hour',
-    format: 'MMM D, h:mma',
-    availableIn: ['free', 'pro', 'enterprise', 'team'],
-  },
+  // {
+  //   key: '3-hours',
+  //   label: 'Last 3 hours',
+  //   startValue: 3,
+  //   startUnit: 'hour',
+  //   format: 'MMM D, h:mma',
+  //   availableIn: ['free', 'pro', 'enterprise', 'team'],
+  // },
   {
     key: 'hourly',
     label: 'Last 24 hours',
@@ -52,14 +52,14 @@ const CHART_INTERVALS: ChartIntervals[] = [
     format: 'MMM D, ha',
     availableIn: ['free', 'pro', 'enterprise', 'team'],
   },
-  {
-    key: '3-days',
-    label: 'Last 3 days',
-    startValue: 3,
-    startUnit: 'day',
-    format: 'MMM D',
-    availableIn: ['pro', 'enterprise', 'team'],
-  },
+  // {
+  //   key: '3-days',
+  //   label: 'Last 3 days',
+  //   startValue: 3,
+  //   startUnit: 'day',
+  //   format: 'MMM D',
+  //   availableIn: ['pro', 'enterprise', 'team'],
+  // },
   {
     key: 'daily',
     label: 'Last 7 days',
@@ -79,9 +79,9 @@ const ProjectUsage = () => {
     'project_storage:all',
   ])
 
-  const { data: plan } = useCurrentOrgPlan()
+  const { plan } = useCurrentOrgPlan()
 
-  const [interval, setInterval] = useState<ProjectLogStatsVariables['interval']>('3-hours')
+  const [interval, setInterval] = useState<ProjectLogStatsVariables['interval']>('minutely')
 
   const { data, isLoading } = useProjectLogStatsQuery({ projectRef, interval })
 
