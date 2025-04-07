@@ -11,8 +11,8 @@ import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { CronJob, getDatabaseCronJob } from 'data/database-cron-jobs/database-cron-job-query'
 import { useDatabaseCronJobCreateMutation } from 'data/database-cron-jobs/database-cron-jobs-create-mutation'
-import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -204,11 +204,6 @@ export const CreateCronJobSheet = ({
 
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
 
-  const { data: cronJobs } = useCronJobsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: upsertCronJob, isLoading } = useDatabaseCronJobCreateMutation()
 
@@ -301,10 +296,16 @@ export const CreateCronJobSheet = ({
 
   const onSubmit: SubmitHandler<CreateCronJobForm> = async ({ name, schedule, values }) => {
     // job names should be unique
-    const nameExists = cronJobs?.some(
-      (job) => job.jobname === name && job.jobname !== selectedCronJob?.jobname
-    )
-    if (nameExists) {
+    const foundCronJob = await getDatabaseCronJob({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      jobName: name,
+    })
+    if (
+      foundCronJob &&
+      foundCronJob.jobname === name &&
+      foundCronJob.jobname !== selectedCronJob?.jobname
+    ) {
       form.setError('name', {
         type: 'manual',
         message: 'A cron job with this name already exists',

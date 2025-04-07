@@ -6,7 +6,7 @@ import DataGrid, { Column, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
+import { useCronJobQuery } from 'data/database-cron-jobs/database-cron-job-query'
 import {
   CronJobRun,
   useCronJobRunsInfiniteQuery,
@@ -136,12 +136,11 @@ export const PreviousRunsTab = () => {
   const { childId: jobName } = useParams()
   const { project } = useProjectContext()
 
-  const { data: cronJobs, isLoading: isLoadingCronJobs } = useCronJobsQuery({
+  const { data: currentJobState, isLoading: isLoadingCronJob } = useCronJobQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    jobName: jobName as string,
   })
-
-  const currentJobState = cronJobs?.find((job) => job.jobname === jobName)
 
   const {
     data,
@@ -215,7 +214,7 @@ export const PreviousRunsTab = () => {
       />
 
       <div className="px-6 py-6 flex gap-12 border-t bg">
-        {isLoadingCronJobs ? (
+        {isLoadingCronJob ? (
           <GenericSkeletonLoader />
         ) : (
           <>
