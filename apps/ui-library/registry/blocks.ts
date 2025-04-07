@@ -6,6 +6,9 @@ import passwordBasedAuthNextjs from './default/blocks/password-based-auth-nextjs
 import passwordBasedAuthReactRouter from './default/blocks/password-based-auth-react-router/registry-item.json' assert { type: 'json' }
 import passwordBasedAuthReact from './default/blocks/password-based-auth-react/registry-item.json' assert { type: 'json' }
 import passwordBasedAuthTanstack from './default/blocks/password-based-auth-tanstack/registry-item.json' assert { type: 'json' }
+
+import socialAuthNextjs from './default/blocks/social-auth-nextjs/registry-item.json' assert { type: 'json' }
+
 import realtimeAvatarStack from './default/blocks/realtime-avatar-stack/registry-item.json' assert { type: 'json' }
 
 import realtimeChat from './default/blocks/realtime-chat/registry-item.json' assert { type: 'json' }
@@ -34,6 +37,9 @@ export const blocks = [
   registryItemAppend(passwordBasedAuthReact as RegistryItem, [reactClient!]),
   registryItemAppend(passwordBasedAuthReactRouter as RegistryItem, [reactRouterClient!]),
   registryItemAppend(passwordBasedAuthTanstack as RegistryItem, [tanstackClient!]),
+
+  registryItemAppend(socialAuthNextjs as RegistryItem, [nextjsClient!]),
+
   ...combine(dropzone as RegistryItem),
   ...combine(realtimeCursor as RegistryItem),
   ...combine(currentUserAvatar as RegistryItem),

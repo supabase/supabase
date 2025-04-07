@@ -55,6 +55,18 @@ export const Index: Record<string, any> = {
       chunks: []
     }
     ,
+    "social-auth-nextjs": {
+      name: "social-auth-nextjs",
+      type: "registry:block",
+      registryDependencies: ["button","card"],
+      component: React.lazy(() => import("@/registry/default/blocks/password-based-auth-nextjs/app/auth/login/page.tsx")),
+      source: "",
+      files: ["registry/default/blocks/password-based-auth-nextjs/app/auth/login/page.tsx","registry/default/blocks/password-based-auth-nextjs/app/auth/error/page.tsx","registry/default/blocks/password-based-auth-nextjs/app/protected/page.tsx","registry/default/blocks/social-auth-nextjs/app/auth/oauth/route.ts","registry/default/blocks/password-based-auth-nextjs/components/login-form.tsx","registry/default/blocks/password-based-auth-nextjs/middleware.ts","registry/default/blocks/password-based-auth-nextjs/components/logout-button.tsx","registry/default/clients/nextjs/lib/supabase/client.ts","registry/default/clients/nextjs/lib/supabase/middleware.ts","registry/default/clients/nextjs/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
     "dropzone-nextjs": {
       name: "dropzone-nextjs",
       type: "registry:component",
