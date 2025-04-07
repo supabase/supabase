@@ -22,7 +22,7 @@ import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-// import { useUrlState } from 'hooks/ui/useUrlState'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import {
   useRoleImpersonationStateSnapshot,
   useSubscribeToImpersonatedRole,
@@ -41,7 +41,7 @@ import {
 } from 'ui'
 import FilterPopover from './filter/FilterPopover'
 import { SortPopover } from './sort'
-import { parseAsArrayOf, parseAsString, useQueryState, useQueryStates } from 'nuqs'
+import { useTableEditorFilters } from 'hooks/misc/use-table-editor-filters'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
@@ -105,50 +105,7 @@ const DefaultHeader = () => {
   // [Joshen] Using this logic to block both column and row creation/update/delete
   const canCreateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
-  const [filters, setFilters] = useState<string[]>([])
-
-  const [{ filter: _, sort: sorts }, setUrlParams] = useQueryStates({
-    filter: {
-      parse: (val) => {
-        // Backwards compatible parser for URL filters
-        // After updating to Nuqs v2 the old filters stopped working
-        // Relevant gh issue: https://github.com/47ng/nuqs/discussions/484
-
-        // example old syntax: ?filter=id:eq:value&filter=created_at:eq:value&filter=id:eq:123123
-        // example new syntax: ?filter=id:eq:idasd,created_at:eq:3423,id:eq:123123
-
-        // should return filters: ['id:eq:idasd', 'created_at:eq:3423', 'id:eq:123123']
-
-        let parsedFilters: string[] = []
-
-        if (val) {
-          // Check if the value contains commas (new syntax)
-          if (val.includes(',')) {
-            parsedFilters = val.split(',')
-          } else {
-            // For old syntax, we need to get all filter parameters from the URL
-            const searchParams = new URLSearchParams(window.location.search)
-            parsedFilters = searchParams.getAll('filter')
-          }
-        }
-
-        // Update state with the new filters
-        setFilters(parsedFilters)
-
-        return parsedFilters
-      },
-    },
-    sort: parseAsArrayOf(parseAsString),
-  })
-
-  function setParams(
-    fn: (prevParams: { filter: string[]; sort: string[] }) => { filter: string[]; sort: string[] }
-  ) {
-    const currentParams = { filter: filters, sort: sorts ?? [] }
-    const newParams = fn(currentParams)
-    setUrlParams(newParams) // store in URL
-    setFilters(newParams.filter) // store in local state
-  }
+  const { filters, sorts, setParams } = useTableEditorFilters()
 
   const onApplyFilters = useCallback(
     (appliedFilters: Filter[]) => {
@@ -179,12 +136,12 @@ const DefaultHeader = () => {
 
   const onApplySorts = useCallback(
     (appliedSorts: Sort[]) => {
-      const sortsArray = sortsToUrlParams(appliedSorts)
+      const sorts = sortsToUrlParams(appliedSorts)
 
       setParams((prevParams) => {
         return {
           ...prevParams,
-          sort: sortsArray,
+          sort: sorts,
         }
       })
 
@@ -193,7 +150,7 @@ const DefaultHeader = () => {
           projectRef,
           tableName: snap.table.name,
           schema: snap.table.schema,
-          sorts: sortsArray,
+          sorts: sorts,
         })
       }
     },
@@ -205,8 +162,8 @@ const DefaultHeader = () => {
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <FilterPopover filters={filters} onApplyFilters={onApplyFilters} />
-        <SortPopover sorts={sorts ?? []} onApplySorts={onApplySorts} />
+        <FilterPopover filters={filters as string[]} onApplyFilters={onApplyFilters} />
+        <SortPopover sorts={sorts as string[]} onApplySorts={onApplySorts} />
       </div>
       {canAddNew && (
         <>
