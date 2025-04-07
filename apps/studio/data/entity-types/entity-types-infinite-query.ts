@@ -3,13 +3,6 @@ import { executeSql, ExecuteSqlVariables } from 'data/sql/execute-sql-query'
 import { ResponseError } from 'types'
 import { ENTITY_TYPE } from './entity-type-constants'
 import { entityTypeKeys } from './keys'
-import {
-  getRecentItemsStore,
-  RecentItem,
-  removeRecentItem,
-  removeRecentItems,
-} from 'state/recent-items'
-import { getTabsStore, removeTabs } from 'state/tabs'
 
 export type EntityTypesVariables = {
   projectRef?: string
