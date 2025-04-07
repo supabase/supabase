@@ -6,14 +6,15 @@ import { PropsWithChildren, createContext, useContext, useEffect, useState } fro
 import { APISidePanelPreview } from './APISidePanelPreview'
 import { CLSPreview } from './CLSPreview'
 import { InlineEditorPreview } from './InlineEditorPreview'
+import { LayoutUpdatePreview } from './LayoutUpdatePreview'
 import { SqlEditorTabsPreview } from './SqlEditorTabs'
 import { TableEditorTabsPreview } from './TableEditorTabs'
 
 export const FEATURE_PREVIEWS = [
   {
     key: LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW,
-    name: 'Dashboard layout update',
-    content: <APISidePanelPreview />,
+    name: 'Layout Update for Organizations',
+    content: <LayoutUpdatePreview />,
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
     isNew: false,
   },
