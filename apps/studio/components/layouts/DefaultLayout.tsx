@@ -13,6 +13,7 @@ import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 
 export interface DefaultLayoutProps {
   headerTitle?: string
+  showProductMenu?: boolean
 }
 
 /**
@@ -26,7 +27,11 @@ export interface DefaultLayoutProps {
  * - First level side navigation bar (e.g For navigating to Table Editor, SQL Editor, Database page, etc)
  * @param showProductMenu - (Mobile only) Show button to toggle visiblity of product menu (Default: true)
  */
-const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayoutProps>) => {
+const DefaultLayout = ({
+  children,
+  headerTitle,
+  showProductMenu = true,
+}: PropsWithChildren<DefaultLayoutProps>) => {
   const newLayoutPreview = useNewLayout()
   const showLayoutHeader = useShowLayoutHeader()
 
@@ -42,7 +47,7 @@ const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayou
             <div className="flex-shrink-0">
               <MobileNavigationBar />
               {newLayoutPreview || showLayoutHeader ? (
-                <LayoutHeader showProductMenu headerTitle={headerTitle} />
+                <LayoutHeader showProductMenu={showProductMenu} headerTitle={headerTitle} />
               ) : null}
             </div>
             {/* Main Content Area */}

@@ -100,8 +100,7 @@ const LayoutHeader = ({
     <header className={cn('flex h-12 items-center flex-shrink-0 border-b')}>
       <div
         className={cn(
-          'flex items-center justify-between py-2 pr-3 flex-1 overflow-x-auto gap-x-4',
-          newLayoutPreview ? 'pl-4' : 'pl-1 md:pl-4'
+          'flex items-center justify-between h-full pr-3 flex-1 overflow-x-auto gap-x-4 md:pl-4'
         )}
       >
         {showProductMenu && (
@@ -109,12 +108,14 @@ const LayoutHeader = ({
             <button
               title="Menu dropdown button"
               className={cn(
-                'group/view-toggle flex justify-center flex-col border-none space-x-0 items-start gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
+                'group/view-toggle flex justify-center items-center border-none gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
               )}
               onClick={() => setMobileMenuOpen(true)}
             >
-              <div className="h-px inline-block left-0 w-4 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
-              <div className="h-px inline-block left-0 w-3 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
+              <div className="flex flex-col gap-y-1">
+                <div className="h-px inline-block left-0 w-4 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
+                <div className="h-px inline-block left-0 w-3 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
+              </div>
             </button>
           </div>
         )}
@@ -230,11 +231,11 @@ const LayoutHeader = ({
               transition={{ duration: 0.15, ease: 'easeOut' }}
             >
               {isInlineEditorEnabled && (
-                <div className="border-r h-full flex items-center justify-center px-2">
+                <div className="border-r h-full flex items-center justify-center md:px-2">
                   <InlineEditorButton />
                 </div>
               )}
-              <div className="px-2">
+              <div className="md:px-2">
                 <AssistantButton />
               </div>
             </motion.div>
