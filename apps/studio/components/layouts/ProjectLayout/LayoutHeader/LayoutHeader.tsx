@@ -119,7 +119,8 @@ const LayoutHeader = ({
             <div className="flex items-center pl-2">
               {showOrgSelection &&
               // hides org dropdown for old layout
-              (newLayoutPreview || showLayoutHeader) ? (
+              (newLayoutPreview || showLayoutHeader) &&
+              IS_PLATFORM ? (
                 <>
                   <LayoutHeaderDivider className="hidden md:block" />
                   <OrganizationDropdown />
