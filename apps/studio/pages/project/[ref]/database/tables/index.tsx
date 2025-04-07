@@ -1,4 +1,6 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
+import { useState } from 'react'
+
 import { TableList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
@@ -6,7 +8,6 @@ import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { useState } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { NextPageWithLayout } from 'types'
 
@@ -47,11 +48,7 @@ const DatabaseTables: NextPageWithLayout = () => {
 
 DatabaseTables.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">
-      {/* <ProjectPageNavigation navKey="postgres-items"> */}
-      {page}
-      {/* </ProjectPageNavigation> */}
-    </DatabaseLayout>
+    <DatabaseLayout title="Database">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 

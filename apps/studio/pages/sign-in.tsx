@@ -1,7 +1,7 @@
 import { LastSignInWrapper } from 'components/interfaces/SignIn/LastSignInWrapper'
 import SignInForm from 'components/interfaces/SignIn/SignInForm'
 import SignInWithGitHub from 'components/interfaces/SignIn/SignInWithGitHub'
-import AuthenticationLayout from 'components/layouts/AuthenticationLayout'
+import { AuthenticationLayout } from 'components/layouts/AuthenticationLayout'
 import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import { IS_PLATFORM } from 'lib/constants'
 import { Lock } from 'lucide-react'
