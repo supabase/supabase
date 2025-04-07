@@ -191,7 +191,7 @@ const LayoutHeader = ({
                   }}
                 >
                   <Connect />
-                  {!isBranchingEnabled && <EnableBranchingButton />}
+                  {!isBranchingEnabled && IS_PLATFORM && <EnableBranchingButton />}
                 </motion.div>
               )}
             </AnimatePresence>
