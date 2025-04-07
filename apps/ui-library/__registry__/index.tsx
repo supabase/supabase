@@ -67,6 +67,42 @@ export const Index: Record<string, any> = {
       chunks: []
     }
     ,
+    "social-auth-react": {
+      name: "social-auth-react",
+      type: "registry:block",
+      registryDependencies: ["button","card"],
+      component: React.lazy(() => import("@/registry/default/blocks/social-auth-react/components/login-form.tsx")),
+      source: "",
+      files: ["registry/default/blocks/social-auth-react/components/login-form.tsx","registry/default/clients/react/lib/supabase/client.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "social-auth-react-router": {
+      name: "social-auth-react-router",
+      type: "registry:block",
+      registryDependencies: ["button","card"],
+      component: React.lazy(() => import("@/registry/default/blocks/social-auth-react-router/app/routes/auth.error.tsx")),
+      source: "",
+      files: ["registry/default/blocks/social-auth-react-router/app/routes/auth.error.tsx","registry/default/blocks/social-auth-react-router/app/routes/auth.oauth.tsx","registry/default/blocks/social-auth-react-router/app/routes/login.tsx","registry/default/blocks/social-auth-react-router/app/routes/logout.tsx","registry/default/blocks/social-auth-react-router/app/routes/protected.tsx","registry/default/blocks/social-auth-react-router/app/routes.ts","registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "social-auth-tanstack": {
+      name: "social-auth-tanstack",
+      type: "registry:block",
+      registryDependencies: ["button","card"],
+      component: React.lazy(() => import("@/registry/default/blocks/social-auth-tanstack/components/login-form.tsx")),
+      source: "",
+      files: ["registry/default/blocks/social-auth-tanstack/components/login-form.tsx","registry/default/blocks/social-auth-tanstack/lib/supabase/fetch-user-server-fn.ts","registry/default/blocks/social-auth-tanstack/routes/_protected.tsx","registry/default/blocks/social-auth-tanstack/routes/_protected/protected.tsx","registry/default/blocks/social-auth-tanstack/routes/auth/error.tsx","registry/default/blocks/social-auth-tanstack/routes/auth/oauth.ts","registry/default/blocks/social-auth-tanstack/routes/login.tsx","registry/default/clients/tanstack/lib/supabase/client.ts","registry/default/clients/tanstack/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
     "dropzone-nextjs": {
       name: "dropzone-nextjs",
       type: "registry:component",
