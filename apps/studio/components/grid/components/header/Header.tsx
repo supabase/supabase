@@ -144,9 +144,10 @@ const DefaultHeader = () => {
   function setParams(
     fn: (prevParams: { filter: string[]; sort: string[] }) => { filter: string[]; sort: string[] }
   ) {
-    const vals = fn({ filter: [], sort: [] })
-    setUrlParams(vals) // store in URL
-    setFilters([...vals.filter, ...filters]) // store in local state
+    const currentParams = { filter: filters, sort: sorts ?? [] }
+    const newParams = fn(currentParams)
+    setUrlParams(newParams) // store in URL
+    setFilters(newParams.filter) // store in local state
   }
 
   const onApplyFilters = useCallback(
