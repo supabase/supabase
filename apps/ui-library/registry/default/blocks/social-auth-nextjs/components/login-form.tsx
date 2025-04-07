@@ -26,13 +26,13 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: `${window.location.origin}/auth/confirm`,
+          redirectTo: `${window.location.origin}/auth/oauth?next=/protected`,
         },
       })
+
       if (error) throw error
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
-    } finally {
       setIsLoading(false)
     }
   }
@@ -42,14 +42,14 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>Enter your email below to login to your account</CardDescription>
+          <CardDescription></CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin}>
             <div className="flex flex-col gap-6">
-              {error && <p className="text-sm text-red-500">{error}</p>}
+              {error && <p className="text-sm text-destructive-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Logging in...' : 'Login'}
+                {isLoading ? 'Logging in...' : 'Login with Github'}
               </Button>
             </div>
           </form>
