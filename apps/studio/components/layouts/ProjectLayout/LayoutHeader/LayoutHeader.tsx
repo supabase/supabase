@@ -53,14 +53,14 @@ const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanEl
 interface LayoutHeaderProps {
   customHeaderComponents?: ReactNode
   breadcrumbs?: any[]
-  hasProductMenu?: boolean
+  showProductMenu?: boolean
   headerTitle?: string
 }
 
 const LayoutHeader = ({
   customHeaderComponents,
   breadcrumbs = [],
-  hasProductMenu,
+  showProductMenu,
   headerTitle,
 }: LayoutHeaderProps) => {
   const newLayoutPreview = useNewLayout()
@@ -98,13 +98,18 @@ const LayoutHeader = ({
 
   return (
     <header className={cn('flex h-12 items-center flex-shrink-0 border-b')}>
-      <div className={cn('flex items-center justify-between py-2 pl-4 pr-3 flex-1')}>
-        {hasProductMenu && (
+      <div
+        className={cn(
+          'flex items-center justify-between py-2 pr-3 flex-1 overflow-x-auto gap-x-4',
+          newLayoutPreview ? 'pl-4' : 'pl-1 md:pl-4'
+        )}
+      >
+        {showProductMenu && (
           <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
             <button
               title="Menu dropdown button"
               className={cn(
-                'group/view-toggle ml-4 flex justify-center flex-col border-none space-x-0 items-start gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
+                'group/view-toggle flex justify-center flex-col border-none space-x-0 items-start gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
               )}
               onClick={() => setMobileMenuOpen(true)}
             >
@@ -116,7 +121,7 @@ const LayoutHeader = ({
         <div className="flex items-center text-sm">
           <HomeIcon />
           <>
-            <div className="flex items-center pl-2">
+            <div className="flex items-center md:pl-2">
               {showOrgSelection &&
               // hides org dropdown for old layout
               (newLayoutPreview || showLayoutHeader) &&

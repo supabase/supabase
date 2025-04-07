@@ -4,7 +4,6 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { SidebarContent } from 'components/interfaces/Sidebar'
 import { IS_PLATFORM } from 'lib/constants'
 import { buttonVariants, cn } from 'ui'
@@ -15,16 +14,9 @@ export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
 
 const MobileNavigationBar = () => {
-  const newLayoutPreview = useNewLayout()
-
   const router = useRouter()
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const { ref: projectRef } = useParams()
-
-  if (newLayoutPreview) {
-    // not used in the new layout
-    return null
-  }
 
   return (
     <div className="h-14 w-full flex flex-row md:hidden">
@@ -71,6 +63,7 @@ const MobileNavigationBar = () => {
               buttonVariants({ type: 'default' }),
               'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30'
             )}
+            onClick={() => setIsSheetOpen(true)}
           >
             <Menu size={18} strokeWidth={1} />
           </button>

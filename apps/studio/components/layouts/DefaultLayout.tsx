@@ -42,7 +42,7 @@ const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayou
             <div className="flex-shrink-0">
               <MobileNavigationBar />
               {newLayoutPreview || showLayoutHeader ? (
-                <LayoutHeader headerTitle={headerTitle} />
+                <LayoutHeader showProductMenu headerTitle={headerTitle} />
               ) : null}
             </div>
             {/* Main Content Area */}
