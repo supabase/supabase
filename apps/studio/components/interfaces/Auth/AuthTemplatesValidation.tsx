@@ -7,7 +7,7 @@ const CONFIRMATION: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'CONFIRMATION',
   type: 'object',
-  title: 'Confirm signup',
+  title: 'Confirm Signup',
   properties: {
     MAILER_SUBJECTS_CONFIRMATION: {
       title: 'Subject heading',
@@ -148,7 +148,7 @@ const RECOVERY: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'RECOVERY',
   type: 'object',
-  title: 'Reset Password',
+  title: 'Password Recovery',
   properties: {
     MAILER_SUBJECTS_RECOVERY: {
       title: 'Subject heading',
