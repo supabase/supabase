@@ -8,7 +8,6 @@ export const useTableEditorFilters = () => {
   const isNewSyntax = urlFilters.length > 0 && urlFilters[0].includes(',')
 
   function getFilters(): string[] {
-    console.log('urlParams', urlParams.getAll('filter'))
     if (isNewSyntax) {
       return urlParams.getAll('filter')[0].split(',')
     }
@@ -33,9 +32,6 @@ export const useTableEditorFilters = () => {
 
   const filters = getFilters()
   const sorts = urlParams.getAll('sort')
-
-  console.log('filters', filters)
-  console.log('sorts', sorts)
 
   return {
     filters,
