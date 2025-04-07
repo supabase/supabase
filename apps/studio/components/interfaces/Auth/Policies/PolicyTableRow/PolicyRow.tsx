@@ -8,7 +8,7 @@ import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import Panel from 'components/ui/Panel'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Badge,
   Button,
@@ -37,7 +37,7 @@ const PolicyRow = ({
   onSelectEditPolicy = noop,
   onSelectDeletePolicy = noop,
 }: PolicyRowProps) => {
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
   const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
 
   const { project } = useProjectContext()
@@ -67,7 +67,13 @@ const PolicyRow = ({
           </p>
 
           <div className="flex flex-col gap-y-1">
-            <p className="text-sm text-foreground">{policy.name}</p>
+            <Button
+              type="text"
+              className="h-auto text-foreground text-sm border-none p-0 hover:bg-transparent"
+              onClick={() => onSelectEditPolicy(policy)}
+            >
+              {policy.name}
+            </Button>
             <div className="flex items-center gap-x-1">
               <div className="text-foreground-lighter text-sm">
                 Applied to:
@@ -113,7 +119,8 @@ const PolicyRow = ({
                 className="space-x-2"
                 onClick={() => {
                   const sql = generatePolicyCreateSQL(policy)
-                  setAiAssistantPanel({
+                  aiSnap.newChat({
+                    name: `Update policy ${policy.name}`,
                     open: true,
                     sqlSnippets: [sql],
                     initialInput: `Update the policy with name "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table. It should...`,

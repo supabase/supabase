@@ -3,6 +3,7 @@ import { Clipboard, Copy, Download, Edit, Lock, MoreHorizontal, Trash, Unlock } 
 import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
+import { useSnapshot } from 'valtio'
 
 import { IS_PLATFORM } from 'common'
 import {
@@ -10,6 +11,7 @@ import {
   MAX_EXPORT_ROW_COUNT_MESSAGE,
 } from 'components/grid/components/header/Header'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
+import { useIsTableEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   formatTableRowsToSQL,
   getEntityLintDetails,
@@ -26,6 +28,7 @@ import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { copyToClipboard } from 'lib/helpers'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { createTabId, getTabsStore, makeTabPermanent } from 'state/tabs'
 import {
   cn,
   DropdownMenu,
@@ -42,7 +45,6 @@ import {
   TreeViewItemVariant,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-
 export interface EntityListItemProps {
   id: number | string
   projectRef: string
@@ -61,6 +63,14 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
 
+  // For tabs preview flag logic
+  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
+  const tabId = createTabId(entity.type, { id: entity.id })
+  const tabStore = getTabsStore(projectRef)
+  const isPreview = isTableEditorTabsEnabled ? tabStore.previewTabId === tabId : false
+
+  const tabs = useSnapshot(tabStore)
+  const isOpened = Object.values(tabs.tabsMap).some((tab) => tab.metadata?.tableId === entity.id)
   const isActive = Number(id) === entity.id
   const canEdit = isActive && !isLocked
 
@@ -209,15 +219,22 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     <EditorTablePageLink
       title={entity.name}
       id={String(entity.id)}
-      href={`/project/${projectRef}/editor/${entity.id}?schema=${selectedSchema}`}
+      href={`/project/${projectRef}/editor/${entity.id}?schema=${entity.schema}`}
       role="button"
       aria-label={`View ${entity.name}`}
       className={cn(
         TreeViewItemVariant({
-          isSelected: isActive,
+          isSelected: isActive && !isPreview,
+          isOpened: isOpened && !isPreview,
+          isPreview,
         }),
         'px-4'
       )}
+      onDoubleClick={(e) => {
+        e.preventDefault()
+        const tabId = createTabId(entity.type, { id: entity.id })
+        makeTabPermanent(projectRef, tabId)
+      }}
     >
       <>
         {isActive && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}

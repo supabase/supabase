@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
+import { useIsTableEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import AlertError from 'components/ui/AlertError'
@@ -40,16 +41,18 @@ import {
   InnerSideBarFilters,
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { tableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import EntityListItem from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
 
 const TableEditorMenu = () => {
-  const { id: _id } = useParams()
+  const { ref, id: _id } = useParams()
   const router = useRouter()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const isMobile = useBreakpoint()
+  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
 
   const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
@@ -114,6 +117,13 @@ const TableEditorMenu = () => {
     }
   }, [selectedTable?.schema])
 
+  useEffect(() => {
+    // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
+    if (isTableEditorTabsEnabled && ref && entityTypes) {
+      tableEditorTabsCleanUp({ ref, schemas: [selectedSchema], entities: entityTypes })
+    }
+  }, [entityTypes])
+
   return (
     <>
       <div className="flex flex-col flex-grow gap-5 pt-5 h-full">
@@ -124,7 +134,6 @@ const TableEditorMenu = () => {
             onSelectSchema={(name: string) => {
               setSearchText('')
               setSelectedSchema(name)
-              router.push(`/project/${project?.ref}/editor?schema=${name}`)
             }}
             onSelectCreateSchema={() => snap.onAddSchema()}
           />

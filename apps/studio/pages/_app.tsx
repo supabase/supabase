@@ -29,6 +29,7 @@ import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
 import { ErrorInfo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 
 import { FeatureFlagProvider, PageTelemetry, ThemeProvider, useThemeSandbox } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
@@ -102,61 +103,65 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <ErrorBoundary FallbackComponent={ErrorBoundaryState} onError={errorBoundaryHandler}>
       <QueryClientProvider client={queryClient}>
-        <Hydrate state={pageProps.dehydratedState}>
-          <AuthProvider>
-            <FeatureFlagProvider
-              API_URL={API_URL}
-              enabled={IS_PLATFORM}
-              getConfigCatFlags={getConfigCatFlags}
-            >
-              <ProfileProvider>
-                <Head>
-                  <title>Supabase</title>
-                  <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-                  {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
-                  <style
-                    dangerouslySetInnerHTML={{
-                      __html: `:root{--font-custom:${customFont.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
-                    }}
-                  />
-                </Head>
-                <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
-                <TooltipProvider delayDuration={0}>
-                  <RouteValidationWrapper>
-                    <ThemeProvider
-                      defaultTheme="system"
-                      themes={['dark', 'light', 'classic-dark']}
-                      enableSystem
-                      disableTransitionOnChange
-                    >
-                      <AppBannerContextProvider>
-                        <CommandProvider>
-                          <FeaturePreviewContextProvider>
-                            {getLayout(<Component {...pageProps} />)}
-                            <StudioCommandMenu />
-                            <GenerateSql />
-                            <FeaturePreviewModal />
-                          </FeaturePreviewContextProvider>
-                          <SonnerToaster position="top-right" />
-                          <MonacoThemeProvider />
-                        </CommandProvider>
-                      </AppBannerContextProvider>
-                    </ThemeProvider>
-                  </RouteValidationWrapper>
-                </TooltipProvider>
+        <NuqsAdapter>
+          <Hydrate state={pageProps.dehydratedState}>
+            <AuthProvider>
+              <FeatureFlagProvider
+                API_URL={API_URL}
+                enabled={IS_PLATFORM}
+                getConfigCatFlags={getConfigCatFlags}
+              >
+                <ProfileProvider>
+                  <Head>
+                    <title>Supabase</title>
+                    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                    {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
+                    <style
+                      dangerouslySetInnerHTML={{
+                        __html: `:root{--font-custom:${customFont.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
+                      }}
+                    />
+                  </Head>
+                  <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
+                  <TooltipProvider delayDuration={0}>
+                    <RouteValidationWrapper>
+                      <ThemeProvider
+                        defaultTheme="system"
+                        themes={['dark', 'light', 'classic-dark']}
+                        enableSystem
+                        disableTransitionOnChange
+                      >
+                        <AppBannerContextProvider>
+                          <CommandProvider>
+                            <FeaturePreviewContextProvider>
+                              {getLayout(<Component {...pageProps} />)}
+                              <StudioCommandMenu />
+                              <GenerateSql />
+                              <FeaturePreviewModal />
+                            </FeaturePreviewContextProvider>
+                            <SonnerToaster position="top-right" />
+                            <MonacoThemeProvider />
+                          </CommandProvider>
+                        </AppBannerContextProvider>
+                      </ThemeProvider>
+                    </RouteValidationWrapper>
+                  </TooltipProvider>
 
-                <PageTelemetry
-                  API_URL={API_URL}
-                  hasAcceptedConsent={hasAcceptedConsent}
-                  enabled={IS_PLATFORM}
-                />
-                <GroupsTelemetry hasAcceptedConsent={hasAcceptedConsent} />
-                {!isTestEnv && <HCaptchaLoadedStore />}
-                {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
-              </ProfileProvider>
-            </FeatureFlagProvider>
-          </AuthProvider>
-        </Hydrate>
+                  <PageTelemetry
+                    API_URL={API_URL}
+                    hasAcceptedConsent={hasAcceptedConsent}
+                    enabled={IS_PLATFORM}
+                  />
+                  <GroupsTelemetry hasAcceptedConsent={hasAcceptedConsent} />
+                  {!isTestEnv && <HCaptchaLoadedStore />}
+                  {!isTestEnv && (
+                    <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+                  )}
+                </ProfileProvider>
+              </FeatureFlagProvider>
+            </AuthProvider>
+          </Hydrate>
+        </NuqsAdapter>
       </QueryClientProvider>
     </ErrorBoundary>
   )

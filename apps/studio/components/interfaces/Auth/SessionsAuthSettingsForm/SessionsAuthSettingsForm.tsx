@@ -1,9 +1,9 @@
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { boolean, number, object } from 'yup'
+import * as z from 'zod'
 
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
@@ -43,17 +43,21 @@ function HoursOrNeverText({ value }: { value: number }) {
   }
 }
 
-const refreshTokenSchema = object({
-  REFRESH_TOKEN_ROTATION_ENABLED: boolean().required(),
-  SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number()
-    .min(0, 'Must be a value more than 0')
-    .required('Must have a Reuse Interval value'),
+const RefreshTokenSchema = z.object({
+  REFRESH_TOKEN_ROTATION_ENABLED: z.boolean(),
+  SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: z.coerce
+    .number()
+    .positive()
+    .min(0, 'Must be a value more than 0'),
 })
 
-const userSessionsSchema = object({
-  SESSIONS_TIMEBOX: number().min(0, 'Must be a positive number'),
-  SESSIONS_INACTIVITY_TIMEOUT: number().min(0, 'Must be a positive number'),
-  SESSIONS_SINGLE_PER_USER: boolean(),
+const UserSessionsSchema = z.object({
+  SESSIONS_TIMEBOX: z.coerce.number().min(0, 'Must be a positive number'),
+  SESSIONS_INACTIVITY_TIMEOUT: z.coerce
+    .number()
+    .multipleOf(0.1)
+    .min(0, 'Must be a positive number'),
+  SESSIONS_SINGLE_PER_USER: z.boolean(),
 })
 
 const SessionsAuthSettingsForm = () => {
@@ -76,8 +80,8 @@ const SessionsAuthSettingsForm = () => {
   const isProPlanAndUp = isSuccessSubscription && subscription?.plan?.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
 
-  const refreshTokenForm = useForm({
-    resolver: yupResolver(refreshTokenSchema),
+  const refreshTokenForm = useForm<z.infer<typeof RefreshTokenSchema>>({
+    resolver: zodResolver(RefreshTokenSchema),
     defaultValues: {
       REFRESH_TOKEN_ROTATION_ENABLED: false,
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: 0,
@@ -85,7 +89,7 @@ const SessionsAuthSettingsForm = () => {
   })
 
   const userSessionsForm = useForm({
-    resolver: yupResolver(userSessionsSchema),
+    resolver: zodResolver(UserSessionsSchema),
     defaultValues: {
       SESSIONS_TIMEBOX: 0,
       SESSIONS_INACTIVITY_TIMEOUT: 0,
@@ -329,7 +333,6 @@ const SessionsAuthSettingsForm = () => {
                           <PrePostTab postTab={<HoursOrNeverText value={field.value || 0} />}>
                             <Input_Shadcn_
                               type="number"
-                              min={0}
                               {...field}
                               disabled={!canUpdateConfig || !isProPlanAndUp}
                             />

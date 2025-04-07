@@ -9,6 +9,7 @@ import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useTelemetryCookie } from './hooks'
 import { TelemetryEvent } from './telemetry-constants'
 import { useUser } from './auth'
+import { getSharedTelemetryData } from './telemetry-utils'
 
 //---
 // PAGE TELEMETRY
@@ -214,24 +215,4 @@ export function useTelemetryIdentify(API_URL: string) {
 
 export function handleResetTelemetry(API_URL: string) {
   return post(`${API_URL}/telemetry/reset`, {})
-}
-
-// ---
-// TELEMETRY UTILS
-// ---
-
-export function getSharedTelemetryData(pathname?: string) {
-  return {
-    page_url: isBrowser ? window.location.href : '',
-    page_title: isBrowser ? document?.title : '',
-    pathname: pathname ? pathname : isBrowser ? window.location.pathname : '',
-    ph: {
-      referrer: isBrowser ? document?.referrer : '',
-      language: navigator.language ?? 'en-US',
-      user_agent: navigator.userAgent,
-      search: isBrowser ? window.location.search : '',
-      viewport_height: isBrowser ? window.innerHeight : 0,
-      viewport_width: isBrowser ? window.innerWidth : 0,
-    },
-  }
 }

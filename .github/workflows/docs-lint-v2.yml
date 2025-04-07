@@ -13,7 +13,7 @@ jobs:
     name: supa-mdx-lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           sparse-checkout: |
@@ -54,10 +54,10 @@ jobs:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -o pipefail
-          git diff --name-only origin/$BASE_REF HEAD \
+          git diff --name-only "origin/$BASE_REF" HEAD \
             | { grep -E "^apps/docs/content/" || test $? = 1; } \
             | xargs -r supa-mdx-lint --format rdf \
-            | reviewdog -f=rdjsonl -reporter=github-pr-review
+            | reviewdog -f=rdjsonl -reporter=github-pr-review -tee
       - name: run linter (external)
         if: steps.filter.outputs.docs == 'true' && github.event.pull_request.head.repo.full_name != github.repository
         env:
@@ -67,7 +67,7 @@ jobs:
         run: |
           set -o pipefail
           run_lints() {
-            git diff --name-only origin/$BASE_REF HEAD \
+            git diff --name-only "origin/$BASE_REF" HEAD \
               | { grep -E "^apps/docs/content/" || test $? = 1; } \
               | xargs -rx -n 1000000000 supa-mdx-lint --format markdown
           }
@@ -76,6 +76,6 @@ jobs:
           LINT_EXIT_CODE=$?
           set -e
           if [[ $LINT_EXIT_CODE -ne 0 ]]; then
-            gh pr comment $BRANCH_NAME --body "$LINT_RESULTS"
+            gh pr comment "$BRANCH_NAME" --body "$LINT_RESULTS"
             exit 1
           fi

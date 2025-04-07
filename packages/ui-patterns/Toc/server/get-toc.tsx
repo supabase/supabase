@@ -1,16 +1,8 @@
 import { remark } from 'remark'
 import { remarkHeading } from '../mdx-plugins/remark-heading'
-import type { ReactNode } from 'react'
 import type { PluggableList } from 'unified'
 import type { Compatible } from 'vfile'
-
-export interface TOCItemType {
-  title: ReactNode
-  url: string
-  depth: number
-}
-
-export type TableOfContents = TOCItemType[]
+import type { TableOfContents } from '../types'
 
 /**
  * Get Table of Contents from markdown/mdx document (using remark)
@@ -53,3 +45,5 @@ export function getTableOfContents(
 
   return []
 }
+
+export type { TableOfContents, TOCItemType } from '../types'

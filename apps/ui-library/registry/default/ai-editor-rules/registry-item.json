@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ai-editor-rules",
+  "type": "registry:file",
+  "title": "Prompt rules for AI Editors",
+  "description": "Prompts for working with Supabase using AI-powered IDE tools",
+  "registryDependencies": [],
+  "dependencies": [],
+  "files": [
+    {
+      "path": "registry/default/ai-editor-rules/create-db-functions.md",
+      "type": "registry:file",
+      "target": ".cursor/rules/create-db-functions.md"
+    },
+    {
+      "path": "registry/default/ai-editor-rules/create-migration.md",
+      "type": "registry:file",
+      "target": ".cursor/rules/create-migration.md"
+    },
+    {
+      "path": "registry/default/ai-editor-rules/create-rls-policies.md",
+      "type": "registry:file",
+      "target": ".cursor/rules/create-rls-policies.md"
+    },
+    {
+      "path": "registry/default/ai-editor-rules/postgres-sql-style-guide.md",
+      "type": "registry:file",
+      "target": ".cursor/rules/postgres-sql-style-guide.md"
+    },
+    {
+      "path": "registry/default/ai-editor-rules/writing-supabase-edge-functions.md",
+      "type": "registry:file",
+      "target": ".cursor/rules/writing-supabase-edge-functions.md"
+    }
+  ]
+}

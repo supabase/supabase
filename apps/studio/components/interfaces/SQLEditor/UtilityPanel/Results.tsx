@@ -2,7 +2,7 @@ import { Clipboard, Expand } from 'lucide-react'
 import { useState } from 'react'
 import DataGrid, { CalculatedColumn } from 'react-data-grid'
 
-import { useKeyboardShortcuts } from 'hooks/deprecated'
+import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
 import { copyToClipboard } from 'lib/helpers'
 import {
   cn,
@@ -24,30 +24,6 @@ function formatClipboardValue(value: any) {
 const Results = ({ rows }: { rows: readonly any[] }) => {
   const [expandCell, setExpandCell] = useState(false)
   const [cellPosition, setCellPosition] = useState<{ column: any; row: any; rowIdx: number }>()
-
-  const onCopyCell = () => {
-    if (cellPosition) {
-      const { rowIdx, column } = cellPosition
-      const colKey = column.key
-      const cellValue = rows[rowIdx]?.[colKey] ?? ''
-      const value = formatClipboardValue(cellValue)
-      copyToClipboard(value)
-    }
-  }
-
-  useKeyboardShortcuts(
-    {
-      'Command+c': (event: any) => {
-        event.stopPropagation()
-        onCopyCell()
-      },
-      'Control+c': (event: any) => {
-        event.stopPropagation()
-        onCopyCell()
-      },
-    },
-    ['INPUT', 'TEXTAREA'] as any
-  )
 
   const formatter = (column: any, row: any) => {
     const cellValue = row[column]
@@ -146,6 +122,7 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
             className="h-full flex-grow border-t-0"
             rowClass={() => '[&>.rdg-cell]:items-center'}
             onSelectedCellChange={setCellPosition}
+            onCellKeyDown={handleCopyCell}
           />
           <CellDetailPanel
             column={cellPosition?.column.name ?? ''}

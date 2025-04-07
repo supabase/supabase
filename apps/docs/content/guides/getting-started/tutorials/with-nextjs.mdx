@@ -3,7 +3,7 @@ title: 'Build a User Management App with Next.js'
 description: 'Learn how to use Supabase in your Next.js App.'
 ---
 
-<QuickstartIntro />
+<$Partial path="quickstart_intro.mdx" />
 
 ![Supabase User Management example](/docs/img/user-management-demo.png)
 
@@ -13,7 +13,7 @@ If you get stuck while working through this guide, refer to the [full example on
 
 </Admonition>
 
-<ProjectSetup />
+<$Partial path="project_setup.mdx" />
 
 ## Building the app
 
@@ -100,9 +100,9 @@ It is recommended to create the following essential utilities files for creating
 
 Create a `client.js` and a `server.js` with the following functionalities for client-side Supabase and server-side Supabase, respectively.
 
-<CH.Code className="min-h-[30rem]">
+<$CodeTabs>
 
-```jsx utils/supabase/client.js
+```jsx name=utils/supabase/client.js
 import { createBrowserClient } from '@supabase/ssr'
 
 export function createClient() {
@@ -114,7 +114,7 @@ export function createClient() {
 }
 ```
 
-```jsx utils/supabase/server.js
+```jsx name=utils/supabase/server.js
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
@@ -148,7 +148,7 @@ export async function createClient() {
 }
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 </TabPanel>
 
@@ -156,21 +156,21 @@ export async function createClient() {
 
 Create a `client.ts` and a `server.ts` with the following functionalities for client-side Supabase and server-side Supabase, respectively.
 
-<CH.Code className="min-h-[30rem]">
+<$CodeTabs>
 
 <$CodeSample
 path="/user-management/nextjs-user-management/utils/supabase/client.ts"
 lines={[[1, -1]]}
-meta="utils/supabase/client.ts"
+meta="name=utils/supabase/client.ts"
 />
 
 <$CodeSample
 path="/user-management/nextjs-user-management/utils/supabase/server.ts"
 lines={[[1, -1]]}
-meta="utils/supabase/server.ts"
+meta="name=utils/supabase/server.ts"
 />
 
-</CH.Code>
+</$CodeTabs>
 
 </TabPanel>
 
@@ -210,9 +210,9 @@ It's safe to trust `getUser()` because it sends a request to the Supabase Auth s
 
 Create a `middleware.js` file at the project root and another one within the `utils/supabase` folder. The `utils/supabase` file contains the logic for updating the session. This is used by the `middleware.js` file, which is a Next.js convention.
 
-<CH.Code className="min-h-[30rem]">
+<$CodeTabs>
 
-```jsx middleware.js
+```jsx name=middleware.js
 import { updateSession } from '@/utils/supabase/middleware'
 
 export async function middleware(request) {
@@ -234,7 +234,7 @@ export const config = {
 }
 ```
 
-```jsx utils/supabase/middleware.js
+```jsx name=utils/supabase/middleware.js
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 
@@ -271,7 +271,7 @@ export async function updateSession(request) {
 }
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 </TabPanel>
 
@@ -279,21 +279,21 @@ export async function updateSession(request) {
 
 Create a `middleware.ts` file at the project root and another one within the `utils/supabase` folder. The `utils/supabase` file contains the logic for updating the session. This is used by the `middleware.ts` file, which is a Next.js convention.
 
-<CH.Code className="min-h-[30rem]">
+<$CodeTabs>
 
 <$CodeSample
 path="/user-management/nextjs-user-management/middleware.ts"
 lines={[[1, -1]]}
-meta="middleware.ts"
+meta="name=middleware.ts"
 />
 
 <$CodeSample
 path="/user-management/nextjs-user-management/utils/supabase/middleware.ts"
 lines={[[1, -1]]}
-meta="utils/supabase/middleware.ts"
+meta="name=utils/supabase/middleware.ts"
 />
 
-</CH.Code>
+</$CodeTabs>
 
 </TabPanel>
 
@@ -317,7 +317,9 @@ Create a login/signup page for your application:
 
 Create a new folder named `login`, containing a `page.jsx` file with a login/signup form.
 
-```jsx app/login/page.jsx
+<$CodeTabs>
+
+```jsx name=app/login/page.jsx
 import { login, signup } from './actions'
 
 export default function LoginPage() {
@@ -334,17 +336,23 @@ export default function LoginPage() {
 }
 ```
 
+</$CodeTabs>
+
 </TabPanel>
 
 <TabPanel id="ts" label="TypeScript">
 
 Create a new folder named `login`, containing a `page.tsx` file with a login/signup form.
 
+<$CodeTabs>
+
 <$CodeSample
 path="/user-management/nextjs-user-management/app/login/page.tsx"
 lines={[[1, -1]]}
-meta="app/login/page.tsx"
+meta="name=app/login/page.tsx"
 />
+
+</$CodeTabs>
 
 </TabPanel>
 
@@ -374,9 +382,9 @@ See the Next.js docs to learn more about [opting out of data caching](https://ne
 
 <TabPanel id="js" label="JavaScript">
 
-<CH.Code className="max-h-[30rem]">
+<$CodeTabs>
 
-```js app/login/actions.js
+```js name=app/login/actions.js
 'use server'
 
 import { revalidatePath } from 'next/cache'
@@ -423,33 +431,33 @@ export async function signup(formData) {
 }
 ```
 
-```jsx app/error/page.jsx
+```jsx name=app/error/page.jsx
 export default function ErrorPage() {
   return <p>Sorry, something went wrong</p>
 }
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 </TabPanel>
 
 <TabPanel id="ts" label="TypeScript">
 
-<CH.Code className="max-h-[30rem]">
+<$CodeTabs>
 
 <$CodeSample
 path="/user-management/nextjs-user-management/app/login/actions.ts"
 lines={[[1, -1]]}
-meta="app/login/actions.ts"
+meta="name=app/login/actions.ts"
 />
 
 <$CodeSample
 path="/user-management/nextjs-user-management/app/error/page.tsx"
 lines={[[1, -1]]}
-meta="app/error/page.tsx"
+meta="name=app/error/page.tsx"
 />
 
-</CH.Code>
+</$CodeTabs>
 
 </TabPanel>
 
@@ -493,7 +501,9 @@ In the following code snippet, we perform the following steps:
 
 <TabPanel id="js" label="JavaScript">
 
-```js app/auth/confirm/route.js
+<$CodeTabs>
+
+```js name=app/auth/confirm/route.js
 import { type NextRequest, NextResponse } from 'next/server'
 
 import { createClient } from '@/utils/supabase/server'
@@ -530,15 +540,21 @@ export async function GET(request) {
 }
 ```
 
+</$CodeTabs>
+
 </TabPanel>
 
 <TabPanel id="ts" label="TypeScript">
 
+<$CodeTabs>
+
 <$CodeSample
 path="/user-management/nextjs-user-management/app/auth/confirm/route.ts"
 lines={[[1, -1]]}
-meta="app/auth/confirm/route.ts"
+meta="name=app/auth/confirm/route.ts"
 />
+
+</$CodeTabs>
 
 </TabPanel>
 
@@ -560,9 +576,9 @@ Let's create a new component for that called `AccountForm` within the `app/accou
 
 <TabPanel id="js" label="JavaScript">
 
-<CH.Code className="max-h-[40rem]">
+<$CodeTabs>
 
-```jsx app/account/account-form.jsx
+```jsx name=app/account/account-form.jsx
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
@@ -683,21 +699,21 @@ export default function AccountForm({ user }) {
 }
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 </TabPanel>
 
 <TabPanel id="ts" label="TypeScript">
 
-<CH.Code className="max-h-[40rem]">
+<$CodeTabs>
 
 <$CodeSample
 path="/user-management/nextjs-user-management/app/account/account-form.tsx"
 lines={[[1, 4], [7, 78], [88, -1]]}
-meta="app/account/account-form.tsx"
+meta="name=app/account/account-form.tsx"
 />
 
-</CH.Code>
+</$CodeTabs>
 
 </TabPanel>
 
@@ -715,7 +731,9 @@ Create an account page for the `AccountForm` component we just created
 
 <TabPanel id="js" label="JavaScript">
 
-```jsx app/account/page.jsx
+<$CodeTabs>
+
+```jsx name=app/account/page.jsx
 import AccountForm from './account-form'
 import { createClient } from '@/utils/supabase/server'
 
@@ -730,15 +748,21 @@ export default async function Account() {
 }
 ```
 
+</$CodeTabs>
+
 </TabPanel>
 
 <TabPanel id="ts" label="TypeScript">
 
+<$CodeTabs>
+
 <$CodeSample
 path="/user-management/nextjs-user-management/app/account/page.tsx"
 lines={[[1, -1]]}
-meta="app/account/page.tsx"
+meta="name=app/account/page.tsx"
 />
+
+</$CodeTabs>
 
 </TabPanel>
 </Tabs>
@@ -757,7 +781,9 @@ Let's create a route handler to handle the signout from the server side. Make su
 
 <TabPanel id="js" label="JavaScript">
 
-```js app/auth/signout/route.js
+<$CodeTabs>
+
+```js name=app/auth/signout/route.js
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { NextResponse } from 'next/server'
@@ -781,15 +807,21 @@ export async function POST(req) {
 }
 ```
 
+</$CodeTabs>
+
 </TabPanel>
 
 <TabPanel id="ts" label="TypeScript">
 
+<$CodeTabs>
+
 <$CodeSample
 path="/user-management/nextjs-user-management/app/auth/signout/route.ts"
 lines={[[1, -1]]}
-meta="app/auth/signout/route.ts"
+meta="name=app/auth/signout/route.ts"
 />
+
+</$CodeTabs>
 
 </TabPanel>
 
@@ -824,7 +856,9 @@ Let's create an avatar widget for the user so that they can upload a profile pho
 
 <TabPanel id="js" label="JavaScript">
 
-```jsx app/account/avatar.jsx
+<$CodeTabs>
+
+```jsx name=app/account/avatar.jsx
 'use client'
 import React, { useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
@@ -914,15 +948,21 @@ export default function Avatar({ uid, url, size, onUpload }) {
 }
 ```
 
+</$CodeTabs>
+
 </TabPanel>
 
 <TabPanel id="ts" label="TypeScript">
 
+<$CodeTabs>
+
 <$CodeSample
 path="/user-management/nextjs-user-management/app/account/avatar.tsx"
 lines={[[1, -1]]}
-meta="app/account/avatar.tsx"
+meta="name=app/account/avatar.tsx"
 />
+
+</$CodeTabs>
 
 </TabPanel>
 
@@ -942,7 +982,9 @@ And then we can add the widget to the `AccountForm` component:
 
 <TabPanel id="js" label="JavaScript">
 
-```jsx app/account/account-form.jsx
+<$CodeTabs>
+
+```jsx name=app/account/account-form.jsx
 // Import the new component
 import Avatar from './avatar'
 
@@ -965,15 +1007,21 @@ return (
 )
 ```
 
+</$CodeTabs>
+
 </TabPanel>
 
 <TabPanel id="ts" label="TypeScript">
 
+<$CodeTabs>
+
 <$CodeSample
 path="/user-management/nextjs-user-management/app/account/account-form.tsx"
 lines={[[5, 5], [77, 87], [137, -1]]}
-meta="app/account/account-form.tsx"
+meta="name=app/account/account-form.tsx"
 />
+
+</$CodeTabs>
 
 </TabPanel>
 

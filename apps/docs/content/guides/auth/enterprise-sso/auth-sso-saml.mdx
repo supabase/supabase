@@ -68,7 +68,7 @@ Below is information about your project's SAML 2.0 configuration which you can s
 | SLO URL                     | `https://<project>.supabase.co/auth/v1/sso/slo`                         |
 | `NameID`                    | Required `emailAddress` or `persistent`                                 |
 
-Note that SLO (Single Logout) is not supported at this time with Supabase Auth as it is a rarely supported feature by identity providers. However, the URL is registered and advertised for when this does become available.
+Note that SLO (Single Logout) is not supported at this time with Supabase Auth as it is a rarely supported feature by identity providers. However, the URL is registered and advertised for when this does become available. SLO is a best-effort service, so we recommend considering [Session Timebox or Session Inactivity Timeout](/docs/guides/auth/sessions#limiting-session-lifetime-and-number-of-allowed-sessions-per-user) instead to force your end-users to authenticate regularly.
 
 Append `?download=true` to the Metadata URL to download the Metadata XML file. This is useful in cases where the identity provider requires a file.
 
@@ -382,7 +382,7 @@ You can use the `-o json` flag to output the information as JSON, should you nee
 
 ## Pricing
 
-<PricingMauSso />
+<$Partial path="billing/pricing/pricing_mau_sso.mdx" />
 
 For a detailed breakdown of how charges are calculated, refer to [Manage Monthly Active SSO Users usage](/docs/guides/platform/manage-your-usage/monthly-active-users-sso).
 

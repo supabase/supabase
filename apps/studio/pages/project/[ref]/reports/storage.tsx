@@ -1,9 +1,12 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { REPORTS_DATEPICKER_HELPERS } from 'components/interfaces/Reports/Reports.constants'
+import {
+  createFilteredDatePickerHelpers,
+  REPORTS_DATEPICKER_HELPERS,
+} from 'components/interfaces/Reports/Reports.constants'
 import {
   CacheHitRateChartRenderer,
   TopCacheMissesRenderer,
@@ -31,7 +34,9 @@ export const StorageReport: NextPageWithLayout = () => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const plan = subscription?.plan
 
-  const defaultHelper = REPORTS_DATEPICKER_HELPERS[0] // last 24h
+  const defaultHelper =
+    REPORTS_DATEPICKER_HELPERS.find((h) => h.default) || REPORTS_DATEPICKER_HELPERS[0]
+
   const [selectedRange, setSelectedRange] = useState<DatePickerValue>({
     to: defaultHelper.calcTo(),
     from: defaultHelper.calcFrom(),
@@ -39,14 +44,7 @@ export const StorageReport: NextPageWithLayout = () => {
     text: defaultHelper.text,
   })
 
-  const datepickerHelpers = useMemo(
-    () =>
-      REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
-        ...helper,
-        disabled: (index > 0 && plan?.id === 'free') || (index > 1 && plan?.id !== 'pro'),
-      })),
-    []
-  )
+  const datepickerHelpers = createFilteredDatePickerHelpers(plan?.id || 'free')
 
   const handleDatepickerChange = (vals: DatePickerValue) => {
     report.mergeParams({

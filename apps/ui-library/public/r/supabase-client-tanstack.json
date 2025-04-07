@@ -1,0 +1,25 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "supabase-client-tanstack",
+  "type": "registry:lib",
+  "title": "Supabase Client for TanStack Start",
+  "description": "",
+  "dependencies": [
+    "@supabase/ssr@latest",
+    "@supabase/supabase-js@latest"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+      "content": "/// <reference types=\"vite/types/importMeta.d.ts\" />\nimport { createBrowserClient } from '@supabase/ssr'\n\nexport function createClient() {\n  return createBrowserClient(\n    import.meta.env.VITE_SUPABASE_URL!,\n    import.meta.env.VITE_SUPABASE_ANON_KEY!\n  )\n}\n",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+      "content": "import { createServerClient } from '@supabase/ssr'\nimport { parseCookies, setCookie } from '@tanstack/react-start/server'\n\nexport function createClient() {\n  return createServerClient(process.env.VITE_SUPABASE_URL!, process.env.VITE_SUPABASE_ANON_KEY!, {\n    cookies: {\n      getAll() {\n        return Object.entries(parseCookies()).map(\n          ([name, value]) =>\n            ({\n              name,\n              value,\n            }) as { name: string; value: string }\n        )\n      },\n      setAll(cookies) {\n        cookies.forEach((cookie) => {\n          setCookie(cookie.name, cookie.value)\n        })\n      },\n    },\n  })\n}\n",
+      "type": "registry:lib"
+    }
+  ],
+  "docs": "You'll need to add a `.env` file with the following environment variables to your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`."
+}

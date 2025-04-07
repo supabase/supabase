@@ -9,7 +9,7 @@ type ListBucketObjectsParams = {
   projectRef: string
   bucketId?: string
   path: string
-  options: components['schemas']['StorageObjectSearchOptions']
+  options: components['schemas']['GetObjectsBody']['options']
 }
 
 export type StorageObject = components['schemas']['StorageObject']

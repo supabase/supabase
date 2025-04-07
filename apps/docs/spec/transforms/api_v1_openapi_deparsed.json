@@ -64,7 +64,6 @@
             "name": "branch_id",
             "required": true,
             "in": "path",
-            "description": "Branch ID",
             "schema": {
               "type": "string"
             }
@@ -78,6 +77,18 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "ref": {
+                      "type": "string"
+                    },
+                    "postgres_version": {
+                      "type": "string"
+                    },
+                    "postgres_engine": {
+                      "type": "string"
+                    },
+                    "release_channel": {
+                      "type": "string"
+                    },
                     "status": {
                       "type": "string",
                       "enum": [
@@ -98,23 +109,11 @@
                         "RESIZING"
                       ]
                     },
-                    "db_port": {
-                      "type": "integer"
-                    },
-                    "ref": {
-                      "type": "string"
-                    },
-                    "postgres_version": {
-                      "type": "string"
-                    },
-                    "postgres_engine": {
-                      "type": "string"
-                    },
-                    "release_channel": {
-                      "type": "string"
-                    },
                     "db_host": {
                       "type": "string"
+                    },
+                    "db_port": {
+                      "type": "number"
                     },
                     "db_user": {
                       "type": "string"
@@ -127,13 +126,13 @@
                     }
                   },
                   "required": [
-                    "status",
-                    "db_port",
                     "ref",
                     "postgres_version",
                     "postgres_engine",
                     "release_channel",
-                    "db_host"
+                    "status",
+                    "db_host",
+                    "db_port"
                   ]
                 }
               }
@@ -159,7 +158,6 @@
             "name": "branch_id",
             "required": true,
             "in": "path",
-            "description": "Branch ID",
             "schema": {
               "type": "string"
             }
@@ -172,16 +170,16 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "reset_on_push": {
-                    "type": "boolean",
-                    "deprecated": true,
-                    "description": "This field is deprecated and will be ignored. Use v1-reset-a-branch endpoint directly instead."
-                  },
                   "branch_name": {
                     "type": "string"
                   },
                   "git_branch": {
                     "type": "string"
+                  },
+                  "reset_on_push": {
+                    "type": "boolean",
+                    "description": "This field is deprecated and will be ignored. Use v1-reset-a-branch endpoint directly instead.",
+                    "deprecated": true
                   },
                   "persistent": {
                     "type": "boolean"
@@ -210,26 +208,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "pr_number": {
-                      "type": "integer",
-                      "format": "int32"
-                    },
-                    "latest_check_run_id": {
-                      "type": "number",
-                      "deprecated": true,
-                      "description": "This field is deprecated and will not be populated."
-                    },
-                    "status": {
-                      "type": "string",
-                      "enum": [
-                        "CREATING_PROJECT",
-                        "RUNNING_MIGRATIONS",
-                        "MIGRATIONS_PASSED",
-                        "MIGRATIONS_FAILED",
-                        "FUNCTIONS_DEPLOYED",
-                        "FUNCTIONS_FAILED"
-                      ]
-                    },
                     "id": {
                       "type": "string"
                     },
@@ -248,8 +226,28 @@
                     "git_branch": {
                       "type": "string"
                     },
+                    "pr_number": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "latest_check_run_id": {
+                      "type": "number",
+                      "description": "This field is deprecated and will not be populated.",
+                      "deprecated": true
+                    },
                     "persistent": {
                       "type": "boolean"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "CREATING_PROJECT",
+                        "RUNNING_MIGRATIONS",
+                        "MIGRATIONS_PASSED",
+                        "MIGRATIONS_FAILED",
+                        "FUNCTIONS_DEPLOYED",
+                        "FUNCTIONS_FAILED"
+                      ]
                     },
                     "created_at": {
                       "type": "string"
@@ -259,13 +257,13 @@
                     }
                   },
                   "required": [
-                    "status",
                     "id",
                     "name",
                     "project_ref",
                     "parent_project_ref",
                     "is_default",
                     "persistent",
+                    "status",
                     "created_at",
                     "updated_at"
                   ]
@@ -293,7 +291,6 @@
             "name": "branch_id",
             "required": true,
             "in": "path",
-            "description": "Branch ID",
             "schema": {
               "type": "string"
             }
@@ -308,7 +305,8 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "enum": ["ok"]
                     }
                   },
                   "required": ["message"]
@@ -338,7 +336,6 @@
             "name": "branch_id",
             "required": true,
             "in": "path",
-            "description": "Branch ID",
             "schema": {
               "type": "string"
             }
@@ -356,7 +353,8 @@
                       "type": "string"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "enum": ["ok"]
                     }
                   },
                   "required": ["workflow_run_id", "message"]
@@ -366,6 +364,54 @@
           },
           "500": {
             "description": "Failed to push database branch"
+          }
+        },
+        "tags": ["Environments"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/branches/{branch_id}/merge": {
+      "post": {
+        "operationId": "v1-merge-a-branch",
+        "summary": "Merges a database branch",
+        "description": "Merges the specified database branch",
+        "parameters": [
+          {
+            "name": "branch_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "workflow_run_id": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string",
+                      "enum": ["ok"]
+                    }
+                  },
+                  "required": ["workflow_run_id", "message"]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to merge database branch"
           }
         },
         "tags": ["Environments"],
@@ -386,7 +432,6 @@
             "name": "branch_id",
             "required": true,
             "in": "path",
-            "description": "Branch ID",
             "schema": {
               "type": "string"
             }
@@ -404,7 +449,8 @@
                       "type": "string"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "enum": ["ok"]
                     }
                   },
                   "required": ["workflow_run_id", "message"]
@@ -778,32 +824,16 @@
         "summary": "[Beta] Authorize user through oauth",
         "parameters": [
           {
-            "name": "client_id",
-            "required": true,
+            "name": "code_challenge_method",
+            "required": false,
             "in": "query",
             "schema": {
+              "enum": ["plain", "sha256", "S256"],
               "type": "string"
             }
           },
           {
-            "name": "response_type",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "enum": ["code", "token", "id_token token"],
-              "type": "string"
-            }
-          },
-          {
-            "name": "redirect_uri",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "scope",
+            "name": "code_challenge",
             "required": false,
             "in": "query",
             "schema": {
@@ -819,27 +849,26 @@
             }
           },
           {
-            "name": "response_mode",
-            "required": false,
+            "name": "response_type",
+            "required": true,
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "code_challenge",
-            "required": false,
+            "name": "redirect_uri",
+            "required": true,
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "code_challenge_method",
-            "required": false,
+            "name": "client_id",
+            "required": true,
             "in": "query",
             "schema": {
-              "enum": ["plain", "sha256", "S256"],
               "type": "string"
             }
           }
@@ -870,11 +899,12 @@
                 "type": "object",
                 "properties": {
                   "grant_type": {
-                    "enum": ["authorization_code", "refresh_token"],
-                    "type": "string"
+                    "type": "string",
+                    "enum": ["authorization_code", "refresh_token"]
                   },
                   "client_id": {
-                    "type": "string"
+                    "type": "string",
+                    "format": "uuid"
                   },
                   "client_secret": {
                     "type": "string"
@@ -892,7 +922,7 @@
                     "type": "string"
                   }
                 },
-                "required": ["grant_type", "client_id", "client_secret"]
+                "additionalProperties": false
               }
             }
           }
@@ -905,22 +935,22 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "expires_in": {
-                      "type": "integer",
-                      "format": "int64"
-                    },
-                    "token_type": {
-                      "type": "string",
-                      "enum": ["Bearer"]
-                    },
                     "access_token": {
                       "type": "string"
                     },
                     "refresh_token": {
                       "type": "string"
+                    },
+                    "expires_in": {
+                      "type": "integer"
+                    },
+                    "token_type": {
+                      "type": "string",
+                      "enum": ["Bearer"]
                     }
                   },
-                  "required": ["expires_in", "token_type", "access_token", "refresh_token"]
+                  "required": ["access_token", "refresh_token", "expires_in", "token_type"],
+                  "additionalProperties": false
                 }
               }
             }
@@ -1275,22 +1305,19 @@
         "summary": "Get project api keys",
         "parameters": [
           {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          },
-          {
             "name": "reveal",
-            "required": true,
+            "required": false,
             "in": "query",
             "schema": {
               "type": "boolean"
+            }
+          },
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -1304,11 +1331,6 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "type": {
-                        "nullable": true,
-                        "type": "string",
-                        "enum": ["publishable", "secret", "legacy"]
-                      },
                       "name": {
                         "type": "string"
                       },
@@ -1317,6 +1339,11 @@
                       },
                       "id": {
                         "type": "string",
+                        "nullable": true
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": ["publishable", "secret", "legacy"],
                         "nullable": true
                       },
                       "prefix": {
@@ -1332,25 +1359,24 @@
                         "nullable": true
                       },
                       "secret_jwt_template": {
-                        "nullable": true,
-                        "allOf": [
-                          {
-                            "type": "object",
-                            "properties": {
-                              "role": {
-                                "type": "string"
-                              }
-                            },
-                            "required": ["role"]
+                        "type": "object",
+                        "properties": {
+                          "role": {
+                            "type": "string",
+                            "minLength": 1
                           }
-                        ]
+                        },
+                        "required": ["role"],
+                        "nullable": true
                       },
                       "inserted_at": {
                         "type": "string",
+                        "format": "date-time",
                         "nullable": true
                       },
                       "updated_at": {
                         "type": "string",
+                        "format": "date-time",
                         "nullable": true
                       }
                     },
@@ -1359,6 +1385,9 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": ""
           }
         },
         "tags": ["Secrets"],
@@ -1373,22 +1402,19 @@
         "summary": "[Alpha] Creates a new API key for the project",
         "parameters": [
           {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          },
-          {
             "name": "reveal",
-            "required": true,
+            "required": false,
             "in": "query",
             "schema": {
               "type": "boolean"
+            }
+          },
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -1400,26 +1426,23 @@
                 "type": "object",
                 "properties": {
                   "type": {
-                    "enum": ["publishable", "secret"],
-                    "type": "string"
+                    "type": "string",
+                    "enum": ["publishable", "secret"]
                   },
                   "description": {
                     "type": "string",
                     "nullable": true
                   },
                   "secret_jwt_template": {
-                    "nullable": true,
-                    "allOf": [
-                      {
-                        "type": "object",
-                        "properties": {
-                          "role": {
-                            "type": "string"
-                          }
-                        },
-                        "required": ["role"]
+                    "type": "object",
+                    "properties": {
+                      "role": {
+                        "type": "string",
+                        "minLength": 1
                       }
-                    ]
+                    },
+                    "required": ["role"],
+                    "nullable": true
                   }
                 },
                 "required": ["type"]
@@ -1435,11 +1458,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "type": {
-                      "nullable": true,
-                      "type": "string",
-                      "enum": ["publishable", "secret", "legacy"]
-                    },
                     "name": {
                       "type": "string"
                     },
@@ -1448,6 +1466,11 @@
                     },
                     "id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": ["publishable", "secret", "legacy"],
                       "nullable": true
                     },
                     "prefix": {
@@ -1463,25 +1486,24 @@
                       "nullable": true
                     },
                     "secret_jwt_template": {
-                      "nullable": true,
-                      "allOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "role": {
-                              "type": "string"
-                            }
-                          },
-                          "required": ["role"]
+                      "type": "object",
+                      "properties": {
+                        "role": {
+                          "type": "string",
+                          "minLength": 1
                         }
-                      ]
+                      },
+                      "required": ["role"],
+                      "nullable": true
                     },
                     "inserted_at": {
                       "type": "string",
+                      "format": "date-time",
                       "nullable": true
                     },
                     "updated_at": {
                       "type": "string",
+                      "format": "date-time",
                       "nullable": true
                     }
                   },
@@ -1489,6 +1511,9 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": ""
           }
         },
         "tags": ["Secrets"],
@@ -1505,14 +1530,11 @@
         "summary": "[Alpha] Updates an API key for the project",
         "parameters": [
           {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
+            "name": "reveal",
+            "required": false,
+            "in": "query",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
+              "type": "boolean"
             }
           },
           {
@@ -1524,11 +1546,11 @@
             }
           },
           {
-            "name": "reveal",
+            "name": "ref",
             "required": true,
-            "in": "query",
+            "in": "path",
             "schema": {
-              "type": "boolean"
+              "type": "string"
             }
           }
         ],
@@ -1544,18 +1566,15 @@
                     "nullable": true
                   },
                   "secret_jwt_template": {
-                    "nullable": true,
-                    "allOf": [
-                      {
-                        "type": "object",
-                        "properties": {
-                          "role": {
-                            "type": "string"
-                          }
-                        },
-                        "required": ["role"]
+                    "type": "object",
+                    "properties": {
+                      "role": {
+                        "type": "string",
+                        "minLength": 1
                       }
-                    ]
+                    },
+                    "required": ["role"],
+                    "nullable": true
                   }
                 }
               }
@@ -1570,11 +1589,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "type": {
-                      "nullable": true,
-                      "type": "string",
-                      "enum": ["publishable", "secret", "legacy"]
-                    },
                     "name": {
                       "type": "string"
                     },
@@ -1583,6 +1597,11 @@
                     },
                     "id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": ["publishable", "secret", "legacy"],
                       "nullable": true
                     },
                     "prefix": {
@@ -1598,25 +1617,24 @@
                       "nullable": true
                     },
                     "secret_jwt_template": {
-                      "nullable": true,
-                      "allOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "role": {
-                              "type": "string"
-                            }
-                          },
-                          "required": ["role"]
+                      "type": "object",
+                      "properties": {
+                        "role": {
+                          "type": "string",
+                          "minLength": 1
                         }
-                      ]
+                      },
+                      "required": ["role"],
+                      "nullable": true
                     },
                     "inserted_at": {
                       "type": "string",
+                      "format": "date-time",
                       "nullable": true
                     },
                     "updated_at": {
                       "type": "string",
+                      "format": "date-time",
                       "nullable": true
                     }
                   },
@@ -1624,6 +1642,9 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": ""
           }
         },
         "tags": ["Secrets"],
@@ -1638,14 +1659,11 @@
         "summary": "[Alpha] Get API key",
         "parameters": [
           {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
+            "name": "reveal",
+            "required": false,
+            "in": "query",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
+              "type": "boolean"
             }
           },
           {
@@ -1657,11 +1675,11 @@
             }
           },
           {
-            "name": "reveal",
+            "name": "ref",
             "required": true,
-            "in": "query",
+            "in": "path",
             "schema": {
-              "type": "boolean"
+              "type": "string"
             }
           }
         ],
@@ -1673,11 +1691,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "type": {
-                      "nullable": true,
-                      "type": "string",
-                      "enum": ["publishable", "secret", "legacy"]
-                    },
                     "name": {
                       "type": "string"
                     },
@@ -1686,6 +1699,11 @@
                     },
                     "id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": ["publishable", "secret", "legacy"],
                       "nullable": true
                     },
                     "prefix": {
@@ -1701,25 +1719,24 @@
                       "nullable": true
                     },
                     "secret_jwt_template": {
-                      "nullable": true,
-                      "allOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "role": {
-                              "type": "string"
-                            }
-                          },
-                          "required": ["role"]
+                      "type": "object",
+                      "properties": {
+                        "role": {
+                          "type": "string",
+                          "minLength": 1
                         }
-                      ]
+                      },
+                      "required": ["role"],
+                      "nullable": true
                     },
                     "inserted_at": {
                       "type": "string",
+                      "format": "date-time",
                       "nullable": true
                     },
                     "updated_at": {
                       "type": "string",
+                      "format": "date-time",
                       "nullable": true
                     }
                   },
@@ -1727,6 +1744,9 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": ""
           }
         },
         "tags": ["Secrets"],
@@ -1741,14 +1761,11 @@
         "summary": "[Alpha] Deletes an API key for the project",
         "parameters": [
           {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
+            "name": "reveal",
+            "required": false,
+            "in": "query",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
+              "type": "boolean"
             }
           },
           {
@@ -1760,11 +1777,11 @@
             }
           },
           {
-            "name": "reveal",
+            "name": "ref",
             "required": true,
-            "in": "query",
+            "in": "path",
             "schema": {
-              "type": "boolean"
+              "type": "string"
             }
           }
         ],
@@ -1776,11 +1793,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "type": {
-                      "nullable": true,
-                      "type": "string",
-                      "enum": ["publishable", "secret", "legacy"]
-                    },
                     "name": {
                       "type": "string"
                     },
@@ -1789,6 +1801,11 @@
                     },
                     "id": {
                       "type": "string",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": ["publishable", "secret", "legacy"],
                       "nullable": true
                     },
                     "prefix": {
@@ -1804,25 +1821,24 @@
                       "nullable": true
                     },
                     "secret_jwt_template": {
-                      "nullable": true,
-                      "allOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "role": {
-                              "type": "string"
-                            }
-                          },
-                          "required": ["role"]
+                      "type": "object",
+                      "properties": {
+                        "role": {
+                          "type": "string",
+                          "minLength": 1
                         }
-                      ]
+                      },
+                      "required": ["role"],
+                      "nullable": true
                     },
                     "inserted_at": {
                       "type": "string",
+                      "format": "date-time",
                       "nullable": true
                     },
                     "updated_at": {
                       "type": "string",
+                      "format": "date-time",
                       "nullable": true
                     }
                   },
@@ -1853,10 +1869,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -1871,26 +1884,6 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "pr_number": {
-                        "type": "integer",
-                        "format": "int32"
-                      },
-                      "latest_check_run_id": {
-                        "type": "number",
-                        "deprecated": true,
-                        "description": "This field is deprecated and will not be populated."
-                      },
-                      "status": {
-                        "type": "string",
-                        "enum": [
-                          "CREATING_PROJECT",
-                          "RUNNING_MIGRATIONS",
-                          "MIGRATIONS_PASSED",
-                          "MIGRATIONS_FAILED",
-                          "FUNCTIONS_DEPLOYED",
-                          "FUNCTIONS_FAILED"
-                        ]
-                      },
                       "id": {
                         "type": "string"
                       },
@@ -1909,8 +1902,28 @@
                       "git_branch": {
                         "type": "string"
                       },
+                      "pr_number": {
+                        "type": "integer",
+                        "format": "int32"
+                      },
+                      "latest_check_run_id": {
+                        "type": "number",
+                        "description": "This field is deprecated and will not be populated.",
+                        "deprecated": true
+                      },
                       "persistent": {
                         "type": "boolean"
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "CREATING_PROJECT",
+                          "RUNNING_MIGRATIONS",
+                          "MIGRATIONS_PASSED",
+                          "MIGRATIONS_FAILED",
+                          "FUNCTIONS_DEPLOYED",
+                          "FUNCTIONS_FAILED"
+                        ]
                       },
                       "created_at": {
                         "type": "string"
@@ -1920,13 +1933,13 @@
                       }
                     },
                     "required": [
-                      "status",
                       "id",
                       "name",
                       "project_ref",
                       "parent_project_ref",
                       "is_default",
                       "persistent",
+                      "status",
                       "created_at",
                       "updated_at"
                     ]
@@ -1934,6 +1947,9 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": ""
           },
           "500": {
             "description": "Failed to retrieve database branches"
@@ -1955,10 +1971,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -1970,9 +1983,24 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "branch_name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "git_branch": {
+                    "type": "string"
+                  },
+                  "persistent": {
+                    "type": "boolean"
+                  },
+                  "region": {
+                    "type": "string"
+                  },
                   "desired_instance_size": {
                     "type": "string",
                     "enum": [
+                      "pico",
+                      "nano",
                       "micro",
                       "small",
                       "medium",
@@ -1987,24 +2015,19 @@
                   },
                   "release_channel": {
                     "type": "string",
-                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
+                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
+                    "description": "Release channel. If not provided, GA will be used."
                   },
                   "postgres_engine": {
                     "type": "string",
-                    "description": "Postgres engine version. If not provided, the latest version will be used.",
-                    "enum": ["15", "17-oriole"]
+                    "enum": ["15", "17-oriole"],
+                    "description": "Postgres engine version. If not provided, the latest version will be used."
                   },
-                  "branch_name": {
-                    "type": "string"
-                  },
-                  "git_branch": {
-                    "type": "string"
-                  },
-                  "persistent": {
-                    "type": "boolean"
-                  },
-                  "region": {
-                    "type": "string"
+                  "secrets": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
                   }
                 },
                 "required": ["branch_name"]
@@ -2020,26 +2043,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "pr_number": {
-                      "type": "integer",
-                      "format": "int32"
-                    },
-                    "latest_check_run_id": {
-                      "type": "number",
-                      "deprecated": true,
-                      "description": "This field is deprecated and will not be populated."
-                    },
-                    "status": {
-                      "type": "string",
-                      "enum": [
-                        "CREATING_PROJECT",
-                        "RUNNING_MIGRATIONS",
-                        "MIGRATIONS_PASSED",
-                        "MIGRATIONS_FAILED",
-                        "FUNCTIONS_DEPLOYED",
-                        "FUNCTIONS_FAILED"
-                      ]
-                    },
                     "id": {
                       "type": "string"
                     },
@@ -2058,8 +2061,28 @@
                     "git_branch": {
                       "type": "string"
                     },
+                    "pr_number": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "latest_check_run_id": {
+                      "type": "number",
+                      "description": "This field is deprecated and will not be populated.",
+                      "deprecated": true
+                    },
                     "persistent": {
                       "type": "boolean"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "CREATING_PROJECT",
+                        "RUNNING_MIGRATIONS",
+                        "MIGRATIONS_PASSED",
+                        "MIGRATIONS_FAILED",
+                        "FUNCTIONS_DEPLOYED",
+                        "FUNCTIONS_FAILED"
+                      ]
                     },
                     "created_at": {
                       "type": "string"
@@ -2069,19 +2092,22 @@
                     }
                   },
                   "required": [
-                    "status",
                     "id",
                     "name",
                     "project_ref",
                     "parent_project_ref",
                     "is_default",
                     "persistent",
+                    "status",
                     "created_at",
                     "updated_at"
                   ]
                 }
               }
             }
+          },
+          "403": {
+            "description": ""
           },
           "500": {
             "description": "Failed to create database branch"
@@ -2103,16 +2129,16 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
+            "description": ""
+          },
+          "403": {
             "description": ""
           },
           "500": {
@@ -2834,10 +2860,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -2886,10 +2909,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -2941,10 +2961,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -2958,8 +2975,8 @@
                   "type": "object",
                   "properties": {
                     "entitlement": {
-                      "enum": ["disallowed", "allowed"],
-                      "type": "string"
+                      "type": "string",
+                      "enum": ["disallowed", "allowed"]
                     },
                     "config": {
                       "type": "object",
@@ -2976,7 +2993,8 @@
                             "type": "string"
                           }
                         }
-                      }
+                      },
+                      "description": "At any given point in time, this is the config that the user has requested be applied to their project. The `status` field indicates if it has been applied to the project, or is pending. When an updated config is received, the applied config is moved to `old_config`."
                     },
                     "old_config": {
                       "type": "object",
@@ -2993,11 +3011,12 @@
                             "type": "string"
                           }
                         }
-                      }
+                      },
+                      "description": "Populated when a new config has been received, but not registered as successfully applied to a project."
                     },
                     "status": {
-                      "enum": ["stored", "applied"],
-                      "type": "string"
+                      "type": "string",
+                      "enum": ["stored", "applied"]
                     }
                   },
                   "required": ["entitlement", "config", "status"]
@@ -3029,10 +3048,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -3070,8 +3086,8 @@
                   "type": "object",
                   "properties": {
                     "entitlement": {
-                      "enum": ["disallowed", "allowed"],
-                      "type": "string"
+                      "type": "string",
+                      "enum": ["disallowed", "allowed"]
                     },
                     "config": {
                       "type": "object",
@@ -3088,7 +3104,8 @@
                             "type": "string"
                           }
                         }
-                      }
+                      },
+                      "description": "At any given point in time, this is the config that the user has requested be applied to their project. The `status` field indicates if it has been applied to the project, or is pending. When an updated config is received, the applied config is moved to `old_config`."
                     },
                     "old_config": {
                       "type": "object",
@@ -3105,11 +3122,12 @@
                             "type": "string"
                           }
                         }
-                      }
+                      },
+                      "description": "Populated when a new config has been received, but not registered as successfully applied to a project."
                     },
                     "status": {
-                      "enum": ["stored", "applied"],
-                      "type": "string"
+                      "type": "string",
+                      "enum": ["stored", "applied"]
                     }
                   },
                   "required": ["entitlement", "config", "status"]
@@ -3141,10 +3159,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -3188,10 +3203,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -3255,8 +3267,6 @@
             "in": "path",
             "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -3269,25 +3279,25 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "db_schema": {
+                      "type": "string"
+                    },
                     "max_rows": {
                       "type": "integer"
+                    },
+                    "db_extra_search_path": {
+                      "type": "string"
                     },
                     "db_pool": {
                       "type": "integer",
                       "nullable": true,
                       "description": "If `null`, the value is automatically configured based on compute size."
                     },
-                    "db_schema": {
-                      "type": "string"
-                    },
-                    "db_extra_search_path": {
-                      "type": "string"
-                    },
                     "jwt_secret": {
                       "type": "string"
                     }
                   },
-                  "required": ["max_rows", "db_pool", "db_schema", "db_extra_search_path"]
+                  "required": ["db_schema", "max_rows", "db_extra_search_path", "db_pool"]
                 }
               }
             }
@@ -3316,8 +3326,6 @@
             "in": "path",
             "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -3329,6 +3337,12 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "db_extra_search_path": {
+                    "type": "string"
+                  },
+                  "db_schema": {
+                    "type": "string"
+                  },
                   "max_rows": {
                     "type": "integer",
                     "minimum": 0,
@@ -3338,12 +3352,6 @@
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 1000
-                  },
-                  "db_extra_search_path": {
-                    "type": "string"
-                  },
-                  "db_schema": {
-                    "type": "string"
                   }
                 }
               }
@@ -3358,22 +3366,22 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "db_schema": {
+                      "type": "string"
+                    },
                     "max_rows": {
                       "type": "integer"
+                    },
+                    "db_extra_search_path": {
+                      "type": "string"
                     },
                     "db_pool": {
                       "type": "integer",
                       "nullable": true,
                       "description": "If `null`, the value is automatically configured based on compute size."
-                    },
-                    "db_schema": {
-                      "type": "string"
-                    },
-                    "db_extra_search_path": {
-                      "type": "string"
                     }
                   },
-                  "required": ["max_rows", "db_pool", "db_schema", "db_extra_search_path"]
+                  "required": ["db_schema", "max_rows", "db_extra_search_path", "db_pool"]
                 }
               }
             }
@@ -3496,6 +3504,9 @@
               }
             }
           },
+          "403": {
+            "description": ""
+          },
           "500": {
             "description": "Failed to retrieve project"
           }
@@ -3569,10 +3580,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -3626,10 +3634,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -3646,7 +3651,7 @@
                     "name": {
                       "type": "string",
                       "maxLength": 256,
-                      "pattern": "/^(?!SUPABASE_).*/",
+                      "pattern": "^(?!SUPABASE_).*",
                       "description": "Secret name must not start with the SUPABASE_ prefix.",
                       "example": "string"
                     },
@@ -3688,10 +3693,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -3744,10 +3746,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -3800,10 +3799,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -3890,10 +3886,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -3939,10 +3932,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -3956,8 +3946,8 @@
                   "type": "object",
                   "properties": {
                     "status": {
-                      "enum": ["not-used", "custom-domain-used", "active"],
-                      "type": "string"
+                      "type": "string",
+                      "enum": ["not-used", "custom-domain-used", "active"]
                     },
                     "custom_domain": {
                       "type": "string"
@@ -3990,10 +3980,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -4026,10 +4013,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -4091,10 +4075,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -4156,10 +4137,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -4171,15 +4149,15 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "target_version": {
+                    "type": "string"
+                  },
                   "release_channel": {
                     "type": "string",
                     "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
-                  },
-                  "target_version": {
-                    "type": "string"
                   }
                 },
-                "required": ["release_channel", "target_version"]
+                "required": ["target_version"]
               }
             }
           }
@@ -4225,10 +4203,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -4241,18 +4216,15 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "current_app_version_release_channel": {
-                      "type": "string",
-                      "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
-                    },
-                    "duration_estimate_hours": {
-                      "type": "integer"
-                    },
                     "eligible": {
                       "type": "boolean"
                     },
                     "current_app_version": {
                       "type": "string"
+                    },
+                    "current_app_version_release_channel": {
+                      "type": "string",
+                      "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
                     },
                     "latest_app_version": {
                       "type": "string"
@@ -4264,7 +4236,6 @@
                         "properties": {
                           "postgres_version": {
                             "type": "string",
-                            "description": "Postgres engine version. If not provided, the latest version will be used.",
                             "enum": ["15", "17-oriole"]
                           },
                           "release_channel": {
@@ -4284,6 +4255,9 @@
                         "type": "string"
                       }
                     },
+                    "duration_estimate_hours": {
+                      "type": "number"
+                    },
                     "legacy_auth_custom_roles": {
                       "type": "array",
                       "items": {
@@ -4298,13 +4272,13 @@
                     }
                   },
                   "required": [
-                    "current_app_version_release_channel",
-                    "duration_estimate_hours",
                     "eligible",
                     "current_app_version",
+                    "current_app_version_release_channel",
                     "latest_app_version",
                     "target_upgrade_versions",
                     "potential_breaking_changes",
+                    "duration_estimate_hours",
                     "legacy_auth_custom_roles",
                     "extension_dependent_objects"
                   ]
@@ -4333,20 +4307,17 @@
         "summary": "[Beta] Gets the latest status of the project's upgrade",
         "parameters": [
           {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
+            "name": "tracking_id",
+            "required": false,
+            "in": "query",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           },
           {
-            "name": "tracking_id",
-            "required": false,
-            "in": "query",
+            "name": "ref",
+            "required": true,
+            "in": "path",
             "schema": {
               "type": "string"
             }
@@ -4361,63 +4332,53 @@
                   "type": "object",
                   "properties": {
                     "databaseUpgradeStatus": {
-                      "nullable": true,
-                      "allOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "target_version": {
-                              "type": "integer"
-                            },
-                            "status": {
-                              "enum": [0, 1, 2],
-                              "type": "integer"
-                            },
-                            "initiated_at": {
-                              "type": "string"
-                            },
-                            "latest_status_at": {
-                              "type": "string"
-                            },
-                            "error": {
-                              "type": "string",
-                              "enum": [
-                                "1_upgraded_instance_launch_failed",
-                                "2_volume_detachchment_from_upgraded_instance_failed",
-                                "3_volume_attachment_to_original_instance_failed",
-                                "4_data_upgrade_initiation_failed",
-                                "5_data_upgrade_completion_failed",
-                                "6_volume_detachchment_from_original_instance_failed",
-                                "7_volume_attachment_to_upgraded_instance_failed",
-                                "8_upgrade_completion_failed",
-                                "9_post_physical_backup_failed"
-                              ]
-                            },
-                            "progress": {
-                              "type": "string",
-                              "enum": [
-                                "0_requested",
-                                "1_started",
-                                "2_launched_upgraded_instance",
-                                "3_detached_volume_from_upgraded_instance",
-                                "4_attached_volume_to_original_instance",
-                                "5_initiated_data_upgrade",
-                                "6_completed_data_upgrade",
-                                "7_detached_volume_from_original_instance",
-                                "8_attached_volume_to_upgraded_instance",
-                                "9_completed_upgrade",
-                                "10_completed_post_physical_backup"
-                              ]
-                            }
-                          },
-                          "required": [
-                            "target_version",
-                            "status",
-                            "initiated_at",
-                            "latest_status_at"
+                      "type": "object",
+                      "properties": {
+                        "initiated_at": {
+                          "type": "string"
+                        },
+                        "latest_status_at": {
+                          "type": "string"
+                        },
+                        "target_version": {
+                          "type": "number"
+                        },
+                        "error": {
+                          "type": "string",
+                          "enum": [
+                            "1_upgraded_instance_launch_failed",
+                            "2_volume_detachchment_from_upgraded_instance_failed",
+                            "3_volume_attachment_to_original_instance_failed",
+                            "4_data_upgrade_initiation_failed",
+                            "5_data_upgrade_completion_failed",
+                            "6_volume_detachchment_from_original_instance_failed",
+                            "7_volume_attachment_to_upgraded_instance_failed",
+                            "8_upgrade_completion_failed",
+                            "9_post_physical_backup_failed"
                           ]
+                        },
+                        "progress": {
+                          "type": "string",
+                          "enum": [
+                            "0_requested",
+                            "1_started",
+                            "2_launched_upgraded_instance",
+                            "3_detached_volume_from_upgraded_instance",
+                            "4_attached_volume_to_original_instance",
+                            "5_initiated_data_upgrade",
+                            "6_completed_data_upgrade",
+                            "7_detached_volume_from_original_instance",
+                            "8_attached_volume_to_upgraded_instance",
+                            "9_completed_upgrade",
+                            "10_completed_post_physical_backup"
+                          ]
+                        },
+                        "status": {
+                          "type": "number"
                         }
-                      ]
+                      },
+                      "required": ["initiated_at", "latest_status_at", "target_version", "status"],
+                      "nullable": true
                     }
                   },
                   "required": ["databaseUpgradeStatus"]
@@ -4480,6 +4441,9 @@
               }
             }
           },
+          "403": {
+            "description": ""
+          },
           "500": {
             "description": "Failed to get project readonly mode status"
           }
@@ -4513,6 +4477,9 @@
           "201": {
             "description": ""
           },
+          "403": {
+            "description": ""
+          },
           "500": {
             "description": "Failed to disable project's readonly mode"
           }
@@ -4534,10 +4501,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -4608,10 +4572,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -4961,6 +4922,9 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": ""
           }
         },
         "tags": ["Auth"],
@@ -5391,6 +5355,9 @@
               }
             }
           },
+          "403": {
+            "description": ""
+          },
           "500": {
             "description": "Failed to retrieve project's Postgres config"
           }
@@ -5671,6 +5638,9 @@
               }
             }
           },
+          "403": {
+            "description": ""
+          },
           "500": {
             "description": "Failed to retrieve project's pgbouncer config"
           }
@@ -5680,7 +5650,7 @@
     },
     "/v1/projects/{ref}/config/database/pooler": {
       "get": {
-        "operationId": "v1-get-supavisor-config",
+        "operationId": "getSupavisorConfig",
         "summary": "Gets project's supavisor config",
         "parameters": [
           {
@@ -5712,6 +5682,11 @@
                       "db_port": {
                         "type": "integer"
                       },
+                      "connectionString": {
+                        "type": "string",
+                        "deprecated": true,
+                        "description": "Use connection_string instead"
+                      },
                       "default_pool_size": {
                         "type": "integer",
                         "nullable": true
@@ -5719,6 +5694,10 @@
                       "max_client_conn": {
                         "type": "integer",
                         "nullable": true
+                      },
+                      "pool_mode": {
+                        "enum": ["transaction", "session"],
+                        "type": "string"
                       },
                       "identifier": {
                         "type": "string"
@@ -5735,26 +5714,23 @@
                       "db_name": {
                         "type": "string"
                       },
-                      "connectionString": {
-                        "type": "string"
-                      },
-                      "pool_mode": {
-                        "enum": ["transaction", "session"],
+                      "connection_string": {
                         "type": "string"
                       }
                     },
                     "required": [
                       "database_type",
                       "db_port",
+                      "connectionString",
                       "default_pool_size",
                       "max_client_conn",
+                      "pool_mode",
                       "identifier",
                       "is_using_scram_auth",
                       "db_user",
                       "db_host",
                       "db_name",
-                      "connectionString",
-                      "pool_mode"
+                      "connection_string"
                     ]
                   }
                 }
@@ -5773,7 +5749,7 @@
         ]
       },
       "patch": {
-        "operationId": "v1-update-supavisor-config",
+        "operationId": "updateSupavisorConfig",
         "summary": "Updates project's supavisor config",
         "parameters": [
           {
@@ -5804,8 +5780,8 @@
                   "pool_mode": {
                     "enum": ["transaction", "session"],
                     "type": "string",
-                    "deprecated": true,
-                    "description": "This field is deprecated and is ignored in this request"
+                    "description": "Dedicated pooler mode for the project",
+                    "deprecated": true
                   }
                 }
               }
@@ -5825,7 +5801,6 @@
                       "nullable": true
                     },
                     "pool_mode": {
-                      "enum": ["transaction", "session"],
                       "type": "string"
                     }
                   },
@@ -8299,7 +8274,7 @@
       },
       "get": {
         "operationId": "listTPAForProject",
-        "summary": "[Alpha] Lists all third-party auth integrations",
+        "summary": "Lists all third-party auth integrations",
         "parameters": [
           {
             "name": "ref",
@@ -8377,7 +8352,7 @@
     "/v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}": {
       "delete": {
         "operationId": "deleteTPAForProject",
-        "summary": "[Alpha] Removes a third-party auth integration",
+        "summary": "Removes a third-party auth integration",
         "parameters": [
           {
             "name": "ref",
@@ -8458,7 +8433,7 @@
       },
       "get": {
         "operationId": "getTPAForProject",
-        "summary": "[Alpha] Get a third-party integration",
+        "summary": "Get a third-party integration",
         "parameters": [
           {
             "name": "ref",
@@ -8701,6 +8676,427 @@
         ]
       }
     },
+    "/v1/projects/{ref}/billing/addons": {
+      "get": {
+        "operationId": "v1-list-project-addons",
+        "summary": "Lists project addons",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "selected_addons": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "custom_domain",
+                              "compute_instance",
+                              "pitr",
+                              "ipv4",
+                              "auth_mfa_phone",
+                              "auth_mfa_web_authn",
+                              "log_drain"
+                            ]
+                          },
+                          "variant": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "oneOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "ci_micro",
+                                      "ci_small",
+                                      "ci_medium",
+                                      "ci_large",
+                                      "ci_xlarge",
+                                      "ci_2xlarge",
+                                      "ci_4xlarge",
+                                      "ci_8xlarge",
+                                      "ci_12xlarge",
+                                      "ci_16xlarge"
+                                    ]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": ["cd_default"]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": ["pitr_7", "pitr_14", "pitr_28"]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": ["ipv4_default"]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": ["auth_mfa_phone_default"]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": ["auth_mfa_web_authn_default"]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": ["log_drain_default"]
+                                  }
+                                ]
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "price": {
+                                "type": "object",
+                                "properties": {
+                                  "description": {
+                                    "type": "string"
+                                  },
+                                  "type": {
+                                    "type": "string",
+                                    "enum": ["fixed", "usage"]
+                                  },
+                                  "interval": {
+                                    "type": "string",
+                                    "enum": ["monthly", "hourly"]
+                                  },
+                                  "amount": {
+                                    "type": "number"
+                                  }
+                                },
+                                "required": ["description", "type", "interval", "amount"]
+                              },
+                              "meta": {
+                                "type": "object",
+                                "additionalProperties": {
+                                  "oneOf": [
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            "required": ["id", "name", "price"]
+                          }
+                        },
+                        "required": ["type", "variant"]
+                      }
+                    },
+                    "available_addons": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "custom_domain",
+                              "compute_instance",
+                              "pitr",
+                              "ipv4",
+                              "auth_mfa_phone",
+                              "auth_mfa_web_authn",
+                              "log_drain"
+                            ]
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "variants": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "oneOf": [
+                                    {
+                                      "type": "string",
+                                      "enum": [
+                                        "ci_micro",
+                                        "ci_small",
+                                        "ci_medium",
+                                        "ci_large",
+                                        "ci_xlarge",
+                                        "ci_2xlarge",
+                                        "ci_4xlarge",
+                                        "ci_8xlarge",
+                                        "ci_12xlarge",
+                                        "ci_16xlarge"
+                                      ]
+                                    },
+                                    {
+                                      "type": "string",
+                                      "enum": ["cd_default"]
+                                    },
+                                    {
+                                      "type": "string",
+                                      "enum": ["pitr_7", "pitr_14", "pitr_28"]
+                                    },
+                                    {
+                                      "type": "string",
+                                      "enum": ["ipv4_default"]
+                                    },
+                                    {
+                                      "type": "string",
+                                      "enum": ["auth_mfa_phone_default"]
+                                    },
+                                    {
+                                      "type": "string",
+                                      "enum": ["auth_mfa_web_authn_default"]
+                                    },
+                                    {
+                                      "type": "string",
+                                      "enum": ["log_drain_default"]
+                                    }
+                                  ]
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "price": {
+                                  "type": "object",
+                                  "properties": {
+                                    "description": {
+                                      "type": "string"
+                                    },
+                                    "type": {
+                                      "type": "string",
+                                      "enum": ["fixed", "usage"]
+                                    },
+                                    "interval": {
+                                      "type": "string",
+                                      "enum": ["monthly", "hourly"]
+                                    },
+                                    "amount": {
+                                      "type": "number"
+                                    }
+                                  },
+                                  "required": ["description", "type", "interval", "amount"]
+                                },
+                                "meta": {
+                                  "type": "object",
+                                  "additionalProperties": {
+                                    "oneOf": [
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "boolean"
+                                      },
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              },
+                              "required": ["id", "name", "price"]
+                            }
+                          }
+                        },
+                        "required": ["type", "name", "variants"]
+                      }
+                    }
+                  },
+                  "required": ["selected_addons", "available_addons"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to list project addons"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "v1-apply-project-addon",
+        "summary": "Applies project addon",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "addon_variant": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "enum": [
+                          "ci_micro",
+                          "ci_small",
+                          "ci_medium",
+                          "ci_large",
+                          "ci_xlarge",
+                          "ci_2xlarge",
+                          "ci_4xlarge",
+                          "ci_8xlarge",
+                          "ci_12xlarge",
+                          "ci_16xlarge"
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "enum": ["cd_default"]
+                      },
+                      {
+                        "type": "string",
+                        "enum": ["pitr_7", "pitr_14", "pitr_28"]
+                      },
+                      {
+                        "type": "string",
+                        "enum": ["ipv4_default"]
+                      }
+                    ]
+                  },
+                  "addon_type": {
+                    "type": "string",
+                    "enum": [
+                      "custom_domain",
+                      "compute_instance",
+                      "pitr",
+                      "ipv4",
+                      "auth_mfa_phone",
+                      "auth_mfa_web_authn",
+                      "log_drain"
+                    ]
+                  }
+                },
+                "required": ["addon_variant", "addon_type"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to apply project addon"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/projects/{ref}/billing/addons/{addon_variant}": {
+      "delete": {
+        "operationId": "v1-remove-project-addon",
+        "summary": "Removes project addon",
+        "parameters": [
+          {
+            "name": "addon_variant",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "enum": [
+                "ci_micro",
+                "ci_small",
+                "ci_medium",
+                "ci_large",
+                "ci_xlarge",
+                "ci_2xlarge",
+                "ci_4xlarge",
+                "ci_8xlarge",
+                "ci_12xlarge",
+                "ci_16xlarge",
+                "cd_default",
+                "pitr_7",
+                "pitr_14",
+                "pitr_28",
+                "ipv4_default"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to remove project addon"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/v1/projects/{ref}/analytics/endpoints/logs.all": {
       "get": {
         "operationId": "getLogs",
@@ -8812,6 +9208,99 @@
         ]
       }
     },
+    "/v1/projects/{ref}/database/migrations": {
+      "get": {
+        "operationId": "v1-list-migrations",
+        "summary": "[Beta] List applied migration versions",
+        "description": "Only available to selected partner OAuth apps",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "version": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["version"]
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to list database migrations"
+          }
+        },
+        "tags": ["Database"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "v1-apply-a-migration",
+        "summary": "[Beta] Apply a database migration",
+        "description": "Only available to selected partner OAuth apps",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": "Failed to apply database migration"
+          }
+        },
+        "tags": ["Database"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/v1/projects/{ref}/database/query": {
       "post": {
         "operationId": "v1-run-a-query",
@@ -8821,10 +9310,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -8837,7 +9323,8 @@
                 "type": "object",
                 "properties": {
                   "query": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1
                   }
                 },
                 "required": ["query"]
@@ -8985,10 +9472,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -9003,17 +9487,6 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "version": {
-                        "type": "integer"
-                      },
-                      "created_at": {
-                        "type": "integer",
-                        "format": "int64"
-                      },
-                      "updated_at": {
-                        "type": "integer",
-                        "format": "int64"
-                      },
                       "id": {
                         "type": "string"
                       },
@@ -9024,8 +9497,17 @@
                         "type": "string"
                       },
                       "status": {
-                        "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-                        "type": "string"
+                        "type": "string",
+                        "enum": ["ACTIVE", "REMOVED", "THROTTLED"]
+                      },
+                      "version": {
+                        "type": "integer"
+                      },
+                      "created_at": {
+                        "type": "integer"
+                      },
+                      "updated_at": {
+                        "type": "integer"
                       },
                       "verify_jwt": {
                         "type": "boolean"
@@ -9041,13 +9523,13 @@
                       }
                     },
                     "required": [
-                      "version",
-                      "created_at",
-                      "updated_at",
                       "id",
                       "slug",
                       "name",
-                      "status"
+                      "status",
+                      "version",
+                      "created_at",
+                      "updated_at"
                     ]
                   }
                 }
@@ -9075,47 +9557,11 @@
         "deprecated": true,
         "parameters": [
           {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          },
-          {
-            "name": "slug",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "pattern": "/^[A-Za-z0-9_-]+$/",
-              "type": "string"
-            }
-          },
-          {
-            "name": "name",
+            "name": "import_map_path",
             "required": false,
             "in": "query",
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "verify_jwt",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "import_map",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "boolean"
             }
           },
           {
@@ -9127,9 +9573,41 @@
             }
           },
           {
-            "name": "import_map_path",
+            "name": "import_map",
             "required": false,
             "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "verify_jwt",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "name",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "slug",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
             "schema": {
               "type": "string"
             }
@@ -9144,7 +9622,7 @@
                 "properties": {
                   "slug": {
                     "type": "string",
-                    "pattern": "/^[A-Za-z0-9_-]+$/"
+                    "pattern": "^[A-Za-z0-9_-]+$"
                   },
                   "name": {
                     "type": "string"
@@ -9165,7 +9643,7 @@
                 "properties": {
                   "slug": {
                     "type": "string",
-                    "pattern": "/^[A-Za-z0-9_-]+$/"
+                    "pattern": "^[A-Za-z0-9_-]+$"
                   },
                   "name": {
                     "type": "string"
@@ -9190,17 +9668,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "version": {
-                      "type": "integer"
-                    },
-                    "created_at": {
-                      "type": "integer",
-                      "format": "int64"
-                    },
-                    "updated_at": {
-                      "type": "integer",
-                      "format": "int64"
-                    },
                     "id": {
                       "type": "string"
                     },
@@ -9211,8 +9678,17 @@
                       "type": "string"
                     },
                     "status": {
-                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-                      "type": "string"
+                      "type": "string",
+                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"]
+                    },
+                    "version": {
+                      "type": "integer"
+                    },
+                    "created_at": {
+                      "type": "integer"
+                    },
+                    "updated_at": {
+                      "type": "integer"
                     },
                     "verify_jwt": {
                       "type": "boolean"
@@ -9228,13 +9704,13 @@
                     }
                   },
                   "required": [
-                    "version",
-                    "created_at",
-                    "updated_at",
                     "id",
                     "slug",
                     "name",
-                    "status"
+                    "status",
+                    "version",
+                    "created_at",
+                    "updated_at"
                   ]
                 }
               }
@@ -9263,10 +9739,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -9280,25 +9753,25 @@
                 "items": {
                   "type": "object",
                   "properties": {
-                    "version": {
-                      "type": "integer"
-                    },
-                    "created_at": {
-                      "type": "integer",
-                      "format": "int64"
-                    },
                     "id": {
                       "type": "string"
                     },
                     "slug": {
-                      "type": "string"
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9_-]+$"
                     },
                     "name": {
                       "type": "string"
                     },
                     "status": {
-                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-                      "type": "string"
+                      "type": "string",
+                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"]
+                    },
+                    "version": {
+                      "type": "integer"
+                    },
+                    "created_at": {
+                      "type": "integer"
                     },
                     "verify_jwt": {
                       "type": "boolean"
@@ -9313,7 +9786,7 @@
                       "type": "string"
                     }
                   },
-                  "required": ["version", "id", "slug", "name", "status"]
+                  "required": ["id", "slug", "name", "status", "version"]
                 }
               }
             }
@@ -9332,17 +9805,6 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "version": {
-                            "type": "integer"
-                          },
-                          "created_at": {
-                            "type": "integer",
-                            "format": "int64"
-                          },
-                          "updated_at": {
-                            "type": "integer",
-                            "format": "int64"
-                          },
                           "id": {
                             "type": "string"
                           },
@@ -9353,8 +9815,17 @@
                             "type": "string"
                           },
                           "status": {
-                            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-                            "type": "string"
+                            "type": "string",
+                            "enum": ["ACTIVE", "REMOVED", "THROTTLED"]
+                          },
+                          "version": {
+                            "type": "integer"
+                          },
+                          "created_at": {
+                            "type": "integer"
+                          },
+                          "updated_at": {
+                            "type": "integer"
                           },
                           "verify_jwt": {
                             "type": "boolean"
@@ -9370,13 +9841,13 @@
                           }
                         },
                         "required": [
-                          "version",
-                          "created_at",
-                          "updated_at",
                           "id",
                           "slug",
                           "name",
-                          "status"
+                          "status",
+                          "version",
+                          "created_at",
+                          "updated_at"
                         ]
                       }
                     }
@@ -9408,14 +9879,11 @@
         "description": "A new endpoint to deploy functions. It will create if function does not exist.",
         "parameters": [
           {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
+            "name": "bundleOnly",
+            "required": false,
+            "in": "query",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
+              "type": "boolean"
             }
           },
           {
@@ -9423,16 +9891,15 @@
             "required": false,
             "in": "query",
             "schema": {
-              "pattern": "/^[A-Za-z0-9_-]+$/",
               "type": "string"
             }
           },
           {
-            "name": "bundleOnly",
-            "required": false,
-            "in": "query",
+            "name": "ref",
+            "required": true,
+            "in": "path",
             "schema": {
-              "type": "boolean"
+              "type": "string"
             }
           }
         ],
@@ -9475,7 +9942,7 @@
                     "required": ["entrypoint_path"]
                   }
                 },
-                "required": ["file", "metadata"]
+                "required": ["metadata"]
               }
             }
           }
@@ -9488,17 +9955,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "version": {
-                      "type": "integer"
-                    },
-                    "created_at": {
-                      "type": "integer",
-                      "format": "int64"
-                    },
-                    "updated_at": {
-                      "type": "integer",
-                      "format": "int64"
-                    },
                     "id": {
                       "type": "string"
                     },
@@ -9509,8 +9965,17 @@
                       "type": "string"
                     },
                     "status": {
-                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-                      "type": "string"
+                      "type": "string",
+                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"]
+                    },
+                    "version": {
+                      "type": "integer"
+                    },
+                    "created_at": {
+                      "type": "integer"
+                    },
+                    "updated_at": {
+                      "type": "integer"
                     },
                     "verify_jwt": {
                       "type": "boolean"
@@ -9525,7 +9990,7 @@
                       "type": "string"
                     }
                   },
-                  "required": ["version", "id", "slug", "name", "status"]
+                  "required": ["id", "slug", "name", "status", "version"]
                 }
               }
             }
@@ -9552,23 +10017,19 @@
         "description": "Retrieves a function with the specified slug and project.",
         "parameters": [
           {
-            "name": "ref",
+            "name": "function_slug",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
+              "pattern": "^[A-Za-z0-9_-]+$",
               "type": "string"
             }
           },
           {
-            "name": "function_slug",
+            "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Function slug",
             "schema": {
-              "pattern": "/^[A-Za-z0-9_-]+$/",
               "type": "string"
             }
           }
@@ -9581,17 +10042,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "version": {
-                      "type": "integer"
-                    },
-                    "created_at": {
-                      "type": "integer",
-                      "format": "int64"
-                    },
-                    "updated_at": {
-                      "type": "integer",
-                      "format": "int64"
-                    },
                     "id": {
                       "type": "string"
                     },
@@ -9602,8 +10052,17 @@
                       "type": "string"
                     },
                     "status": {
-                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-                      "type": "string"
+                      "type": "string",
+                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"]
+                    },
+                    "version": {
+                      "type": "integer"
+                    },
+                    "created_at": {
+                      "type": "integer"
+                    },
+                    "updated_at": {
+                      "type": "integer"
                     },
                     "verify_jwt": {
                       "type": "boolean"
@@ -9619,13 +10078,13 @@
                     }
                   },
                   "required": [
-                    "version",
-                    "created_at",
-                    "updated_at",
                     "id",
                     "slug",
                     "name",
-                    "status"
+                    "status",
+                    "version",
+                    "created_at",
+                    "updated_at"
                   ]
                 }
               }
@@ -9651,57 +10110,11 @@
         "description": "Updates a function with the specified slug and project.",
         "parameters": [
           {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": {
-              "minLength": 20,
-              "maxLength": 20,
-              "type": "string"
-            }
-          },
-          {
-            "name": "function_slug",
-            "required": true,
-            "in": "path",
-            "description": "Function slug",
-            "schema": {
-              "pattern": "/^[A-Za-z0-9_-]+$/",
-              "type": "string"
-            }
-          },
-          {
-            "name": "slug",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "pattern": "/^[A-Za-z0-9_-]+$/",
-              "type": "string"
-            }
-          },
-          {
-            "name": "name",
+            "name": "import_map_path",
             "required": false,
             "in": "query",
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "verify_jwt",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "import_map",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "boolean"
             }
           },
           {
@@ -9713,9 +10126,42 @@
             }
           },
           {
-            "name": "import_map_path",
+            "name": "import_map",
             "required": false,
             "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "verify_jwt",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "name",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "function_slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
             "schema": {
               "type": "string"
             }
@@ -9766,17 +10212,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "version": {
-                      "type": "integer"
-                    },
-                    "created_at": {
-                      "type": "integer",
-                      "format": "int64"
-                    },
-                    "updated_at": {
-                      "type": "integer",
-                      "format": "int64"
-                    },
                     "id": {
                       "type": "string"
                     },
@@ -9787,8 +10222,17 @@
                       "type": "string"
                     },
                     "status": {
-                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-                      "type": "string"
+                      "type": "string",
+                      "enum": ["ACTIVE", "REMOVED", "THROTTLED"]
+                    },
+                    "version": {
+                      "type": "integer"
+                    },
+                    "created_at": {
+                      "type": "integer"
+                    },
+                    "updated_at": {
+                      "type": "integer"
                     },
                     "verify_jwt": {
                       "type": "boolean"
@@ -9804,13 +10248,13 @@
                     }
                   },
                   "required": [
-                    "version",
-                    "created_at",
-                    "updated_at",
                     "id",
                     "slug",
                     "name",
-                    "status"
+                    "status",
+                    "version",
+                    "created_at",
+                    "updated_at"
                   ]
                 }
               }
@@ -9836,23 +10280,19 @@
         "description": "Deletes a function with the specified slug from the specified project.",
         "parameters": [
           {
-            "name": "ref",
+            "name": "function_slug",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
+              "pattern": "^[A-Za-z0-9_-]+$",
               "type": "string"
             }
           },
           {
-            "name": "function_slug",
+            "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Function slug",
             "schema": {
-              "pattern": "/^[A-Za-z0-9_-]+$/",
               "type": "string"
             }
           }
@@ -9883,23 +10323,19 @@
         "description": "Retrieves a function body for the specified slug and project.",
         "parameters": [
           {
-            "name": "ref",
+            "name": "function_slug",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
+              "pattern": "^[A-Za-z0-9_-]+$",
               "type": "string"
             }
           },
           {
-            "name": "function_slug",
+            "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Function slug",
             "schema": {
-              "pattern": "/^[A-Za-z0-9_-]+$/",
               "type": "string"
             }
           }
@@ -10920,6 +11356,9 @@
               }
             }
           },
+          "403": {
+            "description": ""
+          },
           "500": {
             "description": "Failed to get backups"
           }
@@ -10941,10 +11380,7 @@
             "name": "ref",
             "required": true,
             "in": "path",
-            "description": "Project ref",
             "schema": {
-              "minLength": 20,
-              "maxLength": 20,
               "type": "string"
             }
           }
@@ -10969,6 +11405,9 @@
         },
         "responses": {
           "201": {
+            "description": ""
+          },
+          "403": {
             "description": ""
           }
         },
@@ -11025,6 +11464,9 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": ""
           }
         },
         "tags": ["Organizations"],
@@ -11086,6 +11528,9 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": ""
           }
         },
         "tags": ["Organizations"],
@@ -11109,6 +11554,18 @@
       "BranchDetailResponse": {
         "type": "object",
         "properties": {
+          "ref": {
+            "type": "string"
+          },
+          "postgres_version": {
+            "type": "string"
+          },
+          "postgres_engine": {
+            "type": "string"
+          },
+          "release_channel": {
+            "type": "string"
+          },
           "status": {
             "type": "string",
             "enum": [
@@ -11129,23 +11586,11 @@
               "RESIZING"
             ]
           },
-          "db_port": {
-            "type": "integer"
-          },
-          "ref": {
-            "type": "string"
-          },
-          "postgres_version": {
-            "type": "string"
-          },
-          "postgres_engine": {
-            "type": "string"
-          },
-          "release_channel": {
-            "type": "string"
-          },
           "db_host": {
             "type": "string"
+          },
+          "db_port": {
+            "type": "number"
           },
           "db_user": {
             "type": "string"
@@ -11158,28 +11603,28 @@
           }
         },
         "required": [
-          "status",
-          "db_port",
           "ref",
           "postgres_version",
           "postgres_engine",
           "release_channel",
-          "db_host"
+          "status",
+          "db_host",
+          "db_port"
         ]
       },
       "UpdateBranchBody": {
         "type": "object",
         "properties": {
-          "reset_on_push": {
-            "type": "boolean",
-            "deprecated": true,
-            "description": "This field is deprecated and will be ignored. Use v1-reset-a-branch endpoint directly instead."
-          },
           "branch_name": {
             "type": "string"
           },
           "git_branch": {
             "type": "string"
+          },
+          "reset_on_push": {
+            "type": "boolean",
+            "description": "This field is deprecated and will be ignored. Use v1-reset-a-branch endpoint directly instead.",
+            "deprecated": true
           },
           "persistent": {
             "type": "boolean"
@@ -11200,26 +11645,6 @@
       "BranchResponse": {
         "type": "object",
         "properties": {
-          "pr_number": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "latest_check_run_id": {
-            "type": "number",
-            "deprecated": true,
-            "description": "This field is deprecated and will not be populated."
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "CREATING_PROJECT",
-              "RUNNING_MIGRATIONS",
-              "MIGRATIONS_PASSED",
-              "MIGRATIONS_FAILED",
-              "FUNCTIONS_DEPLOYED",
-              "FUNCTIONS_FAILED"
-            ]
-          },
           "id": {
             "type": "string"
           },
@@ -11238,8 +11663,28 @@
           "git_branch": {
             "type": "string"
           },
+          "pr_number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "latest_check_run_id": {
+            "type": "number",
+            "description": "This field is deprecated and will not be populated.",
+            "deprecated": true
+          },
           "persistent": {
             "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "CREATING_PROJECT",
+              "RUNNING_MIGRATIONS",
+              "MIGRATIONS_PASSED",
+              "MIGRATIONS_FAILED",
+              "FUNCTIONS_DEPLOYED",
+              "FUNCTIONS_FAILED"
+            ]
           },
           "created_at": {
             "type": "string"
@@ -11249,13 +11694,13 @@
           }
         },
         "required": [
-          "status",
           "id",
           "name",
           "project_ref",
           "parent_project_ref",
           "is_default",
           "persistent",
+          "status",
           "created_at",
           "updated_at"
         ]
@@ -11264,7 +11709,8 @@
         "type": "object",
         "properties": {
           "message": {
-            "type": "string"
+            "type": "string",
+            "enum": ["ok"]
           }
         },
         "required": ["message"]
@@ -11276,7 +11722,8 @@
             "type": "string"
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "enum": ["ok"]
           }
         },
         "required": ["workflow_run_id", "message"]
@@ -11523,11 +11970,12 @@
         "type": "object",
         "properties": {
           "grant_type": {
-            "enum": ["authorization_code", "refresh_token"],
-            "type": "string"
+            "type": "string",
+            "enum": ["authorization_code", "refresh_token"]
           },
           "client_id": {
-            "type": "string"
+            "type": "string",
+            "format": "uuid"
           },
           "client_secret": {
             "type": "string"
@@ -11545,27 +11993,27 @@
             "type": "string"
           }
         },
-        "required": ["grant_type", "client_id", "client_secret"]
+        "additionalProperties": false
       },
       "OAuthTokenResponse": {
         "type": "object",
         "properties": {
-          "expires_in": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "token_type": {
-            "type": "string",
-            "enum": ["Bearer"]
-          },
           "access_token": {
             "type": "string"
           },
           "refresh_token": {
             "type": "string"
+          },
+          "expires_in": {
+            "type": "integer"
+          },
+          "token_type": {
+            "type": "string",
+            "enum": ["Bearer"]
           }
         },
-        "required": ["expires_in", "token_type", "access_token", "refresh_token"]
+        "required": ["access_token", "refresh_token", "expires_in", "token_type"],
+        "additionalProperties": false
       },
       "OAuthRevokeTokenBodyDto": {
         "type": "object",
@@ -11893,23 +12341,9 @@
           "content"
         ]
       },
-      "ApiKeySecretJWTTemplate": {
-        "type": "object",
-        "properties": {
-          "role": {
-            "type": "string"
-          }
-        },
-        "required": ["role"]
-      },
       "ApiKeyResponse": {
         "type": "object",
         "properties": {
-          "type": {
-            "nullable": true,
-            "type": "string",
-            "enum": ["publishable", "secret", "legacy"]
-          },
           "name": {
             "type": "string"
           },
@@ -11918,6 +12352,11 @@
           },
           "id": {
             "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "enum": ["publishable", "secret", "legacy"],
             "nullable": true
           },
           "prefix": {
@@ -11933,25 +12372,24 @@
             "nullable": true
           },
           "secret_jwt_template": {
-            "nullable": true,
-            "allOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "role": {
-                    "type": "string"
-                  }
-                },
-                "required": ["role"]
+            "type": "object",
+            "properties": {
+              "role": {
+                "type": "string",
+                "minLength": 1
               }
-            ]
+            },
+            "required": ["role"],
+            "nullable": true
           },
           "inserted_at": {
             "type": "string",
+            "format": "date-time",
             "nullable": true
           },
           "updated_at": {
             "type": "string",
+            "format": "date-time",
             "nullable": true
           }
         },
@@ -11961,26 +12399,23 @@
         "type": "object",
         "properties": {
           "type": {
-            "enum": ["publishable", "secret"],
-            "type": "string"
+            "type": "string",
+            "enum": ["publishable", "secret"]
           },
           "description": {
             "type": "string",
             "nullable": true
           },
           "secret_jwt_template": {
-            "nullable": true,
-            "allOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "role": {
-                    "type": "string"
-                  }
-                },
-                "required": ["role"]
+            "type": "object",
+            "properties": {
+              "role": {
+                "type": "string",
+                "minLength": 1
               }
-            ]
+            },
+            "required": ["role"],
+            "nullable": true
           }
         },
         "required": ["type"]
@@ -11993,51 +12428,39 @@
             "nullable": true
           },
           "secret_jwt_template": {
-            "nullable": true,
-            "allOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "role": {
-                    "type": "string"
-                  }
-                },
-                "required": ["role"]
+            "type": "object",
+            "properties": {
+              "role": {
+                "type": "string",
+                "minLength": 1
               }
-            ]
+            },
+            "required": ["role"],
+            "nullable": true
           }
         }
-      },
-      "DesiredInstanceSize": {
-        "type": "string",
-        "enum": [
-          "micro",
-          "small",
-          "medium",
-          "large",
-          "xlarge",
-          "2xlarge",
-          "4xlarge",
-          "8xlarge",
-          "12xlarge",
-          "16xlarge"
-        ]
-      },
-      "ReleaseChannel": {
-        "type": "string",
-        "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
-      },
-      "PostgresEngine": {
-        "type": "string",
-        "description": "Postgres engine version. If not provided, the latest version will be used.",
-        "enum": ["15", "17-oriole"]
       },
       "CreateBranchBody": {
         "type": "object",
         "properties": {
+          "branch_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "git_branch": {
+            "type": "string"
+          },
+          "persistent": {
+            "type": "boolean"
+          },
+          "region": {
+            "type": "string"
+          },
           "desired_instance_size": {
             "type": "string",
             "enum": [
+              "pico",
+              "nano",
               "micro",
               "small",
               "medium",
@@ -12052,24 +12475,19 @@
           },
           "release_channel": {
             "type": "string",
-            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
+            "description": "Release channel. If not provided, GA will be used."
           },
           "postgres_engine": {
             "type": "string",
-            "description": "Postgres engine version. If not provided, the latest version will be used.",
-            "enum": ["15", "17-oriole"]
+            "enum": ["15", "17-oriole"],
+            "description": "Postgres engine version. If not provided, the latest version will be used."
           },
-          "branch_name": {
-            "type": "string"
-          },
-          "git_branch": {
-            "type": "string"
-          },
-          "persistent": {
-            "type": "boolean"
-          },
-          "region": {
-            "type": "string"
+          "secrets": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
           }
         },
         "required": ["branch_name"]
@@ -12486,29 +12904,12 @@
         },
         "required": ["ipv4_addresses"]
       },
-      "NetworkRestrictionsRequest": {
-        "type": "object",
-        "properties": {
-          "dbAllowedCidrs": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "dbAllowedCidrsV6": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
       "NetworkRestrictionsResponse": {
         "type": "object",
         "properties": {
           "entitlement": {
-            "enum": ["disallowed", "allowed"],
-            "type": "string"
+            "type": "string",
+            "enum": ["disallowed", "allowed"]
           },
           "config": {
             "type": "object",
@@ -12525,7 +12926,8 @@
                   "type": "string"
                 }
               }
-            }
+            },
+            "description": "At any given point in time, this is the config that the user has requested be applied to their project. The `status` field indicates if it has been applied to the project, or is pending. When an updated config is received, the applied config is moved to `old_config`."
           },
           "old_config": {
             "type": "object",
@@ -12542,14 +12944,32 @@
                   "type": "string"
                 }
               }
-            }
+            },
+            "description": "Populated when a new config has been received, but not registered as successfully applied to a project."
           },
           "status": {
-            "enum": ["stored", "applied"],
-            "type": "string"
+            "type": "string",
+            "enum": ["stored", "applied"]
           }
         },
         "required": ["entitlement", "config", "status"]
+      },
+      "NetworkRestrictionsRequest": {
+        "type": "object",
+        "properties": {
+          "dbAllowedCidrs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dbAllowedCidrsV6": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
       },
       "PgsodiumConfigResponse": {
         "type": "object",
@@ -12572,29 +12992,35 @@
       "PostgrestConfigWithJWTSecretResponse": {
         "type": "object",
         "properties": {
+          "db_schema": {
+            "type": "string"
+          },
           "max_rows": {
             "type": "integer"
+          },
+          "db_extra_search_path": {
+            "type": "string"
           },
           "db_pool": {
             "type": "integer",
             "nullable": true,
             "description": "If `null`, the value is automatically configured based on compute size."
           },
-          "db_schema": {
-            "type": "string"
-          },
-          "db_extra_search_path": {
-            "type": "string"
-          },
           "jwt_secret": {
             "type": "string"
           }
         },
-        "required": ["max_rows", "db_pool", "db_schema", "db_extra_search_path"]
+        "required": ["db_schema", "max_rows", "db_extra_search_path", "db_pool"]
       },
-      "UpdatePostgrestConfigBody": {
+      "V1UpdatePostgrestConfigBody": {
         "type": "object",
         "properties": {
+          "db_extra_search_path": {
+            "type": "string"
+          },
+          "db_schema": {
+            "type": "string"
+          },
           "max_rows": {
             "type": "integer",
             "minimum": 0,
@@ -12604,34 +13030,28 @@
             "type": "integer",
             "minimum": 0,
             "maximum": 1000
-          },
-          "db_extra_search_path": {
-            "type": "string"
-          },
-          "db_schema": {
-            "type": "string"
           }
         }
       },
       "V1PostgrestConfigResponse": {
         "type": "object",
         "properties": {
+          "db_schema": {
+            "type": "string"
+          },
           "max_rows": {
             "type": "integer"
+          },
+          "db_extra_search_path": {
+            "type": "string"
           },
           "db_pool": {
             "type": "integer",
             "nullable": true,
             "description": "If `null`, the value is automatically configured based on compute size."
-          },
-          "db_schema": {
-            "type": "string"
-          },
-          "db_extra_search_path": {
-            "type": "string"
           }
         },
-        "required": ["max_rows", "db_pool", "db_schema", "db_extra_search_path"]
+        "required": ["db_schema", "max_rows", "db_extra_search_path", "db_pool"]
       },
       "V1ProjectRefResponse": {
         "type": "object",
@@ -12660,9 +13080,6 @@
           },
           "updated_at": {
             "type": "string"
-          },
-          "updated_at": {
-            "type": "string"
           }
         },
         "required": ["name", "value"]
@@ -12673,7 +13090,7 @@
           "name": {
             "type": "string",
             "maxLength": 256,
-            "pattern": "/^(?!SUPABASE_).*/",
+            "pattern": "^(?!SUPABASE_).*",
             "description": "Secret name must not start with the SUPABASE_ prefix.",
             "example": "string"
           },
@@ -12683,15 +13100,6 @@
           }
         },
         "required": ["name", "value"]
-      },
-      "SslEnforcements": {
-        "type": "object",
-        "properties": {
-          "database": {
-            "type": "boolean"
-          }
-        },
-        "required": ["database"]
       },
       "SslEnforcementResponse": {
         "type": "object",
@@ -12739,8 +13147,8 @@
         "type": "object",
         "properties": {
           "status": {
-            "enum": ["not-used", "custom-domain-used", "active"],
-            "type": "string"
+            "type": "string",
+            "enum": ["not-used", "custom-domain-used", "active"]
           },
           "custom_domain": {
             "type": "string"
@@ -12778,15 +13186,15 @@
       "UpgradeDatabaseBody": {
         "type": "object",
         "properties": {
+          "target_version": {
+            "type": "string"
+          },
           "release_channel": {
             "type": "string",
             "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
-          },
-          "target_version": {
-            "type": "string"
           }
         },
-        "required": ["release_channel", "target_version"]
+        "required": ["target_version"]
       },
       "ProjectUpgradeInitiateResponse": {
         "type": "object",
@@ -12797,39 +13205,18 @@
         },
         "required": ["tracking_id"]
       },
-      "ProjectVersion": {
-        "type": "object",
-        "properties": {
-          "postgres_version": {
-            "type": "string",
-            "description": "Postgres engine version. If not provided, the latest version will be used.",
-            "enum": ["15", "17-oriole"]
-          },
-          "release_channel": {
-            "type": "string",
-            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
-          },
-          "app_version": {
-            "type": "string"
-          }
-        },
-        "required": ["postgres_version", "release_channel", "app_version"]
-      },
       "ProjectUpgradeEligibilityResponse": {
         "type": "object",
         "properties": {
-          "current_app_version_release_channel": {
-            "type": "string",
-            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
-          },
-          "duration_estimate_hours": {
-            "type": "integer"
-          },
           "eligible": {
             "type": "boolean"
           },
           "current_app_version": {
             "type": "string"
+          },
+          "current_app_version_release_channel": {
+            "type": "string",
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
           },
           "latest_app_version": {
             "type": "string"
@@ -12841,7 +13228,6 @@
               "properties": {
                 "postgres_version": {
                   "type": "string",
-                  "description": "Postgres engine version. If not provided, the latest version will be used.",
                   "enum": ["15", "17-oriole"]
                 },
                 "release_channel": {
@@ -12861,6 +13247,9 @@
               "type": "string"
             }
           },
+          "duration_estimate_hours": {
+            "type": "number"
+          },
           "legacy_auth_custom_roles": {
             "type": "array",
             "items": {
@@ -12875,122 +13264,68 @@
           }
         },
         "required": [
-          "current_app_version_release_channel",
-          "duration_estimate_hours",
           "eligible",
           "current_app_version",
+          "current_app_version_release_channel",
           "latest_app_version",
           "target_upgrade_versions",
           "potential_breaking_changes",
+          "duration_estimate_hours",
           "legacy_auth_custom_roles",
           "extension_dependent_objects"
         ]
-      },
-      "DatabaseUpgradeStatus": {
-        "type": "object",
-        "properties": {
-          "target_version": {
-            "type": "integer"
-          },
-          "status": {
-            "enum": [0, 1, 2],
-            "type": "integer"
-          },
-          "initiated_at": {
-            "type": "string"
-          },
-          "latest_status_at": {
-            "type": "string"
-          },
-          "error": {
-            "type": "string",
-            "enum": [
-              "1_upgraded_instance_launch_failed",
-              "2_volume_detachchment_from_upgraded_instance_failed",
-              "3_volume_attachment_to_original_instance_failed",
-              "4_data_upgrade_initiation_failed",
-              "5_data_upgrade_completion_failed",
-              "6_volume_detachchment_from_original_instance_failed",
-              "7_volume_attachment_to_upgraded_instance_failed",
-              "8_upgrade_completion_failed",
-              "9_post_physical_backup_failed"
-            ]
-          },
-          "progress": {
-            "type": "string",
-            "enum": [
-              "0_requested",
-              "1_started",
-              "2_launched_upgraded_instance",
-              "3_detached_volume_from_upgraded_instance",
-              "4_attached_volume_to_original_instance",
-              "5_initiated_data_upgrade",
-              "6_completed_data_upgrade",
-              "7_detached_volume_from_original_instance",
-              "8_attached_volume_to_upgraded_instance",
-              "9_completed_upgrade",
-              "10_completed_post_physical_backup"
-            ]
-          }
-        },
-        "required": ["target_version", "status", "initiated_at", "latest_status_at"]
       },
       "DatabaseUpgradeStatusResponse": {
         "type": "object",
         "properties": {
           "databaseUpgradeStatus": {
-            "nullable": true,
-            "allOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "target_version": {
-                    "type": "integer"
-                  },
-                  "status": {
-                    "enum": [0, 1, 2],
-                    "type": "integer"
-                  },
-                  "initiated_at": {
-                    "type": "string"
-                  },
-                  "latest_status_at": {
-                    "type": "string"
-                  },
-                  "error": {
-                    "type": "string",
-                    "enum": [
-                      "1_upgraded_instance_launch_failed",
-                      "2_volume_detachchment_from_upgraded_instance_failed",
-                      "3_volume_attachment_to_original_instance_failed",
-                      "4_data_upgrade_initiation_failed",
-                      "5_data_upgrade_completion_failed",
-                      "6_volume_detachchment_from_original_instance_failed",
-                      "7_volume_attachment_to_upgraded_instance_failed",
-                      "8_upgrade_completion_failed",
-                      "9_post_physical_backup_failed"
-                    ]
-                  },
-                  "progress": {
-                    "type": "string",
-                    "enum": [
-                      "0_requested",
-                      "1_started",
-                      "2_launched_upgraded_instance",
-                      "3_detached_volume_from_upgraded_instance",
-                      "4_attached_volume_to_original_instance",
-                      "5_initiated_data_upgrade",
-                      "6_completed_data_upgrade",
-                      "7_detached_volume_from_original_instance",
-                      "8_attached_volume_to_upgraded_instance",
-                      "9_completed_upgrade",
-                      "10_completed_post_physical_backup"
-                    ]
-                  }
-                },
-                "required": ["target_version", "status", "initiated_at", "latest_status_at"]
+            "type": "object",
+            "properties": {
+              "initiated_at": {
+                "type": "string"
+              },
+              "latest_status_at": {
+                "type": "string"
+              },
+              "target_version": {
+                "type": "number"
+              },
+              "error": {
+                "type": "string",
+                "enum": [
+                  "1_upgraded_instance_launch_failed",
+                  "2_volume_detachchment_from_upgraded_instance_failed",
+                  "3_volume_attachment_to_original_instance_failed",
+                  "4_data_upgrade_initiation_failed",
+                  "5_data_upgrade_completion_failed",
+                  "6_volume_detachchment_from_original_instance_failed",
+                  "7_volume_attachment_to_upgraded_instance_failed",
+                  "8_upgrade_completion_failed",
+                  "9_post_physical_backup_failed"
+                ]
+              },
+              "progress": {
+                "type": "string",
+                "enum": [
+                  "0_requested",
+                  "1_started",
+                  "2_launched_upgraded_instance",
+                  "3_detached_volume_from_upgraded_instance",
+                  "4_attached_volume_to_original_instance",
+                  "5_initiated_data_upgrade",
+                  "6_completed_data_upgrade",
+                  "7_detached_volume_from_original_instance",
+                  "8_attached_volume_to_upgraded_instance",
+                  "9_completed_upgrade",
+                  "10_completed_post_physical_backup"
+                ]
+              },
+              "status": {
+                "type": "number"
               }
-            ]
+            },
+            "required": ["initiated_at", "latest_status_at", "target_version", "status"],
+            "nullable": true
           }
         },
         "required": ["databaseUpgradeStatus"]
@@ -13527,6 +13862,11 @@
           "db_port": {
             "type": "integer"
           },
+          "connectionString": {
+            "type": "string",
+            "deprecated": true,
+            "description": "Use connection_string instead"
+          },
           "default_pool_size": {
             "type": "integer",
             "nullable": true
@@ -13534,6 +13874,10 @@
           "max_client_conn": {
             "type": "integer",
             "nullable": true
+          },
+          "pool_mode": {
+            "enum": ["transaction", "session"],
+            "type": "string"
           },
           "identifier": {
             "type": "string"
@@ -13550,26 +13894,23 @@
           "db_name": {
             "type": "string"
           },
-          "connectionString": {
-            "type": "string"
-          },
-          "pool_mode": {
-            "enum": ["transaction", "session"],
+          "connection_string": {
             "type": "string"
           }
         },
         "required": [
           "database_type",
           "db_port",
+          "connectionString",
           "default_pool_size",
           "max_client_conn",
+          "pool_mode",
           "identifier",
           "is_using_scram_auth",
           "db_user",
           "db_host",
           "db_name",
-          "connectionString",
-          "pool_mode"
+          "connection_string"
         ]
       },
       "UpdateSupavisorConfigBody": {
@@ -13584,8 +13925,8 @@
           "pool_mode": {
             "enum": ["transaction", "session"],
             "type": "string",
-            "deprecated": true,
-            "description": "This field is deprecated and is ignored in this request"
+            "description": "Dedicated pooler mode for the project",
+            "deprecated": true
           }
         }
       },
@@ -13597,7 +13938,6 @@
             "nullable": true
           },
           "pool_mode": {
-            "enum": ["transaction", "session"],
             "type": "string"
           }
         },
@@ -15117,6 +15457,297 @@
         "properties": {},
         "hideDefinitions": ["release_channel", "postgres_engine"]
       },
+      "ListProjectAddonsResponseDto": {
+        "type": "object",
+        "properties": {
+          "selected_addons": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "custom_domain",
+                    "compute_instance",
+                    "pitr",
+                    "ipv4",
+                    "auth_mfa_phone",
+                    "auth_mfa_web_authn",
+                    "log_drain"
+                  ]
+                },
+                "variant": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "oneOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "ci_micro",
+                            "ci_small",
+                            "ci_medium",
+                            "ci_large",
+                            "ci_xlarge",
+                            "ci_2xlarge",
+                            "ci_4xlarge",
+                            "ci_8xlarge",
+                            "ci_12xlarge",
+                            "ci_16xlarge"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["cd_default"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["pitr_7", "pitr_14", "pitr_28"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["ipv4_default"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["auth_mfa_phone_default"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["auth_mfa_web_authn_default"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["log_drain_default"]
+                        }
+                      ]
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "price": {
+                      "type": "object",
+                      "properties": {
+                        "description": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": ["fixed", "usage"]
+                        },
+                        "interval": {
+                          "type": "string",
+                          "enum": ["monthly", "hourly"]
+                        },
+                        "amount": {
+                          "type": "number"
+                        }
+                      },
+                      "required": ["description", "type", "interval", "amount"]
+                    },
+                    "meta": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "oneOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          },
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "required": ["id", "name", "price"]
+                }
+              },
+              "required": ["type", "variant"]
+            }
+          },
+          "available_addons": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "custom_domain",
+                    "compute_instance",
+                    "pitr",
+                    "ipv4",
+                    "auth_mfa_phone",
+                    "auth_mfa_web_authn",
+                    "log_drain"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "variants": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "oneOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "ci_micro",
+                              "ci_small",
+                              "ci_medium",
+                              "ci_large",
+                              "ci_xlarge",
+                              "ci_2xlarge",
+                              "ci_4xlarge",
+                              "ci_8xlarge",
+                              "ci_12xlarge",
+                              "ci_16xlarge"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": ["cd_default"]
+                          },
+                          {
+                            "type": "string",
+                            "enum": ["pitr_7", "pitr_14", "pitr_28"]
+                          },
+                          {
+                            "type": "string",
+                            "enum": ["ipv4_default"]
+                          },
+                          {
+                            "type": "string",
+                            "enum": ["auth_mfa_phone_default"]
+                          },
+                          {
+                            "type": "string",
+                            "enum": ["auth_mfa_web_authn_default"]
+                          },
+                          {
+                            "type": "string",
+                            "enum": ["log_drain_default"]
+                          }
+                        ]
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "price": {
+                        "type": "object",
+                        "properties": {
+                          "description": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["fixed", "usage"]
+                          },
+                          "interval": {
+                            "type": "string",
+                            "enum": ["monthly", "hourly"]
+                          },
+                          "amount": {
+                            "type": "number"
+                          }
+                        },
+                        "required": ["description", "type", "interval", "amount"]
+                      },
+                      "meta": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "oneOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "required": ["id", "name", "price"]
+                  }
+                }
+              },
+              "required": ["type", "name", "variants"]
+            }
+          }
+        },
+        "required": ["selected_addons", "available_addons"]
+      },
+      "ApplyProjectAddonBodyDto": {
+        "type": "object",
+        "properties": {
+          "addon_variant": {
+            "oneOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "ci_micro",
+                  "ci_small",
+                  "ci_medium",
+                  "ci_large",
+                  "ci_xlarge",
+                  "ci_2xlarge",
+                  "ci_4xlarge",
+                  "ci_8xlarge",
+                  "ci_12xlarge",
+                  "ci_16xlarge"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": ["cd_default"]
+              },
+              {
+                "type": "string",
+                "enum": ["pitr_7", "pitr_14", "pitr_28"]
+              },
+              {
+                "type": "string",
+                "enum": ["ipv4_default"]
+              }
+            ]
+          },
+          "addon_type": {
+            "type": "string",
+            "enum": [
+              "custom_domain",
+              "compute_instance",
+              "pitr",
+              "ipv4",
+              "auth_mfa_phone",
+              "auth_mfa_web_authn",
+              "log_drain"
+            ]
+          }
+        },
+        "required": ["addon_variant", "addon_type"]
+      },
       "V1AnalyticsResponse": {
         "type": "object",
         "properties": {
@@ -15170,11 +15801,28 @@
           }
         }
       },
+      "V1ListMigrationsResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": ["version"]
+        }
+      },
       "V1RunQueryBody": {
         "type": "object",
         "properties": {
           "query": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         },
         "required": ["query"]
@@ -15214,17 +15862,6 @@
       "FunctionResponse": {
         "type": "object",
         "properties": {
-          "version": {
-            "type": "integer"
-          },
-          "created_at": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "updated_at": {
-            "type": "integer",
-            "format": "int64"
-          },
           "id": {
             "type": "string"
           },
@@ -15235,8 +15872,17 @@
             "type": "string"
           },
           "status": {
-            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-            "type": "string"
+            "type": "string",
+            "enum": ["ACTIVE", "REMOVED", "THROTTLED"]
+          },
+          "version": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "integer"
+          },
+          "updated_at": {
+            "type": "integer"
           },
           "verify_jwt": {
             "type": "boolean"
@@ -15251,14 +15897,14 @@
             "type": "string"
           }
         },
-        "required": ["version", "created_at", "updated_at", "id", "slug", "name", "status"]
+        "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
       },
       "V1CreateFunctionBody": {
         "type": "object",
         "properties": {
           "slug": {
             "type": "string",
-            "pattern": "/^[A-Za-z0-9_-]+$/"
+            "pattern": "^[A-Za-z0-9_-]+$"
           },
           "name": {
             "type": "string"
@@ -15275,25 +15921,25 @@
       "BulkUpdateFunctionBody": {
         "type": "object",
         "properties": {
-          "version": {
-            "type": "integer"
-          },
-          "created_at": {
-            "type": "integer",
-            "format": "int64"
-          },
           "id": {
             "type": "string"
           },
           "slug": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]+$"
           },
           "name": {
             "type": "string"
           },
           "status": {
-            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-            "type": "string"
+            "type": "string",
+            "enum": ["ACTIVE", "REMOVED", "THROTTLED"]
+          },
+          "version": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "integer"
           },
           "verify_jwt": {
             "type": "boolean"
@@ -15308,7 +15954,7 @@
             "type": "string"
           }
         },
-        "required": ["version", "id", "slug", "name", "status"]
+        "required": ["id", "slug", "name", "status", "version"]
       },
       "BulkUpdateFunctionResponse": {
         "type": "object",
@@ -15318,17 +15964,6 @@
             "items": {
               "type": "object",
               "properties": {
-                "version": {
-                  "type": "integer"
-                },
-                "created_at": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "updated_at": {
-                  "type": "integer",
-                  "format": "int64"
-                },
                 "id": {
                   "type": "string"
                 },
@@ -15339,8 +15974,17 @@
                   "type": "string"
                 },
                 "status": {
-                  "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-                  "type": "string"
+                  "type": "string",
+                  "enum": ["ACTIVE", "REMOVED", "THROTTLED"]
+                },
+                "version": {
+                  "type": "integer"
+                },
+                "created_at": {
+                  "type": "integer"
+                },
+                "updated_at": {
+                  "type": "integer"
                 },
                 "verify_jwt": {
                   "type": "boolean"
@@ -15355,35 +15999,11 @@
                   "type": "string"
                 }
               },
-              "required": ["version", "created_at", "updated_at", "id", "slug", "name", "status"]
+              "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
             }
           }
         },
         "required": ["functions"]
-      },
-      "FunctionDeployMetadata": {
-        "type": "object",
-        "properties": {
-          "entrypoint_path": {
-            "type": "string"
-          },
-          "import_map_path": {
-            "type": "string"
-          },
-          "static_patterns": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "verify_jwt": {
-            "type": "boolean"
-          },
-          "name": {
-            "type": "string"
-          }
-        },
-        "required": ["entrypoint_path"]
       },
       "FunctionDeployBody": {
         "type": "object",
@@ -15420,22 +16040,11 @@
             "required": ["entrypoint_path"]
           }
         },
-        "required": ["file", "metadata"]
+        "required": ["metadata"]
       },
       "DeployFunctionResponse": {
         "type": "object",
         "properties": {
-          "version": {
-            "type": "integer"
-          },
-          "created_at": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "updated_at": {
-            "type": "integer",
-            "format": "int64"
-          },
           "id": {
             "type": "string"
           },
@@ -15446,8 +16055,17 @@
             "type": "string"
           },
           "status": {
-            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-            "type": "string"
+            "type": "string",
+            "enum": ["ACTIVE", "REMOVED", "THROTTLED"]
+          },
+          "version": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "integer"
+          },
+          "updated_at": {
+            "type": "integer"
           },
           "verify_jwt": {
             "type": "boolean"
@@ -15462,22 +16080,11 @@
             "type": "string"
           }
         },
-        "required": ["version", "id", "slug", "name", "status"]
+        "required": ["id", "slug", "name", "status", "version"]
       },
       "FunctionSlugResponse": {
         "type": "object",
         "properties": {
-          "version": {
-            "type": "integer"
-          },
-          "created_at": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "updated_at": {
-            "type": "integer",
-            "format": "int64"
-          },
           "id": {
             "type": "string"
           },
@@ -15488,8 +16095,17 @@
             "type": "string"
           },
           "status": {
-            "enum": ["ACTIVE", "REMOVED", "THROTTLED"],
-            "type": "string"
+            "type": "string",
+            "enum": ["ACTIVE", "REMOVED", "THROTTLED"]
+          },
+          "version": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "integer"
+          },
+          "updated_at": {
+            "type": "integer"
           },
           "verify_jwt": {
             "type": "boolean"
@@ -15504,7 +16120,7 @@
             "type": "string"
           }
         },
-        "required": ["version", "created_at", "updated_at", "id", "slug", "name", "status"]
+        "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
       },
       "V1UpdateFunctionBody": {
         "type": "object",
@@ -16517,6 +17133,10 @@
       "BillingPlanId": {
         "type": "string",
         "enum": ["free", "pro", "team", "enterprise"]
+      },
+      "ReleaseChannel": {
+        "type": "string",
+        "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
       },
       "V1OrganizationSlugResponse": {
         "type": "object",

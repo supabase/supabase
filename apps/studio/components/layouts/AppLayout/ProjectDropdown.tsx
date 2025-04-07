@@ -101,11 +101,9 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
 
   const isBranch = projectDetails?.parentRef !== projectDetails?.ref
 
-  const projects = isNewNav
-    ? allProjects
-        ?.filter((x) => x.organization_id === selectedOrganization?.id)
-        .sort((a, b) => a.name.localeCompare(b.name))
-    : allProjects?.sort((a, b) => a.name.localeCompare(b.name))
+  const projects = allProjects
+    ?.filter((x) => x.organization_id === selectedOrganization?.id)
+    .sort((a, b) => a.name.localeCompare(b.name))
   const selectedProject = isBranch
     ? projects?.find((project) => project.ref === projectDetails?.parentRef)
     : projects?.find((project) => project.ref === ref)
