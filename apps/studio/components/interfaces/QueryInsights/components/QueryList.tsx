@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { QueryInsightsQuery } from 'data/query-insights/query-insights-query'
 import dayjs from 'dayjs'
@@ -10,12 +10,47 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 interface QueryListProps {
   queries: QueryInsightsQuery[]
   isLoading: boolean
+  onQuerySelect?: (query: QueryInsightsQuery | null) => void
+  selectedQuery?: QueryInsightsQuery | null
 }
 
-export const QueryList = ({ queries, isLoading }: QueryListProps) => {
+export const QueryList = ({ queries, isLoading, onQuerySelect, selectedQuery }: QueryListProps) => {
   const router = useRouter()
   const gridRef = useRef<DataGridHandle>(null)
-  const [selectedRow, setSelectedRow] = useState<number>()
+  const [selectedRow, setSelectedRow] = useState<number | undefined>()
+
+  // Update selected row when selectedQuery changes from parent
+  useEffect(() => {
+    if (selectedQuery) {
+      const idx = queries.findIndex((q) => q.query_id === selectedQuery.query_id)
+      if (idx !== -1) {
+        setSelectedRow(idx)
+      }
+    } else {
+      setSelectedRow(undefined)
+    }
+  }, [selectedQuery, queries])
+
+  // Handler for row click
+  const handleRowClick = (idx: number) => {
+    if (isNaN(idx) || idx < 0 || idx >= queries.length) return
+
+    const query = queries[idx]
+    const isAlreadySelected = selectedQuery?.query_id === query.query_id
+
+    // If the query is already selected, deselect it
+    if (isAlreadySelected) {
+      setSelectedRow(undefined)
+      onQuerySelect?.(null)
+    } else {
+      // Otherwise, select the new query
+      setSelectedRow(idx)
+      onQuerySelect?.(query)
+    }
+
+    // Scroll to keep the row in view
+    gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
+  }
 
   const columns: Column<QueryInsightsQuery>[] = [
     {
@@ -102,28 +137,21 @@ export const QueryList = ({ queries, isLoading }: QueryListProps) => {
         headerRowHeight={36}
         columns={columns}
         rows={queries}
-        rowClass={(_, idx) => {
-          const isSelected = idx === selectedRow
+        rowClass={(row, idx) => {
+          // Use the query_id for comparison instead of row index
+          const isSelected = selectedQuery?.query_id === row.query_id
           return [
-            `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
+            `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'hover:bg-surface-200'} cursor-pointer`,
             `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
             '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
             '[&>.rdg-cell:first-child>div]:ml-4',
           ].join(' ')
         }}
         renderers={{
-          renderRow: (idx, props) => (
-            <Row
-              {...props}
-              key={`qi-row-${props.rowIdx}`}
-              onClick={() => {
-                if (typeof idx === 'number' && idx >= 0) {
-                  setSelectedRow(idx)
-                  gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
-                }
-              }}
-            />
-          ),
+          renderRow: (rowIdx, props) => {
+            const idx = typeof rowIdx === 'number' ? rowIdx : Number(rowIdx)
+            return <Row {...props} key={`qi-row-${rowIdx}`} onClick={() => handleRowClick(idx)} />
+          },
           noRowsFallback: isLoading ? (
             <div className="absolute top-14 px-6 w-full">
               <GenericSkeletonLoader />
