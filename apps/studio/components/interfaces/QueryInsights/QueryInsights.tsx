@@ -119,8 +119,8 @@ export const QueryInsights = () => {
   }, [selectedTimeRange])
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-6 flex-grow">
+      <div className="flex items-center justify-between px-5 pt-5">
         <div>
           <h3 className="text-xl text-foreground">Query Metrics</h3>
           <p className="text-sm text-foreground-light">
@@ -159,7 +159,7 @@ export const QueryInsights = () => {
         onValueChange={(value) => setSelectedMetric(value as MetricType)}
         className="space-y-4"
       >
-        <TabsList_Shadcn_>
+        <TabsList_Shadcn_ className="px-5 flex gap-5">
           {METRICS.map((metric) => (
             <TabsTrigger_Shadcn_ key={metric.id} value={metric.id}>
               {metric.label}
@@ -172,7 +172,7 @@ export const QueryInsights = () => {
         </div>
       </Tabs_Shadcn_>
 
-      <div>
+      <div className="px-5">
         <h3 className="text-xl text-foreground">Recent Queries</h3>
         <p className="text-sm text-foreground-light">Detailed view of recent query executions</p>
       </div>

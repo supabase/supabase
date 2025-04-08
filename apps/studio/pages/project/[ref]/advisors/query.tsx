@@ -8,13 +8,6 @@ import type { NextPageWithLayout } from 'types'
 const QueryInsightsPage: NextPageWithLayout = () => {
   return (
     <div className="h-full flex flex-col">
-      <FormHeader
-        className="py-4 px-6 !mb-0"
-        title="Query Insights"
-        description="Monitor and analyze query performance with enhanced metrics"
-        docsUrl="https://supabase.com/docs/guides/platform/performance"
-        actions={<DatabaseSelector />}
-      />
       <QueryInsights />
     </div>
   )
