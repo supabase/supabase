@@ -6964,6 +6964,7 @@ export interface components {
       updated_at: string
     }
     SupavisorConfigResponse: {
+      connection_string: string
       /** @description Use connection_string instead */
       connectionString: string
       /** @enum {string} */
@@ -15642,33 +15643,21 @@ export interface operations {
           | 'cpu_usage_busy_irqs'
           | 'cpu_usage_busy_other'
           | 'cpu_usage_busy_idle'
-          | 'client_connections_max_limit'
           | 'client_connections_pgbouncer'
-          | 'client_connections_postgres'
-          | 'client_connections_realtime'
-          | 'client_connections_supavisor'
           | 'max_cpu_usage'
           | 'avg_cpu_usage'
           | 'disk_io_budget'
-          | 'disk_iops_usage'
-          | 'disk_iops_max'
+          | 'disk_io_consumption'
           | 'disk_iops_read'
           | 'disk_iops_write'
-          | 'disk_io_consumption'
-          | 'ram_available_max'
+          | 'disk_bytes_read'
+          | 'disk_bytes_written'
           | 'ram_usage'
+          | 'ram_usage_total'
           | 'ram_usage_used'
           | 'ram_usage_free'
-          | 'ram_usage_applications'
-          | 'ram_usage_page_tables'
-          | 'ram_usage_swap_cache'
           | 'ram_usage_cache_and_buffers'
-          | 'ram_usage_slab'
-          | 'ram_usage_cache'
-          | 'ram_usage_buffers'
-          | 'ram_usage_unused'
           | 'ram_usage_swap'
-          | 'ram_usage_hardware_corrupted'
           | 'swap_usage'
           | 'physical_replication_lag_physical_replica_lag_seconds'
           | 'pg_stat_database_num_backends'

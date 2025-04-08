@@ -3,16 +3,11 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { ArrowRight, BookOpen, ExternalLink, RefreshCw } from 'lucide-react'
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
-import { Admonition } from 'ui-patterns'
 import { useFlag } from 'hooks/ui/useFlag'
-import { BASE_PATH } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
 import { useParams } from 'common'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
@@ -23,7 +18,6 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import ChartHandler from 'components/ui/Charts/ChartHandler'
 import Panel from 'components/ui/Panel'
 import { REPORTS_DATEPICKER_HELPERS } from 'components/interfaces/Reports/Reports.constants'
@@ -32,24 +26,19 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
 import DatePickers from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { MultiAttribute } from 'components/ui/Charts/ComposedChartHandler'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import ComposedChartHandler, { MultiAttribute } from 'components/ui/Charts/ComposedChartHandler'
 
 import { analyticsKeys } from 'data/analytics/keys'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
-import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
-import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import type { NextPageWithLayout } from 'types'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { getReportAttributes } from 'data/reports/database-charts'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -71,7 +60,8 @@ const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
-  const isReportsV2 = useFlag('reportsDatabaseV2')
+  // const isReportsV2 = useFlag('reportsDatabaseV2')
+  const isReportsV2 = true
 
   const state = useDatabaseSelectorStateSnapshot()
   const defaultStart = dayjs().subtract(7, 'day').toISOString()
@@ -221,7 +211,7 @@ const DatabaseUsage = () => {
   //     ? DateTimeFormats.FULL_SECONDS
   //     : undefined
 
-  const updateDateRange: UpdateDateRange = (from: string, to: string) => {
+  const updateDateRange = (from: string, to: string) => {
     setDateRange({
       period_start: { date: from, time_period: '7d' },
       period_end: { date: to, time_period: 'today' },

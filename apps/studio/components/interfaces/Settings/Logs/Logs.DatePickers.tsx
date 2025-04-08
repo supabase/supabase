@@ -15,6 +15,7 @@ import {
 } from 'ui'
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD, getDefaultHelper } from './Logs.constants'
 import type { DatetimeHelper } from './Logs.types'
+import { useFlag } from 'hooks/ui/useFlag'
 
 interface Props {
   to: string
@@ -26,7 +27,8 @@ const DatePickers = ({ to, from, onChange, helpers }: PropsWithChildren<Props>) 
   const defaultHelper = getDefaultHelper(helpers)
   const [helperValue, setHelperValue] = useState<string>(to || from ? '' : defaultHelper.text)
   const [selectedHelperItem, setSelectedHelperItem] = useState<DatetimeHelper | null>(null)
-  const isReportsV2 = useFlag('reportsDatabaseV2')
+  // const isReportsV2 = useFlag('reportsDatabaseV2')
+  const isReportsV2 = true
 
   const handleHelperChange = (newValue: string) => {
     const selectedHelper = helpers.find((h) => h.text === newValue)

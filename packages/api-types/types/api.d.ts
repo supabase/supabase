@@ -1344,33 +1344,6 @@ export interface components {
         | ('pitr_7' | 'pitr_14' | 'pitr_28')
         | 'ipv4_default'
     }
-    ApplyProjectAddonBodyDto: {
-      /** @enum {string} */
-      addon_type:
-        | 'custom_domain'
-        | 'compute_instance'
-        | 'pitr'
-        | 'ipv4'
-        | 'auth_mfa_phone'
-        | 'auth_mfa_web_authn'
-        | 'log_drain'
-      addon_variant:
-        | (
-            | 'ci_micro'
-            | 'ci_small'
-            | 'ci_medium'
-            | 'ci_large'
-            | 'ci_xlarge'
-            | 'ci_2xlarge'
-            | 'ci_4xlarge'
-            | 'ci_8xlarge'
-            | 'ci_12xlarge'
-            | 'ci_16xlarge'
-          )
-        | 'cd_default'
-        | ('pitr_7' | 'pitr_14' | 'pitr_28')
-        | 'ipv4_default'
-    }
     AttributeMapping: {
       keys: {
         [key: string]: components['schemas']['AttributeValue']
@@ -2260,6 +2233,7 @@ export interface components {
       available: boolean
     }
     SupavisorConfigResponse: {
+      connection_string: string
       /** @description Use connection_string instead */
       connectionString: string
       /** @enum {string} */
@@ -3514,124 +3488,6 @@ export interface operations {
         }
       }
       403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  'v1-list-project-addons': {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ListProjectAddonsResponseDto']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to list project addons */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  'v1-apply-project-addon': {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ApplyProjectAddonBodyDto']
-      }
-    }
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to apply project addon */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  'v1-remove-project-addon': {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        addon_variant:
-          | 'ci_micro'
-          | 'ci_small'
-          | 'ci_medium'
-          | 'ci_large'
-          | 'ci_xlarge'
-          | 'ci_2xlarge'
-          | 'ci_4xlarge'
-          | 'ci_8xlarge'
-          | 'ci_12xlarge'
-          | 'ci_16xlarge'
-          | 'cd_default'
-          | 'pitr_7'
-          | 'pitr_14'
-          | 'pitr_28'
-          | 'ipv4_default'
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to remove project addon */
-      500: {
         headers: {
           [name: string]: unknown
         }
