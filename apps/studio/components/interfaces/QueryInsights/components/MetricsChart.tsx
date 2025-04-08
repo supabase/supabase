@@ -202,10 +202,10 @@ export function MetricsChart({
                     exit={{ opacity: 0, scale: 0.95, x: -8 }}
                     transition={{ duration: 0.15 }}
                     className={cn(
-                      'text-xs px-2 py-1 rounded-full transition-colors inline-flex items-center gap-1.5',
+                      'text-xs px-2 py-1 rounded-full transition-colors inline-flex items-center gap-1.5 border',
                       visibleMetrics[key as keyof typeof visibleMetrics]
                         ? 'bg-surface-300'
-                        : 'hover:bg-surface-100'
+                        : 'hover:bg-surface-100 border-transparent'
                     )}
                     onClick={() =>
                       setVisibleMetrics((prev) => ({
@@ -215,7 +215,10 @@ export function MetricsChart({
                     }
                   >
                     <div
-                      className="w-2 h-2 rounded-full"
+                      className={cn(
+                        'w-2 h-2 rounded-full',
+                        !visibleMetrics[key as keyof typeof visibleMetrics] && 'opacity-50'
+                      )}
                       style={{ backgroundColor: value.color }}
                     />
                     <span>
