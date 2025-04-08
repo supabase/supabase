@@ -1,8 +1,8 @@
 import { renderHook } from '@testing-library/react-hooks'
-import { useTableEditorFilters } from './use-table-editor-filters'
-import { expect, describe, it, beforeAll, vi } from 'vitest'
-import { withNuqsTestingAdapter } from 'nuqs/adapters/testing'
 import { useRouter } from 'next/router'
+import { withNuqsTestingAdapter } from 'nuqs/adapters/testing'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
+import { useTableEditorFilters } from './useTableEditorFilters'
 
 beforeAll(() => {
   vi.mock('next/router', () => import('next-router-mock'))

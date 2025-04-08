@@ -22,7 +22,7 @@ import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useUrlState } from 'hooks/ui/useUrlState'
+import { useTableEditorFilters } from 'hooks/misc/useTableEditorFilters'
 import {
   useRoleImpersonationStateSnapshot,
   useSubscribeToImpersonatedRole,
@@ -41,7 +41,6 @@ import {
 } from 'ui'
 import FilterPopover from './filter/FilterPopover'
 import { SortPopover } from './sort'
-import { useTableEditorFilters } from 'hooks/misc/use-table-editor-filters'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
