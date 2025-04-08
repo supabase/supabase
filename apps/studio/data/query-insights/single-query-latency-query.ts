@@ -20,12 +20,14 @@ const getSingleQueryLatencySql = (
   SELECT
     bucket_start_time as timestamp,
     mean_exec_time as value,
+    calls,
     datname as database
   FROM pg_stat_monitor
-  WHERE queryid = '${queryId}'
-    AND bucket_start_time >= '${startTime}'
-    AND bucket_start_time <= '${endTime}'
-  ORDER BY bucket_start_time ASC
+  WHERE bucket_start_time >= '${startTime}'::timestamptz
+    AND bucket_start_time <= '${endTime}'::timestamptz
+    AND bucket_done = true -- Only include completed buckets
+    AND queryid = ${queryId}::bigint
+  ORDER BY timestamp ASC
 `
 
 export function useSingleQueryLatency(
@@ -46,6 +48,7 @@ export function useSingleQueryLatency(
         sql: getSingleQueryLatencySql(queryId, startTime, endTime),
       })
 
+      console.log('Chart data points:', result)
       return result as QueryInsightsMetric[]
     },
     enabled: !!queryId && !!projectRef,

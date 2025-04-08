@@ -18,7 +18,7 @@ export type QueryInsightsMetric = {
 }
 
 export type QueryInsightsQuery = {
-  query_id: string
+  query_id: number
   query: string
   total_time: number
   calls: number
@@ -28,6 +28,7 @@ export type QueryInsightsQuery = {
   mean_exec_time: number
   database: string
   timestamp: string
+  cmd_type_text: string
 }
 
 export type QueryInsightsMetrics = {
@@ -53,25 +54,27 @@ const getMetricsSql = (metric: string, startTime: string, endTime: string) => {
       return /* SQL */ `
         SELECT
           bucket_start_time as timestamp,
-          SUM(rows_retrieved) as value,
+          SUM(rows) / 300 as value, -- Convert to per-second rate (5 mins = 300 seconds)
           datname as database
         FROM pg_stat_monitor
-        WHERE bucket_start_time >= '${startTime}'
-          AND bucket_start_time <= '${endTime}'
+        WHERE bucket_start_time >= '${startTime}'::timestamptz
+          AND bucket_start_time <= '${endTime}'::timestamptz
+          AND bucket_done = true -- Only include completed buckets
         GROUP BY bucket_start_time, datname
-        ORDER BY bucket_start_time ASC
+        ORDER BY timestamp ASC
       `
     case 'rows_written':
       return /* SQL */ `
         SELECT
           bucket_start_time as timestamp,
-          SUM(rows_retrieved) as value,
+          SUM(rows) / 300 as value, -- Convert to per-second rate (5 mins = 300 seconds)
           datname as database
         FROM pg_stat_monitor
-        WHERE bucket_start_time >= '${startTime}'
-          AND bucket_start_time <= '${endTime}'
+        WHERE bucket_start_time >= '${startTime}'::timestamptz
+          AND bucket_start_time <= '${endTime}'::timestamptz
+          AND bucket_done = true -- Only include completed buckets
         GROUP BY bucket_start_time, datname
-        ORDER BY bucket_start_time ASC
+        ORDER BY timestamp ASC
       `
     case 'query_latency':
       return /* SQL */ `
@@ -83,54 +86,59 @@ const getMetricsSql = (metric: string, startTime: string, endTime: string) => {
           percentile_cont(0.999) WITHIN GROUP (ORDER BY mean_exec_time) as p99_9,
           datname as database
         FROM pg_stat_monitor
-        WHERE bucket_start_time >= '${startTime}'
-          AND bucket_start_time <= '${endTime}'
+        WHERE bucket_start_time >= '${startTime}'::timestamptz
+          AND bucket_start_time <= '${endTime}'::timestamptz
+          AND bucket_done = true -- Only include completed buckets
         GROUP BY bucket_start_time, datname
-        ORDER BY bucket_start_time ASC
+        ORDER BY timestamp ASC
       `
     case 'queries_per_second':
       return /* SQL */ `
         SELECT
           bucket_start_time as timestamp,
-          COUNT(*) as value,
+          COUNT(*) / 300.0 as value, -- Convert to per-second rate (5 mins = 300 seconds)
           datname as database
         FROM pg_stat_monitor
-        WHERE bucket_start_time >= '${startTime}'
-          AND bucket_start_time <= '${endTime}'
+        WHERE bucket_start_time >= '${startTime}'::timestamptz
+          AND bucket_start_time <= '${endTime}'::timestamptz
+          AND bucket_done = true -- Only include completed buckets
         GROUP BY bucket_start_time, datname
-        ORDER BY bucket_start_time ASC
+        ORDER BY timestamp ASC
       `
     default:
       return /* SQL */ `
         SELECT
           bucket_start_time as timestamp,
-          SUM(rows_retrieved) as value,
+          SUM(rows) / 300 as value, -- Convert to per-second rate (5 mins = 300 seconds)
           datname as database
         FROM pg_stat_monitor
-        WHERE bucket_start_time >= '${startTime}'
-          AND bucket_start_time <= '${endTime}'
+        WHERE bucket_start_time >= '${startTime}'::timestamptz
+          AND bucket_start_time <= '${endTime}'::timestamptz
+          AND bucket_done = true -- Only include completed buckets
         GROUP BY bucket_start_time, datname
-        ORDER BY bucket_start_time ASC
+        ORDER BY timestamp ASC
       `
   }
 }
 
 const getQueriesSql = (startTime: string, endTime: string) => /* SQL */ `
-  SELECT
+  SELECT 
     queryid as query_id,
-    query,
+    COALESCE(MAX(top_query), MAX(query)) as query,
     SUM(total_exec_time) as total_time,
     SUM(calls) as calls,
-    SUM(rows_retrieved) as rows,
+    SUM(rows) as rows,
     SUM(shared_blks_read) as shared_blks_read,
     SUM(shared_blks_hit) as shared_blks_hit,
-    AVG(mean_exec_time) as mean_exec_time,
-    datname as database,
-    MAX(bucket_start_time) as timestamp
+    SUM(total_exec_time) / NULLIF(SUM(calls), 0) as mean_exec_time,
+    STRING_AGG(DISTINCT datname, ', ') as database,
+    MAX(bucket_start_time) as timestamp,
+    MAX(get_cmd_type(cmd_type)) as cmd_type_text
   FROM pg_stat_monitor
   WHERE bucket_start_time >= '${startTime}'
     AND bucket_start_time <= '${endTime}'
-  GROUP BY queryid, query, datname
+    AND bucket_done = true -- Only include completed buckets
+  GROUP BY queryid
   ORDER BY SUM(calls) DESC
   LIMIT 100
 `
