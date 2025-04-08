@@ -85,14 +85,7 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
   }
 
   return (
-    <Modal
-      closable
-      hideFooter
-      size="medium"
-      visible={visible}
-      onCancel={onClose}
-      header="Add new secret"
-    >
+    <Modal hideFooter size="medium" visible={visible} onCancel={onClose} header="Add new secret">
       {isLoading ? (
         <Modal.Content>
           <GenericSkeletonLoader />

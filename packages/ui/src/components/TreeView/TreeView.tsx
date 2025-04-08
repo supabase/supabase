@@ -163,7 +163,6 @@ const TreeViewItem = forwardRef<
         aria-selected={isSelected}
         aria-expanded={!isEditing && isExpanded}
         onDoubleClick={onDoubleClick}
-        {...props}
         className={cn(TreeViewItemVariant({ isSelected, isOpened, isPreview }), props.className)}
         style={{
           paddingLeft: xPadding + ((level - 1) * levelPadding) / 2,

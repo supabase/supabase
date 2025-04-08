@@ -136,6 +136,7 @@
     "@testing-library/dom": "^9.3.3",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^14.0.0",
+    "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/user-event": "^13.5.0",
     "@types/common-tags": "^1.8.1",
     "@types/file-saver": "^2.0.2",

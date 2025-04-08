@@ -608,6 +608,45 @@ export const WRAPPERS: WrapperMeta[] = [
         ],
       },
       {
+        label: 'Meters',
+        description: 'Records for tracking event usage in billing',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'text',
+          },
+          {
+            name: 'display_name',
+            type: 'text',
+          },
+          {
+            name: 'event_name',
+            type: 'text',
+          },
+          {
+            name: 'event_time_window',
+            type: 'text',
+          },
+          {
+            name: 'status',
+            type: 'text',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'billing/meters',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
         label: 'Payment Intents',
         description: 'Payment Intents on your Stripe account',
         availableColumns: [

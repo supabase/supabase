@@ -22,7 +22,6 @@ export async function getEnumeratedTypes(
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
   const { data, error } = await get('/platform/pg-meta/{ref}/types', {
-    // @ts-expect-error: We don't need to pass included included_schemas / excluded_schemas in query params
     params: {
       header: { 'x-connection-encrypted': connectionString! },
       path: { ref: projectRef },
