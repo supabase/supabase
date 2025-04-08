@@ -1777,18 +1777,6 @@ export interface components {
       verify_jwt?: boolean
       version: number
     }
-    /** @enum {string} */
-    DesiredInstanceSize:
-      | 'micro'
-      | 'small'
-      | 'medium'
-      | 'large'
-      | 'xlarge'
-      | '2xlarge'
-      | '4xlarge'
-      | '8xlarge'
-      | '12xlarge'
-      | '16xlarge'
     Domain: {
       created_at?: string
       domain?: string
@@ -2822,6 +2810,12 @@ export interface components {
       body?: string
       name?: string
       verify_jwt?: boolean
+    }
+    V1UpdatePostgrestConfigBody: {
+      db_extra_search_path?: string
+      db_pool?: number
+      db_schema?: string
+      max_rows?: number
     }
     ValidationError: {
       message: string
