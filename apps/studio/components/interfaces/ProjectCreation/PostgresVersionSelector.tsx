@@ -68,6 +68,7 @@ export const PostgresVersionSelector = ({
   const availableVersions = (data?.available_versions ?? []).sort((a, b) =>
     a.version.localeCompare(b.version)
   )
+  const { postgresVersionSelection } = form.watch()
 
   useEffect(() => {
     if (availableVersions.length > 0) {
@@ -76,8 +77,6 @@ export const PostgresVersionSelector = ({
       form.setValue('postgresVersionSelection', defaultValue)
     }
   }, [isSuccess, form])
-
-  const { postgresVersionSelection } = form.watch()
 
   return (
     <FormItemLayout label="Postgres Version" layout={layout}>
