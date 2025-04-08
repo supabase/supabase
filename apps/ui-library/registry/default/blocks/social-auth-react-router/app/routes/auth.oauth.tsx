@@ -1,5 +1,5 @@
 import { createClient } from '@/registry/default/clients/react-router/lib/supabase/server'
-import { redirect, type LoaderFunctionArgs } from '@remix-run/node'
+import { type LoaderFunctionArgs, redirect } from 'react-router'
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const requestUrl = new URL(request.url)
@@ -16,5 +16,5 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }
   }
   // redirect the user to an error page with some instructions
-  return redirect(`/auth/error`, { headers })
+  return redirect(`/auth/error`)
 }

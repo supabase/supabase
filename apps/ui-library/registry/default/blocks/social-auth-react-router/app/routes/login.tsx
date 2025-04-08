@@ -10,12 +10,7 @@ import {
 import { type ActionFunctionArgs, redirect, useFetcher } from 'react-router'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { supabase, headers } = createClient(request)
-
-  const formData = await request.formData()
-
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
+  const { supabase } = createClient(request)
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'github',
@@ -47,15 +42,15 @@ export default function Login() {
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl">Login</CardTitle>
-              <CardDescription>Enter your email below to login to your account</CardDescription>
+              <CardTitle className="text-2xl">Welcome!</CardTitle>
+              <CardDescription>Sign in to your account to continue</CardDescription>
             </CardHeader>
             <CardContent>
               <fetcher.Form method="post">
                 <div className="flex flex-col gap-6">
                   {error && <p className="text-sm text-destructive-500">{error}</p>}
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? 'Logging in...' : 'Login with Github'}
+                    {loading ? 'Logging in...' : 'Continue with Github'}
                   </Button>
                 </div>
               </fetcher.Form>

@@ -1,4 +1,4 @@
-import { LoginForm } from '@/registry/default/blocks/password-based-auth-tanstack/components/login-form'
+import { LoginForm } from '@/registry/default/blocks/social-auth-tanstack/components/login-form'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/login')({

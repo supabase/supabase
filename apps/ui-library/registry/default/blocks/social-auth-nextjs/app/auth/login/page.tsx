@@ -1,4 +1,4 @@
-import { LoginForm } from '@/registry/default/blocks/password-based-auth-nextjs/components/login-form'
+import { LoginForm } from '@/registry/default/blocks/social-auth-nextjs/components/login-form'
 
 export default function Page() {
   return (
