@@ -68,19 +68,22 @@ export const PostgresVersionSelector = ({
   const availableVersions = (data?.available_versions ?? []).sort((a, b) =>
     a.version.localeCompare(b.version)
   )
+  const { postgresVersionSelection } = form.watch()
 
   useEffect(() => {
-    const gaVersion = availableVersions.find((x) => x.release_channel === 'ga')
-    const defaultValue = gaVersion ? formatValue(gaVersion) : undefined
-    form.setValue('postgresVersionSelection', defaultValue)
+    if (availableVersions.length > 0) {
+      const gaVersion = availableVersions.find((x) => x.release_channel === 'ga')
+      const defaultValue = gaVersion ? formatValue(gaVersion) : formatValue(availableVersions[0])
+      form.setValue('postgresVersionSelection', defaultValue)
+    }
   }, [isSuccess, form])
 
   return (
     <FormItemLayout label="Postgres Version" layout={layout}>
       <Select_Shadcn_
-        value={field.value}
+        value={postgresVersionSelection}
         onValueChange={field.onChange}
-        disabled={availableVersions.length <= 1 || isLoadingProjectVersions}
+        disabled={availableVersions.length === 0 || isLoadingProjectVersions}
       >
         <SelectTrigger_Shadcn_ className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start">
           <SelectValue_Shadcn_ placeholder="Select a Postgres version for your project" />

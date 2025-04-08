@@ -52,7 +52,6 @@ const DeleteOrganizationButton = () => {
         </Button>
       </div>
       <Modal
-        closable
         hideFooter
         size="small"
         visible={isOpen}
