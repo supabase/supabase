@@ -49,6 +49,7 @@ Sentry.init({
     // [Joshen] Seems to be from hcaptcha
     "undefined is not an object (evaluating 'n.chat.setReady')",
     "undefined is not an object (evaluating 'i.chat.setReady')",
+    'e._UkSqui0u9[t] is not a function',
     // [Terry] When users paste in an embedded Github Gist
     // Error thrown by `sql-formatter` lexer when given invalid input
     // Original format: new Error(`Parse error: Unexpected "${text}" at line ${line} column ${col}`)
