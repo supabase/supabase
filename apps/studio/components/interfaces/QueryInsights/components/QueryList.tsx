@@ -1,128 +1,146 @@
-import { useEffect, useState } from 'react'
-import { Clock, Database } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useRef, useState } from 'react'
+import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
+import { QueryInsightsQuery } from 'data/query-insights/query-insights-query'
 import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import { Button } from 'ui'
-
-dayjs.extend(relativeTime)
-
-interface Query {
-  query_id: string
-  query: string
-  total_time: number
-  calls: number
-  rows: number
-  shared_blks_read: number
-  shared_blks_hit: number
-  mean_exec_time: number
-  database: string
-  timestamp: string
-}
+import { cn } from 'ui'
+import { TextSearch } from 'lucide-react'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface QueryListProps {
-  queries?: Query[]
-  isLoading?: boolean
+  queries: QueryInsightsQuery[]
+  isLoading: boolean
 }
 
-export const QueryList = ({ queries = [], isLoading = false }: QueryListProps) => {
-  const [expandedQueries, setExpandedQueries] = useState<Set<string>>(new Set())
+export const QueryList = ({ queries, isLoading }: QueryListProps) => {
+  const router = useRouter()
+  const gridRef = useRef<DataGridHandle>(null)
+  const [selectedRow, setSelectedRow] = useState<number>()
 
-  const toggleQueryExpansion = (queryId: string) => {
-    const newExpanded = new Set(expandedQueries)
-    if (newExpanded.has(queryId)) {
-      newExpanded.delete(queryId)
-    } else {
-      newExpanded.add(queryId)
-    }
-    setExpandedQueries(newExpanded)
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <div className="animate-pulse">Loading queries...</div>
-      </div>
-    )
-  }
-
-  if (queries.length === 0) {
-    return (
-      <div className="flex items-center justify-center py-8 text-foreground-light">
-        No queries found for the selected time range
-      </div>
-    )
-  }
+  const columns: Column<QueryInsightsQuery>[] = [
+    {
+      key: 'timestamp',
+      name: 'Time',
+      resizable: true,
+      minWidth: 120,
+      headerCellClass: 'first:pl-6',
+      renderCell: (props) => (
+        <div className="font-mono text-xs">{dayjs(props.row.timestamp).format('HH:mm:ss')}</div>
+      ),
+    },
+    {
+      key: 'query',
+      name: 'Query',
+      resizable: true,
+      minWidth: 400,
+      headerCellClass: '',
+      renderCell: (props) => <div className="font-mono text-xs truncate">{props.row.query}</div>,
+    },
+    {
+      key: 'calls',
+      name: 'Calls',
+      resizable: true,
+      minWidth: 100,
+      headerCellClass: '',
+      renderCell: (props) => (
+        <div className="font-mono text-xs text-right">{props.row.calls.toLocaleString()}</div>
+      ),
+    },
+    {
+      key: 'total_time',
+      name: 'Total Time',
+      resizable: true,
+      minWidth: 120,
+      headerCellClass: '',
+      renderCell: (props) => (
+        <div className="font-mono text-xs text-right">
+          <p>{props.row.total_time.toFixed(0)}ms</p>
+          <p className="text-foreground-lighter">{(props.row.total_time / 1000).toFixed(2)}s</p>
+        </div>
+      ),
+    },
+    {
+      key: 'mean_exec_time',
+      name: 'Mean Time',
+      resizable: true,
+      minWidth: 120,
+      headerCellClass: '',
+      renderCell: (props) => (
+        <div className="font-mono text-xs text-right">
+          <p>{props.row.mean_exec_time.toFixed(0)}ms</p>
+          <p className="text-foreground-lighter">{(props.row.mean_exec_time / 1000).toFixed(2)}s</p>
+        </div>
+      ),
+    },
+    {
+      key: 'rows',
+      name: 'Rows',
+      resizable: true,
+      minWidth: 100,
+      headerCellClass: '',
+      renderCell: (props) => (
+        <div className="font-mono text-xs text-right">{props.row.rows.toLocaleString()}</div>
+      ),
+    },
+    {
+      key: 'database',
+      name: 'Database',
+      resizable: true,
+      minWidth: 120,
+      headerCellClass: '',
+      renderCell: (props) => <div className="font-mono text-xs">{props.row.database}</div>,
+    },
+  ]
 
   return (
-    <div className="space-y-2">
-      {queries.map((query) => (
-        <div
-          key={query.query_id}
-          className="rounded-md border border-default bg-surface-100 overflow-hidden"
-        >
-          <div className="p-4">
-            <div className="flex items-start justify-between gap-4">
-              <div className="space-y-1 flex-grow">
-                <div className="font-mono text-xs text-foreground-light break-all">
-                  {expandedQueries.has(query.query_id) ? (
-                    query.query
-                  ) : (
-                    <>
-                      {query.query.slice(0, 100)}
-                      {query.query.length > 100 && '...'}
-                    </>
-                  )}
-                </div>
-                <div className="flex items-center gap-x-4 text-xs text-foreground-light">
-                  <div className="flex items-center gap-x-1">
-                    <Database strokeWidth={1.5} size={14} />
-                    <span>{query.database}</span>
-                  </div>
-                  <div className="flex items-center gap-x-1">
-                    <Clock strokeWidth={1.5} size={14} />
-                    <span>{dayjs(query.timestamp).fromNow()}</span>
-                  </div>
-                </div>
-              </div>
-              {query.query.length > 100 && (
-                <Button
-                  type="default"
-                  size="tiny"
-                  onClick={() => toggleQueryExpansion(query.query_id)}
-                >
-                  {expandedQueries.has(query.query_id) ? 'Show less' : 'Show more'}
-                </Button>
-              )}
+    <div className="border rounded-md bg-surface-100 flex-grow flex flex-col">
+      <DataGrid
+        ref={gridRef}
+        style={{ height: '100%' }}
+        className={cn('flex-1')}
+        rowHeight={44}
+        headerRowHeight={36}
+        columns={columns}
+        rows={queries}
+        rowClass={(_, idx) => {
+          const isSelected = idx === selectedRow
+          return [
+            `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
+            `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
+            '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+            '[&>.rdg-cell:first-child>div]:ml-4',
+          ].join(' ')
+        }}
+        renderers={{
+          renderRow: (idx, props) => (
+            <Row
+              {...props}
+              key={`qi-row-${props.rowIdx}`}
+              onClick={() => {
+                if (typeof idx === 'number' && idx >= 0) {
+                  setSelectedRow(idx)
+                  gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
+                }
+              }}
+            />
+          ),
+          noRowsFallback: isLoading ? (
+            <div className="absolute top-14 px-6 w-full">
+              <GenericSkeletonLoader />
             </div>
-            <div className="mt-4 grid grid-cols-4 gap-4">
-              <div>
-                <div className="text-xs text-foreground-light mb-1">Total time</div>
-                <div className="text-sm">{query.total_time.toFixed(2)}ms</div>
-              </div>
-              <div>
-                <div className="text-xs text-foreground-light mb-1">Calls</div>
-                <div className="text-sm">{query.calls}</div>
-              </div>
-              <div>
-                <div className="text-xs text-foreground-light mb-1">Rows</div>
-                <div className="text-sm">
-                  {query.rows >= 1000 ? `${(query.rows / 1000).toFixed(1)}k` : query.rows}
-                </div>
-              </div>
-              <div>
-                <div className="text-xs text-foreground-light mb-1">Cache hit ratio</div>
-                <div className="text-sm">
-                  {(
-                    (query.shared_blks_hit / (query.shared_blks_hit + query.shared_blks_read)) *
-                    100
-                  ).toFixed(1)}
-                  %
-                </div>
+          ) : (
+            <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
+              <TextSearch className="text-foreground-muted" strokeWidth={1} />
+              <div className="text-center">
+                <p className="text-foreground">No queries detected</p>
+                <p className="text-foreground-light">
+                  There are no actively running queries that match the criteria
+                </p>
               </div>
             </div>
-          </div>
-        </div>
-      ))}
+          ),
+        }}
+      />
     </div>
   )
 }

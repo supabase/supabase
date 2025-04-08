@@ -72,8 +72,8 @@ export const MetricsChart = ({ data, metric, isLoading }: MetricsChartProps) => 
     } satisfies ChartConfig
 
     return (
-      <div className="flex flex-col gap-2">
-        <div className="flex gap-2">
+      <div className="flex flex-col gap-5">
+        <div className="flex gap-2 px-5">
           {Object.entries(config).map(([key, value]) => {
             const metricValue = Number(
               chartData[chartData.length - 1]?.[key as keyof (typeof chartData)[0]]
@@ -111,8 +111,8 @@ export const MetricsChart = ({ data, metric, isLoading }: MetricsChartProps) => 
             height={100}
             style={{ width: '100%', height: '100%' }}
             margin={{
-              left: 12,
-              right: 12,
+              // left: 12,
+              right: 16,
             }}
           >
             <defs>
