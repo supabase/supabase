@@ -30,14 +30,14 @@ hideToc: true
 
     <StepHikeCompact.Details title="Create a React app">
 
-    Create a React app using the `create-react-app` command.
+    Create a React app using the Vite build tool.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
       ```bash Terminal
-      npx create-react-app my-app
+      npm create vite@latest my-app -- --template react
       ```
 
     </StepHikeCompact.Code>
@@ -75,38 +75,38 @@ hideToc: true
 
 
       ```js src/App.js
-        import './index.css'
-        import { useState, useEffect } from 'react'
-        import { createClient } from '@supabase/supabase-js'
-        import { Auth } from '@supabase/auth-ui-react'
-        import { ThemeSupa } from '@supabase/auth-ui-shared'
+      import './index.css'
+      import { useState, useEffect } from 'react'
+      import { createClient } from '@supabase/supabase-js'
+      import { Auth } from '@supabase/auth-ui-react'
+      import { ThemeSupa } from '@supabase/auth-ui-shared'
 
-        const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+      const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
 
-        export default function App() {
-          const [session, setSession] = useState(null)
+      export default function App() {
+        const [session, setSession] = useState(null)
 
-          useEffect(() => {
-            supabase.auth.getSession().then(({ data: { session } }) => {
-              setSession(session)
-            })
+        useEffect(() => {
+          supabase.auth.getSession().then(({ data: { session } }) => {
+            setSession(session)
+          })
 
-            const {
-              data: { subscription },
-            } = supabase.auth.onAuthStateChange((_event, session) => {
-              setSession(session)
-            })
+          const {
+            data: { subscription },
+          } = supabase.auth.onAuthStateChange((_event, session) => {
+            setSession(session)
+          })
 
-            return () => subscription.unsubscribe()
-          }, [])
+          return () => subscription.unsubscribe()
+        }, [])
 
-          if (!session) {
-            return (<Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />)
-          }
-          else {
-            return (<div>Logged in!</div>)
-          }
+        if (!session) {
+          return (<Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />)
         }
+        else {
+          return (<div>Logged in!</div>)
+        }
+      }
       ```
 
     </StepHikeCompact.Code>
