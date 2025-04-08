@@ -92,12 +92,6 @@ export const PauseDisabledState = () => {
         ref,
         backup: {
           id: latestBackup,
-          // [Joshen] Just FYI these params aren't required for the download backup request
-          // API types need to be updated
-          project_id: -1,
-          inserted_at: '',
-          isPhysicalBackup: false,
-          status: {},
         },
       },
       {

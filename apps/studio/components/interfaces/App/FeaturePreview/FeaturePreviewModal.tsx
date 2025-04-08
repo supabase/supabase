@@ -19,11 +19,27 @@ const FeaturePreviewModal = () => {
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
 
+  const enableNewLayoutPreview = useFlag('newLayoutPreview')
   const isFeaturePreviewTabsTableEditorFlag = useFlag('featurePreviewTabsTableEditor')
   const isFeaturePreviewTabsSqlEditorFlag = useFlag('featurePreviewSqlEditorTabs')
 
+  function isReleasedToPublic(feature: (typeof FEATURE_PREVIEWS)[number]) {
+    switch (feature.key) {
+      case LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS:
+        return isFeaturePreviewTabsTableEditorFlag
+      case LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS:
+        return isFeaturePreviewTabsSqlEditorFlag
+      case LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW:
+        return enableNewLayoutPreview
+      default:
+        return true
+    }
+  }
+
   const selectedFeaturePreview =
-    snap.selectedFeaturePreview === '' ? FEATURE_PREVIEWS[0].key : snap.selectedFeaturePreview
+    snap.selectedFeaturePreview === ''
+      ? FEATURE_PREVIEWS.filter((feature) => isReleasedToPublic(feature))[0].key
+      : snap.selectedFeaturePreview
 
   const [selectedFeatureKey, setSelectedFeatureKey] = useState<string>(selectedFeaturePreview)
 
@@ -52,16 +68,6 @@ const FeaturePreviewModal = () => {
     snap.setSelectedFeaturePreview(FEATURE_PREVIEWS[0].key)
   }
 
-  function isReleasedToPublic(feature: (typeof FEATURE_PREVIEWS)[number]) {
-    switch (feature.key) {
-      case LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS:
-        return isFeaturePreviewTabsTableEditorFlag
-      case LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS:
-        return isFeaturePreviewTabsSqlEditorFlag
-      default:
-        return true
-    }
-  }
   // this modal can be triggered on other pages
   // Update local state when valtio state changes
 

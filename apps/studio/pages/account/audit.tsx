@@ -1,14 +1,29 @@
 import { AuditLogs } from 'components/interfaces/Account'
+import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import {
   ScaffoldContainer,
+  ScaffoldContainerLegacy,
   ScaffoldDescription,
   ScaffoldHeader,
   ScaffoldTitle,
 } from 'components/layouts/Scaffold'
 import type { NextPageWithLayout } from 'types'
 
-const User: NextPageWithLayout = () => {
+const Audit: NextPageWithLayout = () => {
+  const newLayoutPreview = useNewLayout()
+
+  if (newLayoutPreview) {
+    return (
+      <ScaffoldContainerLegacy className="gap-0">
+        <AuditLogs />
+      </ScaffoldContainerLegacy>
+    )
+  }
+
   return (
     <ScaffoldContainer>
       <ScaffoldHeader>
@@ -22,18 +37,14 @@ const User: NextPageWithLayout = () => {
   )
 }
 
-User.getLayout = (page) => (
-  <AccountLayout
-    title="Audit Logs"
-    breadcrumbs={[
-      {
-        key: `supabase-settings`,
-        label: 'Audit Logs',
-      },
-    ]}
-  >
-    {page}
-  </AccountLayout>
+Audit.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout headerTitle="Account">
+      <OrganizationLayout>
+        <AccountLayout title="Audit Logs">{page}</AccountLayout>
+      </OrganizationLayout>
+    </DefaultLayout>
+  </AppLayout>
 )
 
-export default User
+export default Audit

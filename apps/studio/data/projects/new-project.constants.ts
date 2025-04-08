@@ -14,16 +14,6 @@ export const instanceSizeSpecs: Record<
     cloud_providers: string[]
   }
 > = {
-  // [Joshen] Just to fix the TS error since this size is now expected
-  // Unsure the parameters here, so leaving cloud_providers blank for now to prevent it from showing up in new project page
-  pico: {
-    label: 'Pico',
-    ram: '',
-    cpu: '',
-    priceHourly: 0,
-    priceMonthly: 0,
-    cloud_providers: [],
-  },
   micro: {
     label: 'Micro',
     ram: '1 GB',
