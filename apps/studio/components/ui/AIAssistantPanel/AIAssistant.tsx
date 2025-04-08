@@ -301,7 +301,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       <div className={cn('flex flex-col h-full', className)}>
         <div ref={scrollContainerRef} className={cn('flex-grow overflow-auto flex flex-col')}>
           <div className="z-30 sticky top-0">
-            <div className="border-b flex items-center bg gap-x-3 px-5 h-[46px]">
+            <div className="border-b flex items-center bg gap-x-3 pl-5 pr-4 h-[46px]">
               <AiIconAnimation allowHoverEffect />
 
               <div className="text-sm flex-1 flex items-center gap-x-2">
