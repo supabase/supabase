@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react-hooks'
 import { useRouter } from 'next/router'
 import { withNuqsTestingAdapter } from 'nuqs/adapters/testing'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
-import { useTableEditorFilters } from './useTableEditorFilters'
+import { useTableEditorFiltersSort } from './useTableEditorFiltersSort'
 
 beforeAll(() => {
   vi.mock('next/router', () => import('next-router-mock'))
@@ -18,13 +18,10 @@ describe('useTableEditorFilters', () => {
     const router = renderHook(() => useRouter()).result.current
     router.push(url)
 
-    const { result } = renderHook(() => useTableEditorFilters(), {
+    const { result } = renderHook(() => useTableEditorFiltersSort(), {
       wrapper: withNuqsTestingAdapter(),
     })
 
-    console.log('URL', url)
-    console.log('EXPECTED FILTERS', expected)
-    console.log('RESULT FILTERS', result.current.filters)
     expect(result.current.filters).toEqual(expected)
 
     expect(result.current.sorts).toEqual(['id:asc'])
@@ -36,7 +33,7 @@ describe('useTableEditorFilters', () => {
       '/test?filter=id:eq:123&filter=created_at:eq:2021-01-01&filter=id:eq:456&sort=id:asc'
     )
 
-    const { result } = renderHook(() => useTableEditorFilters(), {
+    const { result } = renderHook(() => useTableEditorFiltersSort(), {
       wrapper: withNuqsTestingAdapter(),
     })
 
@@ -48,7 +45,7 @@ describe('useTableEditorFilters', () => {
     const router = renderHook(() => useRouter()).result.current
     router.push('/test')
 
-    const { result } = renderHook(() => useTableEditorFilters(), {
+    const { result } = renderHook(() => useTableEditorFiltersSort(), {
       wrapper: withNuqsTestingAdapter(),
     })
 
@@ -59,7 +56,7 @@ describe('useTableEditorFilters', () => {
     const router = renderHook(() => useRouter()).result.current
     router.push('/test?filter=id:eq:123&filter=created_at:eq:2021-01-01&filter=id:eq:456')
 
-    const { result } = renderHook(() => useTableEditorFilters(), {
+    const { result } = renderHook(() => useTableEditorFiltersSort(), {
       wrapper: withNuqsTestingAdapter(),
     })
 
