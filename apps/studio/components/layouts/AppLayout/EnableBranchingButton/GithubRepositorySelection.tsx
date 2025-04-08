@@ -110,11 +110,7 @@ const GithubRepositorySelection = ({
               />
             </>
           ) : (
-            <EmptyIntegrationConnection
-              showNode={false}
-              onClick={() => onSelectConnectRepo()}
-              orgSlug={org?.slug}
-            />
+            <EmptyIntegrationConnection showNode={false} onClick={() => onSelectConnectRepo()} />
           )}
         </div>
       </Modal.Content>

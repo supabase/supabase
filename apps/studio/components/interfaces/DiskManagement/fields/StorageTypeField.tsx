@@ -101,7 +101,7 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
                 {DISK_TYPE_OPTIONS.map((item) => {
                   const disableIo2 = item.type === 'io2' && !isIo2Supported
                   return (
-                    <Tooltip>
+                    <Tooltip key={item.type}>
                       <TooltipTrigger asChild>
                         <SelectItem_Shadcn_
                           key={item.type}
