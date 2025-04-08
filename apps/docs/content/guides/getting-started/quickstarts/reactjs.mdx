@@ -23,7 +23,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npm create vite@latest my-app -- --template react
       ```
 
@@ -42,7 +42,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       cd my-app && npm install @supabase/supabase-js
       ```
 
@@ -63,35 +63,34 @@ hideToc: true
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
 
+      ```js name=src/App.jsx
+      import { useEffect, useState } from "react";
+      import { createClient } from "@supabase/supabase-js";
 
-      ```js src/App.jsx
-        import { useEffect, useState } from "react";
-        import { createClient } from "@supabase/supabase-js";
+      const supabase = createClient("https://<project>.supabase.co", "<your-anon-key>");
 
-        const supabase = createClient("https://<project>.supabase.co", "<your-anon-key>");
+      function App() {
+        const [instruments, setInstruments] = useState([]);
 
-        function App() {
-          const [instruments, setInstruments] = useState([]);
+        useEffect(() => {
+          getInstruments();
+        }, []);
 
-          useEffect(() => {
-            getInstruments();
-          }, []);
-
-          async function getInstruments() {
-            const { data } = await supabase.from("instruments").select();
-            setInstruments(data);
-          }
-
-          return (
-            <ul>
-              {instruments.map((instrument) => (
-                <li key={instrument.name}>{instrument.name}</li>
-              ))}
-            </ul>
-          );
+        async function getInstruments() {
+          const { data } = await supabase.from("instruments").select();
+          setInstruments(data);
         }
 
-        export default App;
+        return (
+          <ul>
+            {instruments.map((instrument) => (
+              <li key={instrument.name}>{instrument.name}</li>
+            ))}
+          </ul>
+        );
+      }
+
+      export default App;
       ```
 
     </StepHikeCompact.Code>
@@ -107,7 +106,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npm run dev
       ```
 

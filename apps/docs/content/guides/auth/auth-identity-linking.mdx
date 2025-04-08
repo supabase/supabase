@@ -34,6 +34,10 @@ Users that signed up with [SAML SSO](/docs/guides/auth/sso/auth-sso-saml) will n
 Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user, call [`linkIdentity()`](/docs/reference/javascript/auth-linkidentity):
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('<your-supabase-url>', '<your-supabase-anon-key>')
+
+// ---cut---
 const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
 ```
 
@@ -92,16 +96,22 @@ In the example above, the user will be redirected to Google to complete the OAut
 You can use [`getUserIdentities()`](/docs/reference/javascript/auth-getuseridentities) to fetch all the identities linked to a user. Then, call [`unlinkIdentity()`](/docs/reference/javascript/auth-unlinkidentity) to unlink the identity. The user needs to be logged in and have at least 2 linked identities in order to unlink an existing identity.
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('<your-supabase-url>', '<your-supabase-anon-key>')
+
+// ---cut---
 // retrieve all identities linked to a user
-const {
-  data: { identities },
-} = await supabase.auth.getUserIdentities()
+const { data: identities, error: identitiesError } = await supabase.auth.getUserIdentities()
 
-// find the google identity linked to the user
-const googleIdentity = identities.find((identity) => identity.provider === 'google')
+if (!identitiesError) {
+  // find the google identity linked to the user
+  const googleIdentity = identities.identities.find((identity) => identity.provider === 'google')
 
-// unlink the google identity from the user
-const { data, error } = await supabase.auth.unlinkIdentity(googleIdentity)
+  if (googleIdentity) {
+    // unlink the google identity from the user
+    const { data, error } = await supabase.auth.unlinkIdentity(googleIdentity)
+  }
+}
 ```
 
 </TabPanel>
