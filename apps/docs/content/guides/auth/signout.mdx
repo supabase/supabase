@@ -17,6 +17,10 @@ Call the sign out method from the client library. It removes the active session 
 <TabPanel id="js" label="JavaScript">
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project-id.supabase.co', 'your-anon-key')
+
+// ---cut---
 async function signOut() {
   const { error } = await supabase.auth.signOut()
 }
@@ -77,6 +81,10 @@ You can invoke these by providing the `scope` option:
 <TabPanel id="js" label="JavaScript">
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project-id.supabase.co', 'your-anon-key')
+
+// ---cut---
 // defaults to the global scope
 await supabase.auth.signOut()
 
