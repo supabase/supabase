@@ -88,7 +88,8 @@ export function MetricsChart({
   if (metric === 'query_latency') {
     // Create the baseline chart data from the metrics
     const chartData = data.map((point) => {
-      const timestamp = dayjs(point.timestamp).format('HH:mm')
+      // Keep the original timestamp to maintain 5-minute intervals
+      const timestamp = point.timestamp
       return {
         timestamp,
         p50: point.p50,
@@ -102,7 +103,7 @@ export function MetricsChart({
 
     // Sort chart data by timestamp
     chartData.sort((a, b) => {
-      return dayjs(a.timestamp, 'HH:mm').diff(dayjs(b.timestamp, 'HH:mm'))
+      return dayjs(a.timestamp).diff(dayjs(b.timestamp))
     })
 
     // If we have query latency data, add it to the chart
@@ -110,17 +111,32 @@ export function MetricsChart({
       // Create a map of timestamps to query latency values
       const queryLatencyMap = new Map<string, number>()
       queryLatencyData.forEach((point) => {
-        const timestamp = dayjs(point.timestamp).format('HH:mm')
-        queryLatencyMap.set(timestamp, point.value || 0)
+        queryLatencyMap.set(point.timestamp, point.value || 0)
       })
 
       // Add query latency data to each chart data point
-      // Points without data will keep their 0 value
       chartData.forEach((point) => {
         if (queryLatencyMap.has(point.timestamp)) {
           point.query_latency = queryLatencyMap.get(point.timestamp)!
         }
       })
+
+      // Add any missing query latency points
+      queryLatencyData.forEach((point) => {
+        if (!chartData.find((d) => d.timestamp === point.timestamp)) {
+          chartData.push({
+            timestamp: point.timestamp,
+            p50: 0,
+            p95: 0,
+            p99: 0,
+            p99_9: 0,
+            query_latency: point.value || 0,
+          })
+        }
+      })
+
+      // Re-sort chart data by timestamp
+      chartData.sort((a, b) => dayjs(a.timestamp).diff(dayjs(b.timestamp)))
     }
 
     const config = {
@@ -252,6 +268,7 @@ export function MetricsChart({
                   tickLine={false}
                   axisLine={false}
                   tickMargin={8}
+                  tickFormatter={(value) => dayjs(value).format('HH:mm')}
                 />
                 <YAxis />
                 <ChartTooltip
