@@ -15,6 +15,7 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import { Button } from 'ui'
 import { MetricType } from '../QueryInsights'
+import { useSingleQueryLatency } from 'data/query-insights/single-query-latency-query'
 
 interface MetricsChartProps {
   data: QueryInsightsMetric[]
@@ -33,12 +34,22 @@ export function MetricsChart({
   endTime,
   selectedQuery,
 }: MetricsChartProps) {
+  const { ref } = useParams()
   const [visibleMetrics, setVisibleMetrics] = useState({
     p50: true,
     p95: true,
     p99: true,
     p99_9: true,
-    query_exec_time: true,
+    query_latency: true,
+  })
+
+  // Fetch single query latency data if a query is selected
+  const {
+    data: queryLatencyData,
+    isLoading: isLoadingQueryLatency,
+    error: queryLatencyError,
+  } = useSingleQueryLatency(ref, selectedQuery?.query_id, startTime, endTime, {
+    enabled: !!selectedQuery,
   })
 
   if (isLoading) {
@@ -67,8 +78,8 @@ export function MetricsChart({
         p95: point.p95,
         p99: point.p99,
         p99_9: point.p99_9,
-        // Add a placeholder for the query execution time
-        query_exec_time: null as unknown as number | undefined,
+        // Initialize query latency as 0 instead of null
+        query_latency: 0,
       }
     })
 
@@ -77,26 +88,22 @@ export function MetricsChart({
       return dayjs(a.timestamp, 'HH:mm').diff(dayjs(b.timestamp, 'HH:mm'))
     })
 
-    // If we have a selected query, add its execution time as a consistent line
-    if (selectedQuery) {
-      // For visualizing the query, use its mean execution time as a flat line
-      const queryExecTime = selectedQuery.mean_exec_time
-
-      // Log for debugging
-      console.log(
-        'Selected Query:',
-        selectedQuery.query_id,
-        selectedQuery.query.substring(0, 30) + '...'
-      )
-      console.log('Query Execution Time:', queryExecTime)
-
-      // Set the query execution time for all data points to create a flat line
-      chartData.forEach((dataPoint) => {
-        dataPoint.query_exec_time = queryExecTime
+    // If we have query latency data, add it to the chart
+    if (selectedQuery && queryLatencyData && queryLatencyData.length > 0) {
+      // Create a map of timestamps to query latency values
+      const queryLatencyMap = new Map<string, number>()
+      queryLatencyData.forEach((point) => {
+        const timestamp = dayjs(point.timestamp).format('HH:mm')
+        queryLatencyMap.set(timestamp, point.value || 0)
       })
 
-      // Log the chart data for debugging
-      console.log('Chart Data with Query:', chartData.slice(0, 2))
+      // Add query latency data to each chart data point
+      // Points without data will keep their 0 value
+      chartData.forEach((point) => {
+        if (queryLatencyMap.has(point.timestamp)) {
+          point.query_latency = queryLatencyMap.get(point.timestamp)!
+        }
+      })
     }
 
     const config = {
@@ -116,9 +123,9 @@ export function MetricsChart({
         label: 'p99.9',
         color: 'hsl(var(--destructive-default))',
       },
-      query_exec_time: {
-        label: 'Query Execution Time',
-        color: 'hsl(var(--red-500))',
+      query_latency: {
+        label: 'Query Latency',
+        color: 'hsl(var(--foreground-default))',
       },
     } satisfies ChartConfig
 
@@ -138,14 +145,18 @@ export function MetricsChart({
                 <span>
                   Total Calls: <strong>{selectedQuery.calls.toLocaleString()}</strong>
                 </span>
+                {isLoadingQueryLatency && <span>Loading query latency data...</span>}
+                {Boolean(queryLatencyError) && (
+                  <span className="text-red-500">Error loading query latency</span>
+                )}
               </div>
             </div>
           </div>
         )}
         <div className="flex gap-2 px-5">
           {Object.entries(config).map(([key, value]) => {
-            // Only show query execution time button if we have a selected query
-            if (key === 'query_exec_time' && !selectedQuery) {
+            // Only show query latency button if we have a selected query
+            if (key === 'query_latency' && !selectedQuery) {
               return null
             }
 
@@ -216,8 +227,9 @@ export function MetricsChart({
                 type="monotone"
                 dataKey="p50"
                 fill={config.p50.color}
-                fillOpacity={selectedQuery ? 0.2 : 0.4}
+                fillOpacity={selectedQuery ? 0.05 : 0.4}
                 stroke={config.p50.color}
+                strokeOpacity={selectedQuery ? 0.1 : 0.8}
                 strokeWidth={2}
                 dot={false}
                 animationDuration={100}
@@ -228,8 +240,9 @@ export function MetricsChart({
                 type="monotone"
                 dataKey="p95"
                 fill={config.p95.color}
-                fillOpacity={selectedQuery ? 0.2 : 0.4}
+                fillOpacity={selectedQuery ? 0.05 : 0.4}
                 stroke={config.p95.color}
+                strokeOpacity={selectedQuery ? 0.1 : 0.8}
                 strokeWidth={2}
                 dot={false}
                 animationDuration={100}
@@ -240,8 +253,9 @@ export function MetricsChart({
                 type="monotone"
                 dataKey="p99"
                 fill={config.p99.color}
-                fillOpacity={selectedQuery ? 0.2 : 0.4}
+                fillOpacity={selectedQuery ? 0.05 : 0.4}
                 stroke={config.p99.color}
+                strokeOpacity={selectedQuery ? 0.1 : 0.8}
                 strokeWidth={2}
                 dot={false}
                 animationDuration={100}
@@ -252,21 +266,23 @@ export function MetricsChart({
                 type="monotone"
                 dataKey="p99_9"
                 fill={config.p99_9.color}
-                fillOpacity={selectedQuery ? 0.2 : 0.4}
+                fillOpacity={selectedQuery ? 0.05 : 0.4}
                 stroke={config.p99_9.color}
+                strokeOpacity={selectedQuery ? 0.1 : 0.8}
                 strokeWidth={2}
                 dot={false}
                 animationDuration={100}
               />
             )}
-            {selectedQuery && visibleMetrics.query_exec_time && (
+            {selectedQuery && visibleMetrics.query_latency && (
               <Area
                 type="monotone"
-                dataKey="query_exec_time"
-                fill={config.query_exec_time.color}
-                fillOpacity={0.4}
-                stroke={config.query_exec_time.color}
-                strokeWidth={2}
+                dataKey="query_latency"
+                fill={config.query_latency.color}
+                fillOpacity={0.6}
+                stroke={config.query_latency.color}
+                strokeOpacity={1}
+                strokeWidth={2.5}
                 dot={false}
                 animationDuration={100}
               />
