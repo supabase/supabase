@@ -73,7 +73,6 @@ export const PostgresVersionSelector = ({
     if (availableVersions.length > 0) {
       const gaVersion = availableVersions.find((x) => x.release_channel === 'ga')
       const defaultValue = gaVersion ? formatValue(gaVersion) : formatValue(availableVersions[0])
-      console.log({ defaultValue })
       form.setValue('postgresVersionSelection', defaultValue)
     }
   }, [isSuccess, form])
