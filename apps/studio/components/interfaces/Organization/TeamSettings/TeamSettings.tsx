@@ -66,6 +66,8 @@ const TeamSettings = () => {
 
   const canAddMembers = rolesAddable.length > 0
   const canLeave = !isOwner || (isOwner && hasMultipleOwners(members, roles))
+  const hasMFAEnabled =
+    members?.find((member) => member.primary_email == profile?.primary_email)?.mfa_enabled || false
 
   const { mutate: deleteMember } = useOrganizationMemberDeleteMutation({
     onSuccess: async () => {
@@ -103,7 +105,7 @@ const TeamSettings = () => {
         {newLayoutPreview && <ScaffoldTitle>Team</ScaffoldTitle>}
 
         <ScaffoldSectionContent className="w-full">
-          <EnforceMFAToggle />
+          <EnforceMFAToggle hasMFAEnabled={hasMFAEnabled} />
         </ScaffoldSectionContent>
         <ScaffoldFilterAndContent>
           <ScaffoldActionsContainer className="w-full flex-col md:flex-row gap-2 justify-between">

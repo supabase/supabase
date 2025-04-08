@@ -4,8 +4,12 @@ import {
   Alert_Shadcn_,
   Button,
   Toggle,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   WarningIcon,
 } from 'ui'
+import { HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import AlertError from 'components/ui/AlertError'
 import { useParams } from 'common'
@@ -17,7 +21,11 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 
-const EnforceMFAToggle = () => {
+export interface EnforceMFAToggleProps {
+  hasMFAEnabled: boolean
+}
+
+const EnforceMFAToggle = ({ hasMFAEnabled }: EnforceMFAToggleProps) => {
   const { slug } = useParams()
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const {
@@ -78,10 +86,22 @@ const EnforceMFAToggle = () => {
             <Toggle
               checked={snap.isMfaEnforced}
               onChange={onToggleMfa}
-              disabled={!canUpdateOrganization}
+              disabled={!canUpdateOrganization || !hasMFAEnabled}
               label="Require MFA to access organization"
               descriptionText="Team members must have MFA enabled and a valid MFA session to access the organization and any projects."
             />
+            {!hasMFAEnabled && canUpdateOrganization && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button asChild type="text" className="px-1">
+                    <a target="_blank" rel="noreferrer" href="/dashboard/account/security">
+                      <HelpCircle size={14} className="text-foreground-light" />
+                    </a>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Enable MFA on your own account first.</TooltipContent>
+              </Tooltip>
+            )}
           </Panel.Content>
         </Panel>
       )}
