@@ -46,7 +46,6 @@ export const Message = function Message({
   content,
   isLoading,
   readOnly,
-  children,
   action = null,
   variant = 'default',
   onResults,
@@ -76,8 +75,6 @@ export const Message = function Message({
           variant === 'warning' && 'bg-warning-200'
         )}
       >
-        {children}
-
         {variant === 'warning' && <WarningIcon className="w-6 h-6" />}
 
         {action}

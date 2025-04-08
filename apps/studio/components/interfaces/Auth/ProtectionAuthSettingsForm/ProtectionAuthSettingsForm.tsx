@@ -1,18 +1,18 @@
+import { yupResolver } from '@hookform/resolvers/yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { boolean, number, object, string } from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
 
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -25,16 +25,22 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  Select_Shadcn_,
+  PrePostTab,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Select_Shadcn_,
   Switch,
   WarningIcon,
-  PrePostTab,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
+
+const CAPTCHA_PROVIDERS = [
+  { key: 'hcaptcha', label: 'hCaptcha' },
+  { key: 'turnstile', label: 'Turnstile by Cloudflare' },
+]
 
 const schema = object({
   DISABLE_SIGNUP: boolean().required(),
@@ -190,27 +196,43 @@ const ProtectionAuthSettingsForm = () => {
                   <FormField_Shadcn_
                     control={protectionForm.control}
                     name="SECURITY_CAPTCHA_PROVIDER"
-                    render={({ field }) => (
-                      <FormItemLayout layout="flex-row-reverse" label="Choose Captcha Provider">
-                        <FormControl_Shadcn_>
-                          <Select_Shadcn_
-                            value={field.value}
-                            onValueChange={field.onChange}
-                            disabled={!canUpdateConfig}
+                    render={({ field }) => {
+                      const selectedProvider = CAPTCHA_PROVIDERS.find((x) => x.key === field.value)
+                      return (
+                        <FormItemLayout layout="flex-row-reverse" label="Choose Captcha Provider">
+                          <FormControl_Shadcn_>
+                            <Select_Shadcn_
+                              value={field.value}
+                              onValueChange={field.onChange}
+                              disabled={!canUpdateConfig}
+                            >
+                              <SelectTrigger_Shadcn_>
+                                <SelectValue_Shadcn_ placeholder="Select provider" />
+                              </SelectTrigger_Shadcn_>
+                              <SelectContent_Shadcn_ align="end">
+                                {CAPTCHA_PROVIDERS.map((x) => (
+                                  <SelectItem_Shadcn_ key={x.key} value={x.key}>
+                                    {x.label}
+                                  </SelectItem_Shadcn_>
+                                ))}
+                              </SelectContent_Shadcn_>
+                            </Select_Shadcn_>
+                          </FormControl_Shadcn_>
+                          <InlineLink
+                            href={
+                              field.value === 'hcaptcha'
+                                ? 'https://supabase.com/docs/guides/auth/auth-captcha?queryGroups=captcha-method&captcha-method=hcaptcha-1'
+                                : field.value === 'turnstile'
+                                  ? 'https://supabase.com/docs/guides/auth/auth-captcha?queryGroups=captcha-method&captcha-method=turnstile-1'
+                                  : '/'
+                            }
+                            className="mt-2 text-xs text-foreground-light hover:text-foreground no-underline"
                           >
-                            <SelectTrigger_Shadcn_>
-                              <SelectValue_Shadcn_ placeholder="Select provider" />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
-                              <SelectItem_Shadcn_ value="hcaptcha">hCaptcha</SelectItem_Shadcn_>
-                              <SelectItem_Shadcn_ value="turnstile">
-                                Turnstile by Cloudflare
-                              </SelectItem_Shadcn_>
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
+                            How to set up {selectedProvider?.label}?
+                          </InlineLink>
+                        </FormItemLayout>
+                      )
+                    }}
                   />
                 </CardContent>
 

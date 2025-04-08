@@ -126,7 +126,7 @@ The experimental routing mode can be enabled by sending the header `sb-lb-routin
 Starting on April 4th, 2025, we will be changing the routing behavior for eligible Data API requests:
 
 - Old behavior: Round-Robin distribution among all databases (all read replicas + primary) of your project
-- New behavior: Geo-aware routing, that directs requests to the closest available database
+- New behavior: Geo-routing, that directs requests to the closest available database
 
 The new behavior delivers a better experience for your users by minimizing the latency to your project. You can take full advantage of this by placing Read Replicas close to your major customer bases.
 

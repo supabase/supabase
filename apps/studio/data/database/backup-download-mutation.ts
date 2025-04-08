@@ -3,17 +3,16 @@ import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import { Backup } from './backup-restore-mutation'
+import { components } from 'api-types'
 
 export type BackupDownloadVariables = {
   ref: string
-  backup: Backup
+  backup: components['schemas']['DownloadBackupBody']
 }
 
 export async function downloadBackup({ ref, backup }: BackupDownloadVariables) {
   const { data, error } = await post('/platform/database/{ref}/backups/download', {
     params: { path: { ref } },
-    // @ts-ignore TODO(kamil): Remove ts-ignore once `DownloadBackupBody` changes lands
     body: {
       id: backup.id,
     },

@@ -1533,6 +1533,9 @@ export interface components {
     }
     /** @enum {string} */
     BillingPlanId: 'free' | 'pro' | 'team' | 'enterprise'
+    BranchActionBody: {
+      migration_version?: string
+    }
     BranchDeleteResponse: {
       /** @enum {string} */
       message: 'ok'
@@ -1708,7 +1711,7 @@ export interface components {
       status?: 'in_use' | 'standby'
     }
     CreateThirdPartyAuthBody: {
-      custom_jwks?: Record<string, never>
+      custom_jwks?: unknown
       jwks_url?: string
       oidc_issuer_url?: string
     }
@@ -1970,7 +1973,7 @@ export interface components {
       code?: string
       code_verifier?: string
       /** @enum {string} */
-      grant_type: 'authorization_code' | 'refresh_token'
+      grant_type?: 'authorization_code' | 'refresh_token'
       redirect_uri?: string
       refresh_token?: string
     }
@@ -2216,29 +2219,22 @@ export interface components {
       validation_records: components['schemas']['ValidationRecord'][]
     }
     StorageConfigResponse: {
-      features: components['schemas']['StorageFeatures']
-      /** Format: int64 */
+      features: {
+        imageTransformation: {
+          enabled: boolean
+        }
+        s3Protocol: {
+          enabled: boolean
+        }
+      }
       fileSizeLimit: number
-    }
-    StorageFeatureImageTransformation: {
-      enabled: boolean
-    }
-    StorageFeatures: {
-      imageTransformation: components['schemas']['StorageFeatureImageTransformation']
-      s3Protocol: components['schemas']['StorageFeatureS3Protocol']
-    }
-    StorageFeatureS3Protocol: {
-      enabled: boolean
     }
     SubdomainAvailabilityResponse: {
       available: boolean
     }
     SupavisorConfigResponse: {
       connection_string: string
-      /**
-       * @deprecated
-       * @description Use connection_string instead
-       */
+      /** @description Use connection_string instead */
       connectionString: string
       /** @enum {string} */
       database_type: 'PRIMARY' | 'READ_REPLICA'
@@ -2254,13 +2250,14 @@ export interface components {
       pool_mode: 'transaction' | 'session'
     }
     ThirdPartyAuth: {
-      custom_jwks?: Record<string, never> | null
+      custom_jwks?: unknown
+      /** Format: uuid */
       id: string
       inserted_at: string
       jwks_url?: string | null
       oidc_issuer_url?: string | null
       resolved_at?: string | null
-      resolved_jwks?: Record<string, never> | null
+      resolved_jwks?: unknown
       type: string
       updated_at: string
     }
@@ -2529,14 +2526,19 @@ export interface components {
       status: 'in_use' | 'previously_used' | 'revoked' | 'standby'
     }
     UpdateStorageConfigBody: {
-      features?: components['schemas']['StorageFeatures']
-      /** Format: int64 */
+      features?: {
+        imageTransformation: {
+          enabled: boolean
+        }
+        s3Protocol: {
+          enabled: boolean
+        }
+      }
       fileSizeLimit?: number
     }
     UpdateSupavisorConfigBody: {
       default_pool_size?: number | null
       /**
-       * @deprecated
        * @description Dedicated pooler mode for the project
        * @enum {string}
        */
@@ -2586,6 +2588,10 @@ export interface components {
       name: string
       slug: string
       verify_jwt?: boolean
+    }
+    V1CreateMigrationBody: {
+      name?: string
+      query: string
     }
     V1CreateProjectBodyDto: {
       /** @description Database password */
@@ -2779,6 +2785,7 @@ export interface components {
     }
     V1RunQueryBody: {
       query: string
+      read_only?: boolean
     }
     V1ServiceHealthResponse: {
       error?: string
@@ -2931,7 +2938,11 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody?: never
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BranchActionBody']
+      }
+    }
     responses: {
       201: {
         headers: {
@@ -2959,7 +2970,11 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody?: never
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BranchActionBody']
+      }
+    }
     responses: {
       201: {
         headers: {
@@ -2987,7 +3002,11 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody?: never
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BranchActionBody']
+      }
+    }
     responses: {
       201: {
         headers: {
@@ -4110,7 +4129,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4138,7 +4156,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4170,7 +4187,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
         tpa_id: string
       }
@@ -4199,7 +4215,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
         tpa_id: string
       }
@@ -4263,7 +4278,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4292,7 +4306,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4783,7 +4796,11 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody?: never
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1CreateMigrationBody']
+      }
+    }
     responses: {
       200: {
         headers: {

@@ -126,6 +126,14 @@ export const QueryBlock = ({
 
   const [showSql, setShowSql] = useState(_showSql)
   const [queryResult, setQueryResult] = useState<any[] | undefined>(results)
+
+  const formattedQueryResult = useMemo(() => {
+    // Make sure Y axis values are numbers
+    return queryResult?.map((row) => {
+      return Object.fromEntries(Object.entries(row).map(([key, value]) => [key, Number(value)]))
+    })
+  }, [queryResult])
+
   const [parameterValues, setParameterValues] = useState<Record<string, string>>({})
   const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
 
@@ -355,8 +363,8 @@ export const QueryBlock = ({
                   margin={{ left: 0, right: 0 }}
                   data={
                     chartSettings.cumulative
-                      ? getCumulativeResults({ rows: queryResult ?? [] }, chartSettings)
-                      : queryResult
+                      ? getCumulativeResults({ rows: formattedQueryResult ?? [] }, chartSettings)
+                      : formattedQueryResult
                   }
                 >
                   <CartesianGrid vertical={false} />
