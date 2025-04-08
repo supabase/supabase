@@ -7,6 +7,16 @@ import { IS_PLATFORM } from 'common/constants/environment'
 import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
 import { match } from 'path-to-regexp'
 
+function isHCaptchaRelatedError(event: Sentry.Event): boolean {
+  const errors = event.exception?.values ?? []
+  for (const error of errors) {
+    if (error.stacktrace?.frames?.some((f) => f.abs_path?.includes('onload=hCaptchaOnLoad'))) {
+      return true
+    }
+  }
+  return false
+}
+
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
@@ -27,6 +37,11 @@ Sentry.init({
       }
       return event
     }
+
+    if (isHCaptchaRelatedError(event)) {
+      return null
+    }
+
     return null
   },
   ignoreErrors: [
@@ -49,7 +64,6 @@ Sentry.init({
     // [Joshen] Seems to be from hcaptcha
     "undefined is not an object (evaluating 'n.chat.setReady')",
     "undefined is not an object (evaluating 'i.chat.setReady')",
-    'e._UkSqui0u9[t] is not a function',
     // [Terry] When users paste in an embedded Github Gist
     // Error thrown by `sql-formatter` lexer when given invalid input
     // Original format: new Error(`Parse error: Unexpected "${text}" at line ${line} column ${col}`)
