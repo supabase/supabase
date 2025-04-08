@@ -17,6 +17,7 @@ import { WarningIcon } from 'ui'
 import type { ChartData } from './Charts.types'
 import Panel from 'components/ui/Panel'
 import { useChartHighlight } from './useChartHighlight'
+import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 import ComposedChart from './ComposedChart'
 
 type Provider = 'infra-monitoring' | 'daily-stats'
@@ -54,7 +55,7 @@ interface ComposedChartHandlerProps {
   showLegend?: boolean
   showTotal?: boolean
   showMaxValue?: boolean
-  updateDateRange: any
+  updateDateRange: UpdateDateRange
   valuePrecision?: number
   isVisible?: boolean
 }

@@ -11,13 +11,14 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { ChartHighlight } from './useChartHighlight'
+import { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 
 const ChartHighlightActions = ({
   chartHighlight,
   updateDateRange,
 }: {
   chartHighlight?: ChartHighlight
-  updateDateRange: any
+  updateDateRange: UpdateDateRange
 }) => {
   const { left: selectedRangeStart, right: selectedRangeEnd, clearHighlight } = chartHighlight ?? {}
   const [isOpen, setIsOpen] = useState(!!chartHighlight?.popoverPosition)

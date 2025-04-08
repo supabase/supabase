@@ -48,6 +48,8 @@ const DatabaseReport: NextPageWithLayout = () => {
   )
 }
 
+export type UpdateDateRange = (from: string, to: string) => void
+
 DatabaseReport.getLayout = (page) => (
   <DefaultLayout>
     <ReportsLayout title="Database">{page}</ReportsLayout>
@@ -211,7 +213,7 @@ const DatabaseUsage = () => {
   //     ? DateTimeFormats.FULL_SECONDS
   //     : undefined
 
-  const updateDateRange = (from: string, to: string) => {
+  const updateDateRange: UpdateDateRange = (from: string, to: string) => {
     setDateRange({
       period_start: { date: from, time_period: '7d' },
       period_end: { date: to, time_period: 'today' },

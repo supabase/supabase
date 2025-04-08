@@ -140,15 +140,17 @@ export default function ComposedChart({
     name: maxAttribute?.attribute,
     color: '#3ECF8E',
   }
-  const chartData = data
-    ? Object.entries(data[0])
-        .map(([key, value], index) => ({
-          name: key,
-          value: value,
-          color: STACKED_CHART_COLORS[index - (1 % STACKED_CHART_COLORS.length)],
-        }))
-        .filter((att) => att.name !== 'timestamp' && att.name !== maxAttribute?.attribute)
-    : []
+
+  const chartData =
+    data && !!data[0]
+      ? Object.entries(data[0])
+          ?.map(([key, value], index) => ({
+            name: key,
+            value: value,
+            color: STACKED_CHART_COLORS[index - (1 % STACKED_CHART_COLORS.length)],
+          }))
+          .filter((att) => att.name !== 'timestamp' && att.name !== maxAttribute?.attribute)
+      : []
 
   const stackedAttributes = chartData.filter((att) => !att.name.includes('max'))
   const isPercentage = format === '%'
