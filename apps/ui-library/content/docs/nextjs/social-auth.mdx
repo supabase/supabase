@@ -1,0 +1,60 @@
+---
+title: Social Authentication
+description: Social authentication block for Next.js
+---
+
+<BlockPreview name="password-based-auth/auth/sign-up" />
+
+## Installation
+
+<BlockItem name="social-auth-nextjs" description="All needed components for the social auth flow" />
+
+## Folder structure
+
+This block includes the [Supabase client](/ui/docs/nextjs/client). When installing, you can skip overwriting it.
+
+<RegistryBlock itemName="password-based-auth-nextjs" />
+
+## Usage
+
+Once you install the block in your Next.js project, you'll get all the necessary pages and components to set up a social authentication flow.
+
+### Getting started
+
+First, add a `.env` file to your project with the following environment variables:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+```
+
+- If you're using supabase.com, you can find these values in the [Connect modal](https://supabase.com/dashboard/project/_?showConnect=true) under App Frameworks or in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api).
+
+- If you're using a local instance of Supabase, you can find these values by running `supabase start` or `supabase status` (if you already have it running).
+
+### Setting up third party providers
+
+We support a wide variety of social providers that you can use to integrate with your application. The full list is available [here](https://supabase.com/docs/guides/auth/social-login).
+
+### Setting up routes and redirect URLs
+
+1. Set the site URL in the [URL Configuration](https://supabase.com/dashboard/project/_/auth/url-configuration) settings in the Supabase Dashboard.
+1. Set up the Next.js route that users will visit to reset or update their password. Go to the [URL Configuration](https://supabase.com/dashboard/project/_/auth/url-configuration) settings and add the `forgot-password` route to the list of Redirect URLs. It should look something like: `http://example.com/auth/forgot-password`.
+
+1. Update the redirect paths in the `login-form.tsx` and `update-password-form.tsx` components to point to the logged-in routes in your app.
+
+<Callout type="info">
+
+You can use this block with the Pages router by simply moving the routes from the `app` folder into the `pages` folder and renaming them. Example instead of `app/login/page.tsx`, you'd create a `pages/login.tsx` file.
+
+</Callout>
+
+### How to combine social auth with password-based auth
+
+## Further reading
+
+- [Password-based authentication (PKCE flow)](https://supabase.com/docs/guides/auth/passwords?queryGroups=flow&flow=pkce)
+- [Authentication error codes](https://supabase.com/docs/guides/auth/debugging/error-codes)
+- [Email templates](https://supabase.com/docs/guides/auth/auth-email-templates)
+- [Email templates for local development](https://supabase.com/docs/guides/local-development/customizing-email-templates)
+- [Custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp)
