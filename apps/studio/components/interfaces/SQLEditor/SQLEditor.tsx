@@ -31,7 +31,10 @@ import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
+import {
+  isRoleImpersonationEnabled,
+  useGetImpersonatedRoleState,
+} from 'state/role-impersonation-state'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
@@ -85,7 +88,7 @@ export const SQLEditor = () => {
   const organization = useSelectedOrganization()
   const aiSnap = useAiAssistantStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const getImpersonatedRole = useGetImpersonatedRole()
+  const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const isOptedInToAI = useOrgOptedIntoAi()
   const [selectedSchemas] = useSchemasForAi(project?.ref!)
@@ -289,7 +292,7 @@ export const SQLEditor = () => {
           setLineHighlights([])
         }
 
-        const impersonatedRole = getImpersonatedRole()
+        const impersonatedRoleState = getImpersonatedRoleState()
         const connectionString = databases?.find(
           (db) => db.identifier === databaseSelectorState.selectedDatabaseId
         )?.connectionString
@@ -303,12 +306,9 @@ export const SQLEditor = () => {
         execute({
           projectRef: project.ref,
           connectionString: connectionString,
-          sql: wrapWithRoleImpersonation(formattedSql, {
-            projectRef: project.ref,
-            role: impersonatedRole,
-          }),
+          sql: wrapWithRoleImpersonation(formattedSql, impersonatedRoleState),
           autoLimit: appendAutoLimit ? limit : undefined,
-          isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+          isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
           contextualInvalidation: true,
           handleError: (error) => {
             throw error
@@ -329,7 +329,7 @@ export const SQLEditor = () => {
       project,
       hasHipaaAddon,
       execute,
-      getImpersonatedRole,
+      getImpersonatedRoleState,
       setAiTitle,
       databaseSelectorState.selectedDatabaseId,
       databases,
