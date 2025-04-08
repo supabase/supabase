@@ -18,6 +18,8 @@
   },
   "dependencies": {
     "@code-hike/mdx": "^0.9.0",
+    "@codesandbox/sandpack-react": "^2.20.0",
+    "@hcaptcha/react-hcaptcha": "^1.11.1",
     "@heroicons/react": "^1.0.6",
     "@mdx-js/react": "^2.3.0",
     "@next/bundle-analyzer": "^14.2.3",
@@ -32,6 +34,7 @@
     "@vercel/og": "^0.6.2",
     "ai-commands": "workspace:*",
     "animejs": "^3.2.2",
+    "class-variance-authority": "^0.7.1",
     "classnames": "^2.3.1",
     "clsx": "^1.2.1",
     "cobe": "^0.6.2",

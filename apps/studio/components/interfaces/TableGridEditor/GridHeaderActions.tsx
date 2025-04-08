@@ -5,7 +5,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useTrackedState } from 'components/grid/store/Store'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import APIDocsButton from 'components/ui/APIDocsButton'
@@ -27,6 +26,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -44,7 +44,6 @@ import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
 
 export interface GridHeaderActionsProps {
   table: Entity
-  canEditViaTableEditor: boolean
 }
 
 const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
@@ -75,9 +74,9 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const [showEnableRealtime, setShowEnableRealtime] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
   const [isAutofixViewSecurityModalOpen, setIsAutofixViewSecurityModalOpen] = useState(false)
-  const state = useTrackedState()
-  const { selectedRows } = state
-  const showHeaderActions = selectedRows.size === 0
+
+  const snap = useTableEditorTableStateSnapshot()
+  const showHeaderActions = snap.selectedRows.size === 0
 
   const projectRef = project?.ref
   const { data } = useDatabasePoliciesQuery({
@@ -185,7 +184,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   }
 
   return (
-    <>
+    <div className="sb-grid-header__inner">
       {showHeaderActions && (
         <div className="flex items-center gap-x-2">
           {isReadOnly && (
@@ -466,7 +465,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
           onSelectConfirm={onToggleRLS}
         />
       )}
-    </>
+    </div>
   )
 }
 

@@ -5,7 +5,7 @@ import { NextSeo } from 'next-seo'
 import Layout from '~/components/Layouts/Default'
 import ProductHeader from '~/components/Sections/ProductHeader2'
 
-import content from '~/data/enterprise/content'
+import content from '~/data/enterprise'
 import EnterpriseLogos from '../components/Enterprise/EnterpriseLogos'
 
 const EnterpriseUseCases = dynamic(() => import('components/Enterprise/UseCases'))

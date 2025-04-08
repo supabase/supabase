@@ -441,7 +441,7 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** Send exit survey to HubSpot */
+    /** Send exit survey to HubSpot, Notion, and survey_responses table */
     post: operations['SendFeedbackController_sendExitSurvey']
     delete?: never
     options?: never
@@ -1034,7 +1034,7 @@ export interface paths {
     /** Gets the Billing customer */
     get: operations['CustomerController_getCustomer']
     /** Updates the billing customer */
-    put: operations['updateCustomerV2']
+    put: operations['CustomerController_updateCustomer']
     post?: never
     delete?: never
     options?: never
@@ -1251,6 +1251,41 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/oauth/apps/{app_id}/client-secrets': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List oauth app client secrets */
+    get: operations['OAuthAppClientSecretsController_listClientSecrets']
+    put?: never
+    /** Create oauth app client secret */
+    post: operations['OAuthAppClientSecretsController_CreateClientSecret']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/oauth/apps/{app_id}/client-secrets/{secret_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Remove oauth app client secret */
+    delete: operations['OAuthAppClientSecretsController_RemoveClientSecret']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/oauth/apps/{id}': {
     parameters: {
       query?: never
@@ -1312,7 +1347,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets Stripe payment methods for the given organization */
-    get: operations['getPaymentMethodsV2']
+    get: operations['PaymentsController_getPaymentMethods']
     put?: never
     post?: never
     /** Detach payment method with the given card ID */
@@ -1602,7 +1637,7 @@ export interface paths {
     /** Gets project pg.publications */
     get: operations['PublicationsController_getPublications']
     put?: never
-    /** Gets project pg.publications */
+    /** Creates project pg.publication */
     post: operations['PublicationsController_createPublication']
     /** Deletes project pg.publication with the given ID */
     delete: operations['PublicationsController_deletePublication']
@@ -2104,10 +2139,10 @@ export interface paths {
       cookie?: never
     }
     /** Lists project's warehouse access tokens from logflare */
-    get: operations['v1-list-all-warehouse-tokens']
+    get: operations['AccessTokenController_listAccessTokens']
     put?: never
     /** Create a warehouse access token */
-    post: operations['v1-create-a-warehouse-token']
+    post: operations['AccessTokenController_createAccessToken']
     delete?: never
     options?: never
     head?: never
@@ -2125,7 +2160,7 @@ export interface paths {
     put?: never
     post?: never
     /** Delete a warehouse access token */
-    delete: operations['v1-delete-a-warehouse-token']
+    delete: operations['AccessTokenController_deleteAccessToken']
     options?: never
     head?: never
     patch?: never
@@ -2139,10 +2174,10 @@ export interface paths {
       cookie?: never
     }
     /** Lists project's telemetry collections from logflare */
-    get: operations['v1-list-all-telemetry-collections']
+    get: operations['CollectionController_listCollections']
     put?: never
     /** Create a telemetry collection */
-    post: operations['v1-create-a-telemetry-collection']
+    post: operations['CollectionController_createCollection']
     delete?: never
     options?: never
     head?: never
@@ -2157,15 +2192,15 @@ export interface paths {
       cookie?: never
     }
     /** Get a telemetry collection */
-    get: operations['v1-get-a-telemetry-collection']
+    get: operations['CollectionController_getCollectionSchema']
     put?: never
     post?: never
     /** Delete a telemetry collection */
-    delete: operations['v1-delete-a-telemetry-collection']
+    delete: operations['CollectionController_deleteCollection']
     options?: never
     head?: never
     /** Update a telemetry collection */
-    patch: operations['v1-update-a-telemetry-collection']
+    patch: operations['CollectionController_updateCollection']
     trace?: never
   }
   '/platform/projects/{ref}/analytics/warehouse/collections/{token}/schema': {
@@ -2176,7 +2211,7 @@ export interface paths {
       cookie?: never
     }
     /** Get a telemetry collection schema */
-    get: operations['v1-get-a-telemetry-collection-schema']
+    get: operations['CollectionController_getCollection']
     put?: never
     post?: never
     delete?: never
@@ -2193,10 +2228,10 @@ export interface paths {
       cookie?: never
     }
     /** Lists project's warehouse endpoints from logflare */
-    get: operations['v1-list-all-warehouse-endpoints']
+    get: operations['EndpointController_listEndpoints']
     put?: never
     /** Create a warehouse endpoint */
-    post: operations['v1-create-a-warehouse-endpoint']
+    post: operations['EndpointController_createEndpoint']
     delete?: never
     options?: never
     head?: never
@@ -2212,10 +2247,10 @@ export interface paths {
     }
     get?: never
     /** Update a warehouse endpoint */
-    put: operations['v1-update-a-warehouse-endpoint']
+    put: operations['EndpointController_updateEndpoint']
     post?: never
     /** Delete a warehouse endpoint */
-    delete: operations['v1-delete-a-warehouse-endpoint']
+    delete: operations['EndpointController_deleteEndpoint']
     options?: never
     head?: never
     patch?: never
@@ -2229,7 +2264,7 @@ export interface paths {
       cookie?: never
     }
     /** Lists project's warehouse queries from logflare */
-    get: operations['v1-list-all-warehouse-queries']
+    get: operations['WarehouseQueryController_runQuery']
     put?: never
     post?: never
     delete?: never
@@ -2246,7 +2281,7 @@ export interface paths {
       cookie?: never
     }
     /** Parses a warehouse query */
-    get: operations['v1-parse-warehouse-query']
+    get: operations['WarehouseQueryController_parseQuery']
     put?: never
     post?: never
     delete?: never
@@ -2263,7 +2298,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's warehouse tenant from logflare */
-    get: operations['v1-provision-a-warehouse-tenant']
+    get: operations['TenantController_getTenant']
     put?: never
     post?: never
     delete?: never
@@ -2384,9 +2419,9 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's Postgres config */
-    get: operations['v1-get-postgres-config']
+    get: operations['PostgresConfigController_getConfig']
     /** Updates project's Postgres config */
-    put: operations['v1-update-postgres-config']
+    put: operations['PostgresConfigController_updateConfig']
     post?: never
     delete?: never
     options?: never
@@ -2447,6 +2482,23 @@ export interface paths {
     patch: operations['SecretsConfigController_updateConfig']
     trace?: never
   }
+  '/platform/projects/{ref}/config/secrets/update-status': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the last JWT secret update status */
+    get: operations['SecretsConfigController_getJwtSecretUpdateStatus']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/projects/{ref}/config/storage': {
     parameters: {
       query?: never
@@ -2473,14 +2525,14 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's supavisor config */
-    get: operations['v1-get-supavisor-config']
+    get: operations['SupavisorConfigController_getSupavisorConfig']
     put?: never
     post?: never
     delete?: never
     options?: never
     head?: never
     /** Updates project's supavisor config */
-    patch: operations['v1-update-supavisor-config']
+    patch: operations['SupavisorConfigController_updateSupavisorConfig']
     trace?: never
   }
   '/platform/projects/{ref}/content': {
@@ -2763,6 +2815,23 @@ export interface paths {
     options?: never
     head?: never
     patch?: never
+    trace?: never
+  }
+  '/platform/projects/{ref}/notifications/advisor/exceptions/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Updates advisor notification exceptions */
+    patch: operations['ProjectAdvisorNotificationsController_updateNotificationExceptions']
     trace?: never
   }
   '/platform/projects/{ref}/pause': {
@@ -3907,23 +3976,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/vercel/token': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets the Vercel access token for the given code */
-    get: operations['VercelAccessTokenController_getAccessToken']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/workflow-runs': {
     parameters: {
       query?: never
@@ -3965,7 +4017,17 @@ export interface components {
   schemas: {
     AccessControlPermission: {
       actions: string[] | null
-      condition: Record<string, never>
+      condition:
+        | (
+            | string
+            | number
+            | boolean
+            | unknown[]
+            | {
+                [key: string]: unknown
+              }
+          )
+        | null
       organization_id: number | null
       organization_slug: string
       project_ids: number[] | null
@@ -4022,7 +4084,32 @@ export interface components {
       result?: Record<string, never>[]
     }
     ApiResponse: {
-      autoApiService: components['schemas']['AutoApiService']
+      autoApiService: {
+        app: {
+          id: number
+          name: string
+        }
+        app_config: {
+          [key: string]: unknown
+        }
+        defaultApiKey: string
+        endpoint: string
+        id: number
+        name: string
+        project: {
+          /** @description Project ref */
+          ref: string
+        }
+        /** @enum {string} */
+        protocol: 'https'
+        restUrl: string
+        service_api_keys: {
+          api_key_encrypted?: string
+          name: string
+          tags: string
+        }[]
+        serviceApiKey: string
+      }
     }
     ApproveAuthorizationResponse: {
       url: string
@@ -4032,7 +4119,7 @@ export interface components {
       role_scoped_projects?: string[]
     }
     AuditLogsResponse: {
-      result: Record<string, never>[]
+      result: unknown[]
       retention_period: number
     }
     AuthBackupAdminLintResponseDto: {
@@ -4088,41 +4175,23 @@ export interface components {
         title: string
       }[]
     }
-    AutoApiService: {
-      app: {
-        id?: number
-        name?: string
-      }
-      app_config: Record<string, never>
-      defaultApiKey: string
-      endpoint: string
-      id: number
-      name: string
-      project: {
-        ref?: string
-      }
-      protocol: string
-      restUrl: string
-      service_api_keys: components['schemas']['ServiceApiKey'][]
-      serviceApiKey: string
-    }
     AvailableAddonResponse: {
       name: string
       type: components['schemas']['ProjectAddonType']
       variants: components['schemas']['ProjectAddonVariantResponse'][]
     }
-    Backup: {
-      id: number
-      inserted_at: string
-      isPhysicalBackup: boolean
-      project_id: number
-      status: Record<string, never>
-    }
     BackupId: {
       id: number
     }
     BackupsResponse: {
-      backups: components['schemas']['Backup'][]
+      backups: {
+        id: number
+        inserted_at: string
+        isPhysicalBackup: boolean
+        project_id: number
+        /** @enum {string} */
+        status: 'COMPLETED' | 'FAILED' | 'PENDING' | 'REMOVED' | 'ARCHIVED' | 'CANCELLED'
+      }[]
       physicalBackupData: {
         earliestPhysicalBackupDateUnix?: number
         latestPhysicalBackupDateUnix?: number
@@ -4134,12 +4203,15 @@ export interface components {
     }
     BillingCustomerUpdateBody: {
       additional_emails?: string[]
-      address?: components['schemas']['CustomerBillingAddress']
+      address?: {
+        city?: string
+        country: string
+        line1: string
+        line2?: string
+        postal_code?: string
+        state?: string
+      }
     }
-    /** @enum {string} */
-    BillingPlanChangeType: 'upgrade' | 'downgrade' | 'none'
-    /** @enum {string} */
-    BillingPlanEffectiveAt: 'now' | 'end_of_billing_period' | 'none'
     /** @enum {string} */
     BillingPlanId: 'free' | 'pro' | 'team' | 'enterprise'
     BillingProjectAddonResponse: {
@@ -4161,7 +4233,14 @@ export interface components {
       id: string
     }
     CloneBackupsResponse: {
-      backups: components['schemas']['Backup'][]
+      backups: {
+        id: number
+        inserted_at: string
+        isPhysicalBackup: boolean
+        project_id: number
+        /** @enum {string} */
+        status: 'COMPLETED' | 'FAILED' | 'PENDING' | 'REMOVED' | 'ARCHIVED' | 'CANCELLED'
+      }[]
       physicalBackupData: {
         earliestPhysicalBackupDateUnix?: number
         latestPhysicalBackupDateUnix?: number
@@ -4180,13 +4259,6 @@ export interface components {
       newProjectName: string
       /** @default 0 */
       recoveryTimeTarget?: number
-    }
-    ColumnPrivilege: {
-      grantee: string
-      grantor: string
-      is_grantable: boolean
-      /** @enum {string} */
-      privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
     }
     CopyObjectBody: {
       from: string
@@ -4218,13 +4290,14 @@ export interface components {
     }
     CreateCliLoginSessionBody: {
       public_key: string
+      /** Format: uuid */
       session_id: string
       token_name?: string
     }
     CreateColumnBody: {
       check?: string
       comment?: string
-      defaultValue?: Record<string, never>
+      defaultValue?: unknown
       /** @enum {string} */
       defaultValueFormat?: 'expression' | 'literal'
       /** @enum {string} */
@@ -4267,7 +4340,9 @@ export interface components {
       args: string[]
       /** @enum {string} */
       behavior: 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
-      config_params?: Record<string, never>
+      config_params?: {
+        [key: string]: string
+      }
       definition: string
       language: string
       name: string
@@ -4288,36 +4363,47 @@ export interface components {
       role_id: number
       role_scoped_projects?: string[]
     }
-    CreateNotificationExceptionsDto: {
+    CreateNotificationExceptionsBodyDto: {
       exceptions: {
         /** Format: uuid */
         assigned_to?: string
         is_disabled: boolean
         /** @enum {string} */
-        lint_category?: 'ALL' | 'PERFORMANCE' | 'SECURITY'
-        /** @enum {string} */
+        lint_category?: 'PERFORMANCE' | 'SECURITY'
+        lint_metadata?: {
+          [key: string]: unknown
+        }
         lint_name?:
-          | 'ssl_not_enforced'
-          | 'network_restrictions_not_set'
-          | 'pitr_not_enabled'
-          | 'password_requirements_min_length'
-          | 'unindexed_foreign_keys'
-          | 'auth_users_exposed'
-          | 'auth_rls_initplan'
-          | 'no_primary_key'
-          | 'unused_index'
-          | 'multiple_permissive_policies'
-          | 'policy_exists_rls_disabled'
-          | 'rls_enabled_no_policy'
-          | 'duplicate_index'
-          | 'security_definer_view'
-          | 'function_search_path_mutable'
-          | 'rls_disabled_in_public'
-          | 'extension_in_public'
-          | 'rls_references_user_metadata'
-          | 'materialized_view_in_api'
-          | 'foreign_table_in_api'
-          | 'unsupported_reg_types'
+          | (
+              | 'ssl_not_enforced'
+              | 'network_restrictions_not_set'
+              | 'pitr_not_enabled'
+              | 'password_requirements_min_length'
+              | 'unindexed_foreign_keys'
+              | 'auth_users_exposed'
+              | 'auth_rls_initplan'
+              | 'no_primary_key'
+              | 'unused_index'
+              | 'multiple_permissive_policies'
+              | 'policy_exists_rls_disabled'
+              | 'rls_enabled_no_policy'
+              | 'duplicate_index'
+              | 'security_definer_view'
+              | 'function_search_path_mutable'
+              | 'rls_disabled_in_public'
+              | 'extension_in_public'
+              | 'rls_references_user_metadata'
+              | 'materialized_view_in_api'
+              | 'foreign_table_in_api'
+              | 'unsupported_reg_types'
+              | 'auth_otp_long_expiry'
+              | 'auth_otp_short_length'
+              | 'auth_leaked_password_protection'
+              | 'auth_insufficient_mfa_options'
+              | 'auth_password_policy_missing'
+              | 'no_backup_admin'
+            )
+          | string
         note?: string
       }[]
     }
@@ -4333,6 +4419,9 @@ export interface components {
         /** Format: uuid */
         last_updated_by: string
         lint_category: string | null
+        lint_metadata?: {
+          [key: string]: unknown
+        }
         lint_name: string | null
         note: string | null
         project_ref: string
@@ -4368,6 +4457,18 @@ export interface components {
       )[]
       website: string
     }
+    CreateOAuthAppClientSecretResponseDto: {
+      client_secret: string
+      client_secret_alias: string
+      /** Format: date-time */
+      created_at: string
+      /** Format: uuid */
+      created_by: string
+      /** Format: uuid */
+      id: string
+      /** Format: uuid */
+      oauth_app_id: string
+    }
     CreateOAuthAppResponse: {
       client_id: string
       client_secret: string
@@ -4379,7 +4480,7 @@ export interface components {
       payment_method?: string
       size?: string
       /** @enum {string} */
-      tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
+      tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | 'tier_enterprise'
     }
     CreatePipelineResponse: {
       id: number
@@ -4494,8 +4595,8 @@ export interface components {
       id: number
     }
     CreateStorageBucketBody: {
-      allowed_mime_types: string[]
-      file_size_limit: number
+      allowed_mime_types?: string[]
+      file_size_limit?: number
       id: string
       public: boolean
     }
@@ -4524,7 +4625,7 @@ export interface components {
       /** @enum {string} */
       enabled_mode: 'ORIGIN' | 'REPLICA' | 'ALWAYS' | 'DISABLED'
       events: ('INSERT' | 'UPDATE' | 'DELETE')[]
-      function_args: string[]
+      function_args?: string[]
       function_name: string
       function_schema: string
       name: string
@@ -4562,7 +4663,9 @@ export interface components {
       email_change_token_new?: string
       email_confirmed_at?: string
       encrypted_password?: string
+      /** Format: uuid */
       id?: string
+      /** Format: uuid */
       instance_id?: string
       invited_at?: string
       is_anonymous?: boolean
@@ -4574,8 +4677,12 @@ export interface components {
       phone_change_sent_at?: string
       phone_change_token?: string
       phone_confirmed_at?: string
-      raw_app_meta_data?: Record<string, never>
-      raw_user_meta_data?: Record<string, never>
+      raw_app_meta_data?: {
+        [key: string]: unknown
+      }
+      raw_user_meta_data?: {
+        [key: string]: unknown
+      }
       reauthentication_sent_at?: string
       reauthentication_token?: string
       recovery_sent_at?: string
@@ -4584,11 +4691,19 @@ export interface components {
       updated_at?: string
     }
     CreateVercelConnectionResponse: {
-      env_sync_error?: components['schemas']['SyncVercelEnvError']
+      env_sync_error?: {
+        message: string
+      }
       id: string
     }
     CreateVercelConnectionsBody: {
-      connection: components['schemas']['IntegrationConnectionVercel']
+      connection: {
+        foreign_project_id: string
+        metadata: {
+          [key: string]: unknown
+        }
+        supabase_project_ref: string
+      }
       organization_integration_id: string
     }
     CreateVercelEnvironmentVariableBody: {
@@ -4600,7 +4715,9 @@ export interface components {
     CreateVercelIntegrationBody: {
       code: string
       configuration_id: string
-      metadata: Record<string, never>
+      metadata: {
+        [key: string]: unknown
+      }
       organization_slug: string
       source: string
       teamId?: string
@@ -4622,17 +4739,16 @@ export interface components {
         | 'requires_payment_method'
         | 'succeeded'
     }
-    CustomerBillingAddress: {
-      city?: string
-      country: string
-      line1: string
-      line2?: string
-      postal_code?: string
-      state?: string
-    }
     CustomerResponse: {
       additional_emails: string[] | null
-      address: components['schemas']['CustomerBillingAddress'] | null
+      address?: {
+        city?: string
+        country: string
+        line1: string
+        line2?: string
+        postal_code?: string
+        state?: string
+      }
       balance: number
       billing_via_partner: boolean
       email: string
@@ -4640,22 +4756,6 @@ export interface components {
     CustomSupabaseInternalRequests: {
       ami: components['schemas']['AmiSearchOptions']
     }
-    /** @enum {string} */
-    database_status:
-      | 'ACTIVE_HEALTHY'
-      | 'ACTIVE_UNHEALTHY'
-      | 'COMING_UP'
-      | 'GOING_DOWN'
-      | 'INIT_FAILED'
-      | 'REMOVED'
-      | 'RESTORING'
-      | 'UNKNOWN'
-      | 'INIT_READ_REPLICA'
-      | 'INIT_READ_REPLICA_FAILED'
-      | 'RESTARTING'
-      | 'RESIZING'
-    /** @enum {string} */
-    database_type: 'PRIMARY' | 'READ_REPLICA'
     DatabaseDetailResponse: {
       /** @enum {string} */
       cloud_provider: 'AWS' | 'AWS_K8S' | 'FLY'
@@ -4704,6 +4804,7 @@ export interface components {
     }
     /** @enum {string} */
     DbInstanceSize:
+      | 'pico'
       | 'nano'
       | 'micro'
       | 'small'
@@ -4807,29 +4908,38 @@ export interface components {
       timestamp: string
     }
     DownloadableBackupsResponse: {
-      backups: components['schemas']['Backup'][]
-      status: Record<string, never>
+      backups: {
+        id: number
+        inserted_at: string
+        isPhysicalBackup: boolean
+        project_id: number
+        /** @enum {string} */
+        status: 'COMPLETED' | 'FAILED' | 'PENDING' | 'REMOVED' | 'ARCHIVED' | 'CANCELLED'
+      }[]
+      /** @enum {string} */
+      status: 'ok' | 'physical-backups-enabled' | 'project-not-active'
     }
     DownloadBackupBody: {
-      data: Record<string, never>
       id: number
-      inserted_at: string
-      project_id: number
-      s3_bucket: string
-      s3_path: string
-      status: string
     }
     DownloadBackupResponse: {
       fileUrl: string
     }
     DownloadObjectBody: {
-      options?: components['schemas']['DownloadObjectOptions']
+      options?: {
+        download?: boolean
+        downloadName?: string
+        transform?: {
+          /** @enum {string} */
+          format?: 'origin'
+          height?: number
+          quality?: number
+          /** @enum {string} */
+          resize?: 'cover' | 'contain' | 'fill'
+          width?: number
+        }
+      }
       path: string
-    }
-    DownloadObjectOptions: {
-      download?: boolean
-      downloadName?: string
-      transform?: components['schemas']['StorageObjectTransformOptions']
     }
     FormatQueryBody: {
       query: string
@@ -4846,6 +4956,17 @@ export interface components {
       favorites: number
       private: number
       shared: number
+    }
+    GetJwtSecretUpdateStatus: {
+      update_status: {
+        change_tracking_id: string
+        /** @enum {number} */
+        error?: 0 | 1 | 2 | 3 | 4 | 5
+        /** @enum {number} */
+        progress: 0 | 1 | 2 | 3 | 4 | 5
+        /** @enum {number} */
+        status: 0 | 1 | 2
+      } | null
     }
     GetLeakedServiceKeyLintResponseDto: {
       lints: {
@@ -4934,7 +5055,15 @@ export interface components {
       website: string
     }
     GetObjectsBody: {
-      options: components['schemas']['StorageObjectSearchOptions']
+      options?: {
+        limit?: number
+        offset?: number
+        search?: string
+        sortBy?: {
+          column?: string
+          order?: string
+        }
+      }
       path: string
     }
     GetOrganizationByFlyOrganizationIdResponse: {
@@ -4956,6 +5085,14 @@ export interface components {
         slug?: string
       }
       updated_at: string
+    }
+    GetPostgrestConfigResponse: {
+      db_anon_role: string
+      db_extra_search_path: string
+      db_schema: string
+      jwt_secret: string
+      max_rows: number
+      role_claim_key: string
     }
     GetProjectByFlyExtensionIdResponse: {
       ref: string
@@ -5012,26 +5149,52 @@ export interface components {
       title: string
     }[]
     GetPublicUrlBody: {
-      options?: components['schemas']['PublicUrlOptions']
+      options?: {
+        download?: boolean
+        downloadName?: string
+        transform?: {
+          /** @enum {string} */
+          format?: 'origin'
+          height?: number
+          quality?: number
+          /** @enum {string} */
+          resize?: 'cover' | 'contain' | 'fill'
+          width?: number
+        }
+      }
       path: string
     }
     GetSignedUrlBody: {
       expiresIn: number
-      options?: components['schemas']['SignedUrlOptions']
+      options?: {
+        download?: boolean
+        downloadName?: string
+        transform?: {
+          /** @enum {string} */
+          format?: 'origin'
+          height?: number
+          quality?: number
+          /** @enum {string} */
+          resize?: 'cover' | 'contain' | 'fill'
+          width?: number
+        }
+      }
       path: string
     }
     GetSignedUrlsBody: {
       expiresIn: number
-      options?: components['schemas']['SignedUrlsOptions']
+      options?: {
+        download?: boolean
+        downloadName?: string
+      }
       path: string[]
     }
-    GetStorageCredential: {
-      created_at: string
-      description: string
-      id: string
-    }
     GetStorageCredentialsResponse: {
-      data: components['schemas']['GetStorageCredential'][]
+      data: {
+        created_at: string
+        description: string
+        id: string
+      }[]
     }
     GetSubscriptionResponse: {
       addons: components['schemas']['BillingSubscriptionAddon'][]
@@ -5042,7 +5205,6 @@ export interface components {
       current_period_end: number
       current_period_start: number
       customer_balance: number
-      nano_enabled: boolean
       next_invoice_at: number
       payment_method_type: string
       plan: components['schemas']['BillingSubscriptionPlan']
@@ -5119,24 +5281,42 @@ export interface components {
       }
       updated_at: string
     }
-    GetVercelConnections: {
+    GetVercelConnectionsResponse: {
       foreign_project_id: string
       id: string
       inserted_at: string
-      metadata: Record<string, never>
+      metadata: {
+        [key: string]: unknown
+      }
       organization_integration_id: string
       supabase_project_ref: string
       updated_at: string
-    }
+    }[]
     GetVercelProjectsResponse: {
       pagination: {
-        count?: number
-        next?: number | null
-        prev?: number | null
+        count: number
+        next: number | null
+        prev: number | null
       }
-      projects: components['schemas']['IntegrationVercelProject'][]
+      projects: {
+        framework?: string | null
+        id: string
+        link?: {
+          deployHooks: {
+            createdAt?: number
+            id: string
+            name: string
+            ref: string
+            url: string
+          }[]
+          gitCredentialId?: string
+          productionBranch?: string
+          type?: string
+        }
+        name: string
+      }[]
     }
-    GitHubAuthorization: {
+    GitHubAuthorizationResponse: {
       id: number
       sender_id: number
       user_id: number
@@ -5319,26 +5499,9 @@ export interface components {
       is_grantable?: boolean
       /** @enum {string} */
       privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
-    }
+    }[]
     HCaptchaBody: {
       hcaptchaToken: string
-    }
-    IntegrationConnectionVercel: {
-      foreign_project_id: string
-      metadata: Record<string, never>
-      supabase_project_ref: string
-    }
-    IntegrationVercelProject: {
-      framework?: string | null
-      id: string
-      link?: components['schemas']['VercelProjectLink']
-      name: string
-    }
-    Invitation: {
-      id: number
-      invited_at: string
-      invited_email: string
-      role_id: number
     }
     InvitationByTokenResponse: {
       authorized_user: boolean
@@ -5350,7 +5513,12 @@ export interface components {
       token_does_not_exist: boolean
     }
     InvitationResponse: {
-      invitations: components['schemas']['Invitation'][]
+      invitations: {
+        id: number
+        invited_at: string
+        invited_email: string
+        role_id: number
+      }[]
     }
     Invoice: {
       amount_due: number
@@ -5437,34 +5605,30 @@ export interface components {
       phone: string | null
       token: string
     }
-    ListGitHubConnectionsConnection: {
-      branch_limit: number
-      id: number
-      inserted_at: string
-      installation_id: number
-      project: components['schemas']['ListGitHubConnectionsProject']
-      repository: components['schemas']['ListGitHubConnectionsRepository']
-      supabase_changes_only: boolean
-      updated_at: string
-      user: components['schemas']['ListGitHubConnectionsUser'] | null
-      workdir: string
-    }
-    ListGitHubConnectionsProject: {
-      id: number
-      name: string
-      ref: string
-    }
-    ListGitHubConnectionsRepository: {
-      id: number
-      name: string
-    }
     ListGitHubConnectionsResponse: {
-      connections: components['schemas']['ListGitHubConnectionsConnection'][]
-    }
-    ListGitHubConnectionsUser: {
-      id: number
-      primary_email: string | null
-      username: string
+      connections: {
+        branch_limit: number
+        id: number
+        inserted_at: string
+        installation_id: number
+        project: {
+          id: number
+          name: string
+          ref: string
+        }
+        repository: {
+          id: number
+          name: string
+        }
+        supabase_changes_only: boolean
+        updated_at: string
+        user: {
+          id: number
+          primary_email: string | null
+          username: string
+        } | null
+        workdir: string
+      }[]
     }
     ListNotificationExceptionsResponseDto: {
       exceptions: {
@@ -5478,19 +5642,34 @@ export interface components {
         /** Format: uuid */
         last_updated_by: string
         lint_category: string | null
+        lint_metadata?: {
+          [key: string]: unknown
+        }
         lint_name: string | null
         note: string | null
         project_ref: string
       }[]
     }
-    LoadBalancerDatabase: {
-      identifier: string
-      status: string
-      /** @enum {string} */
-      type: 'PRIMARY' | 'READ_REPLICA'
+    ListOAuthAppClientSecretsResponseDto: {
+      client_secrets: {
+        client_secret_alias: string
+        /** Format: date-time */
+        created_at: string
+        /** Format: uuid */
+        created_by: string
+        /** Format: uuid */
+        id: string
+        /** Format: uuid */
+        oauth_app_id: string
+      }[]
     }
     LoadBalancerDetailResponse: {
-      databases: components['schemas']['LoadBalancerDatabase'][]
+      databases: {
+        identifier: string
+        status: string
+        /** @enum {string} */
+        type: 'PRIMARY' | 'READ_REPLICA'
+      }[]
       endpoint: string
     }
     MarkDefaultPaymentMethodBody: {
@@ -5502,15 +5681,13 @@ export interface components {
     Member: {
       gotrue_id: string
       is_sso_user: boolean | null
-      metadata: Record<string, never> | null
+      metadata: {
+        [key: string]: unknown
+      }
       mfa_enabled: boolean
       primary_email: string | null
       role_ids: number[]
       username: string
-    }
-    MemberExceedingFreeProjectLimit: {
-      limit: number
-      name: string
     }
     MemberWithFreeProjectLimit: {
       free_project_limit: number
@@ -5521,32 +5698,20 @@ export interface components {
       from: string
       to: string
     }
-    NotificationAction: {
-      action_type?: string
-      label: string
-      url?: string
-    }
-    NotificationData: {
-      actions?: components['schemas']['NotificationAction'][]
-      message?: string
-      org_slug?: string
-      project_ref?: string
-      title: string
-    }
     NotificationResponseV1: {
-      data: Record<string, never>
+      data?: unknown
       id: string
       inserted_at: string
-      meta: Record<string, never>
+      meta?: unknown
       notification_name: string
       notification_status: string
       project_id: number
     }
     NotificationResponseV2: {
-      data: components['schemas']['NotificationData']
+      data?: unknown
       id: string
       inserted_at: string
-      meta: Record<string, never>
+      meta?: unknown
       name: string
       /** @enum {string} */
       priority: 'Critical' | 'Warning' | 'Info'
@@ -5596,7 +5761,69 @@ export interface components {
       website: string
     }
     OrganizationProjectsResponse: {
-      projects: components['schemas']['ProjectWithDatabases'][]
+      projects: {
+        databases: {
+          cloud_provider: string
+          disk_last_modified_at?: string
+          disk_throughput_mbps?: number
+          /** @enum {string} */
+          disk_type?: 'gp3' | 'io2'
+          disk_volume_size_gb?: number
+          identifier: string
+          /** @enum {string} */
+          infra_compute_size?:
+            | 'pico'
+            | 'nano'
+            | 'micro'
+            | 'small'
+            | 'medium'
+            | 'large'
+            | 'xlarge'
+            | '2xlarge'
+            | '4xlarge'
+            | '8xlarge'
+            | '12xlarge'
+            | '16xlarge'
+          region: string
+          /** @enum {string} */
+          status:
+            | 'ACTIVE_HEALTHY'
+            | 'ACTIVE_UNHEALTHY'
+            | 'COMING_UP'
+            | 'GOING_DOWN'
+            | 'INIT_FAILED'
+            | 'REMOVED'
+            | 'RESTORING'
+            | 'UNKNOWN'
+            | 'INIT_READ_REPLICA'
+            | 'INIT_READ_REPLICA_FAILED'
+            | 'RESTARTING'
+            | 'RESIZING'
+          /** @enum {string} */
+          type: 'PRIMARY' | 'READ_REPLICA'
+        }[]
+        is_branch: boolean
+        name: string
+        ref: string
+        region: string
+        /** @enum {string} */
+        status:
+          | 'INACTIVE'
+          | 'ACTIVE_HEALTHY'
+          | 'ACTIVE_UNHEALTHY'
+          | 'COMING_UP'
+          | 'UNKNOWN'
+          | 'GOING_DOWN'
+          | 'INIT_FAILED'
+          | 'REMOVED'
+          | 'RESTORING'
+          | 'UPGRADING'
+          | 'PAUSING'
+          | 'RESTORE_FAILED'
+          | 'RESTARTING'
+          | 'PAUSE_FAILED'
+          | 'RESIZING'
+      }[]
     }
     OrganizationResponse: {
       billing_email: string | null
@@ -5604,7 +5831,9 @@ export interface components {
       is_owner: boolean
       name: string
       opt_in_tags: string[]
-      restriction_data: Record<string, never>
+      restriction_data: {
+        [key: string]: string
+      } | null
       /** @enum {string|null} */
       restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
       slug: string
@@ -5612,15 +5841,20 @@ export interface components {
       subscription_id: string | null
     }
     OrganizationRoleResponse: {
-      org_scoped_roles: components['schemas']['OrganizationRoleV2'][]
-      project_scoped_roles: components['schemas']['OrganizationRoleV2'][]
-    }
-    OrganizationRoleV2: {
-      base_role_id: number
-      description: string | null
-      id: number
-      name: string
-      project_ids: number[] | null
+      org_scoped_roles: {
+        base_role_id: number
+        description: string | null
+        id: number
+        name: string
+        project_ids: number[] | null
+      }[]
+      project_scoped_roles: {
+        base_role_id: number
+        description: string | null
+        id: number
+        name: string
+        project_ids: number[] | null
+      }[]
     }
     OrganizationSlugAvailableVersionsBodyDto: {
       provider: string
@@ -5636,6 +5870,7 @@ export interface components {
       id: number
       /** @enum {string} */
       infra_compute_size?:
+        | 'pico'
         | 'nano'
         | 'micro'
         | 'small'
@@ -5674,62 +5909,66 @@ export interface components {
     OrgDocumentUrlResponse: {
       fileUrl: string
     }
-    OrgMetricUsage: {
-      available_in_plan: boolean
-      capped: boolean
-      cost: number
-      /** @enum {string} */
-      metric:
-        | 'EGRESS'
-        | 'DATABASE_SIZE'
-        | 'STORAGE_SIZE'
-        | 'MONTHLY_ACTIVE_USERS'
-        | 'MONTHLY_ACTIVE_SSO_USERS'
-        | 'FUNCTION_INVOCATIONS'
-        | 'STORAGE_IMAGES_TRANSFORMED'
-        | 'REALTIME_MESSAGE_COUNT'
-        | 'REALTIME_PEAK_CONNECTIONS'
-        | 'DISK_SIZE_GB_HOURS_GP3'
-        | 'DISK_SIZE_GB_HOURS_IO2'
-        | 'AUTH_MFA_PHONE'
-        | 'AUTH_MFA_WEB_AUTHN'
-        | 'LOG_DRAIN_EVENTS'
-        | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
-        | 'DISK_THROUGHPUT_GP3'
-        | 'DISK_IOPS_GP3'
-        | 'DISK_IOPS_IO2'
-        | 'COMPUTE_HOURS_BRANCH'
-        | 'COMPUTE_HOURS_XS'
-        | 'COMPUTE_HOURS_SM'
-        | 'COMPUTE_HOURS_MD'
-        | 'COMPUTE_HOURS_L'
-        | 'COMPUTE_HOURS_XL'
-        | 'COMPUTE_HOURS_2XL'
-        | 'COMPUTE_HOURS_4XL'
-        | 'COMPUTE_HOURS_8XL'
-        | 'COMPUTE_HOURS_12XL'
-        | 'COMPUTE_HOURS_16XL'
-        | 'CUSTOM_DOMAIN'
-        | 'PITR_7'
-        | 'PITR_14'
-        | 'PITR_28'
-        | 'IPV4'
-        | 'LOG_DRAIN'
-      pricing_free_units?: number
-      pricing_package_price?: number
-      pricing_package_size?: number
-      pricing_per_unit_price?: number
-      /** @enum {string} */
-      pricing_strategy: 'UNIT' | 'PACKAGE' | 'TIERED' | 'NONE'
-      project_allocations: components['schemas']['ProjectAllocation'][]
-      unit_price_desc: string
-      unlimited: boolean
-      usage: number
-      usage_original: number
-    }
     OrgUsageResponse: {
       usage_billing_enabled: boolean
-      usages: components['schemas']['OrgMetricUsage'][]
+      usages: {
+        available_in_plan: boolean
+        capped: boolean
+        cost: number
+        /** @enum {string} */
+        metric:
+          | 'EGRESS'
+          | 'DATABASE_SIZE'
+          | 'STORAGE_SIZE'
+          | 'MONTHLY_ACTIVE_USERS'
+          | 'MONTHLY_ACTIVE_SSO_USERS'
+          | 'FUNCTION_INVOCATIONS'
+          | 'STORAGE_IMAGES_TRANSFORMED'
+          | 'REALTIME_MESSAGE_COUNT'
+          | 'REALTIME_PEAK_CONNECTIONS'
+          | 'DISK_SIZE_GB_HOURS_GP3'
+          | 'DISK_SIZE_GB_HOURS_IO2'
+          | 'AUTH_MFA_PHONE'
+          | 'AUTH_MFA_WEB_AUTHN'
+          | 'LOG_DRAIN_EVENTS'
+          | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+          | 'DISK_THROUGHPUT_GP3'
+          | 'DISK_IOPS_GP3'
+          | 'DISK_IOPS_IO2'
+          | 'COMPUTE_HOURS_BRANCH'
+          | 'COMPUTE_HOURS_XS'
+          | 'COMPUTE_HOURS_SM'
+          | 'COMPUTE_HOURS_MD'
+          | 'COMPUTE_HOURS_L'
+          | 'COMPUTE_HOURS_XL'
+          | 'COMPUTE_HOURS_2XL'
+          | 'COMPUTE_HOURS_4XL'
+          | 'COMPUTE_HOURS_8XL'
+          | 'COMPUTE_HOURS_12XL'
+          | 'COMPUTE_HOURS_16XL'
+          | 'CUSTOM_DOMAIN'
+          | 'PITR_7'
+          | 'PITR_14'
+          | 'PITR_28'
+          | 'IPV4'
+          | 'LOG_DRAIN'
+        pricing_free_units?: number
+        pricing_package_price?: number
+        pricing_package_size?: number
+        pricing_per_unit_price?: number
+        /** @enum {string} */
+        pricing_strategy: 'UNIT' | 'PACKAGE' | 'TIERED' | 'NONE'
+        project_allocations: {
+          hours?: number
+          name: string
+          ref: string
+          usage: number
+        }[]
+        unit_price_desc: string
+        unlimited: boolean
+        usage: number
+        usage_original: number
+      }[]
     }
     OverdueInvoiceCount: {
       organization_id: number
@@ -5740,11 +5979,11 @@ export interface components {
     }
     PasswordCheckResponse: {
       result: {
-        feedback?: {
-          suggestions?: string[]
-          warning?: string
+        feedback: {
+          suggestions: string[]
+          warning: string
         }
-        score?: number
+        score: number
       }
     }
     PauseStatusResponse: {
@@ -5753,21 +5992,19 @@ export interface components {
       max_days_till_restore_disabled: number
       remaining_days_till_restore_disabled: number | null
     }
-    Payment: {
-      card?: components['schemas']['PaymentMethodCard']
-      created: number
-      id: string
-      is_default: boolean
-      type: string
-    }
-    PaymentMethodCard: {
-      brand: string
-      exp_month: number
-      exp_year: number
-      last4: string
-    }
     PaymentsResponse: {
-      data: components['schemas']['Payment'][]
+      data: {
+        card?: {
+          brand: string
+          exp_month: number
+          exp_year: number
+          last4: string
+        }
+        created: number
+        id: string
+        is_default: boolean
+        type: string
+      }[]
       defaultPaymentMethodId: string | null
     }
     PgbouncerConfigResponse: {
@@ -5782,23 +6019,27 @@ export interface components {
       inserted_at: string
       max_client_conn?: number
       pgbouncer_enabled: boolean
-      pgbouncer_status: Record<string, never>
-      pool_mode: Record<string, never>
+      /** @enum {string} */
+      pgbouncer_status: 'COMING_UP' | 'COMING_DOWN' | 'RELOADING' | 'ENABLED' | 'DISABLED'
+      /** @enum {string} */
+      pool_mode: 'transaction' | 'session' | 'statement'
       ssl_enforced: boolean
     }
     PgbouncerStatusResponse: {
       active: boolean
     }
-    PlanResponse: {
-      change_type: components['schemas']['BillingPlanChangeType']
-      effective_at: components['schemas']['BillingPlanEffectiveAt']
-      id: components['schemas']['BillingPlanId']
-      is_current: boolean
-      name: string
-      price: number
-    }
     PlansResponse: {
-      plans: components['schemas']['PlanResponse'][]
+      plans: {
+        /** @enum {string} */
+        change_type: 'upgrade' | 'downgrade' | 'none'
+        /** @enum {string} */
+        effective_at?: 'now' | 'end_of_billing_period' | 'none'
+        /** @enum {string} */
+        id: 'free' | 'pro' | 'team' | 'enterprise'
+        is_current: boolean
+        name: string
+        price: number
+      }[]
     }
     PointInTimeRestoreBody: {
       recovery_time_target_unix: number
@@ -5807,11 +6048,12 @@ export interface components {
       check: string | null
       comment: string | null
       data_type: string
-      default_value: Record<string, never>
+      default_value: (string | number) | null
       enums: string[]
       format: string
       id: string
-      identity_generation: Record<string, never>
+      /** @enum {string|null} */
+      identity_generation: 'BY DEFAULT' | 'ALWAYS' | null
       is_generated: boolean
       is_identity: boolean
       is_nullable: boolean
@@ -5826,7 +6068,13 @@ export interface components {
     PostgresColumnPrivileges: {
       column_id: string
       column_name: string
-      privileges: components['schemas']['ColumnPrivilege'][]
+      privileges: {
+        grantee: string
+        grantor: string
+        is_grantable: boolean
+        /** @enum {string} */
+        privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
+      }[]
       relation_name: string
       relation_schema: string
     }
@@ -5869,7 +6117,27 @@ export interface components {
       schema: string | null
     }
     PostgresForeignTable: {
-      columns?: components['schemas']['PostgresColumn'][]
+      columns?: {
+        check: string | null
+        comment: string | null
+        data_type: string
+        default_value: (string | number) | null
+        enums: string[]
+        format: string
+        id: string
+        /** @enum {string|null} */
+        identity_generation: 'BY DEFAULT' | 'ALWAYS' | null
+        is_generated: boolean
+        is_identity: boolean
+        is_nullable: boolean
+        is_unique: boolean
+        is_updatable: boolean
+        name: string
+        ordinal_position: number
+        schema: string
+        table: string
+        table_id: number
+      }[]
       comment: string | null
       id: number
       name: string
@@ -5880,7 +6148,9 @@ export interface components {
       /** @enum {string} */
       behavior: 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
       complete_statement: string
-      config_params: Record<string, never> | null
+      config_params: {
+        [key: string]: string
+      } | null
       definition: string
       id: number
       identity_argument_types: string
@@ -5891,7 +6161,27 @@ export interface components {
       security_definer: boolean
     }
     PostgresMaterializedView: {
-      columns?: components['schemas']['PostgresColumn'][]
+      columns?: {
+        check: string | null
+        comment: string | null
+        data_type: string
+        default_value: (string | number) | null
+        enums: string[]
+        format: string
+        id: string
+        /** @enum {string|null} */
+        identity_generation: 'BY DEFAULT' | 'ALWAYS' | null
+        is_generated: boolean
+        is_identity: boolean
+        is_nullable: boolean
+        is_unique: boolean
+        is_updatable: boolean
+        name: string
+        ordinal_position: number
+        schema: string
+        table: string
+        table_id: number
+      }[]
       comment: string | null
       id: number
       is_populated: boolean
@@ -5920,7 +6210,13 @@ export interface components {
       publish_insert: boolean
       publish_truncate: boolean
       publish_update: boolean
-      tables: components['schemas']['Table'][] | null
+      tables:
+        | {
+            id: number
+            name: string
+            schema: string
+          }[]
+        | null
     }
     PostgresSchema: {
       id: number
@@ -5929,28 +6225,54 @@ export interface components {
     }
     PostgresTable: {
       bytes: number
-      columns?: components['schemas']['PostgresColumn'][]
+      columns?: {
+        check: string | null
+        comment: string | null
+        data_type: string
+        default_value: (string | number) | null
+        enums: string[]
+        format: string
+        id: string
+        /** @enum {string|null} */
+        identity_generation: 'BY DEFAULT' | 'ALWAYS' | null
+        is_generated: boolean
+        is_identity: boolean
+        is_nullable: boolean
+        is_unique: boolean
+        is_updatable: boolean
+        name: string
+        ordinal_position: number
+        schema: string
+        table: string
+        table_id: number
+      }[]
       comment: string | null
       dead_rows_estimate: number
       id: number
       live_rows_estimate: number
       name: string
-      primary_keys: components['schemas']['PrimaryKey'][]
-      relationships: components['schemas']['Relationship'][]
+      primary_keys: {
+        name: string
+        schema: string
+        table_id: number
+        table_name: string
+      }[]
+      relationships: {
+        constraint_name: string
+        id: number
+        source_column_name: string
+        source_schema: string
+        source_table_name: string
+        target_column_name: string
+        target_table_name: string
+        target_table_schema: string
+      }[]
       /** @enum {string} */
       replica_identity: 'DEFAULT' | 'INDEX' | 'FULL' | 'NOTHING'
       rls_enabled: boolean
       rls_forced: boolean
       schema: string
       size: string
-    }
-    PostgrestConfigResponse: {
-      db_anon_role: string
-      db_extra_search_path: string
-      db_schema: string
-      jwt_secret: string
-      max_rows: number
-      role_claim_key: string
     }
     PostgresTrigger: {
       /** @enum {string} */
@@ -5979,7 +6301,27 @@ export interface components {
       schema: string
     }
     PostgresView: {
-      columns?: components['schemas']['PostgresColumn'][]
+      columns?: {
+        check: string | null
+        comment: string | null
+        data_type: string
+        default_value: (string | number) | null
+        enums: string[]
+        format: string
+        id: string
+        /** @enum {string|null} */
+        identity_generation: 'BY DEFAULT' | 'ALWAYS' | null
+        is_generated: boolean
+        is_identity: boolean
+        is_nullable: boolean
+        is_unique: boolean
+        is_updatable: boolean
+        name: string
+        ordinal_position: number
+        schema: string
+        table: string
+        table_id: number
+      }[]
       comment: string | null
       id: number
       is_updatable: boolean
@@ -5987,27 +6329,32 @@ export interface components {
       schema: string
     }
     PreviewProjectTransferResponse: {
-      errors: components['schemas']['PreviewTransferInfo'][]
+      errors: {
+        key: string
+        message: string
+      }[]
       has_access_to_target_organization: boolean
       has_permissions_on_source_organization: boolean
-      members_exceeding_free_project_limit: components['schemas']['MemberExceedingFreeProjectLimit'][]
+      info: {
+        key: string
+        message: string
+      }[]
+      members_exceeding_free_project_limit: {
+        limit: number
+        name: string
+      }[]
       source_project_eligible: boolean
-      source_subscription_plan: components['schemas']['BillingPlanId']
+      /** @enum {string} */
+      source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise'
       target_organization_eligible: boolean | null
       target_organization_has_free_project_slots: boolean | null
-      target_subscription_plan: components['schemas']['BillingPlanId']
+      /** @enum {string|null} */
+      target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | null
       valid: boolean
-      warnings: components['schemas']['PreviewTransferInfo'][]
-    }
-    PreviewTransferInfo: {
-      key: string
-      message: string
-    }
-    PrimaryKey: {
-      name: string
-      schema: string
-      table_id: number
-      table_name: string
+      warnings: {
+        key: string
+        message: string
+      }[]
     }
     Profile: {
       first_name: string
@@ -6046,23 +6393,6 @@ export interface components {
       username: string
     }
     /** @enum {string} */
-    project_status:
-      | 'INACTIVE'
-      | 'ACTIVE_HEALTHY'
-      | 'ACTIVE_UNHEALTHY'
-      | 'COMING_UP'
-      | 'UNKNOWN'
-      | 'GOING_DOWN'
-      | 'INIT_FAILED'
-      | 'REMOVED'
-      | 'RESTORING'
-      | 'UPGRADING'
-      | 'PAUSING'
-      | 'RESTORE_FAILED'
-      | 'RESTARTING'
-      | 'PAUSE_FAILED'
-      | 'RESIZING'
-    /** @enum {string} */
     ProjectAddonPricingInterval: 'monthly' | 'hourly'
     ProjectAddonsResponse: {
       available_addons: components['schemas']['AvailableAddonResponse'][]
@@ -6089,12 +6419,6 @@ export interface components {
       price_interval: components['schemas']['ProjectAddonPricingInterval']
       price_type: components['schemas']['ProjectAddonVariantPricingType']
     }
-    ProjectAllocation: {
-      hours?: number
-      name: string
-      ref: string
-      usage: number
-    }
     ProjectAppConfigResponse: {
       db_schema: string
       endpoint: string
@@ -6106,8 +6430,25 @@ export interface components {
       target_project_ref: string
     }
     ProjectClonedStatusResponse: {
-      cloned_from: Record<string, never>
-      clones: components['schemas']['TargetCloneStatus'][]
+      cloned_from?: {
+        project_id: number
+        source_project: {
+          name: string
+          ref: string
+        }
+      }
+      clones: {
+        inserted_at: string | null
+        project_id: number
+        /** @enum {string} */
+        status: 'COMPLETED' | 'IN_PROGRESS' | 'FAILED' | 'REMOVED'
+        target_project: {
+          name: string
+          ref: string
+        }
+        target_project_id: number
+        updated_at: string | null
+      }[]
       id: number
       ref: string
     }
@@ -6116,26 +6457,26 @@ export interface components {
       release_channel: components['schemas']['ReleaseChannel']
       version: string
     }
-    ProjectDatabase: {
-      cloud_provider: string
-      disk_last_modified_at?: string
-      disk_throughput_mbps?: number
-      /** @enum {string} */
-      disk_type?: 'gp3' | 'io2'
-      disk_volume_size_gb?: number
-      identifier: string
-      infra_compute_size?: components['schemas']['DbInstanceSize']
-      region: string
-      status: components['schemas']['database_status']
-      type: components['schemas']['database_type']
-    }
     ProjectDetailResponse: {
       cloud_provider: string
       connectionString: string
       db_host: string
       dbVersion?: string
       id: number
-      infra_compute_size?: components['schemas']['DbInstanceSize']
+      /** @enum {string} */
+      infra_compute_size?:
+        | 'pico'
+        | 'nano'
+        | 'micro'
+        | 'small'
+        | 'medium'
+        | 'large'
+        | 'xlarge'
+        | '2xlarge'
+        | '4xlarge'
+        | '8xlarge'
+        | '12xlarge'
+        | '16xlarge'
       inserted_at: string
       is_branch_enabled: boolean
       is_physical_backups_enabled: boolean
@@ -6220,23 +6561,6 @@ export interface components {
       need_pitr: 'critical' | 'warning' | null
       project: string
     }
-    ProjectResponse: {
-      cloud_provider: string
-      db_dns_name: string
-      db_host: string
-      db_name: string
-      db_port: string
-      db_user: string
-      id: number
-      inserted_at: string
-      jwt_secret: string
-      name: string
-      ref: string
-      region: string
-      services?: components['schemas']['ServiceResponse'][]
-      ssl_enforced: boolean
-      status: string
-    }
     ProjectSensitivityResponse: {
       is_sensitive: boolean
     }
@@ -6271,19 +6595,6 @@ export interface components {
       release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       version: string
     }
-    ProjectWithDatabases: {
-      databases: components['schemas']['ProjectDatabase'][]
-      is_branch: boolean
-      name: string
-      ref: string
-      region: string
-      status: components['schemas']['project_status']
-    }
-    PublicUrlOptions: {
-      download?: boolean
-      downloadName?: string
-      transform?: components['schemas']['StorageObjectTransformOptions']
-    }
     PublicUrlResponse: {
       publicUrl: string
     }
@@ -6312,16 +6623,6 @@ export interface components {
       max_joins_per_second: number | null
       /** @description Whether to only allow private channels */
       private_only: boolean | null
-    }
-    Relationship: {
-      constraint_name: string
-      id: number
-      source_column_name: string
-      source_schema: string
-      source_table_name: string
-      target_column_name: string
-      target_table_name: string
-      target_table_schema: string
     }
     /**
      * @description Release channel. If not provided, GA will be used.
@@ -6426,38 +6727,39 @@ export interface components {
       }[]
     }
     ResetPasswordBody: {
+      /** Format: email */
       email: string
+      /** Format: uri */
       redirectTo?: string
     }
     ResizeBody: {
       volume_size_gb: number
     }
-    RestartProjectBodyDto: {
+    RestartProjectBody: {
       database_identifier?: string
-    }
-    RestartServiceRequest: {
-      database_identifier?: string
-      region: string
-      services: (
-        | 'adminapi'
-        | 'api-gateway'
-        | 'envoy'
-        | 'functions'
-        | 'gotrue'
-        | 'kong'
-        | 'pgbouncer'
-        | 'pgsodium'
-        | 'postgresql'
-        | 'postgrest'
-        | 'realtime'
-        | 'storage'
-        | 'walg'
-        | 'autoshutdown'
-      )[]
-      source_notification_id?: string
     }
     RestartServicesBody: {
-      restartRequest: components['schemas']['RestartServiceRequest']
+      restartRequest: {
+        database_identifier?: string
+        region: string
+        services: (
+          | 'adminapi'
+          | 'api-gateway'
+          | 'envoy'
+          | 'functions'
+          | 'gotrue'
+          | 'kong'
+          | 'pgbouncer'
+          | 'pgsodium'
+          | 'postgresql'
+          | 'postgrest'
+          | 'realtime'
+          | 'storage'
+          | 'walg'
+          | 'autoshutdown'
+        )[]
+        source_notification_id?: string
+      }
     }
     RestoreCancellation: Record<string, never>
     RestoreLogicalBackupBody: {
@@ -6479,7 +6781,7 @@ export interface components {
       grantee: string
       /** @enum {string} */
       privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
-    }
+    }[]
     RunQueryBody: {
       query: string
     }
@@ -6538,51 +6840,73 @@ export interface components {
       prevPlan?: string
       reasons: string[]
     }
-    ServiceApiKey: {
-      api_key_encrypted?: string
-      name: string
-      tags: string
-    }
-    ServiceApiKeyResponse: {
-      api_key?: string
-      api_key_encrypted?: string
-      name: string
-      tags: string
-    }
-    ServiceResponse: {
-      app: {
-        id?: number
-        name?: string
-      }
-      app_config: Record<string, never>
-      id: number
-      name: string
-      service_api_keys: components['schemas']['ServiceApiKeyResponse'][]
-    }
     ServiceVersions: {
       gotrue?: string
       postgrest?: string
       'supabase-postgres': string
     }
     SettingsResponse: {
-      project: components['schemas']['ProjectResponse']
-      services: components['schemas']['ServiceResponse'][]
+      project: {
+        cloud_provider: string
+        db_dns_name: string
+        db_host: string
+        db_name: string
+        db_port: number
+        db_user: string
+        id: number
+        inserted_at: string
+        jwt_secret: string
+        name: string
+        ref: string
+        region: string
+        services?: {
+          app: {
+            id: number
+            name: string
+          }
+          app_config: {
+            [key: string]: unknown
+          }
+          id: number
+          name: string
+          service_api_keys: {
+            api_key?: string
+            api_key_encrypted?: string
+            name: string
+            tags: string
+          }[]
+        }[]
+        ssl_enforced: boolean
+        status: string
+      }
+      services: {
+        app: {
+          id: number
+          name: string
+        }
+        app_config: {
+          [key: string]: unknown
+        }
+        id: number
+        name: string
+        service_api_keys: {
+          api_key?: string
+          api_key_encrypted?: string
+          name: string
+          tags: string
+        }[]
+      }[]
     }
     SetupIntentResponse: {
       client_secret: string
-      payment_method: Record<string, never>
-    }
-    SignedUrlOptions: {
-      download?: boolean
-      downloadName?: string
-      transform?: components['schemas']['StorageObjectTransformOptions']
+      payment_method:
+        | string
+        | {
+            [key: string]: unknown
+          }
     }
     SignedUrlResponse: {
       signedUrl: string
-    }
-    SignedUrlsOptions: {
-      download?: boolean
-      downloadName?: string
     }
     SignedUrlsResponse: {
       error: string | null
@@ -6590,12 +6914,16 @@ export interface components {
       signedUrl: string
     }
     SignUpBody: {
+      /** Format: email */
       email: string
       password: string
+      /** Format: uri */
       redirectTo?: string
     }
-    StorageBucket: {
+    StorageBucketResponse: {
+      allowed_mime_types?: string[]
       created_at: string
+      file_size_limit?: number
       id: string
       name: string
       owner: string
@@ -6603,52 +6931,41 @@ export interface components {
       updated_at: string
     }
     StorageConfigResponse: {
-      features: components['schemas']['StorageFeatures']
-      /** Format: int64 */
+      features: {
+        imageTransformation: {
+          enabled: boolean
+        }
+        s3Protocol: {
+          enabled: boolean
+        }
+      }
       fileSizeLimit: number
-    }
-    StorageFeatureImageTransformation: {
-      enabled: boolean
-    }
-    StorageFeatures: {
-      imageTransformation: components['schemas']['StorageFeatureImageTransformation']
-      s3Protocol: components['schemas']['StorageFeatureS3Protocol']
-    }
-    StorageFeatureS3Protocol: {
-      enabled: boolean
     }
     StorageObject: {
       bucket_id: string
-      buckets: components['schemas']['StorageBucket']
+      buckets: {
+        allowed_mime_types?: string[]
+        created_at: string
+        file_size_limit?: number
+        id: string
+        name: string
+        owner: string
+        public: boolean
+        updated_at: string
+      }
       created_at: string
       id: string
       last_accessed_at: string
-      metadata: Record<string, never>
+      metadata: {
+        [key: string]: unknown
+      }
       name: string
       owner: string
       updated_at: string
     }
-    StorageObjectSearchOptions: {
-      limit?: number
-      offset?: number
-      search?: string
-      sortBy?: components['schemas']['StorageObjectSortBy']
-    }
-    StorageObjectSortBy: {
-      column?: string
-      order?: string
-    }
-    StorageObjectTransformOptions: {
-      /** @enum {string} */
-      format?: 'origin'
-      height?: number
-      quality?: number
-      /** @enum {string} */
-      resize?: 'cover' | 'contain' | 'fill'
-      width?: number
-    }
     SupavisorConfigResponse: {
-      connection_string: string
+      /** @description Use connection_string instead */
+      connectionString: string
       /** @enum {string} */
       database_type: 'PRIMARY' | 'READ_REPLICA'
       db_host: string
@@ -6662,34 +6979,12 @@ export interface components {
       /** @enum {string} */
       pool_mode: 'transaction' | 'session'
     }
-    SyncVercelEnvError: {
-      message: string
-    }
-    Table: {
-      id: number
-      name: string
-      schema: string
-    }
-    TargetClonedProject: {
-      name: string
-      ref: string
-    }
-    TargetCloneStatus: {
-      inserted_at: string | null
-      project_id: number
-      /** @enum {string} */
-      status: 'COMPLETED' | 'IN_PROGRESS' | 'FAILED' | 'REMOVED'
-      target_project: components['schemas']['TargetClonedProject']
-      target_project_id: number
-      updated_at: string | null
-    }
-    TaxId: {
-      country: string
-      type: string
-      value: string
-    }
     TaxIdResponse: {
-      tax_id: components['schemas']['TaxId'] | null
+      tax_id: {
+        country: string
+        type: string
+        value: string
+      } | null
     }
     TelemetryCallFeatureFlagsResponseDto: {
       [key: string]: unknown
@@ -6757,8 +7052,9 @@ export interface components {
       pathname: string
     }
     TransferOrganizationBody: {
+      /** Format: uuid */
       member_gotrue_id: string
-      member_id: number
+      member_id?: number
       org_id: number
     }
     TransferProjectBody: {
@@ -6801,7 +7097,7 @@ export interface components {
     UpdateColumnBody: {
       check?: string
       comment?: string
-      defaultValue?: Record<string, never>
+      defaultValue?: unknown
       /** @enum {string} */
       defaultValueFormat?: 'expression' | 'literal'
       dropDefault?: boolean
@@ -6841,7 +7137,9 @@ export interface components {
       args?: string[]
       /** @enum {string} */
       behavior?: 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
-      config_params?: Record<string, never>
+      config_params?: {
+        [key: string]: string
+      }
       definition?: string
       id?: number
       language?: string
@@ -6850,7 +7148,7 @@ export interface components {
       schema?: string
       security_definer?: boolean
     }
-    UpdateGitHubConnectionsBody: {
+    UpdateGitHubConnectionBody: {
       branch_limit?: number
       supabase_changes_only?: boolean
       workdir?: string
@@ -7058,9 +7356,16 @@ export interface components {
       role_scoped_projects: string[]
     }
     UpdateNotificationBodyV2: {
+      /** Format: uuid */
       id: string
       /** @enum {string} */
       status: 'new' | 'seen' | 'archived'
+    }[]
+    UpdateNotificationExceptionParamsDto: {
+      /** Format: uuid */
+      id: string
+      /** @description Project ref */
+      ref: string
     }
     UpdateNotificationsBodyV1: {
       ids: string[]
@@ -7087,9 +7392,13 @@ export interface components {
       default_pool_size?: number
       ignore_startup_parameters: string
       max_client_conn?: number
-      pgbouncer_enabled: boolean
-      /** @enum {string} */
-      pool_mode: 'transaction' | 'session' | 'statement'
+      /** @deprecated */
+      pgbouncer_enabled?: boolean
+      /**
+       * @deprecated
+       * @enum {string}
+       */
+      pool_mode?: 'transaction' | 'session' | 'statement'
     }
     UpdatePolicyBody: {
       check?: string
@@ -7103,8 +7412,14 @@ export interface components {
       ignore_startup_parameters: string
       max_client_conn?: number
       pgbouncer_enabled: boolean
-      pgbouncer_status: Record<string, never>
-      pool_mode: Record<string, never>
+      /** @enum {string} */
+      pgbouncer_status: 'COMING_UP' | 'COMING_DOWN' | 'RELOADING' | 'ENABLED' | 'DISABLED'
+      /**
+       * @deprecated
+       * @description Cannot be changed, this is ignored
+       * @enum {string}
+       */
+      pool_mode?: 'transaction' | 'session' | 'statement'
     }
     UpdatePostgresConfigBody: {
       effective_cache_size?: string
@@ -7139,9 +7454,16 @@ export interface components {
       db_schema?: string
       max_rows?: number
     }
+    UpdatePostgrestConfigResponse: {
+      db_extra_search_path: string
+      /** @description If `null`, the value is automatically configured based on compute size. */
+      db_pool: number | null
+      db_schema: string
+      max_rows: number
+    }
     UpdateProfileBody: {
-      first_name: string
-      last_name: string
+      first_name?: string
+      last_name?: string
     }
     UpdateProjectBody: {
       name: string
@@ -7211,13 +7533,19 @@ export interface components {
       message: string
     }
     UpdateStorageBucketBody: {
-      allowed_mime_types: string[]
-      file_size_limit: number
+      allowed_mime_types?: string[] | null
+      file_size_limit?: number | null
       public: boolean
     }
     UpdateStorageConfigBody: {
-      features?: components['schemas']['StorageFeatures']
-      /** Format: int64 */
+      features?: {
+        imageTransformation: {
+          enabled: boolean
+        }
+        s3Protocol: {
+          enabled: boolean
+        }
+      }
       fileSizeLimit?: number
     }
     UpdateSubscriptionBody: {
@@ -7284,7 +7612,9 @@ export interface components {
       email_change_token_new?: string
       email_confirmed_at?: string
       encrypted_password?: string
+      /** Format: uuid */
       id?: string
+      /** Format: uuid */
       instance_id?: string
       invited_at?: string
       is_anonymous?: boolean
@@ -7296,8 +7626,12 @@ export interface components {
       phone_change_sent_at?: string
       phone_change_token?: string
       phone_confirmed_at?: string
-      raw_app_meta_data?: Record<string, never>
-      raw_user_meta_data?: Record<string, never>
+      raw_app_meta_data?: {
+        [key: string]: unknown
+      }
+      raw_user_meta_data?: {
+        [key: string]: unknown
+      }
       reauthentication_sent_at?: string
       reauthentication_token?: string
       recovery_sent_at?: string
@@ -7306,8 +7640,7 @@ export interface components {
       updated_at?: string
     }
     UpdateVercelConnectionsBody: {
-      /** @enum {array} */
-      env_sync_targets?: 'production' | 'preview' | 'development'
+      env_sync_targets?: ('production' | 'preview' | 'development')[]
       public_env_var_prefix?: string
     }
     UpsertContentBodyDto: {
@@ -7326,6 +7659,10 @@ export interface components {
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
     }
+    UserAuditLogsResponse: {
+      result: unknown[]
+      retention_period: number
+    }
     UserBody: {
       aud?: string
       banned_until?: string
@@ -7342,7 +7679,9 @@ export interface components {
       email_change_token_new?: string
       email_confirmed_at?: string
       encrypted_password?: string
+      /** Format: uuid */
       id?: string
+      /** Format: uuid */
       instance_id?: string
       invited_at?: string
       is_anonymous?: boolean
@@ -7354,8 +7693,12 @@ export interface components {
       phone_change_sent_at?: string
       phone_change_token?: string
       phone_confirmed_at?: string
-      raw_app_meta_data?: Record<string, never>
-      raw_user_meta_data?: Record<string, never>
+      raw_app_meta_data?: {
+        [key: string]: unknown
+      }
+      raw_user_meta_data?: {
+        [key: string]: unknown
+      }
       reauthentication_sent_at?: string
       reauthentication_token?: string
       recovery_sent_at?: string
@@ -7403,13 +7746,6 @@ export interface components {
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
     }
-    V1PostgrestConfigResponse: {
-      db_extra_search_path: string
-      /** @description If `null`, the value is automatically configured based on compute size. */
-      db_pool: number | null
-      db_schema: string
-      max_rows: number
-    }
     ValidateQueryBody: {
       query: string
     }
@@ -7421,25 +7757,11 @@ export interface components {
       subject: string
     }
     ValidateSpamResponse: {
-      rules: components['schemas']['ValidateSpamRule'][]
-    }
-    ValidateSpamRule: {
-      desc: string
-      name: string
-      score: number
-    }
-    VercelProjectDeployHooks: {
-      createdAt?: number
-      id: string
-      name: string
-      ref: string
-      url: string
-    }
-    VercelProjectLink: {
-      deployHooks: components['schemas']['VercelProjectDeployHooks'][]
-      gitCredentialId?: string
-      productionBranch?: string
-      type?: string
+      rules: {
+        desc: string
+        name: string
+        score: number
+      }[]
     }
     VercelRedirectResponse: {
       url: string
@@ -7448,7 +7770,7 @@ export interface components {
       branch_id: string
       check_run_id: number | null
       created_at: string
-      git_config: Record<string, never> | null
+      git_config?: unknown
       id: string
       /** @enum {string} */
       status:
@@ -7576,7 +7898,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -7615,7 +7936,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -7654,7 +7974,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -7693,7 +8012,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -7767,7 +8085,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -7807,7 +8124,6 @@ export interface operations {
       header?: never
       path: {
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -7841,7 +8157,6 @@ export interface operations {
       header?: never
       path: {
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -7881,7 +8196,6 @@ export interface operations {
       header?: never
       path: {
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -8037,7 +8351,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -8126,7 +8439,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -8157,7 +8469,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -8188,7 +8499,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -8219,7 +8529,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -8248,7 +8557,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -8281,7 +8589,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -8342,8 +8649,8 @@ export interface operations {
     parameters: {
       query: {
         id: number
-        limit?: string
-        offset?: string
+        limit: number
+        offset: number
       }
       header: {
         'x-connection-encrypted': string
@@ -8570,7 +8877,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['GitHubAuthorization']
+          'application/json': components['schemas']['GitHubAuthorizationResponse']
         }
       }
       /** @description Failed to get GitHub authorization */
@@ -8763,7 +9070,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateGitHubConnectionsBody']
+        'application/json': components['schemas']['UpdateGitHubConnectionBody']
       }
     }
     responses: {
@@ -8990,7 +9297,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['GetVercelConnections'][]
+          'application/json': components['schemas']['GetVercelConnectionsResponse']
         }
       }
       /** @description Failed to get installed vercel connections for the given organization integration */
@@ -9004,9 +9311,9 @@ export interface operations {
   }
   VercelProjectController_getVercelProjects: {
     parameters: {
-      query: {
-        from?: string
-        limit: string
+      query?: {
+        from?: number
+        limit?: number
         search?: string
       }
       header?: never
@@ -9106,7 +9413,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateNotificationBodyV2'][]
+        'application/json': components['schemas']['UpdateNotificationBodyV2']
       }
     }
     responses: {
@@ -9175,7 +9482,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Oauth authorization id */
         id: string
       }
       cookie?: never
@@ -9335,11 +9641,9 @@ export interface operations {
   }
   OrgAuditLogsController_getAuditLogs: {
     parameters: {
-      query?: {
-        /** @description End timestamp */
-        iso_timestamp_end?: string
-        /** @description Start timestamp */
-        iso_timestamp_start?: string
+      query: {
+        iso_timestamp_end: string
+        iso_timestamp_start: string
       }
       header?: never
       path: {
@@ -9458,7 +9762,6 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -9493,7 +9796,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -9529,7 +9831,6 @@ export interface operations {
       header?: never
       path: {
         invoiceId: string
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -9599,7 +9900,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -9778,7 +10078,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -9802,12 +10101,11 @@ export interface operations {
       }
     }
   }
-  updateCustomerV2: {
+  CustomerController_updateCustomer: {
     parameters: {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -9843,49 +10141,12 @@ export interface operations {
     parameters: {
       query: {
         endDate: string
-        interval: string
-        metric:
-          | 'EGRESS'
-          | 'DATABASE_SIZE'
-          | 'STORAGE_SIZE'
-          | 'MONTHLY_ACTIVE_USERS'
-          | 'MONTHLY_ACTIVE_SSO_USERS'
-          | 'FUNCTION_INVOCATIONS'
-          | 'STORAGE_IMAGES_TRANSFORMED'
-          | 'REALTIME_MESSAGE_COUNT'
-          | 'REALTIME_PEAK_CONNECTIONS'
-          | 'DISK_SIZE_GB_HOURS_GP3'
-          | 'DISK_SIZE_GB_HOURS_IO2'
-          | 'AUTH_MFA_PHONE'
-          | 'AUTH_MFA_WEB_AUTHN'
-          | 'LOG_DRAIN_EVENTS'
-          | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
-          | 'DISK_THROUGHPUT_GP3'
-          | 'DISK_IOPS_GP3'
-          | 'DISK_IOPS_IO2'
-          | 'COMPUTE_HOURS_BRANCH'
-          | 'COMPUTE_HOURS_XS'
-          | 'COMPUTE_HOURS_SM'
-          | 'COMPUTE_HOURS_MD'
-          | 'COMPUTE_HOURS_L'
-          | 'COMPUTE_HOURS_XL'
-          | 'COMPUTE_HOURS_2XL'
-          | 'COMPUTE_HOURS_4XL'
-          | 'COMPUTE_HOURS_8XL'
-          | 'COMPUTE_HOURS_12XL'
-          | 'COMPUTE_HOURS_16XL'
-          | 'CUSTOM_DOMAIN'
-          | 'PITR_7'
-          | 'PITR_14'
-          | 'PITR_28'
-          | 'IPV4'
-          | 'LOG_DRAIN'
+        metric: string
         projectRef?: string
         startDate: string
       }
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -9918,7 +10179,6 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -9989,7 +10249,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10019,7 +10278,6 @@ export interface operations {
       header?: never
       path: {
         gotrue_id: string
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10047,7 +10305,6 @@ export interface operations {
       header?: never
       path: {
         gotrue_id: string
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10080,7 +10337,6 @@ export interface operations {
       path: {
         gotrue_id: string
         role_id: string
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10113,7 +10369,6 @@ export interface operations {
       path: {
         gotrue_id: string
         role_id: string
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10140,7 +10395,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10169,7 +10423,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10201,7 +10454,6 @@ export interface operations {
       header?: never
       path: {
         id: number
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10228,7 +10480,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
         token: string
       }
@@ -10258,7 +10509,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
         token: string
       }
@@ -10317,7 +10567,6 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10345,7 +10594,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10363,6 +10611,89 @@ export interface operations {
         content: {
           'application/json': components['schemas']['CreateOAuthAppResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OAuthAppClientSecretsController_listClientSecrets: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        app_id: string
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListOAuthAppClientSecretsResponseDto']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OAuthAppClientSecretsController_CreateClientSecret: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        app_id: string
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateOAuthAppClientSecretResponseDto']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OAuthAppClientSecretsController_RemoveClientSecret: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        app_id: string
+        secret_id: string
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       403: {
         headers: {
@@ -10465,9 +10796,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Oauth authorization id */
         id: string
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10495,9 +10824,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Oauth authorization id */
         id: string
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10520,12 +10847,11 @@ export interface operations {
       }
     }
   }
-  getPaymentMethodsV2: {
+  PaymentsController_getPaymentMethods: {
     parameters: {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10560,7 +10886,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10597,7 +10922,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10673,7 +10997,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10737,7 +11060,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10772,7 +11094,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10811,7 +11132,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10876,7 +11196,6 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -10928,7 +11247,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -10965,14 +11283,13 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['GrantColumnPrivilegesBody'][]
+        'application/json': components['schemas']['GrantColumnPrivilegesBody']
       }
     }
     responses: {
@@ -11006,14 +11323,13 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['RevokeColumnPrivilegesBody'][]
+        'application/json': components['schemas']['RevokeColumnPrivilegesBody']
       }
     }
     responses: {
@@ -11042,15 +11358,14 @@ export interface operations {
   }
   ColumnsController_getColumns: {
     parameters: {
-      query: {
-        excluded_schemas: string
-        included_schemas: string
+      query?: {
+        excluded_schemas?: string
+        included_schemas?: string
       }
       header: {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11087,7 +11402,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11124,7 +11438,7 @@ export interface operations {
   ColumnsController_deleteColumn: {
     parameters: {
       query: {
-        cascade?: string
+        cascade?: boolean
         /** @description Column ID */
         id: string
       }
@@ -11132,7 +11446,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11172,7 +11485,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11213,7 +11525,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11250,7 +11561,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11294,7 +11604,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11326,17 +11635,16 @@ export interface operations {
   }
   ForeignTablesController_getForeignTables: {
     parameters: {
-      query: {
-        id: string
-        include_columns: string
-        limit: string
-        offset: string
+      query?: {
+        id?: string
+        include_columns?: string
+        limit?: string
+        offset?: string
       }
       header: {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11368,15 +11676,14 @@ export interface operations {
   }
   FunctionsController_getFunctions: {
     parameters: {
-      query: {
-        excluded_schemas: string
-        included_schemas: string
+      query?: {
+        excluded_schemas?: string
+        included_schemas?: string
       }
       header: {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11413,7 +11720,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11457,7 +11763,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11497,7 +11802,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11533,19 +11837,18 @@ export interface operations {
   }
   MaterializedViewsController_getMaterializedViews: {
     parameters: {
-      query: {
-        excluded_schemas: string
-        id: string
-        include_columns: string
-        included_schemas: string
-        limit: string
-        offset: string
+      query?: {
+        excluded_schemas?: string
+        id?: string
+        include_columns?: string
+        included_schemas?: string
+        limit?: string
+        offset?: string
       }
       header: {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11577,15 +11880,14 @@ export interface operations {
   }
   PoliciesController_getPolicies: {
     parameters: {
-      query: {
-        excluded_schemas: string
-        included_schemas: string
+      query?: {
+        excluded_schemas?: string
+        included_schemas?: string
       }
       header: {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11622,7 +11924,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11666,7 +11967,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11706,7 +12006,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11747,7 +12046,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11784,7 +12082,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11828,7 +12125,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11868,7 +12164,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11909,7 +12204,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11948,7 +12242,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -11981,7 +12274,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -12016,7 +12308,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -12053,7 +12344,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -12097,7 +12387,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -12137,7 +12426,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -12173,21 +12461,19 @@ export interface operations {
   }
   TablesController_getTables: {
     parameters: {
-      query: {
-        excluded_schemas: string
-        /** @description Table ID */
+      query?: {
+        excluded_schemas?: string
         id?: string
-        include_columns: string
-        include_system_schemas: string
-        included_schemas: string
-        limit: string
-        offset: string
+        include_columns?: string
+        include_system_schemas?: string
+        included_schemas?: string
+        limit?: string
+        offset?: string
       }
       header: {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -12224,7 +12510,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -12261,7 +12546,7 @@ export interface operations {
   TablesController_deleteTable: {
     parameters: {
       query: {
-        cascade: boolean
+        cascade?: boolean
         /** @description Table ID */
         id: number
       }
@@ -12269,7 +12554,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -12309,7 +12593,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -12345,15 +12628,14 @@ export interface operations {
   }
   TriggersController_getTriggers: {
     parameters: {
-      query: {
-        excluded_schemas: string
-        included_schemas: string
+      query?: {
+        excluded_schemas?: string
+        included_schemas?: string
       }
       header: {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -12390,7 +12672,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -12434,7 +12715,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -12474,7 +12754,6 @@ export interface operations {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -12510,15 +12789,14 @@ export interface operations {
   }
   TypesController_getTypes: {
     parameters: {
-      query: {
-        excluded_schemas: string
-        included_schemas: string
+      query?: {
+        excluded_schemas?: string
+        included_schemas?: string
       }
       header: {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -12550,20 +12828,19 @@ export interface operations {
   }
   ViewsController_getViews: {
     parameters: {
-      query: {
-        excluded_schemas: string
-        id: string
-        include_columns: string
-        include_system_schemas: string
-        included_schemas: string
-        limit: string
-        offset: string
+      query?: {
+        excluded_schemas?: string
+        id?: string
+        include_columns?: string
+        include_system_schemas?: string
+        included_schemas?: string
+        limit?: string
+        offset?: string
       }
       header: {
         'x-connection-encrypted': string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -12822,11 +13099,9 @@ export interface operations {
   }
   UserAuditLogsController_getAuditLogs: {
     parameters: {
-      query?: {
-        /** @description End timestamp */
-        iso_timestamp_end?: string
-        /** @description Start timestamp */
-        iso_timestamp_start?: string
+      query: {
+        iso_timestamp_end: string
+        iso_timestamp_start: string
       }
       header?: never
       path?: never
@@ -12839,7 +13114,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['AuditLogsResponse']
+          'application/json': components['schemas']['UserAuditLogsResponse']
         }
       }
       /** @description Failed to get a user's audit logs */
@@ -13020,7 +13295,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -13042,7 +13316,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -13070,7 +13343,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -13263,7 +13535,6 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -13472,7 +13743,7 @@ export interface operations {
       }
     }
   }
-  'v1-list-all-warehouse-tokens': {
+  AccessTokenController_listAccessTokens: {
     parameters: {
       query?: never
       header?: never
@@ -13507,7 +13778,7 @@ export interface operations {
       }
     }
   }
-  'v1-create-a-warehouse-token': {
+  AccessTokenController_createAccessToken: {
     parameters: {
       query?: never
       header?: never
@@ -13539,7 +13810,7 @@ export interface operations {
       }
     }
   }
-  'v1-delete-a-warehouse-token': {
+  AccessTokenController_deleteAccessToken: {
     parameters: {
       query?: never
       header?: never
@@ -13569,7 +13840,7 @@ export interface operations {
       }
     }
   }
-  'v1-list-all-telemetry-collections': {
+  CollectionController_listCollections: {
     parameters: {
       query?: never
       header?: never
@@ -13604,7 +13875,7 @@ export interface operations {
       }
     }
   }
-  'v1-create-a-telemetry-collection': {
+  CollectionController_createCollection: {
     parameters: {
       query?: never
       header?: never
@@ -13636,7 +13907,7 @@ export interface operations {
       }
     }
   }
-  'v1-get-a-telemetry-collection': {
+  CollectionController_getCollectionSchema: {
     parameters: {
       query?: never
       header?: never
@@ -13668,7 +13939,7 @@ export interface operations {
       }
     }
   }
-  'v1-delete-a-telemetry-collection': {
+  CollectionController_deleteCollection: {
     parameters: {
       query?: never
       header?: never
@@ -13700,7 +13971,7 @@ export interface operations {
       }
     }
   }
-  'v1-update-a-telemetry-collection': {
+  CollectionController_updateCollection: {
     parameters: {
       query?: never
       header?: never
@@ -13732,7 +14003,7 @@ export interface operations {
       }
     }
   }
-  'v1-get-a-telemetry-collection-schema': {
+  CollectionController_getCollection: {
     parameters: {
       query?: never
       header?: never
@@ -13764,7 +14035,7 @@ export interface operations {
       }
     }
   }
-  'v1-list-all-warehouse-endpoints': {
+  EndpointController_listEndpoints: {
     parameters: {
       query?: never
       header?: never
@@ -13799,7 +14070,7 @@ export interface operations {
       }
     }
   }
-  'v1-create-a-warehouse-endpoint': {
+  EndpointController_createEndpoint: {
     parameters: {
       query?: never
       header?: never
@@ -13831,7 +14102,7 @@ export interface operations {
       }
     }
   }
-  'v1-update-a-warehouse-endpoint': {
+  EndpointController_updateEndpoint: {
     parameters: {
       query?: never
       header?: never
@@ -13863,7 +14134,7 @@ export interface operations {
       }
     }
   }
-  'v1-delete-a-warehouse-endpoint': {
+  EndpointController_deleteEndpoint: {
     parameters: {
       query?: never
       header?: never
@@ -13893,7 +14164,7 @@ export interface operations {
       }
     }
   }
-  'v1-list-all-warehouse-queries': {
+  WarehouseQueryController_runQuery: {
     parameters: {
       query?: never
       header?: never
@@ -13926,7 +14197,7 @@ export interface operations {
       }
     }
   }
-  'v1-parse-warehouse-query': {
+  WarehouseQueryController_parseQuery: {
     parameters: {
       query?: never
       header?: never
@@ -13959,7 +14230,7 @@ export interface operations {
       }
     }
   }
-  'v1-provision-a-warehouse-tenant': {
+  TenantController_getTenant: {
     parameters: {
       query?: never
       header?: never
@@ -14181,7 +14452,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -14210,7 +14480,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -14249,7 +14518,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -14273,7 +14541,7 @@ export interface operations {
       }
     }
   }
-  'v1-get-postgres-config': {
+  PostgresConfigController_getConfig: {
     parameters: {
       query?: never
       header?: never
@@ -14302,7 +14570,7 @@ export interface operations {
       }
     }
   }
-  'v1-update-postgres-config': {
+  PostgresConfigController_updateConfig: {
     parameters: {
       query?: never
       header?: never
@@ -14358,7 +14626,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['PostgrestConfigResponse']
+          'application/json': components['schemas']['GetPostgrestConfigResponse']
         }
       }
       403: {
@@ -14397,7 +14665,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1PostgrestConfigResponse']
+          'application/json': components['schemas']['UpdatePostgrestConfigResponse']
         }
       }
       403: {
@@ -14511,12 +14779,40 @@ export interface operations {
       }
     }
   }
-  StorageConfigController_getConfig: {
+  SecretsConfigController_getJwtSecretUpdateStatus: {
     parameters: {
       query?: never
       header?: never
       path: {
         /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetJwtSecretUpdateStatus']
+        }
+      }
+      /** @description Failed to retrieve JWT secret update status */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  StorageConfigController_getConfig: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
         ref: string
       }
       cookie?: never
@@ -14551,7 +14847,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -14585,12 +14880,11 @@ export interface operations {
       }
     }
   }
-  'v1-get-supavisor-config': {
+  SupavisorConfigController_getSupavisorConfig: {
     parameters: {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -14614,12 +14908,11 @@ export interface operations {
       }
     }
   }
-  'v1-update-supavisor-config': {
+  SupavisorConfigController_updateSupavisorConfig: {
     parameters: {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -15012,7 +15305,6 @@ export interface operations {
         attribute:
           | 'total_realtime_requests'
           | 'total_realtime_egress'
-          | 'avg_cpu_usage'
           | 'total_ingress'
           | 'total_egress'
           | 'total_requests'
@@ -15020,7 +15312,6 @@ export interface operations {
           | 'total_patch_requests'
           | 'total_post_requests'
           | 'total_delete_requests'
-          | 'total_options_requests'
           | 'total_supavisor_egress_bytes'
           | 'total_rest_ingress'
           | 'total_rest_egress'
@@ -15029,16 +15320,10 @@ export interface operations {
           | 'total_rest_post_requests'
           | 'total_rest_patch_requests'
           | 'total_rest_delete_requests'
-          | 'total_rest_options_requests'
           | 'total_auth_billing_period_mau'
           | 'total_auth_billing_period_sso_mau'
-          | 'total_auth_ingress'
           | 'total_auth_egress'
           | 'total_auth_requests'
-          | 'total_auth_get_requests'
-          | 'total_auth_post_requests'
-          | 'total_auth_patch_requests'
-          | 'total_auth_options_requests'
           | 'total_auth_delete_requests'
           | 'total_storage_ingress'
           | 'total_storage_egress'
@@ -15047,16 +15332,13 @@ export interface operations {
           | 'total_storage_get_requests'
           | 'total_storage_post_requests'
           | 'total_storage_delete_requests'
-          | 'total_storage_options_requests'
-          | 'total_storage_patch_requests'
           | 'total_logdrain_egress'
         endDate: string
-        interval: string
+        interval?: string
         startDate: string
       }
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -15362,7 +15644,6 @@ export interface operations {
           | 'cpu_usage_busy_idle'
           | 'client_connections_max_limit'
           | 'client_connections_pgbouncer'
-          | 'client_connections_pgbouncer_waiting'
           | 'client_connections_postgres'
           | 'client_connections_realtime'
           | 'client_connections_supavisor'
@@ -15400,7 +15681,6 @@ export interface operations {
       }
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -15518,7 +15798,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateNotificationExceptionsDto']
+        'application/json': components['schemas']['CreateNotificationExceptionsBodyDto']
       }
     }
     responses: {
@@ -15559,6 +15839,37 @@ export interface operations {
         content?: never
       }
       /** @description Failed to delete advisor notification exceptions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ProjectAdvisorNotificationsController_updateNotificationExceptions: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateNotificationExceptionParamsDto']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update advisor notification exceptions */
       500: {
         headers: {
           [name: string]: unknown
@@ -15664,7 +15975,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['RestartProjectBodyDto']
+        'application/json': components['schemas']['RestartProjectBody']
       }
     }
     responses: {
@@ -16032,7 +16343,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -16062,7 +16372,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -16173,7 +16482,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17004,7 +17312,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17016,7 +17323,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['StorageBucket'][]
+          'application/json': components['schemas']['StorageBucketResponse'][]
         }
       }
       403: {
@@ -17039,7 +17346,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17078,9 +17384,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17092,7 +17396,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['StorageBucket']
+          'application/json': components['schemas']['StorageBucketResponse']
         }
       }
       403: {
@@ -17115,9 +17419,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17150,9 +17452,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17189,9 +17489,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17224,9 +17522,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
+        /** @description Bucket ID */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17263,9 +17560,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
+        /** @description Bucket ID */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17304,9 +17600,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
+        /** @description Bucket ID */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17343,9 +17638,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
+        /** @description Bucket ID */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17384,9 +17678,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
+        /** @description Bucket ID */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17423,9 +17716,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
+        /** @description Bucket ID */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17464,9 +17756,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
+        /** @description Bucket ID */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17505,9 +17796,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage bucket id */
+        /** @description Bucket ID */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17546,7 +17836,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17581,7 +17870,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17620,9 +17908,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Storage credential id */
         id: string
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -17997,7 +18283,6 @@ export interface operations {
   VercelProjectsController_getVercelProjects: {
     parameters: {
       query: {
-        id: string
         teamId: string
       }
       header: {
@@ -18028,7 +18313,6 @@ export interface operations {
   VercelProjectsController_getVercelProject: {
     parameters: {
       query: {
-        id: string
         teamId: string
       }
       header: {
@@ -18036,7 +18320,6 @@ export interface operations {
       }
       path: {
         id: string
-        teamId: string
       }
       cookie?: never
     }
@@ -18063,7 +18346,7 @@ export interface operations {
     parameters: {
       query: {
         projectId: string
-        teamId?: string
+        teamId: string
       }
       header: {
         vercel_authorization: string
@@ -18094,7 +18377,7 @@ export interface operations {
     parameters: {
       query: {
         projectId: string
-        teamId?: string
+        teamId: string
       }
       header: {
         vercel_authorization: string
@@ -18153,40 +18436,12 @@ export interface operations {
       }
     }
   }
-  VercelAccessTokenController_getAccessToken: {
-    parameters: {
-      query: {
-        code: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get Vercel access token */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   WorkflowRunController_listWorkflowRuns: {
     parameters: {
       query?: {
-        /** @description Branch ID */
         branch_id?: string
         limit?: number
         offset?: number
-        /** @description Project ref */
         project_ref?: string
       }
       header?: never
@@ -18215,9 +18470,7 @@ export interface operations {
   WorkflowRunController_countWorkflowRuns: {
     parameters: {
       query?: {
-        /** @description Branch ID */
         branch_id?: string
-        /** @description Project ref */
         project_ref?: string
       }
       header?: never
@@ -18248,7 +18501,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Workflow run ID */
         workflow_run_id: string
       }
       cookie?: never

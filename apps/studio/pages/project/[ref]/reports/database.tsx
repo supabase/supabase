@@ -18,6 +18,7 @@ import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/DiskSizeConfigurationModal'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import Table from 'components/to-be-cleaned/Table'
@@ -38,14 +39,17 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { analyticsKeys } from 'data/analytics/keys'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
+import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
-import { getReportAttributes } from 'data/reports/database-charts'
-
-const ComposedChartHandler = dynamic(() => import('components/ui/Charts/ComposedChartHandler'))
-
-export type UpdateDateRange = (from: string, to: string) => void
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { BASE_PATH } from 'lib/constants'
+import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
+import { formatBytes } from 'lib/helpers'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import type { NextPageWithLayout } from 'types'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -103,10 +107,8 @@ const DatabaseUsage = () => {
     },
   })
 
-  const { data: pgBouncerConfig } = usePgbouncerConfigQuery({
-    projectRef: ref ?? 'default',
-  })
-  const isPgBouncerEnabled = pgBouncerConfig?.pgbouncer_enabled
+  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
+  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
   const REPORT_ATTRIBUTES_V2 = getReportAttributes()
 
@@ -122,13 +124,13 @@ const DatabaseUsage = () => {
     },
     {
       id: 'supavisor_connections_active',
-      label: 'Client to Supavisor connections',
+      label: 'Client to Shared Pooler connections',
       hide: false,
     },
     {
-      id: 'pgbouncer_pools_client_active_connections',
-      label: 'Client to dedicated pooler connections',
-      hide: !isPgBouncerEnabled,
+      id: 'client_connections_pgbouncer',
+      label: 'Client to Dedicated Pooler connections',
+      hide: isFreePlan,
     },
   ] as const
 
@@ -333,26 +335,15 @@ const DatabaseUsage = () => {
             <Panel.Content className="grid grid-cols-1 gap-4">
               {dateRange &&
                 REPORT_ATTRIBUTES.filter((attr) => !attr.hide).map((attr) => (
-                  <>
-                    <ChartHandler
-                      key={attr.id}
-                      provider="infra-monitoring"
-                      attribute={attr.id}
-                      label={attr.label}
-                      interval={dateRange.interval}
-                      startDate={dateRange?.period_start?.date}
-                      endDate={dateRange?.period_end?.date}
-                    />
-                    {attr.id === 'pgbouncer_pools_client_active_connections' && (
-                      <Admonition type="note" title="Dedicated Pooler is enabled" className="p-2">
-                        <p>
-                          Your project is currently using the Dedicated Pooler instead of Supavisor.
-                          You can update this in{' '}
-                          <Link href={`/project/${ref}/settings/database`}>Database settings</Link>.
-                        </p>
-                      </Admonition>
-                    )}
-                  </>
+                  <ChartHandler
+                    key={attr.id}
+                    provider="infra-monitoring"
+                    attribute={attr.id}
+                    label={attr.label}
+                    interval={dateRange.interval}
+                    startDate={dateRange?.period_start?.date}
+                    endDate={dateRange?.period_end?.date}
+                  />
                 ))}
             </Panel.Content>
           </Panel>

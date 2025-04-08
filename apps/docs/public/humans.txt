@@ -11,6 +11,7 @@ Angelico de los Reyes
 Ant Wilson
 Ariuna K
 Artur Zakirov
+Artyom Borissov
 Beng Eu
 Bo Lu
 Bobbie Soedirgo
@@ -24,11 +25,14 @@ Chris Copplestone
 Chris Gwilliams
 Chris Stockton
 Craig Cannon
+Darren Cunningham
 Dave Wilson
+David A. Ventimiglia
 Deji I
 Div Arora
 Divit D
 Egor Romanov
+Eleftheria Trivyzaki
 Etienne Stalmans
 Fabrizio Fenoglio
 Francesco Sansalvadore
@@ -58,6 +62,7 @@ Kevin Grüneberg
 Lakshan Perera
 Laura C
 Laurence Isla
+Lenny Urbanowski
 Long Hoang
 Łukasz Niemier
 Margarita Sandomirskaia

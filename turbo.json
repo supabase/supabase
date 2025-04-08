@@ -84,11 +84,14 @@
         "NEXT_PUBLIC_STUDIO_URL",
         "NEXT_PUBLIC_DOCS_URL",
         "NEXT_PUBLIC_REFERENCE_DOCS_URL",
+        "NEXT_PUBLIC_UI_LIBRARY_URL",
         "NEXT_PUBLIC_SUPABASE_URL",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
         "NEXT_PUBLIC_VERCEL_ENV",
         "NEXT_PUBLIC_VERCEL_BRANCH_URL",
         "NEXT_PUBLIC_API_URL",
+        "NEXT_PUBLIC_HCAPTCHA_SITE_KEY",
+        "HCAPTCHA_SECRET_KEY",
         "NODE_ENV",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
@@ -99,6 +102,8 @@
         "NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL",
         "NEXT_PUBLIC_GOTRUE_URL",
         "NEXT_PUBLIC_BASE_PATH",
+        "NEXT_PUBLIC_EXAMPLES_SUPABASE_ANON_KEY",
+        "NEXT_PUBLIC_EXAMPLES_SUPABASE_URL",
         // These envs are technically passthrough env vars because they're only used on the server side of Nextjs
         "LIVE_SUPABASE_COM_SERVICE_ROLE_KEY",
         "GITHUB_CHANGELOG_APP_ID",
@@ -109,6 +114,7 @@
         "EMAIL_ABUSE_SERVICE_KEY",
         "HUBSPOT_PORTAL_ID",
         "HUBSPOT_ENTERPRISE_FORM_GUID",
+        "HUBSPOT_PARTNERSHIP_FORM_GUID",
         "OPENAI_API_KEY",
         "EMAIL_REPORT_SLACK_WEBHOOK",
         "npm_lifecycle_event",
@@ -117,6 +123,27 @@
         "FORCE_ASSET_CDN",
         "ASSET_CDN_S3_ENDPOINT",
         "SITE_NAME"
+      ],
+      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
+    },
+    "ui-library#build": {
+      "dependsOn": ["^build"],
+      "env": [
+        "NEXT_PUBLIC_BASE_PATH",
+        "NEXT_PUBLIC_APP_URL",
+        "NEXT_PUBLIC_VERCEL_TARGET_ENV",
+        "NEXT_PUBLIC_VERCEL_BRANCH_URL",
+        "NEXT_PUBLIC_API_URL",
+        "NODE_ENV",
+        "HIDE_TAILWIND_INDICATOR",
+        // These envs are used in the packages
+        "NEXT_PUBLIC_STORAGE_KEY",
+        "NEXT_PUBLIC_AUTH_DEBUG_KEY",
+        "NEXT_PUBLIC_AUTH_PERSISTED_KEY",
+        "NEXT_PUBLIC_AUTH_NAVIGATOR_LOCK_KEY",
+        "NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL",
+        "NEXT_PUBLIC_GOTRUE_URL",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },

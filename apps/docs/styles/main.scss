@@ -283,7 +283,7 @@ th code {
   @apply text-nowrap;
 }
 
-/* 
+/*
  * Prevents very long code lines (checksums, URLs, etc., from breaking table
  * widths
  */
@@ -348,4 +348,22 @@ th code {
 }
 .skip-link:focus {
   @apply not-sr-only;
+}
+
+// Shiki dark mode styling
+
+[data-theme="dark"] :is(.shiki,
+.shiki span) {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+  /* Optional, if you also want font styles */
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
+// Code blocks need margin applied when in content container
+
+.prose :where(.shiki) {
+  margin-block: 2rem;
 }

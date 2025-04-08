@@ -43,7 +43,7 @@ export const Restriction = () => {
     shownAlert = 'restricted'
   }
 
-  if (shownAlert === null) {
+  if (shownAlert === null || !org?.restriction_data) {
     return null
   }
 

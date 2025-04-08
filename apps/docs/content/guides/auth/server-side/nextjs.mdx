@@ -45,10 +45,14 @@ Fill in your `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`:
 
 <StepHikeCompact.Code>
 
-```txt .env.local
+<$CodeTabs>
+
+```txt name=.env.local
 NEXT_PUBLIC_SUPABASE_URL=<your_supabase_project_url>
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<your_supabase_anon_key>
 ```
+
+</$CodeTabs>
 
 </StepHikeCompact.Code>
 
@@ -108,9 +112,9 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
 
 <StepHikeCompact.Code>
 
-<CH.Code className="min-h-[34rem]">
+<$CodeTabs>
 
-```ts utils/supabase/client.ts
+```ts name=utils/supabase/client.ts
 import { createBrowserClient } from '@supabase/ssr'
 
 export function createClient() {
@@ -121,7 +125,7 @@ export function createClient() {
 }
 ```
 
-```ts utils/supabase/server.ts
+```ts name=utils/supabase/server.ts
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
@@ -153,7 +157,7 @@ export async function createClient() {
 }
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 </StepHikeCompact.Code>
 
@@ -163,7 +167,7 @@ export async function createClient() {
 
 <StepHikeCompact.Details title="Hook up middleware">
 
-Create a `middleware.ts` file at the root of your project.
+Create a `middleware.ts` file at the root of your project, or inside the `./src` folder if you are using one.
 
 Since Server Components can't write cookies, you need middleware to refresh expired Auth tokens and store them.
 
@@ -193,9 +197,9 @@ It's safe to trust `getUser()` because it sends a request to the Supabase Auth s
 
 <StepHikeCompact.Code>
 
-<CH.Code className="min-h-[800px]">
+<$CodeTabs>
 
-```ts middleware.ts
+```ts name=middleware.ts
 import { type NextRequest } from 'next/server'
 import { updateSession } from '@/utils/supabase/middleware'
 
@@ -217,7 +221,7 @@ export const config = {
 }
 ```
 
-```ts utils/supabase/middleware.ts
+```ts name=utils/supabase/middleware.ts
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
@@ -285,7 +289,7 @@ export async function updateSession(request: NextRequest) {
 }
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 </StepHikeCompact.Code>
 
@@ -311,9 +315,9 @@ See the Next.js docs to learn more about [opting out of data caching](https://ne
 
 <StepHikeCompact.Code>
 
-<CH.Code className="min-h-[34rem]">
+<$CodeTabs>
 
-```ts app/login/page.tsx
+```ts name=app/login/page.tsx
 import { login, signup } from './actions'
 
 export default function LoginPage() {
@@ -330,7 +334,7 @@ export default function LoginPage() {
 }
 ```
 
-```ts app/login/actions.ts
+```ts name=app/login/actions.ts
 'use server'
 
 import { revalidatePath } from 'next/cache'
@@ -379,7 +383,7 @@ export async function signup(formData: FormData) {
 }
 ```
 
-```ts app/error/page.tsx
+```ts name=app/error/page.tsx
 'use client'
 
 export default function ErrorPage() {
@@ -387,7 +391,7 @@ export default function ErrorPage() {
 }
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 </StepHikeCompact.Code>
 
@@ -419,7 +423,9 @@ Since this is a Router Handler, use the Supabase client from `@/utils/supabase/s
 
 <StepHikeCompact.Code>
 
-```ts app/auth/confirm/route.ts
+<$CodeTabs>
+
+```ts name=app/auth/confirm/route.ts
 import { type EmailOtpType } from '@supabase/supabase-js'
 import { type NextRequest } from 'next/server'
 
@@ -449,6 +455,8 @@ export async function GET(request: NextRequest) {
   redirect('/error')
 }
 ```
+
+</$CodeTabs>
 
 </StepHikeCompact.Code>
 
@@ -480,7 +488,9 @@ It's safe to trust `getUser()` because it sends a request to the Supabase Auth s
 
 <StepHikeCompact.Code>
 
-```ts app/private/page.tsx
+<$CodeTabs>
+
+```ts name=app/private/page.tsx
 import { redirect } from 'next/navigation'
 
 import { createClient } from '@/utils/supabase/server'
@@ -496,6 +506,8 @@ export default async function PrivatePage() {
   return <p>Hello {data.user.email}</p>
 }
 ```
+
+</$CodeTabs>
 
 </StepHikeCompact.Code>
 
@@ -618,9 +630,9 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
 
 <StepHikeCompact.Code>
 
-<CH.Code>
+<$CodeTabs>
 
-```ts utils/supabase/server-props.ts
+```ts name=utils/supabase/server-props.ts
 import { type GetServerSidePropsContext } from 'next'
 import { createServerClient, serializeCookieHeader } from '@supabase/ssr'
 
@@ -649,7 +661,7 @@ export function createClient({ req, res }: GetServerSidePropsContext) {
 }
 ```
 
-```ts utils/supabase/static-props.ts
+```ts name=utils/supabase/static-props.ts
 import { createClient as createClientPrimitive } from '@supabase/supabase-js'
 
 export function createClient() {
@@ -662,7 +674,7 @@ export function createClient() {
 }
 ```
 
-```ts utils/supabase/component.ts
+```ts name=utils/supabase/component.ts
 import { createBrowserClient } from '@supabase/ssr'
 
 export function createClient() {
@@ -675,7 +687,7 @@ export function createClient() {
 }
 ```
 
-```ts utils/supabase/api.ts
+```ts name=utils/supabase/api.ts
 import { createServerClient, serializeCookieHeader } from '@supabase/ssr'
 import { type NextApiRequest, type NextApiResponse } from 'next'
 
@@ -704,7 +716,7 @@ export default function createClient(req: NextApiRequest, res: NextApiResponse) 
 }
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 </StepHikeCompact.Code>
 
@@ -722,9 +734,9 @@ Since Supabase is being called from a component, use the client defined in `@/ut
 
 <StepHikeCompact.Code>
 
-<CH.Code>
+<$CodeTabs>
 
-```ts pages/login.tsx
+```ts name=pages/login.tsx
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
@@ -777,7 +789,7 @@ export default function LoginPage() {
 }
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 </StepHikeCompact.Code>
 
@@ -809,9 +821,9 @@ Since this is an API route, use the Supabase client from `@/utils/supabase/api.t
 
 <StepHikeCompact.Code>
 
-<CH.Code>
+<$CodeTabs>
 
-```ts pages/api/auth/confirm.ts
+```ts name=pages/api/auth/confirm.ts
 import { type EmailOtpType } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
@@ -850,13 +862,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 ```
 
-```tsx pages/error.tsx
+```tsx name=pages/error.tsx
 export default function ErrorPage() {
   return <p>Sorry, something went wrong</p>
 }
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 </StepHikeCompact.Code>
 

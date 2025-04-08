@@ -382,6 +382,7 @@ export const LOGS_TABLES = {
   supavisor: LogsTableName.SUPAVISOR,
   warehouse: LogsTableName.WAREHOUSE,
   pg_cron: LogsTableName.POSTGRES,
+  pgbouncer: LogsTableName.PGBOUNCER,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
@@ -393,8 +394,8 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.REALTIME]: 'Realtime server for Postgres logical replication broadcasting',
   [LogsTableName.STORAGE]: 'Object storage logs',
   [LogsTableName.POSTGREST]: 'RESTful API web server logs',
-  [LogsTableName.SUPAVISOR]: 'Cloud-native Postgres connection pooler logs',
-  [LogsTableName.PGBOUNCER]: 'Lightweight connection pooler for PostgreSQL',
+  [LogsTableName.SUPAVISOR]: 'Shared connection pooler logs for PostgreSQL',
+  [LogsTableName.PGBOUNCER]: 'Dedicated connection pooler for PostgreSQL',
   [LogsTableName.WAREHOUSE]: 'Logs obtained from a data warehouse collection',
   [LogsTableName.PG_CRON]: 'Postgres logs from pg_cron cron jobs',
 }
@@ -697,6 +698,11 @@ export const EXPLORER_DATEPICKER_HELPERS: DatetimeHelper[] = [
     calcFrom: () => dayjs().subtract(1, 'hour').startOf('hour').toISOString(),
     calcTo: () => '',
     default: true,
+  },
+  {
+    text: 'Last 3 hours',
+    calcFrom: () => dayjs().subtract(3, 'hour').startOf('hour').toISOString(),
+    calcTo: () => '',
   },
   {
     text: 'Last 24 hours',

@@ -63,7 +63,7 @@ h6 { */
 .h4:not(.prose *):not(.overwrite),
 .h5:not(.prose *):not(.overwrite),
 .h6:not(.prose *):not(.overwrite) {
-  @apply text-foreground;
+  /* @apply text-foreground; */
   margin-bottom: 16px;
 }
 

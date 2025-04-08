@@ -163,7 +163,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
                 <>
                   {isLoggedIn ? (
                     <Button block size="medium" asChild>
-                      <Link href="/dashboard/projects">Dashboard</Link>
+                      <Link href="https://supabase.com/dashboard/projects">Dashboard</Link>
                     </Button>
                   ) : (
                     <>

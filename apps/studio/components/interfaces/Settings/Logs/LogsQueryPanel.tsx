@@ -9,14 +9,12 @@ import { copyToClipboard } from 'lib/helpers'
 import { BookOpen, Check, ChevronDown, Clipboard, ExternalLink, X } from 'lucide-react'
 import { logConstants } from 'shared-data'
 import {
-  Alert,
   Badge,
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Popover,
   SidePanel,
   Tabs,
   Tooltip,
@@ -31,6 +29,7 @@ import {
 import DatePickers from './Logs.DatePickers'
 import { LogsWarning, LogTemplate, WarehouseCollection } from './Logs.types'
 import { WarehouseQueryTemplate } from './Warehouse.utils'
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 
 export type SourceType = 'logs' | 'warehouse'
 export interface LogsQueryPanelProps {
@@ -213,29 +212,27 @@ const LogsQueryPanel = ({
 
             <div className="overflow-hidden">
               <div
+                data-testid="log-explorer-warnings"
                 className={` transition-all duration-300 ${
                   warnings.length > 0 ? 'opacity-100' : 'invisible h-0 w-0 opacity-0'
                 }`}
               >
-                <Popover
-                  overlay={
-                    <Alert variant="warning" title="">
-                      <div className="flex flex-col gap-3">
-                        {warnings.map((warning, index) => (
-                          <p key={index}>
-                            {warning.text}{' '}
-                            {warning.link && (
-                              <Link href={warning.link}>{warning.linkText || 'View'}</Link>
-                            )}
-                          </p>
-                        ))}
-                      </div>
-                    </Alert>
-                  }
-                >
-                  <Badge variant="warning">
-                    {warnings.length} {warnings.length > 1 ? 'warnings' : 'warning'}
-                  </Badge>
+                <Popover>
+                  <PopoverTrigger>
+                    <Badge variant="warning">
+                      {warnings.length} {warnings.length > 1 ? 'warnings' : 'warning'}
+                    </Badge>
+                    <PopoverContent className="p-0 divide-y">
+                      {warnings.map((warning, index) => (
+                        <p key={index} className="p-3 text-xs text-foreground-light text-left">
+                          {warning.text}{' '}
+                          {warning.link && (
+                            <Link href={warning.link}>{warning.linkText || 'View'}</Link>
+                          )}
+                        </p>
+                      ))}
+                    </PopoverContent>
+                  </PopoverTrigger>
                 </Popover>
               </div>
             </div>

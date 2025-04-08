@@ -125,7 +125,8 @@ export const generateUpdateColumnPayload = (
   // Only append the properties which are getting updated
   const name = field.name.trim()
   const type = field.isArray ? `${field.format}[]` : field.format
-  const comment = ((field.comment?.length ?? '') === 0 ? null : field.comment)?.trim()
+  const comment = ((field.comment?.length ?? '') === 0 ? '' : field.comment)?.trim()
+
   const check = field.check?.trim()
 
   const payload: Partial<UpdateColumnPayload> = {}

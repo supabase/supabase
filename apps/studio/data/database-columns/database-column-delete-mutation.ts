@@ -31,7 +31,7 @@ export async function deleteDatabaseColumn({
       header: { 'x-connection-encrypted': connectionString! },
       path: { ref: projectRef },
       // cascade is expected to be a string 'true' or 'false'
-      query: { id, cascade: cascade.toString() },
+      query: { id, cascade },
     },
     headers,
   })

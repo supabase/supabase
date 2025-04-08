@@ -91,6 +91,7 @@ All of the services should have a status `running (healthy)`. If you see a statu
 
 Your app is now running with default credentials.
 [Secure your services](#securing-your-services) as soon as possible using the instructions below.
+
 </Admonition>
 
 ### Accessing Supabase Studio
@@ -211,7 +212,8 @@ basicauth_credentials:
 ```
 
 To enable all dashboard features outside of `localhost`, update the following value in the `./docker/.env` file:
- - `SUPABASE_PUBLIC_URL`: The URL or IP used to access the dashboard
+
+- `SUPABASE_PUBLIC_URL`: The URL or IP used to access the dashboard
 
 You will need to [restart](#restarting-all-services) the services for the changes to take effect.
 
@@ -230,6 +232,7 @@ docker compose up -d
 {/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 
 Be aware that this will result in downtime. Simply restarting the services does not apply configuration changes.
+
 ## Stopping all services
 
 You can stop Supabase by running `docker compose stop` in same directory as your `docker-compose.yml` file.
@@ -307,9 +310,9 @@ Each system has a number of configuration options which can be found in the rele
 
 These configuration items are generally added to the `env` section of each service, inside the `docker-compose.yml` section. If these configuration items are sensitive, they should be stored in a [secret manager](/docs/guides/self-hosting#managing-your-secrets) or using an `.env` file and then referenced using the `${}` syntax.
 
-<CH.Code>
+<$CodeTabs>
 
-```yml docker-compose.yml
+```yml name=docker-compose.yml
 services:
   rest:
     image: postgrest/postgrest
@@ -317,12 +320,12 @@ services:
       PGRST_JWT_SECRET: ${JWT_SECRET}
 ```
 
-```bash .env
+```bash name=.env
 ## Never check your secrets into version control
 `${JWT_SECRET}`
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 ### Common configuration
 
@@ -360,9 +363,9 @@ You can find all the available options in the [storage repository](https://githu
 
 Configuring the Supabase AI Assistant is optional. By adding your own `OPENAI_API_KEY`, you can enable AI services, which help with writing SQL queries, statements, and policies.
 
-<CH.Code>
+<$CodeTabs>
 
-```yaml docker-compose.yml
+```yaml name=docker-compose.yml
 services:
   studio:
     image: supabase/studio
@@ -370,12 +373,12 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
 ```
 
-```bash .env
+```bash name=.env
 ## Never check your secrets into version control
 `${OPENAI_API_KEY}`
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 #### Setting database's `log_min_messages`
 

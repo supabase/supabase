@@ -25,6 +25,7 @@ const RestoringState = () => {
 
   const { data } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []
+  const logicalBackups = backups.filter((b) => !b.isPhysicalBackup)
 
   const { mutate: downloadBackup, isLoading: isDownloading } = useBackupDownloadMutation({
     onSuccess: (res) => {
@@ -41,8 +42,9 @@ const RestoringState = () => {
 
   const onClickDownloadBackup = () => {
     if (!ref) return console.error('Project ref is required')
-    if (backups.length === 0) return console.error('No available backups to download')
-    downloadBackup({ ref, backup: backups[0] })
+    if (logicalBackups.length === 0) return console.error('No available backups to download')
+
+    downloadBackup({ ref, backup: logicalBackups[0] })
   }
 
   async function checkServer() {
@@ -125,16 +127,17 @@ const RestoringState = () => {
                 type="default"
                 icon={<Download />}
                 loading={isDownloading}
-                disabled={backups.length === 0}
+                disabled={logicalBackups.length === 0}
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text: backups.length === 0 ? 'No available backups to download' : undefined,
+                    text:
+                      logicalBackups.length === 0 ? 'No available backups to download' : undefined,
                   },
                 }}
                 onClick={onClickDownloadBackup}
               >
-                Download backup
+                Download latest backup
               </ButtonTooltip>
             </div>
           </>

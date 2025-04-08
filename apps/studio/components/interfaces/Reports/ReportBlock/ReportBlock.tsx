@@ -11,7 +11,9 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Dashboards, SqlSnippets } from 'types'
 import { cn } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { DEPRECATED_REPORTS } from '../Reports.constants'
 import { ChartBlock } from './ChartBlock'
+import { DeprecatedChartBlock } from './DeprecatedChartBlock'
 
 interface ReportBlockProps {
   item: Dashboards.Chart
@@ -61,6 +63,7 @@ export const ReportBlock = ({
   const sql = isSnippet ? (data?.content as SqlSnippets.Content)?.sql : undefined
   const chartConfig = { ...DEFAULT_CHART_CONFIG, ...(item.chartConfig ?? {}) }
   const isReadOnlySQL = isReadOnlySelect(sql ?? '')
+  const isDeprecatedChart = DEPRECATED_REPORTS.includes(item.attribute)
   const snippetMissing = error?.message.includes('Content not found')
 
   return (
@@ -129,6 +132,22 @@ export const ReportBlock = ({
                 </>
               )}
             </div>
+          }
+        />
+      ) : isDeprecatedChart ? (
+        <DeprecatedChartBlock
+          attribute={item.attribute}
+          label={`${item.label}${projectRef !== state.selectedDatabaseId ? (item.provider === 'infra-monitoring' ? ' of replica' : ' on project') : ''}`}
+          actions={
+            !disableUpdate ? (
+              <ButtonTooltip
+                type="text"
+                icon={<X />}
+                className="w-7 h-7"
+                onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
+                tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
+              />
+            ) : null
           }
         />
       ) : (
