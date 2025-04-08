@@ -3,7 +3,11 @@ title: Social Authentication
 description: Social authentication block for Next.js
 ---
 
-<BlockPreview name="password-based-auth/auth/sign-up" />
+<BlockPreview name="social-auth/auth/login" />
+<Callout>
+  The block is using Github provider by default, but can be easily switched by changing a single
+  parameter.
+</Callout>
 
 ## Installation
 
@@ -13,7 +17,7 @@ description: Social authentication block for Next.js
 
 This block includes the [Supabase client](/ui/docs/nextjs/client). When installing, you can skip overwriting it.
 
-<RegistryBlock itemName="password-based-auth-nextjs" />
+<RegistryBlock itemName="social-auth-nextjs" />
 
 ## Usage
 
@@ -35,13 +39,14 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ### Setting up third party providers
 
 We support a wide variety of social providers that you can use to integrate with your application. The full list is available [here](https://supabase.com/docs/guides/auth/social-login).
+The block is using PKCE flow and Github as a provider, but you could easily change it by changing the `provider` field in `supabase.auth.signInWithOAuth` call.
 
 ### Setting up routes and redirect URLs
 
 1. Set the site URL in the [URL Configuration](https://supabase.com/dashboard/project/_/auth/url-configuration) settings in the Supabase Dashboard.
 1. Set up the Next.js route that users will visit to reset or update their password. Go to the [URL Configuration](https://supabase.com/dashboard/project/_/auth/url-configuration) settings and add the `forgot-password` route to the list of Redirect URLs. It should look something like: `http://example.com/auth/forgot-password`.
 
-1. Update the redirect paths in the `login-form.tsx` and `update-password-form.tsx` components to point to the logged-in routes in your app.
+1. Update the redirect paths in the `login-form.tsx` components to point to the logged-in routes in your app.
 
 <Callout type="info">
 
@@ -49,12 +54,14 @@ You can use this block with the Pages router by simply moving the routes from th
 
 </Callout>
 
-### How to combine social auth with password-based auth
+### Combining social auth with password-based auth
+
+If you want to combine this block with the password-based auth, you need to:
+
+- Copy the `handleSocialLogin` function into the password-based `login-form.tsx` component and bind it to a button.
+- Copy the `@/app/auth/oauth/route.ts` in your app under the same route.
 
 ## Further reading
 
-- [Password-based authentication (PKCE flow)](https://supabase.com/docs/guides/auth/passwords?queryGroups=flow&flow=pkce)
+- [Social login](https://supabase.com/docs/guides/auth/social-login)
 - [Authentication error codes](https://supabase.com/docs/guides/auth/debugging/error-codes)
-- [Email templates](https://supabase.com/docs/guides/auth/auth-email-templates)
-- [Email templates for local development](https://supabase.com/docs/guides/local-development/customizing-email-templates)
-- [Custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp)
