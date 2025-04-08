@@ -27,7 +27,6 @@ import {
 import { Datum, CommonChartProps } from './Charts.types'
 import { useChartSize, numberFormatter } from './Charts.utils'
 import { ChartHighlight } from './useChartHighlight'
-import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { MultiAttribute } from './ComposedChartHandler'
 import { CustomLabel, CustomTooltip, formatBytes } from './ComposedChart.utils'
@@ -51,7 +50,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   hideChartType?: boolean
   chartStyle?: string
   onChartStyleChange?: (style: string) => void
-  updateDateRange: UpdateDateRange
+  updateDateRange: any
 }
 
 export default function ComposedChart({
