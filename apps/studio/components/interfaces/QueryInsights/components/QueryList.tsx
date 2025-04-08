@@ -3,7 +3,7 @@ import { useRef, useState, useEffect } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { QueryInsightsQuery } from 'data/query-insights/query-insights-query'
 import dayjs from 'dayjs'
-import { cn } from 'ui'
+import { cn, CodeBlock } from 'ui'
 import { TextSearch } from 'lucide-react'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -18,6 +18,10 @@ export const QueryList = ({ queries, isLoading, onQuerySelect, selectedQuery }: 
   const router = useRouter()
   const gridRef = useRef<DataGridHandle>(null)
   const [selectedRow, setSelectedRow] = useState<number | undefined>()
+
+  const normalizeWhitespace = (sql: string) => {
+    return sql.replace(/\s+/g, ' ').trim()
+  }
 
   // Update selected row when selectedQuery changes from parent
   useEffect(() => {
@@ -53,23 +57,34 @@ export const QueryList = ({ queries, isLoading, onQuerySelect, selectedQuery }: 
   }
 
   const columns: Column<QueryInsightsQuery>[] = [
-    {
-      key: 'timestamp',
-      name: 'Time',
-      resizable: true,
-      minWidth: 120,
-      headerCellClass: 'first:pl-6',
-      renderCell: (props) => (
-        <div className="font-mono text-xs">{dayjs(props.row.timestamp).format('HH:mm:ss')}</div>
-      ),
-    },
+    // {
+    //   key: 'timestamp',
+    //   name: 'Time',
+    //   resizable: true,
+    //   minWidth: 120,
+    //   headerCellClass: 'first:pl-6',
+    //   renderCell: (props) => (
+    //     <div className="font-mono text-xs">{dayjs(props.row.timestamp).format('HH:mm:ss')}</div>
+    //   ),
+    // },
     {
       key: 'query',
       name: 'Query',
       resizable: true,
       minWidth: 400,
       headerCellClass: '',
-      renderCell: (props) => <div className="font-mono text-xs truncate">{props.row.query}</div>,
+      renderCell: (props) => (
+        <div className="font-mono text-xs truncate w-full overflow-hidden">
+          <CodeBlock
+            language="sql"
+            className="!bg-transparent !p-0 !m-0 !border-none !whitespace-nowrap !overflow-visible"
+            hideLineNumbers
+            hideCopy
+          >
+            {normalizeWhitespace(props.row.query)}
+          </CodeBlock>
+        </div>
+      ),
     },
     {
       key: 'calls',
@@ -117,14 +132,14 @@ export const QueryList = ({ queries, isLoading, onQuerySelect, selectedQuery }: 
         <div className="font-mono text-xs text-right">{props.row.rows.toLocaleString()}</div>
       ),
     },
-    {
-      key: 'database',
-      name: 'Database',
-      resizable: true,
-      minWidth: 120,
-      headerCellClass: '',
-      renderCell: (props) => <div className="font-mono text-xs">{props.row.database}</div>,
-    },
+    // {
+    //   key: 'database',
+    //   name: 'Database',
+    //   resizable: true,
+    //   minWidth: 120,
+    //   headerCellClass: '',
+    //   renderCell: (props) => <div className="font-mono text-xs">{props.row.database}</div>,
+    // },
   ]
 
   return (
