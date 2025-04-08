@@ -1,5 +1,5 @@
 import type { PostgresSchema } from '@supabase/postgres-meta'
-import { toPng } from 'html-to-image'
+import { toSvg } from 'html-to-image'
 import { Download, Loader2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useState } from 'react'
@@ -17,6 +17,7 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { toast } from 'sonner'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
@@ -106,7 +107,7 @@ export const SchemaGraph = () => {
     const height = reactflowViewport.clientHeight
     const { x, y, zoom } = reactFlowInstance.getViewport()
 
-    toPng(reactflowViewport, {
+    toSvg(reactflowViewport, {
       backgroundColor: 'white',
       width,
       height,
@@ -121,6 +122,11 @@ export const SchemaGraph = () => {
         a.setAttribute('download', `supabase-schema-${ref}.png`)
         a.setAttribute('href', data)
         a.click()
+        toast.success('Successfully downloaded current view')
+      })
+      .catch((error) => {
+        console.error('Failed to download:', error)
+        toast.error('Failed to download current view:', error.message)
       })
       .finally(() => {
         setIsDownloading(false)
