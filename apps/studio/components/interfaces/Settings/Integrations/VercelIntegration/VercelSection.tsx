@@ -31,11 +31,9 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
+import { Button, cn } from 'ui'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import VercelIntegrationConnectionForm from './VercelIntegrationConnectionForm'
-import PartnerManagedResource from 'components/ui/PartnerManagedResource'
-import PartnerIcon from 'components/ui/PartnerIcon'
 
 const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
   const project = useSelectedProject()
@@ -216,7 +214,6 @@ You can change the scope of the access for Supabase by configuring
                     />
                   )}
                   <EmptyIntegrationConnection
-                    orgSlug={org?.slug}
                     disabled={isBranch || !canCreateVercelConnection}
                     onClick={() => onAddVercelConnection(vercelIntegration.id)}
                   >

@@ -16,7 +16,7 @@ import {
   Users,
   UserX,
 } from 'lucide-react'
-import RequestADemoForm from '../../components/Forms/RequestADemoForm'
+import RequestADemoForm from '../components/Forms/RequestADemoForm'
 
 export default {
   metadata: {

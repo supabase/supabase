@@ -5,9 +5,30 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 03 Apr 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Fri, 04 Apr 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/launch-week-14-top-10</guid>
+  <title>Top 10 Launches of Launch Week 14</title>
+  <link>https://supabase.com/blog/launch-week-14-top-10</link>
+  <description>Highlights from Launch Week 14</description>
+  <pubDate>Fri, 04 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/mcp-server</guid>
+  <title>Supabase MCP Server</title>
+  <link>https://supabase.com/blog/mcp-server</link>
+  <description>Connect your AI tools to Supabase using MCP</description>
+  <pubDate>Fri, 04 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/data-api-nearest-read-replica</guid>
+  <title>Data API Routes to Nearest Read Replica</title>
+  <link>https://supabase.com/blog/data-api-nearest-read-replica</link>
+  <description>Route your Data API (PostgREST) requests to the nearest Read Replica</description>
+  <pubDate>Fri, 04 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/declarative-schemas</guid>
   <title>Declarative Schemas for Simpler Database Management</title>
   <link>https://supabase.com/blog/declarative-schemas</link>

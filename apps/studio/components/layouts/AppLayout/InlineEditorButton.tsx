@@ -12,7 +12,7 @@ const InlineEditorButton = () => {
       type="text"
       size="tiny"
       id="editor-trigger"
-      className="h-full w-full rounded-none text-foreground-light"
+      className="w-[24px] h-[24px] flex items-center justify-center p-0"
       onClick={() => {
         closeAssistant()
         setEditorPanel({ open: !editorPanel.open })

@@ -700,6 +700,11 @@ export const EXPLORER_DATEPICKER_HELPERS: DatetimeHelper[] = [
     default: true,
   },
   {
+    text: 'Last 3 hours',
+    calcFrom: () => dayjs().subtract(3, 'hour').startOf('hour').toISOString(),
+    calcTo: () => '',
+  },
+  {
     text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
     calcTo: () => '',
