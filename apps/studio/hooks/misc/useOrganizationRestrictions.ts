@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 
+import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { RESTRICTION_MESSAGES } from 'components/interfaces/Organization/restriction.constants'
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -14,6 +15,7 @@ export type WarningBannerProps = {
 
 export function useOrganizationRestrictions() {
   const org = useSelectedOrganization()
+  const isNewLayout = useNewLayout()
 
   const { data: overdueInvoices } = useOverdueInvoicesQuery()
   const { data: organizations } = useOrganizationsQuery()
@@ -36,7 +38,7 @@ export function useOrganizationRestrictions() {
     })
   }
 
-  if (overdueInvoicesFromOtherOrgs?.length) {
+  if (overdueInvoicesFromOtherOrgs?.length && isNewLayout) {
     warnings.push({
       type: 'danger',
       title: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.title,
