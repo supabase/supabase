@@ -18,12 +18,13 @@ const TransferProjectButton = () => {
   const project = useSelectedProject()
   const projectRef = project?.ref
   const projectOrgId = project?.organization_id
-  const { data: allOrganizations } = useOrganizationsQuery()
+  const [isOpen, setIsOpen] = useState(false)
+
+  const { data: allOrganizations } = useOrganizationsQuery({ enabled: isOpen })
   const disableProjectTransfer = useFlag('disableProjectTransfer')
 
   const organizations = (allOrganizations || []).filter((it) => it.id !== projectOrgId)
 
-  const [isOpen, setIsOpen] = useState(false)
   const [selectedOrg, setSelectedOrg] = useState()
 
   const {

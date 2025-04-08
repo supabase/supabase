@@ -41,7 +41,7 @@ const DiskSizeConfigurationModal = ({
 
   const organization = useSelectedOrganization()
   const { data: projectSubscriptionData, isLoading: isLoadingSubscription } =
-    useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+    useOrgSubscriptionQuery({ orgSlug: organization?.slug }, { enabled: visible })
 
   const isLoading = isLoadingProject || isLoadingSubscription
 

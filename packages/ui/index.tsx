@@ -240,7 +240,7 @@ export * from './src/components/shadcn/ui/calendar'
 
 export { Toggle as Toggle_Shadcn } from './src/components/shadcn/ui/toggle'
 
-export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
+export { ScrollArea, ScrollBar, ScrollViewport } from './src/components/shadcn/ui/scroll-area'
 
 export { Separator } from './src/components/shadcn/ui/separator'
 

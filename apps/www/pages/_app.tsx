@@ -5,6 +5,7 @@ import '../styles/index.css'
 import {
   AuthProvider,
   FeatureFlagProvider,
+  IS_PLATFORM,
   PageTelemetry,
   ThemeProvider,
   useThemeSandbox,
@@ -21,6 +22,7 @@ import MetaFaviconsPagesRouter, {
   DEFAULT_FAVICON_ROUTE,
   DEFAULT_FAVICON_THEME_COLOR,
 } from 'common/MetaFavicons/pages-router'
+import { LW14Announcement } from 'ui-patterns/Banners/LW14Announcement'
 import { WwwCommandMenu } from '~/components/CommandMenu'
 import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
@@ -84,7 +86,7 @@ export default function App({ Component, pageProps }: AppProps) {
       />
 
       <AuthProvider>
-        <FeatureFlagProvider API_URL={API_URL}>
+        <FeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM}>
           <ThemeProvider
             themes={themes.map((theme) => theme.value)}
             enableSystem
@@ -93,10 +95,15 @@ export default function App({ Component, pageProps }: AppProps) {
           >
             <TooltipProvider delayDuration={0}>
               <CommandProvider>
+                <LW14Announcement />
                 <SonnerToaster position="top-right" />
                 <Component {...pageProps} />
                 <WwwCommandMenu />
-                <PageTelemetry API_URL={API_URL} hasAcceptedConsent={hasAcceptedConsent} />
+                <PageTelemetry
+                  API_URL={API_URL}
+                  hasAcceptedConsent={hasAcceptedConsent}
+                  enabled={IS_PLATFORM}
+                />
               </CommandProvider>
             </TooltipProvider>
           </ThemeProvider>

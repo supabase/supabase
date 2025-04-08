@@ -9,6 +9,8 @@ type GitHubRepositoryRelease = {
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  // [Joshen] Added under supabase/turbo.json, but not sure why it's still warning
+  // eslint-disable-next-line turbo/no-undeclared-env-vars
   const version = process.env.CURRENT_CLI_VERSION
   const fallback = { current: version, latest: null, published_at: null }
   try {

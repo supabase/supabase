@@ -1,0 +1,22 @@
+type supportedFrameworks = 'nextjs' | 'react-router' | 'tanstack' | 'react'
+export interface NavItem {
+  title: string
+  href?: string
+  disabled?: boolean
+  external?: boolean
+  icon?: any // to do: clean up later | keyof typeof Icons
+  label?: string
+  supportedFrameworks?: supportedFrameworks[]
+}
+
+export interface NavItemWithChildren extends NavItem {
+  items: NavItemWithChildren[]
+}
+
+export interface MainNavItem extends NavItem {}
+
+export interface SidebarNavItem extends NavItemWithChildren {}
+
+export interface SidebarNavGroup extends NavItem {
+  items: (SidebarNavItem & { commandItemLabel: string })[]
+}

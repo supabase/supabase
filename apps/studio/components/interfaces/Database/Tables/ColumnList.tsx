@@ -61,7 +61,7 @@ const ColumnList = ({
   const columns =
     (filterString.length === 0
       ? selectedTable?.columns ?? []
-      : selectedTable?.columns?.filter((column: any) => column.name.includes(filterString))) ?? []
+      : selectedTable?.columns?.filter((column) => column.name.includes(filterString))) ?? []
 
   const isLocked = PROTECTED_SCHEMAS.includes(selectedTable?.schema ?? '')
   const canUpdateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
@@ -127,7 +127,7 @@ const ColumnList = ({
                   <Table.th key="format">Format</Table.th>,
                   <Table.th key="buttons"></Table.th>,
                 ]}
-                body={columns.map((x: any, i: number) => (
+                body={columns.map((x) => (
                   <Table.tr className="border-t" key={x.name}>
                     <Table.td>
                       <p>{x.name}</p>

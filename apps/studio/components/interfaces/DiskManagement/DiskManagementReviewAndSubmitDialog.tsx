@@ -315,23 +315,24 @@ export const DiskManagementReviewAndSubmitDialog = ({
                   attribute="Throughput"
                   defaultValue={form.formState.defaultValues?.throughput?.toLocaleString() ?? 0}
                   newValue={form.getValues('throughput')?.toLocaleString() ?? 0}
-                  unit="MiB/s"
+                  unit="MB/s"
                   beforePrice={Number(throughputPrice.oldPrice)}
                   afterPrice={Number(throughputPrice.newPrice)}
                   priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
                 />
               )}
-            {form.formState.defaultValues?.totalSize !== form.getValues('totalSize') && (
-              <TableDataRow
-                attribute="Disk size"
-                defaultValue={form.formState.defaultValues?.totalSize?.toLocaleString() ?? 0}
-                newValue={form.getValues('totalSize')?.toLocaleString()}
-                unit="GB"
-                beforePrice={Number(diskSizePrice.oldPrice)}
-                afterPrice={Number(diskSizePrice.newPrice)}
-                priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
-              />
-            )}
+            {form.formState.defaultValues?.totalSize !== form.getValues('totalSize') ||
+              (form.formState.defaultValues?.storageType !== form.getValues('storageType') && (
+                <TableDataRow
+                  attribute="Disk size"
+                  defaultValue={form.formState.defaultValues?.totalSize?.toLocaleString() ?? 0}
+                  newValue={form.getValues('totalSize')?.toLocaleString()}
+                  unit="GB"
+                  beforePrice={Number(diskSizePrice.oldPrice)}
+                  afterPrice={Number(diskSizePrice.newPrice)}
+                  priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
+                />
+              ))}
             {form.formState.defaultValues?.growthPercent !== form.getValues('growthPercent') && (
               <TableDataRow
                 attribute="Growth percent"
@@ -381,6 +382,12 @@ export const DiskManagementReviewAndSubmitDialog = ({
             )}
           </TableBody>
         </Table>
+
+        {numReplicas > 0 && (
+          <div className="border-t px-4 py-2 text-sm text-foreground-lighter">
+            {replicaTooltipText}
+          </div>
+        )}
 
         <DialogFooter>
           <Button block size="large" type="default" onClick={() => setIsDialogOpen(false)}>

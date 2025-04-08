@@ -8,13 +8,14 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { cn } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { untitledSnippetTitle } from './SQLEditor.constants'
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
+import { makeActiveTabPermanent } from 'state/tabs'
 
 export type MonacoEditorProps = {
   id: string
@@ -49,7 +50,7 @@ const MonacoEditor = ({
   const project = useSelectedProject()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
@@ -92,7 +93,8 @@ const MonacoEditor = ({
         const selectedValue = (editorRef?.current as any)
           .getModel()
           .getValueInRange((editorRef?.current as any)?.getSelection())
-        setAiAssistantPanel({
+        aiSnap.newChat({
+          name: 'Explain code section',
           open: true,
           sqlSnippets: [selectedValue],
           initialInput: 'Can you explain this section to me in more detail?',
@@ -146,6 +148,9 @@ const MonacoEditor = ({
   const debouncedSetSql = debounce((id, value) => snapV2.setSql(id, value), 1000)
 
   function handleEditorChange(value: string | undefined) {
+    // make active tab permanent
+    makeActiveTabPermanent(ref)
+
     const snippetCheck = snapV2.snippets[id]
 
     if (id && value) {

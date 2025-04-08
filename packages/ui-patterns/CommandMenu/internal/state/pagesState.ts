@@ -1,7 +1,6 @@
 import { type ReactNode } from 'react'
 import { proxy } from 'valtio'
-
-import { type ICommandSection } from '../CommandSection'
+import { type ICommandSection } from '../types'
 
 type PageComponent = () => ReactNode
 

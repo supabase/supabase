@@ -3,12 +3,14 @@ on:
   push:
     branches: [master]
     paths:
+      - 'packages/pg-meta/**/*'
       - 'apps/studio/**'
       - 'tests/studio-tests/**'
       - 'pnpm-lock.yaml'
   pull_request:
     branches: [master]
     paths:
+      - 'packages/pg-meta/**/*'
       - 'apps/studio/**'
       - 'tests/studio-tests/**'
       - 'pnpm-lock.yaml'
@@ -17,6 +19,9 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: write
 
 jobs:
   test:

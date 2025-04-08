@@ -1,5 +1,5 @@
 import { debounce } from 'lodash'
-import { Book, Check, Save, X } from 'lucide-react'
+import { Book, Save, X } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -20,24 +20,22 @@ import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
-  AiIconAnimation,
   Button,
   cn,
-  Input_Shadcn_,
-  SQL_ICON,
-  Popover_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  PopoverContent_Shadcn_,
+  CodeBlock,
   Command_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandList_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
   CommandItem_Shadcn_,
+  CommandList_Shadcn_,
   HoverCard_Shadcn_,
   HoverCardContent_Shadcn_,
   HoverCardTrigger_Shadcn_,
-  CodeBlock,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  SQL_ICON,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
@@ -53,7 +51,7 @@ interface EditorPanelProps {
 export const EditorPanel = ({ onChange }: EditorPanelProps) => {
   const { ref } = useParams()
   const project = useSelectedProject()
-  const { editorPanel, setEditorPanel, setAiAssistantPanel } = useAppStateSnapshot()
+  const { editorPanel, setEditorPanel } = useAppStateSnapshot()
   const { profile } = useProfile()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()

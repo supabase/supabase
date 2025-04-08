@@ -53,7 +53,7 @@ const Connect = () => {
       ?.children.find((child) => child.key === selectedChild)?.children[0]?.key || ''
   )
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+  const { data: settings } = useProjectSettingsV2Query({ projectRef }, { enabled: showConnect })
   const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
 
   const handleParentChange = (value: string) => {

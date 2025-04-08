@@ -15,15 +15,6 @@ export const DISK_AUTOSCALE_CONFIG_DEFAULTS = {
   maxSizeGb: 60000,
 }
 
-export const IOPS_RANGE = {
-  [DiskType.GP3]: { min: 3000, max: 16000 },
-  [DiskType.IO2]: { min: 100, max: 256000 },
-}
-
-export const THROUGHPUT_RANGE = {
-  [DiskType.GP3]: { min: 125, max: 1000 },
-}
-
 export const DISK_PRICING = {
   [DiskType.GP3]: {
     storage: 0.125, // per GB per month
@@ -50,7 +41,7 @@ export const DISK_LIMITS = {
   [DiskType.IO2]: {
     minStorage: 4,
     maxStorage: 61440,
-    minIops: 100,
+    minIops: 1500,
     maxIops: 256000,
     includedIops: 0,
     includedThroughput: 0,

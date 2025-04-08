@@ -123,23 +123,26 @@ export const LocalVersionPopover = () => {
               <DialogHeader className="border-b">
                 <DialogTitle>Stable release schedule</DialogTitle>
               </DialogHeader>
-              <DialogSection className="flex flex-col gap-y-2">
-                <p className="text-foreground-lighter text-xs font-mono uppercase">
-                  Approximate next release: {approximateNextRelease}
-                </p>
-                <p className="text-sm">
-                  Supabase CLI releases follows a 2 weeks cadence, which stable releases will be
-                  available for{' '}
-                  <InlineLink href="https://supabase.com/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=linux#updating-the-supabase-cli">
-                    update
-                  </InlineLink>{' '}
-                  via the CLI.
-                </p>
+              <DialogSection className="flex flex-col gap-y-3">
+                <div className="flex flex-col gap-y-2">
+                  <p className="text-foreground-lighter text-xs font-mono uppercase">
+                    Approximate next release: {approximateNextRelease}
+                  </p>
+                  <p className="text-sm">
+                    Supabase CLI releases follows a two-week schedule, with stable updates available
+                    through the{' '}
+                    <InlineLink href="https://supabase.com/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=linux#updating-the-supabase-cli">
+                      CLI
+                    </InlineLink>
+                    .
+                  </p>
+                </div>
                 <Admonition
                   type="default"
                   title="Beta Releases"
-                  description="Beta releases are also available in between stable releases via the Beta version of the CLI if you might be waiting on a fix. If you'd like to try, we recommend doing so via npm:"
+                  description="Beta releases are also available between stable releases through the Beta version of the CLI, which might be helpful if you are waiting for a specific fix."
                 >
+                  <p className="!mt-2">If you'd like to try, we recommend doing so via npm:</p>
                   <div className="flex items-center bg-surface-200 py-1 px-2 rounded mt-2">
                     <SimpleCodeBlock parentClassName="bg-surface-200">
                       npm i supabase@beta --save-dev

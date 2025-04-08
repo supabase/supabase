@@ -12,9 +12,7 @@ export type ProjectsVariables = {
   ref?: string
 }
 
-export type ProjectInfo = components['schemas']['ProjectInfo'] & {
-  status: components['schemas']['project_status']
-}
+export type ProjectInfo = components['schemas']['ProjectInfo']
 
 export async function getProjects(signal?: AbortSignal) {
   const { data, error } = await get('/platform/projects', { signal })
@@ -34,7 +32,11 @@ export const useProjectsQuery = <TData = ProjectsData>({
   return useQuery<ProjectsData, ProjectsError, TData>(
     projectKeys.list(),
     ({ signal }) => getProjects(signal),
-    { enabled: enabled && profile !== undefined, ...options }
+    {
+      enabled: enabled && profile !== undefined,
+      staleTime: 30 * 60 * 1000, // 30 minutes
+      ...options,
+    }
   )
 }
 

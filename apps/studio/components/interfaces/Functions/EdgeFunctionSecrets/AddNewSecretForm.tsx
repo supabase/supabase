@@ -60,6 +60,22 @@ const AddNewSecretForm = () => {
     const text = e.clipboardData?.getData('text')
     if (!text) return
 
+    // If text doesn't contain '=' and is being pasted into a specific field, handle as single value
+    if (!text.includes('=')) {
+      const inputName = (e.target as HTMLInputElement).name
+      if (inputName?.includes('secrets')) {
+        const [_, indexStr, field] = inputName.match(/secrets\.(\d+)\.(\w+)/) || []
+        if (indexStr && field) {
+          const index = parseInt(indexStr)
+          form.setValue(
+            `secrets.${index}.${field}` as `secrets.${number}.name` | `secrets.${number}.value`,
+            text
+          )
+          return
+        }
+      }
+    }
+
     const pairs: Array<SecretPair> = []
 
     try {
