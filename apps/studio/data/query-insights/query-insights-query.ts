@@ -119,18 +119,19 @@ const getQueriesSql = (startTime: string, endTime: string) => /* SQL */ `
   SELECT
     queryid as query_id,
     query,
-    total_exec_time as total_time,
-    calls,
-    rows_retrieved as rows,
-    shared_blks_read,
-    shared_blks_hit,
-    mean_exec_time,
+    SUM(total_exec_time) as total_time,
+    SUM(calls) as calls,
+    SUM(rows_retrieved) as rows,
+    SUM(shared_blks_read) as shared_blks_read,
+    SUM(shared_blks_hit) as shared_blks_hit,
+    AVG(mean_exec_time) as mean_exec_time,
     datname as database,
-    bucket_start_time as timestamp
+    MAX(bucket_start_time) as timestamp
   FROM pg_stat_monitor
   WHERE bucket_start_time >= '${startTime}'
     AND bucket_start_time <= '${endTime}'
-  ORDER BY calls DESC
+  GROUP BY queryid, query, datname
+  ORDER BY SUM(calls) DESC
   LIMIT 100
 `
 

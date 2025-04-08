@@ -12,6 +12,7 @@ import { QueryList } from './components/QueryList'
 import {
   useQueryInsightsMetrics,
   useQueryInsightsQueries,
+  QueryInsightsQuery,
 } from 'data/query-insights/query-insights-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
@@ -50,6 +51,7 @@ export const QueryInsights = () => {
 
   const [selectedMetric, setSelectedMetric] = useState<MetricType>('query_latency')
   const [selectedTimeRange, setSelectedTimeRange] = useState('24h')
+  const [selectedQuery, setSelectedQuery] = useState<QueryInsightsQuery | null>(null)
   const [timeRange, setTimeRange] = useState({
     period_start: {
       date: dayjs().subtract(24, 'hour').format('YYYY-MM-DD HH:mm:ssZ'),
@@ -168,7 +170,14 @@ export const QueryInsights = () => {
         </TabsList_Shadcn_>
 
         <div className="h-80">
-          <MetricsChart data={metricsData} metric={selectedMetric} isLoading={isLoadingMetrics} />
+          <MetricsChart
+            data={metricsData ?? []}
+            metric={selectedMetric}
+            isLoading={isLoadingMetrics}
+            startTime={timeRange.period_start.date}
+            endTime={timeRange.period_end.date}
+            selectedQuery={selectedQuery}
+          />
         </div>
       </Tabs_Shadcn_>
 
@@ -177,7 +186,12 @@ export const QueryInsights = () => {
         <p className="text-sm text-foreground-light">Detailed view of recent query executions</p>
       </div>
 
-      <QueryList queries={queriesData || []} isLoading={isLoadingQueries} />
+      <QueryList
+        queries={queriesData || []}
+        isLoading={isLoadingQueries}
+        onQuerySelect={setSelectedQuery}
+        selectedQuery={selectedQuery}
+      />
     </div>
   )
 }
