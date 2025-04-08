@@ -34,7 +34,7 @@ export function useOrganizationRestrictions() {
       type: 'danger',
       title: RESTRICTION_MESSAGES.OVERDUE_INVOICES.title,
       message: RESTRICTION_MESSAGES.OVERDUE_INVOICES.message,
-      link: `/org/${org?.slug}/settings/invoices`,
+      link: `/org/${org?.slug}/invoices`,
     })
   }
 
@@ -43,7 +43,7 @@ export function useOrganizationRestrictions() {
       type: 'danger',
       title: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.title,
       message: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.message,
-      link: `/org/${organizations ? organizations?.find((org) => org.id === overdueInvoicesFromOtherOrgs[0].organization_id)?.slug : org?.slug}/settings/invoices`,
+      link: `/org/${organizations ? organizations?.find((org) => org.id === overdueInvoicesFromOtherOrgs[0].organization_id)?.slug : org?.slug}/invoices`,
     })
   }
 
@@ -54,7 +54,7 @@ export function useOrganizationRestrictions() {
       message: RESTRICTION_MESSAGES.GRACE_PERIOD.message(
         dayjs(org?.restriction_data?.['grace_period_end']).format('DD MMM, YYYY')
       ),
-      link: `/org/${org?.slug}/settings/billing`,
+      link: `/org/${org?.slug}/billing`,
     })
   }
 
@@ -63,7 +63,7 @@ export function useOrganizationRestrictions() {
       type: 'warning',
       title: RESTRICTION_MESSAGES.GRACE_PERIOD_OVER.title,
       message: RESTRICTION_MESSAGES.GRACE_PERIOD_OVER.message,
-      link: `/org/${org?.slug}/settings/billing`,
+      link: `/org/${org?.slug}/billing`,
     })
   }
 
@@ -72,7 +72,7 @@ export function useOrganizationRestrictions() {
       type: 'danger',
       title: RESTRICTION_MESSAGES.RESTRICTED.title,
       message: RESTRICTION_MESSAGES.RESTRICTED.message,
-      link: `/org/${org?.slug}/settings/billing`,
+      link: `/org/${org?.slug}/billing`,
     })
   }
 
