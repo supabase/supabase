@@ -17,6 +17,7 @@ import InlineEditorButton from 'components/layouts/AppLayout/InlineEditorButton'
 import OrganizationDropdown from 'components/layouts/AppLayout/OrganizationDropdown'
 import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
+import { useCLIReleaseVersionQuery } from 'data/misc/cli-release-version-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -30,6 +31,7 @@ import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
+import { LocalVersionPopover } from './LocalVersionPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
@@ -74,6 +76,9 @@ const LayoutHeader = ({
 
   const { open: isAiAssistantOpen } = useAiAssistantStateSnapshot()
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
+
+  const { data } = useCLIReleaseVersionQuery()
+  const currentCliVersion = data?.current
 
   const { data: subscription } = useOrgSubscriptionQuery({
     orgSlug: selectedOrganization?.slug,
@@ -202,7 +207,6 @@ const LayoutHeader = ({
               )}
             </AnimatePresence>
           </>
-          {/* Additional breadcrumbs are supplied */}
           <BreadcrumbsView defaultValue={breadcrumbs} />
         </div>
         <div className="flex items-center gap-x-2">
@@ -215,7 +219,10 @@ const LayoutHeader = ({
               <UserDropdown />
             </>
           ) : (
-            <ThemeDropdown />
+            <>
+              {!!currentCliVersion && <LocalVersionPopover />}
+              <ThemeDropdown />
+            </>
           )}
         </div>
       </div>
