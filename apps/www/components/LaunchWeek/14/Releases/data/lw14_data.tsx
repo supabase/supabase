@@ -138,7 +138,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 3,
     dd: 'Wed',
     shipped: true,
-    isToday: true,
+    isToday: false,
     hasCountdown: false,
     blog: '/blog/realtime-broadcast-from-database',
     date: '02 April',
@@ -175,49 +175,77 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-4',
     d: 4,
     dd: 'Thu',
-    shipped: false,
+    shipped: true,
     isToday: false,
-    hasCountdown: true,
-    blog: '',
+    hasCountdown: false,
+    blog: '/blog/declarative-schemas',
     date: '03 April',
     published_at: '2025-04-03T07:00:00.000-07:00',
-    title: '',
-    description: null,
+    title: 'Declarative Schemas for Simpler Database Management',
+    description: <>Declarative Schemas for Simpler Database Management</>,
     links: [
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
+      {
+        type: 'video',
+        href: 'ts7HEeCuVH0',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1MnGnwOpYgkJO',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        url: '#',
+        blog: '#',
+        bg_layers: [
+          {
+            img: '/images/launchweek/14/releases/d4/day-4-dark.svg',
+            mobileImg: '/images/launchweek/14/releases/d4/day-4-dark-mobile.svg',
+            imgLight: '/images/launchweek/14/releases/d4/day-4-light.svg',
+            mobileImgLight: '/images/launchweek/14/releases/d4/day-4-light-mobile.svg',
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'day-5',
     d: 5,
     dd: 'Fri',
-    shipped: false,
+    shipped: true,
     isToday: false,
     hasCountdown: false,
-    blog: '',
+    blog: '/blog/mcp-server',
     date: '04 April',
     published_at: '2025-04-04T07:00:00.000-07:00',
-    title: '',
-    description: null,
+    title: 'Supabase MCP Server',
+    description: 'Supabase MCP Server',
     links: [
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
+      {
+        type: 'video',
+        href: '1SMldLoOhbg',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1OwxWXywakQKQ',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        url: '#',
+        blog: '#',
+        bg_layers: [
+          {
+            img: '/images/launchweek/14/releases/d5/day-5-dark.svg',
+            mobileImg: '/images/launchweek/14/releases/d5/day-5-dark-mobile.svg',
+            imgLight: '/images/launchweek/14/releases/d5/day-5-light.svg',
+            mobileImgLight: '/images/launchweek/14/releases/d5/day-5-light-mobile.svg',
+          },
+        ],
+      },
+    ],
   },
 ]
 

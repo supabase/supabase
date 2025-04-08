@@ -10,9 +10,7 @@ import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
 
-const DropdownMenu = (props: React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Root>) => (
-  <DropdownMenuPrimitive.Root modal={false} {...props} />
-)
+const DropdownMenu = DropdownMenuPrimitive.Root
 
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
 
@@ -149,7 +147,7 @@ const DropdownMenuLabel = React.forwardRef<
 >(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Label
     ref={ref}
-    className={cn('px-2 py-1.5 text-xs text-foreground-light', inset && 'pl-8', className)}
+    className={cn('px-2 py-1.5 text-xs text-foreground-lighter', inset && 'pl-8', className)}
     {...props}
   />
 ))

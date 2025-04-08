@@ -22,7 +22,7 @@ import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useUrlState } from 'hooks/ui/useUrlState'
+import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
 import {
   useRoleImpersonationStateSnapshot,
   useSubscribeToImpersonatedRole,
@@ -104,9 +104,7 @@ const DefaultHeader = () => {
   // [Joshen] Using this logic to block both column and row creation/update/delete
   const canCreateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
-  const [{ filter: filters, sort: sorts }, setParams] = useUrlState({
-    arrayKeys: ['sort', 'filter'],
-  })
+  const { filters, sorts, setParams } = useTableEditorFiltersSort()
 
   const onApplyFilters = useCallback(
     (appliedFilters: Filter[]) => {
@@ -114,12 +112,12 @@ const DefaultHeader = () => {
       // Reset page to 1 when filters change
       snap.setPage(1)
 
-      const filters = filtersToUrlParams(appliedFilters)
+      const newFilters = filtersToUrlParams(appliedFilters)
 
       setParams((prevParams) => {
         return {
-          ...prevParams,
-          filter: filters,
+          filter: newFilters,
+          sort: prevParams.sort,
         }
       })
 
@@ -128,21 +126,21 @@ const DefaultHeader = () => {
           projectRef,
           tableName: snap.table.name,
           schema: snap.table.schema,
-          filters: filters,
+          filters: newFilters,
         })
       }
     },
-    [projectRef, snap.table.name, snap.table.schema]
+    [projectRef, snap.table.name, snap.table.schema, setParams]
   )
 
   const onApplySorts = useCallback(
     (appliedSorts: Sort[]) => {
-      const sorts = sortsToUrlParams(appliedSorts)
+      const newSorts = sortsToUrlParams(appliedSorts)
 
       setParams((prevParams) => {
         return {
-          ...prevParams,
-          sort: sorts,
+          filter: prevParams.filter,
+          sort: newSorts,
         }
       })
 
@@ -151,11 +149,11 @@ const DefaultHeader = () => {
           projectRef,
           tableName: snap.table.name,
           schema: snap.table.schema,
-          sorts: sorts,
+          sorts: newSorts,
         })
       }
     },
-    [projectRef, snap.table.name, snap.table.schema]
+    [projectRef, snap.table.name, snap.table.schema, setParams]
   )
 
   const { mutate: sendEvent } = useSendEventMutation()

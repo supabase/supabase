@@ -40,6 +40,10 @@ const footerData = [
         text: 'Launch Week',
         url: '/launch-week',
       },
+      {
+        text: 'AI Builders',
+        url: '/solutions/ai-builders',
+      },
     ],
   },
   {
@@ -89,6 +93,10 @@ const footerData = [
       {
         text: 'Documentation',
         url: '/docs',
+      },
+      {
+        text: 'Supabase UI',
+        url: 'https://supabase.com/ui',
       },
       {
         text: 'Changelog',

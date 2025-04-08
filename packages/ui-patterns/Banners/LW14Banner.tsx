@@ -32,9 +32,7 @@ export function LW14Banner() {
           )}
         >
           <p className="flex gap-1.5 items-center ">{announcement.text}</p>
-          <div className="hidden lg:block text-foreground-lighter">
-            Realtime: Broadcast from Database
-          </div>
+          <div className="hidden lg:block text-foreground-lighter">Top 10 Launches</div>
           <Button size="tiny" type="default" className="px-2 !leading-none text-xs" asChild>
             <Link href={announcement.link}>{announcement.cta}</Link>
           </Button>

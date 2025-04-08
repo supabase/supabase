@@ -185,10 +185,14 @@ export const MarkdownPre = ({
   const rawContent = children[0].props.children[0]
   const propsMatch = rawContent.match(/(?:--|\/\/)\s*props:\s*(\{[^}]+\})/)
 
-  const snippetProps: AssistantSnippetProps = useMemo(
-    () => (propsMatch ? JSON.parse(propsMatch[1]) : {}),
-    [propsMatch]
-  )
+  const snippetProps: AssistantSnippetProps = useMemo(() => {
+    try {
+      if (propsMatch) {
+        return JSON.parse(propsMatch[1])
+      }
+    } catch {}
+    return {}
+  }, [propsMatch])
 
   const { xAxis, yAxis } = snippetProps
   const snippetId = snippetProps.id

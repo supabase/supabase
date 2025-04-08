@@ -12,7 +12,7 @@ export interface RevokeAppModalProps {
   onClose: () => void
 }
 
-const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) => {
+export const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) => {
   const { slug } = useParams()
   const { mutate: revokeAuthorizedApp, isLoading: isDeleting } = useAuthorizedAppRevokeMutation({
     onSuccess: () => {
@@ -64,5 +64,3 @@ const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) => {
     </Modal>
   )
 }
-
-export default RevokeAppModal

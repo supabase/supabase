@@ -482,7 +482,9 @@ const SidePanelEditor = ({
         }
 
         if (hasError) {
-          toast(`Table ${table.name} has been updated, but there were some errors`, { id: toastId })
+          toast.warning(
+            `Table ${table.name} has been updated but there were some errors. Please check these errors separately.`
+          )
         } else {
           if (isTableEditorTabsEnabled && ref && payload.name) {
             // [Joshen] Only table entities can be updated via the dashboard
@@ -588,6 +590,7 @@ const SidePanelEditor = ({
           row={snap.sidePanel?.type === 'row' ? snap.sidePanel.row : undefined}
           selectedTable={selectedTable}
           visible={snap.sidePanel?.type === 'row'}
+          editable={editable}
           closePanel={onClosePanel}
           saveChanges={saveRow}
           updateEditorDirty={() => setIsEdited(true)}
