@@ -1,4 +1,5 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
+import { PlanId } from 'data/subscriptions/types'
 
 export interface Notification {
   category: 'info' | 'error' | 'success' | 'loading'
