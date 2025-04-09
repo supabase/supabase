@@ -3,10 +3,7 @@ import Link from 'next/link'
 import { ReactNode, useMemo } from 'react'
 
 import { useParams } from 'common'
-import {
-  useIsInlineEditorEnabled,
-  useNewLayout,
-} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import Connect from 'components/interfaces/Connect/Connect'
 import { ThemeDropdown } from 'components/interfaces/ThemeDropdown'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
@@ -75,7 +72,6 @@ const LayoutHeader = ({
   const { setMobileMenuOpen } = useAppStateSnapshot()
 
   const { open: isAiAssistantOpen } = useAiAssistantStateSnapshot()
-  const isInlineEditorEnabled = useIsInlineEditorEnabled()
 
   const { data } = useCLIReleaseVersionQuery()
   const currentCliVersion = data?.current
