@@ -153,6 +153,7 @@ const PITRSidePanel = () => {
         !hasChanges ||
         isSubmitting ||
         !canUpdatePitr ||
+        !hasSufficientCompute ||
         blockDowngradeDueToHipaa ||
         blockDowngradeDueToReadReplicas
       }
