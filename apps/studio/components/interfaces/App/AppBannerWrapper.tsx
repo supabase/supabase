@@ -6,6 +6,7 @@ import { NoticeBanner } from 'components/layouts/AppLayout/NoticeBanner'
 import { RestrictionBanner } from 'components/layouts/AppLayout/RestrictionBanner'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
+import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
 
 const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { profile } = useProfile()
@@ -20,6 +21,7 @@ const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
         {ongoingIncident && <IncidentBanner />}
         {showNoticeBanner && <NoticeBanner />}
         {profile !== undefined && <RestrictionBanner />}
+        <OrganizationResourceBanner />
         {clockSkewBanner && <ClockSkewBanner />}
       </div>
       {children}
