@@ -292,7 +292,6 @@ export const createAiAssistantState = (
     clearMessages: () => {
       const activeChatId = state.activeChatId // Get ID before potential modification
       if (activeChatId && state.chats[activeChatId]) {
-        // Update immutablely
         state.chats = {
           ...state.chats,
           [activeChatId]: {
@@ -322,7 +321,6 @@ export const createAiAssistantState = (
           : []
 
       if (messagesToAdd.length > 0) {
-        // Update immutablely
         state.chats = {
           ...state.chats,
           [activeChatId]: {
@@ -360,7 +358,6 @@ export const createAiAssistantState = (
       })
 
       if (messageUpdated) {
-        // Update immutablely
         state.chats = {
           ...state.chats,
           [activeChatId]: {
