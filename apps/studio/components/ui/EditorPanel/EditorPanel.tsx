@@ -157,7 +157,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
 
   return (
     <div className="flex flex-col h-full bg-surface-100">
-      <div className="border-b flex shrink-0 items-center gap-x-3 px-5 h-[46px]">
+      <div className="border-b flex shrink-0 items-center gap-x-3 px-4 h-[46px]">
         <span className="text-sm flex-1">SQL Editor</span>
         <div className="flex gap-2 items-center">
           <Popover_Shadcn_ open={isTemplatesOpen} onOpenChange={setIsTemplatesOpen}>
