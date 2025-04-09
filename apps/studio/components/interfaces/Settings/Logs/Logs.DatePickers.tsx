@@ -29,8 +29,6 @@ const DatePickers = ({ to, from, onChange, helpers }: PropsWithChildren<Props>) 
   const [selectedHelperItem, setSelectedHelperItem] = useState<DatetimeHelper | null>(null)
   const isReportsV2 = useFlag('reportsDatabaseV2')
 
-  console.log('isReportsV2', isReportsV2)
-
   const handleHelperChange = (newValue: string) => {
     const selectedHelper = helpers.find((h) => h.text === newValue)
 
