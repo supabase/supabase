@@ -237,11 +237,9 @@ const LayoutHeader = ({
               exit={{ opacity: 0, x: 0, width: 0 }}
               transition={{ duration: 0.15, ease: 'easeOut' }}
             >
-              {isInlineEditorEnabled && (
-                <div className="border-r h-full flex items-center justify-center md:px-2">
-                  <InlineEditorButton />
-                </div>
-              )}
+              <div className="border-r h-full flex items-center justify-center md:px-2">
+                <InlineEditorButton />
+              </div>
               <div className="md:px-2">
                 <AssistantButton />
               </div>
