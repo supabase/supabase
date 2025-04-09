@@ -30,7 +30,7 @@ MCP compatible tools can connect to Supabase using the [Supabase MCP server](htt
 1.  Create a `.cursor/mcp.json` file if it doesn't exist and open it.
 1.  Add the following configuration:
 
-    <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Cursor" }} />
+<$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Cursor" }} />
 
 1.  Save the configuration file.
 
@@ -42,7 +42,7 @@ MCP compatible tools can connect to Supabase using the [Supabase MCP server](htt
 1. Tap on the hammer (MCP) icon, then **Configure** to open the configuration file.
 1. Add the following configuration:
 
-   <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Windsurf" }} />
+<$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Windsurf" }} />
 
 1. Save the configuration file and reload by tapping **Refresh** in the Cascade assistant.
 
@@ -54,7 +54,7 @@ MCP compatible tools can connect to Supabase using the [Supabase MCP server](htt
 1. Tap **Configure MCP Servers** to open the configuration file.
 1. Add the following configuration:
 
-   <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "VS Code" }} />
+<$Partial path="mcp_supabase_config.mdx" variables={{ "app": "VS Code" }} />
 
 1. Save the configuration file. Cline should automatically reload the configuration.
 
@@ -66,7 +66,7 @@ MCP compatible tools can connect to Supabase using the [Supabase MCP server](htt
 1. Under the **Developer** tab, tap **Edit Config** to open the configuration file.
 1. Add the following configuration:
 
-   <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Claude desktop" }} />
+<$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Claude desktop" }} />
 
 1. Save the configuration file and restart Claude desktop.
 
@@ -77,44 +77,43 @@ MCP compatible tools can connect to Supabase using the [Supabase MCP server](htt
 1. Create a `.mcp.json` file in your project root if it doesn't exist.
 1. Add the following configuration:
 
-   <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Claude code" }} />
+<$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Claude code" }} />
 
 1. Save the configuration file.
 
 1. Restart Claude code to apply the new configuration.
 
+### Enabling MCP in VSCode
+
+VSCode supports MCP out of the box in its latest release. Follow these steps to enable MCP in VSCode:
+
+Install the Latest Version of VSCode:
+
+Ensure you have the latest version of VSCode installed. You can download it from the official VSCode website.
+Configure MCP in VSCode:
+
+Create a .vscode/mcp.json file in your workspace:
+
+                {
+                  "servers": [
+                        {
+                          "name": "Supabase MCP Server",
+                          "url": "http://localhost:3000"
+                        }
+                              ]
+                }
+
+Alternatively, you can add the MCP server configuration through the VSCode Command Palette:
+Open the Command Palette (Ctrl+Shift+P or Cmd+Shift+P on macOS).
+Type MCP: Add Server and follow the prompts to add your MCP server.
+Verify MCP Configuration:
+
+Ensure that the MCP server is running and accessible.
+Use the VSCode Command Palette to interact with the MCP server and verify that it is working correctly.
+
+For more details, refer to the (https://code.visualstudio.com/docs/copilot/chat/mcp-servers).
+
+
 ### Next steps
 
 Your AI tool is now connected to Supabase using MCP. Try asking your AI assistant to create a new project, create a table, or fetch project config.
-
-For a full list of tools available, see the [GitHub README](https://github.com/supabase-community/supabase-mcp#tools). If you experience any issues, [submit an bug report](https://github.com/supabase-community/supabase-mcp/issues/new?template=1.Bug_report.md).
-
-## MCP for local Supabase instances
-
-The Supabase MCP server connects directly to the cloud platform to access your database. If you are running a local instance of Supabase, you can instead use the [Postgres MCP server](https://github.com/modelcontextprotocol/servers/tree/main/src/postgres) to connect to your local database. This MCP server runs all queries as read-only transactions.
-
-### Step 1: Find your database connection string
-
-To connect to your local Supabase instance, you need to get the connection string for your local database. You can find your connection string by running:
-
-```shell
-supabase status
-```
-
-or if you are using `npx`:
-
-```shell
-npx supabase status
-```
-
-This will output a list of details about your local Supabase instance. Copy the `DB URL` field in the output.
-
-### Step 2: Configure the MCP server
-
-Configure your client with the following:
-
-<$Partial path="mcp_postgres_config.mdx" variables={{ "app": "your MCP client" }} />
-
-### Next steps
-
-Your AI tool is now connected to your local Supabase instance using MCP. Try asking the AI tool to query your database using natural language commands.
