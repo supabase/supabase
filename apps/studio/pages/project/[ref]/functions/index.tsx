@@ -26,6 +26,7 @@ import {
   Dialog,
   DialogContent,
   DialogSection,
+  DialogTitle,
   DialogTrigger,
   DropdownMenu,
   DropdownMenuContent,
@@ -98,6 +99,9 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
             </DropdownMenuItem>
           </DialogTrigger>
           <DialogContent size="large">
+            <DialogTitle className="sr-only">
+              Create your first Edge Function via the CLI
+            </DialogTitle>
             <DialogSection padding="small">
               <TerminalInstructions />
             </DialogSection>
