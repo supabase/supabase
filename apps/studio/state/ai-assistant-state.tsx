@@ -16,7 +16,7 @@ type AssistantMessageType = MessageType & { results?: { [id: string]: any[] } }
 type ChatSession = {
   id: string
   name: string
-  messages: readonly AssistantMessageType[]
+  messages: AssistantMessageType[]
   createdAt: Date
   updatedAt: Date
 }
@@ -278,38 +278,25 @@ export const createAiAssistantState = (
     renameChat: (id: string, name: string) => {
       const chat = state.chats[id]
       if (chat && chat.name !== name) {
-        state.chats = {
-          ...state.chats,
-          [id]: {
-            ...chat,
-            name,
-            updatedAt: new Date(),
-          },
-        }
+        chat.name = name
+        chat.updatedAt = new Date()
       }
     },
 
     clearMessages: () => {
-      const activeChatId = state.activeChatId // Get ID before potential modification
-      if (activeChatId && state.chats[activeChatId]) {
-        state.chats = {
-          ...state.chats,
-          [activeChatId]: {
-            ...state.chats[activeChatId],
-            messages: [],
-            updatedAt: new Date(),
-          },
-        }
+      const chat = state.activeChat
+      if (chat) {
+        chat.messages = []
+        chat.updatedAt = new Date()
         state.sqlSnippets = []
         state.initialInput = ''
       }
     },
 
     saveMessage: (message: MessageType | MessageType[]) => {
-      const activeChatId = state.activeChatId
-      if (!activeChatId || !state.chats[activeChatId]) return
+      const chat = state.activeChat
+      if (!chat) return
 
-      const chat = state.chats[activeChatId]
       const existingMessages = chat.messages
       const messagesToAdd = Array.isArray(message)
         ? message.filter(
@@ -321,14 +308,8 @@ export const createAiAssistantState = (
           : []
 
       if (messagesToAdd.length > 0) {
-        state.chats = {
-          ...state.chats,
-          [activeChatId]: {
-            ...chat,
-            messages: [...existingMessages, ...messagesToAdd],
-            updatedAt: new Date(),
-          },
-        }
+        chat.messages.push(...messagesToAdd)
+        chat.updatedAt = new Date()
       }
     },
 
@@ -341,31 +322,17 @@ export const createAiAssistantState = (
       resultId?: string
       results: any[]
     }) => {
-      const activeChatId = state.activeChatId
-      if (!activeChatId || !state.chats[activeChatId] || !resultId) return
+      const chat = state.activeChat
+      if (!chat || !resultId) return
 
-      const chat = state.chats[activeChatId]
-      const existingMessages = chat.messages
-      let messageUpdated = false
+      const messageIndex = chat.messages.findIndex((msg) => msg.id === id)
 
-      const updatedMessages = existingMessages.map((msg: AssistantMessageType) => {
-        if (msg.id === id) {
-          messageUpdated = true
-          return { ...msg, results: { ...(msg.results ?? {}), [resultId]: results } }
-        } else {
-          return msg
+      if (messageIndex !== -1) {
+        const msg = chat.messages[messageIndex]
+        if (!msg.results) {
+          msg.results = {}
         }
-      })
-
-      if (messageUpdated) {
-        state.chats = {
-          ...state.chats,
-          [activeChatId]: {
-            ...chat,
-            messages: updatedMessages,
-            // Optionally update updatedAt timestamp here if needed
-          },
-        }
+        msg.results[resultId] = results
       }
     },
 
