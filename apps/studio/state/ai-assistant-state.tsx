@@ -497,7 +497,6 @@ export const AiAssistantStateContextProvider = ({
         unsubscribe()
       }
     }
-    // No cleanup needed if projectRef is undefined or not in browser
     return undefined
   }, [state, projectRef])
 
