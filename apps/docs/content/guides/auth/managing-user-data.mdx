@@ -68,6 +68,10 @@ You can assign metadata to users on sign up:
 <TabPanel id="js" label="JavaScript">
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_KEY!)
+
+// ---cut---
 const { data, error } = await supabase.auth.signUp({
   email: 'valid.email@supabase.io',
   password: 'example-password',
@@ -137,10 +141,14 @@ User metadata is stored on the `raw_user_meta_data` column of the `auth.users` t
 <TabPanel id="js" label="JavaScript">
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_KEY!)
+
+// ---cut---
 const {
   data: { user },
 } = await supabase.auth.getUser()
-let metadata = user.user_metadata
+let metadata = user?.user_metadata
 ```
 
 </TabPanel>

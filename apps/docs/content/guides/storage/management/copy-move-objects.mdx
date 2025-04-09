@@ -17,6 +17,10 @@ When making a copy of an object, the owner of the new object will be the user wh
 To copy an object within the same bucket, use the `copy` method.
 
 ```javascript
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 await supabase.storage.from('avatars').copy('public/avatar1.png', 'private/avatar2.png')
 ```
 
@@ -25,6 +29,10 @@ await supabase.storage.from('avatars').copy('public/avatar1.png', 'private/avata
 To copy an object across buckets, use the `copy` method and specify the destination bucket.
 
 ```javascript
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 await supabase.storage.from('avatars').copy('public/avatar1.png', 'private/avatar2.png', {
   destinationBucket: 'avatars2',
 })
@@ -41,6 +49,10 @@ When moving an object, the owner of the new object will be the user who initiate
 To move an object within the same bucket, you can use the `move` method.
 
 ```javascript
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 const { data, error } = await supabase.storage
   .from('avatars')
   .move('public/avatar1.png', 'private/avatar2.png')
@@ -51,6 +63,10 @@ const { data, error } = await supabase.storage
 To move an object across buckets, use the `move` method and specify the destination bucket.
 
 ```javascript
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 await supabase.storage.from('avatars').move('public/avatar1.png', 'private/avatar2.png', {
   destinationBucket: 'avatars2',
 })
