@@ -9,7 +9,7 @@ sidebar_label: 'Logical Replication'
 
 ## Write Ahead Log (WAL)
 
-Postgres uses a system called the Write Ahead Log (WAL) to managae changes to the database. As you make changes, they are appended to the WAL (which is a series of files (also called "segments"), where the file size can be specified). Once one segment is full, Postgresql will start appending to a new segment. After a period of time, a checkpoint occurs and Postgresql synchronizes the WAL with your database. Once the checkpoint is complete, then the WAL files can be removed from disk and free up space.
+Postgres uses a system called the Write Ahead Log (WAL) to manage changes to the database. As you make changes, they are appended to the WAL (which is a series of files (also called "segments"), where the file size can be specified). Once one segment is full, Postgres will start appending to a new segment. After a period of time, a checkpoint occurs and Postgres synchronizes the WAL with your database. Once the checkpoint is complete, then the WAL files can be removed from disk and free up space.
 
 ## Logical Replication and WAL
 
@@ -25,7 +25,7 @@ When setting up logical replication, three key components are involved:
 
 ## Logical Replication Output Format
 
-Logical replication is typically output in 2 forms, `pgoutput` and `wal2json`. The output method is how Postgresql sends changes to any active replication slot.
+Logical replication is typically output in 2 forms, `pgoutput` and `wal2json`. The output method is how Postgres sends changes to any active replication slot.
 
 # Logical Replication Configuration
 
