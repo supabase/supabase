@@ -262,15 +262,22 @@ const DatabaseUsage = () => {
       </Alert_Shadcn_>
       <section className="relative pt-16 -mt-4">
         <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
-          <div className="sticky top-0 bg-200 py-4 mb-4 flex items-center justify-between space-x-3 pointer-events-auto">
+          <div className="sticky top-0 bg-200 py-4 mb-4 flex items-center space-x-3 pointer-events-auto">
+            <ButtonTooltip
+              type="default"
+              disabled={isRefreshing}
+              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+              className="w-7"
+              tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+              onClick={onRefreshReport}
+            />
             <DatePickers
               onChange={(values: any) => updateDateRange(values.from, values.to)}
               from={dateRange?.period_start?.date || ''}
               to={dateRange?.period_end?.date || ''}
               helpers={REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
                 ...helper,
-                // disabled: (index > 4 && plan?.id === 'free') || (index > 5 && plan?.id !== 'pro'),
-                disabled: false,
+                disabled: (index > 4 && plan?.id === 'free') || (index > 5 && plan?.id !== 'pro'),
               }))}
             />
             <div className="flex items-center gap-4">
@@ -287,14 +294,6 @@ const DatabaseUsage = () => {
                   </p>
                 </div>
               )}
-              <ButtonTooltip
-                type="default"
-                disabled={isRefreshing}
-                icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
-                className="w-7"
-                tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-                onClick={onRefreshReport}
-              />
             </div>
           </div>
         </div>
