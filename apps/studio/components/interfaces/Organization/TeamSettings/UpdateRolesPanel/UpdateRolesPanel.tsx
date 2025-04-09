@@ -80,6 +80,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const [projectsRoleConfiguration, setProjectsRoleConfiguration] = useState<
     ProjectRoleConfiguration[]
   >([])
+  const [initialConfiguration, setInitialConfiguration] = useState<ProjectRoleConfiguration[]>([])
 
   const originalConfiguration =
     allRoles !== undefined
@@ -131,17 +132,16 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
     }
   }
 
-  const onToggleApplyToAllProjects = () => {
+  const onToggleApplyToAllProjects = (applyGlobally: boolean) => {
     const roleIdToApply =
       projectsRoleConfiguration[0]?.roleId ?? lowerPermissionsRole ?? orgScopedRoles[0].id
-    if (isApplyingRoleToAllProjects) {
-      setProjectsRoleConfiguration(
-        orgProjects.map((p) => {
-          return { ref: p.ref, projectId: p.id, roleId: roleIdToApply }
-        })
-      )
-    } else {
+    if (applyGlobally) {
+      // Store the current configuration before applying globally
+      setInitialConfiguration(projectsRoleConfiguration)
       setProjectsRoleConfiguration([{ ref: undefined, roleId: roleIdToApply }])
+    } else {
+      // Restore the initial configuration
+      setProjectsRoleConfiguration(initialConfiguration)
     }
   }
 
