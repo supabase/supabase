@@ -81,7 +81,7 @@ Migrating from Fauna’s NoSQL architecture to a relational Postgres database re
 Phase one focused on replicating Fauna’s schemas in Supabase using Postgres `jsonb` columns to accommodate Fauna’s document-style structure. Bree built ETL pipelines and verification scripts to ensure data consistency across both platforms. This dual-write phase ensured every read and write operation was fully synchronized.
 
 <Admonition>
-Read our blog post on [migrating from Fauna to Supabase](/blog/migrating-from-fauna-to-supabase).
+  Read our blog post on [migrating from Fauna to Supabase](/blog/migrating-from-fauna-to-supabase).
 </Admonition>
 
 One of the primary challenges was handling type mismatches. Bree built conversion scripts to synchronize NoSQL data types with Postgres.
