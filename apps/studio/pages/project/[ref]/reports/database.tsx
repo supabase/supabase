@@ -185,7 +185,6 @@ const DatabaseUsage = () => {
 
   const handleIntervalGranularity = (from: string, to: string) => {
     const conditions = {
-      '15s': dayjs(to).diff(from, 'hour') < 1, // less than 1 hour
       '1m': dayjs(to).diff(from, 'hour') < 3, // less than 3 hours
       '10m': dayjs(to).diff(from, 'hour') < 6, // less than 6 hours
       '30m': dayjs(to).diff(from, 'hour') < 18, // less than 18 hours
@@ -194,8 +193,6 @@ const DatabaseUsage = () => {
     }
 
     switch (true) {
-      case conditions['15s']:
-        return '1m'
       case conditions['1m']:
         return '1m'
       case conditions['10m']:
@@ -206,11 +203,6 @@ const DatabaseUsage = () => {
         return '1h'
     }
   }
-
-  // const handleCustomDateFormat =
-  //   handleIntervalGranularity(dateRange?.period_start?.date, dateRange?.period_end?.date) === '15s'
-  //     ? DateTimeFormats.FULL_SECONDS
-  //     : undefined
 
   const updateDateRange: UpdateDateRange = (from: string, to: string) => {
     setDateRange({
@@ -277,7 +269,8 @@ const DatabaseUsage = () => {
               to={dateRange?.period_end?.date || ''}
               helpers={REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
                 ...helper,
-                disabled: (index > 4 && plan?.id === 'free') || (index > 5 && plan?.id !== 'pro'),
+                // disabled: (index > 4 && plan?.id === 'free') || (index > 5 && plan?.id !== 'pro'),
+                disabled: false,
               }))}
             />
             <div className="flex items-center gap-4">
