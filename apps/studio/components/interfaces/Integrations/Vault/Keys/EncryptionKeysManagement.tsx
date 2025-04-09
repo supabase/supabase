@@ -233,7 +233,6 @@ export const EncryptionKeysManagement = () => {
       </div>
 
       <Modal
-        closable
         size="medium"
         alignFooter="right"
         visible={selectedKeyToRemove !== undefined}
@@ -264,7 +263,6 @@ export const EncryptionKeysManagement = () => {
       </Modal>
 
       <Modal
-        closable
         hideFooter
         size="medium"
         visible={showAddKeyModal}

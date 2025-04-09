@@ -110,7 +110,7 @@ const FunctionList = ({
               {!isLocked && (
                 <div className="flex items-center justify-end">
                   {canUpdateFunctions ? (
-                    <DropdownMenu>
+                    <DropdownMenu modal={false}>
                       <DropdownMenuTrigger asChild>
                         <Button type="default" className="px-1" icon={<MoreVertical />} />
                       </DropdownMenuTrigger>

@@ -11,7 +11,7 @@ export type ColumnPrivilegesGrant = components['schemas']['GrantColumnPrivileges
 export type ColumnPrivilegesGrantVariables = {
   projectRef: string
   connectionString?: string
-  grants: ColumnPrivilegesGrant[]
+  grants: ColumnPrivilegesGrant
 }
 
 export async function grantColumnPrivileges({

@@ -44,7 +44,7 @@ export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
         } else if (dataType === 'ARRAY') {
           return `'${JSON.stringify(val).replace('[', '{').replace(/.$/, '}')}'`
         } else if (format?.includes('json')) {
-          return `${JSON.stringify(val).replace(/\\"/g, '"').replace('"', "'").replace(/.$/, "'")}`
+          return `${JSON.stringify(val).replace(/\\"/g, '"').replace(/'/g, "''").replace('"', "'").replace(/.$/, "'")}`
         } else {
           return `'${val}'`
         }

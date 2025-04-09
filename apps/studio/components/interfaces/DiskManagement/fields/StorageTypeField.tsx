@@ -54,13 +54,23 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
               /**
                * Set default IOPS if not dirty
                * This is to ensure that the IOPS is set to the minimum value if the user has not changed it
+               *
+               * Only set it if the current configured IOPS is smaller than the min IOPS, otherwise leave at same IOPS
                */
               if (e === 'gp3') {
-                if (!form.getFieldState('provisionedIOPS').isDirty) {
+                if (
+                  !form.getFieldState('provisionedIOPS').isDirty &&
+                  (!form.getValues('provisionedIOPS') ||
+                    form.getValues('provisionedIOPS') < DISK_LIMITS[DiskType.GP3].minIops)
+                ) {
                   form.setValue('provisionedIOPS', DISK_LIMITS[DiskType.GP3].minIops)
                 }
               } else {
-                if (!form.getFieldState('provisionedIOPS').isDirty) {
+                if (
+                  !form.getFieldState('provisionedIOPS').isDirty &&
+                  (!form.getValues('provisionedIOPS') ||
+                    form.getValues('provisionedIOPS') < DISK_LIMITS[DiskType.IO2].minIops)
+                ) {
                   form.setValue('provisionedIOPS', DISK_LIMITS[DiskType.IO2].minIops)
                 }
               }
@@ -91,7 +101,7 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
                 {DISK_TYPE_OPTIONS.map((item) => {
                   const disableIo2 = item.type === 'io2' && !isIo2Supported
                   return (
-                    <Tooltip>
+                    <Tooltip key={item.type}>
                       <TooltipTrigger asChild>
                         <SelectItem_Shadcn_
                           key={item.type}

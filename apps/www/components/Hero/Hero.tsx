@@ -18,9 +18,10 @@ const Hero = () => {
                 <div className="flex flex-col items-center">
                   <div className="z-40 w-full flex justify-center -mt-4 lg:-mt-12 mb-8">
                     <AnnouncementBadge
-                      url="/launch-week#day-1"
-                      badge="LW14: Day 1"
-                      announcement="Supabase UI Library"
+                      url="/blog/launch-week-14-top-10"
+                      badge="Launch Week 14"
+                      announcement="Top 10 Launches"
+                      className="[&_a]:sm:gap-4 [&_.announcement-badge]:!text-xs [&_.announcement-text]:!text-xs [&_.announcement-badge]:sm:!text-sm [&_.announcement-text]:sm:!text-sm"
                       style={{
                         fontFamily:
                           'Departure Mono, Source Code Pro, Office Code Pro, Menlo, monospace',

@@ -1,7 +1,7 @@
 import { forwardRef, memo, useRef } from 'react'
 import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
 
-import { formatClipboardValue } from 'components/grid/utils/common'
+import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
 import { TableGridInnerLoadingState } from 'components/interfaces/TableGridEditor/LoadingState'
 import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -9,12 +9,10 @@ import AlertError from 'components/ui/AlertError'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { copyToClipboard } from 'lib/helpers'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, cn } from 'ui'
 import type { Filter, GridProps, SupaRow } from '../../types'
-import { useKeyboardShortcuts } from '../common/Hooks'
 import { useOnRowsChange } from './Grid.utils'
 import RowRenderer from './RowRenderer'
 
@@ -62,28 +60,6 @@ export const Grid = memo(
       }
 
       const selectedCellRef = useRef<{ rowIdx: number; row: any; column: any } | null>(null)
-
-      function copyCellValue() {
-        const selectedCellValue =
-          selectedCellRef.current?.row?.[selectedCellRef.current?.column?.key]
-        const text = formatClipboardValue(selectedCellValue)
-        if (!text) return
-        copyToClipboard(text)
-      }
-
-      useKeyboardShortcuts(
-        {
-          'Command+c': (event: KeyboardEvent) => {
-            event.stopPropagation()
-            copyCellValue()
-          },
-          'Control+c': (event: KeyboardEvent) => {
-            event.stopPropagation()
-            copyCellValue()
-          },
-        },
-        ['INPUT', 'TEXTAREA']
-      )
 
       function onSelectedCellChange(args: { rowIdx: number; row: any; column: any }) {
         selectedCellRef.current = args
@@ -155,7 +131,14 @@ export const Grid = memo(
                   {isLoading && <TableGridInnerLoadingState />}
                   {isError && (
                     <div className="p-2 col-span-full">
-                      <AlertError error={error} subject="Failed to retrieve rows from table" />
+                      <AlertError error={error} subject="Failed to retrieve rows from table">
+                        {filters.length > 0 && (
+                          <p>
+                            Verify that the filter values are correct, as the error may stem from an
+                            incorrectly applied filter
+                          </p>
+                        )}
+                      </AlertError>
                     </div>
                   )}
                   {isSuccess && (
@@ -217,6 +200,7 @@ export const Grid = memo(
             onSelectedCellChange={onSelectedCellChange}
             onSelectedRowsChange={onSelectedRowsChange}
             onCellDoubleClick={(props) => onRowDoubleClick(props.row, props.column)}
+            onCellKeyDown={handleCopyCell}
           />
         </div>
       )

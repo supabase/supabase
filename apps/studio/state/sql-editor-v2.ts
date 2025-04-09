@@ -108,7 +108,6 @@ export const sqlEditorState = proxy({
     if (storedSnippet) {
       if (!storedSnippet.snippet.content) {
         storedSnippet.snippet.content = snippet.content
-        sqlEditorState.needsSaving.set(storedSnippet.snippet.id, true)
       }
     } else {
       sqlEditorState.addSnippet({ projectRef: projectRef, snippet })

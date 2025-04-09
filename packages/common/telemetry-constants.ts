@@ -266,6 +266,29 @@ export interface FeaturePreviewDisabledEvent {
  */
 export interface ProjectCreationSimpleVersionSubmittedEvent {
   action: 'project_creation_simple_version_submitted'
+  /**
+   * the instance size selected in the project creation form
+   */
+  properties: {
+    instanceSize: string
+  }
+}
+
+/**
+ * Existing project creation form confirm modal was triggered and opened.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
+  action: 'project_creation_simple_version_confirm_modal_opened'
+  /**
+   * the instance size selected in the project creation form
+   */
+  properties: {
+    instanceSize: string
+  }
 }
 
 /**
@@ -1166,6 +1189,14 @@ export interface EdgeFunctionTemplateClickedEvent {
  */
 export interface EdgeFunctionViaCliButtonClickedEvent {
   action: 'edge_function_via_cli_button_clicked'
+  properties: {
+    /**
+     * Click on Via CLI can either happen:
+     *   1. on the main block when there are no functions
+     *   2. in the secondary action section of the page
+     */
+    origin: 'no_functions_block' | 'secondary_action'
+  }
   groups: {
     project: string
     organization: string
@@ -1258,6 +1289,7 @@ export type TelemetryEvent =
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
   | ProjectCreationSimpleVersionSubmittedEvent
+  | ProjectCreationSimpleVersionConfirmModalOpenedEvent
   | ProjectCreationInitialStepPromptIntendedEvent
   | ProjectCreationInitialStepSubmittedEvent
   | ProjectCreationSecondStepPromptIntendedEvent
