@@ -96,7 +96,6 @@ async function loadFromIndexedDB(projectRef: string): Promise<StoredAiAssistantS
   try {
     const persistedState = await getAiState(projectRef)
     if (persistedState) {
-      console.log('Loaded state from IndexedDB:', persistedState)
       // Revive dates
       Object.values(persistedState.chats).forEach((chat: ChatSession) => {
         if (chat && typeof chat === 'object') {
@@ -116,10 +115,8 @@ async function loadFromIndexedDB(projectRef: string): Promise<StoredAiAssistantS
 async function tryMigrateFromLocalStorage(
   projectRef: string
 ): Promise<StoredAiAssistantState | null> {
-  console.log('No state found in IndexedDB for', projectRef, 'checking localStorage...')
   const stored = localStorage.getItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
   if (!stored) {
-    console.log('No state found in localStorage for', projectRef)
     return null
   }
 
@@ -133,7 +130,6 @@ async function tryMigrateFromLocalStorage(
     })
 
     if (parsedFromLocalStorage && typeof parsedFromLocalStorage.chats === 'object') {
-      console.log('Found state in localStorage, attempting migration...')
       migratedState = {
         projectRef: projectRef,
         open: parsedFromLocalStorage.open ?? false,
@@ -154,13 +150,10 @@ async function tryMigrateFromLocalStorage(
   if (migratedState) {
     try {
       await saveAiState(migratedState)
-      console.log('Successfully migrated state from localStorage to IndexedDB.')
       localStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
       return migratedState
     } catch (saveError) {
       console.error('Failed to save migrated state to IndexedDB:', saveError)
-      // Don't remove from localStorage if save failed, maybe retry later?
-      // Return null as migration wasn't fully successful
       return null
     }
   }
@@ -171,7 +164,6 @@ async function tryMigrateFromLocalStorage(
 // Helper function to ensure an active chat exists or initialize a new one
 function ensureActiveChatOrInitialize(state: AiAssistantState) {
   // Check URL param again to override loaded 'open' state if present
-  // This check should happen *after* loading/migration potentially sets 'open'
   if (typeof window !== 'undefined') {
     const urlParams = new URLSearchParams(window.location.search)
     const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
@@ -189,11 +181,9 @@ function ensureActiveChatOrInitialize(state: AiAssistantState) {
         (a, b) =>
           (state.chats[b].updatedAt?.getTime() || 0) - (state.chats[a].updatedAt?.getTime() || 0)
       )[0]
-      console.log('Selected most recent chat:', state.activeChatId)
     } else {
       // If loaded/migrated state had no chats, create a new one
-      console.log('No chats found after loading/migration, creating a new chat.')
-      state.newChat() // newChat now handles setting the activeChatId
+      state.newChat()
     }
   }
 }
@@ -219,8 +209,6 @@ export const createAiAssistantState = (
     resetAiAssistantPanel: () => {
       // Reset should probably reset to initial defaults, not current state values
       Object.assign(state, INITIAL_AI_ASSISTANT)
-      // If resetting should clear persisted state, we might need an async operation here
-      // For now, just resets the in-memory state
     },
 
     // Panel visibility
@@ -479,7 +467,6 @@ export const AiAssistantStateContextProvider = ({
     async function loadAndInitializeState() {
       if (!projectRef || typeof window === 'undefined') {
         if (projectRef === undefined) {
-          console.log('ProjectRef is undefined, resetting state.')
           state.resetAiAssistantPanel()
         }
         return // Don't load if no projectRef or not in browser
@@ -511,19 +498,19 @@ export const AiAssistantStateContextProvider = ({
     return () => {
       isMounted = false
     }
-  }, [projectRef, state]) // Keep `state` in dependency array as methods like reset/newChat are used
+  }, [projectRef, state])
 
   // Effect to save state to IndexedDB on changes
   useEffect(() => {
     if (typeof window !== 'undefined' && projectRef) {
       // Create a debounced version of saveAiState
-      const debouncedSaveAiState = debounce(saveAiState, 500) // Debounce by 500ms
+      const debouncedSaveAiState = debounce(saveAiState, 500)
 
       const unsubscribe = subscribe(state, () => {
         const snap = snapshot(state)
         // Prepare state for IndexedDB
         const stateToSave: StoredAiAssistantState = {
-          projectRef: projectRef, // Ensure projectRef is included
+          projectRef: projectRef,
           open: snap.open,
           activeChatId: snap.activeChatId,
           chats: snap.chats
@@ -533,24 +520,23 @@ export const AiAssistantStateContextProvider = ({
                   ...acc,
                   [chatId]: {
                     ...chat,
-                    messages: chat.messages?.slice(-20) || [], // Keep limiting messages
+                    messages: chat.messages?.slice(-20) || [],
                   },
                 }
               }, {})
             : {},
         }
-        // Call the debounced save function
         debouncedSaveAiState(stateToSave)
       })
       // Clean up subscription and cancel any pending saves on unmount or projectRef change
       return () => {
-        debouncedSaveAiState.cancel() // Cancel pending saves
+        debouncedSaveAiState.cancel()
         unsubscribe()
       }
     }
     // No cleanup needed if projectRef is undefined or not in browser
     return undefined
-  }, [state, projectRef]) // Depend on state and projectRef
+  }, [state, projectRef])
 
   return (
     <AiAssistantStateContext.Provider value={state}>{children}</AiAssistantStateContext.Provider>
