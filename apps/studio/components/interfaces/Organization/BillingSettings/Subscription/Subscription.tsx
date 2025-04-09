@@ -43,10 +43,6 @@ const Subscription = () => {
 
   const currentPlan = subscription?.plan
   const planName = currentPlan?.name ?? 'Unknown'
-  const billingCycleStart = dayjs.unix(subscription?.current_period_start ?? 0).utc()
-  const billingCycleEnd = dayjs.unix(subscription?.current_period_end ?? 0).utc()
-  const daysToCycleEnd = billingCycleEnd.diff(dayjs(), 'days')
-  const daysWithinCycle = billingCycleEnd.diff(billingCycleStart, 'days')
 
   const canChangeTier = !projectUpdateDisabled && !['enterprise'].includes(currentPlan?.id ?? '')
 
@@ -58,7 +54,13 @@ const Subscription = () => {
         </div>
         <ScaffoldSectionDetail>
           <div className="sticky space-y-6 top-12">
-            <p className="text-foreground text-base m-0">Subscription Plan</p>
+            <div className="space-y-2">
+              <p className="text-foreground text-base m-0">Subscription Plan</p>
+              <p className="text-sm text-foreground-light m-0">
+                Each organization has it's own subscription plan, billing cycle, payment methods and
+                usage quotas.
+              </p>
+            </div>
             <div className="space-y-2">
               <p className="text-sm text-foreground-light m-0">More information</p>
               <div>
@@ -90,10 +92,7 @@ const Subscription = () => {
               {isSuccess && (
                 <div className="space-y-6">
                   <div>
-                    <p className="text-sm">This organization is currently on the plan:</p>
-                    <p className="text-2xl text-brand uppercase">
-                      {currentPlan?.name ?? 'Unknown'}
-                    </p>
+                    <p className="text-2xl text-brand">{currentPlan?.name ?? 'Unknown'} Plan</p>
                   </div>
 
                   <div>
@@ -167,19 +166,6 @@ const Subscription = () => {
                       </Button>
                     </Admonition>
                   )}
-
-                  <SparkBar
-                    type="horizontal"
-                    value={daysWithinCycle - daysToCycleEnd}
-                    max={daysWithinCycle}
-                    barClass="bg-foreground"
-                    labelBottom={`Current billing cycle (${billingCycleStart.format(
-                      'MMM DD'
-                    )} - ${billingCycleEnd.format('MMM DD')})`}
-                    bgClass="bg-surface-300"
-                    labelBottomClass="!text-foreground-light pb-1"
-                    labelTop={`${daysToCycleEnd} days remaining`}
-                  />
                 </div>
               )}
             </>

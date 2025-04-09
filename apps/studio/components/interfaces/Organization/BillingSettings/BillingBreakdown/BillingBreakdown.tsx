@@ -15,6 +15,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import UpcomingInvoice from './UpcomingInvoice'
+import SparkBar from 'components/ui/SparkBar'
 
 const BillingBreakdown = () => {
   const { slug: orgSlug } = useParams()
@@ -36,16 +37,28 @@ const BillingBreakdown = () => {
   const billingCycleStart = dayjs.unix(subscription?.current_period_start ?? 0).utc()
   const billingCycleEnd = dayjs.unix(subscription?.current_period_end ?? 0).utc()
 
+  const daysToCycleEnd = billingCycleEnd.diff(dayjs(), 'days')
+  const daysWithinCycle = billingCycleEnd.diff(billingCycleStart, 'days')
+
   return (
     <ScaffoldSection>
       <ScaffoldSectionDetail>
         <div className="sticky space-y-2 top-12 pr-3">
           <p className="text-foreground text-base m-0">Billing Breakdown</p>
-          <p className="text-sm text-foreground-light m-0">
-            Current billing cycle: {billingCycleStart.format('MMM DD')} -{' '}
-            {billingCycleEnd.format('MMM DD')}
-          </p>
-          <p className="text-sm text-foreground-light m-0">
+          <div className="py-2">
+            <SparkBar
+              type="horizontal"
+              value={daysWithinCycle - daysToCycleEnd}
+              max={daysWithinCycle}
+              barClass="bg-foreground"
+              labelBottom={`${billingCycleStart.format('MMMM DD')} - ${billingCycleEnd.format('MMMM DD')}`}
+              bgClass="bg-surface-300"
+              labelBottomClass="!text-foreground-light p-1 m-0"
+              labelTop={`${daysToCycleEnd} days left`}
+              labelTopClass="p-1 m-0"
+            />
+          </div>
+          <p className="text-sm text-foreground-light mt-4">
             It may take up to an hour for addon changes or new projects to show up.
           </p>
         </div>
