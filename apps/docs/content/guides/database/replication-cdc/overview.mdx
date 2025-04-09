@@ -1,38 +1,53 @@
 ---
 id: 'replication'
-title: 'Replication and Analytics with Supabase'
+title: 'Replication and Change Data Capture with Supabase'
 description: 'Performing Extract Transform Load (ETL) with Supabase'
 sidebar_label: 'Overview'
 ---
 
-Performing analytics, connecting external tools or expanding access are all tasks that you do not want to use your primary database for. In these scenarios, the most common options are:
-1. Setting up a Read-Replica
-2. Configuring Logical replication to send your data to a Data Warehouse
+Change Data Capture (CDC) is a technique used to track and capture changes in your database so they can be replicated to other systems. You might need CDC with your Supabase database in several scenarios:
 
-## Read Replicas
+## Real-time data synchronization
 
-[Read-Replicas](/guides/platform/read-replicas) are available on Supabase and allow you to create a second database that is a direct, read-only copy of your primary database that stays in sync. This can be useful for many things, like load-balancing, and, in this case, for analytics workloads.
+If you need to keep multiple systems in sync with your Supabase database, CDC provides a reliable way to capture and propagate changes as they occur. This is useful when:
 
-## Logical Replication
+- Synchronizing data between your production database and analytics platforms
+- Maintaining consistency across microservices that use separate databases
 
-<Admonition type="warning">
+## Analytics and reporting
 
-Logical replication does work on the Supabase platform but it is not currently fully supported due to restricted access to certain Postgres settings.
-Full support is in development and our Support team can help you in the meantime.
+When you need advanced analytics without impacting your production database:
 
-</Admonition>
+- Offload complex analytical queries to a dedicated system
+- Create data warehouses or data lakes for business intelligence
+- Generate reports without putting load on your transactional database
 
-Your use case might go beyond what a Read-Replica can offer and you may need to replicate your data from Supabase into a Data Warehouse, like Clickhouse or Google BigQuery. This could be because of long running queries, the amount of data or because you need to combine your Supabase data with data from other systems.
+## Event-driven architectures
 
-This is done using a method called [Logical Replication](/guides/database/logical-replication).
+CDC is essential for event-driven systems where:
 
-In most cases a tool, such as Estuary or Airbyte or Fivetran, will be used to susbscribe to your database, capture the changes and write them to a destination of your choice, ranging from S3 to  Google BigQuery to Google Sheets to Salesforce.
+- You want to trigger downstream processes whenever data changes
+- You need to implement event sourcing patterns
+- You're building reactive applications that respond to data changes
 
-Regardless of the tool chosen, it is very likely that logical replication will be used at its core. To understand the process, we have an [introduction](/guides/database/replication-cdc/logical-replication), as well as an [FAQ](/guides/databae/replication-cdc/faq)
+## Data integration
 
-To learn how to configure Supabase with a specific tool, do the following:
-1. Follow the steps in our [guide to setting up replication](/guides/database/postgres/setup-replicstion-external) to create a `publication` and a `replication slot`
-2. Select a guide from the navigation menu 
+When integrating Supabase with other services:
+
+- Feeding data to machine learning pipelines
+- Populating search engines like Elasticsearch
+- Sending data to third-party services that need up-to-date information
+
+## Backup and disaster recovery
+
+CDC can support more robust backup strategies:
+
+- Comply with policies relevant to the industries and countries you operate in
+- Minimize data loss with near real-time replication
+
+By capturing changes at the database level, CDC provides a reliable foundation for these use cases with minimal impact on your application's performance.
+
+
 
 ## Resources 
 

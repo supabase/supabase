@@ -5,23 +5,6 @@ description: 'Considerations and FAQs when setting up replication'
 sidebar_label: 'Considerations'
 ---
 
-# Why not use my Primary database?
-
-If you want to run analytics on your app, you may wonder why you could not just plug in your database connection string to an analytics tool and go. In some cases, you could, but we do not recommend it. Here's why:
-
-### Security
-
-Adding a new system to your database can expose data and settings that you may want to keep private (or may be required to keep private due to compliance or legislation). Using a read-only user is possible but you must ensure that access is controlled and regularly audited.
-
-### Performance
-
-Your users want to create or view new content and your analytics queries want to perform complex calculations on the past 3 months. Both of these wants will be sharing the same resources and one might win over the other; causing your users to have a bad experience or your analytics report to time out.
-
-### Recovery
-
-If you accidentally drop a table, you might not want to restore your whole project from a backup so you can check these values in your external system before your boss finds out.
-
-
 # Which connection string should I use?
 
 Always use the direct connection string for logical replication. 
@@ -42,7 +25,19 @@ It does not capture deletion of data and is **not recommended**, particularly fo
 
 # Can I configure replication in the Dashboard?
 
-You can view [publications](https://supabase.com/dashboard/project/default/database/publications) in the Dashboard but all steps to configure replication must be done using the [SQL Editor](https://supabase.com/dashboard/project/default/sql/new) or a tool of your choice.
+You can view [publications](https://supabase.com/dashboard/project/default/database/publications) in the Dashboard but all steps to configure replication must be done using the [SQL Editor](https://supabase.com/dashboard/project/default/sql/new) or a CLI tool of your choice.
+
+# Can I configure my database settings for replication?
+
+Yes. Using the Supabase CLI, you can [configure database settings](/guides/database/custom-postgres-config#cli-configurable-settings) to optimize them for your replication needs. These values can vary depending on the activity of your database size and activity.
+
+# What are some important configuration options?
+
+Some of the more important options to be aware of are:
+- `max_wal_size`
+- `max_slot_wal_keep_size`
+- `wal_keep_size`
+- `max_wal_senders`
 
 # How can I see the status of replication?
 
@@ -56,3 +51,4 @@ Postgres has some system tables that allow you to monitor the status of replicat
 ## Replica
 
 - `select * from pg_subscription_rel;` - Shows the status of any subscriptions on a replica
+
