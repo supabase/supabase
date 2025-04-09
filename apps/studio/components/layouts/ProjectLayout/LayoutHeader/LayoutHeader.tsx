@@ -224,23 +224,22 @@ const LayoutHeader = ({
       </div>
 
       <AnimatePresence initial={false}>
-        {!!projectRef &&
-          (isInlineEditorEnabled || (!isInlineEditorEnabled && !isAiAssistantOpen)) && (
-            <motion.div
-              className="border-l h-full flex items-center justify-center flex-shrink-0"
-              initial={{ opacity: 0, x: 0, width: 0 }}
-              animate={{ opacity: 1, x: 0, width: isInlineEditorEnabled ? 'auto' : 48 }}
-              exit={{ opacity: 0, x: 0, width: 0 }}
-              transition={{ duration: 0.15, ease: 'easeOut' }}
-            >
-              <div className="border-r h-full flex items-center justify-center md:px-2">
-                <InlineEditorButton />
-              </div>
-              <div className="md:px-2">
-                <AssistantButton />
-              </div>
-            </motion.div>
-          )}
+        {!!projectRef && (
+          <motion.div
+            className="border-l h-full flex items-center justify-center flex-shrink-0"
+            initial={{ opacity: 0, x: 0, width: 0 }}
+            animate={{ opacity: 1, x: 0, width: 'auto' }}
+            exit={{ opacity: 0, x: 0, width: 0 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
+          >
+            <div className="border-r h-full flex items-center justify-center md:px-2">
+              <InlineEditorButton />
+            </div>
+            <div className="md:px-2">
+              <AssistantButton />
+            </div>
+          </motion.div>
+        )}
       </AnimatePresence>
     </header>
   )
