@@ -14,7 +14,7 @@ interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
 }
 
-const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) => {
+export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const { project } = useProjectContext()
@@ -46,7 +46,9 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
       </Table.td>
       <Table.td>
         <div className="text-xs text-foreground-light flex gap-2 items-center truncate">
-          <p className="font-mono truncate hidden md:inline">{endpoint}</p>
+          <p title={endpoint} className="font-mono truncate hidden md:inline max-w-[30rem]">
+            {endpoint}
+          </p>
           <button
             type="button"
             className="text-foreground-lighter hover:text-foreground transition"
@@ -99,5 +101,3 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
     </Table.tr>
   )
 }
-
-export default EdgeFunctionsListItem

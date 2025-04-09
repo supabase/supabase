@@ -122,6 +122,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/fragments/logs-bar-chart',
           items: [],
         },
+        {
+          title: 'Table of Contents (TOC)',
+          href: '/docs/fragments/toc',
+          items: [],
+        },
       ],
     },
     {

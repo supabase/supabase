@@ -488,17 +488,6 @@ export const pricing: Pricing = {
         },
         usage_based: false,
       },
-      {
-        key: 'functions.numberOfFunctions',
-        title: 'Number of functions',
-        plans: {
-          free: '25 included',
-          pro: '500 included',
-          team: '1000 included',
-          enterprise: 'Unlimited',
-        },
-        usage_based: false,
-      },
     ],
   },
   realtime: {
@@ -585,7 +574,7 @@ export const pricing: Pricing = {
     features: [
       {
         key: 'security.byoc',
-        title: 'On Premises / BYO cloud',
+        title: 'BYO cloud',
         plans: {
           free: false,
           pro: false,

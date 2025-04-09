@@ -49,6 +49,14 @@ Realtime knows the region your database is in, and connects to it from the close
 
 Every Realtime region has at least two nodes so if one node goes offline the other node should reconnect and start streaming changes again.
 
+## Broadcast from Postgres
+
+Realtime Broadcast sends messages when changes happen in your database. Behind the scenes, Realtime creates a publication on the `realtime.messages` table. It then reads the Write-Ahead Log (WAL) file for this table, and sends a message whenever an insert happens. Messages are sent as JSON packages over WebSockets.
+
+The `realtime.messages` table is partitioned by day. This allows old messages to be deleted performantly, by dropping old partitions. Partitions are retained for 3 days before being deleted.
+
+Broadcast uses [Realtime Authorization](/docs/guides/realtime/authorization) by default to protect your data.
+
 ## Streaming the Write-Ahead Log
 
 A Postgres logical replication slot is acquired when connecting to your database.

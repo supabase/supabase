@@ -17,7 +17,7 @@ export interface Project extends Omit<ProjectDetail, 'status'> {
    * If not we will show ConnectingState and run a polling until it's back online
    */
   postgrestStatus?: 'ONLINE' | 'OFFLINE'
-  status: components['schemas']['project_status']
+  status: components['schemas']['ProjectDetailResponse']['status']
 }
 
 export async function getProjectDetail({ ref }: ProjectDetailVariables, signal?: AbortSignal) {

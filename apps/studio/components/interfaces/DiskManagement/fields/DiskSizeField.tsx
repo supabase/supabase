@@ -43,7 +43,10 @@ export function DiskSizeField({
     isLoading: isLoadingDiskAttributes,
     error: diskAttributesError,
     isError: isDiskAttributesError,
-  } = useDiskAttributesQuery({ projectRef })
+  } = useDiskAttributesQuery(
+    { projectRef },
+    { enabled: project && project.cloud_provider !== 'FLY' }
+  )
   const {
     data: subscription,
     error: subscriptionError,
@@ -55,9 +58,12 @@ export function DiskSizeField({
     data: diskUtil,
     error: diskUtilError,
     isError: isDiskUtilizationError,
-  } = useDiskUtilizationQuery({
-    projectRef: projectRef,
-  })
+  } = useDiskUtilizationQuery(
+    {
+      projectRef: projectRef,
+    },
+    { enabled: project && project.cloud_provider !== 'FLY' }
+  )
 
   const error = subscriptionError || diskUtilError || diskAttributesError
   const isError = isSubscriptionError || isDiskUtilizationError || isDiskAttributesError
@@ -89,7 +95,7 @@ export function DiskSizeField({
   const mainDiskUsed = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
 
   return (
-    <div className="grid grid-cols-12 gap-5">
+    <div className="grid @xl:grid-cols-12 gap-5">
       <div className="col-span-4">
         <FormField_Shadcn_
           name="totalSize"

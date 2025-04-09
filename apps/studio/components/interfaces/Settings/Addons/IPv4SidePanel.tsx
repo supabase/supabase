@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
@@ -12,9 +13,9 @@ import type { AddonVariantId } from 'data/subscriptions/types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
+import { ExternalLink } from 'lucide-react'
 import { useAddonsPagePanel } from 'state/addons-page'
 import { Button, Radio, SidePanel, cn } from 'ui'
-import { ExternalLink } from 'lucide-react'
 import { Admonition } from 'ui-patterns'
 
 const IPv4SidePanel = () => {
@@ -59,6 +60,7 @@ const IPv4SidePanel = () => {
   const isFreePlan = subscription?.plan?.id === 'free'
   const hasChanges = selectedOption !== (subscriptionIpV4Option?.variant.identifier ?? 'ipv4_none')
   const selectedIPv4 = availableOptions.find((option) => option.identifier === selectedOption)
+  const isPgBouncerEnabled = !isFreePlan
 
   useEffect(() => {
     if (visible) {
@@ -117,14 +119,22 @@ const IPv4SidePanel = () => {
             database via a IPv4 address.
           </p>
 
-          <p className="text-sm">
-            If you are connecting via our connection pooler, you do not need this add-on as our
-            pooler resolves to IPv4 addresses. You can check your connection info in your{' '}
-            <Link href={`/project/${projectRef}/settings/database`} className="text-brand">
-              project database settings
-            </Link>
-            .
-          </p>
+          {isPgBouncerEnabled ? (
+            <Admonition
+              type="default"
+              title="The Dedicated Pooler does not support IPv4 addresses"
+              description="If you are connecting to your database via the Dedicated Pooler, you may need this add-on if your network does not support communicating via IPv6. Alternatively, you may consider using our Shared Pooler."
+            />
+          ) : (
+            <p className="text-sm">
+              If you are connecting via the Shared connection pooler, you do not need this add-on as
+              our pooler resolves to IPv4 addresses. You can check your connection info in your{' '}
+              <InlineLink href={`/project/${projectRef}/settings/database#connection-pooler`}>
+                project database settings
+              </InlineLink>
+              .
+            </p>
+          )}
 
           <div className={cn('!mt-8 pb-4', isFreePlan && 'opacity-75')}>
             <Radio.Group

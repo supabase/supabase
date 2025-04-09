@@ -66,3 +66,5 @@ final data = res.data;`,
 )`,
   },
 ]
+
+export const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'] as const

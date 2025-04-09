@@ -1,16 +1,17 @@
-import React from 'react'
 import { Edit, File, Plus, Trash } from 'lucide-react'
-import { Button } from 'ui'
+import { useEffect, useState } from 'react'
+
 import AIEditor from 'components/ui/AIEditor'
 import {
-  TreeView,
-  TreeViewItem,
-  flattenTree,
+  Button,
   ContextMenu_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuSeparator_Shadcn_,
+  ContextMenuTrigger_Shadcn_,
+  flattenTree,
+  TreeView,
+  TreeViewItem,
 } from 'ui'
 
 interface FileData {
@@ -61,6 +62,18 @@ const FileExplorerAndEditor = ({
 }: FileExplorerAndEditorProps) => {
   const selectedFile = files.find((f) => f.selected) ?? files[0]
 
+  const [treeData, setTreeData] = useState({
+    name: '',
+    children: files.map((file) => ({
+      id: file.id.toString(),
+      name: file.name,
+      metadata: {
+        isEditing: false,
+        originalId: file.id,
+      },
+    })),
+  })
+
   const handleChange = (value: string) => {
     const updatedFiles = files.map((file) =>
       file.id === selectedFile.id ? { ...file, content: value } : file
@@ -69,7 +82,7 @@ const FileExplorerAndEditor = ({
   }
 
   const addNewFile = () => {
-    const newId = Math.max(...files.map((f) => f.id)) + 1
+    const newId = Math.max(0, ...files.map((f) => f.id)) + 1
     const updatedFiles = files.map((f) => ({ ...f, selected: false }))
     onFilesChange([
       ...updatedFiles,
@@ -132,20 +145,8 @@ const FileExplorerAndEditor = ({
     setTreeData(updatedTreeData)
   }
 
-  const [treeData, setTreeData] = React.useState({
-    name: '',
-    children: files.map((file) => ({
-      id: file.id.toString(),
-      name: file.name,
-      metadata: {
-        isEditing: false,
-        originalId: file.id,
-      },
-    })),
-  })
-
   // Update treeData when files change
-  React.useEffect(() => {
+  useEffect(() => {
     setTreeData({
       name: '',
       children: files.map((file) => ({
@@ -193,13 +194,16 @@ const FileExplorerAndEditor = ({
                         level={level}
                         xPadding={16}
                         name={element.name}
-                        icon={<File size={14} className="text-foreground-light" />}
+                        icon={<File size={14} className="text-foreground-light shrink-0" />}
                         isEditing={Boolean(element.metadata?.isEditing)}
                         onEditSubmit={(value) => {
                           if (originalId !== null) handleFileNameChange(originalId, value)
                         }}
                         onClick={() => {
                           if (originalId !== null) handleFileSelect(originalId)
+                        }}
+                        onDoubleClick={() => {
+                          if (originalId !== null) handleStartRename(originalId)
                         }}
                       />
                     </div>

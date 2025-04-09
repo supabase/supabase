@@ -1,16 +1,18 @@
+import { Key } from 'lucide-react'
+import DataGrid, { Column } from 'react-data-grid'
+
+import { NullValue } from 'components/grid/components/common/NullValue'
 import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
-import type { SupaRow, SupaTable } from 'components/grid/types'
+import type { SupaRow } from 'components/grid/types'
 import {
   ESTIMATED_CHARACTER_PIXEL_WIDTH,
   getColumnDefaultWidth,
 } from 'components/grid/utils/gridColumns'
-import { Key } from 'lucide-react'
-import DataGrid, { Column } from 'react-data-grid'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { convertByteaToHex } from '../RowEditor.utils'
 
 export interface SelectorGridProps {
-  table: SupaTable
   rows: SupaRow[]
   onRowSelect: (row: SupaRow) => void
 }
@@ -34,22 +36,32 @@ const columnRender = (name: string, isPrimaryKey = false) => {
   )
 }
 
+// TODO: move this formatter out to a common component
 const formatter = ({ column, format, row }: { column: string; format: string; row: SupaRow }) => {
   const formattedValue =
     format === 'bytea'
       ? convertByteaToHex(row[column])
-      : typeof row[column] === 'object'
-        ? JSON.stringify(row[column])
-        : row[column]
+      : row[column] === null
+        ? null
+        : typeof row[column] === 'object'
+          ? JSON.stringify(row[column])
+          : row[column]
+
   return (
     <div className="group sb-grid-select-cell__formatter overflow-hidden">
-      <span className="text-sm truncate">{formattedValue}</span>
+      {formattedValue === null ? (
+        <NullValue />
+      ) : (
+        <span className="text-sm truncate">{formattedValue}</span>
+      )}
     </div>
   )
 }
 
-const SelectorGrid = ({ table, rows, onRowSelect }: SelectorGridProps) => {
-  const columns: Column<SupaRow>[] = table.columns.map((column) => {
+const SelectorGrid = ({ rows, onRowSelect }: SelectorGridProps) => {
+  const snap = useTableEditorTableStateSnapshot()
+
+  const columns: Column<SupaRow>[] = snap.table.columns.map((column) => {
     const columnDefaultWidth = getColumnDefaultWidth(column)
     const columnWidthBasedOnName =
       (column.name.length + column.format.length) * ESTIMATED_CHARACTER_PIXEL_WIDTH

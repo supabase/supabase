@@ -109,7 +109,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end" className="w-32">
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger asChild>
                 <DropdownMenuItem
                   className="space-x-2"
                   disabled={!canManageSecrets}
@@ -127,7 +127,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
             </Tooltip>
 
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger asChild>
                 <DropdownMenuItem
                   className="space-x-2"
                   disabled={!canManageSecrets}

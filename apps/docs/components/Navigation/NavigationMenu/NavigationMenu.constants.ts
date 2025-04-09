@@ -652,6 +652,7 @@ export const auth = {
       name: 'Third-party auth',
       items: [
         { name: 'Overview', url: '/guides/auth/third-party/overview' },
+        { name: 'Clerk', url: '/guides/auth/third-party/clerk' },
         { name: 'Firebase Auth', url: '/guides/auth/third-party/firebase-auth' },
         { name: 'Auth0', url: '/guides/auth/third-party/auth0' },
         { name: 'AWS Cognito (Amplify)', url: '/guides/auth/third-party/aws-cognito' },
@@ -1107,6 +1108,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/wrappers/bigquery',
         },
         {
+          name: 'Connecting to Clerk',
+          url: '/guides/database/extensions/wrappers/clerk',
+        },
+        {
           name: 'Connecting to ClickHouse',
           url: '/guides/database/extensions/wrappers/clickhouse',
         },
@@ -1324,8 +1329,12 @@ export const functions: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Create an Edge Function',
+          name: 'Quickstart',
           url: '/guides/functions/quickstart',
+        },
+        {
+          name: 'Create an Edge Function Locally',
+          url: '/guides/functions/local-quickstart',
         },
         {
           name: 'Deploy to Production',
@@ -1334,6 +1343,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Setting up your editor',
           url: '/guides/functions/local-development',
+        },
+        {
+          name: 'Development tips',
+          url: '/guides/functions/development-tips',
         },
       ],
     },
@@ -1389,6 +1402,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Integrating with Log Drains',
           url: '/guides/platform/log-drains',
+        },
+        {
+          name: 'Using Deno 2',
+          url: '/guides/functions/deno2',
         },
       ],
     },
@@ -1540,6 +1557,14 @@ export const functions: NavMenuConstant = {
           name: 'Type-Safe SQL with Kysely',
           url: '/guides/functions/kysely-postgres',
         },
+        {
+          name: 'Text To Speech with ElevenLabs',
+          url: '/guides/functions/examples/elevenlabs-generate-speech-stream',
+        },
+        {
+          name: 'Speech Transcription with ElevenLabs',
+          url: '/guides/functions/examples/elevenlabs-transcribe-speech',
+        },
       ],
     },
   ],
@@ -1594,10 +1619,6 @@ export const realtime: NavMenuConstant = {
         {
           name: 'Listening to Postgres Changes with Flutter',
           url: '/guides/realtime/realtime-listening-flutter',
-        },
-        {
-          name: 'Migrate to Broadcast Changes',
-          url: '/guides/realtime/migrate-from-postgres-changes',
         },
       ],
     },
@@ -2041,6 +2062,27 @@ export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof Ico
   },
 ]
 
+export const security: NavMenuConstant = {
+  icon: 'platform',
+  title: 'Security',
+  url: '/guides/security',
+  items: [
+    { name: 'Overview', url: '/guides/security' },
+    {
+      name: 'Product security',
+      url: '/guides/security/product-security',
+    },
+    {
+      name: 'Compliance',
+      url: undefined,
+      items: [
+        { name: 'SOC 2', url: '/guides/security/soc-2-compliance' },
+        { name: 'HIPAA', url: '/guides/security/hipaa-compliance' },
+      ],
+    },
+  ],
+}
+
 export const platform: NavMenuConstant = {
   icon: 'platform',
   title: 'Platform',
@@ -2388,6 +2430,7 @@ export const deployment: NavMenuConstant = {
         },
         { name: 'Maturity model', url: '/guides/deployment/maturity-model' },
         { name: 'Production checklist', url: '/guides/deployment/going-into-prod' },
+        { name: 'SOC 2 compliance', url: '/guides/security/soc-2-compliance' },
       ],
     },
     {
