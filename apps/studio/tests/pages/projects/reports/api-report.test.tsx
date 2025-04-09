@@ -11,14 +11,21 @@ import { render } from '../../../helpers'
 // I'd be keen to see how we can do this better if anyone is more familiar to jest 🙏
 
 // Mock the common module to provide useParams with a project ref
-vi.mock('common', async () => {
+vi.mock('common', async (importOriginal) => {
+  const actual = await importOriginal()
+
   return {
     useParams: vi.fn().mockReturnValue({ ref: 'test-project-ref' }),
     isBrowser: false,
     useIsLoggedIn: vi.fn(),
-    // Add other common exports as needed
+    LOCAL_STORAGE_KEYS: (actual as any).LOCAL_STORAGE_KEYS,
   }
 })
+
+// Mock gotrue library
+vi.mock('lib/gotrue', () => ({
+  auth: { onAuthStateChange: vi.fn() },
+}))
 
 // Mock project detail query
 vi.mock('data/projects/project-detail-query', async () => {
