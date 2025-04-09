@@ -30,12 +30,15 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const Content = () => (
     <div className={cn('w-full flex flex-col overflow-hidden')}>
       {selectedOrganization && selectedOrganization?.managed_by !== 'supabase' && (
-        <Alert_Shadcn_ variant="default" className="flex items-center gap-4">
+        <Alert_Shadcn_
+          variant="default"
+          className="flex items-center gap-4 border-t-0 border-x-0 rounded-none"
+        >
           <PartnerIcon organization={selectedOrganization} showTooltip={false} size="medium" />
           <AlertTitle_Shadcn_ className="flex-1">
             This organization is managed by {PARTNER_TO_NAME[selectedOrganization.managed_by]}.
           </AlertTitle_Shadcn_>
-          <Button type="default" iconRight={<ExternalLink />} asChild disabled={!isSuccess}>
+          <Button asChild type="default" iconRight={<ExternalLink />} disabled={!isSuccess}>
             <a href={data?.url} target="_blank" rel="noopener noreferrer">
               Manage
             </a>
