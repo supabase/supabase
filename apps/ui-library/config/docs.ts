@@ -91,7 +91,7 @@ export const componentPages: SidebarNavGroup = {
     },
     {
       title: 'Infinite List',
-      supportedFrameworks: ['nextjs'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
       href: '/docs/nextjs/infinite-list',
       items: [],
       commandItemLabel: 'Infinite List',
