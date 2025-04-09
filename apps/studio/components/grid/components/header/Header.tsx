@@ -161,8 +161,8 @@ const DefaultHeader = () => {
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <FilterPopover filters={filters as string[]} onApplyFilters={onApplyFilters} />
-        <SortPopover sorts={sorts as string[]} onApplySorts={onApplySorts} />
+        <FilterPopover filters={filters} onApplyFilters={onApplyFilters} />
+        <SortPopover sorts={sorts} onApplySorts={onApplySorts} />
       </div>
       {canAddNew && (
         <>
