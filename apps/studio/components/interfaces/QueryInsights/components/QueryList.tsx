@@ -123,13 +123,71 @@ export const QueryList = ({ queries, isLoading, onQuerySelect, selectedQuery }: 
       ),
     },
     {
-      key: 'rows',
-      name: 'Rows',
+      key: 'rows_read',
+      name: 'Rows Read',
       resizable: true,
       minWidth: 100,
       headerCellClass: '',
       renderCell: (props) => (
-        <div className="font-mono text-xs text-right">{props.row.rows.toLocaleString()}</div>
+        <div
+          className={cn(
+            'font-mono text-xs text-right',
+            selectedQuery && selectedQuery.query_id !== props.row.query_id && 'opacity-50'
+          )}
+        >
+          {((props.row.rows_read ?? 0) > 0 ? props.row.rows_read : 0).toLocaleString()}
+        </div>
+      ),
+    },
+    {
+      key: 'rows_insert',
+      name: 'Rows Insert',
+      resizable: true,
+      minWidth: 100,
+      headerCellClass: '',
+      renderCell: (props) => (
+        <div
+          className={cn(
+            'font-mono text-xs text-right',
+            selectedQuery && selectedQuery.query_id !== props.row.query_id && 'opacity-50'
+          )}
+        >
+          {((props.row.rows_insert ?? 0) > 0 ? props.row.rows_insert : 0).toLocaleString()}
+        </div>
+      ),
+    },
+    {
+      key: 'rows_update',
+      name: 'Rows Update',
+      resizable: true,
+      minWidth: 100,
+      headerCellClass: '',
+      renderCell: (props) => (
+        <div
+          className={cn(
+            'font-mono text-xs text-right',
+            selectedQuery && selectedQuery.query_id !== props.row.query_id && 'opacity-50'
+          )}
+        >
+          {((props.row.rows_update ?? 0) > 0 ? props.row.rows_update : 0).toLocaleString()}
+        </div>
+      ),
+    },
+    {
+      key: 'rows_delete',
+      name: 'Rows Delete',
+      resizable: true,
+      minWidth: 100,
+      headerCellClass: '',
+      renderCell: (props) => (
+        <div
+          className={cn(
+            'font-mono text-xs text-right',
+            selectedQuery && selectedQuery.query_id !== props.row.query_id && 'opacity-50'
+          )}
+        >
+          {((props.row.rows_delete ?? 0) > 0 ? props.row.rows_delete : 0).toLocaleString()}
+        </div>
       ),
     },
     // {
