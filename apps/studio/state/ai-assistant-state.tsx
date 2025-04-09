@@ -410,7 +410,7 @@ export type AiAssistantState = AiAssistantData & {
   loadPersistedState: (persistedState: StoredAiAssistantState) => void
 }
 
-export const AiAssistantStateContext = createContext<AiAssistantState | null>(null)
+export const AiAssistantStateContext = createContext<AiAssistantState>(createAiAssistantState())
 
 export const AiAssistantStateContextProvider = ({
   projectRef,
@@ -505,10 +505,5 @@ export const AiAssistantStateContextProvider = ({
 
 export const useAiAssistantStateSnapshot = (options?: Parameters<typeof useSnapshot>[1]) => {
   const state = useContext(AiAssistantStateContext)
-  if (!state) {
-    throw new Error(
-      'useAiAssistantStateSnapshot must be used within an AiAssistantStateContextProvider'
-    )
-  }
   return useSnapshot(state, options)
 }
