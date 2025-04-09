@@ -488,6 +488,17 @@ export const pricing: Pricing = {
         },
         usage_based: false,
       },
+      {
+        key: 'functions.numberOfFunctions',
+        title: 'Number of functions',
+        plans: {
+          free: '100 included',
+          pro: '500 included',
+          team: '1000 included',
+          enterprise: 'Unlimited',
+        },
+        usage_based: false,
+      },
     ],
   },
   realtime: {
