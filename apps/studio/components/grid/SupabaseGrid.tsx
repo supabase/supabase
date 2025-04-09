@@ -24,6 +24,7 @@ import { Grid } from './components/grid/Grid'
 import Header, { HeaderProps } from './components/header/Header'
 import { RowContextMenu } from './components/menu'
 import { Filter, GridProps } from './types'
+import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
 
 export const SupabaseGrid = ({
   customHeader,
@@ -44,9 +45,8 @@ export const SupabaseGrid = ({
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
 
-  const [{ sort, filter }, setParams] = useUrlState({
-    arrayKeys: ['sort', 'filter'],
-  })
+  const { filters: filter, sorts: sort, setParams } = useTableEditorFiltersSort()
+
   const sorts = formatSortURLParams(snap.table.name, sort as string[] | undefined)
   const filters = formatFilterURLParams(filter as string[])
 
