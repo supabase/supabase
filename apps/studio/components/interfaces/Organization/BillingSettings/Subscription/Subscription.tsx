@@ -54,23 +54,12 @@ const Subscription = () => {
         </div>
         <ScaffoldSectionDetail>
           <div className="sticky space-y-6 top-12">
-            <div className="space-y-2">
+            <div className="space-y-2 mb-4">
               <p className="text-foreground text-base m-0">Subscription Plan</p>
               <p className="text-sm text-foreground-light m-0">
                 Each organization has it's own subscription plan, billing cycle, payment methods and
                 usage quotas.
               </p>
-            </div>
-            <div className="space-y-2">
-              <p className="text-sm text-foreground-light m-0">More information</p>
-              <div>
-                <Link href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
-                  <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                    <p className="text-sm m-0">Pricing</p>
-                    <ExternalLink size={16} strokeWidth={1.5} />
-                  </div>
-                </Link>
-              </div>
             </div>
           </div>
         </ScaffoldSectionDetail>
