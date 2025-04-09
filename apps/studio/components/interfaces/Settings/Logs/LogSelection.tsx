@@ -63,6 +63,18 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
         }
 
         return <DefaultPreviewSelectionRenderer log={apiLog} />
+
+      case 'database':
+        const hint = log?.metadata?.[0]?.parsed?.[0]?.hint
+        const detail = log?.metadata?.[0]?.parsed?.[0]?.detail
+        const query = log?.metadata?.[0]?.parsed?.[0]?.query
+        const postgresLog = {
+          ...(hint && { hint }),
+          ...(detail && { detail }),
+          ...(query && { query }),
+          ...log,
+        }
+        return <DefaultPreviewSelectionRenderer log={postgresLog} />
       default:
         return <DefaultPreviewSelectionRenderer log={log} />
     }
