@@ -382,7 +382,7 @@ export const createAiAssistantState = (
     },
 
     getCachedSQLResults: ({ messageId, snippetId }: { messageId: string; snippetId?: string }) => {
-      const chat = state.activeChat // Reading is fine
+      const chat = state.activeChat
       if (!chat || !snippetId) return
 
       const message = chat.messages.find((msg) => msg.id === messageId)
