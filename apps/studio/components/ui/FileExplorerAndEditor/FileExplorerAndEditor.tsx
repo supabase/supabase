@@ -82,7 +82,7 @@ const FileExplorerAndEditor = ({
   }
 
   const addNewFile = () => {
-    const newId = Math.max(...files.map((f) => f.id)) + 1
+    const newId = Math.max(0, ...files.map((f) => f.id)) + 1
     const updatedFiles = files.map((f) => ({ ...f, selected: false }))
     onFilesChange([
       ...updatedFiles,

@@ -22,7 +22,7 @@ const ProjectUsageSection = () => {
   // to eliminate multiple spinners
   const { isLoading: isLogsStatsLoading } = useProjectLogStatsQuery({
     projectRef: project?.ref,
-    interval: 'hourly',
+    interval: 'minutely',
   })
 
   if (usageError) {

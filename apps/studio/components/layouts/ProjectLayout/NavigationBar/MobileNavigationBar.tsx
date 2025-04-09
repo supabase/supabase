@@ -10,6 +10,9 @@ import { buttonVariants, cn } from 'ui'
 import { CommandMenuTrigger } from 'ui-patterns'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
+export const ICON_SIZE = 20
+export const ICON_STROKE_WIDTH = 1.5
+
 const MobileNavigationBar = () => {
   const router = useRouter()
   const [isSheetOpen, setIsSheetOpen] = useState(false)
