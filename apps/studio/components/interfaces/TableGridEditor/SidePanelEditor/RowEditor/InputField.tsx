@@ -121,7 +121,7 @@ const InputField = ({
         onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         actions={
           isEditable && (
-            <DropdownMenu>
+            <DropdownMenu modal>
               <DropdownMenuTrigger asChild>
                 <Button type="default" icon={<Edit />} className="px-1.5" />
               </DropdownMenuTrigger>
