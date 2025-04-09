@@ -188,11 +188,9 @@ function ensureActiveChatOrInitialize(state: AiAssistantState) {
   }
 }
 
-export const createAiAssistantState = (
-  initialStateOverride?: Partial<AiAssistantData>
-): AiAssistantState => {
-  // Initialize with defaults or overrides, loading happens asynchronously in the provider
-  const initialState = { ...INITIAL_AI_ASSISTANT, ...initialStateOverride }
+export const createAiAssistantState = (): AiAssistantState => {
+  // Initialize with defaults, loading happens asynchronously in the provider
+  const initialState = { ...INITIAL_AI_ASSISTANT }
 
   // Check URL params for initial 'open' state, overriding any loaded state later if present
   if (typeof window !== 'undefined') {
