@@ -14,8 +14,8 @@ import {
   useProjectLogStatsQuery,
 } from 'data/analytics/project-log-stats-query'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { ChartIntervals } from 'types'
 import {
   Button,
@@ -113,7 +113,7 @@ const ProjectUsage = () => {
               <span>{selectedInterval.label}</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="start">
+          <DropdownMenuContent side="bottom" align="start" className="w-40">
             <DropdownMenuRadioGroup
               value={interval}
               onValueChange={(interval) =>
@@ -133,7 +133,7 @@ const ProjectUsage = () => {
           </DropdownMenuContent>
         </DropdownMenu>
         <span className="text-xs text-foreground-light">
-          Statistics for past {selectedInterval.label}
+          Statistics for {selectedInterval.label.toLowerCase()}
         </span>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-4">
