@@ -96,6 +96,46 @@ const LazyChartWrapper = ({ children }: PropsWithChildren) => {
   return <div ref={ref}>{React.cloneElement(children as React.ReactElement, { isVisible })}</div>
 }
 
+// Create a custom hook to fetch data based on attributes
+const useAttributeQueries = (
+  attributes: MultiAttribute[],
+  ref: string | string[] | undefined,
+  startDate: string,
+  endDate: string,
+  interval: AnalyticsInterval,
+  databaseIdentifier: string | undefined,
+  data: ChartData | undefined,
+  isVisible: boolean
+) => {
+  return attributes.map((attr: MultiAttribute) => {
+    if (attr.provider === 'daily-stats') {
+      return useProjectDailyStatsQuery(
+        {
+          projectRef: ref as string,
+          attribute: attr.attribute as ProjectDailyStatsAttribute,
+          startDate,
+          endDate,
+          interval,
+          databaseIdentifier,
+        },
+        { enabled: data === undefined && isVisible }
+      )
+    } else {
+      return useInfraMonitoringQuery(
+        {
+          projectRef: ref as string,
+          attribute: attr.attribute as InfraMonitoringAttribute,
+          startDate,
+          endDate,
+          interval,
+          databaseIdentifier,
+        },
+        { enabled: data === undefined && isVisible }
+      )
+    }
+  })
+}
+
 /**
  * Controls chart display state. Optionally fetches static chart data if data is not provided.
  *
@@ -137,48 +177,31 @@ const ComposedChartHandler = ({
 
   const databaseIdentifier = state.selectedDatabaseId
 
-  // Query data for each attribute based on its provider
-  const attributeQueries = attributes.map((attr) => {
-    if (attr.provider === 'daily-stats') {
-      return useProjectDailyStatsQuery(
-        {
-          projectRef: ref as string,
-          attribute: attr.attribute as ProjectDailyStatsAttribute,
-          startDate,
-          endDate,
-          interval: interval as AnalyticsInterval,
-          databaseIdentifier,
-        },
-        { enabled: data === undefined && isVisible }
-      )
-    } else {
-      return useInfraMonitoringQuery(
-        {
-          projectRef: ref as string,
-          attribute: attr.attribute as InfraMonitoringAttribute,
-          startDate,
-          endDate,
-          interval: interval as AnalyticsInterval,
-          databaseIdentifier,
-        },
-        { enabled: data === undefined && isVisible }
-      )
-    }
-  })
+  // Use the custom hook at the top level of the component
+  const attributeQueries = useAttributeQueries(
+    attributes,
+    ref,
+    startDate,
+    endDate,
+    interval as AnalyticsInterval,
+    databaseIdentifier,
+    data,
+    isVisible
+  )
 
   // Combine all the data into a single dataset
   const combinedData = useMemo(() => {
     if (data) return data
 
-    const isLoading = attributeQueries.some((query) => query.isLoading)
+    const isLoading = attributeQueries.some((query: any) => query.isLoading)
     if (isLoading) return undefined
 
-    const hasError = attributeQueries.some((query) => !query.data)
+    const hasError = attributeQueries.some((query: any) => !query.data)
     if (hasError) return undefined
 
     // Get all unique timestamps from all datasets
     const timestamps = new Set<string>()
-    attributeQueries.forEach((query) => {
+    attributeQueries.forEach((query: any) => {
       query.data?.data?.forEach((point: any) => {
         timestamps.add(point.period_start)
       })
@@ -200,7 +223,7 @@ const ComposedChartHandler = ({
     return combined as DataPoint[]
   }, [data, attributeQueries, attributes])
 
-  const loading = isLoading || attributeQueries.some((query) => query.isLoading)
+  const loading = isLoading || attributeQueries.some((query: any) => query.isLoading)
 
   // Calculate highlighted value based on the first attribute's data
   const _highlightedValue = useMemo(() => {
