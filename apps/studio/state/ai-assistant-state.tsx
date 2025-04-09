@@ -207,7 +207,6 @@ export const createAiAssistantState = (
     ...initialState, // Spread initial values directly
 
     resetAiAssistantPanel: () => {
-      // Reset should probably reset to initial defaults, not current state values
       Object.assign(state, INITIAL_AI_ASSISTANT)
     },
 
