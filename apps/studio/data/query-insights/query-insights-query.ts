@@ -33,6 +33,7 @@ export type QueryInsightsQuery = {
   database: string
   timestamp: string
   cmd_type_text: string
+  application_name: string
 }
 
 export type QueryInsightsMetrics = {
@@ -141,11 +142,13 @@ const getQueriesSql = (startTime: string, endTime: string) => /* SQL */ `
     SUM(total_exec_time) / NULLIF(SUM(calls), 0) as mean_exec_time,
     STRING_AGG(DISTINCT datname, ', ') as database,
     MAX(bucket_start_time) as timestamp,
-    MAX(get_cmd_type(cmd_type)) as cmd_type_text
+    MAX(get_cmd_type(cmd_type)) as cmd_type_text,
+    STRING_AGG(DISTINCT COALESCE(application_name, 'Unknown'), ', ') as application_name
   FROM pg_stat_monitor
   WHERE bucket_start_time >= '${startTime}'
     AND bucket_start_time <= '${endTime}'
     AND bucket_done = true
+    AND cmd_type IN (1, 2, 3, 4)  -- 1=SELECT, 2=INSERT, 3=UPDATE, 4=DELETE
   GROUP BY queryid
   ORDER BY mean_exec_time DESC
   LIMIT 100

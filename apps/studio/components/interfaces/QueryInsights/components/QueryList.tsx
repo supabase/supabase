@@ -190,6 +190,16 @@ export const QueryList = ({ queries, isLoading, onQuerySelect, selectedQuery }: 
         </div>
       ),
     },
+    {
+      key: 'application_name',
+      name: 'Application',
+      resizable: true,
+      minWidth: 120,
+      headerCellClass: '',
+      renderCell: (props) => (
+        <div className="font-mono text-xs">{props.row.application_name || 'Unknown'}</div>
+      ),
+    },
     // {
     //   key: 'database',
     //   name: 'Database',

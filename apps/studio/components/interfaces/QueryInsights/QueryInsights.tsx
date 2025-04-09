@@ -50,12 +50,12 @@ export const QueryInsights = () => {
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
 
   const [selectedMetric, setSelectedMetric] = useState<MetricType>('query_latency')
-  const [selectedTimeRange, setSelectedTimeRange] = useState('24h')
+  const [selectedTimeRange, setSelectedTimeRange] = useState('1d')
   const [selectedQuery, setSelectedQuery] = useState<QueryInsightsQuery | null>(null)
   const [timeRange, setTimeRange] = useState({
     period_start: {
       date: dayjs().subtract(24, 'hour').format('YYYY-MM-DD HH:mm:ssZ'),
-      time_period: '24h',
+      time_period: '1d',
     },
     period_end: {
       date: dayjs().format('YYYY-MM-DD HH:mm:ssZ'),
@@ -81,11 +81,23 @@ export const QueryInsights = () => {
   useEffect(() => {
     // Update the time range when selectedTimeRange changes
     switch (selectedTimeRange) {
-      case '24h':
+      case '3h':
+        setTimeRange({
+          period_start: {
+            date: dayjs().subtract(3, 'hour').format('YYYY-MM-DD HH:mm:ssZ'),
+            time_period: '3h',
+          },
+          period_end: {
+            date: dayjs().format('YYYY-MM-DD HH:mm:ssZ'),
+            time_period: 'now',
+          },
+        })
+        break
+      case '1d':
         setTimeRange({
           period_start: {
             date: dayjs().subtract(24, 'hour').format('YYYY-MM-DD HH:mm:ssZ'),
-            time_period: '24h',
+            time_period: '1d',
           },
           period_end: {
             date: dayjs().format('YYYY-MM-DD HH:mm:ssZ'),
@@ -133,12 +145,48 @@ export const QueryInsights = () => {
           value={selectedTimeRange}
           loading={isLoadingMetrics}
           onChange={({ period_start, period_end, interval }) => {
-            setSelectedTimeRange(period_start.time_period)
-            setTimeRange({ period_start, period_end })
+            // If selecting the same time range again, force a refresh by setting with a new object
+            if (period_start.time_period === selectedTimeRange) {
+              const newTimeRange = {
+                period_start: {
+                  date:
+                    period_start.time_period === '1d'
+                      ? dayjs().subtract(24, 'hour').format('YYYY-MM-DD HH:mm:ssZ')
+                      : period_start.time_period === '3h'
+                        ? dayjs().subtract(3, 'hour').format('YYYY-MM-DD HH:mm:ssZ')
+                        : period_start.time_period === '7d'
+                          ? dayjs().subtract(7, 'day').format('YYYY-MM-DD HH:mm:ssZ')
+                          : period_start.time_period === '30d'
+                            ? dayjs().subtract(30, 'day').format('YYYY-MM-DD HH:mm:ssZ')
+                            : period_start.date,
+                  time_period: period_start.time_period,
+                },
+                period_end: {
+                  date: dayjs().format('YYYY-MM-DD HH:mm:ssZ'),
+                  time_period: 'now',
+                },
+              }
+
+              // Reset state to force a refresh
+              setTimeRange(newTimeRange)
+
+              // Temporarily set to a different value and then back
+              setSelectedTimeRange('__refreshing__')
+              setTimeout(() => setSelectedTimeRange(period_start.time_period), 10)
+            } else {
+              // Normal update for changing to a different time period
+              setSelectedTimeRange(period_start.time_period)
+              setTimeRange({ period_start, period_end })
+            }
           }}
           options={[
             {
-              key: '24h',
+              key: '3h',
+              label: 'Last 3 hours',
+              interval: '30m',
+            },
+            {
+              key: '1d',
               label: 'Last 24 hours',
               interval: '1h',
             },
