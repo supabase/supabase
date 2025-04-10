@@ -34,6 +34,7 @@ export type QueryInsightsQuery = {
   timestamp: string
   cmd_type_text: string
   application_name: string
+  badness_score: number
 }
 
 export type QueryInsightsMetrics = {
@@ -129,29 +130,65 @@ const getMetricsSql = (metric: string, startTime: string, endTime: string) => {
 
 const getQueriesSql = (startTime: string, endTime: string) => /* SQL */ `
   SELECT 
-    queryid as query_id,
-    COALESCE(MAX(top_query), MAX(query)) as query,
-    SUM(total_exec_time) as total_time,
-    SUM(calls) as calls,
-    SUM(CASE WHEN cmd_type = 1 THEN rows ELSE 0 END) as rows_read,
-    SUM(CASE WHEN cmd_type = 2 THEN rows ELSE 0 END) as rows_insert,
-    SUM(CASE WHEN cmd_type = 3 THEN rows ELSE 0 END) as rows_update,
-    SUM(CASE WHEN cmd_type = 4 THEN rows ELSE 0 END) as rows_delete,
-    SUM(shared_blks_read) as shared_blks_read,
-    SUM(shared_blks_hit) as shared_blks_hit,
-    SUM(total_exec_time) / NULLIF(SUM(calls), 0) as mean_exec_time,
-    STRING_AGG(DISTINCT datname, ', ') as database,
-    MAX(bucket_start_time) as timestamp,
-    MAX(get_cmd_type(cmd_type)) as cmd_type_text,
-    STRING_AGG(DISTINCT COALESCE(application_name, 'Unknown'), ', ') as application_name
-  FROM pg_stat_monitor
-  WHERE bucket_start_time >= '${startTime}'
-    AND bucket_start_time <= '${endTime}'
-    AND bucket_done = true
-    AND cmd_type IN (1, 2, 3, 4)  -- 1=SELECT, 2=INSERT, 3=UPDATE, 4=DELETE
-  GROUP BY queryid
-  ORDER BY mean_exec_time DESC
-  LIMIT 100
+  queryid AS query_id,
+
+  -- Prefer top-level query if available, else fallback to normalized form
+  COALESCE(MAX(top_query), MAX(query)) AS query,
+
+  -- Total time spent executing this query across all calls
+  SUM(total_exec_time) AS total_time,
+
+  -- Number of times this query was executed
+  SUM(calls) AS calls,
+
+  -- Total rows affected or returned depending on command type
+  SUM(CASE WHEN cmd_type = 1 THEN rows ELSE 0 END) AS rows_read,   -- SELECT
+  SUM(CASE WHEN cmd_type = 2 THEN rows ELSE 0 END) AS rows_insert, -- INSERT
+  SUM(CASE WHEN cmd_type = 3 THEN rows ELSE 0 END) AS rows_update, -- UPDATE
+  SUM(CASE WHEN cmd_type = 4 THEN rows ELSE 0 END) AS rows_delete, -- DELETE
+
+  -- Buffer activity: disk reads vs cache hits
+  SUM(shared_blks_read) AS shared_blks_read,
+  SUM(shared_blks_hit) AS shared_blks_hit,
+
+  -- Mean execution time per call
+  SUM(total_exec_time) / NULLIF(SUM(calls), 0) AS mean_exec_time,
+
+  -- Metadata
+  STRING_AGG(DISTINCT datname, ', ') AS database,
+  MAX(bucket_start_time) AS timestamp,
+  MAX(get_cmd_type(cmd_type)) AS cmd_type_text,
+  STRING_AGG(DISTINCT COALESCE(application_name, 'Unknown'), ', ') AS application_name,
+
+  -- Total number of rows affected or returned across all executions
+  (
+    SUM(CASE WHEN cmd_type = 1 THEN rows ELSE 0 END) + 
+    SUM(CASE WHEN cmd_type = 2 THEN rows ELSE 0 END) + 
+    SUM(CASE WHEN cmd_type = 3 THEN rows ELSE 0 END) + 
+    SUM(CASE WHEN cmd_type = 4 THEN rows ELSE 0 END)
+  ) AS rows_total,
+
+  -- Heuristic "badness score":
+  -- Penalizes queries that are slow, frequent, and touch few rows
+  (
+    (SUM(total_exec_time) / NULLIF(SUM(calls), 1)) *  -- mean execution time
+    LOG(GREATEST(SUM(calls), 1)) /                    -- scaled by frequency
+    GREATEST(                                         -- penalize low-row queries
+      SUM(CASE WHEN cmd_type = 1 THEN rows ELSE 0 END) + 
+      SUM(CASE WHEN cmd_type = 2 THEN rows ELSE 0 END) + 
+      SUM(CASE WHEN cmd_type = 3 THEN rows ELSE 0 END) + 
+      SUM(CASE WHEN cmd_type = 4 THEN rows ELSE 0 END),
+    1)
+  ) AS badness_score
+
+FROM pg_stat_monitor
+WHERE bucket_start_time >= '${startTime}'
+  AND bucket_start_time <= '${endTime}'
+  AND bucket_done = true
+  AND cmd_type IN (1, 2, 3, 4)  -- Only consider SELECT, INSERT, UPDATE, DELETE
+GROUP BY queryid
+ORDER BY badness_score DESC
+LIMIT 1000;
 `
 
 export function useQueryInsightsMetrics(
