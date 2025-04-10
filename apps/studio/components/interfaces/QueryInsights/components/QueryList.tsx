@@ -200,6 +200,18 @@ export const QueryList = ({ queries, isLoading, onQuerySelect, selectedQuery }: 
         <div className="font-mono text-xs">{props.row.application_name || 'Unknown'}</div>
       ),
     },
+    {
+      key: 'badness_score',
+      name: 'Badness Score',
+      resizable: true,
+      minWidth: 120,
+      headerCellClass: '',
+      renderCell: (props) => (
+        <div className="font-mono text-xs text-right">
+          {(props.row.badness_score ?? 0).toFixed(2)}
+        </div>
+      ),
+    },
     // {
     //   key: 'database',
     //   name: 'Database',
