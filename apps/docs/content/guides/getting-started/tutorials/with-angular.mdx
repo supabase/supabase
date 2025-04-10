@@ -155,14 +155,15 @@ import { SupabaseService } from '../supabase.service'
 export class AuthComponent {
   loading = false
 
-  signInForm = this.formBuilder.group({
-    email: '',
-  })
-
+  signInForm 
   constructor(
     private readonly supabase: SupabaseService,
     private readonly formBuilder: FormBuilder
-  ) {}
+  ) {
+     this.signInForm = this.formBuilder.group({
+      email: '',
+      });
+  }
 
   async onSubmit(): Promise<void> {
     try {
