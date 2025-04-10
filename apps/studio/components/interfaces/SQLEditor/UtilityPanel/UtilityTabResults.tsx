@@ -21,7 +21,7 @@ export type UtilityTabResultsProps = {
 }
 
 const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
-  ({ id, isExecuting, isDisabled, isDebugging, onDebug }, htmlRef) => {
+  ({ id, isExecuting, isDisabled, isDebugging, onDebug }) => {
     const { ref } = useParams()
     const state = useDatabaseSelectorStateSnapshot()
     const organization = useSelectedOrganization()
@@ -35,7 +35,9 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
 
     const isTimeout =
       result?.error?.message?.includes('canceling statement due to statement timeout') ||
-      result?.error?.message?.includes('upstream request timeout')
+      result?.error?.message?.includes('upstream request timeout') ||
+      result?.error?.message?.includes('Query read timeout')
+
     const isNetWorkError = result?.error?.message?.includes('EHOSTUNREACH')
 
     if (isExecuting) {
@@ -81,7 +83,16 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
                   >
                     increase the statement timeout
                   </a>
-                  .
+                  , if your query take more than 50s to run, please{' '}
+                  <Link
+                    target="_blank"
+                    rel="noreferrer"
+                    href={`/project/${ref}/settings/database`}
+                    className="underline transition hover:text-foreground flex items-center gap-x-1"
+                  >
+                    connect to your database directly.
+                    <ExternalLink size={12} />
+                  </Link>
                 </p>
               </div>
             ) : (
