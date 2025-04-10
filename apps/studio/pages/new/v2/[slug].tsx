@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { components } from 'api-types'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { debounce } from 'lodash'
@@ -41,9 +40,8 @@ import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { instanceSizeSpecs } from 'data/projects/new-project.constants'
+import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
 import {
-  DbInstanceSize,
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
@@ -93,8 +91,6 @@ import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-
-type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
 const sizes: DesiredInstanceSize[] = [
   'micro',
@@ -420,7 +416,7 @@ const WizardForm = () => {
   const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
 
   const additionalMonthlySpend =
-    instanceSizeSpecs[instanceSize as DbInstanceSize]!.priceMonthly - availableComputeCredits
+    instanceSizeSpecs[instanceSize as DesiredInstanceSize]!.priceMonthly - availableComputeCredits
 
   const selectedRegionObject = useMemo((): {
     name: string
@@ -910,8 +906,9 @@ const WizardForm = () => {
                                               <span className="text-foreground-lighter line-through">
                                                 $
                                                 {
-                                                  instanceSizeSpecs[instanceSize as DbInstanceSize]!
-                                                    .priceMonthly
+                                                  instanceSizeSpecs[
+                                                    instanceSize as DesiredInstanceSize
+                                                  ]!.priceMonthly
                                                 }
                                               </span>
                                               <span>${additionalMonthlySpend}</span>
@@ -1242,11 +1239,11 @@ const WizardForm = () => {
  * Needs to be in the API in the future [kevin]
  */
 const monthlyInstancePrice = (instance: string | undefined): number => {
-  return instanceSizeSpecs[instance as DbInstanceSize]?.priceMonthly || 10
+  return instanceSizeSpecs[instance as DesiredInstanceSize]?.priceMonthly || 10
 }
 
 const instanceLabel = (instance: string | undefined): string => {
-  return instanceSizeSpecs[instance as DbInstanceSize]?.label || 'Micro'
+  return instanceSizeSpecs[instance as DesiredInstanceSize]?.label || 'Micro'
 }
 
 const Wizard: NextPageWithLayout = () => {
