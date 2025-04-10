@@ -57,7 +57,7 @@ const CostControl = ({}: CostControlProps) => {
             <div className="space-y-2">
               <p className="text-foreground text-base m-0">Cost Control</p>
               <p className="text-sm text-foreground-light m-0">
-                Allow scaling beyond your plans{' '}
+                Allow scaling beyond your plan's{' '}
                 <Link
                   href={`/org/${slug}/usage`}
                   className="text-green-900 transition hover:text-green-1000"
