@@ -96,7 +96,7 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
             Add a new header
           </Button>
           {variant === 'edge_function' && (
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button type="default" className="rounded-l-none px-[4px] py-[5px]">
                   <ChevronDown size={14} />
