@@ -4,7 +4,7 @@ import { PropsWithChildren } from 'react'
 import { useParams } from 'common'
 import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
-import { cn, NavMenu, NavMenuItem } from 'ui'
+import { NavMenu, NavMenuItem } from 'ui'
 import { ScaffoldContainerLegacy, ScaffoldTitle } from '../Scaffold'
 
 function OrganizationSettingsLayout({ children }: PropsWithChildren) {
@@ -72,21 +72,16 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
 
   return (
     <>
-      <ScaffoldContainerLegacy>
+      <ScaffoldContainerLegacy className="mb-0">
         <ScaffoldTitle>Organization Settings</ScaffoldTitle>
+        <NavMenu className="overflow-x-auto" aria-label="Organization menu navigation">
+          {(navMenuItems.filter(Boolean) as { label: string; href: string }[]).map((item) => (
+            <NavMenuItem key={item.label} active={currentPath === item.href}>
+              <Link href={item.href}>{item.label}</Link>
+            </NavMenuItem>
+          ))}
+        </NavMenu>
       </ScaffoldContainerLegacy>
-      <NavMenu
-        className={cn(
-          '[&_ul]:mx-auto [&_ul]:max-w-[1200px] [&_ul]:px-6 [&_ul]:lg:px-14 [&_ul]:xl:px-24 [&_ul]:2xl:px-32'
-        )}
-        aria-label="Organization menu navigation"
-      >
-        {(navMenuItems.filter(Boolean) as { label: string; href: string }[]).map((item) => (
-          <NavMenuItem key={item.label} active={currentPath === item.href}>
-            <Link href={item.href}>{item.label}</Link>
-          </NavMenuItem>
-        ))}
-      </NavMenu>
       <main className="h-full w-full overflow-y-auto">{children}</main>
     </>
   )
