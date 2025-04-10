@@ -1,9 +1,12 @@
 'use client'
 
+import * as React from 'react'
 import { motion } from 'framer-motion'
 import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { CommandCopyButton } from './command-copy-button'
 import { useLocalStorage } from './use-local-storage'
+import { useState, useEffect } from 'react'
+import { Check } from 'lucide-react'
 
 interface CommandCopyProps {
   name: string
@@ -16,6 +19,18 @@ const LOCAL_STORAGE_KEY = 'package-manager-copy-command'
 
 export function Command({ name, highlight }: CommandCopyProps) {
   const [value, setValue] = useLocalStorage(LOCAL_STORAGE_KEY, 'npm')
+  const [showCleanBranchWarning, setShowCleanBranchWarning] = useState(false)
+
+  // only show the clean branch warning for 8 seconds
+  useEffect(() => {
+    if (showCleanBranchWarning) {
+      const timer = setTimeout(() => {
+        setShowCleanBranchWarning(false)
+      }, 8000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [showCleanBranchWarning])
 
   const getBaseUrl = () => {
     if (process.env.NEXT_PUBLIC_VERCEL_TARGET_ENV === 'production') {
@@ -53,7 +68,6 @@ export function Command({ name, highlight }: CommandCopyProps) {
             }}
           />
         )}
-
         <div className="flex flex-col">
           <TabsList_Shadcn_ className="gap-2 relative mb-2 z-10">
             {(Object.keys(commands) as PackageManager[]).map((manager) => (
@@ -62,20 +76,29 @@ export function Command({ name, highlight }: CommandCopyProps) {
               </TabsTrigger_Shadcn_>
             ))}
           </TabsList_Shadcn_>
-
-          {(Object.keys(commands) as PackageManager[]).map((manager) => (
-            <TabsContent_Shadcn_ key={manager} value={manager} className="m-0">
-              <div className="flex items-center">
-                <div className="flex-1 font-mono text-sm text-foreground relative z-10">
-                  <span className="mr-2 text-[#888]">$</span>
-                  {commands[manager]}
+          {showCleanBranchWarning ? (
+            <div className="font-mono text-sm text-foreground bg-green-300 p-2 rounded-sm flex items-center justify-between gap-2 h-10">
+              Make sure you run this command in a clean Git branch so you can preview the changes
+              <Check className="h-4 w-4 text-brand-600" />
+            </div>
+          ) : (
+            (Object.keys(commands) as PackageManager[]).map((manager) => (
+              <TabsContent_Shadcn_ key={manager} value={manager} className="m-0">
+                <div className="flex items-center">
+                  <div className="flex-1 font-mono text-sm text-foreground relative z-10">
+                    <span className="mr-2 text-[#888]">$</span>
+                    {commands[manager]}
+                  </div>
+                  <div className="relative z-10">
+                    <CommandCopyButton
+                      command={commands[manager]}
+                      setShowCleanBranchWarning={setShowCleanBranchWarning}
+                    />
+                  </div>
                 </div>
-                <div className="relative z-10">
-                  <CommandCopyButton command={commands[manager]} />
-                </div>
-              </div>
-            </TabsContent_Shadcn_>
-          ))}
+              </TabsContent_Shadcn_>
+            ))
+          )}
         </div>
       </div>
     </Tabs_Shadcn_>

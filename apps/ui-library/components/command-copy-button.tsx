@@ -6,7 +6,13 @@ import { useEffect, useState } from 'react'
 import { useSendTelemetryEvent } from 'lib/telemetry'
 import { Button_Shadcn_ } from 'ui'
 
-export function CommandCopyButton({ command }: { command: string }) {
+export function CommandCopyButton({
+  command,
+  setShowCleanBranchWarning,
+}: {
+  command: string
+  setShowCleanBranchWarning: (show: boolean) => void
+}) {
   const [copied, setCopied] = useState(false)
   const sendTelemetryEvent = useSendTelemetryEvent()
 
@@ -54,7 +60,7 @@ export function CommandCopyButton({ command }: { command: string }) {
         // Copy command to clipboard
         navigator.clipboard.writeText(command)
         setCopied(true)
-
+        setShowCleanBranchWarning(true)
         // Parse command and send telemetry event
         const { framework, packageManager, title } = parseCommandForTelemetry(command)
 
