@@ -57,18 +57,14 @@ const FeedbackWidget = ({
       localStorage.removeItem(FEEDBACK_STORAGE_KEY)
       localStorage.removeItem(SCREENSHOT_STORAGE_KEY)
       toast.success('Your feedback has been sent. Thank you!', { duration: 8000 })
-      toast.warning(
-        'We do not always respond to feedback. If you require assistance, contact support instead.',
-        {
-          duration: 8000,
-          action: {
-            label: 'Contact support',
-            onClick: () => {
-              router.push('/support/new')
-            },
-          },
-        }
-      )
+      setTimeout(() => {
+        toast.warning(
+          'We do not always respond to feedback. If you require assistance, contact support instead.',
+          {
+            duration: 8000,
+          }
+        )
+      }, 3000)
       setSending(false)
     },
     onError: (error) => {
