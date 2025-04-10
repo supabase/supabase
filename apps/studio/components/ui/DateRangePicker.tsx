@@ -110,7 +110,20 @@ export const DateRangePicker = ({
             date: today,
             time_period: 'today',
           },
-          interval: '15s',
+          interval: '1m',
+        })
+        break
+      case '30m':
+        onChange({
+          period_start: {
+            date: dayjs().subtract(30, 'minutes').format(DATE_FORMAT),
+            time_period: '1d',
+          },
+          period_end: {
+            date: today,
+            time_period: 'today',
+          },
+          interval: '1m',
         })
         break
       case '1d':
@@ -214,11 +227,10 @@ export const DateRangePicker = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type="default" iconRight={<ChevronDown />} className="hidden">
+        <Button type="default" iconRight={<ChevronDown />}>
           <span>{timePeriod && options.find((x) => x.key === timePeriod)?.label}</span>
         </Button>
       </DropdownMenuTrigger>
-
       <DropdownMenuContent side="bottom" align="start" className={cn(!footer && 'w-36', className)}>
         <DropdownMenuRadioGroup value={timePeriod} onValueChange={(x) => handleChange(x)}>
           {options.map((option) => {

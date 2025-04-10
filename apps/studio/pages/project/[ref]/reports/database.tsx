@@ -19,11 +19,10 @@ import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ChartHandler from 'components/ui/Charts/ChartHandler'
 import Panel from 'components/ui/Panel'
-import { REPORTS_DATEPICKER_HELPERS } from 'components/interfaces/Reports/Reports.constants'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import DatePickers from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import ComposedChartHandler, { MultiAttribute } from 'components/ui/Charts/ComposedChartHandler'
+import { DateRangePicker } from 'components/ui/DateRangePicker'
 
 import { analyticsKeys } from 'data/analytics/keys'
 import { getReportAttributes } from 'data/reports/database-charts'
@@ -37,6 +36,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
+import { TIME_PERIODS_INFRA } from '../../../../lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 
 import type { NextPageWithLayout } from 'types'
@@ -271,16 +271,20 @@ const DatabaseUsage = () => {
               tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
               onClick={onRefreshReport}
             />
-            <DatePickers
-              onChange={(values: any) => updateDateRange(values.from, values.to)}
-              from={dateRange?.period_start?.date || ''}
-              to={dateRange?.period_end?.date || ''}
-              helpers={REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
-                ...helper,
-                disabled: (index > 4 && plan?.id === 'free') || (index > 5 && plan?.id !== 'pro'),
-              }))}
-            />
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <DateRangePicker
+                loading={false}
+                value={'7d'}
+                options={TIME_PERIODS_INFRA}
+                currentBillingPeriodStart={undefined}
+                onChange={(values) => {
+                  if (values.interval === '1d') {
+                    setDateRange({ ...values, interval: '1h' })
+                  } else {
+                    setDateRange(values)
+                  }
+                }}
+              />
               {dateRange && (
                 <div className="flex items-center gap-x-2 text-xs">
                   <p className="text-foreground-light">

@@ -6,7 +6,6 @@ import { DatePicker } from 'components/ui/DatePicker'
 import {
   Alert,
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
@@ -15,7 +14,6 @@ import {
 } from 'ui'
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD, getDefaultHelper } from './Logs.constants'
 import type { DatetimeHelper } from './Logs.types'
-import { useFlag } from 'hooks/ui/useFlag'
 
 interface Props {
   to: string
@@ -26,15 +24,12 @@ interface Props {
 const DatePickers = ({ to, from, onChange, helpers }: PropsWithChildren<Props>) => {
   const defaultHelper = getDefaultHelper(helpers)
   const [helperValue, setHelperValue] = useState<string>(to || from ? '' : defaultHelper.text)
-  const [selectedHelperItem, setSelectedHelperItem] = useState<DatetimeHelper | null>(null)
-  const isReportsV2 = useFlag('reportsDatabaseV2')
 
   const handleHelperChange = (newValue: string) => {
     const selectedHelper = helpers.find((h) => h.text === newValue)
 
     if (onChange && selectedHelper) {
       onChange({ to: selectedHelper.calcTo(), from: selectedHelper.calcFrom() })
-      setSelectedHelperItem(selectedHelper)
     }
   }
 
@@ -61,15 +56,15 @@ const DatePickers = ({ to, from, onChange, helpers }: PropsWithChildren<Props>) 
           <Button
             type={helperValue ? 'secondary' : 'default'}
             icon={<Clock size={12} />}
-            className={cn(isReportsV2 && 'rounded-r-none')}
+            className="rounded-r-none"
           >
-            <span>{selectedHelperItem?.text || defaultHelper.text}</span>
+            <span>{selectedHelper?.text || defaultHelper.text}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="start">
           <DropdownMenuRadioGroup
             onValueChange={handleHelperChange}
-            value={selectedHelperItem?.text || ''}
+            value={selectedHelper?.text || ''}
           >
             {helpers.map((helper) => (
               <DropdownMenuRadioItem
@@ -90,32 +85,30 @@ const DatePickers = ({ to, from, onChange, helpers }: PropsWithChildren<Props>) 
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {isReportsV2 && (
-        <DatePicker
-          triggerButtonClassName="rounded-l-none"
-          triggerButtonType={selectedHelper ? 'default' : 'secondary'}
-          triggerButtonTitle="Custom"
-          onChange={(value) => {
-            setHelperValue('')
-            if (onChange) onChange(value)
-          }}
-          to={!helperValue ? to : undefined}
-          from={!helperValue ? from : undefined}
-          renderFooter={({ to, from }) => {
-            if (
-              to &&
-              from &&
-              Math.abs(dayjs(from).diff(dayjs(to), 'day')) > LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD
-            ) {
-              return (
-                <Alert title={''} variant="warning" className="mx-3 pl-2 pr-2 pt-1 pb-2">
-                  Large ranges may result in memory errors for big projects.
-                </Alert>
-              )
-            }
-          }}
-        />
-      )}
+      <DatePicker
+        triggerButtonClassName="rounded-l-none"
+        triggerButtonType={selectedHelper ? 'default' : 'secondary'}
+        triggerButtonTitle="Custom"
+        onChange={(value) => {
+          setHelperValue('')
+          if (onChange) onChange(value)
+        }}
+        to={!helperValue ? to : undefined}
+        from={!helperValue ? from : undefined}
+        renderFooter={({ to, from }) => {
+          if (
+            to &&
+            from &&
+            Math.abs(dayjs(from).diff(dayjs(to), 'day')) > LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD
+          ) {
+            return (
+              <Alert title={''} variant="warning" className="mx-3 pl-2 pr-2 pt-1 pb-2">
+                Large ranges may result in memory errors for big projects.
+              </Alert>
+            )
+          }
+        }}
+      />
     </div>
   )
 }
