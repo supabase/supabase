@@ -1,5 +1,5 @@
 import type { PostgresSchema } from '@supabase/postgres-meta'
-import { toPng } from 'html-to-image'
+import { toPng, toSvg } from 'html-to-image'
 import { Download, Loader2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useState } from 'react'
@@ -17,6 +17,8 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { toast } from 'sonner'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
@@ -97,7 +99,7 @@ export const SchemaGraph = () => {
     }
   }
 
-  const downloadImage = () => {
+  const downloadImage = (format: 'png' | 'svg') => {
     const reactflowViewport = document.querySelector('.react-flow__viewport') as HTMLElement
     if (!reactflowViewport) return
 
@@ -106,25 +108,57 @@ export const SchemaGraph = () => {
     const height = reactflowViewport.clientHeight
     const { x, y, zoom } = reactFlowInstance.getViewport()
 
-    toPng(reactflowViewport, {
-      backgroundColor: 'white',
-      width,
-      height,
-      style: {
-        width: width.toString(),
-        height: height.toString(),
-        transform: `translate(${x}px, ${y}px) scale(${zoom})`,
-      },
-    })
-      .then((data) => {
-        const a = document.createElement('a')
-        a.setAttribute('download', `supabase-schema-${ref}.png`)
-        a.setAttribute('href', data)
-        a.click()
+    if (format === 'svg') {
+      toSvg(reactflowViewport, {
+        backgroundColor: 'white',
+        width,
+        height,
+        style: {
+          width: width.toString(),
+          height: height.toString(),
+          transform: `translate(${x}px, ${y}px) scale(${zoom})`,
+        },
       })
-      .finally(() => {
-        setIsDownloading(false)
+        .then((data) => {
+          const a = document.createElement('a')
+          a.setAttribute('download', `supabase-schema-${ref}.svg`)
+          a.setAttribute('href', data)
+          a.click()
+          toast.success('Successfully downloaded as SVG')
+        })
+        .catch((error) => {
+          console.error('Failed to download:', error)
+          toast.error('Failed to download current view:', error.message)
+        })
+        .finally(() => {
+          setIsDownloading(false)
+        })
+    } else if (format === 'png') {
+      toPng(reactflowViewport, {
+        backgroundColor: 'white',
+        width,
+        height,
+        style: {
+          width: width.toString(),
+          height: height.toString(),
+          transform: `translate(${x}px, ${y}px) scale(${zoom})`,
+        },
       })
+        .then((data) => {
+          const a = document.createElement('a')
+          a.setAttribute('download', `supabase-schema-${ref}.png`)
+          a.setAttribute('href', data)
+          a.click()
+          toast.success('Successfully downloaded as PNG')
+        })
+        .catch((error) => {
+          console.error('Failed to download:', error)
+          toast.error('Failed to download current view:', error.message)
+        })
+        .finally(() => {
+          setIsDownloading(false)
+        })
+    }
   }
 
   useEffect(() => {
@@ -159,14 +193,25 @@ export const SchemaGraph = () => {
               onSelectSchema={setSelectedSchema}
             />
             <div className="flex items-center gap-x-2">
-              <ButtonTooltip
-                type="default"
-                loading={isDownloading}
-                className="px-1.5"
-                icon={<Download />}
-                onClick={downloadImage}
-                tooltip={{ content: { side: 'bottom', text: 'Download current view as PNG' } }}
-              />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <ButtonTooltip
+                    type="default"
+                    loading={isDownloading}
+                    className="px-1.5"
+                    icon={<Download />}
+                    tooltip={{ content: { side: 'bottom', text: 'Download current view' } }}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-32">
+                  <DropdownMenuItem onClick={() => downloadImage('png')}>
+                    Download as PNG
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => downloadImage('svg')}>
+                    Download as SVG
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <ButtonTooltip
                 type="default"
                 onClick={resetLayout}

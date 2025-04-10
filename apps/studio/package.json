@@ -133,6 +133,7 @@
     "@aws-sdk/client-secrets-manager": "^3.410.0",
     "@radix-ui/react-use-escape-keydown": "^1.0.3",
     "@supabase/postgres-meta": "^0.64.4",
+    "@tailwindcss/container-queries": "^0.1.1",
     "@testing-library/dom": "^9.3.3",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^14.0.0",
