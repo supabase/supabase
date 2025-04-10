@@ -6,12 +6,23 @@ import { components } from 'api-types'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { DocsButton } from 'components/ui/DocsButton'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { InstanceSpecs } from 'lib/constants'
-import { cn, FormField_Shadcn_, RadioGroupCard, RadioGroupCardItem, Skeleton } from 'ui'
+import Link from 'next/link'
+import {
+  cn,
+  FormField_Shadcn_,
+  RadioGroupCard,
+  RadioGroupCardItem,
+  Skeleton,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { ComputeBadge } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
@@ -24,7 +35,6 @@ import {
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
 import { NoticeBar } from '../ui/NoticeBar'
-import Link from 'next/link'
 
 /**
  * to do: this could be a type from api-types
@@ -47,28 +57,9 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const org = useSelectedOrganization()
   const { control, formState, setValue, trigger } = form
 
-  const {
-    /**
-     * no error/isError states handled here, as a parent component handles them
-     */
-    data: subscription,
-  } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
 
-  const {
-    /**
-     * projectContext is used for:
-     *   - cloud provider
-     *   - infra_compute_size
-     */
-    project,
-    /**
-     * isLoading is used to avoid a useCheckPermissions() race condition
-     */
-    isLoading: isProjectLoading,
-    /**
-     * to do: there is no error/isError variables available for useProjectContext
-     */
-  } = useProjectContext()
+  const { project, isLoading: isProjectLoading } = useProjectContext()
   const {
     data: addons,
     isLoading: isAddonsLoading,
@@ -88,6 +79,8 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
      */
     return getAvailableComputeOptions(availableAddons, project?.cloud_provider)
   }, [availableAddons, project?.cloud_provider])
+
+  const subscriptionPitr = addons?.selected_addons.find((addon) => addon.type === 'pitr')
 
   const computeSizePrice = calculateComputeSizePrice({
     availableOptions: availableOptions,
@@ -127,7 +120,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
             labelOptional={
               <>
                 <BillingChangeBadge
-                  className={'mb-2'}
+                  className="mb-2"
                   show={
                     formState.isDirty &&
                     formState.dirtyFields.computeSize &&
@@ -179,10 +172,14 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                   {availableOptions.map((compute: ComputeOption) => {
                     const cpuArchitecture = getCloudProviderArchitecture(project?.cloud_provider)
 
-                    const lockedOption =
+                    const lockedMicroDueToPITR =
+                      compute.identifier === 'ci_micro' && !!subscriptionPitr
+                    const lockedNanoDueToPlan =
                       subscription?.plan.id !== 'free' &&
                       project?.infra_compute_size !== 'nano' &&
                       compute.identifier === 'ci_nano'
+
+                    const lockedOption = lockedNanoDueToPlan || lockedMicroDueToPITR
 
                     const price =
                       subscription?.plan.id !== 'free' &&
@@ -195,9 +192,9 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
 
                     return (
                       <RadioGroupCardItem
+                        showIndicator={false}
                         id={compute.identifier}
                         key={compute.identifier}
-                        showIndicator={false}
                         value={compute.identifier}
                         className={cn(
                           'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group] w-full h-[110px]',
@@ -205,69 +202,86 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                         )}
                         disabled={disabled || lockedOption}
                         label={
-                          <>
-                            {showUpgradeBadge && compute.identifier === 'ci_micro' && (
-                              <div className="absolute -top-4 -right-3 text-violet-1100 flex items-center gap-1 bg-surface-75 py-0.5 px-2 rounded-full border border-violet-900">
-                                <span>No additional charge</span>
-                              </div>
-                            )}
-                            <div className="w-full flex flex-col gap-3 justify-between">
-                              <div className="relative px-3 opacity-50 group-data-[state=checked]:opacity-100 flex justify-between">
-                                <ComputeBadge
-                                  className="inline-flex font-semibold"
-                                  infraComputeSize={
-                                    compute.name as components['schemas']['DbInstanceSize']
-                                  }
-                                />
-                                <div className="flex items-center space-x-1">
-                                  {lockedOption ? (
-                                    <div className="bg border rounded-lg h-7 w-7 flex items-center justify-center">
-                                      <Lock size={14} />
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div>
+                                {showUpgradeBadge && compute.identifier === 'ci_micro' && (
+                                  <div className="absolute -top-4 -right-3 text-violet-1100 flex items-center gap-1 bg-surface-75 py-0.5 px-2 rounded-full border border-violet-900">
+                                    <span>No additional charge</span>
+                                  </div>
+                                )}
+                                <div className="w-full flex flex-col gap-3 justify-between">
+                                  <div className="relative px-3 opacity-50 group-data-[state=checked]:opacity-100 flex justify-between">
+                                    <ComputeBadge
+                                      className="inline-flex font-semibold"
+                                      infraComputeSize={
+                                        compute.name as components['schemas']['DbInstanceSize']
+                                      }
+                                    />
+                                    <div className="flex items-center space-x-1">
+                                      {lockedOption ? (
+                                        <div className="bg border rounded-lg h-7 w-7 flex items-center justify-center">
+                                          <Lock size={14} />
+                                        </div>
+                                      ) : (
+                                        <>
+                                          <span className="text-foreground text-sm font-semibold">
+                                            ${price}
+                                          </span>
+                                          <span className="text-foreground-light translate-y-[1px]">
+                                            {' '}
+                                            /{' '}
+                                            {compute.price_interval === 'monthly'
+                                              ? 'month'
+                                              : 'hour'}
+                                          </span>
+                                        </>
+                                      )}
                                     </div>
-                                  ) : (
-                                    <>
-                                      <span className="text-foreground text-sm font-semibold">
-                                        ${price}
-                                      </span>
-                                      <span className="text-foreground-light translate-y-[1px]">
-                                        {' '}
-                                        / {compute.price_interval === 'monthly' ? 'month' : 'hour'}
-                                      </span>
-                                    </>
-                                  )}
-                                </div>
-                              </div>
+                                  </div>
 
-                              <div className="w-full">
-                                <div className="px-3 text-sm flex flex-col gap-1">
-                                  <div className="text-foreground-light flex gap-2 items-center">
-                                    <Microchip
-                                      strokeWidth={1}
-                                      size={14}
-                                      className="text-foreground-lighter"
-                                    />
-                                    <span>
-                                      {compute.identifier === 'ci_nano' && 'Up to '}
-                                      {compute.meta?.memory_gb ?? 0} GB memory
-                                    </span>
-                                  </div>
-                                  <div className="text-foreground-light flex gap-2 items-center">
-                                    <CpuIcon
-                                      strokeWidth={1}
-                                      size={14}
-                                      className="text-foreground-lighter"
-                                    />
-                                    <span>
-                                      {compute.meta?.cpu_cores ?? 0}
-                                      {compute.meta?.cpu_cores !== 'Shared' &&
-                                        `-core ${cpuArchitecture}`}{' '}
-                                      CPU
-                                    </span>
+                                  <div className="w-full">
+                                    <div className="px-3 text-sm flex flex-col gap-1">
+                                      <div className="text-foreground-light flex gap-2 items-center">
+                                        <Microchip
+                                          strokeWidth={1}
+                                          size={14}
+                                          className="text-foreground-lighter"
+                                        />
+                                        <span>
+                                          {compute.identifier === 'ci_nano' && 'Up to '}
+                                          {compute.meta?.memory_gb ?? 0} GB memory
+                                        </span>
+                                      </div>
+                                      <div className="text-foreground-light flex gap-2 items-center">
+                                        <CpuIcon
+                                          strokeWidth={1}
+                                          size={14}
+                                          className="text-foreground-lighter"
+                                        />
+                                        <span>
+                                          {compute.meta?.cpu_cores ?? 0}
+                                          {compute.meta?.cpu_cores !== 'Shared' &&
+                                            `-core ${cpuArchitecture}`}{' '}
+                                          CPU
+                                        </span>
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
-                          </>
+                            </TooltipTrigger>
+                            {lockedMicroDueToPITR && (
+                              <TooltipContent side="bottom" className="w-64 text-center">
+                                Project has PITR enabled which requires a minimum of Small compute.
+                                Please{' '}
+                                <InlineLink href="/project/_/settings/addons?panel=pitr">
+                                  disable PITR
+                                </InlineLink>{' '}
+                                first before selecting Micro
+                              </TooltipContent>
+                            )}
+                          </Tooltip>
                         }
                       />
                     )
