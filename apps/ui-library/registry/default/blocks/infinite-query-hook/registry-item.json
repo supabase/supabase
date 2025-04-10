@@ -4,7 +4,8 @@
   "type": "registry:block",
   "title": "Infinite Query Hook",
   "description": "React hook for infinite lists, fetching data from Supabase.",
-  "dependencies": ["lucide-react", "@supabase/postgrest-js"],
+  "dependencies": ["@supabase/supabase-js", "@supabase/postgrest-js@*"],
+  "registryDependencies": [],
   "files": [
     {
       "path": "registry/default/blocks/infinite-query-hook/hooks/use-infinite-query.ts",

@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 const supabase = createClient()
 
+// The following types are used to make the hook type-safe. It extracts the database type from the supabase client.
 type SupabaseClientType = typeof supabase
 
 // Utility type to check if the type is any
@@ -37,26 +38,31 @@ type SupabaseTableName = keyof DatabaseSchema['Tables']
 // Extracts the table definition from the database type
 type SupabaseTableData<T extends SupabaseTableName> = DatabaseSchema['Tables'][T]['Row']
 
-//
 type SupabaseSelectBuilder<T extends SupabaseTableName> = ReturnType<
   PostgrestQueryBuilder<DatabaseSchema, DatabaseSchema['Tables'][T], T>['select']
 >
 
-type SupabaseFilterHandler<T extends SupabaseTableName> = (
+// A function that modifies the query. Can be used to sort, filter, etc. If .range is used, it will be overwritten.
+type SupabaseQueryHandler<T extends SupabaseTableName> = (
   query: SupabaseSelectBuilder<T>
 ) => SupabaseSelectBuilder<T>
 
 interface UseInfiniteQueryProps<T extends SupabaseTableName, Query extends string = '*'> {
+  // The table name to query
   tableName: T
-  selectQuery?: string
+  // The columns to select, defaults to `*`
+  columns?: string
+  // The number of items to fetch per page, defaults to `20`
   pageSize?: number
-  filterBuilder?: SupabaseFilterHandler<T>
+  // A function that modifies the query. Can be used to sort, filter, etc. If .range is used, it will be overwritten.
+  trailingQuery?: SupabaseQueryHandler<T>
 }
 
+//
 function useInfiniteQuery<
   TData extends SupabaseTableData<T>,
   T extends SupabaseTableName = SupabaseTableName,
->({ tableName, selectQuery = '*', pageSize = 20, filterBuilder }: UseInfiniteQueryProps<T>) {
+>({ tableName, columns = '*', pageSize = 20, trailingQuery }: UseInfiniteQueryProps<T>) {
   const [data, setData] = useState<TData[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -74,11 +80,11 @@ function useInfiniteQuery<
       try {
         let query = supabase
           .from(tableName)
-          .select(selectQuery, { count: 'exact' }) as unknown as SupabaseSelectBuilder<T>
+          .select(columns, { count: 'exact' }) as unknown as SupabaseSelectBuilder<T>
 
-        // Apply filters if filterBuilder is provided
-        if (filterBuilder) {
-          query = filterBuilder(query)
+        // Apply filters if trailingQuery is provided
+        if (trailingQuery) {
+          query = trailingQuery(query)
         }
 
         const { data: newData, count } = await query.range(skip, skip + pageSize - 1).throwOnError()
@@ -100,7 +106,7 @@ function useInfiniteQuery<
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tableName, selectQuery, pageSize, hasMore]
+    [tableName, columns, pageSize, hasMore]
   )
 
   const fetchNextPage = useCallback(async () => {
@@ -119,14 +125,14 @@ function useInfiniteQuery<
     setIsLoading(false)
     setHasInitialFetch(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tableName, selectQuery, pageSize])
+  }, [tableName, columns, pageSize])
 
   return { data, isSuccess, isLoading, isFetching, error, hasMore, fetchNextPage, count }
 }
 
 export {
   useInfiniteQuery,
-  type SupabaseFilterHandler,
+  type SupabaseQueryHandler,
   type SupabaseTableData,
   type SupabaseTableName,
   type UseInfiniteQueryProps,

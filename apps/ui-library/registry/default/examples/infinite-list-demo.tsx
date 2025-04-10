@@ -1,58 +1,101 @@
 'use client'
 
-import { InfiniteList } from '@/registry/default/blocks/infinite-list/components/infinite-list'
-import { SupabaseFilterBuilder } from '@/registry/default/blocks/infinite-list/hooks/use-infinite-query'
+import { cn } from '@/lib/utils'
+import {
+  SupabaseQueryHandler,
+  SupabaseTableData,
+  SupabaseTableName,
+  useInfiniteQuery,
+} from '@/registry/default/blocks/infinite-query-hook/hooks/use-infinite-query'
+import * as React from 'react'
 
-// Example Task data structure (Adapt to your actual data)
-export type Log = {
-  id: number
-  log_message: string
-  log_level: string
-  created_at: string // Assuming ISO string format from Supabase
+interface InfiniteListProps<TableName extends SupabaseTableName> {
+  tableName: TableName
+  selectQuery?: string
+  pageSize?: number
+  trailingQuery?: SupabaseQueryHandler<TableName>
+  renderItem: (item: SupabaseTableData<TableName>, index: number) => React.ReactNode
+  className?: string
+  listClassName?: string
+  renderNoResults?: () => React.ReactNode
+  renderEndMessage?: () => React.ReactNode
+  renderSkeleton?: (count: number) => React.ReactNode
 }
 
-// IMPORTANT: Replace 'your_table_name' with the actual name of your Supabase table
-const YOUR_SUPABASE_TABLE_NAME = 'logging_data' // <<<--- CHANGE THIS
+const DefaultNoResults = () => (
+  <div className="text-center text-muted-foreground py-10">No results.</div>
+)
 
-const InfiniteListDemo = () => {
-  // Define how each item should be rendered
-  const renderLogItem = (log: Log) => {
-    return (
-      <div className="border-b py-3 px-4 hover:bg-muted flex items-center justify-between">
-        <div>
-          <span className="font-medium text-sm text-foreground">
-            {log.log_message} (ID: {log.id})
-          </span>
-          <div className="text-sm text-foreground-light">
-            {new Date(log.created_at).toLocaleDateString()}
-          </div>
-        </div>
-        <span className="text-xs text-foreground-light rounded-lg py-2 px-3 bg-muted">
-          {log.log_level}
-        </span>
-      </div>
+const DefaultEndMessage = () => (
+  <div className="text-center text-muted-foreground py-4 text-sm">You&apos;ve reached the end.</div>
+)
+
+export function InfiniteList<TableName extends SupabaseTableName>({
+  tableName,
+  selectQuery = '*',
+  pageSize = 20,
+  trailingQuery,
+  renderItem,
+  className,
+  listClassName,
+  renderNoResults = DefaultNoResults,
+  renderEndMessage = DefaultEndMessage,
+  renderSkeleton,
+}: InfiniteListProps<TableName>) {
+  const { data, isLoading, hasMore, fetchNextPage } = useInfiniteQuery({
+    tableName: tableName,
+    columns: selectQuery,
+    pageSize,
+    trailingQuery,
+  })
+
+  // Ref for the scrolling container
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null)
+
+  // Intersection observer logic - target the last rendered *item* or a dedicated sentinel
+  const loadMoreSentinelRef = React.useRef<HTMLDivElement>(null)
+  const observer = React.useRef<IntersectionObserver | null>(null)
+
+  React.useEffect(() => {
+    if (observer.current) observer.current.disconnect()
+
+    observer.current = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          fetchNextPage()
+        }
+      },
+      {
+        root: scrollContainerRef.current, // Use the scroll container for scroll detection
+        threshold: 0.1, // Trigger when 10% of the target is visible
+        rootMargin: '0px 0px 100px 0px', // Trigger loading a bit before reaching the end
+      }
     )
-  }
 
-  // Define a filter to only show logs with log_level = 'info'
-  const filterLogsToInfo = (query: SupabaseFilterBuilder) => {
-    return query.eq('log_level', 'INFO') as SupabaseFilterBuilder
-  }
+    if (loadMoreSentinelRef.current) {
+      observer.current.observe(loadMoreSentinelRef.current)
+    }
+
+    return () => {
+      if (observer.current) observer.current.disconnect()
+    }
+  }, [isLoading, hasMore, fetchNextPage])
 
   return (
-    <div className="bg-surface-100 h-[600px]">
-      {/* 
-        Ensure your Supabase instance has a table named `YOUR_SUPABASE_TABLE_NAME` 
-        with columns matching the 'Log' type.
-      */}
-      <InfiniteList<Log>
-        tableName={YOUR_SUPABASE_TABLE_NAME}
-        renderItem={renderLogItem}
-        pageSize={15}
-        filterBuilder={filterLogsToInfo}
-      />
+    <div ref={scrollContainerRef} className={cn('relative h-full overflow-auto', className)}>
+      <div className={cn(listClassName)}>
+        {data.length === 0 && !isLoading && renderNoResults()}
+
+        {data.map((item, index) => (
+          <div key={(item as any)?.id ?? index}>{renderItem(item, index)}</div>
+        ))}
+
+        {isLoading && renderSkeleton && renderSkeleton(pageSize)}
+
+        <div ref={loadMoreSentinelRef} style={{ height: '1px' }} />
+
+        {!hasMore && data.length > 0 && renderEndMessage()}
+      </div>
     </div>
   )
 }
-
-export default InfiniteListDemo

@@ -23,7 +23,7 @@
     "@radix-ui/react-slot": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@react-router/fs-routes": "^7.4.0",
-    "@supabase/postgrest-js": "^1.19.4",
+    "@supabase/postgrest-js": "*",
     "@supabase/supa-mdx-lint": "0.2.6-alpha",
     "class-variance-authority": "^0.6.0",
     "common": "workspace:*",
