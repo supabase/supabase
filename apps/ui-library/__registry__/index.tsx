@@ -295,49 +295,13 @@ export const Index: Record<string, any> = {
       chunks: []
     }
     ,
-    "infinite-list-nextjs": {
-      name: "infinite-list-nextjs",
+    "infinite-query-hook": {
+      name: "infinite-query-hook",
       type: "registry:block",
       registryDependencies: [],
-      component: React.lazy(() => import("@/registry/default/blocks/infinite-list/components/infinite-list.tsx")),
+      
       source: "",
-      files: ["registry/default/blocks/infinite-list/components/infinite-list.tsx","registry/default/blocks/infinite-list/hooks/use-infinite-query.ts","registry/default/clients/nextjs/lib/supabase/client.ts","registry/default/clients/nextjs/lib/supabase/middleware.ts","registry/default/clients/nextjs/lib/supabase/server.ts"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    }
-    ,
-    "infinite-list-react": {
-      name: "infinite-list-react",
-      type: "registry:block",
-      registryDependencies: [],
-      component: React.lazy(() => import("@/registry/default/blocks/infinite-list/components/infinite-list.tsx")),
-      source: "",
-      files: ["registry/default/blocks/infinite-list/components/infinite-list.tsx","registry/default/blocks/infinite-list/hooks/use-infinite-query.ts","registry/default/clients/react/lib/supabase/client.ts"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    }
-    ,
-    "infinite-list-react-router": {
-      name: "infinite-list-react-router",
-      type: "registry:block",
-      registryDependencies: [],
-      component: React.lazy(() => import("@/registry/default/blocks/infinite-list/components/infinite-list.tsx")),
-      source: "",
-      files: ["registry/default/blocks/infinite-list/components/infinite-list.tsx","registry/default/blocks/infinite-list/hooks/use-infinite-query.ts","registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    }
-    ,
-    "infinite-list-tanstack": {
-      name: "infinite-list-tanstack",
-      type: "registry:block",
-      registryDependencies: [],
-      component: React.lazy(() => import("@/registry/default/blocks/infinite-list/components/infinite-list.tsx")),
-      source: "",
-      files: ["registry/default/blocks/infinite-list/components/infinite-list.tsx","registry/default/blocks/infinite-list/hooks/use-infinite-query.ts","registry/default/clients/tanstack/lib/supabase/client.ts","registry/default/clients/tanstack/lib/supabase/server.ts"],
+      files: ["registry/default/blocks/infinite-query-hook/hooks/use-infinite-query.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
