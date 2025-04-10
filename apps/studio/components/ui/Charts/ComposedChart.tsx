@@ -29,7 +29,12 @@ import { useChartSize, numberFormatter } from './Charts.utils'
 import { ChartHighlight } from './useChartHighlight'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { MultiAttribute } from './ComposedChartHandler'
-import { CustomLabel, CustomTooltip, formatBytes } from './ComposedChart.utils'
+import {
+  calculateTotalChartAggregate,
+  CustomLabel,
+  CustomTooltip,
+  formatBytes,
+} from './ComposedChart.utils'
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   attributes: MultiAttribute[]
@@ -126,20 +131,41 @@ export default function ComposedChart({
     )
   }
 
-  const resolvedHighlightedLabel = getHeaderLabel()
-  const resolvedHighlightedValue =
-    focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue
-
-  const showHighlightActions =
-    chartHighlight?.coordinates.left &&
-    chartHighlight?.coordinates.right &&
-    chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
-
   const maxAttribute = attributes.find((a) => a.isMaxValue)
   const maxAttributeData = {
     name: maxAttribute?.attribute,
     color: '#3ECF8E',
   }
+
+  const lastDataPoint = !!data[data.length - 1]
+    ? Object.entries(data[data.length - 1])
+        .map(([key, value]) => ({
+          dataKey: key,
+          value: value as number,
+        }))
+        .filter((entry) => entry.dataKey !== 'timestamp')
+    : undefined
+
+  const resolvedHighlightedLabel = getHeaderLabel()
+  const resolvedHighlightedValue =
+    focusDataIndex !== null
+      ? showTotal
+        ? calculateTotalChartAggregate(
+            _activePayload,
+            maxAttribute?.attribute ? [maxAttribute?.attribute] : []
+          )
+        : data[focusDataIndex]?.[yAxisKey]
+      : showTotal && lastDataPoint
+        ? calculateTotalChartAggregate(
+            lastDataPoint,
+            maxAttribute?.attribute ? [maxAttribute?.attribute] : []
+          )
+        : highlightedValue
+
+  const showHighlightActions =
+    chartHighlight?.coordinates.left &&
+    chartHighlight?.coordinates.right &&
+    chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
 
   const chartData =
     data && !!data[0]
@@ -222,7 +248,7 @@ export default function ComposedChart({
             })
           }}
           onMouseUp={chartHighlight?.handleMouseUp}
-          onMouseLeave={() => {
+          onMouseLeave={(e) => {
             setFocusDataIndex(null)
             setActivePayload(null)
           }}
@@ -279,7 +305,8 @@ export default function ComposedChart({
                   fill={attribute.color}
                   strokeOpacity={hoveredLabel && hoveredLabel !== attribute.name ? 0.4 : 1}
                   stroke={attribute.color}
-                  radius={0.75}
+                  radius={20}
+                  animationDuration={375}
                   fillOpacity={
                     hoveredLabel && hoveredLabel !== attribute.name
                       ? 0.075

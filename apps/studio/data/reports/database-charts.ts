@@ -1,4 +1,4 @@
-export const getReportAttributes = () => [
+export const getReportAttributes = (isFreePlan: boolean) => [
   {
     id: 'ram-usage',
     label: 'Memory usage',
@@ -158,7 +158,7 @@ export const getReportAttributes = () => [
     id: 'supavisor-connections-active',
     label: 'Supavisor client connections',
     valuePrecision: 0,
-    hide: false,
+    hide: isFreePlan,
     showTooltip: false,
     showLegend: false,
     showMaxValue: false,

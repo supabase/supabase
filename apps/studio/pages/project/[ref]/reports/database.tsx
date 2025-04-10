@@ -101,7 +101,7 @@ const DatabaseUsage = () => {
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
-  const REPORT_ATTRIBUTES_V2 = getReportAttributes()
+  const REPORT_ATTRIBUTES_V2 = getReportAttributes(isFreePlan)
 
   const REPORT_ATTRIBUTES = [
     { id: 'ram_usage', label: 'Memory usage', hide: false },
@@ -304,7 +304,7 @@ const DatabaseUsage = () => {
         {isReportsV2 ? (
           <div className="grid grid-cols-1 gap-4">
             {dateRange &&
-              REPORT_ATTRIBUTES_V2.map((attr) => (
+              REPORT_ATTRIBUTES_V2.filter((attr) => !attr.hide).map((attr) => (
                 <ComposedChartHandler
                   key={attr.id}
                   {...attr}

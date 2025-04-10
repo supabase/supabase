@@ -1,11 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import dayjs from 'dayjs'
 import { DateTimeFormats } from './Charts.constants'
 import { numberFormatter } from './Charts.utils'
 import { MultiAttribute } from './ComposedChartHandler'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { useEffect, useState } from 'react'
 import { cn } from 'ui'
 
 interface CustomIconProps {
@@ -43,7 +43,20 @@ export const formatBytes = (bytes: number, precision: number = 1) => {
   return `${(bytes / Math.pow(k, i)).toFixed(precision)} ${sizes[i]}`
 }
 
-const isMax = (attributes?: MultiAttribute[]) => attributes?.find((a) => a.isMaxValue)
+const isMaxAttribute = (attributes?: MultiAttribute[]) => attributes?.find((a) => a.isMaxValue)
+
+/**
+ * Calculate the total aggregate of the chart values
+ * by summing the values of the attributes
+ * that are not in the `ignoreAttributes` array
+ */
+export const calculateTotalChartAggregate = (
+  payload: { dataKey: string; value: number }[],
+  ignoreAttributes?: string[]
+) =>
+  payload
+    ?.filter((p) => !ignoreAttributes?.includes(p.dataKey))
+    .reduce((acc, curr) => acc + curr.value, 0)
 
 const CustomTooltip = ({
   active,
@@ -55,16 +68,17 @@ const CustomTooltip = ({
 }: TooltipProps) => {
   if (active && payload && payload.length) {
     const timestamp = payload[0].payload.timestamp
-    const maxValueAttribute = isMax(attributes)
+    const maxValueAttribute = isMaxAttribute(attributes)
     const maxValueData =
       maxValueAttribute && payload?.find((p: any) => p.dataKey === maxValueAttribute.attribute)
     const maxValue = maxValueData?.value
     const isRamChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
     const total =
       showTotal &&
-      payload
-        ?.filter((p) => p.dataKey !== maxValueAttribute?.attribute)
-        .reduce((acc, curr) => acc + curr.value, 0)
+      calculateTotalChartAggregate(
+        payload,
+        maxValueAttribute?.attribute ? [maxValueAttribute.attribute] : []
+      )
 
     const getIcon = (name: string, color: string) => {
       switch (name.toLowerCase().includes('max')) {
@@ -113,14 +127,14 @@ const CustomTooltip = ({
               <span className="flex-grow text-foreground-lighter">Total</span>
               <div className="flex items-end gap-1">
                 <span className="text-base">
-                  {isRamChart ? formatBytes(total, 1) : numberFormatter(total)}
+                  {isRamChart ? formatBytes(total as number, 1) : numberFormatter(total as number)}
                   {isPercentage ? '%' : ''}
                 </span>
                 {maxValueAttribute &&
-                  !isNaN(total / maxValueData?.value) &&
-                  isFinite(total / maxValueData?.value) && (
+                  !isNaN((total as number) / maxValueData?.value) &&
+                  isFinite((total as number) / maxValueData?.value) && (
                     <span className="text-[11px] text-foreground-light mb-0.5">
-                      ({((total / maxValueData?.value) * 100).toFixed(1)}%)
+                      ({(((total as number) / maxValueData?.value) * 100).toFixed(1)}%)
                     </span>
                   )}
               </div>
@@ -143,7 +157,7 @@ interface CustomLabelProps {
 
 const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: CustomLabelProps) => {
   const items = payload ?? []
-  const maxValueAttribute = isMax(attributes)
+  const maxValueAttribute = isMaxAttribute(attributes)
   const [hoveredLabel, setHoveredLabel] = useState<string | null>(null)
 
   const handleMouseEnter = (label: string) => {
@@ -187,7 +201,7 @@ const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: Custom
     if (!showMaxValue && isMax) return null
 
     return (
-      <p
+      <div
         key={entry.name}
         className="inline-flex md:flex-col gap-1 md:gap-0 w-fit text-foreground"
         onMouseEnter={() => handleMouseEnter(entry.name)}
@@ -205,7 +219,7 @@ const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: Custom
         ) : (
           <Label />
         )}
-      </p>
+      </div>
     )
   }
 
