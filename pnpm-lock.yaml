@@ -335,7 +335,7 @@ importers:
         version: 1.0.1
       next:
         specifier: 'catalog:'
-        version: 14.2.26(@babel/core@7.26.9(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
+        version: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       next-mdx-remote:
         specifier: ^4.4.1
         version: 4.4.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(supports-color@8.1.1)
@@ -613,6 +613,9 @@ importers:
       '@tanstack/react-query-devtools':
         specifier: 4.35.7
         version: 4.35.7(@tanstack/react-query@4.35.7(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      '@types/pg':
+        specifier: ^8.11.11
+        version: 8.11.11
       '@uidotdev/usehooks':
         specifier: ^2.4.1
         version: 2.4.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -727,6 +730,9 @@ importers:
       path-to-regexp:
         specifier: ^8.0.0
         version: 8.1.0
+      pg:
+        specifier: ^8.13.1
+        version: 8.13.1
       pg-minify:
         specifier: ^1.6.3
         version: 1.6.3
@@ -1274,7 +1280,7 @@ importers:
         version: 1.2.0
       next:
         specifier: 'catalog:'
-        version: 14.2.26(@babel/core@7.26.9(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
+        version: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       next-contentlayer2:
         specifier: 0.5.3
         version: 0.5.3(contentlayer2@0.5.3(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.25.2)(markdown-wasm@1.2.0)(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(supports-color@8.1.1)
@@ -1528,7 +1534,7 @@ importers:
         version: 0.7.12
       '@vercel/flags':
         specifier: ^2.6.0
-        version: 2.6.0(next@14.2.26(@babel/core@7.26.9(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        version: 2.6.0(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       api-types:
         specifier: workspace:*
         version: link:../api-types
@@ -1543,7 +1549,7 @@ importers:
         version: 4.17.21
       next:
         specifier: 'catalog:'
-        version: 14.2.26(@babel/core@7.26.9(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
+        version: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       next-themes:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -1821,7 +1827,7 @@ importers:
         version: 0.436.0(react@18.2.0)
       next:
         specifier: 'catalog:'
-        version: 14.2.26(@babel/core@7.26.9(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
+        version: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       next-themes:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -1975,7 +1981,7 @@ importers:
         version: 0.33.0
       next:
         specifier: 'catalog:'
-        version: 14.2.26(@babel/core@7.26.9(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
+        version: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       next-themes:
         specifier: '*'
         version: 0.3.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -2084,7 +2090,7 @@ importers:
         version: link:../api-types
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@14.2.26(@babel/core@7.26.9(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0)
+        version: 0.9.13(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0)
       typescript:
         specifier: ~5.5.0
         version: 5.5.2
@@ -7473,10 +7479,6 @@ packages:
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
 
-  buffer-writer@2.0.0:
-    resolution: {integrity: sha512-a7ZpuTZU1TRtnwyCNW3I5dc0wWNC3VR9S++Ewyk2HHZdrO3CQJqSpd+95Us590V6AL7JqUAH2IwZ/398PmNFgw==}
-    engines: {node: '>=4'}
-
   buffer@6.0.3:
     resolution: {integrity: sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==}
 
@@ -8800,7 +8802,6 @@ packages:
     resolution: {integrity: sha512-t0q23FIpvHDTtnORW+bDJziGsal5uh9RJTJ1fyH8drd4lICOoXhJ5pLMUZ5C0VQei6dNmwTzzoTRgMkO9JgHEQ==}
     peerDependencies:
       eslint: '>= 5'
-    bundledDependencies: []
 
   eslint-plugin-import@2.29.1:
     resolution: {integrity: sha512-BbPC0cuExzhiMo4Ff1BTVwHpjjv28C5R+btTOGaCRC7UEz801up0JadwkeSk5Ued6TG34uaczuVuH6qyy5YUxw==}
@@ -11922,9 +11923,6 @@ packages:
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
 
-  packet-reader@1.0.0:
-    resolution: {integrity: sha512-HAKu/fG3HpHFO0AA8WE8q2g+gBJaZ9MG7fcKk+IJPLTGAD6Psw4443l+9DGRbOIh3/aXr7Phy0TjilYivJo5XQ==}
-
   pako@0.2.9:
     resolution: {integrity: sha512-NUcwaKxUxWrZLpDG+z/xZaCgQITkA/Dv4V/T6bw7VON6l1Xz/VnrBqrYjZQ12TamKHzITTfOEIYUj48y2KXImA==}
 
@@ -12099,15 +12097,6 @@ packages:
   pg-types@4.0.2:
     resolution: {integrity: sha512-cRL3JpS3lKMGsKaWndugWQoLOCoP+Cic8oseVcbr0qhPzYD5DWXK+RZ9LY9wxRf7RQia4SCwQlXk0q6FCPrVng==}
     engines: {node: '>=10'}
-
-  pg@8.11.3:
-    resolution: {integrity: sha512-+9iuvG8QfaaUrrph+kpF24cXkH1YOOUeArRNYIxq1viYHZagBxrTno7cecY1Fa44tJeZvaoG+Djpkc3JwehN5g==}
-    engines: {node: '>= 8.0.0'}
-    peerDependencies:
-      pg-native: '>=3.0.1'
-    peerDependenciesMeta:
-      pg-native:
-        optional: true
 
   pg@8.13.1:
     resolution: {integrity: sha512-OUir1A0rPNZlX//c7ksiu7crsGZTKSOXJPgtNiHGIlC9H0lO+NC6ZDYksSgBYY/thSWhnSRBv8w1lieNNGATNQ==}
@@ -16653,7 +16642,7 @@ snapshots:
       crypto-js: 4.2.0
       fastify: 4.29.0
       fastify-metrics: 10.6.0(fastify@4.29.0)
-      pg: 8.11.3
+      pg: 8.13.1
       pg-connection-string: 2.6.2
       pg-format: 1.0.4
       pg-protocol: 1.6.0
@@ -20098,7 +20087,7 @@ snapshots:
   '@supabase/postgres-meta@0.64.6(encoding@0.1.13)(supports-color@8.1.1)':
     dependencies:
       '@sinclair/typebox': 0.25.24
-      pg: 8.11.3
+      pg: 8.13.1
       pg-format: 1.0.4
       pgsql-parser: 13.5.0(encoding@0.1.13)(supports-color@8.1.1)
       postgres-array: 3.0.2
@@ -21263,7 +21252,7 @@ snapshots:
 
   '@types/pg-pool@2.0.6':
     dependencies:
-      '@types/pg': 8.6.1
+      '@types/pg': 8.11.11
 
   '@types/pg@8.11.11':
     dependencies:
@@ -21478,6 +21467,14 @@ snapshots:
       jose: 5.2.1
     optionalDependencies:
       next: 14.2.26(@babel/core@7.26.9(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+
+  '@vercel/flags@2.6.0(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
+    dependencies:
+      jose: 5.2.1
+    optionalDependencies:
+      next: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
 
@@ -22366,8 +22363,6 @@ snapshots:
   buffer-crc32@1.0.0: {}
 
   buffer-from@1.1.2: {}
-
-  buffer-writer@2.0.0: {}
 
   buffer@6.0.3:
     dependencies:
@@ -27703,7 +27698,7 @@ snapshots:
       '@contentlayer2/core': 0.5.3(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1)
       '@contentlayer2/utils': 0.5.3
       contentlayer2: 0.5.3(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1)
-      next: 14.2.26(@babel/core@7.26.9(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
+      next: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     transitivePeerDependencies:
@@ -27732,9 +27727,14 @@ snapshots:
       next: 14.2.26(@babel/core@7.26.9(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       react: 18.2.0
 
+  next-router-mock@0.9.13(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react@18.2.0):
+    dependencies:
+      next: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
+      react: 18.2.0
+
   next-seo@6.5.0(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
-      next: 14.2.26(@babel/core@7.26.9(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
+      next: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
 
@@ -28091,7 +28091,7 @@ snapshots:
   nuqs@1.19.1(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)):
     dependencies:
       mitt: 3.0.1
-      next: 14.2.26(@babel/core@7.26.9(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
+      next: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0)
 
   nuqs@2.4.1(next@14.2.26(@babel/core@7.26.9(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(sass@1.72.0))(react-router@7.4.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0):
     dependencies:
@@ -28367,8 +28367,6 @@ snapshots:
 
   package-json-from-dist@1.0.1: {}
 
-  packet-reader@1.0.0: {}
-
   pako@0.2.9: {}
 
   papaparse@5.4.1: {}
@@ -28522,10 +28520,6 @@ snapshots:
 
   pg-numeric@1.0.2: {}
 
-  pg-pool@3.7.1(pg@8.11.3):
-    dependencies:
-      pg: 8.11.3
-
   pg-pool@3.7.1(pg@8.13.1):
     dependencies:
       pg: 8.13.1
@@ -28551,18 +28545,6 @@ snapshots:
       postgres-date: 2.1.0
       postgres-interval: 3.0.0
       postgres-range: 1.1.4
-
-  pg@8.11.3:
-    dependencies:
-      buffer-writer: 2.0.0
-      packet-reader: 1.0.0
-      pg-connection-string: 2.7.0
-      pg-pool: 3.7.1(pg@8.11.3)
-      pg-protocol: 1.7.1
-      pg-types: 2.2.0
-      pgpass: 1.0.5
-    optionalDependencies:
-      pg-cloudflare: 1.1.1
 
   pg@8.13.1:
     dependencies:
