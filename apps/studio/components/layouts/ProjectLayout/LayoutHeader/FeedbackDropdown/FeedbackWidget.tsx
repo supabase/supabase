@@ -58,7 +58,7 @@ const FeedbackWidget = ({
       localStorage.removeItem(SCREENSHOT_STORAGE_KEY)
       toast.success('Your feedback has been sent. Thank you!', { duration: 8000 })
       setTimeout(() => {
-        toast.warning(
+        toast(
           'We do not always respond to feedback. If you require assistance, contact support instead.',
           {
             duration: 8000,
