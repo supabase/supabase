@@ -44,7 +44,7 @@ const BillingBreakdown = () => {
     <ScaffoldSection>
       <ScaffoldSectionDetail>
         <div className="sticky space-y-2 top-12 pr-3">
-          <p className="text-foreground text-base m-0">Billing Breakdown</p>
+          <p className="text-foreground text-base m-0">Upcoming Invoice</p>
           <div className="py-2">
             <SparkBar
               type="horizontal"
@@ -58,14 +58,20 @@ const BillingBreakdown = () => {
               labelTopClass="p-1 m-0"
             />
           </div>
+          <p className="prose text-sm">
+            Your upcoming invoice (excluding credits) will continue to update until the end of your
+            billing cycle on {billingCycleEnd.format('MMMM DD')}. For a more detailed breakdown,
+            visit the <Link href={`/org/${orgSlug}/usage`}>usage page.</Link>
+          </p>
+          <br />
           <p className="text-sm text-foreground-light mt-4">
-            It may take up to an hour for addon changes or new projects to show up.
+            Add-on changes or new projects may take up to an hour to appear.
           </p>
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
         {!canReadSubscriptions ? (
-          <NoPermission resourceText="view this organization's billing breakdown" />
+          <NoPermission resourceText="view this organization's upcoming invoice" />
         ) : (
           <>
             {isLoadingSubscription && (
@@ -80,19 +86,7 @@ const BillingBreakdown = () => {
               <AlertError subject="Failed to retrieve subscription" error={subscriptionError} />
             )}
 
-            {invoiceFeatureEnabled && (
-              <>
-                <p className="prose text-sm">
-                  The table shows your upcoming invoice, excluding credits. This invoice will
-                  continue updating until the end of your billing period on{' '}
-                  {billingCycleEnd.format('MMMM DD')}. See{' '}
-                  <Link href={`/org/${orgSlug}/usage`}>usage page</Link> for a more detailed usage
-                  breakdown.
-                </p>
-
-                <UpcomingInvoice slug={orgSlug} />
-              </>
-            )}
+            {invoiceFeatureEnabled && <UpcomingInvoice slug={orgSlug} />}
           </>
         )}
       </ScaffoldSectionContent>

@@ -126,10 +126,9 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                   title="Compute"
                   computeCredits={computeCreditsItem}
                   tooltip={
-                    <p className="prose text-xs mb-2">
-                      Each project on a paid plan is a dedicated server running 24/7 with no
-                      pausing. The first project is covered by Compute Credits. Additional projects
-                      will incur compute costs starting at $10/month, independent of activity. See{' '}
+                    <p className="prose text-xs">
+                      The first project is covered by Compute Credits. Additional projects incur
+                      compute costs starting at $10/month, independent of activity. See{' '}
                       <Link
                         href={'/docs/guides/platform/manage-your-usage/compute'}
                         target="_blank"
@@ -146,7 +145,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                   title="Replica Compute"
                   computeItems={replicaComputeItems}
                   tooltip={
-                    <p className="prose text-xs mb-2">
+                    <p className="prose text-xs">
                       Each Read Replica is a dedicated database. You are charged for its resources:
                       Compute, Disk Size, provisioned Disk IOPS, provisioned Disk Throughput, and
                       IPv4. See{' '}
@@ -372,7 +371,7 @@ function ComputeLineItem({
       <TableRow>
         <TableCell className="!py-2 px-0 flex items-center gap-1">
           <span>{title}</span>
-          <InfoTooltip className="max-w-sm p-3">{tooltip}</InfoTooltip>
+          <InfoTooltip className="max-w-sm">{tooltip}</InfoTooltip>
         </TableCell>
         <TableCell className="text-right py-2 px-0">
           <InvoiceLineItemAmount
