@@ -1,14 +1,17 @@
-import { useIsLoggedIn, useTelemetryProps } from 'common'
+import * as Sentry from '@sentry/nextjs'
+import { useIsLoggedIn } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
 import type { Profile } from 'data/profile/types'
-import Telemetry from 'lib/telemetry'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import type { ResponseError } from 'types'
+import { useSignOut } from './auth'
+import { getGitHubProfileImgUrl } from './github'
 
 export type ProfileContextType = {
   profile: Profile | undefined
@@ -27,20 +30,17 @@ export const ProfileContext = createContext<ProfileContextType>({
 })
 
 export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
-
   const isLoggedIn = useIsLoggedIn()
+  const router = useRouter()
+  const signOut = useSignOut()
 
+  const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: createProfile, isLoading: isCreatingProfile } = useProfileCreateMutation({
-    async onSuccess() {
-      Telemetry.sendEvent(
-        { category: 'conversion', action: 'sign_up', label: '' },
-        telemetryProps,
-        router
-      )
+    onSuccess: () => {
+      sendEvent({ action: 'sign_up', properties: { category: 'conversion' } })
     },
-    onError() {
+    onError: (error) => {
+      Sentry.captureMessage('Failed to create users profile: ' + error.message)
       toast.error('Failed to create your profile. Please refresh to try again.')
     },
   })
@@ -54,13 +54,18 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
     isSuccess,
   } = useProfileQuery({
     enabled: isLoggedIn,
-    onSuccess(profile) {
-      Telemetry.sendIdentify(profile, telemetryProps)
-    },
     onError(err) {
       // if the user does not yet exist, create a profile for them
-      if (typeof err === 'object' && err !== null && 'code' in err && (err as any).code === 404) {
+      if (err.message === "User's profile not found") {
         createProfile()
+      }
+
+      // [Alaister] If the user has a bad auth token, auth-js won't know about it
+      // and will think the user is authenticated. Since fetching the profile happens
+      // on every page load, we can check for a 401 here and sign the user out if
+      // they have a bad token.
+      if (err.code === 401) {
+        signOut().then(() => router.push('/sign-in'))
       }
     },
   })
@@ -69,10 +74,12 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
 
   const value = useMemo(() => {
     const isLoading = isLoadingProfile || isCreatingProfile || isLoadingPermissions
+    const isGHUser = !!profile && 'auth0_id' in profile && profile?.auth0_id.startsWith('github')
+    const profileImageUrl = isGHUser ? getGitHubProfileImgUrl(profile.username) : undefined
 
     return {
       error,
-      profile,
+      profile: !!profile ? { ...profile, profileImageUrl } : undefined,
       isLoading,
       isError,
       isSuccess,

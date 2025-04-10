@@ -1,19 +1,18 @@
 import dayjs from 'dayjs'
-import { ComponentProps, useState } from 'react'
+import { ComponentProps, useState, useMemo } from 'react'
 import {
   Bar,
+  CartesianGrid,
   Cell,
   Legend,
   BarChart as RechartBarChart,
   Tooltip,
   XAxis,
-  Label,
   YAxis,
-  CartesianGrid,
 } from 'recharts'
 
 import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
-import type { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart'
+import type { CategoricalChartState } from 'recharts/types/chart/types'
 import ChartHeader from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
@@ -58,6 +57,14 @@ const BarChart = ({
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
+  // Transform data to ensure yAxisKey values are numbers
+  const transformedData = useMemo(() => {
+    return data.map((item) => ({
+      ...item,
+      [yAxisKey]: typeof item[yAxisKey] === 'string' ? Number(item[yAxisKey]) : item[yAxisKey],
+    }))
+  }, [data, yAxisKey])
+
   // Default props
   const _XAxisProps = XAxisProps || {
     interval: data.length - 2,
@@ -68,6 +75,7 @@ const BarChart = ({
   const _YAxisProps = YAxisProps || {
     tickFormatter: (value) => numberFormatter(value, valuePrecision),
     tick: false,
+    width: 0,
   }
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
@@ -95,7 +103,7 @@ const BarChart = ({
     return (
       <NoDataPlaceholder
         message={emptyStateMessage}
-        description="It may take up to 24 hours for data to show"
+        description="It may take up to 24 hours for data to refresh"
         size={size}
         className={className}
         attribute={title}
@@ -120,13 +128,7 @@ const BarChart = ({
       />
       <Container>
         <RechartBarChart
-          data={data}
-          margin={{
-            top: 0,
-            right: 0,
-            left: -58, // [Joshen] 120724 Not sure why bar charts have a weird left margin suddenly, but this is a temp fix
-            bottom: 0,
-          }}
+          data={transformedData}
           className="overflow-visible"
           //   mouse hover focusing logic
           onMouseMove={(e: any) => {
@@ -160,7 +162,7 @@ const BarChart = ({
             dataKey={yAxisKey}
             fill={CHART_COLORS.GREEN_1}
             animationDuration={300}
-            // max bar size required to prevent bars from expanding to max width.
+            // Max bar size required to prevent bars from expanding to max width.
             maxBarSize={48}
           >
             {data?.map((_entry: Datum, index: any) => (

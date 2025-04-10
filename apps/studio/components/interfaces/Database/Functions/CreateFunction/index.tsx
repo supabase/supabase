@@ -3,7 +3,7 @@ import { isEmpty, isNull, keyBy, mapValues, partition } from 'lodash'
 import { Plus, Trash } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import z from 'zod'
 
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
@@ -13,7 +13,7 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import type { FormSchema } from 'types'
 import {
   Button,
@@ -39,7 +39,6 @@ import {
   SheetSection,
   Toggle,
   cn,
-  useWatch_Shadcn_,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -82,6 +81,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   })
+  const language = form.watch('language')
 
   const { mutate: createDatabaseFunction, isLoading: isCreating } =
     useDatabaseFunctionCreateMutation()
@@ -156,7 +156,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         className={cn(
           // 'bg-surface-200',
           'p-0 flex flex-row gap-0',
-          assistantVisible ? '!min-w-[1200px]' : '!min-w-[600px]'
+          assistantVisible ? '!min-w-screen lg:!min-w-[1200px]' : '!min-w-screen lg:!min-w-[600px]'
         )}
       >
         <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
@@ -203,7 +203,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                       <FormControl_Shadcn_>
                         <SchemaSelector
                           selectedSchemaName={field.value}
-                          excludedSchemas={EXCLUDED_SCHEMAS}
+                          excludedSchemas={PROTECTED_SCHEMAS}
                           size="small"
                           onSelectSchema={(name) => field.onChange(name)}
                         />
@@ -256,11 +256,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                         </FormLabel_Shadcn_>
                         <FormDescription_Shadcn_ className="text-sm text-foreground-light">
                           <p>
-                            The language below should be written in{' '}
-                            <code>
-                              <FormLanguage />
-                            </code>
-                            .
+                            The language below should be written in <code>{language}</code>.
                           </p>
                           {!isEditing && <p>Change the language in the Advanced Settings below.</p>}
                         </FormDescription_Shadcn_>
@@ -273,6 +269,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                       >
                         <FunctionEditor
                           field={field}
+                          language={language}
                           focused={focusedEditor}
                           setFocused={setFocusedEditor}
                         />
@@ -646,10 +643,4 @@ const FormFieldLanguage = () => {
       )}
     />
   )
-}
-
-const FormLanguage = () => {
-  const language = useWatch_Shadcn_({ name: 'language' })
-
-  return language
 }

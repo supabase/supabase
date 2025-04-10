@@ -5,8 +5,10 @@ import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useState } from 'react'
 
 import { NewOrgForm } from 'components/interfaces/Organization'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import WizardLayout from 'components/layouts/WizardLayout'
-import { useSetupIntent } from 'data/stripe/setup-intent-mutation'
+import { SetupIntentResponse, useSetupIntent } from 'data/stripe/setup-intent-mutation'
 import { STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import type { NextPageWithLayout } from 'types'
@@ -19,7 +21,7 @@ const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 const Wizard: NextPageWithLayout = () => {
   const { resolvedTheme } = useTheme()
 
-  const [intent, setIntent] = useState<any>()
+  const [intent, setIntent] = useState<SetupIntentResponse>()
   const captchaLoaded = useIsHCaptchaLoaded()
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
@@ -42,7 +44,7 @@ const Wizard: NextPageWithLayout = () => {
   const options = {
     clientSecret: intent ? intent.client_secret : '',
     appearance: { theme: resolvedTheme?.includes('dark') ? 'night' : 'flat', labels: 'floating' },
-  } as any
+  } as const
 
   const loadPaymentForm = async () => {
     if (captchaRef && captchaLoaded) {
@@ -104,9 +106,13 @@ const Wizard: NextPageWithLayout = () => {
 }
 
 Wizard.getLayout = (page) => (
-  <WizardLayout organization={null} project={null}>
-    {page}
-  </WizardLayout>
+  <AppLayout>
+    <DefaultLayout headerTitle="New organization">
+      <WizardLayout organization={null} project={null}>
+        {page}
+      </WizardLayout>
+    </DefaultLayout>
+  </AppLayout>
 )
 
 export default Wizard

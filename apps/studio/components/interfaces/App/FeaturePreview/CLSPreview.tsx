@@ -1,10 +1,12 @@
+import Image from 'next/image'
+
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
+import { InlineLink } from 'components/ui/InlineLink'
 import { BASE_PATH } from 'lib/constants'
-import Image from 'next/image'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, IconAlertCircle } from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
 
-const CLSPreview = () => {
+export const CLSPreview = () => {
   const { ref } = useParams()
 
   return (
@@ -19,7 +21,7 @@ const CLSPreview = () => {
           content={`This is an advanced feature and should be used with caution. Unless you have a very specific use case, we recommend just using [Row-Level Security](https://supabase.com/docs/guides/auth/row-level-security).`}
         />
         <Alert_Shadcn_ variant="warning" className="mt-2">
-          <IconAlertCircle strokeWidth={2} />
+          <WarningIcon />
           <AlertTitle_Shadcn_>
             Changes to column privileges will not be reflected in migrations when running{' '}
             <code className="text-xs">supabase db diff</code>.
@@ -42,15 +44,11 @@ const CLSPreview = () => {
         <p className="text-sm">Enabling this preview will:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>
-            <Markdown
-              className="text-foreground-light"
-              content={`Grant access to a new UI for granting and/or revoking column-level privileges [here](/project/${ref}/database/column-privileges).`}
-            />
+            Grant access to a new UI for granting and/or revoking column-level privileges{' '}
+            <InlineLink href={`/project/${ref}/database/column-privileges`}>here</InlineLink>.
           </li>
         </ul>
       </div>
     </div>
   )
 }
-
-export default CLSPreview

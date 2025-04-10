@@ -2,32 +2,60 @@ import dayjs from 'dayjs'
 
 import type { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
+import { PlanId } from 'data/subscriptions/types'
 
-export const LAYOUT_COLUMN_COUNT = 24
+export const LAYOUT_COLUMN_COUNT = 2
 
-export const REPORTS_DATEPICKER_HELPERS: DatetimeHelper[] = [
+interface ReportsDatetimeHelper extends DatetimeHelper {
+  availableIn: PlanId[]
+}
+
+export const REPORTS_DATEPICKER_HELPERS: ReportsDatetimeHelper[] = [
+  {
+    text: 'Last 60 minutes',
+    calcFrom: () => dayjs().subtract(1, 'hour').startOf('day').toISOString(),
+    calcTo: () => '',
+    default: true,
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
+  },
+  {
+    text: 'Last 3 hours',
+    calcFrom: () => dayjs().subtract(3, 'hour').startOf('day').toISOString(),
+    calcTo: () => '',
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
+  },
   {
     text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
     calcTo: () => '',
-    default: true,
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
     text: 'Last 7 days',
     calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
     calcTo: () => '',
+    availableIn: ['pro', 'team', 'enterprise'],
   },
   {
     text: 'Last 14 days',
     calcFrom: () => dayjs().subtract(14, 'day').startOf('day').toISOString(),
     calcTo: () => '',
+    availableIn: ['team', 'enterprise'],
   },
   {
-    text: 'Last 30 days',
-    calcFrom: () => dayjs().subtract(30, 'day').startOf('day').toISOString(),
+    text: 'Last 28 days',
+    calcFrom: () => dayjs().subtract(28, 'day').startOf('day').toISOString(),
     calcTo: () => '',
+    availableIn: ['team', 'enterprise'],
   },
 ]
+
+export const createFilteredDatePickerHelpers = (planId: PlanId) => {
+  return REPORTS_DATEPICKER_HELPERS.map((helper) => ({
+    ...helper,
+    disabled: !helper.availableIn.includes(planId),
+  }))
+}
 
 export const DEFAULT_QUERY_PARAMS = {
   iso_timestamp_start: REPORTS_DATEPICKER_HELPERS[0].calcFrom(),
@@ -281,6 +309,8 @@ limit 12
         queryType: 'db',
         sql: (_params, where, orderBy) => `
 -- Most frequently called queries
+set search_path to public, extensions;
+
 select
     auth.rolname,
     statements.query,
@@ -306,6 +336,8 @@ select
         queryType: 'db',
         sql: (_, where, orderBy) => `
 -- Most time consuming queries
+set search_path to public, extensions;
+
 select
     auth.rolname,
     statements.query,
@@ -322,6 +354,8 @@ select
         queryType: 'db',
         sql: (_params, where, orderBy) => `
 -- Slowest queries by max execution time
+set search_path to public, extensions;
+
 select
     auth.rolname,
     statements.query,
@@ -371,7 +405,7 @@ select
         (SELECT 
           pg_catalog.pg_namespace.nspname AS SCHEMA_NAME,
           relname,
-          pg_relation_size(pg_catalog.pg_class.oid) AS table_size
+          pg_total_relation_size(pg_catalog.pg_class.oid) AS table_size
         FROM pg_catalog.pg_class
         JOIN pg_catalog.pg_namespace ON relnamespace = pg_catalog.pg_namespace.oid
         ) t
@@ -382,3 +416,16 @@ select
     },
   },
 }
+
+export const DEPRECATED_REPORTS = [
+  'total_realtime_ingress',
+  'total_rest_options_requests',
+  'total_auth_ingress',
+  'total_auth_get_requests',
+  'total_auth_post_requests',
+  'total_auth_patch_requests',
+  'total_auth_options_requests',
+  'total_storage_options_requests',
+  'total_storage_patch_requests',
+  'total_options_requests',
+]

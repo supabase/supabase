@@ -1,12 +1,13 @@
 import type { XYCoord } from 'dnd-core'
+import { Menu, X } from 'lucide-react'
 import { memo, useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
-import { Button, IconMenu, IconX, Toggle } from 'ui'
 
-import type { DragItem, Sort, SupaTable } from 'components/grid/types'
+import type { DragItem, Sort } from 'components/grid/types'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import { Button, Toggle } from 'ui'
 
 export interface SortRowProps {
-  table: SupaTable
   index: number
   columnName: string
   sort: Sort
@@ -15,8 +16,9 @@ export interface SortRowProps {
   onDrag: (dragIndex: number, hoverIndex: number) => void
 }
 
-const SortRow = ({ table, index, columnName, sort, onDelete, onToggle, onDrag }: SortRowProps) => {
-  const column = table.columns.find((x) => x.name === columnName)
+const SortRow = ({ index, columnName, sort, onDelete, onToggle, onDrag }: SortRowProps) => {
+  const snap = useTableEditorTableStateSnapshot()
+  const column = snap.table.columns.find((x) => x.name === columnName)
 
   const ref = useRef<HTMLDivElement>(null)
 
@@ -104,7 +106,7 @@ const SortRow = ({ table, index, columnName, sort, onDelete, onToggle, onDrag }:
       data-handler-id={handlerId}
     >
       <span className="transition-color text-foreground-lighter hover:text-foreground-light">
-        <IconMenu strokeWidth={2} size={16} />
+        <Menu strokeWidth={2} size={16} />
       </span>
       <div className="grow">
         <span className="flex grow items-center gap-1 truncate text-sm text-foreground">
@@ -125,7 +127,7 @@ const SortRow = ({ table, index, columnName, sort, onDelete, onToggle, onDrag }:
         />
       </div>
       <Button
-        icon={<IconX strokeWidth={1.5} size={14} />}
+        icon={<X strokeWidth={1.5} />}
         size="tiny"
         type="text"
         onClick={() => onDelete(columnName)}

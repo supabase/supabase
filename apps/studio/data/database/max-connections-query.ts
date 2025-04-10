@@ -1,7 +1,8 @@
-import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { databaseKeys } from './keys'
 
-export const getMaxConnectionsQuery = () => {
+export const getMaxConnectionsSql = () => {
   const sql = /* SQL */ `show max_connections`
 
   return sql
@@ -14,26 +15,37 @@ export type MaxConnectionsVariables = {
   schema?: string
 }
 
-export type MaxConnectionsData = { maxConnections: number }
+export async function getMaxConnections(
+  { projectRef, connectionString }: MaxConnectionsVariables,
+  signal?: AbortSignal
+) {
+  const sql = getMaxConnectionsSql()
+
+  const { result } = await executeSql(
+    { projectRef, connectionString, sql, queryKey: ['max-connections'] },
+    signal
+  )
+
+  const connections = parseInt(result[0].max_connections)
+
+  return { maxConnections: connections }
+}
+
+export type MaxConnectionsData = Awaited<ReturnType<typeof getMaxConnections>>
 export type MaxConnectionsError = ExecuteSqlError
 
-export const useMaxConnectionsQuery = <TData extends MaxConnectionsData = MaxConnectionsData>(
+export const useMaxConnectionsQuery = <TData = MaxConnectionsData>(
   { projectRef, connectionString }: MaxConnectionsVariables,
-  options: UseQueryOptions<ExecuteSqlData, MaxConnectionsError, TData> = {}
-) => {
-  return useExecuteSqlQuery<TData>(
+  {
+    enabled = true,
+    ...options
+  }: UseQueryOptions<MaxConnectionsData, MaxConnectionsError, TData> = {}
+) =>
+  useQuery<MaxConnectionsData, MaxConnectionsError, TData>(
+    databaseKeys.maxConnections(projectRef),
+    ({ signal }) => getMaxConnections({ projectRef, connectionString }, signal),
     {
-      projectRef,
-      connectionString,
-      sql: getMaxConnectionsQuery(),
-      queryKey: ['max-connections'],
-    },
-    {
-      select: (data: { result: { max_connections: string }[] }) => {
-        const connections = parseInt(data.result[0].max_connections)
-        return { maxConnections: connections } as any
-      },
+      enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )
-}

@@ -1,5 +1,5 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-query'
 import { sortBy } from 'lodash'
 import { useCallback } from 'react'
 
@@ -59,6 +59,7 @@ export async function getTables(
   if (Array.isArray(data) && sortByProperty) {
     return sortBy(data, (t) => t[sortByProperty]) as PostgresTable[]
   }
+
   return data as Omit<PostgresTable, 'columns'>[]
 }
 
@@ -72,7 +73,7 @@ export const useTablesQuery = <TData = TablesData>(
   return useQuery<TablesData, TablesError, TData>(
     tableKeys.list(projectRef, schema, includeColumns),
     ({ signal }) => getTables({ projectRef, connectionString, schema, includeColumns }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', staleTime: 0, ...options }
+    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
 }
 
@@ -89,6 +90,24 @@ export function useGetTables({
   return useCallback(
     (schema?: TablesVariables['schema'], includeColumns?: TablesVariables['includeColumns']) => {
       return queryClient.fetchQuery({
+        queryKey: tableKeys.list(projectRef, schema, includeColumns),
+        queryFn: ({ signal }) =>
+          getTables({ projectRef, connectionString, schema, includeColumns }, signal),
+      })
+    },
+    [connectionString, projectRef, queryClient]
+  )
+}
+
+export function usePrefetchTables({
+  projectRef,
+  connectionString,
+}: Pick<TablesVariables, 'projectRef' | 'connectionString'>) {
+  const queryClient = useQueryClient()
+
+  return useCallback(
+    (schema?: TablesVariables['schema'], includeColumns?: TablesVariables['includeColumns']) => {
+      return queryClient.prefetchQuery({
         queryKey: tableKeys.list(projectRef, schema, includeColumns),
         queryFn: ({ signal }) =>
           getTables({ projectRef, connectionString, schema, includeColumns }, signal),

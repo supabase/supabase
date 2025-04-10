@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 import { analyticsKeys } from './keys'
 
 type WarehouseCollectionsVariables = {
@@ -15,7 +16,7 @@ export async function getWarehouseCollections(
   }
 
   // TODO: Remove type cast when codegen types are fixed
-  const { data, error } = await get(`/v0/projects/{ref}/analytics/warehouse/collections`, {
+  const { data, error } = await get(`/platform/projects/{ref}/analytics/warehouse/collections`, {
     params: { path: { ref: projectRef } },
     signal,
   })
@@ -35,6 +36,6 @@ export const useWarehouseCollectionsQuery = (
     analyticsKeys.warehouseCollections(projectRef),
     ({ signal }) => getWarehouseCollections({ projectRef }, signal),
     {
-      enabled: enabled && !!projectRef,
+      enabled: enabled && !!projectRef && IS_PLATFORM,
     }
   )

@@ -1,8 +1,8 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import pgMeta from '@supabase/pg-meta'
+import { QueryClient, UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { z } from 'zod'
 
-import type { components } from 'data/api'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { privilegeKeys } from './keys'
 
 export type TablePrivilegesVariables = {
@@ -10,33 +10,29 @@ export type TablePrivilegesVariables = {
   connectionString?: string
 }
 
-export type TablePrivilege = components['schemas']['PostgresTablePrivileges']
+export type PgTablePrivileges = z.infer<typeof pgMeta.tablePrivileges.zod>
 
-export async function getTablePrivileges(
+const pgMetaTablePrivilegesList = pgMeta.tablePrivileges.list()
+
+export type TablePrivilegesData = z.infer<typeof pgMetaTablePrivilegesList.zod>
+export type TablePrivilegesError = ExecuteSqlError
+
+async function getTablePrivileges(
   { projectRef, connectionString }: TablePrivilegesVariables,
   signal?: AbortSignal
 ) {
-  if (!projectRef) throw new Error('projectRef is required')
-
-  const headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await get('/platform/pg-meta/{ref}/table-privileges', {
-    params: {
-      path: { ref: projectRef },
-      // this is needed to satisfy the typescript, but it doesn't pass the actual header
-      header: { 'x-connection-encrypted': connectionString! },
+  const { result } = await executeSql(
+    {
+      projectRef,
+      connectionString,
+      sql: pgMetaTablePrivilegesList.sql,
+      queryKey: ['table-privileges'],
     },
-    signal,
-    headers,
-  })
+    signal
+  )
 
-  if (error) throw handleError(error)
-  return data
+  return result as TablePrivilegesData
 }
-
-export type TablePrivilegesData = Awaited<ReturnType<typeof getTablePrivileges>>
-export type TablePrivilegesError = ResponseError
 
 export const useTablePrivilegesQuery = <TData = TablePrivilegesData>(
   { projectRef, connectionString }: TablePrivilegesVariables,
@@ -53,3 +49,10 @@ export const useTablePrivilegesQuery = <TData = TablePrivilegesData>(
       ...options,
     }
   )
+
+export function invalidateTablePrivilegesQuery(
+  client: QueryClient,
+  projectRef: string | undefined
+) {
+  return client.invalidateQueries(privilegeKeys.tablePrivilegesList(projectRef))
+}

@@ -2,10 +2,18 @@
   "name": "icons",
   "main": "./src/icons/index.ts",
   "scripts": {
-    "build:icons": "build-icons --templateSrc=./scripts/exportTemplate.mjs --renderUniqueKey --iconFileExtension=.ts --exportFileName=index.ts"
+    "preinstall": "npx only-allow pnpm",
+    "build:icons": "build-icons --templateSrc=./scripts/exportTemplate.mjs --renderUniqueKey --iconFileExtension=.ts --exportFileName=index.ts",
+    "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "typescript": "^5.5.0",
-    "@supabase/build-icons": "*"
+    "typescript": "~5.5.0",
+    "@supabase/build-icons": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.24"
+  },
+  "peerDependencies": {
+    "react": "*"
   }
 }

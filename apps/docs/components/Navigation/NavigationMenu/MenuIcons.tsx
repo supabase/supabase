@@ -1,4 +1,4 @@
-import { products } from 'shared-data'
+import { PRODUCT_MODULES, products } from 'shared-data'
 
 type HomeMenuIcon = {
   width?: number
@@ -450,7 +450,7 @@ export function IconMenuAI({ width = 16, height = 16, className }: HomeMenuIcon)
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d={products.vector.icon[16]}
+        d={PRODUCT_MODULES.vector.icon[16]}
         stroke="currentColor"
         strokeMiterlimit="10"
         strokeLinecap="round"

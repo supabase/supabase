@@ -1,20 +1,19 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { ChevronDown, Edit, Lock, Trash, Unlock } from 'lucide-react'
 import type { CalculatedColumn } from 'react-data-grid'
+
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconChevronDown,
-  IconEdit,
-  IconLock,
-  IconTrash,
-  IconUnlock,
   Separator,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
-
-import { useDispatch, useTrackedState } from '../../store/Store'
 
 interface ColumnMenuProps {
   column: CalculatedColumn<any, unknown>
@@ -22,57 +21,48 @@ interface ColumnMenuProps {
 }
 
 const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
-  const state = useTrackedState()
-  const dispatch = useDispatch()
-  const { onEditColumn: onEditColumnFunc, onDeleteColumn: onDeleteColumnFunc } = state
+  const tableEditorSnap = useTableEditorStateSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
 
   const columnKey = column.key
 
   function onFreezeColumn() {
-    dispatch({ type: 'FREEZE_COLUMN', payload: { columnKey } })
+    snap.freezeColumn(columnKey)
   }
 
   function onUnfreezeColumn() {
-    dispatch({ type: 'UNFREEZE_COLUMN', payload: { columnKey } })
+    snap.unfreezeColumn(columnKey)
   }
 
   function onEditColumn() {
-    if (onEditColumnFunc) onEditColumnFunc(columnKey)
+    const pgColumn = snap.originalTable.columns.find((c) => c.name === column.name)
+    if (pgColumn) {
+      tableEditorSnap.onEditColumn(pgColumn)
+    }
   }
 
   function onDeleteColumn() {
-    if (onDeleteColumnFunc) onDeleteColumnFunc(columnKey)
+    const pgColumn = snap.originalTable.columns.find((c) => c.name === column.name)
+    if (pgColumn) {
+      tableEditorSnap.onDeleteColumn(pgColumn)
+    }
   }
 
   function renderMenu() {
     return (
       <>
-        {state.editable && onEditColumn !== undefined && (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
+        {snap.editable && (
+          <Tooltip>
+            <TooltipTrigger asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
               <DropdownMenuItem className="space-x-2" onClick={onEditColumn} disabled={isEncrypted}>
-                <IconEdit size="tiny" />
+                <Edit size={14} />
                 <p>Edit column</p>
               </DropdownMenuItem>
-            </Tooltip.Trigger>
+            </TooltipTrigger>
             {isEncrypted && (
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      Encrypted columns cannot be edited
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
+              <TooltipContent side="bottom">Encrypted columns cannot be edited</TooltipContent>
             )}
-          </Tooltip.Root>
+          </Tooltip>
         )}
         <DropdownMenuItem
           className="space-x-2"
@@ -80,21 +70,21 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
         >
           {column.frozen ? (
             <>
-              <IconUnlock size="tiny" />
+              <Unlock size={14} />
               <p>Unfreeze column</p>
             </>
           ) : (
             <>
-              <IconLock size="tiny" />
+              <Lock size={14} />
               <p>Freeze column</p>
             </>
           )}
         </DropdownMenuItem>
-        {state.editable && onDeleteColumn !== undefined && (
+        {snap.editable && (
           <>
             <Separator />
             <DropdownMenuItem className="space-x-2" onClick={onDeleteColumn}>
-              <IconTrash size="tiny" stroke="red" />
+              <Trash size={14} stroke="red" />
               <p>Delete column</p>
             </DropdownMenuItem>
           </>
@@ -107,9 +97,15 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button className="opacity-50 flex" type="text" style={{ padding: '3px' }}>
-            <IconChevronDown />
-          </Button>
+          <Button
+            className="opacity-50 flex"
+            type="text"
+            style={{ padding: '3px' }}
+            onClick={(e) => {
+              e.stopPropagation()
+            }}
+            icon={<ChevronDown />}
+          />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" side="bottom">
           {renderMenu()}

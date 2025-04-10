@@ -1,15 +1,31 @@
-import { Button, ButtonProps, IconCheck, IconClipboard } from 'ui'
-import { copyToClipboard } from 'lib/helpers'
+import { Check, Clipboard } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-export interface CopyButtonProps extends ButtonProps {
-  text: string
+import { copyToClipboard } from 'lib/helpers'
+import { Button, ButtonProps, cn } from 'ui'
+
+type CopyButtonBaseProps = {
   iconOnly?: boolean
   copyLabel?: string
   copiedLabel?: string
+  onCopy?: () => Promise<string> | string
 }
+
+type CopyButtonWithText = CopyButtonBaseProps & {
+  text: string
+  asyncText?: never
+}
+
+type CopyButtonWithAsyncText = CopyButtonBaseProps & {
+  text?: never
+  asyncText: () => Promise<string> | string
+}
+
+export type CopyButtonProps = (CopyButtonWithText | CopyButtonWithAsyncText) & ButtonProps
+
 const CopyButton = ({
   text,
+  asyncText,
   iconOnly = false,
   children,
   onClick,
@@ -27,22 +43,26 @@ const CopyButton = ({
 
   return (
     <Button
-      onClick={(e) => {
+      onClick={async (e) => {
+        const textToCopy = asyncText ? await asyncText() : text
         setShowCopied(true)
-        copyToClipboard(text)
+        await copyToClipboard(textToCopy!)
         onClick?.(e)
       }}
-      icon={
-        showCopied ? (
-          <IconCheck size="tiny" strokeWidth={2} className="text-brand" />
-        ) : (
-          <IconClipboard size="tiny" />
-        )
-      }
       {...props}
+      className={cn(
+        {
+          'px-1': iconOnly,
+        },
+        props.className
+      )}
+      icon={
+        showCopied ? <Check strokeWidth={2} className="text-brand" /> : props.icon ?? <Clipboard />
+      }
     >
       {!iconOnly && <>{children ?? (showCopied ? copiedLabel : copyLabel)}</>}
     </Button>
   )
 }
+
 export default CopyButton

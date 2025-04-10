@@ -1,7 +1,8 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
+import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import type { ResponseError } from 'types'
 
 export type OrganizationAcceptInvitationVariables = {
@@ -35,12 +36,16 @@ export const useOrganizationAcceptInvitationMutation = ({
   >,
   'mutationFn'
 > = {}) => {
+  const queryClient = useQueryClient()
+
   return useMutation<
     OrganizationMemberUpdateData,
     ResponseError,
     OrganizationAcceptInvitationVariables
   >((vars) => acceptOrganizationInvitation(vars), {
     async onSuccess(data, variables, context) {
+      await invalidateOrganizationsQuery(queryClient)
+
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

@@ -135,7 +135,7 @@ const genWhereStatement = (table: LogsTableName, filters: Filters) => {
   }
 }
 
-export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
+export const genDefaultQuery = (table: LogsTableName, filters: Filters, limit: number = 100) => {
   const where = genWhereStatement(table, filters)
   const joins = genCrossJoinUnnests(table)
   const orderBy = 'order by timestamp desc'
@@ -145,12 +145,12 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
       if (IS_PLATFORM === false) {
         return `
 -- local dev edge_logs query
-select id, edge_logs.timestamp, event_message, request.method, request.path, response.status_code 
-from edge_logs 
+select id, edge_logs.timestamp, event_message, request.method, request.path, response.status_code
+from edge_logs
 ${joins}
 ${where}
 ${orderBy}
-limit 100;
+limit ${limit};
 `
       }
       return `select id, identifier, timestamp, event_message, request.method, request.path, response.status_code
@@ -158,7 +158,7 @@ limit 100;
   ${joins}
   ${where}
   ${orderBy}
-  limit 100
+  limit ${limit}
   `
 
     case 'postgres_logs':
@@ -169,14 +169,14 @@ from postgres_logs
 ${joins}
 ${where}
 ${orderBy}
-limit 100
+limit ${limit}
   `
       }
       return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table}
   ${joins}
   ${where}
   ${orderBy}
-  limit 100
+  limit ${limit}
   `
 
     case 'function_logs':
@@ -184,7 +184,7 @@ limit 100
   ${joins}
   ${where}
   ${orderBy}
-  limit 100
+  limit ${limit}
     `
 
     case 'auth_logs':
@@ -192,7 +192,7 @@ limit 100
   ${joins}
   ${where}
   ${orderBy}
-  limit 100
+  limit ${limit}
     `
 
     case 'function_edge_logs':
@@ -200,17 +200,31 @@ limit 100
   ${joins}
   ${where}
   ${orderBy}
-  limit 100
+  limit ${limit}
   `
     case 'supavisor_logs':
-      return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit 100`
+      return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit ${limit}`
 
     default:
       return `select id, ${table}.timestamp, event_message from ${table}
   ${where}
   ${orderBy}
-  limit 100
+  limit ${limit}
   `
+
+    case 'pg_cron_logs':
+      const baseWhere = `where (parsed.application_name = 'pg_cron' OR event_message LIKE '%cron job%')`
+
+      const pgCronWhere = where ? `${baseWhere} AND ${where.substring(6)}` : baseWhere
+
+      return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.query
+from postgres_logs
+  cross join unnest(metadata) as m
+  cross join unnest(m.parsed) as parsed
+${pgCronWhere}
+${orderBy}
+limit ${limit}
+`
   }
 }
 
@@ -306,15 +320,26 @@ export const genChartQuery = (
   filters: Filters
 ) => {
   const [startOffset, trunc] = calcChartStart(params)
-  const where = genWhereStatement(table, filters)
+  let where = genWhereStatement(table, filters)
+  const errorCondition = getErrorCondition(table)
+  const warningCondition = getWarningCondition(table)
+
+  // pg_cron logs are a subset of postgres logs
+  // to calculate the chart, we need to query postgres logs
+  if (table === LogsTableName.PG_CRON) {
+    table = LogsTableName.POSTGRES
+    where = `where (parsed.application_name = 'pg_cron' OR event_message LIKE '%cron job%')`
+  }
 
   let joins = genCrossJoinUnnests(table)
 
-  return `
+  const q = `
 SELECT
 -- log-event-chart
   timestamp_trunc(t.timestamp, ${trunc}) as timestamp,
-  count(t.timestamp) as count
+  count(CASE WHEN NOT (${errorCondition} OR ${warningCondition}) THEN 1 END) as ok_count,
+  count(CASE WHEN ${errorCondition} THEN 1 END) as error_count,
+  count(CASE WHEN ${warningCondition} THEN 1 END) as warning_count,
 FROM
   ${table} t
   ${joins}
@@ -328,6 +353,7 @@ timestamp
 ORDER BY
   timestamp ASC
   `
+  return q
 }
 
 type TsPair = [string | '', string | '']
@@ -444,8 +470,18 @@ export const fillTimeseries = (
   valueKey: string | string[],
   defaultValue: number,
   min?: string,
-  max?: string
+  max?: string,
+  minPointsToFill: number = 20
 ) => {
+  // If we have more points than minPointsToFill, just normalize timestamps and return
+  if (timeseriesData.length > minPointsToFill) {
+    return timeseriesData.map((datum) => {
+      const iso = dayjs.utc(datum[timestampKey]).toISOString()
+      datum[timestampKey] = iso
+      return datum
+    })
+  }
+
   if (timeseriesData.length <= 1 && !(min || max)) return timeseriesData
   const dates: unknown[] = timeseriesData.map((datum) => dayjs.utc(datum[timestampKey]))
 
@@ -466,7 +502,7 @@ export const fillTimeseries = (
   // Intentional throwing of error here to be caught by Sentry, as this would indicate a bug since charts shouldn't be rendering more than 10k data points
   if (diff > 10000) {
     throw new Error(
-      'Data error, filling timeseries dynamically with more than 10k data points degrades performance.'
+      'The selected date range will render more than 10,000 data points within the charts, which will degrade browser performance. Please select a smaller date range.'
     )
   }
 
@@ -531,4 +567,63 @@ const _getTruncation = (date: Dayjs) => {
     3: 'day' as const,
   }[zeroCount]!
   return truncation
+}
+
+export function checkForWithClause(query: string) {
+  const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
+
+  const withClauseRegex = /\b(WITH)\b(?=(?:[^']*'[^']*')*[^']*$)/i
+  return withClauseRegex.test(queryWithoutComments)
+}
+
+export function checkForILIKEClause(query: string) {
+  const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
+
+  const ilikeClauseRegex = /\b(ILIKE)\b(?=(?:[^']*'[^']*')*[^']*$)/i
+  return ilikeClauseRegex.test(queryWithoutComments)
+}
+
+export function checkForWildcard(query: string) {
+  const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
+
+  const queryWithoutCount = queryWithoutComments.replace(/count\(\*\)/gi, '')
+
+  const wildcardRegex = /\*/
+  return wildcardRegex.test(queryWithoutCount)
+}
+
+function getErrorCondition(table: LogsTableName): string {
+  switch (table) {
+    case 'edge_logs':
+      return 'response.status_code >= 500'
+    case 'postgres_logs':
+      return "parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')"
+    case 'auth_logs':
+      return "metadata.level = 'error' OR metadata.status >= 400"
+    case 'function_edge_logs':
+      return 'response.status_code >= 500'
+    case 'function_logs':
+      return "metadata.level IN ('error', 'fatal')"
+    case 'pg_cron_logs':
+      return "parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')"
+    default:
+      return 'false'
+  }
+}
+
+function getWarningCondition(table: LogsTableName): string {
+  switch (table) {
+    case 'edge_logs':
+      return 'response.status_code >= 400 AND response.status_code < 500'
+    case 'postgres_logs':
+      return "parsed.error_severity IN ('WARNING')"
+    case 'auth_logs':
+      return "metadata.level = 'warning'"
+    case 'function_edge_logs':
+      return 'response.status_code >= 400 AND response.status_code < 500'
+    case 'function_logs':
+      return "metadata.level IN ('warning')"
+    default:
+      return 'false'
+  }
 }

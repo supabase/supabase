@@ -1,11 +1,12 @@
-import Link from 'next/link'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
+import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
-import { Button, IconExternalLink, IconTrash } from 'ui'
+import { Trash } from 'lucide-react'
+import { Button } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
 export type CustomDomainDeleteProps = {
@@ -48,18 +49,10 @@ const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProp
 
       <Panel.Content className="w-full">
         <div className="flex items-center justify-between">
-          <Button asChild type="default" icon={<IconExternalLink />}>
-            <Link
-              href="https://supabase.com/docs/guides/platform/custom-domains"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Documentation
-            </Link>
-          </Button>
+          <DocsButton href="https://supabase.com/docs/guides/platform/custom-domains" />
           <Button
             type="danger"
-            icon={<IconTrash />}
+            icon={<Trash />}
             onClick={() => setIsDeleteConfirmModalVisible(true)}
           >
             Delete Custom Domain

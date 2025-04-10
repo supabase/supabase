@@ -1,11 +1,12 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, noop } from 'lodash'
+import { Edit3, MoreVertical, Trash } from 'lucide-react'
 import Image from 'next/legacy/image'
 
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseHooksQuery } from 'data/database-triggers/database-triggers-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
@@ -17,9 +18,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconEdit3,
-  IconMoreVertical,
-  IconTrash,
 } from 'ui'
 
 export interface HookListProps {
@@ -97,46 +95,36 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
                 {canUpdateWebhook ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button type="default" className="px-1">
-                        <IconMoreVertical />
-                      </Button>
+                      <Button type="default" className="px-1" icon={<MoreVertical />} />
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent side="left">
                       <>
                         <DropdownMenuItem className="space-x-2" onClick={() => editHook(x)}>
-                          <IconEdit3 size="tiny" />
+                          <Edit3 size="14" />
                           <p>Edit hook</p>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="space-x-2" onClick={() => deleteHook(x)}>
-                          <IconTrash stroke="red" size="tiny" />
+                          <Trash stroke="red" size="14" />
                           <p>Delete hook</p>
                         </DropdownMenuItem>
                       </>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger asChild>
-                      <Button disabled type="default" icon={<IconMoreVertical />} />
-                    </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                      <Tooltip.Content side="left">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-alternative py-1 px-2 leading-none shadow',
-                            'border border-background',
-                          ].join(' ')}
-                        >
-                          <span className="text-xs text-foreground">
-                            You need additional permissions to update webhooks
-                          </span>
-                        </div>
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
+                  <ButtonTooltip
+                    disabled
+                    type="default"
+                    className="px-1"
+                    icon={<MoreVertical />}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: 'You need additional permissions to update webhooks',
+                      },
+                    }}
+                  />
                 )}
               </div>
             </Table.td>

@@ -14,13 +14,11 @@ export interface FileExplorerProps {
   columns: StorageColumn[]
   openedFolders: StorageItem[]
   selectedItems: StorageItemWithColumn[]
-  selectedFilePreview: (StorageItemWithColumn & { previewUrl: string | undefined }) | null
   itemSearchString: string
   onFilesUpload: (event: any, index: number) => void
   onSelectAllItemsInColumn: (index: number) => void
   onSelectColumnEmptySpace: (index: number) => void
   onColumnLoadMore: (index: number, column: StorageColumn) => void
-  onCopyUrl: (name: string, url: string) => void
 }
 
 const FileExplorer = ({
@@ -28,13 +26,11 @@ const FileExplorer = ({
   columns = [],
   openedFolders = [],
   selectedItems = [],
-  selectedFilePreview,
   itemSearchString,
   onFilesUpload = noop,
   onSelectAllItemsInColumn = noop,
   onSelectColumnEmptySpace = noop,
   onColumnLoadMore = noop,
-  onCopyUrl = noop,
 }: FileExplorerProps) => {
   const fileExplorerRef = useRef<any>(null)
 
@@ -50,10 +46,10 @@ const FileExplorer = ({
   return (
     <div
       ref={fileExplorerRef}
-      className="file-explorer flex flex-grow overflow-x-auto justify-between h-full w-full"
+      className="file-explorer flex flex-grow overflow-x-auto justify-between h-full w-full relative"
     >
       <ColumnContextMenu id={CONTEXT_MENU_KEYS.STORAGE_COLUMN} />
-      <ItemContextMenu id={CONTEXT_MENU_KEYS.STORAGE_ITEM} onCopyUrl={onCopyUrl} />
+      <ItemContextMenu id={CONTEXT_MENU_KEYS.STORAGE_ITEM} />
       <FolderContextMenu id={CONTEXT_MENU_KEYS.STORAGE_FOLDER} />
       {view === STORAGE_VIEWS.COLUMNS ? (
         <div className="flex">
@@ -65,13 +61,11 @@ const FileExplorer = ({
               column={column}
               openedFolders={openedFolders}
               selectedItems={selectedItems}
-              selectedFilePreview={selectedFilePreview}
               itemSearchString={itemSearchString}
               onFilesUpload={onFilesUpload}
               onSelectAllItemsInColumn={onSelectAllItemsInColumn}
               onSelectColumnEmptySpace={onSelectColumnEmptySpace}
               onColumnLoadMore={onColumnLoadMore}
-              onCopyUrl={onCopyUrl}
             />
           ))}
         </div>
@@ -84,13 +78,11 @@ const FileExplorer = ({
               view={view}
               column={columns[columns.length - 1]}
               selectedItems={selectedItems}
-              selectedFilePreview={selectedFilePreview}
               itemSearchString={itemSearchString}
               onFilesUpload={onFilesUpload}
               onSelectAllItemsInColumn={onSelectAllItemsInColumn}
               onSelectColumnEmptySpace={onSelectColumnEmptySpace}
               onColumnLoadMore={onColumnLoadMore}
-              onCopyUrl={onCopyUrl}
             />
           )}
         </>

@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, post } from 'data/fetchers'
@@ -11,7 +11,7 @@ export type ColumnPrivilegesGrant = components['schemas']['GrantColumnPrivileges
 export type ColumnPrivilegesGrantVariables = {
   projectRef: string
   connectionString?: string
-  grants: ColumnPrivilegesGrant[]
+  grants: ColumnPrivilegesGrant
 }
 
 export async function grantColumnPrivileges({

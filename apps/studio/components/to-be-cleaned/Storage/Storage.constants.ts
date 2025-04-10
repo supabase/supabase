@@ -1,7 +1,7 @@
-export const URL_EXPIRY_DURATION = {
-  WEEK: 60 * 60 * 24 * 7,
-  MONTH: 60 * 60 * 24 * 30,
-  YEAR: 60 * 60 * 24 * 365,
+export enum URL_EXPIRY_DURATION {
+  WEEK = 60 * 60 * 24 * 7,
+  MONTH = 60 * 60 * 24 * 30,
+  YEAR = 60 * 60 * 24 * 365,
 }
 
 export enum STORAGE_VIEWS {

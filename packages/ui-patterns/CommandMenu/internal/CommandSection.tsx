@@ -1,11 +1,4 @@
-import { type ICommand } from './Command'
-
-type ICommandSection = {
-  id: string
-  name: string
-  forceMount: boolean
-  commands: Array<ICommand>
-}
+import { ICommandSection } from './types'
 
 const toSectionId = (str: string) => str.toLowerCase().replace(/\s+/g, '-')
 
@@ -20,4 +13,3 @@ const section$new = (
 })
 
 export { section$new }
-export type { ICommandSection }

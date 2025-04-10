@@ -27,23 +27,29 @@ const ProductMenu = ({ page, menu }: ProductMenuProps) => {
                   }
                 />
                 <div>
-                  {group.items.map((item) => (
-                    <ProductMenuItem
-                      key={item.key}
-                      url={item.url}
-                      name={item.name}
-                      icon={item.icon}
-                      rightIcon={item.rightIcon}
-                      isActive={page === item.key}
-                      isExternal={item.isExternal}
-                      target={item.isExternal ? '_blank' : '_self'}
-                      label={item.label}
-                    />
-                  ))}
+                  {group.items.map((item) => {
+                    const isActive = !!item.pages
+                      ? item.pages.includes(page ?? '')
+                      : page === item.key
+
+                    return (
+                      <ProductMenuItem
+                        key={item.key}
+                        url={item.url}
+                        name={item.name}
+                        icon={item.icon}
+                        rightIcon={item.rightIcon}
+                        isActive={isActive}
+                        isExternal={item.isExternal}
+                        target={item.isExternal ? '_blank' : '_self'}
+                        label={item.label}
+                      />
+                    )
+                  })}
                 </div>
               </div>
             </div>
-            {idx !== menu.length - 1 && <div className="h-px w-full bg-border-overlay"></div>}
+            {idx !== menu.length - 1 && <div className="h-px w-full bg-border-overlay" />}
           </div>
         ))}
       </Menu>

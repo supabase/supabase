@@ -1,7 +1,13 @@
+import { Download, Move, Trash2, X } from 'lucide-react'
+
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { Button, IconDownload, IconTrash2, IconMove, IconX } from 'ui'
+import { Button } from 'ui'
 
 const FileExplorerHeaderSelection = () => {
+  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
   const storageExplorerStore = useStorageStore()
   const {
     selectedItems,
@@ -15,7 +21,7 @@ const FileExplorerHeaderSelection = () => {
   return (
     <div className="z-10 flex h-[40px] items-center rounded-t-md bg-brand-400 px-2 py-1 shadow [[data-theme*=dark]_&]:bg-brand-500">
       <Button
-        icon={<IconX size={16} strokeWidth={2} />}
+        icon={<X size={16} strokeWidth={2} />}
         type="text"
         onClick={() => clearSelectedItems()}
       />
@@ -25,7 +31,7 @@ const FileExplorerHeaderSelection = () => {
           selected
         </p>
         <Button
-          icon={<IconDownload size={16} strokeWidth={2} />}
+          icon={<Download size={16} strokeWidth={2} />}
           type="primary"
           onClick={async () => {
             if (selectedItems.length === 1) {
@@ -38,20 +44,36 @@ const FileExplorerHeaderSelection = () => {
           Download
         </Button>
         <div className="border-r border-green-900 py-3 opacity-50" />
-        <Button
-          icon={<IconTrash2 size={16} strokeWidth={2} />}
+
+        <ButtonTooltip
+          icon={<Trash2 size={16} strokeWidth={2} />}
           type="primary"
+          disabled={!canUpdateFiles}
           onClick={() => setSelectedItemsToDelete(selectedItems)}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !canUpdateFiles ? 'You need additional permissions to delete files' : undefined,
+            },
+          }}
         >
           Delete
-        </Button>
-        <Button
-          icon={<IconMove size={16} strokeWidth={2} />}
+        </ButtonTooltip>
+
+        <ButtonTooltip
+          icon={<Move size={16} strokeWidth={2} />}
           type="primary"
+          disabled={!canUpdateFiles}
           onClick={() => setSelectedItemsToMove(selectedItems)}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !canUpdateFiles ? 'You need additional permissions to move files' : undefined,
+            },
+          }}
         >
           Move
-        </Button>
+        </ButtonTooltip>
       </div>
     </div>
   )

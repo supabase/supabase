@@ -7,97 +7,7 @@
   },
   {
     "type": "category",
-    "title": "analytics",
-    "items": [
-      {
-        "id": "v1-create-a-warehouse-collection",
-        "title": "Create a warehouse collection",
-        "slug": "v1-create-a-warehouse-collection",
-        "type": "operation"
-      },
-      {
-        "id": "v1-create-a-warehouse-endpoint",
-        "title": "Create a warehouse endpoint",
-        "slug": "v1-create-a-warehouse-endpoint",
-        "type": "operation"
-      },
-      {
-        "id": "v1-create-a-warehouse-token",
-        "title": "Create a warehouse token",
-        "slug": "v1-create-a-warehouse-token",
-        "type": "operation"
-      },
-      {
-        "id": "v1-delete-a-warehouse-collection",
-        "title": "Delete a warehouse collection",
-        "slug": "v1-delete-a-warehouse-collection",
-        "type": "operation"
-      },
-      {
-        "id": "v1-delete-a-warehouse-endpoint",
-        "title": "Delete a warehouse endpoint",
-        "slug": "v1-delete-a-warehouse-endpoint",
-        "type": "operation"
-      },
-      {
-        "id": "v1-delete-a-warehouse-token",
-        "title": "Delete a warehouse token",
-        "slug": "v1-delete-a-warehouse-token",
-        "type": "operation"
-      },
-      {
-        "id": "v1-get-a-warehouse-collection",
-        "title": "Get a warehouse collection",
-        "slug": "v1-get-a-warehouse-collection",
-        "type": "operation"
-      },
-      {
-        "id": "v1-list-all-warehouse-collections",
-        "title": "List all warehouse collections",
-        "slug": "v1-list-all-warehouse-collections",
-        "type": "operation"
-      },
-      {
-        "id": "v1-list-all-warehouse-endpoints",
-        "title": "List all warehouse endpoints",
-        "slug": "v1-list-all-warehouse-endpoints",
-        "type": "operation"
-      },
-      {
-        "id": "v1-list-all-warehouse-queries",
-        "title": "List all warehouse queries",
-        "slug": "v1-list-all-warehouse-queries",
-        "type": "operation"
-      },
-      {
-        "id": "v1-list-all-warehouse-tokens",
-        "title": "List all warehouse tokens",
-        "slug": "v1-list-all-warehouse-tokens",
-        "type": "operation"
-      },
-      {
-        "id": "v1-provision-a-warehouse-tenant",
-        "title": "Provision a warehouse tenant",
-        "slug": "v1-provision-a-warehouse-tenant",
-        "type": "operation"
-      },
-      {
-        "id": "v1-update-a-warehouse-collection",
-        "title": "Update a warehouse collection",
-        "slug": "v1-update-a-warehouse-collection",
-        "type": "operation"
-      },
-      {
-        "id": "v1-update-a-warehouse-endpoint",
-        "title": "Update a warehouse endpoint",
-        "slug": "v1-update-a-warehouse-endpoint",
-        "type": "operation"
-      }
-    ]
-  },
-  {
-    "type": "category",
-    "title": "auth",
+    "title": "Auth",
     "items": [
       {
         "id": "v1-create-a-sso-provider",
@@ -145,7 +55,7 @@
   },
   {
     "type": "category",
-    "title": "database",
+    "title": "Database",
     "items": [
       {
         "id": "v1-disable-readonly-mode-temporarily",
@@ -259,7 +169,7 @@
   },
   {
     "type": "category",
-    "title": "domains",
+    "title": "Domains",
     "items": [
       {
         "id": "v1-activate-custom-hostname",
@@ -313,12 +223,30 @@
   },
   {
     "type": "category",
-    "title": "edge functions",
+    "title": "Edge Functions",
     "items": [
+      {
+        "id": "v1-bulk-update-functions",
+        "title": "Bulk update functions",
+        "slug": "v1-bulk-update-functions",
+        "type": "operation"
+      },
+      {
+        "id": "v1-create-a-function",
+        "title": "Create a function",
+        "slug": "v1-create-a-function",
+        "type": "operation"
+      },
       {
         "id": "v1-delete-a-function",
         "title": "Delete a function",
         "slug": "v1-delete-a-function",
+        "type": "operation"
+      },
+      {
+        "id": "v1-deploy-a-function",
+        "title": "Deploy a function",
+        "slug": "v1-deploy-a-function",
         "type": "operation"
       },
       {
@@ -349,7 +277,7 @@
   },
   {
     "type": "category",
-    "title": "environments",
+    "title": "Environments",
     "items": [
       {
         "id": "v1-create-a-branch",
@@ -382,6 +310,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-push-a-branch",
+        "title": "Push a branch",
+        "slug": "v1-push-a-branch",
+        "type": "operation"
+      },
+      {
         "id": "v1-reset-a-branch",
         "title": "Reset a branch",
         "slug": "v1-reset-a-branch",
@@ -397,7 +331,7 @@
   },
   {
     "type": "category",
-    "title": "oauth",
+    "title": "OAuth",
     "items": [
       {
         "id": "v1-authorize-user",
@@ -410,12 +344,18 @@
         "title": "Exchange oauth token",
         "slug": "v1-exchange-oauth-token",
         "type": "operation"
+      },
+      {
+        "id": "v1-revoke-token",
+        "title": "Revoke token",
+        "slug": "v1-revoke-token",
+        "type": "operation"
       }
     ]
   },
   {
     "type": "category",
-    "title": "organizations",
+    "title": "Organizations",
     "items": [
       {
         "id": "v1-create-an-organization",
@@ -445,8 +385,14 @@
   },
   {
     "type": "category",
-    "title": "projects",
+    "title": "Projects",
     "items": [
+      {
+        "id": "v1-cancel-a-project-restoration",
+        "title": "Cancel a project restoration",
+        "slug": "v1-cancel-a-project-restoration",
+        "type": "operation"
+      },
       {
         "id": "v1-create-a-project",
         "title": "Create a project",
@@ -472,15 +418,21 @@
         "type": "operation"
       },
       {
-        "id": "v1-get-postgrest-upgrade-eligibility",
-        "title": "Get postgrest upgrade eligibility",
-        "slug": "v1-get-postgrest-upgrade-eligibility",
+        "id": "v1-get-postgres-upgrade-eligibility",
+        "title": "Get postgres upgrade eligibility",
+        "slug": "v1-get-postgres-upgrade-eligibility",
         "type": "operation"
       },
       {
-        "id": "v1-get-postgrest-upgrade-status",
-        "title": "Get postgrest upgrade status",
-        "slug": "v1-get-postgrest-upgrade-status",
+        "id": "v1-get-postgres-upgrade-status",
+        "title": "Get postgres upgrade status",
+        "slug": "v1-get-postgres-upgrade-status",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project",
+        "title": "Get project",
+        "slug": "v1-get-project",
         "type": "operation"
       },
       {
@@ -502,6 +454,24 @@
         "type": "operation"
       },
       {
+        "id": "v1-list-available-restore-versions",
+        "title": "List available restore versions",
+        "slug": "v1-list-available-restore-versions",
+        "type": "operation"
+      },
+      {
+        "id": "v1-pause-a-project",
+        "title": "Pause a project",
+        "slug": "v1-pause-a-project",
+        "type": "operation"
+      },
+      {
+        "id": "v1-restore-a-project",
+        "title": "Restore a project",
+        "slug": "v1-restore-a-project",
+        "type": "operation"
+      },
+      {
         "id": "v1-update-network-restrictions",
         "title": "Update network restrictions",
         "slug": "v1-update-network-restrictions",
@@ -517,7 +487,7 @@
   },
   {
     "type": "category",
-    "title": "rest",
+    "title": "Rest",
     "items": [
       {
         "id": "v1-get-postgrest-service-config",
@@ -535,7 +505,7 @@
   },
   {
     "type": "category",
-    "title": "secrets",
+    "title": "Secrets",
     "items": [
       {
         "id": "v1-bulk-create-secrets",
@@ -577,12 +547,24 @@
   },
   {
     "type": "category",
-    "title": "storage",
+    "title": "Storage",
     "items": [
+      {
+        "id": "v1-get-storage-config",
+        "title": "Get storage config",
+        "slug": "v1-get-storage-config",
+        "type": "operation"
+      },
       {
         "id": "v1-list-all-buckets",
         "title": "List all buckets",
         "slug": "v1-list-all-buckets",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-storage-config",
+        "title": "Update storage config",
+        "slug": "v1-update-storage-config",
         "type": "operation"
       }
     ]

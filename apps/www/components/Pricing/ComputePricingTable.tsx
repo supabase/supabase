@@ -2,6 +2,7 @@ import React, { Fragment, useMemo } from 'react'
 import pricingAddOn from '~/data/PricingAddOnTable.json'
 import { IconPricingIncludedCheck, IconPricingMinus } from './PricingIcons'
 import { cn } from 'ui'
+import Link from 'next/link'
 
 const ComputePricingTable = () => {
   const columnNames = useMemo(
@@ -46,10 +47,18 @@ const ComputePricingTable = () => {
                     <td key={column.key} className="p-3">
                       {column.key === 'dedicated' ? (
                         column.value ? (
-                          <IconPricingIncludedCheck plan="Pro plan" />
+                          <IconPricingIncludedCheck plan="Pro Plan" />
                         ) : (
-                          <IconPricingMinus plan="Free plan" />
+                          <IconPricingMinus plan="Free Plan" />
                         )
+                      ) : column.url ? (
+                        <Link
+                          href={column.url}
+                          className="underline text-brand hover:text-brand-600"
+                          target="_blank"
+                        >
+                          {column.value}
+                        </Link>
                       ) : (
                         column.value
                       )}
@@ -82,9 +91,9 @@ const ComputePricingTable = () => {
                   >
                     {column.key === 'dedicated' ? (
                       column.value ? (
-                        <IconPricingIncludedCheck plan="Pro plan" />
+                        <IconPricingIncludedCheck plan="Pro Plan" />
                       ) : (
-                        <IconPricingMinus plan="Free plan" />
+                        <IconPricingMinus plan="Free Plan" />
                       )
                     ) : (
                       column.value

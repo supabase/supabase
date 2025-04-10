@@ -1,7 +1,8 @@
 import Param from '~/components/Params'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
-import { GuideTemplate, MDXRemoteGuides, newEditLink } from '~/features/docs/GuidesMdx.template'
-import { getStorageConfigV0 } from '~/lib/mdx/getConfig'
+import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { MDXRemoteBase } from '~/features/docs/MdxBase'
+import specStorageV0 from '~/spec/storage_v0_config.yaml' with { type: 'yml' }
 
 const meta = {
   title: 'Storage Self-hosting Config',
@@ -14,20 +15,19 @@ const generateMetadata = genGuideMeta(() => ({
 }))
 
 const StorageConfigPage = async () => {
-  const spec = getStorageConfigV0()
-  const descriptionMdx = spec.info.description
+  const descriptionMdx = specStorageV0.info.description
 
   return (
     <GuideTemplate
       meta={meta}
       editLink={newEditLink(
-        'supabase/supabase/blob/master/apps/docs/pages/guides/self-hosting/storage/config.tsx'
+        'supabase/supabase/blob/master/apps/docs/app/guides/(with-sidebar)/self-hosting/storage/config/page.tsx'
       )}
     >
-      <MDXRemoteGuides source={descriptionMdx} />
+      <MDXRemoteBase source={descriptionMdx} />
 
       <div>
-        {spec.info.tags.map((tag: ReturnType<typeof getStorageConfigV0>['info']['tags']) => {
+        {specStorageV0.info.tags.map((tag: ReturnType<typeof specStorageV0>['info']['tags']) => {
           return (
             <>
               <h2 className="text-foreground">{tag.title}</h2>
@@ -35,11 +35,11 @@ const StorageConfigPage = async () => {
               <div className="not-prose">
                 <h5 className="text-base text-foreground mb-3">Parameters</h5>
                 <ul>
-                  {spec.parameters
-                    .filter((param: ReturnType<typeof getStorageConfigV0>['parameters']) =>
+                  {specStorageV0.parameters
+                    .filter((param: ReturnType<typeof specStorageV0>['parameters']) =>
                       param.tags.includes(tag.id)
                     )
-                    .map((param: ReturnType<typeof getStorageConfigV0>['parameters']) => {
+                    .map((param: ReturnType<typeof specStorageV0>['parameters']) => {
                       return (
                         <Param
                           name={param.title}

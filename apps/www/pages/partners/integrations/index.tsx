@@ -1,7 +1,8 @@
+import { Loader, Search } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { IconLoader, IconSearch, Input } from 'ui'
+import { Input } from 'ui'
 import { useDebounce } from 'use-debounce'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -117,7 +118,7 @@ function IntegrationPartnersPage(props: Props) {
 
                 <Input
                   size="small"
-                  icon={<IconSearch />}
+                  icon={<Search />}
                   placeholder="Search..."
                   type="text"
                   value={search}
@@ -125,7 +126,7 @@ function IntegrationPartnersPage(props: Props) {
                   actions={
                     isSearching && (
                       <span className="mr-1 animate-spin text-white">
-                        <IconLoader />
+                        <Loader />
                       </span>
                     )
                   }
@@ -147,29 +148,6 @@ function IntegrationPartnersPage(props: Props) {
                 <div className="space-y-4">
                   <div className="text-foreground-lighter mb-2 text-sm">Explore more</div>
                   <div className="grid grid-cols-2 gap-8 lg:grid-cols-1">
-                    <PartnerLinkBox
-                      title="Experts"
-                      color="blue"
-                      description="Explore our certified Supabase agency experts that build with Supabase"
-                      href={`/partners/experts`}
-                      icon={
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-6 w-6"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth="1"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                          />
-                        </svg>
-                      }
-                    />
-
                     <PartnerLinkBox
                       href={`/partners/integrations#become-a-partner`}
                       title="Become a partner"

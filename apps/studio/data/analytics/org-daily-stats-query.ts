@@ -1,8 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { get, handleError } from 'data/fetchers'
 import type { AnalyticsData } from './constants'
 import { analyticsKeys } from './keys'
 
@@ -13,6 +12,7 @@ export enum EgressType {
   REALTIME = 'egress_realtime',
   FUNCTIONS = 'egress_functions',
   SUPAVISOR = 'egress_supavisor',
+  LOGDRAIN = 'egress_logdrain',
   UNIFIED = 'egress',
 }
 
@@ -21,10 +21,12 @@ export enum PricingMetric {
   EGRESS = 'EGRESS',
   DATABASE_SIZE = 'DATABASE_SIZE',
   STORAGE_SIZE = 'STORAGE_SIZE',
+  DISK_SIZE_GB_HOURS_GP3 = 'DISK_SIZE_GB_HOURS_GP3',
+  DISK_SIZE_GB_HOURS_IO2 = 'DISK_SIZE_GB_HOURS_IO2',
   MONTHLY_ACTIVE_USERS = 'MONTHLY_ACTIVE_USERS',
   MONTHLY_ACTIVE_SSO_USERS = 'MONTHLY_ACTIVE_SSO_USERS',
+  MONTHLY_ACTIVE_THIRD_PARTY_USERS = 'MONTHLY_ACTIVE_THIRD_PARTY_USERS',
   FUNCTION_INVOCATIONS = 'FUNCTION_INVOCATIONS',
-  FUNCTION_COUNT = 'FUNCTION_COUNT',
   STORAGE_IMAGES_TRANSFORMED = 'STORAGE_IMAGES_TRANSFORMED',
   REALTIME_MESSAGE_COUNT = 'REALTIME_MESSAGE_COUNT',
   REALTIME_PEAK_CONNECTIONS = 'REALTIME_PEAK_CONNECTIONS',
@@ -33,6 +35,13 @@ export enum PricingMetric {
   PITR_7 = 'PITR_7',
   PITR_14 = 'PITR_14',
   PITR_28 = 'PITR_28',
+  DISK_IOPS_GP3 = 'DISK_IOPS_GP3',
+  DISK_IOPS_IO2 = 'DISK_IOPS_IO2',
+  DISK_THROUGHPUT_GP3 = 'DISK_THROUGHPUT_GP3',
+  LOG_DRAIN = 'LOG_DRAIN',
+  LOG_DRAIN_EVENTS = 'LOG_DRAIN_EVENTS',
+  AUTH_MFA_PHONE = 'AUTH_MFA_PHONE',
+  AUTH_MFA_WEB_AUTHN = 'AUTH_MFA_WEB_AUTHN',
 }
 
 export enum ComputeUsageMetric {
@@ -98,16 +107,23 @@ export async function getOrgDailyStats(
   if (!startDate) throw new Error('Start date is required')
   if (!endDate) throw new Error('Start date is required')
 
-  let endpoint = `${API_URL}/organizations/${orgSlug}/daily-stats?metric=${metric}&startDate=${encodeURIComponent(
-    startDate
-  )}&endDate=${encodeURIComponent(endDate)}`
+  const { data, error } = await get('/platform/organizations/{slug}/daily-stats', {
+    params: {
+      path: { slug: orgSlug },
+      query: {
+        metric,
+        startDate,
+        endDate,
+        interval,
+        projectRef,
+      },
+    },
+    signal,
+  })
 
-  if (interval) endpoint += `&interval=${interval}`
-  if (projectRef) endpoint += `&projectRef=${projectRef}`
+  if (error) handleError(error)
 
-  const data = await get(endpoint, { signal })
-  if (data.error) throw data.error
-  return data as AnalyticsData
+  return data as unknown as AnalyticsData
 }
 
 export type OrgDailyStatsData = Awaited<ReturnType<typeof getOrgDailyStats>>

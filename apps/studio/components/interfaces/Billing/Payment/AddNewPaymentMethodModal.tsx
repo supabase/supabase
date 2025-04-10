@@ -3,7 +3,7 @@ import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Modal } from 'ui'
 
 import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
@@ -17,6 +17,8 @@ interface AddNewPaymentMethodModalProps {
   returnUrl: string
   onCancel: () => void
   onConfirm: () => void
+  showSetDefaultCheckbox?: boolean
+  autoMarkAsDefaultPaymentMethod?: boolean
 }
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
@@ -26,6 +28,8 @@ const AddNewPaymentMethodModal = ({
   returnUrl,
   onCancel,
   onConfirm,
+  showSetDefaultCheckbox,
+  autoMarkAsDefaultPaymentMethod,
 }: AddNewPaymentMethodModalProps) => {
   const { resolvedTheme } = useTheme()
   const [intent, setIntent] = useState<any>()
@@ -137,6 +141,8 @@ const AddNewPaymentMethodModal = ({
             returnUrl={returnUrl}
             onCancel={onLocalCancel}
             onConfirm={onLocalConfirm}
+            showSetDefaultCheckbox={showSetDefaultCheckbox}
+            autoMarkAsDefaultPaymentMethod={autoMarkAsDefaultPaymentMethod}
           />
         </Elements>
       </Modal>

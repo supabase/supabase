@@ -14,18 +14,20 @@ export interface RealtimeLayoutProps {
 
 const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutProps>) => {
   const project = useSelectedProject()
+  const enableRealtimeSettings = useFlag('enableRealtimeSettings')
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
-
-  const authzEnabled = useFlag('authzRealtime')
 
   return (
     <ProjectLayout
       title={title}
       product="Realtime"
       productMenu={
-        <ProductMenu page={page} menu={generateRealtimeMenu(project!, { authzEnabled })} />
+        <ProductMenu
+          page={page}
+          menu={generateRealtimeMenu(project!, { enableRealtimeSettings })}
+        />
       }
     >
       {children}

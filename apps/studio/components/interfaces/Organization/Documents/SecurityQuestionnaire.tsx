@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Download } from 'lucide-react'
 import Link from 'next/link'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Button } from 'ui'
 
 import {
@@ -51,7 +51,7 @@ const SecurityQuestionnaire = () => {
           <p className="text-base m-0">Standard Security Questionnaire</p>
           <div className="space-y-2 text-sm text-foreground-light m-0">
             <p>
-              Organizations on Teams plan or above have access to our standard security
+              Organizations on Team Plan or above have access to our standard security
               questionnaire.
             </p>
           </div>
@@ -74,8 +74,10 @@ const SecurityQuestionnaire = () => {
               {isSuccess && (
                 <div className="flex items-center justify-center h-full">
                   {currentPlan?.id === 'free' || currentPlan?.id === 'pro' ? (
-                    <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
-                      <Button type="default">Upgrade to Teams</Button>
+                    <Link
+                      href={`/org/${slug}/billing?panel=subscriptionPlan&source=securityQuestionnaire`}
+                    >
+                      <Button type="default">Upgrade to Team</Button>
                     </Link>
                   ) : (
                     <Button

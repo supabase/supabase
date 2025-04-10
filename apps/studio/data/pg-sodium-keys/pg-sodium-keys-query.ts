@@ -1,5 +1,5 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
-import { Query } from 'components/grid/query/Query'
+import { Query } from '@supabase/pg-meta/src/query'
 import { sortBy } from 'lodash'
 import { executeSql } from '../sql/execute-sql-query'
 import { pgSodiumKeys } from './keys'
@@ -49,7 +49,7 @@ export type PgSodiumKeysError = unknown
 
 export const usePgSodiumKeysQuery = <TData = PgSodiumKeysData>(
   { projectRef, connectionString }: PgSodiumKeysVariables,
-  { enabled, ...options }: UseQueryOptions<PgSodiumKeysData, PgSodiumKeysError, TData> = {}
+  { enabled = true, ...options }: UseQueryOptions<PgSodiumKeysData, PgSodiumKeysError, TData> = {}
 ) =>
   useQuery<PgSodiumKeysData, PgSodiumKeysError, TData>(
     pgSodiumKeys.list(projectRef),

@@ -1,9 +1,9 @@
 import pgMeta from '@supabase/pg-meta'
-import { QueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 
-import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from 'data/sql/execute-sql-query'
-import { sqlKeys } from 'data/sql/keys'
+import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { databaseKeys } from './keys'
 
 export type SchemasVariables = {
   projectRef?: string
@@ -17,25 +17,45 @@ const pgMetaSchemasList = pgMeta.schemas.list()
 export type SchemasData = z.infer<typeof pgMetaSchemasList.zod>
 export type SchemasError = ExecuteSqlError
 
-export const useSchemasQuery = <TData = SchemasData>(
+export async function getSchemas(
   { projectRef, connectionString }: SchemasVariables,
-  options: UseQueryOptions<ExecuteSqlData, SchemasError, TData> = {}
-) =>
-  useExecuteSqlQuery(
+  signal?: AbortSignal
+) {
+  const { result } = await executeSql(
     {
       projectRef,
       connectionString,
       sql: pgMetaSchemasList.sql,
-      queryKey: ['schemas', 'list'],
+      queryKey: ['schemas'],
     },
+    signal
+  )
+
+  return result
+}
+
+export const useSchemasQuery = <TData = SchemasData>(
+  { projectRef, connectionString }: SchemasVariables,
+  { enabled = true, ...options }: UseQueryOptions<SchemasData, SchemasError, TData> = {}
+) =>
+  useQuery<SchemasData, SchemasError, TData>(
+    databaseKeys.schemas(projectRef),
+    ({ signal }) => getSchemas({ projectRef, connectionString }, signal),
     {
-      select(data) {
-        return data.result
-      },
+      enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )
 
 export function invalidateSchemasQuery(client: QueryClient, projectRef: string | undefined) {
-  return client.invalidateQueries(sqlKeys.query(projectRef, ['schemas', 'list']))
+  return client.invalidateQueries(databaseKeys.schemas(projectRef))
+}
+
+export function prefetchSchemas(
+  client: QueryClient,
+  { projectRef, connectionString }: SchemasVariables
+) {
+  return client.fetchQuery(databaseKeys.schemas(projectRef), ({ signal }) =>
+    getSchemas({ projectRef, connectionString }, signal)
+  )
 }

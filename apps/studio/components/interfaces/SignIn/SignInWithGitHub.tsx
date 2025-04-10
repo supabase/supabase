@@ -1,14 +1,18 @@
+import * as Sentry from '@sentry/nextjs'
 import { Github } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
-import * as Sentry from '@sentry/nextjs'
+import { toast } from 'sonner'
 
 import { BASE_PATH } from 'lib/constants'
+
+import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button } from 'ui'
+import { LastSignInWrapper } from './LastSignInWrapper'
 
 const SignInWithGitHub = () => {
   const [loading, setLoading] = useState(false)
+  const [_, setLastSignInUsed] = useLastSignIn()
 
   async function handleGithubSignIn() {
     setLoading(true)
@@ -20,16 +24,16 @@ const SignInWithGitHub = () => {
           process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
             ? location.origin
             : process.env.NEXT_PUBLIC_SITE_URL
-        }${BASE_PATH}/sign-in-mfa`
+        }${BASE_PATH}/sign-in-mfa?method=github`
       )
 
       const { error } = await auth.signInWithOAuth({
         provider: 'github',
-        options: {
-          redirectTo,
-        },
+        options: { redirectTo },
       })
+
       if (error) throw error
+      else setLastSignInUsed('github')
     } catch (error: any) {
       toast.error(`Failed to sign in via GitHub: ${error.message}`)
       Sentry.captureMessage('[CRITICAL] Failed to sign in via GH: ' + error.message)
@@ -38,17 +42,19 @@ const SignInWithGitHub = () => {
   }
 
   return (
-    <Button
-      block
-      onClick={handleGithubSignIn}
-      // set the width to 20 so that it matches the loading spinner and don't push the text when loading
-      icon={<Github width={20} height={18} />}
-      size="large"
-      type="default"
-      loading={loading}
-    >
-      Continue with GitHub
-    </Button>
+    <LastSignInWrapper type="github">
+      <Button
+        block
+        onClick={handleGithubSignIn}
+        // set the width to 20 so that it matches the loading spinner and don't push the text when loading
+        icon={<Github width={20} height={18} />}
+        size="large"
+        type="default"
+        loading={loading}
+      >
+        Continue with GitHub
+      </Button>
+    </LastSignInWrapper>
   )
 }
 

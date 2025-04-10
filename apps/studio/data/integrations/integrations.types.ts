@@ -156,11 +156,8 @@ export type IntegrationProjectConnection = {
   foreign_project_id: string
   organization_integration_id: string
   env_sync_targets?: string[]
+  public_env_var_prefix?: string
   metadata: Imetadata
-}
-
-export type IntegrationsVariables = {
-  orgSlug?: string
 }
 
 export type IntegrationProjectConnectionPayload = {
@@ -176,7 +173,6 @@ export type userDetails = {
   primary_email: string
 }
 type addedBy = userDetails
-type updatedBy = userDetails
 
 export type IntegrationName = 'Vercel' | 'GitHub' // | 'Netlify'
 export type VercelAccountType = 'Team' | 'Personal'
@@ -272,4 +268,5 @@ export type UpdateConnectionPayload = {
   id: string
   organizationIntegrationId: string
   envSyncTargets: EnvironmentTargets[]
+  publicEnvVarPrefix?: string
 }

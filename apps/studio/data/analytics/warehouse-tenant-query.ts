@@ -1,7 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { analyticsKeys } from './keys'
 import { get, handleError } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 import { ResponseError } from 'types'
+import { analyticsKeys } from './keys'
 
 export type WarehouseTenantVariables = {
   projectRef: string
@@ -16,7 +17,7 @@ export async function getWarehouseTenant(
   if (!projectRef) {
     throw new Error('projectRef is required')
   }
-  const { data, error } = await get(`/v0/projects/{ref}/analytics/warehouse/tenant`, {
+  const { data, error } = await get(`/platform/projects/{ref}/analytics/warehouse/tenant`, {
     params: { path: { ref: projectRef } },
     signal,
   })
@@ -41,7 +42,7 @@ export const useWarehouseTenantQuery = <TData = WarehouseTenantData>(
     analyticsKeys.warehouseTenant(projectRef),
     ({ signal }) => getWarehouseTenant({ projectRef }, signal),
     {
-      enabled: enabled && !!projectRef,
+      enabled: enabled && !!projectRef && IS_PLATFORM,
       staleTime: Infinity,
       // 2H mins cache time
       cacheTime: 120 * 60 * 1000,

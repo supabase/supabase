@@ -1,11 +1,14 @@
+import { Download } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
+import { DocsButton } from 'components/ui/DocsButton'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { generateTypes } from 'data/projects/project-type-generation-query'
-import { Button, IconDownload, IconExternalLink } from 'ui'
+import { Button } from 'ui'
 
 interface Props {
   selectedLang: 'bash' | 'js'
@@ -15,10 +18,12 @@ export default function GeneratingTypes({ selectedLang }: Props) {
   const { ref } = useParams()
   const [isGeneratingTypes, setIsGeneratingTypes] = useState(false)
 
+  const { data: config } = useProjectPostgrestConfigQuery({ projectRef: ref })
+
   const onClickGenerateTypes = async () => {
     try {
       setIsGeneratingTypes(true)
-      const res = await generateTypes({ ref })
+      const res = await generateTypes({ ref, included_schemas: config?.db_schema })
       let element = document.createElement('a')
       element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(res.types))
       element.setAttribute('download', 'supabase.ts')
@@ -38,15 +43,7 @@ export default function GeneratingTypes({ selectedLang }: Props) {
     <>
       <h2 className="doc-heading flex items-center justify-between">
         <span>Generating types</span>
-        <Button asChild type="default" icon={<IconExternalLink />}>
-          <Link
-            href="https://supabase.com/docs/guides/database/api/generating-types"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Documentation
-          </Link>
-        </Button>
+        <DocsButton href="https://supabase.com/docs/guides/database/api/generating-types" />
       </h2>
       <div className="doc-section">
         <article className="code-column text-foreground">
@@ -73,7 +70,7 @@ export default function GeneratingTypes({ selectedLang }: Props) {
                   type="default"
                   disabled={isGeneratingTypes}
                   loading={isGeneratingTypes}
-                  icon={<IconDownload strokeWidth={1.5} />}
+                  icon={<Download strokeWidth={1.5} />}
                   onClick={onClickGenerateTypes}
                 >
                   Generate and download types

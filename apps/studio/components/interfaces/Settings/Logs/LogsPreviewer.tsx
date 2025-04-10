@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { Rewind } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
@@ -13,12 +14,15 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Button } from 'ui'
-import LogEventChart from './LogEventChart'
 import LogTable from './LogTable'
 import { LOGS_TABLES, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
-import { ensureNoTimestampConflict, maybeShowUpgradePrompt } from './Logs.utils'
+import { maybeShowUpgradePrompt } from './Logs.utils'
 import UpgradePrompt from './UpgradePrompt'
+import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
+import useSingleLog from 'hooks/analytics/useSingleLog'
+import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
+import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 /**
  * Acts as a container component for the entire log display
@@ -36,6 +40,8 @@ interface LogsPreviewerProps {
   filterOverride?: Filters
   condensedLayout?: boolean
   tableName?: LogsTableName
+  EmptyState?: React.ReactNode
+  filterPanelClassName?: string
 }
 export const LogsPreviewer = ({
   projectRef,
@@ -44,12 +50,19 @@ export const LogsPreviewer = ({
   condensedLayout = false,
   tableName,
   children,
+  EmptyState,
+  filterPanelClassName,
 }: PropsWithChildren<LogsPreviewerProps>) => {
   const router = useRouter()
-  const { s, ite, its, db } = useParams()
+  const { db } = useParams()
   const [showChart, setShowChart] = useState(true)
+
   const organization = useSelectedOrganization()
   const state = useDatabaseSelectorStateSnapshot()
+  const { search, setSearch, timestampStart, timestampEnd, setTimeRange, filters, setFilters } =
+    useLogsUrlState()
+
+  const [selectedLogId, setSelectedLogId] = useSelectedLog()
 
   const { data: databases, isSuccess } = useReadReplicasQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
@@ -61,44 +74,35 @@ export const LogsPreviewer = ({
     logData,
     params,
     newCount,
-    filters,
     isLoading,
     eventChartData,
     isLoadingOlder,
     loadOlder,
-    setFilters,
     refresh,
-    setParams,
-  } = useLogsPreview(projectRef as string, table, filterOverride)
+  } = useLogsPreview({ projectRef, table, filterOverride })
 
-  const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
-    params.iso_timestamp_start as string
-  )
+  const {
+    data: selectedLog,
+    isLoading: isSelectedLogLoading,
+    error: selectedLogError,
+  } = useSingleLog({
+    projectRef,
+    id: selectedLogId ?? undefined,
+    queryType,
+    paramsToMerge: params,
+  })
 
-  useEffect(() => {
-    setFilters((prev) => ({
-      ...prev,
-      search_query: s as string,
-      database: db as string,
-    }))
-    if (ite || its) {
-      setParams((prev) => ({
-        ...prev,
-        iso_timestamp_start: (its || '') as string,
-        iso_timestamp_end: (ite || '') as string,
-      }))
-    }
-  }, [db, s, ite, its])
+  const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(timestampStart)
 
   // Show the prompt on page load based on query params
   useEffect(() => {
-    if (its) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(its as string, subscription?.plan?.id)
+    if (timestampStart) {
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(timestampStart, subscription?.plan?.id)
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       }
     }
-  }, [its, subscription])
+  }, [timestampStart, subscription])
 
   useEffect(() => {
     if (db !== undefined) {
@@ -117,85 +121,47 @@ export const LogsPreviewer = ({
   }, [db, isSuccess])
 
   const onSelectTemplate = (template: LogTemplate) => {
-    setFilters((prev: any) => ({ ...prev, search_query: template.searchString }))
+    setFilters({ ...filters, search_query: template.searchString })
   }
 
   const handleRefresh = () => {
+    // Call refresh first to ensure we get the count with current timestamps
+    setTimeRange('', '')
     refresh()
-    router.push({
-      pathname: router.pathname,
-      query: {
-        ...router.query,
-        ite: undefined,
-        its: undefined,
-        // ...whereFilters,
-      },
-    })
   }
+
   const handleSearch: LogSearchCallback = async (event, { query, to, from }) => {
     if (event === 'search-input-change') {
-      setFilters((prev) => ({ ...prev, search_query: query }))
-      router.push({
-        pathname: router.pathname,
-        query: { ...router.query, s: query },
-      })
+      setSearch(query || '')
+      setSelectedLogId(null)
     } else if (event === 'event-chart-bar-click') {
-      const [nextStart, nextEnd] = ensureNoTimestampConflict(
-        [params.iso_timestamp_start || '', params.iso_timestamp_end || ''],
-        [from || '', to || '']
-      )
-      setParams((prev) => ({
-        ...prev,
-        iso_timestamp_start: nextStart,
-        iso_timestamp_end: nextEnd,
-      }))
-      router.push({
-        pathname: router.pathname,
-        query: {
-          ...router.query,
-          its: nextStart,
-          ite: nextEnd,
-        },
-      })
+      setTimeRange(from || '', to || '')
     } else if (event === 'datepicker-change') {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, subscription?.plan?.id)
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from || '', subscription?.plan?.id)
 
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       } else {
-        setParams((prev) => ({
-          ...prev,
-          iso_timestamp_start: from || '',
-          iso_timestamp_end: to || '',
-        }))
-        router.push({
-          pathname: router.pathname,
-          query: {
-            ...router.query,
-            its: from || '',
-            ite: to || '',
-          },
-        })
+        setTimeRange(from || '', to || '')
       }
     }
   }
 
   return (
-    <div className="flex flex-col flex-grow h-full">
+    <div className="flex-1 flex flex-col h-full">
       <PreviewFilterPanel
+        className={filterPanelClassName}
         csvData={logData}
         isLoading={isLoading}
         newCount={newCount}
         onRefresh={handleRefresh}
         onSearch={handleSearch}
-        defaultSearchValue={filters.search_query as string}
-        defaultToValue={params.iso_timestamp_end}
-        defaultFromValue={params.iso_timestamp_start}
+        defaultSearchValue={search}
+        defaultToValue={timestampEnd}
+        defaultFromValue={timestampStart}
         queryUrl={`/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
           params.sql || ''
-        )}&its=${encodeURIComponent(params.iso_timestamp_start || '')}&ite=${encodeURIComponent(
-          params.iso_timestamp_end || ''
-        )}`}
+        )}&its=${encodeURIComponent(timestampStart)}&ite=${encodeURIComponent(timestampEnd)}`}
         onSelectTemplate={onSelectTemplate}
         filters={filters}
         onFiltersChange={setFilters}
@@ -204,10 +170,7 @@ export const LogsPreviewer = ({
         isShowingEventChart={showChart}
         onToggleEventChart={() => setShowChart(!showChart)}
         onSelectedDatabaseChange={(id: string) => {
-          setFilters((prev) => ({
-            ...prev,
-            database: id !== projectRef ? undefined : id,
-          }))
+          setFilters({ ...filters, database: id !== projectRef ? id : undefined })
           const { db, ...params } = router.query
           router.push({
             pathname: router.pathname,
@@ -219,27 +182,40 @@ export const LogsPreviewer = ({
       <div
         className={
           'transition-all duration-500 ' +
-          (showChart && !isLoading && logData.length > 0
-            ? 'mb-4 h-24 pt-4 opacity-100'
-            : 'h-0 opacity-0')
+          (showChart && logData.length > 0 ? 'mb-2 mt-1 opacity-100' : 'h-0 opacity-0')
         }
       >
-        <div className={condensedLayout ? 'px-4' : ''}>
-          {!isLoading && showChart && (
-            <LogEventChart
+        <div className={condensedLayout ? 'px-3' : ''}>
+          {showChart && (
+            <LogsBarChart
               data={eventChartData}
-              onBarClick={(isoTimestamp) => {
+              onBarClick={(datum) => {
+                if (!datum?.timestamp) return
+
+                const datumTimestamp = dayjs(datum.timestamp).toISOString()
+
+                const start = dayjs(datumTimestamp).subtract(1, 'minute').toISOString()
+                const end = dayjs(datumTimestamp).add(1, 'minute').toISOString()
+
                 handleSearch('event-chart-bar-click', {
-                  query: filters.search_query as string,
-                  to: isoTimestamp as string,
-                  from: null,
+                  query: filters.search_query?.toString(),
+                  to: end,
+                  from: start,
                 })
               }}
+              EmptyState={
+                <div className="flex flex-col items-center justify-center h-[67px]">
+                  <h2 className="text-foreground-light text-xs">No data</h2>
+                  <p className="text-foreground-lighter text-xs">
+                    It may take up to 24 hours for data to refresh
+                  </p>
+                </div>
+              }
             />
           )}
         </div>
       </div>
-      <div className="relative flex flex-col flex-grow pt-4">
+      <div className="relative flex flex-col flex-grow flex-1 overflow-auto">
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
           <LogTable
@@ -249,27 +225,34 @@ export const LogsPreviewer = ({
             queryType={queryType}
             isHistogramShowing={showChart}
             onHistogramToggle={() => setShowChart(!showChart)}
-            params={params}
             error={error}
+            EmptyState={EmptyState}
+            onSelectedLogChange={(log) => setSelectedLogId(log?.id ?? null)}
+            selectedLog={selectedLog}
+            isSelectedLogLoading={isSelectedLogLoading}
+            selectedLogError={selectedLogError ?? undefined}
           />
         </LoadingOpacity>
-        {!error && (
-          <div className="border-t flex flex-row justify-between p-2">
-            <Button
-              onClick={loadOlder}
-              icon={<Rewind />}
-              type="default"
-              loading={isLoadingOlder}
-              disabled={isLoadingOlder}
-            >
-              Load older
-            </Button>
-            <div className="flex flex-row justify-end mt-2">
-              <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
-            </div>
-          </div>
-        )}
       </div>
+      {!error && logData.length > 0 && (
+        <div className="border-t flex flex-row items-center gap-3 p-2">
+          <Button
+            onClick={loadOlder}
+            icon={<Rewind />}
+            type="default"
+            loading={isLoadingOlder}
+            disabled={isLoadingOlder}
+          >
+            Load older
+          </Button>
+          <div className="text-sm text-foreground-lighter">
+            Showing <span className="font-mono">{logData.length}</span> results
+          </div>
+          <div className="flex flex-row justify-end mt-2">
+            <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

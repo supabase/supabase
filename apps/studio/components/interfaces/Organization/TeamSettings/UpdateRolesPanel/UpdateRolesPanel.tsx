@@ -1,15 +1,15 @@
 import { isEqual } from 'lodash'
-import { ExternalLink, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -36,12 +36,12 @@ import {
   SheetHeader,
   SheetSection,
   Switch,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  WarningIcon,
   cn,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { useGetRolesManagementPermissions } from '../TeamSettings.utils'
 import { UpdateRolesConfirmationModal } from './UpdateRolesConfirmationModal'
 import {
@@ -58,20 +58,18 @@ interface UpdateRolesPanelProps {
 export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelProps) => {
   const { slug } = useParams()
   const organization = useSelectedOrganization()
-  const projectLevelPermissionsEnabled = useFlag('projectLevelPermissions')
+  const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   const { data: projects } = useProjectsQuery()
   const { data: permissions } = usePermissionsQuery()
   const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
 
   // [Joshen] We use the org scoped roles as the source for available roles
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
   const projectScopedRoles = allRoles?.project_scoped_roles ?? []
-  const isEnterprise = subscription?.plan.id === 'enterprise'
 
   const { rolesAddable, rolesRemovable } = useGetRolesManagementPermissions(
-    organization?.id,
+    organization?.slug,
     orgScopedRoles.concat(projectScopedRoles),
     permissions ?? []
   )
@@ -173,19 +171,11 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
               <p className="truncate" title={`Manage access for ${member.username}`}>
                 Manage access for {member.username}
               </p>
-              <Button asChild type="default" icon={<ExternalLink />}>
-                <a
-                  target="_blank"
-                  rel="noreferrer"
-                  href="https://supabase.com/docs/guides/platform/access-control"
-                >
-                  Documentation
-                </a>
-              </Button>
+              <DocsButton href="https://supabase.com/docs/guides/platform/access-control" />
             </SheetHeader>
 
             <SheetSection className="h-full overflow-auto flex flex-col gap-y-4">
-              {projectLevelPermissionsEnabled && isEnterprise && (
+              {isOptedIntoProjectLevelPermissions && (
                 <div className="flex items-center gap-x-4">
                   <Switch
                     disabled={cannotAddAnyRoles}
@@ -253,16 +243,16 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
 
                         <div className="flex items-center gap-x-2">
                           {cannotAddAnyRoles ? (
-                            <Tooltip_Shadcn_>
-                              <TooltipTrigger_Shadcn_ asChild>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
                                 <div className="flex items-center justify-between rounded-md border border-button bg-button px-3 py-2 text-sm h-10 w-56 text-foreground-light">
                                   {role?.name ?? 'Unknown'}
                                 </div>
-                              </TooltipTrigger_Shadcn_>
-                              <TooltipContent_Shadcn_ side="bottom">
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom">
                                 Additional permissions required to update role
-                              </TooltipContent_Shadcn_>
-                            </Tooltip_Shadcn_>
+                              </TooltipContent>
+                            </Tooltip>
                           ) : (
                             <Select_Shadcn_
                               value={(project?.baseRoleId ?? project.roleId).toString()}
@@ -278,44 +268,42 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                               </SelectTrigger_Shadcn_>
                               <SelectContent_Shadcn_>
                                 <SelectGroup_Shadcn_>
-                                  {(orgScopedRoles ?? [])
-                                    .sort((a, b) => sortByObject[a.name] - sortByObject[b.name])
-                                    .map((role) => {
-                                      const canAssignRole = rolesAddable.includes(role.id)
+                                  {(orgScopedRoles ?? []).map((role) => {
+                                    const canAssignRole = rolesAddable.includes(role.id)
 
-                                      return (
-                                        <SelectItem_Shadcn_
-                                          key={role.id}
-                                          value={role.id.toString()}
-                                          className="text-sm"
-                                          disabled={!canAssignRole}
-                                        >
-                                          {role.name}
-                                        </SelectItem_Shadcn_>
-                                      )
-                                    })}
+                                    return (
+                                      <SelectItem_Shadcn_
+                                        key={role.id}
+                                        value={role.id.toString()}
+                                        className="text-sm"
+                                        disabled={!canAssignRole}
+                                      >
+                                        {role.name}
+                                      </SelectItem_Shadcn_>
+                                    )
+                                  })}
                                 </SelectGroup_Shadcn_>
                               </SelectContent_Shadcn_>
                             </Select_Shadcn_>
                           )}
 
                           {!isApplyingRoleToAllProjects && (
-                            <Tooltip_Shadcn_>
-                              <TooltipTrigger_Shadcn_ asChild>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
                                 <Button
                                   type="text"
                                   disabled={!canRemoveRole}
                                   className="px-1"
-                                  icon={<X size={14} />}
+                                  icon={<X />}
                                   onClick={() => onRemoveProject(project?.ref)}
                                 />
-                              </TooltipTrigger_Shadcn_>
+                              </TooltipTrigger>
                               {!canRemoveRole && (
-                                <TooltipContent_Shadcn_ side="bottom">
+                                <TooltipContent side="bottom">
                                   Additional permission required to remove role from member
-                                </TooltipContent_Shadcn_>
+                                </TooltipContent>
                               )}
-                            </Tooltip_Shadcn_>
+                            </Tooltip>
                           )}
                         </div>
                       </div>
@@ -331,7 +319,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                 >
                   <PopoverTrigger_Shadcn_ asChild>
                     <Button type="default" className="w-min">
-                      Assign role to project
+                      Add project
                     </Button>
                   </PopoverTrigger_Shadcn_>
                   <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">

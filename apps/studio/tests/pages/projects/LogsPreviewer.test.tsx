@@ -1,26 +1,27 @@
-import { vi } from 'vitest'
-import { act, findByRole, findByText, fireEvent, screen, waitFor } from '@testing-library/react'
-import { wait } from '@testing-library/user-event/dist/utils'
+import { findByText, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useRouter } from 'next/router'
+import { expect, test, vi } from 'vitest'
 
 dayjs.extend(utc)
 
-import { useParams } from 'common'
 import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { logDataFixture } from '../../fixtures'
 import { render } from '../../helpers'
 
 // [Joshen] There's gotta be a much better way to mock these things so that it applies for ALL tests
 // Since these are easily commonly used things across all pages/components that we might be testing for
-vi.mock('common', () => ({
-  useParams: vi.fn().mockReturnValue({}),
-  useIsLoggedIn: vi.fn(),
-}))
+vi.mock('common', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    useParams: vi.fn().mockReturnValue({}),
+    useIsLoggedIn: vi.fn(),
+    isBrowser: false,
+    LOCAL_STORAGE_KEYS: (actual as any).LOCAL_STORAGE_KEYS,
+  }
+})
 vi.mock('lib/gotrue', () => ({
   auth: { onAuthStateChange: vi.fn() },
 }))

@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { del, handleError } from 'data/fetchers'
@@ -11,7 +11,7 @@ export type ColumnPrivilegesRevoke = components['schemas']['RevokeColumnPrivileg
 export type ColumnPrivilegesRevokeVariables = {
   projectRef: string
   connectionString?: string
-  revokes: ColumnPrivilegesRevoke[]
+  revokes: ColumnPrivilegesRevoke
 }
 
 export async function revokeColumnPrivileges({

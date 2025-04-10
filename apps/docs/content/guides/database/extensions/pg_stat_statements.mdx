@@ -6,16 +6,16 @@ description: 'Track planning and execution statistics of all SQL statements exec
 
 `pg_stat_statements` is a database extension that exposes a view, of the same name, to track statistics about SQL statements executed on the database. The following table shows some of the available statistics and metadata:
 
-| Column Name     | Column Type                      | Description                                                                                                                  |
-| --------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| userid          | oid (references pg_authid.oid)   | OID of user who executed the statement                                                                                       |
-| dbid            | oid (references pg_database.oid) | OID of database in which the statement was executed                                                                          |
-| toplevel        | bool                             | True if the query was executed as a top-level statement (always true if pg_stat_statements.track is set to top)              |
-| queryid         | bigint                           | Hash code to identify identical normalized queries.                                                                          |
-| query           | text                             | Text of a representative statement                                                                                           |
-| plans           | bigint                           | Number of times the statement was planned (if pg_stat_statements.track_planning is enabled, otherwise zero)                  |
-| total_plan_time | double precision                 | Total time spent planning the statement, in milliseconds (if pg_stat_statements.track_planning is enabled, otherwise zero)   |
-| min_plan_time   | double precision                 | Minimum time spent planning the statement, in milliseconds (if pg_stat_statements.track_planning is enabled, otherwise zero) |
+| Column Name       | Column Type                          | Description                                                                                                                  |
+| ----------------- | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `userid`          | `oid` (references `pg_authid.oid`)   | OID of user who executed the statement                                                                                       |
+| `dbid`            | `oid` (references `pg_database.oid`) | OID of database in which the statement was executed                                                                          |
+| `toplevel`        | `bool`                               | True if the query was executed as a top-level statement (always true if pg_stat_statements.track is set to top)              |
+| `queryid`         | `bigint`                             | Hash code to identify identical normalized queries.                                                                          |
+| `query`           | `text`                               | Text of a representative statement                                                                                           |
+| `plans`           | `bigint`                             | Number of times the statement was planned (if pg_stat_statements.track_planning is enabled, otherwise zero)                  |
+| `total_plan_time` | `double precision`                   | Total time spent planning the statement, in milliseconds (if pg_stat_statements.track_planning is enabled, otherwise zero)   |
+| `min_plan_time`   | `double precision`                   | Minimum time spent planning the statement, in milliseconds (if pg_stat_statements.track_planning is enabled, otherwise zero) |
 
 A full list of statistics is available in the [pg_stat_statements docs](https://www.postgresql.org/docs/current/pgstatstatements.html).
 

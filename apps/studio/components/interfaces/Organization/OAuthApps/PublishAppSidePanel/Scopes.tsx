@@ -1,5 +1,7 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
+import { ChevronDown } from 'lucide-react'
 import { Dispatch, PropsWithChildren, SetStateAction } from 'react'
+
 import {
   Button,
   DropdownMenu,
@@ -8,7 +10,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconChevronDown,
 } from 'ui'
 
 const ScopeDropdownCheckboxItem = ({
@@ -72,9 +73,9 @@ const Scope = ({
         <span className="text-foreground text-sm">{title}</span>
         <span className="text-foreground-light text-xs">{description}</span>
       </div>
-      <DropdownMenu>
+      <DropdownMenu modal={true}>
         <DropdownMenuTrigger asChild>
-          <Button type="default" iconRight={<IconChevronDown />}>
+          <Button type="default" iconRight={<ChevronDown />}>
             <p>{accessDescription}</p>
           </Button>
         </DropdownMenuTrigger>
@@ -106,6 +107,14 @@ export const ScopesPanel = ({
 }) => {
   return (
     <div className="-space-y-px">
+      <Scope
+        title="Analytics"
+        description="Analytics logs."
+        readScopeName={OAuthScope.ANALYTICS_READ}
+        writeScopeName={OAuthScope.ANALYTICS_WRITE}
+        scopes={scopes}
+        setScopes={setScopes}
+      />
       <Scope
         title="Auth"
         description="Auth configurations and SSO providers."

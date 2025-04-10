@@ -1,12 +1,14 @@
-import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { isEmpty } from 'lodash'
 import { HelpCircle } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import PolicyTableRow from 'components/interfaces/Auth/Policies/PolicyTableRow'
+import PolicyTableRow, {
+  PolicyTableRowProps,
+} from 'components/interfaces/Auth/Policies/PolicyTableRow'
 import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
@@ -18,7 +20,7 @@ import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
 interface PoliciesProps {
   schema: string
-  tables: PostgresTable[]
+  tables: PolicyTableRowProps['table'][]
   hasTables: boolean
   isLocked: boolean
   onSelectCreatePolicy: (table: string) => void
@@ -37,7 +39,12 @@ const Policies = ({
   const { ref } = useParams()
   const { project } = useProjectContext()
 
-  const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<any>({})
+  const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<{
+    id: number
+    schema: string
+    name: string
+    rls_enabled: boolean
+  }>()
   const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<any>({})
 
   const { mutate: updateTable } = useTableUpdateMutation({
@@ -59,10 +66,15 @@ const Policies = ({
 
   const closeConfirmModal = () => {
     setSelectedPolicyToDelete({})
-    setSelectedTableToToggleRLS({})
+    setSelectedTableToToggleRLS(undefined)
   }
 
-  const onSelectToggleRLS = (table: PostgresTable) => {
+  const onSelectToggleRLS = (table: {
+    id: number
+    schema: string
+    name: string
+    rls_enabled: boolean
+  }) => {
     setSelectedTableToToggleRLS(table)
   }
 
@@ -76,6 +88,8 @@ const Policies = ({
 
   // Methods that involve some API
   const onToggleRLS = async () => {
+    if (!selectedTableToToggleRLS) return console.error('Table is required')
+
     const payload = {
       id: selectedTableToToggleRLS.id,
       rls_enabled: !selectedTableToToggleRLS.rls_enabled,
@@ -85,7 +99,7 @@ const Policies = ({
       projectRef: project?.ref!,
       connectionString: project?.connectionString,
       id: payload.id,
-      schema: (selectedTableToToggleRLS as PostgresTable).schema,
+      schema: selectedTableToToggleRLS.schema,
       payload: payload,
     })
   }
@@ -170,14 +184,14 @@ const Policies = ({
       />
 
       <ConfirmModal
-        danger={selectedTableToToggleRLS.rls_enabled}
-        visible={!isEmpty(selectedTableToToggleRLS)}
+        danger={selectedTableToToggleRLS?.rls_enabled}
+        visible={selectedTableToToggleRLS !== undefined}
         title={`Confirm to ${
-          selectedTableToToggleRLS.rls_enabled ? 'disable' : 'enable'
+          selectedTableToToggleRLS?.rls_enabled ? 'disable' : 'enable'
         } Row Level Security`}
         description={`Are you sure you want to ${
-          selectedTableToToggleRLS.rls_enabled ? 'disable' : 'enable'
-        } Row Level Security for the table "${selectedTableToToggleRLS.name}"?`}
+          selectedTableToToggleRLS?.rls_enabled ? 'disable' : 'enable'
+        } Row Level Security for the table "${selectedTableToToggleRLS?.name}"?`}
         buttonLabel="Confirm"
         buttonLoadingLabel="Saving"
         onSelectCancel={closeConfirmModal}

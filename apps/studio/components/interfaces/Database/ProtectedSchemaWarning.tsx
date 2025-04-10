@@ -1,14 +1,8 @@
 import { useState } from 'react'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertCircle,
-  Modal,
-} from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Modal } from 'ui'
 
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { AlertCircle } from 'lucide-react'
 
 export const ProtectedSchemaModal = ({
   visible,
@@ -37,7 +31,7 @@ export const ProtectedSchemaModal = ({
           access through the dashboard.
         </p>
         <div className="flex flex-wrap gap-1">
-          {EXCLUDED_SCHEMAS.map((schema) => (
+          {PROTECTED_SCHEMAS.map((schema) => (
             <code key={schema} className="text-xs">
               {schema}
             </code>
@@ -62,7 +56,7 @@ const ProtectedSchemaWarning = ({ schema, entity }: { schema: string; entity: st
   return (
     <>
       <Alert_Shadcn_>
-        <IconAlertCircle strokeWidth={2} />
+        <AlertCircle strokeWidth={2} />
         <AlertTitle_Shadcn_>Currently viewing {entity} from a protected schema</AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_>
           <p className="mb-2">

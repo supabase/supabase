@@ -1,11 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
-import { Button, Input, Modal } from 'ui'
+import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import {
   useIsProjectActive,
   useProjectContext,
@@ -17,6 +15,8 @@ import { useDatabasePasswordResetMutation } from 'data/database/database-passwor
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
 import passwordStrength from 'lib/password-strength'
+import { generateStrongPassword } from 'lib/project'
+import { Button, Input, Modal } from 'ui'
 
 const ResetDbPassword = ({ disabled = false }) => {
   const { ref } = useParams()
@@ -80,12 +80,8 @@ const ResetDbPassword = ({ disabled = false }) => {
     }
   }
 
-  function generateStrongPassword() {
-    const password = generator.generate({
-      length: 16,
-      numbers: true,
-      uppercase: true,
-    })
+  function generatePassword() {
+    const password = generateStrongPassword()
     setPassword(password)
     delayedCheckPasswordStrength(password)
   }
@@ -148,7 +144,7 @@ const ResetDbPassword = ({ disabled = false }) => {
                 passwordStrengthScore={passwordStrengthScore}
                 passwordStrengthMessage={passwordStrengthMessage}
                 password={password}
-                generateStrongPassword={generateStrongPassword}
+                generateStrongPassword={generatePassword}
               />
             }
           />

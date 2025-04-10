@@ -1,13 +1,17 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
-import type { SupaRow } from 'components/grid/types'
-import type { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
-import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import { PropsWithChildren, createContext, useContext, useRef } from 'react'
-import type { Dictionary } from 'types'
 import { proxy, useSnapshot } from 'valtio'
+import { proxySet } from 'valtio/utils'
 
-type ForeignKey = {
-  foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
+import type { SupaRow } from 'components/grid/types'
+import { ForeignKey } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
+import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
+import type { Dictionary } from 'types'
+
+export const TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE = 100
+
+type ForeignKeyState = {
+  foreignKey: ForeignKey
   row: Dictionary<any>
   column: PostgresColumn
 }
@@ -21,7 +25,7 @@ export type SidePanel =
   | { type: 'json'; jsonValue: EditValue }
   | {
       type: 'foreign-row-selector'
-      foreignKey: ForeignKey
+      foreignKey: ForeignKeyState
     }
   | { type: 'csv-import' }
 
@@ -52,23 +56,13 @@ export type UIState =
       confirmationDialog: ConfirmationDialog
     }
 
+/**
+ * Global table editor state for the table editor across multiple tables.
+ * See ./table-editor-table.tsx for table specific state.
+ */
 export const createTableEditorState = () => {
   const state = proxy({
-    selectedSchemaName: 'public',
-    setSelectedSchemaName: (schemaName: string) => {
-      state.selectedSchemaName = schemaName
-    },
-
-    enforceExactCount: false,
-    setEnforceExactCount: (value: boolean) => {
-      state.enforceExactCount = value
-    },
-
-    page: 1,
-    setPage: (page: number) => {
-      state.page = page
-    },
-    rowsPerPage: 100,
+    rowsPerPage: TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE,
     setRowsPerPage: (rowsPerPage: number) => {
       state.rowsPerPage = rowsPerPage
     },
@@ -182,7 +176,7 @@ export const createTableEditorState = () => {
         sidePanel: { type: 'cell', value: { column, row } },
       }
     },
-    onEditForeignKeyColumnValue: (foreignKey: ForeignKey) => {
+    onEditForeignKeyColumnValue: (foreignKey: ForeignKeyState) => {
       state.ui = {
         open: 'side-panel',
         sidePanel: { type: 'foreign-row-selector', foreignKey },

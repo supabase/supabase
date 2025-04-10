@@ -21,9 +21,9 @@ import {
   Input_Shadcn_,
   cn,
 } from 'ui'
-import { Admonition } from './../admonition'
 import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 import { z } from 'zod'
+import { Admonition } from './../admonition'
 
 export interface TextConfirmModalProps {
   loading: boolean
@@ -143,18 +143,30 @@ const TextConfirmModal = forwardRef<
             </>
           )}
           <Form_Shadcn_ {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="px-5 flex flex-col gap-2 pt-3">
+            <form
+              autoComplete="off"
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="px-5 flex flex-col gap-2 pt-3"
+            >
               <FormField_Shadcn_
                 control={form.control}
                 name="confirmValue"
                 render={({ field }) => (
                   <FormItem_Shadcn_ className="flex flex-col gap-y-1">
                     <FormLabel_Shadcn_ {...label}>
-                      Type <span className="text-foreground break-all">{confirmString}</span> to
-                      confirm.
+                      Type{' '}
+                      <span className="text-foreground break-all whitespace-pre">
+                        {confirmString}
+                      </span>{' '}
+                      to confirm.
                     </FormLabel_Shadcn_>
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_ placeholder={confirmPlaceholder} {...input} {...field} />
+                      <Input_Shadcn_
+                        autoComplete="off"
+                        placeholder={confirmPlaceholder}
+                        {...input}
+                        {...field}
+                      />
                     </FormControl_Shadcn_>
                     <FormDescription_Shadcn_ {...description} />
                     <FormMessage_Shadcn_ {...formMessage} />

@@ -3,8 +3,7 @@
 @tailwind utilities;
 
 @import './../../../packages/ui/build/css/source/global.css';
-@import './../../../packages/ui/build/css/themes/dark.css';
-@import './../../../packages/ui/build/css/themes/deep-dark.css';
+@import './../../../packages/ui/build/css/themes/dark-combined.css';
 @import './../../../packages/ui/build/css/themes/light.css';
 
 @font-face {
@@ -167,9 +166,9 @@ pre[class*='language-'] {
 }
 
 // ToC styles
-.toc__menu-item--active {
-  color: hsl(var(--brand-default)) !important;
-}
+// .toc__menu-item--active {
+//   color: hsl(var(--brand-default)) !important;
+// }
 
 .video-container {
   position: relative;
@@ -284,6 +283,14 @@ th code {
   @apply text-nowrap;
 }
 
+/*
+ * Prevents very long code lines (checksums, URLs, etc., from breaking table
+ * widths
+ */
+.prose :where(td) code {
+  @apply break-all;
+}
+
 /* Zoomable image */
 
 [data-rmiz-modal]:focus,
@@ -334,4 +341,29 @@ th code {
   100% {
     background-position: 1000px 0;
   }
+}
+
+.skip-link {
+  @apply sr-only;
+}
+.skip-link:focus {
+  @apply not-sr-only;
+}
+
+// Shiki dark mode styling
+
+[data-theme="dark"] :is(.shiki,
+.shiki span) {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+  /* Optional, if you also want font styles */
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
+// Code blocks need margin applied when in content container
+
+.prose :where(.shiki:not(.shiki-wrapper *), .shiki-wrapper) {
+  margin-block: 2rem;
 }

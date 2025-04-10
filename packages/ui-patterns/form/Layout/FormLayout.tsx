@@ -1,4 +1,5 @@
 import { cva } from 'class-variance-authority'
+import { motion } from 'framer-motion'
 import React from 'react'
 import {
   FormDescription_Shadcn_,
@@ -15,7 +16,7 @@ type Props = {
   error?: string | React.ReactNode
   label?: string | React.ReactNode
   labelOptional?: string | React.ReactNode
-  layout?: 'horizontal' | 'vertical' | 'flex'
+  layout?: 'horizontal' | 'vertical' | 'flex' | 'flex-row-reverse'
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
   beforeLabel?: string | React.ReactNode
   afterLabel?: string | React.ReactNode
@@ -26,7 +27,7 @@ type Props = {
   name?: string
 }
 
-const ContainerVariants = cva('relative grid gap-2', {
+const ContainerVariants = cva('relative grid gap-10', {
   variants: {
     size: {
       tiny: 'text-xs',
@@ -41,9 +42,10 @@ const ContainerVariants = cva('relative grid gap-2', {
       false: '',
     },
     layout: {
-      horizontal: 'grid grid-cols-12',
+      horizontal: 'flex flex-col gap-2 md:grid md:grid-cols-12',
       vertical: 'flex flex-col gap-3',
       flex: 'flex flex-row gap-3',
+      'flex-row-reverse': 'flex flex-row gap-6 flex-row-reverse justify-between',
     },
     flex: {
       true: '',
@@ -56,11 +58,16 @@ const ContainerVariants = cva('relative grid gap-2', {
       align: 'right',
       className: 'justify-between',
     },
+    {
+      layout: 'flex-row-reverse',
+      align: 'right',
+      className: 'justify-between',
+    },
   ],
   defaultVariants: {},
 })
 
-const LabelContainerVariants = cva('', {
+const LabelContainerVariants = cva('transition-all duration-500 ease-in-out', {
   variants: {
     flex: {
       true: '',
@@ -74,6 +81,7 @@ const LabelContainerVariants = cva('', {
       horizontal: 'flex flex-col gap-2 col-span-4',
       vertical: 'flex flex-row gap-2 justify-between',
       flex: 'flex flex-col gap-0',
+      'flex-row-reverse': 'flex flex-col',
     },
     labelLayout: {
       horizontal: '',
@@ -107,7 +115,7 @@ const LabelContainerVariants = cva('', {
   defaultVariants: {},
 })
 
-const DataContainerVariants = cva('', {
+const DataContainerVariants = cva('transition-all duration-500 ease-in-out', {
   variants: {
     flex: {
       true: '',
@@ -121,6 +129,7 @@ const DataContainerVariants = cva('', {
       horizontal: '',
       vertical: '',
       flex: '',
+      'flex-row-reverse': '',
     },
   },
   compoundVariants: [
@@ -161,6 +170,7 @@ const DescriptionVariants = cva('text-foreground-lighter leading-normal', {
       vertical: 'mt-2',
       horizontal: 'mt-2',
       flex: '',
+      'flex-row-reverse': '',
     },
   },
   defaultVariants: {},
@@ -203,6 +213,12 @@ const FlexContainer = cva('', {
       left: '',
       right: '',
     },
+    layout: {
+      horizontal: '',
+      vertical: '',
+      flex: '',
+      'flex-row-reverse': '',
+    },
   },
   compoundVariants: [
     {
@@ -214,6 +230,10 @@ const FlexContainer = cva('', {
       flex: true,
       align: 'right',
       className: 'order-last',
+    },
+    {
+      layout: 'flex-row-reverse',
+      className: 'flex flex-col justify-center items-end shrink-0',
     },
   ],
 })
@@ -231,6 +251,7 @@ const NonBoxInputContainer = cva('', {
     layout: {
       vertical: '',
       horizontal: '',
+      'flex-row-reverse': '',
     },
   },
   compoundVariants: [
@@ -275,10 +296,24 @@ export const FormLayout = React.forwardRef<
     },
     ref
   ) => {
-    const flex = layout === 'flex'
+    const flex = layout === 'flex' || layout === 'flex-row-reverse'
     const hasLabel = Boolean(label || beforeLabel || afterLabel)
     const renderError = isReactForm && !hideMessage && (
-      <FormMessage_Shadcn_ className="mt-2" data-formlayout-id={'message'} />
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className={cn(layout === 'flex-row-reverse' ? 'mt-0' : 'mt-2')}
+      >
+        <FormMessage_Shadcn_
+          className={cn(
+            'mt-2 transition-opacity duration-300 ease-in-out',
+            layout === 'flex-row-reverse' && 'mt-0'
+          )}
+          data-formlayout-id={'message'}
+        />
+      </motion.div>
     )
 
     const renderDescription =
@@ -290,14 +325,14 @@ export const FormLayout = React.forwardRef<
         >
           {description}
         </FormDescription_Shadcn_>
-      ) : (
+      ) : description ? (
         <p
           className={cn(DescriptionVariants({ size, layout }), 'text-sm text-foreground-light')}
           data-formlayout-id={'description'}
         >
           {description}
         </p>
-      )
+      ) : null
 
     const LabelContents = () => (
       <>
@@ -329,7 +364,12 @@ export const FormLayout = React.forwardRef<
         {...props}
         className={cn(ContainerVariants({ size, flex, align, layout }), className)}
       >
-        {flex && <div className={cn(FlexContainer({ flex, align }))}>{props.children}</div>}
+        {flex && (
+          <div className={cn(FlexContainer({ flex, align, layout }))}>
+            {props.children}
+            {layout === 'flex-row-reverse' && renderError}
+          </div>
+        )}
         {hasLabel || labelOptional || layout === 'horizontal' ? (
           <>
             <div
@@ -338,16 +378,17 @@ export const FormLayout = React.forwardRef<
             >
               {hasLabel && isReactForm ? (
                 <FormLabel_Shadcn_
-                  className="flex gap-2 items-center"
-                  data-formlayout-id={'formLabel'}
+                  className="text-foreground flex gap-2 items-center break-all"
+                  data-formlayout-id="formLabel"
+                  htmlFor={props.name || id}
                 >
                   <LabelContents />
                 </FormLabel_Shadcn_>
               ) : (
                 <Label_Shadcn_
-                  htmlFor={props.name}
-                  data-formlayout-id={'label'}
-                  className="flex gap-2 items-center"
+                  className="text-foreground flex gap-2 items-center break-all leading-normal"
+                  data-formlayout-id="label"
+                  htmlFor={props.name || id}
                 >
                   <LabelContents />
                 </Label_Shadcn_>
@@ -364,7 +405,7 @@ export const FormLayout = React.forwardRef<
               {flex && (
                 <>
                   {renderDescription}
-                  {renderError}
+                  {layout !== 'flex-row-reverse' && renderError}
                 </>
               )}
             </div>

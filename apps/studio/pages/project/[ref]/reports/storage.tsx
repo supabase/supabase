@@ -1,9 +1,7 @@
-import { useMemo } from 'react'
-
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { REPORTS_DATEPICKER_HELPERS } from 'components/interfaces/Reports/Reports.constants'
+import { createFilteredDatePickerHelpers } from 'components/interfaces/Reports/Reports.constants'
 import {
   CacheHitRateChartRenderer,
   TopCacheMissesRenderer,
@@ -11,15 +9,20 @@ import {
 import DatePickers from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useStorageReport } from 'data/reports/storage-report-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { RefreshCw } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 export const StorageReport: NextPageWithLayout = () => {
   const report = useStorageReport()
   const organization = useSelectedOrganization()
+
+  const { isLoading, refresh } = report
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const plan = subscription?.plan
@@ -31,20 +34,21 @@ export const StorageReport: NextPageWithLayout = () => {
     })
   }
 
-  const datepickerHelpers = useMemo(
-    () =>
-      REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
-        ...helper,
-        disabled: (index > 0 && plan?.id === 'free') || (index > 1 && plan?.id !== 'pro'),
-      })),
-    []
-  )
+  const datepickerHelpers = createFilteredDatePickerHelpers(plan?.id || 'free')
 
   return (
     <ReportPadding>
       <ReportHeader title="Storage" />
       <div className="w-full flex flex-col gap-1">
-        <div>
+        <div className="flex items-center gap-x-2">
+          <ButtonTooltip
+            type="default"
+            disabled={isLoading}
+            icon={<RefreshCw className={isLoading ? 'animate-spin' : ''} />}
+            className="w-7"
+            tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+            onClick={() => refresh()}
+          />
           <DatePickers
             onChange={handleDatepickerChange}
             to={report.params.cacheHitRate.iso_timestamp_end || ''}
@@ -71,6 +75,10 @@ export const StorageReport: NextPageWithLayout = () => {
   )
 }
 
-StorageReport.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
+StorageReport.getLayout = (page) => (
+  <DefaultLayout>
+    <ReportsLayout>{page}</ReportsLayout>
+  </DefaultLayout>
+)
 
 export default StorageReport

@@ -22,7 +22,10 @@ const generateRssItem = (post: any): string => {
   const encodedTitle = xmlEncode(post.title)
   const encodedPath = xmlEncode(post.path)
   const encodedDescription = xmlEncode(post.description)
-  const formattedDate = dayjs(post.date).utc().format('ddd, DD MMM YYYY HH:mm:ss [GMT]')
+  const formattedDate = dayjs(post.date)
+    .utcOffset(0, true)
+    .startOf('day')
+    .format('ddd, DD MMM YYYY HH:mm:ss [-0700]')
 
   return `<item>
   <guid>https://supabase.com${encodedPath}</guid>
@@ -39,6 +42,11 @@ const generateRssItem = (post: any): string => {
 export const generateRss = (posts: any[], authorID?: string): string => {
   const authorInfo = authors.find((item) => item.author_id === authorID)
 
+  const formattedDate = dayjs(posts[0].date)
+    .utcOffset(0, true)
+    .startOf('day')
+    .format('ddd, DD MMM YYYY HH:mm:ss [-0700]')
+
   if (authorID) {
     return `
   <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
@@ -47,9 +55,7 @@ export const generateRss = (posts: any[], authorID?: string): string => {
       <link>https://supabase.com/blog</link>
       <description>Latest Postgres news from ${authorInfo?.author} at Supabase</description>
       <language>en</language>
-      <lastBuildDate>${dayjs(posts[0].date)
-        .utc()
-        .format('ddd, DD MMM YYYY HH:mm:ss [GMT]')}</lastBuildDate>
+      <lastBuildDate>${formattedDate}</lastBuildDate>
       <atom:link href="https://supabase.com/planetpg-${authorID}-rss.xml" rel="self" type="application/rss+xml"/>
       ${posts.map(generateRssItem).join('')}
     </channel>
@@ -63,9 +69,7 @@ export const generateRss = (posts: any[], authorID?: string): string => {
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>${dayjs(posts[0].date)
-        .utc()
-        .format('ddd, DD MMM YYYY HH:mm:ss [GMT]')}</lastBuildDate>
+      <lastBuildDate>${formattedDate}</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       ${posts.map(generateRssItem).join('')}
     </channel>

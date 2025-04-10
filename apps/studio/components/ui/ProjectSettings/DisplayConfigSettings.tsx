@@ -1,12 +1,13 @@
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { useParams } from 'common'
+import { AlertCircle, Loader } from 'lucide-react'
 import { PropsWithChildren } from 'react'
-import { IconAlertCircle, IconLoader, Input } from 'ui'
 
+import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { Input } from 'ui'
 
 const DisplayConfigSettings = () => {
   const { ref: projectRef } = useParams()
@@ -14,9 +15,10 @@ const DisplayConfigSettings = () => {
     data: settings,
     isLoading: isProjectSettingsLoading,
     isError: isProjectSettingsError,
-  } = useProjectSettingsQuery({
+  } = useProjectSettingsV2Query({
     projectRef,
   })
+  const { data: config, isError: isPostgrestError } = useProjectPostgrestConfigQuery({ projectRef })
 
   const {
     data,
@@ -24,31 +26,28 @@ const DisplayConfigSettings = () => {
     isLoading: isJwtSecretUpdateStatusLoading,
   } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
-
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
-  // Get the API service
-  const jwtSecret = settings?.project?.jwt_secret ?? ''
-  const apiService = (settings?.services ?? []).find(
-    (x: any) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
-  )
-  const apiConfig = apiService?.app_config
-  const apiUrl = `${apiConfig?.protocol ?? 'https'}://${apiConfig?.endpoint ?? '-'}`
+
+  const jwtSecret = config?.jwt_secret ?? ''
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint
+  const apiUrl = endpoint ? `${protocol}://${endpoint}` : '-'
 
   return (
     <ConfigContentWrapper>
-      {isProjectSettingsError || isJwtSecretUpdateStatusError ? (
+      {isProjectSettingsError || isPostgrestError || isJwtSecretUpdateStatusError ? (
         <div className="flex items-center justify-center py-8 space-x-2">
-          <IconAlertCircle size={16} strokeWidth={1.5} />
+          <AlertCircle size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">
-            {isProjectSettingsError
+            {isProjectSettingsError || isPostgrestError
               ? 'Failed to retrieve configuration'
               : 'Failed to update JWT secret'}
           </p>
         </div>
-      ) : isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
+      ) : isProjectSettingsLoading || isPostgrestError || isJwtSecretUpdateStatusLoading ? (
         <div className="flex items-center justify-center py-8 space-x-2">
-          <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
+          <Loader className="animate-spin" size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">
             {isProjectSettingsLoading ? 'Retrieving API keys' : 'JWT secret is being updated'}
           </p>

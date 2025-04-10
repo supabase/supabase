@@ -10,6 +10,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   autofix:
     runs-on: ubuntu-latest
@@ -23,36 +26,29 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
-          sparse-checkout: apps
+          token: ${{ secrets.PAT_AUTOFIX }}
           fetch-depth: ${{ env.PR_FETCH_DEPTH }}
+          sparse-checkout: |
+            packages
+            apps
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
 
       - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
+          cache: pnpm
 
-     # Installing all dependencies takes up to three minutes, hacking around to only installing prettier+deps
       - name: Install required dependencies
-        run: |
-          rm package.json
-          rm package-lock.json
-          npm i prettier@4.0.0-alpha.8 prettier-plugin-sql-cst
+        run: pnpm i
 
       - name: Run Prettier in fix mode
-        run: |
-          npx prettier --write 'apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
+        run: pnpm run format
 
       - name: Commit changes and push to existing branch
-        run: |
-          git checkout -- package.json
-          git checkout -- package-lock.json
-          git config --global user.name 'github-tidy-bot'
-          git config --global user.email 'github-tidy-bot@supabase.com'
-          if [[ `git status --porcelain` ]]; then
-            echo "[bot] Changes detected, committing."
-       
-            echo "[bot] Running in non-squash mode."
-            git commit -am "ci: Autofix updates from GitHub workflow"
-            git push
-          else
-            echo "[bot] No changes detected, nothing to commit."
-          fi
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "ci: Autofix updates from GitHub workflow"
+          commit_user_name: "kevcodez"
+          commit_user_email: "k.grueneberg1994@gmail.com"

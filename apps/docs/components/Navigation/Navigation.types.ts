@@ -9,18 +9,8 @@ export interface NavMenuGroup {
 
 export interface NavMenuSection {
   name: string
-  url?: `/${string}`
+  url?: `/${string}` | `https://${string}`
   items: Partial<NavMenuSection>[]
-}
-
-export interface References {
-  [key: string]: {
-    name: string
-    library?: string
-    versions: string[]
-    icon: string
-    currentVersion?: string
-  }
 }
 
 type MenuItem = {

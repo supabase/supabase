@@ -1,58 +1,47 @@
-import { useTelemetryProps } from 'common'
-import { FlaskConical } from 'lucide-react'
+import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Button, IconExternalLink, IconEye, IconEyeOff, Modal, ScrollArea, cn } from 'ui'
 
+import { useParams } from 'common'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import Telemetry from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
-import APISidePanelPreview from './APISidePanelPreview'
-import CLSPreview from './CLSPreview'
-import { useFeaturePreviewContext } from './FeaturePreviewContext'
-import RLSAIAssistantPreview from './RLSAIAssistantPreview'
+import { removeTabsByEditor } from 'state/tabs'
+import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
+import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
 
 const FeaturePreviewModal = () => {
-  // [Ivan] We should probably move this to a separate file, together with LOCAL_STORAGE_KEYS. We should make adding new feature previews as simple as possible.
-  const FEATURE_PREVIEWS: { key: string; name: string; content: any; discussionsUrl?: string }[] = [
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
-      name: 'Project API documentation',
-      content: <APISidePanelPreview />,
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
-    },
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT,
-      name: 'Supabase Assistant for RLS policies',
-      content: <RLSAIAssistantPreview />,
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/21882',
-    },
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
-      name: 'Column-level privileges',
-      content: <CLSPreview />,
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
-    },
-  ]
-
-  const router = useRouter()
+  const { ref } = useParams()
   const snap = useAppStateSnapshot()
-  const telemetryProps = useTelemetryProps()
+  const org = useSelectedOrganization()
   const featurePreviewContext = useFeaturePreviewContext()
+  const { mutate: sendEvent } = useSendEventMutation()
+
+  const enableNewLayoutPreview = useFlag('newLayoutPreview')
+  const isFeaturePreviewTabsTableEditorFlag = useFlag('featurePreviewTabsTableEditor')
+  const isFeaturePreviewTabsSqlEditorFlag = useFlag('featurePreviewSqlEditorTabs')
+
+  function isReleasedToPublic(feature: (typeof FEATURE_PREVIEWS)[number]) {
+    switch (feature.key) {
+      case LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS:
+        return isFeaturePreviewTabsTableEditorFlag
+      case LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS:
+        return isFeaturePreviewTabsSqlEditorFlag
+      case LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW:
+        return enableNewLayoutPreview
+      default:
+        return true
+    }
+  }
 
   const selectedFeaturePreview =
-    snap.selectedFeaturePreview === '' ? FEATURE_PREVIEWS[0].key : snap.selectedFeaturePreview
+    snap.selectedFeaturePreview === ''
+      ? FEATURE_PREVIEWS.filter((feature) => isReleasedToPublic(feature))[0].key
+      : snap.selectedFeaturePreview
 
   const [selectedFeatureKey, setSelectedFeatureKey] = useState<string>(selectedFeaturePreview)
-
-  // this modal can be triggered on other pages
-  // Update local state when valtio state changes
-  useEffect(() => {
-    if (snap.selectedFeaturePreview !== '') {
-      setSelectedFeatureKey(snap.selectedFeaturePreview)
-    }
-  }, [snap.selectedFeaturePreview])
 
   const { flags, onUpdateFlag } = featurePreviewContext
   const selectedFeature = FEATURE_PREVIEWS.find((preview) => preview.key === selectedFeatureKey)
@@ -60,15 +49,18 @@ const FeaturePreviewModal = () => {
 
   const toggleFeature = () => {
     onUpdateFlag(selectedFeatureKey, !isSelectedFeatureEnabled)
-    Telemetry.sendEvent(
-      {
-        category: 'ui_feature_previews',
-        action: isSelectedFeatureEnabled ? 'disabled' : 'enabled',
-        label: selectedFeatureKey,
-      },
-      telemetryProps,
-      router
-    )
+    sendEvent({
+      action: isSelectedFeatureEnabled ? 'feature_preview_disabled' : 'feature_preview_enabled',
+      properties: { feature: selectedFeatureKey },
+      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+    })
+
+    if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS) {
+      removeTabsByEditor(ref as string | undefined, 'table')
+    }
+    if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS) {
+      removeTabsByEditor(ref as string | undefined, 'sql')
+    }
   }
 
   function handleCloseFeaturePreviewModal() {
@@ -76,12 +68,30 @@ const FeaturePreviewModal = () => {
     snap.setSelectedFeaturePreview(FEATURE_PREVIEWS[0].key)
   }
 
+  // this modal can be triggered on other pages
+  // Update local state when valtio state changes
+
+  useEffect(() => {
+    if (snap.selectedFeaturePreview !== '') {
+      setSelectedFeatureKey(snap.selectedFeaturePreview)
+    }
+  }, [snap.selectedFeaturePreview])
+
+  useEffect(() => {
+    if (snap.showFeaturePreviewModal) {
+      sendEvent({
+        action: 'feature_previews_clicked',
+        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      })
+    }
+  }, [snap.showFeaturePreviewModal])
+
   return (
     <Modal
       hideFooter
       showCloseButton
       size="xlarge"
-      className="max-w-4xl"
+      className="!max-w-4xl"
       header="Dashboard feature previews"
       visible={snap.showFeaturePreviewModal}
       onCancel={handleCloseFeaturePreviewModal}
@@ -90,7 +100,10 @@ const FeaturePreviewModal = () => {
         <div className="flex">
           <div>
             <ScrollArea className="h-[550px] w-[280px] border-r">
-              {FEATURE_PREVIEWS.map((feature) => {
+              {FEATURE_PREVIEWS.filter((feature) => {
+                // filter out preview features that are not released to the public
+                return isReleasedToPublic(feature)
+              }).map((feature) => {
                 const isEnabled = flags[feature.key] ?? false
 
                 return (
@@ -103,9 +116,9 @@ const FeaturePreviewModal = () => {
                     )}
                   >
                     {isEnabled ? (
-                      <IconEye size={14} strokeWidth={2} className="text-brand" />
+                      <Eye size={14} strokeWidth={2} className="text-brand" />
                     ) : (
-                      <IconEyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
+                      <EyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
                     )}
                     <p className="text-sm truncate" title={feature.name}>
                       {feature.name}
@@ -117,10 +130,13 @@ const FeaturePreviewModal = () => {
           </div>
           <div className="flex-grow max-h-[550px] p-4 space-y-3 overflow-y-auto">
             <div className="flex items-center justify-between">
-              <p>{selectedFeature?.name}</p>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-x-2">
+                <p>{selectedFeature?.name}</p>
+                {selectedFeature?.isNew && <Badge color="green">New</Badge>}
+              </div>
+              <div className="flex items-center gap-x-2">
                 {selectedFeature?.discussionsUrl !== undefined && (
-                  <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                  <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                     <Link href={selectedFeature.discussionsUrl} target="_blank" rel="noreferrer">
                       Give feedback
                     </Link>
@@ -143,7 +159,7 @@ const FeaturePreviewModal = () => {
               Have an idea for the dashboard? Let us know via Github Discussions!
             </p>
           </div>
-          <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
               href="https://github.com/orgs/supabase/discussions/categories/feature-requests"
               target="_blank"

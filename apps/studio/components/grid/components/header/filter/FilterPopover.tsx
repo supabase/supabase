@@ -4,8 +4,8 @@ import { FilterIcon, Plus } from 'lucide-react'
 import { KeyboardEvent, useCallback, useMemo, useState } from 'react'
 
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
-import type { Filter, SupaTable } from 'components/grid/types'
-import { useUrlState } from 'hooks/ui/useUrlState'
+import type { Filter } from 'components/grid/types'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -13,53 +13,30 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-import { FilterOperatorOptions } from './Filter.constants'
 import FilterRow from './FilterRow'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 export interface FilterPopoverProps {
-  table: SupaTable
   filters: string[]
-  setParams: ReturnType<typeof useUrlState>[1]
+  onApplyFilters: (filters: Filter[]) => void
 }
 
-const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
+const FilterPopover = ({ filters, onApplyFilters }: FilterPopoverProps) => {
   const [open, setOpen] = useState(false)
-  const snap = useTableEditorStateSnapshot()
 
   const btnText =
     (filters || []).length > 0
       ? `Filtered by ${filters.length} rule${filters.length > 1 ? 's' : ''}`
       : 'Filter'
 
-  const onApplyFilters = (appliedFilters: Filter[]) => {
-    snap.setEnforceExactCount(false)
-    setParams((prevParams) => {
-      return {
-        ...prevParams,
-        filter: appliedFilters.map((filter) => {
-          const selectedOperator = FilterOperatorOptions.find(
-            (option) => option.value === filter.operator
-          )
-
-          return `${filter.column}:${selectedOperator?.abbrev}:${filter.value}`
-        }),
-      }
-    })
-  }
-
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
-          type={(filters || []).length > 0 ? 'link' : 'text'}
-          icon={<FilterIcon strokeWidth={1.5} className="text-foreground-light" />}
-        >
+        <Button type={(filters || []).length > 0 ? 'link' : 'text'} icon={<FilterIcon />}>
           {btnText}
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start">
-        <FilterOverlay table={table} filters={filters} onApplyFilters={onApplyFilters} />
+        <FilterOverlay filters={filters} onApplyFilters={onApplyFilters} />
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
   )
@@ -68,12 +45,13 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
 export default FilterPopover
 
 interface FilterOverlayProps {
-  table: SupaTable
   filters: string[]
   onApplyFilters: (filter: Filter[]) => void
 }
 
-const FilterOverlay = ({ table, filters: filtersFromUrl, onApplyFilters }: FilterOverlayProps) => {
+const FilterOverlay = ({ filters: filtersFromUrl, onApplyFilters }: FilterOverlayProps) => {
+  const snap = useTableEditorTableStateSnapshot()
+
   const initialFilters = useMemo(
     () => formatFilterURLParams((filtersFromUrl as string[]) ?? []),
     [filtersFromUrl]
@@ -81,7 +59,7 @@ const FilterOverlay = ({ table, filters: filtersFromUrl, onApplyFilters }: Filte
   const [filters, setFilters] = useState<Filter[]>(initialFilters)
 
   function onAddFilter() {
-    const column = table.columns[0]?.name
+    const column = snap.table.columns[0]?.name
 
     if (column) {
       setFilters([
@@ -113,8 +91,19 @@ const FilterOverlay = ({ table, filters: filtersFromUrl, onApplyFilters }: Filte
     )
   }, [])
 
+  const onSelectApplyFilters = () => {
+    // [Joshen] Trim empty spaces in input for only UUID type columns
+    const formattedFilters = filters.map((f) => {
+      const column = snap.table.columns.find((c) => c.name === f.column)
+      if (column?.format === 'uuid') return { ...f, value: f.value.trim() }
+      else return f
+    })
+    setFilters(formattedFilters)
+    onApplyFilters(formattedFilters)
+  }
+
   function handleEnterKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter') onApplyFilters(filters)
+    if (event.key === 'Enter') onSelectApplyFilters()
   }
 
   return (
@@ -123,7 +112,6 @@ const FilterOverlay = ({ table, filters: filtersFromUrl, onApplyFilters }: Filte
         {filters.map((filter, index) => (
           <FilterRow
             key={`filter-${filter.column}-${[index]}`}
-            table={table}
             filter={filter}
             filterIdx={index}
             onChange={onChangeFilter}
@@ -146,7 +134,7 @@ const FilterOverlay = ({ table, filters: filtersFromUrl, onApplyFilters }: Filte
         <Button
           disabled={isEqual(filters, initialFilters)}
           type="default"
-          onClick={() => onApplyFilters(filters)}
+          onClick={() => onSelectApplyFilters()}
         >
           Apply filter
         </Button>

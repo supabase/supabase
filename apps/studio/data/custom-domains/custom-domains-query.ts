@@ -1,6 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { IS_PLATFORM } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { customDomainKeys } from './keys'
@@ -19,7 +20,7 @@ type Ssl = {
   id: string
   type: string
   method: string
-  status: 'pending_validation' | 'pending_deployment' | 'validation_timed_out'
+  status: 'pending_validation' | 'pending_deployment' | 'validation_timed_out' | 'initializing'
   txt_name?: string
   txt_value?: string
   settings: Settings
@@ -105,9 +106,16 @@ export type CustomDomainsError = ResponseError
 export const useCustomDomainsQuery = <TData = CustomDomainsData>(
   { projectRef }: CustomDomainsVariables,
   { enabled = true, ...options }: UseQueryOptions<CustomDomainsData, CustomDomainsError, TData> = {}
-) =>
-  useQuery<CustomDomainsData, CustomDomainsError, TData>(
+) => {
+  const { data } = useProjectAddonsQuery({ projectRef })
+  const hasCustomDomainsAddon = !!data?.selected_addons.find((x) => x.type === 'custom_domain')
+
+  return useQuery<CustomDomainsData, CustomDomainsError, TData>(
     customDomainKeys.list(projectRef),
     ({ signal }) => getCustomDomains({ projectRef }, signal),
-    { enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined', ...options }
+    {
+      enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined' && hasCustomDomainsAddon,
+      ...options,
+    }
   )
+}

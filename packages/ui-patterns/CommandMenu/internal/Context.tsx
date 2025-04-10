@@ -1,9 +1,11 @@
+'use client'
+
 import { createContext, useContext } from 'react'
 
-import { type ICommandsState } from '../internal/state/commandsState'
+import { type ICommandsState } from '../internal/types'
 import { type IPagesState } from '../internal/state/pagesState'
 import { type IQueryState } from '../internal/state/queryState'
-import { type IViewState } from '../internal/state/viewState'
+import { type IViewState } from '../internal/state/viewState.types'
 
 const CommandContext = createContext<
   | {

@@ -1,7 +1,7 @@
 import type { PostgresTable, PostgresTrigger } from '@supabase/postgres-meta'
 import Image from 'next/legacy/image'
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -12,7 +12,7 @@ import {
   EdgeFunctionsResponse,
   useEdgeFunctionsQuery,
 } from 'data/edge-functions/edge-functions-query'
-import { getTable } from 'data/tables/table-query'
+import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { isValidHttpUrl, tryParseJson, uuidv4 } from 'lib/helpers'
 import { Button, Checkbox, Form, Input, Listbox, Radio, SidePanel } from 'ui'
@@ -92,7 +92,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
     function_type: isEdgeFunction(selectedHook?.function_args?.[0] ?? '')
       ? 'supabase_function'
       : 'http_request',
-    timeout_ms: Number(selectedHook?.function_args?.[4] ?? 1000),
+    timeout_ms: Number(selectedHook?.function_args?.[4] ?? 5000),
   }
 
   useEffect(() => {
@@ -100,21 +100,38 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       setIsEdited(false)
       setIsClosingPanel(false)
 
-      // Reset form fields outside of the Form context
       if (selectedHook !== undefined) {
         setEvents(selectedHook.events)
 
         const [url, method, headers, parameters] = selectedHook.function_args
-        const formattedHeaders = tryParseJson(headers) || {}
+
+        let parsedParameters: Record<string, string> = {}
+
+        // Try to parse the parameters with escaped quotes
+        try {
+          parsedParameters = JSON.parse(parameters.replace(/\\"/g, '"'))
+        } catch (e) {
+          // If parsing still fails, fallback to an empty object
+          parsedParameters = {}
+        }
+
+        let parsedHeaders: Record<string, string> = {}
+        try {
+          parsedHeaders = JSON.parse(headers.replace(/\\"/g, '"'))
+        } catch (e) {
+          // If parsing still fails, fallback to an empty object
+          parsedHeaders = {}
+        }
+
         setHttpHeaders(
-          Object.keys(formattedHeaders).map((key) => {
-            return { id: uuidv4(), name: key, value: formattedHeaders[key] }
+          Object.keys(parsedHeaders).map((key) => {
+            return { id: uuidv4(), name: key, value: parsedHeaders[key] }
           })
         )
-        const formattedParameters = tryParseJson(parameters) || {}
+
         setHttpParameters(
-          Object.keys(formattedParameters).map((key) => {
-            return { id: uuidv4(), name: key, value: formattedParameters[key] }
+          Object.keys(parsedParameters).map((key) => {
+            return { id: uuidv4(), name: key, value: parsedParameters[key] }
           })
         )
       } else {
@@ -165,8 +182,8 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       }
     }
 
-    if (values.timeout_ms < 1000 || values.timeout_ms > 5000) {
-      errors['timeout_ms'] = 'Timeout should be between 1000ms and 5000ms'
+    if (values.timeout_ms < 1000 || values.timeout_ms > 10_000) {
+      errors['timeout_ms'] = 'Timeout should be between 1000ms and 10,000ms'
     }
 
     if (JSON.stringify(values) !== JSON.stringify(initialValues)) setIsEdited(true)
@@ -182,7 +199,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       return setEventsError('Please select at least one event')
     }
 
-    const selectedTable = await getTable({
+    const selectedTable = await getTableEditor({
       id: values.table_id,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -205,6 +222,15 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
         return a
       }, {})
 
+    // replacer function with JSON.stringify to handle quotes properly
+    const stringifiedParameters = JSON.stringify(parameters, (key, value) => {
+      if (typeof value === 'string') {
+        // Return the raw string without any additional escaping
+        return value
+      }
+      return value
+    })
+
     const payload: any = {
       events,
       activation: 'AFTER',
@@ -220,7 +246,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
         values.http_url,
         values.http_method,
         JSON.stringify(headers),
-        JSON.stringify(parameters),
+        stringifiedParameters,
         values.timeout_ms.toString(),
       ],
     }

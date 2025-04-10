@@ -1,28 +1,6 @@
 import { proxy } from 'valtio'
-import { type ICommand } from '../Command'
-import { type ICommandSection, section$new } from '../CommandSection'
-
-type OrderSectionInstruction = (sections: ICommandSection[], idx: number) => ICommandSection[]
-type OrderCommandsInstruction = (
-  commands: ICommand[],
-  commandsToInsert: ICommand[]
-) => Array<ICommand>
-type CommandOptions = {
-  deps?: any[]
-  enabled?: boolean
-  forceMountSection?: boolean
-  orderSection?: OrderSectionInstruction
-  orderCommands?: OrderCommandsInstruction
-}
-
-type ICommandsState = {
-  commandSections: ICommandSection[]
-  registerSection: (
-    sectionName: string,
-    commands: ICommand[],
-    options?: CommandOptions
-  ) => () => void
-}
+import { type ICommandSection, type ICommandsState, type CommandOptions } from '../types'
+import { section$new } from '../CommandSection'
 
 const initCommandsState = () => {
   const state: ICommandsState = proxy({
@@ -32,6 +10,14 @@ const initCommandsState = () => {
       if (editIndex === -1) editIndex = state.commandSections.length
 
       state.commandSections[editIndex] ??= section$new(sectionName)
+      if (options?.sectionMeta) {
+        const oldMeta = state.commandSections[editIndex].meta
+        if (!!oldMeta && typeof oldMeta === 'object' && typeof options.sectionMeta === 'object') {
+          state.commandSections[editIndex].meta = { ...oldMeta, ...options.sectionMeta }
+        } else {
+          state.commandSections[editIndex].meta = options.sectionMeta
+        }
+      }
 
       if (options?.forceMountSection) state.commandSections[editIndex].forceMount = true
 
@@ -73,4 +59,4 @@ const orderSectionFirst = (sections: ICommandSection[], idx: number) => [
 ]
 
 export { initCommandsState, orderSectionFirst }
-export type { ICommandsState, CommandOptions }
+export type { CommandOptions }

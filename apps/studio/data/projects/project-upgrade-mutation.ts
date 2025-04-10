@@ -1,18 +1,26 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
+import { components } from 'api-types'
+
+export type ReleaseChannel = components['schemas']['ReleaseChannel']
 
 export type ProjectUpgradeVariables = {
   ref: string
-  target_version: number
+  target_version: string
+  release_channel: ReleaseChannel
 }
 
-export async function upgradeProject({ ref, target_version }: ProjectUpgradeVariables) {
+export async function upgradeProject({
+  ref,
+  target_version,
+  release_channel,
+}: ProjectUpgradeVariables) {
   const { data, error } = await post('/v1/projects/{ref}/upgrade', {
     params: { path: { ref } },
-    body: { target_version },
+    body: { target_version: target_version.toString(), release_channel },
   })
   if (error) handleError(error)
   return data

@@ -2,6 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import { invoicesKeys } from './keys'
+import { IS_PLATFORM } from 'lib/constants'
 
 export type OverdueInvoicesResponse = components['schemas']['OverdueInvoiceCount']
 
@@ -24,5 +25,9 @@ export const useOverdueInvoicesQuery = <TData = OverdueInvoicesData>({
   useQuery<OverdueInvoicesData, OverdueInvoicesError, TData>(
     invoicesKeys.overdueInvoices(),
     ({ signal }) => getOverdueInvoices(signal),
-    { enabled, ...options }
+    {
+      enabled: enabled && IS_PLATFORM,
+      staleTime: 30 * 60 * 1000, // 30 minutes
+      ...options,
+    }
   )

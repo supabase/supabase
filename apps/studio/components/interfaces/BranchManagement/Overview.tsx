@@ -1,9 +1,10 @@
 import { noop } from 'lodash'
-import { Button, IconChevronRight } from 'ui'
+import { Button } from 'ui'
 
 import type { Branch } from 'data/branches/branches-query'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { PreviewBranchesEmptyState } from './EmptyStates'
+import { ChevronRight } from 'lucide-react'
 
 const MAX_BRANCHES_OVERVIEW = 10
 
@@ -44,11 +45,7 @@ const Overview = ({
         footer={
           isSuccess && (
             <div className="flex items-center justify-center">
-              <Button
-                type="text"
-                iconRight={<IconChevronRight />}
-                onClick={() => onViewAllBranches()}
-              >
+              <Button type="text" iconRight={<ChevronRight />} onClick={() => onViewAllBranches()}>
                 View all branches
               </Button>
             </div>

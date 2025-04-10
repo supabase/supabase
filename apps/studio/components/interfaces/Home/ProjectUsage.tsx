@@ -8,8 +8,13 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import BarChart from 'components/ui/Charts/BarChart'
 import Panel from 'components/ui/Panel'
-import { UsageApiCounts, useProjectLogStatsQuery } from 'data/analytics/project-log-stats-query'
-import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
+import {
+  ProjectLogStatsVariables,
+  UsageApiCounts,
+  useProjectLogStatsQuery,
+} from 'data/analytics/project-log-stats-query'
+import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { ChartIntervals } from 'types'
 import {
@@ -25,13 +30,28 @@ import {
 const CHART_INTERVALS: ChartIntervals[] = [
   {
     key: 'minutely',
-    label: '60 minutes',
+    label: 'Last 60 minutes',
     startValue: 1,
     startUnit: 'hour',
     format: 'MMM D, h:mma',
+    availableIn: ['free', 'pro', 'enterprise', 'team'],
   },
-  { key: 'hourly', label: '24 hours', startValue: 24, startUnit: 'hour', format: 'MMM D, ha' },
-  { key: 'daily', label: '7 days', startValue: 7, startUnit: 'day', format: 'MMM D' },
+  {
+    key: 'hourly',
+    label: 'Last 24 hours',
+    startValue: 24,
+    startUnit: 'hour',
+    format: 'MMM D, ha',
+    availableIn: ['free', 'pro', 'enterprise', 'team'],
+  },
+  {
+    key: 'daily',
+    label: 'Last 7 days',
+    startValue: 7,
+    startUnit: 'day',
+    format: 'MMM D',
+    availableIn: ['pro', 'enterprise', 'team'],
+  },
 ]
 
 const ProjectUsage = () => {
@@ -43,7 +63,9 @@ const ProjectUsage = () => {
     'project_storage:all',
   ])
 
-  const [interval, setInterval] = useState<string>('hourly')
+  const { plan } = useCurrentOrgPlan()
+
+  const [interval, setInterval] = useState<ProjectLogStatsVariables['interval']>('minutely')
 
   const { data, isLoading } = useProjectLogStatsQuery({ projectRef, interval })
 
@@ -53,7 +75,7 @@ const ProjectUsage = () => {
     selectedInterval.startUnit as dayjs.ManipulateType
   )
   const endDateLocal = dayjs()
-  const charts = useFillTimeseriesSorted(
+  const { data: charts } = useFillTimeseriesSorted(
     data?.result || [],
     'timestamp',
     [
@@ -64,7 +86,8 @@ const ProjectUsage = () => {
     ],
     0,
     startDateLocal.toISOString(),
-    endDateLocal.toISOString()
+    endDateLocal.toISOString(),
+    5
   )
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
 
@@ -90,10 +113,19 @@ const ProjectUsage = () => {
               <span>{selectedInterval.label}</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="start">
-            <DropdownMenuRadioGroup value={interval} onValueChange={setInterval}>
+          <DropdownMenuContent side="bottom" align="start" className="w-40">
+            <DropdownMenuRadioGroup
+              value={interval}
+              onValueChange={(interval) =>
+                setInterval(interval as ProjectLogStatsVariables['interval'])
+              }
+            >
               {CHART_INTERVALS.map((i) => (
-                <DropdownMenuRadioItem key={i.key} value={i.key}>
+                <DropdownMenuRadioItem
+                  key={i.key}
+                  value={i.key}
+                  disabled={!i.availableIn?.includes(plan?.id || 'free')}
+                >
                   {i.label}
                 </DropdownMenuRadioItem>
               ))}
@@ -101,7 +133,7 @@ const ProjectUsage = () => {
           </DropdownMenuContent>
         </DropdownMenu>
         <span className="text-xs text-foreground-light">
-          Statistics for past {selectedInterval.label}
+          Statistics for {selectedInterval.label.toLowerCase()}
         </span>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-4">

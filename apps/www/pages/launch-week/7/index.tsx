@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { createClient } from '@supabase/supabase-js'
 
-import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
+import { LW_URL, SITE_ORIGIN } from '~/lib/constants'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -46,7 +46,7 @@ export default function TicketHome({ users }: Props) {
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: SITE_URL,
+          url: LW_URL,
           images: [
             {
               url: OG_IMAGE,
@@ -56,7 +56,7 @@ export default function TicketHome({ users }: Props) {
       />
       <DefaultLayout>
         <div className="bg-[#1C1C1C] -mt-[65px]">
-          <div className="relative bg-lw7 pt-16">
+          <div className="relative bg-[#9e44ef] pt-16">
             <div className="relative z-10">
               <SectionContainer className="flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !px-2 !mx-auto">
                 <LaunchWeekLogoHeader />
