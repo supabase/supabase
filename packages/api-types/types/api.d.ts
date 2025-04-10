@@ -244,7 +244,15 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Gets project's logs */
+    /**
+     * Gets project's logs
+     * @description Executes a SQL query on the project's logs.
+     *
+     *     Either the 'iso_timestamp_start' and 'iso_timestamp_end' parameters must be provided.
+     *     If both are not provided, only the last 1 minute of logs will be queried.
+     *     The timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.
+     *
+     */
     get: operations['getLogs']
     put?: never
     post?: never
@@ -1628,12 +1636,6 @@ export interface components {
         version: number
       }[]
     }
-    CfResponse: {
-      errors: Record<string, never>[]
-      messages: Record<string, never>[]
-      result: components['schemas']['CustomHostnameDetails']
-      success: boolean
-    }
     CreateApiKeyBody: {
       description?: string | null
       secret_jwt_template?: {
@@ -1714,15 +1716,6 @@ export interface components {
       custom_jwks?: unknown
       jwks_url?: string
       oidc_issuer_url?: string
-    }
-    CustomHostnameDetails: {
-      custom_origin_server: string
-      hostname: string
-      id: string
-      ownership_verification: components['schemas']['OwnershipVerification']
-      ssl: components['schemas']['SslValidation']
-      status: string
-      verification_errors?: string[]
     }
     DatabaseUpgradeStatusResponse: {
       databaseUpgradeStatus: {
@@ -1875,9 +1868,8 @@ export interface components {
             | 'auth_mfa_phone_default'
             | 'auth_mfa_web_authn_default'
             | 'log_drain_default'
-          meta?: {
-            [key: string]: number | boolean | string | string[]
-          }
+          /** @description Any JSON-serializable value */
+          meta?: unknown
           name: string
           price: {
             amount: number
@@ -1919,9 +1911,8 @@ export interface components {
             | 'auth_mfa_phone_default'
             | 'auth_mfa_web_authn_default'
             | 'log_drain_default'
-          meta?: {
-            [key: string]: number | boolean | string | string[]
-          }
+          /** @description Any JSON-serializable value */
+          meta?: unknown
           name: string
           price: {
             amount: number
@@ -1987,11 +1978,6 @@ export interface components {
     OrganizationResponseV1: {
       id: string
       name: string
-    }
-    OwnershipVerification: {
-      name: string
-      type: string
-      value: string
     }
     PgsodiumConfigResponse: {
       root_key: string
@@ -2212,11 +2198,6 @@ export interface components {
       currentConfig: {
         database: boolean
       }
-    }
-    SslValidation: {
-      status: string
-      validation_errors?: components['schemas']['ValidationError'][]
-      validation_records: components['schemas']['ValidationRecord'][]
     }
     StorageConfigResponse: {
       features: {
@@ -2469,7 +2450,33 @@ export interface components {
     }
     UpdateCustomHostnameResponse: {
       custom_hostname: string
-      data: components['schemas']['CfResponse']
+      data: {
+        errors: unknown[]
+        messages: unknown[]
+        result: {
+          custom_origin_server: string
+          hostname: string
+          id: string
+          ownership_verification: {
+            name: string
+            type: string
+            value: string
+          }
+          ssl: {
+            status: string
+            validation_errors?: {
+              message: string
+            }[]
+            validation_records: {
+              txt_name: string
+              txt_value: string
+            }[]
+          }
+          status: string
+          verification_errors?: string[]
+        }
+        success: boolean
+      }
       /** @enum {string} */
       status:
         | '1_not_started'
@@ -2816,13 +2823,6 @@ export interface components {
       db_pool?: number
       db_schema?: string
       max_rows?: number
-    }
-    ValidationError: {
-      message: string
-    }
-    ValidationRecord: {
-      txt_name: string
-      txt_value: string
     }
     VanitySubdomainBody: {
       vanity_subdomain: string
@@ -4418,7 +4418,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4453,7 +4452,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4490,7 +4488,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4525,7 +4522,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4558,7 +4554,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4593,7 +4588,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4632,7 +4626,6 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Project ref */
         ref: string
       }
       cookie?: never
