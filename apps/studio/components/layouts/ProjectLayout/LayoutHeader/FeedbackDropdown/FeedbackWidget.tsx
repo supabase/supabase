@@ -1,5 +1,5 @@
 import { toPng } from 'html-to-image'
-import { Camera, Image as ImageIcon, Upload, X } from 'lucide-react'
+import { Camera, CircleCheck, Image as ImageIcon, Upload, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
@@ -47,24 +47,18 @@ const FeedbackWidget = ({
 
   const [isSending, setSending] = useState(false)
   const [isSavingScreenshot, setIsSavingScreenshot] = useState(false)
+  const [isFeedbackSent, setIsFeedbackSent] = useState(false)
 
   const { mutate: sendEvent } = useSendEventMutation()
 
   const { mutate: submitFeedback } = useSendFeedbackMutation({
     onSuccess: () => {
+      setIsFeedbackSent(true)
       setFeedback('')
       setScreenshot(undefined)
       localStorage.removeItem(FEEDBACK_STORAGE_KEY)
       localStorage.removeItem(SCREENSHOT_STORAGE_KEY)
-      toast.success('Your feedback has been sent. Thank you!', { duration: 8000 })
-      setTimeout(() => {
-        toast(
-          'We do not always respond to feedback. If you require assistance, contact support instead.',
-          {
-            duration: 8000,
-          }
-        )
-      }, 3000)
+
       setSending(false)
     },
     onError: (error) => {
@@ -178,20 +172,24 @@ const FeedbackWidget = ({
         pathname: router.asPath,
       })
     }
-
-    return onClose()
   }
 
-  return (
+  return isFeedbackSent ? (
+    <ThanksMessage onClose={onClose} />
+  ) : (
     <>
       <div className="px-3">
+        <h2>Send Feedback</h2>
+        <p className="text-sm text-foreground-light">
+          How can we improve this page? Anything you'd change or isn't working?
+        </p>
         <TextArea_Shadcn_
-          placeholder="Ideas on how to improve this page.&#10;Use the Support Form for technical issues."
+          placeholder="It would be great if..."
           rows={5}
           value={feedback}
           onChange={(e) => setFeedback(e.target.value)}
           onPaste={handlePasteEvent}
-          className="text-sm"
+          className="text-sm mt-4"
         />
       </div>
       <PopoverSeparator />
@@ -300,3 +298,34 @@ const FeedbackWidget = ({
 }
 
 export default FeedbackWidget
+
+const ThanksMessage = ({ onClose }: { onClose: () => void }) => {
+  return (
+    <div className="px-3">
+      <div className="grid gap-4">
+        <div className="flex items-center gap-2 text-sm text-foreground-light">
+          <CircleCheck size={16} /> Your feedback has been sent. Thanks!{' '}
+        </div>
+        <p className="text-sm text-foreground-light">
+          We do not always respond to feedback. If you require assistance, please contact support
+          instead.
+        </p>
+        <PopoverSeparator />
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs text-foreground-light">
+              <Link href="/support/new">
+                <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
+                  Create a Support Ticket
+                </span>
+              </Link>{' '}
+            </p>
+          </div>
+          <Button type="default" onClick={onClose}>
+            Close
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}

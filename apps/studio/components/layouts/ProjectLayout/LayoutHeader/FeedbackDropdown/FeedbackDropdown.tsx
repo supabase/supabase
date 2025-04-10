@@ -25,7 +25,7 @@ const FeedbackDropdown = () => {
       <PopoverContent_Shadcn_
         side="bottom"
         align="end"
-        className="p-0 flex flex-col py-3 gap-3"
+        className="px-3 flex flex-col py-3 gap-3 w-96"
         id="feedback-widget"
       >
         <FeedbackWidget
