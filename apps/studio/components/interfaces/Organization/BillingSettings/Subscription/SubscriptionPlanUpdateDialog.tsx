@@ -1,34 +1,36 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { InfoIcon, Check, ExternalLink } from 'lucide-react'
+import { Check, ExternalLink, InfoIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
-import { toast } from 'sonner'
+import { useEffect, useState } from 'react'
 import tweets from 'shared-data/tweets'
+import { toast } from 'sonner'
 
+import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { organizationKeys } from 'data/organizations/keys'
+import { OrganizationBillingSubscriptionPreviewResponse } from 'data/organizations/organization-billing-subscription-preview'
+import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
+import { SubscriptionTier } from 'data/subscriptions/types'
+import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { formatCurrency } from 'lib/helpers'
 import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  Dialog,
+  DialogContent,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
   Table,
   TableBody,
   TableCell,
   TableRow,
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-  Card,
-  CardContent,
-  Badge,
 } from 'ui'
-import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import { organizationKeys } from 'data/organizations/keys'
-import { formatCurrency } from 'lib/helpers'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { SubscriptionTier } from 'data/subscriptions/types'
-import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import PaymentMethodSelection from './PaymentMethodSelection'
-import { Button, Dialog, DialogContent } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { OrganizationBillingSubscriptionPreviewResponse } from 'data/organizations/organization-billing-subscription-preview'
+import PaymentMethodSelection from './PaymentMethodSelection'
 
 const getRandomTweet = () => {
   const filteredTweets = tweets.filter((it) => it.text.length < 180)
@@ -576,7 +578,7 @@ const SubscriptionPlanUpdateDialog = ({
                   onClick={onUpdateSubscription}
                   className="flex-1"
                 >
-                  Confirm {planMeta?.change_type === 'downgrade' ? 'Downgrade' : 'Upgrade'}
+                  Confirm {planMeta?.change_type === 'downgrade' ? 'downgrade' : 'upgrade'}
                 </Button>
               </div>
             </div>
