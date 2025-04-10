@@ -25,7 +25,7 @@ import ComposedChartHandler, { MultiAttribute } from 'components/ui/Charts/Compo
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 
 import { analyticsKeys } from 'data/analytics/keys'
-import { getReportAttributes } from 'data/reports/database-charts'
+import { getReportAttributes, getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -101,30 +101,8 @@ const DatabaseUsage = () => {
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
-  const REPORT_ATTRIBUTES_V2 = getReportAttributes(isFreePlan)
-
-  const REPORT_ATTRIBUTES = [
-    { id: 'ram_usage', label: 'Memory usage', hide: false },
-    { id: 'avg_cpu_usage', label: 'Average CPU usage', hide: false },
-    { id: 'max_cpu_usage', label: 'Max CPU usage', hide: false },
-    { id: 'disk_iops_write', label: 'Disk IOps write', hide: false },
-    { id: 'disk_iops_read', label: 'Disk IOps read', hide: false },
-    {
-      id: 'pg_stat_database_num_backends',
-      label: 'Pooler to database connections',
-      hide: false,
-    },
-    {
-      id: 'supavisor_connections_active',
-      label: 'Client to Shared Pooler connections',
-      hide: false,
-    },
-    {
-      id: 'client_connections_pgbouncer',
-      label: 'Client to Dedicated Pooler connections',
-      hide: isFreePlan,
-    },
-  ] as const
+  const REPORT_ATTRIBUTES = getReportAttributes(isFreePlan)
+  const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(isFreePlan)
 
   const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
     onSuccess: (_, variables) => {

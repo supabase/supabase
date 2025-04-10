@@ -1,4 +1,27 @@
 export const getReportAttributes = (isFreePlan: boolean) => [
+  { id: 'ram_usage', label: 'Memory usage', hide: false },
+  { id: 'avg_cpu_usage', label: 'Average CPU usage', hide: false },
+  { id: 'max_cpu_usage', label: 'Max CPU usage', hide: false },
+  { id: 'disk_iops_write', label: 'Disk IOps write', hide: false },
+  { id: 'disk_iops_read', label: 'Disk IOps read', hide: false },
+  {
+    id: 'pg_stat_database_num_backends',
+    label: 'Pooler to database connections',
+    hide: false,
+  },
+  {
+    id: 'supavisor_connections_active',
+    label: 'Client to Shared Pooler connections',
+    hide: false,
+  },
+  {
+    id: 'client_connections_pgbouncer',
+    label: 'Client to Dedicated Pooler connections',
+    hide: isFreePlan,
+  },
+]
+
+export const getReportAttributesV2 = (isFreePlan: boolean) => [
   {
     id: 'ram-usage',
     label: 'Memory usage',
