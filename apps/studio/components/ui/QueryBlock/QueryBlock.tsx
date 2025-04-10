@@ -197,10 +197,9 @@ export const QueryBlock = ({
   }, [sql])
 
   useEffect(() => {
-    if (!!sql && !isLoading && runQuery && !!readOnlyConnectionString) {
+    if (!!sql && !isLoading && runQuery && !!readOnlyConnectionString && !readOnlyError) {
       handleExecute()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sql, isLoading, runQuery, readOnlyConnectionString])
 
   useEffect(() => {
