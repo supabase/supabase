@@ -9,14 +9,7 @@ import denoTypes from './types/lib.deno.d.ts.include'
 const extraFiles: ExtraFiles = { 'deno.d.ts': denoTypes }
 
 const twoslasher = createTwoslasher({ extraFiles })
-const TWOSLASHABLE_LANGS: ReadonlyArray<string> = [
-  'js',
-  'ts',
-  'jsx',
-  'tsx',
-  'javascript',
-  'typescript',
-]
+const TWOSLASHABLE_LANGS: ReadonlyArray<string> = ['js', 'ts', 'javascript', 'typescript']
 
 export async function CodeBlock({
   className,
@@ -42,6 +35,10 @@ export async function CodeBlock({
       code = editedCode
     } catch (_err) {
       // Silently ignore, if imports aren't defined type compilation fails
+      // Uncomment lines below to debug in dev
+      // console.log('\n==========CODE==========\n')
+      // console.log(code)
+      // console.error(_err.recommendation)
     }
   }
 

@@ -376,7 +376,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
             <Popover_Shadcn_ modal={false}>
               <PopoverTrigger_Shadcn_ asChild>
                 <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
-                  Foreign table is accessible via your project's APIs
+                  Unprotected Data API access
                 </Button>
               </PopoverTrigger_Shadcn_>
               <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
@@ -385,8 +385,9 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                 </h3>
                 <div className="grid gap-2 mt-4 text-foreground-light text-sm">
                   <p>
-                    Foreign tables do not enforce RLS. Move them to a private schema not exposed to
-                    Postgrest or disable Postgrest.
+                    Foreign tables do not enforce RLS, which may allow unrestricted access. To
+                    secure them, either move foreign tables to a private schema not exposed by
+                    PostgREST, or <a href="">disable PostgREST access</a> entirely.
                   </p>
 
                   <div className="mt-2">

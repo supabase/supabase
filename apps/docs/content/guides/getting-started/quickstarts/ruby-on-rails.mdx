@@ -18,7 +18,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-     ```bash Terminal
+     ```bash name=Terminal
      rails new blog -d=postgresql
      ```
 
@@ -43,7 +43,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-    ```bash Terminal
+    ```bash name=Terminal
     export DATABASE_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
     ```
 
@@ -62,7 +62,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-    ```bash Terminal
+    ```bash name=Terminal
     bin/rails generate model Article title:string body:text
     bin/rails db:migrate
     ```
@@ -80,11 +80,11 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       bin/rails console
       ```
 
-      ```rb irb
+      ```rb name=irb
       article = Article.new(title: "Hello Rails", body: "I am on Rails!")
       article.save # Saves the entry to the database
 
@@ -104,7 +104,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       bin/rails server
       ```
 
