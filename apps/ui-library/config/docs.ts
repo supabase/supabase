@@ -90,11 +90,11 @@ export const componentPages: SidebarNavGroup = {
       commandItemLabel: 'Realtime Chat',
     },
     {
-      title: 'Infinite List',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
-      href: '/docs/nextjs/infinite-list',
+      title: 'Infinite Query Hook',
+      supportedFrameworks: [],
+      href: '/docs/infinite-query-hook',
       items: [],
-      commandItemLabel: 'Infinite List',
+      commandItemLabel: 'Infinite Query Hook',
     },
   ],
 }

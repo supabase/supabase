@@ -1,6 +1,6 @@
 ---
-title: Infinite List
-description: List component with infinite scrolling capabilities using Supabase.
+title: Infinite Query Hook
+description: React hook for infinite lists, fetching data from Supabase.
 ---
 
 <BlockPreview name="infinite-list-demo" />
@@ -8,31 +8,18 @@ description: List component with infinite scrolling capabilities using Supabase.
 ## Installation
 
 <BlockItem
-  name="infinite-list-nextjs"
+  name="infinite-query-hook"
   description="Installs the Infinite List component and necessary Supabase client setup."
 />
 
 ## Folder structure
 
-<RegistryBlock itemName="infinite-list-nextjs" />
+<RegistryBlock itemName="infinite-query-hook" />
 
 ## Introduction
 
-The Infinite List component provides a scrollable container that loads data progressively from your Supabase database as the user scrolls down. It uses a custom hook to manage data fetching and pagination state, and allows flexible rendering via a `renderItem` prop.
-
-## Prerequisites
-
-1. **Supabase Project:** You need a Supabase project set up.
-2. **Supabase Table:** A table in your Supabase database that you want to display.
-3. **Environment Variables:** Ensure your application has the following environment variables set up (usually in a `.env.local` file):
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
-   ```
-4. **Required Packages:** Make sure you have the following packages installed:
-   ```bash
-   npm install @supabase/supabase-js @supabase/postgrest-js
-   ```
+The Infinite Query Hook provides a single React hook which will make it easier to load data progressively from your Supabase database. It handles data fetching and pagination state, It is meant to be used with infinite lists or tables.
+The hook is fully typed, provided you have generated and setup your database types.
 
 ## Usage
 
@@ -168,6 +155,8 @@ export default function CustomLogsPage() {
 | `renderNoResults`  | `() => React.ReactNode`                                   | Function to render content when no results are found. Default: "No results."          |
 | `renderEndMessage` | `() => React.ReactNode`                                   | Function to render message at the end of the list. Default: "You've reached the end." |
 | `renderSkeleton`   | `(count: number) => React.ReactNode`                      | Function to render loading skeletons. Default: Uses simple placeholders.              |
+
+## Type-safety
 
 ## TData interface
 
