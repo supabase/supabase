@@ -477,17 +477,6 @@ export const pricing: Pricing = {
         },
         usage_based: true,
       },
-      {
-        key: 'functions.scriptSize',
-        title: 'Script size',
-        plans: {
-          free: '20 MB',
-          pro: '20 MB',
-          team: '20 MB',
-          enterprise: 'Custom',
-        },
-        usage_based: false,
-      },
     ],
   },
   realtime: {
