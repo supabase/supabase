@@ -15,6 +15,7 @@ import type { NextPageWithLayout } from 'types'
 
 const SignInMfaPage: NextPageWithLayout = () => {
   const router = useRouter()
+
   const queryClient = useQueryClient()
   const {
     // current methods for mfa are github and sso

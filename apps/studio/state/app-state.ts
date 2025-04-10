@@ -58,9 +58,11 @@ const getInitialState = () => {
       selectedFeaturePreview: '',
       showAiSettingsModal: false,
       showGenerateSqlModal: false,
+      showConnectDialog: false,
       ongoingQueriesPanelOpen: false,
       mobileMenuOpen: false,
       showSidebar: true,
+      lastRouteBeforeVisitingAccountPage: '',
     }
   }
 
@@ -88,9 +90,11 @@ const getInitialState = () => {
     selectedFeaturePreview: '',
     showAiSettingsModal: false,
     showGenerateSqlModal: false,
+    showConnectDialog: false,
     ongoingQueriesPanelOpen: false,
     mobileMenuOpen: false,
     showSidebar: true,
+    lastRouteBeforeVisitingAccountPage: '',
   }
 }
 
@@ -182,6 +186,11 @@ export const appState = proxy({
   mobileMenuOpen: false,
   setMobileMenuOpen: (value: boolean) => {
     appState.mobileMenuOpen = value
+  },
+
+  lastRouteBeforeVisitingAccountPage: '',
+  setLastRouteBeforeVisitingAccountPage: (value: string) => {
+    appState.lastRouteBeforeVisitingAccountPage = value
   },
 })
 

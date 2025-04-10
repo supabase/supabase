@@ -95,7 +95,7 @@ export function DiskSizeField({
   const mainDiskUsed = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
 
   return (
-    <div className="grid grid-cols-12 gap-5">
+    <div className="grid @xl:grid-cols-12 gap-5">
       <div className="col-span-4">
         <FormField_Shadcn_
           name="totalSize"

@@ -7,6 +7,16 @@ import { IS_PLATFORM } from 'common/constants/environment'
 import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
 import { match } from 'path-to-regexp'
 
+function isHCaptchaRelatedError(event: Sentry.Event): boolean {
+  const errors = event.exception?.values ?? []
+  for (const error of errors) {
+    if (error.stacktrace?.frames?.some((f) => f.abs_path?.includes('onload=hCaptchaOnLoad'))) {
+      return true
+    }
+  }
+  return false
+}
+
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
@@ -27,6 +37,11 @@ Sentry.init({
       }
       return event
     }
+
+    if (isHCaptchaRelatedError(event)) {
+      return null
+    }
+
     return null
   },
   ignoreErrors: [

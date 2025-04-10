@@ -23,7 +23,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```sh Terminal
+      ```sh name=Terminal
       npm init vue@latest my-app
       ```
 
@@ -42,7 +42,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       cd my-app && npm install @supabase/supabase-js
       ```
 
@@ -62,10 +62,10 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```js src/lib/supabaseClient.js
-        import { createClient } from '@supabase/supabase-js'
+      ```js name=src/lib/supabaseClient.js
+      import { createClient } from '@supabase/supabase-js'
 
-        export const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+      export const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
       ```
 
     </StepHikeCompact.Code>
@@ -81,28 +81,28 @@ hideToc: true
     <StepHikeCompact.Code>
 
 
-      ```vue src/App.vue
-        <script setup>
-        import { ref, onMounted } from 'vue'
-        import { supabase } from './lib/supabaseClient'
+      ```vue name=src/App.vue
+      <script setup>
+      import { ref, onMounted } from 'vue'
+      import { supabase } from './lib/supabaseClient'
 
-        const instruments = ref([])
+      const instruments = ref([])
 
-        async function getInstruments() {
-          const { data } = await supabase.from('instruments').select()
-          instruments.value = data
-        }
+      async function getInstruments() {
+        const { data } = await supabase.from('instruments').select()
+        instruments.value = data
+      }
 
-        onMounted(() => {
-          getInstruments()
-        })
-        </script>
+      onMounted(() => {
+         getInstruments()
+      })
+      </script>
 
-        <template>
-          <ul>
-            <li v-for="instrument in instruments" :key="instrument.id">{{ instrument.name }}</li>
-          </ul>
-        </template>
+      <template>
+        <ul>
+          <li v-for="instrument in instruments" :key="instrument.id">{{ instrument.name }}</li>
+        </ul>
+      </template>
       ```
 
     </StepHikeCompact.Code>
@@ -118,7 +118,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npm run dev
       ```
 

@@ -65,5 +65,5 @@ export function openInstallGitHubIntegrationWindow(type: 'install' | 'authorize'
 }
 
 export const getGitHubProfileImgUrl = (username: string) => {
-  return `https://github.com/${username}.png?size=80`
+  return `https://github.com/${username}.png?size=96`
 }

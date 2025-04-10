@@ -11,7 +11,7 @@ export type ColumnPrivilegesRevoke = components['schemas']['RevokeColumnPrivileg
 export type ColumnPrivilegesRevokeVariables = {
   projectRef: string
   connectionString?: string
-  revokes: ColumnPrivilegesRevoke[]
+  revokes: ColumnPrivilegesRevoke
 }
 
 export async function revokeColumnPrivileges({
