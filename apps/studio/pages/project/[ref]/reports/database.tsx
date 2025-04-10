@@ -62,7 +62,7 @@ const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
-  const isReportsV2 = false
+  const isReportsV2 = useFlag('reportsDatabaseV2')
 
   const state = useDatabaseSelectorStateSnapshot()
   const defaultStart = dayjs().subtract(7, 'day').toISOString()
