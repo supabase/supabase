@@ -62,7 +62,7 @@ const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
-  const isReportsV2 = useFlag('reportsDatabaseV2')
+  const isReportsV2 = false
 
   const state = useDatabaseSelectorStateSnapshot()
   const defaultStart = dayjs().subtract(7, 'day').toISOString()
@@ -107,7 +107,8 @@ const DatabaseUsage = () => {
     { id: 'ram_usage', label: 'Memory usage', hide: false },
     { id: 'avg_cpu_usage', label: 'Average CPU usage', hide: false },
     { id: 'max_cpu_usage', label: 'Max CPU usage', hide: false },
-    { id: 'disk_io_consumption', label: 'Disk IO consumed', hide: false },
+    { id: 'disk_iops_write', label: 'Disk IOps write', hide: false },
+    { id: 'disk_iops_read', label: 'Disk IOps read', hide: false },
     {
       id: 'pg_stat_database_num_backends',
       label: 'Pooler to database connections',
