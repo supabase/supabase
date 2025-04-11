@@ -54,7 +54,11 @@ const BillingBreakdown = () => {
               labelBottom={`${billingCycleStart.format('MMMM DD')} - ${billingCycleEnd.format('MMMM DD')}`}
               bgClass="bg-surface-300"
               labelBottomClass="!text-foreground-light p-1 m-0"
-              labelTop={subscription ? `${daysToCycleEnd} days left` : ''}
+              labelTop={
+                subscription
+                  ? `${daysToCycleEnd} ${daysToCycleEnd === 1 ? 'day' : 'days'} left`
+                  : ''
+              }
               labelTopClass="p-1 m-0"
             />
           </div>

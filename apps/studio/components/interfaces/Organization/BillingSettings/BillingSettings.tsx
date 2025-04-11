@@ -20,7 +20,7 @@ const BillingSettings = () => {
 
   const { slug: orgSlug } = useParams()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
-  const isNotOrgWithPartnerBilling = !subscription?.billing_via_partner ?? true
+  const isNotOrgWithPartnerBilling = !subscription?.billing_via_partner
 
   const billingAccountDataEnabled =
     isBillingAccountDataEnabledOnProfileLevel && isNotOrgWithPartnerBilling
@@ -41,9 +41,11 @@ const BillingSettings = () => {
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id="breakdown">
-        <BillingBreakdown />
-      </ScaffoldContainer>
+      {subscription?.plan.id !== 'free' && (
+        <ScaffoldContainer id="breakdown">
+          <BillingBreakdown />
+        </ScaffoldContainer>
+      )}
 
       {isBillingCreditsEnabledOnProfileLevel && (
         <>

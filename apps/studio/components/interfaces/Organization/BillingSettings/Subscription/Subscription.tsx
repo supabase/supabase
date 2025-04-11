@@ -137,22 +137,11 @@ const Subscription = () => {
                       <div className="[&>p]:!leading-normal prose text-sm">
                         Projects may become unresponsive when this organization exceeds its{' '}
                         <Link href={`/org/${slug}/usage`}>included usage quota</Link>. To scale
-                        seamlessly and pay for over-usage,{' '}
+                        seamlessly,{' '}
                         {currentPlan?.id === 'free'
                           ? 'upgrade to a paid plan.'
                           : 'you can disable Spend Cap under the Cost Control settings.'}
                       </div>
-                      <Button
-                        type="default"
-                        className="mt-1"
-                        onClick={() =>
-                          snap.setPanelKey(
-                            currentPlan?.id === 'free' ? 'subscriptionPlan' : 'costControl'
-                          )
-                        }
-                      >
-                        {currentPlan?.id === 'free' ? 'Upgrade Plan' : 'Adjust Spend Cap'}
-                      </Button>
                     </Admonition>
                   )}
                 </div>

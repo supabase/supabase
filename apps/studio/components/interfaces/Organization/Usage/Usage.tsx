@@ -28,6 +28,7 @@ import Bandwidth from './Bandwidth'
 import Compute from './Compute'
 import SizeAndCounts from './SizeAndCounts'
 import TotalUsage from './TotalUsage'
+import Link from 'next/link'
 
 const Usage = () => {
   const newLayoutPreview = useNewLayout()
@@ -199,15 +200,21 @@ const Usage = () => {
           <Admonition
             type="default"
             title="Usage filtered by project"
-            description={`You are currently viewing usage for the "${selectedProject?.name || selectedProjectRef}" project. Supabase uses organization-level billing and quotas. For billing purposes, we sum up usage from
-                  all your projects. To view your usage quota, set the project filter above back to
-                  "All Projects".`}
-          >
-            <DocsButton
-              abbrev={false}
-              href="https://supabase.com/docs/guides/platform/billing-on-supabase#organization-based-billing"
-            />
-          </Admonition>
+            description={
+              <div>
+                You are currently viewing usage for the "$
+                {selectedProject?.name || selectedProjectRef}" project. Supabase uses{' '}
+                <Link
+                  href="/docs/guides/platform/billing-on-supabase#organization-based-billing"
+                  target="_blank"
+                >
+                  organization-level billing
+                </Link>{' '}
+                and quotas. For billing purposes, we sum up usage from all your projects. To view
+                your usage quota, set the project filter above back to "All Projects".
+              </div>
+            }
+          />
         </ScaffoldContainer>
       ) : (
         <ScaffoldContainer id="restriction" className="mt-5">
