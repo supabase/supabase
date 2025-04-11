@@ -30,6 +30,7 @@ import { LogsDatePicker, DatePickerValue } from './Logs.DatePickers'
 import { LogsWarning, LogTemplate, WarehouseCollection } from './Logs.types'
 import { WarehouseQueryTemplate } from './Warehouse.utils'
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
+import dayjs from 'dayjs'
 
 export type SourceType = 'logs' | 'warehouse'
 export interface LogsQueryPanelProps {
@@ -90,6 +91,27 @@ const LogsQueryPanel = ({
       return true
     })
     .map(([, value]) => value)
+
+  function getDefaultDatePickerValue() {
+    if (defaultFrom && defaultTo) {
+      return {
+        to: defaultTo,
+        from: defaultFrom,
+        text: `${dayjs(defaultFrom).format('DD MMM, HH:mm')} - ${dayjs(defaultTo).format('DD MMM, HH:mm')}`,
+        isHelper: false,
+      }
+    }
+    return {
+      to: EXPLORER_DATEPICKER_HELPERS[0].calcTo(),
+      from: EXPLORER_DATEPICKER_HELPERS[0].calcFrom(),
+      text: EXPLORER_DATEPICKER_HELPERS[0].text,
+      isHelper: true,
+    }
+  }
+
+  const [selectedDatePickerValue, setSelectedDatePickerValue] = useState<DatePickerValue>(
+    getDefaultDatePickerValue()
+  )
 
   return (
     <div className="border-b bg-surface-100">
@@ -203,11 +225,11 @@ const LogsQueryPanel = ({
 
             {dataSource === 'logs' && (
               <LogsDatePicker
-                value={{
-                  from: defaultFrom,
-                  to: defaultTo,
+                value={selectedDatePickerValue}
+                onSubmit={(value) => {
+                  setSelectedDatePickerValue(value)
+                  onDateChange(value)
                 }}
-                onSubmit={onDateChange}
                 helpers={EXPLORER_DATEPICKER_HELPERS}
               />
             )}
