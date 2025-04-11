@@ -2055,7 +2055,11 @@ export const security: NavMenuConstant = {
     { name: 'Overview', url: '/guides/security' },
     {
       name: 'Product security',
-      url: '/guides/security/product-security',
+      url: undefined,
+      items: [
+        { name: 'Product configuration', url: '/guides/security/product-security' },
+        { name: 'Security testing', url: '/guides/security/security-testing' },
+      ],
     },
     {
       name: 'Compliance',

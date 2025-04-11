@@ -157,6 +157,7 @@ allow_list = [
     "Grafana",
     "GraphQL",
     "Groonga",
+    "HackerOne",
     "HashiCorp",
     "Heroku",
     "Homebrew",
