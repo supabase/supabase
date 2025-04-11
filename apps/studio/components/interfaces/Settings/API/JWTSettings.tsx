@@ -318,8 +318,12 @@ const JWTSettings = () => {
               <p className="font-bold">This will invalidate all API keys</p>
               <p>
                 Generating a new JWT secret will invalidate <u className="text-foreground">all</u>{' '}
-                existing keys, including <code className="text-xs">service_role</code> and{' '}
-                <code className="text-xs">anon</code>.
+                existing keys, including <code className="text-xs text-code">service_role</code>{' '}
+                <code className="text-xs text-code !bg-destructive !text-white !border-destructive">
+                  secret
+                </code>{' '}
+                and <code className="text-xs text-code">anon</code>{' '}
+                <code className="text-xs text-code">public</code>.
               </p>
             </div>
           </li>
