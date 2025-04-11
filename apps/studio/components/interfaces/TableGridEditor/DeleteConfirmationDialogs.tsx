@@ -3,7 +3,10 @@ import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 
-import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
+import {
+  formatFilterURLParams,
+  removeTableEditorStateFromLocalStorage,
+} from 'components/grid/SupabaseGrid.utils'
 import type { SupaRow } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseColumnDeleteMutation } from 'data/database-columns/database-column-delete-mutation'
@@ -42,7 +45,20 @@ const DeleteConfirmationDialogs = ({
     connectionString: project?.connectionString,
   })
 
-  const removeDeletedColumnFromFiltersAndSorts = (columnName: string) => {
+  const removeDeletedColumnFromFiltersAndSorts = ({
+    ref,
+    name,
+    schema,
+    columnName,
+  }: {
+    ref: string
+    name: string
+    schema: string
+    columnName: string
+  }) => {
+    // Also remove it from localstorage
+    removeTableEditorStateFromLocalStorage(ref, name, schema)
+
     setParams((prevParams) => {
       const existingFilters = (prevParams?.filter ?? []) as string[]
       const existingSorts = (prevParams?.sort ?? []) as string[]
@@ -65,7 +81,15 @@ const DeleteConfirmationDialogs = ({
     onSuccess: () => {
       if (!(snap.confirmationDialog?.type === 'column')) return
       const selectedColumnToDelete = snap.confirmationDialog.column
-      removeDeletedColumnFromFiltersAndSorts(selectedColumnToDelete.name)
+      if (!project?.ref) return
+
+      removeDeletedColumnFromFiltersAndSorts({
+        ref: project?.ref,
+        name: selectedColumnToDelete.name,
+        schema: selectedColumnToDelete.schema,
+        columnName: selectedColumnToDelete.name,
+      })
+
       toast.success(`Successfully deleted column "${selectedColumnToDelete.name}"`)
     },
     onError: (error) => {
