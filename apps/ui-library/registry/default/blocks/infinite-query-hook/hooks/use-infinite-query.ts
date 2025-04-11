@@ -127,7 +127,7 @@ function useInfiniteQuery<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tableName, columns, pageSize])
 
-  return { data, isSuccess, isLoading, isFetching, error, hasMore, fetchNextPage, count }
+  return { data, count, isSuccess, isLoading, isFetching, error, hasMore, fetchNextPage }
 }
 
 export {
