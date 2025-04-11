@@ -346,7 +346,7 @@ function ComputeLineItem({
   computeItems: UpcomingInvoiceResponse['lines']
   computeCredits?: UpcomingInvoiceResponse['lines'][number] | null
 }) {
-  const replicaProjects = computeItems
+  const computeProjects = computeItems
     .flatMap((item) =>
       item.breakdown!.map((project) => ({
         ...project,
@@ -357,15 +357,14 @@ function ComputeLineItem({
     // descending by cost
     .sort((a, b) => b.computeCosts - a.computeCosts)
 
-  const replicaComputeCosts =
-    Math.max(
-      0,
-      computeItems.reduce((prev, cur) => prev + cur.amount, 0)
-    ) + (computeCredits?.amount ?? 0)
+  const computeCosts = Math.max(
+    0,
+    computeItems.reduce((prev, cur) => prev + cur.amount_before_discount, 0)
+  )
 
-  const discountedReplicaComputeCosts = computeItems.reduce(
-    (prev, cur) => prev + (cur.amount_before_discount ?? 0),
-    0
+  const discountedComputeCosts = Math.max(
+    0,
+    computeItems.reduce((prev, cur) => prev + (cur.amount ?? 0), 0) + (computeCredits?.amount ?? 0)
   )
 
   if (!computeItems.length) return null
@@ -379,12 +378,12 @@ function ComputeLineItem({
         </TableCell>
         <TableCell className="text-right py-2 px-0">
           <InvoiceLineItemAmount
-            amount={discountedReplicaComputeCosts}
-            amountBeforeDiscount={replicaComputeCosts}
+            amount={discountedComputeCosts}
+            amountBeforeDiscount={computeCosts}
           />
         </TableCell>
       </TableRow>
-      {replicaProjects.map((project) => (
+      {computeProjects.map((project) => (
         <TableRow key={project.project_ref} className="text-foreground-light text-xs">
           <TableCell className="!py-2 px-0 pl-6">
             {project.project_name} ({project.computeType} - {project.usage} Hours)
