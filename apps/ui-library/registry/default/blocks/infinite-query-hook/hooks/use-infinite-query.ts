@@ -3,7 +3,7 @@
 import { createClient } from '@/registry/default/fixtures/lib/supabase/client'
 import { PostgrestQueryBuilder } from '@supabase/postgrest-js'
 import { SupabaseClient } from '@supabase/supabase-js'
-import { useCallback, useEffect, useState } from 'react'
+import { useRef, useSyncExternalStore } from 'react'
 
 const supabase = createClient()
 
@@ -58,76 +58,135 @@ interface UseInfiniteQueryProps<T extends SupabaseTableName, Query extends strin
   trailingQuery?: SupabaseQueryHandler<T>
 }
 
-//
+interface StoreState<TData> {
+  data: TData[]
+  count: number
+  isSuccess: boolean
+  isLoading: boolean
+  isFetching: boolean
+  error: Error | null
+  hasInitialFetch: boolean
+}
+
+type Listener = () => void
+
+function createStore<TData extends SupabaseTableData<T>, T extends SupabaseTableName>(
+  props: UseInfiniteQueryProps<T>
+) {
+  const { tableName, columns = '*', pageSize = 20, trailingQuery } = props
+
+  let state: StoreState<TData> = {
+    data: [],
+    count: 0,
+    isSuccess: false,
+    isLoading: false,
+    isFetching: false,
+    error: null,
+    hasInitialFetch: false,
+  }
+
+  const listeners = new Set<Listener>()
+
+  const notify = () => {
+    listeners.forEach((listener) => listener())
+  }
+
+  const setState = (newState: Partial<StoreState<TData>>) => {
+    state = { ...state, ...newState }
+    notify()
+  }
+
+  const fetchPage = (skip: number) => {
+    if (state.hasInitialFetch && (state.isFetching || state.count <= state.data.length)) return
+
+    setState({ isFetching: true })
+
+    let query = supabase
+      .from(tableName)
+      .select(columns, { count: 'exact' }) as unknown as SupabaseSelectBuilder<T>
+
+    if (trailingQuery) {
+      query = trailingQuery(query)
+    }
+    query
+      .range(skip, skip + pageSize - 1)
+
+      .then(({ data: newData, count, error }) => {
+        if (error) {
+          console.error('An unexpected error occurred:', error)
+          setState({ error })
+        } else {
+          const deduplicatedData = ((newData || []) as TData[]).filter(
+            (item) => !state.data.find((old) => old.id === item.id)
+          )
+
+          setState({
+            data: [...state.data, ...deduplicatedData],
+            count: count || 0,
+            isSuccess: true,
+            error: null,
+          })
+        }
+        setState({ isFetching: false })
+      })
+  }
+
+  const fetchNextPage = async () => {
+    if (state.isFetching) return
+    await fetchPage(state.data.length)
+  }
+
+  const initialize = async () => {
+    setState({ isLoading: true, isSuccess: false, data: [] })
+    fetchNextPage().then(() => {
+      setState({ isLoading: false, hasInitialFetch: true })
+    })
+  }
+
+  return {
+    getState: () => state,
+    subscribe: (listener: Listener) => {
+      listeners.add(listener)
+      return () => listeners.delete(listener)
+    },
+    fetchNextPage,
+    initialize,
+  }
+}
+
 function useInfiniteQuery<
   TData extends SupabaseTableData<T>,
   T extends SupabaseTableName = SupabaseTableName,
->({ tableName, columns = '*', pageSize = 20, trailingQuery }: UseInfiniteQueryProps<T>) {
-  const [data, setData] = useState<TData[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
-  const [hasInitialFetch, setHasInitialFetch] = useState(false)
-  const [error, setError] = useState<Error | null>(null)
-  const [count, setCount] = useState<number>(0)
-  const [isFetching, setIsFetching] = useState(false)
-  const hasMore = count && count > data.length
+>(props: UseInfiniteQueryProps<T>) {
+  const storeRef = useRef(createStore<TData, T>(props))
 
-  const fetchPage = useCallback(
-    async (skip: number) => {
-      if (hasInitialFetch && (isFetching || !hasMore)) return
+  // Recreate store if props change
+  if (
+    storeRef.current.getState().hasInitialFetch &&
+    (props.tableName !== props.tableName ||
+      props.columns !== props.columns ||
+      props.pageSize !== props.pageSize)
+  ) {
+    storeRef.current = createStore<TData, T>(props)
+  }
 
-      setIsFetching(true)
-      try {
-        let query = supabase
-          .from(tableName)
-          .select(columns, { count: 'exact' }) as unknown as SupabaseSelectBuilder<T>
+  const state = useSyncExternalStore(storeRef.current.subscribe, () => storeRef.current.getState())
 
-        // Apply filters if trailingQuery is provided
-        if (trailingQuery) {
-          query = trailingQuery(query)
-        }
+  // Initialize on mount
+  if (!state.hasInitialFetch && typeof window !== 'undefined') {
+    storeRef.current.initialize()
+  }
 
-        const { data: newData, count } = await query.range(skip, skip + pageSize - 1).throwOnError()
-
-        if (count) {
-          setCount(count)
-        }
-
-        if (newData) {
-          setData((prevData) => [...prevData, ...newData] as TData[])
-        }
-
-        setIsSuccess(true)
-      } catch (error: any) {
-        console.error('An unexpected error occurred:', error)
-        setError(error)
-      } finally {
-        setIsFetching(false)
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tableName, columns, pageSize, hasMore]
-  )
-
-  const fetchNextPage = useCallback(async () => {
-    fetchPage(data.length)
-  }, [data.length, fetchPage])
-
-  useEffect(() => {
-    setIsSuccess(false)
-
-    setIsLoading(true)
-    // Reset state when props change significantly
-    setData([])
-    // Fetch initial data
-    fetchNextPage()
-
-    setIsLoading(false)
-    setHasInitialFetch(true)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tableName, columns, pageSize])
-
-  return { data, count, isSuccess, isLoading, isFetching, error, hasMore, fetchNextPage }
+  return {
+    data: state.data,
+    count: state.count,
+    isSuccess: state.isSuccess,
+    isLoading: state.isLoading,
+    isFetching: state.isFetching,
+    error: state.error,
+    hasMore: state.count > state.data.length,
+    fetchNextPage: storeRef.current.fetchNextPage,
+  }
 }
 
 export {

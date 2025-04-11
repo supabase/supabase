@@ -31,6 +31,14 @@ const DefaultEndMessage = () => (
   <div className="text-center text-muted-foreground py-4 text-sm">You&apos;ve reached the end.</div>
 )
 
+const defaultSkeleton = (count: number) => (
+  <div className="flex flex-col gap-2 px-4">
+    {Array.from({ length: count }).map((_, index) => (
+      <div className="h-4 w-full bg-muted animate-pulse" />
+    ))}
+  </div>
+)
+
 export function InfiniteList<TableName extends SupabaseTableName>({
   tableName,
   selectQuery = '*',
@@ -41,9 +49,9 @@ export function InfiniteList<TableName extends SupabaseTableName>({
   listClassName,
   renderNoResults = DefaultNoResults,
   renderEndMessage = DefaultEndMessage,
-  renderSkeleton,
+  renderSkeleton = defaultSkeleton,
 }: InfiniteListProps<TableName>) {
-  const { data, isFetching, hasMore, fetchNextPage } = useInfiniteQuery({
+  const { data, isFetching, hasMore, fetchNextPage, isSuccess } = useInfiniteQuery({
     tableName: tableName,
     columns: selectQuery,
     pageSize,
@@ -85,11 +93,9 @@ export function InfiniteList<TableName extends SupabaseTableName>({
   return (
     <div ref={scrollContainerRef} className={cn('relative h-full overflow-auto', className)}>
       <div className={cn(listClassName)}>
-        {data.length === 0 && !isFetching && renderNoResults()}
+        {isSuccess && data.length === 0 && renderNoResults()}
 
-        {data.map((item, index) => (
-          <div key={(item as any)?.id ?? index}>{renderItem(item, index)}</div>
-        ))}
+        {data.map((item, index) => renderItem(item, index))}
 
         {isFetching && renderSkeleton && renderSkeleton(pageSize)}
 
@@ -106,7 +112,10 @@ type Channel = Database['public']['Tables']['channels']['Row']
 // Define how each item should be rendered
 const renderChannelItem = (channel: Channel) => {
   return (
-    <div className="border-b py-3 px-4 hover:bg-muted flex items-center justify-between">
+    <div
+      key={channel.id}
+      className="border-b py-3 px-4 hover:bg-muted flex items-center justify-between"
+    >
       <div>
         <span className="font-medium text-sm text-foreground">
           {channel.slug} (ID: {channel.id})
