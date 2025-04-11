@@ -99,6 +99,11 @@ const BackupsList = () => {
         confirmLabelLoading="Restoring"
         visible={selectedBackup !== undefined}
         title="Confirm to restore from backup"
+        alert={{
+          title: 'Your project will be offline while the restore is in progress',
+          description:
+            'It is advised to upgrade at a time when there will be minimal impact for your application.',
+        }}
         loading={isRestoring || isSuccessBackup}
         onCancel={() => setSelectedBackup(undefined)}
         onConfirm={() => {
