@@ -254,11 +254,6 @@ export function getCacheHitsConfig(
       color: 'hsl(var(--chart-3))', // Chart color 3
       formatter: percentFormatter,
     },
-    shared_blks_dirtied: {
-      label: 'Blocks Modified',
-      color: 'hsl(var(--chart-4))', // Chart color 4
-      formatter: formatMetricValue,
-    },
   }
 
   return { chartData, config }
