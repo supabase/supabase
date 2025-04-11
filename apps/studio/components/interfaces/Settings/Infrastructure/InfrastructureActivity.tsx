@@ -31,7 +31,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
+import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS, InstanceSpecs } from 'lib/constants'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Admonition } from 'ui-patterns/admonition'
@@ -72,7 +72,7 @@ const InfrastructureActivity = () => {
   function getCurrentComputeInstanceSpecs() {
     if (computeInstance?.variant.meta) {
       // If user has a compute instance (called addons) return that
-      return computeInstance?.variant.meta
+      return computeInstance?.variant.meta as InstanceSpecs
     } else {
       // Otherwise, return the default specs
       return project?.infra_compute_size === 'nano' ? INSTANCE_NANO_SPECS : INSTANCE_MICRO_SPECS

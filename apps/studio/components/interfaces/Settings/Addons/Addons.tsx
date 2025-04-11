@@ -466,7 +466,7 @@ const Addons = () => {
                     <p className="text-sm text-foreground-light">Current option:</p>
                     <p>
                       {pitr !== undefined
-                        ? `Point in time recovery of ${pitr.variant.meta?.backup_duration_days} days is enabled`
+                        ? `Point in time recovery of ${(pitr.variant.meta as any)?.backup_duration_days} days is enabled`
                         : 'Point in time recovery is not enabled'}
                     </p>
                     {!sufficientPgVersion ? (
