@@ -282,7 +282,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 description="Passwordless login via email for the user"
                 button={{
                   icon: <Mail />,
-                  text: 'Send magic link',
+                  text: user.confirmed_at ? 'Send magic link' : 'Send confirmation email',
                   isLoading: isSendingMagicLink,
                   disabled: !canSendMagicLink,
                   onClick: () => {
@@ -292,7 +292,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 success={
                   successAction === 'send_magic_link'
                     ? {
-                        title: 'Magic link sent',
+                        title: user.confirmed_at ? 'Magic link sent' : 'Confirmation email sent',
                         description: `The link in the email is valid for ${formattedExpiry}`,
                       }
                     : undefined
