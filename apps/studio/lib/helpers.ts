@@ -292,7 +292,7 @@ const currencyFormatterSmallValues = Intl.NumberFormat('en-US', {
 export const formatCurrency = (amount: number | undefined | null): string | null => {
   if (amount === undefined || amount === null) {
     return null
-  } else if (amount < 0.01) {
+  } else if (amount > 0 && amount < 0.01) {
     return currencyFormatterSmallValues.format(amount)
   } else {
     return currencyFormatterDefault.format(amount)
