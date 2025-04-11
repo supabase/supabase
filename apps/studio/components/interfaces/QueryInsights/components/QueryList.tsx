@@ -212,6 +212,36 @@ export const QueryList = ({ queries, isLoading, onQuerySelect, selectedQuery }: 
         </div>
       ),
     },
+    {
+      key: 'index_recommendations',
+      name: 'Index Recommendations',
+      resizable: true,
+      minWidth: 160,
+      headerCellClass: '',
+      renderCell: (props) => {
+        const indexStatements = props.row.index_statements
+        const hasRecommendations =
+          indexStatements !== undefined &&
+          Array.isArray(indexStatements) &&
+          indexStatements.length > 0
+
+        return (
+          <div className="font-mono text-xs">
+            {hasRecommendations ? (
+              <span className="px-2 py-1 bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-100 rounded">
+                {indexStatements.length} suggestions
+              </span>
+            ) : props.row.query.toLowerCase().startsWith('select') ? (
+              <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 rounded">
+                Optimized
+              </span>
+            ) : (
+              <span className="text-foreground-lighter">N/A</span>
+            )}
+          </div>
+        )
+      },
+    },
     // {
     //   key: 'database',
     //   name: 'Database',
