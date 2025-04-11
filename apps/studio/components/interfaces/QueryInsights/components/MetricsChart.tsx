@@ -34,6 +34,8 @@ import {
   ChartConfigResult,
   getCacheHitsConfig,
 } from '../chartConfigs'
+import { MetricToggleButtons, VisibleMetricsState } from './MetricToggleButtons'
+import { SelectedQueryBadge } from './SelectedQueryBadge'
 
 // Chart opacity constants
 const CHART_OPACITY = {
@@ -65,23 +67,7 @@ export function MetricsChart({
   selectedQuery,
 }: MetricsChartProps) {
   const { ref } = useParams()
-  const [visibleMetrics, setVisibleMetrics] = useState<{
-    p50: boolean
-    p95: boolean
-    p99: boolean
-    p99_9: boolean
-    query_latency: boolean
-    rows: boolean
-    query_rows: boolean
-    shared_blks_hit: boolean
-    shared_blks_read: boolean
-    shared_blks_dirtied: boolean
-    shared_blks_written: boolean
-    cache_hit_ratio: boolean
-    cache_miss_ratio: boolean
-    calls: boolean
-    query_calls: boolean
-  }>({
+  const [visibleMetrics, setVisibleMetrics] = useState<VisibleMetricsState>({
     p50: true,
     p95: true,
     p99: true,
@@ -146,6 +132,16 @@ export function MetricsChart({
     }
   }, [data, metric, queryLatencyData, queryRowsData, queryCallsData])
 
+  // Handler for clearing the selected query
+  const handleClearSelectedQuery = () => {
+    // Find the appropriate onQuerySelect handler (it's actually in the parent component)
+    // This will be called via the parent's prop
+    const paramsToSend = { clearQuery: true }
+    window.dispatchEvent(
+      new CustomEvent('clearSelectedQueryInsightsQuery', { detail: paramsToSend })
+    )
+  }
+
   if (isLoading) {
     return (
       <div className="flex-1 flex items-center justify-center">
@@ -183,67 +179,62 @@ export function MetricsChart({
     const config = (chartConfig as ChartConfigResult<any>).config
     const chartData = (chartConfig as ChartConfigResult<any>).chartData
 
+    // Get metrics for the selected query badge
+    const getQueryMetrics = () => {
+      if (!selectedQuery) return []
+
+      const latestData = chartData[chartData.length - 1]
+      if (!latestData) return []
+
+      const metrics = []
+
+      if (metric === 'query_latency') {
+        // Add just the single query latency value
+        if (latestData.query_latency !== undefined) {
+          metrics.push({
+            label: 'Query latency',
+            value: formatLatency(latestData.query_latency),
+            color: config.query_latency?.color || 'hsl(var(--chart-1))',
+          })
+        }
+      } else if (metric === 'rows_read') {
+        // Add rows read for the query
+        if (latestData.query_rows !== undefined) {
+          metrics.push({
+            label: 'Rows',
+            value: formatMetricValue(latestData.query_rows),
+            color: config.query_rows?.color || 'hsl(var(--chart-2))',
+          })
+        }
+      } else if (metric === 'cache_hits') {
+        // Cache hits don't have query-specific metrics
+      }
+
+      return metrics
+    }
+
     return (
       <div className="h-[320px] flex flex-col">
         <div className="flex flex-col flex-1 min-h-0">
-          <div className="flex gap-2 px-5 mb-4">
-            <AnimatePresence>
-              {Object.entries(config).map(([key, value]) => {
-                // Only show specific buttons based on conditions
-                if ((key === 'query_rows' || key === 'query_latency') && !selectedQuery) {
-                  return null
-                }
+          <div className="flex flex-wrap items-center gap-2 px-5 mb-4">
+            <MetricToggleButtons
+              chartConfig={chartConfig as ChartConfigResult<any>}
+              visibleMetrics={visibleMetrics}
+              setVisibleMetrics={setVisibleMetrics}
+              metric={metric}
+              selectedQuery={selectedQuery}
+            />
 
-                // Filter out the blocks metrics for cache hits chart
-                if (
-                  metric === 'cache_hits' &&
-                  (key === 'shared_blks_dirtied' || key === 'shared_blks_written')
-                ) {
-                  return null
-                }
-
-                const metricValue = Number(
-                  chartData[chartData.length - 1]?.[key as keyof (typeof chartData)[0]]
-                )
-                const formattedValue = !isNaN(metricValue)
-                  ? (value as any).formatter(metricValue)
-                  : '0'
-
-                return (
-                  <motion.button
-                    key={key}
-                    initial={{ opacity: 0, scale: 0.95, x: -8 }}
-                    animate={{ opacity: 1, scale: 1, x: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, x: -8 }}
-                    transition={{ duration: 0.15 }}
-                    className={cn(
-                      'text-xs px-2 py-1 rounded-full transition-colors inline-flex items-center gap-1.5 border',
-                      visibleMetrics[key as keyof typeof visibleMetrics]
-                        ? 'bg-surface-300'
-                        : 'hover:bg-surface-100 border-transparent'
-                    )}
-                    onClick={() =>
-                      setVisibleMetrics((prev) => ({
-                        ...prev,
-                        [key]: !prev[key as keyof typeof visibleMetrics],
-                      }))
-                    }
-                  >
-                    <div
-                      className={cn(
-                        'w-2 h-2 rounded-full',
-                        !visibleMetrics[key as keyof typeof visibleMetrics] && 'opacity-50'
-                      )}
-                      style={{ backgroundColor: (value as any).color }}
-                    />
-                    <span>
-                      {(value as any).label}: {formattedValue}
-                    </span>
-                  </motion.button>
-                )
-              })}
-            </AnimatePresence>
+            {selectedQuery && (
+              <SelectedQueryBadge
+                selectedQuery={selectedQuery}
+                onClear={handleClearSelectedQuery}
+                metric={metric}
+                metrics={getQueryMetrics()}
+              />
+            )}
           </div>
+
           <div className="flex-1 min-h-0">
             <ChartContainer className="h-full w-full" config={config}>
               <AreaChart
@@ -477,69 +468,41 @@ export function MetricsChart({
       ? chartData.reduce((sum, point) => sum + (point.query_calls ?? 0), 0)
       : 0
 
+    // Get metrics for the selected query badge
+    const getQueryMetrics = () => {
+      if (!selectedQuery) return []
+
+      return [
+        {
+          label: 'Calls',
+          value: formatMetricValue(totalQueryCalls),
+          color: config.query_calls?.color || 'hsl(var(--chart-3))',
+        },
+      ]
+    }
+
     return (
       <div className="h-[320px] flex flex-col">
         <div className="flex flex-col flex-1 min-h-0">
-          <div className="flex gap-2 px-5 mb-4">
-            <AnimatePresence>
-              <motion.button
-                key="calls"
-                initial={{ opacity: 0, scale: 0.95, x: -8 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                exit={{ opacity: 0, scale: 0.95, x: -8 }}
-                transition={{ duration: 0.15 }}
-                className={cn(
-                  'text-xs px-2 py-1 rounded-full transition-colors inline-flex items-center gap-1.5 border',
-                  visibleMetrics.calls
-                    ? 'bg-surface-300'
-                    : 'hover:bg-surface-100 border-transparent'
-                )}
-                onClick={() =>
-                  setVisibleMetrics((prev) => ({
-                    ...prev,
-                    calls: !prev.calls,
-                  }))
-                }
-              >
-                <div
-                  className={cn('w-2 h-2 rounded-full', !visibleMetrics.calls && 'opacity-50')}
-                  style={{ backgroundColor: config.calls.color }}
-                />
-                <span>Total Calls: {formatMetricValue(totalCalls)}</span>
-              </motion.button>
+          <div className="flex flex-wrap items-center gap-2 px-5 mb-4">
+            <MetricToggleButtons
+              chartConfig={chartConfig as ChartConfigResult<any>}
+              visibleMetrics={visibleMetrics}
+              setVisibleMetrics={setVisibleMetrics}
+              metric={metric}
+              selectedQuery={selectedQuery}
+            />
 
-              {selectedQuery && (
-                <motion.button
-                  key="query_calls"
-                  initial={{ opacity: 0, scale: 0.95, x: -8 }}
-                  animate={{ opacity: 1, scale: 1, x: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, x: -8 }}
-                  transition={{ duration: 0.15 }}
-                  className={cn(
-                    'text-xs px-2 py-1 rounded-full transition-colors inline-flex items-center gap-1.5 border',
-                    visibleMetrics.query_calls
-                      ? 'bg-surface-300'
-                      : 'hover:bg-surface-100 border-transparent'
-                  )}
-                  onClick={() =>
-                    setVisibleMetrics((prev) => ({
-                      ...prev,
-                      query_calls: !prev.query_calls,
-                    }))
-                  }
-                >
-                  <div
-                    className={cn(
-                      'w-2 h-2 rounded-full',
-                      !visibleMetrics.query_calls && 'opacity-50'
-                    )}
-                    style={{ backgroundColor: config.query_calls.color }}
-                  />
-                  <span>Query Calls: {formatMetricValue(totalQueryCalls)}</span>
-                </motion.button>
-              )}
-            </AnimatePresence>
+            {selectedQuery && (
+              <SelectedQueryBadge
+                selectedQuery={selectedQuery}
+                onClear={handleClearSelectedQuery}
+                metric={metric}
+                metrics={getQueryMetrics()}
+              />
+            )}
           </div>
+
           <div className="flex-1 min-h-0">
             <ChartContainer className="h-full w-full" config={config}>
               <AreaChart
@@ -641,27 +604,25 @@ export function MetricsChart({
   return (
     <div className="h-[320px] flex flex-col">
       <div className="flex flex-col flex-1 min-h-0">
-        <div className="flex gap-2 px-5 mb-4">
-          <AnimatePresence>
-            <motion.button
-              key="generic-metric"
-              initial={{ opacity: 0, scale: 0.95, x: -8 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              exit={{ opacity: 0, scale: 0.95, x: -8 }}
-              transition={{ duration: 0.15 }}
-              className={cn(
-                'text-xs px-2 py-1 rounded-full transition-colors inline-flex items-center gap-1.5 border',
-                'bg-surface-300'
-              )}
-            >
-              <div
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: 'hsl(var(--chart-1))' }}
-              />
-              <span>{metric}</span>
-            </motion.button>
-          </AnimatePresence>
+        <div className="flex flex-wrap items-center gap-2 px-5 mb-4">
+          <MetricToggleButtons
+            chartConfig={chartConfig as ChartConfigResult<any>}
+            visibleMetrics={visibleMetrics}
+            setVisibleMetrics={setVisibleMetrics}
+            metric={metric}
+            selectedQuery={selectedQuery}
+          />
+
+          {selectedQuery && (
+            <SelectedQueryBadge
+              selectedQuery={selectedQuery}
+              onClear={handleClearSelectedQuery}
+              metric={metric}
+              metrics={[]}
+            />
+          )}
         </div>
+
         <div className="flex-1 min-h-0">
           <ChartContainer
             className="h-full w-full"

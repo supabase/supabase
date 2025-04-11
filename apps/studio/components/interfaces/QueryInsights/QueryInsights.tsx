@@ -16,6 +16,7 @@ import {
 } from 'data/query-insights/query-insights-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { SelectedQueryBadge } from './components/SelectedQueryBadge'
 
 export type MetricType = 'rows_read' | 'query_latency' | 'calls' | 'cache_hits'
 
@@ -77,6 +78,27 @@ export const QueryInsights = () => {
   )
 
   const selectedDatabase = databases?.find((db) => db.identifier === state.selectedDatabaseId)
+
+  // Event listener for clearing the selected query
+  useEffect(() => {
+    const handleClearSelectedQuery = (event: CustomEvent) => {
+      if (event.detail?.clearQuery) {
+        setSelectedQuery(null)
+      }
+    }
+
+    window.addEventListener(
+      'clearSelectedQueryInsightsQuery',
+      handleClearSelectedQuery as EventListener
+    )
+
+    return () => {
+      window.removeEventListener(
+        'clearSelectedQueryInsightsQuery',
+        handleClearSelectedQuery as EventListener
+      )
+    }
+  }, [])
 
   useEffect(() => {
     // Update the time range when selectedTimeRange changes
@@ -209,7 +231,7 @@ export const QueryInsights = () => {
         onValueChange={(value) => setSelectedMetric(value as MetricType)}
         className="space-y-4"
       >
-        <TabsList_Shadcn_ className="px-5 flex gap-5">
+        <TabsList_Shadcn_ className="w-full flex justify-start gap-5 px-5">
           {METRICS.map((metric) => (
             <TabsTrigger_Shadcn_ key={metric.id} value={metric.id}>
               {metric.label}
