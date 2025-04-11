@@ -51,14 +51,14 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
         provider: 'infra-monitoring',
         label: 'Free',
         tooltip:
-          'Available unused RAM. Low values may lead to increased swapping and slower performance.',
+          'Available unused RAM. A small amount is always reserved. High unused RAM present with erratic Used RAM may indicate unoptimized queries disrupting cache.',
       },
       {
         attribute: 'ram_usage_swap',
         provider: 'infra-monitoring',
         label: 'Swap',
         tooltip:
-          'Memory swapped to disk when RAM is full. High values indicate memory exhaustion, potentially causing slowdowns.',
+          'Memory swapped to disk when RAM is full. An instance has 1GB of SWAP. High swap with high disk I/O signals memory stress.',
       },
     ],
   },
@@ -96,14 +96,14 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
         label: 'IOwait',
         format: '%',
         tooltip:
-          'CPU time waiting for disk or network I/O. High values may indicate storage bottlenecks.',
+          'CPU time waiting for disk or network I/O. High values may indicate disk bottlenecks.',
       },
       {
         attribute: 'cpu_usage_busy_irqs',
         provider: 'infra-monitoring',
         label: 'IRQs',
         format: '%',
-        tooltip: 'CPU time handling hardware',
+        tooltip: 'CPU time handling hardware interrupt requests (IRQ)',
       },
       {
         attribute: 'cpu_usage_busy_other',
