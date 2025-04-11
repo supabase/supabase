@@ -118,17 +118,16 @@ import {
   SupabaseTableData,
   SupabaseTableName,
   useInfiniteQuery,
-} from '@/registry/default/blocks/infinite-query-hook/hooks/use-infinite-query'
+} from '@/hooks/use-infinite-query'
 import * as React from 'react'
 
 interface InfiniteListProps<TableName extends SupabaseTableName> {
   tableName: TableName
-  selectQuery?: string
+  columns?: string
   pageSize?: number
   trailingQuery?: SupabaseQueryHandler<TableName>
   renderItem: (item: SupabaseTableData<TableName>, index: number) => React.ReactNode
   className?: string
-  listClassName?: string
   renderNoResults?: () => React.ReactNode
   renderEndMessage?: () => React.ReactNode
   renderSkeleton?: (count: number) => React.ReactNode
@@ -145,26 +144,25 @@ const DefaultEndMessage = () => (
 const defaultSkeleton = (count: number) => (
   <div className="flex flex-col gap-2 px-4">
     {Array.from({ length: count }).map((_, index) => (
-      <div className="h-4 w-full bg-muted animate-pulse" />
+      <div key={index} className="h-4 w-full bg-muted animate-pulse" />
     ))}
   </div>
 )
 
 export function InfiniteList<TableName extends SupabaseTableName>({
   tableName,
-  selectQuery = '*',
+  columns = '*',
   pageSize = 20,
   trailingQuery,
   renderItem,
   className,
-  listClassName,
   renderNoResults = DefaultNoResults,
   renderEndMessage = DefaultEndMessage,
   renderSkeleton = defaultSkeleton,
 }: InfiniteListProps<TableName>) {
   const { data, isFetching, hasMore, fetchNextPage, isSuccess } = useInfiniteQuery({
-    tableName: tableName,
-    columns: selectQuery,
+    tableName,
+    columns,
     pageSize,
     trailingQuery,
   })
@@ -203,7 +201,7 @@ export function InfiniteList<TableName extends SupabaseTableName>({
 
   return (
     <div ref={scrollContainerRef} className={cn('relative h-full overflow-auto', className)}>
-      <div className={cn(listClassName)}>
+      <div>
         {isSuccess && data.length === 0 && renderNoResults()}
 
         {data.map((item, index) => renderItem(item, index))}

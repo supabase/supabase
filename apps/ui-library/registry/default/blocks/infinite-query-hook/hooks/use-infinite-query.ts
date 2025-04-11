@@ -184,7 +184,7 @@ function useInfiniteQuery<
   const state = useSyncExternalStore(
     storeRef.current.subscribe,
     () => storeRef.current.getState(),
-    () => initialState
+    () => initialState as StoreState<TData>
   )
 
   // Initialize on mount
