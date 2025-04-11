@@ -125,8 +125,13 @@ export const LogsPreviewer = ({
   }
 
   const handleRefresh = () => {
-    // Call refresh first to ensure we get the count with current timestamps
-    setTimeRange('', '')
+    if (timestampStart) {
+      const newTimestampStart = dayjs(timestampStart).toISOString()
+      const newTimestampEnd = dayjs().toISOString()
+      setTimeRange(newTimestampStart, newTimestampEnd)
+    } else {
+      setTimeRange('', '')
+    }
     refresh()
   }
 

@@ -26,10 +26,11 @@ import {
   LOGS_SOURCE_DESCRIPTION,
   LogsTableName,
 } from './Logs.constants'
-import DatePickers from './Logs.DatePickers'
+import { LogsDatePicker, DatePickerValue } from './Logs.DatePickers'
 import { LogsWarning, LogTemplate, WarehouseCollection } from './Logs.types'
 import { WarehouseQueryTemplate } from './Warehouse.utils'
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
+import dayjs from 'dayjs'
 
 export type SourceType = 'logs' | 'warehouse'
 export interface LogsQueryPanelProps {
@@ -43,7 +44,7 @@ export interface LogsQueryPanelProps {
   onSelectTemplate: (template: LogTemplate) => void
   onSelectWarehouseTemplate: (template: WarehouseQueryTemplate) => void
   onSelectSource: (source: string) => void
-  onDateChange: React.ComponentProps<typeof DatePickers>['onChange']
+  onDateChange: (value: DatePickerValue) => void
   onDataSourceChange: (sourceType: SourceType) => void
 }
 
@@ -90,6 +91,27 @@ const LogsQueryPanel = ({
       return true
     })
     .map(([, value]) => value)
+
+  function getDefaultDatePickerValue() {
+    if (defaultFrom && defaultTo) {
+      return {
+        to: defaultTo,
+        from: defaultFrom,
+        text: `${dayjs(defaultFrom).format('DD MMM, HH:mm')} - ${dayjs(defaultTo).format('DD MMM, HH:mm')}`,
+        isHelper: false,
+      }
+    }
+    return {
+      to: EXPLORER_DATEPICKER_HELPERS[0].calcTo(),
+      from: EXPLORER_DATEPICKER_HELPERS[0].calcFrom(),
+      text: EXPLORER_DATEPICKER_HELPERS[0].text,
+      isHelper: true,
+    }
+  }
+
+  const [selectedDatePickerValue, setSelectedDatePickerValue] = useState<DatePickerValue>(
+    getDefaultDatePickerValue()
+  )
 
   return (
     <div className="border-b bg-surface-100">
@@ -202,10 +224,12 @@ const LogsQueryPanel = ({
             )}
 
             {dataSource === 'logs' && (
-              <DatePickers
-                to={defaultTo}
-                from={defaultFrom}
-                onChange={onDateChange}
+              <LogsDatePicker
+                value={selectedDatePickerValue}
+                onSubmit={(value) => {
+                  setSelectedDatePickerValue(value)
+                  onDateChange(value)
+                }}
                 helpers={EXPLORER_DATEPICKER_HELPERS}
               />
             )}

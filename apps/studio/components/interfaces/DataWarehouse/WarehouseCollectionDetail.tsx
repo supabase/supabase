@@ -15,7 +15,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import DatePickers from '../Settings/Logs/Logs.DatePickers'
+import { LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 import { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import LogTable from '../Settings/Logs/LogTable'
 import { TestCollectionDialog } from './TestCollectionDialog'
@@ -202,11 +202,13 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               /> */}
-              <DatePickers
-                to={filters.interval?.to()}
-                from={filters.interval?.from()}
+              <LogsDatePicker
                 helpers={INTERVALS}
-                onChange={(e) =>
+                value={{
+                  from: filters.interval.from(),
+                  to: filters.interval.to(),
+                }}
+                onSubmit={(e) =>
                   setFilters({
                     ...filters,
                     interval: {
