@@ -214,7 +214,7 @@ const getQueriesSql = (startTime: string, endTime: string) => /* SQL */ `
     WHERE bucket_start_time >= '${startTime}'
       AND bucket_start_time <= '${endTime}'
       AND bucket_done = true
-      AND cmd_type IN (1, 2, 3, 4)  -- Only consider SELECT, INSERT, UPDATE, DELETE
+      -- AND cmd_type IN (1, 2, 3, 4)  -- Only consider SELECT, INSERT, UPDATE, DELETE
     GROUP BY queryid
   )
   SELECT 
@@ -227,7 +227,7 @@ const getQueriesSql = (startTime: string, endTime: string) => /* SQL */ `
       FROM index_advisor(q.query)
     ) ia ON q.query ILIKE 'SELECT%' OR q.query ILIKE 'WITH%'
   ORDER BY badness_score DESC
-  LIMIT 1000;
+  LIMIT 9999;
 `
 
 export function useQueryInsightsMetrics(

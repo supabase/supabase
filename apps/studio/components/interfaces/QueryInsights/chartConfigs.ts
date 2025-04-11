@@ -300,7 +300,32 @@ export function getCallsConfig(
 
   // If we have query-specific call data, add it to the chart
   if (queryCallsData && queryCallsData.length > 0) {
-    // Add query-specific call data processing here if needed
+    // Create a map of timestamps to query calls values
+    const queryCallsMap = new Map<string, number>()
+    queryCallsData.forEach((point) => {
+      queryCallsMap.set(point.timestamp, Number(point.value) || 0)
+    })
+
+    // Add query calls data to each chart data point
+    chartData.forEach((point) => {
+      if (queryCallsMap.has(point.timestamp)) {
+        point.query_calls = queryCallsMap.get(point.timestamp)!
+      }
+    })
+
+    // Add any missing query calls points
+    queryCallsData.forEach((point) => {
+      if (!chartData.find((d) => d.timestamp === point.timestamp)) {
+        chartData.push({
+          timestamp: point.timestamp,
+          calls: 0,
+          query_calls: Number(point.value) || 0,
+        })
+      }
+    })
+
+    // Re-sort chart data by timestamp
+    chartData.sort((a, b) => dayjs(a.timestamp).diff(dayjs(b.timestamp)))
   }
 
   const config: ChartConfigType = {

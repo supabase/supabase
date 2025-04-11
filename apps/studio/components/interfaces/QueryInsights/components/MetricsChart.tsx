@@ -15,8 +15,11 @@ import { useState, useMemo } from 'react'
 import { useParams } from 'common'
 import { Button } from 'ui'
 import { MetricType } from '../QueryInsights'
-import { useSingleQueryLatency } from 'data/query-insights/single-query-latency-query'
-import { useSingleQueryRows } from 'data/query-insights/single-query-latency-query'
+import {
+  useSingleQueryLatency,
+  useSingleQueryRows,
+  useSingleQueryCalls,
+} from 'data/query-insights/single-query-latency-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { formatLatency, formatMetricValue } from '../QueryInsights.utils'
 import {
@@ -76,6 +79,8 @@ export function MetricsChart({
     shared_blks_written: boolean
     cache_hit_ratio: boolean
     cache_miss_ratio: boolean
+    calls: boolean
+    query_calls: boolean
   }>({
     p50: true,
     p95: true,
@@ -90,6 +95,8 @@ export function MetricsChart({
     shared_blks_written: true,
     cache_hit_ratio: true,
     cache_miss_ratio: true,
+    calls: true,
+    query_calls: true,
   })
 
   // Fetch single query latency data if a query is selected
@@ -110,6 +117,15 @@ export function MetricsChart({
     enabled: !!selectedQuery && metric === 'rows_read',
   })
 
+  // Fetch single query calls data if a query is selected
+  const {
+    data: queryCallsData,
+    isLoading: isLoadingQueryCalls,
+    error: queryCallsError,
+  } = useSingleQueryCalls(ref, selectedQuery?.query_id?.toString(), startTime, endTime, {
+    enabled: !!selectedQuery && metric === 'calls',
+  })
+
   // Derive chart configuration based on the selected metric
   const chartConfig = useMemo(() => {
     if (!Array.isArray(data) || data.length === 0) {
@@ -124,11 +140,11 @@ export function MetricsChart({
       case 'cache_hits':
         return getCacheHitsConfig(data)
       case 'calls':
-        return getCallsConfig(data)
+        return getCallsConfig(data, queryCallsData)
       default:
         return getGenericMetricConfig(data)
     }
-  }, [data, metric, queryLatencyData, queryRowsData])
+  }, [data, metric, queryLatencyData, queryRowsData, queryCallsData])
 
   if (isLoading) {
     return (
@@ -457,6 +473,9 @@ export function MetricsChart({
 
     // Calculate total calls for display
     const totalCalls = chartData.reduce((sum, point) => sum + (point.calls ?? 0), 0)
+    const totalQueryCalls = selectedQuery
+      ? chartData.reduce((sum, point) => sum + (point.query_calls ?? 0), 0)
+      : 0
 
     return (
       <div className="h-[320px] flex flex-col">
@@ -471,15 +490,54 @@ export function MetricsChart({
                 transition={{ duration: 0.15 }}
                 className={cn(
                   'text-xs px-2 py-1 rounded-full transition-colors inline-flex items-center gap-1.5 border',
-                  'bg-surface-300'
+                  visibleMetrics.calls
+                    ? 'bg-surface-300'
+                    : 'hover:bg-surface-100 border-transparent'
                 )}
+                onClick={() =>
+                  setVisibleMetrics((prev) => ({
+                    ...prev,
+                    calls: !prev.calls,
+                  }))
+                }
               >
                 <div
-                  className="w-2 h-2 rounded-full"
+                  className={cn('w-2 h-2 rounded-full', !visibleMetrics.calls && 'opacity-50')}
                   style={{ backgroundColor: config.calls.color }}
                 />
                 <span>Total Calls: {formatMetricValue(totalCalls)}</span>
               </motion.button>
+
+              {selectedQuery && (
+                <motion.button
+                  key="query_calls"
+                  initial={{ opacity: 0, scale: 0.95, x: -8 }}
+                  animate={{ opacity: 1, scale: 1, x: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, x: -8 }}
+                  transition={{ duration: 0.15 }}
+                  className={cn(
+                    'text-xs px-2 py-1 rounded-full transition-colors inline-flex items-center gap-1.5 border',
+                    visibleMetrics.query_calls
+                      ? 'bg-surface-300'
+                      : 'hover:bg-surface-100 border-transparent'
+                  )}
+                  onClick={() =>
+                    setVisibleMetrics((prev) => ({
+                      ...prev,
+                      query_calls: !prev.query_calls,
+                    }))
+                  }
+                >
+                  <div
+                    className={cn(
+                      'w-2 h-2 rounded-full',
+                      !visibleMetrics.query_calls && 'opacity-50'
+                    )}
+                    style={{ backgroundColor: config.query_calls.color }}
+                  />
+                  <span>Query Calls: {formatMetricValue(totalQueryCalls)}</span>
+                </motion.button>
+              )}
             </AnimatePresence>
           </div>
           <div className="flex-1 min-h-0">
@@ -502,6 +560,20 @@ export function MetricsChart({
                       stopOpacity={CHART_OPACITY.GRADIENT_END}
                     />
                   </linearGradient>
+                  {selectedQuery && (
+                    <linearGradient id="gradient-query_calls" x1="0" y1="0" x2="0" y2="1">
+                      <stop
+                        offset="5%"
+                        stopColor={config.query_calls.color}
+                        stopOpacity={CHART_OPACITY.GRADIENT_START}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor={config.query_calls.color}
+                        stopOpacity={CHART_OPACITY.GRADIENT_END}
+                      />
+                    </linearGradient>
+                  )}
                 </defs>
                 <CartesianGrid vertical={false} />
                 <XAxis
@@ -523,17 +595,38 @@ export function MetricsChart({
                   content={<ChartTooltipContent indicator="dot" hideLabel />}
                 />
                 <ChartLegend content={<ChartLegendContent />} />
-                <Area
-                  type="monotone"
-                  dataKey="calls"
-                  fill="url(#gradient-calls)"
-                  stroke={config.calls.color}
-                  strokeWidth={1.5}
-                  dot={false}
-                  animationDuration={100}
-                  fillOpacity={CHART_OPACITY.FILL_NORMAL}
-                  strokeOpacity={CHART_OPACITY.STROKE_NORMAL}
-                />
+
+                {visibleMetrics.calls && (
+                  <Area
+                    type="monotone"
+                    dataKey="calls"
+                    fill="url(#gradient-calls)"
+                    stroke={config.calls.color}
+                    strokeWidth={1.5}
+                    dot={false}
+                    animationDuration={100}
+                    fillOpacity={
+                      selectedQuery ? CHART_OPACITY.FILL_SELECTED : CHART_OPACITY.FILL_NORMAL
+                    }
+                    strokeOpacity={
+                      selectedQuery ? CHART_OPACITY.STROKE_SELECTED : CHART_OPACITY.STROKE_NORMAL
+                    }
+                  />
+                )}
+
+                {selectedQuery && visibleMetrics.query_calls && (
+                  <Area
+                    type="monotone"
+                    dataKey="query_calls"
+                    fill="url(#gradient-query_calls)"
+                    stroke={config.query_calls.color}
+                    strokeWidth={2}
+                    dot={false}
+                    animationDuration={100}
+                    fillOpacity={CHART_OPACITY.HIGHLIGHT_FILL}
+                    strokeOpacity={CHART_OPACITY.HIGHLIGHT_STROKE}
+                  />
+                )}
               </AreaChart>
             </ChartContainer>
           </div>
