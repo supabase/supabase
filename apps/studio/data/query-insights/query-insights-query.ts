@@ -10,6 +10,8 @@ export type QueryInsightsMetric = {
   database: string
   shared_blks_read?: number
   shared_blks_hit?: number
+  shared_blks_dirtied?: number
+  shared_blks_written?: number
   mean_exec_time?: number
   total_exec_time?: number
   p50?: number
@@ -111,6 +113,22 @@ const getMetricsSql = (metric: string, startTime: string, endTime: string) => {
         SELECT
           bucket_start_time as timestamp,
           COUNT(*) / 300.0 as value, -- Convert to per-second rate (5 mins = 300 seconds)
+          datname as database
+        FROM pg_stat_monitor
+        WHERE bucket_start_time >= '${startTime}'::timestamptz
+          AND bucket_start_time <= '${endTime}'::timestamptz
+          AND bucket_done = true -- Only include completed buckets
+        GROUP BY bucket_start_time, datname
+        ORDER BY timestamp ASC
+      `
+    case 'cache_hits':
+      return /* SQL */ `
+        SELECT
+          bucket_start_time as timestamp,
+          SUM(shared_blks_hit) as shared_blks_hit,
+          SUM(shared_blks_read) as shared_blks_read,
+          SUM(shared_blks_dirtied) as shared_blks_dirtied,
+          SUM(shared_blks_written) as shared_blks_written,
           datname as database
         FROM pg_stat_monitor
         WHERE bucket_start_time >= '${startTime}'::timestamptz

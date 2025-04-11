@@ -17,7 +17,12 @@ import {
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 
-export type MetricType = 'rows_read' | 'rows_written' | 'query_latency' | 'queries_per_second'
+export type MetricType =
+  | 'rows_read'
+  | 'rows_written'
+  | 'query_latency'
+  | 'queries_per_second'
+  | 'cache_hits'
 
 const METRICS: { id: MetricType; label: string; description: string }[] = [
   {
@@ -39,6 +44,11 @@ const METRICS: { id: MetricType; label: string; description: string }[] = [
     id: 'queries_per_second',
     label: 'Queries per Second',
     description: 'Number of queries executed per second',
+  },
+  {
+    id: 'cache_hits',
+    label: 'Cache Hits',
+    description: 'Statistics for shared buffer cache usage',
   },
 ]
 
