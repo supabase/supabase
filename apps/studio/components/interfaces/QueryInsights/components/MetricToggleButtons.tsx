@@ -7,10 +7,18 @@ import { MetricPill } from './MetricPill'
 
 // Define the exact shape of the visibleMetrics state
 export interface VisibleMetricsState {
-  p50: boolean
-  p95: boolean
-  p99: boolean
-  p99_9: boolean
+  // Old keys for backward compatibility
+  p50?: boolean
+  p95?: boolean
+  p99?: boolean
+  p99_9?: boolean
+
+  // New latency keys
+  latency_p50?: boolean
+  latency_p90?: boolean
+  latency_p99?: boolean
+
+  // Common keys
   query_latency: boolean
   rows: boolean
   query_rows: boolean
@@ -22,7 +30,7 @@ export interface VisibleMetricsState {
   cache_miss_ratio: boolean
   calls: boolean
   query_calls: boolean
-  [key: string]: boolean // Allow string indexing
+  [key: string]: boolean | undefined // Allow string indexing with optional values
 }
 
 interface MetricToggleButtonsProps {
@@ -72,9 +80,54 @@ export const MetricToggleButtons = ({
           return null
         }
 
-        const metricValue = Number(
-          chartData[chartData.length - 1]?.[key as keyof (typeof chartData)[0]]
-        )
+        // Calculate metric value based on the type of metric
+        let metricValue: number
+
+        // For rows and calls metrics, calculate the total across all data points
+        if (key === 'rows' || key === 'calls') {
+          metricValue = chartData.reduce((sum, point) => {
+            const value = Number(point[key as keyof typeof point])
+            return sum + (isNaN(value) ? 0 : value)
+          }, 0)
+        }
+        // For latency metrics, calculate the average of all data points
+        else if (
+          key.includes('latency') ||
+          key.includes('p50') ||
+          key.includes('p95') ||
+          key.includes('p99')
+        ) {
+          const points = chartData.filter((point) => {
+            const value = Number(point[key as keyof typeof point])
+            return !isNaN(value) && value > 0
+          })
+
+          metricValue =
+            points.length > 0
+              ? points.reduce((sum, point) => {
+                  const value = Number(point[key as keyof typeof point])
+                  return sum + value
+                }, 0) / points.length
+              : 0
+        }
+        // For ratio metrics, use the last data point
+        else if (
+          key.includes('ratio') ||
+          key.includes('percentage') ||
+          key.includes('cache_hit_ratio') ||
+          key.includes('cache_miss_ratio')
+        ) {
+          metricValue = Number(
+            chartData[chartData.length - 1]?.[key as keyof (typeof chartData)[0]]
+          )
+        }
+        // For all other metrics, use the last data point as default
+        else {
+          metricValue = Number(
+            chartData[chartData.length - 1]?.[key as keyof (typeof chartData)[0]]
+          )
+        }
+
         const formattedValue = !isNaN(metricValue) ? (value as any).formatter(metricValue) : '0'
 
         return (
