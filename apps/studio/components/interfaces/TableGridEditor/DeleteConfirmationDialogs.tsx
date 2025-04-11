@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 
 import {
   formatFilterURLParams,
-  removeTableEditorStateFromLocalStorage,
+  saveTableEditorStateToLocalStorageDebounced,
 } from 'components/grid/SupabaseGrid.utils'
 import type { SupaRow } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -47,24 +47,20 @@ const DeleteConfirmationDialogs = ({
 
   const removeDeletedColumnFromFiltersAndSorts = ({
     ref,
-    name,
+    tableName,
     schema,
     columnName,
   }: {
     ref: string
-    name: string
+    tableName: string
     schema: string
     columnName: string
   }) => {
-    // Also remove it from localstorage
-    removeTableEditorStateFromLocalStorage(ref, name, schema)
-
     setParams((prevParams) => {
       const existingFilters = (prevParams?.filter ?? []) as string[]
       const existingSorts = (prevParams?.sort ?? []) as string[]
 
-      return {
-        ...prevParams,
+      const newFiltersAndSorts = {
         filter: existingFilters.filter((filter: string) => {
           const [column] = filter.split(':')
           if (column !== columnName) return filter
@@ -74,6 +70,20 @@ const DeleteConfirmationDialogs = ({
           if (column !== columnName) return sort
         }),
       }
+
+      // Overwrite local storage without the deleted column
+      saveTableEditorStateToLocalStorageDebounced({
+        projectRef: ref,
+        tableName,
+        schema,
+        filters: newFiltersAndSorts.filter,
+        sorts: newFiltersAndSorts.sort,
+      })
+
+      return {
+        ...prevParams,
+        ...newFiltersAndSorts,
+      }
     })
   }
 
@@ -82,10 +92,11 @@ const DeleteConfirmationDialogs = ({
       if (!(snap.confirmationDialog?.type === 'column')) return
       const selectedColumnToDelete = snap.confirmationDialog.column
       if (!project?.ref) return
+      if (!selectedTable?.name) return
 
       removeDeletedColumnFromFiltersAndSorts({
         ref: project?.ref,
-        name: selectedColumnToDelete.name,
+        tableName: selectedTable?.name,
         schema: selectedColumnToDelete.schema,
         columnName: selectedColumnToDelete.name,
       })

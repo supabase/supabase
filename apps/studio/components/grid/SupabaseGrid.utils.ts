@@ -171,21 +171,6 @@ export function saveTableEditorStateToLocalStorage({
   localStorage.setItem(storageKey, JSON.stringify(savedJson))
 }
 
-export const removeTableEditorStateFromLocalStorage = (
-  projectRef: string,
-  tableName: string,
-  schema?: string | null
-) => {
-  const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
-  const savedStr = localStorage.getItem(storageKey)
-  const tableKey = !schema || schema == 'public' ? tableName : `${schema}.${tableName}`
-
-  if (!savedStr) return
-  const savedJson = JSON.parse(savedStr)
-  delete savedJson[tableKey]
-  localStorage.setItem(storageKey, JSON.stringify(savedJson))
-}
-
 export const saveTableEditorStateToLocalStorageDebounced = AwesomeDebouncePromise(
   saveTableEditorStateToLocalStorage,
   500
