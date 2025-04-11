@@ -23,6 +23,7 @@ import {
   getRowsReadConfig,
   getQueryLatencyConfig,
   getGenericMetricConfig,
+  getCallsConfig,
   ChartConfigType,
   RowsReadChartData,
   QueryLatencyChartData,
@@ -30,6 +31,18 @@ import {
   ChartConfigResult,
   getCacheHitsConfig,
 } from '../chartConfigs'
+
+// Chart opacity constants
+const CHART_OPACITY = {
+  GRADIENT_START: 0.3,
+  GRADIENT_END: 0.05,
+  FILL_NORMAL: 0.3,
+  FILL_SELECTED: 0.05,
+  STROKE_NORMAL: 0.8,
+  STROKE_SELECTED: 0.2,
+  HIGHLIGHT_FILL: 0.6,
+  HIGHLIGHT_STROKE: 1,
+}
 
 interface MetricsChartProps {
   data: QueryInsightsMetric[]
@@ -110,11 +123,10 @@ export function MetricsChart({
         return getQueryLatencyConfig(data, queryLatencyData)
       case 'cache_hits':
         return getCacheHitsConfig(data)
-      case 'rows_written':
-      case 'queries_per_second':
-        return getGenericMetricConfig(data)
+      case 'calls':
+        return getCallsConfig(data)
       default:
-        return null
+        return getGenericMetricConfig(data)
     }
   }, [data, metric, queryLatencyData, queryRowsData])
 
@@ -163,6 +175,14 @@ export function MetricsChart({
               {Object.entries(config).map(([key, value]) => {
                 // Only show specific buttons based on conditions
                 if ((key === 'query_rows' || key === 'query_latency') && !selectedQuery) {
+                  return null
+                }
+
+                // Filter out the blocks metrics for cache hits chart
+                if (
+                  metric === 'cache_hits' &&
+                  (key === 'shared_blks_dirtied' || key === 'shared_blks_written')
+                ) {
                   return null
                 }
 
@@ -218,8 +238,16 @@ export function MetricsChart({
                 <defs>
                   {Object.entries(config).map(([key, value]) => (
                     <linearGradient key={key} id={`gradient-${key}`} x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={(value as any).color} stopOpacity={0.3} />
-                      <stop offset="95%" stopColor={(value as any).color} stopOpacity={0.05} />
+                      <stop
+                        offset="5%"
+                        stopColor={(value as any).color}
+                        stopOpacity={CHART_OPACITY.GRADIENT_START}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor={(value as any).color}
+                        stopOpacity={CHART_OPACITY.GRADIENT_END}
+                      />
                     </linearGradient>
                   ))}
                 </defs>
@@ -249,16 +277,6 @@ export function MetricsChart({
                   tickCount={metric === 'query_latency' ? 5 : undefined}
                   yAxisId="left"
                 />
-                {metric === 'cache_hits' && (
-                  <YAxis
-                    yAxisId="right"
-                    orientation="right"
-                    tickFormatter={formatMetricValue}
-                    domain={['auto', 'auto']}
-                    allowDataOverflow={false}
-                    width={50}
-                  />
-                )}
                 <ChartTooltip
                   cursor={false}
                   content={<ChartTooltipContent indicator="dot" hideLabel />}
@@ -277,8 +295,14 @@ export function MetricsChart({
                         strokeWidth={1}
                         dot={false}
                         animationDuration={100}
-                        fillOpacity={selectedQuery ? 0.1 : 0.3}
-                        strokeOpacity={selectedQuery ? 0.3 : 1}
+                        fillOpacity={
+                          selectedQuery ? CHART_OPACITY.FILL_SELECTED : CHART_OPACITY.FILL_NORMAL
+                        }
+                        strokeOpacity={
+                          selectedQuery
+                            ? CHART_OPACITY.STROKE_SELECTED
+                            : CHART_OPACITY.STROKE_NORMAL
+                        }
                         yAxisId="left"
                       />
                     )}
@@ -291,6 +315,8 @@ export function MetricsChart({
                         strokeWidth={2}
                         dot={false}
                         animationDuration={100}
+                        fillOpacity={CHART_OPACITY.HIGHLIGHT_FILL}
+                        strokeOpacity={CHART_OPACITY.HIGHLIGHT_STROKE}
                         yAxisId="left"
                       />
                     )}
@@ -299,28 +325,17 @@ export function MetricsChart({
 
                 {metric === 'query_latency' && (
                   <>
-                    {visibleMetrics.p50 && (
+                    {visibleMetrics.p99_9 && (
                       <Area
                         type="monotone"
-                        dataKey="p50"
-                        fill={config.p50.color}
-                        fillOpacity={selectedQuery && visibleMetrics.query_latency ? 0.05 : 0.4}
-                        stroke={config.p50.color}
-                        strokeOpacity={selectedQuery && visibleMetrics.query_latency ? 0.1 : 0.8}
-                        strokeWidth={1}
-                        dot={false}
-                        animationDuration={100}
-                        yAxisId="left"
-                      />
-                    )}
-                    {visibleMetrics.p95 && (
-                      <Area
-                        type="monotone"
-                        dataKey="p95"
-                        fill={config.p95.color}
-                        fillOpacity={selectedQuery && visibleMetrics.query_latency ? 0.05 : 0.4}
-                        stroke={config.p95.color}
-                        strokeOpacity={selectedQuery && visibleMetrics.query_latency ? 0.1 : 0.8}
+                        dataKey="p99_9"
+                        fill={`url(#gradient-p99_9)`}
+                        stroke={config.p99_9.color}
+                        strokeOpacity={
+                          selectedQuery && visibleMetrics.query_latency
+                            ? CHART_OPACITY.STROKE_SELECTED
+                            : CHART_OPACITY.STROKE_NORMAL
+                        }
                         strokeWidth={1}
                         dot={false}
                         animationDuration={100}
@@ -331,24 +346,47 @@ export function MetricsChart({
                       <Area
                         type="monotone"
                         dataKey="p99"
-                        fill={config.p99.color}
-                        fillOpacity={selectedQuery && visibleMetrics.query_latency ? 0.05 : 0.4}
+                        fill={`url(#gradient-p99)`}
                         stroke={config.p99.color}
-                        strokeOpacity={selectedQuery && visibleMetrics.query_latency ? 0.1 : 0.8}
+                        strokeOpacity={
+                          selectedQuery && visibleMetrics.query_latency
+                            ? CHART_OPACITY.STROKE_SELECTED
+                            : CHART_OPACITY.STROKE_NORMAL
+                        }
                         strokeWidth={1}
                         dot={false}
                         animationDuration={100}
                         yAxisId="left"
                       />
                     )}
-                    {visibleMetrics.p99_9 && (
+                    {visibleMetrics.p95 && (
                       <Area
                         type="monotone"
-                        dataKey="p99_9"
-                        fill={config.p99_9.color}
-                        fillOpacity={selectedQuery && visibleMetrics.query_latency ? 0.05 : 0.4}
-                        stroke={config.p99_9.color}
-                        strokeOpacity={selectedQuery && visibleMetrics.query_latency ? 0.1 : 0.8}
+                        dataKey="p95"
+                        fill={`url(#gradient-p95)`}
+                        stroke={config.p95.color}
+                        strokeOpacity={
+                          selectedQuery && visibleMetrics.query_latency
+                            ? CHART_OPACITY.STROKE_SELECTED
+                            : CHART_OPACITY.STROKE_NORMAL
+                        }
+                        strokeWidth={1}
+                        dot={false}
+                        animationDuration={100}
+                        yAxisId="left"
+                      />
+                    )}
+                    {visibleMetrics.p50 && (
+                      <Area
+                        type="monotone"
+                        dataKey="p50"
+                        fill={`url(#gradient-p50)`}
+                        stroke={config.p50.color}
+                        strokeOpacity={
+                          selectedQuery && visibleMetrics.query_latency
+                            ? CHART_OPACITY.STROKE_SELECTED
+                            : CHART_OPACITY.STROKE_NORMAL
+                        }
                         strokeWidth={1}
                         dot={false}
                         animationDuration={100}
@@ -359,10 +397,9 @@ export function MetricsChart({
                       <Area
                         type="monotone"
                         dataKey="query_latency"
-                        fill={config.query_latency.color}
-                        fillOpacity={0.6}
+                        fill={`url(#gradient-query_latency)`}
                         stroke={config.query_latency.color}
-                        strokeOpacity={1}
+                        strokeOpacity={CHART_OPACITY.HIGHLIGHT_STROKE}
                         strokeWidth={2.5}
                         dot={false}
                         animationDuration={100}
@@ -383,7 +420,8 @@ export function MetricsChart({
                         strokeWidth={2}
                         dot={false}
                         animationDuration={100}
-                        fillOpacity={0.3}
+                        fillOpacity={CHART_OPACITY.FILL_NORMAL}
+                        strokeOpacity={CHART_OPACITY.STROKE_NORMAL}
                         name="Cache Hit Ratio"
                         yAxisId="left"
                       />
@@ -397,33 +435,10 @@ export function MetricsChart({
                         strokeWidth={2}
                         dot={false}
                         animationDuration={100}
-                        fillOpacity={0.3}
+                        fillOpacity={CHART_OPACITY.FILL_NORMAL}
+                        strokeOpacity={CHART_OPACITY.STROKE_NORMAL}
                         name="Cache Miss Ratio"
                         yAxisId="left"
-                      />
-                    )}
-                    {visibleMetrics.shared_blks_dirtied && (
-                      <Line
-                        type="monotone"
-                        dataKey="shared_blks_dirtied"
-                        stroke={config.shared_blks_dirtied.color}
-                        strokeWidth={1.5}
-                        dot={false}
-                        animationDuration={100}
-                        name="Blocks Modified"
-                        yAxisId="right"
-                      />
-                    )}
-                    {visibleMetrics.shared_blks_written && (
-                      <Line
-                        type="monotone"
-                        dataKey="shared_blks_written"
-                        stroke={config.shared_blks_written.color}
-                        strokeWidth={1.5}
-                        dot={false}
-                        animationDuration={100}
-                        name="Blocks Written"
-                        yAxisId="right"
                       />
                     )}
                   </>
@@ -436,28 +451,188 @@ export function MetricsChart({
     )
   }
 
+  // For calls and other metrics, use the bar chart
+  if (metric === 'calls') {
+    const { chartData, config } = chartConfig as ChartConfigResult<any>
+
+    // Calculate total calls for display
+    const totalCalls = chartData.reduce((sum, point) => sum + (point.calls ?? 0), 0)
+
+    return (
+      <div className="h-[320px] flex flex-col">
+        <div className="flex flex-col flex-1 min-h-0">
+          <div className="flex gap-2 px-5 mb-4">
+            <AnimatePresence>
+              <motion.button
+                key="calls"
+                initial={{ opacity: 0, scale: 0.95, x: -8 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.95, x: -8 }}
+                transition={{ duration: 0.15 }}
+                className={cn(
+                  'text-xs px-2 py-1 rounded-full transition-colors inline-flex items-center gap-1.5 border',
+                  'bg-surface-300'
+                )}
+              >
+                <div
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: config.calls.color }}
+                />
+                <span>Total Calls: {formatMetricValue(totalCalls)}</span>
+              </motion.button>
+            </AnimatePresence>
+          </div>
+          <div className="flex-1 min-h-0">
+            <ChartContainer className="h-full w-full" config={config}>
+              <AreaChart
+                data={chartData}
+                style={{ width: '100%', height: '100%' }}
+                margin={{ right: 16 }}
+              >
+                <defs>
+                  <linearGradient id="gradient-calls" x1="0" y1="0" x2="0" y2="1">
+                    <stop
+                      offset="5%"
+                      stopColor={config.calls.color}
+                      stopOpacity={CHART_OPACITY.GRADIENT_START}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor={config.calls.color}
+                      stopOpacity={CHART_OPACITY.GRADIENT_END}
+                    />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="timestamp"
+                  interval="preserveStartEnd"
+                  minTickGap={50}
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  tickFormatter={(value) => dayjs(value).format('HH:mm')}
+                />
+                <YAxis
+                  tickFormatter={formatMetricValue}
+                  domain={[0, 'auto']}
+                  allowDataOverflow={false}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent indicator="dot" hideLabel />}
+                />
+                <ChartLegend content={<ChartLegendContent />} />
+                <Area
+                  type="monotone"
+                  dataKey="calls"
+                  fill="url(#gradient-calls)"
+                  stroke={config.calls.color}
+                  strokeWidth={1.5}
+                  dot={false}
+                  animationDuration={100}
+                  fillOpacity={CHART_OPACITY.FILL_NORMAL}
+                  strokeOpacity={CHART_OPACITY.STROKE_NORMAL}
+                />
+              </AreaChart>
+            </ChartContainer>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   // For other metrics, use the bar chart
   const { chartData } = chartConfig as { chartData: GenericChartData[] }
 
   return (
-    <div className="h-[320px]">
-      <motion.div
-        className="h-full"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
-      >
-        <LogsBarChart
-          data={chartData}
-          DateTimeFormat="HH:mm"
-          EmptyState={
-            <div className="flex items-center justify-center h-full">
-              <div className="text-sm text-foreground-light">No data available</div>
-            </div>
-          }
-        />
-      </motion.div>
+    <div className="h-[320px] flex flex-col">
+      <div className="flex flex-col flex-1 min-h-0">
+        <div className="flex gap-2 px-5 mb-4">
+          <AnimatePresence>
+            <motion.button
+              key="generic-metric"
+              initial={{ opacity: 0, scale: 0.95, x: -8 }}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              exit={{ opacity: 0, scale: 0.95, x: -8 }}
+              transition={{ duration: 0.15 }}
+              className={cn(
+                'text-xs px-2 py-1 rounded-full transition-colors inline-flex items-center gap-1.5 border',
+                'bg-surface-300'
+              )}
+            >
+              <div
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: 'hsl(var(--chart-1))' }}
+              />
+              <span>{metric}</span>
+            </motion.button>
+          </AnimatePresence>
+        </div>
+        <div className="flex-1 min-h-0">
+          <ChartContainer
+            className="h-full w-full"
+            config={{
+              ok_count: {
+                label: 'Value',
+                color: 'hsl(var(--chart-1))',
+              },
+            }}
+          >
+            <AreaChart
+              data={chartData}
+              style={{ width: '100%', height: '100%' }}
+              margin={{ right: 16 }}
+            >
+              <defs>
+                <linearGradient id="gradient-generic" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="5%"
+                    stopColor="hsl(var(--chart-1))"
+                    stopOpacity={CHART_OPACITY.GRADIENT_START}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="hsl(var(--chart-1))"
+                    stopOpacity={CHART_OPACITY.GRADIENT_END}
+                  />
+                </linearGradient>
+              </defs>
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="timestamp"
+                interval="preserveStartEnd"
+                minTickGap={50}
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={(value) => dayjs(value).format('HH:mm')}
+              />
+              <YAxis
+                tickFormatter={formatMetricValue}
+                domain={[0, 'auto']}
+                allowDataOverflow={false}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent indicator="dot" hideLabel />}
+              />
+              <ChartLegend content={<ChartLegendContent />} />
+              <Area
+                type="monotone"
+                dataKey="ok_count"
+                fill="url(#gradient-generic)"
+                stroke="hsl(var(--chart-1))"
+                strokeWidth={1.5}
+                dot={false}
+                animationDuration={100}
+                fillOpacity={CHART_OPACITY.FILL_NORMAL}
+                strokeOpacity={CHART_OPACITY.STROKE_NORMAL}
+              />
+            </AreaChart>
+          </ChartContainer>
+        </div>
+      </div>
     </div>
   )
 }

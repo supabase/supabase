@@ -43,6 +43,12 @@ export interface GenericChartData {
   error_count: number
 }
 
+export interface CallsChartData {
+  timestamp: string
+  calls: number
+  query_calls?: number
+}
+
 export interface ChartConfigResult<T> {
   chartData: T[]
   config: ChartConfigType
@@ -98,12 +104,12 @@ export function getRowsReadConfig(
   const config: ChartConfigType = {
     rows: {
       label: 'Rows Read',
-      color: '#3ECF8E',
+      color: 'hsl(var(--chart-1))',
       formatter: formatMetricValue,
     },
     query_rows: {
       label: 'Query Rows',
-      color: '#9BA6B0',
+      color: 'hsl(var(--chart-2))',
       formatter: formatMetricValue,
     },
   }
@@ -174,27 +180,27 @@ export function getQueryLatencyConfig(
   const config: ChartConfigType = {
     p50: {
       label: 'p50',
-      color: '#4B5563',
+      color: 'hsl(var(--chart-1))', // Pink/Red
       formatter: formatLatency,
     },
     p95: {
       label: 'p95',
-      color: '#6B7280',
+      color: 'hsl(var(--chart-2))', // Purple
       formatter: formatLatency,
     },
     p99: {
       label: 'p99',
-      color: '#9CA3AF',
+      color: 'hsl(var(--chart-3))', // Orange
       formatter: formatLatency,
     },
     p99_9: {
       label: 'p99.9',
-      color: '#D1D5DB',
+      color: 'hsl(var(--chart-4))', // Green
       formatter: formatLatency,
     },
     query_latency: {
       label: 'Query latency',
-      color: '#3B82F6',
+      color: 'hsl(var(--chart-5))', // Blue
       formatter: formatLatency,
     },
   }
@@ -240,22 +246,17 @@ export function getCacheHitsConfig(
   const config: ChartConfigType = {
     cache_hit_ratio: {
       label: 'Cache Hit Ratio',
-      color: '#3ECF8E', // Green
+      color: 'hsl(var(--chart-1))', // Chart color 1
       formatter: percentFormatter,
     },
     cache_miss_ratio: {
       label: 'Cache Miss Ratio',
-      color: '#EF4444', // Red/danger
+      color: 'hsl(var(--chart-3))', // Chart color 3
       formatter: percentFormatter,
     },
     shared_blks_dirtied: {
       label: 'Blocks Modified',
-      color: '#9BA6B0', // Gray
-      formatter: formatMetricValue,
-    },
-    shared_blks_written: {
-      label: 'Blocks Written',
-      color: '#6366F1', // Indigo
+      color: 'hsl(var(--chart-4))', // Chart color 4
       formatter: formatMetricValue,
     },
   }
@@ -278,4 +279,42 @@ export function getGenericMetricConfig(data: QueryInsightsMetric[]): {
   }))
 
   return { chartData }
+}
+
+/**
+ * Prepares data and configuration for the Calls chart
+ */
+export function getCallsConfig(
+  data: QueryInsightsMetric[],
+  queryCallsData?: QueryInsightsMetric[]
+): ChartConfigResult<CallsChartData> {
+  // Create the baseline chart data from the metrics
+  const chartData = data.map((point) => ({
+    timestamp: point.timestamp,
+    calls: Number(point.value) ?? 0,
+    query_calls: 0,
+  }))
+
+  // Sort chart data by timestamp
+  chartData.sort((a, b) => dayjs(a.timestamp).diff(dayjs(b.timestamp)))
+
+  // If we have query-specific call data, add it to the chart
+  if (queryCallsData && queryCallsData.length > 0) {
+    // Add query-specific call data processing here if needed
+  }
+
+  const config: ChartConfigType = {
+    calls: {
+      label: 'Total Calls',
+      color: 'hsl(var(--chart-1))', // Chart color 1
+      formatter: formatMetricValue,
+    },
+    query_calls: {
+      label: 'Query Calls',
+      color: 'hsl(var(--chart-2))', // Chart color 2
+      formatter: formatMetricValue,
+    },
+  }
+
+  return { chartData, config }
 }
