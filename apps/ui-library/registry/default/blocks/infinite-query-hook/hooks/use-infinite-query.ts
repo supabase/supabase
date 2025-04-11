@@ -154,6 +154,17 @@ function createStore<TData extends SupabaseTableData<T>, T extends SupabaseTable
   }
 }
 
+// Empty initial state to avoid hydration errors.
+const initialState: any = {
+  data: [],
+  count: 0,
+  isSuccess: false,
+  isLoading: false,
+  isFetching: false,
+  error: null,
+  hasInitialFetch: false,
+}
+
 function useInfiniteQuery<
   TData extends SupabaseTableData<T>,
   T extends SupabaseTableName = SupabaseTableName,
@@ -170,7 +181,11 @@ function useInfiniteQuery<
     storeRef.current = createStore<TData, T>(props)
   }
 
-  const state = useSyncExternalStore(storeRef.current.subscribe, () => storeRef.current.getState())
+  const state = useSyncExternalStore(
+    storeRef.current.subscribe,
+    () => storeRef.current.getState(),
+    () => initialState
+  )
 
   // Initialize on mount
   if (!state.hasInitialFetch && typeof window !== 'undefined') {
