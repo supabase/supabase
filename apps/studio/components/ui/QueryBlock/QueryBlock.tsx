@@ -350,7 +350,7 @@ export const QueryBlock = ({
       {view === 'chart' && queryResult !== undefined ? (
         <>
           {(queryResult ?? []).length === 0 ? (
-            <div className="flex w-full h-full items-center justify-center">
+            <div className="flex w-full h-full items-center justify-center py-3">
               <p className="text-foreground-light text-xs">No results returned from query</p>
             </div>
           ) : !xKey || !yKey ? (
