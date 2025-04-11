@@ -61,7 +61,7 @@ const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
-  const isReportsV2 = useFlag('reportsDatabaseV2')
+  const isReportsV2 = false
 
   const state = useDatabaseSelectorStateSnapshot()
   const defaultStart = dayjs().subtract(7, 'day').toISOString()
@@ -375,7 +375,7 @@ const DatabaseUsage = () => {
             )
           }}
           append={() => (
-            <div className="px-6 pb-2">
+            <div className="px-6 pb-6">
               <Alert_Shadcn_ variant="default" className="mt-4">
                 <AlertDescription_Shadcn_>
                   <div className="space-y-2">

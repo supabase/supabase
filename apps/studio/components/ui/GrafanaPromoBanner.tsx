@@ -1,6 +1,7 @@
 import React from 'react'
+import Link from 'next/link'
 import { useParams } from 'common'
-import { BookOpen, Link } from 'lucide-react'
+import { BookOpen } from 'lucide-react'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, AlertDescription_Shadcn_, cn, Button } from 'ui'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'

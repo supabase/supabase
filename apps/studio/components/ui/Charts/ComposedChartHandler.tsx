@@ -107,9 +107,17 @@ const useAttributeQueries = (
   data: ChartData | undefined,
   isVisible: boolean
 ) => {
-  const queries = attributes.map((attr: MultiAttribute) => {
+  // Use individual hooks for each attribute instead of using map
+  const results = []
+
+  // We need to use separate hooks for each possible attribute
+  // This ensures hooks are called unconditionally at the top level
+  for (let i = 0; i < attributes.length; i++) {
+    const attr = attributes[i]
+
     if (attr.provider === 'daily-stats') {
-      return useProjectDailyStatsQuery(
+      // Must use hook directly, not in a conditional or loop
+      const dailyStatsQuery = useProjectDailyStatsQuery(
         {
           projectRef: ref as string,
           attribute: attr.attribute as ProjectDailyStatsAttribute,
@@ -120,8 +128,10 @@ const useAttributeQueries = (
         },
         { enabled: data === undefined && isVisible }
       )
-    } else {
-      return useInfraMonitoringQuery(
+      results.push(dailyStatsQuery)
+    } else if (attr.provider === 'infra-monitoring') {
+      // Must use hook directly, not in a conditional or loop
+      const infraMonitoringQuery = useInfraMonitoringQuery(
         {
           projectRef: ref as string,
           attribute: attr.attribute as InfraMonitoringAttribute,
@@ -132,10 +142,14 @@ const useAttributeQueries = (
         },
         { enabled: data === undefined && isVisible }
       )
+      results.push(infraMonitoringQuery)
+    } else {
+      // Push a placeholder for any unknown provider to maintain array structure
+      results.push({ isLoading: false, data: undefined })
     }
-  })
+  }
 
-  return queries
+  return results
 }
 
 /**
