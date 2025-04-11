@@ -71,9 +71,9 @@ const getSingleQueryCallsSql = (queryId: string, startTime: string, endTime: str
 
 export function useSingleQueryLatency(
   projectRef: string | undefined,
-  queryId: string | undefined,
   startTime: string,
   endTime: string,
+  queryId: string | undefined,
   options?: UseQueryOptions<QueryInsightsMetric[]>
 ) {
   return useQuery({
@@ -97,9 +97,9 @@ export function useSingleQueryLatency(
 
 export function useSingleQueryRows(
   projectRef: string | undefined,
-  queryId: string | undefined,
   startTime: string,
   endTime: string,
+  queryId: string | undefined,
   options?: UseQueryOptions<QueryInsightsMetric[]>
 ) {
   return useQuery({
@@ -108,11 +108,15 @@ export function useSingleQueryRows(
       if (!projectRef) throw new Error('Project ref is required')
       if (!queryId) return []
 
+      const sql = getSingleQueryRowsSql(queryId, startTime, endTime)
+      console.log('[useSingleQueryRows] Executing SQL:', sql)
+
       const { result } = await executeSql({
         projectRef,
-        sql: getSingleQueryRowsSql(queryId, startTime, endTime),
+        sql,
       })
 
+      console.log('[useSingleQueryRows] Result:', result)
       return result as QueryInsightsMetric[]
     },
     enabled: !!queryId && !!projectRef,
@@ -122,9 +126,9 @@ export function useSingleQueryRows(
 
 export function useSingleQueryCalls(
   projectRef: string | undefined,
-  queryId: string | undefined,
   startTime: string,
   endTime: string,
+  queryId: string | undefined,
   options?: UseQueryOptions<QueryInsightsMetric[]>
 ) {
   return useQuery({

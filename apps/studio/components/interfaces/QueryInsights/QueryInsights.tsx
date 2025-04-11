@@ -53,6 +53,7 @@ export const QueryInsights = () => {
   const [selectedMetric, setSelectedMetric] = useState<MetricType>('query_latency')
   const [selectedTimeRange, setSelectedTimeRange] = useState('1d')
   const [selectedQuery, setSelectedQuery] = useState<QueryInsightsQuery | null>(null)
+  const [hoveredQuery, setHoveredQuery] = useState<QueryInsightsQuery | null>(null)
   const [timeRange, setTimeRange] = useState({
     period_start: {
       date: dayjs().subtract(24, 'hour').format('YYYY-MM-DD HH:mm:ssZ'),
@@ -247,6 +248,7 @@ export const QueryInsights = () => {
             startTime={timeRange.period_start.date}
             endTime={timeRange.period_end.date}
             selectedQuery={selectedQuery}
+            hoveredQuery={hoveredQuery}
           />
         </div>
       </Tabs_Shadcn_>
@@ -260,7 +262,9 @@ export const QueryInsights = () => {
         queries={queriesData || []}
         isLoading={isLoadingQueries}
         onQuerySelect={setSelectedQuery}
+        onQueryHover={setHoveredQuery}
         selectedQuery={selectedQuery}
+        hoveredQuery={hoveredQuery}
       />
     </div>
   )

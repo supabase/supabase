@@ -11,13 +11,23 @@ interface QueryListProps {
   queries: QueryInsightsQuery[]
   isLoading: boolean
   onQuerySelect?: (query: QueryInsightsQuery | null) => void
+  onQueryHover?: (query: QueryInsightsQuery | null) => void
   selectedQuery?: QueryInsightsQuery | null
+  hoveredQuery?: QueryInsightsQuery | null
 }
 
-export const QueryList = ({ queries, isLoading, onQuerySelect, selectedQuery }: QueryListProps) => {
+export const QueryList = ({
+  queries,
+  isLoading,
+  onQuerySelect,
+  onQueryHover,
+  selectedQuery,
+  hoveredQuery,
+}: QueryListProps) => {
   const router = useRouter()
   const gridRef = useRef<DataGridHandle>(null)
   const [selectedRow, setSelectedRow] = useState<number | undefined>()
+  const [hoveredRow, setHoveredRow] = useState<number | undefined>()
 
   const normalizeWhitespace = (sql: string) => {
     return sql.replace(/\s+/g, ' ').trim()
@@ -54,6 +64,35 @@ export const QueryList = ({ queries, isLoading, onQuerySelect, selectedQuery }: 
 
     // Scroll to keep the row in view
     gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
+  }
+
+  // Handler for row hover
+  const handleRowMouseEnter = (idx: number) => {
+    if (isNaN(idx) || idx < 0 || idx >= queries.length) return
+    if (selectedQuery) return // Don't trigger hover when a query is already selected
+
+    const query = queries[idx]
+    setHoveredRow(idx)
+    onQueryHover?.(query)
+    console.log('Query hover:', query.query_id, query.query.substring(0, 50) + '...')
+  }
+
+  const handleRowMouseLeave = () => {
+    if (selectedQuery) return // Don't clear hover when a query is already selected
+
+    setHoveredRow(undefined)
+    onQueryHover?.(null)
+    console.log('Query hover cleared')
+  }
+
+  const rowClassRender = (row: QueryInsightsQuery) => {
+    const isSelected = selectedQuery?.query_id === row.query_id
+    const isHovered = hoveredQuery?.query_id === row.query_id && !selectedQuery
+
+    return cn(
+      'cursor-pointer transition-colors',
+      isSelected ? 'bg-surface-300' : isHovered ? 'bg-surface-200' : ''
+    )
   }
 
   const columns: Column<QueryInsightsQuery>[] = [
@@ -265,8 +304,9 @@ export const QueryList = ({ queries, isLoading, onQuerySelect, selectedQuery }: 
         rowClass={(row, idx) => {
           // Use the query_id for comparison instead of row index
           const isSelected = selectedQuery?.query_id === row.query_id
+          // const isHovered = hoveredQuery?.query_id === row.query_id && !selectedQuery
           return [
-            `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'hover:bg-surface-200'} cursor-pointer`,
+            rowClassRender(row),
             `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
             '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
             '[&>.rdg-cell:first-child>div]:ml-4',
@@ -275,7 +315,16 @@ export const QueryList = ({ queries, isLoading, onQuerySelect, selectedQuery }: 
         renderers={{
           renderRow: (rowIdx, props) => {
             const idx = typeof rowIdx === 'number' ? rowIdx : Number(rowIdx)
-            return <Row {...props} key={`qi-row-${rowIdx}`} onClick={() => handleRowClick(idx)} />
+            return (
+              <Row
+                {...props}
+                key={`qi-row-${rowIdx}`}
+                onClick={() => handleRowClick(idx)}
+                // Commenting out hover functionality
+                // onMouseEnter={() => handleRowMouseEnter(idx)}
+                // onMouseLeave={handleRowMouseLeave}
+              />
+            )
           },
           noRowsFallback: isLoading ? (
             <div className="absolute top-14 px-6 w-full">
