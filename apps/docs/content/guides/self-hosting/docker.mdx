@@ -1,8 +1,8 @@
 ---
-title: 'Self-Hosting with Docker'
-description: 'Learn how to configure and deploy Supabase with Docker.'
-subtitle: 'Learn how to configure and deploy Supabase with Docker.'
-tocVideo: 'FqiQKRKsfZE'
+title: "Self-Hosting with Docker"
+description: "Learn how to configure and deploy Supabase with Docker."
+subtitle: "Learn how to configure and deploy Supabase with Docker."
+tocVideo: "FqiQKRKsfZE"
 ---
 
 Docker is the easiest way to get started with self-hosted Supabase. It should only take you a few minutes to get up and running. This guide assumes you are running the command from the machine you intend to host from.
@@ -24,12 +24,12 @@ You need the following installed in your system: [Git](https://git-scm.com/downl
 Follow these steps to start Supabase on your machine:
 
 <Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="general"
->
-<TabPanel id="general" label="General">
+scrollable
+size="small"
+type="underlined"
+defaultActiveId="general"
+
+> <TabPanel id="general" label="General">
 
 ```sh
 # Get the code
@@ -169,6 +169,7 @@ You may also want to connect to your Postgres database via an ORM or another dir
 
 For this you can use the standard Postgres connection string.
 You can find the the environment values mentioned below in the `.env` file which will be covered in the next section.
+
 ```
 postgres://postgres:[POSTGRES_PASSWORD]@[your-server-ip]:5432/[POSTGRES_DB]
 ```
@@ -260,7 +261,7 @@ docker compose down
 docker compose up -d
 ```
 
-{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
+{/_ supa-mdx-lint-disable-next-line Rule004ExcludeWords _/}
 
 Be aware that this will result in downtime. Simply restarting the services does not apply configuration changes.
 
@@ -309,8 +310,8 @@ If the tool doesn't exist, we build and open source it ourselves.
 <Image
   alt="Diagram showing the architecture of Supabase. The Kong API gateway sits in front of 7 services: GoTrue, PostgREST, Realtime, Storage, pg_meta, Functions, and pg_graphql. All the services talk to a single Postgres instance."
   src={{
-    dark: '/docs/img/supabase-architecture.svg',
-    light: '/docs/img/supabase-architecture--light.svg',
+    dark: "/docs/img/supabase-architecture.svg",
+    light: "/docs/img/supabase-architecture--light.svg",
   }}
 />
 
