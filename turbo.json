@@ -71,9 +71,9 @@
         "FORCE_ASSET_CDN",
         "ASSET_CDN_S3_ENDPOINT",
         "SITE_NAME",
-        "VERCEL_URL",
-        "CURRENT_CLI_VERSION"
+        "VERCEL_URL"
       ],
+      "passThroughEnv": ["CURRENT_CLI_VERSION"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "www#build": {
