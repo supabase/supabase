@@ -65,7 +65,10 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
   const computeItems =
     upcomingInvoice?.lines?.filter(
-      (item) => item.description?.toLowerCase().includes('compute') && item.breakdown?.length > 0
+      (item) =>
+        item.description?.toLowerCase().includes('compute') &&
+        item.breakdown &&
+        item.breakdown?.length > 0
     ) || []
 
   const computeCreditsItem =
@@ -171,8 +174,8 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                             {branchingComputeItems
                               .flatMap((it) => it.breakdown)
                               .map((breakdown) => (
-                                <li key={`branching-breakdown-${breakdown.project_ref}`}>
-                                  {breakdown.project_name} ({breakdown.usage} Hours)
+                                <li key={`branching-breakdown-${breakdown!.project_ref}`}>
+                                  {breakdown!.project_name} ({breakdown!.usage} Hours)
                                 </li>
                               ))}
                           </ul>
@@ -211,13 +214,14 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                     <TableCell className="py-2 px-0">
                       <div className="gap-1 flex items-center">
                         <span>{item.description ?? 'Unknown'}</span>
-                        {(item.breakdown.length > 0 || item.usage_metric != null) && (
+                        {((item.breakdown && item.breakdown.length > 0) ||
+                          item.usage_metric != null) && (
                           <InfoTooltip className="max-w-sm">
                             {item.unit_price_desc && (
                               <p className="mb-2">Pricing: {item.unit_price_desc}</p>
                             )}
 
-                            {item.breakdown.length > 0 && (
+                            {item.breakdown && item.breakdown.length > 0 && (
                               <>
                                 <p>Projects using {item.description}:</p>
                                 <ul className="ml-6 list-disc">
@@ -344,7 +348,7 @@ function ComputeLineItem({
 }) {
   const replicaProjects = computeItems
     .flatMap((item) =>
-      item.breakdown.map((project) => ({
+      item.breakdown!.map((project) => ({
         ...project,
         computeType: item.description,
         computeCosts: project.amount!,

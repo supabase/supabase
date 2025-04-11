@@ -28,7 +28,7 @@ export type UpcomingInvoiceResponse = {
     usage_based: boolean
     usage_metric?: PricingMetric
     usage_original?: number
-    breakdown: {
+    breakdown?: {
       project_ref: string
       project_name: string
       usage: number
@@ -57,7 +57,45 @@ export async function getUpcomingInvoice(
 
   if (error) handleError(error)
 
-  return data as unknown as UpcomingInvoiceResponse
+    return {
+      "subscription_id": "ZdC9sCcyrf9WRhV5",
+      "amount_total": 2350,
+      "amount_projected": 2353,
+      "billing_cycle_start": "2025-03-16T00:00:00.000Z",
+      "billing_cycle_end": "2025-04-16T00:00:00.000Z",
+      "customer_balance": 0,
+      "currency": "USD",
+      "lines": [
+          {
+              "amount": 2000,
+              "amount_before_discount": 2000,
+              "description": "Enterprise Plan",
+              "quantity": 1,
+              "unit_price": 2000,
+              "usage_based": false,
+              "period": {
+                  "start": "2025-04-16T00:00:00.000Z",
+                  "end": "2025-05-16T00:00:00.000Z"
+              },
+              "proration": false
+          },
+          {
+              "amount": 350,
+              "amount_before_discount": 350,
+              "description": "HIPAA",
+              "quantity": 1,
+              "unit_price": 350,
+              "usage_based": false,
+              "period": {
+                  "start": "2025-04-16T00:00:00.000Z",
+                  "end": "2025-05-16T00:00:00.000Z"
+              },
+              "proration": false
+          }
+      ]
+  } as unknown as UpcomingInvoiceResponse
+
+  //return data as unknown as UpcomingInvoiceResponse
 }
 
 export type UpcomingInvoiceData = Awaited<ReturnType<typeof getUpcomingInvoice>>
