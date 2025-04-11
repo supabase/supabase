@@ -74,7 +74,6 @@ export const QueryList = ({
     const query = queries[idx]
     setHoveredRow(idx)
     onQueryHover?.(query)
-    console.log('Query hover:', query.query_id, query.query.substring(0, 50) + '...')
   }
 
   const handleRowMouseLeave = () => {
@@ -82,7 +81,6 @@ export const QueryList = ({
 
     setHoveredRow(undefined)
     onQueryHover?.(null)
-    console.log('Query hover cleared')
   }
 
   const rowClassRender = (row: QueryInsightsQuery) => {
@@ -320,9 +318,8 @@ export const QueryList = ({
                 {...props}
                 key={`qi-row-${rowIdx}`}
                 onClick={() => handleRowClick(idx)}
-                // Commenting out hover functionality
-                // onMouseEnter={() => handleRowMouseEnter(idx)}
-                // onMouseLeave={handleRowMouseLeave}
+                onMouseEnter={() => handleRowMouseEnter(idx)}
+                onMouseLeave={handleRowMouseLeave}
               />
             )
           },
