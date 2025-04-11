@@ -1,9 +1,8 @@
 import { format } from 'date-fns'
 import { Clock } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import type { TimeSplitInputProps, TimeType } from './DatePicker.types'
-import { toast } from 'sonner'
 import {
   isUnixMicro,
   unixMicroToIsoTimestamp,

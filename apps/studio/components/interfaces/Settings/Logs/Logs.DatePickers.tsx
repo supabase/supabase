@@ -10,6 +10,7 @@ import TimeSplitInput from 'components/ui/DatePicker/TimeSplitInput'
 import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
 import { Label } from '@ui/components/shadcn/ui/label'
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
+import { PropsWithChildren } from 'react'
 
 export type DatePickerValue = {
   to: string
@@ -24,7 +25,7 @@ interface Props {
   helpers: DatetimeHelper[]
 }
 
-export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) => {
+export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<Props>) => {
   const [open, setOpen] = useState(false)
 
   // Reset the state when the popover closes
