@@ -68,8 +68,8 @@ const CustomDomainConfig = () => {
             customDomainsDisabledDueToQuota
               ? 'We are working with our upstream DNS provider before we are able to sign up new custom domains. Please check back in a few hours.'
               : plan === 'free'
-                ? 'To configure a custom domain for your project, please upgrade to the Pro Plan with the custom domains add-on selected'
-                : 'To configure a custom domain for your project, please enable the add-on'
+                ? 'Paid Plans come with free vanity subdomains or Custom Domains for an additional $10/month per domain.'
+                : 'To configure a custom domain for your project, please enable the add-on. Each Custom Domains costs $10 per month.'
           }
           addon="customDomain"
           source="customDomain"
