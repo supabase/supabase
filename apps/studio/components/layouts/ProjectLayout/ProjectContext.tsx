@@ -2,10 +2,10 @@ import { createContext, PropsWithChildren, useContext, useMemo } from 'react'
 
 import { Project, useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { PROJECT_STATUS } from 'lib/constants'
+import { AiAssistantStateContextProvider } from 'state/ai-assistant-state'
 import { DatabaseSelectorStateContextProvider } from 'state/database-selector'
 import { RoleImpersonationStateContextProvider } from 'state/role-impersonation-state'
 import { TableEditorStateContextProvider } from 'state/table-editor'
-import { AiAssistantStateContextProvider } from 'state/ai-assistant-state'
 
 export interface ProjectContextType {
   project?: Project
@@ -46,10 +46,7 @@ export const ProjectContextProvider = ({
           projectRef={projectRef}
         >
           <DatabaseSelectorStateContextProvider key={`database-selector-state-${projectRef}`}>
-            <RoleImpersonationStateContextProvider
-              key={`role-impersonation-state-${projectRef}`}
-              projectRef={projectRef}
-            >
+            <RoleImpersonationStateContextProvider key={`role-impersonation-state-${projectRef}`}>
               {children}
             </RoleImpersonationStateContextProvider>
           </DatabaseSelectorStateContextProvider>
