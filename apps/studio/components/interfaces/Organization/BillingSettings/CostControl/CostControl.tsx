@@ -57,7 +57,14 @@ const CostControl = ({}: CostControlProps) => {
             <div className="space-y-2">
               <p className="text-foreground text-base m-0">Cost Control</p>
               <p className="text-sm text-foreground-light m-0">
-                Control whether to use beyond your plans included quota
+                Allow scaling beyond your plan's{' '}
+                <Link
+                  href={`/org/${slug}/usage`}
+                  className="text-green-900 transition hover:text-green-1000"
+                >
+                  included quota
+                </Link>
+                .
               </p>
             </div>
             <div className="space-y-2">
@@ -114,16 +121,8 @@ const CostControl = ({}: CostControlProps) => {
                     </Alert>
                   ) : (
                     <p className="text-sm text-foreground-light">
-                      You can control whether your organization is charged for additional usage
-                      beyond the{' '}
-                      <Link
-                        href={`/org/${slug}/usage`}
-                        className="text-green-900 transition hover:text-green-1000"
-                      >
-                        included quota
-                      </Link>{' '}
-                      of your subscription plan. If you need to go beyond the included quota, simply
-                      switch off your spend cap to pay for additional usage.
+                      If you need to go beyond the included quota, simply switch off your spend cap
+                      to pay for additional usage.
                     </p>
                   )}
 
@@ -152,7 +151,7 @@ const CostControl = ({}: CostControlProps) => {
                       </p>
                       <p className="text-sm text-foreground-light">
                         {isUsageBillingEnabled ? (
-                          <span>You will be charged for any usage above the included quota.</span>
+                          <span>You will be charged for usage beyond the included quota.</span>
                         ) : (
                           <span>
                             You won't be charged any extra for usage. However, your projects could
@@ -161,12 +160,6 @@ const CostControl = ({}: CostControlProps) => {
                           </span>
                         )}
                       </p>
-                      {isUsageBillingEnabled && (
-                        <p className="text-sm text-foreground-light mt-1">
-                          Your projects will never become unresponsive. Only when your usage reaches
-                          the quota limit will you be charged for any excess usage.
-                        </p>
-                      )}
                       <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
                         <Button
                           type="default"

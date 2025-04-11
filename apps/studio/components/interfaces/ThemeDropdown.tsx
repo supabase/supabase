@@ -1,10 +1,8 @@
 import { Palette } from 'lucide-react'
 import { useTheme } from 'next-themes'
 
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import {
-  cn,
+  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -12,55 +10,33 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-  sidebarMenuButtonVariants,
   singleThemes,
   Theme,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import {
-  DEFAULT_SIDEBAR_BEHAVIOR,
-  ICON_SIZE,
-  ICON_STROKE_WIDTH,
-  SidebarBehaviourType,
-} from './Sidebar'
 
 export const ThemeDropdown = () => {
   const { theme, setTheme } = useTheme()
-  const [sidebarBehaviour] = useLocalStorageQuery<SidebarBehaviourType>(
-    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
-    DEFAULT_SIDEBAR_BEHAVIOR
-  )
-
-  const button = (
-    <button
-      data-sidebar="menu-button"
-      data-has-icon={true}
-      className={cn(
-        sidebarMenuButtonVariants({ variant: 'default', size: 'default', hasIcon: true })
-      )}
-    >
-      <Palette size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />
-      <span>Theme</span>
-    </button>
-  )
 
   return (
     <DropdownMenu>
-      {sidebarBehaviour === 'closed' ? (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <DropdownMenuTrigger asChild>{button}</DropdownMenuTrigger>
-          </TooltipTrigger>
-          <TooltipContent side="right" align="center">
-            <span>Theme</span>
-          </TooltipContent>
-        </Tooltip>
-      ) : (
-        <DropdownMenuTrigger asChild>{button}</DropdownMenuTrigger>
-      )}
-      <DropdownMenuContent side="top" align="start">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="text"
+              className="w-7"
+              icon={<Palette className="text-foreground-light" />}
+            />
+          </DropdownMenuTrigger>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" align="center">
+          <span>Theme</span>
+        </TooltipContent>
+      </Tooltip>
+      <DropdownMenuContent side="top" align="end" className="w-32">
         <DropdownMenuGroup>
           <DropdownMenuLabel>Theme</DropdownMenuLabel>
           <DropdownMenuRadioGroup

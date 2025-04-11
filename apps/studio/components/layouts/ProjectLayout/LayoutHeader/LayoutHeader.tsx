@@ -3,10 +3,7 @@ import Link from 'next/link'
 import { ReactNode, useMemo } from 'react'
 
 import { useParams } from 'common'
-import {
-  useIsInlineEditorEnabled,
-  useNewLayout,
-} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import Connect from 'components/interfaces/Connect/Connect'
 import { ThemeDropdown } from 'components/interfaces/ThemeDropdown'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
@@ -17,6 +14,7 @@ import InlineEditorButton from 'components/layouts/AppLayout/InlineEditorButton'
 import OrganizationDropdown from 'components/layouts/AppLayout/OrganizationDropdown'
 import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
+import { useCLIReleaseVersionQuery } from 'data/misc/cli-release-version-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -30,6 +28,7 @@ import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
+import { LocalVersionPopover } from './LocalVersionPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
@@ -73,7 +72,9 @@ const LayoutHeader = ({
   const { setMobileMenuOpen } = useAppStateSnapshot()
 
   const { open: isAiAssistantOpen } = useAiAssistantStateSnapshot()
-  const isInlineEditorEnabled = useIsInlineEditorEnabled()
+
+  const { data } = useCLIReleaseVersionQuery()
+  const currentCliVersion = data?.current
 
   const { data: subscription } = useOrgSubscriptionQuery({
     orgSlug: selectedOrganization?.slug,
@@ -202,7 +203,6 @@ const LayoutHeader = ({
               )}
             </AnimatePresence>
           </>
-          {/* Additional breadcrumbs are supplied */}
           <BreadcrumbsView defaultValue={breadcrumbs} />
         </div>
         <div className="flex items-center gap-x-2">
@@ -215,31 +215,31 @@ const LayoutHeader = ({
               <UserDropdown />
             </>
           ) : (
-            <ThemeDropdown />
+            <>
+              {!!currentCliVersion && <LocalVersionPopover />}
+              <ThemeDropdown />
+            </>
           )}
         </div>
       </div>
 
       <AnimatePresence initial={false}>
-        {!!projectRef &&
-          (isInlineEditorEnabled || (!isInlineEditorEnabled && !isAiAssistantOpen)) && (
-            <motion.div
-              className="border-l h-full flex items-center justify-center flex-shrink-0"
-              initial={{ opacity: 0, x: 0, width: 0 }}
-              animate={{ opacity: 1, x: 0, width: isInlineEditorEnabled ? 'auto' : 48 }}
-              exit={{ opacity: 0, x: 0, width: 0 }}
-              transition={{ duration: 0.15, ease: 'easeOut' }}
-            >
-              {isInlineEditorEnabled && (
-                <div className="border-r h-full flex items-center justify-center md:px-2">
-                  <InlineEditorButton />
-                </div>
-              )}
-              <div className="md:px-2">
-                <AssistantButton />
-              </div>
-            </motion.div>
-          )}
+        {!!projectRef && (
+          <motion.div
+            className="border-l h-full flex items-center justify-center flex-shrink-0"
+            initial={{ opacity: 0, x: 0, width: 0 }}
+            animate={{ opacity: 1, x: 0, width: 'auto' }}
+            exit={{ opacity: 0, x: 0, width: 0 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
+          >
+            <div className="border-r h-full flex items-center justify-center md:px-2">
+              <InlineEditorButton />
+            </div>
+            <div className="md:px-2">
+              <AssistantButton />
+            </div>
+          </motion.div>
+        )}
       </AnimatePresence>
     </header>
   )

@@ -211,12 +211,25 @@ export const DiskManagementReviewAndSubmitDialog = ({
 
   const hasComputeChanges =
     form.formState.defaultValues?.computeSize !== form.getValues('computeSize')
+  const hasTotalSizeChanges =
+    form.formState.defaultValues?.totalSize !== form.getValues('totalSize')
+  const hasStorageTypeChanges =
+    form.formState.defaultValues?.storageType !== form.getValues('storageType')
+  const hasThroughputChanges =
+    form.formState.defaultValues?.throughput !== form.getValues('throughput')
+  const hasIOPSChanges =
+    form.formState.defaultValues?.provisionedIOPS !== form.getValues('provisionedIOPS')
+
+  const hasGrowthPercentChanges =
+    form.formState.defaultValues?.growthPercent !== form.getValues('growthPercent')
+  const hasMinIncrementChanges =
+    form.formState.defaultValues?.minIncrementGb !== form.getValues('minIncrementGb')
+  const hasMaxSizeChanges = form.formState.defaultValues?.maxSizeGb !== form.getValues('maxSizeGb')
 
   const hasDiskConfigChanges =
-    form.formState.defaultValues?.provisionedIOPS !== form.getValues('provisionedIOPS') ||
-    (form.formState.defaultValues?.throughput !== form.getValues('throughput') &&
-      form.getValues('storageType') === 'gp3') ||
-    form.formState.defaultValues?.totalSize !== form.getValues('totalSize')
+    hasIOPSChanges ||
+    (hasThroughputChanges && form.getValues('storageType') === 'gp3') ||
+    hasTotalSizeChanges
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -269,7 +282,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
             <TableHeaderRow />
           </TableHeader>
           <TableBody className="[&_td]:py-0 [&_tr]:h-[50px] [&_tr]:border-dotted">
-            {form.formState.defaultValues?.computeSize !== form.getValues('computeSize') && (
+            {hasComputeChanges && (
               <TableDataRow
                 attribute="Compute size"
                 defaultValue={mapAddOnVariantIdToComputeSize(
@@ -286,7 +299,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 }
               />
             )}
-            {form.formState.defaultValues?.storageType !== form.getValues('storageType') && (
+            {hasStorageTypeChanges && (
               <TableDataRow
                 hidePrice
                 attribute="Storage Type"
@@ -297,8 +310,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 afterPrice={0}
               />
             )}
-            {form.formState.defaultValues?.provisionedIOPS !==
-              form.getValues('provisionedIOPS') && (
+            {(hasIOPSChanges || hasStorageTypeChanges) && (
               <TableDataRow
                 attribute="IOPS"
                 defaultValue={form.formState.defaultValues?.provisionedIOPS?.toLocaleString() ?? 0}
@@ -309,31 +321,29 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
               />
             )}
-            {form.formState.defaultValues?.throughput !== form.getValues('throughput') &&
-              form.getValues('storageType') === 'gp3' && (
-                <TableDataRow
-                  attribute="Throughput"
-                  defaultValue={form.formState.defaultValues?.throughput?.toLocaleString() ?? 0}
-                  newValue={form.getValues('throughput')?.toLocaleString() ?? 0}
-                  unit="MB/s"
-                  beforePrice={Number(throughputPrice.oldPrice)}
-                  afterPrice={Number(throughputPrice.newPrice)}
-                  priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
-                />
-              )}
-            {form.formState.defaultValues?.totalSize !== form.getValues('totalSize') ||
-              (form.formState.defaultValues?.storageType !== form.getValues('storageType') && (
-                <TableDataRow
-                  attribute="Disk size"
-                  defaultValue={form.formState.defaultValues?.totalSize?.toLocaleString() ?? 0}
-                  newValue={form.getValues('totalSize')?.toLocaleString()}
-                  unit="GB"
-                  beforePrice={Number(diskSizePrice.oldPrice)}
-                  afterPrice={Number(diskSizePrice.newPrice)}
-                  priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
-                />
-              ))}
-            {form.formState.defaultValues?.growthPercent !== form.getValues('growthPercent') && (
+            {form.getValues('storageType') === 'gp3' && hasThroughputChanges && (
+              <TableDataRow
+                attribute="Throughput"
+                defaultValue={form.formState.defaultValues?.throughput?.toLocaleString() ?? 0}
+                newValue={form.getValues('throughput')?.toLocaleString() ?? 0}
+                unit="MB/s"
+                beforePrice={Number(throughputPrice.oldPrice)}
+                afterPrice={Number(throughputPrice.newPrice)}
+                priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
+              />
+            )}
+            {(hasTotalSizeChanges || hasStorageTypeChanges) && (
+              <TableDataRow
+                attribute="Disk size"
+                defaultValue={form.formState.defaultValues?.totalSize?.toLocaleString() ?? 0}
+                newValue={form.getValues('totalSize')?.toLocaleString()}
+                unit="GB"
+                beforePrice={Number(diskSizePrice.oldPrice)}
+                afterPrice={Number(diskSizePrice.newPrice)}
+                priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
+              />
+            )}
+            {hasGrowthPercentChanges && (
               <TableDataRow
                 attribute="Growth percent"
                 defaultValue={
@@ -348,7 +358,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 afterPrice={0}
               />
             )}
-            {form.formState.defaultValues?.minIncrementGb !== form.getValues('minIncrementGb') && (
+            {hasMinIncrementChanges && (
               <TableDataRow
                 attribute="Min increment"
                 defaultValue={
@@ -364,7 +374,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 afterPrice={0}
               />
             )}
-            {form.formState.defaultValues?.maxSizeGb !== form.getValues('maxSizeGb') && (
+            {hasMaxSizeChanges && (
               <TableDataRow
                 attribute="Max disk size"
                 defaultValue={

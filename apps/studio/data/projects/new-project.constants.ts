@@ -1,7 +1,18 @@
 import { components } from 'api-types'
 import { PROVIDERS } from 'lib/constants'
 
-type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
+export type DesiredInstanceSize = Exclude<
+  components['schemas']['CreateProjectBody']['desired_instance_size'],
+  undefined | 'pico' | 'nano'
+>
+export type ReleaseChannel = Exclude<
+  components['schemas']['CreateProjectBody']['release_channel'],
+  undefined
+>
+export type PostgresEngine = Exclude<
+  components['schemas']['CreateProjectBody']['postgres_engine'],
+  undefined
+>
 
 export const instanceSizeSpecs: Record<
   DesiredInstanceSize,
@@ -14,16 +25,6 @@ export const instanceSizeSpecs: Record<
     cloud_providers: string[]
   }
 > = {
-  // [Joshen] Just to fix the TS error since this size is now expected
-  // Unsure the parameters here, so leaving cloud_providers blank for now to prevent it from showing up in new project page
-  pico: {
-    label: 'Pico',
-    ram: '',
-    cpu: '',
-    priceHourly: 0,
-    priceMonthly: 0,
-    cloud_providers: [],
-  },
   micro: {
     label: 'Micro',
     ram: '1 GB',
