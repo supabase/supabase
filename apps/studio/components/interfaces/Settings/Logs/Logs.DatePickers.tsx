@@ -42,10 +42,15 @@ export const LogsDatePicker: React.FC<Props> = ({ onSubmit, helpers, value }) =>
         ss: fromDate?.getSeconds().toString().padStart(2, '0') || '00',
       })
 
+      const now = new Date()
+      const nowHH = now.getHours().toString().padStart(2, '0')
+      const nowMM = now.getMinutes().toString().padStart(2, '0')
+      const nowSS = now.getSeconds().toString().padStart(2, '0')
+
       setEndTime({
-        HH: toDate?.getHours().toString().padStart(2, '0') || '23',
-        mm: toDate?.getMinutes().toString().padStart(2, '0') || '59',
-        ss: toDate?.getSeconds().toString().padStart(2, '0') || '59',
+        HH: toDate?.getHours().toString().padStart(2, '0') || nowHH,
+        mm: toDate?.getMinutes().toString().padStart(2, '0') || nowMM,
+        ss: toDate?.getSeconds().toString().padStart(2, '0') || nowSS,
       })
     }
   }, [open, value])
