@@ -49,6 +49,9 @@ export function getCreateFDWSql({
     const value = (formState[option.name] || '').replace(/'/g, "''")
 
     return /* SQL */ `
+      -- pgsodium may not be created by default
+      create extension if not exists pgsodium;
+
       select pgsodium.create_key(
         name := '${key}'
       );
