@@ -31,6 +31,8 @@ import {
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import PaymentMethodSelection from './PaymentMethodSelection'
+import { ProjectInfo } from 'data/projects/projects-query'
+import { Admonition } from 'ui-patterns'
 
 const getRandomTweet = () => {
   const filteredTweets = tweets.filter((it) => it.text.length < 180)
@@ -71,6 +73,7 @@ interface Props {
   subscription: any
   slug?: string
   currentPlanMeta: any
+  projects: ProjectInfo[]
 }
 
 const SubscriptionPlanUpdateDialog = ({
@@ -88,6 +91,7 @@ const SubscriptionPlanUpdateDialog = ({
   subscription,
   slug,
   currentPlanMeta,
+  projects,
 }: Props) => {
   const queryClient = useQueryClient()
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
@@ -179,9 +183,9 @@ const SubscriptionPlanUpdateDialog = ({
           {/* Left Column */}
           <div className="p-8 pb-8 flex flex-col">
             <div className="flex-1">
-              <h3 className="text-lg font-medium mb-4">
+              <h3 className="text-base mb-4">
                 {planMeta?.change_type === 'downgrade' ? 'Downgrade' : 'Upgrade'}{' '}
-                {selectedOrganization?.name} to{' '}
+                <span className="font-bold">{selectedOrganization?.name}</span> to{' '}
                 {planMeta?.change_type === 'downgrade'
                   ? DOWNGRADE_PLAN_HEADINGS[(selectedTier as DowngradePlanHeadingKey) || 'default']
                   : PLAN_HEADINGS[(selectedTier as PlanHeadingKey) || 'default']}
@@ -568,6 +572,16 @@ const SubscriptionPlanUpdateDialog = ({
                     )}
                 </div>
               )}
+
+              {projects.length === 0 && (
+                <div className="pb-2">
+                  <Admonition title="Empty organization" type="warning">
+                    This organization has no active projects. Did you select the correct
+                    organization?
+                  </Admonition>
+                </div>
+              )}
+
               <div className="flex space-x-4">
                 <Button type="default" onClick={onClose} className="flex-1">
                   Cancel
