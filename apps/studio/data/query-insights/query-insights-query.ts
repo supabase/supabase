@@ -121,6 +121,19 @@ const getMetricsSql = (metric: string, startTime: string, endTime: string) => {
         GROUP BY bucket_start_time, datname
         ORDER BY timestamp ASC
       `
+    case 'calls':
+      return /* SQL */ `
+        SELECT
+          bucket_start_time as timestamp,
+          SUM(calls) as value,
+          datname as database
+        FROM pg_stat_monitor
+        WHERE bucket_start_time >= '${startTime}'::timestamptz
+          AND bucket_start_time <= '${endTime}'::timestamptz
+          AND bucket_done = true -- Only include completed buckets
+        GROUP BY bucket_start_time, datname
+        ORDER BY timestamp ASC
+      `
     case 'cache_hits':
       return /* SQL */ `
         SELECT
