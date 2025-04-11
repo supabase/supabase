@@ -89,13 +89,6 @@ const FeedbackWidget = ({
     }
   }, [screenshot])
 
-  const clearFeedback = () => {
-    setFeedback('')
-    setScreenshot(undefined)
-    localStorage.removeItem(FEEDBACK_STORAGE_KEY)
-    localStorage.removeItem(SCREENSHOT_STORAGE_KEY)
-  }
-
   const captureScreenshot = async () => {
     setIsSavingScreenshot(true)
 
@@ -178,22 +171,18 @@ const FeedbackWidget = ({
     <ThanksMessage onClose={onClose} />
   ) : (
     <>
-      <div className="px-3">
-        <h2>Send Feedback</h2>
-        <p className="text-sm text-foreground-light">
-          How can we improve this page? Anything you'd change or isn't working?
-        </p>
+      <div className="px-5">
         <TextArea_Shadcn_
           placeholder="It would be great if..."
           rows={5}
           value={feedback}
           onChange={(e) => setFeedback(e.target.value)}
           onPaste={handlePasteEvent}
-          className="text-sm mt-4"
+          className="text-sm mt-4 mb-1"
         />
       </div>
       <PopoverSeparator />
-      <div className="px-3 flex flex-row justify-between items-start">
+      <div className="px-5 flex flex-row justify-between items-start">
         <div>
           <p className="text-xs text-foreground">Have a technical issue?</p>
           <p className="text-xs text-foreground-light">
@@ -301,26 +290,26 @@ export default FeedbackWidget
 
 const ThanksMessage = ({ onClose }: { onClose: () => void }) => {
   return (
-    <div className="px-3">
-      <div className="grid gap-4">
-        <div className="flex items-center gap-2 text-sm text-foreground-light">
-          <CircleCheck size={16} /> Your feedback has been sent. Thanks!{' '}
+    <div className="px-0 pt-3 pb-0">
+      <div className="grid gap-3">
+        <div className="px-6 grid gap-3 py-2 text-center text-foreground-light">
+          <CircleCheck className="mx-auto text-brand-500" size={24} />
+          <p className="text-foreground text-base">Your feedback has been sent. Thanks!</p>
+          <p className="text-sm ">
+            We do not always respond to feedback. If you require assistance, please contact support
+            instead.
+          </p>
         </div>
-        <p className="text-sm text-foreground-light">
-          We do not always respond to feedback. If you require assistance, please contact support
-          instead.
-        </p>
         <PopoverSeparator />
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-foreground-light">
-              <Link href="/support/new">
-                <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
-                  Create a Support Ticket
-                </span>
-              </Link>{' '}
-            </p>
-          </div>
+        <div className="flex items-center justify-between px-4">
+          <p className="text-xs text-foreground-light">
+            <Link href="/support/new">
+              <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
+                Create a Support Ticket
+              </span>
+            </Link>
+          </p>
+
           <Button type="default" onClick={onClose}>
             Close
           </Button>
