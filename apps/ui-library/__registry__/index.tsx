@@ -451,13 +451,13 @@ export const Index: Record<string, any> = {
       chunks: []
     }
     ,
-    "infinite-list-demo": {
-      name: "infinite-list-demo",
+    "infinite-query-hook-demo": {
+      name: "infinite-query-hook-demo",
       type: "registry:example",
       registryDependencies: [],
-      component: React.lazy(() => import("@/registry/default/examples/infinite-list-demo.tsx")),
+      component: React.lazy(() => import("@/registry/default/examples/infinite-query-hook-demo.tsx")),
       source: "",
-      files: ["registry/default/examples/infinite-list-demo.tsx"],
+      files: ["registry/default/examples/infinite-query-hook-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
