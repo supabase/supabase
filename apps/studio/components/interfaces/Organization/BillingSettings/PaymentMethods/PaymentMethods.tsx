@@ -151,6 +151,8 @@ const PaymentMethods = () => {
                                 paymentMethodType={subscription?.payment_method_type}
                                 setSelectedMethodForUse={setSelectedMethodForUse}
                                 setSelectedMethodToDelete={setSelectedMethodToDelete}
+                                paymentMethodCount={paymentMethods?.data.length ?? 0}
+                                subscriptionPlan={subscription?.plan.id}
                               />
                             ))}
                           </div>
