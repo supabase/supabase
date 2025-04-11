@@ -18,4 +18,11 @@ export const databaseCronJobsKeys = {
     options,
   ],
   timezone: (projectRef: string | undefined) => ['database-cron-timezone', projectRef] as const,
+  edit: (projectRef: string | undefined, jobId: number) => [
+    'projects',
+    projectRef,
+    'cron-jobs',
+    jobId,
+    'edit',
+  ] as const,
 }

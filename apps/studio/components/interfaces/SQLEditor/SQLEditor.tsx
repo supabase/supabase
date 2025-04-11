@@ -300,10 +300,13 @@ export const SQLEditor = () => {
         const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
         const formattedSql = suffixWithLimit(sql, limit)
 
+        // Ensure correct placement of `()` and `;` when editing the cron job
+        const correctedSql = formattedSql.replace(/;\(\)/g, '();')
+
         execute({
           projectRef: project.ref,
           connectionString: connectionString,
-          sql: wrapWithRoleImpersonation(formattedSql, {
+          sql: wrapWithRoleImpersonation(correctedSql, {
             projectRef: project.ref,
             role: impersonatedRole,
           }),
