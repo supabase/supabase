@@ -94,7 +94,7 @@ const BackupsList = () => {
         )}
       </div>
       <ConfirmationModal
-        size="small"
+        size="medium"
         confirmLabel="Confirm restore"
         confirmLabelLoading="Restoring"
         visible={selectedBackup !== undefined}
