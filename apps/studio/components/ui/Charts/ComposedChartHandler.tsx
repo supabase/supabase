@@ -107,7 +107,7 @@ const useAttributeQueries = (
   data: ChartData | undefined,
   isVisible: boolean
 ) => {
-  return attributes.map((attr: MultiAttribute) => {
+  const queries = attributes.map((attr: MultiAttribute) => {
     if (attr.provider === 'daily-stats') {
       return useProjectDailyStatsQuery(
         {
@@ -134,6 +134,8 @@ const useAttributeQueries = (
       )
     }
   })
+
+  return queries
 }
 
 /**
