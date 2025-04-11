@@ -8,7 +8,7 @@ import {
 } from 'data/invoices/org-invoice-upcoming-query'
 import { formatCurrency } from 'lib/helpers'
 import { Table, TableBody, TableCell, TableFooter, TableRow } from 'ui'
-import { billingMetricUnit } from '../helpers'
+import { billingMetricUnit, formatUsage } from '../helpers'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import _ from 'lodash'
@@ -87,7 +87,6 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
   const otherItems =
     upcomingInvoice?.lines?.filter(
       (item) =>
-        item.amount > 0 &&
         !item.description?.toLowerCase().includes('compute') &&
         !item.description?.toLowerCase().includes('plan')
     ) || []
@@ -238,7 +237,8 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                                       </Link>{' '}
                                       {item.usage_metric && (
                                         <span>
-                                          ({breakdown.usage} {billingMetricUnit(item.usage_metric)})
+                                          ({formatUsage(item.usage_metric, breakdown)}{' '}
+                                          {billingMetricUnit(item.usage_metric)})
                                         </span>
                                       )}
                                     </li>
