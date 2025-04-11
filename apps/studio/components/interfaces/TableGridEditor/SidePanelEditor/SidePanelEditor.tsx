@@ -23,7 +23,7 @@ import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-muta
 import { tableKeys } from 'data/tables/keys'
 import { getTables } from 'data/tables/tables-query'
 import { useUrlState } from 'hooks/ui/useUrlState'
-import { useGetImpersonatedRole } from 'state/role-impersonation-state'
+import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, renameTab } from 'state/tabs'
 import type { Dictionary } from 'types'
@@ -103,7 +103,7 @@ const SidePanelEditor = ({
     onError: () => {},
   })
 
-  const getImpersonatedRole = useGetImpersonatedRole()
+  const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
   const saveRow = async (
     payload: any,
@@ -124,7 +124,7 @@ const SidePanelEditor = ({
           table: selectedTable,
           payload,
           enumArrayColumns,
-          impersonatedRole: getImpersonatedRole(),
+          roleImpersonationState: getImpersonatedRoleState(),
         })
       } catch (error: any) {
         saveRowError = error
@@ -141,7 +141,7 @@ const SidePanelEditor = ({
               configuration,
               payload,
               enumArrayColumns,
-              impersonatedRole: getImpersonatedRole(),
+              roleImpersonationState: getImpersonatedRoleState(),
             })
           } catch (error: any) {
             saveRowError = error

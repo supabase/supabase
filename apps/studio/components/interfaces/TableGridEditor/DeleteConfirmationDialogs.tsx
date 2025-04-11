@@ -16,7 +16,7 @@ import { TablesData, useGetTables } from 'data/tables/tables-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { noop } from 'lib/void'
-import { useGetImpersonatedRole } from 'state/role-impersonation-state'
+import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Checkbox } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -178,7 +178,7 @@ const DeleteConfirmationDialogs = ({
     })
   }
 
-  const getImpersonatedRole = useGetImpersonatedRole()
+  const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
   const onConfirmDeleteRow = async () => {
     if (!project) return console.error('Project ref is required')
@@ -188,7 +188,7 @@ const DeleteConfirmationDialogs = ({
 
     if (snap.confirmationDialog.allRowsSelected) {
       if (filters.length === 0) {
-        if (getImpersonatedRole() !== undefined) {
+        if (getImpersonatedRoleState().role !== undefined) {
           snap.closeConfirmationDialog()
           return toast.error('Table truncation is not supported when impersonating a role')
         }
@@ -204,7 +204,7 @@ const DeleteConfirmationDialogs = ({
           connectionString: project.connectionString,
           table: selectedTable as any,
           filters,
-          impersonatedRole: getImpersonatedRole(),
+          roleImpersonationState: getImpersonatedRoleState(),
         })
       }
     } else {
@@ -213,7 +213,7 @@ const DeleteConfirmationDialogs = ({
         connectionString: project.connectionString,
         table: selectedTable as any,
         rows: selectedRowsToDelete as SupaRow[],
-        impersonatedRole: getImpersonatedRole(),
+        roleImpersonationState: getImpersonatedRoleState(),
       })
     }
   }
