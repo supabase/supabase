@@ -57,7 +57,7 @@ interface Props {
   billingPartner?: string
   selectedOrganization: any
   subscription: any
-  slug?: string
+  slug: string
   currentPlanMeta: any
 }
 
@@ -486,7 +486,7 @@ const SubscriptionPlanUpdateDialog = ({
 
             <div className="pt-6">
               {!billingViaPartner ? (
-                <div className="space-y-3 mb-4">
+                <div className="space-y-2 mb-4">
                   <BillingAddressDialog slug={slug} />
                   <PaymentMethodSelection
                     selectedPaymentMethod={selectedPaymentMethod}

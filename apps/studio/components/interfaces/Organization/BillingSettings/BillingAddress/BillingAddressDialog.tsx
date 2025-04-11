@@ -42,7 +42,7 @@ const BillingAddressDialog = ({ slug }: BillingAddressDialogProps) => {
 
   // Create a summary of the address if it exists
   const getAddressSummary = () => {
-    if (!customerProfile?.address?.line1) return 'Add billing address'
+    if (!customerProfile?.address?.line1) return 'No billing address set'
 
     const parts = [
       customerProfile?.address?.line1,
@@ -57,7 +57,7 @@ const BillingAddressDialog = ({ slug }: BillingAddressDialogProps) => {
   return (
     <>
       <div>
-        <Label htmlFor="billing-address-btn" className="text-foreground-light block mb-3">
+        <Label htmlFor="billing-address-btn" className="text-foreground-light block mb-2">
           Billing Address
         </Label>
         {!canReadBillingAddress ? (
@@ -76,17 +76,18 @@ const BillingAddressDialog = ({ slug }: BillingAddressDialogProps) => {
               />
             )}
             {isSuccess && (
-              <Button
-                id="billing-address-btn"
-                type="default"
-                size="small"
-                onClick={() => setOpen(true)}
-                disabled={!canReadBillingAddress || !canUpdateBillingAddress}
-                iconRight={<Pencil size={16} strokeWidth={1.5} className="text-foreground-muted" />}
-                className="w-full justify-between"
-              >
-                {getAddressSummary()}
-              </Button>
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-foreground">{getAddressSummary()}</p>
+                <Button
+                  onClick={() => setOpen(true)}
+                  type="text"
+                  aria-label="Edit"
+                  size={'tiny'}
+                  className="w-8 h-8 p-0 text-foreground-light"
+                >
+                  <Pencil size={14} strokeWidth={1.5} />
+                </Button>
+              </div>
             )}
           </>
         )}
