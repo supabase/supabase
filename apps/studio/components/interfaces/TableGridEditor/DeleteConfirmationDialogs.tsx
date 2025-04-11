@@ -14,12 +14,12 @@ import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-
 import { useTableDeleteMutation } from 'data/tables/table-delete-mutation'
 import { TablesData, useGetTables } from 'data/tables/tables-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useUrlState } from 'hooks/ui/useUrlState'
 import { noop } from 'lib/void'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Checkbox } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
 
 export type DeleteConfirmationDialogsProps = {
   selectedTable?: Entity | PostgresTable
@@ -34,7 +34,7 @@ const DeleteConfirmationDialogs = ({
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
 
-  const [{ filter }, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
+  const { filters: filter, setParams } = useTableEditorFiltersSort()
   const filters = formatFilterURLParams(filter as string[])
 
   const getTables = useGetTables({
