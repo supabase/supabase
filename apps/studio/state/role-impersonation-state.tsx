@@ -125,7 +125,3 @@ export function useSubscribeToImpersonatedRole(
 export function isRoleImpersonationEnabled(impersonationRole?: ImpersonationRole) {
   return impersonationRole?.type === 'postgrest'
 }
-
-export function useIsRoleImpersonationEnabled() {
-  return isRoleImpersonationEnabled(useRoleImpersonationStateSnapshot().role)
-}
