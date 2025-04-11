@@ -367,7 +367,6 @@ function ComputeLineItem({
     computeItems.reduce((prev, cur) => prev + (cur.amount ?? 0), 0) + (computeCredits?.amount ?? 0)
   )
 
-  console.log({computeCosts, discountedComputeCosts})
 
   if (!computeItems.length) return null
 
