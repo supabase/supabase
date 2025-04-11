@@ -96,7 +96,7 @@ const InputWithSuggestions = ({
         data-testid={dataTestId}
         actions={
           showSuggestions && (
-            <DropdownMenu>
+            <DropdownMenu modal>
               <DropdownMenuTrigger asChild>
                 <ButtonTooltip
                   type="default"

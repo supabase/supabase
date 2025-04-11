@@ -22,7 +22,7 @@ const ProjectUsageSection = () => {
   // to eliminate multiple spinners
   const { isLoading: isLogsStatsLoading } = useProjectLogStatsQuery({
     projectRef: project?.ref,
-    interval: 'hourly',
+    interval: 'minutely',
   })
 
   if (usageError) {
@@ -38,7 +38,7 @@ const ProjectUsageSection = () => {
 
   // if the project has more than 25 requests, we assume the project has usage
   const hasProjectData =
-    usage?.result && usage.result.length > 0 ? usage.result[0].count > 25 : false
+    usage?.result && usage.result.length > 0 ? (usage.result[0] as any).count > 25 : false
 
   const isNewProject = dayjs(project?.inserted_at).isAfter(dayjs().subtract(2, 'day'))
 
