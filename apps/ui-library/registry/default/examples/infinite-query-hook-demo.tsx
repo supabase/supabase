@@ -120,8 +120,8 @@ const renderChannelItem = (channel: Channel) => {
 }
 
 // Define a filter to only show logs with log_level = 'info'
-const orderByCreateAt: SupabaseQueryHandler<'channels'> = (query) => {
-  return query.order('created_at', { ascending: false })
+const orderByInsertedAt: SupabaseQueryHandler<'channels'> = (query) => {
+  return query.order('inserted_at', { ascending: false })
 }
 
 const InfiniteListDemo = () => {
@@ -130,8 +130,8 @@ const InfiniteListDemo = () => {
       <InfiniteList
         tableName="channels"
         renderItem={renderChannelItem}
-        pageSize={15}
-        trailingQuery={orderByCreateAt}
+        pageSize={3}
+        trailingQuery={orderByInsertedAt}
       />
     </div>
   )
