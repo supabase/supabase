@@ -23,197 +23,199 @@ The hook is fully typed, provided you have generated and setup your database typ
 
 ## Usage
 
-### Basic usage
-
-```tsx
-import { InfiniteList } from '@/components/ui/infinite-list'
-
-// Define your data type (matching your Supabase table structure)
-type Log = {
-  id: number
-  log_message: string
-  log_level: string
-  created_at: string
-}
-
-export default function LogsPage() {
-  // Define how each item should be rendered
-  const renderLogItem = (log: Log) => {
-    return (
-      <div className="border-b py-3 px-4 hover:bg-muted flex items-center justify-between">
-        <div>
-          <span className="font-medium text-sm text-foreground">
-            {log.log_message} (ID: {log.id})
-          </span>
-          <div className="text-sm text-foreground-light">
-            {new Date(log.created_at).toLocaleDateString()}
-          </div>
-        </div>
-        <span className="text-xs text-foreground-light rounded-lg py-2 px-3 bg-muted">
-          {log.log_level}
-        </span>
-      </div>
-    )
-  }
-
-  return (
-    <div className="h-[600px]">
-      <InfiniteList<Log> tableName="logging_data" renderItem={renderLogItem} pageSize={15} />
-    </div>
-  )
-}
-```
-
-### With filtering
-
-```tsx
-import { InfiniteList } from '@/components/ui/infinite-list'
-import { type SupabaseFilterBuilder } from '@/hooks/use-infinite-query'
-
-// Define your data type
-type Log = {
-  id: number
-  log_message: string
-  log_level: string
-  created_at: string
-}
-
-export default function InfoLogsPage() {
-  const renderLogItem = (log: Log) => {
-    // Render implementation
-  }
-
-  // Define a filter to only show logs with log_level = 'INFO'
-  const filterLogsToInfo = (query: SupabaseFilterBuilder) => {
-    return query.eq('log_level', 'INFO')
-  }
-
-  return (
-    <div className="h-[600px]">
-      <InfiniteList<Log>
-        tableName="logging_data"
-        renderItem={renderLogItem}
-        pageSize={15}
-        filterBuilder={filterLogsToInfo}
-      />
-    </div>
-  )
-}
-```
-
-### Custom appearance
-
-```tsx
-import { InfiniteList } from '@/components/ui/infinite-list'
-
-export default function CustomLogsPage() {
-  // Render implementation...
-
-  return (
-    <InfiniteList<Log>
-      tableName="logging_data"
-      renderItem={renderLogItem}
-      className="h-[800px] border-2 border-primary"
-      listClassName="space-y-4 p-6"
-      renderNoResults={() => (
-        <div className="text-center p-8 bg-muted rounded-lg">No logs found</div>
-      )}
-      renderEndMessage={() => <div className="text-center p-4 text-primary">All logs loaded!</div>}
-      renderSkeleton={(count) => (
-        <div className="space-y-2 animate-pulse">
-          {Array.from({ length: count }).map((_, i) => (
-            <div key={i} className="h-20 bg-muted rounded-md" />
-          ))}
-        </div>
-      )}
-    />
-  )
-}
-```
-
-## Features
-
-- **Infinite Scrolling:** Automatically fetches more data as the user scrolls
-- **Supabase Integration:** Direct integration with Supabase tables
-- **Flexible Rendering:** Highly customizable item rendering
-- **Server-side Filtering:** Apply filters directly to your Supabase queries
-- **Loading States:** Customizable loading skeletons and status messages
-- **Optimized Performance:** Efficient intersection observer implementation
-- **Full Customization:** All aspects of the list appearance can be adjusted
+Before using this hook, we **highly** recommend you setup database types in your project. This will make the hook fully-typesafe. More info about generating Typescript types from database schema [here](https://supabase.com/docs/reference/javascript/typescript-support)
 
 ## Props
 
-| Prop               | Type                                                      | Description                                                                           |
-| ------------------ | --------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `tableName`        | `string`                                                  | **Required.** The name of the Supabase table to fetch data from.                      |
-| `renderItem`       | `(item: TData, index: number) => React.ReactNode`         | **Required.** Function that renders each item in the list.                            |
-| `pageSize`         | `number`                                                  | Number of items to fetch per page. Defaults to `20`.                                  |
-| `selectQuery`      | `string`                                                  | Columns to select from the table. Defaults to `'*'`.                                  |
-| `filterBuilder`    | `(query: SupabaseFilterBuilder) => SupabaseFilterBuilder` | Function to apply filters or sorting to the Supabase query.                           |
-| `className`        | `string`                                                  | Class name for the outer scrollable container.                                        |
-| `listClassName`    | `string`                                                  | Class name for the inner div containing list items.                                   |
-| `renderNoResults`  | `() => React.ReactNode`                                   | Function to render content when no results are found. Default: "No results."          |
-| `renderEndMessage` | `() => React.ReactNode`                                   | Function to render message at the end of the list. Default: "You've reached the end." |
-| `renderSkeleton`   | `(count: number) => React.ReactNode`                      | Function to render loading skeletons. Default: Uses simple placeholders.              |
+| Prop            | Type                                                      | Description                                                      |
+| --------------- | --------------------------------------------------------- | ---------------------------------------------------------------- |
+| `tableName`     | `string`                                                  | **Required.** The name of the Supabase table to fetch data from. |
+| `columns`       | `string`                                                  | Columns to select from the table. Defaults to `'*'`.             |
+| `pageSize`      | `number`                                                  | Number of items to fetch per page. Defaults to `20`.             |
+| `trailingQuery` | `(query: SupabaseSelectBuilder) => SupabaseSelectBuilder` | Function to apply filters or sorting to the Supabase query.      |
+
+## Return type
+
+data, count, isSuccess, isLoading, isFetching, error, hasMore, fetchNextPage
+
+| Prop            | Type          | Description                                                                         |
+| --------------- | ------------- | ----------------------------------------------------------------------------------- |
+| `data`          | `TableData[]` | An array of fetched items.                                                          |
+| `count`         | `number`      | Number of total items in the database. It takes `trailingQuery` into consideration. |
+| `isSuccess`     | `boolean`     | It's true if the last API call succeeded.                                           |
+| `isLoading`     | `boolean`     | It's true only for the initial fetch.                                               |
+| `isFetching`    | `boolean`     | It's true for the initial and all incremental fetches.                              |
+| `error`         | `any`         | The error from the last fetch.                                                      |
+| `hasMore`       | `boolean`     | Whether the query has finished fetching all items from the database                 |
+| `fetchNextPage` | `() => void`  | Sends a new request for the next items                                              |
 
 ## Type-safety
 
-## TData interface
+The hook will use the typed defined on your Supabase client if they're setup ([more info](https://supabase.com/docs/reference/javascript/typescript-support)).
 
-The component is generic and accepts any data type that matches your Supabase table structure. For example:
+The hook also supports an custom defined result type by using `useInfiniteQuery<T>`. For example, if you have a custom type for `Product`, you can use it like this `useInfiniteQuery<Product>`.
 
-```typescript
-type Log = {
-  id: number
-  log_message: string
-  log_level: string
-  created_at: string
-}
+## Examples
 
-// Then use it with the generic parameter
-<InfiniteList<Log> ... />
-```
-
-## Advanced usage
-
-### Custom filtering and sorting
+### With sorting
 
 ```tsx
-const advancedFilter = (query: SupabaseFilterBuilder) => {
-  return query
-    .eq('status', 'active')
-    .gte('created_at', '2023-01-01')
-    .order('created_at', { ascending: false })
-}
+const { data, fetchNextPage } = useInfiniteQuery({
+  tableName: 'products',
+  columns: '*',
+  pageSize: 10,
+  trailingQuery: (query) => query.order('created_at', { ascending: false }),
+})
 
-;<InfiniteList tableName="users" renderItem={renderUser} filterBuilder={advancedFilter} />
-```
-
-### Custom skeleton rendering
-
-```tsx
-const renderCustomSkeleton = (count: number) => (
-  <div className="space-y-4">
-    {Array.from({ length: count }).map((_, i) => (
-      <div key={i} className="flex gap-4">
-        <div className="rounded-full bg-muted h-12 w-12" />
-        <div className="space-y-2 flex-1">
-          <div className="h-4 bg-muted rounded w-3/4" />
-          <div className="h-3 bg-muted rounded w-1/2" />
-        </div>
-      </div>
+return (
+  <div>
+    {data.map((item) => (
+      <ProductCard key={item.id} product={item} />
     ))}
+    <Button onClick={fetchNextPage}>Load more products</Button>
   </div>
 )
+```
 
-<InfiniteList
-  renderSkeleton={renderCustomSkeleton}
-  // other props...
-/>
+### With filtering on search params
+
+```tsx
+const params = useSearchParams()
+const searchQuery = params.get('q')
+
+const { data, isLoading, isFetching, fetchNextPage, count, isSuccess } = useInfiniteQuery({
+  tableName: 'products',
+  columns: '*',
+  pageSize: 10,
+  trailingQuery: (query) => {
+    if (searchQuery && searchQuery.length > 0) {
+      query = query.ilike('name', `%${searchQuery}%`)
+    }
+    return query
+  },
+})
+
+return (
+  <div>
+    {data.map((item) => (
+      <ProductCard key={item.id} product={item} />
+    ))}
+    <Button onClick={fetchNextPage}>Load more products</Button>
+  </div>
+)
+```
+
+### Infinite list component (fetches as you scroll)
+
+The following component abstracts the hook into a component. It includes few utility components for no results and end of the list.
+
+```tsx
+'use client'
+
+import { cn } from '@/lib/utils'
+import {
+  SupabaseQueryHandler,
+  SupabaseTableData,
+  SupabaseTableName,
+  useInfiniteQuery,
+} from '@/registry/default/blocks/infinite-query-hook/hooks/use-infinite-query'
+import * as React from 'react'
+
+interface InfiniteListProps<TableName extends SupabaseTableName> {
+  tableName: TableName
+  selectQuery?: string
+  pageSize?: number
+  trailingQuery?: SupabaseQueryHandler<TableName>
+  renderItem: (item: SupabaseTableData<TableName>, index: number) => React.ReactNode
+  className?: string
+  listClassName?: string
+  renderNoResults?: () => React.ReactNode
+  renderEndMessage?: () => React.ReactNode
+  renderSkeleton?: (count: number) => React.ReactNode
+}
+
+const DefaultNoResults = () => (
+  <div className="text-center text-muted-foreground py-10">No results.</div>
+)
+
+const DefaultEndMessage = () => (
+  <div className="text-center text-muted-foreground py-4 text-sm">You&apos;ve reached the end.</div>
+)
+
+export function InfiniteList<TableName extends SupabaseTableName>({
+  tableName,
+  selectQuery = '*',
+  pageSize = 20,
+  trailingQuery,
+  renderItem,
+  className,
+  listClassName,
+  renderNoResults = DefaultNoResults,
+  renderEndMessage = DefaultEndMessage,
+  renderSkeleton,
+}: InfiniteListProps<TableName>) {
+  const { data, isFetching, hasMore, fetchNextPage } = useInfiniteQuery({
+    tableName: tableName,
+    columns: selectQuery,
+    pageSize,
+    trailingQuery,
+  })
+
+  // Ref for the scrolling container
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null)
+
+  // Intersection observer logic - target the last rendered *item* or a dedicated sentinel
+  const loadMoreSentinelRef = React.useRef<HTMLDivElement>(null)
+  const observer = React.useRef<IntersectionObserver | null>(null)
+
+  React.useEffect(() => {
+    if (observer.current) observer.current.disconnect()
+
+    observer.current = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isFetching) {
+          fetchNextPage()
+        }
+      },
+      {
+        root: scrollContainerRef.current, // Use the scroll container for scroll detection
+        threshold: 0.1, // Trigger when 10% of the target is visible
+        rootMargin: '0px 0px 100px 0px', // Trigger loading a bit before reaching the end
+      }
+    )
+
+    if (loadMoreSentinelRef.current) {
+      observer.current.observe(loadMoreSentinelRef.current)
+    }
+
+    return () => {
+      if (observer.current) observer.current.disconnect()
+    }
+  }, [isFetching, hasMore, fetchNextPage])
+
+  return (
+    <div ref={scrollContainerRef} className={cn('relative h-full overflow-auto', className)}>
+      <div className={cn(listClassName)}>
+        {data.length === 0 && !isFetching && renderNoResults()}
+
+        {data.map((item, index) => (
+          <div key={(item as any)?.id ?? index}>{renderItem(item, index)}</div>
+        ))}
+
+        {isFetching && renderSkeleton && renderSkeleton(pageSize)}
+
+        <div ref={loadMoreSentinelRef} style={{ height: '1px' }} />
+
+        {!hasMore && data.length > 0 && renderEndMessage()}
+      </div>
+    </div>
+  )
+}
 ```
 
 ## Further reading
 
-- [Supabase PostgreSQL API](https://supabase.com/docs/reference/javascript/introduction)
+- [Generating Typescript types from the database](https://supabase.com/docs/reference/javascript/typescript-support)
+- [Supabase Database API](https://supabase.com/docs/reference/javascript/select)
 - [Supabase Pagination](https://supabase.com/docs/reference/javascript/select#pagination)
 - [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
