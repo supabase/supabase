@@ -26,7 +26,11 @@ import {
 import { ComputeBadge } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
-import { ComputeInstanceAddonVariantId } from '../DiskManagement.types'
+import {
+  ComputeInstanceAddonVariantId,
+  ComputeInstanceSize,
+  InfraInstanceSize,
+} from '../DiskManagement.types'
 import {
   calculateComputeSizePrice,
   getAvailableComputeOptions,
@@ -214,9 +218,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                   <div className="relative px-3 opacity-50 group-data-[state=checked]:opacity-100 flex justify-between">
                                     <ComputeBadge
                                       className="inline-flex font-semibold"
-                                      infraComputeSize={
-                                        compute.name as components['schemas']['DbInstanceSize']
-                                      }
+                                      infraComputeSize={compute.name as InfraInstanceSize}
                                     />
                                     <div className="flex items-center space-x-1">
                                       {lockedOption ? (
