@@ -12,7 +12,7 @@ import { organizationKeys } from 'data/organizations/keys'
 import { OrganizationBillingSubscriptionPreviewResponse } from 'data/organizations/organization-billing-subscription-preview'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { SubscriptionTier } from 'data/subscriptions/types'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { PRICING_TIER_PRODUCT_IDS, PROJECT_STATUS } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import {
   Badge,
@@ -490,7 +490,7 @@ const SubscriptionPlanUpdateDialog = ({
                                         className="text-foreground-light"
                                       >
                                         <TableCell className="text-xs py-2 px-0">
-                                          <div className="flex items-center gap-1 flex items-center gap-1">
+                                          <div className="flex items-center gap-1">
                                             <span>{item.description ?? 'Unknown'}</span>
                                             {item.breakdown.length > 0 && (
                                               <InfoTooltip className="max-w-sm">
@@ -573,7 +573,11 @@ const SubscriptionPlanUpdateDialog = ({
                 </div>
               )}
 
-              {projects.length === 0 && (
+              {projects.filter(
+                (it) =>
+                  it.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
+                  it.status === PROJECT_STATUS.COMING_UP
+              ).length === 0 && (
                 <div className="pb-2">
                   <Admonition title="Empty organization" type="warning">
                     This organization has no active projects. Did you select the correct
