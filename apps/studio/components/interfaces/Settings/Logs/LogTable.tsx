@@ -27,6 +27,7 @@ import { isDefaultLogPreviewFormat } from './Logs.utils'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 import { LogsTableEmptyState } from './LogsTableEmptyState'
+import { UnifiedLogsColumnRender } from './LogColumnRenderers/UnifiedLogsColumnRender'
 
 interface Props {
   data?: LogData[]
@@ -164,6 +165,19 @@ const LogTable = ({
         break
       case 'pg_cron':
         columns = DatabasePostgresColumnRender
+        break
+
+      case 'unified':
+        columns = [
+          {
+            key: 'unified-logs',
+            name: 'Logs',
+            resizable: true,
+            renderCell: ({ row }) => <UnifiedLogsColumnRender log={row} />,
+            renderHeaderCell: () => <div className="flex items-center">Logs</div>,
+            minWidth: 128,
+          },
+        ]
         break
 
       default:
@@ -397,6 +411,7 @@ const LogTable = ({
             rowKeyGetter={(r) => {
               if (!hasId) return JSON.stringify(r)
               const row = r as LogData
+              if (!row.id) return `${row.timestamp || ''}-${Math.random()}`
               return row.id
             }}
             renderers={{

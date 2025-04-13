@@ -368,6 +368,7 @@ export enum LogsTableName {
   PGBOUNCER = 'pgbouncer_logs',
   WAREHOUSE = 'warehouse_logs',
   PG_CRON = 'pg_cron_logs',
+  UNIFIED = 'unified_logs',
 }
 
 export const LOGS_TABLES = {
@@ -383,6 +384,7 @@ export const LOGS_TABLES = {
   warehouse: LogsTableName.WAREHOUSE,
   pg_cron: LogsTableName.POSTGRES,
   pgbouncer: LogsTableName.PGBOUNCER,
+  unified: LogsTableName.UNIFIED,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
@@ -398,6 +400,7 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.PGBOUNCER]: 'Dedicated connection pooler for PostgreSQL',
   [LogsTableName.WAREHOUSE]: 'Logs obtained from a data warehouse collection',
   [LogsTableName.PG_CRON]: 'Postgres logs from pg_cron cron jobs',
+  [LogsTableName.UNIFIED]: 'Unified logs from all sources',
 }
 
 export const FILTER_OPTIONS: FilterTableSet = {

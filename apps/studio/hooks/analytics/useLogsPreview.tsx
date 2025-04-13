@@ -85,6 +85,10 @@ function useLogsPreview({
     sql,
   }
 
+  console.log('table:', table)
+
+  console.log('useLogsPreview SQL:', sql)
+
   const {
     data,
     isSuccess,
@@ -151,10 +155,17 @@ function useLogsPreview({
       }
     })
 
+    // Log unified logs data for debugging
+    if (table === 'unified_logs' && logData.length > 0) {
+      console.log('Unified Logs Data:', logData)
+      console.log('Sample log record:', logData[0])
+      console.log('Sample log record metadata:', logData[0]?.metadata)
+    }
+
     const oldestTimestamp = logData.length > 0 ? logData[logData.length - 1]?.timestamp : undefined
 
     return { logData, error, oldestTimestamp }
-  }, [data?.pages])
+  }, [data?.pages, table])
 
   const { data: countData } = useQuery(
     [

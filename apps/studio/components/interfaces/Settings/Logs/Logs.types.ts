@@ -93,6 +93,7 @@ export type QueryType =
   | 'warehouse'
   | 'pg_cron'
   | 'pgbouncer'
+  | 'unified'
 
 export type Mode = 'simple' | 'custom'
 

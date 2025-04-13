@@ -205,6 +205,72 @@ limit ${limit}
     case 'supavisor_logs':
       return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit ${limit}`
 
+    case 'unified_logs':
+      if (IS_PLATFORM === false) {
+        return `
+select 
+  id,
+  el.timestamp as timestamp,
+  'edge' as log_type,
+  edge_logs_response.status_code as code,
+  'undefined' as level,
+  edge_logs_request.path as path,
+  'undefined' as event_message
+from edge_logs as el
+cross join unnest(el.metadata) as edge_logs_metadata
+cross join unnest(edge_logs_metadata.request) as edge_logs_request
+cross join unnest(edge_logs_metadata.response) as edge_logs_response
+
+union all
+
+select 
+  id,
+  pgl.timestamp as timestamp,
+  'postgres' as log_type,
+  'undefined' as code,
+  'undefined' as level,
+  'undefined' as path,
+  'undefined' as event_message
+from postgres_logs as pgl
+
+${where}
+${orderBy}
+limit ${limit}
+`
+      }
+      return `
+select 
+  id,
+  edge_logs.timestamp as timestamp,
+  'edge' as log_type,
+  edge_logs_response.status_code as code,
+  'undefined' as level,
+  edge_logs_request.path as path,
+  'undefined' as event_message
+from edge_logs
+cross join unnest(metadata) as edge_logs_metadata
+cross join unnest(edge_logs_metadata.request) as edge_logs_request
+cross join unnest(edge_logs_metadata.response) as edge_logs_response
+
+-- union all
+
+-- select 
+--   id,
+--   postgres_logs.timestamp as timestamp,
+--   'postgres' as log_type,
+--   postgres_logs_parsed.sql_state_code as code,
+--   'undefined' as level,
+--   null as path,
+--   'undefined' as event_message
+-- from postgres_logs
+-- cross join unnest(postgres_logs.metadata) as postgres_logs_metadata
+-- cross join unnest(postgres_logs_metadata.parsed) as postgres_logs_parsed
+
+${where}
+${orderBy}
+limit ${limit}
+`
+
     default:
       return `select id, ${table}.timestamp, event_message from ${table}
   ${where}
@@ -256,6 +322,10 @@ const genCrossJoinUnnests = (table: LogsTableName) => {
 
     case 'supavisor_logs':
       return `cross join unnest(metadata) as m`
+
+    case 'unified_logs':
+      return `
+  `
 
     default:
       return ''
@@ -339,7 +409,7 @@ SELECT
   timestamp_trunc(t.timestamp, ${trunc}) as timestamp,
   count(CASE WHEN NOT (${errorCondition} OR ${warningCondition}) THEN 1 END) as ok_count,
   count(CASE WHEN ${errorCondition} THEN 1 END) as error_count,
-  count(CASE WHEN ${warningCondition} THEN 1 END) as warning_count,
+  count(CASE WHEN ${warningCondition} THEN 1 END) as warning_count
 FROM
   ${table} t
   ${joins}
