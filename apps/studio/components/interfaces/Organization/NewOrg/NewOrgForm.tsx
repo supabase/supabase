@@ -312,7 +312,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                 onValueChange={(value) => updateForm('kind', value)}
               >
                 <SelectTrigger_Shadcn_ id="kind" className="w-full">
-                  <SelectValue_Shadcn_ placeholder="Select a plan" />
+                  <SelectValue_Shadcn_ />
                 </SelectTrigger_Shadcn_>
 
                 <SelectContent_Shadcn_>
@@ -348,7 +348,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                   onValueChange={(value) => updateForm('size', value)}
                 >
                   <SelectTrigger_Shadcn_ id="size" className="w-full">
-                    <SelectValue_Shadcn_ placeholder="Select a size" />
+                    <SelectValue_Shadcn_ />
                   </SelectTrigger_Shadcn_>
 
                   <SelectContent_Shadcn_>
@@ -376,7 +376,9 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         <Panel.Content>
           <div className="grid grid-cols-3">
             <div className="flex flex-col gap-2">
-              <span>Plan</span>
+              <Label_Shadcn_ htmlFor="plan" className=" text-sm">
+                Plan
+              </Label_Shadcn_>
 
               <a
                 href="https://supabase.com/pricing"
@@ -393,8 +395,8 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                 value={formState.plan}
                 onValueChange={(value) => updateForm('plan', value)}
               >
-                <SelectTrigger_Shadcn_ id="kind" className="w-full">
-                  <SelectValue_Shadcn_ placeholder="Select a plan" />
+                <SelectTrigger_Shadcn_ id="plan" className="w-full">
+                  <SelectValue_Shadcn_ />
                 </SelectTrigger_Shadcn_>
 
                 <SelectContent_Shadcn_>
@@ -405,6 +407,15 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                   ))}
                 </SelectContent_Shadcn_>
               </Select_Shadcn_>
+
+              <div className="mt-1">
+                <Label_Shadcn_
+                  htmlFor="plan"
+                  className="text-foreground-lighter leading-normal text-sm"
+                >
+                  The Plan applies to your new organization.
+                </Label_Shadcn_>
+              </div>
             </div>
           </div>
         </Panel.Content>
@@ -413,8 +424,11 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
           <>
             <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
               <div className="grid grid-cols-3">
-                <div className="col-span-1 flex space-x-2 text-sm text-foreground-light">
-                  <span>Spend Cap</span>
+                <div className="col-span-1 flex space-x-2 text-sm">
+                  <Label_Shadcn_ htmlFor="spend-cap" className=" leading-normal">
+                    Spend Cap
+                  </Label_Shadcn_>
+
                   <HelpCircle
                     size={16}
                     strokeWidth={1.5}
