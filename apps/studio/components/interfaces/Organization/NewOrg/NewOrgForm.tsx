@@ -194,13 +194,11 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     if (projects && projects.length > 1 && formState.plan !== 'FREE') {
       setIsOrgCreationConfirmationModalVisible(true)
     } else {
-      await handleSubmit(event)
+      await handleSubmit()
     }
   }
 
-  const handleSubmit = async (event: any | undefined) => {
-    event?.preventDefault()
-
+  const handleSubmit = async () => {
     if (!stripe || !elements) {
       return console.error('Stripe.js has not loaded')
     }
