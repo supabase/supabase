@@ -198,7 +198,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     }
   }
 
-  const handleSubmit = async (event: any) => {
+  const handleSubmit = async (event: any | undefined) => {
     event?.preventDefault()
 
     if (!stripe || !elements) {
@@ -493,7 +493,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         confirmLabel="Create new organization"
         onCancel={() => setIsOrgCreationConfirmationModalVisible(false)}
         onConfirm={async () => {
-          await handleSubmit(undefined)
+          await handleSubmit()
           setIsOrgCreationConfirmationModalVisible(false)
         }}
         variant={'warning'}
