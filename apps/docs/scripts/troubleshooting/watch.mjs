@@ -2,9 +2,15 @@
 
 import chokidar from 'chokidar'
 import { closeSync, openSync, readFileSync, writeSync } from 'node:fs'
-import { basename, join } from 'node:path'
+import { basename, join, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const TROUBLESHOOTING_DIRECTORY = join(import.meta.dirname, '../../content/troubleshooting')
+// Create __filename and __dirname
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
+// Use __dirname to build the troubleshooting directory path
+const TROUBLESHOOTING_DIRECTORY = join(__dirname, '../../content/troubleshooting')
 
 let __template = ''
 

@@ -1,7 +1,6 @@
 import { ChevronDown, Clipboard, Download } from 'lucide-react'
 import { markdownTable } from 'markdown-table'
-import { useMemo, useRef } from 'react'
-import { CSVLink } from 'react-csv'
+import { useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { copyToClipboard } from 'lib/helpers'
@@ -32,8 +31,6 @@ export const DownloadResultsButton = ({
   onCopyAsMarkdown,
   onCopyAsJSON,
 }: DownloadResultsButtonProps) => {
-  const csvRef = useRef<CSVLink & HTMLAnchorElement & { link: HTMLAnchorElement }>(null)
-
   // [Joshen] Ensure JSON values are stringified for CSV and Markdown
   const formattedResults = results.map((row) => {
     const r = { ...row }
@@ -81,6 +78,34 @@ export const DownloadResultsButton = ({
     }
   }
 
+  // --- New CSV generation/download, without react-csv ---
+
+  const escapeCsvValue = (value: any): string => {
+    const stringValue = String(value)
+    return `"${stringValue.replace(/"/g, '""')}"`
+  }
+
+  const generateCSV = (headers: string[], data: any[]): string => {
+    const headerLine = headers.map(escapeCsvValue).join(',')
+    const dataLines = data.map((row) =>
+      headers.map((key) => escapeCsvValue(row[key] ?? '')).join(',')
+    )
+    return [headerLine, ...dataLines].join('\n')
+  }
+
+  const downloadCSV = (csv: string, fileName: string) => {
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = fileName
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+  }
+
+
   return (
     <>
       <DropdownMenu>
@@ -93,7 +118,9 @@ export const DownloadResultsButton = ({
           <DropdownMenuItem
             className="gap-x-2"
             onClick={() => {
-              csvRef.current?.link.click()
+              console.log('Formatted CSV data:', formattedResults)
+              const csvString = generateCSV(headers || [], formattedResults)
+              downloadCSV(csvString, `${fileName}.csv`)
               toast.success('Downloading results as CSV')
               onDownloadAsCSV?.()
             }}
@@ -111,13 +138,6 @@ export const DownloadResultsButton = ({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <CSVLink
-        ref={csvRef}
-        className="hidden"
-        headers={headers}
-        data={formattedResults}
-        filename={`${fileName}.csv`}
-      />
     </>
   )
 }
