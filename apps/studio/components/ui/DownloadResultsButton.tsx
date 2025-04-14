@@ -2,6 +2,7 @@ import { ChevronDown, Clipboard, Download } from 'lucide-react'
 import { markdownTable } from 'markdown-table'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
+import { escapeCsvValue, generateCSV } from './csv-utils';
 
 import { copyToClipboard } from 'lib/helpers'
 import {
@@ -21,6 +22,7 @@ interface DownloadResultsButtonProps {
   onCopyAsMarkdown?: () => void
   onCopyAsJSON?: () => void
 }
+
 
 export const DownloadResultsButton = ({
   type = 'default',
@@ -78,21 +80,6 @@ export const DownloadResultsButton = ({
     }
   }
 
-  // --- New CSV generation/download, without react-csv ---
-
-  const escapeCsvValue = (value: any): string => {
-    const stringValue = String(value)
-    return `"${stringValue.replace(/"/g, '""')}"`
-  }
-
-  const generateCSV = (headers: string[], data: any[]): string => {
-    const headerLine = headers.map(escapeCsvValue).join(',')
-    const dataLines = data.map((row) =>
-      headers.map((key) => escapeCsvValue(row[key] ?? '')).join(',')
-    )
-    return [headerLine, ...dataLines].join('\n')
-  }
-
   const downloadCSV = (csv: string, fileName: string) => {
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     const url = window.URL.createObjectURL(blob)
@@ -104,7 +91,6 @@ export const DownloadResultsButton = ({
     document.body.removeChild(link)
     window.URL.revokeObjectURL(url)
   }
-
 
   return (
     <>

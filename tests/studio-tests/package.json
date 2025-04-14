@@ -19,7 +19,12 @@
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.49.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@types/react": "^19.1.1",
+    "dotenv": "^16.4.7",
+    "jest": "^29.7.0",
     "lodash": "^4.17.21",
-    "dotenv": "^16.4.7"
+    "ts-jest": "^29.3.2"
   }
 }

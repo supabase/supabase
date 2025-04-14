@@ -1,6 +1,16 @@
 {
   "compilerOptions": {
-    "jsx": "react",
-    "skipLibCheck": true
-  }
+    "jsx": "react-jsx",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "types": ["node", "jest"],
+    "baseUrl": ".",
+    "paths": {
+      "lib/helpers": ["apps/studio/__mocks__/lib/helpers.ts"],
+      "lucide-react": ["apps/studio/__mocks__/lucide-react.tsx"]
+    }
+  },
+  "include": ["src", "tests", "apps/studio/__mocks__"]
 }

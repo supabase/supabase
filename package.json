@@ -27,6 +27,7 @@
     "test:ui": "turbo run test --filter=ui",
     "test:ui-patterns": "turbo run test --filter=ui-patterns",
     "test:studio": "turbo run test --filter=studio",
+    "test:jest": "jest",
     "test:studio:watch": "turbo run test --filter=studio -- watch",
     "test:e2e:studio-local": "pnpm --prefix tests/studio-tests run test:local",
     "test:e2e:studio-staging": "pnpm --prefix tests/studio-tests run test:staging",
@@ -35,15 +36,47 @@
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts",
     "api:codegen": "cd packages/api-types && pnpm run codegen"
   },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "jsdom",
+    "moduleNameMapper": {
+      "^lib/helpers$": "<rootDir>/apps/studio/__mocks__/lib/helpers.ts",
+      "^lucide-react$": "<rootDir>/apps/studio/__mocks__/lucide-react.tsx"
+    },
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "testMatch": [
+      "**/tests/studio-tests/tests/**/*.(test|spec).ts?(x)"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/docker/"
+    ]
+  },
   "devDependencies": {
+    "@babel/core": "^7.26.10",
+    "@babel/preset-env": "^7.26.9",
+    "@babel/preset-react": "^7.26.3",
+    "@playwright/test": "^1.49.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@types/jest": "^29.5.14",
     "@types/node": "catalog:",
+    "babel-jest": "^29.7.0",
     "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "prettier": "3.2.4",
     "prettier-plugin-sql-cst": "^0.11.0",
     "rimraf": "^6.0.0",
     "sass": "^1.72.0",
     "supabase": "^1.151.1",
     "supports-color": "^8.0.0",
+    "ts-jest": "^29.3.2",
     "turbo": "2.3.3",
     "typescript": "~5.5.0"
   },
@@ -60,6 +93,16 @@
     "pnpm": ">=9",
     "node": ">=20"
   },
-  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
-  "packageManager": "pnpm@9.15.5"
+  "keywords": [
+    "postgres",
+    "firebase",
+    "storage",
+    "functions",
+    "database",
+    "auth"
+  ],
+  "packageManager": "pnpm@9.15.5",
+  "dependencies": {
+    "react": "^18.2.0"
+  }
 }
