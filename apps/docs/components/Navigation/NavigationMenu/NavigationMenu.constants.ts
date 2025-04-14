@@ -120,7 +120,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
           },
           {
             label: 'Security',
-            icon: 'status',
+            icon: 'security',
             href: '/guides/security',
           },
           {
@@ -2053,7 +2053,7 @@ export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof Ico
 ]
 
 export const security: NavMenuConstant = {
-  icon: 'status',
+  icon: 'security',
   title: 'Security',
   url: '/guides/security',
   items: [
