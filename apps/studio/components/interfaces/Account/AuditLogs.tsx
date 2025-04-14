@@ -57,10 +57,6 @@ const AuditLogs = () => {
   const minDate = dayjs().subtract(retentionPeriod, 'days')
   const maxDate = dayjs()
 
-  useEffect(() => {
-    console.log('Check')
-  }, [])
-
   // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
   // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
   // viewed for more than 5 minutes, the call parameters needs to be updated. This also works with
