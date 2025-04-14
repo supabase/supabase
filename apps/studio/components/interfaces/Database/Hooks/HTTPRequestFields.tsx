@@ -163,7 +163,7 @@ const HTTPRequestFields = ({
                 Add a new header
               </Button>
               {type === 'supabase_function' && (
-                <DropdownMenu>
+                <DropdownMenu modal>
                   <DropdownMenuTrigger asChild>
                     <Button type="default" className="rounded-l-none px-[4px] py-[5px]">
                       <ChevronDown />

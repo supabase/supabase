@@ -18,7 +18,10 @@ import { Sort } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
+import {
+  RoleImpersonationState,
+  useRoleImpersonationStateSnapshot,
+} from 'state/role-impersonation-state'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import { Button, SidePanel } from 'ui'
 import ActionBar from '../../ActionBar'
@@ -104,7 +107,7 @@ const ForeignRowSelector = ({
       filters: formatFilterURLParams(filters),
       page,
       limit: rowsPerPage,
-      impersonatedRole: roleImpersonationState.role,
+      roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     {
       keepPreviousData: true,

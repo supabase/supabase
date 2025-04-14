@@ -2,7 +2,6 @@ import { ChevronDown, Plus, Trash } from 'lucide-react'
 import { useFieldArray } from 'react-hook-form'
 
 import { useParams } from 'common'
-import { FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import {
   Button,
@@ -96,7 +95,7 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
             Add a new header
           </Button>
           {variant === 'edge_function' && (
-            <DropdownMenu>
+            <DropdownMenu modal>
               <DropdownMenuTrigger asChild>
                 <Button type="default" className="rounded-l-none px-[4px] py-[5px]">
                   <ChevronDown size={14} />

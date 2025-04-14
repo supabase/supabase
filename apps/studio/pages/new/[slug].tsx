@@ -10,7 +10,6 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
-import { components } from 'api-types'
 import { useParams } from 'common'
 import {
   FreeProjectLimitWarning,
@@ -36,9 +35,8 @@ import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { instanceSizeSpecs } from 'data/projects/new-project.constants'
+import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
 import {
-  DbInstanceSize,
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
@@ -86,8 +84,6 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-
-type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
 const sizes: DesiredInstanceSize[] = [
   'micro',
@@ -411,7 +407,7 @@ const Wizard: NextPageWithLayout = () => {
   const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
 
   const additionalMonthlySpend =
-    instanceSizeSpecs[instanceSize as DbInstanceSize]!.priceMonthly - availableComputeCredits
+    instanceSizeSpecs[instanceSize as DesiredInstanceSize]!.priceMonthly - availableComputeCredits
 
   // TODO: Remove this after project creation experiment as it delays rendering
   if (
@@ -677,7 +673,7 @@ const Wizard: NextPageWithLayout = () => {
                                   <span className="text-foreground-lighter line-through">
                                     $
                                     {
-                                      instanceSizeSpecs[instanceSize as DbInstanceSize]!
+                                      instanceSizeSpecs[instanceSize as DesiredInstanceSize]!
                                         .priceMonthly
                                     }
                                   </span>
@@ -997,11 +993,11 @@ const Wizard: NextPageWithLayout = () => {
  * Needs to be in the API in the future [kevin]
  */
 const monthlyInstancePrice = (instance: string | undefined): number => {
-  return instanceSizeSpecs[instance as DbInstanceSize]?.priceMonthly || 10
+  return instanceSizeSpecs[instance as DesiredInstanceSize]?.priceMonthly || 10
 }
 
 const instanceLabel = (instance: string | undefined): string => {
-  return instanceSizeSpecs[instance as DbInstanceSize]?.label || 'Micro'
+  return instanceSizeSpecs[instance as DesiredInstanceSize]?.label || 'Micro'
 }
 
 const PageLayout = withAuth(({ children }: PropsWithChildren) => {

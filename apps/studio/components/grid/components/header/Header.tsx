@@ -23,6 +23,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
+import { RoleImpersonationState } from 'lib/role-impersonation'
 import {
   useRoleImpersonationStateSnapshot,
   useSubscribeToImpersonatedRole,
@@ -41,7 +42,6 @@ import {
 } from 'ui'
 import FilterPopover from './filter/FilterPopover'
 import { SortPopover } from './sort'
-
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
 // exporting. Either that or export as multiple CSV sheets with max n rows each
@@ -306,7 +306,7 @@ const RowHeader = ({ sorts, filters }: RowHeaderProps) => {
     filters,
     page: snap.page,
     limit: tableEditorSnap.rowsPerPage,
-    impersonatedRole: roleImpersonationState.role,
+    roleImpersonationState: roleImpersonationState as RoleImpersonationState,
   })
 
   const { data: countData } = useTableRowsCountQuery(
@@ -316,7 +316,7 @@ const RowHeader = ({ sorts, filters }: RowHeaderProps) => {
       tableId: snap.table.id,
       filters,
       enforceExactCount: snap.enforceExactCount,
-      impersonatedRole: roleImpersonationState.role,
+      roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     { keepPreviousData: true }
   )
@@ -376,7 +376,7 @@ const RowHeader = ({ sorts, filters }: RowHeaderProps) => {
           table: snap.table,
           filters,
           sorts,
-          impersonatedRole: roleImpersonationState.role,
+          roleImpersonationState: roleImpersonationState as RoleImpersonationState,
           progressCallback: (value: number) => {
             const progress = Math.min((value / totalRows) * 100, 100)
             toast(
@@ -462,7 +462,7 @@ const RowHeader = ({ sorts, filters }: RowHeaderProps) => {
           table: snap.table,
           filters,
           sorts,
-          impersonatedRole: roleImpersonationState.role,
+          roleImpersonationState: roleImpersonationState as RoleImpersonationState,
           progressCallback: (value: number) => {
             const progress = Math.min((value / totalRows) * 100, 100)
             toast(
