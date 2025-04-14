@@ -112,6 +112,7 @@ jobs:
           no-cache: true
 
   merge_manifest:
+    if: false  # 禁用此 Job
     needs:
       - settings
       - release_x86
@@ -136,6 +137,7 @@ jobs:
           # ghcr.io/iwangjiaxiang/supabase-unlock@${{ needs.release_arm.outputs.image_digest }}
 
   publish:
+    if: false  # 禁用此 Job
     needs:
       - settings
       - merge_manifest
