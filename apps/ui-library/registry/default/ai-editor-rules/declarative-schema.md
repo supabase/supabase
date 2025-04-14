@@ -3,14 +3,14 @@
 description: For when modifying the Supabase database schema.
 alwaysApply: false
 ---
+
 # Database: Declarative Database Schema
 
 Mandatory Instructions for Supabase Declarative Schema Management
 
 ## 1. **Exclusive Use of Declarative Schema**
 
--**All database schema modifications must be defined within `.sql` files located in the `supabase/schemas/` directory.
--**Do not** create or modify files directly in the `supabase/migrations/` directory unless the modification is about the known caveats below. Migration files are to be generated automatically through the CLI.
+-**All database schema modifications must be defined within `.sql` files located in the `supabase/schemas/` directory. -**Do not\*\* create or modify files directly in the `supabase/migrations/` directory unless the modification is about the known caveats below. Migration files are to be generated automatically through the CLI.
 
 ## 2. **Schema Declaration**
 
@@ -45,20 +45,24 @@ Mandatory Instructions for Supabase Declarative Schema Management
   - Review the generated migration file carefully to avoid unintentional data loss
 
 ## 6. **Known caveats**
+
 The migra diff tool used for generating schema diff is capable of tracking most database changes. However, there are edge cases where it can fail.
 
 If you need to use any of the entities below, remember to add them through versioned migrations instead.
 
 ### Data manipulation language
+
 - DML statements such as insert, update, delete, etc., are not captured by schema diff
 
 ### View ownership
+
 - view owner and grants
 - security invoker on views
 - materialized views
 - doesn’t recreate views when altering column type
 
 ### RLS policies
+
 - alter policy statements
 - column privileges
 - Other entities#
@@ -70,4 +74,5 @@ If you need to use any of the entities below, remember to add them through versi
 - grant statements are duplicated from default privileges
 
 ---
+
 **Non-compliance with these instructions may lead to inconsistent database states and is strictly prohibited.**
