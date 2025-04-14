@@ -217,7 +217,7 @@ const IPv4SidePanel = () => {
                   charge.
                 </p>
               )}
-              {!subscription?.billing_via_partner && (
+              {!organization?.billing_via_partner && (
                 <p className="text-sm text-foreground-light">
                   There are no immediate charges. The addon is billed at the end of your billing
                   cycle based on your usage and prorated to the hour.

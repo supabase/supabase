@@ -54,7 +54,7 @@ const OrganizationDropdown = () => {
           <span className="text-foreground max-w-32 lg:max-w-none truncate hidden md:block">
             {orgName}
           </span>
-          {isSuccess && <Badge variant="default">{selectedOrganization?.plan.name}</Badge>}
+          <Badge variant="default">{selectedOrganization?.plan.name}</Badge>
         </Link>
       )}
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
@@ -69,7 +69,7 @@ const OrganizationDropdown = () => {
             <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
               <div className="flex items-center space-x-2">
                 <p className={'text-xs'}>{orgName}</p>
-                {isSuccess && <Badge variant="default">{selectedOrganization?.plan.name}</Badge>}
+                <Badge variant="default">{selectedOrganization?.plan.name}</Badge>
               </div>
             </Button>
           )}

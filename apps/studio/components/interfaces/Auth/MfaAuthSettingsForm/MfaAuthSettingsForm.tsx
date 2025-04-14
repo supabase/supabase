@@ -91,7 +91,7 @@ const MfaAuthSettingsForm = () => {
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const organization = useSelectedOrganization()
-  const isProPlanAndUp = isSuccessSubscription && organization?.plan?.id !== 'free'
+  const isProPlanAndUp = organization?.plan?.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
 
   // For now, we support Twilio and Vonage. Twilio Verify is not supported and the remaining providers are community maintained.
