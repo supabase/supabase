@@ -17,8 +17,8 @@ import {
 } from 'components/interfaces/Organization/NewProject'
 import { AdvancedConfiguration } from 'components/interfaces/ProjectCreation/AdvancedConfiguration'
 import {
-  PostgresVersionSelector,
   extractPostgresVersionDetails,
+  PostgresVersionSelector,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { SPECIAL_CHARS_REGEX } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
@@ -61,16 +61,16 @@ import type { NextPageWithLayout } from 'types'
 import {
   Badge,
   Button,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Table,
   TableBody,
   TableCell,
@@ -157,6 +157,8 @@ const Wizard: NextPageWithLayout = () => {
     [currentOrg]
   )
 
+  const isFreePlan = currentOrg?.plan?.id === 'free'
+
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
     enabled: isNotOnTeamOrEnterprisePlan,
   })
@@ -208,8 +210,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
-  const freePlanWithExceedingLimits =
-    currentOrg?.plan?.id === 'free' && hasMembersExceedingFreeTierLimit
+  const freePlanWithExceedingLimits = isFreePlan && hasMembersExceedingFreeTierLimit
 
   const isManagedByVercel = currentOrg?.managed_by === 'vercel-marketplace'
 
@@ -336,8 +337,7 @@ const Wizard: NextPageWithLayout = () => {
       // gets ignored due to org billing subscription anyway
       dbPricingTierId: 'tier_free',
       // only set the compute size on pro+ plans. Free plans always use micro (nano in the future) size.
-      dbInstanceSize:
-        currentOrg?.plan.id === 'free' ? undefined : (instanceSize as DesiredInstanceSize),
+      dbInstanceSize: isFreePlan ? undefined : (instanceSize as DesiredInstanceSize),
       dataApiExposedSchemas: !dataApi ? [] : undefined,
       dataApiUseApiSchema: !dataApi ? false : useApiSchema,
       postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
@@ -427,115 +427,122 @@ const Wizard: NextPageWithLayout = () => {
               </div>
               <div className="flex justify-between items-center col-span-8 space-x-6">
                 <div>
-                  <div className="flex justify-between mr-2 text-sm space-x-2">
-                    <span>Additional Monthly Costs</span>
-                    <div className="text-brand flex gap-1 items-center">
-                      {organizationProjects.length > 0 ? (
-                        <>
-                          <span>${additionalMonthlySpend}</span>
-                        </>
-                      ) : (
-                        <>
-                          <span className="text-foreground-lighter line-through">
-                            ${instanceSizeSpecs[instanceSize as DesiredInstanceSize]!.priceMonthly}
-                          </span>
-                          <span>${additionalMonthlySpend}</span>
-                        </>
-                      )}
-                      <InfoTooltip side="top" className="max-w-[450px] p-0">
-                        <div className="p-4 text-sm text-foreground-light space-y-1">
-                          <p>
-                            Each project includes a dedicated Postgres instance running on its own
-                            server. You are charged for the{' '}
-                            <Link
-                              className="underline"
-                              href={`/docs/guides/platform/billing-on-supabase`}
-                              target="_blank"
-                            >
-                              Compute resourcse
-                            </Link>{' '}
-                            of that server, independent of your database usage.
-                          </p>
-                          {monthlyComputeCosts > 0 && (
-                            <p>Compute costs are applied on top of your subscription plan costs.</p>
-                          )}
-                        </div>
+                  {!isFreePlan && (
+                    <div className="flex justify-between mr-2 text-sm space-x-2">
+                      <span>Additional Monthly Costs</span>
+                      <div className="text-brand flex gap-1 items-center">
+                        {organizationProjects.length > 0 ? (
+                          <>
+                            <span>${additionalMonthlySpend}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-foreground-lighter line-through">
+                              $
+                              {instanceSizeSpecs[instanceSize as DesiredInstanceSize]!.priceMonthly}
+                            </span>
+                            <span>${additionalMonthlySpend}</span>
+                          </>
+                        )}
+                        <InfoTooltip side="top" className="max-w-[450px] p-0">
+                          <div className="p-4 text-sm text-foreground-light space-y-1">
+                            <p>
+                              Each project includes a dedicated Postgres instance running on its own
+                              server. You are charged for the{' '}
+                              <Link
+                                className="underline"
+                                href={`/docs/guides/platform/billing-on-supabase`}
+                                target="_blank"
+                              >
+                                Compute resourcse
+                              </Link>{' '}
+                              of that server, independent of your database usage.
+                            </p>
+                            {monthlyComputeCosts > 0 && (
+                              <p>
+                                Compute costs are applied on top of your subscription plan costs.
+                              </p>
+                            )}
+                          </div>
 
-                        <Table className="mt-2">
-                          <TableHeader className="[&_th]:h-7">
-                            <TableRow className="py-2">
-                              <TableHead className="w-[170px]">Project</TableHead>
-                              <TableHead>Compute Size</TableHead>
-                              <TableHead className="text-right">Monthly Costs</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody className="[&_td]:py-2">
-                            {organizationProjects.map((project) => (
-                              <TableRow key={project.ref} className="text-foreground-light">
-                                <TableCell className="w-[170px] truncate">{project.name}</TableCell>
+                          <Table className="mt-2">
+                            <TableHeader className="[&_th]:h-7">
+                              <TableRow className="py-2">
+                                <TableHead className="w-[170px]">Project</TableHead>
+                                <TableHead>Compute Size</TableHead>
+                                <TableHead className="text-right">Monthly Costs</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody className="[&_td]:py-2">
+                              {organizationProjects.map((project) => (
+                                <TableRow key={project.ref} className="text-foreground-light">
+                                  <TableCell className="w-[170px] truncate">
+                                    {project.name}
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    {instanceLabel(project.infra_compute_size)}
+                                  </TableCell>
+                                  <TableCell className="text-right">
+                                    ${monthlyInstancePrice(project.infra_compute_size)}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+
+                              <TableRow>
+                                <TableCell className="w-[170px] flex gap-2">
+                                  <span className="truncate">
+                                    {form.getValues('projectName')
+                                      ? form.getValues('projectName')
+                                      : 'New project'}
+                                  </span>
+                                  <Badge size={'small'} variant={'default'}>
+                                    NEW
+                                  </Badge>
+                                </TableCell>
                                 <TableCell className="text-center">
-                                  {instanceLabel(project.infra_compute_size)}
+                                  {instanceLabel(instanceSize)}
                                 </TableCell>
                                 <TableCell className="text-right">
-                                  ${monthlyInstancePrice(project.infra_compute_size)}
+                                  ${monthlyInstancePrice(instanceSize)}
                                 </TableCell>
                               </TableRow>
-                            ))}
-
-                            <TableRow>
-                              <TableCell className="w-[170px] flex gap-2">
-                                <span className="truncate">
-                                  {form.getValues('projectName')
-                                    ? form.getValues('projectName')
-                                    : 'New project'}
-                                </span>
-                                <Badge size={'small'} variant={'default'}>
-                                  NEW
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-center">
-                                {instanceLabel(instanceSize)}
-                              </TableCell>
-                              <TableCell className="text-right">
-                                ${monthlyInstancePrice(instanceSize)}
-                              </TableCell>
-                            </TableRow>
-                          </TableBody>
-                        </Table>
-                        <PopoverSeparator />
-                        <Table>
-                          <TableHeader className="[&_th]:h-7">
-                            <TableRow>
-                              <TableHead colSpan={2}>Compute Credits</TableHead>
-                              <TableHead colSpan={1} className="text-right">
-                                -$10
-                              </TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody className="[&_td]:py-2">
-                            <TableRow className="text-foreground">
-                              <TableCell colSpan={2}>
-                                Total Monthly Compute Costs
-                                {/**
-                                 * API currently doesnt output replica information on the projects list endpoint. Until then, we cannot correctly calculate the costs including RRs.
-                                 *
-                                 * Will be adjusted in the future [kevin]
-                                 */}
-                                {organizationProjects.length > 0 && (
-                                  <p className="text-xs text-foreground-lighter">
-                                    Excluding Read replicas
-                                  </p>
-                                )}
-                              </TableCell>
-                              <TableCell colSpan={1} className="text-right">
-                                ${monthlyComputeCosts}
-                              </TableCell>
-                            </TableRow>
-                          </TableBody>
-                        </Table>
-                      </InfoTooltip>
+                            </TableBody>
+                          </Table>
+                          <PopoverSeparator />
+                          <Table>
+                            <TableHeader className="[&_th]:h-7">
+                              <TableRow>
+                                <TableHead colSpan={2}>Compute Credits</TableHead>
+                                <TableHead colSpan={1} className="text-right">
+                                  -$10
+                                </TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody className="[&_td]:py-2">
+                              <TableRow className="text-foreground">
+                                <TableCell colSpan={2}>
+                                  Total Monthly Compute Costs
+                                  {/**
+                                   * API currently doesnt output replica information on the projects list endpoint. Until then, we cannot correctly calculate the costs including RRs.
+                                   *
+                                   * Will be adjusted in the future [kevin]
+                                   */}
+                                  {organizationProjects.length > 0 && (
+                                    <p className="text-xs text-foreground-lighter">
+                                      Excluding Read replicas
+                                    </p>
+                                  )}
+                                </TableCell>
+                                <TableCell colSpan={1} className="text-right">
+                                  ${monthlyComputeCosts}
+                                </TableCell>
+                              </TableRow>
+                            </TableBody>
+                          </Table>
+                        </InfoTooltip>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 <Button
