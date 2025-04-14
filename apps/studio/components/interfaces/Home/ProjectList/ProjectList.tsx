@@ -57,7 +57,7 @@ const ProjectList = ({
   const { data: resourceWarnings } = useResourceWarningsQuery()
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery()
   const projectsByOrg = groupBy(allProjects, 'organization_id')
-  const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
+  const isLoadingPermissions = !IS_PLATFORM ? _isLoadingPermissions : false
 
   const hasFilterStatusApplied = filterStatus !== undefined && filterStatus.length !== 2
   const noResultsFromSearch =

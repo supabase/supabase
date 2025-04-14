@@ -7,7 +7,7 @@ export const DEFAULT_HOME = IS_PLATFORM ? '/organizations' : '/project/default'
 
 export const API_URL = (() => {
   //  If running in platform, use API_URL from the env var
-  if (IS_PLATFORM) return process.env.NEXT_PUBLIC_API_URL!
+  if (!IS_PLATFORM) return process.env.NEXT_PUBLIC_API_URL!
   // If running in browser, let it add the host
   if (typeof window !== 'undefined') return '/api'
   // If running self-hosted Vercel preview, use VERCEL_URL

@@ -55,7 +55,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
 
   // [Joshen] This is to ensure that StorageExplorerStore can get the storage file size limit
   // Will be better once we deprecate the mobx store entirely, which we will get there
-  useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
+  useProjectStorageConfigQuery({ projectRef: ref }, { enabled: !IS_PLATFORM })
 
   // This state exists outside of the header because FileExplorerColumn needs to listen to these as well
   // I'm keeping them outside of the mobx store as I feel that the store should contain persistent data
