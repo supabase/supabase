@@ -183,21 +183,6 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     })
   }
 
-  const onSubmitWithOrgCreation = async (event: any) => {
-    event.preventDefault()
-
-    const isOrgNameValid = validateOrgName(formState.name)
-    if (!isOrgNameValid) {
-      return toast.error('Organization name is empty')
-    }
-
-    if (projects && projects.length > 1 && formState.plan !== 'FREE') {
-      setIsOrgCreationConfirmationModalVisible(true)
-    } else {
-      await handleSubmit()
-    }
-  }
-
   const handleSubmit = async () => {
     if (!stripe || !elements) {
       return console.error('Stripe.js has not loaded')
@@ -235,6 +220,21 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const resetPaymentMethod = () => {
     setPaymentMethod(undefined)
     return onPaymentMethodReset()
+  }
+
+  const onSubmitWithOrgCreation = async (event: any) => {
+    event.preventDefault()
+
+    const isOrgNameValid = validateOrgName(formState.name)
+    if (!isOrgNameValid) {
+      return toast.error('Organization name is empty')
+    }
+
+    if (projects && projects.length > 1 && formState.plan !== 'FREE') {
+      setIsOrgCreationConfirmationModalVisible(true)
+    } else {
+      await handleSubmit()
+    }
   }
 
   return (
