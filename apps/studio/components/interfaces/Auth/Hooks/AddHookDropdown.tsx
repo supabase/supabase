@@ -4,7 +4,6 @@ import { ChevronDown } from 'lucide-react'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
@@ -32,10 +31,6 @@ export const AddHookDropdown = ({
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
 
-  const { data: subscription } = useOrgSubscriptionQuery(
-    { orgSlug: organization?.slug },
-    { enabled: IS_PLATFORM }
-  )
   const { data: authConfig } = useAuthConfigQuery({ projectRef })
   const canUpdateAuthHook = useCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
 
@@ -54,7 +49,7 @@ export const AddHookDropdown = ({
   const enterpriseHookOptions = hooks.filter((h) => !isValidHook(h) && h.enterprise)
 
   const isTeamsOrEnterprisePlan =
-    subscription?.plan.id === 'team' || subscription?.plan.id === 'enterprise'
+    organization?.plan.id === 'team' || organization?.plan.id === 'enterprise'
 
   if (!canUpdateAuthHook) {
     return (

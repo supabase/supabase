@@ -37,7 +37,7 @@ export const DatabaseReadOnlyAlert = () => {
               <li>
                 Temporarily disable read-only mode to free up space and reduce your database size
               </li>
-              {subscription?.plan.id === 'free' ? (
+              {organization?.plan.id === 'free' ? (
                 <li>
                   <Link
                     href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=databaseReadOnlyAlertUpgradePlan`}
@@ -46,7 +46,7 @@ export const DatabaseReadOnlyAlert = () => {
                   </Link>{' '}
                   to increase your database size limit to 8GB.
                 </li>
-              ) : subscription?.plan.id === 'pro' && subscription?.usage_billing_enabled ? (
+              ) : organization?.plan.id === 'pro' && subscription?.usage_billing_enabled ? (
                 <li>
                   <Link
                     href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=databaseReadOnlyAlertSpendCap`}

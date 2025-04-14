@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import type { ResponseError } from 'types/base'
 import { subscriptionKeys } from './keys'
 import type { SubscriptionTier } from './types'
+import { organizationKeys } from 'data/organizations/keys'
 
 export type OrgSubscriptionUpdateVariables = {
   slug: string
@@ -56,13 +57,15 @@ export const useOrgSubscriptionUpdateMutation = ({
 
         // [Kevin] Backend can return stale data as it's waiting for the Stripe-sync to complete. Until that's solved in the backend
         // we are going back to monkey here and delay the invalidation
-        await new Promise((resolve) => setTimeout(resolve, 2000))
+        await new Promise((resolve) => setTimeout(resolve, 500))
 
         await Promise.all([
           queryClient.invalidateQueries(subscriptionKeys.orgSubscription(slug)),
           queryClient.invalidateQueries(subscriptionKeys.orgPlans(slug)),
           queryClient.invalidateQueries(usageKeys.orgUsage(slug)),
           queryClient.invalidateQueries(invoicesKeys.orgUpcomingPreview(slug)),
+          queryClient.invalidateQueries(organizationKeys.detail(slug)),
+          queryClient.invalidateQueries(organizationKeys.list()),
         ])
 
         await onSuccess?.(data, variables, context)

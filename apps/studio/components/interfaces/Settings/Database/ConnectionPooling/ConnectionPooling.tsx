@@ -17,7 +17,6 @@ import Panel from 'components/ui/Panel'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { usePgbouncerConfigurationUpdateMutation } from 'data/database/pgbouncer-config-update-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -68,11 +67,9 @@ export const ConnectionPooling = () => {
     isSuccess: isSuccessPgbouncerConfig,
   } = usePgbouncerConfigQuery({ projectRef })
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
-
   const disablePoolModeSelection = useMemo(() => {
-    return subscription?.plan?.id === 'free'
-  }, [subscription])
+    return org?.plan?.id === 'free'
+  }, [org])
 
   const { data: maxConnData } = useMaxConnectionsQuery({
     projectRef: project?.ref,

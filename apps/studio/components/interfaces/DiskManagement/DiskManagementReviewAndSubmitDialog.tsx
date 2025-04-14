@@ -5,7 +5,6 @@ import { UseFormReturn } from 'react-hook-form'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -162,15 +161,11 @@ export const DiskManagementReviewAndSubmitDialog = ({
    * Queries
    * */
   const {
-    data: subscription,
-    // request deps in Form handle errors and loading
-  } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
-  const {
     data: addons,
     // request deps in Form handle errors and loading
   } = useProjectAddonsQuery({ projectRef: project?.ref })
 
-  const planId = subscription?.plan.id ?? 'free'
+  const planId = org?.plan.id ?? 'free'
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
   const replicaTooltipText = `Price change includes primary database and ${numReplicas} replica${numReplicas > 1 ? 's' : ''}`
 
@@ -185,7 +180,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
     availableOptions,
     oldComputeSize: form.formState.defaultValues?.computeSize || 'ci_micro',
     newComputeSize: form.getValues('computeSize'),
-    plan: subscription?.plan.id ?? 'free',
+    plan: org?.plan.id ?? 'free',
   })
   const diskSizePrice = calculateDiskSizePrice({
     planId: planId,
@@ -293,7 +288,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 beforePrice={Number(computeSizePrice.oldPrice)}
                 afterPrice={Number(computeSizePrice.newPrice)}
                 upgradeIncluded={
-                  subscription?.plan.id !== 'free' &&
+                  org?.plan.id !== 'free' &&
                   project?.infra_compute_size === 'nano' &&
                   form.getValues('computeSize') === 'ci_micro'
                 }
