@@ -138,7 +138,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
     },
   ]
 
-  const OrganizationLayoutContentWrapper = newLayoutPreview ? WithSidebar : Fragment
+  const OrganizationLayoutContentWrapper = !newLayoutPreview ? WithSidebar : Fragment
 
   return (
     <OrganizationLayoutContentWrapper
