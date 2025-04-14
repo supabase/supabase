@@ -56,7 +56,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
   const isOptedInToAI = useOrgOptedIntoAi()
-  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
+  const includeSchemaMetadata = isOptedInToAI || IS_PLATFORM
 
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<QueryResponseError>()

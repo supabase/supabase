@@ -92,7 +92,7 @@ export const SQLEditor = () => {
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const isOptedInToAI = useOrgOptedIntoAi()
   const [selectedSchemas] = useSchemasForAi(project?.ref!)
-  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
+  const includeSchemaMetadata = isOptedInToAI || IS_PLATFORM
 
   const {
     sourceSqlDiff,

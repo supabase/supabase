@@ -93,7 +93,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const selectedOrganization = useSelectedOrganization()
   const { id: entityId } = useParams()
   const searchParams = useSearchParamsShallow()
-  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
+  const includeSchemaMetadata = isOptedInToAI || IS_PLATFORM
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()

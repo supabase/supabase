@@ -24,7 +24,7 @@ const AISettingsModal = () => {
 
   const [selectedSchemas, setSelectedSchemas] = useSchemasForAi(selectedProject?.ref!)
 
-  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
+  const includeSchemaMetadata = isOptedInToAI || IS_PLATFORM
 
   return (
     <Modal
