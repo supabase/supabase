@@ -72,7 +72,7 @@ const AuditLogs = () => {
     }, 5 * 60000)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [dateRange.from, dateRange.to])
 
   return (
     <>
