@@ -1,24 +1,21 @@
-import { useRouter } from 'next/router'
 import React, { PropsWithChildren, useState, useMemo, useEffect, useRef } from 'react'
-import { cn } from 'ui'
+import { useRouter } from 'next/router'
+import { Loader2 } from 'lucide-react'
+import { cn, WarningIcon } from 'ui'
+
+import Panel from 'components/ui/Panel'
+import ComposedChart from './ComposedChart'
 
 import { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
-import {
-  InfraMonitoringAttribute,
-  useInfraMonitoringQuery,
-} from 'data/analytics/infra-monitoring-query'
-import {
-  ProjectDailyStatsAttribute,
-  useProjectDailyStatsQuery,
-} from 'data/analytics/project-daily-stats-query'
-import { Loader2 } from 'lucide-react'
+import { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
+import { useInfraMonitoringQueries } from 'data/analytics/infra-monitoring-queries'
+import { ProjectDailyStatsAttribute } from 'data/analytics/project-daily-stats-query'
+import { useProjectDailyStatsQueries } from 'data/analytics/project-daily-stats-queries'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { WarningIcon } from 'ui'
-import type { ChartData } from './Charts.types'
-import Panel from 'components/ui/Panel'
 import { useChartHighlight } from './useChartHighlight'
+
+import type { ChartData } from './Charts.types'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
-import ComposedChart from './ComposedChart'
 
 type Provider = 'infra-monitoring' | 'daily-stats'
 
@@ -94,62 +91,6 @@ const LazyChartWrapper = ({ children }: PropsWithChildren) => {
   }, [])
 
   return <div ref={ref}>{React.cloneElement(children as React.ReactElement, { isVisible })}</div>
-}
-
-// Create a custom hook to fetch data based on attributes
-const useAttributeQueries = (
-  attributes: MultiAttribute[],
-  ref: string | string[] | undefined,
-  startDate: string,
-  endDate: string,
-  interval: AnalyticsInterval,
-  databaseIdentifier: string | undefined,
-  data: ChartData | undefined,
-  isVisible: boolean
-) => {
-  // Use individual hooks for each attribute instead of using map
-  const results = []
-
-  // We need to use separate hooks for each possible attribute
-  // This ensures hooks are called unconditionally at the top level
-  for (let i = 0; i < attributes.length; i++) {
-    const attr = attributes[i]
-
-    if (attr.provider === 'daily-stats') {
-      // Must use hook directly, not in a conditional or loop
-      const dailyStatsQuery = useProjectDailyStatsQuery(
-        {
-          projectRef: ref as string,
-          attribute: attr.attribute as ProjectDailyStatsAttribute,
-          startDate,
-          endDate,
-          interval,
-          databaseIdentifier,
-        },
-        { enabled: data === undefined && isVisible }
-      )
-      results.push(dailyStatsQuery)
-    } else if (attr.provider === 'infra-monitoring') {
-      // Must use hook directly, not in a conditional or loop
-      const infraMonitoringQuery = useInfraMonitoringQuery(
-        {
-          projectRef: ref as string,
-          attribute: attr.attribute as InfraMonitoringAttribute,
-          startDate,
-          endDate,
-          interval,
-          databaseIdentifier,
-        },
-        { enabled: data === undefined && isVisible }
-      )
-      results.push(infraMonitoringQuery)
-    } else {
-      // Push a placeholder for any unknown provider to maintain array structure
-      results.push({ isLoading: false, data: undefined })
-    }
-  }
-
-  return results
 }
 
 /**
@@ -333,6 +274,47 @@ const ComposedChartHandler = ({
       </Panel.Content>
     </Panel>
   )
+}
+
+const useAttributeQueries = (
+  attributes: MultiAttribute[],
+  ref: string | string[] | undefined,
+  startDate: string,
+  endDate: string,
+  interval: AnalyticsInterval,
+  databaseIdentifier: string | undefined,
+  data: ChartData | undefined,
+  isVisible: boolean
+) => {
+  const infraAttributes = attributes
+    .filter((attr) => attr.provider === 'infra-monitoring')
+    .map((attr) => attr.attribute as InfraMonitoringAttribute)
+  const dailyStatsAttributes = attributes
+    .filter((attr) => attr.provider === 'daily-stats')
+    .map((attr) => attr.attribute as ProjectDailyStatsAttribute)
+
+  const infraQueries = useInfraMonitoringQueries(
+    infraAttributes,
+    ref,
+    startDate,
+    endDate,
+    interval,
+    databaseIdentifier,
+    data,
+    isVisible
+  )
+  const dailyStatsQueries = useProjectDailyStatsQueries(
+    dailyStatsAttributes,
+    ref,
+    startDate,
+    endDate,
+    interval,
+    databaseIdentifier,
+    data,
+    isVisible
+  )
+
+  return [...infraQueries, ...dailyStatsQueries]
 }
 
 export default function LazyComposedChartHandler(props: ComposedChartHandlerProps) {

@@ -29,11 +29,9 @@ import { analyticsKeys } from 'data/analytics/keys'
 import { getReportAttributes, getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useDatabaseReport } from 'data/reports/database-report-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
@@ -60,7 +58,6 @@ export default DatabaseReport
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { project } = useProjectContext()
-  const organization = useSelectedOrganization()
   const isReportsV2 = useFlag('reportsDatabaseV2')
 
   const state = useDatabaseSelectorStateSnapshot()
@@ -72,8 +69,6 @@ const DatabaseUsage = () => {
     interval: '1h',
   })
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const plan = subscription?.plan
   const queryClient = useQueryClient()
 
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -199,7 +194,7 @@ const DatabaseUsage = () => {
         </div>
       </div>
       <GrafanaPromoBanner />
-      <section className="relative pt-16 -mt-4">
+      <section className="relative pt-16 -mt-2">
         <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
           <div className="sticky top-0 bg-200 py-4 mb-4 flex items-center space-x-3 pointer-events-auto">
             <ButtonTooltip
