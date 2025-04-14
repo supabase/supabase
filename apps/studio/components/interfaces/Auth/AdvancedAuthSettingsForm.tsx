@@ -11,7 +11,6 @@ import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
@@ -57,16 +56,10 @@ export const AdvancedAuthSettingsForm = () => {
     isError,
   } = useAuthConfigQuery({ projectRef })
 
-  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
-    orgSlug: organization?.slug,
-  })
-
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
-  const isTeamsEnterprisePlan =
-    isSuccessSubscription && subscription?.plan.id !== 'free' && subscription?.plan.id !== 'pro'
-  const promptTeamsEnterpriseUpgrade =
-    IS_PLATFORM && isSuccessSubscription && !isTeamsEnterprisePlan
+  const isTeamsEnterprisePlan = organization?.plan.id !== 'free' && organization?.plan.id !== 'pro'
+  const promptTeamsEnterpriseUpgrade = IS_PLATFORM && !isTeamsEnterprisePlan
 
   const requestDurationForm = useForm({
     resolver: zodResolver(

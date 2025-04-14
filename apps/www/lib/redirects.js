@@ -2999,4 +2999,9 @@ module.exports = [
     source: '/features/fly-postgres',
     destination: '/features/postgres-database',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/fly-postgres',
+    destination: '/docs/guides/database/overview',
+  },
 ]
