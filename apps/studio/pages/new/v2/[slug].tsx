@@ -668,7 +668,7 @@ const WizardForm = () => {
 
                                           <div>
                                             <Button asChild type="default">
-                                              <Link href={`/org/${slug}/invoices`}>
+                                              <Link href={`/org/${slug}/billing#invoices`}>
                                                 View invoices
                                               </Link>
                                             </Button>

@@ -6,6 +6,7 @@ import {
   Boxes,
   ChartArea,
   PanelLeftDashed,
+  Receipt,
   Settings,
   Users,
 } from 'lucide-react'
@@ -484,6 +485,12 @@ const OrganizationLinks = () => {
       href: `/org/${slug}/usage`,
       key: 'usage',
       icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+    },
+    {
+      label: 'Billing',
+      href: `/org/${slug}/billing`,
+      key: 'settings',
+      icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
       label: 'Organization settings',

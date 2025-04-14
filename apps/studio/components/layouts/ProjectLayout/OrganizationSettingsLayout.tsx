@@ -53,10 +53,6 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
       href: `/org/${slug}/usage`,
     },
     {
-      label: 'Invoices',
-      href: `/org/${slug}/invoices`,
-    },
-    {
       label: 'OAuth Apps',
       href: `/org/${slug}/apps`,
     },

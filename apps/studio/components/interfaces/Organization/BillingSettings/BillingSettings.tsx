@@ -10,13 +10,20 @@ import PaymentMethods from './PaymentMethods/PaymentMethods'
 import Subscription from './Subscription/Subscription'
 import TaxID from './TaxID/TaxID'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import InvoicesSection from '../InvoicesSettings/InvoicesSection'
 
 const BillingSettings = () => {
   const {
     billingAccountData: isBillingAccountDataEnabledOnProfileLevel,
     billingPaymentMethods: isBillingPaymentMethodsEnabledOnProfileLevel,
     billingCredits: isBillingCreditsEnabledOnProfileLevel,
-  } = useIsFeatureEnabled(['billing:account_data', 'billing:payment_methods', 'billing:credits'])
+    billingInvoices: isBillingInvoicesEnabledOnProfileLevel,
+  } = useIsFeatureEnabled([
+    'billing:account_data',
+    'billing:payment_methods',
+    'billing:credits',
+    'billing:invoices',
+  ])
 
   const org = useSelectedOrganization()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
@@ -47,12 +54,11 @@ const BillingSettings = () => {
         </ScaffoldContainer>
       )}
 
-      {isBillingCreditsEnabledOnProfileLevel && (
+      {isBillingInvoicesEnabledOnProfileLevel && (
         <>
           <ScaffoldDivider />
-
-          <ScaffoldContainer id="credits-balance">
-            <CreditBalance />
+          <ScaffoldContainer id="invoices">
+            <InvoicesSection />
           </ScaffoldContainer>
         </>
       )}
@@ -63,6 +69,14 @@ const BillingSettings = () => {
 
           <ScaffoldContainer id="payment-methods">
             <PaymentMethods />
+          </ScaffoldContainer>
+        </>
+      )}
+
+      {isBillingCreditsEnabledOnProfileLevel && (
+        <>
+          <ScaffoldContainer id="credits-balance">
+            <CreditBalance />
           </ScaffoldContainer>
         </>
       )}

@@ -1,6 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -9,21 +7,18 @@ import { InvoiceStatus } from 'components/interfaces/Billing/Invoices.types'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { getInvoice } from 'data/invoices/invoice-query'
 import { useInvoicesCountQuery } from 'data/invoices/invoices-count-query'
 import { useInvoicesQuery } from 'data/invoices/invoices-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
 import { Button } from 'ui'
-import CurrentPaymentMethod from '../BillingSettings/PaymentMethods/CurrentPaymentMethod'
 import { FileText, Download, ChevronLeft, ChevronRight } from 'lucide-react'
 import InvoicePayButton from './InvoicePayButton'
 
-const PAGE_LIMIT = 10
+const PAGE_LIMIT = 5
 
 const InvoicesSettings = () => {
   const [page, setPage] = useState(1)
@@ -31,8 +26,6 @@ const InvoicesSettings = () => {
   const selectedOrganization = useSelectedOrganization()
   const { slug } = selectedOrganization ?? {}
   const offset = (page - 1) * PAGE_LIMIT
-
-  const canReadInvoices = useCheckPermissions(PermissionAction.READ, 'invoices')
 
   const { data: count, isError: isErrorCount } = useInvoicesCountQuery(
     {
@@ -63,43 +56,31 @@ const InvoicesSettings = () => {
     }
   }
 
-  if (!canReadInvoices) {
-    return (
-      <ScaffoldContainerLegacy>
-        <NoPermission resourceText="view invoices" />
-      </ScaffoldContainerLegacy>
-    )
-  }
-
   if (
     selectedOrganization?.managed_by !== undefined &&
     selectedOrganization?.managed_by !== 'supabase'
   ) {
     return (
-      <ScaffoldContainerLegacy>
-        <PartnerManagedResource
-          partner={selectedOrganization?.managed_by}
-          resource="Invoices"
-          cta={{
-            installationId: selectedOrganization?.partner_id,
-            path: '/invoices',
-          }}
-          // TODO: support AWS marketplace here: `https://us-east-1.console.aws.amazon.com/billing/home#/bills`
-        />
-      </ScaffoldContainerLegacy>
+      <PartnerManagedResource
+        partner={selectedOrganization?.managed_by}
+        resource="Invoices"
+        cta={{
+          installationId: selectedOrganization?.partner_id,
+          path: '/invoices',
+        }}
+        // TODO: support AWS marketplace here: `https://us-east-1.console.aws.amazon.com/billing/home#/bills`
+      />
     )
   }
 
   return (
-    <ScaffoldContainerLegacy>
+    <>
       {isLoading && <GenericSkeletonLoader />}
 
       {isError && <AlertError error={error} subject="Failed to retrieve invoices" />}
 
       {isSuccess && (
         <>
-          <CurrentPaymentMethod />
-
           <div className="overflow-hidden md:overflow-auto overflow-x-scroll">
             <Table
               head={[
@@ -203,7 +184,7 @@ const InvoicesSettings = () => {
           </div>
         </>
       )}
-    </ScaffoldContainerLegacy>
+    </>
   )
 }
 
