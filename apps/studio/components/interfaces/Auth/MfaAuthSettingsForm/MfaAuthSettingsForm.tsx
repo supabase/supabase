@@ -234,7 +234,8 @@ const MfaAuthSettingsForm = () => {
 
   const phoneMFAIsEnabled =
     phoneForm.watch('MFA_PHONE') === 'Enabled' || phoneForm.watch('MFA_PHONE') === 'Verify Enabled'
-  const hasUpgradedPhoneMFA = authConfig && !authConfig.MFA_PHONE_VERIFY_ENABLED && phoneMFAIsEnabled
+  const hasUpgradedPhoneMFA =
+    authConfig && !authConfig.MFA_PHONE_VERIFY_ENABLED && phoneMFAIsEnabled
 
   return (
     <>
