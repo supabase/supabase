@@ -114,7 +114,7 @@ export const useCustomDomainsQuery = <TData = CustomDomainsData>(
     customDomainKeys.list(projectRef),
     ({ signal }) => getCustomDomains({ projectRef }, signal),
     {
-      enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined' && hasCustomDomainsAddon,
+      enabled: enabled && !IS_PLATFORM && typeof projectRef !== 'undefined' && hasCustomDomainsAddon,
       ...options,
     }
   )

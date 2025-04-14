@@ -67,7 +67,7 @@ const ProjectsPage: NextPageWithLayout = () => {
       )}
 
       <div className="p-4 md:p-5">
-        {IS_PLATFORM && projectCreationEnabled && isSuccess && (
+        {!IS_PLATFORM && projectCreationEnabled && isSuccess && (
           <HomePageActions
             search={search}
             filterStatus={filterStatus}

@@ -28,7 +28,7 @@ const CodePage = () => {
   const { ref, functionSlug } = useParams()
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
-  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
+  const includeSchemaMetadata = isOptedInToAI || IS_PLATFORM
   const edgeFunctionCreate = useFlag('edgeFunctionCreate')
   const { mutate: sendEvent } = useSendEventMutation()
   const org = useSelectedOrganization()

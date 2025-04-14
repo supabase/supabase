@@ -31,6 +31,7 @@ import {
 const Home: NextPageWithLayout = () => {
   const organization = useSelectedOrganization()
   const project = useSelectedProject()
+  project.state = PROJECT_STATUS.ACTIVE_HEALTHY
   const isOrioleDb = useIsOrioleDb()
   const snap = useAppStateSnapshot()
   const { enableBranching } = useParams()

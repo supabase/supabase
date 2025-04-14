@@ -38,7 +38,7 @@ export const useLoadBalancersQuery = <TData = LoadBalancersData>(
     replicaKeys.loadBalancers(projectRef),
     ({ signal }) => getLoadBalancers({ projectRef }, signal),
     {
-      enabled: enabled && typeof projectRef !== 'undefined' && IS_PLATFORM,
+      enabled: enabled && typeof projectRef !== 'undefined' && !IS_PLATFORM,
       ...options,
     }
   )

@@ -21,7 +21,7 @@ export const downloadBucketObject = async (
   // [Joshen] JFYI we have to use lib/common/fetch post as post from openapi-fetch doesn't support receiving octet-streams
   // Opting to hard code /platform for non platform just for this particular mutation, so that it's clear what's happening
   const response = await post(
-    `${API_URL}${IS_PLATFORM ? '' : '/platform'}/storage/${projectRef}/buckets/${bucketId}/objects/download`,
+    `${API_URL}${!IS_PLATFORM ? '' : '/platform'}/storage/${projectRef}/buckets/${bucketId}/objects/download`,
     {
       path,
       options,

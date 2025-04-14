@@ -38,7 +38,7 @@ export const useReadReplicasQuery = <TData = ReadReplicasData>(
     replicaKeys.list(projectRef),
     ({ signal }) => getReadReplicas({ projectRef }, signal),
     {
-      enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
+      enabled: enabled && !IS_PLATFORM && typeof projectRef !== 'undefined',
       ...options,
     }
   )

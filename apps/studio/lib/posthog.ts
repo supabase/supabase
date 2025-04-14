@@ -11,7 +11,7 @@ export async function trackFeatureFlag(body: TrackFeatureFlagVariables) {
       ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
       : null) === 'true'
 
-  if (!consent || !IS_PLATFORM) return undefined
+  if (!consent || IS_PLATFORM) return undefined
   const { data, error } = await post(`/platform/telemetry/feature-flags/track`, { body })
 
   if (error) handleError(error)

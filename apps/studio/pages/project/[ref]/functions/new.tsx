@@ -102,7 +102,7 @@ const NewFunctionPage = () => {
   const { ref, template } = useParams()
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
-  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
+  const includeSchemaMetadata = isOptedInToAI || IS_PLATFORM
   const snap = useAiAssistantStateSnapshot()
   const edgeFunctionCreate = useFlag('edgeFunctionCreate')
   const { mutate: sendEvent } = useSendEventMutation()
