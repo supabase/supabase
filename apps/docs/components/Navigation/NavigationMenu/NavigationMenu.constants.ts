@@ -119,6 +119,11 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'platform',
           },
           {
+            label: 'Security',
+            icon: 'status',
+            href: '/guides/security',
+          },
+          {
             label: 'Telemetry',
             icon: 'telemetry',
             href: '/guides/telemetry',
@@ -2048,7 +2053,7 @@ export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof Ico
 ]
 
 export const security: NavMenuConstant = {
-  icon: 'platform',
+  icon: 'status',
   title: 'Security',
   url: '/guides/security',
   items: [
