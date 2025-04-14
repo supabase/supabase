@@ -207,7 +207,7 @@ const LayoutHeader = ({
         </div>
         <div className="flex items-center gap-x-2">
           {customHeaderComponents && customHeaderComponents}
-          {IS_PLATFORM ? (
+          {!IS_PLATFORM ? (
             <>
               <FeedbackDropdown />
               <NotificationsPopoverV2 />
