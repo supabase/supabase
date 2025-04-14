@@ -10,7 +10,6 @@ import { pluckObjectFields } from 'lib/helpers'
 import { cn } from 'ui'
 import type { projectKeys } from './Connect.types'
 import { getConnectionStrings as getConnectionStringsV2 } from './DatabaseSettings.utils'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { getAddons } from '../Billing/Subscription/Subscription.utils'
@@ -31,8 +30,7 @@ const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabProps>(
   ({ projectKeys, filePath, ...props }, ref) => {
     const { ref: projectRef } = useParams()
     const selectedOrg = useSelectedOrganization()
-    const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
-    const allowPgBouncerSelection = useMemo(() => subscription?.plan.id !== 'free', [subscription])
+    const allowPgBouncerSelection = useMemo(() => selectedOrg?.plan.id !== 'free', [selectedOrg])
 
     const { data: settings } = useProjectSettingsV2Query({ projectRef })
     const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })

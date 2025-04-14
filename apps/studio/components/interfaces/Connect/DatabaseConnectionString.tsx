@@ -9,7 +9,6 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -67,10 +66,9 @@ export const DatabaseConnectionString = () => {
 
   const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const sharedPoolerPreferred = useMemo(() => {
-    return subscription?.plan?.id === 'free'
-  }, [subscription])
+    return org?.plan?.id === 'free'
+  }, [org])
 
   const {
     data: pgbouncerConfig,
