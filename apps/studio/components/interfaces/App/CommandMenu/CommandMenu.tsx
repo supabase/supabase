@@ -36,7 +36,7 @@ export default function StudioCommandMenu() {
     options: { orderSection: orderCommandSectionsByPriority, sectionMeta: { priority: 3 } },
   })
   useSupportCommands()
-  useChangelogCommand({ enabled: IS_PLATFORM })
+  useChangelogCommand({ enabled: !IS_PLATFORM })
   useThemeSwitcherCommands()
 
   return (
