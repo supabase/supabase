@@ -47,42 +47,42 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
     }
   }, [router])
 
-  if (!newLayoutPreview) {
-    return children
-  }
-
   return (
     <>
       <Head>
         <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
         <meta name="description" content="Supabase Studio" />
       </Head>
-      <div className="flex flex-col h-screen w-screen">
-        <ScaffoldContainerLegacy>
-          <Link
-            href={appSnap.lastRouteBeforeVisitingAccountPage ?? '/'}
-            className="flex text-xs flex-row gap-2 items-center text-foreground-lighter focus-visible:text-foreground hover:text-foreground"
-          >
-            <ArrowLeft strokeWidth={1.5} size={14} />
-            Back to dashboard
-          </Link>
-          <ScaffoldTitle>Account settings</ScaffoldTitle>
-        </ScaffoldContainerLegacy>
-        <div className="border-b">
-          <NavMenu
-            className={cn(PADDING_CLASSES, MAX_WIDTH_CLASSES, 'border-none')}
-            aria-label="Organization menu navigation"
-          >
-            {accountLinks.map((item, i) => (
-              <NavMenuItem
-                key={`${item.key}-${i}`}
-                active={(item.key === currentPath || item.keys?.includes(currentPath)) ?? false}
+      <div className={cn(newLayoutPreview ? 'flex flex-col h-screen w-screen' : '')}>
+        {newLayoutPreview && (
+          <>
+            <ScaffoldContainerLegacy>
+              <Link
+                href={appSnap.lastRouteBeforeVisitingAccountPage ?? '/'}
+                className="flex text-xs flex-row gap-2 items-center text-foreground-lighter focus-visible:text-foreground hover:text-foreground"
               >
-                <Link href={item.href}>{item.label}</Link>
-              </NavMenuItem>
-            ))}
-          </NavMenu>
-        </div>
+                <ArrowLeft strokeWidth={1.5} size={14} />
+                Back to dashboard
+              </Link>
+              <ScaffoldTitle>Account settings</ScaffoldTitle>
+            </ScaffoldContainerLegacy>
+            <div className="border-b">
+              <NavMenu
+                className={cn(PADDING_CLASSES, MAX_WIDTH_CLASSES, 'border-none')}
+                aria-label="Organization menu navigation"
+              >
+                {accountLinks.map((item, i) => (
+                  <NavMenuItem
+                    key={`${item.key}-${i}`}
+                    active={(item.key === currentPath || item.keys?.includes(currentPath)) ?? false}
+                  >
+                    <Link href={item.href}>{item.label}</Link>
+                  </NavMenuItem>
+                ))}
+              </NavMenu>
+            </div>
+          </>
+        )}
         {children}
       </div>
     </>
