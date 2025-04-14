@@ -42,7 +42,7 @@ const BillingAddressDialog = ({ slug }: BillingAddressDialogProps) => {
 
   // Create a summary of the address if it exists
   const getAddressSummary = () => {
-    if (!customerProfile?.address?.line1) return 'No billing address set'
+    if (!customerProfile?.address?.line1) return 'Optionally add a billing address'
 
     const parts = [
       customerProfile?.address?.line1,
