@@ -43,26 +43,6 @@ export function getCreateFDWSql({
   const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
   const unencryptedOptions = wrapperMeta.server.options.filter((option) => !option.encrypted)
 
-  const createEncryptedKeysSqlArray = encryptedOptions.map((option) => {
-    const key = `${formState.wrapper_name}_${option.name}`
-    // Escape single quotes in postgresql by doubling them up
-    const value = (formState[option.name] || '').replace(/'/g, "''")
-
-    return /* SQL */ `
-      select pgsodium.create_key(
-        name := '${key}'
-      );
-
-      select vault.create_secret (
-        new_secret := '${value}',
-        new_name   := '${key}',
-        new_key_id := (select id from pgsodium.valid_key where name = '${key}')
-      );
-    `
-  })
-
-  const createEncryptedKeysSql = createEncryptedKeysSqlArray.join('\n')
-
   const encryptedOptionsSqlArray = encryptedOptions.map((option) => `${option.name} ''%s''`)
   const unencryptedOptionsSqlArray = unencryptedOptions.map(
     (option) => `${option.name} ''${formState[option.name]}''`
@@ -76,8 +56,19 @@ export function getCreateFDWSql({
     begin
       ${encryptedOptions
         .map(
-          (option) =>
-            /* SQL */ `select id into v_${option.name} from pgsodium.valid_key where name = '${formState.wrapper_name}_${option.name}' limit 1;`
+          (option) => {
+            const key = `${formState.wrapper_name}_${option.name}`
+            // Escape single quotes in postgresql by doubling them up
+            const value = (formState[option.name] || '').replace(/'/g, "''")
+
+            return /* SQL */ `
+              select vault.create_secret (
+                new_secret := '${value}',
+                new_name   := '${key}',
+                new_description := 'Wrapper credential for ${formState.wrapper_name}'
+              ) into v_${option.name};
+            `
+          }
         )
         .join('\n')}
     
@@ -123,8 +114,6 @@ export function getCreateFDWSql({
     ${newSchemasSql}
 
     ${createWrapperSql}
-
-    ${createEncryptedKeysSql}
 
     ${createServerSql}
 
