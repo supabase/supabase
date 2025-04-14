@@ -5,7 +5,7 @@ import { Edit2, ExternalLink, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -19,7 +19,24 @@ import {
 import { BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { Button, Input, Listbox, Toggle } from 'ui'
+import {
+  Button,
+  Input,
+  Input_Shadcn_,
+  Label_Shadcn_,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import _ from 'lodash'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -70,9 +87,17 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const router = useRouter()
   const user = useProfile()
   const { data: organizations, isSuccess } = useOrganizationsQuery()
+  const { data: projects } = useProjectsQuery()
   const stripe = useStripe()
   const elements = useElements()
   const queryClient = useQueryClient()
+
+  const projectsByOrg = useMemo(() => {
+    return _.groupBy(projects || [], 'organization_slug')
+  }, [projects])
+
+  const [isOrgCreationConfirmationModalVisible, setIsOrgCreationConfirmationModalVisible] =
+    useState(false)
 
   const [formState, setFormState] = useState<FormState>({
     plan: 'FREE',
@@ -158,17 +183,11 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     })
   }
 
-  const handleSubmit = async (event: any) => {
-    event.preventDefault()
-
-    const isOrgNameValid = validateOrgName(formState.name)
-    if (!isOrgNameValid) {
-      return toast.error('Organization name is empty')
-    }
-
+  const handleSubmit = async () => {
     if (!stripe || !elements) {
       return console.error('Stripe.js has not loaded')
     }
+
     setNewOrgLoading(true)
 
     if (formState.plan === 'FREE') {
@@ -203,8 +222,23 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     return onPaymentMethodReset()
   }
 
+  const onSubmitWithOrgCreation = async (event: any) => {
+    event.preventDefault()
+
+    const isOrgNameValid = validateOrgName(formState.name)
+    if (!isOrgNameValid) {
+      return toast.error('Organization name is empty')
+    }
+
+    if (projects && projects.length > 1 && formState.plan !== 'FREE') {
+      setIsOrgCreationConfirmationModalVisible(true)
+    } else {
+      await handleSubmit()
+    }
+  }
+
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={onSubmitWithOrgCreation}>
       <Panel
         title={
           <div key="panel-title">
@@ -243,124 +277,178 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
           </p>
         </Panel.Content>
         <Panel.Content className="Form section-block--body has-inputs-centered">
-          <Input
-            autoFocus
-            label="Name"
-            type="text"
-            layout="horizontal"
-            placeholder="Organization name"
-            descriptionText="What's the name of your company or team?"
-            value={formState.name}
-            onChange={(e) => updateForm('name', e.target.value)}
-          />
+          <div className="grid grid-cols-3 w-full">
+            <div>
+              <Label_Shadcn_ htmlFor="name">Name</Label_Shadcn_>
+            </div>
+            <div className="col-span-2">
+              <Input_Shadcn_
+                id="name"
+                autoFocus
+                type="text"
+                placeholder="Organization name"
+                value={formState.name}
+                onChange={(e) => updateForm('name', e.target.value)}
+              />
+              <div className="mt-1">
+                <Label_Shadcn_
+                  htmlFor="name"
+                  className="text-foreground-lighter leading-normal text-sm"
+                >
+                  What's the name of your company or team?
+                </Label_Shadcn_>
+              </div>
+            </div>
+          </div>
         </Panel.Content>
         <Panel.Content className="Form section-block--body has-inputs-centered">
-          <Listbox
-            label="Type of organization"
-            layout="horizontal"
-            value={formState.kind}
-            onChange={(value) => updateForm('kind', value)}
-            descriptionText="What would best describe your organization?"
-          >
-            {Object.entries(ORG_KIND_TYPES).map(([k, v]) => (
-              <Listbox.Option key={k} label={v} value={k}>
-                {v}
-              </Listbox.Option>
-            ))}
-          </Listbox>
+          <div className="grid grid-cols-3">
+            <div>
+              <Label_Shadcn_ htmlFor="kind">Type</Label_Shadcn_>
+            </div>
+            <div className="col-span-2">
+              <Select_Shadcn_
+                value={formState.kind}
+                onValueChange={(value) => updateForm('kind', value)}
+              >
+                <SelectTrigger_Shadcn_ id="kind" className="w-full">
+                  <SelectValue_Shadcn_ />
+                </SelectTrigger_Shadcn_>
+
+                <SelectContent_Shadcn_>
+                  {Object.entries(ORG_KIND_TYPES).map(([k, v]) => (
+                    <SelectItem_Shadcn_ key={k} value={k}>
+                      {v}
+                    </SelectItem_Shadcn_>
+                  ))}
+                </SelectContent_Shadcn_>
+              </Select_Shadcn_>
+
+              <div className="mt-1">
+                <Label_Shadcn_
+                  htmlFor="kind"
+                  className="text-foreground-lighter leading-normal text-sm"
+                >
+                  What would best describe your organization?
+                </Label_Shadcn_>
+              </div>
+            </div>
+          </div>
         </Panel.Content>
 
         {formState.kind == 'COMPANY' && (
           <Panel.Content className="Form section-block--body has-inputs-centered">
-            <Listbox
-              label="Company size"
-              layout="horizontal"
-              value={formState.size}
-              onChange={(value) => updateForm('size', value)}
-              descriptionText="How many people are in your company?"
-            >
-              {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => (
-                <Listbox.Option key={k} label={v} value={k}>
-                  {v}
-                </Listbox.Option>
-              ))}
-            </Listbox>
+            <div className="grid grid-cols-3">
+              <div>
+                <Label_Shadcn_ htmlFor="size">Company size</Label_Shadcn_>
+              </div>
+              <div className="col-span-2">
+                <Select_Shadcn_
+                  value={formState.size}
+                  onValueChange={(value) => updateForm('size', value)}
+                >
+                  <SelectTrigger_Shadcn_ id="size" className="w-full">
+                    <SelectValue_Shadcn_ />
+                  </SelectTrigger_Shadcn_>
+
+                  <SelectContent_Shadcn_>
+                    {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => (
+                      <SelectItem_Shadcn_ key={k} value={k}>
+                        {v}
+                      </SelectItem_Shadcn_>
+                    ))}
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+
+                <div className="mt-2">
+                  <Label_Shadcn_
+                    htmlFor="size"
+                    className="text-foreground-lighter leading-normal text-sm"
+                  >
+                    How many people are in your company?
+                  </Label_Shadcn_>
+                </div>
+              </div>
+            </div>
           </Panel.Content>
         )}
 
         <Panel.Content>
-          <Listbox
-            label={
-              <div className="flex flex-col gap-2">
-                <span>Plan</span>
+          <div className="grid grid-cols-3">
+            <div className="flex flex-col gap-2">
+              <Label_Shadcn_ htmlFor="plan" className=" text-sm">
+                Plan
+              </Label_Shadcn_>
 
-                <a
-                  href="https://supabase.com/pricing"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="text-sm flex items-center gap-2 opacity-75 hover:opacity-100 transition"
+              <a
+                href="https://supabase.com/pricing"
+                target="_blank"
+                rel="noreferrer noopener"
+                className="text-sm flex items-center gap-2 opacity-75 hover:opacity-100 transition"
+              >
+                Pricing
+                <ExternalLink size={16} strokeWidth={1.5} />
+              </a>
+            </div>
+            <div className="col-span-2">
+              <Select_Shadcn_
+                value={formState.plan}
+                onValueChange={(value) => updateForm('plan', value)}
+              >
+                <SelectTrigger_Shadcn_ id="plan" className="w-full">
+                  <SelectValue_Shadcn_ />
+                </SelectTrigger_Shadcn_>
+
+                <SelectContent_Shadcn_>
+                  {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => (
+                    <SelectItem_Shadcn_ key={k} value={k}>
+                      {v}
+                    </SelectItem_Shadcn_>
+                  ))}
+                </SelectContent_Shadcn_>
+              </Select_Shadcn_>
+
+              <div className="mt-1">
+                <Label_Shadcn_
+                  htmlFor="plan"
+                  className="text-foreground-lighter leading-normal text-sm"
                 >
-                  Pricing
-                  <ExternalLink size={16} strokeWidth={1.5} />
-                </a>
+                  The Plan applies to your new organization.
+                </Label_Shadcn_>
               </div>
-            }
-            layout="horizontal"
-            value={formState.plan}
-            onChange={(value) => updateForm('plan', value)}
-            descriptionText={
-              formState.plan !== 'FREE' ? (
-                <p>
-                  The plan applies only to this new organization. To upgrade an existing
-                  organization,{' '}
-                  <Link
-                    className="underline"
-                    href="/org/_/billing?panel=subscriptionPlan&source=newOrgUpgradeExisting"
-                  >
-                    click here
-                  </Link>
-                  .
-                </p>
-              ) : undefined
-            }
-          >
-            {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => (
-              <Listbox.Option key={k} label={v} value={k}>
-                {v}
-              </Listbox.Option>
-            ))}
-          </Listbox>
+            </div>
+          </div>
         </Panel.Content>
 
         {formState.plan === 'PRO' && (
           <>
             <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-              <Toggle
-                id="spend-cap"
-                layout="horizontal"
-                label={
-                  <div className="flex space-x-4">
-                    <span>Spend Cap</span>
-                    <HelpCircle
-                      size={16}
-                      strokeWidth={1.5}
-                      className="transition opacity-50 cursor-pointer hover:opacity-100"
-                      onClick={() => setShowSpendCapHelperModal(true)}
-                    />
-                  </div>
-                }
-                checked={formState.spend_cap}
-                onChange={() => updateForm('spend_cap', !formState.spend_cap)}
-                descriptionText={
-                  <div>
-                    <p>
-                      With Spend Cap enabled, usage is limited to the plan's quota, with
-                      restrictions when limits are exceeded. To scale beyond Pro Plan limits,
-                      disable the Spend Cap to pay over-usage.
-                    </p>
-                  </div>
-                }
-              />
+              <div className="grid grid-cols-3">
+                <div className="col-span-1 flex space-x-2 text-sm">
+                  <Label_Shadcn_ htmlFor="spend-cap" className=" leading-normal">
+                    Spend Cap
+                  </Label_Shadcn_>
+
+                  <HelpCircle
+                    size={16}
+                    strokeWidth={1.5}
+                    className="transition opacity-50 cursor-pointer hover:opacity-100"
+                    onClick={() => setShowSpendCapHelperModal(true)}
+                  />
+                </div>
+                <div className="col-span-2 flex items-center space-x-2">
+                  <Switch
+                    id="spend-cap"
+                    checked={formState.spend_cap}
+                    onCheckedChange={() => updateForm('spend_cap', !formState.spend_cap)}
+                  />
+                  <Label_Shadcn_ htmlFor="spend-cap">
+                    {formState.spend_cap
+                      ? `Usage is limited to the plan's quota.`
+                      : `You pay for overages beyond the plan's quota.`}
+                  </Label_Shadcn_>
+                </div>
+              </div>
             </Panel.Content>
 
             <SpendCapModal
@@ -408,6 +496,78 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
           </Panel.Content>
         )}
       </Panel>
+
+      <ConfirmationModal
+        size="large"
+        loading={false}
+        visible={isOrgCreationConfirmationModalVisible}
+        title={<>Confirm organization creation</>}
+        confirmLabel="Create new organization"
+        onCancel={() => setIsOrgCreationConfirmationModalVisible(false)}
+        onConfirm={async () => {
+          await handleSubmit()
+          setIsOrgCreationConfirmationModalVisible(false)
+        }}
+        variant={'warning'}
+      >
+        <p className="text-sm text-foreground-light">
+          Supabase{' '}
+          <Link
+            className="underline"
+            href="/docs/guides/platform/billing-on-supabase"
+            target="_blank"
+          >
+            bills per organization
+          </Link>
+          . If you want to upgrade your existing projects, upgrade your existing organization
+          instead.
+        </p>
+
+        <ul className="mt-4 space-y-6">
+          {(organizations || [])
+            .filter((it) => projectsByOrg[it.slug]?.length > 0)
+            .map((org) => {
+              const orgProjects = projectsByOrg[org.slug].map((it) => it.name)
+
+              return (
+                <li key={`org_${org.slug}`}>
+                  <div className="flex justify-between text-sm">
+                    <span>{org.name}</span>
+                    <Button asChild type="primary" size="tiny">
+                      <Link href={`/org/${org.slug}/billing?panel=subscriptionPlan`}>
+                        Change Plan
+                      </Link>
+                    </Button>
+                  </div>
+                  <div className="text-foreground-light text-xs">
+                    {orgProjects.length <= 2 ? (
+                      <span>{orgProjects.join('and ')}</span>
+                    ) : (
+                      <div>
+                        {orgProjects.slice(0, 2).join(', ')} and{' '}
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="underline decoration-dotted">
+                              {orgProjects.length - 2} other{' '}
+                              {orgProjects.length === 3 ? 'project' : 'project'}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <ul className="list-disc list-inside">
+                              {orgProjects.slice(2).map((project) => (
+                                <li>{project}</li>
+                              ))}
+                            </ul>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    )}
+                  </div>
+                </li>
+              )
+            })}
+        </ul>
+      </ConfirmationModal>
     </form>
   )
 }
