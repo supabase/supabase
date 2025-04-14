@@ -133,8 +133,8 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
   } = useOrganizationsQuery()
 
   const selectedOrganization = useMemo(
-    () => organizations?.find((org) => org.slug === slug),
-    [slug, organizations]
+    () => organizations?.find((org) => org.slug === organizationSlug),
+    [organizationSlug, organizations]
   )
   const {
     data: allProjects,
@@ -157,6 +157,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
 
   const respondToEmail = profile?.primary_email ?? 'your email'
   const subscriptionPlanId = selectedOrganization?.plan.id
+
   const projects = [
     ...(allProjects ?? []).filter((project) => project.organization_slug === organizationSlug),
     { ref: 'no-project', name: 'No specific project' } as Partial<Project>,
@@ -263,8 +264,8 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
           form.setValue('projectRef', selectedProject.ref)
         }
       } else if (slug) {
-        if (selectedOrganization !== undefined) {
-          form.setValue('organizationSlug', selectedOrganization.slug)
+        if (organizations.some((it) => it.slug === slug)) {
+          form.setValue('organizationSlug', slug)
         }
       } else if (ref === undefined && slug === undefined) {
         const firstOrganization = organizations?.[0]
