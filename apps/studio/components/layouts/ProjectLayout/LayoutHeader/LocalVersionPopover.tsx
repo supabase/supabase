@@ -23,16 +23,20 @@ import {
   TabsTrigger_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { getSemver, semverGte, semverLte } from './LocalVersionPopover.utils'
 
 export const LocalVersionPopover = () => {
   const { data, isSuccess } = useCLIReleaseVersionQuery()
   const currentCliVersion = data?.current
   const hasLatestCLIVersion = isSuccess && !!data?.latest
-  const isLatestVersion = currentCliVersion === data?.latest
 
-  const isBeta = currentCliVersion === data?.beta
-  // [Joshen] Not sure atm if we need this logic, but in case we need to figure out availability of new beta releases
-  // const hasBetaUpdate = semver.gt(semver.coerce(current), semver.coerce(latest)) && semver.lt(semver.coerce(current), semver.coerce(beta))
+  const current = getSemver(data?.current)
+  const latest = getSemver(data?.latest)
+
+  const hasUpdate =
+    !!current && !!latest ? data?.current !== data?.latest && semverLte(current, latest) : false
+  const isBeta =
+    !!current && !!latest && data?.current !== data?.latest && semverGte(current, latest)
 
   const approximateNextRelease = !!data?.published_at
     ? dayjs(data?.published_at).utc().add(14, 'day').format('DD MMM YYYY')
@@ -43,13 +47,13 @@ export const LocalVersionPopover = () => {
   return (
     <Popover_Shadcn_>
       <PopoverTrigger_Shadcn_ className="flex items-center">
-        <Badge variant={isBeta ? 'warning' : isLatestVersion ? 'default' : 'brand'}>
-          {isBeta ? 'Beta' : isLatestVersion ? 'Latest' : 'Update available'}
+        <Badge variant={isBeta ? 'warning' : hasUpdate ? 'brand' : 'default'}>
+          {isBeta ? 'Beta' : hasUpdate ? 'Update available' : 'Latest'}
         </Badge>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ align="end" className="w-80 px-0">
         {hasLatestCLIVersion ? (
-          !isBeta && !isLatestVersion ? (
+          !isBeta && hasUpdate ? (
             <div className="px-4 mb-3">
               <p className="text-sm mb-2">A new version of Supabase CLI is available:</p>
               <Tabs_Shadcn_ defaultValue="macos">
@@ -173,7 +177,7 @@ export const LocalVersionPopover = () => {
             <p className="text-xs">Current version:</p>
             <p className="text-sm font-mono">{currentCliVersion}</p>
           </div>
-          {hasLatestCLIVersion && !isLatestVersion && !isBeta && (
+          {hasLatestCLIVersion && hasUpdate && !isBeta && (
             <div className="flex flex-col gap-y-1">
               <p className="text-xs">Available version:</p>
               <p className="text-sm font-mono">{data.latest}</p>
