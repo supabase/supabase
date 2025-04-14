@@ -134,7 +134,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
 
   const selectedOrganization = useMemo(
     () => organizations?.find((org) => org.slug === slug),
-    [slug]
+    [slug, organizations]
   )
   const {
     data: allProjects,
@@ -326,9 +326,6 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                           <span>No specific organization</span>
                         ) : (
                           (organizations ?? []).find((o) => o.slug === field.value)?.name
-                        )}
-                        {organizationSlug !== 'no-org' && (
-                          <Loader2 size={14} className="animate-spin" />
                         )}
                         {subscriptionPlanId && (
                           <Badge variant="outline" className="capitalize">
