@@ -172,7 +172,7 @@ const WizardForm = () => {
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
 
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
-    enabled: !['team', 'enterprise'].includes(currentOrg?.plan.id ?? ''),
+    enabled: currentOrg !== undefined && !['team', 'enterprise'].includes(currentOrg.plan.id ?? ''),
   })
   const overdueInvoices = (allOverdueInvoices ?? []).filter(
     (x) => x.organization_id === currentOrg?.id
@@ -790,7 +790,7 @@ const WizardForm = () => {
                                             </div>
                                           }
                                           description={
-                                            <div className="flex flex gap-2">
+                                            <div className="flex gap-2">
                                               <Link
                                                 target="_blank"
                                                 rel="noopener noreferrer"
