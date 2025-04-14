@@ -138,12 +138,6 @@ const tweets = [
     img_url: '/images/twitter-profiles/LTw5OCnv_400x400.jpg',
   },
   {
-    text: '10/100 All day i was migrating my project from firebase to @supabase Because it is perfect and simple!!! I like design and API for understandable. There are in BETA now. Just try!🧪',
-    url: 'https://twitter.com/roomahhka/status/1363155396391763971',
-    handle: 'roomahhka',
-    img_url: '/images/twitter-profiles/e_2eQt6C_400x400.jpg',
-  },
-  {
     text: 'I gave @supabase a try today and I was positively impressed! Very quick setup to get a working remote database with API access and documentation generated automatically for you 👌 10/10 will play more',
     url: 'https://twitter.com/razvanilin/status/1363002398738800640',
     handle: 'razvanilin',
