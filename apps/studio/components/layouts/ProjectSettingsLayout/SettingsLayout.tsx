@@ -23,9 +23,9 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
   const organization = useSelectedOrganization()
 
   useEffect(() => {
-    if (!IS_PLATFORM) {
+    //if (!IS_PLATFORM) {
       router.push('/project/default')
-    }
+    //}
   }, [router])
 
   // billing pages live under /billing/invoices and /billing/subscription, etc

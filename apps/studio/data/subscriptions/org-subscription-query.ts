@@ -19,12 +19,27 @@ export async function getOrgSubscription(
 ) {
   if (!orgSlug) throw new Error('orgSlug is required')
 
-  const { error, data } = await get('/platform/organizations/{slug}/billing/subscription', {
-    params: { path: { slug: orgSlug } },
-    signal,
-  })
+  // const { error, data } = await get('/platform/organizations/{slug}/billing/subscription', {
+  //   params: { path: { slug: orgSlug } },
+  //   signal,
+  // })
 
-  if (error) handleError(error)
+  // if (error) handleError(error)
+  const data = {
+    "billing_via_partner": false,
+    "current_period_end": 1747007000,
+    "current_period_start": 1744516000,
+    "next_invoice_at": 1747007000,
+    "customer_balance": 0,
+    "plan": {
+      "id": "enterprise",
+      "name": "Enterprise"
+    },
+    "usage_billing_enabled": false,
+    "addons": [],
+    "project_addons": [],
+    "payment_method_type": "none"
+  }
   return data
 }
 

@@ -23,9 +23,9 @@ export function withAuth<T>(
   } = { useHighestAAL: true }
 ) {
   // ignore auth in self-hosted
-  if (!IS_PLATFORM) {
+  //if (!IS_PLATFORM) {
     return WrappedComponent
-  }
+  //}
 
   const WithAuthHOC: ComponentType<T> = (props) => {
     const router = useRouter()
