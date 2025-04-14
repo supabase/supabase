@@ -14,14 +14,12 @@ import InlineEditorButton from 'components/layouts/AppLayout/InlineEditorButton'
 import OrganizationDropdown from 'components/layouts/AppLayout/OrganizationDropdown'
 import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
-import { useCLIReleaseVersionQuery } from 'data/misc/cli-release-version-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useShowLayoutHeader } from 'hooks/misc/useShowLayoutHeader'
 import { IS_PLATFORM } from 'lib/constants'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
 import BreadcrumbsView from './BreadcrumbsView'
@@ -70,11 +68,6 @@ const LayoutHeader = ({
   const selectedOrganization = useSelectedOrganization()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
   const { setMobileMenuOpen } = useAppStateSnapshot()
-
-  const { open: isAiAssistantOpen } = useAiAssistantStateSnapshot()
-
-  const { data } = useCLIReleaseVersionQuery()
-  const currentCliVersion = data?.current
 
   const { data: subscription } = useOrgSubscriptionQuery({
     orgSlug: selectedOrganization?.slug,
@@ -200,7 +193,7 @@ const LayoutHeader = ({
             </>
           ) : (
             <>
-              {!!currentCliVersion && <LocalVersionPopover />}
+              <LocalVersionPopover />
               <ThemeDropdown />
             </>
           )}
