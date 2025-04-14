@@ -3,7 +3,7 @@
 import { createClient } from '@/registry/default/fixtures/lib/supabase/client'
 import { PostgrestQueryBuilder } from '@supabase/postgrest-js'
 import { SupabaseClient } from '@supabase/supabase-js'
-import { useRef, useSyncExternalStore } from 'react'
+import { useEffect, useRef, useSyncExternalStore } from 'react'
 
 const supabase = createClient()
 
@@ -96,7 +96,7 @@ function createStore<TData extends SupabaseTableData<T>, T extends SupabaseTable
     notify()
   }
 
-  const fetchPage = (skip: number) => {
+  const fetchPage = async (skip: number) => {
     if (state.hasInitialFetch && (state.isFetching || state.count <= state.data.length)) return
 
     setState({ isFetching: true })
@@ -108,27 +108,24 @@ function createStore<TData extends SupabaseTableData<T>, T extends SupabaseTable
     if (trailingQuery) {
       query = trailingQuery(query)
     }
-    query
-      .range(skip, skip + pageSize - 1)
+    const { data: newData, count, error } = await query.range(skip, skip + pageSize - 1)
 
-      .then(({ data: newData, count, error }) => {
-        if (error) {
-          console.error('An unexpected error occurred:', error)
-          setState({ error })
-        } else {
-          const deduplicatedData = ((newData || []) as TData[]).filter(
-            (item) => !state.data.find((old) => old.id === item.id)
-          )
+    if (error) {
+      console.error('An unexpected error occurred:', error)
+      setState({ error })
+    } else {
+      const deduplicatedData = ((newData || []) as TData[]).filter(
+        (item) => !state.data.find((old) => old.id === item.id)
+      )
 
-          setState({
-            data: [...state.data, ...deduplicatedData],
-            count: count || 0,
-            isSuccess: true,
-            error: null,
-          })
-        }
-        setState({ isFetching: false })
+      setState({
+        data: [...state.data, ...deduplicatedData],
+        count: count || 0,
+        isSuccess: true,
+        error: null,
       })
+    }
+    setState({ isFetching: false })
   }
 
   const fetchNextPage = async () => {
@@ -138,9 +135,8 @@ function createStore<TData extends SupabaseTableData<T>, T extends SupabaseTable
 
   const initialize = async () => {
     setState({ isLoading: true, isSuccess: false, data: [] })
-    fetchNextPage().then(() => {
-      setState({ isLoading: false, hasInitialFetch: true })
-    })
+    await fetchNextPage()
+    setState({ isLoading: false, hasInitialFetch: true })
   }
 
   return {
@@ -171,26 +167,27 @@ function useInfiniteQuery<
 >(props: UseInfiniteQueryProps<T>) {
   const storeRef = useRef(createStore<TData, T>(props))
 
-  // Recreate store if props change
-  if (
-    storeRef.current.getState().hasInitialFetch &&
-    (props.tableName !== props.tableName ||
-      props.columns !== props.columns ||
-      props.pageSize !== props.pageSize)
-  ) {
-    storeRef.current = createStore<TData, T>(props)
-  }
-
   const state = useSyncExternalStore(
     storeRef.current.subscribe,
     () => storeRef.current.getState(),
     () => initialState as StoreState<TData>
   )
 
-  // Initialize on mount
-  if (!state.hasInitialFetch && typeof window !== 'undefined') {
-    storeRef.current.initialize()
-  }
+  useEffect(() => {
+    // Recreate store if props change
+    if (
+      storeRef.current.getState().hasInitialFetch &&
+      (props.tableName !== props.tableName ||
+        props.columns !== props.columns ||
+        props.pageSize !== props.pageSize)
+    ) {
+      storeRef.current = createStore<TData, T>(props)
+    }
+
+    if (!state.hasInitialFetch && typeof window !== 'undefined') {
+      storeRef.current.initialize()
+    }
+  }, [props.tableName, props.columns, props.pageSize, state.hasInitialFetch])
 
   return {
     data: state.data,
