@@ -119,7 +119,7 @@ const ProjectDropdown = ({ isNewNav = true }: ProjectDropdownProps) => {
     return <ShimmeringLoader className="w-[90px]" />
   }
 
-  return IS_PLATFORM ? (
+  return !IS_PLATFORM ? (
     <>
       {newLayoutPreview && (
         <Link

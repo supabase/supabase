@@ -87,7 +87,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
       // Check validity of project that the user is trying to access
       const projects = projectsRef.current ?? []
       const isValidProject = projects.some((project) => project.ref === ref)
-      const isValidBranch = IS_PLATFORM
+      const isValidBranch = !IS_PLATFORM
         ? projects.some((project) => project.preview_branch_refs.includes(ref))
         : true
 

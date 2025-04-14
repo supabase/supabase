@@ -15,7 +15,7 @@ export default async function apiWrapper(
   try {
     const { withAuth } = options || {}
 
-    if (IS_PLATFORM && withAuth) {
+    if (!IS_PLATFORM && withAuth) {
       const response = await apiAuthenticate(req, res)
       if (!isResponseOk(response)) {
         return res.status(401).json({

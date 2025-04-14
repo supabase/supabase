@@ -127,7 +127,7 @@ const LayoutHeader = ({
               {showOrgSelection &&
               // hides org dropdown for old layout
               (newLayoutPreview || showLayoutHeader) &&
-              IS_PLATFORM ? (
+              !IS_PLATFORM ? (
                 <>
                   <LayoutHeaderDivider className="hidden md:block" />
                   <OrganizationDropdown />

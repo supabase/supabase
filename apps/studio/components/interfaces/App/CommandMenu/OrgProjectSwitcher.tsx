@@ -13,7 +13,7 @@ const ORGANIZATION_SWITCHER_PAGE_NAME = 'Configure organization'
 export function useProjectSwitchCommand() {
   const setPage = useSetPage()
 
-  const { data: _projects } = useProjectsQuery({ enabled: IS_PLATFORM })
+  const { data: _projects } = useProjectsQuery({ enabled: !IS_PLATFORM })
   const projects = useMemo(
     () => (_projects ?? []).map(({ name, ref }) => ({ name, ref })),
     [_projects]
@@ -58,7 +58,7 @@ export function useProjectSwitchCommand() {
 export function useConfigureOrganizationCommand() {
   const setPage = useSetPage()
 
-  const { data: organizations } = useOrganizationsQuery({ enabled: IS_PLATFORM })
+  const { data: organizations } = useOrganizationsQuery({ enabled: !IS_PLATFORM })
 
   useRegisterPage(
     ORGANIZATION_SWITCHER_PAGE_NAME,

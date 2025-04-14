@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
     handleEmailVerificationError()
   }, [])
 
-  return <AuthProviderInternal alwaysLoggedIn={!IS_PLATFORM}>{children}</AuthProviderInternal>
+  return <AuthProviderInternal alwaysLoggedIn={IS_PLATFORM}>{children}</AuthProviderInternal>
 }
 
 export { useAuth, useIsLoggedIn, useSession, useUser } from 'common'
