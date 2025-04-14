@@ -57,7 +57,7 @@ export const useOrgSubscriptionUpdateMutation = ({
 
         // [Kevin] Backend can return stale data as it's waiting for the Stripe-sync to complete. Until that's solved in the backend
         // we are going back to monkey here and delay the invalidation
-        await new Promise((resolve) => setTimeout(resolve, 500))
+        await new Promise((resolve) => setTimeout(resolve, 2000))
 
         await Promise.all([
           queryClient.invalidateQueries(subscriptionKeys.orgSubscription(slug)),
