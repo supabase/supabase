@@ -1,6 +1,6 @@
 import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { type PropsWithChildren } from 'react'
+import { Fragment, type PropsWithChildren } from 'react'
 
 import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import PartnerIcon from 'components/ui/PartnerIcon'
@@ -15,16 +15,40 @@ import { SidebarSection } from './AccountLayout/AccountLayout.types'
 import WithSidebar from './AccountLayout/WithSidebar'
 import LayoutHeader from './ProjectLayout/LayoutHeader/LayoutHeader'
 
+const OrganizationLayoutContent = ({ children }: PropsWithChildren<{}>) => {
+  const selectedOrganization = useSelectedOrganization()
+  const { data, isSuccess } = useVercelRedirectQuery({
+    installationId: selectedOrganization?.partner_id,
+  })
+  return (
+    <div className={cn('w-full flex flex-col overflow-hidden')}>
+      {selectedOrganization && selectedOrganization?.managed_by !== 'supabase' && (
+        <Alert_Shadcn_
+          variant="default"
+          className="flex items-center gap-4 border-t-0 border-x-0 rounded-none"
+        >
+          <PartnerIcon organization={selectedOrganization} showTooltip={false} size="medium" />
+          <AlertTitle_Shadcn_ className="flex-1">
+            This organization is managed by {PARTNER_TO_NAME[selectedOrganization.managed_by]}.
+          </AlertTitle_Shadcn_>
+          <Button asChild type="default" iconRight={<ExternalLink />} disabled={!isSuccess}>
+            <a href={data?.url} target="_blank" rel="noopener noreferrer">
+              Manage
+            </a>
+          </Button>
+        </Alert_Shadcn_>
+      )}
+      <main className="h-full w-full overflow-y-auto">{children}</main>
+    </div>
+  )
+}
+
 const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const newLayoutPreview = useNewLayout()
 
   const selectedOrganization = useSelectedOrganization()
   const { data: organizations } = useOrganizationsQuery()
-
-  const { data, isSuccess } = useVercelRedirectQuery({
-    installationId: selectedOrganization?.partner_id,
-  })
 
   const organizationsLinks = (organizations ?? [])
     .map((organization) => ({
@@ -114,42 +138,18 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
     },
   ]
 
-  const Content = () => (
-    <div className={cn('w-full flex flex-col overflow-hidden')}>
-      {selectedOrganization && selectedOrganization?.managed_by !== 'supabase' && (
-        <Alert_Shadcn_
-          variant="default"
-          className="flex items-center gap-4 border-t-0 border-x-0 rounded-none"
-        >
-          <PartnerIcon organization={selectedOrganization} showTooltip={false} size="medium" />
-          <AlertTitle_Shadcn_ className="flex-1">
-            This organization is managed by {PARTNER_TO_NAME[selectedOrganization.managed_by]}.
-          </AlertTitle_Shadcn_>
-          <Button asChild type="default" iconRight={<ExternalLink />} disabled={!isSuccess}>
-            <a href={data?.url} target="_blank" rel="noopener noreferrer">
-              Manage
-            </a>
-          </Button>
-        </Alert_Shadcn_>
-      )}
-      <main className="h-full w-full overflow-y-auto">{children}</main>
-    </div>
-  )
+  const OrganizationLayoutContentWrapper = newLayoutPreview ? WithSidebar : Fragment
 
-  if (!newLayoutPreview) {
-    return (
-      <WithSidebar
-        title={selectedOrganization?.name ?? 'Supabase'}
-        breadcrumbs={[{ key: `org-settings`, label: 'Settings' }]}
-        sections={sectionsWithHeaders}
-      >
-        {!newLayoutPreview && <LayoutHeader />}
-        <Content />
-      </WithSidebar>
-    )
-  } else {
-    return <Content />
-  }
+  return (
+    <OrganizationLayoutContentWrapper
+      title={selectedOrganization?.name ?? 'Supabase'}
+      breadcrumbs={[{ key: `org-settings`, label: 'Settings' }]}
+      sections={sectionsWithHeaders}
+    >
+      {!newLayoutPreview && <LayoutHeader />}
+      <OrganizationLayoutContent>{children}</OrganizationLayoutContent>
+    </OrganizationLayoutContentWrapper>
+  )
 }
 
 export default withAuth(OrganizationLayout)
