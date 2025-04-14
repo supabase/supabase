@@ -44,6 +44,7 @@ jobs:
             ghcr.io/iwangjiaxiang/supabase-unlock
           tags: |
             type=raw,value=${{ needs.settings.outputs.image_version }}_${{ env.arch }}
+            type=raw,value=latest
 
       - uses: docker/setup-buildx-action@v2
 
