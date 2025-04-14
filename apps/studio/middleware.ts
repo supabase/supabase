@@ -24,7 +24,7 @@ const HOSTED_SUPPORTED_API_URLS = [
 ]
 
 export function middleware(request: NextRequest) {
-  if (IS_PLATFORM && !HOSTED_SUPPORTED_API_URLS.some((url) => request.url.endsWith(url))) {
+  if (!IS_PLATFORM && !HOSTED_SUPPORTED_API_URLS.some((url) => request.url.endsWith(url))) {
     return Response.json(
       { success: false, message: 'Endpoint not supported on hosted' },
       { status: 404 }
