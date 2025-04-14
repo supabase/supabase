@@ -37,6 +37,7 @@ interface CustomProps {
   confirmText?: String
   triggerElement?: React.ReactNode
   tooltip?: string
+  contentRef?: React.RefObject<HTMLDivElement>
 }
 
 const SidePanel = ({
@@ -59,6 +60,7 @@ const SidePanel = ({
   triggerElement,
   defaultOpen,
   tooltip,
+  contentRef,
   ...props
 }: SidePanelProps) => {
   const __styles = styleHandler('sidepanel')
@@ -132,7 +134,9 @@ const SidePanel = ({
           }}
         >
           {header && <header className={__styles.header}>{header}</header>}
-          <div className={__styles.contents}>{children}</div>
+          <div className={__styles.contents} ref={contentRef}>
+            {children}
+          </div>
           {!hideFooter && footerContent}
         </Dialog.Content>
       </Dialog.Portal>

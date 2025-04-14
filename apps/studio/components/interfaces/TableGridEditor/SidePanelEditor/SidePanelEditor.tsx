@@ -1,7 +1,9 @@
+'use client'
+
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty, isUndefined, noop } from 'lodash'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -50,6 +52,8 @@ import {
 import SpreadsheetImport from './SpreadsheetImport/SpreadsheetImport'
 import TableEditor from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
+import { usePostgresMutationTerminal } from 'hooks/ui/usePostgresMutationTerminal'
+import { PostgresMutationTerminal } from 'components/ui/PostgresMutationTerminal'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -67,6 +71,19 @@ const SidePanelEditor = ({
   includeColumns = false,
   onTableCreated = noop,
 }: SidePanelEditorProps) => {
+  const terminalHook = usePostgresMutationTerminal()
+  const sidePanelContentRef = useRef<HTMLDivElement>(null)
+
+  const {
+    addStep,
+    terminalStart,
+    steps,
+    terminalStop,
+    terminalReset,
+    terminalOpen,
+    terminalClose,
+  } = terminalHook
+
   const { ref } = useParams()
   const snap = useTableEditorStateSnapshot()
   const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
@@ -409,6 +426,19 @@ const SidePanelEditor = ({
       primaryKey,
     } = configuration
 
+    // reset status terminal
+    terminalReset()
+    // open terminal with callback to scroll to bottom after animation completes
+    terminalOpen(() => {
+      if (sidePanelContentRef.current) {
+        // Fast but smooth scroll to bottom + extra padding
+        sidePanelContentRef.current.scrollTo({
+          top: sidePanelContentRef.current.scrollHeight,
+          behavior: 'smooth',
+        })
+      }
+    })
+
     try {
       if (
         snap.sidePanel?.type === 'table' &&
@@ -440,6 +470,11 @@ const SidePanelEditor = ({
       } else if (isNewRecord) {
         toastId = toast.loading(`Creating new table: ${payload.name}...`)
 
+        // start terminal
+        terminalStart()
+
+        addStep(`Creating new table: ${payload.name}...`)
+
         const table = await createTable({
           projectRef: project?.ref!,
           connectionString: project?.connectionString,
@@ -449,15 +484,26 @@ const SidePanelEditor = ({
           foreignKeyRelations,
           isRLSEnabled,
           importContent,
+          addStep,
         })
-        if (isRealtimeEnabled) await updateTableRealtime(table, true)
+        if (isRealtimeEnabled) {
+          addStep(`Updating realtime for ${table.name}...`)
+          await updateTableRealtime(table, true)
+        }
 
         await Promise.all([
           queryClient.invalidateQueries(tableKeys.list(project?.ref, table.schema, includeColumns)),
           queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
         ])
 
+        // stop terminal and show success message
+        addStep.success(`Table ${table.name} is good to go!`)
         toast.success(`Table ${table.name} is good to go!`, { id: toastId })
+        terminalStop()
+
+        // pause here for 3 seconds
+        await new Promise((resolve) => setTimeout(resolve, 3000))
+
         onTableCreated(table)
       } else if (selectedTable) {
         toastId = toast.loading(`Updating table: ${selectedTable?.name}...`)
@@ -494,8 +540,12 @@ const SidePanelEditor = ({
           toast.success(`Successfully updated ${table.name}!`, { id: toastId })
         }
       }
+
+      terminalClose()
     } catch (error: any) {
       saveTableError = true
+      terminalStop()
+      addStep.error('Failed to create table', error.message)
       toast.error(error.message, { id: toastId })
     }
 
@@ -622,6 +672,8 @@ const SidePanelEditor = ({
         closePanel={onClosePanel}
         saveChanges={saveTable}
         updateEditorDirty={() => setIsEdited(true)}
+        terminal={<PostgresMutationTerminal isOpen={true} steps={steps} hook={terminalHook} />}
+        contentRef={sidePanelContentRef}
       />
       <SchemaEditor visible={snap.sidePanel?.type === 'schema'} closePanel={onClosePanel} />
       <JsonEditor

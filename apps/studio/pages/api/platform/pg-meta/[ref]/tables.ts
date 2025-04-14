@@ -81,10 +81,10 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   })
   if (response.error) {
     console.error('Table POST:', response.error)
-    return res.status(400).json({ error: response.error })
+    return res.status(response.error.code).json({ ...response.error })
   }
 
-  return res.status(200).json(response)
+  return res.status(res.statusCode).json(response)
 }
 
 const handlePatch = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -95,10 +95,10 @@ const handlePatch = async (req: NextApiRequest, res: NextApiResponse) => {
   })
   if (response.error) {
     console.error('Table PATCH:', response.error)
-    return res.status(400).json({ error: response.error })
+    return res.status(response.error.code).json({ ...response.error })
   }
 
-  return res.status(200).json(response)
+  return res.status(res.statusCode).json(response)
 }
 
 const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {

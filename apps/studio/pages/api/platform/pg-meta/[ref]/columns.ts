@@ -46,10 +46,10 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (response.error) {
     console.error('Column POST:', response.error)
-    return res.status(400).json({ error: response.error })
+    return res.status(response.error.code).json({ ...response.error })
   }
 
-  return res.status(200).json(response)
+  return res.status(res.statusCode).json(response)
 }
 
 const handlePatch = async (req: NextApiRequest, res: NextApiResponse) => {

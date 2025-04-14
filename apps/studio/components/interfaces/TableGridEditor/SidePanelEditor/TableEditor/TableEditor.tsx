@@ -1,6 +1,6 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, isUndefined, noop } from 'lodash'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, RefObject } from 'react'
 import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -70,6 +70,8 @@ export interface TableEditorProps {
     resolve: any
   ) => void
   updateEditorDirty: () => void
+  terminal: React.ReactNode
+  contentRef?: React.RefObject<HTMLDivElement>
 }
 
 const TableEditor = ({
@@ -79,6 +81,8 @@ const TableEditor = ({
   closePanel = noop,
   saveChanges = noop,
   updateEditorDirty = noop,
+  terminal,
+  contentRef,
 }: TableEditorProps) => {
   const snap = useTableEditorStateSnapshot()
   const { project } = useProjectContext()
@@ -269,6 +273,7 @@ const TableEditor = ({
           applyFunction={(resolve: () => void) => onSaveChanges(resolve)}
         />
       }
+      contentRef={contentRef}
     >
       <SidePanel.Content className="space-y-10 py-6">
         <Input
@@ -446,6 +451,7 @@ const TableEditor = ({
           </SidePanel.Content>
         </>
       )}
+      {terminal}
     </SidePanel>
   )
 }

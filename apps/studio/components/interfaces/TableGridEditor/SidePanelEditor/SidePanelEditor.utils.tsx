@@ -33,6 +33,7 @@ import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 import type { ImportContent } from './TableEditor/TableEditor.types'
+import type { AddStepFunction } from 'hooks/ui/usePostgresMutationTerminal'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -450,6 +451,7 @@ export const createTable = async ({
   foreignKeyRelations,
   isRLSEnabled,
   importContent,
+  addStep,
 }: {
   projectRef: string
   connectionString: string | undefined
@@ -463,6 +465,7 @@ export const createTable = async ({
   foreignKeyRelations: ForeignKey[]
   isRLSEnabled: boolean
   importContent?: ImportContent
+  addStep: AddStepFunction
 }) => {
   const queryClient = getQueryClient()
 
@@ -480,6 +483,7 @@ export const createTable = async ({
   try {
     // Toggle RLS if configured to be
     if (isRLSEnabled) {
+      addStep(`Updating RLS for ${table.name}...`)
       await updateTableMutation({
         projectRef,
         connectionString,
@@ -492,7 +496,8 @@ export const createTable = async ({
     // Then insert the columns - we don't do Promise.all as we want to keep the integrity
     // of the column order during creation. Note that we add primary key constraints separately
     // via the query endpoint to support composite primary keys as pg-meta does not support that OOB
-    toast.loading(`Adding ${columns.length} columns to ${table.name}...`, { id: toastId })
+    // toast.loading(`Adding ${columns.length} columns to ${table.name}...`, { id: toastId })
+    addStep(`Adding ${columns.length} columns to ${table.name}...`)
 
     for (const column of columns) {
       // We create all columns without primary keys first
@@ -512,11 +517,13 @@ export const createTable = async ({
       .filter((column) => column.isPrimaryKey)
       .map((column) => column.name)
     if (primaryKeyColumns.length > 0) {
+      addStep(`Adding primary key constraints to ${table.name}...`)
       await addPrimaryKey(projectRef, connectionString, table.schema, table.name, primaryKeyColumns)
     }
 
     // Then add the foreign key constraints here
     if (foreignKeyRelations.length > 0) {
+      addStep(`Adding foreign key constraints to ${table.name}...`)
       await addForeignKey({
         projectRef,
         connectionString,
@@ -536,27 +543,29 @@ export const createTable = async ({
           table,
           importContent.selectedHeaders,
           (progress: number) => {
-            toast.loading(
-              <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
-                <SparkBar
-                  value={progress}
-                  max={100}
-                  type="horizontal"
-                  barClass="bg-brand"
-                  labelBottom={`Adding ${importContent.rowCount.toLocaleString()} rows to ${table.name}`}
-                  labelBottomClass=""
-                  labelTop={`${progress.toFixed(2)}%`}
-                  labelTopClass="tabular-nums"
-                />
-              </div>,
-              { id: toastId }
-            )
+            addStep(`Adding ${importContent.rowCount.toLocaleString()} rows to ${table.name}...`)
+            // toast.loading(
+            //   <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
+            //     <SparkBar
+            //       value={progress}
+            //       max={100}
+            //       type="horizontal"
+            //       barClass="bg-brand"
+            //       labelBottom={`Adding ${importContent.rowCount.toLocaleString()} rows to ${table.name}`}
+            //       labelBottomClass=""
+            //       labelTop={`${progress.toFixed(2)}%`}
+            //       labelTopClass="tabular-nums"
+            //     />
+            //   </div>,
+            //   { id: toastId }
+            // )
           }
         )
 
         // For identity columns, manually raise the sequences
         const identityColumns = columns.filter((column) => column.isIdentity)
         for (const column of identityColumns) {
+          addStep(`Raising sequence for ${column.name}...`)
           await executeSql({
             projectRef,
             connectionString,
@@ -580,6 +589,8 @@ export const createTable = async ({
           importContent.rows,
           importContent.selectedHeaders,
           (progress: number) => {
+            addStep(`Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}...`)
+
             toast.loading(
               <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
                 <SparkBar
@@ -601,6 +612,8 @@ export const createTable = async ({
         // For identity columns, manually raise the sequences
         const identityColumns = columns.filter((column) => column.isIdentity)
         for (const column of identityColumns) {
+          addStep(`Raising sequence for ${column.name}...`)
+
           await executeSql({
             projectRef,
             connectionString,
@@ -619,7 +632,7 @@ export const createTable = async ({
 
     // Finally, return the created table
     return table
-  } catch (error) {
+  } catch (error: any) {
     deleteTableMutation({
       projectRef,
       connectionString,

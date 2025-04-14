@@ -24,8 +24,13 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const headers = constructHeaders(req.headers)
   const response = await post(`${PG_META_URL}/query`, { query }, { headers })
 
+  // return res.status(response.code).json(response)
+
+  // console.log('res', res)
+  // console.log('response', response)
+
   if (response.error) {
-    return res.status(400).json(response.error)
+    return res.status(400).json({ ...response.error })
   } else {
     return res.status(200).json(response)
   }
