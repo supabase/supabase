@@ -68,6 +68,7 @@ jobs:
 
   release_arm:
     needs: settings
+    if: false  # 禁用此 Job
     runs-on: arm-runner
     timeout-minutes: 120
     env:
@@ -84,6 +85,7 @@ jobs:
             ghcr.io/iwangjiaxiang/supabase-unlock
           tags: |
             type=raw,value=${{ needs.settings.outputs.image_version }}_${{ env.arch }}
+            type=raw,value=latest
 
       - uses: docker/login-action@v2
         with:
@@ -128,10 +130,10 @@ jobs:
         run: |
           docker buildx imagetools create -t ghcr.io/iwangjiaxiang/supabase-unlock:${{ needs.settings.outputs.image_version }} \
           ghcr.io/iwangjiaxiang/supabase-unlock@${{ needs.release_x86.outputs.image_digest }} \
-          ghcr.io/iwangjiaxiang/supabase-unlock@${{ needs.release_arm.outputs.image_digest }}
+          # ghcr.io/iwangjiaxiang/supabase-unlock@${{ needs.release_arm.outputs.image_digest }}
           docker buildx imagetools create -t ghcr.io/iwangjiaxiang/supabase-unlock:latest \
           ghcr.io/iwangjiaxiang/supabase-unlock@${{ needs.release_x86.outputs.image_digest }} \
-          ghcr.io/iwangjiaxiang/supabase-unlock@${{ needs.release_arm.outputs.image_digest }}
+          # ghcr.io/iwangjiaxiang/supabase-unlock@${{ needs.release_arm.outputs.image_digest }}
 
   publish:
     needs:
