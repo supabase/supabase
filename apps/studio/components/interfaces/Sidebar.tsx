@@ -1,9 +1,17 @@
 import { AnimatePresence, motion, MotionProps } from 'framer-motion'
 import { isUndefined } from 'lodash'
-import { Blocks, Boxes, ChartArea, PanelLeftDashed, Settings, Users } from 'lucide-react'
+import {
+  ArrowUpRight,
+  Blocks,
+  Boxes,
+  ChartArea,
+  PanelLeftDashed,
+  Settings,
+  Users,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { ComponentProps, ComponentPropsWithoutRef, FC, useEffect } from 'react'
+import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
 
 import { useParams } from 'common'
 import {
@@ -13,6 +21,7 @@ import {
   generateToolRoutes,
 } from 'components/layouts/ProjectLayout/NavigationBar/NavigationBar.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -36,13 +45,14 @@ import {
   SidebarContent as SidebarContentPrimitive,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   Sidebar as SidebarPrimitive,
+  SidebarSeparator,
   useSidebar,
 } from 'ui'
-import { useSetCommandMenuOpen } from 'ui-patterns'
 import {
   useIsAPIDocsSidePanelEnabled,
   useIsSQLEditorTabsEnabled,
@@ -139,8 +149,8 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
   )
 }
 
-export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
-  const setCommandMenuOpen = useSetCommandMenuOpen()
+export const SidebarContent = ({ footer }: { footer?: ReactNode }) => {
+  const newLayoutPreview = useNewLayout()
   const { ref: projectRef } = useParams()
 
   // temporary logic to show settings route in sidebar footer
@@ -167,7 +177,7 @@ export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
             >
-              <OrganizationLinks />
+              {newLayoutPreview ? <OrganizationLinks /> : <HomePageLinks />}
             </motion.div>
           )}
         </SidebarContentPrimitive>
@@ -239,7 +249,7 @@ const ActiveDot = (errorArray: any[], warningArray: any[]) => {
   )
 }
 
-function ProjectLinks() {
+const ProjectLinks = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { project } = useProjectContext()
@@ -372,6 +382,78 @@ function ProjectLinks() {
   )
 }
 
+const HomePageLinks = () => {
+  const { data: organizations = [] } = useOrganizationsQuery()
+  const organizationLinks = organizations.map((org) => {
+    return { label: org.name, href: `/org/${org.slug}/general`, key: org.slug }
+  })
+  const accountLinks = [
+    { label: 'Preferences', href: `/account/me`, key: 'preferences' },
+    { label: 'Access Tokens', href: `/account/tokens`, key: 'account-tokens' },
+    { label: 'Security', href: `/account/security`, key: 'security' },
+    { label: 'Audit Logs', href: `/account/audit`, key: 'audit-logs' },
+  ]
+  const docsLinks = [
+    { label: 'Guides', href: `https://supabase.com/docs`, key: 'guides', icon: <ArrowUpRight /> },
+    {
+      label: 'API Reference',
+      href: `https://supabase.com/docs/guides/api`,
+      key: 'api-reference',
+      icon: <ArrowUpRight />,
+    },
+  ]
+
+  return (
+    <SidebarMenu className="flex flex-col gap-y-1 items-start">
+      <SidebarGroupLabel className="px-4 h-auto pt-4">Organizations</SidebarGroupLabel>
+      <SidebarGroup className="gap-0.5">
+        {organizationLinks.map((x) => (
+          <SideBarNavLink
+            key={x.key}
+            active={false}
+            route={{
+              label: x.label,
+              link: x.href,
+              key: x.label,
+            }}
+          />
+        ))}
+      </SidebarGroup>
+      <SidebarSeparator className="!bg-border-overlay w-full mx-0" />
+      <SidebarGroupLabel className="px-4 h-auto pt-4">Account</SidebarGroupLabel>
+      <SidebarGroup className="gap-0.5">
+        {accountLinks.map((x) => (
+          <SideBarNavLink
+            key={x.key}
+            active={false}
+            route={{
+              label: x.label,
+              link: x.href,
+              key: x.label,
+            }}
+          />
+        ))}
+      </SidebarGroup>
+      <SidebarSeparator className="!bg-border-overlay w-full mx-0" />
+      <SidebarGroupLabel className="px-4 h-auto pt-4">Documentation</SidebarGroupLabel>
+      <SidebarGroup className="gap-0.5">
+        {docsLinks.map((x) => (
+          <SideBarNavLink
+            key={x.key}
+            active={false}
+            route={{
+              label: x.label,
+              link: x.href,
+              key: x.label,
+              icon: x.icon,
+            }}
+          />
+        ))}
+      </SidebarGroup>
+    </SidebarMenu>
+  )
+}
+
 const OrganizationLinks = () => {
   const router = useRouter()
   const { slug } = useParams()
@@ -382,7 +464,7 @@ const OrganizationLinks = () => {
     {
       label: 'Projects',
       href: `/org/${slug}`,
-      key: '',
+      key: 'projects',
       icon: <Boxes size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
