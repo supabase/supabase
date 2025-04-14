@@ -8,9 +8,21 @@ export const getSemver = (version?: string) => {
 }
 
 export const semverLte = (a: CLIVersionSemver, b: CLIVersionSemver) => {
-  return a.major <= b.major && a.minor <= b.minor && a.patch <= b.patch
+  if (
+    a.major > b.major ||
+    (a.major === b.major && a.minor > b.minor) ||
+    (a.major === b.major && a.minor === b.minor && a.patch > b.patch)
+  )
+    return false
+  return true
 }
 
 export const semverGte = (a: CLIVersionSemver, b: CLIVersionSemver) => {
-  return a.major >= b.major && a.minor >= b.minor && a.patch >= b.patch
+  if (
+    a.major < b.major ||
+    (a.major === b.major && a.minor < b.minor) ||
+    (a.major === b.major && a.minor === b.minor && a.patch < b.patch)
+  )
+    return false
+  return true
 }
