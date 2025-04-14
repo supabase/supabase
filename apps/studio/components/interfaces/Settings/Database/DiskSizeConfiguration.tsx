@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import dayjs from 'dayjs'
 import { ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
 import { SetStateAction } from 'react'
@@ -14,7 +13,6 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import Panel from 'components/ui/Panel'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUrlState } from 'hooks/ui/useUrlState'
@@ -28,12 +26,8 @@ export interface DiskSizeConfigurationProps {
 const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps) => {
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
-  const { lastDatabaseResizeAt } = project ?? {}
 
   const organization = useSelectedOrganization()
-
-  const timeTillNextAvailableDatabaseResize =
-    lastDatabaseResizeAt === null ? 0 : 6 * 60 - dayjs().diff(lastDatabaseResizeAt, 'minutes')
 
   const [{ show_increase_disk_size_modal }, setUrlParams] = useUrlState()
   const showIncreaseDiskSizeModal = show_increase_disk_size_modal === 'true'
@@ -48,7 +42,6 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
     },
   })
 
-  const { data: projectSubscriptionData } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)
@@ -67,7 +60,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
   return (
     <div id="diskManagement">
       <FormHeader title="Disk Management" />
-      {projectSubscriptionData?.usage_billing_enabled === true ? (
+      {organization?.usage_billing_enabled === true ? (
         <div className="flex flex-col gap-3">
           <Panel className="!m-0">
             <Panel.Content>
@@ -155,12 +148,12 @@ Read more about [disk management](https://supabase.com/docs/guides/platform/data
         <Alert_Shadcn_>
           <InfoIcon />
           <AlertTitle_Shadcn_>
-            {projectSubscriptionData?.plan?.id === 'free'
+            {organization?.plan?.id === 'free'
               ? 'Disk size configuration is not available for projects on the Free Plan'
               : 'Disk size configuration is only available when the spend cap has been disabled'}
           </AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>
-            {projectSubscriptionData?.plan?.id === 'free' ? (
+            {organization?.plan?.id === 'free' ? (
               <p>
                 If you are intending to use more than 500MB of disk space, then you will need to
                 upgrade to at least the Pro Plan.
@@ -174,13 +167,11 @@ Read more about [disk management](https://supabase.com/docs/guides/platform/data
             <Button asChild type="default" className="mt-3">
               <Link
                 href={`/org/${organization?.slug}/billing?panel=${
-                  projectSubscriptionData?.plan?.id === 'free' ? 'subscriptionPlan' : 'costControl'
+                  organization?.plan?.id === 'free' ? 'subscriptionPlan' : 'costControl'
                 }`}
                 target="_blank"
               >
-                {projectSubscriptionData?.plan?.id === 'free'
-                  ? 'Upgrade subscription'
-                  : 'Disable spend cap'}
+                {organization?.plan?.id === 'free' ? 'Upgrade subscription' : 'Disable spend cap'}
               </Link>
             </Button>
           </AlertDescription_Shadcn_>

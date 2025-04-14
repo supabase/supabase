@@ -46,7 +46,6 @@ import {
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { withAuth } from 'hooks/misc/withAuth'
@@ -172,12 +171,8 @@ const WizardForm = () => {
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
 
-  const { data: orgSubscription } = useOrgSubscriptionQuery({ orgSlug: slug })
-
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
-    enabled:
-      orgSubscription !== undefined &&
-      !['team', 'enterprise'].includes(orgSubscription?.plan.id ?? ''),
+    enabled: currentOrg !== undefined && !['team', 'enterprise'].includes(currentOrg.plan.id ?? ''),
   })
   const overdueInvoices = (allOverdueInvoices ?? []).filter(
     (x) => x.organization_id === currentOrg?.id
@@ -221,7 +216,7 @@ const WizardForm = () => {
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
   const freePlanWithExceedingLimits =
-    orgSubscription?.plan?.id === 'free' && hasMembersExceedingFreeTierLimit
+    currentOrg?.plan?.id === 'free' && hasMembersExceedingFreeTierLimit
 
   const isManagedByVercel = currentOrg?.managed_by === 'vercel-marketplace'
 
@@ -342,7 +337,7 @@ const WizardForm = () => {
       dbSql: sql,
       // only set the compute size on pro+ plans. Free plans always use micro (nano in the future) size.
       dbInstanceSize:
-        orgSubscription?.plan.id === 'free' ? undefined : (instanceSize as DesiredInstanceSize),
+        currentOrg?.plan.id === 'free' ? undefined : (instanceSize as DesiredInstanceSize),
       dataApiExposedSchemas: !dataApi ? [] : undefined,
       dataApiUseApiSchema: !dataApi ? false : useApiSchema,
       postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
@@ -782,7 +777,7 @@ const WizardForm = () => {
                                     </Button>
                                   )}
                                 </div>
-                                {orgSubscription?.plan && orgSubscription?.plan.id !== 'free' && (
+                                {currentOrg?.plan.id !== 'free' && (
                                   <div className="py-5 border-b">
                                     <FormField_Shadcn_
                                       control={form.control}
@@ -795,7 +790,7 @@ const WizardForm = () => {
                                             </div>
                                           }
                                           description={
-                                            <div className="flex flex gap-2">
+                                            <div className="flex gap-2">
                                               <Link
                                                 target="_blank"
                                                 rel="noopener noreferrer"

@@ -41,7 +41,6 @@ import {
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { withAuth } from 'hooks/misc/withAuth'
@@ -161,11 +160,9 @@ const Wizard: NextPageWithLayout = () => {
     }
   }, [currentOrg, projectCreationExperimentGroup, router])
 
-  const { data: orgSubscription } = useOrgSubscriptionQuery({ orgSlug: slug })
-
   const isNotOnTeamOrEnterprisePlan = useMemo(
-    () => !['team', 'enterprise'].includes(orgSubscription?.plan.id ?? ''),
-    [orgSubscription]
+    () => !['team', 'enterprise'].includes(currentOrg?.plan.id ?? ''),
+    [currentOrg]
   )
 
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
@@ -220,7 +217,7 @@ const Wizard: NextPageWithLayout = () => {
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
   const freePlanWithExceedingLimits =
-    orgSubscription?.plan?.id === 'free' && hasMembersExceedingFreeTierLimit
+    currentOrg?.plan?.id === 'free' && hasMembersExceedingFreeTierLimit
 
   const isManagedByVercel = currentOrg?.managed_by === 'vercel-marketplace'
 
@@ -348,7 +345,7 @@ const Wizard: NextPageWithLayout = () => {
       dbPricingTierId: 'tier_free',
       // only set the compute size on pro+ plans. Free plans always use micro (nano in the future) size.
       dbInstanceSize:
-        orgSubscription?.plan.id === 'free' ? undefined : (instanceSize as DesiredInstanceSize),
+        currentOrg?.plan.id === 'free' ? undefined : (instanceSize as DesiredInstanceSize),
       dataApiExposedSchemas: !dataApi ? [] : undefined,
       dataApiUseApiSchema: !dataApi ? false : useApiSchema,
       postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
@@ -565,7 +562,7 @@ const Wizard: NextPageWithLayout = () => {
                       </Panel.Content>
                     )}
 
-                    {orgSubscription?.plan && orgSubscription?.plan.id !== 'free' && (
+                    {currentOrg?.plan && currentOrg?.plan.id !== 'free' && (
                       <Panel.Content>
                         <FormField_Shadcn_
                           control={form.control}

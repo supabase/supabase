@@ -14,7 +14,6 @@ import InlineEditorButton from 'components/layouts/AppLayout/InlineEditorButton'
 import OrganizationDropdown from 'components/layouts/AppLayout/OrganizationDropdown'
 import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -69,14 +68,10 @@ const LayoutHeader = ({
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
   const { setMobileMenuOpen } = useAppStateSnapshot()
 
-  const { data: subscription } = useOrgSubscriptionQuery({
-    orgSlug: selectedOrganization?.slug,
-  })
-
   // We only want to query the org usage and check for possible over-ages for plans without usage billing enabled (free or pro with spend cap)
   const { data: orgUsage } = useOrgUsageQuery(
     { orgSlug: selectedOrganization?.slug },
-    { enabled: subscription?.usage_billing_enabled === false }
+    { enabled: selectedOrganization?.usage_billing_enabled === false }
   )
 
   const exceedingLimits = useMemo(() => {
