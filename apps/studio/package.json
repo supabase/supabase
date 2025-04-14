@@ -71,6 +71,7 @@
     "generate-password-browser": "^1.1.0",
     "html-to-image": "^1.10.8",
     "icons": "workspace:*",
+    "idb": "^8.0.2",
     "immutability-helper": "^3.1.1",
     "ip-num": "^1.5.1",
     "json-logic-js": "^2.0.2",

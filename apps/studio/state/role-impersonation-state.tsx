@@ -3,13 +3,20 @@ import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import { useConstant } from 'common'
 import useLatest from 'hooks/misc/useLatest'
-import { ImpersonationRole } from 'lib/role-impersonation'
+import { getPostgrestClaims, ImpersonationRole } from 'lib/role-impersonation'
 
-export function createRoleImpersonationState() {
+export function createRoleImpersonationState(projectRef: string) {
   const roleImpersonationState = proxy({
+    projectRef,
     role: undefined as ImpersonationRole | undefined,
+    claims: undefined as ReturnType<typeof getPostgrestClaims> | undefined,
+
     setRole: (role: ImpersonationRole | undefined) => {
       roleImpersonationState.role = role
+
+      if (role?.type === 'postgrest') {
+        roleImpersonationState.claims = getPostgrestClaims(projectRef, role)
+      }
     },
   })
 
@@ -19,11 +26,14 @@ export function createRoleImpersonationState() {
 export type RoleImpersonationState = ReturnType<typeof createRoleImpersonationState>
 
 export const RoleImpersonationStateContext = createContext<RoleImpersonationState>(
-  createRoleImpersonationState()
+  createRoleImpersonationState('')
 )
 
-export const RoleImpersonationStateContextProvider = ({ children }: PropsWithChildren) => {
-  const state = useConstant(createRoleImpersonationState)
+export const RoleImpersonationStateContextProvider = ({
+  projectRef,
+  children,
+}: PropsWithChildren<{ projectRef?: string }>) => {
+  const state = useConstant(() => createRoleImpersonationState(projectRef ?? ''))
 
   return (
     <RoleImpersonationStateContext.Provider value={state}>
@@ -38,10 +48,14 @@ export function useRoleImpersonationStateSnapshot(options?: Parameters<typeof us
   return useSnapshot(roleImpersonationState, options)
 }
 
-export function useGetImpersonatedRole() {
+export function useGetImpersonatedRoleState() {
   const roleImpersonationState = useContext(RoleImpersonationStateContext)
 
-  return useCallback(() => snapshot(roleImpersonationState).role, [roleImpersonationState])
+  return useCallback(
+    // [Alaister]: typeof roleImpersonationState is needed to avoid readonly type errors everywhere
+    () => snapshot(roleImpersonationState) as typeof roleImpersonationState,
+    [roleImpersonationState]
+  )
 }
 
 export function useSubscribeToImpersonatedRole(

@@ -46,7 +46,10 @@ export const ProjectContextProvider = ({
           projectRef={projectRef}
         >
           <DatabaseSelectorStateContextProvider key={`database-selector-state-${projectRef}`}>
-            <RoleImpersonationStateContextProvider key={`role-impersonation-state-${projectRef}`}>
+            <RoleImpersonationStateContextProvider
+              key={`role-impersonation-state-${projectRef}`}
+              projectRef={projectRef}
+            >
               {children}
             </RoleImpersonationStateContextProvider>
           </DatabaseSelectorStateContextProvider>

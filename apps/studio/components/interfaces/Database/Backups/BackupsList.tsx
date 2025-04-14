@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Panel from 'components/ui/Panel'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
@@ -16,7 +17,6 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import BackupItem from './BackupItem'
 import BackupsEmpty from './BackupsEmpty'
 import BackupsStorageAlert from './BackupsStorageAlert'
-import { useParams } from 'common'
 
 const BackupsList = () => {
   const router = useRouter()
@@ -94,11 +94,17 @@ const BackupsList = () => {
         )}
       </div>
       <ConfirmationModal
-        size="small"
+        size="medium"
         confirmLabel="Confirm restore"
         confirmLabelLoading="Restoring"
         visible={selectedBackup !== undefined}
         title="Confirm to restore from backup"
+        alert={{
+          base: { variant: 'warning' },
+          title: 'Your project will be offline while the restore is in progress',
+          description:
+            'It is advised to upgrade at a time when there will be minimal impact for your application.',
+        }}
         loading={isRestoring || isSuccessBackup}
         onCancel={() => setSelectedBackup(undefined)}
         onConfirm={() => {
