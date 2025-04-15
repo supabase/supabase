@@ -11,7 +11,9 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
   const newLayoutPreview = useNewLayout()
 
   const { slug } = useParams()
-  const currentPath = useCurrentPath()
+  const fullCurrentPath = useCurrentPath()
+  // Get the path without any hash values
+  const [currentPath] = fullCurrentPath.split('#')
 
   // hide these settings in the new layout
   // when path equals `/org/${slug}/team`
