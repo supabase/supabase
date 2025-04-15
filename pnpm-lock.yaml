@@ -8599,8 +8599,8 @@ packages:
   estree-util-to-js@2.0.0:
     resolution: {integrity: sha512-WDF+xj5rRWmD5tj6bIqRi6CkLIXbbNQUcxQHzGysQzvHmdYG2G7p/Tf0J0gpxGgkeMZNTIjT/AoSvC9Xehcgdg==}
 
-  estree-util-value-to-estree@3.1.1:
-    resolution: {integrity: sha512-5mvUrF2suuv5f5cGDnDphIy4/gW86z82kl5qG6mM9z04SEQI4FB5Apmaw/TGEf3l55nLtMs5s51dmhUzvAHQCA==}
+  estree-util-value-to-estree@3.3.3:
+    resolution: {integrity: sha512-Db+m1WSD4+mUO7UgMeKkAwdbfNWwIxLt48XF2oFU9emPfXkIu+k5/nlOj313v7wqtAPo0f9REhUvznFrPkG8CQ==}
 
   estree-util-visit@1.2.1:
     resolution: {integrity: sha512-xbgqcrkIVbIG+lI/gzbvd9SGTJL4zqJKBFttUl5pP27KhAjtMKbX/mQXJ7qgyXpMgVy/zvpm0xoQQaGL8OloOw==}
@@ -22783,10 +22783,9 @@ snapshots:
       astring: 1.8.6
       source-map: 0.7.4
 
-  estree-util-value-to-estree@3.1.1:
+  estree-util-value-to-estree@3.3.3:
     dependencies:
       '@types/estree': 1.0.5
-      is-plain-obj: 4.1.0
 
   estree-util-visit@1.2.1:
     dependencies:
@@ -26770,7 +26769,7 @@ snapshots:
 
   periscopic@3.1.0:
     dependencies:
-      '@types/estree': 1.0.7
+      '@types/estree': 1.0.5
       estree-walker: 3.0.3
       is-reference: 3.0.3
 
@@ -27900,7 +27899,7 @@ snapshots:
     dependencies:
       '@types/mdast': 4.0.1
       estree-util-is-identifier-name: 3.0.0
-      estree-util-value-to-estree: 3.1.1
+      estree-util-value-to-estree: 3.3.3
       toml: 3.0.0
       unified: 11.0.5
       yaml: 2.4.5
