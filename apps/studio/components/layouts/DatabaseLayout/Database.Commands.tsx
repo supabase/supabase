@@ -157,7 +157,7 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         icon: () => <Database />,
       },
       {
-        id: 'run-view-database-migraitons',
+        id: 'run-view-database-migrations',
         name: 'View your migrations',
         route: `/project/${ref}/database/migrations`,
         icon: () => <History />,
