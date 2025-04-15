@@ -241,30 +241,30 @@ limit ${limit}
       return `
 select 
   id,
-  edge_logs.timestamp as timestamp,
+  el.timestamp as timestamp,
   'edge' as log_type,
-  edge_logs_response.status_code as code,
+  CAST(edge_logs_response.status_code AS STRING) as code,
   'undefined' as level,
   edge_logs_request.path as path,
   'undefined' as event_message
-from edge_logs
+from edge_logs as el
 cross join unnest(metadata) as edge_logs_metadata
 cross join unnest(edge_logs_metadata.request) as edge_logs_request
 cross join unnest(edge_logs_metadata.response) as edge_logs_response
 
--- union all
+union all
 
--- select 
---   id,
---   postgres_logs.timestamp as timestamp,
---   'postgres' as log_type,
---   postgres_logs_parsed.sql_state_code as code,
---   'undefined' as level,
---   null as path,
---   'undefined' as event_message
--- from postgres_logs
--- cross join unnest(postgres_logs.metadata) as postgres_logs_metadata
--- cross join unnest(postgres_logs_metadata.parsed) as postgres_logs_parsed
+select 
+  id,
+  pgl.timestamp as timestamp,
+  'postgres' as log_type,
+  pgl_parsed.sql_state_code as code,
+  'undefined' as level,
+  null as path,
+  'undefined' as event_message
+from postgres_logs as pgl
+cross join unnest(pgl.metadata) as pgl_metadata
+cross join unnest(pgl_metadata.parsed) as pgl_parsed
 
 ${where}
 ${orderBy}
