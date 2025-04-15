@@ -1,4 +1,4 @@
-import { AddonVariantId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import { AddonVariantId } from 'data/subscriptions/types'
 
 export type ComputeInstanceAddonVariantId =
   | Extract<

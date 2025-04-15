@@ -20,8 +20,8 @@ jobs:
           flavor: |
             latest=true
           tags: |
-            type=sha,prefix={{date 'YYYYMMDD'}}-,enable=${{ github.event_name == 'schedule' }}
-            type=sha,prefix={{date 'YYYYMMDD'}}-,enable=${{ github.event_name == 'workflow_dispatch' }}
+            type=sha,prefix={{date 'YYYY.MM.DD'}}-sha-,enable=${{ github.event_name == 'schedule' }}
+            type=sha,prefix={{date 'YYYY.MM.DD'}}-sha-,enable=${{ github.event_name == 'workflow_dispatch' }}
 
   release_x86:
     needs: settings

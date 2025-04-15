@@ -6,13 +6,21 @@ import { PropsWithChildren, createContext, useContext, useEffect, useState } fro
 import { APISidePanelPreview } from './APISidePanelPreview'
 import { CLSPreview } from './CLSPreview'
 import { InlineEditorPreview } from './InlineEditorPreview'
+import { LayoutUpdatePreview } from './LayoutUpdatePreview'
 import { SqlEditorTabsPreview } from './SqlEditorTabs'
 import { TableEditorTabsPreview } from './TableEditorTabs'
 
 export const FEATURE_PREVIEWS = [
   {
+    key: LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW,
+    name: 'Layout Update for Organizations',
+    content: <LayoutUpdatePreview />,
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
+    isNew: false,
+  },
+  {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
-    name: 'Inline SQL Editor',
+    name: 'Directly edit database entities',
     content: <InlineEditorPreview />,
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/33690',
     isNew: true,
@@ -113,4 +121,9 @@ export const useIsTableEditorTabsEnabled = () => {
 export const useIsSQLEditorTabsEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
+}
+
+export const useNewLayout = (): boolean => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW]
 }

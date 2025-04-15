@@ -8,7 +8,7 @@ import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePrevi
 import Policies from 'components/interfaces/Auth/Policies/Policies'
 import { getGeneralPolicyTemplates } from 'components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
 import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
-import { generatePolicyCreateSQL } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { generatePolicyUpdateSQL } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -174,7 +174,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           }}
           onSelectEditPolicy={(policy) => {
             if (isInlineEditorEnabled) {
-              const sql = generatePolicyCreateSQL(policy)
+              const sql = generatePolicyUpdateSQL(policy)
               const templates = getGeneralPolicyTemplates(policy.schema, policy.table)
               setEditorPanel({
                 open: true,

@@ -470,7 +470,7 @@ async function FunctionSection({
             {fn.examples.map((example) => (
               <TabsContent_Shadcn_ key={example.id} value={example.id}>
                 <MDXRemoteRefs source={example.code} />
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 mt-2">
                   {!!example.data?.sql && (
                     <CollapsibleDetails title="Data source" content={example.data.sql} />
                   )}

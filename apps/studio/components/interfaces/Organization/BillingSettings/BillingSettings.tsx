@@ -1,4 +1,3 @@
-import { useParams } from 'common'
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useOrgSubscriptionQuery } from '../../../../data/subscriptions/org-subscription-query'
@@ -10,6 +9,7 @@ import CreditBalance from './CreditBalance'
 import PaymentMethods from './PaymentMethods/PaymentMethods'
 import Subscription from './Subscription/Subscription'
 import TaxID from './TaxID/TaxID'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const BillingSettings = () => {
   const {
@@ -18,9 +18,9 @@ const BillingSettings = () => {
     billingCredits: isBillingCreditsEnabledOnProfileLevel,
   } = useIsFeatureEnabled(['billing:account_data', 'billing:payment_methods', 'billing:credits'])
 
-  const { slug: orgSlug } = useParams()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
-  const isNotOrgWithPartnerBilling = !subscription?.billing_via_partner ?? true
+  const org = useSelectedOrganization()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+  const isNotOrgWithPartnerBilling = !subscription?.billing_via_partner
 
   const billingAccountDataEnabled =
     isBillingAccountDataEnabledOnProfileLevel && isNotOrgWithPartnerBilling
@@ -41,9 +41,11 @@ const BillingSettings = () => {
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id="breakdown">
-        <BillingBreakdown />
-      </ScaffoldContainer>
+      {org?.plan.id !== 'free' && (
+        <ScaffoldContainer id="breakdown">
+          <BillingBreakdown />
+        </ScaffoldContainer>
+      )}
 
       {isBillingCreditsEnabledOnProfileLevel && (
         <>

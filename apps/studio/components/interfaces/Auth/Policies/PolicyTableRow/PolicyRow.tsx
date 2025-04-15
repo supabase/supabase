@@ -22,7 +22,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { generatePolicyCreateSQL } from './PolicyTableRow.utils'
+import { generatePolicyUpdateSQL } from './PolicyTableRow.utils'
 
 interface PolicyRowProps {
   policy: PostgresPolicy
@@ -118,7 +118,7 @@ const PolicyRow = ({
               <DropdownMenuItem
                 className="space-x-2"
                 onClick={() => {
-                  const sql = generatePolicyCreateSQL(policy)
+                  const sql = generatePolicyUpdateSQL(policy)
                   aiSnap.newChat({
                     name: `Update policy ${policy.name}`,
                     open: true,

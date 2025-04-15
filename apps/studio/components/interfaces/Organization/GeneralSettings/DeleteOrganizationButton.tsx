@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useOrganizationDeleteMutation } from 'data/organizations/organization-delete-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -10,6 +11,7 @@ import { Button, Form, Input, Modal } from 'ui'
 
 const DeleteOrganizationButton = () => {
   const router = useRouter()
+  const newLayoutPreview = useNewLayout()
   const selectedOrganization = useSelectedOrganization()
   const { slug: orgSlug, name: orgName } = selectedOrganization ?? {}
 
@@ -20,7 +22,7 @@ const DeleteOrganizationButton = () => {
   const { mutate: deleteOrganization, isLoading: isDeleting } = useOrganizationDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted ${orgName}`)
-      router.push('/projects')
+      router.push(newLayoutPreview ? '/organizations' : '/projects')
     },
   })
 
@@ -52,7 +54,6 @@ const DeleteOrganizationButton = () => {
         </Button>
       </div>
       <Modal
-        closable
         hideFooter
         size="small"
         visible={isOpen}
