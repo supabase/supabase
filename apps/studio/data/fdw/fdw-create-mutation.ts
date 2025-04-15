@@ -49,15 +49,56 @@ export function getCreateFDWSql({
     const value = (formState[option.name] || '').replace(/'/g, "''")
 
     return /* SQL */ `
-      select pgsodium.create_key(
-        name := '${key}'
-      );
+      do $$
+      begin
+        -- Old wrappers has an implicit dependency on pgsodium. For new wrappers
+        -- we use Vault directly.
+        if (select extversion from pg_extension where extname = 'wrappers') in (
+          '0.1.0',
+          '0.1.1',
+          '0.1.4',
+          '0.1.5',
+          '0.1.6',
+          '0.1.7',
+          '0.1.8',
+          '0.1.9',
+          '0.1.10',
+          '0.1.11',
+          '0.1.12',
+          '0.1.14',
+          '0.1.15',
+          '0.1.16',
+          '0.1.17',
+          '0.1.18',
+          '0.1.19',
+          '0.2.0',
+          '0.3.0',
+          '0.3.1',
+          '0.4.0',
+          '0.4.1',
+          '0.4.2',
+          '0.4.3',
+          '0.4.4',
+          '0.4.5'
+        ) then
+          create extension if not exists pgsodium;
 
-      select vault.create_secret (
-        new_secret := '${value}',
-        new_name   := '${key}',
-        new_key_id := (select id from pgsodium.valid_key where name = '${key}')
-      );
+          perform pgsodium.create_key(
+            name := '${key}'
+          );
+
+          perform vault.create_secret(
+            new_secret := '${value}',
+            new_name   := '${key}',
+            new_key_id := (select id from pgsodium.valid_key where name = '${key}')
+          );
+        else
+          perform vault.create_secret(
+            new_secret := '${value}',
+            new_name := '${key}'
+          );
+        end if;
+      end $$;
     `
   })
 
