@@ -443,7 +443,7 @@ services:
 
   vector:
     container_name: supabase-vector
-    image: timberio/vector:0.28.1-alpine
+    image: timberio/vector:0.33.0-alpine
     restart: unless-stopped
     volumes:
       - ./volumes/logs/vector.yml:/etc/vector/vector.yml:ro,z
