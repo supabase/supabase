@@ -63,7 +63,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   const [itemSearchString, setItemSearchString] = useState('')
 
   // Requires a fixed height to ensure that explorer is constrained to the viewport
-  const fileExplorerHeight = window.innerHeight - 122
+  const fileExplorerHeight = window.innerHeight - 105
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {

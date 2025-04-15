@@ -267,19 +267,6 @@ const FileExplorerColumn = ({
           onDrop={() => setIsDraggedOver(false)}
         />
       </div>
-      {/* List interface footer */}
-      {view === STORAGE_VIEWS.LIST && (
-        <div
-          className="
-          absolute bottom-0 rounded-b-md mt-auto
-        z-10 flex min-w-min items-center bg-panel-footer-light px-2.5 py-2 [[data-theme*=dark]_&]:bg-panel-footer-dark w-full
-        "
-        >
-          <p className="text-sm">
-            {formatBytes(columnItemsSize)} for {columnItems.length} items
-          </p>
-        </div>
-      )}
     </>
   )
 }
