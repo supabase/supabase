@@ -576,6 +576,37 @@ export function IconGitHub({ width = 16, height = 16, className }: HomeMenuIcon)
   )
 }
 
+export function IconSecurity({ width = 16, height = 16, className }: HomeMenuIcon) {
+  return (
+    <svg
+      className={className}
+      width={width}
+      height={height}
+      viewBox="0 0 18 18"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M8.5 1L2 3V9C2 12 5 14 8.5 14.5C12 14 15 12 15 9V3L8.5 1Z"
+        stroke="currentColor"
+        strokeMiterlimit="10"
+        strokeLinejoin="bevel"
+      />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M6.5 8L7.5 10L11 6"
+        stroke="currentColor"
+        strokeMiterlimit="10"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
 export function IconSupport({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg

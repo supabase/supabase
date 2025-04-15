@@ -122,6 +122,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             label: 'Security',
             icon: 'security',
             href: '/guides/security',
+            level: 'security',
           },
           {
             label: 'Telemetry',
