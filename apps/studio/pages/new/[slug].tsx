@@ -17,8 +17,8 @@ import {
 } from 'components/interfaces/Organization/NewProject'
 import { AdvancedConfiguration } from 'components/interfaces/ProjectCreation/AdvancedConfiguration'
 import {
-  PostgresVersionSelector,
   extractPostgresVersionDetails,
+  PostgresVersionSelector,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { SPECIAL_CHARS_REGEX } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
@@ -61,16 +61,16 @@ import type { NextPageWithLayout } from 'types'
 import {
   Badge,
   Button,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Table,
   TableBody,
   TableCell,
@@ -83,6 +83,9 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
+import { components } from 'api-types'
 
 const sizes: DesiredInstanceSize[] = [
   'micro',
@@ -133,6 +136,8 @@ export type CreateProjectForm = z.infer<typeof FormSchema>
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug, projectName } = useParams()
+  const currentOrg = useSelectedOrganization()
+  const isFreePlan = currentOrg?.plan?.id === 'free'
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -140,8 +145,14 @@ const Wizard: NextPageWithLayout = () => {
   const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
   const allowOrioleDB = useFlag('allowOrioleDb')
-  const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
-    useFreeProjectLimitCheckQuery({ slug })
+  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
+    { slug },
+    { enabled: isFreePlan }
+  )
+
+  const { data: approvedOAuthApps } = useAuthorizedAppsQuery({ slug }, { enabled: !isFreePlan })
+
+  const hasOAuthApps = approvedOAuthApps && approvedOAuthApps.length > 0
 
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
@@ -150,15 +161,6 @@ const Wizard: NextPageWithLayout = () => {
     useState(false)
 
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
-  const currentOrg = organizations?.find((o: any) => o.slug === slug)
-
-  // TODO: Remove this after project creation experiment
-  const projectCreationExperimentGroup = useFlag<string>('projectCreationExperimentGroup')
-  useEffect(() => {
-    if (currentOrg && projectCreationExperimentGroup === 'group-b') {
-      router.replace(`/new/v2/${currentOrg.slug}`)
-    }
-  }, [currentOrg, projectCreationExperimentGroup, router])
 
   const isNotOnTeamOrEnterprisePlan = useMemo(
     () => !['team', 'enterprise'].includes(currentOrg?.plan.id ?? ''),
@@ -174,7 +176,34 @@ const Wizard: NextPageWithLayout = () => {
   )
   const hasOutstandingInvoices = overdueInvoices.length > 0 && isNotOnTeamOrEnterprisePlan
 
-  const { data: allProjects } = useProjectsQuery({})
+  const {
+    mutate: createProject,
+    isLoading: isCreatingNewProject,
+    isSuccess: isSuccessNewProject,
+  } = useProjectCreateMutation({
+    onSuccess: (res) => {
+      sendEvent({
+        action: 'project_creation_simple_version_submitted',
+        properties: {
+          instanceSize: form.getValues('instanceSize'),
+        },
+      })
+      router.push(`/project/${res.ref}/building`)
+    },
+  })
+
+  const { data: allProjectsFromApi } = useProjectsQuery()
+  const [allProjects, setAllProjects] = useState<
+    components['schemas']['ProjectInfo'][] | undefined
+  >(undefined)
+
+  useEffect(() => {
+    // Only set once to ensure compute credits dont change while project is being created
+    if (allProjectsFromApi && !allProjects) {
+      setAllProjects(allProjectsFromApi)
+    }
+  }, [allProjectsFromApi, allProjects, setAllProjects])
+
   const organizationProjects =
     allProjects?.filter(
       (project) =>
@@ -193,22 +222,6 @@ const Wizard: NextPageWithLayout = () => {
     }
   )
 
-  const {
-    mutate: createProject,
-    isLoading: isCreatingNewProject,
-    isSuccess: isSuccessNewProject,
-  } = useProjectCreateMutation({
-    onSuccess: (res) => {
-      sendEvent({
-        action: 'project_creation_simple_version_submitted',
-        properties: {
-          instanceSize: form.getValues('instanceSize'),
-        },
-      })
-      router.push(`/project/${res.ref}/building`)
-    },
-  })
-
   const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
   const isInvalidSlug = isOrganizationsSuccess && currentOrg === undefined
   const isEmptyOrganizations = (organizations?.length ?? 0) <= 0 && isOrganizationsSuccess
@@ -216,8 +229,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
-  const freePlanWithExceedingLimits =
-    currentOrg?.plan?.id === 'free' && hasMembersExceedingFreeTierLimit
+  const freePlanWithExceedingLimits = isFreePlan && hasMembersExceedingFreeTierLimit
 
   const isManagedByVercel = currentOrg?.managed_by === 'vercel-marketplace'
 
@@ -270,11 +282,14 @@ const Wizard: NextPageWithLayout = () => {
 
   const { instanceSize, cloudProvider, dbRegion, organization } = form.watch()
 
-  const availableOrioleVersion = useAvailableOrioleImageVersion({
-    cloudProvider: cloudProvider as CloudProvider,
-    dbRegion,
-    organizationSlug: organization,
-  })
+  const availableOrioleVersion = useAvailableOrioleImageVersion(
+    {
+      cloudProvider: cloudProvider as CloudProvider,
+      dbRegion,
+      organizationSlug: organization,
+    },
+    { enabled: currentOrg != null && !isManagedByVercel }
+  )
 
   // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
   const monthlyComputeCosts =
@@ -296,10 +311,10 @@ const Wizard: NextPageWithLayout = () => {
   }
 
   const onSubmitWithComputeCostsConfirmation = async (values: z.infer<typeof FormSchema>) => {
-    if (
+    const launchingLargerInstance =
       values.instanceSize &&
       !sizesWithNoCostConfirmationRequired.includes(values.instanceSize as DesiredInstanceSize)
-    ) {
+    if (additionalMonthlySpend > 0 && (hasOAuthApps || launchingLargerInstance)) {
       sendEvent({
         action: 'project_creation_simple_version_confirm_modal_opened',
         properties: {
@@ -344,8 +359,7 @@ const Wizard: NextPageWithLayout = () => {
       // gets ignored due to org billing subscription anyway
       dbPricingTierId: 'tier_free',
       // only set the compute size on pro+ plans. Free plans always use micro (nano in the future) size.
-      dbInstanceSize:
-        currentOrg?.plan.id === 'free' ? undefined : (instanceSize as DesiredInstanceSize),
+      dbInstanceSize: isFreePlan ? undefined : (instanceSize as DesiredInstanceSize),
       dataApiExposedSchemas: !dataApi ? [] : undefined,
       dataApiUseApiSchema: !dataApi ? false : useApiSchema,
       postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
@@ -406,20 +420,11 @@ const Wizard: NextPageWithLayout = () => {
   const additionalMonthlySpend =
     instanceSizeSpecs[instanceSize as DesiredInstanceSize]!.priceMonthly - availableComputeCredits
 
-  // TODO: Remove this after project creation experiment as it delays rendering
-  if (
-    !currentOrg ||
-    !projectCreationExperimentGroup ||
-    projectCreationExperimentGroup === 'group-b'
-  ) {
-    return null
-  }
-
   return (
     <Form_Shadcn_ {...form}>
       <form onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation)}>
         <Panel
-          loading={!isOrganizationsSuccess || isLoadingFreeProjectLimitCheck}
+          loading={!isOrganizationsSuccess}
           title={
             <div key="panel-title">
               <h3>Create a new project</h3>
@@ -432,20 +437,125 @@ const Wizard: NextPageWithLayout = () => {
             </div>
           }
           footer={
-            <div key="panel-footer" className="flex items-center justify-between w-full">
-              <Button
-                type="default"
-                disabled={isCreatingNewProject || isSuccessNewProject}
-                onClick={() => router.push('/projects')}
-              >
-                Cancel
-              </Button>
-              <div className="items-center space-x-3">
-                {!projectCreationDisabled && (
-                  <span className="text-xs text-foreground-lighter">
-                    You can rename your project later
-                  </span>
-                )}
+            <div key="panel-footer" className="grid grid-cols-12 w-full gap-4 items-center">
+              <div className="col-span-4">
+                {!isFreePlan &&
+                  !projectCreationDisabled &&
+                  canCreateProject &&
+                  additionalMonthlySpend > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span>Additional Costs</span>
+                      <div className="text-brand flex gap-1 items-center font-mono font-medium">
+                        <span>${additionalMonthlySpend}/m</span>
+                        <InfoTooltip side="top" className="max-w-[450px] p-0">
+                          <div className="p-4 text-sm text-foreground-light space-y-1">
+                            <p>
+                              Each project includes a dedicated Postgres instance running on its own
+                              server. You are charged for the{' '}
+                              <Link
+                                className="underline"
+                                href={`/docs/guides/platform/billing-on-supabase`}
+                                target="_blank"
+                              >
+                                Compute resourcse
+                              </Link>{' '}
+                              of that server, independent of your database usage.
+                            </p>
+                            {monthlyComputeCosts > 0 && (
+                              <p>
+                                Compute costs are applied on top of your subscription plan costs.
+                              </p>
+                            )}
+                          </div>
+
+                          <Table className="mt-2">
+                            <TableHeader className="[&_th]:h-7">
+                              <TableRow className="py-2">
+                                <TableHead className="w-[170px]">Project</TableHead>
+                                <TableHead>Compute Size</TableHead>
+                                <TableHead className="text-right">Monthly Costs</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody className="[&_td]:py-2">
+                              {organizationProjects.map((project) => (
+                                <TableRow key={project.ref} className="text-foreground-light">
+                                  <TableCell className="w-[170px] truncate">
+                                    {project.name}
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    {instanceLabel(project.infra_compute_size)}
+                                  </TableCell>
+                                  <TableCell className="text-right">
+                                    ${monthlyInstancePrice(project.infra_compute_size)}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+
+                              <TableRow>
+                                <TableCell className="w-[170px] flex gap-2">
+                                  <span className="truncate">
+                                    {form.getValues('projectName')
+                                      ? form.getValues('projectName')
+                                      : 'New project'}
+                                  </span>
+                                  <Badge size={'small'} variant={'default'}>
+                                    NEW
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  {instanceLabel(instanceSize)}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  ${monthlyInstancePrice(instanceSize)}
+                                </TableCell>
+                              </TableRow>
+                            </TableBody>
+                          </Table>
+                          <PopoverSeparator />
+                          <Table>
+                            <TableHeader className="[&_th]:h-7">
+                              <TableRow>
+                                <TableHead colSpan={2}>Compute Credits</TableHead>
+                                <TableHead colSpan={1} className="text-right">
+                                  -$10
+                                </TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody className="[&_td]:py-2">
+                              <TableRow className="text-foreground">
+                                <TableCell colSpan={2}>
+                                  Total Monthly Compute Costs
+                                  {/**
+                                   * API currently doesnt output replica information on the projects list endpoint. Until then, we cannot correctly calculate the costs including RRs.
+                                   *
+                                   * Will be adjusted in the future [kevin]
+                                   */}
+                                  {organizationProjects.length > 0 && (
+                                    <p className="text-xs text-foreground-lighter">
+                                      Excluding Read replicas
+                                    </p>
+                                  )}
+                                </TableCell>
+                                <TableCell colSpan={1} className="text-right">
+                                  ${monthlyComputeCosts}
+                                </TableCell>
+                              </TableRow>
+                            </TableBody>
+                          </Table>
+                        </InfoTooltip>
+                      </div>
+                    </div>
+                  )}
+              </div>
+
+              <div className="flex items-end col-span-8 space-x-2 ml-auto">
+                <Button
+                  type="default"
+                  disabled={isCreatingNewProject || isSuccessNewProject}
+                  onClick={() => router.push('/projects')}
+                >
+                  Cancel
+                </Button>
                 <Button
                   htmlType="submit"
                   loading={isCreatingNewProject || isSuccessNewProject}
@@ -486,9 +596,14 @@ const Wizard: NextPageWithLayout = () => {
                             </FormControl_Shadcn_>
                             <SelectContent_Shadcn_>
                               <SelectGroup_Shadcn_>
-                                {organizations?.map((x: any) => (
-                                  <SelectItem_Shadcn_ key={x.id} value={x.slug}>
-                                    {x.name}
+                                {organizations?.map((x) => (
+                                  <SelectItem_Shadcn_
+                                    key={x.id}
+                                    value={x.slug}
+                                    className="flex justify-between"
+                                  >
+                                    <span className="mr-2">{x.name}</span>
+                                    <Badge>{x.plan.name}</Badge>
                                   </SelectItem_Shadcn_>
                                 ))}
                               </SelectGroup_Shadcn_>
@@ -498,7 +613,6 @@ const Wizard: NextPageWithLayout = () => {
                       </FormItemLayout>
                     )}
                   />
-
                   {!isAdmin && <NotOrganizationOwnerWarning />}
                 </Panel.Content>
 
@@ -657,143 +771,6 @@ const Wizard: NextPageWithLayout = () => {
                             </FormItemLayout>
                           )}
                         />
-                        <FormItemLayout layout="horizontal">
-                          <div className="flex justify-between mr-2">
-                            <span>Additional Monthly Compute Costs</span>
-                            <div className="text-brand flex gap-1 items-center">
-                              {organizationProjects.length > 0 ? (
-                                <>
-                                  <span>${additionalMonthlySpend}</span>
-                                </>
-                              ) : (
-                                <>
-                                  <span className="text-foreground-lighter line-through">
-                                    $
-                                    {
-                                      instanceSizeSpecs[instanceSize as DesiredInstanceSize]!
-                                        .priceMonthly
-                                    }
-                                  </span>
-                                  <span>${additionalMonthlySpend}</span>
-                                </>
-                              )}
-                              <InfoTooltip side="top" className="max-w-[450px] p-0">
-                                <Table className="mt-2">
-                                  <TableHeader className="[&_th]:h-7">
-                                    <TableRow className="py-2">
-                                      <TableHead className="w-[170px]">Project</TableHead>
-                                      <TableHead>Compute Size</TableHead>
-                                      <TableHead className="text-right">Monthly Costs</TableHead>
-                                    </TableRow>
-                                  </TableHeader>
-                                  <TableBody className="[&_td]:py-2">
-                                    {organizationProjects.map((project) => (
-                                      <TableRow key={project.ref} className="text-foreground-light">
-                                        <TableCell className="w-[170px] truncate">
-                                          {project.name}
-                                        </TableCell>
-                                        <TableCell className="text-center">
-                                          {instanceLabel(project.infra_compute_size)}
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                          ${monthlyInstancePrice(project.infra_compute_size)}
-                                        </TableCell>
-                                      </TableRow>
-                                    ))}
-
-                                    <TableRow>
-                                      <TableCell className="w-[170px] flex gap-2">
-                                        <span className="truncate">
-                                          {form.getValues('projectName')
-                                            ? form.getValues('projectName')
-                                            : 'New project'}
-                                        </span>
-                                        <Badge size={'small'} variant={'default'}>
-                                          NEW
-                                        </Badge>
-                                      </TableCell>
-                                      <TableCell className="text-center">
-                                        {instanceLabel(instanceSize)}
-                                      </TableCell>
-                                      <TableCell className="text-right">
-                                        ${monthlyInstancePrice(instanceSize)}
-                                      </TableCell>
-                                    </TableRow>
-                                  </TableBody>
-                                </Table>
-                                <PopoverSeparator />
-                                <Table>
-                                  <TableHeader className="[&_th]:h-7">
-                                    <TableRow>
-                                      <TableHead colSpan={2}>Compute Credits</TableHead>
-                                      <TableHead colSpan={1} className="text-right">
-                                        -$10
-                                      </TableHead>
-                                    </TableRow>
-                                  </TableHeader>
-                                  <TableBody className="[&_td]:py-2">
-                                    <TableRow className="text-foreground">
-                                      <TableCell colSpan={2}>
-                                        Total Monthly Compute Costs
-                                        {/**
-                                         * API currently doesnt output replica information on the projects list endpoint. Until then, we cannot correctly calculate the costs including RRs.
-                                         *
-                                         * Will be adjusted in the future [kevin]
-                                         */}
-                                        {organizationProjects.length > 0 && (
-                                          <p className="text-xs text-foreground-lighter">
-                                            Excluding Read replicas
-                                          </p>
-                                        )}
-                                      </TableCell>
-                                      <TableCell colSpan={1} className="text-right">
-                                        ${monthlyComputeCosts}
-                                      </TableCell>
-                                    </TableRow>
-                                  </TableBody>
-                                </Table>
-
-                                <div className="p-4 text-xs text-foreground-light space-y-1">
-                                  <p>
-                                    Compute is charged usage-based whenever your billing cycle
-                                    resets. Given compute charges are hourly, your invoice will
-                                    contain "Compute Hours" for each hour a project ran on a
-                                    specific compute size.
-                                  </p>
-                                  {monthlyComputeCosts > 0 && (
-                                    <p>
-                                      Compute costs are applied on top of your subscription plan
-                                      costs.
-                                    </p>
-                                  )}
-                                </div>
-                              </InfoTooltip>
-                            </div>
-                          </div>
-
-                          <div className="mt-2 text-foreground-lighter space-y-1">
-                            {additionalMonthlySpend > 0 && availableComputeCredits === 0 ? (
-                              <p>
-                                Your monthly spend will increase, and can be more than above if you
-                                exceed your plan's usage quota. Your organization includes $10/month
-                                of compute credits, which you already exceed with your existing
-                                projects.
-                              </p>
-                            ) : additionalMonthlySpend > 0 && availableComputeCredits > 0 ? (
-                              <p>
-                                Your monthly spend will increase, and can be more than above if you
-                                exceed your plan's usage quota. Your organization includes $10/month
-                                of compute credits, which you exceed with the selected compute size.
-                              </p>
-                            ) : (
-                              <p>
-                                Your monthly spend won't increase, unless you exceed your plan's
-                                usage quota. Your organization includes $10/month of compute
-                                credits, which cover this project.
-                              </p>
-                            )}
-                          </div>
-                        </FormItemLayout>
                       </Panel.Content>
                     )}
 
@@ -972,11 +949,21 @@ const Wizard: NextPageWithLayout = () => {
           }}
           variant={'warning'}
         >
-          <p className="text-sm text-foreground-light">
-            Launching a project on compute size "{instanceLabel(instanceSize)}" increases your
-            monthly compute costs by ${additionalMonthlySpend}. By clicking "Confirm", you agree to
-            the additional costs and the project creation starts.
-          </p>
+          <div className="text-sm text-foreground-light space-y-1">
+            <p>
+              Launching a project on compute size "{instanceLabel(instanceSize)}" increases your
+              monthly costs by ${additionalMonthlySpend}, independent of how actively you use it. By
+              clicking "Confirm", you agree to the additional costs.{' '}
+              <Link
+                href="/docs/guides/platform/manage-your-usage/compute"
+                target="_blank"
+                className="underline"
+              >
+                Compute Costs
+              </Link>{' '}
+              are non-refundable.
+            </p>
+          </div>
         </ConfirmationModal>
       </form>
     </Form_Shadcn_>
