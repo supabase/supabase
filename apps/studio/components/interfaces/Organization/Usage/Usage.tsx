@@ -11,7 +11,6 @@ import {
 
 import AlertError from 'components/ui/AlertError'
 import DateRangePicker from 'components/ui/DateRangePicker'
-import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectsQuery } from 'data/projects/projects-query'

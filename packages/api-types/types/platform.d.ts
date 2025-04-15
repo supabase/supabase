@@ -5963,6 +5963,11 @@ export interface components {
       is_owner: boolean
       name: string
       opt_in_tags: string[]
+      plan: {
+        /** @enum {string} */
+        id: 'free' | 'pro' | 'team' | 'enterprise'
+        name: string
+      }
       restriction_data: {
         [key: string]: string
       } | null
@@ -5971,6 +5976,7 @@ export interface components {
       slug: string
       stripe_customer_id: string | null
       subscription_id: string | null
+      usage_billing_enabled: boolean
     }
     OrganizationRoleResponse: {
       org_scoped_roles: {
@@ -6033,10 +6039,16 @@ export interface components {
       id: number
       name: string
       opt_in_tags: string[]
+      plan: {
+        /** @enum {string} */
+        id?: 'free' | 'pro' | 'team' | 'enterprise'
+        name?: string
+      }
       projects: components['schemas']['OrganizationSlugProject'][]
       restriction_data: Record<string, never> | null
       restriction_status: Record<string, never> | null
       slug: string
+      usage_billing_enabled: boolean
     }
     OrgDocumentUrlResponse: {
       fileUrl: string
@@ -13785,7 +13797,7 @@ export interface operations {
   UsageApiController_getApiCounts: {
     parameters: {
       query: {
-        interval: 'minutely' | 'hourly' | 'daily'
+        interval: 'minutely' | 'hourly' | 'daily' | '15min' | '30min' | '1hr' | '3hr' | '1day'
       }
       header?: never
       path: {
