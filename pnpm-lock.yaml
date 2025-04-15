@@ -977,6 +977,9 @@ importers:
       graphql-ws:
         specifier: 5.14.1
         version: 5.14.1(graphql@16.8.1)
+      import-in-the-middle:
+        specifier: ^1.13.1
+        version: 1.13.1
       msw:
         specifier: ^2.3.0
         version: 2.4.11(typescript@5.5.2)
@@ -992,6 +995,9 @@ importers:
       raw-loader:
         specifier: ^4.0.2
         version: 4.0.2(webpack@5.94.0)
+      require-in-the-middle:
+        specifier: ^7.5.2
+        version: 7.5.2(supports-color@8.1.1)
       tailwindcss:
         specifier: ^3.4.1
         version: 3.4.1(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2))
