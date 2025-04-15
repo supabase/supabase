@@ -62,9 +62,11 @@
     "next-themes": "^0.3.0",
     "prism-react-renderer": "^2.3.1",
     "prop-types": "^15.7.2",
+    "react": "catalog:",
     "react-accessible-treeview": "^2.8.3",
     "react-copy-to-clipboard": "^5.1.0",
     "react-day-picker": "^8.8.0",
+    "react-dom": "catalog:",
     "react-hook-form": "^7.45.0",
     "react-intersection-observer": "^9.8.2",
     "react-medium-image-zoom": "^5.2.4",
@@ -73,6 +75,7 @@
     "recharts": "^2.12.7",
     "sonner": "^1.5.0",
     "tailwind-merge": "^1.13.2",
+    "tailwindcss": "^3.4.1",
     "vaul": "^0.9.1"
   },
   "devDependencies": {
@@ -81,9 +84,9 @@
     "@testing-library/react": "^14.0.0",
     "@types/lodash": "4.17.5",
     "@types/node": "catalog:",
-    "@types/react": "^18.2.24",
+    "@types/react": "catalog:",
     "@types/react-copy-to-clipboard": "^5.0.4",
-    "@types/react-dom": "^18.2.8",
+    "@types/react-dom": "catalog:",
     "@types/react-syntax-highlighter": "^15.5.6",
     "common": "workspace:*",
     "config": "workspace:*",
@@ -95,8 +98,6 @@
     "vitest": "^3.0.5"
   },
   "peerDependencies": {
-    "next": "catalog:",
-    "react": "*",
-    "react-dom": "*"
+    "next": "catalog:"
   }
 }
