@@ -35,7 +35,14 @@ const FilterPopover = ({ filters, onApplyFilters }: FilterPopoverProps) => {
           {btnText}
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start" portal={true}>
+      <PopoverContent_Shadcn_
+        className="p-0 w-96"
+        side="bottom"
+        align="start"
+        // safari fix
+        // https://www.radix-ui.com/primitives/docs/components/popover#portal
+        portal={true}
+      >
         <FilterOverlay filters={filters} onApplyFilters={onApplyFilters} />
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
