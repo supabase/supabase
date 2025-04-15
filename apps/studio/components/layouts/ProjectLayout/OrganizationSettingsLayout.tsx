@@ -23,7 +23,8 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
       newLayoutPreview &&
       (path === `/org/${slug}/team` ||
         path === `/org/${slug}/integrations` ||
-        path === `/org/${slug}/usage`)
+        path === `/org/${slug}/usage` ||
+        path === `/org/${slug}/billing`)
     )
   }
 
@@ -44,7 +45,7 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
       label: 'Integrations',
       href: `/org/${slug}/integrations`,
     },
-    {
+    !newLayoutPreview && {
       label: 'Billing',
       href: `/org/${slug}/billing`,
     },

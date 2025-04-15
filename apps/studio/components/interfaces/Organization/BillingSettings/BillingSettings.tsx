@@ -1,4 +1,4 @@
-import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import { ScaffoldContainer, ScaffoldContainerLegacy, ScaffoldDivider, ScaffoldTitle } from 'components/layouts/Scaffold'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useOrgSubscriptionQuery } from '../../../../data/subscriptions/org-subscription-query'
 import BillingAddress from './BillingAddress/BillingAddress'
@@ -11,6 +11,7 @@ import Subscription from './Subscription/Subscription'
 import TaxID from './TaxID/TaxID'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import InvoicesSection from '../InvoicesSettings/InvoicesSection'
+import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 const BillingSettings = () => {
   const {
@@ -25,6 +26,8 @@ const BillingSettings = () => {
     'billing:invoices',
   ])
 
+  const newLayoutPreview = useNewLayout()
+
   const org = useSelectedOrganization()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const isNotOrgWithPartnerBilling = !subscription?.billing_via_partner
@@ -36,6 +39,12 @@ const BillingSettings = () => {
 
   return (
     <>
+      {newLayoutPreview && (
+        <ScaffoldContainerLegacy>
+          <ScaffoldTitle>Billing</ScaffoldTitle>
+        </ScaffoldContainerLegacy>
+      )}
+
       <ScaffoldContainer id="subscription">
         <Subscription />
       </ScaffoldContainer>
