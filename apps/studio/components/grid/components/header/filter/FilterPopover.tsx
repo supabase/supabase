@@ -21,7 +21,7 @@ export interface FilterPopoverProps {
   onApplyFilters: (filters: Filter[]) => void
 }
 
-const FilterPopover = ({ filters, portal = false, onApplyFilters }: FilterPopoverProps) => {
+const FilterPopover = ({ filters, portal = true, onApplyFilters }: FilterPopoverProps) => {
   const [open, setOpen] = useState(false)
 
   const btnText =

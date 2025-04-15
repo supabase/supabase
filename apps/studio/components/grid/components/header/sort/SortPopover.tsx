@@ -22,7 +22,7 @@ export interface SortPopoverProps {
   onApplySorts: (sorts: Sort[]) => void
 }
 
-const SortPopover = ({ sorts, portal = false, onApplySorts }: SortPopoverProps) => {
+const SortPopover = ({ sorts, portal = true, onApplySorts }: SortPopoverProps) => {
   const [open, setOpen] = useState(false)
 
   const btnText =
