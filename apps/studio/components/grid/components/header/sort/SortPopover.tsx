@@ -36,7 +36,7 @@ const SortPopover = ({ sorts, onApplySorts }: SortPopoverProps) => {
           {btnText}
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start">
+      <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start" portal={true}>
         <SortOverlay sorts={sorts} onApplySorts={onApplySorts} />
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
