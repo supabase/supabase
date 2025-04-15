@@ -18,10 +18,11 @@ import SortRow from './SortRow'
 
 export interface SortPopoverProps {
   sorts: string[]
+  portal?: boolean
   onApplySorts: (sorts: Sort[]) => void
 }
 
-const SortPopover = ({ sorts, onApplySorts }: SortPopoverProps) => {
+const SortPopover = ({ sorts, portal = true, onApplySorts }: SortPopoverProps) => {
   const [open, setOpen] = useState(false)
 
   const btnText =
@@ -36,14 +37,7 @@ const SortPopover = ({ sorts, onApplySorts }: SortPopoverProps) => {
           {btnText}
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
-        className="p-0 w-96"
-        side="bottom"
-        align="start"
-        // using `portal` for a safari fix. issue with rendering outside of body element
-        // https://www.radix-ui.com/primitives/docs/components/popover#portal
-        portal={true}
-      >
+      <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start" portal={portal}>
         <SortOverlay sorts={sorts} onApplySorts={onApplySorts} />
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>

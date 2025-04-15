@@ -8,12 +8,14 @@ import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
 import RoleImpersonationSelector from './RoleImpersonationSelector'
 
 export interface RoleImpersonationPopoverProps {
+  portal?: boolean
   serviceRoleLabel?: string
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
   align?: 'center' | 'start' | 'end'
 }
 
 const RoleImpersonationPopover = ({
+  portal = true,
   serviceRoleLabel,
   variant = 'regular',
   align = 'end',
@@ -57,12 +59,10 @@ const RoleImpersonationPopover = ({
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_
+        portal={portal}
         className="p-0 w-full overflow-hidden"
         side="bottom"
         align={align}
-        // using `portal` for a safari fix. issue with rendering outside of body element
-        // https://www.radix-ui.com/primitives/docs/components/popover#portal
-        portal={true}
       >
         <RoleImpersonationSelector serviceRoleLabel={serviceRoleLabel} />
       </PopoverContent_Shadcn_>

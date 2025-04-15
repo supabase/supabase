@@ -263,11 +263,10 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                   </Button>
                 </PopoverTrigger_Shadcn_>
                 <PopoverContent_Shadcn_
+                  // using `portal` for a safari fix. issue with rendering outside of body element
+                  portal
                   className="min-w-[395px] text-sm"
                   align="end"
-                  // using `portal` for a safari fix. issue with rendering outside of body element
-                  // https://www.radix-ui.com/primitives/docs/components/popover#portal
-                  portal={true}
                 >
                   <h3 className="flex items-center gap-2">
                     <Lock size={16} /> Row Level Security (RLS)
@@ -304,11 +303,10 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                 </Button>
               </PopoverTrigger_Shadcn_>
               <PopoverContent_Shadcn_
+                // using `portal` for a safari fix. issue with rendering outside of body element
+                portal
                 className="min-w-[395px] text-sm"
                 align="end"
-                // using `portal` for a safari fix. issue with rendering outside of body element
-                // https://www.radix-ui.com/primitives/docs/components/popover#portal
-                portal={true}
               >
                 <h3 className="flex items-center gap-2">
                   <Unlock size={16} /> Secure your View
@@ -355,11 +353,10 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                 </Button>
               </PopoverTrigger_Shadcn_>
               <PopoverContent_Shadcn_
+                // using `portal` for a safari fix. issue with rendering outside of body element
+                portal
                 className="min-w-[395px] text-sm"
                 align="end"
-                // using `portal` for a safari fix. issue with rendering outside of body element
-                // https://www.radix-ui.com/primitives/docs/components/popover#portal
-                portal={true}
               >
                 <h3 className="flex items-center gap-2">
                   <Unlock size={16} /> Secure your View
@@ -398,11 +395,10 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                 </Button>
               </PopoverTrigger_Shadcn_>
               <PopoverContent_Shadcn_
+                // using `portal` for a safari fix. issue with rendering outside of body element
+                portal
                 className="min-w-[395px] text-sm"
                 align="end"
-                // using `portal` for a safari fix. issue with rendering outside of body element
-                // https://www.radix-ui.com/primitives/docs/components/popover#portal
-                portal={true}
               >
                 <h3 className="flex items-center gap-2">
                   <Unlock size={16} /> Secure Foreign table
