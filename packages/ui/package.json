@@ -26,7 +26,7 @@
     "@radix-ui/react-collapsible": "^1.0.3",
     "@radix-ui/react-context": "^1.0.1",
     "@radix-ui/react-context-menu": "^2.1.5",
-    "@radix-ui/react-dialog": "^1.1.4",
+    "@radix-ui/react-dialog": "1.0.5",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@radix-ui/react-hover-card": "^1.0.7",
     "@radix-ui/react-label": "^2.0.2",
