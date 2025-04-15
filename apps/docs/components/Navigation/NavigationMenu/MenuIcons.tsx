@@ -589,7 +589,7 @@ export function IconSecurity({ width = 16, height = 16, className }: HomeMenuIco
       <path
         fillRule="evenodd"
         clipRule="evenodd"
-        d="M8.5 1L2 3V9C2 12 5 14 8.5 14.5C12 14 15 12 15 9V3L8.5 1Z"
+        d="M9 2L3 4V11C3 14 6 16 9 16.5C12 16 15 14 15 11V4L9 2Z"
         stroke="currentColor"
         strokeMiterlimit="10"
         strokeLinejoin="bevel"
@@ -597,7 +597,7 @@ export function IconSecurity({ width = 16, height = 16, className }: HomeMenuIco
       <path
         fillRule="evenodd"
         clipRule="evenodd"
-        d="M6.5 8L7.5 10L11 6"
+        d="M7 10L8 12L12 8"
         stroke="currentColor"
         strokeMiterlimit="10"
         strokeLinejoin="round"
