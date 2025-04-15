@@ -22,7 +22,6 @@ import { useUpdateDiskAutoscaleConfigMutation } from 'data/config/disk-autoscale
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AddonVariantId } from 'data/subscriptions/types'
@@ -132,9 +131,7 @@ export function DiskManagementForm() {
     },
     { enabled: project != null && !isFlyArchitecture }
   )
-  const { data: subscription, isSuccess: isSubscriptionSuccess } = useOrgSubscriptionQuery({
-    orgSlug: org?.slug,
-  })
+
   const { data: diskAutoscaleConfig, isSuccess: isDiskAutoscaleConfigSuccess } =
     useDiskAutoscaleCustomConfigQuery(
       { projectRef },
@@ -178,13 +175,12 @@ export function DiskManagementForm() {
     isDiskAttributesSuccess &&
     isDiskUtilizationSuccess &&
     isReadReplicasSuccess &&
-    isSubscriptionSuccess &&
     isDiskAutoscaleConfigSuccess &&
     isCooldownSuccess
 
   const isRequestingChanges = data?.requested_modification !== undefined
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
-  const isPlanUpgradeRequired = subscription?.plan.id === 'free'
+  const isPlanUpgradeRequired = org?.plan.id === 'free'
 
   const { formState } = form
   const usedSize = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
@@ -193,7 +189,7 @@ export function DiskManagementForm() {
 
   const disableIopsThroughputConfig =
     RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(form.watch('computeSize')) &&
-    subscription?.plan.id !== 'free'
+    org?.plan.id !== 'free'
 
   const isBranch = project?.parent_project_ref !== undefined
 

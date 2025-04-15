@@ -108,6 +108,7 @@ const MemoizedQueryBlock = memo(
     >
       <QueryBlock
         lockColumns
+        showRunButtonIfNotReadOnly
         label={title}
         sql={sql}
         chartConfig={{

@@ -13,6 +13,11 @@ export interface Organization {
   restriction_data: Record<string, string> | null
   managed_by: 'supabase' | 'vercel-marketplace' | 'aws-marketplace'
   partner_id?: string
+  plan: {
+    id: 'free' | 'pro' | 'team' | 'enterprise'
+    name: string
+  }
+  usage_billing_enabled: boolean
 }
 
 /**

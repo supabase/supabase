@@ -14,14 +14,11 @@ import InlineEditorButton from 'components/layouts/AppLayout/InlineEditorButton'
 import OrganizationDropdown from 'components/layouts/AppLayout/OrganizationDropdown'
 import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
-import { useCLIReleaseVersionQuery } from 'data/misc/cli-release-version-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useShowLayoutHeader } from 'hooks/misc/useShowLayoutHeader'
 import { IS_PLATFORM } from 'lib/constants'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
 import BreadcrumbsView from './BreadcrumbsView'
@@ -71,19 +68,10 @@ const LayoutHeader = ({
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
   const { setMobileMenuOpen } = useAppStateSnapshot()
 
-  const { open: isAiAssistantOpen } = useAiAssistantStateSnapshot()
-
-  const { data } = useCLIReleaseVersionQuery()
-  const currentCliVersion = data?.current
-
-  const { data: subscription } = useOrgSubscriptionQuery({
-    orgSlug: selectedOrganization?.slug,
-  })
-
   // We only want to query the org usage and check for possible over-ages for plans without usage billing enabled (free or pro with spend cap)
   const { data: orgUsage } = useOrgUsageQuery(
     { orgSlug: selectedOrganization?.slug },
-    { enabled: subscription?.usage_billing_enabled === false }
+    { enabled: selectedOrganization?.usage_billing_enabled === false }
   )
 
   const exceedingLimits = useMemo(() => {
@@ -101,25 +89,9 @@ const LayoutHeader = ({
     <header className={cn('flex h-12 items-center flex-shrink-0 border-b')}>
       <div
         className={cn(
-          'flex items-center justify-between h-full pr-3 flex-1 overflow-x-auto gap-x-4 md:pl-4'
+          'flex items-center justify-between h-full pr-3 flex-1 overflow-x-auto gap-x-8 pl-4'
         )}
       >
-        {showProductMenu && (
-          <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
-            <button
-              title="Menu dropdown button"
-              className={cn(
-                'group/view-toggle flex justify-center items-center border-none gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
-              )}
-              onClick={() => setMobileMenuOpen(true)}
-            >
-              <div className="flex flex-col gap-y-1">
-                <div className="h-px inline-block left-0 w-4 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
-                <div className="h-px inline-block left-0 w-3 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
-              </div>
-            </button>
-          </div>
-        )}
         <div className="flex items-center text-sm">
           <HomeIcon />
           <>
@@ -216,7 +188,7 @@ const LayoutHeader = ({
             </>
           ) : (
             <>
-              {!!currentCliVersion && <LocalVersionPopover />}
+              <LocalVersionPopover />
               <ThemeDropdown />
             </>
           )}
@@ -232,10 +204,10 @@ const LayoutHeader = ({
             exit={{ opacity: 0, x: 0, width: 0 }}
             transition={{ duration: 0.15, ease: 'easeOut' }}
           >
-            <div className="border-r h-full flex items-center justify-center md:px-2">
+            <div className="border-r h-full flex items-center justify-center px-2">
               <InlineEditorButton />
             </div>
-            <div className="md:px-2">
+            <div className="px-2">
               <AssistantButton />
             </div>
           </motion.div>
