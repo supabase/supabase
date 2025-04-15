@@ -23,7 +23,6 @@ import {
   MAX_REPLICAS_BELOW_XL,
   useReadReplicasQuery,
 } from 'data/read-replicas/replicas-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -73,12 +72,11 @@ const DeployNewReplicaPanel = ({
 
   const { data } = useReadReplicasQuery({ projectRef })
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const { data: diskConfiguration } = useDiskAttributesQuery({ projectRef })
 
   const isNotOnTeamOrEnterprisePlan = useMemo(
-    () => !['team', 'enterprise'].includes(subscription?.plan.id ?? ''),
-    [subscription]
+    () => !['team', 'enterprise'].includes(org?.plan.id ?? ''),
+    [org]
   )
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
     enabled: isNotOnTeamOrEnterprisePlan,
@@ -166,14 +164,13 @@ const DeployNewReplicaPanel = ({
     : MAX_REPLICAS_ABOVE_XL
   const reachedMaxReplicas =
     (data ?? []).filter((db) => db.identifier !== projectRef).length >= maxNumberOfReplicas
-  const isFreePlan = subscription?.plan.id === 'free'
+  const isFreePlan = org?.plan.id === 'free'
   const isAWSProvider = project?.cloud_provider === 'AWS'
   const isWalgEnabled = project?.is_physical_backups_enabled
   const currentComputeAddon = addons?.selected_addons.find(
     (addon) => addon.type === 'compute_instance'
   )
-  const isProWithSpendCapEnabled =
-    subscription?.plan.id === 'pro' && !subscription.usage_billing_enabled
+  const isProWithSpendCapEnabled = org?.plan.id === 'pro' && !org.usage_billing_enabled
   const isMinimallyOnSmallCompute =
     currentComputeAddon?.variant.identifier !== undefined &&
     currentComputeAddon?.variant.identifier !== 'ci_micro'
