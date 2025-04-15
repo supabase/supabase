@@ -25,7 +25,7 @@ const RoleImpersonationPopover = ({
   const currentRole = state.role?.role ?? serviceRoleLabel ?? 'service role'
 
   return (
-    <Popover_Shadcn_ open={isOpen} onOpenChange={setIsOpen} modal={false}>
+    <Popover_Shadcn_ open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button
           size="tiny"
@@ -56,7 +56,14 @@ const RoleImpersonationPopover = ({
           </div>
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-full overflow-hidden" side="bottom" align={align}>
+      <PopoverContent_Shadcn_
+        className="p-0 w-full overflow-hidden"
+        side="bottom"
+        align={align}
+        // using `portal` for a safari fix. issue with rendering outside of body element
+        // https://www.radix-ui.com/primitives/docs/components/popover#portal
+        portal={true}
+      >
         <RoleImpersonationSelector serviceRoleLabel={serviceRoleLabel} />
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
