@@ -4,7 +4,8 @@ import { KeyboardEvent, memo } from 'react'
 import { DropdownControl } from 'components/grid/components/common/DropdownControl'
 import type { Filter, FilterOperator } from 'components/grid/types'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { Button, Input } from 'ui'
+import { Button } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { FilterOperatorOptions } from './Filter.constants'
 
 export interface FilterRowProps {

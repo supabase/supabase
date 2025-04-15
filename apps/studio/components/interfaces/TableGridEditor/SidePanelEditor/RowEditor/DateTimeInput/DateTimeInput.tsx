@@ -59,7 +59,7 @@ const DateTimeInput = ({
       step={inputType == 'datetime-local' || inputType == 'time' ? '1' : undefined}
       actions={
         !disabled && (
-          <DropdownMenu>
+          <DropdownMenu modal>
             <DropdownMenuTrigger asChild>
               <Button type="default" icon={<Edit />} className="px-1.5" />
             </DropdownMenuTrigger>

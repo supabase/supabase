@@ -30,7 +30,7 @@ const SortPopover = ({ sorts, onApplySorts }: SortPopoverProps) => {
       : 'Sort'
 
   return (
-    <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
+    <Popover_Shadcn_ modal open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button type={(sorts || []).length > 0 ? 'link' : 'text'} icon={<List />}>
           {btnText}

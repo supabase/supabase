@@ -177,7 +177,7 @@ const InputField = ({
                   : `NULL (Default: ${field.defaultValue})`
           }
           actions={
-            <DropdownMenu>
+            <DropdownMenu modal>
               <DropdownMenuTrigger asChild>
                 <Button type="default" icon={<Edit />} className="px-1.5" />
               </DropdownMenuTrigger>

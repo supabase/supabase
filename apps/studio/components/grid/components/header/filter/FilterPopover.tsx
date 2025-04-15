@@ -29,7 +29,7 @@ const FilterPopover = ({ filters, onApplyFilters }: FilterPopoverProps) => {
       : 'Filter'
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+    <Popover_Shadcn_ modal open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button type={(filters || []).length > 0 ? 'link' : 'text'} icon={<FilterIcon />}>
           {btnText}

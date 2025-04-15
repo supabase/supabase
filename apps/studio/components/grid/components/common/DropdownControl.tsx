@@ -21,7 +21,7 @@ export const DropdownControl = ({
   onSelect,
 }: PropsWithChildren<DropdownControlProps>) => {
   return (
-    <DropdownMenu>
+    <DropdownMenu modal>
       <DropdownMenuTrigger>{children}</DropdownMenuTrigger>
       <DropdownMenuContent side={side} align={align}>
         <div className="dropdown-control" style={{ maxHeight: '30vh' }}>
