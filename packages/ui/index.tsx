@@ -228,6 +228,7 @@ export {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
+  TooltipPortal,
 } from './src/components/shadcn/ui/tooltip'
 
 export {
