@@ -1,5 +1,16 @@
 import { useState } from 'react'
-import { Button, Dialog, DialogContent } from 'ui'
+
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogSectionSeparator,
+  DialogTitle,
+  DialogFooter,
+  Form_Shadcn_ as Form,
+} from 'ui'
 import { Label_Shadcn_ as Label } from 'ui'
 import BillingAddressForm from './BillingAddressForm'
 import { Pencil } from 'lucide-react'
@@ -10,6 +21,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import AlertError from 'components/ui/AlertError'
+import { useBillingAddressForm } from './useBillingAddressForm'
 
 interface BillingAddressDialogProps {
   slug: string
@@ -36,11 +48,21 @@ const BillingAddressDialog = ({ slug }: BillingAddressDialogProps) => {
     isError,
   } = useOrganizationCustomerProfileQuery({ slug }, { enabled: canReadBillingAddress })
 
-  const onClose = () => {
+  const handleDialogClose = () => {
     setOpen(false)
   }
 
-  // Create a summary of the address if it exists
+  const { form, handleSubmit, handleReset, isSubmitting, isDirty } = useBillingAddressForm({
+    slug,
+    initialAddress: customerProfile?.address,
+    onSuccess: handleDialogClose,
+  })
+
+  const handleClose = () => {
+    handleReset()
+    handleDialogClose()
+  }
+
   const getAddressSummary = () => {
     if (!customerProfile?.address?.line1) return 'Optionally add a billing address'
 
@@ -54,10 +76,12 @@ const BillingAddressDialog = ({ slug }: BillingAddressDialogProps) => {
     return parts.join(', ')
   }
 
+  const isSubmitDisabled = !isDirty || !canUpdateBillingAddress || isSubmitting
+
   return (
     <>
       <div>
-        <Label htmlFor="billing-address-btn" className="text-foreground-light block mb-2">
+        <Label htmlFor="billing-address-btn" className="text-foreground-light block mb-0">
           Billing Address
         </Label>
         {!canReadBillingAddress ? (
@@ -79,11 +103,13 @@ const BillingAddressDialog = ({ slug }: BillingAddressDialogProps) => {
               <div className="flex items-center justify-between">
                 <p className="text-sm text-foreground">{getAddressSummary()}</p>
                 <Button
+                  id="billing-address-btn"
                   onClick={() => setOpen(true)}
                   type="text"
                   aria-label="Edit"
                   size={'tiny'}
                   className="w-8 h-8 p-0 text-foreground-light"
+                  disabled={!canUpdateBillingAddress}
                 >
                   <Pencil size={14} strokeWidth={1.5} />
                 </Button>
@@ -96,18 +122,43 @@ const BillingAddressDialog = ({ slug }: BillingAddressDialogProps) => {
       <Dialog
         open={open}
         onOpenChange={(value) => {
-          if (!value) onClose()
+          if (!value) handleDialogClose()
           else setOpen(true)
         }}
       >
-        <DialogContent size={'large'} className="border-none">
-          <BillingAddressForm
-            address={customerProfile?.address}
-            onClose={onClose}
-            insideDialog
-            disabled={!canUpdateBillingAddress}
-            formId="billing-address-form-dialog"
-          />
+        <DialogContent size={'large'}>
+          <DialogHeader>
+            <DialogTitle>Billing Address</DialogTitle>
+            <DialogDescription>
+              This will be reflected in every upcoming invoice, past invoices are not affected
+            </DialogDescription>
+          </DialogHeader>
+          <DialogSectionSeparator />
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)}>
+              <BillingAddressForm className="p-5" form={form} disabled={!canUpdateBillingAddress} />
+              <DialogFooter className="justify-end">
+                {!canUpdateBillingAddress && (
+                  <span className="text-sm text-foreground-lighter">
+                    You need additional permissions to manage this organization's billing address
+                  </span>
+                )}
+                <div className="flex items-center gap-2">
+                  <Button type="default" onClick={handleClose}>
+                    Cancel
+                  </Button>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    disabled={isSubmitDisabled}
+                    loading={isSubmitting}
+                  >
+                    Save
+                  </Button>
+                </div>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
     </>

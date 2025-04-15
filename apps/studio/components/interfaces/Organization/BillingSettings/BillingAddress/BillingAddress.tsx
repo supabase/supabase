@@ -14,6 +14,8 @@ import { useOrganizationCustomerProfileQuery } from 'data/organizations/organiza
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import BillingAddressForm from './BillingAddressForm'
+import { Button, Card, CardFooter, cn, Form_Shadcn_ as Form } from 'ui'
+import { useBillingAddressForm } from './useBillingAddressForm'
 
 const BillingAddress = () => {
   const { slug } = useParams()
@@ -32,6 +34,13 @@ const BillingAddress = () => {
     { slug },
     { enabled: canReadBillingAddress }
   )
+
+  const { form, handleSubmit, handleReset, isSubmitting, isDirty } = useBillingAddressForm({
+    slug,
+    initialAddress: data?.address,
+  })
+
+  const isSubmitDisabled = !isDirty || !canUpdateBillingAddress || isSubmitting
 
   return (
     <ScaffoldSection>
@@ -73,7 +82,38 @@ const BillingAddress = () => {
             )}
 
             {isSuccess && (
-              <BillingAddressForm address={data?.address} disabled={!canUpdateBillingAddress} />
+              <Card>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(handleSubmit)}>
+                    <BillingAddressForm
+                      className="p-8"
+                      form={form}
+                      disabled={!canUpdateBillingAddress}
+                    />
+                    <CardFooter className="border-t justify-end px-8">
+                      {!canUpdateBillingAddress && (
+                        <span className="text-sm text-foreground-lighter mr-auto">
+                          You need additional permissions to manage this organization's billing
+                          address
+                        </span>
+                      )}
+                      <div className="flex items-center gap-2">
+                        <Button type="default" onClick={handleReset} disabled={isSubmitDisabled}>
+                          Cancel
+                        </Button>
+                        <Button
+                          type="primary"
+                          htmlType="submit"
+                          disabled={isSubmitDisabled}
+                          loading={isSubmitting}
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    </CardFooter>
+                  </form>
+                </Form>
+              </Card>
             )}
           </>
         )}
