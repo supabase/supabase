@@ -153,7 +153,7 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
       {
         id: 'run-view-database-backups',
         name: 'View your backups',
-        route: `/project/${ref}/database/backup/scheduled`,
+        route: `/project/${ref}/database/backups/scheduled`,
         icon: () => <Database />,
       },
       {
