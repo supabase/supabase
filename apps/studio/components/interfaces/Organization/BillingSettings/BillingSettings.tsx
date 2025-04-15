@@ -1,6 +1,15 @@
-import { ScaffoldContainer, ScaffoldContainerLegacy, ScaffoldDivider, ScaffoldTitle } from 'components/layouts/Scaffold'
+import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import {
+  ScaffoldContainer,
+  ScaffoldContainerLegacy,
+  ScaffoldDivider,
+  ScaffoldTitle,
+} from 'components/layouts/Scaffold'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { cn } from 'ui'
 import { useOrgSubscriptionQuery } from '../../../../data/subscriptions/org-subscription-query'
+import InvoicesSection from '../InvoicesSettings/InvoicesSection'
 import BillingAddress from './BillingAddress/BillingAddress'
 import BillingBreakdown from './BillingBreakdown/BillingBreakdown'
 import BillingEmail from './BillingEmail'
@@ -9,9 +18,6 @@ import CreditBalance from './CreditBalance'
 import PaymentMethods from './PaymentMethods/PaymentMethods'
 import Subscription from './Subscription/Subscription'
 import TaxID from './TaxID/TaxID'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import InvoicesSection from '../InvoicesSettings/InvoicesSection'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 const BillingSettings = () => {
   const {
@@ -45,7 +51,7 @@ const BillingSettings = () => {
         </ScaffoldContainerLegacy>
       )}
 
-      <ScaffoldContainer id="subscription">
+      <ScaffoldContainer id="subscription" className={cn(newLayoutPreview && '[&>div]:!pt-0')}>
         <Subscription />
       </ScaffoldContainer>
 
@@ -84,6 +90,8 @@ const BillingSettings = () => {
 
       {isBillingCreditsEnabledOnProfileLevel && (
         <>
+          <ScaffoldDivider />
+
           <ScaffoldContainer id="credits-balance">
             <CreditBalance />
           </ScaffoldContainer>
