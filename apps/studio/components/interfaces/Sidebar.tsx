@@ -489,7 +489,7 @@ const OrganizationLinks = () => {
     {
       label: 'Billing',
       href: `/org/${slug}/billing`,
-      key: 'settings',
+      key: 'billing',
       icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
@@ -511,8 +511,6 @@ const OrganizationLinks = () => {
                 ? activeRoute === undefined
                 : item.key === 'settings'
                   ? router.pathname.includes('/general') ||
-                    router.pathname.includes('/billing') ||
-                    router.pathname.includes('/invoices') ||
                     router.pathname.includes('/apps') ||
                     router.pathname.includes('/audit') ||
                     router.pathname.includes('/documents')
