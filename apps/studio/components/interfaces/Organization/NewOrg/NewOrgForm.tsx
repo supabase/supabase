@@ -92,6 +92,8 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const elements = useElements()
   const queryClient = useQueryClient()
 
+  const freeOrgs = (organizations || []).filter((it) => it.plan.id === 'free')
+
   const projectsByOrg = useMemo(() => {
     return _.groupBy(projects || [], 'organization_slug')
   }, [projects])
@@ -230,7 +232,9 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
       return toast.error('Organization name is empty')
     }
 
-    if (projects && projects.length > 1 && formState.plan !== 'FREE') {
+    const hasFreeOrgWithProjects = freeOrgs.some((it) => projectsByOrg[it.slug]?.length > 0)
+
+    if (hasFreeOrgWithProjects && formState.plan !== 'FREE') {
       setIsOrgCreationConfirmationModalVisible(true)
     } else {
       await handleSubmit()
@@ -524,7 +528,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         </p>
 
         <ul className="mt-4 space-y-6">
-          {(organizations || [])
+          {freeOrgs
             .filter((it) => projectsByOrg[it.slug]?.length > 0)
             .map((org) => {
               const orgProjects = projectsByOrg[org.slug].map((it) => it.name)

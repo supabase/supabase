@@ -83,6 +83,9 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
+import { components } from 'api-types'
 
 const sizes: DesiredInstanceSize[] = [
   'micro',
@@ -133,6 +136,8 @@ export type CreateProjectForm = z.infer<typeof FormSchema>
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug, projectName } = useParams()
+  const currentOrg = useSelectedOrganization()
+  const isFreePlan = currentOrg?.plan?.id === 'free'
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -140,8 +145,14 @@ const Wizard: NextPageWithLayout = () => {
   const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
   const allowOrioleDB = useFlag('allowOrioleDb')
-  const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
-    useFreeProjectLimitCheckQuery({ slug })
+  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
+    { slug },
+    { enabled: isFreePlan }
+  )
+
+  const { data: approvedOAuthApps } = useAuthorizedAppsQuery({ slug }, { enabled: !isFreePlan })
+
+  const hasOAuthApps = approvedOAuthApps && approvedOAuthApps.length > 0
 
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
@@ -150,14 +161,11 @@ const Wizard: NextPageWithLayout = () => {
     useState(false)
 
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
-  const currentOrg = organizations?.find((o: any) => o.slug === slug)
 
   const isNotOnTeamOrEnterprisePlan = useMemo(
     () => !['team', 'enterprise'].includes(currentOrg?.plan.id ?? ''),
     [currentOrg]
   )
-
-  const isFreePlan = currentOrg?.plan?.id === 'free'
 
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
     enabled: isNotOnTeamOrEnterprisePlan,
@@ -168,7 +176,34 @@ const Wizard: NextPageWithLayout = () => {
   )
   const hasOutstandingInvoices = overdueInvoices.length > 0 && isNotOnTeamOrEnterprisePlan
 
-  const { data: allProjects } = useProjectsQuery({})
+  const {
+    mutate: createProject,
+    isLoading: isCreatingNewProject,
+    isSuccess: isSuccessNewProject,
+  } = useProjectCreateMutation({
+    onSuccess: (res) => {
+      sendEvent({
+        action: 'project_creation_simple_version_submitted',
+        properties: {
+          instanceSize: form.getValues('instanceSize'),
+        },
+      })
+      router.push(`/project/${res.ref}/building`)
+    },
+  })
+
+  const { data: allProjectsFromApi } = useProjectsQuery()
+  const [allProjects, setAllProjects] = useState<
+    components['schemas']['ProjectInfo'][] | undefined
+  >(undefined)
+
+  useEffect(() => {
+    // Only set once to ensure compute credits dont change while project is being created
+    if (allProjectsFromApi && !allProjects) {
+      setAllProjects(allProjectsFromApi)
+    }
+  }, [allProjectsFromApi, allProjects, setAllProjects])
+
   const organizationProjects =
     allProjects?.filter(
       (project) =>
@@ -186,22 +221,6 @@ const Wizard: NextPageWithLayout = () => {
       retry: false,
     }
   )
-
-  const {
-    mutate: createProject,
-    isLoading: isCreatingNewProject,
-    isSuccess: isSuccessNewProject,
-  } = useProjectCreateMutation({
-    onSuccess: (res) => {
-      sendEvent({
-        action: 'project_creation_simple_version_submitted',
-        properties: {
-          instanceSize: form.getValues('instanceSize'),
-        },
-      })
-      router.push(`/project/${res.ref}/building`)
-    },
-  })
 
   const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
   const isInvalidSlug = isOrganizationsSuccess && currentOrg === undefined
@@ -263,11 +282,14 @@ const Wizard: NextPageWithLayout = () => {
 
   const { instanceSize, cloudProvider, dbRegion, organization } = form.watch()
 
-  const availableOrioleVersion = useAvailableOrioleImageVersion({
-    cloudProvider: cloudProvider as CloudProvider,
-    dbRegion,
-    organizationSlug: organization,
-  })
+  const availableOrioleVersion = useAvailableOrioleImageVersion(
+    {
+      cloudProvider: cloudProvider as CloudProvider,
+      dbRegion,
+      organizationSlug: organization,
+    },
+    { enabled: currentOrg != null && !isManagedByVercel }
+  )
 
   // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
   const monthlyComputeCosts =
@@ -289,10 +311,10 @@ const Wizard: NextPageWithLayout = () => {
   }
 
   const onSubmitWithComputeCostsConfirmation = async (values: z.infer<typeof FormSchema>) => {
-    if (
+    const launchingLargerInstance =
       values.instanceSize &&
       !sizesWithNoCostConfirmationRequired.includes(values.instanceSize as DesiredInstanceSize)
-    ) {
+    if (additionalMonthlySpend > 0 && (hasOAuthApps || launchingLargerInstance)) {
       sendEvent({
         action: 'project_creation_simple_version_confirm_modal_opened',
         properties: {
@@ -402,7 +424,7 @@ const Wizard: NextPageWithLayout = () => {
     <Form_Shadcn_ {...form}>
       <form onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation)}>
         <Panel
-          loading={!isOrganizationsSuccess || isLoadingFreeProjectLimitCheck}
+          loading={!isOrganizationsSuccess}
           title={
             <div key="panel-title">
               <h3>Create a new project</h3>
@@ -415,35 +437,16 @@ const Wizard: NextPageWithLayout = () => {
             </div>
           }
           footer={
-            <div key="panel-footer" className="grid grid-cols-12 w-full gap-4">
+            <div key="panel-footer" className="grid grid-cols-12 w-full gap-4 items-center">
               <div className="col-span-4">
-                <Button
-                  type="default"
-                  disabled={isCreatingNewProject || isSuccessNewProject}
-                  onClick={() => router.push('/projects')}
-                >
-                  Cancel
-                </Button>
-              </div>
-              <div className="flex justify-between items-center col-span-8 space-x-6">
-                <div>
-                  {!isFreePlan && (
-                    <div className="flex justify-between mr-2 text-sm space-x-2">
-                      <span>Additional Monthly Costs</span>
-                      <div className="text-brand flex gap-1 items-center">
-                        {organizationProjects.length > 0 ? (
-                          <>
-                            <span>${additionalMonthlySpend}</span>
-                          </>
-                        ) : (
-                          <>
-                            <span className="text-foreground-lighter line-through">
-                              $
-                              {instanceSizeSpecs[instanceSize as DesiredInstanceSize]!.priceMonthly}
-                            </span>
-                            <span>${additionalMonthlySpend}</span>
-                          </>
-                        )}
+                {!isFreePlan &&
+                  !projectCreationDisabled &&
+                  canCreateProject &&
+                  additionalMonthlySpend > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span>Additional Costs</span>
+                      <div className="text-brand flex gap-1 items-center font-mono font-medium">
+                        <span>${additionalMonthlySpend}/m</span>
                         <InfoTooltip side="top" className="max-w-[450px] p-0">
                           <div className="p-4 text-sm text-foreground-light space-y-1">
                             <p>
@@ -543,8 +546,16 @@ const Wizard: NextPageWithLayout = () => {
                       </div>
                     </div>
                   )}
-                </div>
+              </div>
 
+              <div className="flex items-end col-span-8 space-x-2 ml-auto">
+                <Button
+                  type="default"
+                  disabled={isCreatingNewProject || isSuccessNewProject}
+                  onClick={() => router.push('/projects')}
+                >
+                  Cancel
+                </Button>
                 <Button
                   htmlType="submit"
                   loading={isCreatingNewProject || isSuccessNewProject}
@@ -585,9 +596,14 @@ const Wizard: NextPageWithLayout = () => {
                             </FormControl_Shadcn_>
                             <SelectContent_Shadcn_>
                               <SelectGroup_Shadcn_>
-                                {organizations?.map((x: any) => (
-                                  <SelectItem_Shadcn_ key={x.id} value={x.slug}>
-                                    {x.name}
+                                {organizations?.map((x) => (
+                                  <SelectItem_Shadcn_
+                                    key={x.id}
+                                    value={x.slug}
+                                    className="flex justify-between"
+                                  >
+                                    <span className="mr-2">{x.name}</span>
+                                    <Badge>{x.plan.name}</Badge>
                                   </SelectItem_Shadcn_>
                                 ))}
                               </SelectGroup_Shadcn_>
@@ -597,7 +613,6 @@ const Wizard: NextPageWithLayout = () => {
                       </FormItemLayout>
                     )}
                   />
-
                   {!isAdmin && <NotOrganizationOwnerWarning />}
                 </Panel.Content>
 
@@ -934,11 +949,21 @@ const Wizard: NextPageWithLayout = () => {
           }}
           variant={'warning'}
         >
-          <p className="text-sm text-foreground-light">
-            Launching a project on compute size "{instanceLabel(instanceSize)}" increases your
-            monthly compute costs by ${additionalMonthlySpend}. By clicking "Confirm", you agree to
-            the additional costs and the project creation starts.
-          </p>
+          <div className="text-sm text-foreground-light space-y-1">
+            <p>
+              Launching a project on compute size "{instanceLabel(instanceSize)}" increases your
+              monthly costs by ${additionalMonthlySpend}, independent of how actively you use it. By
+              clicking "Confirm", you agree to the additional costs.{' '}
+              <Link
+                href="/docs/guides/platform/manage-your-usage/compute"
+                target="_blank"
+                className="underline"
+              >
+                Compute Costs
+              </Link>{' '}
+              are non-refundable.
+            </p>
+          </div>
         </ConfirmationModal>
       </form>
     </Form_Shadcn_>
