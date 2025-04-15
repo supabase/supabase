@@ -18,7 +18,7 @@ description: Social authentication block for React Router
 
 ## Folder structure
 
-This block includes the [Supabase client](/ui/docs/react-router/client). When installing, you can skip overwriting it.
+This block includes the [Supabase client](/ui/docs/react/client).If you already have one installed, you can skip overwriting it.
 
 <RegistryBlock itemName="social-auth-react-router" />
 
@@ -42,12 +42,13 @@ VITE_SUPABASE_ANON_KEY=
 ### Setting up third party providers
 
 We support a wide variety of social providers that you can use to integrate with your application. The full list is available [here](https://supabase.com/docs/guides/auth/social-login).
-The block is using PKCE flow and Github as a provider, but you could easily change it by changing the `provider` field in `supabase.auth.signInWithOAuth` call.
+This block uses the PKCE flow with GitHub as the provider. To switch providers, just update the `provider` field in the `supabase.auth.signInWithOAuth` call.
 
 ### Setting up routes and redirect URLs
 
 1. Set the site URL in the [URL Configuration](https://supabase.com/dashboard/project/_/auth/url-configuration) settings in the Supabase Dashboard.
-1. Update the redirect paths in the `login.tsx` components to point to the logged-in routes in your app.
+1. Update the redirect paths in `login-form.tsx` to point to your app’s logged-in routes. Our examples use `/protected`, but you can set this to whatever fits your app.
+1. Visit `http://your-site-url/login` to see this component in action.
 
 ### Combining social auth with password-based auth
 

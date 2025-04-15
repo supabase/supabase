@@ -28,6 +28,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       })
 
       if (error) throw error
+      location.href = '/protected'
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
       setIsLoading(false)
