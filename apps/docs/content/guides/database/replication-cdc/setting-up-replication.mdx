@@ -1,0 +1,84 @@
+---
+id: 'setting-up-replication'
+title: 'Setting up replication and CDC with Supabase'
+description: 'Performing Extract Transform Load (ETL) with Supabase'
+sidebar_label: 'Setting up replication and CDC'
+---
+
+## Prerequisites
+
+To set up replication, the following is recommended:
+- Instance size of XL or greater
+- [IPv4 addon](/guides/platform/ipv4-address) enabled
+
+To create a replication slot, you will need to use the `postgres` user and follow the instructions in our [guide](/guides/database/postgres/setup-replication-external).
+
+If you are replicating to an external system and using any of the tools below, check their documentation first and we have added additional information where the setup with Supabase can vary.
+
+<Tabs defaultValue="estuary">
+
+<TabsList>
+  <TabsTrigger value="estuary">Estuary</TabsTrigger>
+  <TabsTrigger value="fivetran">Fivetran</TabsTrigger>
+  <TabsTrigger value="airbyte">Airbyte</TabsTrigger>
+  <TabsTrigger value="materialize">Materialize</TabsTrigger>
+  <TabsTrigger value="stitch">Stitch</TabsTrigger>
+</TabsList>
+
+<TabsContent value="airbyte">
+
+Airbyte has the following [documentation](https://docs.airbyte.com/integrations/sources/postgres/) for setting up Postgresql as a source, either in their cloud offering or by self-hosting.
+
+You can follow those steps with the following modifications:
+
+1. Use the `postgres` user
+2. Select `logical replication` as the replication method (`xmin` is possible, but not recommended)
+
+## Troubleshootting
+
+Airbyte has a known [issue](https://discuss.airbyte.io/t/postgres-source-replication-slot-safe-wal-size-only-reset-when-a-change-occurs/3263/7) where it does not clear WAL files on each successful sync. The recommended workaround is to have a `heartbeat` table that you write changes to once an hour.>
+
+</TabsContent>
+
+<TabsContent value="estuary">
+Estuary has the following [documentation](https://docs.estuary.dev/reference/Connectors/capture-connectors/PostgreSQL/Supabase/) for setting up Postgresql as a source.
+
+
+
+</TabsContent>
+
+<TabsContent value="fivetran">
+
+Fivetran has the following [documentation](https://fivetran.com/docs/connectors/databases/postgresql/setup-guide) for setting up Postgresql as a source.
+
+You can follow those steps with the following modifications:
+
+1. In Step 2, choose `logical replication` as the sync mechanism
+2. In Step 3, do not create a user and use the existing `postgres` user for replication 
+3. In Step 5, no need to modify any WAL settings as we have done that for you
+
+</TabsContent>
+
+<TabsContent value="materialize">
+
+Materialize has the following [documentation](https://materialize.com/docs/sql/create-source/postgres/) on setting up Postgresql as a source.
+
+You can follow those steps with the following modifications:
+
+1. Follow the steps in our [guide](/guides/database/postgres/setup-replication-external) to create a publication slot
+
+</TabsContent>
+
+<TabsContent value="stitch">
+
+Stitch has the following [documentation](https://www.stitchdata.com/docs/integrations/databases/postgresql/v2#extract-data) on configuring Postgresql as a source.
+
+You can follow those steps with the following modifications:
+
+1. Use the `postgres` user for replication
+2. Skip step 3
+
+
+</TabsContent>
+
+</Tabs>
