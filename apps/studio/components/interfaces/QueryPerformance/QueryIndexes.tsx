@@ -9,6 +9,8 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useGetIndexAdvisorResult } from 'data/database/retrieve-index-advisor-result-query'
 import { useGetIndexesFromSelectQuery } from 'data/database/retrieve-index-from-select-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { isQueryEligibleForIndexAdvisor } from 'lib/database/index-advisor'
+import { useIsIndexAdvisorAvailable } from 'hooks/misc/useIsIndexAdvisorAvailable'
 import {
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
@@ -57,13 +59,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
     connectionString: project?.connectionString,
   })
 
-  const hypopgExtension = (extensions ?? []).find((ext) => ext.name === 'hypopg')
-  const indexAdvisorExtension = (extensions ?? []).find((ext) => ext.name === 'index_advisor')
-  const isIndexAdvisorAvailable =
-    indexAdvisorExtension !== undefined &&
-    indexAdvisorExtension.installed_version !== null &&
-    hypopgExtension !== undefined &&
-    hypopgExtension.installed_version !== null
+  const isAdvisorAvailable = useIsIndexAdvisorAvailable()
 
   const {
     data: indexAdvisorResult,
@@ -78,7 +74,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
       connectionString: project?.connectionString,
       query: selectedRow?.['query'],
     },
-    { enabled: isIndexAdvisorAvailable }
+    { enabled: isAdvisorAvailable }
   )
 
   const {
@@ -170,7 +166,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
           <p className="text-sm">New index recommendations</p>
           {isLoadingExtensions ? (
             <GenericSkeletonLoader />
-          ) : !isIndexAdvisorAvailable ? (
+          ) : !isAdvisorAvailable ? (
             <IndexAdvisorDisabledState />
           ) : (
             <>
@@ -241,7 +237,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
             </>
           )}
         </div>
-        {isIndexAdvisorAvailable && hasIndexRecommendation && (
+        {isAdvisorAvailable && hasIndexRecommendation && (
           <>
             <div className="flex flex-col gap-y-2">
               <p className="text-sm">Query costs</p>
@@ -306,7 +302,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
         )}
       </QueryPanelSection>
 
-      {isIndexAdvisorAvailable && hasIndexRecommendation && (
+      {isAdvisorAvailable && hasIndexRecommendation && (
         <div className="bg-studio sticky bottom-0 border-t py-3 flex items-center justify-between px-5">
           <div className="flex flex-col gap-y-1 text-sm">
             <span>Apply index to database</span>

@@ -319,7 +319,7 @@ limit 12
     queries: {
       mostFrequentlyInvoked: {
         queryType: 'db',
-        sql: (_params, where, orderBy) => `
+        sql: (_params, where, orderBy, runIndexAdvisor = false) => `
 -- Most frequently called queries
 set search_path to public, extensions;
 
@@ -337,16 +337,25 @@ select
     -- min_time,
     -- max_time,
     -- mean_time,
-    statements.rows / statements.calls as avg_rows
+    statements.rows / statements.calls as avg_rows${
+      runIndexAdvisor
+        ? `,
+    case 
+      when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
+      then (select array_length(index_statements, 1) > 0 from index_advisor(statements.query))
+      else false
+    end as has_index_suggestion`
+        : ''
+    }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
   ${where || ''}
   ${orderBy || 'order by statements.calls desc'}
-  limit 20;`,
+  limit 20`,
       },
       mostTimeConsuming: {
         queryType: 'db',
-        sql: (_, where, orderBy) => `
+        sql: (_, where, orderBy, runIndexAdvisor = false) => `
 -- Most time consuming queries
 set search_path to public, extensions;
 
@@ -355,12 +364,21 @@ select
     statements.query,
     statements.calls,
     statements.total_exec_time + statements.total_plan_time as total_time,
-    to_char(((statements.total_exec_time + statements.total_plan_time)/sum(statements.total_exec_time + statements.total_plan_time) OVER()) * 100, 'FM90D0') || '%'  AS prop_total_time
+    to_char(((statements.total_exec_time + statements.total_plan_time)/sum(statements.total_exec_time + statements.total_plan_time) OVER()) * 100, 'FM90D0') || '%'  AS prop_total_time${
+      runIndexAdvisor
+        ? `,
+    case 
+      when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
+      then (select array_length(index_statements, 1) > 0 from index_advisor(statements.query))
+      else false
+    end as has_index_suggestion`
+        : ''
+    }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
   ${where || ''}
   ${orderBy || 'order by total_time desc'}
-  limit 20;`,
+  limit 20`,
       },
       slowestExecutionTime: {
         queryType: 'db',

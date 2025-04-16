@@ -43,6 +43,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     orderBy,
     preset,
     roles: typeof roles === 'string' ? [roles] : roles,
+    runIndexAdvisor: true,
   })
 
   return (
