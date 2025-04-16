@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
-import { ChevronRight, ExternalLink, Loader2, Mail, Plus, X } from 'lucide-react'
+import { Book, ChevronRight, ExternalLink, Mail, Plus, X, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -27,7 +27,6 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
-  ScrollArea,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -41,7 +40,6 @@ import {
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
-import { DocsLinkGroup } from './DocsLink'
 import { IPV4SuggestionAlert } from './IPV4SuggestionAlert'
 import { LibrarySuggestions } from './LibrarySuggestions'
 import { PlanExpectationInfoBox } from './PlanExpectationInfoBox'
@@ -517,17 +515,46 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
             )}
           />
 
-          {docsResults.length > 0 && hasResults && (
-            <div className="pt-4 px-4 border rounded-md">
-              <h2 className="text-sm text-foreground-light px-2 mb-4">
-                Suggested resources ({Math.min(docsResults.length, 5)})
-              </h2>
-              <ScrollArea className={docsResults.length > 3 ? 'h-[300px]' : ''}>
-                {docsResults.slice(0, 5).map((page, i) => (
-                  <DocsLinkGroup key={`${page.id}-group`} page={page} />
-                ))}
-              </ScrollArea>
+          {searchState.status === 'loading' && docsResults.length === 0 && (
+            <div className="flex items-center gap-2 text-sm text-foreground-light">
+              <Loader2 className="animate-spin" size={14} />
+              <span>Searching for relevant resources...</span>
             </div>
+          )}
+
+          {docsResults.length > 0 && hasResults && (
+            <>
+              <div className="flex items-center gap-2">
+                <h5 className="text-sm text-foreground-lighter">AI Suggested resources</h5>
+                {searchState.status === 'loading' && (
+                  <div className="flex items-center gap-2 text-xs text-foreground-light">
+                    <Loader2 className="animate-spin" size={12} />
+                    <span>Updating results...</span>
+                  </div>
+                )}
+              </div>
+
+              <ul
+                className={cn(
+                  'flex flex-col gap-y-0.5 transition-opacity duration-200',
+                  searchState.status === 'loading' ? 'opacity-50' : 'opacity-100'
+                )}
+              >
+                {docsResults.slice(0, 5).map((page, i) => (
+                  <li key={page.id} className="flex items-center gap-x-1">
+                    <Book size={16} className="text-foreground-muted" />
+                    <a
+                      href={page.path}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm text-foreground-light hover:text-foreground transition"
+                    >
+                      {page.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </>
           )}
         </div>
 
