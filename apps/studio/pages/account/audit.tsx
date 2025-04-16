@@ -1,5 +1,5 @@
 import { AuditLogs } from 'components/interfaces/Account'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -14,7 +14,7 @@ import type { NextPageWithLayout } from 'types'
 import { cn } from 'ui'
 
 const Audit: NextPageWithLayout = () => {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
 
   return (
     <ScaffoldContainer className={cn(newLayoutPreview ? '[&>div]:mt-8' : '')}>

@@ -3,10 +3,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { IS_PLATFORM, useParams } from 'common'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
 import {
@@ -40,7 +39,7 @@ const HomePageActions = ({
   setSearch,
   setFilterStatus,
 }: HomePageActionsProps) => {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
 
   const router = useRouter()
   const { slug } = useParams()
