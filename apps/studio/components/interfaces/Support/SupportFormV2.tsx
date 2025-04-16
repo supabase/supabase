@@ -1,16 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
-import {
-  Check,
-  ChevronRight,
-  CircleUserRound,
-  ExternalLink,
-  Loader2,
-  Mail,
-  Plus,
-  SquareUserRound,
-  X,
-} from 'lucide-react'
+import { ChevronRight, ExternalLink, Mail, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -27,7 +17,6 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import {
-  AiIconAnimation,
   Badge,
   Button,
   cn,
@@ -767,7 +756,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
           </>
         )}
 
-        <div className={cn(CONTAINER_CLASSES, 'flex flex-col items-end gap-3 -mt-4')}>
+        <div className={cn(CONTAINER_CLASSES, 'flex flex-col items-end gap-3')}>
           <Button
             htmlType="submit"
             size="large"
