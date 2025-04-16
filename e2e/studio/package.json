@@ -1,0 +1,20 @@
+{
+  "name": "studio",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:staging": "TEST_ENV=staging playwright test",
+    "test:e2e:prod": "TEST_ENV=production playwright test",
+    "test:e2e:preview": "TEST_ENV=preview playwright test",
+    "test:e2e:selfhosted": "TEST_ENV=self-hosted playwright test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@playwright/test": "^1.51.1",
+    "dotenv": "^16.5.0"
+  }
+}
