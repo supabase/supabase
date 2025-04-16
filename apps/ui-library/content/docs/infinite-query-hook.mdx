@@ -21,9 +21,9 @@ description: React hook for infinite lists, fetching data from Supabase.
 The Infinite Query Hook provides a single React hook which will make it easier to load data progressively from your Supabase database. It handles data fetching and pagination state, It is meant to be used with infinite lists or tables.
 The hook is fully typed, provided you have generated and setup your database types.
 
-## Usage
+## Adding types
 
-Before using this hook, we **highly** recommend you setup database types in your project. This will make the hook fully-typesafe. More info about generating Typescript types from database schema [here](https://supabase.com/docs/reference/javascript/typescript-support)
+Before using this hook, we **highly** recommend you setup database types in your project. This will make the hook fully-typesafe. More info about generating Typescript types from database schema [here](https://supabase.com/docs/guides/api/rest/generating-types)
 
 ## Props
 
@@ -49,13 +49,13 @@ data, count, isSuccess, isLoading, isFetching, error, hasMore, fetchNextPage
 | `hasMore`       | `boolean`     | Whether the query has finished fetching all items from the database                 |
 | `fetchNextPage` | `() => void`  | Sends a new request for the next items                                              |
 
-## Type-safety
+## Type safety
 
 The hook will use the typed defined on your Supabase client if they're setup ([more info](https://supabase.com/docs/reference/javascript/typescript-support)).
 
 The hook also supports an custom defined result type by using `useInfiniteQuery<T>`. For example, if you have a custom type for `Product`, you can use it like this `useInfiniteQuery<Product>`.
 
-## Examples
+## Usage
 
 ### With sorting
 
@@ -78,6 +78,8 @@ return (
 ```
 
 ### With filtering on search params
+
+This example will filter based on a search param like `example.com/?q=hello`.
 
 ```tsx
 const params = useSearchParams()
@@ -212,6 +214,48 @@ export function InfiniteList<TableName extends SupabaseTableName>({
 
         {!hasMore && data.length > 0 && renderEndMessage()}
       </div>
+    </div>
+  )
+}
+```
+
+Then you can use it like this:
+
+```tsx
+type Channel = Database['public']['Tables']['channels']['Row']
+
+// Define how each item should be rendered
+const renderChannelItem = (channel: Channel) => {
+  return (
+    <div
+      key={channel.id}
+      className="border-b py-3 px-4 hover:bg-muted flex items-center justify-between"
+    >
+      <div>
+        <span className="font-medium text-sm text-foreground">
+          {channel.slug} (ID: {channel.id})
+        </span>
+        <div className="text-sm text-foreground-light">
+          {new Date(channel.inserted_at).toLocaleDateString()}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const orderByInsertedAt: SupabaseQueryHandler<'channels'> = (query) => {
+  return query.order('inserted_at', { ascending: false })
+}
+
+const InfiniteListDemo = () => {
+  return (
+    <div className="bg-surface-100 h-[600px]">
+      <InfiniteList
+        tableName="channels"
+        renderItem={renderChannelItem}
+        pageSize={3}
+        trailingQuery={orderByInsertedAt}
+      />
     </div>
   )
 }
