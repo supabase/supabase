@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
-import { Book, ChevronRight, ExternalLink, Loader2, Mail, Plus, X } from 'lucide-react'
+import { Book, ChevronRight, ExternalLink, Github, Loader2, Mail, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -518,19 +518,29 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                   searchState.status === 'loading' ? 'opacity-50' : 'opacity-100'
                 )}
               >
-                {docsResults.slice(0, 5).map((page, i) => (
-                  <li key={page.id} className="flex items-center gap-x-1">
-                    <Book size={16} className="text-foreground-muted" />
-                    <a
-                      href={`https://supabase.com/docs${page.path}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-sm text-foreground-light hover:text-foreground transition"
-                    >
-                      {page.title}
-                    </a>
-                  </li>
-                ))}
+                {docsResults.slice(0, 5).map((page, i) => {
+                  return (
+                    <li key={page.id} className="flex items-center gap-x-1">
+                      {page.type === 'github-discussions' ? (
+                        <Github size={16} className="text-foreground-muted" />
+                      ) : (
+                        <Book size={16} className="text-foreground-muted" />
+                      )}
+                      <a
+                        href={
+                          page.type === 'github-discussions'
+                            ? page.path
+                            : `https://supabase.com/docs${page.path}`
+                        }
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sm text-foreground-light hover:text-foreground transition"
+                      >
+                        {page.title}
+                      </a>
+                    </li>
+                  )
+                })}
               </ul>
             </>
           )}
