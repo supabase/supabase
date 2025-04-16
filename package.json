@@ -38,6 +38,7 @@
   "devDependencies": {
     "@types/node": "catalog:",
     "eslint": "^8.57.0",
+    "knip": "^5.50.4",
     "prettier": "3.2.4",
     "prettier-plugin-sql-cst": "^0.11.0",
     "rimraf": "^6.0.0",
