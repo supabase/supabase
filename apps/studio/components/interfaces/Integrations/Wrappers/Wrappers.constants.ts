@@ -2875,7 +2875,7 @@ export const WRAPPERS: WrapperMeta[] = [
           { name: 'domain', type: 'text' },
           { name: 'active', type: 'boolean' },
           { name: 'provider', type: 'text' },
-          { name: 'user_count', type: 'integer' },
+          { name: 'user_count', type: 'bigint' },
           { name: 'created_at', type: 'timestamp' },
           { name: 'updated_at', type: 'timestamp' },
           { name: 'attrs', type: 'jsonb' },
@@ -3078,7 +3078,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'SlackFdw',
     label: 'Slack',
     docsUrl: 'https://fdw.dev/catalog/slack/',
-    minimumExtensionVersion: '0.1.0',
+    minimumExtensionVersion: '0.4.0',
     server: {
       options: [
         {
@@ -3328,7 +3328,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'Cfd1Fdw',
     label: 'Cloudflare D1',
     docsUrl: 'https://fdw.dev/catalog/cfd1/',
-    minimumExtensionVersion: '0.1.0',
+    minimumExtensionVersion: '0.4.0',
     server: {
       options: [
         {
@@ -3402,7 +3402,7 @@ export const WRAPPERS: WrapperMeta[] = [
     },
     tables: [
       {
-        label: 'Databases',
+        label: 'D1 Databases',
         description: 'D1 databases in your Cloudflare account',
         availableColumns: [
           { name: 'uuid', type: 'text' },
@@ -3457,15 +3457,14 @@ export const WRAPPERS: WrapperMeta[] = [
   },
   {
     name: 'hubspot_wrapper',
-    description:
-      'Query and sync HubSpot CRM data (companies, contacts, deals, tickets, and more) with Postgres using the Wasm FDW.',
+    description: 'Query and sync HubSpot CRM data using the Wasm FDW.',
     handlerName: WRAPPER_HANDLERS.HUBSPOT,
     validatorName: 'wasm_fdw_validator',
     icon: `${BASE_PATH}/img/icons/hubspot-icon.svg`,
     extensionName: 'HubspotFdw',
     label: 'HubSpot',
     docsUrl: 'https://fdw.dev/catalog/hubspot/',
-    minimumExtensionVersion: '0.1.0',
+    minimumExtensionVersion: '0.4.0',
     server: {
       options: [
         {
@@ -3677,6 +3676,44 @@ export const WRAPPERS: WrapperMeta[] = [
           {
             name: 'object',
             defaultValue: 'objects/feedback_submissions',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Goals',
+        description: 'User-specific quotas for sales and services teams',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'objects/goal_targets',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Partner Clients',
+        description: 'Customers that Solutions Partners have a sold or managed relationship with',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'objects/partner_clients',
             editable: false,
             required: true,
             type: 'text',
