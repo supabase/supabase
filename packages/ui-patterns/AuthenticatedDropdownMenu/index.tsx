@@ -96,7 +96,7 @@ export const AuthenticatedDropdownMenu = ({ user, menu, site }: Props) => {
                   return (
                     <DropdownMenuItem
                       key={`${site}-auth-dropdown-${sectionItem.label}-${sectionIdx}-${itemIdx}`}
-                      className="space-x-2"
+                      className="space-x-2 hover:cursor-pointer"
                       onClick={sectionItem.onClick!}
                       {...sectionItem.otherProps}
                     >
@@ -125,6 +125,7 @@ export const AuthenticatedDropdownMenu = ({ user, menu, site }: Props) => {
                             <DropdownMenuRadioItem
                               key={`${site}-auth-dropdown-theme-${theme.value}`}
                               value={theme.value}
+                              className="hover:cursor-pointer"
                             >
                               {theme.name}
                             </DropdownMenuRadioItem>
@@ -140,7 +141,10 @@ export const AuthenticatedDropdownMenu = ({ user, menu, site }: Props) => {
                       href={sectionItem.href!}
                       {...sectionItem.otherProps}
                     >
-                      <DropdownMenuItem className="space-x-2" onClick={() => {}}>
+                      <DropdownMenuItem
+                        className="space-x-2 hover:cursor-pointer"
+                        onClick={() => {}}
+                      >
                         <DropdownItemContent {...sectionItem} />
                       </DropdownMenuItem>
                     </Link>
