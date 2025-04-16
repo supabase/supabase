@@ -1,7 +1,7 @@
 'use client'
 
 import type { User } from '@supabase/supabase-js'
-import { LogOut, Globe, LifeBuoy, Settings, UserIcon } from 'lucide-react'
+import { LogOut, Globe, LifeBuoy, Settings, UserIcon, Database } from 'lucide-react'
 import { logOut } from 'common'
 
 import type { menuItem } from 'ui-patterns/AuthenticatedDropdownMenu'
@@ -19,6 +19,11 @@ const useDropdownMenu = (user: User | null) => {
         label: 'Account Preferences',
         icon: Settings,
         href: 'https://supabase.com/dashboard/account/me',
+      },
+      {
+        label: 'All Projects',
+        icon: Database,
+        href: 'https://supabase.com/dashboard/projects',
       },
     ],
     [

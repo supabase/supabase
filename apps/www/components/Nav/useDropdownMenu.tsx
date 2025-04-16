@@ -23,7 +23,7 @@ const useDropdownMenu = (user: User | null) => {
         href: 'https://supabase.com/dashboard/account/me',
       },
       {
-        label: 'My Projects',
+        label: 'All Projects',
         icon: Database,
         href: 'https://supabase.com/dashboard/projects',
       },
@@ -32,6 +32,7 @@ const useDropdownMenu = (user: User | null) => {
         icon: Command,
         type: 'button',
         onClick: () => setCommandMenuOpen(true),
+        shortcut: '⌘K',
       },
     ],
     [
