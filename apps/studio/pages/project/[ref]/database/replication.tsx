@@ -5,26 +5,17 @@ import Destinations from 'components/interfaces/Database/Replication/Destination
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useFlag } from 'hooks/ui/useFlag'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
-  const enablePgReplicate = useFlag('enablePgReplicate')
+  // const enablePgReplicate = useFlag('enablePgReplicate')
+  const enablePgReplicate = true
+
   return (
     <>
       {enablePgReplicate ? (
         <ScaffoldContainer>
-          <ScaffoldSection>
-            <div className="col-span-12">
-              <FormHeader
-                title="Database Replication"
-                description="Send data to other destinations"
-              />
-            </div>
-          </ScaffoldSection>
-          <ScaffoldSection>
-            <div className="col-span-12">
-              <Destinations />
-            </div>
-          </ScaffoldSection>
+          <Destinations />
         </ScaffoldContainer>
       ) : (
         <ScaffoldContainer>
@@ -44,7 +35,9 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
 
 DatabaseReplicationPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    <PageLayout title="Database Replication" subtitle="Send data to other destinations">
+      {page}
+    </PageLayout>
   </DefaultLayout>
 )
 

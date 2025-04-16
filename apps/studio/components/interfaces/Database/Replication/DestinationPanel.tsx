@@ -21,9 +21,6 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
   Input_Shadcn_,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -33,6 +30,7 @@ import {
   Separator,
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetSection,
@@ -40,6 +38,9 @@ import {
   Switch,
   TextArea_Shadcn_,
   WarningIcon,
+  Label_Shadcn_ as Label,
+  Card,
+  CardContent,
 } from 'ui'
 import * as z from 'zod'
 import PublicationsComboBox from './PublicationsComboBox'
@@ -48,6 +49,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { useReplicationSinkByIdQuery } from 'data/replication/sink-by-id-query'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 interface DestinationPanelProps {
   visible: boolean
@@ -223,205 +225,235 @@ const DestinationPanel = ({
           <Sheet open={visible} onOpenChange={onClose}>
             <SheetContent showClose={false} size="default">
               <div className="flex flex-col h-full" tabIndex={-1}>
-                <SheetHeader>
-                  <SheetTitle>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div>{editMode ? 'Edit Destination' : 'New Destination'}</div>
-                        <div className="text-xs">
-                          {editMode
-                            ? 'Modify existing destination'
-                            : 'Send data to a new destination'}
-                        </div>
-                      </div>
-                      <div className="flex">
-                        <Switch
-                          checked={enabled}
-                          onCheckedChange={(checked) => {
-                            form.setValue('enabled', checked)
-                          }}
-                        />
-                        <div className="text-sm mx-2">Enable</div>
-                      </div>
-                    </div>
-                  </SheetTitle>
+                <SheetHeader className="flex justify-between items-center">
+                  <div>
+                    <SheetTitle>{editMode ? 'Edit Destination' : 'New Destination'}</SheetTitle>
+                    <SheetDescription>
+                      {editMode ? 'Modify existing destination' : 'Send data to a new destination'}
+                    </SheetDescription>
+                  </div>
+                  <div className="flex">
+                    <Switch
+                      checked={enabled}
+                      onCheckedChange={(checked) => {
+                        form.setValue('enabled', checked)
+                      }}
+                    />
+                    <Label className="text-sm mx-2">Enable</Label>
+                  </div>
                 </SheetHeader>
                 <SheetSection className="flex-grow overflow-auto">
                   <Form_Shadcn_ {...form}>
-                    <form
-                      id={formId}
-                      onSubmit={form.handleSubmit(onSubmit)}
-                      className="flex flex-col gap-y-4"
-                    >
-                      <p>Where to send</p>
-                      <FormField_Shadcn_
-                        name="type"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                            <FormLabel_Shadcn_>Type</FormLabel_Shadcn_>
-                            <FormControl_Shadcn_>
-                              <Select_Shadcn_ value={field.value}>
-                                <SelectTrigger_Shadcn_>{field.value}</SelectTrigger_Shadcn_>
-                                <SelectContent_Shadcn_>
-                                  <SelectGroup_Shadcn_>
-                                    <SelectItem_Shadcn_ value="BigQuery">
-                                      BigQuery
-                                    </SelectItem_Shadcn_>
-                                  </SelectGroup_Shadcn_>
-                                </SelectContent_Shadcn_>
-                              </Select_Shadcn_>
-                            </FormControl_Shadcn_>
-                            <FormMessage_Shadcn_ />
-                          </FormItem_Shadcn_>
-                        )}
-                      ></FormField_Shadcn_>
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                            <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
-                            <FormControl_Shadcn_>
-                              <Input_Shadcn_ {...field} placeholder="Name" />
-                            </FormControl_Shadcn_>
-                            <FormMessage_Shadcn_ />
-                          </FormItem_Shadcn_>
-                        )}
-                      />
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="projectId"
-                        render={({ field }) => (
-                          <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                            <FormLabel_Shadcn_>Project Id</FormLabel_Shadcn_>
-                            <FormControl_Shadcn_>
-                              <Input_Shadcn_ {...field} placeholder="Project id" />
-                            </FormControl_Shadcn_>
-                            <FormMessage_Shadcn_ />
-                          </FormItem_Shadcn_>
-                        )}
-                      />
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="datasetId"
-                        render={({ field }) => (
-                          <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                            <FormLabel_Shadcn_>Dataset Id</FormLabel_Shadcn_>
-                            <FormControl_Shadcn_>
-                              <Input_Shadcn_ {...field} placeholder="Dataset id" />
-                            </FormControl_Shadcn_>
-                            <FormMessage_Shadcn_ />
-                          </FormItem_Shadcn_>
-                        )}
-                      />
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="serviceAccountKey"
-                        render={({ field }) => (
-                          <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                            <FormLabel_Shadcn_>Service Account Key</FormLabel_Shadcn_>
-                            <FormControl_Shadcn_>
-                              <TextArea_Shadcn_
-                                {...field}
-                                rows={4}
-                                maxLength={5000}
-                                placeholder="Service account key"
-                              />
-                            </FormControl_Shadcn_>
-                            <FormMessage_Shadcn_ />
-                          </FormItem_Shadcn_>
-                        )}
-                      />
-                      <Separator className="mt-3" />
-                      <p>What to send</p>
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="publicationName"
-                        render={({ field }) => (
-                          <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                            <FormLabel_Shadcn_>Publication</FormLabel_Shadcn_>
-                            <FormControl_Shadcn_>
-                              <PublicationsComboBox
-                                publications={publications?.map((pub) => pub.name) || []}
-                                loading={loadingPublications}
-                                field={field}
-                                onNewPublicationClick={() => setPublicationPanelVisible(true)}
-                              />
-                            </FormControl_Shadcn_>
-                            <FormMessage_Shadcn_ />
-                          </FormItem_Shadcn_>
-                        )}
-                      />
-                      <Separator className="mt-3" />
+                    <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+                      <h3>What data to send</h3>
+
+                      <Card className="mb-8 mt-4">
+                        <CardContent>
+                          <FormField_Shadcn_
+                            control={form.control}
+                            name="publicationName"
+                            render={({ field }) => (
+                              <FormItemLayout
+                                label="Publication"
+                                layout="flex-row-reverse"
+                                description="Share table changes for replication"
+                              >
+                                <FormControl_Shadcn_>
+                                  <PublicationsComboBox
+                                    publications={publications?.map((pub) => pub.name) || []}
+                                    loading={loadingPublications}
+                                    field={field}
+                                    onNewPublicationClick={() => setPublicationPanelVisible(true)}
+                                  />
+                                </FormControl_Shadcn_>
+                              </FormItemLayout>
+                            )}
+                          />
+                        </CardContent>
+                      </Card>
+                      <h3>Where to send that data</h3>
+                      <Card className="mb-8 mt-4">
+                        <CardContent>
+                          <FormField_Shadcn_
+                            name="type"
+                            control={form.control}
+                            render={({ field }) => (
+                              <FormItemLayout
+                                label="Type"
+                                layout="flex-row-reverse"
+                                description="The type of destination to send the data to"
+                              >
+                                <FormControl_Shadcn_>
+                                  <Select_Shadcn_ value={field.value}>
+                                    <SelectTrigger_Shadcn_>{field.value}</SelectTrigger_Shadcn_>
+                                    <SelectContent_Shadcn_>
+                                      <SelectGroup_Shadcn_>
+                                        <SelectItem_Shadcn_ value="BigQuery">
+                                          BigQuery
+                                        </SelectItem_Shadcn_>
+                                      </SelectGroup_Shadcn_>
+                                    </SelectContent_Shadcn_>
+                                  </Select_Shadcn_>
+                                </FormControl_Shadcn_>
+                              </FormItemLayout>
+                            )}
+                          ></FormField_Shadcn_>
+                        </CardContent>
+                        <CardContent>
+                          <FormField_Shadcn_
+                            control={form.control}
+                            name="name"
+                            render={({ field }) => (
+                              <FormItemLayout
+                                label="Name"
+                                layout="flex-row-reverse"
+                                description="The name of the destination"
+                              >
+                                <FormControl_Shadcn_>
+                                  <Input_Shadcn_ {...field} placeholder="Name" />
+                                </FormControl_Shadcn_>
+                              </FormItemLayout>
+                            )}
+                          />
+                        </CardContent>
+                        <CardContent>
+                          <FormField_Shadcn_
+                            control={form.control}
+                            name="projectId"
+                            render={({ field }) => (
+                              <FormItemLayout
+                                label="Project Id"
+                                layout="flex-row-reverse"
+                                description="Send data to this BigQuery project"
+                              >
+                                <FormControl_Shadcn_>
+                                  <Input_Shadcn_ {...field} placeholder="Project id" />
+                                </FormControl_Shadcn_>
+                              </FormItemLayout>
+                            )}
+                          />
+                        </CardContent>
+                        <CardContent>
+                          <FormField_Shadcn_
+                            control={form.control}
+                            name="datasetId"
+                            render={({ field }) => (
+                              <FormItemLayout
+                                label="Dataset Id"
+                                layout="flex-row-reverse"
+                                description="Send data to this BigQuery dataset"
+                              >
+                                <FormControl_Shadcn_>
+                                  <Input_Shadcn_ {...field} placeholder="Dataset id" />
+                                </FormControl_Shadcn_>
+                              </FormItemLayout>
+                            )}
+                          />
+                        </CardContent>
+                        <CardContent>
+                          <FormField_Shadcn_
+                            control={form.control}
+                            name="serviceAccountKey"
+                            render={({ field }) => (
+                              <FormItemLayout
+                                label="Service Account Key"
+                                layout="flex-row-reverse"
+                                description="The service account key for BigQuery"
+                              >
+                                <FormControl_Shadcn_>
+                                  <TextArea_Shadcn_
+                                    {...field}
+                                    rows={4}
+                                    maxLength={5000}
+                                    placeholder="Service account key"
+                                  />
+                                </FormControl_Shadcn_>
+                              </FormItemLayout>
+                            )}
+                          />
+                        </CardContent>
+                      </Card>
+
                       <Accordion_Shadcn_ type="single" collapsible>
                         <AccordionItem_Shadcn_ value="item-1" className="border-none">
                           <AccordionTrigger_Shadcn_ className="font-normal gap-2 justify-start py-1">
                             Advanced Settings
                           </AccordionTrigger_Shadcn_>
                           <AccordionContent_Shadcn_ asChild className="!pb-0">
-                            <div className="flex flex-col gap-y-4 mt-4">
-                              <FormField_Shadcn_
-                                control={form.control}
-                                name="maxSize"
-                                render={({ field }) => (
-                                  <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                                    <FormLabel_Shadcn_>Max Size</FormLabel_Shadcn_>
-                                    <FormControl_Shadcn_>
-                                      <Input_Shadcn_
-                                        {...field}
-                                        type="number"
-                                        {...form.register('maxSize', {
-                                          valueAsNumber: true, // Ensure the value is handled as a number
-                                        })}
-                                        placeholder="Max size"
-                                      />
-                                    </FormControl_Shadcn_>
-                                    <FormMessage_Shadcn_ />
-                                  </FormItem_Shadcn_>
-                                )}
-                              />
-                              <FormField_Shadcn_
-                                control={form.control}
-                                name="maxFillSecs"
-                                render={({ field }) => (
-                                  <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                                    <FormLabel_Shadcn_>Max Fill Seconds</FormLabel_Shadcn_>
-                                    <FormControl_Shadcn_>
-                                      <Input_Shadcn_
-                                        {...field}
-                                        type="number"
-                                        {...form.register('maxFillSecs', {
-                                          valueAsNumber: true, // Ensure the value is handled as a number
-                                        })}
-                                        placeholder="Max fill seconds"
-                                      />
-                                    </FormControl_Shadcn_>
-                                    <FormMessage_Shadcn_ />
-                                  </FormItem_Shadcn_>
-                                )}
-                              />
-                              <FormField_Shadcn_
-                                control={form.control}
-                                name="maxStalenessMins"
-                                render={({ field }) => (
-                                  <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                                    <FormLabel_Shadcn_>Max Staleness</FormLabel_Shadcn_>
-                                    <FormControl_Shadcn_>
-                                      <Input_Shadcn_
-                                        {...field}
-                                        type="number"
-                                        {...form.register('maxStalenessMins', {
-                                          valueAsNumber: true, // Ensure the value is handled as a number
-                                        })}
-                                        placeholder="Max staleness in minutes"
-                                      />
-                                    </FormControl_Shadcn_>
-                                    <FormMessage_Shadcn_ />
-                                  </FormItem_Shadcn_>
-                                )}
-                              />
-                            </div>
+                            <Card className="mt-4">
+                              <CardContent>
+                                <FormField_Shadcn_
+                                  control={form.control}
+                                  name="maxSize"
+                                  render={({ field }) => (
+                                    <FormItemLayout
+                                      label="Max Size"
+                                      layout="flex-row-reverse"
+                                      description="The maximum size of the data to send"
+                                    >
+                                      <FormControl_Shadcn_>
+                                        <Input_Shadcn_
+                                          {...field}
+                                          type="number"
+                                          {...form.register('maxSize', {
+                                            valueAsNumber: true, // Ensure the value is handled as a number
+                                          })}
+                                          placeholder="Max size"
+                                        />
+                                      </FormControl_Shadcn_>
+                                    </FormItemLayout>
+                                  )}
+                                />
+                              </CardContent>
+                              <CardContent>
+                                <FormField_Shadcn_
+                                  control={form.control}
+                                  name="maxFillSecs"
+                                  render={({ field }) => (
+                                    <FormItemLayout
+                                      label="Max Fill Seconds"
+                                      layout="flex-row-reverse"
+                                      description="The maximum amount of time to fill the data"
+                                    >
+                                      <FormControl_Shadcn_>
+                                        <Input_Shadcn_
+                                          {...field}
+                                          type="number"
+                                          {...form.register('maxFillSecs', {
+                                            valueAsNumber: true, // Ensure the value is handled as a number
+                                          })}
+                                          placeholder="Max fill seconds"
+                                        />
+                                      </FormControl_Shadcn_>
+                                    </FormItemLayout>
+                                  )}
+                                />
+                              </CardContent>
+                              <CardContent>
+                                <FormField_Shadcn_
+                                  control={form.control}
+                                  name="maxStalenessMins"
+                                  render={({ field }) => (
+                                    <FormItemLayout
+                                      label="Max Staleness"
+                                      layout="flex-row-reverse"
+                                      description="Maximum staleness time allowed"
+                                    >
+                                      <FormControl_Shadcn_>
+                                        <Input_Shadcn_
+                                          {...field}
+                                          type="number"
+                                          {...form.register('maxStalenessMins', {
+                                            valueAsNumber: true, // Ensure the value is handled as a number
+                                          })}
+                                          placeholder="Max staleness in minutes"
+                                        />
+                                      </FormControl_Shadcn_>
+                                    </FormItemLayout>
+                                  )}
+                                />
+                              </CardContent>
+                            </Card>
                           </AccordionContent_Shadcn_>
                         </AccordionItem_Shadcn_>
                       </Accordion_Shadcn_>
@@ -430,8 +462,7 @@ const DestinationPanel = ({
                           control={form.control}
                           name="enabled"
                           render={({ field }) => (
-                            <FormItem_Shadcn_ className="flex flex-row justify-between items-center p-4">
-                              <FormLabel_Shadcn_>Enabled</FormLabel_Shadcn_>
+                            <FormItemLayout layout="flex-row-reverse" label="Enabled">
                               <FormControl_Shadcn_>
                                 <Switch
                                   checked={field.value}
@@ -439,8 +470,7 @@ const DestinationPanel = ({
                                   disabled={field.disabled}
                                 />
                               </FormControl_Shadcn_>
-                              <FormMessage_Shadcn_ />
-                            </FormItem_Shadcn_>
+                            </FormItemLayout>
                           )}
                         />
                       </div>

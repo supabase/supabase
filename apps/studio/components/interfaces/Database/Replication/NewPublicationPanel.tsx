@@ -22,8 +22,11 @@ import {
   FormControl_Shadcn_,
   Input_Shadcn_,
   FormMessage_Shadcn_,
+  Card,
+  CardContent,
 } from 'ui'
 import { MultiSelector } from 'ui-patterns/multi-select'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
 interface NewPublicationPanelProps {
@@ -104,52 +107,62 @@ const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanel
                   onSubmit={form.handleSubmit(onSubmit)}
                   className="flex flex-col gap-y-4"
                 >
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                        <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_ {...field} placeholder="Name" />
-                        </FormControl_Shadcn_>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
-                    )}
-                  />
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="tables"
-                    render={({ field }) => (
-                      <FormItem_Shadcn_ className="flex flex-col gap-y-2">
-                        <FormLabel_Shadcn_>Tables</FormLabel_Shadcn_>
-                        <FormControl_Shadcn_>
-                          <MultiSelector
-                            values={field.value}
-                            onValuesChange={field.onChange}
-                            disabled={creatingPublication}
+                  <Card>
+                    <CardContent>
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            label="Name"
+                            layout="flex-row-reverse"
+                            description="The name of the publication"
                           >
-                            <MultiSelector.Trigger>
-                              <MultiSelector.Input placeholder="Select tables" />
-                            </MultiSelector.Trigger>
-                            <MultiSelector.Content>
-                              <MultiSelector.List>
-                                {tables?.tables.map((table) => (
-                                  <MultiSelector.Item
-                                    key={`${table.schema}.${table.name}`}
-                                    value={`${table.schema}.${table.name}`}
-                                  >
-                                    {`${table.schema}.${table.name}`}
-                                  </MultiSelector.Item>
-                                ))}
-                              </MultiSelector.List>
-                            </MultiSelector.Content>
-                          </MultiSelector>
-                        </FormControl_Shadcn_>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
-                    )}
-                  />
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_ {...field} placeholder="Name" />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+                    </CardContent>
+                    <CardContent>
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="tables"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            label="Tables"
+                            layout="flex-row-reverse"
+                            description="Select the tables to include in the publication"
+                          >
+                            <FormControl_Shadcn_>
+                              <MultiSelector
+                                values={field.value}
+                                onValuesChange={field.onChange}
+                                disabled={creatingPublication}
+                              >
+                                <MultiSelector.Trigger>
+                                  <MultiSelector.Input placeholder="Select tables" />
+                                </MultiSelector.Trigger>
+                                <MultiSelector.Content>
+                                  <MultiSelector.List>
+                                    {tables?.tables.map((table) => (
+                                      <MultiSelector.Item
+                                        key={`${table.schema}.${table.name}`}
+                                        value={`${table.schema}.${table.name}`}
+                                      >
+                                        {`${table.schema}.${table.name}`}
+                                      </MultiSelector.Item>
+                                    ))}
+                                  </MultiSelector.List>
+                                </MultiSelector.Content>
+                              </MultiSelector>
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+                    </CardContent>
+                  </Card>
                 </form>
               </Form_Shadcn_>
             </SheetSection>
