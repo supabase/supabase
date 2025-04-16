@@ -13,7 +13,7 @@ type SupabaseClientType = typeof supabase
 // Utility type to check if the type is any
 type IfAny<T, Y, N> = 0 extends 1 & T ? Y : N
 
-// Extracts the database type from the supabase client. If the supabase client doesn't have a type, it fallback properly.
+// Extracts the database type from the supabase client. If the supabase client doesn't have a type, it will fallback properly.
 type Database =
   SupabaseClientType extends SupabaseClient<infer U>
     ? IfAny<
