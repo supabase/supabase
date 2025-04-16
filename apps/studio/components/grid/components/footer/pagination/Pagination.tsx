@@ -8,6 +8,7 @@ import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { THRESHOLD_COUNT, useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useUrlState } from 'hooks/ui/useUrlState'
+import { RoleImpersonationState } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
@@ -63,7 +64,7 @@ const Pagination = () => {
       tableId: id,
       filters,
       enforceExactCount: snap.enforceExactCount,
-      impersonatedRole: roleImpersonationState.role,
+      roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     {
       keepPreviousData: true,

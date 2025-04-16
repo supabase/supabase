@@ -11,6 +11,7 @@ import { INSTANCE_MICRO_SPECS } from 'lib/constants'
 import { Button, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import ShimmeringLoader from './ShimmeringLoader'
+import { InfraInstanceSize } from 'components/interfaces/DiskManagement/DiskManagement.types'
 
 const Row = ({ label, stat }: { label: string; stat: React.ReactNode | string }) => {
   return (
@@ -26,7 +27,7 @@ interface ComputeBadgeWrapperProps {
     ref?: string
     organization_slug?: string
     cloud_provider?: string
-    infra_compute_size?: components['schemas']['DbInstanceSize']
+    infra_compute_size?: InfraInstanceSize
   }
 }
 

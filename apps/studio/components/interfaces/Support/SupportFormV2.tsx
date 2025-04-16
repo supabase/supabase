@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
 import { ChevronRight, ExternalLink, Loader2, Mail, Plus, X } from 'lucide-react'
 import Link from 'next/link'
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -14,7 +14,6 @@ import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import type { Project } from 'data/projects/project-detail-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import {
@@ -133,14 +132,10 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
     isSuccess: isSuccessOrganizations,
   } = useOrganizationsQuery()
 
-  const {
-    data: subscription,
-    isLoading: isLoadingSubscription,
-    isSuccess: isSuccessSubscription,
-  } = useOrgSubscriptionQuery({
-    orgSlug: organizationSlug === 'no-org' ? undefined : organizationSlug,
-  })
-
+  const selectedOrganization = useMemo(
+    () => organizations?.find((org) => org.slug === organizationSlug),
+    [organizationSlug, organizations]
+  )
   const {
     data: allProjects,
     isLoading: isLoadingProjects,
@@ -161,7 +156,8 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
   })
 
   const respondToEmail = profile?.primary_email ?? 'your email'
-  const subscriptionPlanId = subscription?.plan.id
+  const subscriptionPlanId = selectedOrganization?.plan.id
+
   const projects = [
     ...(allProjects ?? []).filter((project) => project.organization_slug === organizationSlug),
     { ref: 'no-project', name: 'No specific project' } as Partial<Project>,
@@ -268,9 +264,8 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
           form.setValue('projectRef', selectedProject.ref)
         }
       } else if (slug) {
-        const selectedOrganization = organizations?.find((org) => org.slug === slug)
-        if (selectedOrganization !== undefined) {
-          form.setValue('organizationSlug', selectedOrganization.slug)
+        if (organizations.some((it) => it.slug === slug)) {
+          form.setValue('organizationSlug', slug)
         }
       } else if (ref === undefined && slug === undefined) {
         const firstOrganization = organizations?.[0]
@@ -333,10 +328,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                         ) : (
                           (organizations ?? []).find((o) => o.slug === field.value)?.name
                         )}
-                        {organizationSlug !== 'no-org' && isLoadingSubscription && (
-                          <Loader2 size={14} className="animate-spin" />
-                        )}
-                        {isSuccessSubscription && (
+                        {subscriptionPlanId && (
                           <Badge variant="outline" className="capitalize">
                             {subscriptionPlanId}
                           </Badge>

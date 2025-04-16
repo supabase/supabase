@@ -18,7 +18,10 @@ import { Sort } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
+import {
+  RoleImpersonationState,
+  useRoleImpersonationStateSnapshot,
+} from 'state/role-impersonation-state'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import { Button, SidePanel } from 'ui'
 import ActionBar from '../../ActionBar'
@@ -104,7 +107,7 @@ const ForeignRowSelector = ({
       filters: formatFilterURLParams(filters),
       page,
       limit: rowsPerPage,
-      impersonatedRole: roleImpersonationState.role,
+      roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     {
       keepPreviousData: true,
@@ -157,9 +160,13 @@ const ForeignRowSelector = ({
                 <div className="flex items-center justify-between my-2 mx-3">
                   <div className="flex items-center">
                     <RefreshButton tableId={table?.id} isRefetching={isRefetching} />
-                    <FilterPopover filters={filters} onApplyFilters={onApplyFilters} />
+                    <FilterPopover
+                      portal={false}
+                      filters={filters}
+                      onApplyFilters={onApplyFilters}
+                    />
                     <DndProvider backend={HTML5Backend} context={window}>
-                      <SortPopover sorts={sorts} onApplySorts={onApplySorts} />
+                      <SortPopover portal={false} sorts={sorts} onApplySorts={onApplySorts} />
                     </DndProvider>
                   </div>
 

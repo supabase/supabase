@@ -3,7 +3,6 @@ import { AlertTriangle, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
@@ -15,7 +14,6 @@ export const DatabaseReadOnlyAlert = () => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
   const { data: resourceWarnings } = useResourceWarningsQuery()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
   const isReadOnlyMode =
     (resourceWarnings ?? [])?.find((warning) => warning.project === projectRef)
@@ -37,7 +35,7 @@ export const DatabaseReadOnlyAlert = () => {
               <li>
                 Temporarily disable read-only mode to free up space and reduce your database size
               </li>
-              {subscription?.plan.id === 'free' ? (
+              {organization?.plan.id === 'free' ? (
                 <li>
                   <Link
                     href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=databaseReadOnlyAlertUpgradePlan`}
@@ -46,7 +44,7 @@ export const DatabaseReadOnlyAlert = () => {
                   </Link>{' '}
                   to increase your database size limit to 8GB.
                 </li>
-              ) : subscription?.plan.id === 'pro' && subscription?.usage_billing_enabled ? (
+              ) : organization?.plan.id === 'pro' && organization?.usage_billing_enabled ? (
                 <li>
                   <Link
                     href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=databaseReadOnlyAlertSpendCap`}

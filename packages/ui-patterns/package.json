@@ -28,7 +28,9 @@
     "monaco-editor": "*",
     "next-themes": "*",
     "openai": "^4.20.1",
+    "react": "catalog:",
     "react-countdown": "^2.3.5",
+    "react-dom": "catalog:",
     "react-error-boundary": "^4.0.12",
     "react-hook-form": "^7.45.0",
     "react-intersection-observer": "^9.8.2",
@@ -50,27 +52,25 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@testing-library/dom": "^10.1.0",
-    "@testing-library/jest-dom": "^6.4.6",
+    "@testing-library/dom": "^10.0.0",
+    "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/react": "^16.0.0",
-    "@testing-library/user-event": "^13.5.0",
+    "@testing-library/user-event": "^14.0.0",
     "@types/common-tags": "^1.8.4",
     "@types/lodash": "^4.17.5",
     "@types/mdast": "^3.0.0",
     "@types/node": "catalog:",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "api-types": "workspace:*",
     "next-router-mock": "^0.9.13",
     "typescript": "~5.5.0",
     "unified": "^11.0.5",
     "vfile": "^6.0.3",
-    "vite": "^6.2.4",
+    "vite": "^6.2.6",
     "vitest": "^3.0.5"
   },
   "peerDependencies": {
-    "next": "catalog:",
-    "react": "*",
-    "react-dom": "*"
+    "next": "*"
   }
 }
