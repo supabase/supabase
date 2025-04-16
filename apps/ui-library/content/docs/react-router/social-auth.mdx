@@ -42,7 +42,7 @@ VITE_SUPABASE_ANON_KEY=
 ### Setting up third party providers
 
 We support a wide variety of social providers that you can use to integrate with your application. The full list is available [here](https://supabase.com/docs/guides/auth/social-login).
-This block uses the PKCE flow with GitHub as the provider. To switch providers, just update the `provider` field in the `supabase.auth.signInWithOAuth` call.
+This block uses the PKCE flow with GitHub as the provider. To switch providers, just update the `provider` field in the `supabase.auth.signInWithOAuth` call. Enable the provider you want to use under [Auth Providers](https://supabase.com/dashboard/project/_/auth/providers) in the Supabase Dashboard and add the necessary credentials.
 
 ### Setting up routes and redirect URLs
 
@@ -56,7 +56,7 @@ If you want to combine this block with the password-based auth, you need to:
 
 - Copy the `@/app/routes/auth.oauth.tsx` in your app under the same route.
 - Copy just the action from the social login page into a separate route.
-- In the password-based `login.tsx` page, create another form with the Github button inside. The method should be `post` and the `action` should point at the action route from the previous step.
+- In the password-based `login.tsx` page, create another form with a "Login with ..." button. The method should be `post` and the `action` should point at the action route from the previous step.
 
 ## Further reading
 
