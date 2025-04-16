@@ -1,4 +1,4 @@
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   ScaffoldContainer,
   ScaffoldContainerLegacy,
@@ -32,7 +32,7 @@ const BillingSettings = () => {
     'billing:invoices',
   ])
 
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
 
   const org = useSelectedOrganization()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
