@@ -485,29 +485,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
             name="subject"
             control={form.control}
             render={({ field }) => (
-              <FormItemLayout
-                layout="vertical"
-                label="Subject"
-                description={
-                  field.value.length > 0 &&
-                  INCLUDE_DISCUSSIONS.includes(category) && (
-                    <p className="flex items-center gap-x-1">
-                      <span>Check our </span>
-                      <Link
-                        key="gh-discussions"
-                        href={`https://github.com/orgs/supabase/discussions?discussions_q=${field.value}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex items-center gap-x-1 text-foreground-light underline hover:text-foreground transition"
-                      >
-                        Github discussions
-                        <ExternalLink size={14} strokeWidth={2} />
-                      </Link>
-                      <span> for a quick answer</span>
-                    </p>
-                  )
-                }
-              >
+              <FormItemLayout layout="vertical" label="Subject">
                 <FormControl_Shadcn_>
                   <Input_Shadcn_ {...field} placeholder="Summary of the problem you have" />
                 </FormControl_Shadcn_>
@@ -544,7 +522,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                   <li key={page.id} className="flex items-center gap-x-1">
                     <Book size={16} className="text-foreground-muted" />
                     <a
-                      href={page.path}
+                      href={`https://supabase.com/docs${page.path}`}
                       target="_blank"
                       rel="noreferrer"
                       className="text-sm text-foreground-light hover:text-foreground transition"
@@ -555,6 +533,23 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                 ))}
               </ul>
             </>
+          )}
+
+          {form.getValues('subject').length > 0 && INCLUDE_DISCUSSIONS.includes(category) && (
+            <p className="flex items-center gap-x-1 text-foreground-lighter text-sm">
+              <span>Check our </span>
+              <Link
+                key="gh-discussions"
+                href={`https://github.com/orgs/supabase/discussions?discussions_q=${form.getValues('subject')}`}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-x-1 underline hover:text-foreground transition"
+              >
+                Github discussions
+                <ExternalLink size={14} strokeWidth={2} />
+              </Link>
+              <span> for a quick answer</span>
+            </p>
           )}
         </div>
 
