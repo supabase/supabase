@@ -3326,7 +3326,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'Cfd1Fdw',
     label: 'Cloudflare D1',
     docsUrl: 'https://fdw.dev/catalog/cfd1/',
-    minimumExtensionVersion: '0.1.0',
+    minimumExtensionVersion: '0.4.0',
     server: {
       options: [
         {
@@ -3400,7 +3400,7 @@ export const WRAPPERS: WrapperMeta[] = [
     },
     tables: [
       {
-        label: 'Databases',
+        label: 'D1 Databases',
         description: 'D1 databases in your Cloudflare account',
         availableColumns: [
           { name: 'uuid', type: 'text' },
