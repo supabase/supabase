@@ -143,6 +143,10 @@ export const getTableRowsSql = ({
   // getPagination is expecting to start from 0
   const { from, to } = getPagination((page ?? 1) - 1, limit)
 
+  // To have efficient query, we use CTE optimization, to first reduce the number of rows and order them in the right place
+  // filtering, applying limits and order by, then we can apply selection with some conditional logic to truncate large columns
+  // allowing postgres to only truncate the columns within the subset that we'll return instead of attemting to do it on
+  // all the rows within the table
   const baseSelectQuery = `with _base_query as (${queryChains.range(from, to).toSql({ isCTE: false, isFinal: false })})`
 
   const allColumnNames = table.columns
@@ -202,6 +206,7 @@ export const getTableRowsSql = ({
 
   const selectClause = selectExpressions.join(',')
   const finalQuery = new Query()
+  // Now, we apply our selection logic with the tables truncation  on the _base_query contructed before
   const finalQueryChain = finalQuery.from('_base_query').select(selectClause)
   return `${baseSelectQuery}
   ${finalQueryChain.toSql({ isCTE: true, isFinal: true })}`
