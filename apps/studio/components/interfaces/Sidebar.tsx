@@ -102,10 +102,7 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
         {!hideSideBar && (
           <SidebarMotion
             {...props}
-            transition={{
-              delay: 0.4,
-              duration: 0.4,
-            }}
+            transition={{ delay: 0.4, duration: 0.4 }}
             overflowing={sidebarBehaviour === 'expandable'}
             collapsible="icon"
             variant="sidebar"
@@ -153,14 +150,6 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
 export const SidebarContent = ({ footer }: { footer?: ReactNode }) => {
   const newLayoutPreview = useIsNewLayoutEnabled()
   const { ref: projectRef } = useParams()
-
-  // temporary logic to show settings route in sidebar footer
-  // this will be removed once we move to an updated org/project nav
-  const router = useRouter()
-  const { ref } = useParams()
-  const { project } = useProjectContext()
-  const settingsRoutes = generateSettingsRoutes(ref, project)
-  const activeRoute = router.pathname.split('/')[3]
 
   return (
     <>

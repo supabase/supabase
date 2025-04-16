@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
-import { ChevronRight, ExternalLink, Loader2, Mail, Plus, X } from 'lucide-react'
+import { ChevronRight, ExternalLink, Mail, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -67,7 +67,7 @@ interface SupportFormV2Props {
 export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFormV2Props) => {
   const { profile } = useProfile()
   const {
-    ref,
+    projectRef: ref,
     slug,
     category: urlCategory,
     subject: urlSubject,
