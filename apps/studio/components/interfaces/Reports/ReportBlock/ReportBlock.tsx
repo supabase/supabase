@@ -2,14 +2,13 @@ import { X } from 'lucide-react'
 
 import { useParams } from 'common'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import { isReadOnlySelect } from 'components/ui/AIAssistantPanel/AIAssistant.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DEFAULT_CHART_CONFIG, QueryBlock } from 'components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import { useContentIdQuery } from 'data/content/content-id-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Dashboards, SqlSnippets } from 'types'
-import { cn } from 'ui'
+import { Button, cn } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { DEPRECATED_REPORTS } from '../Reports.constants'
 import { ChartBlock } from './ChartBlock'
@@ -62,7 +61,6 @@ export const ReportBlock = ({
   )
   const sql = isSnippet ? (data?.content as SqlSnippets.Content)?.sql : undefined
   const chartConfig = { ...DEFAULT_CHART_CONFIG, ...(item.chartConfig ?? {}) }
-  const isReadOnlySQL = isReadOnlySelect(sql ?? '')
   const isDeprecatedChart = DEPRECATED_REPORTS.includes(item.attribute)
   const snippetMissing = error?.message.includes('Content not found')
 
@@ -73,7 +71,6 @@ export const ReportBlock = ({
           runQuery
           isChart
           draggable
-          disableRunIfMutation
           id={item.id}
           isLoading={isLoading}
           isRefreshing={isRefreshing}
@@ -95,10 +92,8 @@ export const ReportBlock = ({
           noResultPlaceholder={
             <div
               className={cn(
-                'flex flex-col gap-y-1 items-center h-full w-full',
-                isLoading
-                  ? 'justify-start items-start p-2 gap-y-2'
-                  : 'justify-center items-center px-4 gap-y-1'
+                'flex flex-col gap-y-1 h-full w-full',
+                isLoading ? 'justify-start items-start p-2 gap-y-2' : 'justify-center px-4 gap-y-1'
               )}
             >
               {isLoading ? (
@@ -109,28 +104,40 @@ export const ReportBlock = ({
                 </>
               ) : isError ? (
                 <>
-                  <p className="text-xs text-foreground-light">
+                  <p className="text-xs text-foreground-light text-center">
                     {snippetMissing ? 'SQL snippet cannot be found' : 'Error fetching SQL snippet'}
                   </p>
                   <p className="text-xs text-foreground-lighter text-center">
                     {snippetMissing ? 'Please remove this block from your report' : error.message}
                   </p>
                 </>
-              ) : isReadOnlySQL ? (
+              ) : (
                 <>
-                  <p className="text-xs text-foreground-light">No results returned from query</p>
+                  <p className="text-xs text-foreground-light text-center">
+                    No results returned from query
+                  </p>
                   <p className="text-xs text-foreground-lighter text-center">
                     Results from the SQL query can be viewed as a table or chart here
                   </p>
                 </>
-              ) : (
-                <>
-                  <p className="text-xs text-foreground-light">SQL query is not readonly</p>
-                  <p className="text-xs text-foreground-lighter text-center">
-                    Queries that involve any mutation will not be run or rendered in reports
-                  </p>
-                </>
               )}
+            </div>
+          }
+          readOnlyErrorPlaceholder={
+            <div className="flex flex-col h-full justify-center items-center text-center">
+              <p className="text-xs text-foreground-light">
+                SQL query is not read-only and cannot be rendered
+              </p>
+              <p className="text-xs text-foreground-lighter text-center">
+                Queries that involve any mutation will not be run in reports
+              </p>
+              <Button
+                type="default"
+                className="mt-2"
+                onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
+              >
+                Remove chart
+              </Button>
             </div>
           }
         />

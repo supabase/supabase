@@ -22,7 +22,6 @@ import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-l
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag, usePHFlag } from 'hooks/ui/useFlag'
@@ -78,7 +77,6 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const enableProBenefitWording = usePHFlag('proBenefitWording')
 
   const orgSlug = selectedOrganization?.slug
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
   const {
     data: pauseStatus,
     error: pauseStatusError,
@@ -97,7 +95,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     pauseStatus?.max_days_till_restore_disabled ??
     0
 
-  const isFreePlan = subscription?.plan?.id === 'free'
+  const isFreePlan = selectedOrganization?.plan?.id === 'free'
   const isRestoreDisabled = enforceNinetyDayUnpauseExpiry && isSuccess && !pauseStatus.can_restore
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(

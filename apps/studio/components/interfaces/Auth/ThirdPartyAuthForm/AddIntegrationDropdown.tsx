@@ -19,6 +19,7 @@ import {
 
 interface AddIntegrationDropdownProps {
   buttonText?: string
+  align?: 'end' | 'center'
   onSelectIntegrationType: (type: INTEGRATION_TYPES) => void
 }
 
@@ -45,16 +46,17 @@ const ProviderDropdownItem = ({
 }
 
 export const AddIntegrationDropdown = ({
+  align = 'end',
   onSelectIntegrationType,
 }: AddIntegrationDropdownProps) => {
   return (
-    <DropdownMenu modal={false}>
+    <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button type="primary" iconRight={<ChevronDown size={14} strokeWidth={1} />}>
           Add provider
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align={align} className="w-56">
         <DropdownMenuLabel>Select Provider</DropdownMenuLabel>
         <DropdownMenuSeparator />
 

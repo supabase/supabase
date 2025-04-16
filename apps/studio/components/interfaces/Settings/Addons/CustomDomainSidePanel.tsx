@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
@@ -24,7 +23,7 @@ import {
   SidePanel,
   cn,
 } from 'ui'
-import { ExternalLink, AlertCircle, AlertTriangle } from 'lucide-react'
+import { ExternalLink, AlertCircle } from 'lucide-react'
 
 const CustomDomainSidePanel = () => {
   const { ref: projectRef } = useParams()
@@ -42,7 +41,6 @@ const CustomDomainSidePanel = () => {
   const visible = panel === 'customDomain'
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully enabled custom domain`)
@@ -69,7 +67,7 @@ const CustomDomainSidePanel = () => {
   const availableOptions =
     (addons?.available_addons ?? []).find((addon) => addon.type === 'custom_domain')?.variants ?? []
 
-  const isFreePlan = subscription?.plan?.id === 'free'
+  const isFreePlan = organization?.plan?.id === 'free'
   const hasChanges = selectedOption !== (subscriptionCDOption?.variant.identifier ?? 'cd_none')
   const selectedCustomDomain = availableOptions.find(
     (option) => option.identifier === selectedOption

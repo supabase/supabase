@@ -43,3 +43,15 @@ export const useReadReplicasQuery = <TData = ReadReplicasData>(
     }
   )
 }
+
+export const usePrimaryDatabase = ({ projectRef }: { projectRef?: string }) => {
+  const {
+    data: databases = [],
+    error,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useReadReplicasQuery({ projectRef })
+  const primaryDatabase = databases.find((x) => x.identifier === projectRef)
+  return { database: primaryDatabase, error, isLoading, isError, isSuccess }
+}
