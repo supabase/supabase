@@ -3713,6 +3713,7 @@ export const WRAPPERS: WrapperMeta[] = [
     icon: `${BASE_PATH}/img/icons/orb-icon.svg`,
     description: 'Usage-based billing and metering platform',
     extensionName: 'OrbFdw',
+    minimumExtensionVersion: '0.4.0',
     label: 'Orb',
     docsUrl: 'https://fdw.dev/catalog/orb/',
     server: {
