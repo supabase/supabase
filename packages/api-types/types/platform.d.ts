@@ -4183,6 +4183,7 @@ export interface components {
         postal_code?: string
         state?: string
       }
+      billing_name?: string
     }
     Buffer: Record<string, never>
     BulkDeleteUserContentResponse: {
@@ -4287,6 +4288,10 @@ export interface components {
       /** Format: uuid */
       session_id: string
       token_name?: string
+    }
+    CreateCollectionBody: {
+      name: string
+      retention_days: number
     }
     CreateColumnBody: {
       check?: string
@@ -4469,10 +4474,24 @@ export interface components {
       id: string
     }
     CreateOrganizationBody: {
+      address?: {
+        city?: string
+        country: string
+        line1: string
+        line2?: string
+        postal_code?: string
+        state?: string
+      }
+      billing_name?: string
       kind?: string
       name: string
       payment_method?: string
       size?: string
+      tax_id?: {
+        country?: string
+        type: string
+        value: string
+      }
       /** @enum {string} */
       tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | 'tier_enterprise'
     }
@@ -4783,6 +4802,7 @@ export interface components {
         state?: string
       }
       balance: number
+      billing_name?: string
       billing_via_partner: boolean
       email: string
     }
@@ -4856,7 +4876,6 @@ export interface components {
     }
     DeleteOAuthAppResponse: {
       client_id: string
-      client_secret_alias: string
       created_at: string
       icon?: string
       id: string
@@ -5859,7 +5878,6 @@ export interface components {
       app_id?: string
       authorized_at?: string
       client_id?: string
-      client_secret_alias?: string
       created_at?: string
       created_by?: string
       icon?: string
@@ -6815,7 +6833,6 @@ export interface components {
     }
     PutOAuthAppResponse: {
       client_id: string
-      client_secret_alias: string
       created_at: string
       icon?: string
       id: string
@@ -7361,6 +7378,10 @@ export interface components {
           }
       description?: string
       name?: string
+    }
+    UpdateCollectionBody: {
+      name: string
+      retention_days: number
     }
     UpdateColumnBody: {
       check?: string
@@ -14151,7 +14172,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['LFSource']
+        'application/json': components['schemas']['CreateCollectionBody']
       }
     }
     responses: {
@@ -14260,7 +14281,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['LFSource']
+        'application/json': components['schemas']['UpdateCollectionBody']
       }
     }
     responses: {
