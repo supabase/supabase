@@ -3075,7 +3075,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'SlackFdw',
     label: 'Slack',
     docsUrl: 'https://fdw.dev/catalog/slack/',
-    minimumExtensionVersion: '0.1.0',
+    minimumExtensionVersion: '0.4.0',
     server: {
       options: [
         {
