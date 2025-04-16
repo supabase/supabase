@@ -1,4 +1,3 @@
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   ScaffoldContainer,
   ScaffoldContainerLegacy,
@@ -18,6 +17,7 @@ import CreditBalance from './CreditBalance'
 import PaymentMethods from './PaymentMethods/PaymentMethods'
 import Subscription from './Subscription/Subscription'
 import TaxID from './TaxID/TaxID'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 const BillingSettings = () => {
   const {
@@ -32,7 +32,7 @@ const BillingSettings = () => {
     'billing:invoices',
   ])
 
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
 
   const org = useSelectedOrganization()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })

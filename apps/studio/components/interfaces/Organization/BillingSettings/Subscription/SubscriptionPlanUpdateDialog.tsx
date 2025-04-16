@@ -58,7 +58,7 @@ interface Props {
   billingPartner?: string
   selectedOrganization: any
   subscription: any
-  slug: string
+  slug: string | undefined
   currentPlanMeta: any
   projects: ProjectInfo[]
 }

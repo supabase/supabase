@@ -24,7 +24,7 @@ import AlertError from 'components/ui/AlertError'
 import { useBillingAddressForm } from './useBillingAddressForm'
 
 interface BillingAddressDialogProps {
-  slug: string
+  slug: string | undefined
 }
 
 const BillingAddressDialog = ({ slug }: BillingAddressDialogProps) => {

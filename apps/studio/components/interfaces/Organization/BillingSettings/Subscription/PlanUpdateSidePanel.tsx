@@ -28,7 +28,6 @@ import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import SubscriptionPlanUpdateDialog from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
-import { PROJECT_STATUS } from 'lib/constants'
 
 const PlanUpdateSidePanel = () => {
   const router = useRouter()
