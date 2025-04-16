@@ -765,57 +765,6 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                   )
                 }}
               />
-              {/* <div className="flex flex-col gap-y-2 px-5 text-sm">
-                <div className="text-foreground-light flex items-center gap-x-2">
-                  <div className="w-7 h-7 bg-surface-200 rounded border flex items-center justify-center">
-                    <SquareUserRound className="w-5 h-5" strokeWidth={1} />
-                  </div>
-                  <span className="font-medium">Human access</span>
-                  <span>- Access to your project data and configuration</span>
-                </div>
-                <div className="text-foreground-light flex items-center gap-x-2">
-                  <div className="w-7 h-7 bg-surface-200 rounded border flex items-center justify-center">
-                    <AiIconAnimation size={16} />
-                  </div>
-                  <span className="font-medium">AI access</span>
-                  <span>- Access to your project data and configuration</span>
-                </div>
-              </div>
-              <Collapsible_Shadcn_>
-                <div className="flex items-center gap-x-2">
-                  <CollapsibleTrigger_Shadcn_ className="group flex items-center gap-x-1 ">
-                    <ChevronRight
-                      strokeWidth={2}
-                      size={14}
-                      className="transition-all group-data-[state=open]:rotate-90 text-foreground-muted -ml-1"
-                    />
-                    <p className="text-sm text-foreground-light">
-                      More information about temporary access
-                    </p>
-                  </CollapsibleTrigger_Shadcn_>
-                </div>
-                <CollapsibleContent_Shadcn_ className="text-xs text-foreground-light mt-2 space-y-2">
-                  <p>
-                    By enabling this, you grant permission for our support team to access your
-                    project temporarily and, if applicable, to use AI tools to assist in diagnosing
-                    and resolving issues. This access may involve analyzing database configurations,
-                    query performance, and other relevant data to expedite troubleshooting and
-                    enhance support accuracy.
-                  </p>
-                  <p>
-                    We are committed to maintaining strict data privacy and security standards in
-                    all support activities.{' '}
-                    <Link
-                      href="https://supabase.com/privacy"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-foreground-light underline hover:text-foreground transition"
-                    >
-                      Privacy Policy
-                    </Link>
-                  </p>
-                </CollapsibleContent_Shadcn_>
-              </Collapsible_Shadcn_>  */}
             </div>
             <Separator />
           </>
