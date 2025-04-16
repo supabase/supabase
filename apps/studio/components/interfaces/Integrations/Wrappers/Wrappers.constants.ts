@@ -3464,7 +3464,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'HubspotFdw',
     label: 'HubSpot',
     docsUrl: 'https://fdw.dev/catalog/hubspot/',
-    minimumExtensionVersion: '0.1.0',
+    minimumExtensionVersion: '0.4.0',
     server: {
       options: [
         {
