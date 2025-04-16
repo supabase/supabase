@@ -2874,7 +2874,7 @@ export const WRAPPERS: WrapperMeta[] = [
           { name: 'domain', type: 'text' },
           { name: 'active', type: 'boolean' },
           { name: 'provider', type: 'text' },
-          { name: 'user_count', type: 'integer' },
+          { name: 'user_count', type: 'bigint' },
           { name: 'created_at', type: 'timestamp' },
           { name: 'updated_at', type: 'timestamp' },
           { name: 'attrs', type: 'jsonb' },
