@@ -8,8 +8,7 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
-  // const enablePgReplicate = useFlag('enablePgReplicate')
-  const enablePgReplicate = true
+  const enablePgReplicate = useFlag('enablePgReplicate')
 
   return (
     <>
