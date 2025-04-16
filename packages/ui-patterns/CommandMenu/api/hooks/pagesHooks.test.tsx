@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react'
 import { describe, expect, it } from 'vitest'
 
 import { CommandProvider } from '../CommandProvider'
-import { useCurrentPage, useRegisterPage, useSetPage } from './pagesHooks'
 import { PageType } from '../utils'
+import { useCurrentPage, useRegisterPage, useSetPage } from './pagesHooks'
 
 const PageAdderOne = ({ enabled = true }) => {
   useRegisterPage('Page one', { type: PageType.Commands, sections: [] }, { enabled })
@@ -97,8 +97,8 @@ describe('useRegisterPage', () => {
       expect(screen.getByTestId('current-page')).toHaveTextContent('Page one')
     })
 
-    act(() => {
-      userEvent.click(screen.getByRole('button'))
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button'))
     })
     await waitFor(() => {
       expect(screen.getByTestId('current-page')).toHaveTextContent('[None]')
@@ -119,15 +119,15 @@ describe('useRegisterPage', () => {
       expect(screen.getByTestId('current-page')).toHaveTextContent('Page one')
     })
 
-    act(() => {
-      userEvent.click(screen.getByRole('button'))
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button'))
     })
     await waitFor(() => {
       expect(screen.getByTestId('current-page')).toHaveTextContent('[None]')
     })
 
-    act(() => {
-      userEvent.click(screen.getByRole('button'))
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button'))
     })
     await waitFor(() => {
       expect(screen.getByTestId('current-page')).toHaveTextContent('Page one')
