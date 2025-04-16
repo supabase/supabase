@@ -460,6 +460,12 @@ const nextConfig = {
         source: '/project/:ref/settings/functions',
         destination: '/project/:ref/functions/secrets',
       },
+      {
+        source: '/org/:slug/invoices',
+        destination: '/org/:slug/billing#invoices',
+        permanent: true,
+      },
+
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
             {

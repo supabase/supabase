@@ -6,6 +6,7 @@ import {
   Boxes,
   ChartArea,
   PanelLeftDashed,
+  Receipt,
   Settings,
   Users,
 } from 'lucide-react'
@@ -486,6 +487,12 @@ const OrganizationLinks = () => {
       icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
+      label: 'Billing',
+      href: `/org/${slug}/billing`,
+      key: 'billing',
+      icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+    },
+    {
       label: 'Organization settings',
       href: `/org/${slug}/general`,
       key: 'settings',
@@ -504,8 +511,6 @@ const OrganizationLinks = () => {
                 ? activeRoute === undefined
                 : item.key === 'settings'
                   ? router.pathname.includes('/general') ||
-                    router.pathname.includes('/billing') ||
-                    router.pathname.includes('/invoices') ||
                     router.pathname.includes('/apps') ||
                     router.pathname.includes('/audit') ||
                     router.pathname.includes('/documents')

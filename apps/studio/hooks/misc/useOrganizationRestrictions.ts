@@ -34,7 +34,7 @@ export function useOrganizationRestrictions() {
       type: 'danger',
       title: RESTRICTION_MESSAGES.OVERDUE_INVOICES.title,
       message: RESTRICTION_MESSAGES.OVERDUE_INVOICES.message,
-      link: `/org/${org?.slug}/invoices`,
+      link: `/org/${org?.slug}/billing#invoices`,
     })
   }
 
@@ -43,7 +43,7 @@ export function useOrganizationRestrictions() {
       type: 'danger',
       title: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.title,
       message: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.message,
-      link: `/org/${organizations ? organizations?.find((org) => org.id === overdueInvoicesFromOtherOrgs[0].organization_id)?.slug : org?.slug}/invoices`,
+      link: `/org/${organizations ? organizations?.find((org) => org.id === overdueInvoicesFromOtherOrgs[0].organization_id)?.slug : org?.slug}/billing#invoices`,
     })
   }
 
