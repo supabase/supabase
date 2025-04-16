@@ -125,15 +125,13 @@ export const useIsTableEditorTabsEnabled = () => {
 }
 
 export const useIsSQLEditorTabsEnabled = () => {
-  if (!IS_PLATFORM) return false
-
   const { flags } = useFeaturePreviewContext()
+  if (!IS_PLATFORM) return false
   return flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
 }
 
 export const useIsNewLayoutEnabled = (): boolean => {
-  if (!IS_PLATFORM) return false
-
   const { flags } = useFeaturePreviewContext()
+  if (!IS_PLATFORM) return false
   return flags[LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW]
 }
