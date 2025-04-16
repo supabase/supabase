@@ -3,7 +3,7 @@ import { PropsWithChildren } from 'react'
 import { useParams } from 'common'
 import { AppBannerWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Sidebar } from 'components/interfaces/Sidebar'
 import { useShowLayoutHeader } from 'hooks/misc/useShowLayoutHeader'
 import { SidebarProvider } from 'ui'
@@ -13,7 +13,6 @@ import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 
 export interface DefaultLayoutProps {
   headerTitle?: string
-  showProductMenu?: boolean
 }
 
 /**
@@ -27,12 +26,8 @@ export interface DefaultLayoutProps {
  * - First level side navigation bar (e.g For navigating to Table Editor, SQL Editor, Database page, etc)
  * @param showProductMenu - (Mobile only) Show button to toggle visiblity of product menu (Default: true)
  */
-const DefaultLayout = ({
-  children,
-  headerTitle,
-  showProductMenu = true,
-}: PropsWithChildren<DefaultLayoutProps>) => {
-  const newLayoutPreview = useNewLayout()
+const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayoutProps>) => {
+  const newLayoutPreview = useIsNewLayoutEnabled()
   const showLayoutHeader = useShowLayoutHeader()
 
   const { ref } = useParams()
@@ -47,7 +42,7 @@ const DefaultLayout = ({
             <div className="flex-shrink-0">
               <MobileNavigationBar />
               {newLayoutPreview || showLayoutHeader ? (
-                <LayoutHeader showProductMenu={showProductMenu} headerTitle={headerTitle} />
+                <LayoutHeader headerTitle={headerTitle} />
               ) : null}
             </div>
             {/* Main Content Area */}

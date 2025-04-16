@@ -1,9 +1,9 @@
 import { useParams } from 'common'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useRouter } from 'next/router'
 
 export function useShowLayoutHeader() {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
   const { ref } = useParams()
   const router = useRouter()
   const pathname = router.pathname ?? ''
