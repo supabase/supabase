@@ -59,6 +59,7 @@ export const componentPages: SidebarNavGroup = {
       supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
       href: '/docs/nextjs/social-auth',
       items: [],
+      new: true,
       commandItemLabel: 'Social Auth',
     },
     {
