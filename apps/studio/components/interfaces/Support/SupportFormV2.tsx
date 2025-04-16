@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
-import { ChevronRight, ExternalLink, Loader2, Mail, Plus, X } from 'lucide-react'
+import { ChevronRight, ExternalLink, Mail, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -112,7 +112,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
     subject: '',
     message: '',
     affectedServices: '',
-    allowSupportAccess: false,
+    allowSupportAccess: true,
   }
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -685,60 +685,78 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
             <FormField_Shadcn_
               name="allowSupportAccess"
               control={form.control}
-              render={({ field }) => (
-                <FormItemLayout
-                  name="allowSupportAccess"
-                  className="px-6"
-                  layout="flex"
-                  label="Allow Supabase Support and AI-Assisted Diagnostics access to your project"
-                  description={
-                    <Collapsible_Shadcn_>
+              render={({ field }) => {
+                return (
+                  <FormItemLayout
+                    name="allowSupportAccess"
+                    className="px-6"
+                    layout="flex"
+                    label={
                       <div className="flex items-center gap-x-2">
-                        <CollapsibleTrigger_Shadcn_ className="group flex items-center gap-x-2 ">
-                          <ChevronRight
-                            strokeWidth={2}
-                            size={14}
-                            className="transition-all group-data-[state=open]:rotate-90 text-foreground-lighter duration-200 -ml-1"
-                          />
-                          <p className="text-xs text-foreground-light underline">
-                            More information about temporary access
-                          </p>
-                        </CollapsibleTrigger_Shadcn_>
+                        <span className="text-foreground">
+                          Allow support access to your project
+                        </span>
+                        <Badge className="bg-opacity-100">Recommended</Badge>
                       </div>
-                      <CollapsibleContent_Shadcn_ className="text-xs text-foreground-light mt-2 space-y-2">
-                        <p>
-                          By enabling this, you grant permission for our support team to access your
-                          project temporarily and, if applicable, to use AI tools to assist in
-                          diagnosing and resolving issues. This access may involve analyzing
-                          database configurations, query performance, and other relevant data to
-                          expedite troubleshooting and enhance support accuracy. We are committed to
-                          maintaining strict data privacy and security standards in all support
-                          activities.{' '}
-                          <Link
-                            href="https://supabase.com/privacy"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-foreground-light underline hover:text-foreground transition"
+                    }
+                    description={
+                      <div className="flex flex-col">
+                        <span className="text-foreground-light">
+                          Human support and AI diagnostic access.
+                        </span>
+                        <Collapsible_Shadcn_ className="mt-2">
+                          <CollapsibleTrigger_Shadcn_
+                            className={
+                              'group flex items-center gap-x-1 group-data-[state=open]:text-foreground hover:text-foreground transition'
+                            }
                           >
-                            Privacy Policy
-                          </Link>
-                        </p>
-                      </CollapsibleContent_Shadcn_>
-                    </Collapsible_Shadcn_>
-                  }
-                >
-                  <Switch
-                    id="allowSupportAccess"
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormItemLayout>
-              )}
+                            <ChevronRight
+                              strokeWidth={2}
+                              size={14}
+                              className="transition-all group-data-[state=open]:rotate-90 text-foreground-muted -ml-1"
+                            />
+                            <span className="text-sm">More information</span>
+                          </CollapsibleTrigger_Shadcn_>
+                          <CollapsibleContent_Shadcn_ className="text-sm text-foreground-light mt-2 space-y-2">
+                            <p>
+                              By enabling this, you grant permission for our support team to access
+                              your project temporarily and, if applicable, to use AI tools to assist
+                              in diagnosing and resolving issues. This access may involve analyzing
+                              database configurations, query performance, and other relevant data to
+                              expedite troubleshooting and enhance support accuracy.
+                            </p>
+                            <p>
+                              We are committed to maintaining strict data privacy and security
+                              standards in all support activities.{' '}
+                              <Link
+                                href="https://supabase.com/privacy"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-foreground-light underline hover:text-foreground transition"
+                              >
+                                Privacy Policy
+                              </Link>
+                            </p>
+                          </CollapsibleContent_Shadcn_>
+                        </Collapsible_Shadcn_>
+                      </div>
+                    }
+                  >
+                    <Switch
+                      size="large"
+                      id="allowSupportAccess"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormItemLayout>
+                )
+              }}
             />
+            <Separator />
           </>
         )}
 
-        <div className={cn(CONTAINER_CLASSES, 'flex flex-col items-end gap-3 -mt-4')}>
+        <div className={cn(CONTAINER_CLASSES, 'flex flex-col items-end gap-3')}>
           <Button
             htmlType="submit"
             size="large"

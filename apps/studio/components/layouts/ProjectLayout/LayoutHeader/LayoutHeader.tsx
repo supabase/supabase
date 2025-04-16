@@ -19,6 +19,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useShowLayoutHeader } from 'hooks/misc/useShowLayoutHeader'
 import { IS_PLATFORM } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
 import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
@@ -49,12 +50,14 @@ interface LayoutHeaderProps {
   customHeaderComponents?: ReactNode
   breadcrumbs?: any[]
   headerTitle?: string
+  showProductMenu?: boolean
 }
 
 const LayoutHeader = ({
   customHeaderComponents,
   breadcrumbs = [],
   headerTitle,
+  showProductMenu,
 }: LayoutHeaderProps) => {
   const newLayoutPreview = useIsNewLayoutEnabled()
 
@@ -62,6 +65,7 @@ const LayoutHeader = ({
   const { ref: projectRef, slug } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
+  const { setMobileMenuOpen } = useAppStateSnapshot()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
   // We only want to query the org usage and check for possible over-ages for plans without usage billing enabled (free or pro with spend cap)
