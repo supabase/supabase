@@ -703,11 +703,18 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                       name="allowSupportAccess"
                       className="px-6"
                       layout="flex"
-                      label={'Allow support access to your project'}
+                      label={
+                        <div className="flex items-center gap-x-2">
+                          <span className="text-foreground">
+                            Allow support access to your project
+                          </span>
+                          <Badge className="bg-opacity-100">Recommended</Badge>
+                        </div>
+                      }
                       description={
                         <div className="flex flex-col">
                           <span className="text-foreground-light">
-                            Human support and AI support authorized access.
+                            Human support and AI diagnostic access.
                           </span>
                           <Collapsible_Shadcn_ className="mt-2">
                             <CollapsibleTrigger_Shadcn_
