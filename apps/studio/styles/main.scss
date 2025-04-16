@@ -2,10 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-@import '~ui/build/css/source/global.css';
-@import '~ui/build/css/themes/dark.css';
-@import '~ui/build/css/themes/light.css';
-@import '~ui/build/css/themes/classic-dark.css';
+@import './../../../packages/ui/build/css/source/global.css';
+@import './../../../packages/ui/build/css/source/global.css';
+@import './../../../packages/ui/build/css/themes/dark.css';
+@import './../../../packages/ui/build/css/themes/light.css';
+@import './../../../packages/ui/build/css/themes/classic-dark.css';
 
 :root {
   --chart-1: hsl(var(--brand-default));
