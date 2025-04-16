@@ -21,6 +21,7 @@ export const WRAPPER_HANDLERS = {
   NOTION: 'wasm_fdw_handler',
   SLACK: 'wasm_fdw_handler',
   CLOUDFLARE_D1: 'wasm_fdw_handler',
+  HUBSPOT: 'wasm_fdw_handler',
 }
 
 export const WRAPPERS: WrapperMeta[] = [
@@ -3447,6 +3448,294 @@ export const WRAPPERS: WrapperMeta[] = [
             defaultValue: 'id',
             editable: true,
             required: false,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'hubspot_wrapper',
+    description: 'Query and sync HubSpot CRM data using the Wasm FDW.',
+    handlerName: WRAPPER_HANDLERS.HUBSPOT,
+    validatorName: 'wasm_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/hubspot-icon.svg`,
+    extensionName: 'HubspotFdw',
+    label: 'HubSpot',
+    docsUrl: 'https://fdw.dev/catalog/hubspot/',
+    minimumExtensionVersion: '0.4.0',
+    server: {
+      options: [
+        {
+          name: 'fdw_package_url',
+          label: 'FDW Package URL',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue:
+            'https://github.com/supabase/wrappers/releases/download/wasm_hubspot_fdw_v0.1.0/hubspot_fdw.wasm',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_name',
+          label: 'FDW Package Name',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'supabase:hubspot-fdw',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_version',
+          label: 'FDW Package Version',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '0.1.0',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_checksum',
+          label: 'FDW Package Checksum',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '2cbf39e9e28aa732a225db09b2186a2342c44697d4fa047652d358e292ba5521',
+          hidden: true,
+        },
+        {
+          name: 'api_url',
+          label: 'API URL',
+          required: false,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'https://api.hubapi.com/crm/v3',
+        },
+        {
+          name: 'api_key_id',
+          label: 'HubSpot API Key',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
+          urlHelper: 'https://app.hubspot.com/api-key',
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Companies',
+        description: 'Companies and organizations in your HubSpot CRM',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'name', type: 'text' },
+          { name: 'domain', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'objects/companies',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Contacts',
+        description: 'Contacts in your HubSpot CRM',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'email', type: 'text' },
+          { name: 'firstname', type: 'text' },
+          { name: 'lastname', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'objects/contacts',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Deals',
+        description: 'Deals and transactions in your HubSpot CRM',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'objects/deals',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Tickets',
+        description: 'Customer service requests in your HubSpot CRM',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'subject', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'objects/tickets',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Products',
+        description: 'Products offered by your company in HubSpot',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'name', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'objects/products',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Leads',
+        description: 'Potential customers in your HubSpot CRM',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'objects/leads',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Partner Clients',
+        description: 'Partner clients managed by your company in HubSpot',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'objects/partner_clients',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Feedback Submissions',
+        description: 'Feedback submissions from NPS, CSAT, CES, and custom surveys',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'objects/feedback_submissions',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Custom Object',
+        description: 'Custom objects managed by your company in HubSpot',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            label: 'Object',
+            name: 'object',
+            placeholder: 'objects/<objectType> e.g. `objects/2-3508482`',
+            defaultValue: 'objects/<objectType>',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Goals',
+        description: 'User-specific quotas for sales and services teams',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'objects/goal_targets',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Partner Clients',
+        description: 'Customers that Solutions Partners have a sold or managed relationship with',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'objects/partner_clients',
+            editable: false,
+            required: true,
             type: 'text',
           },
         ],
