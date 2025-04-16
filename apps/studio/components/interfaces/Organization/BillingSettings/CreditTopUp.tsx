@@ -260,7 +260,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                 <p className="prose text-sm">
                   For larger discounted credit packages, please{' '}
                   <Link
-                    href={`/support/new?slug=${slug}&subject=${encodeURIComponent('I would like to inquire about larger credit packages')}&category=${SupportCategories.BILLING}`}
+                    href={`/support/new?slug=${slug}&subject=${encodeURIComponent('I would like to inquire about larger credit packages')}&category=${SupportCategories.SALES_ENQUIRY}`}
                     target="_blank"
                   >
                     reach out.

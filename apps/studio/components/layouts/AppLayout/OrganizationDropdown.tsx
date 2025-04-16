@@ -8,7 +8,6 @@ import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePr
 import PartnerIcon from 'components/ui/PartnerIcon'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
@@ -40,7 +39,6 @@ const OrganizationDropdown = () => {
 
   const slug = selectedOrganization?.slug
   const orgName = selectedOrganization?.name
-  const { data: subscription, isSuccess } = useOrgSubscriptionQuery({ orgSlug: slug })
 
   const [open, setOpen] = useState(false)
 
@@ -56,7 +54,7 @@ const OrganizationDropdown = () => {
           <span className="text-foreground max-w-32 lg:max-w-none truncate hidden md:block">
             {orgName}
           </span>
-          {isSuccess && <Badge variant="default">{subscription?.plan.name}</Badge>}
+          <Badge variant="default">{selectedOrganization?.plan.name}</Badge>
         </Link>
       )}
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
@@ -71,7 +69,7 @@ const OrganizationDropdown = () => {
             <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
               <div className="flex items-center space-x-2">
                 <p className={'text-xs'}>{orgName}</p>
-                {isSuccess && <Badge variant="default">{subscription?.plan.name}</Badge>}
+                <Badge variant="default">{selectedOrganization?.plan.name}</Badge>
               </div>
             </Button>
           )}

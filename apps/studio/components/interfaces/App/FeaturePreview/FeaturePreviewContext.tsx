@@ -20,7 +20,7 @@ export const FEATURE_PREVIEWS = [
   },
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
-    name: 'Inline SQL Editor',
+    name: 'Directly edit database entities',
     content: <InlineEditorPreview />,
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/33690',
     isNew: true,
