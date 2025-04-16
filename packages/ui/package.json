@@ -80,8 +80,8 @@
   },
   "devDependencies": {
     "@ctrl/tinycolor": "^3.4.0",
-    "@testing-library/jest-dom": "^6.1.3",
-    "@testing-library/react": "^14.0.0",
+    "@testing-library/jest-dom": "^6.6.0",
+    "@testing-library/react": "^16.0.0",
     "@types/lodash": "4.17.5",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
@@ -94,7 +94,7 @@
     "style-dictionary": "^3.7.1",
     "tsconfig": "workspace:*",
     "typescript": "~5.5.0",
-    "vite": "^6.2.4",
+    "vite": "^6.2.6",
     "vitest": "^3.0.5"
   },
   "peerDependencies": {
