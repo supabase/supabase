@@ -165,7 +165,7 @@ const LayoutHeader = ({
                     ease: 'easeOut',
                   }}
                 >
-                  <Connect />
+                  {<Connect />}
                   {!isBranchingEnabled && IS_PLATFORM && <EnableBranchingButton />}
                 </motion.div>
               )}

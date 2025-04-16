@@ -32,11 +32,11 @@ export const HomeIcon = () => {
     return '/projects'
   }
 
-  const href = newLayoutPreview
-    ? IS_PLATFORM
+  const href = IS_PLATFORM
+    ? newLayoutPreview
       ? getDefaultOrgRedirect()
-      : `/project/${project?.ref}`
-    : '/projects'
+      : `/projects`
+    : '/project/default'
 
   return (
     <Link href={href} className="items-center justify-center flex-shrink-0 hidden md:flex">
