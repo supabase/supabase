@@ -5,8 +5,9 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
 import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { withAuth } from 'hooks/misc/withAuth'
-import { IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { cn, NavMenu, NavMenuItem } from 'ui'
 import {
@@ -21,10 +22,21 @@ export interface AccountLayoutProps {
 }
 
 const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps>) => {
-  const newLayoutPreview = useNewLayout()
-
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
+  const newLayoutPreview = useNewLayout()
+
+  const [lastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
+
+  const backToDashboardURL =
+    appSnap.lastRouteBeforeVisitingAccountPage.length > 0
+      ? appSnap.lastRouteBeforeVisitingAccountPage
+      : !!lastVisitedOrganization
+        ? `/org/${lastVisitedOrganization}`
+        : '/organizations'
 
   const accountLinks = [
     {
@@ -58,7 +70,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
           <>
             <ScaffoldContainerLegacy>
               <Link
-                href={appSnap.lastRouteBeforeVisitingAccountPage ?? '/'}
+                href={backToDashboardURL}
                 className="flex text-xs flex-row gap-2 items-center text-foreground-lighter focus-visible:text-foreground hover:text-foreground"
               >
                 <ArrowLeft strokeWidth={1.5} size={14} />
