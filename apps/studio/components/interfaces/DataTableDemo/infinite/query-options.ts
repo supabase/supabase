@@ -4,6 +4,7 @@ import type { Percentile } from 'components/interfaces/DataTableDemo/lib/request
 import SuperJSON from 'superjson'
 import type { BaseChartSchema, ColumnSchema, FacetMetadataSchema } from './schema'
 import type { SearchParamsType } from './search-params'
+// Removed: import { searchParamsSerializer } from './search-params'
 import {
   ARRAY_DELIMITER,
   RANGE_DELIMITER,
@@ -11,14 +12,14 @@ import {
   SORT_DELIMITER,
 } from 'components/interfaces/DataTableDemo/lib/delimiters'
 
-// Helper function to create query params string (assuming similar API conventions)
+// Restore the helper function to create query params string
 const createApiQueryString = (params: Record<string, any>): string => {
   const queryParams = new URLSearchParams()
 
   for (const [key, value] of Object.entries(params)) {
     if (value === null || value === undefined) continue
 
-    // Add handling specific to infinite API if needed, otherwise assume similar to light
+    // Using logic similar to the original light version
     if (key === 'date' && Array.isArray(value) && value.length === 2) {
       queryParams.set('dateStart', value[0].getTime().toString())
       queryParams.set('dateEnd', value[1].getTime().toString())
@@ -36,16 +37,23 @@ const createApiQueryString = (params: Record<string, any>): string => {
       value.length > 0
     ) {
       // Assuming slider or range gives min/max
-      queryParams.set(`${key}Start`, value[0].toString())
-      queryParams.set(`${key}End`, value[value.length - 1].toString())
+      // Use the correct delimiters if necessary based on how backend expects ranges
+      if (value.length === 1) {
+        // Handle single value if needed, maybe just set the key?
+        // queryParams.set(key, value[0].toString());
+      } else if (value.length >= 2) {
+        queryParams.set(`${key}Start`, value[0].toString())
+        queryParams.set(`${key}End`, value[value.length - 1].toString())
+      }
     } else if (Array.isArray(value)) {
       if (value.length > 0) {
-        queryParams.set(key, value.join(',')) // Use comma separation for arrays
+        // Use comma (ARRAY_DELIMITER) separation for arrays
+        queryParams.set(key, value.join(ARRAY_DELIMITER))
       }
     } else if (key === 'sort' && typeof value === 'object' && value !== null) {
       queryParams.set(
         key,
-        `${(value as { id: string; desc: boolean }).id}.${(value as { id: string; desc: boolean }).desc ? 'desc' : 'asc'}`
+        `${(value as { id: string; desc: boolean }).id}${SORT_DELIMITER}${(value as { id: string; desc: boolean }).desc ? 'desc' : 'asc'}`
       )
     } else if (value instanceof Date) {
       queryParams.set(key, value.getTime().toString())
@@ -112,16 +120,15 @@ export const dataOptions = (search: SearchParamsType) => {
         ...(direction && { direction }), // Add direction if present
       }
 
-      const queryString = createApiQueryString(apiParams)
       // Assuming the API route is /api/data-table/infinite
-      const response = await fetch(`/api/data-table/infinite${queryString}`)
+      const response = await fetch(`/api/data-table/infinite${createApiQueryString(apiParams)}`)
 
       if (!response.ok) {
         throw new Error('Network response was not ok')
       }
 
-      const json = await response.json()
-      return SuperJSON.parse<InfiniteQueryResponse<ColumnSchema[], LogsMeta>>(json)
+      const jsonString = await response.text()
+      return SuperJSON.parse<InfiniteQueryResponse<ColumnSchema[], LogsMeta>>(jsonString)
     },
     initialPageParam: { cursor: new Date().getTime(), direction: 'next' } as PageParam,
     getPreviousPageParam: (

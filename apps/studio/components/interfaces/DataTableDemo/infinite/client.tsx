@@ -68,6 +68,12 @@ export function Client() {
     })
   }, [facets])
 
+  // --- DEBUG: Check props before passing to DataTableInfinite ---
+  console.log('>>> [Client] flatData length:', flatData?.length)
+  console.log('>>> [Client] filterDBRowCount:', filterDBRowCount)
+  console.log('>>> [Client] data object:', data) // Log the raw react-query data
+  // --- END DEBUG ---
+
   return (
     <DataTableInfinite
       columns={columns}

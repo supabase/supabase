@@ -1,7 +1,7 @@
 import {
   createParser,
   // createSearchParamsCache, // Removed for Pages Router compatibility
-  // createSerializer, // Removed for Pages Router compatibility
+  createSerializer, // Uncommented for Pages Router compatibility
   parseAsArrayOf,
   parseAsBoolean,
   parseAsInteger,
@@ -64,7 +64,7 @@ export const searchParamsParser = {
 
 // Removed for Pages Router compatibility
 // export const searchParamsCache = createSearchParamsCache(searchParamsParser)
-// export const searchParamsSerializer = createSerializer(searchParamsParser)
+export const searchParamsSerializer = createSerializer(searchParamsParser) // Uncommented
 
 export type SearchParamsType = inferParserType<typeof searchParamsParser>
 

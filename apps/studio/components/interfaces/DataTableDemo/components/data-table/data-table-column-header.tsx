@@ -22,8 +22,8 @@ export function DataTableColumnHeader<TData, TValue>({
 
   return (
     <Button
-      variant="ghost"
-      size="sm"
+      type="text"
+      size="small"
       onClick={() => {
         column.toggleSorting(undefined)
       }}
@@ -31,23 +31,25 @@ export function DataTableColumnHeader<TData, TValue>({
         'py-0 px-0 h-7 hover:bg-transparent flex gap-2 items-center justify-between w-full',
         className
       )}
+      iconRight={
+        <span className="flex flex-col">
+          <ChevronUp
+            className={cn(
+              '-mb-0.5 h-3 w-3',
+              column.getIsSorted() === 'asc' ? 'text-foreground' : 'text-foreground-muted'
+            )}
+          />
+          <ChevronDown
+            className={cn(
+              '-mt-0.5 h-3 w-3',
+              column.getIsSorted() === 'desc' ? 'text-foreground' : 'text-foreground-muted'
+            )}
+          />
+        </span>
+      }
       {...props}
     >
       <span>{title}</span>
-      <span className="flex flex-col">
-        <ChevronUp
-          className={cn(
-            '-mb-0.5 h-3 w-3',
-            column.getIsSorted() === 'asc' ? 'text-accent-foreground' : 'text-muted-foreground'
-          )}
-        />
-        <ChevronDown
-          className={cn(
-            '-mt-0.5 h-3 w-3',
-            column.getIsSorted() === 'desc' ? 'text-accent-foreground' : 'text-muted-foreground'
-          )}
-        />
-      </span>
     </Button>
   )
 }
