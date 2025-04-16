@@ -1,0 +1,5 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema-jsonc.json",
+  "exclude": ["types", "exports"],
+  "ignore": ["examples/**", "**/*.mdx", "supabase/functions/**", "**/*.test.ts"],
+}
