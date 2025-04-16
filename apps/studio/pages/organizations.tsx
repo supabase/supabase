@@ -7,12 +7,15 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainerLegacy, ScaffoldTitle } from 'components/layouts/Scaffold'
 import { ActionCard } from 'components/ui/ActionCard'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
 import { NextPageWithLayout } from 'types'
 import { Skeleton } from 'ui'
 
 const OrganizationsPage: NextPageWithLayout = () => {
   const router = useRouter()
+
   const { data: organizations, isLoading, isError, error, isSuccess } = useOrganizationsQuery()
+  const { data: projects = [] } = useProjectsQuery()
 
   useEffect(() => {
     // If there are no organizations, force the user to create one
@@ -37,16 +40,23 @@ const OrganizationsPage: NextPageWithLayout = () => {
           )}
           {isError && <div>Error loading organizations</div>}
           {isSuccess &&
-            organizations?.map((organization) => (
-              <ActionCard
-                bgColor="bg border"
-                className="[&>div]:items-center"
-                key={organization.id}
-                icon={<Boxes size={18} strokeWidth={1} className="text-foreground" />}
-                title={organization.name}
-                onClick={() => router.push(`/org/${organization.slug}`)}
-              />
-            ))}
+            organizations?.map((organization) => {
+              const numProjects = projects.filter(
+                (x) => x.organization_slug === organization.slug
+              ).length
+
+              return (
+                <ActionCard
+                  bgColor="bg border"
+                  className="[&>div]:items-center"
+                  key={organization.id}
+                  icon={<Boxes size={18} strokeWidth={1} className="text-foreground" />}
+                  title={organization.name}
+                  description={`${organization.plan.name} Plan${numProjects > 0 ? `${'  '}•${'  '}${numProjects} project${numProjects > 1 ? 's' : ''}` : ''}`}
+                  onClick={() => router.push(`/org/${organization.slug}`)}
+                />
+              )
+            })}
         </div>
       </ScaffoldContainerLegacy>
     </>

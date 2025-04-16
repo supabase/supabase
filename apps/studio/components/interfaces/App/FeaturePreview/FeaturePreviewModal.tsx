@@ -1,6 +1,6 @@
 import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -36,12 +36,10 @@ const FeaturePreviewModal = () => {
     }
   }
 
-  const selectedFeaturePreview =
+  const selectedFeatureKey =
     snap.selectedFeaturePreview === ''
       ? FEATURE_PREVIEWS.filter((feature) => isReleasedToPublic(feature))[0].key
       : snap.selectedFeaturePreview
-
-  const [selectedFeatureKey, setSelectedFeatureKey] = useState<string>(selectedFeaturePreview)
 
   const { flags, onUpdateFlag } = featurePreviewContext
   const selectedFeature = FEATURE_PREVIEWS.find((preview) => preview.key === selectedFeatureKey)
@@ -65,17 +63,7 @@ const FeaturePreviewModal = () => {
 
   function handleCloseFeaturePreviewModal() {
     snap.setShowFeaturePreviewModal(false)
-    snap.setSelectedFeaturePreview(FEATURE_PREVIEWS[0].key)
   }
-
-  // this modal can be triggered on other pages
-  // Update local state when valtio state changes
-
-  useEffect(() => {
-    if (snap.selectedFeaturePreview !== '') {
-      setSelectedFeatureKey(snap.selectedFeaturePreview)
-    }
-  }, [snap.selectedFeaturePreview])
 
   useEffect(() => {
     if (snap.showFeaturePreviewModal) {
@@ -109,7 +97,7 @@ const FeaturePreviewModal = () => {
                 return (
                   <div
                     key={feature.key}
-                    onClick={() => setSelectedFeatureKey(feature.key)}
+                    onClick={() => snap.setSelectedFeaturePreview(feature.key)}
                     className={cn(
                       'flex items-center space-x-3 p-4 border-b cursor-pointer bg transition',
                       selectedFeatureKey === feature.key ? 'bg-surface-300' : 'bg-surface-100'
