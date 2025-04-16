@@ -3,9 +3,9 @@ import Link from 'next/link'
 import { ReactNode, useMemo } from 'react'
 
 import { useParams } from 'common'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import Connect from 'components/interfaces/Connect/Connect'
-import { ThemeDropdown } from 'components/interfaces/ThemeDropdown'
+import { LocalDropdown } from 'components/interfaces/LocalDropdown'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
 import AssistantButton from 'components/layouts/AppLayout/AssistantButton'
 import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
@@ -19,7 +19,6 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useShowLayoutHeader } from 'hooks/misc/useShowLayoutHeader'
 import { IS_PLATFORM } from 'lib/constants'
-import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
 import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
@@ -49,24 +48,21 @@ const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanEl
 interface LayoutHeaderProps {
   customHeaderComponents?: ReactNode
   breadcrumbs?: any[]
-  showProductMenu?: boolean
   headerTitle?: string
 }
 
 const LayoutHeader = ({
   customHeaderComponents,
   breadcrumbs = [],
-  showProductMenu,
   headerTitle,
 }: LayoutHeaderProps) => {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
 
   const showLayoutHeader = useShowLayoutHeader()
   const { ref: projectRef, slug } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
-  const { setMobileMenuOpen } = useAppStateSnapshot()
 
   // We only want to query the org usage and check for possible over-ages for plans without usage billing enabled (free or pro with spend cap)
   const { data: orgUsage } = useOrgUsageQuery(
@@ -169,7 +165,7 @@ const LayoutHeader = ({
                     ease: 'easeOut',
                   }}
                 >
-                  <Connect />
+                  {<Connect />}
                   {!isBranchingEnabled && IS_PLATFORM && <EnableBranchingButton />}
                 </motion.div>
               )}
@@ -189,7 +185,7 @@ const LayoutHeader = ({
           ) : (
             <>
               <LocalVersionPopover />
-              <ThemeDropdown />
+              <LocalDropdown />
             </>
           )}
         </div>

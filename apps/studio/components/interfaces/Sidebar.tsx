@@ -56,8 +56,8 @@ import {
 } from 'ui'
 import {
   useIsAPIDocsSidePanelEnabled,
+  useIsNewLayoutEnabled,
   useIsSQLEditorTabsEnabled,
-  useNewLayout,
 } from './App/FeaturePreview/FeaturePreviewContext'
 
 export const ICON_SIZE = 32
@@ -74,7 +74,7 @@ const SidebarMotion = motion(SidebarPrimitive) as FC<
 export interface SidebarProps extends ComponentPropsWithoutRef<typeof SidebarPrimitive> {}
 
 export const Sidebar = ({ className, ...props }: SidebarProps) => {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
 
   const { ref } = useParams()
 
@@ -151,7 +151,7 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
 }
 
 export const SidebarContent = ({ footer }: { footer?: ReactNode }) => {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
   const { ref: projectRef } = useParams()
 
   // temporary logic to show settings route in sidebar footer
