@@ -3456,8 +3456,7 @@ export const WRAPPERS: WrapperMeta[] = [
   },
   {
     name: 'hubspot_wrapper',
-    description:
-      'Query and sync HubSpot CRM data (companies, contacts, deals, tickets, and more) with Postgres using the Wasm FDW.',
+    description: 'Query and sync HubSpot CRM data using the Wasm FDW.',
     handlerName: WRAPPER_HANDLERS.HUBSPOT,
     validatorName: 'wasm_fdw_validator',
     icon: `${BASE_PATH}/img/icons/hubspot-icon.svg`,
@@ -3698,6 +3697,44 @@ export const WRAPPERS: WrapperMeta[] = [
             placeholder: 'objects/<objectType> e.g. `objects/2-3508482`',
             defaultValue: 'objects/<objectType>',
             editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Goals',
+        description: 'User-specific quotas for sales and services teams',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'objects/goal_targets',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Partner Clients',
+        description: 'Customers that Solutions Partners have a sold or managed relationship with',
+        availableColumns: [
+          { name: 'id', type: 'text' },
+          { name: 'created_at', type: 'timestamp' },
+          { name: 'updated_at', type: 'timestamp' },
+          { name: 'attrs', type: 'jsonb' },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'objects/partner_clients',
+            editable: false,
             required: true,
             type: 'text',
           },
