@@ -2,41 +2,9 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { z } from 'zod'
 
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
-
-// Define the expected form values structure and validation schema
-export const BillingAddressSchema = z
-  .object({
-    line1: z.string().optional(),
-    line2: z.string().optional(),
-    city: z.string().optional(),
-    state: z.string().optional(),
-    postal_code: z.string().optional(),
-    country: z.string().optional(),
-  })
-  .refine(
-    (data) => {
-      const hasAnyField = data.line1 || data.line2 || data.city || data.state || data.postal_code
-      // If any field has value, country and line1 must have values.
-      return !hasAnyField || (!!data.country && !!data.line1)
-    },
-    {
-      message: 'Country and Address line 1 are required if any other field is provided.',
-      path: ['line1'],
-    }
-  )
-  .refine((data) => !(!!data.line1 && !data.country), {
-    message: 'Please select a country',
-    path: ['country'],
-  })
-  .refine((data) => !(!!data.country && !data.line1), {
-    message: 'Please provide an address line 1',
-    path: ['line1'],
-  })
-
-export type BillingAddressFormValues = z.infer<typeof BillingAddressSchema>
+import { BillingAddressFormValues, BillingAddressSchema } from './BillingAddressForm'
 
 interface UseBillingAddressFormProps {
   slug?: string
@@ -54,6 +22,7 @@ export function useBillingAddressForm({
   const form = useForm<BillingAddressFormValues>({
     resolver: zodResolver(BillingAddressSchema),
     defaultValues: {
+      billing_name: initialAddress?.billing_name || '',
       line1: initialAddress?.line1 || '',
       line2: initialAddress?.line2 || '',
       city: initialAddress?.city || '',
@@ -67,6 +36,7 @@ export function useBillingAddressForm({
   useEffect(() => {
     if (initialAddress) {
       form.reset({
+        billing_name: initialAddress.billing_name || '',
         line1: initialAddress.line1 || '',
         line2: initialAddress.line2 || '',
         city: initialAddress.city || '',
@@ -75,7 +45,7 @@ export function useBillingAddressForm({
         country: initialAddress.country || '',
       })
     }
-  }, [initialAddress, form])
+  }, [initialAddress])
 
   const { mutate: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation({
     onSuccess: () => {
@@ -102,12 +72,17 @@ export function useBillingAddressForm({
     }, {} as BillingAddressFormValues)
 
     const addressPayload = !trimmedValues.line1 ? null : trimmedValues
-    updateCustomerProfile({ slug, address: addressPayload as any })
+    updateCustomerProfile({
+      slug,
+      address: addressPayload as any,
+      billing_name: trimmedValues.billing_name,
+    })
   }
 
   const handleReset = () => {
     if (initialAddress) {
       form.reset({
+        billing_name: initialAddress.billing_name || '',
         line1: initialAddress.line1 || '',
         line2: initialAddress.line2 || '',
         city: initialAddress.city || '',

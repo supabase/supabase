@@ -20,7 +20,7 @@ import {
   cn,
 } from 'ui'
 import { COUNTRIES } from './BillingAddress.constants'
-import { BillingAddressFormValues } from './useBillingAddressForm'
+import { z } from 'zod'
 
 interface BillingAddressFormProps {
   form: UseFormReturn<BillingAddressFormValues>
@@ -28,9 +28,56 @@ interface BillingAddressFormProps {
   className?: string
 }
 
+// Define the expected form values structure and validation schema
+export const BillingAddressSchema = z
+  .object({
+    billing_name: z.string().min(3, 'Name must be at least 3 letters long'),
+    line1: z.string().optional(),
+    line2: z.string().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    postal_code: z.string().optional(),
+    country: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      // its fine to just set the name, but once any other field is set, requires full address
+      const hasAnyField = data.line1 || data.line2 || data.city || data.state || data.postal_code
+      // If any field has value, country and line1 must have values.
+      return !hasAnyField || (!!data.country && !!data.line1)
+    },
+    {
+      message: 'Country and Address line 1 are required if any other field is provided.',
+      path: ['line1'],
+    }
+  )
+  .refine((data) => !(!!data.line1 && !data.country), {
+    message: 'Please select a country',
+    path: ['country'],
+  })
+  .refine((data) => !(!!data.country && !data.line1), {
+    message: 'Please provide an address line 1',
+    path: ['line1'],
+  })
+
+export type BillingAddressFormValues = z.infer<typeof BillingAddressSchema>
+
 const BillingAddressForm = ({ form, disabled = false, className }: BillingAddressFormProps) => {
   return (
     <div className={cn('flex flex-col space-y-4', className)}>
+      <FormField
+        control={form.control}
+        name="billing_name"
+        render={({ field }: { field: any }) => (
+          <FormItem>
+            <FormControl>
+              <Input {...field} placeholder="Name" disabled={disabled} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
       <FormField
         control={form.control}
         name="line1"

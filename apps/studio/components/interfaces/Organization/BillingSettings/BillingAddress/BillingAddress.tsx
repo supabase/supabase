@@ -16,6 +16,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import BillingAddressForm from './BillingAddressForm'
 import { Button, Card, CardFooter, cn, Form_Shadcn_ as Form } from 'ui'
 import { useBillingAddressForm } from './useBillingAddressForm'
+import { useMemo } from 'react'
 
 const BillingAddress = () => {
   const { slug } = useParams()
@@ -35,9 +36,14 @@ const BillingAddress = () => {
     { enabled: canReadBillingAddress }
   )
 
+  const initialAddress = useMemo(
+    () => ({ ...data?.address, billing_name: data?.billing_name }),
+    [data]
+  )
+
   const { form, handleSubmit, handleReset, isSubmitting, isDirty } = useBillingAddressForm({
     slug,
-    initialAddress: data?.address,
+    initialAddress,
   })
 
   const isSubmitDisabled = !isDirty || !canUpdateBillingAddress || isSubmitting
