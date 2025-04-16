@@ -2,12 +2,10 @@ import { CpuIcon, Lock, Microchip } from 'lucide-react'
 import { useMemo } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 
-import { components } from 'api-types'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLink } from 'components/ui/InlineLink'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
@@ -26,11 +24,7 @@ import {
 import { ComputeBadge } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
-import {
-  ComputeInstanceAddonVariantId,
-  ComputeInstanceSize,
-  InfraInstanceSize,
-} from '../DiskManagement.types'
+import { ComputeInstanceAddonVariantId, InfraInstanceSize } from '../DiskManagement.types'
 import {
   calculateComputeSizePrice,
   getAvailableComputeOptions,
@@ -61,8 +55,6 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const org = useSelectedOrganization()
   const { control, formState, setValue, trigger } = form
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
-
   const { project, isLoading: isProjectLoading } = useProjectContext()
   const {
     data: addons,
@@ -90,11 +82,11 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
     availableOptions: availableOptions,
     oldComputeSize: form.formState.defaultValues?.computeSize || 'ci_micro',
     newComputeSize: form.getValues('computeSize'),
-    plan: subscription?.plan.id ?? 'free',
+    plan: org?.plan.id ?? 'free',
   })
 
   const showUpgradeBadge = showMicroUpgrade(
-    subscription?.plan.id ?? 'free',
+    org?.plan.id ?? 'free',
     project?.infra_compute_size ?? 'nano'
   )
 
@@ -179,14 +171,14 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                     const lockedMicroDueToPITR =
                       compute.identifier === 'ci_micro' && !!subscriptionPitr
                     const lockedNanoDueToPlan =
-                      subscription?.plan.id !== 'free' &&
+                      org?.plan.id !== 'free' &&
                       project?.infra_compute_size !== 'nano' &&
                       compute.identifier === 'ci_nano'
 
                     const lockedOption = lockedNanoDueToPlan || lockedMicroDueToPITR
 
                     const price =
-                      subscription?.plan.id !== 'free' &&
+                      org?.plan.id !== 'free' &&
                       project?.infra_compute_size === 'nano' &&
                       compute.identifier === 'ci_nano'
                         ? availableOptions.find(

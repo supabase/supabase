@@ -142,7 +142,7 @@ const Home: NextPageWithLayout = () => {
 }
 
 Home.getLayout = (page) => (
-  <DefaultLayout showProductMenu={false}>
+  <DefaultLayout>
     <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
   </DefaultLayout>
 )

@@ -13,10 +13,7 @@ import { useOrganizationCreateInvitationMutation } from 'data/organization-membe
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import {
-  useHasAccessToProjectLevelPermissions,
-  useOrgSubscriptionQuery,
-} from 'data/subscriptions/org-subscription-query'
+import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import {
   doPermissionsCheck,
   useCheckPermissions,
@@ -82,11 +79,8 @@ export const InviteMemberButton = () => {
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )
-  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery(
-    { orgSlug: slug },
-    { enabled: canReadSubscriptions }
-  )
-  const currentPlan = subscription?.plan
+
+  const currentPlan = organization?.plan
   const hasAccessToProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   const userMemberData = members?.find((m) => m.gotrue_id === profile?.gotrue_id)
@@ -405,16 +399,15 @@ export const InviteMemberButton = () => {
                           Learn more
                         </Link>
                       </Button>
-                      {isSuccessSubscription &&
-                        (currentPlan?.id === 'free' || currentPlan?.id === 'pro') && (
-                          <Button asChild type="default">
-                            <Link
-                              href={`/org/${slug}/billing?panel=subscriptionPlan&source=inviteMemberSSO`}
-                            >
-                              Upgrade to Team
-                            </Link>
-                          </Button>
-                        )}
+                      {(currentPlan?.id === 'free' || currentPlan?.id === 'pro') && (
+                        <Button asChild type="default">
+                          <Link
+                            href={`/org/${slug}/billing?panel=subscriptionPlan&source=inviteMemberSSO`}
+                          >
+                            Upgrade to Team
+                          </Link>
+                        </Button>
+                      )}
                     </div>
                   </div>
                 }

@@ -254,12 +254,6 @@ div[data-radix-portal]:not(.portal--toast) {
   }
 }
 
-.text-area-text-sm {
-  textarea {
-    @apply text-sm;
-  }
-}
-
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
