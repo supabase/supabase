@@ -199,9 +199,7 @@ describe('Advanced Query Tests', () => {
       const query = new Query()
       const sql = query.from('table with spaces', 'public').select('"quoted\'column"').toSql()
 
-      expect(sql).toMatchInlineSnapshot(
-        `"select "quoted'column" from public."table with spaces";"`
-      )
+      expect(sql).toMatchInlineSnapshot(`"select "quoted'column" from public."table with spaces";"`)
       const result = await validateSql(db, sql)
       expect(result.length).toBe(2)
       expect(result[0]["quoted'column"]).toBe("value with 'quotes'")
