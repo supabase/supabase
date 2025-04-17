@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProjectList } from 'components/interfaces/Home/ProjectList'
 import HomePageActions from 'components/interfaces/HomePageActions'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -13,7 +13,7 @@ import { PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
 const ProjectsPage: NextPageWithLayout = () => {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
   const hasWindowLoaded = typeof window !== 'undefined'
 
   const router = useRouter()

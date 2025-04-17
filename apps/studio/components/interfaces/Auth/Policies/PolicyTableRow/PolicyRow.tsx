@@ -69,20 +69,21 @@ const PolicyRow = ({
           <div className="flex flex-col gap-y-1">
             <Button
               type="text"
-              className="h-auto text-foreground text-sm border-none p-0 hover:bg-transparent"
+              className="h-auto text-foreground text-sm border-none p-0 hover:bg-transparent justify-start"
               onClick={() => onSelectEditPolicy(policy)}
             >
               {policy.name}
             </Button>
             <div className="flex items-center gap-x-1">
               <div className="text-foreground-lighter text-sm">
-                Applied to:
+                Applied to:{' '}
                 {policy.roles.slice(0, 3).map((role, i) => (
                   <code key={`policy-${role}-${i}`} className="text-foreground-light text-xs">
                     {role}
+                    {policy.roles.length > 1 ? '' : ' '}
                   </code>
-                ))}{' '}
-                role
+                ))}
+                {policy.roles.length > 1 ? 'roles' : 'role'}
               </div>
               {policy.roles.length > 3 && (
                 <Tooltip>

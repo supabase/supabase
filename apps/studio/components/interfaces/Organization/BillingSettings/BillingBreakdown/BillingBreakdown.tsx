@@ -43,7 +43,7 @@ const BillingBreakdown = () => {
   return (
     <ScaffoldSection>
       <ScaffoldSectionDetail>
-        <div className="sticky space-y-2 top-12 pr-3">
+        <div className="sticky space-y-2 top-12 pr-6">
           <p className="text-foreground text-base m-0">Upcoming Invoice</p>
           <div className="py-2">
             <SparkBar
