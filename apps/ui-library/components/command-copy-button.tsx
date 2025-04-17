@@ -19,10 +19,10 @@ export function CommandCopyButton({ command }: { command: string }) {
 
   const parseCommandForTelemetry = (cmd: string) => {
     // Extract framework from URL (e.g., 'nextjs' from 'password-based-auth-nextjs.json')
-    const frameworkMatch = cmd.match(/\/ui\/r\/.*?-(\w+)\.json/)
+    const frameworkMatch = cmd.match(/ui\/r\/.*?-(nextjs|react|react-router|tanstack)\.json/)
     const framework = frameworkMatch
       ? (frameworkMatch[1] as 'nextjs' | 'react-router' | 'tanstack' | 'react')
-      : 'nextjs'
+      : 'all'
 
     // Extract package manager from command prefix (npx, pnpm, yarn, bun)
     const packageManager = cmd.startsWith('npx')
@@ -36,8 +36,8 @@ export function CommandCopyButton({ command }: { command: string }) {
             : ('npm' as const)
 
     // Extract template title from URL (e.g., 'password-based-auth' from 'password-based-auth-nextjs.json')
-    const titleMatch = cmd.match(/\/ui\/r\/(.*?)-\w+\.json/)
-    const title = titleMatch ? titleMatch[1] : ''
+    const titleMatch = cmd.match(/\/ui\/r\/(.*?)\.json/)
+    const title = (titleMatch ? titleMatch[1] : '').replaceAll(`-${framework}`, '')
 
     return {
       framework,
@@ -57,7 +57,8 @@ export function CommandCopyButton({ command }: { command: string }) {
 
         // Parse command and send telemetry event
         const { framework, packageManager, title } = parseCommandForTelemetry(command)
-
+        console.log({ framework, packageManager, title })
+        return
         sendTelemetryEvent({
           action: 'supabase_ui_command_copy_button_clicked',
           properties: {
