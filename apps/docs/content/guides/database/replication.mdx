@@ -6,10 +6,24 @@ slug: 'replication'
 
 Replication is a technique for copying the data from one database to another. Supabase uses replication functionality to provide a real-time API. Replication is useful for:
 
-- Spreading out the "load." For example, if your database has a lot of reads, you might want to split it between two databases.
-- Reducing latency. For example, you may want one database in London to serve your European customers, and one in New York to serve the US.
+1. Spreading out the "load." For example, if your database has a lot of reads, you might want to split it between two databases.
+2. Reducing latency. For example, you may want one database in London to serve your European customers, and one in New York to serve the US.
+3. Extracting data from your database into a Data Warehouse (or a different destination)
+4. Listening to the database for changes (as realtime does)
 
 Replication is done through _publications_, a method of choosing which changes to send to other systems (usually another Postgres database). Publications can be managed in the [Dashboard](https://supabase.com/dashboard) or with SQL.
+
+If points 1 and 2 are your goals, check out our managed [Read Replicas](/docs/content/guides/platform/read-replicas.mdx)
+
+If point 3 is your aim, a guide on using replication to send data to external tools can be found [here](/docs/content/guides/database/postgres/setup-replication-external.mdx)
+
+<Admonition type="caution">
+
+When setting up replication, you are responsible for the publication and the subscriptions. Replication from Supabase is not part of the platform's core features and is not covered by support. For more information, see our [Shared Responsibility Model](/docs/content/guides/platform/shared-responsibility-model.mdx)
+
+If your destination is not available (or if your Supabase project has a spike in traffic) then you will see your disk usage grow and your replication can fail. It is your responsibility to monitor and remedy this.
+
+</Admonition>
 
 ## Manage publications in the dashboard
 
