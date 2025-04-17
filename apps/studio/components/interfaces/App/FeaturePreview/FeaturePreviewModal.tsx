@@ -6,7 +6,7 @@ import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { removeTabsByEditor } from 'state/tabs'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
@@ -20,15 +20,9 @@ const FeaturePreviewModal = () => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   const enableNewLayoutPreview = useFlag('newLayoutPreview')
-  const isFeaturePreviewTabsTableEditorFlag = useFlag('featurePreviewTabsTableEditor')
-  const isFeaturePreviewTabsSqlEditorFlag = useFlag('featurePreviewSqlEditorTabs')
 
   function isReleasedToPublic(feature: (typeof FEATURE_PREVIEWS)[number]) {
     switch (feature.key) {
-      case LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS:
-        return isFeaturePreviewTabsTableEditorFlag
-      case LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS:
-        return isFeaturePreviewTabsSqlEditorFlag
       case LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW:
         return enableNewLayoutPreview
       default:
@@ -44,6 +38,10 @@ const FeaturePreviewModal = () => {
   const { flags, onUpdateFlag } = featurePreviewContext
   const selectedFeature = FEATURE_PREVIEWS.find((preview) => preview.key === selectedFeatureKey)
   const isSelectedFeatureEnabled = flags[selectedFeatureKey]
+
+  const allFeaturePreviews = IS_PLATFORM
+    ? FEATURE_PREVIEWS
+    : FEATURE_PREVIEWS.filter((x) => !x.isPlatformOnly)
 
   const toggleFeature = () => {
     onUpdateFlag(selectedFeatureKey, !isSelectedFeatureEnabled)
@@ -88,32 +86,31 @@ const FeaturePreviewModal = () => {
         <div className="flex">
           <div>
             <ScrollArea className="h-[550px] w-[280px] border-r">
-              {FEATURE_PREVIEWS.filter((feature) => {
-                // filter out preview features that are not released to the public
-                return isReleasedToPublic(feature)
-              }).map((feature) => {
-                const isEnabled = flags[feature.key] ?? false
+              {allFeaturePreviews
+                .filter((feature) => isReleasedToPublic(feature))
+                .map((feature) => {
+                  const isEnabled = flags[feature.key] ?? false
 
-                return (
-                  <div
-                    key={feature.key}
-                    onClick={() => snap.setSelectedFeaturePreview(feature.key)}
-                    className={cn(
-                      'flex items-center space-x-3 p-4 border-b cursor-pointer bg transition',
-                      selectedFeatureKey === feature.key ? 'bg-surface-300' : 'bg-surface-100'
-                    )}
-                  >
-                    {isEnabled ? (
-                      <Eye size={14} strokeWidth={2} className="text-brand" />
-                    ) : (
-                      <EyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
-                    )}
-                    <p className="text-sm truncate" title={feature.name}>
-                      {feature.name}
-                    </p>
-                  </div>
-                )
-              })}
+                  return (
+                    <div
+                      key={feature.key}
+                      onClick={() => snap.setSelectedFeaturePreview(feature.key)}
+                      className={cn(
+                        'flex items-center space-x-3 p-4 border-b cursor-pointer bg transition',
+                        selectedFeatureKey === feature.key ? 'bg-surface-300' : 'bg-surface-100'
+                      )}
+                    >
+                      {isEnabled ? (
+                        <Eye size={14} strokeWidth={2} className="text-brand" />
+                      ) : (
+                        <EyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
+                      )}
+                      <p className="text-sm truncate" title={feature.name}>
+                        {feature.name}
+                      </p>
+                    </div>
+                  )
+                })}
             </ScrollArea>
           </div>
           <div className="flex-grow max-h-[550px] p-4 space-y-3 overflow-y-auto">

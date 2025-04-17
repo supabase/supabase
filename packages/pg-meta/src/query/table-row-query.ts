@@ -111,6 +111,44 @@ export const getTableRowsSql = ({
 
   const query = new Query()
 
+  // Properly escape the table name and schema
+  let queryChains = query.from(table.name, table.schema).select()
+
+  filters.forEach((x) => {
+    const col = table.columns?.find((y) => y.name === x.column)
+    const isStringTypeColumn = !!col ? TEXT_TYPES.includes(col.format) : true
+    queryChains = queryChains.filter(
+      x.column,
+      x.operator,
+      !isStringTypeColumn && x.value === '' ? null : x.value
+    )
+  })
+
+  // If sorts is empty and table row count is within threshold, use the primary key as the default sort
+  // Only apply for selections over a Table, not View, MaterializedViews, ...
+  const liveRowCount = (table as PGTable).live_rows_estimate || 0
+  if (sorts.length === 0 && liveRowCount <= THRESHOLD_COUNT && table.columns.length > 0) {
+    const defaultOrderByColumns = getDefaultOrderByColumns(table as PGTable)
+    if (defaultOrderByColumns.length > 0) {
+      defaultOrderByColumns.forEach((col) => {
+        queryChains = queryChains.order(table.name, col, true, true)
+      })
+    }
+  } else {
+    sorts.forEach((x) => {
+      queryChains = queryChains.order(x.table, x.column, x.ascending, x.nullsFirst)
+    })
+  }
+
+  // getPagination is expecting to start from 0
+  const { from, to } = getPagination((page ?? 1) - 1, limit)
+
+  // To have efficient query, we use CTE optimization, to first reduce the number of rows and order them in the right place
+  // filtering, applying limits and order by, then we can apply selection with some conditional logic to truncate large columns
+  // allowing postgres to only truncate the columns within the subset that we'll return instead of attemting to do it on
+  // all the rows within the table
+  const baseSelectQuery = `with _base_query as (${queryChains.range(from, to).toSql({ isCTE: false, isFinal: false })})`
+
   const allColumnNames = table.columns
     .sort((a, b) => a.ordinal_position - b.ordinal_position)
     .map((column) => ({ name: column.name, format: column.format.toLowerCase() }))
@@ -167,39 +205,11 @@ export const getTableRowsSql = ({
   })
 
   const selectClause = selectExpressions.join(',')
-
-  // Properly escape the table name and schema
-  let queryChains = query.from(table.name, table.schema).select(selectClause)
-
-  filters.forEach((x) => {
-    const col = table.columns?.find((y) => y.name === x.column)
-    const isStringTypeColumn = !!col ? TEXT_TYPES.includes(col.format) : true
-    queryChains = queryChains.filter(
-      x.column,
-      x.operator,
-      !isStringTypeColumn && x.value === '' ? null : x.value
-    )
-  })
-
-  // If sorts is empty and table row count is within threshold, use the primary key as the default sort
-  // Only apply for selections over a Table, not View, MaterializedViews, ...
-  const liveRowCount = (table as PGTable).live_rows_estimate || 0
-  if (sorts.length === 0 && liveRowCount <= THRESHOLD_COUNT && table.columns.length > 0) {
-    const defaultOrderByColumns = getDefaultOrderByColumns(table as PGTable)
-    if (defaultOrderByColumns.length > 0) {
-      defaultOrderByColumns.forEach((col) => {
-        queryChains = queryChains.order(table.name, col, true, true)
-      })
-    }
-  } else {
-    sorts.forEach((x) => {
-      queryChains = queryChains.order(x.table, x.column, x.ascending, x.nullsFirst)
-    })
-  }
-
-  // getPagination is expecting to start from 0
-  const { from, to } = getPagination((page ?? 1) - 1, limit)
-  return queryChains.range(from, to).toSql()
+  const finalQuery = new Query()
+  // Now, we apply our selection logic with the tables truncation  on the _base_query contructed before
+  const finalQueryChain = finalQuery.from('_base_query').select(selectClause)
+  return `${baseSelectQuery}
+  ${finalQueryChain.toSql({ isCTE: true, isFinal: true })}`
 }
 
 export default {
