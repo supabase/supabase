@@ -55,6 +55,14 @@ export const componentPages: SidebarNavGroup = {
       commandItemLabel: 'Password-Based Auth',
     },
     {
+      title: 'Social Auth',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/social-auth',
+      items: [],
+      new: true,
+      commandItemLabel: 'Social Auth',
+    },
+    {
       title: 'Dropzone',
       supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
       href: '/docs/nextjs/dropzone',

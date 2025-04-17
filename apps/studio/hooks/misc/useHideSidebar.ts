@@ -1,9 +1,9 @@
 import { usePathname } from 'next/navigation'
 
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 export function useHideSidebar() {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
   const pathname = usePathname() ?? ''
   const shouldHide =
     pathname.startsWith('/account') ||

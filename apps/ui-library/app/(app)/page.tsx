@@ -69,6 +69,24 @@ export default function Home() {
               </div>
               <HorizontalGridLine />
 
+              {/* Social Authentication */}
+              <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative flex justify-between items-center">
+                <span>Social Authentication</span>
+                <Link
+                  className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2"
+                  href="/docs/nextjs/social-auth"
+                >
+                  Go to block ➔
+                </Link>
+              </div>
+              <HorizontalGridLine />
+              <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 relative">
+                <div className="-mt-4">
+                  <BlockPreview name="social-auth/auth/login" />
+                </div>
+              </div>
+              <HorizontalGridLine />
+
               {/* Realtime Cursors */}
               <div className="col-start-2 col-span-10 md:col-start-3 md:col-span-8 pt-16 pb-6 text-xs uppercase font-mono text-foreground-light tracking-wider relative flex justify-between items-center">
                 <span>Realtime Cursors</span>

@@ -2,7 +2,7 @@ import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Fragment, type PropsWithChildren } from 'react'
 
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
 import { useVercelRedirectQuery } from 'data/integrations/vercel-redirect-query'
@@ -45,7 +45,7 @@ const OrganizationLayoutContent = ({ children }: PropsWithChildren<{}>) => {
 
 const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
 
   const selectedOrganization = useSelectedOrganization()
   const { data: organizations } = useOrganizationsQuery()

@@ -44,8 +44,8 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
     return this._getQueryModifier().range(from, to)
   }
 
-  toSql() {
-    return this._getQueryModifier().toSql()
+  toSql(options?: { isCTE: boolean; isFinal: boolean }) {
+    return this._getQueryModifier().toSql(options)
   }
 
   _getQueryModifier() {

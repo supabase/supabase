@@ -236,7 +236,7 @@ const DeployNewReplicaPanel = ({
               </span>
               <div className="mt-3">
                 <Button asChild type="default">
-                  <Link href={`/org/${org?.slug}/invoices`}>View invoices</Link>
+                  <Link href={`/org/${org?.slug}/billing#invoices`}>View invoices</Link>
                 </Button>
               </div>
             </AlertDescription_Shadcn_>
