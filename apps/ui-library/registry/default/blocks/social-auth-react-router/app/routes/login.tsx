@@ -11,11 +11,12 @@ import { type ActionFunctionArgs, redirect, useFetcher } from 'react-router'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase } = createClient(request)
+  const origin = new URL(request.url).origin
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'github',
     options: {
-      redirectTo: `${window.location.origin}/auth/oauth?next=/protected`,
+      redirectTo: `${origin}/auth/oauth?next=/protected`,
     },
   })
 
