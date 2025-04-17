@@ -11,6 +11,7 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { AiIconAnimation, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import Results from './Results'
+import { InlineLink } from 'components/ui/InlineLink'
 
 export type UtilityTabResultsProps = {
   id: string
@@ -66,33 +67,30 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
                 <p className="font-mono text-sm">SQL query ran into an upstream timeout</p>
                 <p className="font-mono text-sm text-foreground-light">
                   You can either{' '}
-                  <a
+                  <InlineLink
                     target="_blank"
                     rel="noreferrer"
-                    className="underline transition hover:text-foreground"
                     href="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
                   >
                     optimize your query
-                  </a>
+                  </InlineLink>
                   , or{' '}
-                  <a
+                  <InlineLink
                     target="_blank"
                     rel="noreferrer"
-                    className="underline transition hover:text-foreground"
                     href="https://supabase.com/docs/guides/database/timeouts"
                   >
                     increase the statement timeout
-                  </a>
-                  , if your query take more than 50s to run, please{' '}
-                  <Link
+                  </InlineLink>
+                  {' or '}
+                  <InlineLink
                     target="_blank"
                     rel="noreferrer"
                     href={`/project/${ref}/settings/database`}
-                    className="underline transition hover:text-foreground flex items-center gap-x-1"
                   >
-                    connect to your database directly.
-                    <ExternalLink size={12} />
-                  </Link>
+                    connect to your database directly
+                  </InlineLink>
+                  .
                 </p>
               </div>
             ) : (
