@@ -35,7 +35,7 @@ Then let's install the only additional dependency: [supabase-js](https://github.
 npm install @supabase/supabase-js
 ```
 
-And finally we want to save the environment variables in a `.env`. 
+And finally we want to save the environment variables in a `.env`.
 
 All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 
@@ -100,26 +100,8 @@ Let's set up a Vue component to manage logins and sign ups. We'll use Magic Link
 </template>
 
 <script lang="ts">
-import { supabase } from '../supabase'
-import {
-  IonContent,
-  IonHeader,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-  IonList,
-  IonItem,
-  IonLabel,
-  IonInput,
-  IonButton,
-  toastController,
-  loadingController,
-} from '@ionic/vue'
-import { defineComponent, ref } from 'vue'
-
-export default defineComponent({
-  name: 'LoginPage',
-  components: {
+  import { supabase } from '../supabase'
+  import {
     IonContent,
     IonHeader,
     IonPage,
@@ -130,31 +112,49 @@ export default defineComponent({
     IonLabel,
     IonInput,
     IonButton,
-  },
-  setup() {
-    const email = ref('')
-    const handleLogin = async () => {
-      const loader = await loadingController.create({})
-      const toast = await toastController.create({ duration: 5000 })
+    toastController,
+    loadingController,
+  } from '@ionic/vue'
+  import { defineComponent, ref } from 'vue'
 
-      try {
-        await loader.present()
-        const { error } = await supabase.auth.signInWithOtp({ email: email.value })
+  export default defineComponent({
+    name: 'LoginPage',
+    components: {
+      IonContent,
+      IonHeader,
+      IonPage,
+      IonTitle,
+      IonToolbar,
+      IonList,
+      IonItem,
+      IonLabel,
+      IonInput,
+      IonButton,
+    },
+    setup() {
+      const email = ref('')
+      const handleLogin = async () => {
+        const loader = await loadingController.create({})
+        const toast = await toastController.create({ duration: 5000 })
 
-        if (error) throw error
+        try {
+          await loader.present()
+          const { error } = await supabase.auth.signInWithOtp({ email: email.value })
 
-        toast.message = 'Check your email for the login link!'
-        await toast.present()
-      } catch (error: any) {
-        toast.message = error.error_description || error.message
-        await toast.present()
-      } finally {
-        await loader.dismiss()
+          if (error) throw error
+
+          toast.message = 'Check your email for the login link!'
+          await toast.present()
+        } catch (error: any) {
+          toast.message = error.error_description || error.message
+          await toast.present()
+        } finally {
+          await loader.dismiss()
+        }
       }
-    }
-    return { handleLogin, email }
-  },
-})
+      return { handleLogin, email }
+    },
+  })
 </script>
 ```
 
@@ -209,27 +209,7 @@ Let's create a new component for that called `Account.vue`.
 </template>
 
 <script lang="ts">
-import {
-  IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonItem,
-  IonLabel,
-  IonInput,
-  IonButton,
-  toastController,
-  loadingController,
-} from '@ionic/vue'
-import { defineComponent, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { supabase } from '@/supabase'
-import type { User } from '@supabase/supabase-js'
-
-export default defineComponent({
-  name: 'AccountPage',
-  components: {
+  import {
     IonPage,
     IonHeader,
     IonToolbar,
@@ -239,112 +219,132 @@ export default defineComponent({
     IonLabel,
     IonInput,
     IonButton,
-  },
-  setup() {
-    const router = useRouter()
-    const user = ref<User | null>(null)
+    toastController,
+    loadingController,
+  } from '@ionic/vue'
+  import { defineComponent, onMounted, ref } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { supabase } from '@/supabase'
+  import type { User } from '@supabase/supabase-js'
 
-    const profile = ref({
-      username: '',
-      website: '',
-      avatar_url: '',
-    })
+  export default defineComponent({
+    name: 'AccountPage',
+    components: {
+      IonPage,
+      IonHeader,
+      IonToolbar,
+      IonTitle,
+      IonContent,
+      IonItem,
+      IonLabel,
+      IonInput,
+      IonButton,
+    },
+    setup() {
+      const router = useRouter()
+      const user = ref<User | null>(null)
 
-    const getProfile = async () => {
-      const loader = await loadingController.create()
-      const toast = await toastController.create({ duration: 5000 })
-      await loader.present()
+      const profile = ref({
+        username: '',
+        website: '',
+        avatar_url: '',
+      })
 
-      try {
-        const { data, error, status } = await supabase
-          .from('profiles')
-          .select('username, website, avatar_url')
-          .eq('id', user.value?.id)
-          .single()
+      const getProfile = async () => {
+        const loader = await loadingController.create()
+        const toast = await toastController.create({ duration: 5000 })
+        await loader.present()
 
-        if (error && status !== 406) throw error
+        try {
+          const { data, error, status } = await supabase
+            .from('profiles')
+            .select('username, website, avatar_url')
+            .eq('id', user.value?.id)
+            .single()
 
-        if (data) {
-          profile.value = {
-            username: data.username,
-            website: data.website,
-            avatar_url: data.avatar_url,
+          if (error && status !== 406) throw error
+
+          if (data) {
+            profile.value = {
+              username: data.username,
+              website: data.website,
+              avatar_url: data.avatar_url,
+            }
           }
+        } catch (error: any) {
+          toast.message = error.message
+          await toast.present()
+        } finally {
+          await loader.dismiss()
         }
-      } catch (error: any) {
-        toast.message = error.message
-        await toast.present()
-      } finally {
-        await loader.dismiss()
       }
-    }
 
-    const updateProfile = async () => {
-      const loader = await loadingController.create()
-      const toast = await toastController.create({ duration: 5000 })
-      await loader.present()
+      const updateProfile = async () => {
+        const loader = await loadingController.create()
+        const toast = await toastController.create({ duration: 5000 })
+        await loader.present()
 
-      try {
-        const updates = {
-          id: user.value?.id,
-          ...profile.value,
-          updated_at: new Date(),
+        try {
+          const updates = {
+            id: user.value?.id,
+            ...profile.value,
+            updated_at: new Date(),
+          }
+
+          const { error } = await supabase.from('profiles').upsert(updates, {
+            returning: 'minimal',
+          })
+
+          if (error) throw error
+        } catch (error: any) {
+          toast.message = error.message
+          await toast.present()
+        } finally {
+          await loader.dismiss()
+        }
+      }
+
+      const signOut = async () => {
+        const loader = await loadingController.create()
+        const toast = await toastController.create({ duration: 5000 })
+        await loader.present()
+
+        try {
+          const { error } = await supabase.auth.signOut()
+          if (error) throw error
+          router.push('/')
+        } catch (error: any) {
+          toast.message = error.message
+          await toast.present()
+        } finally {
+          await loader.dismiss()
+        }
+      }
+
+      onMounted(async () => {
+        const loader = await loadingController.create()
+        await loader.present()
+
+        const { data } = await supabase.auth.getSession()
+        user.value = data.session?.user ?? null
+
+        if (!user.value) {
+          router.push('/')
+        } else {
+          await getProfile()
         }
 
-        const { error } = await supabase.from('profiles').upsert(updates, {
-          returning: 'minimal',
-        })
-
-        if (error) throw error
-      } catch (error: any) {
-        toast.message = error.message
-        await toast.present()
-      } finally {
         await loader.dismiss()
+      })
+
+      return {
+        user,
+        profile,
+        updateProfile,
+        signOut,
       }
-    }
-
-    const signOut = async () => {
-      const loader = await loadingController.create()
-      const toast = await toastController.create({ duration: 5000 })
-      await loader.present()
-
-      try {
-        const { error } = await supabase.auth.signOut()
-        if (error) throw error
-        router.push('/')
-      } catch (error: any) {
-        toast.message = error.message
-        await toast.present()
-      } finally {
-        await loader.dismiss()
-      }
-    }
-
-    onMounted(async () => {
-      const loader = await loadingController.create()
-      await loader.present()
-
-      const { data } = await supabase.auth.getSession()
-      user.value = data.session?.user ?? null
-
-      if (!user.value) {
-        router.push('/')
-      } else {
-        await getProfile()
-      }
-
-      await loader.dismiss()
-    })
-
-    return {
-      user,
-      profile,
-      updateProfile,
-      signOut,
-    }
-  },
-})
+    },
+  })
 </script>
 ```
 
@@ -357,26 +357,26 @@ Now that we have all the components in place, let's update `App.vue` and our rou
 <$CodeTabs>
 
 ```ts name=src/router.index.ts
-import { createRouter, createWebHistory } from '@ionic/vue-router';
-import { RouteRecordRaw } from 'vue-router';
-import LoginPage from '../views/Login.vue';
-import AccountPage from '../views/Account.vue';
+import { createRouter, createWebHistory } from '@ionic/vue-router'
+import { RouteRecordRaw } from 'vue-router'
+import LoginPage from '../views/Login.vue'
+import AccountPage from '../views/Account.vue'
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Login',
-    component: LoginPage
+    component: LoginPage,
   },
   {
     path: '/account',
     name: 'Account',
-    component: AccountPage
-  }
+    component: AccountPage,
+  },
 ]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes
+  routes,
 })
 
 export default router
@@ -390,35 +390,38 @@ export default router
 </template>
 
 <script lang="ts">
-import { IonApp, IonRouterOutlet, useIonRouter } from '@ionic/vue'
-import { defineComponent, ref, onMounted } from 'vue'
-import { supabase } from './supabase'
+  import { IonApp, IonRouterOutlet, useIonRouter } from '@ionic/vue'
+  import { defineComponent, ref, onMounted } from 'vue'
+  import { supabase } from './supabase'
 
-export default defineComponent({
-  name: 'App',
-  components: {
-    IonApp,
-    IonRouterOutlet,
-  },
-  setup() {
-    const router = useIonRouter()
-    const user = ref(null)
+  export default defineComponent({
+    name: 'App',
+    components: {
+      IonApp,
+      IonRouterOutlet,
+    },
+    setup() {
+      const router = useIonRouter()
+      const user = ref(null)
 
-    onMounted(() => {
-      supabase.auth.getSession().then((resp) => {
-        user.value = resp.data.session?.user ?? null
-      }).catch(err => {
-        console.log('Error fetching session', err)
+      onMounted(() => {
+        supabase.auth
+          .getSession()
+          .then((resp) => {
+            user.value = resp.data.session?.user ?? null
+          })
+          .catch((err) => {
+            console.log('Error fetching session', err)
+          })
+
+        supabase.auth.onAuthStateChange((_event, session) => {
+          user.value = session?.user ?? null
+        })
       })
 
-      supabase.auth.onAuthStateChange((_event, session) => {
-        user.value = session?.user ?? null
-      })
-    })
-
-    return { user }
-  },
-})
+      return { user }
+    },
+  })
 </script>
 ```
 
