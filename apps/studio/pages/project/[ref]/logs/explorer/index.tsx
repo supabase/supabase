@@ -333,7 +333,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       setEditorValue(q)
       setWarehouseEditorValue(q)
     }
-  }, [])
+  }, [q])
 
   useEffect(() => {
     let newWarnings = []
