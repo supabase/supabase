@@ -1,17 +1,20 @@
 import { Search } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
+import { CronJob } from 'data/database-cron-jobs/database-cron-job-query'
+import { useCronJobsInfiniteQuery } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Button, Input, Sheet, SheetContent } from 'ui'
+import { useDebounce } from 'use-debounce'
 import { CronJobCard } from './CronJobCard'
 import { DeleteCronJob } from './DeleteCronJob'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { LoadMoreCronJobs } from './load-more-cron-jobs'
 
 const EMPTY_CRON_JOB = {
   jobname: '',
@@ -25,6 +28,7 @@ export const CronjobsTab = () => {
   const org = useSelectedOrganization()
 
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 500)
   const [createCronJobSheetShown, setCreateCronJobSheetShown] = useQueryState(
     'dialog-shown',
     parseAsBoolean.withDefault(false).withOptions({ clearOnDefault: true })
@@ -37,10 +41,19 @@ export const CronjobsTab = () => {
   >()
   const [cronJobForDeletion, setCronJobForDeletion] = useState<CronJob | undefined>()
 
-  const { data: cronJobs, isLoading } = useCronJobsQuery({
+  const {
+    data: cronJobsPages,
+    isLoading,
+    isFetching,
+    hasNextPage,
+    fetchNextPage,
+  } = useCronJobsInfiniteQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    searchTerm: debouncedSearchQuery,
   })
+
+  const cronJobs = useMemo(() => cronJobsPages?.pages.flat(), [cronJobsPages]) ?? []
 
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -54,18 +67,6 @@ export const CronjobsTab = () => {
   const installedVersion = pgCronExtension?.installed_version
   const supportsSeconds = installedVersion ? parseFloat(installedVersion) >= 1.5 : false
 
-  if (isLoading)
-    return (
-      <div className="p-10">
-        <GenericSkeletonLoader />
-      </div>
-    )
-
-  const filteredCronJobs =
-    searchQuery.length > 0
-      ? (cronJobs ?? []).filter((cj) => cj?.jobname?.includes(searchQuery || ''))
-      : cronJobs ?? []
-
   const onOpenCreateJobSheet = () => {
     sendEvent({
       action: 'cron_job_create_clicked',
@@ -77,42 +78,41 @@ export const CronjobsTab = () => {
   return (
     <>
       <div className="w-full space-y-4 p-4 md:p-10">
-        {(cronJobs ?? []).length == 0 ? (
-          <div className="border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4 border-dashed">
-            <p className="text-sm text-foreground">No cron jobs created yet</p>
+        <div className="w-full space-y-4">
+          <div className="flex items-center justify-between flex-wrap">
+            <Input
+              placeholder="Search for a job"
+              size="small"
+              icon={<Search size={14} />}
+              value={searchQuery || ''}
+              className="w-64"
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+
             <Button onClick={onOpenCreateJobSheet}>Create job</Button>
           </div>
-        ) : (
-          <div className="w-full space-y-4">
-            <div className="flex items-center justify-between flex-wrap">
-              <Input
-                placeholder="Search for a job"
-                size="small"
-                icon={<Search size={14} />}
-                value={searchQuery || ''}
-                className="w-64"
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-
-              <Button onClick={onOpenCreateJobSheet}>Create job</Button>
+          {isLoading ? (
+            <div className="p-10">
+              <GenericSkeletonLoader />
             </div>
-            {filteredCronJobs.length === 0 ? (
-              <div
-                className={
-                  'border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4 border-dashed'
-                }
-              >
-                <p className="text-sm text-foreground">No results found</p>
-                <p className="text-sm text-foreground-light">
-                  Your search for "{searchQuery}" did not return any results
-                </p>
-              </div>
-            ) : isLoading ? (
-              <div className="p-10">
-                <GenericSkeletonLoader />
-              </div>
-            ) : (
-              filteredCronJobs.map((job) => (
+          ) : cronJobs.length === 0 ? (
+            <div
+              className={
+                'border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4 border-dashed'
+              }
+            >
+              <p className="text-sm text-foreground">No results found</p>
+              <p className="text-sm text-foreground-light">
+                Your search for "{debouncedSearchQuery}" did not return any results
+              </p>
+            </div>
+          ) : isLoading ? (
+            <div className="p-10">
+              <GenericSkeletonLoader />
+            </div>
+          ) : (
+            <>
+              {cronJobs.map((job) => (
                 <CronJobCard
                   key={job.jobid}
                   job={job}
@@ -122,10 +122,11 @@ export const CronjobsTab = () => {
                   }}
                   onDeleteCronJob={(job) => setCronJobForDeletion(job)}
                 />
-              ))
-            )}
-          </div>
-        )}
+              ))}
+              {hasNextPage && <LoadMoreCronJobs onVisible={fetchNextPage} isLoading={isFetching} />}
+            </>
+          )}
+        </div>
       </div>
 
       <DeleteCronJob

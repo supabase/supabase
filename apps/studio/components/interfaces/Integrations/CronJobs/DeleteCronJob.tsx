@@ -1,11 +1,11 @@
 import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { CronJob } from 'data/database-cron-jobs/database-cron-job-query'
 import { useDatabaseCronJobDeleteMutation } from 'data/database-cron-jobs/database-cron-jobs-delete-mutation'
-import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface DeleteCronJobProps {
   cronJob: CronJob
