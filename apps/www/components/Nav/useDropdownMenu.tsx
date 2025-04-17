@@ -6,8 +6,10 @@ import { logOut } from 'common'
 
 import type { menuItem } from 'ui-patterns/AuthenticatedDropdownMenu'
 import { useSetCommandMenuOpen } from 'ui-patterns'
+import { useRouter } from 'next/router'
 
 const useDropdownMenu = (user: User | null) => {
+  const router = useRouter()
   const setCommandMenuOpen = useSetCommandMenuOpen()
 
   const menu: menuItem[][] = [
@@ -46,7 +48,10 @@ const useDropdownMenu = (user: User | null) => {
         label: 'Logout',
         type: 'button',
         icon: LogOut,
-        onClick: () => logOut(),
+        onClick: async () => {
+          await logOut()
+          router.reload()
+        },
       },
     ],
   ]
