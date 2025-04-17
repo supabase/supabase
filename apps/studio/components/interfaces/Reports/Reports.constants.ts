@@ -342,9 +342,19 @@ select
         ? `,
     case 
       when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
-      then (select array_length(index_statements, 1) > 0 from index_advisor(statements.query))
-      else false
-    end as has_index_suggestion`
+      then (
+        select json_build_object(
+          'has_suggestion', array_length(index_statements, 1) > 0,
+          'startup_cost_before', startup_cost_before,
+          'startup_cost_after', startup_cost_after,
+          'total_cost_before', total_cost_before,
+          'total_cost_after', total_cost_after,
+          'index_statements', index_statements
+        )
+        from index_advisor(statements.query)
+      )
+      else null
+    end as index_advisor_result`
         : ''
     }
   from pg_stat_statements as statements
@@ -369,9 +379,19 @@ select
         ? `,
     case 
       when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
-      then (select array_length(index_statements, 1) > 0 from index_advisor(statements.query))
-      else false
-    end as has_index_suggestion`
+      then (
+        select json_build_object(
+          'has_suggestion', array_length(index_statements, 1) > 0,
+          'startup_cost_before', startup_cost_before,
+          'startup_cost_after', startup_cost_after,
+          'total_cost_before', total_cost_before,
+          'total_cost_after', total_cost_after,
+          'index_statements', index_statements
+        )
+        from index_advisor(statements.query)
+      )
+      else null
+    end as index_advisor_result`
         : ''
     }
   from pg_stat_statements as statements
@@ -382,7 +402,7 @@ select
       },
       slowestExecutionTime: {
         queryType: 'db',
-        sql: (_params, where, orderBy) => `
+        sql: (_params, where, orderBy, runIndexAdvisor = false) => `
 -- Slowest queries by max execution time
 set search_path to public, extensions;
 
@@ -400,7 +420,26 @@ select
     -- min_time,
     -- max_time,
     -- mean_time,
-    statements.rows / statements.calls as avg_rows
+    statements.rows / statements.calls as avg_rows${
+      runIndexAdvisor
+        ? `,
+    case 
+      when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
+      then (
+        select json_build_object(
+          'has_suggestion', array_length(index_statements, 1) > 0,
+          'startup_cost_before', startup_cost_before,
+          'startup_cost_after', startup_cost_after,
+          'total_cost_before', total_cost_before,
+          'total_cost_after', total_cost_after,
+          'index_statements', index_statements
+        )
+        from index_advisor(statements.query)
+      )
+      else null
+    end as index_advisor_result`
+        : ''
+    }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
   ${where || ''}
@@ -459,3 +498,23 @@ export const DEPRECATED_REPORTS = [
   'total_storage_patch_requests',
   'total_options_requests',
 ]
+
+export interface IndexAdvisorResult {
+  has_suggestion: boolean
+  startup_cost_before: number
+  startup_cost_after: number
+  total_cost_before: number
+  total_cost_after: number
+  index_statements: string[]
+}
+
+export const calculateQueryImprovement = (costBefore: number, costAfter: number): number => {
+  return ((costBefore - costAfter) / costBefore) * 100
+}
+
+export const calculateTotalQueryImprovement = (indexAdvisorResult: IndexAdvisorResult): number => {
+  return calculateQueryImprovement(
+    indexAdvisorResult.total_cost_before,
+    indexAdvisorResult.total_cost_after
+  )
+}

@@ -5,6 +5,15 @@ export interface IndexAdvisorConfig {
   connectionString?: string
 }
 
+export interface IndexAdvisorResult {
+  has_suggestion: boolean
+  startup_cost_before: number
+  startup_cost_after: number
+  total_cost_before: number
+  total_cost_after: number
+  index_statements: string[]
+}
+
 /**
  * Gets the required extensions for index advisor
  * @param extensions Array of database extensions
@@ -27,5 +36,27 @@ export function isQueryEligibleForIndexAdvisor(query: string | undefined): boole
     query.toLowerCase().startsWith('select') ||
     query.toLowerCase().startsWith('with pgrst_source') ||
     query.toLowerCase().startsWith('with pgrst_payload')
+  )
+}
+
+/**
+ * Calculates the percentage improvement between two cost values
+ * @param costBefore Cost before optimization
+ * @param costAfter Cost after optimization
+ * @returns Percentage improvement
+ */
+export function calculateQueryImprovement(costBefore: number, costAfter: number): number {
+  return ((costBefore - costAfter) / costBefore) * 100
+}
+
+/**
+ * Calculates the total query improvement percentage from index advisor results
+ * @param indexAdvisorResult Result from index advisor containing before/after costs
+ * @returns Total percentage improvement
+ */
+export function calculateTotalQueryImprovement(indexAdvisorResult: IndexAdvisorResult): number {
+  return calculateQueryImprovement(
+    indexAdvisorResult.total_cost_before,
+    indexAdvisorResult.total_cost_after
   )
 }

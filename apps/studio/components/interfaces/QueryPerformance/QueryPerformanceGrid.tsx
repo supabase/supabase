@@ -79,7 +79,12 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         if (col.id === 'query') {
           return (
             <div className="w-full flex items-center gap-x-2">
-              {props.row.has_index_suggestion && <IndexSuggestionIcon />}
+              {props.row.index_advisor_result?.has_suggestion && (
+                <IndexSuggestionIcon
+                  indexAdvisorResult={props.row.index_advisor_result}
+                  query={props.row.query}
+                />
+              )}
               <div className="font-mono text-xs">{value}</div>
             </div>
           )
@@ -107,9 +112,10 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
   const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
   const query = (selectedQuery ?? '').trim().toLowerCase()
   const showIndexSuggestions =
-    query.startsWith('select') ||
-    query.startsWith('with pgrst_source') ||
-    query.startsWith('with pgrst_payload')
+    (query.startsWith('select') ||
+      query.startsWith('with pgrst_source') ||
+      query.startsWith('with pgrst_payload')) &&
+    reportData[selectedRow!]?.index_advisor_result?.has_suggestion
 
   const onSortChange = (column: string) => {
     let updatedSort = undefined
