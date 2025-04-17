@@ -1469,6 +1469,10 @@ functions:
           ```
       - id: update-the-users-metadata
         name: Update the user's metadata
+        description: |
+          Updates the user's custom metadata.
+
+          **Note**: The `data` field maps to the `auth.users.raw_user_meta_data` column in your Supabase database. When calling `getUser()`, the data will be available as `user.user_metadata`.
         isSpotlight: true
         code: |
           ```js
