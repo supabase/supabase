@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRightIcon } from '@heroicons/react/outline'
@@ -74,10 +74,9 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
               <div className="hidden sm:block absolute inset-0 bg-gradient-to-r from-background-surface-75 from-0% via-background-surface-75 via-20% to-transparent to-75% w-full h-full z-0" />
               {day.steps[0]?.bg_layers &&
                 day.steps[0]?.bg_layers?.map((layer, i) => (
-                  <>
+                  <Fragment key={`${day.title}-image-${i}?v=3`}>
                     {!!layer.img && (
                       <div
-                        key={`${day.title}-image-${i}?v=3`}
                         className="absolute transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
                       >
                         <Image
@@ -117,7 +116,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
                         />
                       </div>
                     )}
-                  </>
+                  </Fragment>
                 ))}
             </div>
           </Link>
