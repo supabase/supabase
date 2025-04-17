@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import type { ResponseError } from 'types'
 
 export type OrganizationAcceptInvitationVariables = {
@@ -45,7 +46,7 @@ export const useOrganizationAcceptInvitationMutation = ({
   >((vars) => acceptOrganizationInvitation(vars), {
     async onSuccess(data, variables, context) {
       await invalidateOrganizationsQuery(queryClient)
-
+      await invalidateProjectsQuery(queryClient)
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

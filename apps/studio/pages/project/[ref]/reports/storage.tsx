@@ -19,7 +19,6 @@ import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useStorageReport } from 'data/reports/storage-report-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { RefreshCw } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
@@ -31,8 +30,7 @@ export const StorageReport: NextPageWithLayout = () => {
 
   const { isLoading, refresh } = report
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const plan = subscription?.plan
+  const plan = organization?.plan
 
   const defaultHelper =
     REPORTS_DATEPICKER_HELPERS.find((h) => h.default) || REPORTS_DATEPICKER_HELPERS[0]

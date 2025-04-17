@@ -1,7 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
 
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   AlertDescription_Shadcn_ as AlertDescription,
@@ -16,20 +15,8 @@ export function SpendCapDisabledSection() {
   const org = useSelectedOrganization()
   const project = useSelectedProject()
 
-  const {
-    data,
-    // no error/isError states handled here, as a parent component handles them
-    // we rely on this to check if the subscription has loaded
-    isSuccess,
-  } = useOrgSubscriptionQuery({
-    orgSlug: org?.slug,
-  })
-
   const isSpendCapEnabled =
-    isSuccess &&
-    data?.plan.id !== 'free' &&
-    !data?.usage_billing_enabled &&
-    project?.cloud_provider !== 'FLY'
+    org?.plan.id !== 'free' && !org?.usage_billing_enabled && project?.cloud_provider !== 'FLY'
 
   return (
     <AnimatePresence>

@@ -63,7 +63,7 @@ const DateTimeInput = ({
             <DropdownMenuTrigger asChild>
               <Button type="default" icon={<Edit />} className="px-1.5" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-28">
+            <DropdownMenuContent align="end" className="w-28 pointer-events-auto">
               {isNullable && (
                 <DropdownMenuItem onClick={() => onChange('')}>Set to NULL</DropdownMenuItem>
               )}

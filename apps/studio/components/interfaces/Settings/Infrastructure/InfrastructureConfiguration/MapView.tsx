@@ -290,7 +290,7 @@ const MapView = ({
                         )}
                       </div>
                       {database.identifier !== ref && (
-                        <DropdownMenu modal={false}>
+                        <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button type="text" icon={<MoreVertical />} className="px-1" />
                           </DropdownMenuTrigger>

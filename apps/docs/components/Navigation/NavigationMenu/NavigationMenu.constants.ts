@@ -119,6 +119,12 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'platform',
           },
           {
+            label: 'Security',
+            icon: 'security',
+            href: '/guides/security',
+            level: 'security',
+          },
+          {
             label: 'Telemetry',
             icon: 'telemetry',
             href: '/guides/telemetry',
@@ -2048,14 +2054,18 @@ export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof Ico
 ]
 
 export const security: NavMenuConstant = {
-  icon: 'platform',
+  icon: 'security',
   title: 'Security',
   url: '/guides/security',
   items: [
     { name: 'Overview', url: '/guides/security' },
     {
       name: 'Product security',
-      url: '/guides/security/product-security',
+      url: undefined,
+      items: [
+        { name: 'Product configuration', url: '/guides/security/product-security' },
+        { name: 'Security testing', url: '/guides/security/security-testing' },
+      ],
     },
     {
       name: 'Compliance',
@@ -2146,7 +2156,6 @@ export const platform: NavMenuConstant = {
         { name: 'Regions', url: '/guides/platform/regions' },
         { name: 'Compute and Disk', url: '/guides/platform/compute-and-disk' },
         { name: 'Database Size', url: '/guides/platform/database-size' },
-        { name: 'Fly Postgres', url: '/guides/platform/fly-postgres' },
         { name: 'HIPAA Projects', url: '/guides/platform/hipaa-projects' },
         {
           name: 'Network Restrictions',

@@ -78,4 +78,15 @@ export const examples: Registry['items'] = [
       },
     ],
   },
+  {
+    name: 'infinite-query-hook-demo',
+    type: 'registry:example',
+    registryDependencies: [],
+    files: [
+      {
+        path: 'registry/default/examples/infinite-query-hook-demo.tsx',
+        type: 'registry:example',
+      },
+    ],
+  },
 ]

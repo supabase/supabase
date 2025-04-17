@@ -45,7 +45,6 @@ import {
   UpsertContentPayload,
   useContentUpsertMutation,
 } from 'data/content/content-upsert-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
@@ -98,7 +97,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   })
   const query = content?.content.find((x) => x.id === queryId)
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const {
     params,
     logData,
@@ -289,7 +287,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   const handleDateChange = ({ to, from }: DatePickerToFrom) => {
-    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, subscription?.plan?.id)
+    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, organization?.plan?.id)
 
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(!showUpgradePrompt)
@@ -333,12 +331,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   // Show the prompt on page load based on query params
   useEffect(() => {
     if (timestampStart) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(timestampStart, subscription?.plan?.id)
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(timestampStart, organization?.plan?.id)
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       }
     }
-  }, [timestampStart, subscription])
+  }, [timestampStart, organization])
 
   return (
     <div className="w-full h-full mx-auto">

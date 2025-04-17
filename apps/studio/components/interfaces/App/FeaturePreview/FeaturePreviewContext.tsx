@@ -1,6 +1,6 @@
 import { noop } from 'lodash'
 
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { EMPTY_OBJ } from 'lib/void'
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 import { APISidePanelPreview } from './APISidePanelPreview'
@@ -17,6 +17,7 @@ export const FEATURE_PREVIEWS = [
     content: <LayoutUpdatePreview />,
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
     isNew: false,
+    isPlatformOnly: true,
   },
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
@@ -24,18 +25,21 @@ export const FEATURE_PREVIEWS = [
     content: <InlineEditorPreview />,
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/33690',
     isNew: true,
+    isPlatformOnly: false,
   },
   {
     key: LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS,
     name: 'Table Editor Tabs',
     content: <TableEditorTabsPreview />,
     isNew: true,
+    isPlatformOnly: false,
   },
   {
     key: LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS,
     name: 'SQL Editor Tabs',
     content: <SqlEditorTabsPreview />,
     isNew: true,
+    isPlatformOnly: true,
   },
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
@@ -43,6 +47,7 @@ export const FEATURE_PREVIEWS = [
     content: <APISidePanelPreview />,
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
     isNew: false,
+    isPlatformOnly: false,
   },
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
@@ -50,6 +55,7 @@ export const FEATURE_PREVIEWS = [
     content: <CLSPreview />,
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
     isNew: false,
+    isPlatformOnly: false,
   },
 ]
 
@@ -120,10 +126,12 @@ export const useIsTableEditorTabsEnabled = () => {
 
 export const useIsSQLEditorTabsEnabled = () => {
   const { flags } = useFeaturePreviewContext()
+  if (!IS_PLATFORM) return false
   return flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
 }
 
-export const useNewLayout = (): boolean => {
+export const useIsNewLayoutEnabled = (): boolean => {
   const { flags } = useFeaturePreviewContext()
+  if (!IS_PLATFORM) return false
   return flags[LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW]
 }

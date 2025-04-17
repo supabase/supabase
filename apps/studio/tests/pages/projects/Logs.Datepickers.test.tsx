@@ -28,8 +28,7 @@ test('renders warning', async () => {
       }}
     />
   )
-  userEvent.click(await screen.findByText(RegExp(from.format('DD MMM'))))
-
+  await userEvent.click(await screen.findByText(RegExp(from.format('DD MMM'))))
   await screen.findByText(/memory errors/)
   await screen.findByText(RegExp(from.format('DD MMM')))
 })
@@ -48,8 +47,8 @@ test('renders dates in local time', async () => {
     />
   )
   // renders time locally
-  userEvent.click(await screen.findByText(RegExp(from.format('DD MMM'))))
-  await screen.findByText(RegExp(from.format('DD MMM')))
+  await userEvent.click(await screen.findByText(RegExp(from.format('DD MMM'))))
+  await screen.findByText(RegExp(from.format('MMMM YYYY')))
 })
 
 test('renders datepicker selected dates in local time', async () => {
@@ -66,7 +65,7 @@ test('renders datepicker selected dates in local time', async () => {
     />
   )
   // renders time locally
-  userEvent.click(await screen.findByText(RegExp(from.format('DD MMM'))))
+  await userEvent.click(await screen.findByText(RegExp(from.format('DD MMM'))))
   // inputs with local time
   await screen.findByText(
     `${from.format('DD MMM')}, ${from.format('HH:mm')} - ${to.format('DD MMM')}, ${to.format('HH:mm')}`
@@ -107,7 +106,7 @@ test('datepicker onSubmit will return ISO string of selected dates', async () =>
   const tomorrowElement = screen.getByText(tomorrow.format('D'))
   userEvent.click(tomorrowElement)
 
-  userEvent.click(await screen.findByText('Apply'))
+  await userEvent.click(await screen.findByText('Apply'))
   expect(mockFn).toBeCalled()
 
   const call = mockFn.mock.calls[0][0]

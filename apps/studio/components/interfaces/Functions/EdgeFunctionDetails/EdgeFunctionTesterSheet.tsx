@@ -433,7 +433,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
 
             <SheetFooter className="px-5 py-3 border-t">
               <div className="flex items-center gap-2">
-                <RoleImpersonationPopover />
+                <RoleImpersonationPopover portal={false} />
                 <Button
                   type="primary"
                   htmlType="submit"
