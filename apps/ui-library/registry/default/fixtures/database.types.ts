@@ -28,86 +28,27 @@ export type Database = {
   }
   public: {
     Tables: {
-      channels: {
+      todos: {
         Row: {
-          created_by: string
           id: number
           inserted_at: string
-          slug: string
-        }
-        Insert: {
-          created_by: string
-          id?: number
-          inserted_at?: string
-          slug: string
-        }
-        Update: {
-          created_by?: string
-          id?: number
-          inserted_at?: string
-          slug?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: 'channels_created_by_fkey'
-            columns: ['created_by']
-            isOneToOne: false
-            referencedRelation: 'users'
-            referencedColumns: ['id']
-          },
-        ]
-      }
-      messages: {
-        Row: {
-          channel_id: number
-          id: number
-          inserted_at: string
-          message: string | null
+          is_complete: boolean | null
+          task: string | null
           user_id: string
         }
         Insert: {
-          channel_id: number
           id?: number
           inserted_at?: string
-          message?: string | null
+          is_complete?: boolean | null
+          task?: string | null
           user_id: string
         }
         Update: {
-          channel_id?: number
           id?: number
           inserted_at?: string
-          message?: string | null
+          is_complete?: boolean | null
+          task?: string | null
           user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: 'messages_channel_id_fkey'
-            columns: ['channel_id']
-            isOneToOne: false
-            referencedRelation: 'channels'
-            referencedColumns: ['id']
-          },
-          {
-            foreignKeyName: 'messages_user_id_fkey'
-            columns: ['user_id']
-            isOneToOne: false
-            referencedRelation: 'users'
-            referencedColumns: ['id']
-          },
-        ]
-      }
-      users: {
-        Row: {
-          id: string
-          username: string | null
-        }
-        Insert: {
-          id: string
-          username?: string | null
-        }
-        Update: {
-          id?: string
-          username?: string | null
         }
         Relationships: []
       }

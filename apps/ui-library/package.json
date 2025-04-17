@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@radix-ui/react-avatar": "*",
+    "@radix-ui/react-checkbox": "*",
     "@radix-ui/react-label": "*",
     "@radix-ui/react-progress": "*",
     "@radix-ui/react-slot": "*",
