@@ -99,11 +99,11 @@ test('datepicker onSubmit will return ISO string of selected dates', async () =>
   const tomorrow = today.add(1, 'day')
 
   // Find and click on today's date
-  const todayElement = screen.getByText(today.format('D'))
+  const todayElement = await screen.findByText(today.format('D'))
   userEvent.click(todayElement)
 
   // Find and click on tomorrow's date
-  const tomorrowElement = screen.getByText(tomorrow.format('D'))
+  const tomorrowElement = await screen.findByText(tomorrow.format('D'))
   userEvent.click(tomorrowElement)
 
   await userEvent.click(await screen.findByText('Apply'))
