@@ -1011,28 +1011,34 @@ importers:
   apps/ui-library:
     dependencies:
       '@radix-ui/react-avatar':
-        specifier: ^1.0.4
+        specifier: '*'
+        version: 1.0.4(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@radix-ui/react-checkbox':
+        specifier: '*'
         version: 1.0.4(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-label':
-        specifier: ^2.0.2
+        specifier: '*'
         version: 2.0.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-progress':
-        specifier: ^1.0.3
+        specifier: '*'
         version: 1.0.3(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-slot':
-        specifier: ^1.1.2
+        specifier: '*'
         version: 1.1.2(@types/react@18.3.3)(react@18.3.1)
       '@radix-ui/react-tooltip':
-        specifier: ^1.0.7
+        specifier: '*'
         version: 1.1.8(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@react-router/fs-routes':
         specifier: ^7.4.0
         version: 7.4.0(@react-router/dev@7.4.0(@types/node@22.13.14)(jiti@2.4.2)(react-router@7.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(sass@1.72.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.2.6(@types/node@22.13.14)(jiti@2.4.2)(sass@1.72.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(yaml@2.4.5))(typescript@5.5.2)
+      '@supabase/postgrest-js':
+        specifier: '*'
+        version: 1.19.2
       '@supabase/supa-mdx-lint':
         specifier: 0.2.6-alpha
         version: 0.2.6-alpha
       class-variance-authority:
-        specifier: ^0.6.0
+        specifier: '*'
         version: 0.6.1
       common:
         specifier: workspace:*

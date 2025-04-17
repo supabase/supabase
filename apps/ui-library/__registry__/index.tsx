@@ -343,6 +343,18 @@ export const Index: Record<string, any> = {
       chunks: []
     }
     ,
+    "infinite-query-hook": {
+      name: "infinite-query-hook",
+      type: "registry:block",
+      registryDependencies: [],
+      
+      source: "",
+      files: ["registry/default/blocks/infinite-query-hook/hooks/use-infinite-query.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
     "supabase-client-nextjs": {
       name: "supabase-client-nextjs",
       type: "registry:lib",
@@ -482,6 +494,18 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/examples/realtime-avatar-stack-preview.tsx")),
       source: "",
       files: ["registry/default/examples/realtime-avatar-stack-preview.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "infinite-query-hook-demo": {
+      name: "infinite-query-hook-demo",
+      type: "registry:example",
+      registryDependencies: [],
+      component: React.lazy(() => import("@/registry/default/examples/infinite-query-hook-demo.tsx")),
+      source: "",
+      files: ["registry/default/examples/infinite-query-hook-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
