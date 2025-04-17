@@ -221,16 +221,18 @@ export function InfiniteList<TableName extends SupabaseTableName>({
 }
 ```
 
-If you want to use the `InfiniteList` component with the [Todo List](https://supabase.com/dashboard/project/_/sql/quickstarts) quickstart, you can do it like so:
+Use the `InfiniteList` component with the Todo List quickstart.
+
+Add `<InfiniteListDemo />` to a page to see it in action.
+Ensure the [Checkbox](https://ui.shadcn.com/docs/components/checkbox) component from shadcn/ui is installed, and [regenerate/download](https://supabase.com/docs/guides/api/rest/generating-types) types after running the quickstart.
 
 ```tsx
 'use client'
 
-import { cn } from '@/lib/utils'
-import { InfiniteList } from '@/components/infinite-list'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Database } from '@/lib/database.types'
-import * as React from 'react'
+import { InfiniteList } from './infinite-component'
+import { SupabaseQueryHandler } from '@/hooks/use-infinite-query'
+import { Database } from '@/lib/supabase.types'
 
 type TodoTask = Database['public']['Tables']['todos']['Row']
 
@@ -258,7 +260,7 @@ const orderByInsertedAt: SupabaseQueryHandler<'todos'> = (query) => {
   return query.order('inserted_at', { ascending: false })
 }
 
-const InfiniteListDemo = () => {
+export const InfiniteListDemo = () => {
   return (
     <div className="bg-background h-[600px]">
       <InfiniteList
@@ -271,6 +273,14 @@ const InfiniteListDemo = () => {
   )
 }
 ```
+
+<Callout>
+  The Todo List table has Row Level Security (RLS) enabled by default. Feel free disable it
+  temporarily while testing. With RLS enabled, you will get an [empty
+  array](https://supabase.com/docs/guides/troubleshooting/why-is-my-select-returning-an-empty-data-array-and-i-have-data-in-the-table-xvOPgx)
+  of results by default. [Read
+  more](https://supabase.com/docs/guides/database/postgres/row-level-security) about RLS.
+</Callout>
 
 ## Further reading
 
