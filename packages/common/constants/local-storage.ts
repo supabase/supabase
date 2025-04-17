@@ -1,5 +1,7 @@
 export const LOCAL_STORAGE_KEYS = {
-  // STUDIO
+  /**
+   * STUDIO
+   */
   AI_ASSISTANT_STATE: (projectRef: string | undefined) =>
     `supabase-ai-assistant-state-${projectRef}`,
   SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',
@@ -64,16 +66,28 @@ export const LOCAL_STORAGE_KEYS = {
   LAST_VISITED_LOGS_PAGE: 'supabase-last-visited-logs-page',
   LAST_VISITED_ORGANIZATION: 'last-visited-organization',
 
-  // COMMON
+  /**
+   * COMMON
+   */
   TELEMETRY_CONSENT: 'supabase-consent-ph',
   TELEMETRY_DATA: 'supabase-telemetry-data',
 
-  // DOCS
+  /**
+   * DOCS
+   */
+  SAVED_ORG: 'docs.ui.user.selected.org',
+  SAVED_PROJECT: 'docs.ui.user.selected.project',
+  SAVED_BRANCH: 'docs.ui.user.selected.branch',
+
   HIDE_PROMO_TOAST: 'supabase-hide-promo-toast-lw13-d1',
 
-  // WWW
+  /**
+   * WWW
+   */
   BLOG_VIEW: 'supabase-blog-view',
-}
+} as const
+
+export type LocalStorageKey = (typeof LOCAL_STORAGE_KEYS)[keyof typeof LOCAL_STORAGE_KEYS]
 
 const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   'graphiql:theme',

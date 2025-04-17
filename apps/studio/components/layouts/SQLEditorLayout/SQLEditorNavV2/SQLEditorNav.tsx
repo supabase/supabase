@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsSQLEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import { MoveQueryModal } from 'components/interfaces/SQLEditor/MoveQueryModal'
@@ -17,7 +17,6 @@ import { Snippet, SnippetFolder, useSQLSnippetFoldersQuery } from 'data/content/
 import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import uuidv4 from 'lib/uuid'
 import { Eye, EyeOffIcon, Heart, Unlock } from 'lucide-react'

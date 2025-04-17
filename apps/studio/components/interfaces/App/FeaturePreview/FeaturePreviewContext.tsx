@@ -1,6 +1,5 @@
 import { noop } from 'lodash'
 
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { EMPTY_OBJ } from 'lib/void'
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 import { APISidePanelPreview } from './APISidePanelPreview'
@@ -9,6 +8,7 @@ import { InlineEditorPreview } from './InlineEditorPreview'
 import { LayoutUpdatePreview } from './LayoutUpdatePreview'
 import { SqlEditorTabsPreview } from './SqlEditorTabs'
 import { TableEditorTabsPreview } from './TableEditorTabs'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 export const FEATURE_PREVIEWS = [
   {

@@ -4,7 +4,7 @@ import SVG from 'react-inlinesvg'
 
 import Panel from 'components/ui/Panel'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { BASE_PATH, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { BASE_PATH } from 'lib/constants'
 import {
   Label_Shadcn_,
   RadioGroup_Shadcn_,
@@ -20,6 +20,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DEFAULT_SIDEBAR_BEHAVIOR } from 'components/interfaces/Sidebar'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 export const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)

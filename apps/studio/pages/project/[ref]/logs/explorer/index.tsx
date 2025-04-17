@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'common'
 import {
   Button,
   Form,
@@ -48,7 +48,6 @@ import {
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
