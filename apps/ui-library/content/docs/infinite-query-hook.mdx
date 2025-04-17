@@ -221,40 +221,49 @@ export function InfiniteList<TableName extends SupabaseTableName>({
 }
 ```
 
-Then you can use it like this:
+If you want to use the `InfiniteList` component with the [Todo List](https://supabase.com/dashboard/project/_/sql/quickstarts) quickstart, you can do it like so:
 
 ```tsx
-type Channel = Database['public']['Tables']['channels']['Row']
+'use client'
+
+import { cn } from '@/lib/utils'
+import { InfiniteList } from '@/components/infinite-list'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Database } from '@/lib/database.types'
+import * as React from 'react'
+
+type TodoTask = Database['public']['Tables']['todos']['Row']
 
 // Define how each item should be rendered
-const renderChannelItem = (channel: Channel) => {
+const renderTodoItem = (todo: TodoTask) => {
   return (
     <div
-      key={channel.id}
+      key={todo.id}
       className="border-b py-3 px-4 hover:bg-muted flex items-center justify-between"
     >
-      <div>
-        <span className="font-medium text-sm text-foreground">
-          {channel.slug} (ID: {channel.id})
-        </span>
-        <div className="text-sm text-foreground-light">
-          {new Date(channel.inserted_at).toLocaleDateString()}
+      <div className="flex items-center gap-3">
+        <Checkbox defaultChecked={todo.is_complete ?? false} />
+        <div>
+          <span className="font-medium text-sm text-foreground">{todo.task}</span>
+          <div className="text-sm text-muted-foreground">
+            {new Date(todo.inserted_at).toLocaleDateString()}
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-const orderByInsertedAt: SupabaseQueryHandler<'channels'> = (query) => {
+const orderByInsertedAt: SupabaseQueryHandler<'todos'> = (query) => {
   return query.order('inserted_at', { ascending: false })
 }
 
 const InfiniteListDemo = () => {
   return (
-    <div className="bg-surface-100 h-[600px]">
+    <div className="bg-background h-[600px]">
       <InfiniteList
-        tableName="channels"
-        renderItem={renderChannelItem}
+        tableName="todos"
+        renderItem={renderTodoItem}
         pageSize={3}
         trailingQuery={orderByInsertedAt}
       />
