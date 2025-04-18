@@ -1,0 +1,3 @@
+# To prevent search engines from seeing the site altogether, uncomment the next two lines:
+# User-Agent: *
+# Disallow: /
