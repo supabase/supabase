@@ -3,15 +3,12 @@ import saveAs from 'file-saver'
 import { ArrowUp, ChevronDown, FileText, Trash } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
-import { ReactNode, useCallback, useState } from 'react'
+import { ReactNode, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import {
-  filtersToUrlParams,
-  saveTableEditorStateToLocalStorage,
-  sortsToUrlParams,
-} from 'components/grid/SupabaseGrid.utils'
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
+import { useTableSort } from 'components/grid/hooks/useTableSort'
 import type { Filter, Sort } from 'components/grid/types'
 import GridHeaderActions from 'components/interfaces/TableGridEditor/GridHeaderActions'
 import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
@@ -22,7 +19,6 @@ import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import {
   useRoleImpersonationStateSnapshot,
@@ -63,8 +59,11 @@ export type HeaderProps = {
   customHeader: ReactNode
 }
 
-const Header = ({ sorts, filters, customHeader }: HeaderProps) => {
+const Header = ({ sorts: sortsProp, filters: filtersProp, customHeader }: HeaderProps) => {
   const snap = useTableEditorTableStateSnapshot()
+
+  const filters = filtersProp
+  const sorts = sortsProp
 
   return (
     <div>
@@ -93,6 +92,11 @@ const DefaultHeader = () => {
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
   const org = useSelectedOrganization()
+  const canCreateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+  const { mutate: sendEvent } = useSendEventMutation()
+
+  const { onApplyFilters, urlFilters } = useTableFilter()
+  const { onApplySorts, urlSorts } = useTableSort()
 
   const onAddRow =
     snap.editable && (snap.table.columns ?? []).length > 0 ? tableEditorSnap.onAddRow : undefined
@@ -101,68 +105,11 @@ const DefaultHeader = () => {
 
   const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
-  // [Joshen] Using this logic to block both column and row creation/update/delete
-  const canCreateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
-
-  const { filters, sorts, setParams } = useTableEditorFiltersSort()
-
-  const onApplyFilters = useCallback(
-    (appliedFilters: Filter[]) => {
-      snap.setEnforceExactCount(false)
-      // Reset page to 1 when filters change
-      snap.setPage(1)
-
-      const newFilters = filtersToUrlParams(appliedFilters)
-
-      setParams((prevParams) => {
-        return {
-          filter: newFilters,
-          sort: prevParams.sort,
-        }
-      })
-
-      if (projectRef) {
-        saveTableEditorStateToLocalStorage({
-          projectRef,
-          tableName: snap.table.name,
-          schema: snap.table.schema,
-          filters: newFilters,
-        })
-      }
-    },
-    [projectRef, snap.table.name, snap.table.schema, setParams]
-  )
-
-  const onApplySorts = useCallback(
-    (appliedSorts: Sort[]) => {
-      const newSorts = sortsToUrlParams(appliedSorts)
-
-      setParams((prevParams) => {
-        return {
-          filter: prevParams.filter,
-          sort: newSorts,
-        }
-      })
-
-      if (projectRef) {
-        saveTableEditorStateToLocalStorage({
-          projectRef,
-          tableName: snap.table.name,
-          schema: snap.table.schema,
-          sorts: newSorts,
-        })
-      }
-    },
-    [projectRef, snap.table.name, snap.table.schema, setParams]
-  )
-
-  const { mutate: sendEvent } = useSendEventMutation()
-
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <FilterPopover filters={filters} onApplyFilters={onApplyFilters} />
-        <SortPopover sorts={sorts} onApplySorts={onApplySorts} />
+        <FilterPopover filters={urlFilters} onApplyFilters={onApplyFilters} />
+        <SortPopover sorts={urlSorts} onApplySorts={onApplySorts} />
       </div>
       {canAddNew && (
         <>
