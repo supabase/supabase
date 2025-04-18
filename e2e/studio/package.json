@@ -7,7 +7,10 @@
     "test:e2e:staging": "TEST_ENV=staging playwright test",
     "test:e2e:prod": "TEST_ENV=production playwright test",
     "test:e2e:preview": "TEST_ENV=preview playwright test",
-    "test:e2e:selfhosted": "TEST_ENV=self-hosted playwright test"
+    "test:e2e:selfhosted": "TEST_ENV=selfhosted playwright test",
+    "test:e2e:dev-selfhosted": "TEST_ENV=dev-selfhosted playwright test",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop"
   },
   "keywords": [],
   "author": "",

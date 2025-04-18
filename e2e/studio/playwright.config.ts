@@ -1,5 +1,5 @@
 import { defineConfig } from '@playwright/test'
-import { ENV_URLS, ENV, STORAGE_STATE_PATH } from './env.config'
+import { ENV_URLS, ENV, STORAGE_STATE_PATH, isEnvWithAuth } from './env.config'
 
 export default defineConfig({
   timeout: 30 * 1000,
@@ -23,7 +23,7 @@ export default defineConfig({
       testMatch: /.*\.spec\.ts/,
       dependencies: ['Global Setup'],
       use: {
-        storageState: STORAGE_STATE_PATH,
+        ...(isEnvWithAuth() ? { storageState: STORAGE_STATE_PATH } : {}),
       },
     },
   ],

@@ -85,9 +85,16 @@ To start API locally, run:
   console.log(`\n ✅ API is running at ${apiUrl}`)
 
   /**
+   * TODO:
+   * Check if user is running hosted or selfhosted
+   * If user is running wrong studio for tests, stop and show error
+   */
+
+  /**
    * Only run authentication if the environment requires it
    */
   if (!ENVS_WITH_AUTH.includes(ENV)) {
+    console.log(`\n 🔑 Skipping authentication for ${ENV}`)
     return
   }
 
@@ -113,6 +120,10 @@ To start API locally, run:
   expect(auth.email).toBeDefined()
   expect(auth.password).toBeDefined()
   expect(auth.projectRef).toBeDefined()
+
+  await expect(page.getByLabel('Email')).toBeVisible()
+  await expect(page.getByLabel('Password')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Sign In' })).toBeVisible()
 
   await page.getByLabel('Email').fill(auth.email ?? '')
   await page.getByLabel('Password').fill(auth.password ?? '')
