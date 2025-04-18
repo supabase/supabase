@@ -168,9 +168,9 @@ export const CodeBlock = ({
         >
           {/* @ts-ignore */}
           <SyntaxHighlighter
+            suppressContentEditableWarning
             language={lang}
             wrapLines={wrapLines}
-            // @ts-ignore
             style={monokaiTheme}
             className={cn(
               'code-block border border-surface p-4 w-full !my-0 !bg-surface-100 outline-none focus:border-foreground-lighter/50',
@@ -220,7 +220,12 @@ export const CodeBlock = ({
               e.preventDefault()
               return false
             }}
-            suppressContentEditableWarning={true}
+            onKeyDown={(e: any) => {
+              if (e.code === 'Backspace') {
+                e.preventDefault()
+                return false
+              }
+            }}
           >
             {codeValue}
           </SyntaxHighlighter>
