@@ -1,29 +1,25 @@
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
-import { useParams } from 'common'
 import dayjs from 'dayjs'
-import timezone from 'dayjs/plugin/timezone'
-import utc from 'dayjs/plugin/timezone'
+import { X } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Alert, Button } from 'ui'
 
+import { useParams } from 'common'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
 import { IS_PLATFORM } from 'lib/constants'
-import { X } from 'lucide-react'
+import { Alert, Button } from 'ui'
+import { InlineLink } from './InlineLink'
 
 // [Joshen] Think twice about the category though - it doesn't correspond
 
-dayjs.extend(utc)
-dayjs.extend(timezone)
-
-const ProjectUpgradeFailedBanner = () => {
+export const ProjectUpgradeFailedBanner = () => {
   const { ref } = useParams()
   const { data } = useProjectUpgradingStatusQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { status, initiated_at, latest_status_at, error } = data?.databaseUpgradeStatus ?? {}
 
   const key = `supabase-upgrade-${ref}-${initiated_at}`
   const isAcknowledged =
-    typeof window !== 'undefined' ? localStorage?.getItem(key) === 'true' ?? false : false
+    typeof window !== 'undefined' ? localStorage?.getItem(key) === 'true' : false
   const [showMessage, setShowMessage] = useState(!isAcknowledged)
 
   const isFailed = status === DatabaseUpgradeStatus.Failed
@@ -84,20 +80,13 @@ const ProjectUpgradeFailedBanner = () => {
           for assistance with the upgrade.
         </div>
         <div>
-          To view logs related to the failed upgrade, visit the{' '}
-          <Link
-            className="underline"
-            href={`/project/${ref}/logs/pg-upgrade-logs?${timestampFilter}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Postgres Version Upgrade logs section
-          </Link>
+          You may also view logs related to the failed upgrade in your{' '}
+          <InlineLink href={`/project/${ref}/logs/pg-upgrade-logs?${timestampFilter}`}>
+            project's logs
+          </InlineLink>
           .
         </div>
       </Alert>
     </div>
   )
 }
-
-export default ProjectUpgradeFailedBanner

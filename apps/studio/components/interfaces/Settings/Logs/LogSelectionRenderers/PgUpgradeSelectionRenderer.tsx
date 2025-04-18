@@ -1,9 +1,10 @@
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
 import LogsDivider from '../Logs.Divider'
+import { LogData } from '../Logs.types'
 import { SelectionDetailedRow, SelectionDetailedTimestampRow } from '../LogsFormatters'
 
-const PgUpgradeSelectionRenderer = ({ log }: any) => {
-  const log_file = log?.metadata[0]?.log_file
+export const PgUpgradeSelectionRenderer = ({ log }: { log: LogData }) => {
+  const log_file = log?.metadata?.[0]?.log_file
 
   return (
     <>
@@ -22,5 +23,3 @@ const PgUpgradeSelectionRenderer = ({ log }: any) => {
     </>
   )
 }
-
-export default PgUpgradeSelectionRenderer

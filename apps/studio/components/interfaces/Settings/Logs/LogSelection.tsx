@@ -14,7 +14,7 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
-import PgUpgradeSelectionRenderer from './LogSelectionRenderers/PgUpgradeSelectionRenderer'
+import { PgUpgradeSelectionRenderer } from './LogSelectionRenderers/PgUpgradeSelectionRenderer'
 import type { LogData, QueryType } from './Logs.types'
 
 export interface LogSelectionProps {
