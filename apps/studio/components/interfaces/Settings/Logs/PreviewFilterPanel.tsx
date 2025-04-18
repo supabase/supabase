@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { Eye, EyeOff, RefreshCw, Search, Terminal, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -19,7 +20,6 @@ import {
 } from './Logs.constants'
 import type { Filters, LogSearchCallback, LogTemplate } from './Logs.types'
 import LogsFilterPopover from './LogsFilterPopover'
-import dayjs from 'dayjs'
 
 interface PreviewFilterPanelProps {
   defaultSearchValue?: string
@@ -79,47 +79,6 @@ const PreviewFilterPanel = ({
 
   const hasEdits = search !== defaultSearchValue
 
-  // Sync local state with provided default value
-  useEffect(() => {
-    if (search !== defaultSearchValue) {
-      setSearch(defaultSearchValue)
-    }
-  }, [defaultSearchValue])
-
-  const RefreshButton = () => (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button
-          title="refresh"
-          type="default"
-          className="px-1.5"
-          icon={
-            <div className="relative">
-              {newCount > 0 && (
-                <div className="absolute -top-3 right-3 flex items-center justify-center">
-                  <div className="absolute z-20">
-                    <p style={{ fontSize: '0.6rem' }} className="text-white">
-                      {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
-                    </p>
-                  </div>
-                  <div className="h-4 w-4 animate-ping rounded-full bg-green-800 opacity-60"></div>
-                  <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
-                </div>
-              )}
-              <RefreshCw />
-            </div>
-          }
-          loading={isLoading}
-          disabled={isLoading}
-          onClick={onRefresh}
-        />
-      </TooltipTrigger>
-      <TooltipContent side="bottom" className="text-xs">
-        Refresh logs
-      </TooltipContent>
-    </Tooltip>
-  )
-
   function getDefaultDatePickerValue() {
     // if we have values in the URL, use them
     const iso_timestamp_start = router.query.iso_timestamp_start as string
@@ -145,6 +104,13 @@ const PreviewFilterPanel = ({
   )
 
   const handleInputSearch = (query: string) => onSearch('search-input-change', { query })
+
+  // Sync local state with provided default value
+  useEffect(() => {
+    if (search !== defaultSearchValue) {
+      setSearch(defaultSearchValue)
+    }
+  }, [defaultSearchValue])
 
   return (
     <div
@@ -204,7 +170,38 @@ const PreviewFilterPanel = ({
           />
         </form>
 
-        <RefreshButton />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              title="refresh"
+              type="default"
+              className="px-1.5"
+              icon={
+                <div className="relative">
+                  {newCount > 0 && (
+                    <div className="absolute -top-3 right-3 flex items-center justify-center">
+                      <div className="absolute z-20">
+                        <p style={{ fontSize: '0.6rem' }} className="text-white">
+                          {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
+                        </p>
+                      </div>
+                      <div className="h-4 w-4 animate-ping rounded-full bg-green-800 opacity-60"></div>
+                      <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
+                    </div>
+                  )}
+                  <RefreshCw />
+                </div>
+              }
+              loading={isLoading}
+              disabled={isLoading}
+              onClick={onRefresh}
+            />
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="text-xs">
+            Refresh logs
+          </TooltipContent>
+        </Tooltip>
+
         <LogsDatePicker
           helpers={PREVIEWER_DATEPICKER_HELPERS}
           onSubmit={(vals) => {
