@@ -10,6 +10,7 @@ type LogTable =
   | 'supavisor_logs'
   | 'pgbouncer_logs'
   | 'pg_cron_logs'
+  | 'pg_upgrade_logs'
 
 type LogSchema = {
   name: string

@@ -183,7 +183,7 @@ export function LogsSidebarMenuV2() {
       url: `/project/${ref}/logs/pgcron-logs`,
       items: [],
     },
-  ]
+  ].filter((x) => x !== null)
 
   const OPERATIONAL_COLLECTIONS = IS_PLATFORM
     ? [
@@ -273,15 +273,18 @@ export function LogsSidebarMenuV2() {
       <Separator className="my-4" />
 
       <SidebarCollapsible title="Collections" defaultOpen={true}>
-        {filteredLogs.map((collection) => (
-          <LogsSidebarItem
-            isActive={isActive(collection?.url ?? '')}
-            href={collection?.url ?? ''}
-            key={collection?.key}
-            icon={<SupaIcon className="text-foreground-light" />}
-            label={collection?.name ?? ''}
-          />
-        ))}
+        {filteredLogs.map((collection) => {
+          const isItemActive = isActive(collection.url)
+          return (
+            <LogsSidebarItem
+              key={collection.key}
+              isActive={isItemActive}
+              href={collection.url}
+              icon={<SupaIcon className="text-foreground-light" />}
+              label={collection.name}
+            />
+          )
+        })}
         {whCollectionsLoading && warehouseEnabled ? (
           <div className="p-4">
             <GenericSkeletonLoader />
@@ -300,11 +303,11 @@ export function LogsSidebarMenuV2() {
           <SidebarCollapsible title="Database operations" defaultOpen={true}>
             {filteredOperationalLogs.map((collection) => (
               <LogsSidebarItem
-                isActive={isActive(collection?.url ?? '')}
-                href={collection?.url ?? ''}
-                key={collection?.key}
+                key={collection.key}
+                isActive={isActive(collection.url)}
+                href={collection.url}
                 icon={<SupaIcon className="text-foreground-light" />}
-                label={collection?.name ?? ''}
+                label={collection.name}
               />
             ))}
           </SidebarCollapsible>
