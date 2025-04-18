@@ -1,17 +1,17 @@
 import { ExternalLink, Loader2 } from 'lucide-react'
-import Link from 'next/link'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { forwardRef } from 'react'
 
 import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import CopyButton from 'components/ui/CopyButton'
+import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { AiIconAnimation, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { AiIconAnimation, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import Results from './Results'
-import { InlineLink } from 'components/ui/InlineLink'
 
 export type UtilityTabResultsProps = {
   id: string
@@ -27,6 +27,7 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
     const state = useDatabaseSelectorStateSnapshot()
     const organization = useSelectedOrganization()
     const snapV2 = useSqlEditorV2StateSnapshot()
+    const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
     const result = snapV2.results[id]?.[0]
     const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
@@ -64,32 +65,25 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
           <div className="flex flex-row justify-between items-start py-4 px-6 gap-x-4">
             {isTimeout ? (
               <div className="flex flex-col gap-y-1">
-                <p className="font-mono text-sm">SQL query ran into an upstream timeout</p>
-                <p className="font-mono text-sm text-foreground-light">
+                <p className="font-mono text-sm tracking-tight">
+                  Error: SQL query ran into an upstream timeout
+                </p>
+                <p className="text-sm text-foreground-light">
                   You can either{' '}
-                  <InlineLink
-                    target="_blank"
-                    rel="noreferrer"
-                    href="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
-                  >
+                  <InlineLink href="https://supabase.com/docs/guides/platform/performance#examining-query-performance">
                     optimize your query
                   </InlineLink>
                   , or{' '}
-                  <InlineLink
-                    target="_blank"
-                    rel="noreferrer"
-                    href="https://supabase.com/docs/guides/database/timeouts"
-                  >
+                  <InlineLink href="https://supabase.com/docs/guides/database/timeouts">
                     increase the statement timeout
                   </InlineLink>
                   {' or '}
-                  <InlineLink
-                    target="_blank"
-                    rel="noreferrer"
-                    href={`/project/${ref}/settings/database`}
+                  <span
+                    className={cn(InlineLinkClassName, 'cursor-pointer')}
+                    onClick={() => setShowConnect(true)}
                   >
                     connect to your database directly
-                  </InlineLink>
+                  </span>
                   .
                 </p>
               </div>
@@ -119,15 +113,13 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
                 {payloadTooLargeError && (
                   <p className="text-sm text-foreground-light flex items-center gap-x-1">
                     Run this query by{' '}
-                    <Link
-                      target="_blank"
-                      rel="noreferrer"
-                      href={`/project/${ref}/settings/database`}
-                      className="underline transition hover:text-foreground flex items-center gap-x-1"
+                    <span
+                      onClick={() => setShowConnect(true)}
+                      className={cn(InlineLinkClassName, 'flex items-center gap-x-1')}
                     >
                       connecting to your database directly
                       <ExternalLink size={12} />
-                    </Link>
+                    </span>
                     .
                   </p>
                 )}
