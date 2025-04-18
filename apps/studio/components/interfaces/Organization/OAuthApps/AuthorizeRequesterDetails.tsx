@@ -79,6 +79,11 @@ const AuthorizeRequesterDetails = ({
         </p>
         <div className="pt-2">
           <ScopeSection
+            description="access to analytics logs."
+            hasReadScope={scopes.includes(OAuthScope.ANALYTICS_READ)}
+            hasWriteScope={scopes.includes(OAuthScope.ANALYTICS_WRITE)}
+          />
+          <ScopeSection
             description="access to auth configurations and SSO providers."
             hasReadScope={scopes.includes(OAuthScope.AUTH_READ)}
             hasWriteScope={scopes.includes(OAuthScope.AUTH_WRITE)}

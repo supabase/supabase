@@ -1,10 +1,9 @@
-import clsx from 'clsx'
+import { Maximize2, Minimize2, Terminal } from 'lucide-react'
 import { useState } from 'react'
-import { Collapsible } from 'ui'
 
 import { useParams } from 'common'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
-import { Terminal, Minimize2, Maximize2 } from 'lucide-react'
+import { cn, Collapsible } from 'ui'
 
 const MigrationsEmptyState = () => {
   const { ref } = useParams()
@@ -47,8 +46,8 @@ const MigrationsEmptyState = () => {
   ]
 
   return (
-    <div className="w-full px-12 py-12 bg-no-repeat border rounded bg-studio border-default">
-      <div className="space-y-8">
+    <div className="w-full p-4 md:p-12 bg-no-repeat border rounded bg-studio border-default">
+      <div className="space-y-4 md:space-y-8">
         <div className="space-y-2 w-4/5">
           <h4 className="text-lg">Database migrations</h4>
           <p className="text-sm text-foreground-light">
@@ -62,7 +61,7 @@ const MigrationsEmptyState = () => {
           <Collapsible.Trigger asChild>
             <button
               type="button"
-              className={clsx(
+              className={cn(
                 'flex w-full items-center justify-between rounded py-3 px-6 text-foreground border bg-surface-100',
                 showInstructions && 'rounded-b-none'
               )}

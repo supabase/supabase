@@ -1,0 +1,154 @@
+# Supabase Design System
+Last updated: 2025-03-05T12:59:50.911Z
+
+## Overview
+The Design System used in Supabase Studio.
+
+## Docs
+- [Changelog](https://supabase-design-system.vercel.app/design-system/docs/changelog)
+    - Latest updates and announcements.
+- [Color usage](https://supabase-design-system.vercel.app/design-system/docs/color-usage)
+    - Colors system breakdown with best practise
+- [Accordion](https://supabase-design-system.vercel.app/design-system/docs/components/accordion)
+    - A vertically stacked set of interactive headings that each reveal a section of content.
+- [Alert](https://supabase-design-system.vercel.app/design-system/docs/components/alert copy)
+    - Displays a callout for user attention.
+- [Alert Dialog](https://supabase-design-system.vercel.app/design-system/docs/components/alert-dialog)
+    - A modal dialog that interrupts the user with important content and expects a response.
+- [Alert](https://supabase-design-system.vercel.app/design-system/docs/components/alert)
+    - Displays a callout for user attention.
+- [Aspect Ratio](https://supabase-design-system.vercel.app/design-system/docs/components/aspect-ratio)
+    - Displays content within a desired ratio.
+- [Atom components](https://supabase-design-system.vercel.app/design-system/docs/components/atom-components)
+- [Avatar](https://supabase-design-system.vercel.app/design-system/docs/components/avatar)
+    - An image element with a fallback for representing the user.
+- [Badge](https://supabase-design-system.vercel.app/design-system/docs/components/badge)
+    - Displays a badge or a component that looks like a badge.
+- [Breadcrumb](https://supabase-design-system.vercel.app/design-system/docs/components/breadcrumb)
+    - Displays the path to the current resource using a hierarchy of links.
+- [Button](https://supabase-design-system.vercel.app/design-system/docs/components/button)
+    - Displays a button or a component that looks like a button.
+- [Calendar](https://supabase-design-system.vercel.app/design-system/docs/components/calendar)
+    - A date field component that allows users to enter and edit date.
+- [Card](https://supabase-design-system.vercel.app/design-system/docs/components/card)
+    - Displays a card with header, content, and footer.
+- [Carousel](https://supabase-design-system.vercel.app/design-system/docs/components/carousel)
+    - A carousel with motion and swipe built using Embla.
+- [Chart](https://supabase-design-system.vercel.app/design-system/docs/components/chart)
+    - Beautiful charts. Built using Recharts. Copy and paste into your apps.
+- [Checkbox](https://supabase-design-system.vercel.app/design-system/docs/components/checkbox)
+    - A control that allows the user to toggle between checked and not checked.
+- [Collapsible](https://supabase-design-system.vercel.app/design-system/docs/components/collapsible)
+    - An interactive component which expands/collapses a panel.
+- [Combobox](https://supabase-design-system.vercel.app/design-system/docs/components/combobox)
+    - Autocomplete input and command palette with a list of suggestions.
+- [Command](https://supabase-design-system.vercel.app/design-system/docs/components/command)
+    - Fast, composable, unstyled command menu for React.
+- [Command Menu (cmdk)](https://supabase-design-system.vercel.app/design-system/docs/components/commandmenu)
+    - A central command menu that acts as a control center with searchable actions.
+- [Context Menu](https://supabase-design-system.vercel.app/design-system/docs/components/context-menu)
+    - Displays a menu to the user — such as a set of actions or functions — triggered by a button.
+- [Data Table](https://supabase-design-system.vercel.app/design-system/docs/components/data-table)
+    - Powerful table and datagrids built using TanStack Table.
+- [Date Picker](https://supabase-design-system.vercel.app/design-system/docs/components/date-picker)
+    - A date picker component with range and presets.
+- [Dialog](https://supabase-design-system.vercel.app/design-system/docs/components/dialog)
+    - A window overlaid on either the primary window or another dialog window, rendering the content underneath inert.
+- [Drawer](https://supabase-design-system.vercel.app/design-system/docs/components/drawer)
+    - A drawer component for React.
+- [Dropdown Menu](https://supabase-design-system.vercel.app/design-system/docs/components/dropdown-menu)
+    - Displays a menu to the user — such as a set of actions or functions — triggered by a button.
+- [Expanding Textarea](https://supabase-design-system.vercel.app/design-system/docs/components/expanding-textarea)
+    - Displays a textarea which autoexpands (or shrinks) based on its content.
+- [React Hook Form](https://supabase-design-system.vercel.app/design-system/docs/components/form)
+    - Building forms with React Hook Form and Zod.
+- [Fragment components](https://supabase-design-system.vercel.app/design-system/docs/components/fragment-components)
+    - ''
+- [Hover Card](https://supabase-design-system.vercel.app/design-system/docs/components/hover-card)
+    - For sighted users to preview content available behind a link.
+- [Input OTP](https://supabase-design-system.vercel.app/design-system/docs/components/input-otp)
+    - Accessible one-time password component with copy paste functionality.
+- [Input](https://supabase-design-system.vercel.app/design-system/docs/components/input)
+    - Displays a form input field or a component that looks like an input field.
+- [Label](https://supabase-design-system.vercel.app/design-system/docs/components/label)
+    - Renders an accessible label associated with controls.
+- [Menubar](https://supabase-design-system.vercel.app/design-system/docs/components/menubar)
+    - A visually persistent menu common in desktop applications that provides quick access to a consistent set of commands.
+- [Navigation Menu](https://supabase-design-system.vercel.app/design-system/docs/components/navigation-menu)
+    - A collection of links for navigating websites.
+- [Pagination](https://supabase-design-system.vercel.app/design-system/docs/components/pagination)
+    - Pagination with page navigation, next and previous links.
+- [Popover](https://supabase-design-system.vercel.app/design-system/docs/components/popover)
+    - Displays rich content in a portal, triggered by a button.
+- [Progress](https://supabase-design-system.vercel.app/design-system/docs/components/progress)
+    - Displays an indicator showing the completion progress of a task, typically displayed as a progress bar.
+- [Radio Group Card](https://supabase-design-system.vercel.app/design-system/docs/components/radio-group-card)
+    - A set of checkable buttons—known as radio buttons—where no more than one of the buttons can be checked at a time.
+- [Radio Group Stacked](https://supabase-design-system.vercel.app/design-system/docs/components/radio-group-stacked)
+    - A set of checkable buttons—known as radio buttons—where no more than one of the buttons can be checked at a time.
+- [Radio Group](https://supabase-design-system.vercel.app/design-system/docs/components/radio-group)
+    - A set of checkable buttons—known as radio buttons—where no more than one of the buttons can be checked at a time.
+- [Resizable](https://supabase-design-system.vercel.app/design-system/docs/components/resizable)
+    - Accessible resizable panel groups and layouts with keyboard support.
+- [Scroll-area](https://supabase-design-system.vercel.app/design-system/docs/components/scroll-area)
+    - Augments native scroll functionality for custom, cross-browser styling.
+- [Select](https://supabase-design-system.vercel.app/design-system/docs/components/select)
+    - Displays a list of options for the user to pick from—triggered by a button.
+- [Separator](https://supabase-design-system.vercel.app/design-system/docs/components/separator)
+    - Visually or semantically separates content.
+- [Sheet](https://supabase-design-system.vercel.app/design-system/docs/components/sheet)
+    - Extends the Dialog component to display content that complements the main content of the screen.
+- [Sidebar](https://supabase-design-system.vercel.app/design-system/docs/components/sidebar)
+    - A composable, themeable and customizable sidebar component.
+- [Skeleton](https://supabase-design-system.vercel.app/design-system/docs/components/skeleton)
+    - Use to show a placeholder while content is loading.
+- [Slider](https://supabase-design-system.vercel.app/design-system/docs/components/slider)
+    - An input where the user selects a value from within a given range.
+- [Sonner](https://supabase-design-system.vercel.app/design-system/docs/components/sonner)
+    - An opinionated toast component for React.
+- [Switch](https://supabase-design-system.vercel.app/design-system/docs/components/switch)
+    - A control that allows the user to toggle between checked and not checked.
+- [Table](https://supabase-design-system.vercel.app/design-system/docs/components/table)
+    - A responsive table component.
+- [Tabs](https://supabase-design-system.vercel.app/design-system/docs/components/tabs)
+    - A set of layered sections of content—known as tab panels—that are displayed one at a time.
+- [Textarea](https://supabase-design-system.vercel.app/design-system/docs/components/textarea)
+    - Displays a form textarea or a component that looks like a textarea.
+- [Toggle Group](https://supabase-design-system.vercel.app/design-system/docs/components/toggle-group)
+    - A set of two-state buttons that can be toggled on or off.
+- [Toggle](https://supabase-design-system.vercel.app/design-system/docs/components/toggle)
+    - A two-state button that can be either on or off.
+- [Tooltip](https://supabase-design-system.vercel.app/design-system/docs/components/tooltip)
+    - A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.
+- [Tree View](https://supabase-design-system.vercel.app/design-system/docs/components/tree-view)
+    - A tree view that assembles all the functionalities of the Accordion component to create a tree view.
+- [Typography](https://supabase-design-system.vercel.app/design-system/docs/components/typography)
+    - Styles for headings, paragraphs, lists...etc
+- [Figma](https://supabase-design-system.vercel.app/design-system/docs/figma)
+    - Every component recreated in Figma. With customizable props, typography and icons.
+- [Admonition](https://supabase-design-system.vercel.app/design-system/docs/fragments/admonition)
+    - Displays a callout for user attention.
+- [Assistant Chat](https://supabase-design-system.vercel.app/design-system/docs/fragments/assistant-chat)
+    - Bespoke Assistant chat text area, with support for a commands Popover.
+- [Form Item Layout](https://supabase-design-system.vercel.app/design-system/docs/fragments/form-item-layout)
+    - A helper component that provides a layout for form items.
+- [Info Tooltip](https://supabase-design-system.vercel.app/design-system/docs/fragments/info-tooltip)
+    - InfoTooltip provides a tooltip with an information icon.
+- [Inner Side Menu](https://supabase-design-system.vercel.app/design-system/docs/fragments/inner-side-menu)
+    - InnerSideMenu is a component that provides a collapsible side menu with multiple sections.
+- [Logs Bar Chart](https://supabase-design-system.vercel.app/design-system/docs/fragments/logs-bar-chart)
+    - A stacked bar chart that displays logs errors and successes.
+- [Modal](https://supabase-design-system.vercel.app/design-system/docs/fragments/modal)
+    - A window overlaid on either the primary window or another dialog window, rendering the content underneath inert.
+- [Multi Select](https://supabase-design-system.vercel.app/design-system/docs/fragments/multi-select)
+    - Multiple selection component.
+- [Text Confirm Dialog](https://supabase-design-system.vercel.app/design-system/docs/fragments/text-confirm-dialog)
+    - A modal dialog that interrupts the user with important content and expects a response.
+- [Icons](https://supabase-design-system.vercel.app/design-system/docs/icons)
+    - Icons system breakdown. Copy values of Icons.
+- [Introduction](https://supabase-design-system.vercel.app/design-system/docs/index)
+    - Components and patterns that you can copy and paste into Supabase apps. Accessible. Customizable. Open Source.
+- [Tailwind Classes](https://supabase-design-system.vercel.app/design-system/docs/tailwind-classes)
+    - Icons system breakdown. Copy values of Icons.
+- [Themes](https://supabase-design-system.vercel.app/design-system/docs/theming)
+    - Themes used in Supabase

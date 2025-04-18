@@ -10,9 +10,14 @@ export interface Organization {
   opt_in_tags: string[]
   subscription_id?: string | null
   restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
-  restriction_data: Record<string, never>
+  restriction_data: Record<string, string> | null
   managed_by: 'supabase' | 'vercel-marketplace' | 'aws-marketplace'
   partner_id?: string
+  plan: {
+    id: 'free' | 'pro' | 'team' | 'enterprise'
+    name: string
+  }
+  usage_billing_enabled: boolean
 }
 
 /**
@@ -38,13 +43,11 @@ export interface Project extends ProjectBase {
   // available after projects.fetchDetail
   connectionString?: string
   dbVersion?: string
-  kpsVersion?: string
   restUrl?: string
   lastDatabaseResizeAt?: string | null
   maxDatabasePreprovisionGb?: string | null
   parent_project_ref?: string
   is_branch_enabled?: boolean
-  serviceVersions: { gotrue: string; postgrest: string; 'supabase-postgres': string }
 
   /**
    * postgrestStatus is available on client side only.
@@ -92,11 +95,17 @@ export interface ResponseFailure {
 
 export type SupaResponse<T> = T | ResponseFailure
 
-export interface ResponseError {
-  code?: number | string
-  message: string
+export class ResponseError extends Error {
+  code?: number
   requestId?: string
+
+  constructor(message: string | undefined, code?: number, requestId?: string) {
+    super(message || 'API error happened while trying to communicate with the server.')
+    this.code = code
+    this.requestId = requestId
+  }
 }
+
 export interface Dictionary<T> {
   [Key: string]: T
 }

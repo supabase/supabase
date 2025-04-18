@@ -1,42 +1,39 @@
-import React from 'react'
-import Link from 'next/link'
-import NextImage from 'next/image'
-import { useRouter } from 'next/router'
-import type { GetStaticProps, InferGetStaticPropsType } from 'next'
-import { MDXRemote } from 'next-mdx-remote'
-import { NextSeo } from 'next-seo'
-import dayjs from 'dayjs'
-import matter from 'gray-matter'
 import {
   DesktopComputerIcon,
-  VideoCameraIcon,
-  MicrophoneIcon,
   HandIcon,
+  MicrophoneIcon,
+  VideoCameraIcon,
 } from '@heroicons/react/solid'
-import { capitalize } from 'lodash'
+import dayjs from 'dayjs'
+import matter from 'gray-matter'
+import capitalize from 'lodash/capitalize'
+import { ChevronLeft, X as XIcon } from 'lucide-react'
+import { MDXRemote } from 'next-mdx-remote'
+import { NextSeo } from 'next-seo'
+import NextImage from 'next/image'
+import Link from 'next/link'
 
 import authors from 'lib/authors.json'
 import { isNotNullOrUndefined } from '~/lib/helpers'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata } from '~/lib/posts'
-import { isBrowser, useTelemetryProps } from 'common'
-import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
-import gaEvents from '~/lib/gaEvents'
-import { XIcon } from '@heroicons/react/outline'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 
-import utc from 'dayjs/plugin/utc'
-import timezone from 'dayjs/plugin/timezone'
 import advancedFormat from 'dayjs/plugin/advancedFormat'
+import timezone from 'dayjs/plugin/timezone'
+import utc from 'dayjs/plugin/utc'
 
 import { Button, Image } from 'ui'
+import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
-import { ChevronLeft } from 'lucide-react'
+
+import type { GetStaticProps, InferGetStaticPropsType } from 'next'
+import type Author from '~/types/author'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -48,6 +45,7 @@ type CTA = {
   url: string
   label?: string
   disabled_label?: string
+  disabled?: boolean
   target?: '_blank' | '_self'
 }
 
@@ -71,8 +69,10 @@ interface EventData {
   timezone?: string
   tags?: string[]
   date: string
+  end_date?: string
   speakers: string
-  image?: string
+  speakers_label?: string
+  og_image?: string
   thumb?: string
   thumb_light?: string
   youtubeHero?: string
@@ -146,16 +146,25 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
     ?.map((speakerId: string) => {
       return authors.find((author) => author.author_id === speakerId)
     })
-    .filter(isNotNullOrUndefined)
+    .filter(isNotNullOrUndefined) as Author[]
+  const hadEndDate = event.end_date?.length
 
-  const IS_REGISTRATION_OPEN = event.onDemand || Date.parse(event.date) > Date.now()
+  const IS_REGISTRATION_OPEN =
+    event.onDemand ||
+    (hadEndDate ? Date.parse(event.end_date!) > Date.now() : Date.parse(event.date) > Date.now())
 
-  const ogImageUrl = encodeURI(
-    `${process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:54321' : 'https://obuldanrptloktxcffvn.supabase.co'}/functions/v1/og-images?site=events&eventType=${event.type}&title=${event.meta_title ?? event.title}&description=${event.meta_description ?? event.description}&date=${dayjs(event.date).tz(event.timezone).format(`DD MMM YYYY`)}&duration=${event.duration}`
-  )
+  const ogImageUrl = event.og_image
+    ? event.og_image
+    : encodeURI(
+        `${process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:54321' : 'https://obuldanrptloktxcffvn.supabase.co'}/functions/v1/og-images?site=events&eventType=${event.type}&title=${event.meta_title ?? event.title}&description=${event.meta_description ?? event.description}&date=${dayjs(event.date).tz(event.timezone).format(`DD MMM YYYY`)}&duration=${event.duration}`
+      )
 
   const meta = {
-    title: `${event.meta_title ?? event.title} | ${dayjs(event.date).tz(event.timezone).format(`DD MMM YYYY`)} | ${capitalize(event.type)}`,
+    title: `${event.meta_title ?? event.title} | ${dayjs(event.date)
+      .tz(event.timezone)
+      .format(
+        hadEndDate ? `DD` : `DD MMM YYYY`
+      )}${hadEndDate ? dayjs(event.end_date).tz(event.timezone).format(` - DD MMM`) : ''} | ${capitalize(event.type)}`,
     description: event.meta_description ?? event.description,
     url: `https://supabase.com/events/${event.slug}`,
     image: ogImageUrl,
@@ -172,17 +181,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
 
   const Icon = eventIcons[event.type]
 
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
-  const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
-  }
-
-  const origin = isBrowser
-    ? location.origin
-    : process.env.VERCEL_URL
-      ? process.env.VERCEL_URL
-      : 'https://supabase.com'
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
     <>
@@ -196,9 +195,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
           type: 'article',
           images: [
             {
-              url:
-                meta.image ??
-                `${origin}${router.basePath}/images/events/${event.image ? event.image : event.thumb}`,
+              url: meta.image,
               alt: `${event.title} thumbnail`,
               width: 1200,
               height: 627,
@@ -256,7 +253,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
               className="
                 relative z-10
                 lg:min-h-[400px] h-full
-                grid grid-cols-1 lg:grid-cols-2
+                grid grid-cols-1 xl:grid-cols-2
                 gap-8
                 text-foreground-light
                 !py-10 md:!py-16
@@ -273,19 +270,26 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     <span className="">Duration: {event.duration}</span>
                   </div>
 
-                  <h1 className="text-foreground text-3xl lg:text-4xl">{event.title}</h1>
+                  <h1 className="text-foreground text-3xl md:text-4xl xl:pr-9">{event.title}</h1>
                   <p>{event.subtitle}</p>
                   <Button
                     type="primary"
                     size="medium"
                     className="mt-2"
-                    disabled={!IS_REGISTRATION_OPEN}
+                    disabled={
+                      !IS_REGISTRATION_OPEN || event.main_cta?.disabled || event.main_cta?.disabled
+                    }
                     asChild
                   >
                     <Link
                       href={event.main_cta?.url ?? '#'}
                       target={event.main_cta?.target ? event.main_cta?.target : undefined}
-                      onClick={() => sendTelemetryEvent(gaEvents['www_event'])}
+                      onClick={() =>
+                        sendTelemetryEvent({
+                          action: 'www_pricing_plan_cta_clicked',
+                          properties: { eventTitle: event.title },
+                        })
+                      }
                     >
                       {IS_REGISTRATION_OPEN
                         ? event.main_cta?.label
@@ -328,21 +332,15 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
           <SectionContainer className="grid lg:grid-cols-3 gap-12 !py-10 md:!py-16">
             {event.company && (
               <div className="order-first lg:col-span-full flex items-center gap-4 md:gap-6 lg:mb-4">
-                <figure className="h-6">
-                  <NextImage
-                    src={supabaseLogoWordmarkLight}
+                <figure className="h-6 [&_.next-image--dynamic-fill_img]:!h-full">
+                  <Image
+                    src={{ dark: supabaseLogoWordmarkDark, light: supabaseLogoWordmarkLight }}
+                    alt="Supabase Logo"
                     width={160}
                     height={30}
-                    alt="Supabase Logo"
-                    className="object-contain dark:hidden"
-                    priority
-                  />
-                  <NextImage
-                    src={supabaseLogoWordmarkDark}
-                    width={160}
-                    height={30}
-                    alt="Supabase Logo"
-                    className="object-contain hidden dark:block"
+                    sizes="100%"
+                    className="!relative object-contain object-left"
+                    containerClassName="h-full object-contain object-left !rounded-none !border-none"
                     priority
                   />
                 </figure>
@@ -350,22 +348,16 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                 <Link
                   href={event.company?.website_url ?? '#'}
                   target="_blank"
-                  className="h-5 aspect-[9/1] transition-opacity opacity-100 hover:opacity-90"
+                  className="h-5 aspect-[9/1] transition-opacity opacity-100 hover:opacity-90 [&_.next-image--dynamic-fill_img]:!h-full"
                 >
-                  <NextImage
-                    src={`/images/events/` + event.company?.logo ?? ''}
+                  <Image
+                    src={{ dark: event.company?.logo, light: event.company?.logo_light }}
                     alt={`${event.company?.name} Logo`}
-                    fill
+                    width={160}
+                    height={30}
                     sizes="100%"
-                    className="!relative object-contain object-left hidden dark:block"
-                    priority
-                  />
-                  <NextImage
-                    src={`/images/events/` + event.company?.logo_light ?? ''}
-                    alt={`${event.company?.name} Logo`}
-                    fill
-                    sizes="100%"
-                    className="!relative object-contain object-left dark:hidden"
+                    className="!relative object-contain object-left"
+                    containerClassName="h-full object-contain object-left !rounded-none !border-none"
                     priority
                   />
                 </Link>
@@ -383,7 +375,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                   type="primary"
                   size="medium"
                   className="mt-2"
-                  disabled={!IS_REGISTRATION_OPEN}
+                  disabled={!IS_REGISTRATION_OPEN || event.main_cta?.disabled}
                   asChild
                 >
                   <Link
@@ -405,7 +397,9 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
             <aside className="order-first lg:order-last">
               {speakers && (
                 <div className="flex flex-col gap-4">
-                  <h2 className="text-foreground-light text-sm font-mono uppercase">Speakers</h2>
+                  <h2 className="text-foreground-light text-sm font-mono uppercase">
+                    {event.speakers_label ?? 'Speakers'}
+                  </h2>
                   <ul className="list-none flex flex-col md:flex-row flex-wrap lg:flex-col gap-4 md:gap-8 lg:gap-4">
                     {speakers?.map((speaker) => (
                       <li key={speaker?.author_id}>
@@ -426,6 +420,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                             <p>{speaker?.author}</p>
                             <span className="text-xs text-foreground-light">
                               {speaker?.position}
+                              {speaker?.company ? `, ${speaker?.company}` : ', Supabase'}
                             </span>
                           </div>
                         </Link>

@@ -41,7 +41,7 @@ const STRIPE_SUBDOMAINS_URL = 'https://*.stripe.com'
 const STRIPE_JS_URL = 'https://js.stripe.com'
 const STRIPE_NETWORK_URL = 'https://*.stripe.network'
 const CLOUDFLARE_URL = 'https://www.cloudflare.com'
-const ONE_ONE_ONE_ONE_URL = 'https://1.1.1.1'
+const ONE_ONE_ONE_ONE_URL = 'https://one.one.one.one'
 const VERCEL_URL = 'https://vercel.com'
 const VERCEL_INSIGHTS_URL = 'https://*.vercel-insights.com'
 const GITHUB_API_URL = 'https://api.github.com'
@@ -49,24 +49,31 @@ const GITHUB_USER_CONTENT_URL = 'https://raw.githubusercontent.com'
 const GITHUB_USER_AVATAR_URL = 'https://avatars.githubusercontent.com'
 const GOOGLE_USER_AVATAR_URL = 'https://lh3.googleusercontent.com'
 const VERCEL_LIVE_URL = 'https://vercel.live'
+const SENTRY_URL =
+  'https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io'
+const SUPABASE_ASSETS_URL =
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+    ? 'https://frontend-assets.supabase.green'
+    : 'https://frontend-assets.supabase.com'
+
 // used by vercel live preview
 const PUSHER_URL = 'https://*.pusher.com'
 const PUSHER_URL_WS = 'wss://*.pusher.com'
 
-const DEFAULT_SRC_URLS = `${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_LOCAL_PROJECTS_URL_WS} ${SUPABASE_PROJECTS_URL} ${SUPABASE_PROJECTS_URL_WS} ${HCAPTCHA_SUBDOMAINS_URL} ${CONFIGCAT_URL} ${STRIPE_SUBDOMAINS_URL} ${STRIPE_NETWORK_URL} ${CLOUDFLARE_URL} ${ONE_ONE_ONE_ONE_URL} ${VERCEL_INSIGHTS_URL} ${GITHUB_API_URL} ${GITHUB_USER_CONTENT_URL}`
-const SCRIPT_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${STRIPE_JS_URL}`
+const DEFAULT_SRC_URLS = `${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_LOCAL_PROJECTS_URL_WS} ${SUPABASE_PROJECTS_URL} ${SUPABASE_PROJECTS_URL_WS} ${HCAPTCHA_SUBDOMAINS_URL} ${CONFIGCAT_URL} ${STRIPE_SUBDOMAINS_URL} ${STRIPE_NETWORK_URL} ${CLOUDFLARE_URL} ${ONE_ONE_ONE_ONE_URL} ${VERCEL_INSIGHTS_URL} ${GITHUB_API_URL} ${GITHUB_USER_CONTENT_URL} ${SUPABASE_ASSETS_URL}`
+const SCRIPT_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${STRIPE_JS_URL} ${SUPABASE_ASSETS_URL}`
 const FRAME_SRC_URLS = `${HCAPTCHA_ASSET_URL} ${STRIPE_JS_URL}`
-const IMG_SRC_URLS = `${SUPABASE_URL} ${SUPABASE_COM_URL} ${SUPABASE_PROJECTS_URL} ${GITHUB_USER_AVATAR_URL} ${GOOGLE_USER_AVATAR_URL}`
-const STYLE_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
-const FONT_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
+const IMG_SRC_URLS = `${SUPABASE_URL} ${SUPABASE_COM_URL} ${SUPABASE_PROJECTS_URL} ${GITHUB_USER_AVATAR_URL} ${GOOGLE_USER_AVATAR_URL} ${SUPABASE_ASSETS_URL}`
+const STYLE_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${SUPABASE_ASSETS_URL}`
+const FONT_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${SUPABASE_ASSETS_URL}`
 
 const csp = [
-  ...(process.env.VERCEL_ENV === 'preview' ||
+  ...(process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
     ? [
-        `default-src 'self' ${DEFAULT_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${SUPABASE_STAGING_PROJECTS_URL_WS} ${VERCEL_LIVE_URL} ${PUSHER_URL} ${PUSHER_URL_WS} ${SUPABASE_DOCS_PROJECT_URL};`,
-        `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL};`,
+        `default-src 'self' ${DEFAULT_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${SUPABASE_STAGING_PROJECTS_URL_WS} ${VERCEL_LIVE_URL} ${PUSHER_URL_WS} ${SUPABASE_DOCS_PROJECT_URL} ${SENTRY_URL};`,
+        `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL} ${PUSHER_URL};`,
         `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
         `img-src 'self' blob: data: ${IMG_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${VERCEL_URL};`,
         `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS} ${VERCEL_LIVE_URL};`,
@@ -74,12 +81,12 @@ const csp = [
         `worker-src 'self' blob: data:;`,
       ]
     : [
-        `default-src 'self' ${DEFAULT_SRC_URLS};`,
-        `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS};`,
-        `frame-src 'self' ${FRAME_SRC_URLS};`,
+        `default-src 'self' ${DEFAULT_SRC_URLS} ${PUSHER_URL_WS} ${SENTRY_URL};`,
+        `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL} ${PUSHER_URL};`,
+        `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
         `img-src 'self' blob: data: ${IMG_SRC_URLS} ;`,
-        `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS};`,
-        `font-src 'self' ${FONT_SRC_URLS};`,
+        `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS} ${VERCEL_LIVE_URL};`,
+        `font-src 'self' ${FONT_SRC_URLS} ${VERCEL_LIVE_URL};`,
         `worker-src 'self' blob: data:;`,
       ]),
   `object-src 'none';`,
@@ -93,14 +100,38 @@ const csp = [
     : []),
 ].join(' ')
 
+function getAssetPrefix() {
+  // If not force enabled, but not production env, disable CDN
+  if (process.env.FORCE_ASSET_CDN !== '1' && process.env.VERCEL_ENV !== 'production') {
+    return undefined
+  }
+
+  // Force disable CDN
+  if (process.env.FORCE_ASSET_CDN === '-1') {
+    return undefined
+  }
+
+  return `${SUPABASE_ASSETS_URL}/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 12)}`
+}
+
 /**
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
+  assetPrefix: getAssetPrefix(),
   output: 'standalone',
   experimental: {
     webpackBuildWorker: true,
+  },
+  async rewrites() {
+    return [
+      {
+        source: `/.well-known/vercel/flags`,
+        destination: `https://supabase.com/.well-known/vercel/flags`,
+        basePath: false,
+      },
+    ]
   },
   async redirects() {
     return [
@@ -249,7 +280,7 @@ const nextConfig = {
             value: 'computeInstance',
           },
         ],
-        destination: '/project/:ref/settings/addons?panel=computeInstance',
+        destination: '/project/:ref/settings/compute-and-disk',
         permanent: true,
       },
       {
@@ -350,11 +381,6 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/project/:ref/sql',
-        destination: '/project/:ref/sql/new',
-        permanent: true,
-      },
-      {
         permanent: true,
         source: '/project/:ref/reports/linter',
         destination: '/project/:ref/database/linter',
@@ -362,7 +388,12 @@ const nextConfig = {
       {
         permanent: true,
         source: '/project/:ref/reports/query-performance',
-        destination: '/project/:ref/database/query-performance',
+        destination: '/project/:ref/advisors/query-performance',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/database/query-performance',
+        destination: '/project/:ref/advisors/query-performance',
       },
       {
         permanent: true,
@@ -384,6 +415,57 @@ const nextConfig = {
         source: '/project/:ref/database/performance-advisor',
         destination: '/project/:ref/advisors/performance',
       },
+      {
+        permanent: true,
+        source: '/project/:ref/database/webhooks',
+        destination: '/project/:ref/integrations/webhooks/overview',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/database/wrappers',
+        destination: '/project/:ref/integrations?category=wrapper',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/database/cron-jobs',
+        destination: '/project/:ref/integrations/cron',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/api/graphiql',
+        destination: '/project/:ref/integrations/graphiql',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/vault/secrets',
+        destination: '/project/:ref/integrations/vault/secrets',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/vault/keys',
+        destination: '/project/:ref/integrations/vault/keys',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/integrations/cron-jobs',
+        destination: '/project/:ref/integrations/cron',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/warehouse',
+        destination: '/project/:ref/settings/general',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/functions',
+        destination: '/project/:ref/functions/secrets',
+      },
+      {
+        source: '/org/:slug/invoices',
+        destination: '/org/:slug/billing#invoices',
+        permanent: true,
+      },
+
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
             {
@@ -410,6 +492,13 @@ const nextConfig = {
             value: 'no-sniff',
           },
           {
+            key: 'Strict-Transport-Security',
+            value:
+              process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1'
+                ? 'max-age=31536000; includeSubDomains; preload'
+                : '',
+          },
+          {
             key: 'Content-Security-Policy',
             value: process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? csp : "frame-ancestors 'none';",
           },
@@ -420,12 +509,25 @@ const nextConfig = {
         ],
       },
       {
-        source: '/img/:slug*',
-        headers: [{ key: 'cache-control', value: 'max-age=2592000' }],
+        source: '/.well-known/vercel/flags',
+        headers: [
+          {
+            key: 'content-type',
+            value: 'application/json',
+          },
+        ],
       },
       {
-        source: '/fonts/:slug*',
-        headers: [{ key: 'cache-control', value: 'max-age=2592000' }],
+        source: '/img/:slug*',
+        headers: [{ key: 'cache-control', value: 'public, max-age=2592000' }],
+      },
+      {
+        source: '/favicon/:slug*',
+        headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
+      },
+      {
+        source: '/(.*).ts',
+        headers: [{ key: 'content-type', value: 'text/typescript' }],
       },
     ]
   },
@@ -479,6 +581,12 @@ const nextConfig = {
         }
       })
 
+    // .md files to be loaded as raw text
+    config.module.rules.push({
+      test: /\.md$/,
+      type: 'asset/source',
+    })
+
     return config
   },
   onDemandEntries: {
@@ -501,29 +609,30 @@ const nextConfig = {
 // ensure that your source maps include changes from all other Webpack plugins
 module.exports =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
-    ? withSentryConfig(
-        withBundleAnalyzer(nextConfig),
-        {
-          silent: true,
+    ? withSentryConfig(withBundleAnalyzer(nextConfig), {
+        silent: true,
+
+        // For all available options, see:
+        // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+
+        // Upload a larger set of source maps for prettier stack traces (increases build time)
+        widenClientFileUpload: true,
+
+        // Automatically annotate React components to show their full name in breadcrumbs and session replay
+        reactComponentAnnotation: {
+          enabled: true,
         },
-        {
-          // For all available options, see:
-          // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
-          // Upload a larger set of source maps for prettier stack traces (increases build time)
-          widenClientFileUpload: true,
+        // Hides source maps from generated client bundles
+        hideSourceMaps: true,
 
-          // Transpiles SDK to be compatible with IE11 (increases bundle size)
-          transpileClientSDK: false,
+        // Automatically tree-shake Sentry logger statements to reduce bundle size
+        disableLogger: true,
 
-          // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
-          tunnelRoute: '/monitoring',
-
-          // Hides source maps from generated client bundles
-          hideSourceMaps: true,
-
-          // Automatically tree-shake Sentry logger statements to reduce bundle size
-          disableLogger: true,
-        }
-      )
+        // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
+        // See the following for more information:
+        // https://docs.sentry.io/product/crons/
+        // https://vercel.com/docs/cron-jobs
+        automaticVercelMonitors: true,
+      })
     : nextConfig

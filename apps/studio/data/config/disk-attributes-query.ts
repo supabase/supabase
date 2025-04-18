@@ -47,10 +47,15 @@ export const useDiskAttributesQuery = <TData = DiskAttributesData>(
 
 export const useRemainingDurationForDiskAttributeUpdate = ({
   projectRef,
+  enabled = true,
 }: {
   projectRef?: string
+  enabled?: boolean
 }) => {
-  const { data } = useDiskAttributesQuery({ projectRef })
+  const { data, isLoading, isError, isSuccess, error } = useDiskAttributesQuery(
+    { projectRef },
+    { enabled }
+  )
 
   const lastModifiedAtString = dayjs(data?.last_modified_at ?? '').utc()
   const secondsFromNow = Math.max(
@@ -62,10 +67,24 @@ export const useRemainingDurationForDiskAttributeUpdate = ({
     return lastModifiedAtString === undefined || COOLDOWN_DURATION - secondsFromNow < 0
       ? 0
       : COOLDOWN_DURATION - secondsFromNow
-  }, [lastModifiedAtString])
+  }, [lastModifiedAtString, secondsFromNow])
 
   if (data?.last_modified_at === undefined)
-    return { remainingDuration: 0, isWithinCooldownWindow: false }
+    return {
+      remainingDuration: 0,
+      isWithinCooldownWindow: false,
+      isLoading,
+      isError,
+      error,
+      isSuccess,
+    }
 
-  return { remainingDuration, isWithinCooldownWindow: remainingDuration > 0 }
+  return {
+    remainingDuration,
+    isWithinCooldownWindow: remainingDuration > 0,
+    isLoading,
+    isError,
+    error,
+    isSuccess,
+  }
 }

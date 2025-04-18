@@ -17,6 +17,9 @@ on:
   schedule:
     - cron: '0 0 * * *'
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -38,13 +41,18 @@ jobs:
             apps/www/.env.local.example
             supabase
 
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          run_install: false
+
       - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
 
       - name: Download dependencies
-        run: npm ci
+        run: pnpm i
 
       # Need the miscellaneous use API, which is available publicly (by design) in www
       - name: Copy environment variables
@@ -53,9 +61,9 @@ jobs:
       - name: Update embeddings
         working-directory: ./apps/docs
         if: ${{ !inputs.refresh }}
-        run: npm run embeddings
+        run: pnpm run embeddings
 
       - name: Refresh embeddings
         working-directory: ./apps/docs
         if: ${{ inputs.refresh }}
-        run: npm run embeddings:refresh
+        run: pnpm run embeddings:refresh

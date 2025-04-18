@@ -59,6 +59,8 @@ const CurrentPaymentMethod = () => {
           paymentMethod={defaultPaymentMethod}
           paymentMethodType={subscription?.payment_method_type}
           canUpdatePaymentMethods={false}
+          paymentMethodCount={paymentMethods?.data.length ?? 0}
+          subscriptionPlan={subscription?.plan.id}
         />
       )}
 

@@ -1,5 +1,5 @@
-import { SnippetDetail } from 'data/content/sql-folders-query'
 import { removeCommentsFromSql } from 'lib/helpers'
+import type { SnippetWithContent } from 'state/sql-editor-v2'
 import type { SqlSnippets, UserContent } from 'types'
 import {
   NEW_SQL_SNIPPET_SKELETON,
@@ -52,7 +52,7 @@ export const createSqlSnippetSkeletonV2 = ({
   owner_id: number
   project_id: number
   folder_id?: string
-}): SnippetDetail => {
+}): SnippetWithContent => {
   return {
     ...NEW_SQL_SNIPPET_SKELETON,
     id,
@@ -137,18 +137,14 @@ export const compareAsModification = (sqlDiff: ContentDiff) => {
 
   return {
     original: sqlDiff.original,
-    modified: `${sqlAiDisclaimerComment}\n\n${formattedModified}`,
+    modified: `${formattedModified}`,
   }
 }
 
 export const compareAsAddition = (sqlDiff: ContentDiff) => {
   const formattedOriginal = sqlDiff.original.replace(sqlAiDisclaimerComment, '').trim()
   const formattedModified = sqlDiff.modified.replace(sqlAiDisclaimerComment, '').trim()
-  const newModified =
-    sqlAiDisclaimerComment +
-    '\n\n' +
-    (formattedOriginal ? formattedOriginal + '\n\n' : '') +
-    formattedModified
+  const newModified = (formattedOriginal ? formattedOriginal + '\n\n' : '') + formattedModified
 
   return {
     original: sqlDiff.original,

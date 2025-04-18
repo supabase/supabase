@@ -12,6 +12,7 @@ export type LintInfo = {
   link: (args: { projectRef: string; metadata: Lint['metadata'] }) => string
   linkText: string
   docsLink: string
+  category: 'security' | 'performance'
 }
 
 export const LINT_TABS = [
@@ -19,18 +20,18 @@ export const LINT_TABS = [
     id: LINTER_LEVELS.ERROR,
     label: 'Errors',
     description: 'You should consider these issues urgent and fix them as soon as you can.',
-    descriptionShort: 'Consider these issues urgent and fix them as soon as you can.',
+    descriptionShort: 'Require immediate attention',
   },
   {
     id: LINTER_LEVELS.WARN,
-    label: 'Warnings ',
+    label: 'Warnings',
     description: 'You should try and read through these issues and fix them if necessary.',
-    descriptionShort: 'Read through these issues and fix them if necessary.',
+    descriptionShort: 'To resolve only if necessary',
   },
   {
     id: LINTER_LEVELS.INFO,
-    label: 'Info ',
+    label: 'Info',
     description: 'You should read through these suggestions and consider implementing them.',
-    descriptionShort: 'Read through these suggestions and consider implementing them.',
+    descriptionShort: 'For consideration to implement',
   },
 ]

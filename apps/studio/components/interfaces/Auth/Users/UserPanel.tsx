@@ -1,10 +1,11 @@
 import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
-import { User } from 'data/auth/users-query'
+import { User } from 'data/auth/users-infinite-query'
 import { X } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
   cn,
+  Input_Shadcn_,
   ResizableHandle,
   ResizablePanel,
   Tabs_Shadcn_,
@@ -13,6 +14,7 @@ import {
   TabsTrigger_Shadcn_,
 } from 'ui'
 import { UserOverview } from './UserOverview'
+import { UserLogs } from './UserLogs'
 
 interface UserPanelProps {
   selectedUser?: User
@@ -22,7 +24,23 @@ interface UserPanelProps {
 export const PANEL_PADDING = 'px-5 py-5'
 
 export const UserPanel = ({ selectedUser, onClose }: UserPanelProps) => {
-  const [view, setView] = useState<'overview' | 'raw'>('overview')
+  const [view, setView] = useState<'overview' | 'raw' | 'logs'>('overview')
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const filteredProperties = selectedUser
+    ? Object.entries(selectedUser)
+        .filter(
+          ([key, value]) =>
+            key.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (typeof value === 'string' && value.toLowerCase().includes(searchQuery.toLowerCase()))
+        )
+        .reduce((obj, [key, value]) => {
+          if (value !== undefined) {
+            obj[key as keyof User] = value as any
+          }
+          return obj
+        }, {} as Partial<User>)
+    : {}
 
   return (
     <>
@@ -47,6 +65,12 @@ export const UserPanel = ({ selectedUser, onClose }: UserPanelProps) => {
               Overview
             </TabsTrigger_Shadcn_>
             <TabsTrigger_Shadcn_
+              value="logs"
+              className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent !shadow-none"
+            >
+              Logs
+            </TabsTrigger_Shadcn_>
+            <TabsTrigger_Shadcn_
               value="raw"
               className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent !shadow-none"
             >
@@ -60,11 +84,35 @@ export const UserPanel = ({ selectedUser, onClose }: UserPanelProps) => {
             {selectedUser && <UserOverview user={selectedUser} onDeleteSuccess={onClose} />}
           </TabsContent_Shadcn_>
           <TabsContent_Shadcn_
+            value="logs"
+            className={cn('mt-0 flex-grow min-h-0 overflow-y-auto')}
+          >
+            {selectedUser && <UserLogs user={selectedUser} />}
+          </TabsContent_Shadcn_>
+          <TabsContent_Shadcn_
             value="raw"
             className={cn('mt-0 flex-grow min-h-0 overflow-y-auto', PANEL_PADDING)}
           >
+            <div className="flex items-center mb-2">
+              <Input_Shadcn_
+                autoFocus
+                type="text"
+                placeholder="Filter..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="mr-2"
+              />
+              <Button
+                type="text"
+                disabled={!searchQuery}
+                onClick={() => setSearchQuery('')}
+                className="text-xs"
+              >
+                Clear
+              </Button>
+            </div>
             <SimpleCodeBlock className="javascript">
-              {JSON.stringify(selectedUser, null, 2)}
+              {JSON.stringify(filteredProperties, null, 2)}
             </SimpleCodeBlock>
           </TabsContent_Shadcn_>
         </Tabs_Shadcn_>

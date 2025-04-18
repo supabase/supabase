@@ -2,10 +2,11 @@ import Image from 'next/image'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
+import { InlineLink } from 'components/ui/InlineLink'
 import { BASE_PATH } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
 
-const CLSPreview = () => {
+export const CLSPreview = () => {
   const { ref } = useParams()
 
   return (
@@ -43,15 +44,11 @@ const CLSPreview = () => {
         <p className="text-sm">Enabling this preview will:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>
-            <Markdown
-              className="text-foreground-light"
-              content={`Grant access to a new UI for granting and/or revoking column-level privileges [here](${BASE_PATH}/project/${ref}/database/column-privileges).`}
-            />
+            Grant access to a new UI for granting and/or revoking column-level privileges{' '}
+            <InlineLink href={`/project/${ref}/database/column-privileges`}>here</InlineLink>.
           </li>
         </ul>
       </div>
     </div>
   )
 }
-
-export default CLSPreview

@@ -163,7 +163,7 @@ export class OpenApiReferenceSource extends ReferenceSource<enrichedOperation> {
 
   extractIndexedContent(): string {
     const { summary, description, operation, tags } = this.specSection
-    return `${this.meta.title}\n\n${summary}\n\n${description}\n\n${operation}\n\n${tags.join(
+    return `# ${this.meta.title ?? ''}\n\n${summary ?? ''}\n\n${description ?? ''}\n\n${operation ?? ''}\n\n${tags.join(
       ', '
     )}`
   }
@@ -212,8 +212,12 @@ export class ClientLibReferenceSource extends ReferenceSource<IFunctionDefinitio
   }
 
   extractIndexedContent(): string {
-    const { title, description } = this.specSection
-    return `${this.meta.title}\n\n${title}\n\n${description}`
+    const { title, description, examples } = this.specSection
+    const exampleText =
+      examples
+        ?.map((example) => `### ${example.name ?? ''}\n\n${example.code ?? ''}`)
+        .join('\n\n') ?? ''
+    return `# ${this.meta.title ?? ''}\n\n${title ?? ''}\n\n${description ?? ''}\n\n## Examples\n\n${exampleText}`
   }
 }
 
@@ -259,6 +263,6 @@ export class CliReferenceSource extends ReferenceSource<CliCommand> {
 
   extractIndexedContent(): string {
     const { summary, description, usage } = this.specSection
-    return `${this.meta.title}\n\n${summary}\n\n${description}\n\n${usage}`
+    return `# ${this.meta.title ?? ''}\n\n${summary ?? ''}\n\n${description ?? ''}\n\n${usage ?? ''}`
   }
 }

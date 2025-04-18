@@ -4,3 +4,4 @@ export { default as DeleteProjectPanel } from './DeleteProjectPanel/DeleteProjec
 export { default as DeleteProjectButton } from './DeleteProjectPanel/DeleteProjectButton'
 export { default as TransferProjectButton } from './TransferProjectPanel/TransferProjectButton'
 export { default as TransferProjectPanel } from './TransferProjectPanel/TransferProjectPanel'
+export { default as ComplianceConfig } from './ComplianceConfig/ProjectComplianceMode'

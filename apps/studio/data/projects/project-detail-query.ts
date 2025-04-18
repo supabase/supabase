@@ -17,7 +17,7 @@ export interface Project extends Omit<ProjectDetail, 'status'> {
    * If not we will show ConnectingState and run a polling until it's back online
    */
   postgrestStatus?: 'ONLINE' | 'OFFLINE'
-  status: components['schemas']['ResourceWithServicesStatusResponse']['status']
+  status: components['schemas']['ProjectDetailResponse']['status']
 }
 
 export async function getProjectDetail({ ref }: ProjectDetailVariables, signal?: AbortSignal) {
@@ -62,15 +62,8 @@ export function invalidateProjectDetailsQuery(client: QueryClient, ref: string) 
   return client.invalidateQueries(projectKeys.detail(ref))
 }
 
-// get the cached value or fallback to fetching it
-export async function getCachedProjectDetail(
-  client: QueryClient,
-  ref: string | undefined
-): Promise<ProjectDetailData | undefined> {
-  if (!ref) return undefined
-
-  const cached = client.getQueryData<ProjectDetailData>(projectKeys.detail(ref))
-  if (cached) return cached
-
-  return await client.fetchQuery<ProjectDetailData, ProjectDetailError>(projectKeys.detail(ref))
+export function prefetchProjectDetail(client: QueryClient, { ref }: ProjectDetailVariables) {
+  return client.fetchQuery(projectKeys.detail(ref), ({ signal }) =>
+    getProjectDetail({ ref }, signal)
+  )
 }

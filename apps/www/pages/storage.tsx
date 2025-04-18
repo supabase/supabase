@@ -1,7 +1,7 @@
 import ApiExamples from 'data/products/storage/api-examples'
 import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
 import StoragePermissionsData from 'data/products/storage/permissions-examples'
-import Solutions from 'data/Solutions'
+import Solutions from '~/data/MainProducts'
 import { ArrowUpRight, Shuffle, Wifi, X } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'

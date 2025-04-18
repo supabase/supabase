@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest'
-import { DiskType } from './DiskManagement.constants'
+import { DiskType } from './ui/DiskManagement.constants'
 import {
   calculateDiskSizePrice,
   calculateIOPSPrice,

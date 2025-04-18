@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
@@ -11,27 +10,29 @@ import { LogDetailsPanel } from 'components/interfaces/AuditLogs'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DatePicker } from 'components/ui/DatePicker'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import {
   AuditLog,
   useOrganizationAuditLogsQuery,
 } from 'data/organizations/organization-audit-logs-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
-  Alert,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
   WarningIcon,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
+import { formatSelectedDateRange } from './AuditLogs.utils'
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
@@ -58,7 +59,7 @@ const AuditLogs = () => {
   const { data: projects } = useProjectsQuery()
   const { data: organizations } = useOrganizationsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
-  const { data: rolesData } = useOrganizationRolesQuery({ slug })
+  const { data: rolesData } = useOrganizationRolesV2Query({ slug })
   const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
     useOrganizationAuditLogsQuery(
       {
@@ -79,24 +80,8 @@ const AuditLogs = () => {
       }
     )
 
-  // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
-  // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
-  // viewed for more than 5 minutes, the call parameters needs to be updated. This also works with
-  // higher tiers (7 days of logs).The user will see a loading shimmer.
-  useEffect(() => {
-    const duration = dayjs(dateRange.from).diff(dayjs(dateRange.to))
-    const interval = setInterval(() => {
-      const currentTime = dayjs().utc().set('millisecond', 0)
-      setDateRange({
-        from: currentTime.add(duration).toISOString(),
-        to: currentTime.toISOString(),
-      })
-    }, 5 * 60000)
-
-    return () => clearInterval(interval)
-  }, [dateRange.from, dateRange.to])
-
-  const roles = rolesData?.roles ?? []
+  const activeMembers = (members ?? []).filter((x) => !x.invited_at)
+  const roles = [...(rolesData?.org_scoped_roles ?? []), ...(rolesData?.project_scoped_roles ?? [])]
 
   const retentionPeriod = data?.retention_period ?? 0
   const logs = data?.result ?? []
@@ -122,6 +107,25 @@ const AuditLogs = () => {
     })
 
   const currentOrganization = organizations?.find((o) => o.slug === slug)
+  const minDate = dayjs().subtract(retentionPeriod, 'days')
+  const maxDate = dayjs()
+
+  // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
+  // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
+  // viewed for more than 5 minutes, the call parameters needs to be updated. This also works with
+  // higher tiers (7 days of logs).The user will see a loading shimmer.
+  useEffect(() => {
+    const duration = dayjs(dateRange.from).diff(dayjs(dateRange.to))
+    const interval = setInterval(() => {
+      const currentTime = dayjs().utc().set('millisecond', 0)
+      setDateRange({
+        from: currentTime.add(duration).toISOString(),
+        to: currentTime.toISOString(),
+      })
+    }, 5 * 60000)
+
+    return () => clearInterval(interval)
+  }, [dateRange.from, dateRange.to])
 
   if (!canReadAuditLogs) {
     return (
@@ -150,7 +154,7 @@ const AuditLogs = () => {
                 title="Organization Audit Logs are not available on Free or Pro plans"
               >
                 <WarningIcon />
-                <div className="flex flex-row pt-1">
+                <div className="flex flex-col md:flex-row pt-1 gap-4">
                   <div className="grow">
                     <AlertTitle_Shadcn_>
                       Organization Audit Logs are not available on Free or Pro plans
@@ -165,7 +169,7 @@ const AuditLogs = () => {
 
                   <div className="flex items-center">
                     <Button type="primary" asChild>
-                      <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
+                      <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=auditLogs`}>
                         Upgrade subscription
                       </Link>
                     </Button>
@@ -184,7 +188,7 @@ const AuditLogs = () => {
                   <p className="text-xs prose">Filter by</p>
                   <FilterPopover
                     name="Users"
-                    options={members ?? []}
+                    options={activeMembers}
                     labelKey="username"
                     valueKey="gotrue_id"
                     activeOptions={filters.users}
@@ -207,38 +211,32 @@ const AuditLogs = () => {
                     triggerButtonTitle=""
                     from={dateRange.from}
                     to={dateRange.to}
-                    minDate={dayjs().subtract(retentionPeriod, 'days').toDate()}
-                    maxDate={dayjs().toDate()}
+                    minDate={minDate.toDate()}
+                    maxDate={maxDate.toDate()}
                     onChange={(value) => {
                       if (value.from !== null && value.to !== null) {
-                        const current = dayjs().utc()
-                        const from = dayjs(value.from)
-                          .utc()
-                          .hour(current.hour())
-                          .minute(current.minute())
-                          .second(current.second())
-                          .toISOString()
-                        const to = dayjs(value.to)
-                          .utc()
-                          .hour(current.hour())
-                          .minute(current.minute())
-                          .second(current.second())
-                          .toISOString()
+                        const { from, to } = formatSelectedDateRange(value)
                         setDateRange({ from, to })
                       }
                     }}
                     renderFooter={() => {
                       return (
-                        <Alert title="" variant="info" className="mx-3 pl-2 pr-2 pt-1 pb-2">
-                          Your organization has a log retention period of{' '}
-                          <span className="text-brand">
-                            {retentionPeriod} day
-                            {retentionPeriod > 1 ? 's' : ''}
-                          </span>
-                          . You may only view logs from{' '}
-                          {dayjs().subtract(retentionPeriod, 'days').format('DD MMM YYYY')} as the
-                          earliest date.
-                        </Alert>
+                        <Admonition
+                          showIcon={false}
+                          type="default"
+                          className="w-auto mx-2 px-3 py-2"
+                        >
+                          <div className="text-xs text-foreground-light">
+                            Your organization has a log retention period of{' '}
+                            <span className="text-brand">
+                              {retentionPeriod} day
+                              {retentionPeriod > 1 ? 's' : ''}
+                            </span>
+                            . You may only view logs from{' '}
+                            {dayjs().subtract(retentionPeriod, 'days').format('DD MMM YYYY')} as the
+                            earliest date.
+                          </div>
+                        </Admonition>
                       )
                     }}
                   />
@@ -284,37 +282,24 @@ const AuditLogs = () => {
                       <div className="flex items-center space-x-2">
                         <p>Date</p>
 
-                        <Tooltip.Root delayDuration={0}>
-                          <Tooltip.Trigger asChild>
-                            <Button
-                              type="text"
-                              className="px-1"
-                              icon={
-                                dateSortDesc ? (
-                                  <ArrowDown strokeWidth={1.5} size={14} />
-                                ) : (
-                                  <ArrowUp strokeWidth={1.5} size={14} />
-                                )
-                              }
-                              onClick={() => setDateSortDesc(!dateSortDesc)}
-                            />
-                          </Tooltip.Trigger>
-                          <Tooltip.Portal>
-                            <Tooltip.Content side="right">
-                              <Tooltip.Arrow className="radix-tooltip-arrow" />
-                              <div
-                                className={[
-                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                  'border border-background',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs text-foreground">
-                                  {dateSortDesc ? 'Sort latest first' : 'Sort earliest first'}
-                                </span>
-                              </div>
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        </Tooltip.Root>
+                        <ButtonTooltip
+                          type="text"
+                          className="px-1"
+                          icon={
+                            dateSortDesc ? (
+                              <ArrowDown strokeWidth={1.5} size={14} />
+                            ) : (
+                              <ArrowUp strokeWidth={1.5} size={14} />
+                            )
+                          }
+                          onClick={() => setDateSortDesc(!dateSortDesc)}
+                          tooltip={{
+                            content: {
+                              side: 'bottom',
+                              text: dateSortDesc ? 'Sort latest first' : 'Sort earliest first',
+                            },
+                          }}
+                        />
                       </div>
                     </Table.th>,
                     <Table.th key="actions" className="py-2"></Table.th>,

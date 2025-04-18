@@ -1,82 +1,73 @@
 import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
-import { motion } from 'framer-motion'
-import { ChevronUp, Loader2 } from 'lucide-react'
+import { useCompletion } from 'ai/react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { ChevronUp, Command, Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { format } from 'sql-formatter'
 
-import { Separator } from '@ui/components/SidePanel/SidePanel'
-import { useParams, useTelemetryProps } from 'common'
+import { useParams } from 'common'
+import ResizableAIWidget from 'components/ui/AIEditor/ResizableAIWidget'
 import { GridFooter } from 'components/ui/GridFooter'
-import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { constructHeaders } from 'data/fetchers'
 import { lintKeys } from 'data/lint/keys'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { isError } from 'data/utils/error-check'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
+import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { formatSql } from 'lib/formatSql'
+import { detectOS, uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
-import Telemetry from 'lib/telemetry'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
+import {
+  isRoleImpersonationEnabled,
+  useGetImpersonatedRoleState,
+} from 'state/role-impersonation-state'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
-  AiIconAnimation,
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-  ImperativePanelHandle,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
-import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
-import { AiAssistantPanel } from './AiAssistantPanel'
-import { DiffActionBar } from './DiffActionBar'
+import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
+import { RunQueryWarningModal } from './RunQueryWarningModal'
 import {
   ROWS_PER_PAGE_OPTIONS,
   sqlAiDisclaimerComment,
   untitledSnippetTitle,
 } from './SQLEditor.constants'
-import {
-  ContentDiff,
-  DiffType,
-  IStandaloneCodeEditor,
-  IStandaloneDiffEditor,
-} from './SQLEditor.types'
+import { DiffType, IStandaloneCodeEditor, IStandaloneDiffEditor } from './SQLEditor.types'
 import {
   checkDestructiveQuery,
   checkIfAppendLimitRequired,
-  compareAsAddition,
-  compareAsModification,
-  compareAsNewSnippet,
   createSqlSnippetSkeletonV2,
   isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
+import { useAddDefinitions } from './useAddDefinitions'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
 
 // Load the monaco editor client-side only (does not behave well server-side)
@@ -86,64 +77,71 @@ const DiffEditor = dynamic(
   { ssr: false }
 )
 
-const SQLEditor = () => {
-  const { ref, id: urlId } = useParams()
+export const SQLEditor = () => {
+  const os = detectOS()
   const router = useRouter()
-  const telemetryProps = useTelemetryProps()
-
-  // generate an id to be used for new snippets. The dependency on urlId is to avoid a bug which
-  // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
-  const generatedId = useMemo(() => uuidv4(), [urlId])
-  // the id is stable across renders - it depends either on the url or on the memoized generated id
-  const id = !urlId || urlId === 'new' ? generatedId : urlId
-
+  const { ref, id: urlId } = useParams()
+  const org = useSelectedOrganization()
   const { profile } = useProfile()
+  const queryClient = useQueryClient()
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
-  const appSnap = useAppStateSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const getImpersonatedRole = useGetImpersonatedRole()
+  const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
-  const queryClient = useQueryClient()
-
-  const { mutate: formatQuery } = useFormatQueryMutation()
-  const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
-  const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
-
-  const [selectedMessage, setSelectedMessage] = useState<string>()
-  const [debugSolution, setDebugSolution] = useState<string>()
-  const [sourceSqlDiff, setSourceSqlDiff] = useState<ContentDiff>()
-  const [pendingTitle, setPendingTitle] = useState<string>()
-  const [hasSelection, setHasSelection] = useState<boolean>(false)
-
-  const editorRef = useRef<IStandaloneCodeEditor | null>(null)
-  const monacoRef = useRef<Monaco | null>(null)
-  const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
-
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
-    projectRef: ref,
-  })
-
-  // Customers on HIPAA plans should not have access to Supabase AI
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
-
-  const [isAiOpen, setIsAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
-
-  const [showPotentialIssuesModal, setShowPotentialIssuesModal] = useState(false)
-  const [queryHasDestructiveOperations, setQueryHasDestructiveOperations] = useState(false)
-  const [queryHasUpdateWithoutWhere, setQueryHasUpdateWithoutWhere] = useState(false)
-
   const isOptedInToAI = useOrgOptedIntoAi()
   const [selectedSchemas] = useSchemasForAi(project?.ref!)
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
-  const [isAcceptDiffLoading, setIsAcceptDiffLoading] = useState(false)
-  const [, setAiQueryCount] = useLocalStorageQuery('supabase_sql-editor-ai-query-count', 0)
+  const {
+    sourceSqlDiff,
+    setSourceSqlDiff,
+    selectedDiffType,
+    setSelectedDiffType,
+    pendingTitle,
+    setIsAcceptDiffLoading,
+    isDiffOpen,
+    defaultSqlDiff,
+    closeDiff,
+  } = useSqlEditorDiff()
+  const { promptState, setPromptState, promptInput, setPromptInput, resetPrompt } =
+    useSqlEditorPrompt()
 
-  const [selectedDiffType, setSelectedDiffType] = useState<DiffType | undefined>(undefined)
-  const [isFirstRender, setIsFirstRender] = useState(true)
+  const editorRef = useRef<IStandaloneCodeEditor | null>(null)
+  const monacoRef = useRef<Monaco | null>(null)
+  const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
+  const [hasSelection, setHasSelection] = useState<boolean>(false)
   const [lineHighlights, setLineHighlights] = useState<string[]>([])
+  const [isDiffEditorMounted, setIsDiffEditorMounted] = useState(false)
+  const [showPotentialIssuesModal, setShowPotentialIssuesModal] = useState(false)
+  const [queryHasDestructiveOperations, setQueryHasDestructiveOperations] = useState(false)
+  const [queryHasUpdateWithoutWhere, setQueryHasUpdateWithoutWhere] = useState(false)
+  const [showWidget, setShowWidget] = useState(false)
+
+  // generate an id to be used for new snippets. The dependency on urlId is to avoid a bug which
+  // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const generatedId = useMemo(() => uuidv4(), [urlId])
+  // the id is stable across renders - it depends either on the url or on the memoized generated id
+  const id = !urlId || urlId === 'new' ? generatedId : urlId
+
+  const limit = snapV2.limit
+  const results = snapV2.results[id]?.[0]
+  const snippetIsLoading = !(
+    id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined
+  )
+  const isLoading = urlId === 'new' ? false : snippetIsLoading
+
+  useAddDefinitions(id, monacoRef.current)
+
+  /** React query data fetching  */
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+
+  const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
+    projectRef: ref,
+  })
 
   const { data, refetch: refetchEntityDefinitions } = useEntityDefinitionsQuery(
     {
@@ -153,17 +151,11 @@ const SQLEditor = () => {
     },
     { enabled: includeSchemaMetadata }
   )
-
   const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
-  const isDiffOpen = !!sourceSqlDiff
 
-  const limit = snapV2.limit
-  const results = snapV2.results[id]?.[0]
-  const snippetIsLoading = !(
-    id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined
-  )
-  const isLoading = urlId === 'new' ? false : snippetIsLoading
-
+  /* React query mutations */
+  const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
+  const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
       if (id) snapV2.addResult(id, data.result, vars.autoLimit)
@@ -236,31 +228,22 @@ const SQLEditor = () => {
       const selection = editor.getSelection()
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
       const sql = snippet
-        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
+        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
         : selectedValue || editorRef.current?.getValue()
-      formatQuery(
-        {
-          projectRef: project.ref,
-          connectionString: project.connectionString,
-          sql,
-        },
-        {
-          onSuccess: (res) => {
-            const editorModel = editorRef?.current?.getModel()
-            if (editorRef.current && editorModel) {
-              editorRef.current.executeEdits('apply-prettify-edit', [
-                {
-                  text: res.result,
-                  range: editorModel.getFullModelRange(),
-                },
-              ])
-              snapV2.setSql(id, res.result)
-            }
+      const formattedSql = formatSql(sql)
+
+      const editorModel = editorRef?.current?.getModel()
+      if (editorRef.current && editorModel) {
+        editorRef.current.executeEdits('apply-prettify-edit', [
+          {
+            text: formattedSql,
+            range: editorModel.getFullModelRange(),
           },
-        }
-      )
+        ])
+        snapV2.setSql(id, formattedSql)
+      }
     }
-  }, [formatQuery, id, isDiffOpen, project, snapV2])
+  }, [id, isDiffOpen, project, snapV2])
 
   const executeQuery = useCallback(
     async (force: boolean = false) => {
@@ -276,7 +259,7 @@ const SQLEditor = () => {
         const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
         const sql = snippet
-          ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
+          ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
           : selectedValue || editorRef.current?.getValue()
 
         let queryHasIssues = false
@@ -309,7 +292,7 @@ const SQLEditor = () => {
           setLineHighlights([])
         }
 
-        const impersonatedRole = getImpersonatedRole()
+        const impersonatedRoleState = getImpersonatedRoleState()
         const connectionString = databases?.find(
           (db) => db.identifier === databaseSelectorState.selectedDatabaseId
         )?.connectionString
@@ -323,18 +306,22 @@ const SQLEditor = () => {
         execute({
           projectRef: project.ref,
           connectionString: connectionString,
-          sql: wrapWithRoleImpersonation(formattedSql, {
-            projectRef: project.ref,
-            role: impersonatedRole,
-          }),
+          sql: wrapWithRoleImpersonation(formattedSql, impersonatedRoleState),
           autoLimit: appendAutoLimit ? limit : undefined,
-          isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+          isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
+          contextualInvalidation: true,
           handleError: (error) => {
             throw error
           },
         })
+
+        sendEvent({
+          action: 'sql_editor_query_run_button_clicked',
+          groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+        })
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       isDiffOpen,
       id,
@@ -342,7 +329,7 @@ const SQLEditor = () => {
       project,
       hasHipaaAddon,
       execute,
-      getImpersonatedRole,
+      getImpersonatedRoleState,
       setAiTitle,
       databaseSelectorState.selectedDatabaseId,
       databases,
@@ -371,60 +358,22 @@ const SQLEditor = () => {
         toast.error(`Failed to create new query: ${error.message}`)
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [profile?.id, project?.id, ref, router, snapV2]
-  )
-
-  const updateEditorWithCheckForDiff = useCallback(
-    ({ id, diffType, sql }: { id: string; diffType: DiffType; sql: string }) => {
-      const editorModel = editorRef.current?.getModel()
-      if (!editorModel) return
-
-      setAiQueryCount((count) => count + 1)
-
-      const existingValue = editorRef.current?.getValue() ?? ''
-      if (existingValue.length === 0) {
-        // if the editor is empty, just copy over the code
-        editorRef.current?.executeEdits('apply-ai-message', [
-          {
-            text: `${sqlAiDisclaimerComment}\n\n${sql}`,
-            range: editorModel.getFullModelRange(),
-          },
-        ])
-      } else {
-        setSelectedMessage(id)
-        const currentSql = editorRef.current?.getValue()
-        const diff = { original: currentSql || '', modified: sql }
-        setSourceSqlDiff(diff)
-        setSelectedDiffType(diffType)
-      }
-    },
-    [setAiQueryCount]
   )
 
   const onDebug = useCallback(async () => {
     try {
       const snippet = snapV2.snippets[id]
       const result = snapV2.results[id]?.[0]
-
-      const { solution, sql } = await debugSql({
-        sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
-        errorMessage: result.error.message,
-        entityDefinitions,
+      aiSnap.newChat({
+        name: 'Debug SQL snippet',
+        open: true,
+        sqlSnippets: [
+          (snippet.snippet.content?.sql ?? '').replace(sqlAiDisclaimerComment, '').trim(),
+        ],
+        initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${result.error.message}`,
       })
-
-      const formattedSql =
-        sqlAiDisclaimerComment +
-        '\n\n' +
-        format(sql, {
-          language: 'postgresql',
-          keywordCase: 'lower',
-        })
-      setDebugSolution(solution)
-      setSourceSqlDiff({
-        original: snippet.snippet.content.sql,
-        modified: formattedSql,
-      })
-      setSelectedDiffType(DiffType.Modification)
     } catch (error: unknown) {
       // [Joshen] There's a tendency for the SQL debug to chuck a lengthy error message
       // that's not relevant for the user - so we prettify it here by avoiding to return the
@@ -435,27 +384,20 @@ const SQLEditor = () => {
         )
       }
     }
-  }, [debugSql, entityDefinitions, id, snapV2.results, snapV2.snippets])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entityDefinitions, id, snapV2.results, snapV2.snippets])
 
   const acceptAiHandler = useCallback(async () => {
     try {
       setIsAcceptDiffLoading(true)
 
-      if (!sourceSqlDiff) {
-        return
-      }
-
       // TODO: show error if undefined
-      if (!editorRef.current || !diffEditorRef.current) {
-        return
-      }
+      if (!sourceSqlDiff || !editorRef.current || !diffEditorRef.current) return
 
       const editorModel = editorRef.current.getModel()
       const diffModel = diffEditorRef.current.getModel()
 
-      if (!editorModel || !diffModel) {
-        return
-      }
+      if (!editorModel || !diffModel) return
 
       const sql = diffModel.modified.getValue()
 
@@ -475,31 +417,24 @@ const SQLEditor = () => {
         }
       }
 
-      Telemetry.sendEvent(
-        {
-          category: 'sql_editor',
-          action: 'ai_suggestion_accepted',
-          label: debugSolution ? 'debug_snippet' : 'edit_snippet',
-        },
-        telemetryProps,
-        router
-      )
+      sendEvent({
+        action: 'assistant_sql_diff_handler_evaluated',
+        properties: { handlerAccepted: true },
+        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      })
 
-      setSelectedMessage(undefined)
       setSelectedDiffType(DiffType.Modification)
-      setDebugSolution(undefined)
-      setSourceSqlDiff(undefined)
-      setPendingTitle(undefined)
+      resetPrompt()
+      closeDiff()
     } finally {
       setIsAcceptDiffLoading(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     sourceSqlDiff,
     selectedDiffType,
     handleNewQuery,
     generateSqlTitle,
-    debugSolution,
-    telemetryProps,
     router,
     id,
     pendingTitle,
@@ -507,137 +442,196 @@ const SQLEditor = () => {
   ])
 
   const discardAiHandler = useCallback(() => {
-    Telemetry.sendEvent(
-      {
-        category: 'sql_editor',
-        action: 'ai_suggestion_rejected',
-        label: debugSolution ? 'debug_snippet' : 'edit_snippet',
-      },
-      telemetryProps,
-      router
-    )
+    sendEvent({
+      action: 'assistant_sql_diff_handler_evaluated',
+      properties: { handlerAccepted: false },
+      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+    })
+    resetPrompt()
+    closeDiff()
+  }, [closeDiff, resetPrompt, sendEvent])
 
-    setSelectedMessage(undefined)
-    setDebugSolution(undefined)
-    setSourceSqlDiff(undefined)
-    setPendingTitle(undefined)
-  }, [debugSolution, telemetryProps, router])
+  const {
+    complete,
+    completion,
+    isLoading: isCompletionLoading,
+  } = useCompletion({
+    api: `${BASE_PATH}/api/ai/sql/complete`,
+    body: {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      includeSchemaMetadata,
+    },
+    onResponse: (response) => {
+      if (!response.ok) throw new Error('Failed to generate completion')
+    },
+    onError: (error) => {
+      toast.error(`Failed to generate SQL: ${error.message}`)
+    },
+  })
+
+  const handlePrompt = async (
+    prompt: string,
+    context: {
+      beforeSelection: string
+      selection: string
+      afterSelection: string
+    }
+  ) => {
+    try {
+      setPromptState((prev) => ({
+        ...prev,
+        selection: context.selection,
+        beforeSelection: context.beforeSelection,
+        afterSelection: context.afterSelection,
+      }))
+      const headerData = await constructHeaders()
+
+      await complete(prompt, {
+        headers: { Authorization: headerData.get('Authorization') ?? '' },
+        body: {
+          completionMetadata: {
+            textBeforeCursor: context.beforeSelection,
+            textAfterCursor: context.afterSelection,
+            language: 'pgsql',
+            prompt,
+            selection: context.selection,
+          },
+        },
+      })
+    } catch (error) {
+      setPromptState((prev) => ({ ...prev, isLoading: false }))
+    }
+  }
+
+  /** All useEffects are at the bottom before returning the TSX */
+
+  useEffect(() => {
+    if (id) {
+      closeDiff()
+      setPromptState((prev) => ({ ...prev, isOpen: false }))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [closeDiff, id])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (!isDiffOpen) {
-        return
-      }
+      if (!isDiffOpen && !promptState.isOpen) return
 
       switch (e.key) {
         case 'Enter':
-          acceptAiHandler()
+          if ((os === 'macos' ? e.metaKey : e.ctrlKey) && isDiffOpen) {
+            acceptAiHandler()
+            resetPrompt()
+          }
           return
         case 'Escape':
-          discardAiHandler()
+          if (isDiffOpen) discardAiHandler()
+          resetPrompt()
+          editorRef.current?.focus()
           return
       }
     }
-
     window.addEventListener('keydown', handler)
-
     return () => window.removeEventListener('keydown', handler)
-  }, [isDiffOpen, acceptAiHandler, discardAiHandler])
+  }, [os, isDiffOpen, promptState.isOpen, acceptAiHandler, discardAiHandler, resetPrompt])
 
   useEffect(() => {
-    const applyDiff = ({ original, modified }: { original: string; modified: string }) => {
-      const model = diffEditorRef.current?.getModel()
+    if (isDiffOpen) {
+      const diffEditor = diffEditorRef.current
+      const model = diffEditor?.getModel()
       if (model && model.original && model.modified) {
-        model.original.setValue(original)
-        model.modified.setValue(modified)
+        model.original.setValue(defaultSqlDiff.original)
+        model.modified.setValue(defaultSqlDiff.modified)
+        // scroll to the start line of the modification
+        const modifiedEditor = diffEditor!.getModifiedEditor()
+        const startLine = promptState.startLineNumber
+        modifiedEditor.revealLineInCenter(startLine)
       }
     }
-
-    const model = diffEditorRef.current?.getModel()
-    try {
-      if (model?.original && model.modified && sourceSqlDiff) {
-        switch (selectedDiffType) {
-          case DiffType.Modification: {
-            const transformedDiff = compareAsModification(sourceSqlDiff)
-            applyDiff(transformedDiff)
-            return
-          }
-
-          case DiffType.Addition: {
-            const transformedDiff = compareAsAddition(sourceSqlDiff)
-            applyDiff(transformedDiff)
-            return
-          }
-
-          case DiffType.NewSnippet: {
-            const transformedDiff = compareAsNewSnippet(sourceSqlDiff)
-            applyDiff(transformedDiff)
-            return
-          }
-
-          default:
-            throw new Error(`Unknown diff type '${selectedDiffType}'`)
-        }
-      }
-    } catch (e) {
-      console.log(e)
-    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDiffType, sourceSqlDiff])
-
-  // Used for cleaner framer motion transitions
-  useEffect(() => {
-    setIsFirstRender(false)
-  }, [])
 
   useEffect(() => {
     if (isSuccessReadReplicas) {
       const primaryDatabase = databases.find((db) => db.identifier === ref)
       databaseSelectorState.setSelectedDatabaseId(primaryDatabase?.identifier)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccessReadReplicas, databases, ref])
 
-  const defaultSqlDiff = useMemo(() => {
-    if (!sourceSqlDiff) {
-      return { original: '', modified: '' }
+  useEffect(() => {
+    if (snapV2.diffContent !== undefined) {
+      const { diffType, sql }: { diffType: DiffType; sql: string } = snapV2.diffContent
+      const editorModel = editorRef.current?.getModel()
+      if (!editorModel) return
+
+      const existingValue = editorRef.current?.getValue() ?? ''
+      if (existingValue.length === 0) {
+        // if the editor is empty, just copy over the code
+        editorRef.current?.executeEdits('apply-ai-message', [
+          {
+            text: `${sql}`,
+            range: editorModel.getFullModelRange(),
+          },
+        ])
+      } else {
+        const currentSql = editorRef.current?.getValue()
+        const diff = { original: currentSql || '', modified: sql }
+        setSourceSqlDiff(diff)
+        setSelectedDiffType(diffType)
+      }
     }
-    switch (selectedDiffType) {
-      case DiffType.Modification: {
-        return compareAsModification(sourceSqlDiff)
-      }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [snapV2.diffContent])
 
-      case DiffType.Addition: {
-        return compareAsAddition(sourceSqlDiff)
-      }
-
-      case DiffType.NewSnippet: {
-        return compareAsNewSnippet(sourceSqlDiff)
-      }
-
-      default:
-        return { original: '', modified: '' }
+  useEffect(() => {
+    if (!completion) {
+      return
     }
-  }, [selectedDiffType, sourceSqlDiff])
 
-  const aiPanelRef = useRef<ImperativePanelHandle>(null)
+    const original =
+      promptState.beforeSelection + promptState.selection + promptState.afterSelection
+    const modified = promptState.beforeSelection + completion + promptState.afterSelection
+
+    if (isCompletionLoading) {
+      // Attempt to format the modified SQL in case the LLM left out indentation, etc
+      let formattedModified = formatSql(modified)
+
+      setSourceSqlDiff({
+        original,
+        modified: formattedModified,
+      })
+      setSelectedDiffType(DiffType.Modification)
+      setPromptState((prev) => ({ ...prev, isLoading: false }))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    completion,
+    promptState.beforeSelection,
+    promptState.selection,
+    promptState.afterSelection,
+    isCompletionLoading,
+  ])
+
+  // We want to check if the diff editor is mounted and if it is, we want to show the widget
+  // We also want to cleanup the widget when the diff editor is closed
+  useEffect(() => {
+    if (!isDiffOpen) {
+      setIsDiffEditorMounted(false)
+      setShowWidget(false)
+    } else if (diffEditorRef.current && isDiffEditorMounted) {
+      setShowWidget(true)
+      return () => setShowWidget(false)
+    }
+  }, [isDiffOpen, isDiffEditorMounted])
 
   return (
     <>
-      <ConfirmationModal
+      <RunQueryWarningModal
         visible={showPotentialIssuesModal}
-        size="large"
-        title={`Potential issue${queryHasDestructiveOperations && queryHasUpdateWithoutWhere ? 's' : ''} detected with your query`}
-        confirmLabel="Run this query"
-        variant="warning"
-        alert={{
-          base: {
-            variant: 'warning',
-          },
-          title:
-            queryHasDestructiveOperations && queryHasUpdateWithoutWhere
-              ? 'The following potential issues have been detected:'
-              : 'The following potential issue has been detected:',
-          description: 'Ensure that these are intentional before executing this query',
-        }}
+        hasDestructiveOperations={queryHasDestructiveOperations}
+        hasUpdateWithoutWhere={queryHasUpdateWithoutWhere}
         onCancel={() => {
           setShowPotentialIssuesModal(false)
           setQueryHasDestructiveOperations(false)
@@ -648,33 +642,7 @@ const SQLEditor = () => {
           setShowPotentialIssuesModal(false)
           executeQuery(true)
         }}
-      >
-        <div className="text-sm">
-          <ul className="border rounded-md grid bg-surface-200">
-            {queryHasDestructiveOperations && (
-              <li className="grid pt-3 pb-2 px-4">
-                <span className="font-bold">Query has destructive operation</span>
-                <span className="text-foreground-lighter">
-                  Make sure you are not accidentally removing something important.
-                </span>
-              </li>
-            )}
-            {queryHasDestructiveOperations && queryHasUpdateWithoutWhere && <Separator />}
-            {queryHasUpdateWithoutWhere && (
-              <li className="grid pt-2 pb-3 px-4 gap-1">
-                <span className="font-bold">Query uses update without a where clause</span>
-                <span className="text-foreground-lighter">
-                  Without a <code className="text-xs">where</code> clause, this could update all
-                  rows in the table.
-                </span>
-              </li>
-            )}
-          </ul>
-        </div>
-        <p className="mt-4 text-sm text-foreground-light">
-          Please confirm that you would like to execute this query.
-        </p>
-      </ConfirmationModal>
+      />
 
       <ResizablePanelGroup
         className="flex h-full"
@@ -687,55 +655,8 @@ const SQLEditor = () => {
             direction="vertical"
             autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
           >
-            {(isAiOpen || isDiffOpen) && !hasHipaaAddon && (
-              <AISchemaSuggestionPopover
-                onClickSettings={() => {
-                  appSnap.setShowAiSettingsModal(true)
-                }}
-              >
-                {isDiffOpen && (
-                  <motion.div
-                    key="ask-ai-input-container"
-                    layoutId="ask-ai-input-container"
-                    variants={{ visible: { borderRadius: 0, x: 0 }, hidden: { x: 100 } }}
-                    initial={isFirstRender ? 'visible' : 'hidden'}
-                    animate="visible"
-                    className={cn(
-                      'flex flex-row items-center gap-3 justify-end px-2 py-2 w-full z-10',
-                      'bg-brand-200 border-b border-brand-400  !shadow-none'
-                    )}
-                  >
-                    {debugSolution && (
-                      <div className="h-full w-full flex flex-row items-center overflow-y-hidden text-sm text-brand-600">
-                        {debugSolution}
-                      </div>
-                    )}
-                    <DiffActionBar
-                      loading={isAcceptDiffLoading}
-                      selectedDiffType={selectedDiffType || DiffType.Modification}
-                      onChangeDiffType={(diffType) => setSelectedDiffType(diffType)}
-                      onAccept={acceptAiHandler}
-                      onCancel={discardAiHandler}
-                    />
-                  </motion.div>
-                )}
-              </AISchemaSuggestionPopover>
-            )}
             <ResizablePanel maxSize={70}>
               <div className="flex-grow overflow-y-auto border-b h-full">
-                {!isAiOpen && (
-                  <motion.button
-                    layoutId="ask-ai-input-icon"
-                    transition={{ duration: 0.1 }}
-                    onClick={() => aiPanelRef.current?.expand()}
-                    className={cn(
-                      'group absolute z-10 rounded-lg right-[24px] top-4 transition-all duration-200 ease-out'
-                    )}
-                  >
-                    <AiIconAnimation loading={false} allowHoverEffect />
-                  </motion.button>
-                )}
-
                 {isLoading ? (
                   <div className="flex h-full w-full items-center justify-center">
                     <Loader2 className="animate-spin text-brand" />
@@ -743,15 +664,7 @@ const SQLEditor = () => {
                 ) : (
                   <>
                     {isDiffOpen && (
-                      <motion.div
-                        className="w-full h-full"
-                        variants={{
-                          visible: { opacity: 1, filter: 'blur(0px)' },
-                          hidden: { opacity: 0, filter: 'blur(10px)' },
-                        }}
-                        initial="hidden"
-                        animate="visible"
-                      >
+                      <div className="w-full h-full">
                         <DiffEditor
                           theme="supabase"
                           language="pgsql"
@@ -759,30 +672,104 @@ const SQLEditor = () => {
                           modified={defaultSqlDiff.modified}
                           onMount={(editor) => {
                             diffEditorRef.current = editor
+                            setIsDiffEditorMounted(true)
                           }}
-                          options={{ fontSize: 13 }}
+                          options={{
+                            fontSize: 13,
+                            renderSideBySide: false,
+                            minimap: { enabled: false },
+                            wordWrap: 'on',
+                            lineNumbers: 'on',
+                            folding: false,
+                            padding: { top: 4 },
+                            lineNumbersMinChars: 3,
+                          }}
                         />
-                      </motion.div>
+                        {showWidget && (
+                          <ResizableAIWidget
+                            editor={diffEditorRef.current!}
+                            id="ask-ai-diff"
+                            value={promptInput}
+                            onChange={setPromptInput}
+                            onSubmit={(prompt: string) => {
+                              handlePrompt(prompt, {
+                                beforeSelection: promptState.beforeSelection,
+                                selection: promptState.selection || defaultSqlDiff.modified,
+                                afterSelection: promptState.afterSelection,
+                              })
+                            }}
+                            onAccept={acceptAiHandler}
+                            onReject={discardAiHandler}
+                            onCancel={resetPrompt}
+                            isDiffVisible={true}
+                            isLoading={isCompletionLoading}
+                            startLineNumber={Math.max(0, promptState.startLineNumber)}
+                            endLineNumber={promptState.endLineNumber}
+                          />
+                        )}
+                      </div>
                     )}
-                    <motion.div
-                      key={id}
-                      variants={{
-                        visible: { opacity: 1, filter: 'blur(0px)' },
-                        hidden: { opacity: 0, filter: 'blur(10px)' },
-                      }}
-                      initial="hidden"
-                      animate={isDiffOpen ? 'hidden' : 'visible'}
-                      className="w-full h-full"
-                    >
+                    <div key={id} className="w-full h-full relative">
                       <MonacoEditor
                         autoFocus
                         id={id}
+                        className={cn(isDiffOpen && 'hidden')}
                         editorRef={editorRef}
                         monacoRef={monacoRef}
                         executeQuery={executeQuery}
                         onHasSelection={setHasSelection}
+                        onPrompt={({
+                          selection,
+                          beforeSelection,
+                          afterSelection,
+                          startLineNumber,
+                          endLineNumber,
+                        }) => {
+                          setPromptState((prev) => ({
+                            ...prev,
+                            isOpen: true,
+                            selection,
+                            beforeSelection,
+                            afterSelection,
+                            startLineNumber,
+                            endLineNumber,
+                          }))
+                        }}
                       />
-                    </motion.div>
+                      {editorRef.current && promptState.isOpen && !isDiffOpen && (
+                        <ResizableAIWidget
+                          editor={editorRef.current}
+                          id="ask-ai"
+                          value={promptInput}
+                          onChange={setPromptInput}
+                          onSubmit={(prompt: string) => {
+                            handlePrompt(prompt, {
+                              beforeSelection: promptState.beforeSelection,
+                              selection: promptState.selection,
+                              afterSelection: promptState.afterSelection,
+                            })
+                          }}
+                          onCancel={resetPrompt}
+                          isDiffVisible={false}
+                          isLoading={isCompletionLoading}
+                          startLineNumber={Math.max(0, promptState.startLineNumber)}
+                          endLineNumber={promptState.endLineNumber}
+                        />
+                      )}
+                      <AnimatePresence>
+                        {!promptState.isOpen && !editorRef.current?.getValue() && (
+                          <motion.p
+                            initial={{ y: 5, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: 5, opacity: 0 }}
+                            className="text-foreground-lighter absolute bottom-4 left-4 z-10 font-mono text-xs flex items-center gap-1"
+                          >
+                            Hit {os === 'macos' ? <Command size={12} /> : `CTRL+`}K to edit with the
+                            Assistant
+                          </motion.p>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </>
                 )}
               </div>
@@ -800,7 +787,6 @@ const SQLEditor = () => {
                   id={id}
                   isExecuting={isExecuting}
                   isDisabled={isDiffOpen}
-                  isDebugging={isDebugSqlLoading}
                   hasSelection={hasSelection}
                   prettifyQuery={prettifyQuery}
                   executeQuery={executeQuery}
@@ -812,8 +798,8 @@ const SQLEditor = () => {
             <ResizablePanel maxSize={10} minSize={10} className="max-h-9">
               {results?.rows !== undefined && !isExecuting && (
                 <GridFooter className="flex items-center justify-between gap-2">
-                  <Tooltip_Shadcn_>
-                    <TooltipTrigger_Shadcn_>
+                  <Tooltip>
+                    <TooltipTrigger>
                       <p className="text-xs">
                         <span className="text-foreground">
                           {results.rows.length} row{results.rows.length > 1 ? 's' : ''}
@@ -823,8 +809,8 @@ const SQLEditor = () => {
                             ` (Limited to only ${results.autoLimit} rows)`}
                         </span>
                       </p>
-                    </TooltipTrigger_Shadcn_>
-                    <TooltipContent_Shadcn_ className="max-w-xs">
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
                       <p className="flex flex-col gap-y-1">
                         <span>
                           Results are automatically limited to preserve browser performance, in
@@ -835,8 +821,8 @@ const SQLEditor = () => {
                           You may change or remove this limit from the dropdown on the right
                         </span>
                       </p>
-                    </TooltipContent_Shadcn_>
-                  </Tooltip_Shadcn_>
+                    </TooltipContent>
+                  </Tooltip>
                   {results.autoLimit !== undefined && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -867,29 +853,7 @@ const SQLEditor = () => {
             </ResizablePanel>
           </ResizablePanelGroup>
         </ResizablePanel>
-
-        <ResizableHandle withHandle />
-
-        <ResizablePanel
-          ref={aiPanelRef}
-          collapsible
-          collapsedSize={0}
-          minSize={31}
-          maxSize={40}
-          onCollapse={() => setIsAiOpen(false)}
-          onExpand={() => setIsAiOpen(true)}
-        >
-          <AiAssistantPanel
-            selectedMessage={selectedMessage}
-            existingSql={editorRef.current?.getValue() || ''}
-            includeSchemaMetadata={includeSchemaMetadata}
-            onDiff={updateEditorWithCheckForDiff}
-            onClose={() => aiPanelRef.current?.collapse()}
-          />
-        </ResizablePanel>
       </ResizablePanelGroup>
     </>
   )
 }
-
-export default SQLEditor

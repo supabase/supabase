@@ -1,7 +1,7 @@
 import { Key } from 'lucide-react'
 import { useMemo } from 'react'
 
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { copyToClipboard } from 'lib/helpers'
 import { Badge } from 'ui'
@@ -23,14 +23,13 @@ export function useApiKeysCommands() {
   const setPage = useSetPage()
 
   const project = useSelectedProject()
-  const { data: settings } = useProjectApiQuery(
+  const ref = project?.ref || '_'
+
+  const { data: settings } = useProjectSettingsV2Query(
     { projectRef: project?.ref },
     { enabled: !!project }
   )
-  const ref = project?.ref || '_'
-
-  const anonKey = settings?.autoApiService?.defaultApiKey ?? undefined
-  const serviceKey = settings?.autoApiService?.serviceApiKey ?? undefined
+  const { anonKey, serviceKey } = getAPIKeys(settings)
 
   const commands = useMemo(
     () =>
@@ -40,7 +39,7 @@ export function useApiKeysCommands() {
             id: 'anon-key',
             name: `Copy anonymous API key`,
             action: () => {
-              copyToClipboard(anonKey ?? '')
+              copyToClipboard(anonKey.api_key ?? '')
               setIsOpen(false)
             },
             badge: () => (
@@ -56,7 +55,7 @@ export function useApiKeysCommands() {
             id: 'service-key',
             name: `Copy service API key`,
             action: () => {
-              copyToClipboard(serviceKey ?? '')
+              copyToClipboard(serviceKey.api_key ?? '')
               setIsOpen(false)
             },
             badge: () => (

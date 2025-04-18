@@ -7,7 +7,6 @@ import { cn } from 'ui'
 
 interface Props {
   title: string
-  span?: string
   icon?: string | React.ReactNode
   children?: React.ReactNode
   header?: string
@@ -22,7 +21,6 @@ interface Props {
 
 export const GlassPanel = ({
   title,
-  span,
   icon,
   children,
   header,

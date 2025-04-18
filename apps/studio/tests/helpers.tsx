@@ -1,8 +1,8 @@
-import { fireEvent, getByText, screen, render as originalRender } from '@testing-library/react'
-import React, { useState } from 'react'
-import { TooltipProvider } from '@radix-ui/react-tooltip'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { fireEvent, getByText, render as originalRender, screen } from '@testing-library/react'
+import React, { useState } from 'react'
 
+import { TooltipProvider } from 'ui'
 interface SelectorOptions {
   container?: HTMLElement
 }

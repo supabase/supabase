@@ -1,7 +1,7 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import { useState } from 'react'
 
-import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
+import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
 import Policies from 'components/interfaces/Auth/Policies/Policies'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
@@ -60,7 +60,7 @@ export const RealtimePolicies = () => {
         </div>
       )}
 
-      <AIPolicyEditorPanel
+      <PolicyEditorPanel
         visible={showPolicyEditor}
         searchString="messages"
         schema="realtime"

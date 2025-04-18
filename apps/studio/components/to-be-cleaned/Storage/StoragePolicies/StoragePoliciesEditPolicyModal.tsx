@@ -5,7 +5,9 @@ import { toast } from 'sonner'
 import { POLICY_MODAL_VIEWS } from 'components/interfaces/Auth/Policies/Policies.constants'
 import PolicySelection from 'components/interfaces/Auth/Policies/PolicySelection'
 import PolicyTemplates from 'components/interfaces/Auth/Policies/PolicyTemplates'
-import { Button, Modal } from 'ui'
+import { DocsButton } from 'components/ui/DocsButton'
+import { ChevronLeft } from 'lucide-react'
+import { Modal } from 'ui'
 import {
   applyBucketIdToTemplateDefinition,
   createPayloadsForAddPolicy,
@@ -14,7 +16,6 @@ import {
 import { STORAGE_POLICY_TEMPLATES } from './StoragePolicies.constants'
 import StoragePoliciesEditor from './StoragePoliciesEditor'
 import StoragePoliciesReview from './StoragePoliciesReview'
-import { ChevronLeft, ExternalLink } from 'lucide-react'
 
 const newPolicyTemplate: any = {
   name: '',
@@ -181,18 +182,9 @@ const StoragePoliciesEditPolicyModal = ({
       )
     }
     return (
-      <div className="w-full flex items-center justify-between gap-x-2">
+      <div className="w-full flex items-center justify-between gap-x-2 pr-6">
         <h4 className="m-0 truncate">{getTitle()}</h4>
-        <Button asChild type="default" icon={<ExternalLink />}>
-          <a
-            href="https://supabase.com/docs/learn/auth-deep-dive/auth-policies"
-            target="_blank"
-            rel="noreferrer"
-          >
-            {' '}
-            Documentation
-          </a>
-        </Button>
+        <DocsButton href="https://supabase.com/docs/learn/auth-deep-dive/auth-policies" />
       </div>
     )
   }
@@ -200,6 +192,7 @@ const StoragePoliciesEditPolicyModal = ({
   return (
     <Modal
       hideFooter
+      className="[&>div:first-child]:py-3"
       size={view === POLICY_MODAL_VIEWS.SELECTION ? 'medium' : 'xxlarge'}
       visible={visible}
       contentStyle={{ padding: 0 }}

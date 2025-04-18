@@ -3,45 +3,42 @@ import { useEffect, useState } from 'react'
 
 import { ProjectList } from 'components/interfaces/Home/ProjectList'
 import HomePageActions from 'components/interfaces/HomePageActions'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import OrganizationLayout from 'components/layouts/OrganizationLayout'
+import { MAX_WIDTH_CLASSES, PADDING_CLASSES } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { Loading } from 'components/ui/Loading'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
+import { cn } from 'ui'
 
 const ProjectsPage: NextPageWithLayout = () => {
+  const newLayoutPreview = useIsNewLayoutEnabled()
+  const [lastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
+
   const router = useRouter()
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState<string[]>([
     PROJECT_STATUS.ACTIVE_HEALTHY,
     PROJECT_STATUS.INACTIVE,
   ])
+
   const { data: organizations, isError, isSuccess } = useOrganizationsQuery()
   useAutoProjectsPrefetch()
 
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
-
-  const navLayoutV2 = useFlag('navigationLayoutV2')
   const hasWindowLoaded = typeof window !== 'undefined'
 
   useEffect(() => {
-    if (navLayoutV2 && isSuccess && hasWindowLoaded) {
-      const localStorageSlug = localStorage.getItem(
-        LOCAL_STORAGE_KEYS.RECENTLY_VISITED_ORGANIZATION
-      )
-      const verifiedSlug = organizations.some((org) => org.slug === localStorageSlug)
-
-      if (organizations.length === 0) router.push('/new')
-      else if (localStorageSlug && verifiedSlug) router.push(`/org/${localStorageSlug}`)
-      else router.push(`/org/${organizations[0].slug}`)
-    }
-
-    if (!navLayoutV2 && isSuccess && hasWindowLoaded) {
-      // navigate to new page exactly once
+    if (hasWindowLoaded && isSuccess) {
       const hasNoOrg = organizations.length === 0
       const hasShownNewPage = localStorage.getItem(LOCAL_STORAGE_KEYS.UI_ONBOARDING_NEW_PAGE_SHOWN)
       if (hasNoOrg && !hasShownNewPage) {
@@ -49,59 +46,52 @@ const ProjectsPage: NextPageWithLayout = () => {
         router.push('/new')
       }
     }
-  }, [navLayoutV2, isSuccess, hasWindowLoaded])
+  }, [hasWindowLoaded, isSuccess])
+
+  useEffect(() => {
+    // [Joshen] Adding the redirect here, but once the nav changes are permanenet
+    // we should be doing the redirect in next.config instead
+    if (hasWindowLoaded && newLayoutPreview) {
+      if (lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
+      else router.push('/organizations')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasWindowLoaded, newLayoutPreview])
 
   return (
-    <>
+    <div className={cn(newLayoutPreview && [MAX_WIDTH_CLASSES, PADDING_CLASSES])}>
       {isError && (
-        <div
-          className={`py-4 px-5 ${navLayoutV2 ? 'h-full flex items-center justify-center' : ''}`}
-        >
+        <div className="p-4 md:px-5">
           <AlertError subject="Failed to retrieve organizations" />
         </div>
       )}
 
-      {navLayoutV2 && (
-        <div className={`flex items-center justify-center h-full`}>
-          <Loading />
+      <div className="p-4 md:p-5">
+        {IS_PLATFORM && projectCreationEnabled && isSuccess && (
+          <HomePageActions
+            search={search}
+            filterStatus={filterStatus}
+            setSearch={setSearch}
+            setFilterStatus={setFilterStatus}
+            organizations={organizations}
+          />
+        )}
+        <div className="my-6 space-y-8">
+          <ProjectList
+            search={search}
+            filterStatus={filterStatus}
+            resetFilterStatus={() => setFilterStatus(['ACTIVE_HEALTHY', 'INACTIVE'])}
+          />
         </div>
-      )}
-      {!navLayoutV2 && (
-        <div className="p-5">
-          {IS_PLATFORM && projectCreationEnabled && isSuccess && (
-            <HomePageActions
-              search={search}
-              filterStatus={filterStatus}
-              setSearch={setSearch}
-              setFilterStatus={setFilterStatus}
-              organizations={organizations}
-            />
-          )}
-          <div className="my-6 space-y-8">
-            <ProjectList
-              search={search}
-              filterStatus={filterStatus}
-              resetFilterStatus={() => setFilterStatus(['ACTIVE_HEALTHY', 'INACTIVE'])}
-            />
-          </div>
-        </div>
-      )}
-    </>
+      </div>
+    </div>
   )
 }
 
 ProjectsPage.getLayout = (page) => (
-  <AccountLayout
-    title="Dashboard"
-    breadcrumbs={[
-      {
-        key: `supabase-projects`,
-        label: 'Projects',
-      },
-    ]}
-  >
-    {page}
-  </AccountLayout>
+  <DefaultLayout headerTitle="All Projects">
+    <OrganizationLayout>{page}</OrganizationLayout>
+  </DefaultLayout>
 )
 
 export default ProjectsPage

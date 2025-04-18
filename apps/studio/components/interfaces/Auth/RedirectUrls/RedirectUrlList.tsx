@@ -72,7 +72,9 @@ export const RedirectUrlList = ({
               tooltip={{
                 content: {
                   side: 'bottom',
-                  text: 'You need additional permissions to remove redirect URLs',
+                  text: !canUpdateConfig
+                    ? 'You need additional permissions to remove redirect URLs'
+                    : undefined,
                 },
               }}
               icon={<Trash />}
@@ -88,7 +90,9 @@ export const RedirectUrlList = ({
             tooltip={{
               content: {
                 side: 'bottom',
-                text: 'You need additional permissions to update redirect URLs',
+                text: !canUpdateConfig
+                  ? 'You need additional permissions to update redirect URLs'
+                  : undefined,
               },
             }}
           >

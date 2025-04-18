@@ -105,7 +105,8 @@ export async function getReferenceSections(sdkId: string, version: string) {
     referenceSections.set(key, JSON.parse(data))
   }
 
-  return referenceSections.get(key)
+  const result = referenceSections.get(key)
+  return result
 }
 
 const flatSections = new Map<string, Array<AbbrevApiReferenceSection>>()
@@ -121,7 +122,8 @@ export async function getFlattenedSections(sdkId: string, version: string) {
     flatSections.set(key, JSON.parse(data))
   }
 
-  return flatSections.get(key)
+  const result = flatSections.get(key)
+  return result
 }
 
 const sectionsBySlug = new Map<string, Map<string, AbbrevApiReferenceSection>>()

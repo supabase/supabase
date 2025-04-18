@@ -2,7 +2,7 @@ import Param from '~/components/Params'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
-import specStorageV0 from '~/spec/storage_v0_config.yaml' assert { type: 'yml' }
+import specStorageV0 from '~/spec/storage_v0_config.yaml' with { type: 'yml' }
 
 const meta = {
   title: 'Storage Self-hosting Config',
@@ -21,7 +21,7 @@ const StorageConfigPage = async () => {
     <GuideTemplate
       meta={meta}
       editLink={newEditLink(
-        'supabase/supabase/blob/master/apps/docs/pages/guides/self-hosting/storage/config.tsx'
+        'supabase/supabase/blob/master/apps/docs/app/guides/(with-sidebar)/self-hosting/storage/config/page.tsx'
       )}
     >
       <MDXRemoteBase source={descriptionMdx} />

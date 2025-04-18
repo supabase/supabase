@@ -100,28 +100,28 @@ export const UpdateRolesConfirmationModal = ({
     const { toRemove, toAssign, toUpdate } = deriveRoleChangeActions(existingRoles, changesToRoles)
 
     try {
-      await Promise.all([
-        ...toAssign.map(({ roleId, projectIds }) =>
-          assignRole({
-            slug,
-            gotrueId,
-            roleId,
-            projects: projectIds.map((id) => projects?.find((p) => p.id === id)?.ref) as string[],
-          })
-        ),
-      ])
-      await Promise.all([
-        ...toRemove.map((roleId) => removeRole({ slug, gotrueId, roleId })),
-        ...toUpdate.map(({ roleId, projectIds }) =>
-          updateRole({
-            slug,
-            gotrueId,
-            roleId,
-            roleName: project_scoped_roles.find((r) => r.id === roleId)?.name as string,
-            projects: projectIds.map((id) => projects?.find((p) => p.id === id)?.ref) as string[],
-          })
-        ),
-      ])
+      for (const { roleId, projectIds } of toAssign) {
+        await assignRole({
+          slug,
+          gotrueId,
+          roleId,
+          projects: projectIds.map((id) => projects?.find((p) => p.id === id)?.ref) as string[],
+          skipInvalidation: true,
+        })
+      }
+      for (const roleId of toRemove) {
+        await removeRole({ slug, gotrueId, roleId, skipInvalidation: true })
+      }
+      for (const { roleId, projectIds } of toUpdate) {
+        await updateRole({
+          slug,
+          gotrueId,
+          roleId,
+          roleName: project_scoped_roles.find((r) => r.id === roleId)?.name as string,
+          projects: projectIds.map((id) => projects?.find((p) => p.id === id)?.ref) as string[],
+          skipInvalidation: true,
+        })
+      }
 
       await Promise.all([
         queryClient.invalidateQueries(organizationKeys.rolesV2(slug)),
@@ -219,7 +219,7 @@ export const UpdateRolesConfirmationModal = ({
                   return (
                     <li key={`update-${i}`} className="text-sm text-foreground-light">
                       From <span className="text-foreground">{originalRoleName}</span> to{' '}
-                      <span className="text-foreground">{updatedRole?.name}</span> on{' '}
+                      <span className="text-foreground">{updatedRole?.name ?? 'Unknown'}</span> on{' '}
                       <span className={project !== undefined ? 'text-foreground' : ''}>
                         {project?.name ?? 'organization'}
                       </span>

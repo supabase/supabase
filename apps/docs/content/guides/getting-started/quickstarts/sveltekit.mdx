@@ -8,8 +8,8 @@ hideToc: true
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    
-    <QuickstartDbSetup />
+
+    <$Partial path="quickstart_db_setup.mdx" />
 
   </StepHikeCompact.Step>
 
@@ -23,8 +23,8 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
-      npm create svelte@latest myapp
+      ```bash name=Terminal
+      npx sv create my-app
       ```
 
     </StepHikeCompact.Code>
@@ -42,8 +42,8 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
-      cd myapp && npm install @supabase/supabase-js
+      ```bash name=Terminal
+      cd my-app && npm install @supabase/supabase-js
       ```
 
     </StepHikeCompact.Code>
@@ -53,7 +53,7 @@ hideToc: true
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Create the Supabase client">
 
-    Create a `/src/lib` directory in your SvelteKit app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client with your project URL and public API (anon) key:
+    Create a `src/lib` directory in your SvelteKit app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client with your project URL and public API (anon) key:
 
     <ProjectConfigVariables variable="url" />
     <ProjectConfigVariables variable="anonKey" />
@@ -62,7 +62,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```js src/lib/supabaseClient.js
+      ```js name=src/lib/supabaseClient.js
         import { createClient } from '@supabase/supabase-js'
 
         export const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
@@ -77,19 +77,19 @@ hideToc: true
 
     Use `load` method to fetch the data server-side and display the query results as a simple list.
 
-    Create `+page.server.js` file in the `routes` directory with the following code.
+    Create `+page.server.js` file in the `src/routes` directory with the following code.
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
 
 
-      ```js src/routes/+page.server.js
+      ```js name=src/routes/+page.server.js
         import { supabase } from "$lib/supabaseClient";
 
         export async function load() {
-          const { data } = await supabase.from("countries").select();
+          const { data } = await supabase.from("instruments").select();
           return {
-            countries: data ?? [],
+            instruments: data ?? [],
           };
         }
       ```
@@ -98,20 +98,20 @@ hideToc: true
 
     <StepHikeCompact.Details title="">
 
-    Replace the existing content in your `+page.svelte` file in the `routes` directory with the following code.
+    Replace the existing content in your `+page.svelte` file in the `src/routes` directory with the following code.
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
 
 
-      ```svelte src/routes/+page.svelte
+      ```svelte name=src/routes/+page.svelte
         <script>
-          export let data;
+          let { data } = $props();
         </script>
 
         <ul>
-          {#each data.countries as country}
-            <li>{country.name}</li>
+          {#each data.instruments as instrument}
+            <li>{instrument.name}</li>
           {/each}
         </ul>
       ```
@@ -123,13 +123,13 @@ hideToc: true
   <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Start the app">
 
-    Start the app and go to http://localhost:5173 in a browser and you should see the list of countries.
+    Start the app and go to http://localhost:5173 in a browser and you should see the list of instruments.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npm run dev
       ```
 

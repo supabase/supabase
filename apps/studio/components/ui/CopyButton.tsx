@@ -2,16 +2,30 @@ import { Check, Clipboard } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { copyToClipboard } from 'lib/helpers'
-import { Button, ButtonProps } from 'ui'
+import { Button, ButtonProps, cn } from 'ui'
 
-export interface CopyButtonProps extends ButtonProps {
-  text: string
+type CopyButtonBaseProps = {
   iconOnly?: boolean
   copyLabel?: string
   copiedLabel?: string
+  onCopy?: () => Promise<string> | string
 }
+
+type CopyButtonWithText = CopyButtonBaseProps & {
+  text: string
+  asyncText?: never
+}
+
+type CopyButtonWithAsyncText = CopyButtonBaseProps & {
+  text?: never
+  asyncText: () => Promise<string> | string
+}
+
+export type CopyButtonProps = (CopyButtonWithText | CopyButtonWithAsyncText) & ButtonProps
+
 const CopyButton = ({
   text,
+  asyncText,
   iconOnly = false,
   children,
   onClick,
@@ -30,11 +44,18 @@ const CopyButton = ({
   return (
     <Button
       onClick={async (e) => {
+        const textToCopy = asyncText ? await asyncText() : text
         setShowCopied(true)
-        await copyToClipboard(text)
+        await copyToClipboard(textToCopy!)
         onClick?.(e)
       }}
       {...props}
+      className={cn(
+        {
+          'px-1': iconOnly,
+        },
+        props.className
+      )}
       icon={
         showCopied ? <Check strokeWidth={2} className="text-brand" /> : props.icon ?? <Clipboard />
       }
@@ -43,4 +64,5 @@ const CopyButton = ({
     </Button>
   )
 }
+
 export default CopyButton

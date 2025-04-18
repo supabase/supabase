@@ -1,5 +1,6 @@
 import { StreamingTextResponse } from 'ai'
 import { chatRlsPolicy } from 'ai-commands/edge'
+import { DatabasePoliciesData } from 'data/database-policies/database-policies-query'
 import { NextRequest } from 'next/server'
 import OpenAI from 'openai'
 
@@ -7,7 +8,7 @@ export const config = {
   runtime: 'edge',
   /* To avoid OpenAI errors, restrict to the Vercel Edge Function regions that
   overlap with the OpenAI API regions.
-  
+
   Reference for Vercel regions: https://vercel.com/docs/edge-network/regions#region-list
   Reference for OpenAI regions: https://help.openai.com/en/articles/5347006-openai-api-supported-countries-and-territories
   */
@@ -69,13 +70,20 @@ async function handlePost(request: NextRequest) {
   const body = await (request.json() as Promise<{
     messages: { content: string; role: 'user' | 'assistant' }[]
     entityDefinitions: string[]
+    existingPolicies: DatabasePoliciesData
     policyDefinition: string
   }>)
 
-  const { messages, entityDefinitions, policyDefinition } = body
+  const { messages, entityDefinitions, existingPolicies, policyDefinition } = body
 
   try {
-    const stream = await chatRlsPolicy(openai, messages, entityDefinitions, policyDefinition)
+    const stream = await chatRlsPolicy(
+      openai,
+      messages,
+      entityDefinitions,
+      existingPolicies,
+      policyDefinition
+    )
     return new StreamingTextResponse(stream)
   } catch (error) {
     console.error(error)

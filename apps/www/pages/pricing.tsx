@@ -3,8 +3,7 @@ import { ArrowUpRight } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import ReactTooltip from 'react-tooltip'
+import { useEffect } from 'react'
 import { Button } from 'ui'
 
 import DefaultLayout from '~/components/Layouts/Default'
@@ -16,21 +15,15 @@ const PricingAddons = dynamic(() => import('~/components/Pricing/PricingAddons')
 const PricingComparisonTable = dynamic(() => import('~/components/Pricing/PricingComparisonTable'))
 const PricingFAQs = dynamic(() => import('~/components/Pricing/PricingFAQs'))
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
+const PricingDiskSection = dynamic(() => import('~/components/Pricing/PricingDiskSection'))
 
 export default function IndexPage() {
   const router = useRouter()
   const { asPath } = useRouter()
-  const [mounted, setMounted] = useState(false)
 
   const meta_title = 'Pricing & Fees | Supabase'
   const meta_description =
     'Explore Supabase fees and pricing information. Find our competitive pricing Plans, with no hidden pricing. We have a generous Free Plan for those getting started, and Pay As You Go for those scaling up.'
-
-  useEffect(() => {
-    setTimeout(() => {
-      setMounted(true)
-    }, 200)
-  }, [])
 
   // Ability to scroll into pricing sections like storage
   useEffect(() => {
@@ -100,7 +93,10 @@ export default function IndexPage() {
             </Button>
           </a>
           <Button size="tiny" type="default" asChild iconRight={<ArrowUpRight className="w-4" />}>
-            <a href="/docs/guides/platform/org-based-billing" target="_blank">
+            <a
+              href="/docs/guides/platform/billing-on-supabase#organization-based-billing"
+              target="_blank"
+            >
               Learn how billing works
             </a>
           </Button>
@@ -112,6 +108,13 @@ export default function IndexPage() {
         className="container relative mx-auto px-4 lg:px-12 pt-16 md:pt-24 lg:pt-32 lg:pb-16"
       >
         <PricingComputeSection />
+      </div>
+
+      <div
+        id="disk"
+        className="container relative mx-auto px-4 lg:px-12 pt-16 md:pt-24 lg:pt-32 lg:pb-16"
+      >
+        <PricingDiskSection />
       </div>
 
       <div id="addons" className="sm:py-18 container relative mx-auto px-4 py-16 md:py-24 lg:px-12">
@@ -127,16 +130,6 @@ export default function IndexPage() {
         <PricingFAQs />
       </div>
       <CTABanner />
-      {mounted && (
-        <ReactTooltip
-          wrapper="span"
-          effect="solid"
-          backgroundColor="hsl(var(--background-alternative-default))"
-          textColor="hsl(var(--foreground-light))"
-          className="!max-w-[320px] !px-3 whitespace-pre-line"
-          uuid="pricing-tt"
-        />
-      )}
     </DefaultLayout>
   )
 }

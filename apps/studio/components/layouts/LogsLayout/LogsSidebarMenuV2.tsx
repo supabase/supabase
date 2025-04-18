@@ -1,23 +1,22 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/components/shadcn/ui/tooltip'
+import { ChevronRight, FilePlus, Plus } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+
 import { IS_PLATFORM, useParams } from 'common'
 import { CreateWarehouseCollectionModal } from 'components/interfaces/DataWarehouse/CreateWarehouseCollection'
 import { WarehouseMenuItem } from 'components/interfaces/DataWarehouse/WarehouseMenuItem'
 import SavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from 'components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
 import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
+import { useWarehouseTenantQuery } from 'data/analytics/warehouse-tenant-query'
 import { useContentQuery } from 'data/content/content-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
-import { ArrowUpRight, ChevronRight, FilePlus, Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   Button,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
@@ -27,8 +26,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Separator,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import {
+  InnerSideBarEmptyPanel,
   InnerSideBarFilters,
   InnerSideBarFilterSearchInput,
   InnerSideMenuItem,
@@ -80,9 +83,9 @@ export function LogsSidebarMenuV2() {
   const [searchText, setSearchText] = useState('')
   const [createCollectionOpen, setCreateCollectionOpen] = useState(false)
   const canCreateCollection = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
-
   const router = useRouter()
   const { ref } = useParams() as { ref: string }
+  const { data: tenantData } = useWarehouseTenantQuery({ projectRef: ref })
   const {
     projectAuthAll: authEnabled,
     projectStorageAll: storageEnabled,
@@ -91,10 +94,15 @@ export function LogsSidebarMenuV2() {
   const warehouseEnabled = useFlag('warehouse')
   const { data: whCollections, isLoading: whCollectionsLoading } = useWarehouseCollectionsQuery(
     { projectRef: ref },
-    { enabled: IS_PLATFORM && warehouseEnabled }
+    { enabled: IS_PLATFORM && warehouseEnabled && !!tenantData }
   )
+  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
+  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
-  const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery(ref)
+  const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery({
+    projectRef: ref,
+    type: 'log_sql',
+  })
 
   const savedQueries = [...(savedQueriesRes?.content ?? [])]
     .filter((c) => c.type === 'log_sql')
@@ -125,13 +133,20 @@ export function LogsSidebarMenuV2() {
     },
     IS_PLATFORM
       ? {
-          name: 'Pooler',
+          name: isFreePlan ? 'Pooler' : 'Shared Pooler',
           key: 'pooler-logs',
           url: `/project/${ref}/logs/pooler-logs`,
           items: [],
         }
       : null,
-    ,
+    !isFreePlan && IS_PLATFORM
+      ? {
+          name: 'Dedicated Pooler',
+          key: 'dedicated-pooler-logs',
+          url: `/project/${ref}/logs/dedicated-pooler-logs`,
+          items: [],
+        }
+      : null,
     authEnabled
       ? {
           name: 'Auth',
@@ -156,6 +171,18 @@ export function LogsSidebarMenuV2() {
           items: [],
         }
       : null,
+    {
+      name: 'Edge Functions',
+      key: 'edge-functions-logs',
+      url: `/project/${ref}/logs/edge-functions-logs`,
+      items: [],
+    },
+    {
+      name: 'Cron',
+      key: 'pg_cron',
+      url: `/project/${ref}/logs/pgcron-logs`,
+      items: [],
+    },
   ]
 
   const OPERATIONAL_COLLECTIONS = IS_PLATFORM
@@ -206,25 +233,27 @@ export function LogsSidebarMenuV2() {
                 Create query
               </Link>
             </DropdownMenuItem>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <DropdownMenuItem className="gap-x-2" asChild>
-                  <button
-                    onClick={() => setCreateCollectionOpen(true)}
-                    className="w-full flex items-center text-xs px-2 py-1"
-                    disabled={!canCreateCollection}
-                  >
-                    <Plus size={14} />
-                    Create collection
-                  </button>
-                </DropdownMenuItem>
-              </TooltipTrigger>
-              {!canCreateCollection && (
-                <TooltipContent>
-                  You need additional permissions to create a collection
-                </TooltipContent>
-              )}
-            </Tooltip>
+            {warehouseEnabled && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DropdownMenuItem className="gap-x-2" asChild>
+                    <button
+                      onClick={() => setCreateCollectionOpen(true)}
+                      className="w-full flex items-center text-xs px-2 py-1"
+                      disabled={!canCreateCollection}
+                    >
+                      <Plus size={14} />
+                      Create collection
+                    </button>
+                  </DropdownMenuItem>
+                </TooltipTrigger>
+                {!canCreateCollection && (
+                  <TooltipContent>
+                    You need additional permissions to create a collection
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
         <CreateWarehouseCollectionModal
@@ -240,14 +269,6 @@ export function LogsSidebarMenuV2() {
         >
           Templates
         </InnerSideMenuItem>
-        <InnerSideMenuItem
-          title="Settings"
-          isActive={isActive(`/project/${ref}/settings/warehouse`)}
-          href={`/project/${ref}/settings/warehouse`}
-        >
-          Settings
-          <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
-        </InnerSideMenuItem>
       </div>
       <Separator className="my-4" />
 
@@ -261,7 +282,7 @@ export function LogsSidebarMenuV2() {
             label={collection?.name ?? ''}
           />
         ))}
-        {whCollectionsLoading ? (
+        {whCollectionsLoading && warehouseEnabled ? (
           <div className="p-4">
             <GenericSkeletonLoader />
           </div>
@@ -297,14 +318,16 @@ export function LogsSidebarMenuV2() {
           </div>
         )}
         {savedQueries.length === 0 && (
-          <div className="mx-4">
-            <Alert_Shadcn_ className="p-3">
-              <AlertTitle_Shadcn_ className="text-xs">No queries created yet</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_ className="text-xs">
-                You can create and save queries from the "Create query" button in the top left.
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          </div>
+          <InnerSideBarEmptyPanel
+            className="mx-4"
+            title="No queries created yet"
+            description="Create and save your queries to use them in the explorer"
+            actions={
+              <Button asChild type="default">
+                <Link href={`/project/${ref}/logs/explorer`}>Create query</Link>
+              </Button>
+            }
+          />
         )}
         {savedQueries.map((query) => (
           <SavedQueriesItem item={query} key={query.id} />

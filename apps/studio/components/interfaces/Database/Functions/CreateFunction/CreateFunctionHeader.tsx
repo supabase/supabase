@@ -31,8 +31,8 @@ export const CreateFunctionHeader = ({
             : 'Add a new function'}
         </SheetTitle>
       </div>
-      {/* <Tooltip_Shadcn_>
-        <TooltipTrigger_Shadcn_ asChild>
+      {/* <Tooltip>
+        <TooltipTrigger asChild>
           <button
             aria-expanded={assistantVisible}
             aria-controls="ai-chat-assistant"
@@ -49,11 +49,11 @@ export const CreateFunctionHeader = ({
               <PanelRightClose size={19} strokeWidth={1} />
             )}
           </button>
-        </TooltipTrigger_Shadcn_>
-        <TooltipContent_Shadcn_ side="left">
+        </TooltipTrigger>
+        <TooltipContent side="left">
           {assistantVisible ? 'Hide' : 'Show'} tools
-        </TooltipContent_Shadcn_>
-      </Tooltip_Shadcn_> */}
+        </TooltipContent>
+      </Tooltip> */}
     </SheetHeader>
   )
 }

@@ -6,22 +6,25 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
+  LoadingLine,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { Markdown } from '../Markdown'
 import { useQueryPerformanceQuery } from '../Reports/Reports.queries'
@@ -44,6 +47,10 @@ export const QueryPerformance = ({
   const { project } = useProjectContext()
   const state = useDatabaseSelectorStateSnapshot()
 
+  const { isLoading, isRefetching } = queryPerformanceQuery
+  const isPrimaryDatabase = state.selectedDatabaseId === ref
+  const formattedDatabaseId = formatDatabaseID(state.selectedDatabaseId ?? '')
+
   const [page, setPage] = useState<QUERY_PERFORMANCE_REPORT_TYPES>(
     (preset as QUERY_PERFORMANCE_REPORT_TYPES) ?? QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING
   )
@@ -58,6 +65,8 @@ export const QueryPerformance = ({
     queryPerformanceQuery.runQuery()
     queryHitRate.runQuery()
   }
+
+  const { data: databases } = useReadReplicasQuery({ projectRef: ref })
 
   const { data: mostTimeConsumingQueries, isLoading: isLoadingMTC } = useQueryPerformanceQuery({
     preset: 'mostTimeConsuming',
@@ -126,63 +135,74 @@ export const QueryPerformance = ({
         }}
       >
         <TabsList_Shadcn_ className={cn('flex gap-0 border-0 items-end z-10')}>
-          {QUERY_PERFORMANCE_TABS.map((tab) => (
-            <TabsTrigger_Shadcn_
-              key={tab.id}
-              value={tab.id}
-              className={cn(
-                'group relative',
-                'px-6 py-3 border-b-0 flex flex-col items-start !shadow-none border-default border-t',
-                'even:border-x last:border-r even:!border-x-strong last:!border-r-strong',
-                tab.id === page ? '!bg-surface-200' : '!bg-surface-200/[33%]',
-                'hover:!bg-surface-100',
-                'data-[state=active]:!bg-surface-200',
-                'hover:text-foreground-light',
-                'transition'
-              )}
-            >
-              {tab.id === page && (
-                <div className="absolute top-0 left-0 w-full h-[1px] bg-foreground" />
-              )}
+          {QUERY_PERFORMANCE_TABS.map((tab) => {
+            const tabMax = Number(tab.max)
+            const maxValue =
+              tab.id !== QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT
+                ? tabMax > 1000
+                  ? (tabMax / 1000).toFixed(2)
+                  : tabMax.toFixed(0)
+                : tabMax.toLocaleString()
 
-              <div className="flex items-center gap-x-2">
-                <span className="">{tab.label}</span>
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild>
-                    <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
-                  </TooltipTrigger_Shadcn_>
-                  <TooltipContent_Shadcn_ side="top">{tab.description}</TooltipContent_Shadcn_>
-                </Tooltip_Shadcn_>
-              </div>
-              {tab.isLoading ? (
-                <ShimmeringLoader className="w-32 pt-1" />
-              ) : tab.max === undefined ? (
-                <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
-                  No data yet
-                </span>
-              ) : (
-                <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
-                  {Number(tab.max).toLocaleString()}
-                  {tab.id !== QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT ? 'ms' : ' calls'}
-                </span>
-              )}
+            return (
+              <TabsTrigger_Shadcn_
+                key={tab.id}
+                value={tab.id}
+                className={cn(
+                  'group relative',
+                  'px-6 py-3 border-b-0 flex flex-col items-start !shadow-none border-default border-t',
+                  'even:border-x last:border-r even:!border-x-strong last:!border-r-strong',
+                  tab.id === page ? '!bg-surface-200' : '!bg-surface-200/[33%]',
+                  'hover:!bg-surface-100',
+                  'data-[state=active]:!bg-surface-200',
+                  'hover:text-foreground-light',
+                  'transition'
+                )}
+              >
+                {tab.id === page && (
+                  <div className="absolute top-0 left-0 w-full h-[1px] bg-foreground" />
+                )}
 
-              {tab.id === page && (
-                <div className="absolute bottom-0 left-0 w-full h-[1px] bg-surface-200"></div>
-              )}
-            </TabsTrigger_Shadcn_>
-          ))}
+                <div className="flex items-center gap-x-2">
+                  <span className="">{tab.label}</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
+                    </TooltipTrigger>
+                    <TooltipContent side="top">{tab.description}</TooltipContent>
+                  </Tooltip>
+                </div>
+                {tab.isLoading ? (
+                  <ShimmeringLoader className="w-32 pt-1" />
+                ) : tab.max === undefined ? (
+                  <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
+                    No data yet
+                  </span>
+                ) : (
+                  <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
+                    {maxValue}
+                    {tab.id !== QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT
+                      ? tabMax > 1000
+                        ? 's'
+                        : 'ms'
+                      : ' calls'}
+                  </span>
+                )}
+
+                {tab.id === page && (
+                  <div className="absolute bottom-0 left-0 w-full h-[1px] bg-surface-200"></div>
+                )}
+              </TabsTrigger_Shadcn_>
+            )
+          })}
         </TabsList_Shadcn_>
       </Tabs_Shadcn_>
 
-      <div className="px-6 py-3 bg-surface-200 border-t -mt-px">
-        <QueryPerformanceFilterBar
-          queryPerformanceQuery={queryPerformanceQuery}
-          onResetReportClick={() => {
-            setShowResetgPgStatStatements(true)
-          }}
-        />
-      </div>
+      <QueryPerformanceFilterBar
+        queryPerformanceQuery={queryPerformanceQuery}
+        onResetReportClick={() => setShowResetgPgStatStatements(true)}
+      />
+      <LoadingLine loading={isLoading || isRefetching} />
 
       <QueryPerformanceGrid queryPerformanceQuery={queryPerformanceQuery} />
 
@@ -195,9 +215,7 @@ export const QueryPerformance = ({
           className="absolute top-1.5 right-3 px-1.5"
           type="text"
           size="tiny"
-          onClick={() => {
-            setShowBottomSection(false)
-          }}
+          onClick={() => setShowBottomSection(false)}
         >
           <X size="14" />
         </Button>
@@ -233,21 +251,27 @@ export const QueryPerformance = ({
         </div>
       </div>
 
-      <ConfirmModal
-        danger
+      <ConfirmationModal
         visible={showResetgPgStatStatements}
+        size="medium"
+        variant="destructive"
         title="Reset query performance analysis"
-        description={
-          'This will reset the `extensions.pg_stat_statements` table that is used to calculate query performance. This data will repopulate immediately after.'
-        }
-        buttonLabel="Clear table"
-        buttonLoadingLabel="Deleting"
-        onSelectCancel={() => setShowResetgPgStatStatements(false)}
-        onSelectConfirm={async () => {
+        confirmLabel="Reset report"
+        confirmLabelLoading="Resetting report"
+        onCancel={() => setShowResetgPgStatStatements(false)}
+        onConfirm={async () => {
+          const connectionString = databases?.find(
+            (db) => db.identifier === state.selectedDatabaseId
+          )?.connectionString
+
+          if (IS_PLATFORM && !connectionString) {
+            return toast.error('Unable to run query: Connection string is missing')
+          }
+
           try {
             await executeSql({
               projectRef: project?.ref,
-              connectionString: project?.connectionString,
+              connectionString,
               sql: `SELECT pg_stat_statements_reset();`,
             })
             handleRefresh()
@@ -256,7 +280,16 @@ export const QueryPerformance = ({
             toast.error(`Failed to reset analysis: ${error.message}`)
           }
         }}
-      />
+      >
+        <p className="text-foreground-light text-sm">
+          This will reset the pg_stat_statements table in the extensions schema on your{' '}
+          <span className="text-foreground">
+            {isPrimaryDatabase ? 'primary database' : `read replica (ID: ${formattedDatabaseId})`}
+          </span>
+          , which is used to calculate query performance. This data will repopulate immediately
+          after.
+        </p>
+      </ConfirmationModal>
     </>
   )
 }

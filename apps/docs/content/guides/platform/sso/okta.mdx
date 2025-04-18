@@ -3,13 +3,13 @@ title: 'Set Up SSO with Okta'
 description: 'Configure single sign-on with Okta.'
 ---
 
-<Admonition>
+<Admonition type="note">
 
-This feature is only available on the Team and Enterprise Plans. Please contact [Sales](https://forms.supabase.com/enterprise) before doing these steps.
+This feature is only available on the [Team and Enterprise Plans](https://supabase.com/pricing). If you are an existing Team or Enterprise Plan customer, continue with the setup below. Once completed, [contact us](https://supabase.com/dashboard/support/new?category=Login_issues&subject=Enquiry%20about%20setting%20up%20SSO&message=I%20would%20like%20to%20set%20up%20SAML%20SSO%20for%20my%20team%20and%20have%20followed%20https://supabase.com/docs/guides/platform/sso%20and%20configured%20my%20provider%20%0A%0APlease%20attach%20the%20IDP%20metadata%20in%20the%20attachments%20below) to enable SSO for your team.
 
 </Admonition>
 
-<Admonition>
+<Admonition type="tip">
 
 Looking for docs on how to add Single Sign-On support in your Supabase project? Head on over to [Single Sign-On with SAML 2.0 for Projects](/docs/guides/auth/enterprise-sso/auth-sso-saml).
 
@@ -17,7 +17,7 @@ Looking for docs on how to add Single Sign-On support in your Supabase project? 
 
 Supabase supports single sign-on (SSO) using Okta.
 
-## Step 1: Choose Create App Integration in the Applications dashboard [#create-app-integration]
+## Step 1: Choose to create an app integration in the applications dashboard [#create-app-integration]
 
 Navigate to the Applications dashboard of the Okta admin console. Click _Create App Integration_.
 
@@ -29,13 +29,13 @@ Supabase supports the SAML 2.0 SSO protocol. Choose it from the _Create a new ap
 
 ![Okta dashboard: Create new app integration dialog](/docs/img/sso-okta-step-02.png)
 
-## Step 3: Fill out General Settings [#add-general-settings]
+## Step 3: Fill out general settings [#add-general-settings]
 
 The information you enter here is for visibility into your Okta applications menu. You can choose any values you like. `Supabase` as a name works well for most use cases.
 
 ![Okta dashboard: Create SAML Integration wizard](/docs/img/sso-okta-step-03.png)
 
-## Step 4: Fill out SAML Settings [#add-saml-settings]
+## Step 4: Fill out SAML settings [#add-saml-settings]
 
 These settings let Supabase use SAML 2.0 properly with your Okta application. Make sure you enter this information exactly as shown on in this table and screenshot.
 
@@ -44,20 +44,20 @@ These settings let Supabase use SAML 2.0 properly with your Okta application. Ma
 | Single sign-on URL                             | `https://alt.supabase.io/auth/v1/sso/saml/acs`      |
 | Use this for Recipient URL and Destination URL | ✔️                                                  |
 | Audience URI (SP Entity ID)                    | `https://alt.supabase.io/auth/v1/sso/saml/metadata` |
-| Default RelayState                             | `https://supabase.com/dashboard`                    |
-| Name ID format                                 | EmailAddress                                        |
+| Default `RelayState`                           | `https://supabase.com/dashboard`                    |
+| Name ID format                                 | `EmailAddress`                                      |
 | Application username                           | Email                                               |
 | Update application username on                 | Create and update                                   |
 
 ![Okta dashboard: Create SAML Integration wizard, Configure SAML step](/docs/img/sso-okta-step-04.png)
 
-## Step 5: Fill out Attribute Statements [#add-attribute-statements]
+## Step 5: Fill out attribute statements [#add-attribute-statements]
 
 Attribute Statements allow Supabase to get information about your Okta users on each login.
 
 **A `email` to `user.email` statement is required.** Other mappings shown below are optional and configurable depending on your Okta setup. If in doubt, replicate the same config as shown.
 
-Please share any changes, if any, from this screen with your Supabase support contact.
+Share any changes, if any, from this screen with your Supabase support contact.
 
 ![Okta dashboard: Attribute Statements configuration screen](/docs/img/sso-okta-step-05.png)
 
@@ -85,4 +85,4 @@ Once you’ve received confirmation from your support contact at Supabase that S
 
 You ask them to enter their email address on the [Sign in with SSO](https://supabase.com/dashboard/sign-in-sso) page.
 
-If sign in is not working correctly, please reach out to your support contact at Supabase for further guidance.
+If sign in is not working correctly, reach out to your support contact at Supabase for further guidance.

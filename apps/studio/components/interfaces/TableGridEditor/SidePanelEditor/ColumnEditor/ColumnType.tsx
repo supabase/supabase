@@ -1,7 +1,18 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { noop } from 'lodash'
+import {
+  Calendar,
+  Check,
+  ChevronsUpDown,
+  ExternalLink,
+  Hash,
+  ListPlus,
+  ToggleRight,
+  Type,
+} from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useState } from 'react'
+
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -15,25 +26,16 @@ import {
   Command_Shadcn_,
   CriticalIcon,
   Input,
+  Label_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
-
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
-import {
-  Calendar,
-  Check,
-  ChevronsUpDown,
-  ExternalLink,
-  Hash,
-  ListPlus,
-  ToggleRight,
-  Type,
-} from 'lucide-react'
-
 import {
   POSTGRES_DATA_TYPES,
   POSTGRES_DATA_TYPE_OPTIONS,
@@ -48,6 +50,7 @@ interface ColumnTypeProps {
   error?: any
   disabled?: boolean
   showLabel?: boolean
+  layout?: 'horizontal' | 'vertical'
   description?: ReactNode
   showRecommendation?: boolean
   onOptionSelect: (value: string) => void
@@ -55,20 +58,23 @@ interface ColumnTypeProps {
 
 const ColumnType = ({
   value,
+  className,
   enumTypes = [],
-  error,
   disabled = false,
   showLabel = true,
+  layout = 'horizontal',
   description,
   showRecommendation = false,
   onOptionSelect = noop,
 }: ColumnTypeProps) => {
-  // @ts-ignore
-  const availableTypes = POSTGRES_DATA_TYPES.concat(enumTypes.map((type) => type.name))
+  const [open, setOpen] = useState(false)
+  const availableTypes = POSTGRES_DATA_TYPES.concat(
+    enumTypes.map((type) => type.format.replaceAll('"', ''))
+  )
   const isAvailableType = value ? availableTypes.includes(value) : true
   const recommendation = RECOMMENDED_ALTERNATIVE_DATA_TYPE[value]
-  const [open, setOpen] = useState(false)
-  console.log({ availableTypes })
+
+  const unsupportedDataTypeText = `This column's data type cannot be changed via the Table Editor as it is not supported yet. You can do so through the SQL Editor instead.`
 
   const getOptionByName = (name: string) => {
     // handle built in types
@@ -76,7 +82,7 @@ const ColumnType = ({
     if (pgOption) return pgOption
 
     // handle custom enums
-    const enumType = enumTypes.find((type) => type.name === name)
+    const enumType = enumTypes.find((type) => type.format === name)
     return enumType ? { ...enumType, type: 'enum' } : undefined
   }
 
@@ -109,50 +115,33 @@ const ColumnType = ({
 
   if (!isAvailableType) {
     return (
-      <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger>
+      <Tooltip>
+        <TooltipTrigger>
           <Input
             readOnly
             disabled
             label={showLabel ? 'Type' : ''}
-            layout={showLabel ? 'horizontal' : undefined}
-            className="md:gap-x-0"
+            layout={showLabel ? layout : undefined}
+            className="md:gap-x-0 [&>div>div]:text-left"
             size="small"
             icon={inferIcon(POSTGRES_DATA_TYPE_OPTIONS.find((x) => x.name === value)?.type ?? '')}
             value={value}
-            descriptionText={
-              showLabel
-                ? 'Custom non-native psql data types currently cannot be changed to a different data type via Supabase Studio'
-                : ''
-            }
+            descriptionText={showLabel ? unsupportedDataTypeText : undefined}
           />
-        </Tooltip.Trigger>
+        </TooltipTrigger>
         {!showLabel && (
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background w-[240px]',
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">
-                  Custom non-native psql data types currently cannot be changed to a different data
-                  type via Supabase Studio
-                </span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
+          <TooltipContent side="bottom" className="w-80">
+            {unsupportedDataTypeText}
+          </TooltipContent>
         )}
-      </Tooltip.Root>
+      </Tooltip>
     )
   }
 
   if (disabled && !showLabel) {
     return (
-      <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger>
+      <Tooltip>
+        <TooltipTrigger>
           <Input
             readOnly
             disabled
@@ -162,28 +151,19 @@ const ColumnType = ({
             size="small"
             value={value}
           />
-        </Tooltip.Trigger>
+        </TooltipTrigger>
         {!showLabel && description && (
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background w-[240px]',
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">{description}</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
+          <TooltipContent side="bottom">
+            <div className="w-80">{description}</div>
+          </TooltipContent>
         )}
-      </Tooltip.Root>
+      </Tooltip>
     )
   }
 
   return (
-    <div>
+    <div className={cn('flex flex-col gap-y-2', className)}>
+      {showLabel && <Label_Shadcn_ className="text-foreground-light">Type</Label_Shadcn_>}
       <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
         <PopoverTrigger_Shadcn_ asChild>
           <Button
@@ -191,13 +171,13 @@ const ColumnType = ({
             role="combobox"
             size={'small'}
             aria-expanded={open}
-            className="w-full justify-between"
+            className={cn('w-full justify-between', !value && 'text-foreground-lighter')}
             iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
           >
             {value ? (
               <div className="flex gap-2 items-center">
                 <span>{inferIcon(getOptionByName(value)?.type ?? '')}</span>
-                {value}
+                {value.replaceAll('"', '')}
               </div>
             ) : (
               'Choose a column type...'
@@ -228,11 +208,7 @@ const ColumnType = ({
                         <span className="text-foreground-lighter">{option.description}</span>
                       </div>
                       <span className="absolute right-3 top-2">
-                        {option.name === value ? (
-                          <Check className="text-brand-500" size={14} />
-                        ) : (
-                          ''
-                        )}
+                        {option.name === value ? <Check className="text-brand" size={14} /> : ''}
                       </span>
                     </CommandItem_Shadcn_>
                   ))}
@@ -241,13 +217,20 @@ const ColumnType = ({
                   <>
                     <CommandItem_Shadcn_>Other types</CommandItem_Shadcn_>
                     <CommandGroup_Shadcn_>
-                      {enumTypes.map((option: any) => (
+                      {enumTypes.map((option) => (
                         <CommandItem_Shadcn_
-                          key={option.name}
-                          value={option.name}
-                          className={cn('relative', option.name === value ? 'bg-surface-200' : '')}
+                          key={option.id}
+                          value={option.format}
+                          className={cn(
+                            'relative',
+                            option.format === value ? 'bg-surface-200' : ''
+                          )}
                           onSelect={(value: string) => {
-                            onOptionSelect(value)
+                            // [Joshen] For camel case types specifically, format property includes escaped double quotes
+                            // which will cause the POST columns call to error out. So we strip it specifically in this context
+                            onOptionSelect(
+                              option.schema === 'public' ? value.replaceAll('"', '') : value
+                            )
                             setOpen(false)
                           }}
                         >
@@ -255,15 +238,22 @@ const ColumnType = ({
                             <div>
                               <ListPlus size={16} className="text-foreground" strokeWidth={1.5} />
                             </div>
-                            <span className="text-foreground">{option.name}</span>
+                            <span className="text-foreground">
+                              {option.format.replaceAll('"', '')}
+                            </span>
                             {option.comment !== undefined && (
-                              <span title={option.comment} className="text-foreground-lighter">
+                              <span
+                                title={option.comment ?? ''}
+                                className="text-foreground-lighter"
+                              >
                                 {option.comment}
                               </span>
                             )}
-                            <span className="flex items-center gap-1.5">
-                              {option.name === value ? <Check size={13} /> : ''}
-                            </span>
+                            {option.format === value && (
+                              <span className="absolute right-3 top-2">
+                                <Check className="text-brand" size={14} />
+                              </span>
+                            )}
                           </div>
                         </CommandItem_Shadcn_>
                       ))}
@@ -277,7 +267,7 @@ const ColumnType = ({
       </Popover_Shadcn_>
 
       {showRecommendation && recommendation !== undefined && (
-        <Alert_Shadcn_ variant="warning">
+        <Alert_Shadcn_ variant="warning" className="mt-2">
           <CriticalIcon />
           <AlertTitle_Shadcn_>
             {' '}

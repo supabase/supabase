@@ -1,4 +1,5 @@
 import { useState } from 'react'
+
 import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
 import FeedbackWidget from './FeedbackWidget'
 
@@ -21,7 +22,12 @@ const FeedbackDropdown = () => {
           <span className="hidden md:flex">Feedback</span>
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ side="bottom" align="end" className="w-full p-0">
+      <PopoverContent_Shadcn_
+        side="bottom"
+        align="end"
+        className="px-0 flex flex-col pt-1 pb-3 gap-3 w-96"
+        id="feedback-widget"
+      >
         <FeedbackWidget
           onClose={() => setIsOpen(false)}
           feedback={feedback}

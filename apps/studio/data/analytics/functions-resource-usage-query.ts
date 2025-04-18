@@ -1,12 +1,12 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { operations } from 'api-types'
+import { get, handleError } from 'data/fetchers'
 import { analyticsKeys } from './keys'
 
 export type FunctionsResourceUsageVariables = {
   projectRef?: string
   functionId?: string
-  interval?: string
+  interval?: operations['FunctionResourceLogsController_getStatus']['parameters']['query']['interval']
 }
 
 export type FunctionsResourceUsageResponse = any
@@ -25,17 +25,25 @@ export async function getFunctionsResourceUsage(
     throw new Error('interval is required')
   }
 
-  const response = await get<FunctionsResourceUsageResponse>(
-    `${API_URL}/projects/${projectRef}/analytics/endpoints/functions.resource-usage?interval=${interval}&function_id=${functionId}`,
+  const { data, error } = await get(
+    '/platform/projects/{ref}/analytics/endpoints/functions.resource-usage',
     {
+      params: {
+        path: {
+          ref: projectRef,
+        },
+        query: {
+          function_id: functionId,
+          interval,
+        },
+      },
       signal,
     }
   )
-  if (response.error) {
-    throw response.error
-  }
 
-  return response
+  if (error) handleError(error)
+
+  return data
 }
 
 export type FunctionsResourceUsageData = Awaited<ReturnType<typeof getFunctionsResourceUsage>>

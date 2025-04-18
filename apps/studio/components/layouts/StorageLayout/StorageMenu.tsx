@@ -1,10 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useLocalStorage } from '@uidotdev/usehooks'
 import { ArrowUpRight, Edit } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import { useLocalStorage } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
 import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
@@ -37,7 +37,7 @@ const StorageMenu = () => {
   const [selectedBucketToEdit, setSelectedBucketToEdit] = useState<StorageBucket>()
   const [selectedBucketToEmpty, setSelectedBucketToEmpty] = useState<StorageBucket>()
   const [selectedBucketToDelete, setSelectedBucketToDelete] = useState<StorageBucket>()
-  const canCreateBuckets = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canCreateBuckets = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const [sort, setSort] = useLocalStorage<'alphabetical' | 'created-at'>(
     'storage-explorer-sort',
@@ -79,7 +79,9 @@ const StorageMenu = () => {
             tooltip={{
               content: {
                 side: 'bottom',
-                text: 'You need additional permissions to create buckets',
+                text: !canCreateBuckets
+                  ? 'You need additional permissions to create buckets'
+                  : undefined,
               },
             }}
           >
@@ -182,7 +184,7 @@ const StorageMenu = () => {
 
           <div className="mx-3">
             <Menu.Group title={<span className="uppercase font-mono">Configuration</span>} />
-            <Link href={`/project/${ref}/storage/policies`} legacyBehavior>
+            <Link href={`/project/${ref}/storage/policies`}>
               <Menu.Item rounded active={page === 'policies'}>
                 <p className="truncate">Policies</p>
               </Menu.Item>

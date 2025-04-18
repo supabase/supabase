@@ -1,0 +1,9 @@
+apis:
+  api:
+    root: http://localhost:8080/api/v1-json
+    x-openapi-ts:
+      output: ./types/api.d.ts
+  platform:
+    root: http://localhost:8080/api/platform-json
+    x-openapi-ts:
+      output: ./types/platform.d.ts

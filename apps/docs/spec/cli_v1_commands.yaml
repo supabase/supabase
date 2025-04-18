@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.200.3
+  version: 2.20.12
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -51,22 +51,25 @@ flags:
     description: use the specified docker network instead of a generated one
     default_value: ''
   - id: output
-    name: --output <[ pretty | json | toml | yaml ]>
+    name: -o, --output <[ env | pretty | json | toml | yaml ]>
     description: output format of status variables
     default_value: pretty
     accepted_values:
+      - id: env
+        name: env
+        type: '[ env | pretty | json | toml | yaml ]'
       - id: pretty
         name: pretty
-        type: '[ pretty | json | toml | yaml ]'
+        type: '[ env | pretty | json | toml | yaml ]'
       - id: json
         name: json
-        type: '[ pretty | json | toml | yaml ]'
+        type: '[ env | pretty | json | toml | yaml ]'
       - id: toml
         name: toml
-        type: '[ pretty | json | toml | yaml ]'
+        type: '[ env | pretty | json | toml | yaml ]'
       - id: yaml
         name: yaml
-        type: '[ pretty | json | toml | yaml ]'
+        type: '[ env | pretty | json | toml | yaml ]'
   - id: workdir
     name: --workdir <string>
     description: path to a Supabase project directory
@@ -468,26 +471,6 @@ commands:
     usage: supabase status [flags]
     subcommands: []
     flags:
-      - id: output
-        name: -o, --output <[ env | pretty | json | toml | yaml ]>
-        description: Output format of status variables.
-        default_value: pretty
-        accepted_values:
-          - id: env
-            name: env
-            type: '[ env | pretty | json | toml | yaml ]'
-          - id: pretty
-            name: pretty
-            type: '[ env | pretty | json | toml | yaml ]'
-          - id: json
-            name: json
-            type: '[ env | pretty | json | toml | yaml ]'
-          - id: toml
-            name: toml
-            type: '[ env | pretty | json | toml | yaml ]'
-          - id: yaml
-            name: yaml
-            type: '[ env | pretty | json | toml | yaml ]'
       - id: override-name
         name: --override-name <strings>
         description: Override specific variable names.
@@ -537,7 +520,7 @@ commands:
       - id: exclude
         name: -x, --exclude <strings>
         description: |
-          Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,inbucket,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor]
+          Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,mailpit,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor]
         default_value: '[]'
       - id: ignore-health-check
         name: --ignore-health-check
@@ -866,7 +849,11 @@ commands:
     links: []
     usage: supabase snippets list
     subcommands: []
-    flags: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-snippets-download
     title: supabase snippets download
     summary: Download contents of a SQL snippet
@@ -875,7 +862,11 @@ commands:
     links: []
     usage: supabase snippets download <snippet-id>
     subcommands: []
-    flags: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-services
     title: supabase services
     summary: Show versions of all Supabase services
@@ -1110,6 +1101,7 @@ commands:
       - management-api
     links: []
     subcommands:
+      - supabase-postgres-config-delete
       - supabase-postgres-config-get
       - supabase-postgres-config-update
     flags: []
@@ -1128,6 +1120,10 @@ commands:
         name: --config <strings>
         description: Config overrides specified as a 'key=value' pair
         default_value: '[]'
+      - id: no-restart
+        name: --no-restart
+        description: Do not restart the database after updating config.
+        default_value: 'false'
       - id: replace-existing-overrides
         name: --replace-existing-overrides
         description: |
@@ -1150,6 +1146,33 @@ commands:
     usage: supabase postgres-config get
     subcommands: []
     flags:
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+  - id: supabase-postgres-config-delete
+    title: supabase postgres-config delete
+    summary: Delete specific Postgres database config overrides
+    description: |
+      Delete specific config overrides, reverting them to their default values.
+    tags: []
+    links: []
+    usage: supabase postgres-config delete [flags]
+    subcommands: []
+    flags:
+      - id: config
+        name: --config <strings>
+        description: Config keys to delete (comma-separated)
+        default_value: '[]'
+      - id: no-restart
+        name: --no-restart
+        description: Do not restart the database after deleting config.
+        default_value: 'false'
       - id: experimental
         name: --experimental
         description: enable experimental features
@@ -1721,6 +1744,7 @@ commands:
       - supabase-inspect-db-long-running-queries
       - supabase-inspect-db-outliers
       - supabase-inspect-db-replication-slots
+      - supabase-inspect-db-role-configs
       - supabase-inspect-db-role-connections
       - supabase-inspect-db-seq-scans
       - supabase-inspect-db-table-index-sizes
@@ -2041,6 +2065,28 @@ commands:
     tags: []
     links: []
     usage: supabase inspect db role-connections
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: |
+          Inspect the database specified by the connection string (must be percent-encoded).
+        default_value: ''
+      - id: linked
+        name: --linked
+        description: Inspect the linked project.
+        default_value: 'true'
+      - id: local
+        name: --local
+        description: Inspect the local database.
+        default_value: 'false'
+  - id: supabase-inspect-db-role-configs
+    title: supabase inspect db role-configs
+    summary: |
+      Show configuration settings for database roles when they have been modified
+    tags: []
+    links: []
+    usage: supabase inspect db role-configs
     subcommands: []
     flags:
       - id: db-url
@@ -2509,23 +2555,6 @@ commands:
     usage: supabase gen keys [flags]
     subcommands: []
     flags:
-      - id: output
-        name: -o, --output <[ env | json | toml | yaml ]>
-        description: Output format of key variables.
-        default_value: env
-        accepted_values:
-          - id: env
-            name: env
-            type: '[ env | json | toml | yaml ]'
-          - id: json
-            name: json
-            type: '[ env | json | toml | yaml ]'
-          - id: toml
-            name: toml
-            type: '[ env | json | toml | yaml ]'
-          - id: yaml
-            name: yaml
-            type: '[ env | json | toml | yaml ]'
       - id: override-name
         name: --override-name <strings>
         description: Override specific variable names.
@@ -2676,6 +2705,10 @@ commands:
         name: --import-map <string>
         description: Path to import map file.
         default_value: ''
+      - id: jobs
+        name: -j, --jobs <uint>
+        description: Maximum number of parallel jobs.
+        default_value: '1'
       - id: no-verify-jwt
         name: --no-verify-jwt
         description: Disable JWT verification for the Function.
@@ -2684,6 +2717,14 @@ commands:
         name: --project-ref <string>
         description: Project ref of the Supabase project.
         default_value: ''
+      - id: use-api
+        name: --use-api
+        description: Use Management API to bundle functions.
+        default_value: 'false'
+      - id: use-docker
+        name: --use-docker
+        description: Use Docker to bundle functions.
+        default_value: 'true'
   - id: supabase-functions-delete
     title: supabase functions delete
     summary: Delete a Function from Supabase
@@ -2866,9 +2907,13 @@ commands:
     summary: Starts local Postgres database
     tags: []
     links: []
-    usage: supabase db start
+    usage: supabase db start [flags]
     subcommands: []
-    flags: []
+    flags:
+      - id: from-backup
+        name: --from-backup <string>
+        description: Path to a logical backup file.
+        default_value: ''
   - id: supabase-db-reset
     title: supabase db reset
     summary: Resets the local database to current migrations
@@ -2880,7 +2925,7 @@ commands:
 
       Recreates the local Postgres container and applies all local migrations found in `supabase/migrations` directory. If test data is defined in `supabase/seed.sql`, it will be seeded after the migrations are run. Any other data or schema changes made during local development will be discarded.
 
-      Note that since Postgres roles are cluster level entities, those changes will persist between resets. In order to reset custom roles, you need to restart the local development stack.
+      When running db reset with `--linked` or `--db-url` flag, a SQL script is executed to identify and drop all user created entities in the remote database. Since Postgres roles are cluster level entities, any custom roles created through the dashboard or `supabase/roles.sql` will not be deleted by remote reset.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -2976,7 +3021,7 @@ commands:
         default_value: 'false'
       - id: include-seed
         name: --include-seed
-        description: Include seed data from supabase/seed.sql.
+        description: Include seed data from your config.
         default_value: 'false'
       - id: linked
         name: --linked
@@ -3327,6 +3372,27 @@ commands:
         name: --use-pgadmin
         description: Use pgAdmin to generate schema diff.
         default_value: 'false'
+  - id: supabase-config
+    title: supabase config
+    summary: Manage Supabase project configurations
+    tags:
+      - management-api
+    links: []
+    subcommands:
+      - supabase-config-push
+    flags: []
+  - id: supabase-config-push
+    title: supabase config push
+    summary: Pushes local config.toml to the linked project
+    tags: []
+    links: []
+    usage: supabase config push
+    subcommands: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-completion
     title: supabase completion
     summary: Generate the autocompletion script for the specified shell
@@ -3472,7 +3538,7 @@ commands:
   - id: supabase-branches-update
     title: supabase branches update
     summary: Update a preview branch
-    description: Update a preview branch by its ID.
+    description: Update a preview branch by its name or ID.
     tags: []
     links: []
     usage: supabase branches update [branch-id] [flags]
@@ -3489,10 +3555,6 @@ commands:
       - id: persistent
         name: --persistent
         description: Switch between ephemeral and persistent branch.
-        default_value: 'false'
-      - id: reset-on-push
-        name: --reset-on-push
-        description: Reset the preview branch on git push.
         default_value: 'false'
       - id: status
         name: --status <string>
@@ -3580,7 +3642,7 @@ commands:
   - id: supabase-branches-delete
     title: supabase branches delete
     summary: Delete a preview branch
-    description: Delete a preview branch by its ID.
+    description: Delete a preview branch by its name or ID.
     tags: []
     links: []
     usage: supabase branches delete [branch-id]
@@ -3613,101 +3675,47 @@ commands:
         description: Select a region to deploy the branch database.
         default_value: ''
         accepted_values:
-          - id: ams
-            name: ams
+          - id: ap-northeast-1
+            name: ap-northeast-1
             type: string
-          - id: arn
-            name: arn
+          - id: ap-northeast-2
+            name: ap-northeast-2
             type: string
-          - id: bog
-            name: bog
+          - id: ap-south-1
+            name: ap-south-1
             type: string
-          - id: bos
-            name: bos
+          - id: ap-southeast-1
+            name: ap-southeast-1
             type: string
-          - id: cdg
-            name: cdg
+          - id: ap-southeast-2
+            name: ap-southeast-2
             type: string
-          - id: den
-            name: den
+          - id: ca-central-1
+            name: ca-central-1
             type: string
-          - id: dfw
-            name: dfw
+          - id: eu-central-1
+            name: eu-central-1
             type: string
-          - id: ewr
-            name: ewr
+          - id: eu-west-1
+            name: eu-west-1
             type: string
-          - id: fra
-            name: fra
+          - id: eu-west-2
+            name: eu-west-2
             type: string
-          - id: gdl
-            name: gdl
+          - id: eu-west-3
+            name: eu-west-3
             type: string
-          - id: gig
-            name: gig
+          - id: sa-east-1
+            name: sa-east-1
             type: string
-          - id: gru
-            name: gru
+          - id: us-east-1
+            name: us-east-1
             type: string
-          - id: hkg
-            name: hkg
+          - id: us-west-1
+            name: us-west-1
             type: string
-          - id: iad
-            name: iad
-            type: string
-          - id: jnb
-            name: jnb
-            type: string
-          - id: lax
-            name: lax
-            type: string
-          - id: lhr
-            name: lhr
-            type: string
-          - id: maa
-            name: maa
-            type: string
-          - id: mad
-            name: mad
-            type: string
-          - id: mia
-            name: mia
-            type: string
-          - id: nrt
-            name: nrt
-            type: string
-          - id: ord
-            name: ord
-            type: string
-          - id: otp
-            name: otp
-            type: string
-          - id: qro
-            name: qro
-            type: string
-          - id: scl
-            name: scl
-            type: string
-          - id: sea
-            name: sea
-            type: string
-          - id: sin
-            name: sin
-            type: string
-          - id: sjc
-            name: sjc
-            type: string
-          - id: syd
-            name: syd
-            type: string
-          - id: waw
-            name: waw
-            type: string
-          - id: yul
-            name: yul
-            type: string
-          - id: yyz
-            name: yyz
+          - id: us-west-2
+            name: us-west-2
             type: string
       - id: size
         name: --size <string>

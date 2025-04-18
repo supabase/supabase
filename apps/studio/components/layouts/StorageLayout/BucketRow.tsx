@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import clsx from 'clsx'
 import { noop } from 'lodash'
 import { ChevronDown, Edit2, Trash, XCircle } from 'lucide-react'
 import Link from 'next/link'
@@ -34,12 +33,12 @@ const BucketRow = ({
   onSelectDeleteBucket = noop,
   onSelectEditBucket = noop,
 }: BucketRowProps) => {
-  const canUpdateBuckets = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canUpdateBuckets = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   return (
     <div
       key={bucket.id}
-      className={clsx(
+      className={cn(
         'group flex items-center justify-between rounded-md',
         isSelected && 'text-foreground bg-surface-100'
       )}

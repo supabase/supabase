@@ -1,8 +1,10 @@
-import clsx from 'clsx'
 import { Check } from 'lucide-react'
+
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PricingInformation } from 'shared-data'
 import { pickFeatures } from 'shared-data/plans'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 
 export interface EnterpriseCardProps {
   plan: PricingInformation
@@ -10,20 +12,26 @@ export interface EnterpriseCardProps {
   billingPartner: 'fly' | 'aws' | 'vercel_marketplace' | undefined
 }
 
-const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardProps) => {
+export const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardProps) => {
+  const selectedOrganization = useSelectedOrganization()
+  const orgSlug = selectedOrganization?.slug
+
   const features = pickFeatures(plan, billingPartner)
+  const currentPlan = selectedOrganization?.plan.name
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   return (
     <div
       key={plan.id}
-      className={clsx(
+      className={cn(
         'grid grid-cols-1 md:grid-cols-3 border rounded-md bg-studio',
         'py-4 col-span-12 justify-between gap-x-8'
       )}
     >
       <div className="flex flex-col justify-center px-4">
         <div className="flex items-center space-x-2">
-          <p className={clsx('text-brand text-sm uppercase')}>{plan.name}</p>
+          <p className={cn('text-brand text-sm uppercase')}>{plan.name}</p>
           {isCurrentPlan ? (
             <div className="text-xs bg-surface-300 text-foreground-light rounded px-2 py-0.5">
               Current plan
@@ -37,11 +45,23 @@ const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardP
 
         <p className="text-sm mt-2 mb-4">{plan.description}</p>
 
-        <a href={plan.href} className="hidden md:block" target="_blank">
-          <Button block type="default" size="tiny">
+        <Button
+          block
+          asChild
+          type="default"
+          size="tiny"
+          onClick={() =>
+            sendEvent({
+              action: 'studio_pricing_plan_cta_clicked',
+              properties: { selectedPlan: 'Enterprise', currentPlan },
+              groups: { organization: orgSlug ?? 'Unknown' },
+            })
+          }
+        >
+          <a href={plan.href} className="hidden md:block" target="_blank">
             {plan.cta}
-          </Button>
-        </a>
+          </a>
+        </Button>
       </div>
 
       <div className="flex flex-col justify-center col-span-2 px-4 md:px-0">
@@ -62,14 +82,24 @@ const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: EnterpriseCardP
           ))}
         </ul>
 
-        <a href={plan.href} className="visible md:hidden mt-8" target="_blank">
-          <Button block type="default" size="tiny">
+        <Button
+          block
+          asChild
+          type="default"
+          size="tiny"
+          onClick={() =>
+            sendEvent({
+              action: 'studio_pricing_plan_cta_clicked',
+              properties: { selectedPlan: 'Enterprise', currentPlan },
+              groups: { organization: orgSlug ?? 'Unknown' },
+            })
+          }
+        >
+          <a href={plan.href} className="visible md:hidden mt-8" target="_blank">
             {plan.cta}
-          </Button>
-        </a>
+          </a>
+        </Button>
       </div>
     </div>
   )
 }
-
-export default EnterpriseCard

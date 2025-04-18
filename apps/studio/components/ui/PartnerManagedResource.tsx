@@ -34,15 +34,15 @@ function PartnerManagedResource({ partner, resource, cta }: PartnerManagedResour
   const ctaUrl = (data?.url ?? '') + (cta?.path ?? '')
 
   return (
-    <Alert_Shadcn_ className="flex flex-col items-center gap-4">
+    <Alert_Shadcn_ className="flex flex-col items-center gap-y-2 border-0 rounded-none">
       <PartnerIcon organization={{ managed_by: partner }} showTooltip={false} size="large" />
 
-      <AlertTitle_Shadcn_ className="text-lg">
+      <AlertTitle_Shadcn_ className="text-sm">
         {resource} are managed by {PARTNER_TO_NAME[partner]}.
       </AlertTitle_Shadcn_>
 
       {ctaEnabled && (
-        <Button asChild iconRight={<ExternalLink />} disabled={isLoading || isError}>
+        <Button asChild type="default" iconRight={<ExternalLink />} disabled={isLoading || isError}>
           <a href={ctaUrl} target="_blank" rel="noopener noreferrer">
             {cta.message || `View ${resource} on ${PARTNER_TO_NAME[partner]}`}
           </a>

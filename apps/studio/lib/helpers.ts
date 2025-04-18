@@ -59,8 +59,9 @@ export const getURL = () => {
   const url =
     process?.env?.NEXT_PUBLIC_SITE_URL && process.env.NEXT_PUBLIC_SITE_URL !== ''
       ? process.env.NEXT_PUBLIC_SITE_URL
-      : process?.env?.VERCEL_URL && process.env.VERCEL_URL !== ''
-        ? process.env.VERCEL_URL
+      : process?.env?.NEXT_PUBLIC_VERCEL_BRANCH_URL &&
+          process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL !== ''
+        ? process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
         : 'https://supabase.com/dashboard'
   return url.includes('http') ? url : `https://${url}`
 }
@@ -291,7 +292,7 @@ const currencyFormatterSmallValues = Intl.NumberFormat('en-US', {
 export const formatCurrency = (amount: number | undefined | null): string | null => {
   if (amount === undefined || amount === null) {
     return null
-  } else if (amount < 0.01) {
+  } else if (amount > 0 && amount < 0.01) {
     return currencyFormatterSmallValues.format(amount)
   } else {
     return currencyFormatterDefault.format(amount)

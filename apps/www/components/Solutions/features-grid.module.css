@@ -1,0 +1,13 @@
+.features-grid {
+  grid-template-areas:
+    'mgmt-api     postgres'
+    'branching    pricing ';
+}
+
+@media (min-width: 1280px) {
+  .features-grid {
+    grid-template-areas:
+      'mgmt-api     mgmt-api     postgres'
+      'branching    pricing      postgres';
+  }
+}

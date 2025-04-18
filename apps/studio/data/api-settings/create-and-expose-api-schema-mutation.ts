@@ -2,9 +2,9 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'sonner'
 
 import { configKeys } from 'data/config/keys'
+import { databaseKeys } from 'data/database/keys'
 import { handleError, patch } from 'data/fetchers'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { sqlKeys } from 'data/sql/keys'
 import type { ResponseError } from 'types'
 
 export type CreateAndExposeAPISchemaVariables = {
@@ -69,7 +69,7 @@ export const useCreateAndExposeAPISchemaMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       await Promise.all([
-        queryClient.invalidateQueries(sqlKeys.query(projectRef, ['schemas', 'list'])),
+        queryClient.invalidateQueries(databaseKeys.schemas(projectRef)),
         queryClient.invalidateQueries(configKeys.postgrest(projectRef)),
       ])
       await onSuccess?.(data, variables, context)

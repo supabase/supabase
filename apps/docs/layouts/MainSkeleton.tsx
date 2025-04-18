@@ -1,13 +1,16 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { usePathname } from 'next/navigation'
 import { memo, useEffect, type PropsWithChildren, type ReactNode } from 'react'
 
 import { cn } from 'ui'
 
+import { type NavMenuSection } from '~/components/Navigation/Navigation.types'
 import DefaultNavigationMenu, {
   MenuId,
 } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import { getMenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
@@ -27,6 +30,14 @@ const levelsData = {
     icon: 'database',
     name: 'Database',
   },
+  cron: {
+    icon: 'cron',
+    name: 'Cron',
+  },
+  queues: {
+    icon: 'queues',
+    name: 'Queues',
+  },
   api: {
     icon: 'rest',
     name: 'REST API',
@@ -42,6 +53,10 @@ const levelsData = {
   functions: {
     icon: 'edge-functions',
     name: 'Edge Functions',
+  },
+  telemetry: {
+    icon: 'telemetry',
+    name: 'Telemetry',
   },
   realtime: {
     icon: 'realtime',
@@ -59,13 +74,21 @@ const levelsData = {
     icon: 'ai',
     name: 'AI & Vectors',
   },
-  supabase_cli: {
+  local_development: {
     icon: 'reference-cli',
-    name: 'Supabase CLI',
+    name: 'Local Development',
+  },
+  security: {
+    icon: 'platform',
+    name: 'Security',
   },
   platform: {
     icon: 'platform',
     name: 'Platform',
+  },
+  contributing: {
+    icon: 'contributing',
+    name: 'Contributing',
   },
   resources: {
     icon: 'resources',
@@ -123,6 +146,10 @@ const levelsData = {
     icon: 'reference-kotlin',
     name: 'Kotlin Reference v2.0',
   },
+  reference_kotlin_v3: {
+    icon: 'reference-kotlin',
+    name: 'Kotlin Reference v3.0',
+  },
   reference_cli: {
     icon: 'reference-cli',
     name: 'CLI Reference',
@@ -153,9 +180,10 @@ const levelsData = {
   },
 }
 
-const MobileHeader = memo(function MobileHeader({ menuId }: { menuId: MenuId }) {
+type MobileHeaderProps = { menuId: MenuId } | { menuName: string }
+
+const MobileHeader = memo(function MobileHeader(props: MobileHeaderProps) {
   const mobileMenuOpen = useMenuMobileOpen()
-  const menuLevel = menuId
 
   return (
     <div
@@ -204,9 +232,9 @@ const MobileHeader = memo(function MobileHeader({ menuId }: { menuId: MenuId }) 
       >
         {mobileMenuOpen
           ? 'Close'
-          : menuLevel
-            ? levelsData[menuLevel]?.name
-            : levelsData['home'].name}
+          : 'menuId' in props
+            ? levelsData[props.menuId]?.name ?? levelsData['home'].name
+            : props.menuName}
       </span>
     </div>
   )
@@ -292,6 +320,7 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
           'relative lg:sticky',
           'w-full lg:w-auto',
           'h-fit lg:h-screen overflow-y-scroll lg:overflow-auto',
+          '[overscroll-behavior:contain]',
           'backdrop-blur backdrop-filter bg-background',
           'flex flex-col flex-grow'
         )}
@@ -322,7 +351,12 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
 
 interface SkeletonProps extends PropsWithChildren {
   menuId?: MenuId
+  menuName?: string
+  hideSideNav?: boolean
   NavigationMenu?: ReactNode
+  hideFooter?: boolean
+  className?: string
+  additionalNavItems?: Record<string, Partial<NavMenuSection>[]>
 }
 
 function TopNavSkeleton({ children }) {
@@ -336,14 +370,29 @@ function TopNavSkeleton({ children }) {
   )
 }
 
-function SidebarSkeleton({ children, menuId, NavigationMenu }: SkeletonProps) {
+function SidebarSkeleton({
+  children,
+  menuId: _menuId,
+  menuName,
+  NavigationMenu,
+  hideFooter = false,
+  className,
+  hideSideNav,
+  additionalNavItems,
+}: SkeletonProps) {
+  const pathname = usePathname()
+  const menuId = _menuId ?? getMenuId(pathname)
+
   const mobileMenuOpen = useMenuMobileOpen()
-  const hideSideNav = !menuId
 
   return (
-    <div className="flex flex-row h-full relative">
+    <div className={cn('flex flex-row h-full relative', className)}>
       {!hideSideNav && (
-        <NavContainer>{NavigationMenu ?? <DefaultNavigationMenu menuId={menuId} />}</NavContainer>
+        <NavContainer>
+          {NavigationMenu ?? (
+            <DefaultNavigationMenu menuId={menuId} additionalNavItems={additionalNavItems} />
+          )}
+        </NavContainer>
       )}
       <Container>
         <div
@@ -362,11 +411,15 @@ function SidebarSkeleton({ children, menuId, NavigationMenu }: SkeletonProps) {
             'backdrop-blur backdrop-filter bg-background'
           )}
         >
-          {!hideSideNav && <MobileHeader menuId={menuId} />}
+          {hideSideNav ? null : menuName ? (
+            <MobileHeader menuName={menuName} />
+          ) : (
+            <MobileHeader menuId={menuId} />
+          )}
         </div>
         <div className="grow">
           {children}
-          <Footer />
+          {!hideFooter && <Footer />}
         </div>
         <MobileMenuBackdrop />
       </Container>
@@ -374,4 +427,4 @@ function SidebarSkeleton({ children, menuId, NavigationMenu }: SkeletonProps) {
   )
 }
 
-export { TopNavSkeleton, SidebarSkeleton }
+export { SidebarSkeleton, TopNavSkeleton }

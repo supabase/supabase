@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 import { analyticsKeys } from './keys'
 
 type WarehouseCollectionsVariables = {
@@ -35,6 +36,6 @@ export const useWarehouseCollectionsQuery = (
     analyticsKeys.warehouseCollections(projectRef),
     ({ signal }) => getWarehouseCollections({ projectRef }, signal),
     {
-      enabled: enabled && !!projectRef,
+      enabled: enabled && !!projectRef && IS_PLATFORM,
     }
   )

@@ -61,7 +61,7 @@ export const TimezoneSelection = ({
                       value={option}
                       onSelect={(text) => {
                         const selectedTimezone = ALL_TIMEZONES.find(
-                          (option) => option.text.toLocaleLowerCase() === text
+                          (option) => option.text === text
                         )
                         if (selectedTimezone) {
                           onSelectTimezone(selectedTimezone)

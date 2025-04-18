@@ -12,6 +12,8 @@ import {
   redirectNonexistentReferenceSection,
 } from '~/features/docs/Reference.utils'
 
+export const dynamicParams = false
+
 export default async function ReferencePage({
   params: { slug },
 }: {

@@ -1,14 +1,16 @@
-import { type SerializeOptions } from 'next-mdx-remote/dist/types'
+import type { SerializeOptions } from 'next-mdx-remote/dist/types'
 import { notFound } from 'next/navigation'
 import { relative } from 'path'
 import rehypeSlug from 'rehype-slug'
 
-import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
+import { genGuideMeta, removeRedundantH1 } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
+
+export const dynamicParams = false
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -84,7 +86,8 @@ const getContent = async ({ slug }: Params) => {
     `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${docsDir}/${remoteFile}`
   )
 
-  const content = await response.text()
+  let content = await response.text()
+  content = removeRedundantH1(content)
 
   return {
     pathname: `/guides/ai/python/${slug}` satisfies `/${string}`,

@@ -14,6 +14,7 @@ import InputField from './InputField'
 import { JsonEditor } from './JsonEditor'
 import type { EditValue, RowField } from './RowEditor.types'
 import {
+  convertByteaToHex,
   generateRowFields,
   generateRowObjectFromFields,
   generateUpdateRowPayload,
@@ -25,6 +26,7 @@ export interface RowEditorProps {
   row?: Dictionary<any>
   selectedTable: PostgresTable
   visible: boolean
+  editable?: boolean
   closePanel: () => void
   saveChanges: (payload: any, isNewRecord: boolean, configuration: any, resolve: () => void) => void
   updateEditorDirty: () => void
@@ -34,6 +36,7 @@ const RowEditor = ({
   row,
   selectedTable,
   visible = false,
+  editable = true,
   closePanel = noop,
   saveChanges = noop,
   updateEditorDirty = noop,
@@ -130,7 +133,10 @@ const RowEditor = ({
       if (!isNewRecord) {
         const primaryKeyColumns = rowFields.filter((field) => field.isPrimaryKey)
         const identifiers = {} as Dictionary<any>
-        primaryKeyColumns.forEach((column) => (identifiers[column.name] = row![column.name]))
+        primaryKeyColumns.forEach((column) => {
+          identifiers[column.name] =
+            column.format === 'bytea' ? convertByteaToHex(row![column.name]) : row![column.name]
+        })
         configuration.identifiers = identifiers
         configuration.rowIdx = row!.idx
       }
@@ -176,6 +182,7 @@ const RowEditor = ({
                       onEditJson={setSelectedValueForJsonEdit}
                       onEditText={setSelectedValueForTextEdit}
                       onSelectForeignKey={() => onOpenForeignRowSelector(field)}
+                      isEditable={editable}
                     />
                   )
                 })}
@@ -202,6 +209,7 @@ const RowEditor = ({
                           onEditText={setSelectedValueForTextEdit}
                           onEditJson={setSelectedValueForJsonEdit}
                           onSelectForeignKey={() => onOpenForeignRowSelector(field)}
+                          isEditable={editable}
                         />
                       )
                     })}
@@ -219,6 +227,7 @@ const RowEditor = ({
                 onUpdateField({ [selectedValueForTextEdit?.column ?? '']: value })
                 setSelectedValueForTextEdit(undefined)
               }}
+              readOnly={!editable}
             />
             <JsonEditor
               visible={isEditingJson}
@@ -229,6 +238,7 @@ const RowEditor = ({
                 onUpdateField({ [selectedValueForJsonEdit?.column ?? '']: value })
                 setSelectedValueForJsonEdit(undefined)
               }}
+              readOnly={!editable}
             />
           </div>
           <div className="flex-shrink">
@@ -237,6 +247,7 @@ const RowEditor = ({
               backButtonLabel="Cancel"
               applyButtonLabel="Save"
               closePanel={closePanel}
+              hideApply={!editable}
             />
           </div>
         </div>

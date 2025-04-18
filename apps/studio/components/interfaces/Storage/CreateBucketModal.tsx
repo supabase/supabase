@@ -32,7 +32,10 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
     },
   })
 
-  const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
+  const { data } = useProjectStorageConfigQuery(
+    { projectRef: ref },
+    { enabled: IS_PLATFORM && visible }
+  )
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
@@ -50,9 +53,16 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
 
   const validate = (values: any) => {
     const errors = {} as any
+
     if (!values.name) {
       errors.name = 'Please provide a name for your bucket'
     }
+
+    if (values.name && !/^[a-z0-9.-]+$/.test(values.name)) {
+      errors.name =
+        'The name of the bucket must only container lowercase letters, numbers, dots, and hyphens'
+    }
+
     if (values.name && values.name.endsWith(' ')) {
       errors.name = 'The name of the bucket cannot end with a whitespace'
     }
@@ -200,14 +210,14 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                           {IS_PLATFORM && (
                             <div className="col-span-12">
                               <p className="text-foreground-light text-sm">
-                                Note: The{' '}
+                                Note: Individual bucket uploads will still be capped at the{' '}
                                 <Link
                                   href={`/project/${ref}/settings/storage`}
-                                  className="text-brand opacity-80 hover:opacity-100 transition"
+                                  className="font-bold underline"
                                 >
                                   global upload limit
                                 </Link>{' '}
-                                takes precedence over this value ({formattedGlobalUploadLimit})
+                                of {formattedGlobalUploadLimit}
                               </p>
                             </div>
                           )}

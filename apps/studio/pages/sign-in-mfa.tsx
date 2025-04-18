@@ -3,18 +3,29 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useTelemetryProps } from 'common'
+import { useParams } from 'common'
 import SignInMfaForm from 'components/interfaces/SignIn/SignInMfaForm'
 import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import { Loading } from 'components/ui/Loading'
+import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import useLatest from 'hooks/misc/useLatest'
 import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
-import Telemetry from 'lib/telemetry'
 import type { NextPageWithLayout } from 'types'
 
 const SignInMfaPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const telemetryProps = useTelemetryProps()
+
   const queryClient = useQueryClient()
+  const {
+    // current methods for mfa are github and sso
+    method: signInMethod = 'unknown',
+  } = useParams()
+  const signInMethodRef = useLatest(signInMethod)
+
+  const { mutate: sendEvent } = useSendEventMutation()
+  const { mutate: addLoginEvent } = useAddLoginEvent()
+
   const [loading, setLoading] = useState(true)
 
   // This useEffect redirects the user to MFA if they're already halfway signed in
@@ -42,15 +53,17 @@ const SignInMfaPage: NextPageWithLayout = () => {
           }
 
           if (data.currentLevel === data.nextLevel) {
-            Telemetry.sendEvent(
-              { category: 'account', action: 'sign_in', label: '' },
-              telemetryProps,
-              router
-            )
+            sendEvent({
+              action: 'sign_in',
+              properties: {
+                category: 'account',
+                method: signInMethodRef.current,
+              },
+            })
+            addLoginEvent({})
+
             await queryClient.resetQueries()
-
             router.push(getReturnToPath())
-
             return
           }
           if (data.currentLevel !== data.nextLevel) {
@@ -69,7 +82,7 @@ const SignInMfaPage: NextPageWithLayout = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col flex-1 bg-alternative h-full items-center justify-center">
+      <div className="flex flex-col flex-1 bg-alternative h-screen items-center justify-center">
         <Loading />
       </div>
     )

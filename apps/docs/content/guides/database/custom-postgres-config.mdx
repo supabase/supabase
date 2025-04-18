@@ -53,13 +53,15 @@ Some settings can only be modified by a superuser. Supabase pre-enables the [`su
 | `auto_explain.log_min_duration`      | Logs query plans taking longer than this duration.                                                                                                           |
 | `auto_explain.log_nested_statements` | Log nested statements' plans.                                                                                                                                |
 | `log_min_messages`                   | Minimum severity level of messages to log.                                                                                                                   |
+| `pg_net.ttl`                         | Sets how long the [pg_net extension](/docs/guides/database/extensions/pg_net) saves responses                                                                |
+| `pg_net.batch_size`                  | Sets how many requests the [pg_net extension](/docs/guides/database/extensions/pg_net) can make per second                                                   |
 | `pgaudit.*`                          | Configures the [PGAudit extension](https://supabase.com/docs/guides/database/extensions/pgaudit). The `log_parameter` is still restricted to protect secrets |
 | `pgrst.*`                            | [`PostgREST` settings](https://docs.postgrest.org/en/stable/references/configuration.html#db-aggregates-enabled)                                             |
 | `plan_filter.*`                      | Configures the [pg_plan_filter extension](https://supabase.com/docs/guides/database/extensions/pg_plan_filter)                                               |
 | `session_replication_role`           | Sets the session's behavior for triggers and rewrite rules.                                                                                                  |
 | `track_io_timing`                    | Collects timing statistics for database I/O activity.                                                                                                        |
 
-For example, to enable `log_nested_statements` for the postgres role, execute:
+For example, to enable `log_nested_statements` for the `postgres` role, execute:
 
 ```sql
 alter role "postgres" set "auto_explain.log_nested_statements" to 'on';
@@ -85,6 +87,12 @@ CLI changes permanently overwrite default settings, so `reset all` and `set to d
 
 </Admonition>
 
+<Admonition type="danger">
+
+In order to overwrite the default settings, you must have `Owner` or `Administrator` privileges within your organizations.
+
+</Admonition>
+
 #### CLI supported parameters
 
 <Admonition type="tip">
@@ -95,17 +103,29 @@ If a setting you need is not yet configurable, [share your use case with us](htt
 
 The following parameters are available for overrides:
 
-1. [effective_cache_size](https://postgresqlco.nf/doc/en/param/effective_cache_size/)
-1. [maintenance_work_mem](https://postgresqlco.nf/doc/en/param/maintenance_work_mem/)
-1. [max_connections](https://postgresqlco.nf/doc/en/param/max_connections/) (CLI only)
-1. [max_locks_per_transaction](https://postgresqlco.nf/doc/en/param/max_locks_per_transaction/) (CLI only)
-1. [max_parallel_maintenance_workers](https://postgresqlco.nf/doc/en/param/max_parallel_maintenance_workers/)
-1. [max_parallel_workers_per_gather](https://postgresqlco.nf/doc/en/param/max_parallel_workers_per_gather/)
-1. [max_parallel_workers](https://postgresqlco.nf/doc/en/param/max_parallel_workers/)
-1. [max_worker_processes](https://postgresqlco.nf/doc/en/param/max_worker_processes/) (CLI only)
-1. [session_replication_role](https://postgresqlco.nf/doc/en/param/session_replication_role/)
-1. [shared_buffers](https://postgresqlco.nf/doc/en/param/shared_buffers/) (CLI only)
-1. [work_mem](https://postgresqlco.nf/doc/en/param/work_mem/)
+1. [effective_cache_size](https://www.postgresql.org/docs/current/runtime-config-query.html#GUC-EFFECTIVE-CACHE-SIZE)
+1. [logical_decoding_work_mem](https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-LOGICAL-DECODING-WORK-MEM) (CLI only)
+1. [maintenance_work_mem](https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-MAINTENANCE-WORK-MEM)
+1. [max_connections](https://www.postgresql.org/docs/current/runtime-config-connection.html#GUC-MAX-CONNECTIONS) (CLI only)
+1. [max_locks_per_transaction](https://www.postgresql.org/docs/current/runtime-config-locks.html#GUC-MAX-LOCKS-PER-TRANSACTION) (CLI only)
+1. [max_parallel_maintenance_workers](https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-MAX-PARALLEL-MAINTENANCE-WORKERS)
+1. [max_parallel_workers_per_gather](https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-MAX-PARALLEL-WORKERS-PER-GATHER)
+1. [max_parallel_workers](https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-MAX-PARALLEL-WORKERS)
+1. [max_replication_slots](https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-MAX-REPLICATION-SLOTS) (CLI only)
+1. [max_slot_wal_keep_size](https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-MAX-SLOT-WAL-KEEP-SIZE) (CLI only)
+1. [max_standby_archive_delay](https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-MAX-STANDBY-ARCHIVE-DELAY) (CLI only)
+1. [max_standby_streaming_delay](https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-MAX-STANDBY-STREAMING-DELAY) (CLI only)
+1. [max_wal_size](https://www.postgresql.org/docs/current/runtime-config-wal.html#GUC-MAX-WAL-SIZE) (CLI only)
+1. [max_wal_senders](https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-MAX-WAL-SENDERS) (CLI only)
+1. [max_worker_processes](https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-MAX-WORKER-PROCESSES) (CLI only)
+1. [session_replication_role](https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-SESSION-REPLICATION-ROLE)
+1. [shared_buffers](https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-SHARED-BUFFERS) (CLI only)
+1. [statement_timeout](https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-STATEMENT-TIMEOUT)
+1. [track_activity_query_size](https://www.postgresql.org/docs/current/runtime-config-statistics.html#GUC-TRACK-ACTIVITY-QUERY-SIZE)
+1. [track_commit_timestamp](https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-TRACK-COMMIT-TIMESTAMP)
+1. [wal_keep_size](https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-WAL-KEEP-SIZE) (CLI only)
+1. [wal_sender_timeout](https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-WAL-SENDER-TIMEOUT) (CLI only)
+1. [work_mem](https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-WORK-MEM)
 
 #### Managing Postgres configuration with the CLI
 
@@ -131,6 +151,30 @@ postgres-config update --config max_parallel_workers=3 \
 --replace-existing-overrides
 ```
 
+To delete specific configuration overrides, use the `postgres-config delete` command:
+
+```bash
+supabase --experimental \
+--project-ref <project-ref> \
+postgres-config delete --config shared_buffers,work_mem
+```
+
+By default, changing the configuration, whether by updating or deleting, causes the database and all associated read replicas to restart. You can use the `--no-restart` flag to prevent this behavior, and attempt to reload the updated configuration without a restart. Refer to the Postgres documentation to determine if a given parameter can be reloaded without a restart.
+
+<Admonition type="note" label="Read Replicas and Custom Config">
+
+Postgres requires several parameters to be synchronized between the Primary cluster and [Read Replicas](/docs/guides/platform/read-replicas).
+
+By default, Supabase ensures that this propagation is executed correctly. However, if the `--no-restart` behavior is used in conjunction with parameters that cannot be reloaded without a restart, the user is responsible for ensuring that both the primaries and the read replicas get restarted in a timely manner to ensure a stable running state. Leaving the configuration updated, but not utilized (via a restart) in such a case can result in read replica failure if the primary, or a read replica, restarts in isolation (e.g. due to an out-of-memory event, or hardware failure).
+
+</Admonition>
+
+```bash
+supabase --experimental \
+--project-ref <project-ref> \
+postgres-config delete --config shared_buffers --no-restart
+```
+
 ### Resetting to default config
 
 To reset a setting to its default value at the database level:
@@ -151,5 +195,6 @@ alter role "<role_name>" set "<setting_name>" to default;
 
 ### Considerations
 
-1. Changes through the CLI must restart the database and will cause momentary disruption to existing database connections; in most cases this should not take more than a few seconds.
+1. Changes through the CLI might restart the database causing momentary disruption to existing database connections; in most cases this should not take more than a few seconds. However, you can use the --no-restart flag to bypass the restart and keep the connections intact. Keep in mind that this depends on the specific configuration changes you're making. if the change requires a restart, using the --no-restart flag will prevent the restart but you won't see those changes take effect until a restart is manually triggered. Additionally, some parameters are required to be the same on Primary and Read Replicas; not restarting in these cases can result in read replica failure if the Primary/Read Replicas restart in isolation.
 1. Custom Postgres Config will always override the default optimizations generated by Supabase. When changing compute add-ons, you should also review and update your custom Postgres Config to ensure they remain compatible and effective with the updated compute.
+1. Some parameters (e.g. `wal_keep_size`) can increase disk utilization, triggering disk expansion, which in turn can lead to [increases in your bill](/docs/guides/platform/compute-add-ons#disk-io).

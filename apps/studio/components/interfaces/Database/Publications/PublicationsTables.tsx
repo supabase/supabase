@@ -10,7 +10,7 @@ import InformationBox from 'components/ui/InformationBox'
 import { Loading } from 'components/ui/Loading'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { Button, Input } from 'ui'
 import PublicationsTableItem from './PublicationsTableItem'
 import { ChevronLeft, Search, AlertCircle } from 'lucide-react'
@@ -44,8 +44,8 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
       select(tables) {
         return tables.filter((table) =>
           filterString.length === 0
-            ? !EXCLUDED_SCHEMAS.includes(table.schema)
-            : !EXCLUDED_SCHEMAS.includes(table.schema) && table.name.includes(filterString)
+            ? !PROTECTED_SCHEMAS.includes(table.schema)
+            : !PROTECTED_SCHEMAS.includes(table.schema) && table.name.includes(filterString)
         )
       },
     }
@@ -119,7 +119,7 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
               </div> */}
                 </Table.th>,
               ]}
-              body={tables.map((table: any, i: number) => (
+              body={tables.map((table) => (
                 <PublicationsTableItem
                   key={table.id}
                   table={table}

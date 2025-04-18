@@ -2,7 +2,8 @@ import { Filter, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { PROJECT_STATUS } from 'lib/constants'
@@ -14,6 +15,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Input,
   Label_Shadcn_,
@@ -23,7 +25,7 @@ import {
 } from 'ui'
 
 interface HomePageActionsProps {
-  organizations: { name: string; slug: string }[]
+  organizations?: { name: string; slug: string }[]
   search: string
   filterStatus: string[]
   setSearch: (value: string) => void
@@ -37,34 +39,47 @@ const HomePageActions = ({
   setSearch,
   setFilterStatus,
 }: HomePageActionsProps) => {
-  const router = useRouter()
+  const newLayoutPreview = useIsNewLayoutEnabled()
 
+  const router = useRouter()
+  const { slug } = useParams()
+
+  const projectCreationEnabled = useIsFeatureEnabled('projects:create')
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
   const { isSuccess: orgsLoaded } = useOrganizationsQuery()
 
   return (
-    <div className="flex gap-x-3">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button type="primary">
-            <span>New project</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent side="bottom" align="center">
-          <>
-            <DropdownMenuLabel>Choose organization</DropdownMenuLabel>
-            {organizations
-              .sort((a, b) => a.name.localeCompare(b.name))
-              .map((x) => (
-                <DropdownMenuItem key={x.slug} onClick={() => router.push(`/new/${x.slug}`)}>
-                  {x.name}
-                </DropdownMenuItem>
-              ))}
-          </>
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <div className="flex flex-col gap-2 md:gap-3 md:flex-row">
+      {newLayoutPreview ? (
+        projectCreationEnabled ? (
+          <Link href={`/new/${slug}`}>
+            <Button type="primary">New project</Button>
+          </Link>
+        ) : null
+      ) : (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button type="primary">
+              <span>New project</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom" align="start">
+            <>
+              <DropdownMenuLabel>Choose organization</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {organizations
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((x) => (
+                  <DropdownMenuItem key={x.slug} onClick={() => router.push(`/new/${x.slug}`)}>
+                    {x.name}
+                  </DropdownMenuItem>
+                ))}
+            </>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
 
-      {IS_PLATFORM && organizationCreationEnabled && orgsLoaded && (
+      {IS_PLATFORM && organizationCreationEnabled && orgsLoaded && !newLayoutPreview && (
         <Button type="default" asChild>
           <Link href="/new" className="flex items-center gap-2">
             New organization
@@ -72,12 +87,12 @@ const HomePageActions = ({
         </Button>
       )}
 
-      <div className="flex items-center gap-x-2">
+      <div className="flex items-center gap-2">
         <Input
           size="tiny"
           placeholder="Search for a project"
           icon={<Search size={16} />}
-          className="w-64 [&>div>div>div>input]:!pl-7 [&>div>div>div>div]:!pl-2"
+          className="w-full flex-1 md:w-64 [&>div>div>div>input]:!pl-7 [&>div>div>div>div]:!pl-2"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
         />

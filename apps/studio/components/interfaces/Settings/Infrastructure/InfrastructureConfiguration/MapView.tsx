@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { partition, uniqBy } from 'lodash'
 import { MoreVertical } from 'lucide-react'
 import Link from 'next/link'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import {
   ComposableMap,
@@ -20,6 +21,7 @@ import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
   Button,
@@ -29,9 +31,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   ScrollArea,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { AVAILABLE_REPLICA_REGIONS, REPLICA_STATUS } from './InstanceConfiguration.constants'
 import GeographyData from './MapData.json'
@@ -50,6 +52,8 @@ const MapView = ({
   onSelectDropReplica,
 }: MapViewProps) => {
   const { ref } = useParams()
+  const dbSelectorState = useDatabaseSelectorStateSnapshot()
+
   const [mount, setMount] = useState(false)
   const [zoom, setZoom] = useState<number>(1.5)
   const [center, setCenter] = useState<[number, number]>([14, 7])
@@ -59,6 +63,7 @@ const MapView = ({
     region: { key: string; country?: string; name?: string }
   }>()
   const canManageReplicas = useCheckPermissions(PermissionAction.CREATE, 'projects')
+  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
   const { data } = useReadReplicasQuery({ projectRef: ref })
   const databases = data ?? []
@@ -271,8 +276,10 @@ const MapView = ({
                             <Badge variant="brand">Healthy</Badge>
                           ) : database.status === REPLICA_STATUS.COMING_UP ? (
                             <Badge>Coming up</Badge>
-                          ) : database.status === REPLICA_STATUS.RESTORING ? (
+                          ) : database.status === REPLICA_STATUS.RESTARTING ? (
                             <Badge>Restarting</Badge>
+                          ) : database.status === REPLICA_STATUS.RESIZING ? (
+                            <Badge>Resizing</Badge>
                           ) : (
                             <Badge variant="warning">Unhealthy</Badge>
                           )}
@@ -283,7 +290,7 @@ const MapView = ({
                         )}
                       </div>
                       {database.identifier !== ref && (
-                        <DropdownMenu modal={false}>
+                        <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button type="text" icon={<MoreVertical />} className="px-1" />
                           </DropdownMenuTrigger>
@@ -291,12 +298,12 @@ const MapView = ({
                             <DropdownMenuItem
                               className="gap-x-2"
                               disabled={database.status !== REPLICA_STATUS.ACTIVE_HEALTHY}
+                              onClick={() => {
+                                setShowConnect(true)
+                                dbSelectorState.setSelectedDatabaseId(database.identifier)
+                              }}
                             >
-                              <Link
-                                href={`/project/${ref}/settings/database?connectionString=${database.identifier}`}
-                              >
-                                View connection string
-                              </Link>
+                              View connection string
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="gap-x-2"
@@ -318,8 +325,8 @@ const MapView = ({
                             >
                               Restart replica
                             </DropdownMenuItem>
-                            <Tooltip_Shadcn_>
-                              <TooltipTrigger_Shadcn_ asChild>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
                                 <DropdownMenuItem
                                   className="gap-x-2 !pointer-events-auto"
                                   disabled={!canManageReplicas}
@@ -327,13 +334,13 @@ const MapView = ({
                                 >
                                   Drop replica
                                 </DropdownMenuItem>
-                              </TooltipTrigger_Shadcn_>
+                              </TooltipTrigger>
                               {!canManageReplicas && (
-                                <TooltipContent_Shadcn_ side="left">
+                                <TooltipContent side="left">
                                   You need additional permissions to drop replicas
-                                </TooltipContent_Shadcn_>
+                                </TooltipContent>
                               )}
-                            </Tooltip_Shadcn_>
+                            </Tooltip>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       )}
@@ -356,7 +363,9 @@ const MapView = ({
               tooltip={{
                 content: {
                   side: 'bottom',
-                  text: 'You need additional permissions to deploy replicas',
+                  text: !canManageReplicas
+                    ? 'You need additional permissions to deploy replicas'
+                    : undefined,
                 },
               }}
             >

@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { RefreshCw, StopCircle } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import AlertError from 'components/ui/AlertError'
@@ -8,6 +8,7 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useQueryAbortMutation } from 'data/sql/abort-query-mutation'
 import { useOngoingQueriesQuery } from 'data/sql/ongoing-queries-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { IS_PLATFORM } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { ResponseError } from 'types'
@@ -20,21 +21,21 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useAppStateSnapshot } from 'state/app-state'
+import { useParams } from 'common'
 
-interface OngoingQueriesPanel {
-  visible: boolean
-  onClose: () => void
-}
-
-export const OngoingQueriesPanel = ({ visible, onClose }: OngoingQueriesPanel) => {
+export const OngoingQueriesPanel = () => {
+  const [_, setParams] = useUrlState({ replace: true })
+  const { viewOngoingQueries } = useParams()
   const project = useSelectedProject()
   const state = useDatabaseSelectorStateSnapshot()
+  const appState = useAppStateSnapshot()
   const [selectedId, setSelectedId] = useState<number>()
 
   const { data: databases } = useReadReplicasQuery({ projectRef: project?.ref })
@@ -59,6 +60,13 @@ export const OngoingQueriesPanel = ({ visible, onClose }: OngoingQueriesPanel) =
   )
   const queries = data ?? []
 
+  useEffect(() => {
+    if (viewOngoingQueries) {
+      appState.setOnGoingQueriesPanelOpen(true)
+      setParams({ viewOngoingQueries: undefined })
+    }
+  }, [viewOngoingQueries])
+
   const { mutate: abortQuery, isLoading } = useQueryAbortMutation({
     onSuccess: () => {
       toast.success(`Successfully aborted query (ID: ${selectedId})`)
@@ -66,9 +74,14 @@ export const OngoingQueriesPanel = ({ visible, onClose }: OngoingQueriesPanel) =
     },
   })
 
+  const closePanel = () => {
+    setParams({ viewOngoingQueries: undefined })
+    appState.setOnGoingQueriesPanelOpen(false)
+  }
+
   return (
     <>
-      <Sheet open={visible} onOpenChange={() => onClose()}>
+      <Sheet open={appState.ongoingQueriesPanelOpen} onOpenChange={() => closePanel()}>
         <SheetContent size="lg">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-x-2">
@@ -140,17 +153,17 @@ export const OngoingQueriesPanel = ({ visible, onClose }: OngoingQueriesPanel) =
                   </div>
                 </div>
 
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild>
+                <Tooltip>
+                  <TooltipTrigger asChild>
                     <Button
                       type="warning"
                       className="px-1.5"
                       icon={<StopCircle />}
                       onClick={() => setSelectedId(query.pid)}
                     />
-                  </TooltipTrigger_Shadcn_>
-                  <TooltipContent_Shadcn_ side="bottom">Abort query</TooltipContent_Shadcn_>
-                </Tooltip_Shadcn_>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Abort query</TooltipContent>
+                </Tooltip>
               </SheetSection>
             ))}
           </div>

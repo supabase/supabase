@@ -7,6 +7,7 @@ import { handleError, post } from 'data/fetchers'
 import { PROVIDERS } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
+import { DesiredInstanceSize, PostgresEngine, ReleaseChannel } from './new-project.constants'
 
 const WHITELIST_ERRORS = [
   'The following organization members have reached their maximum limits for the number of active free projects',
@@ -15,9 +16,8 @@ const WHITELIST_ERRORS = [
   'name should not contain a . string',
   'Project creation in the Supabase dashboard is disabled for this Vercel-managed organization.',
   'Your account, which is handled by the Fly Supabase extension, cannot access this endpoint.',
+  'already exists in your organization.',
 ]
-
-export type DbInstanceSize = components['schemas']['DesiredInstanceSize']
 
 export type ProjectCreateVariables = {
   name: string
@@ -29,9 +29,11 @@ export type ProjectCreateVariables = {
   cloudProvider?: string
   authSiteUrl?: string
   customSupabaseRequest?: object
-  dbInstanceSize?: DbInstanceSize
+  dbInstanceSize?: DesiredInstanceSize
   dataApiExposedSchemas?: string[]
   dataApiUseApiSchema?: boolean
+  postgresEngine?: PostgresEngine
+  releaseChannel?: ReleaseChannel
 }
 
 export async function createProject({
@@ -46,6 +48,8 @@ export async function createProject({
   dbInstanceSize,
   dataApiExposedSchemas,
   dataApiUseApiSchema,
+  postgresEngine,
+  releaseChannel,
 }: ProjectCreateVariables) {
   const body: components['schemas']['CreateProjectBody'] = {
     cloud_provider: cloudProvider,
@@ -61,6 +65,8 @@ export async function createProject({
     desired_instance_size: dbInstanceSize,
     data_api_exposed_schemas: dataApiExposedSchemas,
     data_api_use_api_schema: dataApiUseApiSchema,
+    postgres_engine: postgresEngine,
+    release_channel: releaseChannel,
   }
 
   const { data, error } = await post(`/platform/projects`, {

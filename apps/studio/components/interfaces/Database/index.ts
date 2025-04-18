@@ -5,10 +5,6 @@ export { default as RolesList } from './Roles/RolesList'
 
 export { default as Extensions } from './Extensions/Extensions'
 
-export { default as CreateWrapper } from './Wrappers/CreateWrapper'
-export { default as EditWrapper } from './Wrappers/EditWrapper'
-export { default as Wrappers } from './Wrappers/Wrappers'
-
 export { default as PublicationsList } from './Publications/PublicationsList'
 export { default as PublicationsTables } from './Publications/PublicationsTables'
 

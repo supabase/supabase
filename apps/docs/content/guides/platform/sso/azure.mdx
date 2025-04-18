@@ -3,13 +3,13 @@ title: 'Set Up SSO with Azure AD'
 description: 'Configure single sign-on with Azure AD (Microsoft Entra).'
 ---
 
-<Admonition>
+<Admonition type="note">
 
-This feature is only available on the Team and Enterprise Plans. Please contact [Sales](https://forms.supabase.com/enterprise) before doing these steps.
+This feature is only available on the [Team and Enterprise Plans](https://supabase.com/pricing). If you are an existing Team or Enterprise Plan customer, continue with the setup below. Once completed, [contact us](https://supabase.com/dashboard/support/new?category=Login_issues&subject=Enquiry%20about%20setting%20up%20SSO&message=I%20would%20like%20to%20set%20up%20SAML%20SSO%20for%20my%20team%20and%20have%20followed%20https://supabase.com/docs/guides/platform/sso%20and%20configured%20my%20provider%20%0A%0APlease%20attach%20the%20IDP%20metadata%20in%20the%20attachments%20below) to enable SSO for your team.
 
 </Admonition>
 
-<Admonition>
+<Admonition type="tip">
 
 Looking for docs on how to add Single Sign-On support in your Supabase project? Head on over to [Single Sign-On with SAML 2.0 for Projects](/docs/guides/auth/enterprise-sso/auth-sso-saml).
 
@@ -25,7 +25,7 @@ Click the _Add_ button then _Enterprise application_.
 
 ![Azure AD console: Default Directory Overview](/docs/img/sso-azure-step-01.png)
 
-## Step 2: Choose Create your own application [#create-application]
+## Step 2: Choose to create your own application [#create-application]
 
 You'll be using the custom enterprise application setup for Supabase.
 
@@ -40,7 +40,7 @@ don't find in the gallery (Non-gallery)_.
 
 ![Azure AD console: Create your own application modal](/docs/img/sso-azure-step-03.png)
 
-## Step 4: Choose the Set up single sign-on option [#set-up-single-sign-on]
+## Step 4: Set up single sign-on [#set-up-single-sign-on]
 
 Before you get to assigning users and groups, which would allow accounts in Azure AD to access Supabase, you need to configure the SAML details that allows Supabase to accept sign in requests from Azure AD.
 
@@ -83,7 +83,7 @@ Finally, click the _Save_ button to save the configuration.
 
 ## Step 7: Obtain metadata URL and send to Supabase [#send-metadata-url]
 
-Supabase needs to finalize enabling single sign-on with your Azure AD application. To do this, copy and send the link under **App Federation Metadata Url** in \*section 3 **SAML Certificates\*** to your support contact and await further instructions. If you're not clear who to send this link to or need further assistance, reach out to [Supabase Support](https://supabase.help).
+Supabase needs to finalize enabling single sign-on with your Azure AD application. To do this, copy and send the link under **App Federation Metadata URL** in \*section 3 **SAML Certificates\*** to your support contact and await further instructions. If you're not clear who to send this link to or need further assistance, reach out to [Supabase Support](https://supabase.help).
 
 **Do not test the login until you have heard back from the support contact.**
 

@@ -44,6 +44,8 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
     data: usedIndexes,
     isSuccess,
     isLoading,
+    isError,
+    error,
   } = useGetIndexesFromSelectQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -121,6 +123,13 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
           </p>
         </div>
         {isLoading && <GenericSkeletonLoader />}
+        {isError && (
+          <AlertError
+            projectRef={project?.ref}
+            error={error}
+            subject="Failed to retrieve indexes in use"
+          />
+        )}
         {isSuccess && (
           <div>
             {usedIndexes.length === 0 && (

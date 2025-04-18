@@ -1,5 +1,5 @@
 import { includes, noop } from 'lodash'
-import { Edit, Edit2, Link } from 'lucide-react'
+import { Edit, Edit2, Eye } from 'lucide-react'
 
 import {
   Button,
@@ -8,9 +8,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Input,
-  Listbox,
   Select,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectGroup_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DATETIME_TYPES, JSON_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import { DateTimeInput } from './DateTimeInput'
 import type { EditValue, RowField } from './RowEditor.types'
@@ -91,6 +97,7 @@ const InputField = ({
       <Input
         data-testid={`${field.name}-input`}
         layout="horizontal"
+        placeholder="NULL"
         label={field.name}
         value={field.value ?? ''}
         descriptionText={
@@ -113,15 +120,21 @@ const InputField = ({
         error={errors[field.name]}
         onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         actions={
-          <Button
-            type="default"
-            className="mr-1"
-            htmlType="button"
-            onClick={onSelectForeignKey}
-            icon={<Link />}
-          >
-            Select record
-          </Button>
+          isEditable && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button type="default" icon={<Edit />} className="px-1.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-28">
+                {field.isNullable && (
+                  <DropdownMenuItem onClick={() => onUpdateField({ [field.name]: null })}>
+                    Set to NULL
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={onSelectForeignKey}>Select record</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )
         }
       />
     )
@@ -168,10 +181,12 @@ const InputField = ({
               <DropdownMenuTrigger asChild>
                 <Button type="default" icon={<Edit />} className="px-1.5" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40">
-                <DropdownMenuItem onClick={() => onUpdateField({ [field.name]: null })}>
-                  Set to NULL
-                </DropdownMenuItem>
+              <DropdownMenuContent align="end" className="w-28">
+                {isEditable && (
+                  <DropdownMenuItem onClick={() => onUpdateField({ [field.name]: null })}>
+                    Set to NULL
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem
                   onClick={() => onEditText({ column: field.name, value: field.value || '' })}
                 >
@@ -216,9 +231,9 @@ const InputField = ({
             type="default"
             htmlType="button"
             onClick={() => onEditJson({ column: field.name, value: field.value })}
-            icon={<Edit2 />}
+            icon={isEditable ? <Edit2 /> : <Eye />}
           >
-            Edit JSON
+            {isEditable ? 'Edit JSON' : 'View JSON'}
           </Button>
         }
       />
@@ -231,6 +246,7 @@ const InputField = ({
         name={field.name}
         format={field.format}
         value={field.value ?? ''}
+        isNullable={field.isNullable}
         description={
           <>
             {field.defaultValue && <p>Default: {field.defaultValue}</p>}
@@ -238,6 +254,7 @@ const InputField = ({
           </>
         }
         onChange={(value: any) => onUpdateField({ [field.name]: value })}
+        disabled={!isEditable}
       />
     )
   }
@@ -249,41 +266,58 @@ const InputField = ({
       ...(field.isNullable ? [{ value: 'null', label: 'NULL' }] : []),
     ]
 
-    // Ivan: The value coming in from backend is processed (NULL converted to 'null' string) so that
-    // it's properly selected in the listbox. The issue is with the internal implementation of the
-    // Listbox where the default column value is only considered when field.value is null
-    // (the JS kind). Since we're converting that null into 'null', defaultValue isn't used as it
-    // should. To fix this, we're only setting the defaultValue of the listbox and not setting the
-    // value in the next renders. This makes the ListBox an uncontrolled component but it works.
-    // PS: This is the third time we're fixing this in a month. If you have to fix this again, just
-    // use Input for booleans.
-    const defaultValue = field.value === 'null' ? field.defaultValue : field.value
+    const defaultValue = field.value === null ? undefined : field.value
 
     return (
-      <Listbox
-        size="small"
+      <FormItemLayout
+        isReactForm={false}
         layout="horizontal"
-        name={field.name}
         label={field.name}
         labelOptional={field.format}
-        descriptionText={field.comment}
-        value={defaultValue === null ? 'null' : defaultValue}
-        onChange={(value: string) => {
-          if (value === 'null') onUpdateField({ [field.name]: null })
-          else onUpdateField({ [field.name]: value })
-        }}
+        description={field.comment}
+        className="[&>div:first-child>span]:text-foreground-lighter"
       >
-        {options.map((option) => (
-          <Listbox.Option
-            id={option.value}
-            key={option.value}
-            label={option.label}
-            value={option.value}
-          >
-            {option.label}
-          </Listbox.Option>
-        ))}
-      </Listbox>
+        <Select_Shadcn_
+          value={defaultValue === null ? 'null' : defaultValue}
+          onValueChange={(value: string) => onUpdateField({ [field.name]: value })}
+          disabled={!isEditable}
+        >
+          <SelectTrigger_Shadcn_>
+            <SelectValue_Shadcn_ placeholder="Select a value" />
+          </SelectTrigger_Shadcn_>
+          <SelectContent_Shadcn_>
+            <SelectGroup_Shadcn_>
+              {options.map((option) => (
+                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem_Shadcn_>
+              ))}
+            </SelectGroup_Shadcn_>
+          </SelectContent_Shadcn_>
+        </Select_Shadcn_>
+      </FormItemLayout>
+    )
+  }
+
+  if (field.format === 'bytea') {
+    return (
+      <Input
+        data-testid={`${field.name}-input`}
+        layout="horizontal"
+        label={field.name}
+        descriptionText={
+          <>
+            {field.comment && <p>{field.comment}</p>}
+            <p>Bytea columns are edited and displayed as hex in the dashboard</p>
+          </>
+        }
+        labelOptional={field.format}
+        error={errors[field.name]}
+        value={field.value ?? ''}
+        placeholder={`\\x`}
+        disabled={!isEditable}
+        onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+      />
     )
   }
 

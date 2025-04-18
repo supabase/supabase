@@ -248,7 +248,7 @@ const GitHubIntegrationConnectionForm = ({
                     <Input_Shadcn_
                       {...field}
                       className="w-80"
-                      disabled={!canUpdateGitHubConnection}
+                      disabled={disabled || !canUpdateGitHubConnection}
                       onKeyPress={(event) => {
                         if (event.key === 'Escape') form.reset()
                       }}
@@ -301,7 +301,7 @@ const GitHubIntegrationConnectionForm = ({
                   <div className="relative">
                     <Input_Shadcn_
                       {...field}
-                      disabled={!canUpdateGitHubConnection}
+                      disabled={disabled || !canUpdateGitHubConnection}
                       className="w-80"
                       onKeyPress={(event) => {
                         if (event.key === 'Escape') form.reset()
@@ -349,7 +349,7 @@ const GitHubIntegrationConnectionForm = ({
                 <FormControl_Shadcn_>
                   <Switch
                     className="mt-1"
-                    disabled={!canUpdateGitHubConnection}
+                    disabled={disabled || !canUpdateGitHubConnection}
                     checked={field.value}
                     onCheckedChange={(e) => {
                       field.onChange(e)

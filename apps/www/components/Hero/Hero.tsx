@@ -1,18 +1,12 @@
-import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
-import { BookOpen } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+
 import { Button } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import gaEvents from '~/lib/gaEvents'
-import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+import AnnouncementBadge from '../Announcement/Badge'
 
 const Hero = () => {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
-  const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
-  }
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
     <div className="relative -mt-[65px]">
@@ -22,6 +16,18 @@ const Hero = () => {
             <div className="mx-auto max-w-2xl lg:col-span-6 lg:flex lg:items-center justify-center text-center">
               <div className="relative z-10 lg:h-auto pt-[90px] lg:pt-[90px] lg:min-h-[300px] flex flex-col items-center justify-center sm:mx-auto md:w-3/4 lg:mx-0 lg:w-full gap-4 lg:gap-8">
                 <div className="flex flex-col items-center">
+                  <div className="z-40 w-full flex justify-center -mt-4 lg:-mt-12 mb-8">
+                    <AnnouncementBadge
+                      url="/blog/launch-week-14-top-10"
+                      badge="Launch Week 14"
+                      announcement="Top 10 Launches"
+                      className="[&_a]:sm:gap-4 [&_.announcement-badge]:!text-xs [&_.announcement-text]:!text-xs [&_.announcement-badge]:sm:!text-sm [&_.announcement-text]:sm:!text-sm"
+                      style={{
+                        fontFamily:
+                          'Departure Mono, Source Code Pro, Office Code Pro, Menlo, monospace',
+                      }}
+                    />
+                  </div>
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
                     <span className="block text-foreground">Build in a weekend</span>
                     <span className="text-brand block md:ml-0">Scale to millions</span>
@@ -38,7 +44,12 @@ const Hero = () => {
                     <Link
                       href="https://supabase.com/dashboard"
                       as="https://supabase.com/dashboard"
-                      onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_startProject'])}
+                      onClick={() =>
+                        sendTelemetryEvent({
+                          action: 'start_project_button_clicked',
+                          properties: { buttonLocation: 'Homepage Hero' },
+                        })
+                      }
                     >
                       Start your project
                     </Link>
@@ -47,7 +58,12 @@ const Hero = () => {
                     <Link
                       href="/contact/sales"
                       as="/contact/sales"
-                      onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_requestDemo'])}
+                      onClick={() =>
+                        sendTelemetryEvent({
+                          action: 'request_demo_button_clicked',
+                          properties: { buttonLocation: 'Homepage Hero' },
+                        })
+                      }
                     >
                       Request a demo
                     </Link>

@@ -18,43 +18,41 @@ import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
 
 import { loader } from '@monaco-editor/react'
-import { TooltipProvider } from '@radix-ui/react-tooltip'
 import * as Sentry from '@sentry/nextjs'
-import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { createClient } from '@supabase/supabase-js'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ThemeProvider, useThemeSandbox } from 'common'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
-import { ErrorInfo, useEffect, useMemo, useRef, useState } from 'react'
+import { ErrorInfo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-import { toast } from 'sonner'
+import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 
+import { FeatureFlagProvider, PageTelemetry, ThemeProvider, useThemeSandbox } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
-import { AppBannerWrapper, RouteValidationWrapper } from 'components/interfaces/App'
+import { RouteValidationWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
+import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
 import { GenerateSql } from 'components/interfaces/SqlGenerator/SqlGenerator'
 import { ErrorBoundaryState } from 'components/ui/ErrorBoundaryState'
-import FlagProvider from 'components/ui/Flag/FlagProvider'
-import PageTelemetry from 'components/ui/PageTelemetry'
+import GroupsTelemetry from 'components/ui/GroupsTelemetry'
 import { useRootQueryClient } from 'data/query-client'
+import { customFont, sourceCodePro } from 'fonts'
 import { AuthProvider } from 'lib/auth'
-import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { getFlags as getConfigCatFlags } from 'lib/configcat'
+import { API_URL, BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
-import { SonnerToaster } from 'ui'
+import { SonnerToaster, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
-import { ConsentToast } from 'ui-patterns/ConsentToast'
+import { useConsent } from 'ui-patterns/ConsentToast'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -80,35 +78,9 @@ loader.config({
 // the dashboard, all other layout components should not be doing that
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
-  const snap = useAppStateSnapshot()
   const queryClient = useRootQueryClient()
-  const consentToastId = useRef<string | number>()
-
-  // [Joshen] Some issues with using createBrowserSupabaseClient
-  const [supabase] = useState(() =>
-    IS_PLATFORM
-      ? createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
-        )
-      : undefined
-  )
 
   const getLayout = Component.getLayout ?? ((page) => page)
-
-  const AuthContainer = useMemo(
-    // eslint-disable-next-line react/display-name
-    () => (props: any) => {
-      return IS_PLATFORM ? (
-        <SessionContextProvider supabaseClient={supabase as any}>
-          <AuthProvider>{props.children}</AuthProvider>
-        </SessionContextProvider>
-      ) : (
-        <AuthProvider>{props.children}</AuthProvider>
-      )
-    },
-    [supabase]
-  )
 
   const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
     Sentry.withScope(function (scope) {
@@ -119,54 +91,39 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     console.error(error.stack)
   }
 
-  useEffect(() => {
-    // Check for telemetry consent
-    if (typeof window !== 'undefined') {
-      const onAcceptConsent = () => {
-        snap.setIsOptedInTelemetry(true)
-        if (consentToastId.current) toast.dismiss(consentToastId.current)
-      }
-
-      const onOptOut = () => {
-        snap.setIsOptedInTelemetry(false)
-        if (consentToastId.current) toast.dismiss(consentToastId.current)
-      }
-
-      const hasAcknowledgedConsent = localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      if (IS_PLATFORM && hasAcknowledgedConsent === null) {
-        setTimeout(() => {
-          consentToastId.current = toast(
-            <ConsentToast onAccept={onAcceptConsent} onOptOut={onOptOut} />,
-            {
-              id: 'consent-toast',
-              position: 'bottom-right',
-              duration: Infinity,
-            }
-          )
-        }, 300)
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
   useThemeSandbox()
+
+  // Although this is "technically" breaking the rules of hooks
+  // IS_PLATFORM never changes within a session, so this won't cause any issues
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const { hasAcceptedConsent } = IS_PLATFORM ? useConsent() : { hasAcceptedConsent: true }
 
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
   return (
     <ErrorBoundary FallbackComponent={ErrorBoundaryState} onError={errorBoundaryHandler}>
       <QueryClientProvider client={queryClient}>
-        <Hydrate state={pageProps.dehydratedState}>
-          <AuthContainer>
-            <ProfileProvider>
-              <FlagProvider>
-                <Head>
-                  <title>Supabase</title>
-                  <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-                </Head>
-                <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
-                <PageTelemetry>
-                  <TooltipProvider>
+        <NuqsAdapter>
+          <Hydrate state={pageProps.dehydratedState}>
+            <AuthProvider>
+              <FeatureFlagProvider
+                API_URL={API_URL}
+                enabled={IS_PLATFORM}
+                getConfigCatFlags={getConfigCatFlags}
+              >
+                <ProfileProvider>
+                  <Head>
+                    <title>Supabase</title>
+                    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                    {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
+                    <style
+                      dangerouslySetInnerHTML={{
+                        __html: `:root{--font-custom:${customFont.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
+                      }}
+                    />
+                  </Head>
+                  <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
+                  <TooltipProvider delayDuration={0}>
                     <RouteValidationWrapper>
                       <ThemeProvider
                         defaultTheme="system"
@@ -176,28 +133,34 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       >
                         <AppBannerContextProvider>
                           <CommandProvider>
-                            <AppBannerWrapper>
-                              <FeaturePreviewContextProvider>
-                                {getLayout(<Component {...pageProps} />)}
-                                <StudioCommandMenu />
-                                <GenerateSql />
-                                <FeaturePreviewModal />
-                              </FeaturePreviewContextProvider>
-                            </AppBannerWrapper>
+                            <FeaturePreviewContextProvider>
+                              {getLayout(<Component {...pageProps} />)}
+                              <StudioCommandMenu />
+                              <GenerateSql />
+                              <FeaturePreviewModal />
+                            </FeaturePreviewContextProvider>
                             <SonnerToaster position="top-right" />
+                            <MonacoThemeProvider />
                           </CommandProvider>
                         </AppBannerContextProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>
                   </TooltipProvider>
-                </PageTelemetry>
-
-                {!isTestEnv && <HCaptchaLoadedStore />}
-                {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
-              </FlagProvider>
-            </ProfileProvider>
-          </AuthContainer>
-        </Hydrate>
+                  <PageTelemetry
+                    API_URL={API_URL}
+                    hasAcceptedConsent={hasAcceptedConsent}
+                    enabled={IS_PLATFORM}
+                  />
+                  <GroupsTelemetry hasAcceptedConsent={hasAcceptedConsent} />
+                  {!isTestEnv && <HCaptchaLoadedStore />}
+                  {!isTestEnv && (
+                    <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+                  )}
+                </ProfileProvider>
+              </FeatureFlagProvider>
+            </AuthProvider>
+          </Hydrate>
+        </NuqsAdapter>
       </QueryClientProvider>
     </ErrorBoundary>
   )

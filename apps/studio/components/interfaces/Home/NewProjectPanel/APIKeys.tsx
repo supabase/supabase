@@ -1,16 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
+import { AlertCircle, Loader } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
-import { useParams } from 'common/hooks'
 import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
+import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Input } from 'ui'
-import { AlertCircle, Loader } from 'lucide-react'
 
 const generateInitSnippet = (endpoint: string) => ({
   js: `
@@ -42,30 +42,33 @@ const APIKeys = () => {
     data: settings,
     isError: isProjectSettingsError,
     isLoading: isProjectSettingsLoading,
-  } = useProjectApiQuery({
+  } = useProjectSettingsV2Query({
     projectRef,
   })
+
+  // API keys should not be empty. However it can be populated with a delay on project creation
+  const apiKeys = settings?.service_api_keys ?? []
+  const isApiKeysEmpty = apiKeys.length === 0
 
   const {
     data,
     isError: isJwtSecretUpdateStatusError,
     isLoading: isJwtSecretUpdateStatusLoading,
-  } = useJwtSecretUpdatingStatusQuery({ projectRef })
+  } = useJwtSecretUpdatingStatusQuery(
+    { projectRef },
+    { enabled: !isProjectSettingsLoading && isApiKeysEmpty }
+  )
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
   const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
 
-  // Get the API service
-  const apiService = settings?.autoApiService
-  const apiKeys = apiService?.service_api_keys ?? []
-
-  // API keys should not be empty. However it can be populated with a delay on project creation
-  const isApiKeysEmpty = apiKeys.length === 0
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
 
-  const apiUrl = `${apiService?.protocol ?? 'https'}://${apiService?.endpoint ?? '-'}`
-  const anonKey = apiKeys.find((key) => key.tags === 'anon')
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint
+  const apiUrl = `${protocol}://${endpoint ?? '-'}`
+  const { anonKey } = getAPIKeys(settings)
 
   const clientInitSnippet: any = generateInitSnippet(apiUrl)
   const selectedLanguageSnippet = clientInitSnippet[selectedLanguage.key] ?? 'No snippet available'
@@ -146,7 +149,7 @@ const APIKeys = () => {
                     ? 'JWT secret update failed, new API key may have issues'
                     : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
                       ? 'Updating JWT secret...'
-                      : apiService?.defaultApiKey
+                      : anonKey?.api_key
               }
               onChange={() => {}}
               descriptionText={

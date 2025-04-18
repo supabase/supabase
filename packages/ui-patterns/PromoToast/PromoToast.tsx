@@ -6,19 +6,15 @@ import { useEffect, useState } from 'react'
 import { cn } from 'ui/src/lib/utils/cn'
 import { Button } from 'ui/src/components/Button/Button'
 import { LOCAL_STORAGE_KEYS } from 'common'
-// import CountdownComponent from 'ui/src/layout/banners/LW12CountdownBanner/Countdown'
 import { useTheme } from 'next-themes'
-import announcement from 'ui/src/layout/banners/data/Announcement.json'
+import announcement from '../Banners/data.json'
+import './styles.css'
 
-const LW12BGDark =
-  'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/images/launch-week/lw12/assets/bg-dark.svg?t=2024-07-26T09%3A59%3A25.373Z'
-const LW12BGLight =
-  'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/images/launch-week/lw12/assets/bg-light.svg?t=2024-07-26T09%3A59%3A25.373Z'
+const LW14BG = `/docs/img/launchweek/14/promo-banner-bg.png`
 
 const PromoToast = () => {
   const [visible, setVisible] = useState(false)
   const { resolvedTheme } = useTheme()
-  const bgImage = resolvedTheme?.includes('dark') ? LW12BGDark : LW12BGLight
 
   useEffect(() => {
     const shouldHide =
@@ -44,9 +40,16 @@ const PromoToast = () => {
         visible && 'opacity-100 translate-y-0'
       )}
     >
-      <p className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7"></p>
-      <div className="relative z-10 text-foreground-lighter flex flex-col text-sm w-full mb-2">
-        {/* <CountdownComponent date={new Date(announcement.launchDate)} showCard={false} /> */}
+      <div className="relative z-10 text-foreground-lighter uppercase flex flex-col text-sm w-full font-mono mb-2">
+        <span className="mb-1">{announcement.text}</span>
+        <p
+          style={{
+            fontFamily: 'Departure Mono, Source Code Pro, Office Code Pro, Menlo, monospace',
+          }}
+          className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7"
+        >
+          Top 10 Launches
+        </p>
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
@@ -60,10 +63,11 @@ const PromoToast = () => {
         </Button>
       </div>
       <Image
-        src={bgImage}
+        src={LW14BG}
         alt=""
         fill
         sizes="100%"
+        quality={100}
         aria-hidden
         className="absolute not-sr-only object-cover z-0 inset-0 w-full h-auto"
       />

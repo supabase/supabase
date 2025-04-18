@@ -29,16 +29,8 @@
 
 import * as acorn from 'acorn'
 import tsPlugin from 'acorn-typescript'
-import { type BlockContent, type Code, type Root } from 'mdast'
-import type {
-  MdxJsxAttribute,
-  MdxJsxAttributeValueExpression,
-  MdxJsxExpressionAttribute,
-  MdxJsxFlowElement,
-  MdxJsxFlowElementHast,
-  MdxJsxTextElement,
-  MdxJsxTextElementHast,
-} from 'mdast-util-mdx-jsx'
+import { type DefinitionContent, type BlockContent, type Code, type Root } from 'mdast'
+import type { MdxJsxAttributeValueExpression, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { type Parent } from 'unist'
@@ -46,21 +38,28 @@ import { visitParents } from 'unist-util-visit-parents'
 import { z, type SafeParseError } from 'zod'
 
 import { fetchWithNextOptions } from '~/features/helpers.fetch'
+import { IS_PLATFORM } from '~/lib/constants'
 import { EXAMPLES_DIRECTORY } from '~/lib/docs'
+import { getAttributeValue, getAttributeValueExpression } from './utils.server'
+
+const ALLOW_LISTED_GITHUB_ORGS = ['supabase', 'supabase-community'] as [string, ...string[]]
 
 const linesSchema = z.array(z.tuple([z.coerce.number(), z.coerce.number()]))
-const linesValidator = z.string().transform((v, ctx) => {
-  try {
-    const array = JSON.parse(v)
-    return linesSchema.parse(array)
-  } catch (e) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'Lines should be an array of [number, number] tuples',
-    })
-    return z.NEVER
-  }
-})
+const linesValidator = z
+  .string()
+  .default('[[1, -1]]')
+  .transform((v, ctx) => {
+    try {
+      const array = JSON.parse(v)
+      return linesSchema.parse(array)
+    } catch (e) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Lines should be an array of [number, number] tuples',
+      })
+      return z.NEVER
+    }
+  })
 
 type AdditionalMeta = {
   parent: Parent
@@ -70,7 +69,9 @@ type AdditionalMeta = {
 
 const codeSampleExternalSchema = z.object({
   external: z.coerce.boolean().refine((v) => v === true),
-  org: z.string(),
+  org: z.enum(ALLOW_LISTED_GITHUB_ORGS, {
+    errorMap: () => ({ message: 'Org must be one of: ' + ALLOW_LISTED_GITHUB_ORGS.join(', ') }),
+  }),
   repo: z.string(),
   commit: z.string(),
   path: z.string().transform((v) => (v.startsWith('/') ? v : `/${v}`)),
@@ -134,6 +135,12 @@ async function fetchSourceCodeContent(tree: Root, deps: Dependencies) {
     const isExternal = getAttributeValueExpression(getAttributeValue(node, 'external')) === 'true'
 
     if (isExternal) {
+      if (!IS_PLATFORM) {
+        node.name = 'CodeSampleDummy'
+        node.attributes = []
+        return
+      }
+
       const org = getAttributeValue(node, 'org')
       const repo = getAttributeValue(node, 'repo')
       const commit = getAttributeValue(node, 'commit')
@@ -213,23 +220,6 @@ async function fetchSourceCodeContent(tree: Root, deps: Dependencies) {
   })
 
   return nodeContentMap
-}
-
-function getAttributeValue(
-  node: MdxJsxFlowElement | MdxJsxFlowElementHast | MdxJsxTextElement | MdxJsxTextElementHast,
-  attributeName: string
-) {
-  return (
-    node.attributes.find(
-      (attr: MdxJsxAttribute | MdxJsxExpressionAttribute) =>
-        'name' in attr && attr.name === attributeName
-    )?.value ?? undefined
-  )
-}
-
-function getAttributeValueExpression(node: MdxJsxAttributeValueExpression | string | undefined) {
-  if (typeof node === 'string' || node?.type !== 'mdxJsxAttributeValueExpression') return undefined
-  return node.value
 }
 
 function rewriteNodes(contentMap: Map<MdxJsxFlowElement, [CodeSampleMeta, string]>) {
@@ -470,4 +460,8 @@ function createArrayAttributeValueExpression(...arrayElements: string[]) {
     },
   }
   return expression
+}
+
+export function isCodeSampleWrapper(node: BlockContent | DefinitionContent) {
+  return node.type === 'mdxJsxFlowElement' && node.name === 'CodeSampleWrapper'
 }

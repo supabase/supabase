@@ -1,10 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-import { toast } from 'sonner'
 import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import * as z from 'zod'
 
+import { useParams } from 'common'
+import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
+import { User } from 'data/auth/users-infinite-query'
 import {
   Button,
   cn,
@@ -20,10 +23,6 @@ import {
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
-import { User } from 'data/auth/users-query'
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useParams } from 'common'
 
 interface BanUserModalProps {
   visible: boolean
@@ -34,7 +33,6 @@ interface BanUserModalProps {
 export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
   const { ref: projectRef } = useParams()
 
-  const { data: apiData } = useProjectApiQuery({ projectRef })
   const { mutate: updateUser, isLoading: isBanningUser } = useUserUpdateMutation({
     onSuccess: (_, vars) => {
       const bannedUntil = dayjs()
@@ -62,19 +60,15 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
   const bannedUntil = dayjs().add(Number(value), unit).format('DD MMM YYYY HH:mm (ZZ)')
 
   const onSubmit = (data: FormType) => {
-    if (!apiData) {
-      return toast.error(`Failed to ban user: Error loading project config`)
-    } else if (user.id === undefined) {
+    if (projectRef === undefined) return console.error('Project ref is required')
+    if (user.id === undefined) {
       return toast.error(`Failed to ban user: User ID not found`)
     }
 
     const durationHours = data.unit === 'hours' ? Number(data.value) : Number(data.value) * 24
-    const { protocol, endpoint, serviceApiKey } = apiData.autoApiService
+
     updateUser({
       projectRef,
-      protocol,
-      endpoint,
-      serviceApiKey,
       userId: user.id,
       banDuration: durationHours,
     })

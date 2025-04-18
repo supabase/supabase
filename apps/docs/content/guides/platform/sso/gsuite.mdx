@@ -1,27 +1,27 @@
 ---
 title: 'Set Up SSO with Google Workspace'
-description: 'Configure single sign-on with Google Workspace (GSuite).'
+description: 'Configure single sign-on with Google Workspace (G Suite).'
 ---
 
-<Admonition>
+<Admonition type="note">
 
-This feature is only available on the Team and Enterprise Plans. Please contact [Sales](https://forms.supabase.com/enterprise) before doing these steps.
+This feature is only available on the [Team and Enterprise Plans](https://supabase.com/pricing). If you are an existing Team or Enterprise Plan customer, continue with the setup below. Once completed, [contact us](https://supabase.com/dashboard/support/new?category=Login_issues&subject=Enquiry%20about%20setting%20up%20SSO&message=I%20would%20like%20to%20set%20up%20SAML%20SSO%20for%20my%20team%20and%20have%20followed%20https://supabase.com/docs/guides/platform/sso%20and%20configured%20my%20provider%20%0A%0APlease%20attach%20the%20IDP%20metadata%20in%20the%20attachments%20below) to enable SSO for your team.
 
 </Admonition>
 
-<Admonition>
+<Admonition type="tip">
 
 Looking for docs on how to add Single Sign-On support in your Supabase project? Head on over to [Single Sign-On with SAML 2.0 for Projects](/docs/guides/auth/enterprise-sso/auth-sso-saml).
 
 </Admonition>
 
-Supabase supports single sign-on (SSO) using Google Workspace (formerly known as GSuite).
+Supabase supports single sign-on (SSO) using Google Workspace (formerly known as G Suite).
 
 ## Step 1: Open the Google Workspace web and mobile apps console [#google-workspace-console]
 
 ![Google Workspace: Web and mobile apps admin console](/docs/img/sso-gsuite-step-01.png)
 
-## Step 2: Choose Add custom SAML app [#add-custom-saml-app]
+## Step 2: Choose to add custom SAML app [#add-custom-saml-app]
 
 From the _Add app_ button in the toolbar choose _Add custom SAML app_.
 
@@ -63,7 +63,7 @@ Attribute mappings allow Supabase to get information about your Google Workspace
 
 **A _Primary email_ to `email` mapping is required.** Other mappings shown below are optional and configurable depending on your Google Workspace setup. If in doubt, replicate the same config as shown.
 
-Please share any changes, if any, from this screen with your Supabase support contact.
+Share any changes, if any, from this screen with your Supabase support contact.
 
 ![Google Workspace: Web and mobile apps admin console, Add custom SAML, Attribute mapping](/docs/img/sso-gsuite-step-06.png)
 

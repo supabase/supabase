@@ -1,0 +1,87 @@
+---
+id: 'postgres-js'
+title: 'Postgres.js'
+description: 'Postgres.js Quickstart'
+breadcrumb: 'ORM Quickstarts'
+hideToc: true
+---
+
+### Connecting with Postgres.js
+
+[Postgres.js](https://github.com/porsager/postgres) is a full-featured Postgres client for Node.js and Deno.
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="Install">
+
+    Install Postgres.js and related dependencies.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ```shell
+     npm i postgres
+     ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Connect">
+
+    Create a `db.js` file with the connection details.
+
+    To get your connection details, go to your [`Database Settings`](https://supabase.com/dashboard/project/_/settings/database). Make sure `Use connection pooling` is enabled. Choose `Transaction Mode` if you're on a platform with transient connections, such as a serverless function, and `Session Mode` if you have a long-lived connection. Copy the URI and save it as the environment variable `DATABASE_URL`.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```ts
+    // db.js
+    import postgres from 'postgres'
+
+    const connectionString = process.env.DATABASE_URL
+    const sql = postgres(connectionString)
+
+    export default sql
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Execute commands">
+
+    Use the connection to execute commands.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```ts
+    import sql from './db.js'
+
+    async function getUsersOver(age) {
+      const users = await sql`
+        select name, age
+        from users
+        where age > ${ age }
+      `
+      // users = Result [{ name: "Walter", age: 80 }, { name: 'Murray', age: 68 }, ...]
+      return users
+    }
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>

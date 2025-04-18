@@ -1,7 +1,7 @@
 import React from 'react'
 import { ImageResponse } from '@vercel/og'
 import { createClient } from '@supabase/supabase-js'
-import { themes } from '~/components/LaunchWeek/12/Ticket/ticketThemes'
+import { themes } from '~/components/LaunchWeek/14/utils/ticketThemes'
 
 export const runtime = 'edge' // 'nodejs' is the default
 export const dynamic = 'force-dynamic' // defaults to auto
@@ -15,24 +15,143 @@ const corsHeaders = {
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 
-const STORAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw12`
+const STORAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw14`
 
 // Load custom font
-const FONT_URL = `${STORAGE_URL}/assets/font/CircularStd-Book.otf`
-const MONO_FONT_URL = `${STORAGE_URL}/assets/font/SourceCodePro-Regular.ttf`
-const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
-const mono_font = fetch(new URL(MONO_FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
-// const BUCKET_FOLDER_VERSION = 'v1'
+// const FONT_URL = `${STORAGE_URL}/assets/font/Nippo-Regular.otf`
+// const MONO_FONT_URL = `${STORAGE_URL}/assets/font/DepartureMono-Regular.otf`
+
+const FONT_URL = '/fonts/launchweek/14/Nippo-Regular.otf'
+const MONO_FONT_URL = '/fonts/launchweek/14/DepartureMono-Regular.otf'
 
 const LW_TABLE = 'tickets'
 const LW_MATERIALIZED_VIEW = 'tickets_view'
 
+const usernameToLines = (username: string): string[] => {
+  const maxLineLength = 14
+
+  const nonBreakingReplacements = [
+    { regexp: new RegExp(' ', 'g'), replacement: '\u00A0' }, // Space → Non-breaking space
+    { regexp: new RegExp('-', 'g'), replacement: '\u2011' }, // Hyphen → Non-breaking hyphen
+    { regexp: new RegExp('/', 'g'), replacement: '\u2060\u002F\u2060' }, // Slash with word joiners
+    { regexp: new RegExp('\\.', 'g'), replacement: '\u2024' }, // One dot leader (alternative to period)
+  ]
+  const allowList = [...nonBreakingReplacements.map((x) => x.regexp), new RegExp('\\w', 'g')]
+    .map((x) => x.source.replace('-', '\\-'))
+    .join('|')
+  const allowRegexp = new RegExp(`[^${allowList}]`, 'g')
+  const allowdUsername = username.replace(allowRegexp, '')
+  // Split only by spaces, keeping hyphenated words together
+  const words = allowdUsername.split(' ')
+  const lines: string[] = []
+  let currentLine = ''
+
+  // First try to break at word boundaries (spaces only)
+  for (const word of words) {
+    // If adding this word would exceed the line length and we already have content
+    if (
+      currentLine.length + (currentLine ? 1 : 0) + word.length > maxLineLength &&
+      currentLine.length > 0
+    ) {
+      // Add current line to lines array and start a new line
+      lines.push(currentLine)
+      currentLine = word
+    } else {
+      // Add word to current line with a space if needed
+      currentLine = currentLine ? `${currentLine} ${word}` : word
+    }
+  }
+
+  // Add the last line if it has content
+  if (currentLine) {
+    lines.push(currentLine)
+  }
+
+  // If we still have too few lines but some are too long, split them by character
+  // but try to avoid splitting at hyphens
+  let finalLines: string[] = []
+  for (const line of lines) {
+    if (line.length > maxLineLength) {
+      // For long words, try to find good break points
+      let remainingText = line
+      while (remainingText.length > 0) {
+        if (remainingText.length <= maxLineLength) {
+          finalLines.push(remainingText)
+          break
+        }
+
+        // Try to find a good break point that's not a hyphen
+        let breakPoint = maxLineLength
+
+        // Look for a hyphen in the potential break area (a few chars before maxLineLength)
+        const searchArea = remainingText.substring(Math.max(0, breakPoint - 5), breakPoint + 1)
+        const hyphenPos = searchArea.indexOf('-')
+
+        // If we found a hyphen, adjust the break point to keep the hyphenated word together
+        if (hyphenPos >= 0) {
+          // Calculate the actual position in the original string
+          const actualHyphenPos = Math.max(0, breakPoint - 5) + hyphenPos
+
+          // If hyphen is near the beginning, include the whole hyphenated word on next line
+          if (actualHyphenPos < maxLineLength / 2) {
+            breakPoint = actualHyphenPos
+          }
+          // If hyphen is near the end, include the whole hyphenated word on this line
+          else {
+            // Find the end of the hyphenated word
+            const spaceAfterHyphen = remainingText.indexOf(' ', actualHyphenPos)
+            if (spaceAfterHyphen > 0 && spaceAfterHyphen - actualHyphenPos < 10) {
+              // If the rest of the hyphenated word is reasonably short, keep it together
+              breakPoint = spaceAfterHyphen
+            }
+          }
+        }
+
+        finalLines.push(remainingText.substring(0, breakPoint))
+        remainingText = remainingText.substring(breakPoint).trim()
+      }
+    } else {
+      finalLines.push(line)
+    }
+  }
+
+  // Limit to 3 lines maximum
+  if (finalLines.length > 3) {
+    finalLines = finalLines.slice(0, 2)
+    // Truncate the last line if needed and add ellipsis
+    let lastLine = finalLines[2] || ''
+    if (lastLine.length > 8) {
+      lastLine = lastLine.slice(0, 8) + '...'
+    }
+    finalLines.push(lastLine)
+  }
+
+  finalLines = finalLines.map((line, index) => {
+    let result = line
+    nonBreakingReplacements.forEach(({ regexp, replacement }) => {
+      result = result.replace(regexp, replacement)
+    })
+
+    if (index < finalLines.length - 1) {
+      result = result.padEnd(maxLineLength, '\u00A0')
+    }
+    return result
+  })
+
+  // Ensure we don't have more than 3 lines
+  return finalLines.slice(0, 3)
+}
+
 export async function GET(req: Request, res: Response) {
   const url = new URL(req.url)
-  console.log(process.env.NEXT_PUBLIC_SUPABASE_URL)
+
+  // Just here to silence snyk false positives
+  // Verify that req.url is from an allowed domain
   const username = url.searchParams.get('username') ?? url.searchParams.get('amp;username')
-  const assumePlatinum = url.searchParams.get('platinum') ?? url.searchParams.get('amp;platinum')
   const userAgent = req.headers.get('user-agent')
+
+  const font = fetch(new URL(FONT_URL, url)).then((res) => res.arrayBuffer())
+  const mono_font = fetch(new URL(MONO_FONT_URL, url)).then((res) => res.arrayBuffer())
 
   try {
     if (!username) throw new Error('missing username param')
@@ -47,14 +166,14 @@ export async function GET(req: Request, res: Response) {
       await supabaseAdminClient
         .from(LW_TABLE)
         .update({ shared_on_twitter: 'now' })
-        .eq('launch_week', 'lw12')
+        .eq('launch_week', 'lw14')
         .eq('username', username)
         .is('shared_on_twitter', null)
     } else if (userAgent?.toLocaleLowerCase().includes('linkedin')) {
       await supabaseAdminClient
         .from(LW_TABLE)
         .update({ shared_on_linkedin: 'now' })
-        .eq('launch_week', 'lw12')
+        .eq('launch_week', 'lw14')
         .eq('username', username)
         .is('shared_on_linkedin', null)
     }
@@ -63,91 +182,106 @@ export async function GET(req: Request, res: Response) {
     const { data: user, error } = await supabaseAdminClient
       .from(LW_MATERIALIZED_VIEW)
       .select(
-        'id, name, ticket_number, shared_on_twitter, shared_on_linkedin, platinum, secret, role, company, location'
+        'id, name, metadata, shared_on_twitter, shared_on_linkedin, platinum, secret, role, company, location, ticket_number'
       )
-      .eq('launch_week', 'lw12')
+      .eq('launch_week', 'lw14')
       .eq('username', username)
       .maybeSingle()
 
-    if (error) console.log('fetch error', error.message)
+    if (error) console.log('Failed to fetch user. Inner error:', error.message)
     if (!user) throw new Error(error?.message ?? 'user not found')
 
     const {
       name,
-      ticket_number: ticketNumber,
       secret,
       platinum: isPlatinum,
       shared_on_twitter: sharedOnTwitter,
       shared_on_linkedin: sharedOnLinkedIn,
+      ticket_number,
     } = user
 
-    console.log(user)
-
     const platinum = isPlatinum ?? (!!sharedOnTwitter && !!sharedOnLinkedIn) ?? false
-    if (assumePlatinum && !platinum)
-      return await fetch(`${STORAGE_URL}/assets/platinum_no_meme.jpg`)
+    const platinumSecret = platinum && secret
+
+    const seatCode = (466561 + (ticket_number || 0)).toString(36).toUpperCase()
 
     // Generate image and upload to storage.
-    const ticketType = secret ? 'secret' : platinum ? 'platinum' : 'regular'
+    const ticketType = secret
+      ? platinum
+        ? 'platinumSecret'
+        : 'secret'
+      : platinum
+        ? 'platinum'
+        : 'regular'
 
-    const STYLING_CONFIG = {
-      BACKGROUND: themes[ticketType].OG_BACKGROUND,
-      FOREGROUND: themes[ticketType].TICKET_FOREGROUND,
-      FOREGROUND_LIGHT: themes[ticketType].TICKET_FOREGROUND_LIGHT,
-      TICKET_BORDER: themes[ticketType].TICKET_BORDER,
-      TICKET_FOREGROUND: themes[ticketType].TICKET_FOREGROUND,
-      TICKET_BACKGROUND: themes[ticketType].TICKET_BACKGROUND,
-      TICKET_BACKGROUND_CODE: themes[ticketType].TICKET_BACKGROUND_CODE,
-      TICKET_FOREGROUND_LIGHT: themes[ticketType].TICKET_FOREGROUND_LIGHT,
-      BORDER: themes[ticketType].TICKET_BORDER,
-      CODE_LINE_NUMBER: themes[ticketType].CODE_LINE_NUMBER,
-      CODE_BASE: themes[ticketType].CODE_THEME['hljs'].color,
-      CODE_HIGHLIGHT: themes[ticketType].CODE_HIGHLIGHT_BACKGROUND,
-      CODE_FUNCTION: themes[ticketType].CODE_THEME['hljs'].color,
-      CODE_VARIABLE: themes[ticketType].CODE_THEME['hljs'].color,
-      CODE_METHOD: themes[ticketType].CODE_THEME['hljs'].color,
-      CODE_EXPRESSION: themes[ticketType].CODE_THEME['hljs-keyword'].color,
-      CODE_STRING: themes[ticketType].CODE_THEME['hljs-string'].color,
-      CODE_NUMBER: themes[ticketType].CODE_THEME['hljs'].color,
-      CODE_NULL: themes[ticketType].CODE_THEME['hljs'].color,
-      JSON_KEY: themes[ticketType].CODE_THEME['hljs-attr'].color,
+    const STYLING_CONFIG = () => ({
+      TICKET_FOREGROUND: themes()[ticketType].TICKET_FOREGROUND,
+    })
+
+    const TICKET_THEME = {
+      regular: {
+        color: 'rgb(239, 239, 239)',
+        background: 'transparent',
+      },
+      secret: {
+        color: 'rgba(44, 244, 148)',
+        background: 'rgba(44, 244, 148, 0.2)',
+      },
+      platinum: {
+        color: 'rgba(255, 199, 58)',
+        background: 'rgba(255, 199, 58, 0.2)',
+      },
+      platinumSecret: {
+        color: 'rgba(255, 199, 58)',
+        background: 'rgba(255, 199, 58, 0.2)',
+      },
     }
 
     const fontData = await font
     const monoFontData = await mono_font
+
     const OG_WIDTH = 1200
     const OG_HEIGHT = 628
-    const OG_PADDING_X = 60
-    const OG_PADDING_Y = 60
-    const TICKET_WIDTH = 550
-    const TICKET_RATIO = 396 / 613
-    const TICKET_HEIGHT = TICKET_WIDTH / TICKET_RATIO
-    const TICKET_POS_TOP = OG_PADDING_Y
-    const TICKET_POS_LEFT = 540
-    const LOGO_WIDTH = 40
-    const LOGO_RATIO = 436 / 449
-    const DISPLAY_NAME = name || username
-    const FIRST_NAME = DISPLAY_NAME?.split(' ')[0]
+    const USERNAME_BOTTOM = 435
 
-    const BACKGROUND = {
+    const BACKGROUND = () => ({
       regular: {
-        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png`,
-        BACKGROUND_GRID: `${STORAGE_URL}/assets/bg-dark.png?t=2024-07-26T11%3A13%3A36.534Z`,
+        BACKGROUND_IMG: new URL(`/images/launchweek/14/og-14-regular.png`, url).href,
       },
       platinum: {
-        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png`,
-        BACKGROUND_GRID: `${STORAGE_URL}/assets/bg-dark.png?t=2024-07-26T11%3A13%3A36.534Z`,
+        BACKGROUND_IMG: new URL(`/images/launchweek/14/og-14-platinum.png`, url).href,
+      },
+      platinumSecret: {
+        BACKGROUND_IMG: new URL(`/images/launchweek/14/og-14-platinum-secret.png`, url).href,
       },
       secret: {
-        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon-white.png`,
-        BACKGROUND_GRID: `${STORAGE_URL}/assets/bg-light.png`,
+        BACKGROUND_IMG: new URL(`/images/launchweek/14/og-14-secret.png`, url).href,
       },
+    })
+
+    const NOISE = new URL('/images/launchweek/14/noise-pattern.png', url).href
+
+    const computeBackgroundWidth = (letters: number) => {
+      return 100 + (letters * 40 + (letters - 1) * 12)
+    }
+    const lines = usernameToLines(name ?? username)
+
+    const secretStyles = {
+      background: 'linear-gradient(0deg, rgb(18 18 18 / 0.5) 50%, transparent 50%)',
+      backgroundSize: '100% 6px, 0px 100%',
     }
 
-    const lineNumberStyle = {
-      paddingLeft: 24,
-      width: 46,
-      color: STYLING_CONFIG.CODE_LINE_NUMBER,
+    const testStyles = {
+      background: 'red',
+      backgroundSize: '100% 6px, 0px 100%',
+    }
+
+    const secretTextStyles = {
+      textShadow: '0 0 15px rgba(52,211,153,0.8)',
+    }
+
+    const platinumSecretTextStyles = {
+      textShadow: '0 0 15px rgba(255,199,58,0.8)',
     }
 
     const generatedTicketImage = new ImageResponse(
@@ -158,362 +292,106 @@ export async function GET(req: Request, res: Response) {
               width: '1200px',
               height: '628px',
               position: 'relative',
-              fontFamily: '"Circular"',
-              color: STYLING_CONFIG.FOREGROUND,
-              backgroundColor: STYLING_CONFIG.BACKGROUND,
+              fontFamily: '"Nippo-Regular"',
               overflow: 'hidden',
+              color: STYLING_CONFIG().TICKET_FOREGROUND,
               display: 'flex',
               flexDirection: 'column',
-              padding: '60px',
               justifyContent: 'space-between',
             }}
           >
-            {/* Background  */}
+            {/* Background */}
             <img
-              width="1202"
-              height="632"
+              width="1204"
+              height="634"
               style={{
                 position: 'absolute',
-                top: '-1px',
-                left: '-1px',
-                bottom: '-1px',
-                right: '-1px',
-                zIndex: '0',
-                opacity: ticketType === 'secret' ? 0.2 : 0.5,
-                background: STYLING_CONFIG.BACKGROUND,
+                top: '-2px',
+                left: '-2px',
+                bottom: '-2px',
+                right: '-2px',
                 backgroundSize: 'cover',
+                backgroundColor: STYLING_CONFIG().TICKET_FOREGROUND,
               }}
-              src={BACKGROUND[ticketType].BACKGROUND_GRID}
+              src={BACKGROUND()[ticketType].BACKGROUND_IMG}
             />
-            {/* Ticket  */}
+            {/* Seat number */}
             <div
               style={{
-                display: 'flex',
+                transform: 'rotate(-90deg)',
+                fontFamily: '"Nippo-Regular"',
+                fontSize: '82px',
                 position: 'absolute',
-                zIndex: '1',
-                top: TICKET_POS_TOP,
-                left: TICKET_POS_LEFT,
-                width: TICKET_WIDTH,
-                height: TICKET_HEIGHT,
-                margin: 0,
-                borderRadius: '20px',
-                fontSize: 18,
-                background: STYLING_CONFIG.TICKET_BACKGROUND_CODE,
-                color: STYLING_CONFIG.TICKET_FOREGROUND,
-                border: `1px solid ${STYLING_CONFIG.TICKET_BORDER}`,
-                boxShadow: '0px 0px 45px rgba(0, 0, 0, 0.15)',
+                color: TICKET_THEME[ticketType].color,
+                top: 70,
+                right: 135,
+                ...(secret ? secretTextStyles : {}),
+                ...(platinumSecret ? platinumSecretTextStyles : {}),
               }}
-              tw="flex flex-col overflow-hidden"
             >
-              <span
-                tw="uppercase p-6"
-                style={{
-                  fontSize: 18,
-                  letterSpacing: 2,
-                  color: STYLING_CONFIG.FOREGROUND,
-                }}
-              >
-                Launch Week 12
-                <span tw="pl-2" style={{ color: STYLING_CONFIG.TICKET_FOREGROUND_LIGHT }}>
-                  Ticket
-                </span>
-              </span>
-              {/* Request code snippet */}
-              <div
-                style={{ fontFamily: '"SourceCodePro"', lineHeight: '130%' }}
-                tw="p-6 pt-0 flex flex-row w-full"
-              >
-                <div tw="w-6 flex flex-col" style={{ color: STYLING_CONFIG.CODE_LINE_NUMBER }}>
-                  <span>1</span>
-                  <span>2</span>
-                  <span>3</span>
-                  <span>4</span>
-                  <span>5</span>
-                </div>
-                <div
-                  tw="flex flex-col"
-                  style={{
-                    color: STYLING_CONFIG.CODE_BASE,
-                  }}
-                >
-                  <span>
-                    <span style={{ color: STYLING_CONFIG.CODE_EXPRESSION }}>await</span>{' '}
-                    <span style={{ color: STYLING_CONFIG.CODE_FUNCTION }} tw="ml-3">
-                      supabase
-                    </span>
-                  </span>
-                  <span tw="pl-4">
-                    <span>.</span>
-                    <span style={{ color: STYLING_CONFIG.CODE_METHOD }}>from</span>
-                    <span>&#40;</span>
-                    <span style={{ color: STYLING_CONFIG.CODE_STRING }}>'tickets'</span>
-                    <span>&#41;</span>
-                  </span>
-                  <span tw="pl-4">
-                    <span>.</span>
-                    <span style={{ color: STYLING_CONFIG.CODE_METHOD }}>select</span>
-                    <span>&#40;</span>
-                    <span style={{ color: STYLING_CONFIG.CODE_STRING }}>'*'</span>
-                    <span>&#41;</span>
-                  </span>
-                  <span tw="pl-4">
-                    <span>.</span>
-                    <span style={{ color: STYLING_CONFIG.CODE_METHOD }}>eq</span>
-                    <span>&#40;</span>
-                    <span style={{ color: STYLING_CONFIG.CODE_STRING }}>'username'</span>
-                    <span tw="mr-3">,</span>
-                    <span style={{ color: STYLING_CONFIG.CODE_STRING }}>'{username}'</span>
-                    <span>&#41;</span>
-                  </span>
-                  <span tw="pl-4">
-                    <span>.</span>
-                    <span style={{ color: STYLING_CONFIG.CODE_METHOD }}>single</span>
-                    <span>&#40;</span>
-                    <span>&#41;</span>
-                  </span>
-                </div>
-              </div>
-              {/* Response Json */}
-              <div
-                style={{
-                  fontFamily: '"SourceCodePro"',
-                  lineHeight: '130%',
-                  background: STYLING_CONFIG.TICKET_BACKGROUND,
-                  borderTop: `1px solid ${STYLING_CONFIG.TICKET_BORDER}`,
-                }}
-                tw="py-6 flex flex-col flex-grow w-full"
-              >
-                <div
-                  tw="flex px-6 mb-4 uppercase"
-                  style={{
-                    lineHeight: '100%',
-                    fontSize: 16,
-                    color: STYLING_CONFIG.TICKET_FOREGROUND_LIGHT,
-                  }}
-                >
-                  TICKET RESPONSE
-                </div>
-                <div
-                  tw="flex flex-col w-full"
-                  style={{
-                    color: STYLING_CONFIG.CODE_BASE,
-                  }}
-                >
-                  <div tw="flex">
-                    <span style={lineNumberStyle}>1</span>
-                    <span>&#123;</span>
-                  </div>
-                  <div tw="flex">
-                    <span style={lineNumberStyle}>2</span>
-                    <span>
-                      <span tw="ml-6" style={{ color: STYLING_CONFIG.JSON_KEY }}>
-                        "data"
-                      </span>
-                      <span tw="mr-2">:</span>
-                      <span>&#123;</span>
-                    </span>
-                  </div>
-                  <div
-                    tw="flex flex-col w-full"
-                    style={{
-                      background: STYLING_CONFIG.CODE_HIGHLIGHT,
-                      borderLeft: `1px solid ${STYLING_CONFIG.CODE_BASE}`,
-                    }}
-                  >
-                    <div tw="flex">
-                      <span style={lineNumberStyle}>3</span>
-                      <span>
-                        <span tw="ml-12 mr-2" style={{ color: STYLING_CONFIG.JSON_KEY }}>
-                          "name"
-                        </span>
-                        <span>:</span>
-                        <span tw="ml-2" style={{ color: STYLING_CONFIG.CODE_STRING }}>
-                          "{name}"
-                        </span>
-                        <span>,</span>
-                      </span>
-                    </div>
-                    <div tw="flex">
-                      <span style={lineNumberStyle}>4</span>
-                      <span>
-                        <span tw="ml-12 mr-2" style={{ color: STYLING_CONFIG.JSON_KEY }}>
-                          "username"
-                        </span>
-                        <span>:</span>
-                        <span tw="ml-2" style={{ color: STYLING_CONFIG.CODE_STRING }}>
-                          "{username}"
-                        </span>
-                        <span>,</span>
-                      </span>
-                    </div>
-                    <div tw="flex">
-                      <span style={lineNumberStyle}>6</span>
-                      <span>
-                        <span tw="ml-12 mr-2" style={{ color: STYLING_CONFIG.JSON_KEY }}>
-                          "ticket_number"
-                        </span>
-                        <span>:</span>
-                        <span tw="ml-2" style={{ color: STYLING_CONFIG.CODE_STRING }}>
-                          "{ticketNumber}"
-                        </span>
-                        <span>,</span>
-                      </span>
-                    </div>
-                    <div tw="flex">
-                      <span style={lineNumberStyle}>7</span>
-                      <span>
-                        <span tw="ml-12 mr-2" style={{ color: STYLING_CONFIG.JSON_KEY }}>
-                          "role"
-                        </span>
-                        <span>:</span>
-                        {user.role ? (
-                          <span tw="ml-2" style={{ color: STYLING_CONFIG.CODE_STRING }}>
-                            "{user.role}"
-                          </span>
-                        ) : (
-                          <span tw="ml-2" style={{ color: STYLING_CONFIG.CODE_NULL }}>
-                            null
-                          </span>
-                        )}
-                        <span>,</span>
-                      </span>
-                    </div>
-                    <div tw="flex">
-                      <span style={lineNumberStyle}>8</span>
-                      <span>
-                        <span tw="ml-12 mr-2" style={{ color: STYLING_CONFIG.JSON_KEY }}>
-                          "company"
-                        </span>
-                        <span>:</span>
-                        {user.company ? (
-                          <span tw="ml-2" style={{ color: STYLING_CONFIG.CODE_STRING }}>
-                            "{user.company}"
-                          </span>
-                        ) : (
-                          <span tw="ml-2" style={{ color: STYLING_CONFIG.CODE_NULL }}>
-                            null
-                          </span>
-                        )}
-                        <span>,</span>
-                      </span>
-                    </div>
-                    <div tw="flex">
-                      <span style={lineNumberStyle}>9</span>
-                      <span>
-                        <span tw="ml-12 mr-2" style={{ color: STYLING_CONFIG.JSON_KEY }}>
-                          "location"
-                        </span>
-                        <span>:</span>
-                        {user.location ? (
-                          <span tw="ml-2" style={{ color: STYLING_CONFIG.CODE_STRING }}>
-                            "{user.location}"
-                          </span>
-                        ) : (
-                          <span tw="ml-2" style={{ color: STYLING_CONFIG.CODE_NULL }}>
-                            null
-                          </span>
-                        )}
-                        <span>,</span>
-                      </span>
-                    </div>
-                  </div>
-                  <div tw="flex">
-                    <span style={lineNumberStyle}>10</span>
-                    <span tw="ml-6">&#125;,</span>
-                  </div>
-                  <div tw="flex">
-                    <span style={lineNumberStyle}>11</span>
-                    <span>
-                      <span tw="ml-6" style={{ color: STYLING_CONFIG.JSON_KEY }}>
-                        "error"
-                      </span>
-                      <span>:</span>
-                      <span tw="ml-2" style={{ color: STYLING_CONFIG.CODE_NULL }}>
-                        null
-                      </span>
-                    </span>
-                  </div>
-                  <div tw="flex">
-                    <span style={lineNumberStyle}>12</span>
-                    <span tw="ml-2">&#125;</span>
-                  </div>
-                </div>
-              </div>
+              {seatCode}
             </div>
 
-            <div
-              style={{
-                position: 'absolute',
-                top: OG_PADDING_Y,
-                left: OG_PADDING_X,
-                bottom: OG_PADDING_Y,
-                display: 'flex',
-                flexDirection: 'column',
-                width: TICKET_POS_LEFT - OG_PADDING_X,
-                alignItems: 'flex-start',
-                justifyContent: 'center',
-                letterSpacing: '0.15rem',
-                lineHeight: '110%',
-              }}
-            >
+            {/* Render each username line */}
+            {lines.map((line, index) => (
               <div
+                key={index}
                 style={{
                   display: 'flex',
                   position: 'absolute',
-                  top: 10,
-                  left: 0,
-                  marginBottom: '40',
+                  bottom: USERNAME_BOTTOM - index * 80,
+                  paddingLeft: '93px',
+                  paddingRight: 0,
+                  left: 27,
+                  height: '61px',
+                  width: `${computeBackgroundWidth(line.length)}px`,
+                  backgroundColor: TICKET_THEME[ticketType].background,
                 }}
               >
-                <img
-                  src={BACKGROUND[ticketType].LOGO}
-                  width={LOGO_WIDTH}
-                  height={LOGO_WIDTH / LOGO_RATIO}
-                  alt="logo"
-                />
+                <p
+                  style={{
+                    fontFamily: '"DepartureMono-Regular"',
+                    margin: '0',
+                    color: TICKET_THEME[ticketType].color,
+                    padding: '0',
+                    fontSize: '82px',
+                    lineHeight: '56px',
+                    display: 'flex',
+                    ...(secret ? secretTextStyles : {}),
+                    ...(platinumSecret ? platinumSecretTextStyles : {}),
+                  }}
+                >
+                  {line}
+                </p>
               </div>
+            ))}
 
-              <p
+            {secret && (
+              <div
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  marginBottom: 60,
-                  fontSize: 38,
-                  letterSpacing: '0',
-                  color: STYLING_CONFIG.FOREGROUND_LIGHT,
+                  position: 'absolute',
+                  top: '0px',
+                  left: '0px',
+                  right: '0px',
+                  bottom: '0px',
+                  ...secretStyles,
                 }}
-              >
-                <span
-                  style={{
-                    display: 'flex',
-                    margin: 0,
-                    color: STYLING_CONFIG.FOREGROUND_LIGHT,
-                  }}
-                >
-                  Join {FIRST_NAME} for
-                </span>
-                <span
-                  style={{
-                    display: 'flex',
-                    margin: 0,
-                    color: STYLING_CONFIG.FOREGROUND,
-                  }}
-                >
-                  Launch Week 12
-                </span>
-              </p>
-              <p
+              />
+            )}
+
+            {secret && (
+              <img
+                src={NOISE}
                 style={{
-                  margin: '0',
-                  fontFamily: '"SourceCodePro"',
-                  fontSize: 26,
-                  textTransform: 'uppercase',
-                  color: STYLING_CONFIG.FOREGROUND_LIGHT,
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  opacity: '0.1',
                 }}
-              >
-                August 12-16 / 7AM PT
-              </p>
-            </div>
+              />
+            )}
           </div>
         </>
       ),
@@ -522,12 +400,12 @@ export async function GET(req: Request, res: Response) {
         height: OG_HEIGHT,
         fonts: [
           {
-            name: 'Circular',
+            name: 'Nippo-Regular',
             data: fontData,
             style: 'normal',
           },
           {
-            name: 'SourceCodePro',
+            name: 'DepartureMono-Regular',
             data: monoFontData,
             style: 'normal',
           },
@@ -541,12 +419,12 @@ export async function GET(req: Request, res: Response) {
     )
 
     // [Note] Uncomment only for local testing to return the image directly and skip storage upload.
-    // return await generatedTicketImage
+    // return generatedTicketImage
 
     // Upload image to storage.
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
-      .upload(`launch-week/lw12/og/${ticketType}/${username}.png`, generatedTicketImage.body!, {
+      .upload(`launch-week/lw14/og/${ticketType}/${username}.png`, generatedTicketImage.body!, {
         contentType: 'image/png',
         // cacheControl: `${60 * 60 * 24 * 7}`,
         cacheControl: `0`,

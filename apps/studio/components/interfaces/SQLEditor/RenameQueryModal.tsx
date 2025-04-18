@@ -4,12 +4,18 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { getContentById } from 'data/content/content-id-query'
+import {
+  UpsertContentPayload,
+  useContentUpsertMutation,
+} from 'data/content/content-upsert-mutation'
 import { Snippet } from 'data/content/sql-folders-query'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { createTabId, renameTab } from 'state/tabs'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
+import { useIsSQLEditorTabsEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 
 export interface RenameQueryModalProps {
@@ -29,8 +35,12 @@ const RenameQueryModal = ({
   const organization = useSelectedOrganization()
 
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const { data: subscription } = useOrgSubscriptionQuery(
+    { orgSlug: organization?.slug },
+    { enabled: visible }
+  )
   const isSQLSnippet = snippet.type === 'sql'
+  const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   // Customers on HIPAA plans should not have access to Supabase AI
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
@@ -57,7 +67,9 @@ const RenameQueryModal = ({
     } else {
       try {
         const { content } = await getContentById({ projectRef: ref, id: snippet.id })
-        titleSql({ sql: content.sql })
+        if ('sql' in content) {
+          titleSql({ sql: content.sql })
+        }
       } catch (error) {
         toast.error('Unable to generate title based on query contents')
       }
@@ -70,24 +82,43 @@ const RenameQueryModal = ({
     return errors
   }
 
+  const { mutateAsync: upsertContent } = useContentUpsertMutation()
+
   const onSubmit = async (values: any, { setSubmitting }: any) => {
     if (!ref) return console.error('Project ref is required')
     if (!id) return console.error('Snippet ID is required')
 
     setSubmitting(true)
     try {
-      // [Joshen] For SQL V2 - content is loaded on demand so we need to fetch the data if its not already loaded in the valtio state
-      if (!('content' in snippet)) {
-        // [Joshen] I feel like there's definitely some optimization we can do here but will involve changes to API
-        const snippet = await getContentById({ projectRef: ref, id })
-        snapV2.addSnippet({ projectRef: ref, snippet })
-      }
-      snapV2.renameSnippet({ id, name: nameInput, description: descriptionInput })
+      let localSnippet = snippet
 
+      // [Joshen] For SQL V2 - content is loaded on demand so we need to fetch the data if its not already loaded in the valtio state
+      if (!('content' in localSnippet)) {
+        localSnippet = await getContentById({ projectRef: ref, id })
+
+        snapV2.addSnippet({ projectRef: ref, snippet: localSnippet })
+      }
+
+      await upsertContent({
+        projectRef: ref,
+        payload: {
+          ...localSnippet,
+          name: nameInput,
+          description: descriptionInput,
+        } as UpsertContentPayload,
+      })
+
+      snapV2.renameSnippet({ id, name: nameInput, description: descriptionInput })
+      if (isSQLEditorTabsEnabled && ref) {
+        const tabId = createTabId('sql', { id })
+        renameTab(ref, tabId, nameInput)
+      }
+      toast.success('Successfully renamed snippet!')
       if (onComplete) onComplete()
     } catch (error: any) {
+      setSubmitting(false)
       // [Joshen] We probably need some rollback cause all the saving is async
-      toast.error(`Failed to rename query: ${error.message}`)
+      toast.error(`Failed to rename snippet: ${error.message}`)
     }
   }
 

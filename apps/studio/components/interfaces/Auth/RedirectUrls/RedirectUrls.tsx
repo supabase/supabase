@@ -1,10 +1,13 @@
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
+import {
+  ScaffoldDescription,
+  ScaffoldSection,
+  ScaffoldSectionTitle,
+} from 'components/layouts/Scaffold'
+import { DocsButton } from 'components/ui/DocsButton'
 import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers/Shimmers'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
@@ -70,24 +73,18 @@ export const RedirectUrls = () => {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between">
-        <FormHeader
-          title="Redirect URLs"
-          description="URLs that auth providers are permitted to redirect to post authentication. Wildcards are allowed, for example, https://*.domain.com"
-        />
-        <div className="flex items-center gap-2 mb-6 ml-12">
-          <Button asChild type="default" icon={<ExternalLink />}>
-            <Link
-              href="https://supabase.com/docs/guides/auth/concepts/redirect-urls"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Documentation
-            </Link>
-          </Button>
+    <ScaffoldSection isFullWidth>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <ScaffoldSectionTitle>Redirect URLs</ScaffoldSectionTitle>
+          <ScaffoldDescription>
+            URLs that auth providers are permitted to redirect to post authentication. Wildcards are
+            allowed, for example, https://*.domain.com
+          </ScaffoldDescription>
         </div>
+        <DocsButton href="https://supabase.com/docs/guides/auth/concepts/redirect-urls" />
       </div>
+
       {isLoading && (
         <>
           <ValueContainer>
@@ -98,6 +95,7 @@ export const RedirectUrls = () => {
           </ValueContainer>
         </>
       )}
+
       {isError && (
         <Alert_Shadcn_ variant="destructive">
           <WarningIcon />
@@ -105,6 +103,7 @@ export const RedirectUrls = () => {
           <AlertDescription_Shadcn_>{authConfigError.message}</AlertDescription_Shadcn_>
         </Alert_Shadcn_>
       )}
+
       {isSuccess && (
         <RedirectUrlList
           allowList={URI_ALLOW_LIST_ARRAY}
@@ -176,6 +175,6 @@ export const RedirectUrls = () => {
           </Button>
         </Modal.Content>
       </Modal>
-    </div>
+    </ScaffoldSection>
   )
 }

@@ -1,0 +1,47 @@
+/* Make Sandpack take full height - with higher specificity */
+html body .sp-wrapper {
+  height: 100% !important;
+  min-height: 100% !important;
+}
+
+html body .sp-layout {
+  height: 100% !important;
+  border: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+html body .sp-stack {
+  height: 100% !important;
+  flex: 1 !important;
+}
+
+/* Fix for Sandpack preview */
+html body .sp-preview-container {
+  height: 100% !important;
+}
+
+html body .sp-preview-iframe {
+  height: 100% !important;
+}
+
+/* Fix for Sandpack editor */
+html body .sp-editor {
+  height: 100% !important;
+  overflow: auto !important;
+}
+
+html body .cm-editor {
+  height: 100% !important;
+  overflow: auto !important;
+}
+
+/* Remove unnecessary borders */
+html body .sp-tabs {
+  border-bottom: none !important;
+}
+
+/* Fix for Sandpack layout when both components are rendered */
+html body .sp-layout > div {
+  flex: 1 !important;
+}

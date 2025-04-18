@@ -69,9 +69,9 @@ const WarningIcon = () => (
 const admonitionSVG = cva('', {
   variants: {
     type: {
-      default: `[&>svg]:bg-foreground-muted [&>svg]:text-background-muted`,
-      warning: `[&>svg]:bg-warning [&>svg]:text-warning-100`,
-      destructive: `[&>svg]:bg-destructive [&>svg]:text-white`,
+      default: `[&>svg]:bg-foreground-muted`,
+      warning: ``,
+      destructive: ``,
     },
   },
 })
@@ -80,7 +80,7 @@ const admonitionBase = cva('', {
   variants: {
     type: {
       default: `bg-surface-200/25 border border-default`,
-      warning: `bg-alternative border border-default ![&_p]:text-background-muted`,
+      warning: `bg-alternative border border-default`,
       destructive: `bg-alternative border border-default`,
     },
   },
@@ -103,6 +103,7 @@ export const Admonition = forwardRef<
         {...props}
         className={cn(
           'mb-2',
+          '[&_a]:underline',
           admonitionSVG({ type: typeMapped }),
           admonitionBase({ type: typeMapped }),
           props.className
@@ -110,9 +111,9 @@ export const Admonition = forwardRef<
       >
         {(showIcon && typeMapped === 'warning') || typeMapped === 'destructive' ? (
           <WarningIcon />
-        ) : (
+        ) : showIcon ? (
           <InfoIcon />
-        )}
+        ) : null}
         {label || title ? (
           <>
             <AlertTitle_Shadcn_
@@ -134,10 +135,7 @@ export const Admonition = forwardRef<
             {children && (
               <AlertDescription_Shadcn_
                 {...props.childProps?.description}
-                className={cn(
-                  'mt-3 [&_p]:mb-1.5 [&_p]:mt-0',
-                  props.childProps?.description?.className
-                )}
+                className={cn('[&_p]:mb-1.5 [&_p]:mt-0', props.childProps?.description?.className)}
               >
                 {children}
               </AlertDescription_Shadcn_>

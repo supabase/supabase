@@ -1,6 +1,6 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { sortBy } from 'lodash'
-import { ArrowRight, Database, ExternalLink, HelpCircle, Table, X } from 'lucide-react'
+import { ArrowRight, Database, HelpCircle, Table, X } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
 import {
   AlertDescription_Shadcn_,
@@ -12,6 +12,7 @@ import {
 } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { DocsButton } from 'components/ui/DocsButton'
 import InformationBox from 'components/ui/InformationBox'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { useSchemasQuery } from 'data/database/schemas-query'
@@ -498,15 +499,7 @@ export const ForeignKeySelector = ({
                 label="Action if referenced row is removed"
                 // @ts-ignore
                 labelOptional={
-                  <Button asChild type="default" icon={<ExternalLink />}>
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://supabase.com/docs/guides/database/postgres/cascade-deletes"
-                    >
-                      Documentation
-                    </a>
-                  </Button>
+                  <DocsButton href="https://supabase.com/docs/guides/database/postgres/cascade-deletes" />
                 }
                 descriptionText={
                   <>
