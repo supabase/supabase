@@ -5,8 +5,6 @@ export * from './src/lib/Markdown'
 // GENERAL
 
 export * from './src/components/Button'
-export * from './src/components/Icon'
-export * from './src/components/Icon/IconContext'
 export * from './src/components/Icon/IconBackground'
 export * from './src/components/Image'
 
@@ -19,7 +17,6 @@ export * from './src/components/Accordion'
 export * from './src/components/Collapsible'
 export * from './src/components/CodeBlock'
 export * from './src/components/SimpleCodeBlock'
-export * from './src/components/TreeView/TreeView'
 
 // NAV
 
@@ -30,19 +27,17 @@ export * from './src/components/NavMenu'
 
 export * from './src/components/Modal'
 export * from './src/components/SidePanel'
-export * from './src/components/ContextMenu'
 export * from './src/components/Popover'
 
 // HTML
 
-export * from './src/components/CustomHTMLElements'
+export { Heading } from './src/components/CustomHTMLElements'
 
 // UTILITIES
 
 export * from './src/components/Space'
 export * from './src/components/Loading'
 export * from './src/components/LogoLoader'
-export * from './src/components/Divider'
 export * from './src/lib/utils'
 
 // DATA ENTRY
@@ -54,7 +49,6 @@ export * from './src/components/Input'
 export * from './src/components/InputNumber'
 export * from './src/components/Radio'
 export * from './src/components/Toggle'
-export * from './src/components/Upload'
 export * from './src/components/Form'
 export * from './src/components/ExpandingTextArea'
 
@@ -69,7 +63,6 @@ export * from './src/layout/ai-icon-animation'
 // theme switcher
 export * from './src/components/ThemeProvider/themes'
 export * from './src/components/ThemeProvider/singleThemes'
-export * from './src/components/ThemeProvider/prefixedThemes'
 
 // shadcn
 export * from './src/components/shadcn/ui/dropdown-menu'
@@ -258,17 +251,10 @@ export * from './src/components/shadcn/ui/sidebar'
 
 export * from './src/components/TextLink'
 
+// used for LW
 export * from './src/layout/banners'
 
 export * from './src/components/StatusIcon'
-
-// config
-
-// export { default as Config } from './../ui.config'
-
-// AUTH
-
-// export * from './src/components/Auth'
 
 // ICONS
 // export icons
@@ -293,6 +279,3 @@ export * from './src/components/Icon/icons/IconYoutubeSolid'
 
 // Export hooks
 export * from './src/lib/Hooks'
-
-// Shared constants/utils
-export { TAB_CHANGE_EVENT_NAME } from './src/lib/events'

@@ -1,4 +1,4 @@
-import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
+import { SimpleCodeBlock } from 'ui'
 import { useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import { Markdown } from '../Markdown'
