@@ -53,6 +53,7 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 
 const PLACEHOLDER_WAREHOUSE_QUERY =
   '-- Fetch the last 10 logs in the last 7 days \nselect id, timestamp, event_message from `COLLECTION_NAME` \nwhere timestamp > timestamp_sub(current_timestamp(), interval 7 day) \norder by timestamp desc limit 10'
@@ -68,9 +69,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
   const router = useRouter()
   const { profile } = useProfile()
-  const { ref, q, ite, its, queryId, source: routerSource } = useParams()
+  const { ref, q, queryId, source: routerSource } = useParams()
   const projectRef = ref as string
   const organization = useSelectedOrganization()
+
+  const { timestampStart, timestampEnd, setTimeRange } = useLogsUrlState()
 
   const [editorId, setEditorId] = useState<string>(uuidv4())
   const [warehouseEditorId, setWarehouseEditorId] = useState<string>(uuidv4())
@@ -101,12 +104,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     isLoading: logsLoading,
     changeQuery,
     runQuery,
-    setParams,
   } = useLogsQuery(
     projectRef,
     {
-      iso_timestamp_start: its ? (its as string) : undefined,
-      iso_timestamp_end: ite ? (ite as string) : undefined,
+      iso_timestamp_start: timestampStart,
+      iso_timestamp_end: timestampEnd,
     },
     sourceType === 'logs'
   )
@@ -290,15 +292,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(!showUpgradePrompt)
     } else {
-      setParams((prev) => ({
-        ...prev,
-        iso_timestamp_start: from || '',
-        iso_timestamp_end: to || '',
-      }))
-      router.push({
-        pathname: router.pathname,
-        query: { ...router.query, its: from || '', ite: to || '' },
-      })
+      setTimeRange(from || '', to || '')
     }
   }
 
@@ -319,8 +313,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     let newWarnings = []
-    const start = params.iso_timestamp_start ? dayjs(params.iso_timestamp_start) : dayjs()
-    const end = params.iso_timestamp_end ? dayjs(params.iso_timestamp_end) : dayjs()
+    const start = timestampStart ? dayjs(timestampStart) : dayjs()
+    const end = timestampEnd ? dayjs(timestampEnd) : dayjs()
     const daysDiff = Math.abs(start.diff(end, 'days'))
 
     if (daysDiff >= LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD) {
@@ -332,25 +326,17 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       newWarnings.push({ text: 'When querying large date ranges, include a LIMIT clause.' })
     }
     setWarnings(newWarnings)
-  }, [
-    editorValue,
-    ite,
-    its,
-    router.query,
-    params.iso_timestamp_end,
-    params.iso_timestamp_start,
-    params,
-  ])
+  }, [editorValue, timestampStart, timestampEnd])
 
   // Show the prompt on page load based on query params
   useEffect(() => {
-    if (its) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(its as string, organization?.plan?.id)
+    if (timestampStart) {
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(timestampStart, organization?.plan?.id)
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       }
     }
-  }, [its, organization])
+  }, [timestampStart, organization])
 
   return (
     <div className="w-full h-full mx-auto">
@@ -361,8 +347,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       >
         <ResizablePanel collapsible minSize={5}>
           <LogsQueryPanel
-            defaultFrom={params.iso_timestamp_start || ''}
-            defaultTo={params.iso_timestamp_end || ''}
+            defaultFrom={timestampStart || ''}
+            defaultTo={timestampEnd || ''}
             onDateChange={handleDateChange}
             onSelectSource={handleInsertSource}
             templates={TEMPLATES.filter((template) => template.mode === 'custom')}
