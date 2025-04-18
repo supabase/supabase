@@ -12,7 +12,7 @@ export function useProjectLevelTableEditorCommands(options?: CommandOptions) {
   const ref = project?.ref || '_'
 
   useRegisterCommands(
-    COMMAND_MENU_SECTIONS.ACTIONS,
+    COMMAND_MENU_SECTIONS.TABLE,
     [
       {
         id: 'create-table',
@@ -36,7 +36,7 @@ export function useTableEditorGotoCommands(options?: CommandOptions) {
   ref ||= '_'
 
   useRegisterCommands(
-    COMMAND_MENU_SECTIONS.ACTIONS,
+    COMMAND_MENU_SECTIONS.TABLE,
     [
       {
         id: 'view-tables',

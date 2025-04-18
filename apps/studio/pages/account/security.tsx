@@ -1,7 +1,7 @@
 import { Smartphone } from 'lucide-react'
 
 import { TOTPFactors } from 'components/interfaces/Account'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AccountSettingsLayout from 'components/layouts/AccountLayout/AccountSettingsLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
@@ -37,7 +37,7 @@ const collapsibleClasses = [
 ]
 
 const Security: NextPageWithLayout = () => {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
   const { data } = useMfaListFactorsQuery()
 
   const PageContent = () => (

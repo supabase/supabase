@@ -82,7 +82,11 @@ export const HooksListing = () => {
           ].join(' ')}
         >
           <p className="text-sm text-foreground-light">No hooks configured yet</p>
-          <AddHookDropdown buttonText="Add a new hook" onSelectHook={setSelectedHook} />
+          <AddHookDropdown
+            align="center"
+            buttonText="Add a new hook"
+            onSelectHook={setSelectedHook}
+          />
         </div>
       )}
 

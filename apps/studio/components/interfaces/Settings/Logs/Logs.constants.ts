@@ -5,7 +5,7 @@ import type { DatetimeHelper, FilterTableSet, LogTemplate } from './Logs.types'
 export const LOGS_EXPLORER_DOCS_URL =
   'https://supabase.com/docs/guides/platform/logs#querying-with-the-logs-explorer'
 
-export const LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD = 4
+export const LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD = 2 // IN DAYS
 
 export const TEMPLATES: LogTemplate[] = [
   {
@@ -667,56 +667,71 @@ export const LOGS_TAILWIND_CLASSES = {
 export const PREVIEWER_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
     text: 'Last 15 minutes',
-    calcFrom: () => dayjs().subtract(15, 'minute').startOf('minute').toISOString(),
+    calcFrom: () => dayjs().subtract(15, 'minute').toISOString(),
     calcTo: () => '',
   },
   {
     text: 'Last 30 minutes',
-    calcFrom: () => dayjs().subtract(30, 'minute').startOf('minute').toISOString(),
+    calcFrom: () => dayjs().subtract(30, 'minute').toISOString(),
     calcTo: () => '',
   },
   {
     text: 'Last hour',
-    calcFrom: () => dayjs().subtract(1, 'hour').startOf('hour').toISOString(),
+    calcFrom: () => dayjs().subtract(1, 'hour').toISOString(),
     calcTo: () => '',
     default: true,
   },
   {
     text: 'Last 3 hours',
-    calcFrom: () => dayjs().subtract(3, 'hour').startOf('hour').toISOString(),
+    calcFrom: () => dayjs().subtract(3, 'hour').toISOString(),
     calcTo: () => '',
   },
   {
     text: 'Last 24 hours',
-    calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
+    calcFrom: () => dayjs().subtract(1, 'day').toISOString(),
+    calcTo: () => '',
+  },
+  {
+    text: 'Last 2 days',
+    calcFrom: () => dayjs().subtract(2, 'day').toISOString(),
+    calcTo: () => '',
+  },
+  {
+    text: 'Last 3 days',
+    calcFrom: () => dayjs().subtract(3, 'day').toISOString(),
+    calcTo: () => '',
+  },
+  {
+    text: 'Last 5 days',
+    calcFrom: () => dayjs().subtract(5, 'day').toISOString(),
     calcTo: () => '',
   },
 ]
 export const EXPLORER_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
     text: 'Last hour',
-    calcFrom: () => dayjs().subtract(1, 'hour').startOf('hour').toISOString(),
+    calcFrom: () => dayjs().subtract(1, 'hour').toISOString(),
     calcTo: () => '',
     default: true,
   },
   {
     text: 'Last 3 hours',
-    calcFrom: () => dayjs().subtract(3, 'hour').startOf('hour').toISOString(),
+    calcFrom: () => dayjs().subtract(3, 'hour').toISOString(),
     calcTo: () => '',
   },
   {
     text: 'Last 24 hours',
-    calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
+    calcFrom: () => dayjs().subtract(1, 'day').toISOString(),
     calcTo: () => '',
   },
   {
     text: 'Last 3 days',
-    calcFrom: () => dayjs().subtract(3, 'day').startOf('day').toISOString(),
+    calcFrom: () => dayjs().subtract(3, 'day').toISOString(),
     calcTo: () => '',
   },
   {
     text: 'Last 7 days',
-    calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
+    calcFrom: () => dayjs().subtract(7, 'day').toISOString(),
     calcTo: () => '',
   },
 ]

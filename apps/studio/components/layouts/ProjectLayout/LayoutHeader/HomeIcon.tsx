@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
@@ -11,7 +11,7 @@ import { useShowLayoutHeader } from 'hooks/misc/useShowLayoutHeader'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 export const HomeIcon = () => {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
   const showLayoutHeader = useShowLayoutHeader()
   const selectedOrganization = useSelectedOrganization()
   const { data: organizations } = useOrganizationsQuery()
@@ -32,11 +32,11 @@ export const HomeIcon = () => {
     return '/projects'
   }
 
-  const href = newLayoutPreview
-    ? IS_PLATFORM
+  const href = IS_PLATFORM
+    ? newLayoutPreview
       ? getDefaultOrgRedirect()
-      : `/project/${project?.ref}`
-    : '/projects'
+      : `/projects`
+    : '/project/default'
 
   return (
     <Link href={href} className="items-center justify-center flex-shrink-0 hidden md:flex">

@@ -262,7 +262,12 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                     RLS disabled
                   </Button>
                 </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
+                <PopoverContent_Shadcn_
+                  // using `portal` for a safari fix. issue with rendering outside of body element
+                  portal
+                  className="min-w-[395px] text-sm"
+                  align="end"
+                >
                   <h3 className="flex items-center gap-2">
                     <Lock size={16} /> Row Level Security (RLS)
                   </h3>
@@ -297,7 +302,12 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                   Security Definer view
                 </Button>
               </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
+              <PopoverContent_Shadcn_
+                // using `portal` for a safari fix. issue with rendering outside of body element
+                portal
+                className="min-w-[395px] text-sm"
+                align="end"
+              >
                 <h3 className="flex items-center gap-2">
                   <Unlock size={16} /> Secure your View
                 </h3>
@@ -342,7 +352,12 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                   Security Definer view
                 </Button>
               </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
+              <PopoverContent_Shadcn_
+                // using `portal` for a safari fix. issue with rendering outside of body element
+                portal
+                className="min-w-[395px] text-sm"
+                align="end"
+              >
                 <h3 className="flex items-center gap-2">
                   <Unlock size={16} /> Secure your View
                 </h3>
@@ -379,7 +394,12 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                   Unprotected Data API access
                 </Button>
               </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
+              <PopoverContent_Shadcn_
+                // using `portal` for a safari fix. issue with rendering outside of body element
+                portal
+                className="min-w-[395px] text-sm"
+                align="end"
+              >
                 <h3 className="flex items-center gap-2">
                   <Unlock size={16} /> Secure Foreign table
                 </h3>

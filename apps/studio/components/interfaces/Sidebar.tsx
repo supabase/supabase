@@ -6,6 +6,7 @@ import {
   Boxes,
   ChartArea,
   PanelLeftDashed,
+  Receipt,
   Settings,
   Users,
 } from 'lucide-react'
@@ -55,8 +56,8 @@ import {
 } from 'ui'
 import {
   useIsAPIDocsSidePanelEnabled,
+  useIsNewLayoutEnabled,
   useIsSQLEditorTabsEnabled,
-  useNewLayout,
 } from './App/FeaturePreview/FeaturePreviewContext'
 
 export const ICON_SIZE = 32
@@ -73,7 +74,7 @@ const SidebarMotion = motion(SidebarPrimitive) as FC<
 export interface SidebarProps extends ComponentPropsWithoutRef<typeof SidebarPrimitive> {}
 
 export const Sidebar = ({ className, ...props }: SidebarProps) => {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
 
   const { ref } = useParams()
 
@@ -150,7 +151,7 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
 }
 
 export const SidebarContent = ({ footer }: { footer?: ReactNode }) => {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
   const { ref: projectRef } = useParams()
 
   // temporary logic to show settings route in sidebar footer
@@ -486,6 +487,12 @@ const OrganizationLinks = () => {
       icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
+      label: 'Billing',
+      href: `/org/${slug}/billing`,
+      key: 'billing',
+      icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+    },
+    {
       label: 'Organization settings',
       href: `/org/${slug}/general`,
       key: 'settings',
@@ -504,8 +511,6 @@ const OrganizationLinks = () => {
                 ? activeRoute === undefined
                 : item.key === 'settings'
                   ? router.pathname.includes('/general') ||
-                    router.pathname.includes('/billing') ||
-                    router.pathname.includes('/invoices') ||
                     router.pathname.includes('/apps') ||
                     router.pathname.includes('/audit') ||
                     router.pathname.includes('/documents')
