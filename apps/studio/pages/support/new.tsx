@@ -16,10 +16,14 @@ import { BASE_PATH } from 'lib/constants'
 import { toast } from 'sonner'
 import { NextPageWithLayout } from 'types'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { AIAssistantOption } from 'components/interfaces/Support/AIAssistantOption'
 
 const SupportPage: NextPageWithLayout = () => {
   const [sentCategory, setSentCategory] = useState<string>()
+  // For AIAssistantOption projectRef prop
   const [selectedProject, setSelectedProject] = useState<string>('no-project')
+  // For AIAssistantOption organizationSlug prop
+  const [selectedOrganization, setSelectedOrganization] = useState<string>('no-org')
   const { data, isLoading } = usePlatformStatusQuery()
   const isHealthy = data?.isHealthy
 
@@ -34,6 +38,7 @@ const SupportPage: NextPageWithLayout = () => {
               <SVG src={`${BASE_PATH}/img/supabase-logo.svg`} className="h-4 w-4" />
               <h1 className="m-0 text-lg">Supabase support</h1>
             </div>
+
             <div className="flex items-center gap-x-3">
               <Button asChild type="default" icon={<Wrench />}>
                 <Link
@@ -74,7 +79,7 @@ const SupportPage: NextPageWithLayout = () => {
               </Tooltip>
             </div>
           </div>
-
+          <AIAssistantOption projectRef={selectedProject} organizationSlug={selectedOrganization} />
           <div
             className={[
               'min-w-full w-full space-y-12 rounded border bg-panel-body-light shadow-md',
@@ -90,8 +95,9 @@ const SupportPage: NextPageWithLayout = () => {
               />
             ) : (
               <SupportFormV2
+                onProjectSelected={setSelectedProject}
+                onOrganizationSelected={setSelectedOrganization}
                 setSentCategory={setSentCategory}
-                setSelectedProject={setSelectedProject}
               />
             )}
           </div>
