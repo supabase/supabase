@@ -1,4 +1,7 @@
-import { MousePointerClick, X, Clipboard, Check } from 'lucide-react'
+import { Check, Clipboard, MousePointerClick, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
   Button,
   CodeBlock,
@@ -9,11 +12,10 @@ import {
   cn,
   copyToClipboard,
 } from 'ui'
-import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
-import type { LogData, QueryType } from './Logs.types'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useEffect, useState } from 'react'
+import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
+import { PgUpgradeSelectionRenderer } from './LogSelectionRenderers/PgUpgradeSelectionRenderer'
+import type { LogData, QueryType } from './Logs.types'
 
 export interface LogSelectionProps {
   log?: LogData
@@ -75,6 +77,10 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
           ...log,
         }
         return <DefaultPreviewSelectionRenderer log={postgresLog} />
+      case 'pg_upgrade':
+        if (!log) return null
+        if (!log.metadata) return <DefaultPreviewSelectionRenderer log={log} />
+        return <PgUpgradeSelectionRenderer log={log} />
       default:
         return <DefaultPreviewSelectionRenderer log={log} />
     }
