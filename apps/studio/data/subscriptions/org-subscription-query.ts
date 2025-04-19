@@ -58,5 +58,5 @@ export const useOrgSubscriptionQuery = <TData = OrgSubscriptionData>(
 
 export const useHasAccessToProjectLevelPermissions = (slug: string) => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
-  return subscription?.plan.id === 'enterprise'
+  return subscription?.plan.id === 'enterprise' || subscription?.plan.id === 'team'
 }
