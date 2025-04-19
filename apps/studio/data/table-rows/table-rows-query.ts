@@ -5,15 +5,15 @@ import {
   type UseQueryOptions,
 } from '@tanstack/react-query'
 
-import { IS_PLATFORM } from 'common'
 import { Query } from '@supabase/pg-meta/src/query'
 import { getTableRowsSql } from '@supabase/pg-meta/src/query/table-row-query'
+import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import {
-  ImpersonationRole,
   ROLE_IMPERSONATION_NO_RESULTS,
+  RoleImpersonationState,
   wrapWithRoleImpersonation,
 } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
@@ -28,7 +28,7 @@ export interface GetTableRowsArgs {
   sorts?: Sort[]
   limit?: number
   page?: number
-  impersonatedRole?: ImpersonationRole
+  roleImpersonationState?: RoleImpersonationState
 }
 
 // return the primary key columns if exists, otherwise return the first column to use as a default sort
@@ -78,7 +78,7 @@ export const fetchAllTableRows = async ({
   table,
   filters = [],
   sorts = [],
-  impersonatedRole,
+  roleImpersonationState,
   progressCallback,
 }: {
   projectRef: string
@@ -86,7 +86,7 @@ export const fetchAllTableRows = async ({
   table: SupaTable
   filters?: Filter[]
   sorts?: Sort[]
-  impersonatedRole?: ImpersonationRole
+  roleImpersonationState?: RoleImpersonationState
   progressCallback?: (value: number) => void
 }) => {
   if (IS_PLATFORM && !connectionString) {
@@ -136,10 +136,10 @@ export const fetchAllTableRows = async ({
     page += 1
     const from = page * rowsPerPage
     const to = (page + 1) * rowsPerPage - 1
-    const query = wrapWithRoleImpersonation(queryChains.range(from, to).toSql(), {
-      projectRef,
-      role: impersonatedRole,
-    })
+    const query = wrapWithRoleImpersonation(
+      queryChains.range(from, to).toSql(),
+      roleImpersonationState
+    )
 
     try {
       const { result } = await executeWithRetry(async () =>
@@ -179,7 +179,7 @@ export async function getTableRows(
     projectRef,
     connectionString,
     tableId,
-    impersonatedRole,
+    roleImpersonationState,
     filters,
     sorts,
     limit,
@@ -200,10 +200,7 @@ export async function getTableRows(
 
   const sql = wrapWithRoleImpersonation(
     getTableRowsSql({ table: entity, filters, sorts, limit, page }),
-    {
-      projectRef: projectRef ?? 'ref',
-      role: impersonatedRole,
-    }
+    roleImpersonationState
   )
   const { result } = await executeSql(
     {
@@ -211,7 +208,7 @@ export async function getTableRows(
       connectionString,
       sql,
       queryKey: ['table-rows', table?.id],
-      isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+      isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     },
     signal
   )
@@ -231,7 +228,10 @@ export const useTableRowsQuery = <TData = TableRowsData>(
 ) => {
   const queryClient = useQueryClient()
   return useQuery<TableRowsData, TableRowsError, TData>(
-    tableRowKeys.tableRows(projectRef, { table: { id: tableId }, ...args }),
+    tableRowKeys.tableRows(projectRef, {
+      table: { id: tableId },
+      ...args,
+    }),
     ({ signal }) =>
       getTableRows({ queryClient, projectRef, connectionString, tableId, ...args }, signal),
     {
@@ -243,16 +243,13 @@ export const useTableRowsQuery = <TData = TableRowsData>(
 
 export function prefetchTableRows(
   client: QueryClient,
-  {
-    projectRef,
-    connectionString,
-    tableId,
-    impersonatedRole,
-    ...args
-  }: Omit<TableRowsVariables, 'queryClient'>
+  { projectRef, connectionString, tableId, ...args }: Omit<TableRowsVariables, 'queryClient'>
 ) {
   return client.fetchQuery(
-    tableRowKeys.tableRows(projectRef, { table: { id: tableId }, ...args }),
+    tableRowKeys.tableRows(projectRef, {
+      table: { id: tableId },
+      ...args,
+    }),
     ({ signal }) =>
       getTableRows({ queryClient: client, projectRef, connectionString, tableId, ...args }, signal)
   )

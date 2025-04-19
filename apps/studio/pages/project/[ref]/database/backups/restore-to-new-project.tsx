@@ -20,7 +20,6 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { useCloneStatusQuery } from 'data/projects/clone-status-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
@@ -33,7 +32,6 @@ import Panel from 'components/ui/Panel'
 import { projectSpecToMonthlyPrice } from 'components/interfaces/Database/Backups/RestoreToNewProject/RestoreToNewProject.utils'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { DiskType } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
-import { InfraInstanceSize } from 'components/interfaces/DiskManagement/DiskManagement.types'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const RestoreToNewProjectPage: NextPageWithLayout = () => {
@@ -63,8 +61,7 @@ RestoreToNewProjectPage.getLayout = (page) => (
 const RestoreToNewProject = () => {
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const isFreePlan = subscription?.plan?.id === 'free'
+  const isFreePlan = organization?.plan?.id === 'free'
   const isOrioleDb = useIsOrioleDb()
 
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
@@ -80,7 +77,7 @@ const RestoreToNewProject = () => {
     isError,
   } = useCloneBackupsQuery({ projectRef: project?.ref }, { enabled: !isFreePlan })
 
-  const plan = subscription?.plan?.id
+  const plan = organization?.plan?.id
   const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   const isPermissionsLoaded = usePermissionsLoaded()
@@ -95,7 +92,7 @@ const RestoreToNewProject = () => {
   const IS_PG15_OR_ABOVE = dbVersion >= 15
   const targetVolumeSizeGb = cloneBackups?.target_volume_size_gb
   const targetComputeSize = cloneBackups?.target_compute_size
-  const planId = subscription?.plan?.id ?? 'free'
+  const planId = organization?.plan?.id ?? 'free'
   const { data } = useDiskAttributesQuery({ projectRef: project?.ref })
   const storageType = data?.attributes?.type ?? 'gp3'
 

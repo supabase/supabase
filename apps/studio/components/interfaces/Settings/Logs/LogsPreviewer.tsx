@@ -8,21 +8,20 @@ import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilte
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
+import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
+import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
+import useSingleLog from 'hooks/analytics/useSingleLog'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Button } from 'ui'
+import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 import LogTable from './LogTable'
 import { LOGS_TABLES, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
 import { maybeShowUpgradePrompt } from './Logs.utils'
 import UpgradePrompt from './UpgradePrompt'
-import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
-import useSingleLog from 'hooks/analytics/useSingleLog'
-import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
-import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 /**
  * Acts as a container component for the entire log display
@@ -65,7 +64,6 @@ export const LogsPreviewer = ({
   const [selectedLogId, setSelectedLogId] = useSelectedLog()
 
   const { data: databases, isSuccess } = useReadReplicasQuery({ projectRef })
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
   const table = !tableName ? LOGS_TABLES[queryType] : tableName
 
@@ -94,15 +92,47 @@ export const LogsPreviewer = ({
 
   const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(timestampStart)
 
+  const onSelectTemplate = (template: LogTemplate) => {
+    setFilters({ ...filters, search_query: template.searchString })
+  }
+
+  // [Joshen 180425] This logic here all seems unnecessary IMO? handleRefresh just should call refresh?
+  const handleRefresh = () => {
+    if (timestampStart) {
+      const newTimestampStart = dayjs(timestampStart).toISOString()
+      setTimeRange(newTimestampStart, timestampEnd)
+    } else {
+      setTimeRange('', '')
+    }
+    refresh()
+  }
+
+  const handleSearch: LogSearchCallback = async (event, { query, to, from }) => {
+    if (event === 'search-input-change') {
+      setSearch(query || '')
+      setSelectedLogId(null)
+    } else if (event === 'event-chart-bar-click') {
+      setTimeRange(from || '', to || '')
+    } else if (event === 'datepicker-change') {
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from || '', organization?.plan?.id)
+
+      if (shouldShowUpgradePrompt) {
+        setShowUpgradePrompt(!showUpgradePrompt)
+      } else {
+        setTimeRange(from || '', to || '')
+      }
+    }
+  }
+
   // Show the prompt on page load based on query params
   useEffect(() => {
     if (timestampStart) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(timestampStart, subscription?.plan?.id)
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(timestampStart, organization?.plan?.id)
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       }
     }
-  }, [timestampStart, subscription])
+  }, [timestampStart, organization])
 
   useEffect(() => {
     if (db !== undefined) {
@@ -119,33 +149,6 @@ export const LogsPreviewer = ({
       }
     }
   }, [db, isSuccess])
-
-  const onSelectTemplate = (template: LogTemplate) => {
-    setFilters({ ...filters, search_query: template.searchString })
-  }
-
-  const handleRefresh = () => {
-    // Call refresh first to ensure we get the count with current timestamps
-    setTimeRange('', '')
-    refresh()
-  }
-
-  const handleSearch: LogSearchCallback = async (event, { query, to, from }) => {
-    if (event === 'search-input-change') {
-      setSearch(query || '')
-      setSelectedLogId(null)
-    } else if (event === 'event-chart-bar-click') {
-      setTimeRange(from || '', to || '')
-    } else if (event === 'datepicker-change') {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from || '', subscription?.plan?.id)
-
-      if (shouldShowUpgradePrompt) {
-        setShowUpgradePrompt(!showUpgradePrompt)
-      } else {
-        setTimeRange(from || '', to || '')
-      }
-    }
-  }
 
   return (
     <div className="flex-1 flex flex-col h-full">

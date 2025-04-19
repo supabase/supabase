@@ -102,6 +102,7 @@ export const ThirdPartyAuthForm = () => {
           >
             <p className="text-sm text-foreground-light">No providers configured yet</p>
             <AddIntegrationDropdown
+              align="center"
               buttonText="Add a new integration"
               onSelectIntegrationType={setSelectedIntegration}
             />
@@ -149,9 +150,10 @@ export const ThirdPartyAuthForm = () => {
       />
 
       <ConfirmationModal
+        size="medium"
         visible={!!selectedIntegrationForDeletion}
         variant="destructive"
-        title="Confirm to delete"
+        title="Confirm to delete integration"
         confirmLabel="Delete"
         confirmLabelLoading="Deleting"
         onCancel={() => setSelectedIntegrationForDeletion(undefined)}
@@ -174,8 +176,9 @@ export const ThirdPartyAuthForm = () => {
           }
         }}
       >
-        <p className="py-4 text-sm text-foreground-light">
-          {`Are you sure you want to delete the ${getIntegrationTypeLabel(getIntegrationType(selectedIntegrationForDeletion))} integration?`}
+        <p className="text-sm text-foreground-light">
+          Are you sure you want to delete the{' '}
+          {getIntegrationTypeLabel(getIntegrationType(selectedIntegrationForDeletion))} integration?
         </p>
       </ConfirmationModal>
     </ScaffoldSection>

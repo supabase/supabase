@@ -22,7 +22,8 @@ import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useUrlState } from 'hooks/ui/useUrlState'
+import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
+import { RoleImpersonationState } from 'lib/role-impersonation'
 import {
   useRoleImpersonationStateSnapshot,
   useSubscribeToImpersonatedRole,
@@ -41,7 +42,6 @@ import {
 } from 'ui'
 import FilterPopover from './filter/FilterPopover'
 import { SortPopover } from './sort'
-
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
 // exporting. Either that or export as multiple CSV sheets with max n rows each
@@ -104,9 +104,7 @@ const DefaultHeader = () => {
   // [Joshen] Using this logic to block both column and row creation/update/delete
   const canCreateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
-  const [{ filter: filters, sort: sorts }, setParams] = useUrlState({
-    arrayKeys: ['sort', 'filter'],
-  })
+  const { filters, sorts, setParams } = useTableEditorFiltersSort()
 
   const onApplyFilters = useCallback(
     (appliedFilters: Filter[]) => {
@@ -114,12 +112,12 @@ const DefaultHeader = () => {
       // Reset page to 1 when filters change
       snap.setPage(1)
 
-      const filters = filtersToUrlParams(appliedFilters)
+      const newFilters = filtersToUrlParams(appliedFilters)
 
       setParams((prevParams) => {
         return {
-          ...prevParams,
-          filter: filters,
+          filter: newFilters,
+          sort: prevParams.sort,
         }
       })
 
@@ -128,21 +126,21 @@ const DefaultHeader = () => {
           projectRef,
           tableName: snap.table.name,
           schema: snap.table.schema,
-          filters: filters,
+          filters: newFilters,
         })
       }
     },
-    [projectRef, snap.table.name, snap.table.schema]
+    [projectRef, snap.table.name, snap.table.schema, setParams]
   )
 
   const onApplySorts = useCallback(
     (appliedSorts: Sort[]) => {
-      const sorts = sortsToUrlParams(appliedSorts)
+      const newSorts = sortsToUrlParams(appliedSorts)
 
       setParams((prevParams) => {
         return {
-          ...prevParams,
-          sort: sorts,
+          filter: prevParams.filter,
+          sort: newSorts,
         }
       })
 
@@ -151,11 +149,11 @@ const DefaultHeader = () => {
           projectRef,
           tableName: snap.table.name,
           schema: snap.table.schema,
-          sorts: sorts,
+          sorts: newSorts,
         })
       }
     },
-    [projectRef, snap.table.name, snap.table.schema]
+    [projectRef, snap.table.name, snap.table.schema, setParams]
   )
 
   const { mutate: sendEvent } = useSendEventMutation()
@@ -163,8 +161,8 @@ const DefaultHeader = () => {
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <FilterPopover filters={filters as string[]} onApplyFilters={onApplyFilters} />
-        <SortPopover sorts={sorts as string[]} onApplySorts={onApplySorts} />
+        <FilterPopover filters={filters} onApplyFilters={onApplyFilters} />
+        <SortPopover sorts={sorts} onApplySorts={onApplySorts} />
       </div>
       {canAddNew && (
         <>
@@ -308,7 +306,7 @@ const RowHeader = ({ sorts, filters }: RowHeaderProps) => {
     filters,
     page: snap.page,
     limit: tableEditorSnap.rowsPerPage,
-    impersonatedRole: roleImpersonationState.role,
+    roleImpersonationState: roleImpersonationState as RoleImpersonationState,
   })
 
   const { data: countData } = useTableRowsCountQuery(
@@ -318,7 +316,7 @@ const RowHeader = ({ sorts, filters }: RowHeaderProps) => {
       tableId: snap.table.id,
       filters,
       enforceExactCount: snap.enforceExactCount,
-      impersonatedRole: roleImpersonationState.role,
+      roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     { keepPreviousData: true }
   )
@@ -378,7 +376,7 @@ const RowHeader = ({ sorts, filters }: RowHeaderProps) => {
           table: snap.table,
           filters,
           sorts,
-          impersonatedRole: roleImpersonationState.role,
+          roleImpersonationState: roleImpersonationState as RoleImpersonationState,
           progressCallback: (value: number) => {
             const progress = Math.min((value / totalRows) * 100, 100)
             toast(
@@ -464,7 +462,7 @@ const RowHeader = ({ sorts, filters }: RowHeaderProps) => {
           table: snap.table,
           filters,
           sorts,
-          impersonatedRole: roleImpersonationState.role,
+          roleImpersonationState: roleImpersonationState as RoleImpersonationState,
           progressCallback: (value: number) => {
             const progress = Math.min((value / totalRows) * 100, 100)
             toast(

@@ -1,4 +1,5 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
+import { PlanId } from 'data/subscriptions/types'
 
 export interface Notification {
   category: 'info' | 'error' | 'success' | 'loading'
@@ -21,6 +22,7 @@ export interface ChartIntervals {
   startValue: number
   startUnit: 'minute' | 'hour' | 'day'
   format?: 'MMM D, h:mm:ssa' | 'MMM D, h:mma' | 'MMM D, ha' | 'MMM D'
+  availableIn?: PlanId[]
 }
 
 export interface VaultSecret {

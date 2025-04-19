@@ -84,7 +84,7 @@ During the 90-day restore window a paused project can be restored to the platfor
   src="/docs/img/guides/platform/paused-90-day.png"
 />
 
-After the 90-day restore window, you can download your project's backup file, and Storage objects from the project dashboard. See [restoring a backup locally](#restoring-a-downloaded-backup-locally) for instructions on how to load that backup locally to recover your data.
+After the 90-day restore window, you can download your project's backup file, and Storage objects from the project dashboard. See [restoring a backup locally](/docs/guides/local-development/restoring-downloaded-backup) for instructions on how to load that backup locally to recover your data.
 
 <Image
   zoomable
@@ -99,48 +99,6 @@ If you upgrade to a paid plan while your project is paused, any expired one-clic
   alt="Project Paused: 90 Days Remaining"
   src="/docs/img/guides/platform/paused-paid-tier.png"
 />
-
-#### Restoring a downloaded backup locally
-
-<Admonition type="caution">
-  If you want to restore your backup to a hosted Supabase project, you will need to use the
-  [Migrating within Supabase guide](/docs/guides/platform/migrating-within-supabase)
-</Admonition>
-
-If the 90 day project restore window has expired but you need to access data contained within your project using SQL, you can use the [Supabase CLI](/docs/guides/local-development) to restore the project into a local Postgres instance.
-
-First, download your project's backup file from dashboard and identify its backup image version (following the `PG:` prefix):
-
-<Image
-  zoomable
-  alt="Project Paused: 90 Days Remaining"
-  src="/docs/img/guides/platform/paused-dl-image-version.png"
-/>
-
-Given Postgres version `15.6.1.115`, start Postgres locally with `db_cluster.backup` being the path to your backup file.
-
-```sh
-supabase init
-echo '15.6.1.115' > supabase/.temp/postgres-version
-supabase db start --from-backup db_cluster.backup
-```
-
-Note that the earliest Supabase Postgres version that supports a local restore is `15.1.0.55`. If your hosted project was running on earlier versions, you will likely run into errors during restore. Before submitting any support ticket, make sure you have attached the error logs from `supabase_db_*` docker container.
-
-Once your local database starts up successfully, you can connect using psql to verify that all your data is restored.
-
-```sh
-psql 'postgresql://postgres:postgres@localhost:54322/postgres'
-```
-
-If you want to use other services like Auth, Storage, and Studio dashboard together with your restored database, restart the local development stack.
-
-```sh
-supabase stop
-supabase start
-```
-
-A Postgres database started with Supabase CLI is not production ready and should not be used outside of local development.
 
 #### Disk sizing
 
