@@ -582,12 +582,13 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                 })
                 const isPreview = isSQLEditorTabsEnabled && tabStore.previewTabId === tabId
                 const isActive = !isPreview && element.metadata?.id === id
+                const isSelected = selectedSnippets.some((x) => x.id === element.metadata?.id)
 
                 return (
                   <SQLEditorTreeViewItem
                     {...props}
                     isOpened={isOpened && !isPreview}
-                    isSelected={isActive}
+                    isSelected={isActive || isSelected}
                     isPreview={isPreview}
                     onDoubleClick={(e) => {
                       e.preventDefault()
@@ -665,10 +666,12 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                 })
                 const isPreview = isSQLEditorTabsEnabled && tabStore.previewTabId === tabId
                 const isActive = !isPreview && element.metadata?.id === id
+                const isSelected = selectedSnippets.some((x) => x.id === element.metadata?.id)
+
                 return (
                   <SQLEditorTreeViewItem
                     {...props}
-                    isSelected={isActive}
+                    isSelected={isActive || isSelected}
                     isOpened={isOpened && !isPreview}
                     isPreview={isPreview}
                     onDoubleClick={(e) => {
@@ -753,13 +756,14 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                 })
                 const isPreview = isSQLEditorTabsEnabled && tabStore.previewTabId === tabId
                 const isActive = !isPreview && element.metadata?.id === id
+                const isSelected = selectedSnippets.some((x) => x.id === element.metadata?.id)
 
                 return (
                   <SQLEditorTreeViewItem
                     {...props}
                     element={element}
                     isOpened={isOpened && !isPreview}
-                    isSelected={isActive}
+                    isSelected={isActive || isSelected}
                     isPreview={isPreview}
                     isMultiSelected={selectedSnippets.length > 1}
                     isLastItem={privateSnippetsLastItemIds.has(element.id as string)}
