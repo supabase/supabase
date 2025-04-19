@@ -482,7 +482,7 @@ const Reports = () => {
           )}
         </div>
       ) : (
-        <div className="relative mb-16 flex-grow h-64">
+        <div className="relative mb-16 flex-grow">
           {config && startDate && endDate && (
             <GridResize
               startDate={startDate}

@@ -8,7 +8,7 @@ import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { usePrimaryDatabase } from 'data/read-replicas/replicas-query'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { Parameter, parseParameters } from 'lib/sql-parameters'
 import { Dashboards } from 'types'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, cn, CodeBlock, SQL_ICON } from 'ui'
@@ -127,6 +127,7 @@ export const QueryBlock = ({
 
   const [showSql, setShowSql] = useState(_showSql)
   const [readOnlyError, setReadOnlyError] = useState(false)
+  const [queryError, setQueryError] = useState<QueryResponseError>()
   const [queryResult, setQueryResult] = useState<any[] | undefined>(results)
 
   const formattedQueryResult = useMemo(() => {
@@ -159,6 +160,8 @@ export const QueryBlock = ({
       if (error?.message.includes('permission denied')) {
         setReadOnlyError(true)
         if (showRunButtonIfNotReadOnly) setShowWarning('hasWriteOperation')
+      } else {
+        setQueryError(error)
       }
     },
   })
@@ -393,7 +396,14 @@ export const QueryBlock = ({
         </>
       ) : (
         <>
-          {queryResult ? (
+          {!isExecuting && !!queryError ? (
+            <div
+              className={cn('flex-1 w-full overflow-auto relative border-t px-3.5 py-2')}
+              style={{ maxHeight: maxHeight ? `${maxHeight}px` : undefined }}
+            >
+              <span className="font-mono text-xs">ERROR: {queryError.message}</span>
+            </div>
+          ) : queryResult ? (
             <div
               className={cn('flex-1 w-full overflow-auto relative')}
               style={{ maxHeight: maxHeight ? `${maxHeight}px` : undefined }}
