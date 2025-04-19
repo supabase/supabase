@@ -31,6 +31,8 @@ export interface Tab {
   isPreview?: boolean // Optional flag indicating if the tab is in preview mode
   createdAt?: Date // Optional timestamp for when the tab was created
   updatedAt?: Date // Optional timestamp for when the tab was last updated
+  // Stores the names of columns hidden by the user for this specific tab (session state)
+  hiddenColumns?: string[]
 }
 
 // Interface representing the state of tabs
@@ -389,4 +391,27 @@ export function removeTabsByEditor(ref: string | undefined, type: 'table' | 'sql
   })
 
   removeTabs(ref, tabIdsToRemove)
+}
+
+/**
+ * Action to update hidden columns for a specific tab in the tabs store.
+ *
+ * @param ref Project ref.
+ * @param tabId ID of the tab to update.
+ * @param hiddenColumns Array of column names to be marked as hidden.
+ * @returns {void}
+ */
+export const updateTabHiddenColumns = (
+  ref: string | undefined,
+  tabId: string,
+  hiddenColumns: string[]
+) => {
+  if (!ref) return
+  const store = getTabsStore(ref)
+  if (store.tabsMap[tabId]) {
+    // Update the hiddenColumns array for the specified tab
+    store.tabsMap[tabId].hiddenColumns = hiddenColumns
+    // Update the timestamp to reflect the change
+    store.tabsMap[tabId].updatedAt = new Date()
+  }
 }
