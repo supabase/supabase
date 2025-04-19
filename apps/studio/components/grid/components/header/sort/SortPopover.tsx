@@ -124,59 +124,57 @@ const SortOverlay = ({}: SortOverlayProps): JSX.Element => {
   }, [])
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div className="space-y-2 py-2">
-        {sorts.map((sort, index) => (
-          <SortRow
-            key={sort.column}
-            index={index}
-            columnName={sort.column}
-            sort={sort}
-            onDelete={onDeleteSort}
-            onToggle={onToggleSort}
-            onDrag={onDragSort}
-          />
-        ))}
-        {sorts.length === 0 && (
-          <div className="space-y-1 px-3">
-            <h5 className="text-sm text-foreground-light">No sorts applied to this view</h5>
-            <p className="text-xs text-foreground-lighter">Add a column below to sort the view</p>
-          </div>
-        )}
+    <div className="space-y-2 py-2">
+      {sorts.map((sort, index) => (
+        <SortRow
+          key={sort.column}
+          index={index}
+          columnName={sort.column}
+          sort={sort}
+          onDelete={onDeleteSort}
+          onToggle={onToggleSort}
+          onDrag={onDragSort}
+        />
+      ))}
+      {sorts.length === 0 && (
+        <div className="space-y-1 px-3">
+          <h5 className="text-sm text-foreground-light">No sorts applied to this view</h5>
+          <p className="text-xs text-foreground-lighter">Add a column below to sort the view</p>
+        </div>
+      )}
 
-        <PopoverSeparator_Shadcn_ />
-        <div className="px-3 flex flex-row justify-between">
-          {columns && columns.length > 0 ? (
-            <DropdownControl
-              options={dropdownOptions}
-              onSelect={onAddSort}
-              side="bottom"
-              align="start"
-            >
-              <Button
-                asChild
-                type="text"
-                iconRight={<ChevronDown size="14" className="text-foreground-light" />}
-                className="sb-grid-dropdown__item-trigger"
-                data-testid="table-editor-pick-column-to-sort-button"
-              >
-                <span>Pick {sorts.length > 1 ? 'another' : 'a'} column to sort by</span>
-              </Button>
-            </DropdownControl>
-          ) : (
-            <p className="text-sm text-foreground-light">All columns have been added</p>
-          )}
-          <div className="flex items-center">
+      <PopoverSeparator_Shadcn_ />
+      <div className="px-3 flex flex-row justify-between">
+        {columns && columns.length > 0 ? (
+          <DropdownControl
+            options={dropdownOptions}
+            onSelect={onAddSort}
+            side="bottom"
+            align="start"
+          >
             <Button
-              disabled={isEqual(sorts, initialSorts)}
-              type="default"
-              onClick={() => onApplySorts(sorts)}
+              asChild
+              type="text"
+              iconRight={<ChevronDown size="14" className="text-foreground-light" />}
+              className="sb-grid-dropdown__item-trigger"
+              data-testid="table-editor-pick-column-to-sort-button"
             >
-              Apply sorting
+              <span>Pick {sorts.length > 1 ? 'another' : 'a'} column to sort by</span>
             </Button>
-          </div>
+          </DropdownControl>
+        ) : (
+          <p className="text-sm text-foreground-light">All columns have been added</p>
+        )}
+        <div className="flex items-center">
+          <Button
+            disabled={isEqual(sorts, initialSorts)}
+            type="default"
+            onClick={() => onApplySorts(sorts)}
+          >
+            Apply sorting
+          </Button>
         </div>
       </div>
-    </DndProvider>
+    </div>
   )
 }
