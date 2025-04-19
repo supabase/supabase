@@ -36,6 +36,7 @@ import {
   useGetImpersonatedRoleState,
 } from 'state/role-impersonation-state'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { createTabId, getTabsStore, updateTab } from 'state/tabs'
 import {
   Button,
   DropdownMenu,
@@ -51,6 +52,7 @@ import {
   TooltipTrigger,
   cn,
 } from 'ui'
+import { useSnapshot } from 'valtio'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
@@ -81,11 +83,14 @@ export const SQLEditor = () => {
   const os = detectOS()
   const router = useRouter()
   const { ref, id: urlId } = useParams()
-  const org = useSelectedOrganization()
+
   const { profile } = useProfile()
-  const queryClient = useQueryClient()
   const project = useSelectedProject()
-  const organization = useSelectedOrganization()
+  const org = useSelectedOrganization()
+
+  const queryClient = useQueryClient()
+  const store = getTabsStore(ref)
+  const tabs = useSnapshot(store)
   const aiSnap = useAiAssistantStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
@@ -111,6 +116,8 @@ export const SQLEditor = () => {
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<Monaco | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
+  const scrollTopRef = useRef<number>(0)
+
   const [hasSelection, setHasSelection] = useState<boolean>(false)
   const [lineHighlights, setLineHighlights] = useState<string[]>([])
   const [isDiffEditorMounted, setIsDiffEditorMounted] = useState(false)
@@ -136,7 +143,7 @@ export const SQLEditor = () => {
   useAddDefinitions(id, monacoRef.current)
 
   /** React query data fetching  */
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
@@ -362,6 +369,19 @@ export const SQLEditor = () => {
     [profile?.id, project?.id, ref, router, snapV2]
   )
 
+  const onMount = (editor: IStandaloneCodeEditor) => {
+    const tabId = createTabId('sql', { id })
+    const tabData = tabs.tabsMap[tabId]
+
+    // [Joshen] Tiny timeout to give a bit of time for the content to load before scrolling
+    setTimeout(() => {
+      if (tabData?.metadata?.scrollTop) {
+        editor.setScrollTop(tabData.metadata.scrollTop)
+      }
+    }, 20)
+    editor.onDidScrollChange((e) => (scrollTopRef.current = e.scrollTop))
+  }
+
   const onDebug = useCallback(async () => {
     try {
       const snippet = snapV2.snippets[id]
@@ -510,6 +530,12 @@ export const SQLEditor = () => {
     if (id) {
       closeDiff()
       setPromptState((prev) => ({ ...prev, isOpen: false }))
+    }
+    return () => {
+      if (ref) {
+        const tabId = createTabId('sql', { id })
+        updateTab(ref, tabId, { scrollTop: scrollTopRef.current })
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [closeDiff, id])
@@ -718,6 +744,7 @@ export const SQLEditor = () => {
                         monacoRef={monacoRef}
                         executeQuery={executeQuery}
                         onHasSelection={setHasSelection}
+                        onMount={onMount}
                         onPrompt={({
                           selection,
                           beforeSelection,
