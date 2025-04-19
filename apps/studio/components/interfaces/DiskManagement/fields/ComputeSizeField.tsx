@@ -292,7 +292,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                     )}
                     label={
                       <Link
-                        href={`/support/new?ref=${ref}&category=sales&subject=Enquiry%20about%20larger%20instance%20sizes`}
+                        href={`/support/new?projectRef=${ref}&category=sales&subject=Enquiry%20about%20larger%20instance%20sizes`}
                       >
                         <div className="w-full flex flex-col gap-3 justify-between">
                           <div className="relative px-3 flex justify-between">

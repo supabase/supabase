@@ -67,7 +67,7 @@ interface SupportFormV2Props {
 export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFormV2Props) => {
   const { profile } = useProfile()
   const {
-    ref,
+    projectRef: ref,
     slug,
     category: urlCategory,
     subject: urlSubject,

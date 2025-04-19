@@ -24,7 +24,7 @@ const HelpPopover = () => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   const projectRef = project?.parent_project_ref ?? router.query.ref
-  const supportUrl = `/support/new${projectRef ? `?ref=${projectRef}` : ''}`
+  const supportUrl = `/support/new${projectRef ? `?projectRef=${projectRef}` : ''}`
 
   return (
     <Popover_Shadcn_>
