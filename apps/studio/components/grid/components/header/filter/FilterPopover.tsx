@@ -1,11 +1,11 @@
-import update from 'immutability-helper'
 import { isEqual } from 'lodash'
-import { FilterIcon, Plus } from 'lucide-react'
+import { Filter as FilterIcon, Plus } from 'lucide-react'
 import { KeyboardEvent, useCallback, useMemo, useState } from 'react'
 
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
-import type { Filter } from 'components/grid/types'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import type { Filter } from 'components/grid/types'
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -16,28 +16,27 @@ import {
 import FilterRow from './FilterRow'
 
 export interface FilterPopoverProps {
-  filters: string[]
   portal?: boolean
-  onApplyFilters: (filters: Filter[]) => void
 }
 
-const FilterPopover = ({ filters, portal = true, onApplyFilters }: FilterPopoverProps) => {
+const FilterPopover = ({ portal = true }: FilterPopoverProps) => {
   const [open, setOpen] = useState(false)
+  const { urlFilters } = useTableFilter()
 
   const btnText =
-    (filters || []).length > 0
-      ? `Filtered by ${filters.length} rule${filters.length > 1 ? 's' : ''}`
+    (urlFilters || []).length > 0
+      ? `Filtered by ${urlFilters.length} rule${urlFilters.length > 1 ? 's' : ''}`
       : 'Filter'
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button type={(filters || []).length > 0 ? 'link' : 'text'} icon={<FilterIcon />}>
+        <Button type={(urlFilters || []).length > 0 ? 'link' : 'text'} icon={<FilterIcon />}>
           {btnText}
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start" portal={portal}>
-        <FilterOverlay filters={filters} onApplyFilters={onApplyFilters} />
+        <FilterOverlay />
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
   )
@@ -45,19 +44,18 @@ const FilterPopover = ({ filters, portal = true, onApplyFilters }: FilterPopover
 
 export default FilterPopover
 
-interface FilterOverlayProps {
-  filters: string[]
-  onApplyFilters: (filter: Filter[]) => void
-}
+interface FilterOverlayProps {}
 
-const FilterOverlay = ({ filters: filtersFromUrl, onApplyFilters }: FilterOverlayProps) => {
+const FilterOverlay = ({}: FilterOverlayProps) => {
   const snap = useTableEditorTableStateSnapshot()
+  const { urlFilters, onApplyFilters } = useTableFilter()
 
-  const initialFilters = useMemo(
-    () => formatFilterURLParams((filtersFromUrl as string[]) ?? []),
-    [filtersFromUrl]
-  )
+  const initialFilters = useMemo(() => formatFilterURLParams(urlFilters ?? []), [urlFilters])
   const [filters, setFilters] = useState<Filter[]>(initialFilters)
+
+  useMemo(() => {
+    setFilters(initialFilters)
+  }, [initialFilters])
 
   function onAddFilter() {
     const column = snap.table.columns[0]?.name
@@ -75,21 +73,18 @@ const FilterOverlay = ({ filters: filtersFromUrl, onApplyFilters }: FilterOverla
   }
 
   const onChangeFilter = useCallback((index: number, filter: Filter) => {
-    setFilters((currentFilters) =>
-      update(currentFilters, {
-        [index]: {
-          $set: filter,
-        },
-      })
-    )
+    setFilters((currentFilters) => [
+      ...currentFilters.slice(0, index),
+      filter,
+      ...currentFilters.slice(index + 1),
+    ])
   }, [])
 
   const onDeleteFilter = useCallback((index: number) => {
-    setFilters((currentFilters) =>
-      update(currentFilters, {
-        $splice: [[index, 1]],
-      })
-    )
+    setFilters((currentFilters) => [
+      ...currentFilters.slice(0, index),
+      ...currentFilters.slice(index + 1),
+    ])
   }, [])
 
   const onSelectApplyFilters = () => {

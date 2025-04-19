@@ -22,7 +22,7 @@ import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Checkbox } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 
 export type DeleteConfirmationDialogsProps = {
   selectedTable?: Entity | PostgresTable
@@ -37,8 +37,7 @@ const DeleteConfirmationDialogs = ({
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
 
-  const { filters: filter, setParams } = useTableEditorFiltersSort()
-  const filters = formatFilterURLParams(filter as string[])
+  const { filters, onApplyFilters } = useTableFilter()
 
   const getTables = useGetTables({
     projectRef: project?.ref,
@@ -46,61 +45,21 @@ const DeleteConfirmationDialogs = ({
   })
 
   const removeDeletedColumnFromFiltersAndSorts = ({
-    ref,
-    tableName,
-    schema,
     columnName,
   }: {
-    ref: string
-    tableName: string
-    schema: string
+    ref?: string
+    tableName?: string
+    schema?: string
     columnName: string
   }) => {
-    setParams((prevParams) => {
-      const existingFilters = (prevParams?.filter ?? []) as string[]
-      const existingSorts = (prevParams?.sort ?? []) as string[]
-
-      const newFiltersAndSorts = {
-        filter: existingFilters.filter((filter: string) => {
-          const [column] = filter.split(':')
-          if (column !== columnName) return filter
-        }),
-        sort: existingSorts.filter((sort: string) => {
-          const [column] = sort.split(':')
-          if (column !== columnName) return sort
-        }),
-      }
-
-      // Overwrite local storage without the deleted column
-      saveTableEditorStateToLocalStorageDebounced({
-        projectRef: ref,
-        tableName,
-        schema,
-        filters: newFiltersAndSorts.filter,
-        sorts: newFiltersAndSorts.sort,
-      })
-
-      return {
-        ...prevParams,
-        ...newFiltersAndSorts,
-      }
-    })
+    onApplyFilters(filters.filter((filter) => filter.column !== columnName))
   }
 
   const { mutate: deleteColumn } = useDatabaseColumnDeleteMutation({
     onSuccess: () => {
       if (!(snap.confirmationDialog?.type === 'column')) return
       const selectedColumnToDelete = snap.confirmationDialog.column
-      if (!project?.ref) return
-      if (!selectedTable?.name) return
-
-      removeDeletedColumnFromFiltersAndSorts({
-        ref: project?.ref,
-        tableName: selectedTable?.name,
-        schema: selectedColumnToDelete.schema,
-        columnName: selectedColumnToDelete.name,
-      })
-
+      removeDeletedColumnFromFiltersAndSorts({ columnName: selectedColumnToDelete.name })
       toast.success(`Successfully deleted column "${selectedColumnToDelete.name}"`)
     },
     onError: (error) => {
