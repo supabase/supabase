@@ -1,4 +1,5 @@
 import { Search } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -16,10 +17,12 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH } from 'lib/constants'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -29,6 +32,10 @@ import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSetti
 
 const TeamSettings = () => {
   const newLayoutPreview = useIsNewLayoutEnabled()
+  const [_, setLastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
 
   const {
     organizationMembersCreate: organizationMembersCreationEnabled,
@@ -36,11 +43,13 @@ const TeamSettings = () => {
   } = useIsFeatureEnabled(['organization_members:create', 'organization_members:delete'])
 
   const { slug } = useParams()
+  const router = useRouter()
   const { profile } = useProfile()
   const selectedOrganization = useSelectedOrganization()
   const isOwner = selectedOrganization?.is_owner
 
   const { data: permissions } = usePermissionsQuery()
+  const { refetch: refetchOrganizations } = useOrganizationsQuery()
   const { data: rolesData } = useOrganizationRolesV2Query({ slug })
   const { data: members } = useOrganizationMembersQuery({ slug })
 
@@ -59,10 +68,19 @@ const TeamSettings = () => {
   const canLeave = !isOwner || (isOwner && hasMultipleOwners(members, roles))
 
   const { mutate: deleteMember } = useOrganizationMemberDeleteMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       setIsLeaving(false)
       setIsLeaveTeamModalOpen(false)
-      window?.location.replace(BASE_PATH) // Force reload to clear Store
+
+      await refetchOrganizations()
+      toast.success(`Successfully left ${selectedOrganization?.name}`)
+
+      if (newLayoutPreview) {
+        setLastVisitedOrganization('')
+        router.push('/organizations')
+      } else {
+        router.push('/projects')
+      }
     },
     onError: (error) => {
       setIsLeaving(false)

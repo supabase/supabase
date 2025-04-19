@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -15,7 +14,6 @@ export const HomeIcon = () => {
   const showLayoutHeader = useShowLayoutHeader()
   const selectedOrganization = useSelectedOrganization()
   const { data: organizations } = useOrganizationsQuery()
-  const { project } = useProjectContext()
 
   const router = useRouter()
   const [lastVisitedOrganization] = useLocalStorageQuery(
