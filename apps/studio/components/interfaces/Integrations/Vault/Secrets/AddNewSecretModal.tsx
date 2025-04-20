@@ -121,6 +121,7 @@ const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
               </Modal.Content>
               <Modal.Separator />
               <Modal.Content className="space-y-4">
+                <></>
                 {/* <EncryptionKeySelector
                     nameId="keyName"
                     label="Select a key to encrypt your secret with"
