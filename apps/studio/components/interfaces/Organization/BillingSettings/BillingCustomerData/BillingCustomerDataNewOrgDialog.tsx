@@ -4,7 +4,6 @@ import {
   Button,
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogSectionSeparator,
   DialogTitle,
@@ -13,17 +12,15 @@ import {
 } from 'ui'
 import { Pencil } from 'lucide-react'
 
-import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
+import { FormCustomerData, useBillingCustomerDataForm } from './useBillingCustomerDataForm'
 import { BillingCustomerDataForm } from './BillingCustomerDataForm'
 
 interface BillingCustomerDataNewOrgDialogProps {
-  onBillingAddressChanged: (data: any) => void
-  onTaxIdChanged: (data: any) => void
+  onCustomerDataChange: (data: FormCustomerData) => void
 }
 
 const BillingCustomerDataNewOrgDialog = ({
-  onBillingAddressChanged,
-  onTaxIdChanged,
+  onCustomerDataChange,
 }: BillingCustomerDataNewOrgDialogProps) => {
   const [open, setOpen] = useState(false)
 
@@ -31,10 +28,8 @@ const BillingCustomerDataNewOrgDialog = ({
     setOpen(false)
   }
 
-  const { form, handleSubmit, handleReset, isSubmitting, isDirty } = useBillingCustomerDataForm({
-    onSuccess: handleDialogClose,
-    updateCustomerProfile: onBillingAddressChanged,
-    updateTaxId: onTaxIdChanged,
+  const { form, handleSubmit, handleReset, isDirty } = useBillingCustomerDataForm({
+    onCustomerDataChange,
   })
 
   const handleClose = () => {
@@ -52,7 +47,7 @@ const BillingCustomerDataNewOrgDialog = ({
     return parts.join(', ')
   }
 
-  const isSubmitDisabled = !isDirty || isSubmitting
+  const isSubmitDisabled = !isDirty
 
   return (
     <>
@@ -84,26 +79,26 @@ const BillingCustomerDataNewOrgDialog = ({
         <DialogContent size={'large'}>
           <DialogHeader>
             <DialogTitle>Billing Address &amp; Tax Id</DialogTitle>
-            <DialogDescription>
-              This will be reflected in every upcoming invoice, past invoices are not affected
-            </DialogDescription>
           </DialogHeader>
           <DialogSectionSeparator />
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)}>
+            <form
+              id="new-org-billing-data-form"
+              onSubmit={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                form.handleSubmit(handleSubmit)(e)
+                console.log(form.formState.errors)
+              }}
+            >
               <BillingCustomerDataForm className="p-5" form={form} />
               <DialogFooter className="justify-end">
                 <div className="flex items-center gap-2">
                   <Button type="default" onClick={handleClose}>
                     Cancel
                   </Button>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    disabled={isSubmitDisabled}
-                    loading={isSubmitting}
-                  >
-                    Save
+                  <Button type="primary" htmlType="submit" disabled={isSubmitDisabled}>
+                    Continue
                   </Button>
                 </div>
               </DialogFooter>

@@ -26,6 +26,7 @@ import { TAX_IDS } from './TaxID.constants'
 import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
 import { BillingCustomerDataForm } from './BillingCustomerDataForm'
+import { toast } from 'sonner'
 
 interface BillingCustomerDataExistingOrgDialogProps {
   slug: string | undefined
@@ -51,7 +52,6 @@ const BillingCustomerDataExistingOrgDialog = ({
     error,
     isLoading,
     isSuccess,
-    isError,
   } = useOrganizationCustomerProfileQuery({ slug }, { enabled: canReadBillingCustomerData })
 
   const {
@@ -59,7 +59,6 @@ const BillingCustomerDataExistingOrgDialog = ({
     error: errorTaxId,
     isLoading: isLoadingTaxId,
     isSuccess: isSuccessTaxId,
-    isError: isErrorTaxId,
   } = useOrganizationTaxIdQuery({ slug })
 
   const handleDialogClose = () => {
@@ -84,17 +83,29 @@ const BillingCustomerDataExistingOrgDialog = ({
   const { mutate: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation()
   const { mutate: updateTaxId } = useOrganizationTaxIdUpdateMutation()
 
-  const { form, handleSubmit, handleReset, isSubmitting, isDirty } = useBillingCustomerDataForm({
-    slug,
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const { form, handleSubmit, handleReset, isDirty } = useBillingCustomerDataForm({
     initialCustomerData,
-    onSuccess: handleDialogClose,
-    updateCustomerProfile: (data) =>
-      updateCustomerProfile({
-        slug,
-        address: data.address ?? undefined,
-        billing_name: data.billing_name,
-      }),
-    updateTaxId: (data) => updateTaxId({ slug, taxId: data }),
+    onCustomerDataChange: async (data) => {
+      try {
+        await updateCustomerProfile({
+          address: data.address ?? undefined,
+          billing_name: data.billing_name,
+        })
+
+        await updateTaxId({ slug, taxId: data.tax_id })
+
+        toast.success('Successfully updated billing data')
+
+        handleDialogClose()
+
+        setIsSubmitting(false)
+      } catch (error: any) {
+        toast.error(`Failed updating billing data: ${error.message}`)
+        setIsSubmitting(false)
+      }
+    },
   })
 
   const handleClose = () => {
@@ -127,18 +138,18 @@ const BillingCustomerDataExistingOrgDialog = ({
           <NoPermission resourceText="view this organization's billing address" />
         ) : (
           <>
-            {isLoading && (
+            {(isLoading || isLoadingTaxId) && (
               <div className="space-y-2">
                 <ShimmeringLoader />
               </div>
             )}
-            {isError && (
+            {(error || errorTaxId) && (
               <AlertError
                 subject="Failed to retrieve organization customer profile"
-                error={error as any}
+                error={(error || errorTaxId) as any}
               />
             )}
-            {isSuccess && (
+            {isSuccess && isSuccessTaxId && (
               <div className="flex items-center justify-between">
                 <p className="text-xs text-foreground">{getAddressSummary()}</p>
                 <Button

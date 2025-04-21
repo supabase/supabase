@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import {
@@ -21,6 +21,7 @@ import { Button, Card, CardFooter, Form_Shadcn_ as Form } from 'ui'
 import { BillingCustomerDataForm } from './BillingCustomerDataForm'
 import { TAX_IDS } from './TaxID.constants'
 import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
+import { toast } from 'sonner'
 
 const BillingCustomerData = () => {
   const { slug } = useParams()
@@ -67,11 +68,27 @@ const BillingCustomerData = () => {
   const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation()
   const { mutateAsync: updateTaxId } = useOrganizationTaxIdUpdateMutation()
 
-  const { form, handleSubmit, handleReset, isSubmitting, isDirty } = useBillingCustomerDataForm({
-    slug,
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const { form, handleSubmit, handleReset, isDirty } = useBillingCustomerDataForm({
     initialCustomerData,
-    updateCustomerProfile: (data) => updateCustomerProfile({ slug, address: data.address ??  undefined, billing_name: data.billing_name }),
-    updateTaxId: (data) => updateTaxId({ slug, taxId: data }),
+    onCustomerDataChange: async (data) => {
+      try {
+        await updateCustomerProfile({
+          address: data.address,
+          billing_name: data.billing_name,
+        })
+
+        await updateTaxId({ slug, taxId: data.tax_id })
+
+        toast.success('Successfully updated billing data')
+
+        setIsSubmitting(false)
+      } catch (error: any) {
+        toast.error(`Failed updating billing data: ${error.message}`)
+        setIsSubmitting(false)
+      }
+    },
   })
 
   const isSubmitDisabled = !isDirty || !canUpdateBillingCustomerData || isSubmitting

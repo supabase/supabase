@@ -1,33 +1,27 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 
 import { BillingCustomerDataFormValues, BillingCustomerDataSchema } from './BillingCustomerDataForm'
 import { TAX_IDS } from './TaxID.constants'
 import { sanitizeTaxIdValue } from './TaxID.utils'
 import { components } from 'api-types'
 
+export type FormCustomerData = {
+  address: components['schemas']['CustomerResponse']['address'] | undefined
+  billing_name: string
+  tax_id: components['schemas']['TaxIdResponse']['tax_id'] | null
+}
+
 interface UseBillingAddressFormProps {
-  slug?: string
   initialCustomerData?: Partial<BillingCustomerDataFormValues> | null
-  onSuccess?: () => void
-  updateCustomerProfile: (data: {
-    address: components['schemas']['CustomerResponse']['address'] | null
-    billing_name: string
-  }) => void
-  updateTaxId: (data: components['schemas']['TaxIdResponse']['tax_id']) => void
+  onCustomerDataChange: (data: FormCustomerData) => void
 }
 
 export function useBillingCustomerDataForm({
-  slug,
   initialCustomerData,
-  onSuccess,
-  updateCustomerProfile,
-  updateTaxId,
+  onCustomerDataChange,
 }: UseBillingAddressFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
   const form = useForm<BillingCustomerDataFormValues>({
     resolver: zodResolver(BillingCustomerDataSchema),
     defaultValues: {
@@ -63,12 +57,6 @@ export function useBillingCustomerDataForm({
   }, [initialCustomerData])
 
   const handleSubmit = async (values: BillingCustomerDataFormValues) => {
-    if (!slug) {
-      toast.error('Organization slug is required')
-      return
-    }
-
-    setIsSubmitting(true)
     const trimmedValues = Object.entries(values).reduce((acc, [key, value]) => {
       acc[key as keyof BillingCustomerDataFormValues] =
         typeof value === 'string' ? value.trim() : value
@@ -77,24 +65,21 @@ export function useBillingCustomerDataForm({
 
     const addressPayload = !trimmedValues.line1 ? null : trimmedValues
 
-    try {
-      await updateCustomerProfile({
-        address: addressPayload
-          ? {
-              line1: trimmedValues.line1!,
-              line2: trimmedValues.line2,
-              city: trimmedValues.city,
-              state: trimmedValues.state,
-              postal_code: trimmedValues.postal_code,
-              country: trimmedValues.country!,
-            }
-          : null,
-        billing_name: trimmedValues.billing_name,
-      })
+    const selectedTaxId = TAX_IDS.find((option) => option.name === values.tax_id_name)
 
-      const selectedTaxId = TAX_IDS.find((option) => option.name === values.tax_id_name)
-
-      await updateTaxId(
+    onCustomerDataChange({
+      address: addressPayload
+        ? {
+            line1: trimmedValues.line1!,
+            line2: trimmedValues.line2,
+            city: trimmedValues.city,
+            state: trimmedValues.state,
+            postal_code: trimmedValues.postal_code,
+            country: trimmedValues.country!,
+          }
+        : undefined,
+      billing_name: trimmedValues.billing_name,
+      tax_id:
         selectedTaxId && values.tax_id_type?.length && values.tax_id_value?.length
           ? {
               type: values.tax_id_type,
@@ -104,17 +89,8 @@ export function useBillingCustomerDataForm({
               }),
               country: selectedTaxId?.countryIso2,
             }
-          : null
-      )
-
-      toast.success('Successfully updated billing data')
-
-      setIsSubmitting(false)
-      onSuccess?.()
-    } catch (error: any) {
-      toast.error(`Failed updating billing data: ${error.message}`)
-      setIsSubmitting(false)
-    }
+          : null,
+    })
   }
 
   const handleReset = () => {
@@ -148,7 +124,6 @@ export function useBillingCustomerDataForm({
 
   return {
     form,
-    isSubmitting,
     handleSubmit,
     handleReset,
     isDirty: form.formState.isDirty,

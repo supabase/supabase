@@ -38,6 +38,7 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import _ from 'lodash'
 import BillingCustomerDataNewOrgDialog from '../BillingSettings/BillingCustomerData/BillingCustomerDataNewOrgDialog'
+import { FormCustomerData } from '../BillingSettings/BillingCustomerData/useBillingCustomerDataForm'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -101,6 +102,8 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
 
   const [isOrgCreationConfirmationModalVisible, setIsOrgCreationConfirmationModalVisible] =
     useState(false)
+
+  const [customerData, setCustomerData] = useState<FormCustomerData | null>(null)
 
   const [formState, setFormState] = useState<FormState>({
     plan: 'FREE',
@@ -184,20 +187,9 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         | 'tier_enterprise',
       ...(formState.kind == 'COMPANY' ? { size: formState.size } : {}),
       payment_method: paymentMethodId,
-      billing_name: 'some other name',
-      address: {
-        line1: 'line 1',
-        line2: 'line 2',
-        city: 'city',
-        state: 'state',
-        postal_code: 'postal code',
-        country: 'DE',
-      },
-      tax_id: {
-        country: 'DE',
-        type: 'eu_vat',
-        value: 'DE123456789',
-      },
+      billing_name: dbTier === 'FREE' ? undefined : customerData?.billing_name,
+      address: dbTier === 'FREE' ? undefined : customerData?.address,
+      tax_id: dbTier === 'FREE' ? undefined : customerData?.tax_id ?? undefined,
     })
   }
 
@@ -487,10 +479,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                 </Label_Shadcn_>
               </div>
               <div className="col-span-2">
-                <BillingCustomerDataNewOrgDialog
-                  onBillingAddressChanged={alert}
-                  onTaxIdChanged={alert}
-                />
+                <BillingCustomerDataNewOrgDialog onCustomerDataChange={setCustomerData} />
               </div>
             </div>
           </Panel.Content>
