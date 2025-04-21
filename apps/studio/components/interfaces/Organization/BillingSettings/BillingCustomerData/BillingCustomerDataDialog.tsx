@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import {
   Button,
@@ -12,7 +12,7 @@ import {
   Form_Shadcn_ as Form,
 } from 'ui'
 import { Label_Shadcn_ as Label } from 'ui'
-import BillingAddressForm from './BillingAddressForm'
+import BillingCustomerDataForm from './BillingCustomerDataForm'
 import { Pencil } from 'lucide-react'
 
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -21,21 +21,23 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import AlertError from 'components/ui/AlertError'
-import { useBillingAddressForm } from './useBillingAddressForm'
+import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
+import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
+import { TAX_IDS } from './TaxID.constants'
 
-interface BillingAddressDialogProps {
+interface BillingCustomerDataDialogProps {
   slug: string | undefined
 }
 
-const BillingAddressDialog = ({ slug }: BillingAddressDialogProps) => {
+const BillingCustomerDataDialog = ({ slug }: BillingCustomerDataDialogProps) => {
   const [open, setOpen] = useState(false)
 
-  const canReadBillingAddress = useCheckPermissions(
+  const canReadBillingCustomerData = useCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.customer'
   )
 
-  const canUpdateBillingAddress = useCheckPermissions(
+  const canUpdateBillingCustomerData = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.customer'
   )
@@ -46,15 +48,38 @@ const BillingAddressDialog = ({ slug }: BillingAddressDialogProps) => {
     isLoading,
     isSuccess,
     isError,
-  } = useOrganizationCustomerProfileQuery({ slug }, { enabled: canReadBillingAddress })
+  } = useOrganizationCustomerProfileQuery({ slug }, { enabled: canReadBillingCustomerData })
+
+  const {
+    data: taxId,
+    error: errorTaxId,
+    isLoading: isLoadingTaxId,
+    isSuccess: isSuccessTaxId,
+    isError: isErrorTaxId,
+  } = useOrganizationTaxIdQuery({ slug })
 
   const handleDialogClose = () => {
     setOpen(false)
   }
 
-  const { form, handleSubmit, handleReset, isSubmitting, isDirty } = useBillingAddressForm({
+  const initialCustomerData = useMemo(
+    () => ({
+      ...customerProfile?.address,
+      billing_name: customerProfile?.billing_name,
+      tax_id_type: taxId?.type,
+      tax_id_value: taxId?.value,
+      tax_id_name: taxId
+        ? TAX_IDS.find(
+            (option) => option.type === taxId.type && option.countryIso2 === taxId.country
+          )?.name || ''
+        : '',
+    }),
+    [customerProfile, taxId]
+  )
+
+  const { form, handleSubmit, handleReset, isSubmitting, isDirty } = useBillingCustomerDataForm({
     slug,
-    initialAddress: customerProfile?.address,
+    initialCustomerData,
     onSuccess: handleDialogClose,
   })
 
@@ -76,7 +101,7 @@ const BillingAddressDialog = ({ slug }: BillingAddressDialogProps) => {
     return parts.join(', ')
   }
 
-  const isSubmitDisabled = !isDirty || !canUpdateBillingAddress || isSubmitting
+  const isSubmitDisabled = !isDirty || !canUpdateBillingCustomerData || isSubmitting
 
   return (
     <>
@@ -84,7 +109,7 @@ const BillingAddressDialog = ({ slug }: BillingAddressDialogProps) => {
         <Label htmlFor="billing-address-btn" className="text-foreground-light block mb-0">
           Billing Address
         </Label>
-        {!canReadBillingAddress ? (
+        {!canReadBillingCustomerData ? (
           <NoPermission resourceText="view this organization's billing address" />
         ) : (
           <>
@@ -109,7 +134,7 @@ const BillingAddressDialog = ({ slug }: BillingAddressDialogProps) => {
                   aria-label="Edit"
                   size={'tiny'}
                   className="w-8 h-8 p-0 text-foreground-light"
-                  disabled={!canUpdateBillingAddress}
+                  disabled={!canUpdateBillingCustomerData}
                 >
                   <Pencil size={14} strokeWidth={1.5} />
                 </Button>
@@ -136,9 +161,13 @@ const BillingAddressDialog = ({ slug }: BillingAddressDialogProps) => {
           <DialogSectionSeparator />
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)}>
-              <BillingAddressForm className="p-5" form={form} disabled={!canUpdateBillingAddress} />
+              <BillingCustomerDataForm
+                className="p-5"
+                form={form}
+                disabled={!canUpdateBillingCustomerData}
+              />
               <DialogFooter className="justify-end">
-                {!canUpdateBillingAddress && (
+                {!canUpdateBillingCustomerData && (
                   <span className="text-sm text-foreground-lighter">
                     You need additional permissions to manage this organization's billing address
                   </span>
@@ -165,4 +194,4 @@ const BillingAddressDialog = ({ slug }: BillingAddressDialogProps) => {
   )
 }
 
-export default BillingAddressDialog
+export default BillingCustomerDataDialog

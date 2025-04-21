@@ -15,11 +15,11 @@ import { PRICING_TIER_PRODUCT_IDS, PROJECT_STATUS } from 'lib/constants'
 import { SubscriptionTier } from 'data/subscriptions/types'
 import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import PaymentMethodSelection from './PaymentMethodSelection'
-import BillingAddressDialog from '../BillingAddress/BillingAddressDialog'
 import { ProjectInfo } from 'data/projects/projects-query'
 import { Admonition } from 'ui-patterns'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { OrganizationBillingSubscriptionPreviewResponse } from 'data/organizations/organization-billing-subscription-preview'
+import BillingCustomerDataDialog from '../BillingCustomerData/BillingCustomerDataDialog'
 
 const getRandomTweet = () => {
   const filteredTweets = tweets.filter((it) => it.text.length < 180)
@@ -490,7 +490,7 @@ const SubscriptionPlanUpdateDialog = ({
             <div className="pt-6">
               {!billingViaPartner ? (
                 <div className="space-y-2 mb-4">
-                  <BillingAddressDialog slug={slug} />
+                  <BillingCustomerDataDialog slug={slug} />
                   <PaymentMethodSelection
                     selectedPaymentMethod={selectedPaymentMethod}
                     onSelectPaymentMethod={setSelectedPaymentMethod}

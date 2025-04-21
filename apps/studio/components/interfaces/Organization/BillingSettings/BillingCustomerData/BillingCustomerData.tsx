@@ -13,46 +13,67 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import BillingAddressForm from './BillingAddressForm'
+import BillingCustomerDataForm from './BillingCustomerDataForm'
 import { Button, Card, CardFooter, cn, Form_Shadcn_ as Form } from 'ui'
-import { useBillingAddressForm } from './useBillingAddressForm'
+import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
 import { useMemo } from 'react'
+import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
+import { TAX_IDS } from './TaxID.constants'
 
-const BillingAddress = () => {
+const BillingCustomerData = () => {
   const { slug } = useParams()
   const selectedOrganization = useSelectedOrganization()
 
-  const canReadBillingAddress = useCheckPermissions(
+  const canReadBillingCustomerData = useCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.customer'
   )
-  const canUpdateBillingAddress = useCheckPermissions(
+  const canUpdateBillingCustomerData = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.customer'
   )
 
-  const { data, error, isLoading, isSuccess, isError } = useOrganizationCustomerProfileQuery(
-    { slug },
-    { enabled: canReadBillingAddress }
+  const {
+    data: customerProfile,
+    error,
+    isLoading,
+    isSuccess,
+  } = useOrganizationCustomerProfileQuery({ slug }, { enabled: canReadBillingCustomerData })
+
+  const {
+    data: taxId,
+    error: errorLoadingTaxId,
+    isLoading: isLoadingTaxId,
+    isSuccess: loadedTaxId,
+  } = useOrganizationTaxIdQuery({ slug })
+
+  const initialCustomerData = useMemo(
+    () => ({
+      ...customerProfile?.address,
+      billing_name: customerProfile?.billing_name,
+      tax_id_type: taxId?.type,
+      tax_id_value: taxId?.value,
+      tax_id_name: taxId
+        ? TAX_IDS.find(
+            (option) => option.type === taxId.type && option.countryIso2 === taxId.country
+          )?.name || ''
+        : '',
+    }),
+    [customerProfile, taxId]
   )
 
-  const initialAddress = useMemo(
-    () => ({ ...data?.address, billing_name: data?.billing_name }),
-    [data]
-  )
-
-  const { form, handleSubmit, handleReset, isSubmitting, isDirty } = useBillingAddressForm({
+  const { form, handleSubmit, handleReset, isSubmitting, isDirty } = useBillingCustomerDataForm({
     slug,
-    initialAddress,
+    initialCustomerData,
   })
 
-  const isSubmitDisabled = !isDirty || !canUpdateBillingAddress || isSubmitting
+  const isSubmitDisabled = !isDirty || !canUpdateBillingCustomerData || isSubmitting
 
   return (
     <ScaffoldSection>
       <ScaffoldSectionDetail>
         <div className="sticky space-y-2 top-12 pr-3">
-          <p className="text-foreground text-base m-0">Billing Address</p>
+          <p className="text-foreground text-base m-0">Billing Address &amp; Tax Id</p>
           <p className="text-sm text-foreground-light m-0">
             This will be reflected in every upcoming invoice, past invoices are not affected
           </p>
@@ -68,11 +89,11 @@ const BillingAddress = () => {
               installationId: selectedOrganization?.partner_id,
             }}
           />
-        ) : !canReadBillingAddress ? (
+        ) : !canReadBillingCustomerData ? (
           <NoPermission resourceText="view this organization's billing address" />
         ) : (
           <>
-            {isLoading && (
+            {(isLoading || isLoadingTaxId) && (
               <div className="space-y-2">
                 <ShimmeringLoader />
                 <ShimmeringLoader className="w-3/4" />
@@ -80,24 +101,24 @@ const BillingAddress = () => {
               </div>
             )}
 
-            {isError && (
+            {(error || errorLoadingTaxId) && (
               <AlertError
                 subject="Failed to retrieve organization customer profile"
-                error={error as any}
+                error={(error || errorLoadingTaxId) as any}
               />
             )}
 
-            {isSuccess && (
+            {isSuccess && loadedTaxId && (
               <Card>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(handleSubmit)}>
-                    <BillingAddressForm
+                    <BillingCustomerDataForm
                       className="p-8"
                       form={form}
-                      disabled={!canUpdateBillingAddress}
+                      disabled={!canUpdateBillingCustomerData}
                     />
                     <CardFooter className="border-t justify-end px-8">
-                      {!canUpdateBillingAddress && (
+                      {!canUpdateBillingCustomerData && (
                         <span className="text-sm text-foreground-lighter mr-auto">
                           You need additional permissions to manage this organization's billing
                           address
@@ -128,4 +149,4 @@ const BillingAddress = () => {
   )
 }
 
-export default BillingAddress
+export default BillingCustomerData

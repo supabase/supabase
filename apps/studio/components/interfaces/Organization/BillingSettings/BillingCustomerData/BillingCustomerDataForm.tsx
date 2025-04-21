@@ -1,5 +1,5 @@
 import { UseFormReturn } from 'react-hook-form'
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { Check, ChevronsUpDown, X } from 'lucide-react'
 
 import {
   FormControl_Shadcn_ as FormControl,
@@ -18,18 +18,29 @@ import {
   CommandList_Shadcn_ as CommandList,
   Button,
   cn,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormControl_Shadcn_,
+  Input_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectGroup_Shadcn_,
+  SelectItem_Shadcn_,
+  Select_Shadcn_,
 } from 'ui'
 import { COUNTRIES } from './BillingAddress.constants'
 import { z } from 'zod'
+import { TAX_IDS } from './TaxID.constants'
 
-interface BillingAddressFormProps {
-  form: UseFormReturn<BillingAddressFormValues>
+interface BillingCustomerDataFormProps {
+  form: UseFormReturn<BillingCustomerDataFormValues>
   disabled?: boolean
   className?: string
 }
 
 // Define the expected form values structure and validation schema
-export const BillingAddressSchema = z
+export const BillingCustomerDataSchema = z
   .object({
     billing_name: z.string().min(3, 'Name must be at least 3 letters long'),
     line1: z.string().optional(),
@@ -38,6 +49,9 @@ export const BillingAddressSchema = z
     state: z.string().optional(),
     postal_code: z.string().optional(),
     country: z.string().optional(),
+    tax_id_type: z.string(),
+    tax_id_value: z.string(),
+    tax_id_name: z.string(),
   })
   .refine(
     (data) => {
@@ -60,9 +74,30 @@ export const BillingAddressSchema = z
     path: ['line1'],
   })
 
-export type BillingAddressFormValues = z.infer<typeof BillingAddressSchema>
+export type BillingCustomerDataFormValues = z.infer<typeof BillingCustomerDataSchema>
 
-const BillingAddressForm = ({ form, disabled = false, className }: BillingAddressFormProps) => {
+const BillingCustomerDataForm = ({
+  form,
+  disabled = false,
+  className,
+}: BillingCustomerDataFormProps) => {
+  const onSelectTaxIdType = (name: string) => {
+    const selectedTaxIdOption = TAX_IDS.find((option) => option.name === name)
+    if (!selectedTaxIdOption) return
+    form.setValue('tax_id_type', selectedTaxIdOption.type)
+    form.setValue('tax_id_value', '')
+    form.setValue('tax_id_name', name)
+  }
+
+  const onRemoveTaxId = () => {
+    form.setValue('tax_id_name', '')
+    form.setValue('tax_id_type', '')
+    form.setValue('tax_id_value', '')
+  }
+
+  const { tax_id_name } = form.watch()
+  const selectedTaxId = TAX_IDS.find((option) => option.name === tax_id_name)
+
   return (
     <div className={cn('flex flex-col space-y-4', className)}>
       <FormField
@@ -90,6 +125,7 @@ const BillingAddressForm = ({ form, disabled = false, className }: BillingAddres
           </FormItem>
         )}
       />
+
       <FormField
         control={form.control}
         name="line2"
@@ -102,6 +138,7 @@ const BillingAddressForm = ({ form, disabled = false, className }: BillingAddres
           </FormItem>
         )}
       />
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
           control={form.control}
@@ -183,6 +220,7 @@ const BillingAddressForm = ({ form, disabled = false, className }: BillingAddres
           )}
         />
       </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
           control={form.control}
@@ -209,8 +247,62 @@ const BillingAddressForm = ({ form, disabled = false, className }: BillingAddres
           )}
         />
       </div>
+
+      <div className="grid grid-cols-2 gap-2 w-full items-center">
+        <FormField_Shadcn_
+          name="tax_id_name"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem_Shadcn_>
+              <FormControl_Shadcn_>
+                <Select_Shadcn_
+                  {...field}
+                  disabled={disabled}
+                  value={field.value}
+                  onValueChange={(value) => onSelectTaxIdType(value)}
+                >
+                  <SelectTrigger_Shadcn_>
+                    <SelectValue_Shadcn_ placeholder="No Tax ID" />
+                  </SelectTrigger_Shadcn_>
+                  <SelectContent_Shadcn_>
+                    <SelectGroup_Shadcn_>
+                      {TAX_IDS.sort((a, b) => a.country.localeCompare(b.country)).map((option) => (
+                        <SelectItem_Shadcn_ key={option.name} value={option.name}>
+                          {option.country} - {option.name}
+                        </SelectItem_Shadcn_>
+                      ))}
+                    </SelectGroup_Shadcn_>
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+              </FormControl_Shadcn_>
+            </FormItem_Shadcn_>
+          )}
+        />
+
+        {selectedTaxId && (
+          <div className="flex items-center space-x-2">
+            <FormField_Shadcn_
+              name="tax_id_value"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem_Shadcn_ className="w-full">
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_
+                      {...field}
+                      placeholder={selectedTaxId?.placeholder}
+                      disabled={disabled}
+                    />
+                  </FormControl_Shadcn_>
+                </FormItem_Shadcn_>
+              )}
+            />
+
+            <Button type="text" className="px-1" icon={<X />} onClick={() => onRemoveTaxId()} />
+          </div>
+        )}
+      </div>
     </div>
   )
 }
 
-export default BillingAddressForm
+export default BillingCustomerDataForm
