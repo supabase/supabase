@@ -14,7 +14,6 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
-import { PgUpgradeSelectionRenderer } from './LogSelectionRenderers/PgUpgradeSelectionRenderer'
 import type { LogData, QueryType } from './Logs.types'
 
 export interface LogSelectionProps {
@@ -77,10 +76,6 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
           ...log,
         }
         return <DefaultPreviewSelectionRenderer log={postgresLog} />
-      case 'pg_upgrade':
-        if (!log) return null
-        if (!log.metadata) return <DefaultPreviewSelectionRenderer log={log} />
-        return <PgUpgradeSelectionRenderer log={log} />
       default:
         return <DefaultPreviewSelectionRenderer log={log} />
     }
