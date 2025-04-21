@@ -41,3 +41,5 @@ export const customRender = (component: React.ReactElement, renderOptions?: Cust
     ...renderOptions,
   })
 }
+
+export { render }

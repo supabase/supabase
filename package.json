@@ -103,6 +103,8 @@
   ],
   "packageManager": "pnpm@9.15.5",
   "dependencies": {
+    "@types/dotenv": "^8.2.3",
+    "dotenv": "^16.5.0",
     "react": "^18.2.0"
   }
 }

@@ -31,6 +31,7 @@ import {
   useTheme,
 } from '@graphiql/react'
 import { Fetcher } from '@graphiql/toolkit'
+import { sanitizeEnumNames } from 'lib/graphql/sanitizeIntrospection'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AlertTriangle, XIcon } from 'lucide-react'
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
@@ -55,8 +56,14 @@ export default function GraphiQL({ fetcher, theme = 'dark' }: GraphiQLProps) {
     )
   }
 
+  // Minimal change: wrap the original fetcher to sanitize enum names
+  const sanitizedFetcher: Fetcher = async (graphQLParams) => {
+    const result = await fetcher(graphQLParams)
+    return sanitizeEnumNames(result)
+  }
+
   return (
-    <GraphiQLProvider fetcher={fetcher}>
+    <GraphiQLProvider fetcher={sanitizedFetcher}>
       <GraphiQLInterface theme={theme} />
     </GraphiQLProvider>
   )
@@ -102,25 +109,18 @@ const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
     sizeThresholdSecond: 200,
     storageKey: 'docExplorerFlex',
   })
-  const editorResize = useDragResize({
-    direction: 'horizontal',
-    storageKey: 'editorFlex',
-  })
+  const editorResize = useDragResize({ direction: 'horizontal', storageKey: 'editorFlex' })
   const editorToolsResize = useDragResize({
     defaultSizeRelation: 3,
     direction: 'vertical',
-    initiallyHidden: (() => {
-      return editorContext.initialVariables || editorContext.initialHeaders ? undefined : 'second'
-    })(),
+    initiallyHidden: editorContext.initialVariables || editorContext.initialHeaders ? undefined : 'second',
     sizeThresholdSecond: 60,
     storageKey: 'secondaryEditorFlex',
   })
 
   const [activeSecondaryEditor, setActiveSecondaryEditor] = useState<
     'variables' | 'headers' | 'role-impersonation'
-  >(() => {
-    return !editorContext.initialVariables && editorContext.initialHeaders ? 'headers' : 'variables'
-  })
+  >(() => (!editorContext.initialVariables && editorContext.initialHeaders ? 'headers' : 'variables'))
 
   const toolbar = (
     <>
@@ -137,9 +137,7 @@ const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   )
 
   const onClickReference = useCallback(() => {
-    if (pluginResize.hiddenElement === 'second') {
-      pluginResize.setHiddenElement(null)
-    }
+    if (pluginResize.hiddenElement === 'second') pluginResize.setHiddenElement(null)
   }, [pluginResize])
 
   const handleAddTab = editorContext.addTab
@@ -150,7 +148,7 @@ const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
     (e) => {
       const context = pluginContext!
       const pluginIndex = Number(e.currentTarget.dataset.index!)
-      const plugin = context.plugins.find((_, index) => pluginIndex === index)!
+      const plugin = context.plugins[pluginIndex]!
       const isVisible = plugin === context.visiblePlugin
       if (isVisible) {
         context.setVisiblePlugin(null)
@@ -165,12 +163,8 @@ const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
 
   const handleToolsTabClick: MouseEventHandler<HTMLButtonElement> = useCallback(
     (event) => {
-      if (editorToolsResize.hiddenElement === 'second') {
-        editorToolsResize.setHiddenElement(null)
-      }
-      setActiveSecondaryEditor(
-        event.currentTarget.dataset.name as 'variables' | 'headers' | 'role-impersonation'
-      )
+      if (editorToolsResize.hiddenElement === 'second') editorToolsResize.setHiddenElement(null)
+      setActiveSecondaryEditor(event.currentTarget.dataset.name as any)
     },
     [editorToolsResize]
   )
@@ -183,12 +177,7 @@ const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
 
   const addTab = (
     <Tooltip label="Add tab">
-      <UnStyledButton
-        type="button"
-        className="graphiql-tab-add text-sm"
-        onClick={handleAddTab}
-        aria-label="Add tab"
-      >
+      <UnStyledButton type="button" className="graphiql-tab-add text-sm" onClick={handleAddTab} aria-label="Add tab">
         <PlusIcon aria-hidden="true" />
       </UnStyledButton>
     </Tooltip>

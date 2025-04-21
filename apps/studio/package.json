@@ -128,6 +128,7 @@
   },
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.410.0",
+    "@playwright/test": "^1.49.0",
     "@radix-ui/react-use-escape-keydown": "^1.0.3",
     "@supabase/postgres-meta": "^0.64.4",
     "@testing-library/dom": "^9.3.3",
