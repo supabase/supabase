@@ -33,6 +33,9 @@ const BillingSettings = () => {
   ])
 
   const newLayoutPreview = useIsNewLayoutEnabled()
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+  const newLayoutPreview = useIsNewLayoutEnabled()
 
   const org = useSelectedOrganization()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })

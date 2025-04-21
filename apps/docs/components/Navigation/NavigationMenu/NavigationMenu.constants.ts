@@ -1956,6 +1956,10 @@ export const local_development: NavMenuConstant = {
           url: '/guides/local-development/managing-config',
         },
         {
+          name: 'Restoring downloaded backup',
+          url: '/guides/local-development/restoring-downloaded-backup',
+        },
+        {
           name: 'Customizing email templates',
           url: '/guides/local-development/customizing-email-templates',
         },
