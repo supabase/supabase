@@ -75,6 +75,7 @@ const BillingCustomerData = () => {
     onCustomerDataChange: async (data) => {
       try {
         await updateCustomerProfile({
+          slug,
           address: data.address,
           billing_name: data.billing_name,
         })

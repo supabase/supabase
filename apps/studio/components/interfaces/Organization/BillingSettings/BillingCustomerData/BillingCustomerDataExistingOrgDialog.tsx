@@ -90,6 +90,7 @@ const BillingCustomerDataExistingOrgDialog = ({
     onCustomerDataChange: async (data) => {
       try {
         await updateCustomerProfile({
+          slug,
           address: data.address ?? undefined,
           billing_name: data.billing_name,
         })
@@ -114,9 +115,11 @@ const BillingCustomerDataExistingOrgDialog = ({
   }
 
   const getAddressSummary = () => {
-    if (!customerProfile?.address?.line1) return 'Optionally add a billing address'
+    if (!customerProfile?.address?.line1 && !customerProfile?.billing_name)
+      return 'Optionally add a billing address'
 
     const parts = [
+      customerProfile?.billing_name,
       customerProfile?.address?.line1,
       customerProfile?.address?.city,
       customerProfile?.address?.state,
