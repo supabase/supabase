@@ -3,7 +3,6 @@
 export * from './infrastructure'
 
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
-export const DEFAULT_HOME = IS_PLATFORM ? '/organizations' : '/project/default'
 
 export const API_URL = (() => {
   //  If running in platform, use API_URL from the env var
