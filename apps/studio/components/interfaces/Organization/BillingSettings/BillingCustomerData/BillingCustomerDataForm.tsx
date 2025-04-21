@@ -1,36 +1,34 @@
-import { UseFormReturn } from 'react-hook-form'
 import { Check, ChevronsUpDown, X } from 'lucide-react'
+import { UseFormReturn } from 'react-hook-form'
+import { z } from 'zod'
 
+import { useState } from 'react'
 import {
-  FormControl_Shadcn_ as FormControl,
-  FormField_Shadcn_ as FormField,
-  FormItem_Shadcn_ as FormItem,
-  FormMessage_Shadcn_ as FormMessage,
-  Input_Shadcn_ as Input,
-  Popover_Shadcn_ as Popover,
-  PopoverContent_Shadcn_ as PopoverContent,
-  PopoverTrigger_Shadcn_ as PopoverTrigger,
+  Button,
+  cn,
   Command_Shadcn_ as Command,
   CommandEmpty_Shadcn_ as CommandEmpty,
   CommandGroup_Shadcn_ as CommandGroup,
   CommandInput_Shadcn_ as CommandInput,
   CommandItem_Shadcn_ as CommandItem,
   CommandList_Shadcn_ as CommandList,
-  Button,
-  cn,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormControl_Shadcn_,
+  FormControl_Shadcn_ as FormControl,
+  FormField_Shadcn_ as FormField,
+  FormMessage_Shadcn_ as FormMessage,
+  Input_Shadcn_ as Input,
   Input_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Popover_Shadcn_ as Popover,
+  PopoverContent_Shadcn_ as PopoverContent,
+  PopoverTrigger_Shadcn_ as PopoverTrigger,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
-  Select_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { COUNTRIES } from './BillingAddress.constants'
-import { z } from 'zod'
 import { TAX_IDS } from './TaxID.constants'
 
 interface BillingCustomerDataFormProps {
@@ -76,11 +74,13 @@ export const BillingCustomerDataSchema = z
 
 export type BillingCustomerDataFormValues = z.infer<typeof BillingCustomerDataSchema>
 
-const BillingCustomerDataForm = ({
+export const BillingCustomerDataForm = ({
   form,
   disabled = false,
   className,
 }: BillingCustomerDataFormProps) => {
+  const [showCountriesPopover, setShowCountriesPopover] = useState(false)
+
   const onSelectTaxIdType = (name: string) => {
     const selectedTaxIdOption = TAX_IDS.find((option) => option.name === name)
     if (!selectedTaxIdOption) return
@@ -104,12 +104,12 @@ const BillingCustomerDataForm = ({
         control={form.control}
         name="billing_name"
         render={({ field }: { field: any }) => (
-          <FormItem>
+          <FormItemLayout hideMessage>
             <FormControl>
               <Input {...field} placeholder="Name" disabled={disabled} />
             </FormControl>
             <FormMessage />
-          </FormItem>
+          </FormItemLayout>
         )}
       />
 
@@ -117,12 +117,12 @@ const BillingCustomerDataForm = ({
         control={form.control}
         name="line1"
         render={({ field }: { field: any }) => (
-          <FormItem>
+          <FormItemLayout hideMessage>
             <FormControl>
               <Input {...field} placeholder="Address line 1" disabled={disabled} />
             </FormControl>
             <FormMessage />
-          </FormItem>
+          </FormItemLayout>
         )}
       />
 
@@ -130,12 +130,12 @@ const BillingCustomerDataForm = ({
         control={form.control}
         name="line2"
         render={({ field }: { field: any }) => (
-          <FormItem>
+          <FormItemLayout hideMessage>
             <FormControl>
               <Input {...field} placeholder="Address line 2 (Optional)" disabled={disabled} />
             </FormControl>
             <FormMessage />
-          </FormItem>
+          </FormItemLayout>
         )}
       />
 
@@ -144,8 +144,8 @@ const BillingCustomerDataForm = ({
           control={form.control}
           name="country"
           render={({ field }: { field: any }) => (
-            <FormItem>
-              <Popover>
+            <FormItemLayout hideMessage>
+              <Popover open={showCountriesPopover} onOpenChange={setShowCountriesPopover}>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
@@ -187,6 +187,7 @@ const BillingCustomerDataForm = ({
                                 shouldTouch: true,
                                 shouldValidate: true,
                               })
+                              setShowCountriesPopover(false)
                             }}
                           >
                             <Check
@@ -204,19 +205,19 @@ const BillingCustomerDataForm = ({
                 </PopoverContent>
               </Popover>
               <FormMessage />
-            </FormItem>
+            </FormItemLayout>
           )}
         />
         <FormField
           control={form.control}
           name="postal_code"
           render={({ field }: { field: any }) => (
-            <FormItem>
+            <FormItemLayout hideMessage>
               <FormControl>
                 <Input {...field} placeholder="Postal code" disabled={disabled} />
               </FormControl>
               <FormMessage />
-            </FormItem>
+            </FormItemLayout>
           )}
         />
       </div>
@@ -226,88 +227,81 @@ const BillingCustomerDataForm = ({
           control={form.control}
           name="city"
           render={({ field }: { field: any }) => (
-            <FormItem>
+            <FormItemLayout hideMessage>
               <FormControl>
                 <Input {...field} placeholder="City" disabled={disabled} />
               </FormControl>
               <FormMessage />
-            </FormItem>
+            </FormItemLayout>
           )}
         />
         <FormField
           control={form.control}
           name="state"
           render={({ field }: { field: any }) => (
-            <FormItem>
+            <FormItemLayout hideMessage>
               <FormControl>
                 <Input {...field} placeholder="State / Province" disabled={disabled} />
               </FormControl>
               <FormMessage />
-            </FormItem>
+            </FormItemLayout>
           )}
         />
       </div>
 
-      <div>
-        <p className="text-sm mb-2">Tax ID</p>
-        <div className="grid grid-cols-2 gap-2 w-full items-center">
-          <FormField_Shadcn_
-            name="tax_id_name"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem_Shadcn_>
-                <FormControl_Shadcn_>
-                  <Select_Shadcn_
-                    {...field}
-                    disabled={disabled}
-                    value={field.value}
-                    onValueChange={(value) => onSelectTaxIdType(value)}
-                  >
-                    <SelectTrigger_Shadcn_>
-                      <SelectValue_Shadcn_ placeholder="No Tax ID" />
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
-                        {TAX_IDS.sort((a, b) => a.country.localeCompare(b.country)).map(
-                          (option) => (
-                            <SelectItem_Shadcn_ key={option.name} value={option.name}>
-                              {option.country} - {option.name}
-                            </SelectItem_Shadcn_>
-                          )
-                        )}
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
-                </FormControl_Shadcn_>
-              </FormItem_Shadcn_>
-            )}
-          />
-
-          {selectedTaxId && (
-            <div className="flex items-center space-x-2">
-              <FormField_Shadcn_
-                name="tax_id_value"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem_Shadcn_ className="w-full">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
-                        {...field}
-                        placeholder={selectedTaxId?.placeholder}
-                        disabled={disabled}
-                      />
-                    </FormControl_Shadcn_>
-                  </FormItem_Shadcn_>
-                )}
-              />
-
-              <Button type="text" className="px-1" icon={<X />} onClick={() => onRemoveTaxId()} />
-            </div>
+      <div className="grid grid-cols-2 gap-x-2 w-full items-end">
+        <FormField
+          name="tax_id_name"
+          control={form.control}
+          render={({ field }) => (
+            <FormItemLayout hideMessage layout="vertical" label="Tax ID">
+              <FormControl>
+                <Select_Shadcn_
+                  {...field}
+                  disabled={disabled}
+                  value={field.value}
+                  onValueChange={(value) => onSelectTaxIdType(value)}
+                >
+                  <SelectTrigger_Shadcn_>
+                    <SelectValue_Shadcn_ placeholder="No Tax ID" />
+                  </SelectTrigger_Shadcn_>
+                  <SelectContent_Shadcn_>
+                    <SelectGroup_Shadcn_>
+                      {TAX_IDS.sort((a, b) => a.country.localeCompare(b.country)).map((option) => (
+                        <SelectItem_Shadcn_ key={option.name} value={option.name}>
+                          {option.country} - {option.name}
+                        </SelectItem_Shadcn_>
+                      ))}
+                    </SelectGroup_Shadcn_>
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+              </FormControl>
+            </FormItemLayout>
           )}
-        </div>
+        />
+
+        {selectedTaxId && (
+          <div className="flex items-center space-x-2">
+            <FormField
+              name="tax_id_value"
+              control={form.control}
+              render={({ field }) => (
+                <FormItemLayout hideMessage className="w-full">
+                  <FormControl>
+                    <Input_Shadcn_
+                      {...field}
+                      placeholder={selectedTaxId?.placeholder}
+                      disabled={disabled}
+                    />
+                  </FormControl>
+                </FormItemLayout>
+              )}
+            />
+
+            <Button type="text" className="px-1" icon={<X />} onClick={() => onRemoveTaxId()} />
+          </div>
+        )}
       </div>
     </div>
   )
 }
-
-export default BillingCustomerDataForm

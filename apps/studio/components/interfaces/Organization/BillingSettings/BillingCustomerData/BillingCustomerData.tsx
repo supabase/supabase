@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { useMemo } from 'react'
 
+import { useParams } from 'common'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -11,16 +12,15 @@ import NoPermission from 'components/ui/NoPermission'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
+import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
+import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
+import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import BillingCustomerDataForm from './BillingCustomerDataForm'
-import { Button, Card, CardFooter, cn, Form_Shadcn_ as Form } from 'ui'
-import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
-import { useMemo } from 'react'
-import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
+import { Button, Card, CardFooter, Form_Shadcn_ as Form } from 'ui'
+import { BillingCustomerDataForm } from './BillingCustomerDataForm'
 import { TAX_IDS } from './TaxID.constants'
-import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
-import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
+import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
 
 const BillingCustomerData = () => {
   const { slug } = useParams()
@@ -64,8 +64,8 @@ const BillingCustomerData = () => {
     [customerProfile, taxId]
   )
 
-  const { mutate: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation()
-  const { mutate: updateTaxId } = useOrganizationTaxIdUpdateMutation()
+  const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation()
+  const { mutateAsync: updateTaxId } = useOrganizationTaxIdUpdateMutation()
 
   const { form, handleSubmit, handleReset, isSubmitting, isDirty } = useBillingCustomerDataForm({
     slug,
@@ -80,7 +80,7 @@ const BillingCustomerData = () => {
     <ScaffoldSection>
       <ScaffoldSectionDetail>
         <div className="sticky space-y-2 top-12 pr-3">
-          <p className="text-foreground text-base m-0">Billing Address &amp; Tax Id</p>
+          <p className="text-foreground text-base m-0">Billing Address &amp; Tax ID</p>
           <p className="text-sm text-foreground-light m-0">
             This will be reflected in every upcoming invoice, past invoices are not affected
           </p>
