@@ -158,7 +158,8 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         router.push(`/new/${org.slug}?projectName=${prefilledProjectName}`)
       }
     },
-    onError: () => {
+    onError: (data) => {
+      toast.error(`Failed to create organization: ${data.message}`)
       resetPaymentMethod()
       setNewOrgLoading(false)
     },
@@ -183,6 +184,20 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         | 'tier_enterprise',
       ...(formState.kind == 'COMPANY' ? { size: formState.size } : {}),
       payment_method: paymentMethodId,
+      billing_name: 'some other name',
+      address: {
+        line1: 'line 1',
+        line2: 'line 2',
+        city: 'city',
+        state: 'state',
+        postal_code: 'postal code',
+        country: 'DE',
+      },
+      tax_id: {
+        country: 'DE',
+        type: 'eu_vat',
+        value: 'DE123456789',
+      },
     })
   }
 

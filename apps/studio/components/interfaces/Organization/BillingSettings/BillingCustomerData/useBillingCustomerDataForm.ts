@@ -6,13 +6,17 @@ import { toast } from 'sonner'
 import { BillingCustomerDataFormValues, BillingCustomerDataSchema } from './BillingCustomerDataForm'
 import { TAX_IDS } from './TaxID.constants'
 import { sanitizeTaxIdValue } from './TaxID.utils'
+import { components } from 'api-types'
 
 interface UseBillingAddressFormProps {
   slug?: string
   initialCustomerData?: Partial<BillingCustomerDataFormValues> | null
   onSuccess?: () => void
-  updateCustomerProfile: (data: any) => void
-  updateTaxId: (data: any) => void
+  updateCustomerProfile: (data: {
+    address: components['schemas']['CustomerResponse']['address'] | null
+    billing_name: string
+  }) => void
+  updateTaxId: (data: components['schemas']['TaxIdResponse']['tax_id']) => void
 }
 
 export function useBillingCustomerDataForm({
@@ -75,27 +79,33 @@ export function useBillingCustomerDataForm({
 
     try {
       await updateCustomerProfile({
-        slug,
-        address: addressPayload as any,
+        address: addressPayload
+          ? {
+              line1: trimmedValues.line1!,
+              line2: trimmedValues.line2,
+              city: trimmedValues.city,
+              state: trimmedValues.state,
+              postal_code: trimmedValues.postal_code,
+              country: trimmedValues.country!,
+            }
+          : null,
         billing_name: trimmedValues.billing_name,
       })
 
       const selectedTaxId = TAX_IDS.find((option) => option.name === values.tax_id_name)
 
-      await updateTaxId({
-        slug,
-        taxId:
-          selectedTaxId && values.tax_id_type?.length && values.tax_id_value?.length
-            ? {
-                type: values.tax_id_type,
-                value: sanitizeTaxIdValue({
-                  value: values.tax_id_value,
-                  name: form.getValues().tax_id_name,
-                }),
-                country: selectedTaxId?.countryIso2,
-              }
-            : null,
-      })
+      await updateTaxId(
+        selectedTaxId && values.tax_id_type?.length && values.tax_id_value?.length
+          ? {
+              type: values.tax_id_type,
+              value: sanitizeTaxIdValue({
+                value: values.tax_id_value,
+                name: form.getValues().tax_id_name,
+              }),
+              country: selectedTaxId?.countryIso2,
+            }
+          : null
+      )
 
       toast.success('Successfully updated billing data')
 

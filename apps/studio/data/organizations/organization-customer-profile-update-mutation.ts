@@ -7,7 +7,7 @@ import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationCustomerProfileUpdateVariables = {
-  slug: string
+  slug?: string
   address?: components['schemas']['CustomerResponse']['address']
   billing_name: string
 }

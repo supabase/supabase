@@ -11,10 +11,10 @@ import {
   DialogFooter,
   Form_Shadcn_ as Form,
 } from 'ui'
-import BillingCustomerDataForm from './BillingCustomerDataForm'
 import { Pencil } from 'lucide-react'
 
 import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
+import { BillingCustomerDataForm } from './BillingCustomerDataForm'
 
 interface BillingCustomerDataNewOrgDialogProps {
   onBillingAddressChanged: (data: any) => void

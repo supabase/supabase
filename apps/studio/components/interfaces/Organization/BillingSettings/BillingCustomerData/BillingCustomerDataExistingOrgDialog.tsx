@@ -12,7 +12,6 @@ import {
   Form_Shadcn_ as Form,
 } from 'ui'
 import { Label_Shadcn_ as Label } from 'ui'
-import BillingCustomerDataForm from './BillingCustomerDataForm'
 import { Pencil } from 'lucide-react'
 
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -26,12 +25,15 @@ import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-i
 import { TAX_IDS } from './TaxID.constants'
 import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
+import { BillingCustomerDataForm } from './BillingCustomerDataForm'
 
 interface BillingCustomerDataExistingOrgDialogProps {
   slug: string | undefined
 }
 
-const BillingCustomerDataExistingOrgDialog = ({ slug }: BillingCustomerDataExistingOrgDialogProps) => {
+const BillingCustomerDataExistingOrgDialog = ({
+  slug,
+}: BillingCustomerDataExistingOrgDialogProps) => {
   const [open, setOpen] = useState(false)
 
   const canReadBillingCustomerData = useCheckPermissions(
@@ -86,8 +88,13 @@ const BillingCustomerDataExistingOrgDialog = ({ slug }: BillingCustomerDataExist
     slug,
     initialCustomerData,
     onSuccess: handleDialogClose,
-    updateCustomerProfile,
-    updateTaxId,
+    updateCustomerProfile: (data) =>
+      updateCustomerProfile({
+        slug,
+        address: data.address ?? undefined,
+        billing_name: data.billing_name,
+      }),
+    updateTaxId: (data) => updateTaxId({ slug, taxId: data }),
   })
 
   const handleClose = () => {

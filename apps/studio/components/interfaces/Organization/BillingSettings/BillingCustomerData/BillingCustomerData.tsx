@@ -70,8 +70,8 @@ const BillingCustomerData = () => {
   const { form, handleSubmit, handleReset, isSubmitting, isDirty } = useBillingCustomerDataForm({
     slug,
     initialCustomerData,
-    updateCustomerProfile,
-    updateTaxId,
+    updateCustomerProfile: (data) => updateCustomerProfile({ slug, address: data.address ??  undefined, billing_name: data.billing_name }),
+    updateTaxId: (data) => updateTaxId({ slug, taxId: data }),
   })
 
   const isSubmitDisabled = !isDirty || !canUpdateBillingCustomerData || isSubmitting
