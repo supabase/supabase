@@ -107,7 +107,7 @@ const BillingCustomerDataDialog = ({ slug }: BillingCustomerDataDialogProps) => 
     <>
       <div>
         <Label htmlFor="billing-address-btn" className="text-foreground-light block mb-0">
-          Billing Address
+          Billing Address / Tax Id
         </Label>
         {!canReadBillingCustomerData ? (
           <NoPermission resourceText="view this organization's billing address" />
@@ -126,7 +126,7 @@ const BillingCustomerDataDialog = ({ slug }: BillingCustomerDataDialogProps) => 
             )}
             {isSuccess && (
               <div className="flex items-center justify-between">
-                <p className="text-sm text-foreground">{getAddressSummary()}</p>
+                <p className="text-xs text-foreground">{getAddressSummary()}</p>
                 <Button
                   id="billing-address-btn"
                   onClick={() => setOpen(true)}
@@ -153,7 +153,7 @@ const BillingCustomerDataDialog = ({ slug }: BillingCustomerDataDialogProps) => 
       >
         <DialogContent size={'large'}>
           <DialogHeader>
-            <DialogTitle>Billing Address</DialogTitle>
+            <DialogTitle>Billing Address &amp; Tax Id</DialogTitle>
             <DialogDescription>
               This will be reflected in every upcoming invoice, past invoices are not affected
             </DialogDescription>

@@ -76,15 +76,16 @@ export function useBillingCustomerDataForm({
     }, {} as BillingCustomerDataFormValues)
 
     const addressPayload = !trimmedValues.line1 ? null : trimmedValues
-    await updateCustomerProfile({
-      slug,
-      address: addressPayload as any,
-      billing_name: trimmedValues.billing_name,
-    })
-
-    const selectedTaxId = TAX_IDS.find((option) => option.name === values.tax_id_name)
 
     try {
+      await updateCustomerProfile({
+        slug,
+        address: addressPayload as any,
+        billing_name: trimmedValues.billing_name,
+      })
+
+      const selectedTaxId = TAX_IDS.find((option) => option.name === values.tax_id_name)
+
       await updateTaxId({
         slug,
         taxId:
@@ -103,6 +104,7 @@ export function useBillingCustomerDataForm({
       toast.success('Successfully updated billing data')
 
       setIsSubmitting(false)
+      onSuccess?.()
     } catch (error: any) {
       toast.error(`Failed updating billing data: ${error.message}`)
       setIsSubmitting(false)
