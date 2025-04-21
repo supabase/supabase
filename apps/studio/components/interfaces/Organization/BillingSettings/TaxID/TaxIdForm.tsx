@@ -50,7 +50,7 @@ const TaxIdForm = ({ form, className, canUpdateTaxId }: TaxIdFormProps) => {
   const selectedTaxId = TAX_IDS.find((option) => option.name === name)
 
   return (
-    <div className={cn('flex flex-col space-y-4', className)}>
+    <div className={cn('grid grid-cols-2 gap-2 w-full py-8 px-8 items-center', className)}>
       <FormField_Shadcn_
         name="name"
         control={form.control}

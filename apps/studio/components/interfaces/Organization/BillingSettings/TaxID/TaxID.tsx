@@ -19,6 +19,7 @@ import { Form_Shadcn_ } from 'ui'
 import TaxIdForm from './TaxIdForm'
 import { useTaxIdForm } from './useTaxIdForm'
 import { useMemo } from 'react'
+import { TAX_IDS } from './TaxID.constants'
 
 const TaxID = () => {
   const { slug } = useParams()
@@ -30,7 +31,16 @@ const TaxID = () => {
 
   const { form, handleSubmit, handleReset, isSubmitting, isDirty } = useTaxIdForm({
     slug: slug,
-    initialTaxId,
+    initialTaxId: {
+      type: initialTaxId?.type || '',
+      value: initialTaxId?.value || '',
+      name: initialTaxId
+        ? TAX_IDS.find(
+            (option) =>
+              option.type === initialTaxId.type && option.countryIso2 === initialTaxId.country
+          )?.name || ''
+        : '',
+    },
   })
 
   const canReadTaxId = useCheckPermissions(PermissionAction.BILLING_READ, 'stripe.tax_ids')
@@ -93,11 +103,7 @@ const TaxID = () => {
                 }
               >
                 <Form_Shadcn_ {...form}>
-                  <form
-                    id="tax-id-form"
-                    className="grid grid-cols-2 gap-2 w-full py-8 px-8 items-center"
-                    onSubmit={form.handleSubmit(handleSubmit)}
-                  >
+                  <form id="tax-id-form" onSubmit={form.handleSubmit(handleSubmit)}>
                     <TaxIdForm form={form} canUpdateTaxId={canUpdateTaxId} />
                   </form>
                 </Form_Shadcn_>
