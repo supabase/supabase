@@ -1,8 +1,11 @@
-// import { graphql } from 'graphql'
+import { type DocumentNode, graphql, GraphQLError, parse, specifiedRules, validate } from 'graphql'
+import { createComplexityLimitRule } from 'graphql-validation-complexity'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-
 import { ApiError, InvalidRequestError } from '~/app/api/utils'
+import { rootGraphQLResolver } from '~/resources/rootResolver'
+import { rootGraphQLSchema } from '~/resources/rootSchema'
+import { createQueryDepthLimiter } from './validators'
 
 export const runtime = 'edge'
 
@@ -24,12 +27,55 @@ async function handleGraphQLRequest(request: Request): Promise<NextResponse> {
     )
   }
 
-  // const { query, variables, operationName } = parsedBody.data
-  // When endpoint is complete, this should return a response with the GraphQL
-  // query result
+  const { query, variables, operationName } = parsedBody.data
+  const validationErrors = validateGraphQLRequest(query)
+  if (validationErrors.length > 0) {
+    return NextResponse.json({
+      errors: validationErrors.map((error) => ({
+        message: error.message,
+        locations: error.locations,
+        path: error.path,
+      })),
+    })
+  }
+
+  const result = await graphql({
+    schema: rootGraphQLSchema,
+    rootValue: rootGraphQLResolver,
+    contextValue: { request },
+    source: query,
+    variableValues: variables,
+    operationName,
+  })
+  // return NextResponse.json(result)
 
   // For now, just return a 404 response
   return new NextResponse('Not Found', { status: 404 })
+}
+
+function validateGraphQLRequest(query: string): ReadonlyArray<GraphQLError> {
+  const MAX_DEPTH = 9
+
+  let documentAST: DocumentNode
+  try {
+    documentAST = parse(query)
+  } catch (error: unknown) {
+    if (error instanceof GraphQLError) {
+      return [error]
+    } else {
+      throw error
+    }
+  }
+  const validationRules = [
+    ...specifiedRules,
+    createQueryDepthLimiter(MAX_DEPTH),
+    createComplexityLimitRule(1500, {
+      scalarCost: 1,
+      objectCost: 2,
+      listFactor: 10,
+    }),
+  ]
+  return validate(rootGraphQLSchema, documentAST, validationRules)
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
