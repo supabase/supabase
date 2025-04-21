@@ -38,11 +38,11 @@ const BillingCustomerDataNewOrgDialog = ({
   }
 
   const getAddressSummary = () => {
-    const { line1, city, state, country } = form.getValues()
+    const { line1, city, state, country, billing_name } = form.getValues()
 
-    if (!line1) return 'Optionally add a billing address'
+    if (!line1 && !billing_name) return 'Optionally add a billing address'
 
-    const parts = [line1, city, state, country].filter(Boolean)
+    const parts = [billing_name, line1, city, state, country].filter(Boolean)
 
     return parts.join(', ')
   }
@@ -88,7 +88,9 @@ const BillingCustomerDataNewOrgDialog = ({
                 e.preventDefault()
                 e.stopPropagation()
                 form.handleSubmit(handleSubmit)(e)
-                console.log(form.formState.errors)
+                if (form.formState.isValid) {
+                  handleDialogClose()
+                }
               }}
             >
               <BillingCustomerDataForm className="p-5" form={form} />
