@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { Eye, EyeOff, RefreshCw, Search, Terminal, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -10,7 +11,7 @@ import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { Button, Input, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
-import DatePickers from './Logs.DatePickers'
+import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import {
   FILTER_OPTIONS,
   LOG_ROUTES_WITH_REPLICA_SUPPORT,
@@ -52,8 +53,6 @@ const PreviewFilterPanel = ({
   onRefresh,
   onSearch = () => {},
   defaultSearchValue = '',
-  defaultToValue = '',
-  defaultFromValue = '',
   onExploreClick,
   queryUrl,
   condensedLayout,
@@ -80,52 +79,38 @@ const PreviewFilterPanel = ({
 
   const hasEdits = search !== defaultSearchValue
 
+  function getDefaultDatePickerValue() {
+    // if we have values in the URL, use them
+    const iso_timestamp_start = router.query.iso_timestamp_start as string
+    const iso_timestamp_end = router.query.iso_timestamp_end as string
+    if (iso_timestamp_start && iso_timestamp_end) {
+      return {
+        to: iso_timestamp_end,
+        from: iso_timestamp_start,
+        text: `${dayjs(iso_timestamp_start).format('DD MMM, HH:mm')} - ${dayjs(iso_timestamp_end).format('DD MMM, HH:mm')}`,
+        isHelper: false,
+      }
+    }
+    return {
+      to: PREVIEWER_DATEPICKER_HELPERS[2].calcTo(),
+      from: PREVIEWER_DATEPICKER_HELPERS[2].calcFrom(),
+      text: 'Last hour',
+      isHelper: true,
+    }
+  }
+
+  const [selectedDatePickerValue, setSelectedDatePickerValue] = useState<DatePickerValue>(
+    getDefaultDatePickerValue()
+  )
+
+  const handleInputSearch = (query: string) => onSearch('search-input-change', { query })
+
   // Sync local state with provided default value
   useEffect(() => {
     if (search !== defaultSearchValue) {
       setSearch(defaultSearchValue)
     }
   }, [defaultSearchValue])
-
-  const RefreshButton = () => (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button
-          title="refresh"
-          type="default"
-          className="px-1.5"
-          icon={
-            <div className="relative">
-              {newCount > 0 && (
-                <div className="absolute -top-3 right-3 flex items-center justify-center">
-                  <div className="absolute z-20">
-                    <p style={{ fontSize: '0.6rem' }} className="text-white">
-                      {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
-                    </p>
-                  </div>
-                  <div className="h-4 w-4 animate-ping rounded-full bg-green-800 opacity-60"></div>
-                  <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
-                </div>
-              )}
-              <RefreshCw />
-            </div>
-          }
-          loading={isLoading}
-          disabled={isLoading}
-          onClick={onRefresh}
-        />
-      </TooltipTrigger>
-      <TooltipContent side="bottom" className="text-xs">
-        Refresh logs
-      </TooltipContent>
-    </Tooltip>
-  )
-
-  const handleDatepickerChange = ({ to, from }: Partial<Parameters<LogSearchCallback>[1]>) => {
-    onSearch('datepicker-change', { to, from })
-  }
-
-  const handleInputSearch = (query: string) => onSearch('search-input-change', { query })
 
   return (
     <div
@@ -185,13 +170,45 @@ const PreviewFilterPanel = ({
           />
         </form>
 
-        <RefreshButton />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              title="refresh"
+              type="default"
+              className="px-1.5"
+              icon={
+                <div className="relative">
+                  {newCount > 0 && (
+                    <div className="absolute -top-3 right-3 flex items-center justify-center">
+                      <div className="absolute z-20">
+                        <p style={{ fontSize: '0.6rem' }} className="text-white">
+                          {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
+                        </p>
+                      </div>
+                      <div className="h-4 w-4 animate-ping rounded-full bg-green-800 opacity-60"></div>
+                      <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
+                    </div>
+                  )}
+                  <RefreshCw />
+                </div>
+              }
+              loading={isLoading}
+              disabled={isLoading}
+              onClick={onRefresh}
+            />
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="text-xs">
+            Refresh logs
+          </TooltipContent>
+        </Tooltip>
 
-        <DatePickers
-          onChange={handleDatepickerChange}
-          to={defaultToValue}
-          from={defaultFromValue}
+        <LogsDatePicker
           helpers={PREVIEWER_DATEPICKER_HELPERS}
+          onSubmit={(vals) => {
+            onSearch('datepicker-change', { to: vals.to, from: vals.from })
+            setSelectedDatePickerValue(vals)
+          }}
+          value={selectedDatePickerValue}
         />
 
         {FILTER_OPTIONS[table] !== undefined && (
