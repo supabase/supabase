@@ -19,6 +19,8 @@ import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
 import { useMemo } from 'react'
 import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
 import { TAX_IDS } from './TaxID.constants'
+import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
+import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
 
 const BillingCustomerData = () => {
   const { slug } = useParams()
@@ -62,9 +64,14 @@ const BillingCustomerData = () => {
     [customerProfile, taxId]
   )
 
+  const { mutate: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation()
+  const { mutate: updateTaxId } = useOrganizationTaxIdUpdateMutation()
+
   const { form, handleSubmit, handleReset, isSubmitting, isDirty } = useBillingCustomerDataForm({
     slug,
     initialCustomerData,
+    updateCustomerProfile,
+    updateTaxId,
   })
 
   const isSubmitDisabled = !isDirty || !canUpdateBillingCustomerData || isSubmitting

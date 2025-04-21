@@ -16,13 +16,17 @@ interface UseBillingAddressFormProps {
   slug?: string
   initialCustomerData?: Partial<BillingCustomerDataFormValues> | null
   onSuccess?: () => void
+  updateCustomerProfile: (data: any) => void
+  updateTaxId: (data: any) => void
 }
 
 export function useBillingCustomerDataForm({
   slug,
   initialCustomerData,
   onSuccess,
-}: UseBillingAddressFormProps = {}) {
+  updateCustomerProfile,
+  updateTaxId,
+}: UseBillingAddressFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<BillingCustomerDataFormValues>({
@@ -58,9 +62,6 @@ export function useBillingCustomerDataForm({
       })
     }
   }, [initialCustomerData])
-
-  const { mutate: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation()
-  const { mutate: updateTaxId } = useOrganizationTaxIdUpdateMutation()
 
   const handleSubmit = async (values: BillingCustomerDataFormValues) => {
     if (!slug) {

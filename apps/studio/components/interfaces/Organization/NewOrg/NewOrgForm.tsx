@@ -37,6 +37,7 @@ import {
 import { useProjectsQuery } from 'data/projects/projects-query'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import _ from 'lodash'
+import BillingCustomerDataNewOrgDialog from '../BillingSettings/BillingCustomerData/BillingCustomerDataNewOrgDialog'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -460,6 +461,24 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
               onHide={() => setShowSpendCapHelperModal(false)}
             />
           </>
+        )}
+
+        {formState.plan !== 'FREE' && (
+          <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+            <div className="grid grid-cols-3">
+              <div className="col-span-1 flex space-x-2 text-sm items-center">
+                <Label_Shadcn_ htmlFor="spend-cap" className=" leading-normal">
+                  Billing Address
+                </Label_Shadcn_>
+              </div>
+              <div className="col-span-2">
+                <BillingCustomerDataNewOrgDialog
+                  onBillingAddressChanged={alert}
+                  onTaxIdChanged={alert}
+                />
+              </div>
+            </div>
+          </Panel.Content>
         )}
 
         {formState.plan !== 'FREE' && (

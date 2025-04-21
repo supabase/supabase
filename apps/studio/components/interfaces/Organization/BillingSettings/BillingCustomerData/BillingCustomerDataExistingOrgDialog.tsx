@@ -24,12 +24,14 @@ import AlertError from 'components/ui/AlertError'
 import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
 import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
 import { TAX_IDS } from './TaxID.constants'
+import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
+import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
 
-interface BillingCustomerDataDialogProps {
+interface BillingCustomerDataExistingOrgDialogProps {
   slug: string | undefined
 }
 
-const BillingCustomerDataDialog = ({ slug }: BillingCustomerDataDialogProps) => {
+const BillingCustomerDataExistingOrgDialog = ({ slug }: BillingCustomerDataExistingOrgDialogProps) => {
   const [open, setOpen] = useState(false)
 
   const canReadBillingCustomerData = useCheckPermissions(
@@ -77,10 +79,15 @@ const BillingCustomerDataDialog = ({ slug }: BillingCustomerDataDialogProps) => 
     [customerProfile, taxId]
   )
 
+  const { mutate: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation()
+  const { mutate: updateTaxId } = useOrganizationTaxIdUpdateMutation()
+
   const { form, handleSubmit, handleReset, isSubmitting, isDirty } = useBillingCustomerDataForm({
     slug,
     initialCustomerData,
     onSuccess: handleDialogClose,
+    updateCustomerProfile,
+    updateTaxId,
   })
 
   const handleClose = () => {
@@ -194,4 +201,4 @@ const BillingCustomerDataDialog = ({ slug }: BillingCustomerDataDialogProps) => 
   )
 }
 
-export default BillingCustomerDataDialog
+export default BillingCustomerDataExistingOrgDialog

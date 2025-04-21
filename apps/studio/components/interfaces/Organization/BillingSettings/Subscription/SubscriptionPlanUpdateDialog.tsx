@@ -19,7 +19,7 @@ import { ProjectInfo } from 'data/projects/projects-query'
 import { Admonition } from 'ui-patterns'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { OrganizationBillingSubscriptionPreviewResponse } from 'data/organizations/organization-billing-subscription-preview'
-import BillingCustomerDataDialog from '../BillingCustomerData/BillingCustomerDataDialog'
+import BillingCustomerDataExistingOrgDialog from '../BillingCustomerData/BillingCustomerDataExistingOrgDialog'
 
 const getRandomTweet = () => {
   const filteredTweets = tweets.filter((it) => it.text.length < 180)
@@ -490,7 +490,7 @@ const SubscriptionPlanUpdateDialog = ({
             <div className="pt-6">
               {!billingViaPartner ? (
                 <div className="space-y-2 mb-4">
-                  <BillingCustomerDataDialog slug={slug} />
+                  <BillingCustomerDataExistingOrgDialog slug={slug} />
                   <PaymentMethodSelection
                     selectedPaymentMethod={selectedPaymentMethod}
                     onSelectPaymentMethod={setSelectedPaymentMethod}
