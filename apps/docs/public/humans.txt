@@ -79,6 +79,7 @@ Pavel Borisov
 Peter Lyn
 Qiao Han
 Raminder Singh
+Rickard Nyman
 Rodrigo Mansueli
 Rory Wilding
 Sam Rose
