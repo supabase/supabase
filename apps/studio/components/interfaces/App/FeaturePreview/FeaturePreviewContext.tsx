@@ -17,7 +17,7 @@ export const FEATURE_PREVIEWS = [
     key: LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW,
     name: 'Layout Update for Organizations',
     content: <LayoutUpdatePreview />,
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/33670',
     isNew: false,
     isPlatformOnly: true,
   },
