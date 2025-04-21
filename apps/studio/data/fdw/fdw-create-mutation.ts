@@ -113,12 +113,48 @@ export function getCreateFDWSql({
   const createServerSql = /* SQL */ `
     do $$
     declare
+      -- Old wrappers has an implicit dependency on pgsodium. For new wrappers
+      -- we use Vault directly.
+      is_using_old_wrappers bool;
       ${encryptedOptions.map((option) => `v_${option.name} text;`).join('\n')}
     begin
+      is_using_old_wrappers := (select extversion from pg_extension where extname = 'wrappers') in (
+        '0.1.0',
+        '0.1.1',
+        '0.1.4',
+        '0.1.5',
+        '0.1.6',
+        '0.1.7',
+        '0.1.8',
+        '0.1.9',
+        '0.1.10',
+        '0.1.11',
+        '0.1.12',
+        '0.1.14',
+        '0.1.15',
+        '0.1.16',
+        '0.1.17',
+        '0.1.18',
+        '0.1.19',
+        '0.2.0',
+        '0.3.0',
+        '0.3.1',
+        '0.4.0',
+        '0.4.1',
+        '0.4.2',
+        '0.4.3',
+        '0.4.4',
+        '0.4.5'
+      );
       ${encryptedOptions
         .map(
-          (option) =>
-            /* SQL */ `select id into v_${option.name} from pgsodium.valid_key where name = '${formState.wrapper_name}_${option.name}' limit 1;`
+          (option) => /* SQL */ `
+              if is_using_old_wrappers then
+                select id into v_${option.name} from pgsodium.valid_key where name = '${formState.wrapper_name}_${option.name}' limit 1;
+              else
+                select id into v_${option.name} from vault.secrets where name = '${formState.wrapper_name}_${option.name}' limit 1;
+              end if;
+            `
         )
         .join('\n')}
     

@@ -135,7 +135,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
             content={`
 ### Choose repository to connect to
 
-Check the details below before proceeding
+Your access to repositories depends on your GitHub x Supabase integration setup. You can access repositories that you own, those where you're a collaborator, and those available through organizations you're a member of. Access is determined by both your personal installation and any installations made by the organizations you belong to.
           `}
           />
 

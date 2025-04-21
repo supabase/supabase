@@ -188,10 +188,6 @@ const supabaseIntegrations: IntegrationDefinition[] = [
         label: 'Overview',
       },
       {
-        route: 'keys',
-        label: 'Keys',
-      },
-      {
         route: 'secrets',
         label: 'Secrets',
       },

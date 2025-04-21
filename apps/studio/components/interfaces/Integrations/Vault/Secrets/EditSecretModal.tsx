@@ -161,6 +161,7 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
                   }
                 />
               </Modal.Content>
+              {/*
               <Modal.Separator />
               <Modal.Content className="space-y-4">
                 <EncryptionKeySelector
@@ -170,7 +171,7 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
                   selectedKeyId={selectedKeyId}
                   onSelectKey={setSelectedKeyId}
                 />
-              </Modal.Content>
+              </Modal.Content> */}
               <Modal.Separator />
               <Modal.Content className="flex items-center justify-end space-x-2">
                 <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
