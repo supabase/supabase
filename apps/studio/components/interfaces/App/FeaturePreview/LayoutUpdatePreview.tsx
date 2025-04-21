@@ -63,8 +63,8 @@ export const LayoutUpdateBanner = () => {
         Dashboard layout has been updated!
       </AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_>
-        We've updated the layout of the dashboard to enhance the UX around managing team members and
-        billing for organizations.
+        We've updated the dashboard layout to make it easier to find and manage your organization
+        settings.
       </AlertDescription_Shadcn_>
       <AlertDescription_Shadcn_ className="mt-4 flex items-center gap-x-2">
         <Button asChild type="default" icon={<ExternalLink />}>
