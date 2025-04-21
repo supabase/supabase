@@ -10,8 +10,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
+import { PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
 const ProjectsPage: NextPageWithLayout = () => {
@@ -25,13 +24,6 @@ const ProjectsPage: NextPageWithLayout = () => {
     PROJECT_STATUS.ACTIVE_HEALTHY,
     PROJECT_STATUS.INACTIVE,
   ])
-
-  const [newLayoutPreviewState] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW, '')
-  const [newLayoutAcknowledged, setNewLayoutAcknowledged] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.NEW_LAYOUT_NOTICE_ACKNOWLEDGED,
-    false
-  )
-  const isDefaultOptedInNewLayout = newLayoutPreview && newLayoutPreviewState === ''
 
   useAutoProjectsPrefetch()
 
