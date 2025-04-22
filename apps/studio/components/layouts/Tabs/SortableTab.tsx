@@ -75,11 +75,10 @@ export const SortableTab = ({
         value={tab.id}
         onDoubleClick={() => makeTabPermanent(ref, tab.id)}
         className={cn(
-          'flex items-center gap-2 px-3 text-xs',
+          'flex items-center gap-2 pl-3 pr-2.5 text-xs',
           'bg-dash-sidebar/50 dark:bg-surface-100/50',
           'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
           'border-b border-default',
-          // bottom border active rule
           'data-[state=active]:border-b-background-dash-sidebar dark:data-[state=active]:border-b-background-surface-100',
           'relative group h-full',
           'hover:bg-surface-300 dark:hover:bg-surface-100',
@@ -110,7 +109,7 @@ export const SortableTab = ({
             e.preventDefault()
             e.stopPropagation()
           }}
-          className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-sm cursor-pointer"
+          className="p-0.5 ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-sm cursor-pointer"
           onMouseDown={(e) => {
             e.preventDefault()
             e.stopPropagation()
