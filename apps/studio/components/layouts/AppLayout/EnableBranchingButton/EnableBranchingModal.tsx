@@ -304,12 +304,14 @@ const EnableBranchingModal = () => {
                             </div>
                           </div>
                         ) : (
-                          <div>
-                            <Label>GitHub Repository</Label>
-                            <p className="text-sm text-foreground-light mb-3">
-                              Optionally connect to a GitHub repository to enable deploying previews
-                              on Pull Requests and manage migrations automatically.
-                            </p>
+                          <div className="flex items-center gap-2 justify-between">
+                            <div>
+                              <Label>GitHub Repository</Label>
+                              <p className="text-sm text-foreground-light">
+                                Optionally connect to a GitHub repository to enable deploying
+                                previews on Pull Requests and manage migrations automatically.
+                              </p>
+                            </div>
                             <Button type="default" icon={<Github />} onClick={openLinkerPanel}>
                               Connect to GitHub
                             </Button>

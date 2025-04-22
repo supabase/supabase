@@ -28,6 +28,7 @@ import {
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormMessage_Shadcn_,
+  Label_Shadcn_ as Label,
   Form_Shadcn_,
   Input_Shadcn_,
   DialogSection,
@@ -211,9 +212,6 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
                   )}
                 />
               )}
-            </DialogSection>
-            <DialogSectionSeparator />
-            <DialogSection padding="medium">
               {isLoadingConnections && <GenericSkeletonLoader />}
               {isErrorConnections && (
                 <AlertError
@@ -249,11 +247,14 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-3">
-                      <p className="text-sm text-foreground-light">
-                        Optionally connect to a GitHub repository to manage migrations automatically
-                        for this branch.
-                      </p>
+                    <div className="flex items-center gap-2 justify-between">
+                      <div>
+                        <Label>GitHub Repository</Label>
+                        <p className="text-sm text-foreground-light">
+                          Optionally connect to a GitHub repository to manage migrations
+                          automatically for this branch.
+                        </p>
+                      </div>
                       <Button type="default" icon={<Github />} onClick={openLinkerPanel}>
                         Connect to GitHub
                       </Button>
