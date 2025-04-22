@@ -114,14 +114,6 @@ const TableEditorMenu = () => {
     }
   }, [selectedTable?.schema])
 
-  // useEffect(() => {
-  //   // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
-  //   if (isTableEditorTabsEnabled && ref && entityTypes) {
-  //     console.log('WHAT')
-  //     tableEditorTabsCleanUp({ ref, schemas: [selectedSchema], entities: entityTypes })
-  //   }
-  // }, [entityTypes])
-
   return (
     <>
       <div className="flex flex-col flex-grow gap-5 pt-5 h-full">
