@@ -13,8 +13,27 @@ import { addRecentItem } from './recent-items'
  * So do not use this as reference for writing new valtio stores - refer to database-selector instead
  */
 
+// Object mapping editor types to their corresponding tab types
+export const editorEntityTypes = {
+  table: ['r', 'v', 'm', 'f', 'p'],
+  sql: ['sql'],
+}
+
 // Define the type of tabs available in the application
 export type TabType = ENTITY_TYPE | 'sql'
+
+type CreateTabIdParams = {
+  r: { id: number }
+  v: { id: number }
+  m: { id: number }
+  f: { id: number }
+  p: { id: number }
+  sql: { id: string }
+  schema: { schema: string }
+  view: never
+  function: never
+  new: never
+}
 
 export interface Tab {
   id: string // Unique identifier for the tab
@@ -349,19 +368,6 @@ export const handleTabDragEnd = (
   handleTabNavigation(ref, tabId, router)
 }
 
-type CreateTabIdParams = {
-  r: { id: number }
-  v: { id: number }
-  m: { id: number }
-  f: { id: number }
-  p: { id: number }
-  sql: { id: string }
-  schema: { schema: string }
-  view: never
-  function: never
-  new: never
-}
-
 // Function to create a unique tab ID based on type and parameters
 export function createTabId<T extends TabType>(type: T, params: CreateTabIdParams[T]): string {
   switch (type) {
@@ -380,12 +386,6 @@ export function createTabId<T extends TabType>(type: T, params: CreateTabIdParam
     default:
       return ''
   }
-}
-
-// Object mapping editor types to their corresponding tab types
-export const editorEntityTypes = {
-  table: ['r', 'v', 'm', 'f', 'p'],
-  sql: ['sql'],
 }
 
 // Function to remove tabs based on their editor type

@@ -18,8 +18,8 @@ import { useUrlState } from 'hooks/ui/useUrlState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import { makeActiveTabPermanent } from 'state/tabs'
-import { GenericSkeletonLoader } from 'ui-patterns'
-import NotFoundState from './NotFoundState'
+import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import { useIsTableEditorTabsEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
 import TableDefinition from './TableDefinition'
 
@@ -28,13 +28,14 @@ export interface TableGridEditorProps {
   selectedTable?: Entity
 }
 
-const TableGridEditor = ({
+export const TableGridEditor = ({
   isLoadingSelectedTable = false,
   selectedTable,
 }: TableGridEditorProps) => {
   const router = useRouter()
   const project = useSelectedProject()
   const { ref: projectRef, id } = useParams()
+  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
 
   useLoadTableEditorStateFromLocalStorageIntoUrl({
     projectRef,
@@ -68,7 +69,17 @@ const TableGridEditor = ({
   }
 
   if (isUndefined(selectedTable)) {
-    return <NotFoundState id={Number(id)} />
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="w-[400px]">
+          <Admonition
+            type="default"
+            title={`Unable to find your table with ID ${id}`}
+            description={isTableEditorTabsEnabled ? 'You may close this tab' : undefined}
+          />
+        </div>
+      </div>
+    )
   }
 
   const isViewSelected = isView(selectedTable) || isMaterializedView(selectedTable)
@@ -121,5 +132,3 @@ const TableGridEditor = ({
     </div>
   )
 }
-
-export default TableGridEditor

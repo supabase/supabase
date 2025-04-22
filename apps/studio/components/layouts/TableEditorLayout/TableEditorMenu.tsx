@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { Filter, Plus } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
@@ -41,13 +40,11 @@ import {
   InnerSideBarFilters,
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { tableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import EntityListItem from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
 
 const TableEditorMenu = () => {
   const { ref, id: _id } = useParams()
-  const router = useRouter()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
@@ -117,12 +114,13 @@ const TableEditorMenu = () => {
     }
   }, [selectedTable?.schema])
 
-  useEffect(() => {
-    // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
-    if (isTableEditorTabsEnabled && ref && entityTypes) {
-      tableEditorTabsCleanUp({ ref, schemas: [selectedSchema], entities: entityTypes })
-    }
-  }, [entityTypes])
+  // useEffect(() => {
+  //   // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
+  //   if (isTableEditorTabsEnabled && ref && entityTypes) {
+  //     console.log('WHAT')
+  //     tableEditorTabsCleanUp({ ref, schemas: [selectedSchema], entities: entityTypes })
+  //   }
+  // }, [entityTypes])
 
   return (
     <>
@@ -183,12 +181,10 @@ const TableEditorMenu = () => {
             <InnerSideBarFilterSearchInput
               autoFocus={!isMobile}
               name="search-tables"
-              aria-labelledby="Search tables"
-              onChange={(e) => {
-                setSearchText(e.target.value)
-              }}
               value={searchText}
               placeholder="Search tables..."
+              aria-labelledby="Search tables"
+              onChange={(e) => setSearchText(e.target.value)}
             >
               <InnerSideBarFilterSortDropdown
                 value={sort}
