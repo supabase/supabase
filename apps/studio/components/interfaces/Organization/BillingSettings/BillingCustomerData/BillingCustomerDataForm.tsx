@@ -90,9 +90,9 @@ export const BillingCustomerDataForm = ({
   }
 
   const onRemoveTaxId = () => {
-    form.setValue('tax_id_name', '')
-    form.setValue('tax_id_type', '')
-    form.setValue('tax_id_value', '')
+    form.setValue('tax_id_name', '', { shouldDirty: true })
+    form.setValue('tax_id_type', '', { shouldDirty: true })
+    form.setValue('tax_id_value', '', { shouldDirty: true })
   }
 
   const { tax_id_name } = form.watch()

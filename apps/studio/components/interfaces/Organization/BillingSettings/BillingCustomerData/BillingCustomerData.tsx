@@ -73,6 +73,8 @@ const BillingCustomerData = () => {
   const { form, handleSubmit, handleReset, isDirty } = useBillingCustomerDataForm({
     initialCustomerData,
     onCustomerDataChange: async (data) => {
+      setIsSubmitting(true)
+
       try {
         await updateCustomerProfile({
           slug,

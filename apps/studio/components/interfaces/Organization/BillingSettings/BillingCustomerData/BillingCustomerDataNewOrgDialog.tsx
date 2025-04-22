@@ -107,7 +107,9 @@ const BillingCustomerDataNewOrgDialog = ({
                 e.preventDefault()
                 e.stopPropagation()
                 form.handleSubmit(handleSubmit)(e)
-                if (form.formState.isValid) {
+
+                // Only close the dialog if the form is valid
+                if (!Object.keys(form.formState.errors).length) {
                   handleDialogClose()
                 }
               }}
