@@ -5,10 +5,10 @@ import { useDrag, useDrop } from 'react-dnd'
 
 import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import type { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
 import { ColumnMenu } from '../menu'
+import { useTableColumnOrder } from 'components/grid/hooks/useTableColumnOrder'
 
 export function ColumnHeader<R>({
   column,
@@ -22,15 +22,9 @@ export function ColumnHeader<R>({
   const columnIdx = column.idx
   const columnKey = column.key
   const columnFormat = getColumnFormat(columnType, format)
-  const snap = useTableEditorTableStateSnapshot()
   const hoverValue = column.name as string
 
-  // keep snap.gridColumns' order in sync with data grid component
-  useEffect(() => {
-    if (snap.gridColumns[columnIdx].key != columnKey) {
-      snap.updateColumnIdx(columnKey, columnIdx)
-    }
-  }, [columnKey, columnIdx, snap.gridColumns])
+  const { moveColumn } = useTableColumnOrder()
 
   const [{ isDragging }, drag] = useDrag({
     type: 'column-header',
@@ -94,7 +88,7 @@ export function ColumnHeader<R>({
       }
 
       // Time to actually perform the action
-      snap.moveColumn(dragKey, hoverKey)
+      moveColumn(dragKey, hoverKey)
 
       // Note: we're mutating the monitor item here!
       // Generally it's better to avoid mutations,

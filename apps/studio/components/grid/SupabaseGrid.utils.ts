@@ -8,7 +8,7 @@ import { Entity, isTableLike } from 'data/table-editor/table-editor-types'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { copyToClipboard } from 'ui'
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
-import { STORAGE_KEY_PREFIX } from './constants'
+import { STORAGE_KEY_PREFIX, SELECT_COLUMN_KEY } from './constants'
 import type { Sort, SupaColumn, SupaTable } from './types'
 import { formatClipboardValue } from './utils/common'
 
@@ -192,25 +192,36 @@ export function useLoadTableEditorStateFromLocalStorageIntoUrl({
     }
 
     const searchParams = new URLSearchParams(window.location.search)
-
     const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.name, table.schema)
 
-    // If no sort params are set, use saved state
-
-    let params: { sort?: string[]; filter?: string[] } | undefined
+    let paramsToSet: { sort?: string[]; filter?: string[]; col_order?: string } = {}
+    let needsUpdate = false
 
     if (searchParams.getAll('sort').length <= 0 && savedState?.sorts) {
-      params = { ...params, sort: savedState.sorts }
+      paramsToSet.sort = savedState.sorts
+      needsUpdate = true
     }
 
     if (searchParams.getAll('filter').length <= 0 && savedState?.filters) {
-      params = { ...params, filter: savedState.filters }
+      paramsToSet.filter = savedState.filters
+      needsUpdate = true
     }
 
-    if (params) {
-      setParams((prevParams) => ({ ...prevParams, ...params }))
+    if (!searchParams.has('col_order') && savedState?.gridColumns) {
+      const savedOrder = savedState.gridColumns
+        .map((col) => col.key)
+        .filter((key) => key !== SELECT_COLUMN_KEY)
+      if (savedOrder.length > 0) {
+        const colOrderString = savedOrder.join(',')
+        paramsToSet.col_order = colOrderString
+        needsUpdate = true
+      }
     }
-  }, [projectRef, table])
+
+    if (needsUpdate) {
+      setParams((prevParams) => ({ ...prevParams, ...paramsToSet }))
+    }
+  }, [projectRef, table, setParams])
 }
 
 export const handleCopyCell = (
