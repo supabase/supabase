@@ -22,7 +22,7 @@
     "build:deno-types": "tsx scripts/deno-types.ts"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^0.0.72",
+    "@ai-sdk/openai": "latest",
     "@dagrejs/dagre": "^1.0.4",
     "@deno/eszip": "0.83.0",
     "@dnd-kit/core": "^6.1.0",
@@ -55,7 +55,7 @@
     "@vercel/flags": "^2.6.0",
     "@vitejs/plugin-react": "^4.3.4",
     "@zip.js/zip.js": "^2.7.29",
-    "ai": "^3.4.33",
+    "ai": "latest",
     "ai-commands": "workspace:*",
     "awesome-debounce-promise": "^2.1.0",
     "common": "workspace:*",

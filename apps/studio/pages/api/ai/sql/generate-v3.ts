@@ -1,7 +1,9 @@
 import { openai } from '@ai-sdk/openai'
 import pgMeta from '@supabase/pg-meta'
-import { streamText } from 'ai'
+import { generateText, streamText } from 'ai'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { experimental_createMCPClient as createMCPClient } from 'ai'
+import { Experimental_StdioMCPTransport as StdioMCPTransport } from 'ai/mcp-stdio'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import { getTools } from './tools'
@@ -39,8 +41,36 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   const cookie = req.headers.cookie
   const authorization = req.headers.authorization
+  const accessToken = authorization?.replace('Bearer ', '')
 
+  if (!accessToken) {
+    return res.status(401).json({ error: 'Authorization token is required' })
+  }
+
+  let mcpClient
   try {
+    // Initialize MCP Client
+    mcpClient = await createMCPClient({
+      transport: new StdioMCPTransport({
+        command: 'npx',
+        // Ensure the MCP server package version is appropriate or use latest
+        args: [
+          '-y',
+          '@supabase/mcp-server-supabase@latest', // Or specify a fixed version
+          '--access-token',
+          accessToken,
+          '--read-only', // Enforce read-only mode for database tools
+          // Potentially add --project-ref if needed by server, depends on MCP server implementation
+        ],
+        // Optional: Add environment variables if needed
+        // env: { ...process.env, OTHER_VAR: 'value' },
+      }),
+    })
+
+    const mcpTools = await mcpClient.tools()
+
+    console.log('mcpTools', mcpTools, accessToken)
+
     const { result: schemas } = includeSchemaMetadata
       ? await executeSql(
           {
@@ -57,7 +87,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         )
       : { result: [] }
 
-    const result = await streamText({
+    const result = await generateText({
       model: openai('gpt-4o-mini'),
       maxSteps: 5,
       system: `
@@ -148,19 +178,19 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         ${table !== undefined && includeSchemaMetadata ? `The user is currently looking at the ${table} table.` : ''}
         `,
       messages,
-      tools: getTools({
-        projectRef,
-        connectionString,
-        cookie,
-        authorization,
-        includeSchemaMetadata,
-      }),
+      tools: mcpTools,
     })
+
+    console.log('result', result)
 
     // write the data stream to the response
     // Note: this is sent as a single response, not a stream
-    result.pipeDataStreamToResponse(res)
+    // result.pipeDataStreamToResponse(res)
   } catch (error: any) {
+    console.log('error', error)
     return res.status(500).json({ message: error.message })
+  } finally {
+    // Ensure the MCP client is closed
+    await mcpClient?.close()
   }
 }
