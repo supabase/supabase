@@ -10,7 +10,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { useTableColumnVisibility } from 'components/grid/hooks/useTableColumnVisibility'
+import { SELECT_COLUMN_KEY } from '../../constants'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import type { Filter, GridProps, SupaRow } from '../../types'
@@ -53,12 +53,21 @@ export const Grid = memo(
     ) => {
       const tableEditorSnap = useTableEditorStateSnapshot()
       const snap = useTableEditorTableStateSnapshot()
-      const { hiddenColumns } = useTableColumnVisibility()
 
-      const visibleColumns = useMemo(() => {
+      const processedColumns = useMemo(() => {
         if (!snap.gridColumns) return []
-        return snap.gridColumns.filter((col) => !hiddenColumns.has(col.key))
-      }, [snap.gridColumns, hiddenColumns])
+
+        let selectColumn: CalculatedColumn<any, any> | undefined = undefined
+        const visibleDataColumns = snap.gridColumns.filter((col) => {
+          if (col.key === SELECT_COLUMN_KEY) {
+            selectColumn = col
+            return false
+          }
+          return col.visible ?? true
+        })
+
+        return selectColumn ? [selectColumn, ...visibleDataColumns] : visibleDataColumns
+      }, [snap.gridColumns])
 
       const onRowsChange = useOnRowsChange(rows)
 
@@ -189,7 +198,7 @@ export const Grid = memo(
             ref={ref}
             className={`${gridClass} flex-grow`}
             rowClass={rowClass}
-            columns={visibleColumns as CalculatedColumn<any, any>[]}
+            columns={processedColumns as CalculatedColumn<any, any>[]}
             rows={rows ?? []}
             renderers={{ renderRow: RowRenderer }}
             rowKeyGetter={rowKeyGetter}

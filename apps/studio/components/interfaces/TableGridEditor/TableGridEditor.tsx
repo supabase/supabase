@@ -22,6 +22,7 @@ import { GenericSkeletonLoader } from 'ui-patterns'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
 import TableDefinition from './TableDefinition'
+import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
 
 export interface TableGridEditorProps {
   isLoadingSelectedTable?: boolean
@@ -111,12 +112,12 @@ const TableGridEditor = ({
             <TableDefinition entity={selectedTable} />
           )}
         </SupabaseGrid>
-
         <SidePanelEditor
           editable={editable}
           selectedTable={isTableLike(selectedTable) ? selectedTable : undefined}
           onTableCreated={onTableCreated}
         />
+        <DeleteConfirmationDialogs selectedTable={selectedTable} />
       </TableEditorTableStateContextProvider>
     </div>
   )

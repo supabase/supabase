@@ -1,62 +1,82 @@
 import { useCallback, useMemo } from 'react'
-import { useUrlState } from 'hooks/ui/useUrlState'
-// Import the hook for saving to tabs store
-import { useSaveColumnVisibilityToTabs } from './useSaveColumnVisibilityToTabs'
 
-// Comma-separated string in URL, Set<string> in hook
-const URL_PARAM_KEY = 'hidden_cols'
+import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
+import { useSafeTableEditorSnapshot } from './useSafeTableEditorSnapshot'
 
+/**
+ * Provides state and actions for managing table column visibility.
+ *
+ * Reads visibility state directly from the Valtio store.
+ * Actions update the Valtio store first (triggering automatic persistence)
+ * and then update the 'hidden_cols' URL parameter.
+ */
 export function useTableColumnVisibility() {
-  const [params, setParams] = useUrlState()
-  // Get the function to save to tabs store
-  const { saveHiddenColumnsToTab } = useSaveColumnVisibilityToTabs()
+  const { setParams } = useTableEditorFiltersSort() // Only need setParams
+  const snap = useSafeTableEditorSnapshot()
 
-  const urlHiddenColumnsString = useMemo(() => {
-    const val = params[URL_PARAM_KEY]
-    return typeof val === 'string' ? val : ''
-  }, [params])
-
+  // Derive hidden columns Set directly from Valtio state
   const hiddenColumnsSet = useMemo(() => {
-    return new Set<string>(urlHiddenColumnsString ? urlHiddenColumnsString.split(',') : [])
-  }, [urlHiddenColumnsString])
+    const hidden = new Set<string>()
+    snap.gridColumns?.forEach((col) => {
+      // Consider a column hidden if its visible property is explicitly false
+      if (col.visible === false) {
+        hidden.add(col.key)
+      }
+    })
+    return hidden
+  }, [snap.gridColumns])
 
-  const setHiddenColumnsUrl = useCallback(
-    (newHiddenColumns: Set<string>) => {
-      const newUrlString = Array.from(newHiddenColumns).sort().join(',')
-      setParams((prevParams) => ({
-        ...prevParams,
-        [URL_PARAM_KEY]: newUrlString || undefined, // Remove param if empty
-      }))
-      // Call save to tabs store whenever the whole set changes via URL
-      saveHiddenColumnsToTab(newHiddenColumns)
+  /**
+   * Hides a specific column.
+   * @param columnName Key of the column to hide.
+   */
+  const hideColumn = useCallback(
+    (columnName: string) => {
+      if (!snap.setColumnVisibility || !snap.gridColumns) {
+        console.warn('[useTableColumnVisibility] Valtio action/state not available.')
+        return
+      }
+      // 1. Update Valtio State
+      snap.setColumnVisibility(columnName, false)
+
+      // 2. Update URL Parameter
+      // Construct the new list of hidden keys AFTER the state update
+      const currentHidden = new Set(hiddenColumnsSet)
+      currentHidden.add(columnName)
+      const newHiddenArray = Array.from(currentHidden).sort()
+      const newUrlString = newHiddenArray.join(',')
+      setParams((prev) => ({ ...prev, hidden_cols: newUrlString || undefined }))
     },
-    [setParams, saveHiddenColumnsToTab] // Add saveHiddenColumnsToTab dependency
+    [snap, setParams, hiddenColumnsSet] // Depend on snap, setParams, and current hidden set
   )
 
-  // Function to conveniently hide a single column
-  const hideColumnUrl = useCallback(
+  /**
+   * Shows a specific column.
+   * @param columnName Key of the column to show.
+   */
+  const showColumn = useCallback(
     (columnName: string) => {
-      const newSet = new Set(hiddenColumnsSet)
-      newSet.add(columnName)
-      setHiddenColumnsUrl(newSet) // This will now also trigger saveHiddenColumnsToTab
-    },
-    [hiddenColumnsSet, setHiddenColumnsUrl]
-  )
+      if (!snap.setColumnVisibility || !snap.gridColumns) {
+        console.warn('[useTableColumnVisibility] Valtio action/state not available.')
+        return
+      }
+      // 1. Update Valtio State
+      snap.setColumnVisibility(columnName, true)
 
-  // Function to conveniently show a single column
-  const showColumnUrl = useCallback(
-    (columnName: string) => {
-      const newSet = new Set(hiddenColumnsSet)
-      newSet.delete(columnName)
-      setHiddenColumnsUrl(newSet) // This will now also trigger saveHiddenColumnsToTab
+      // 2. Update URL Parameter
+      // Construct the new list of hidden keys AFTER the state update
+      const currentHidden = new Set(hiddenColumnsSet)
+      currentHidden.delete(columnName)
+      const newHiddenArray = Array.from(currentHidden).sort()
+      const newUrlString = newHiddenArray.join(',')
+      setParams((prev) => ({ ...prev, hidden_cols: newUrlString || undefined }))
     },
-    [hiddenColumnsSet, setHiddenColumnsUrl]
+    [snap, setParams, hiddenColumnsSet] // Depend on snap, setParams, and current hidden set
   )
 
   return {
-    hiddenColumns: hiddenColumnsSet, // The current Set<string> of hidden columns from URL
-    setHiddenColumnsUrl, // Function to update the URL param with a full Set
-    hideColumn: hideColumnUrl, // Function to hide a specific column (updates URL)
-    showColumn: showColumnUrl, // Function to show a specific column (updates URL)
+    hiddenColumns: hiddenColumnsSet,
+    hideColumn,
+    showColumn,
   }
 }
