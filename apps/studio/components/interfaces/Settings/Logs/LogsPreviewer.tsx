@@ -73,8 +73,8 @@ export const LogsPreviewer = ({
   const [selectedLogId, setSelectedLogId] = useSelectedLog()
   const { data: databases, isSuccess } = useReadReplicasQuery({ projectRef })
 
+  // TODO: Move this to useLogsUrlState to simplify LogsPreviewer. - Jordi
   function getDefaultDatePickerValue() {
-    // if we have values in the URL, use them
     const iso_timestamp_start = router.query.iso_timestamp_start as string
     const iso_timestamp_end = router.query.iso_timestamp_end as string
 
