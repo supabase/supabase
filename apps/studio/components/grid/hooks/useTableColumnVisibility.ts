@@ -44,7 +44,7 @@ export function useTableColumnVisibility() {
       const currentHidden = new Set(hiddenColumnsSet)
       currentHidden.add(columnName)
       const newHiddenArray = Array.from(currentHidden).sort()
-      const newUrlString = newHiddenArray.join(',')
+      const newUrlString = newHiddenArray.join('%2C')
       setParams((prev) => ({ ...prev, hidden_cols: newUrlString || undefined }))
     },
     [snap, setParams, hiddenColumnsSet] // Depend on snap, setParams, and current hidden set
@@ -68,7 +68,7 @@ export function useTableColumnVisibility() {
       const currentHidden = new Set(hiddenColumnsSet)
       currentHidden.delete(columnName)
       const newHiddenArray = Array.from(currentHidden).sort()
-      const newUrlString = newHiddenArray.join(',')
+      const newUrlString = newHiddenArray.join('%2C')
       setParams((prev) => ({ ...prev, hidden_cols: newUrlString || undefined }))
     },
     [snap, setParams, hiddenColumnsSet] // Depend on snap, setParams, and current hidden set

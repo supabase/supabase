@@ -41,7 +41,8 @@ export function useTableColumnOrder() {
       })
 
       // 2. Update URL Parameter
-      const newUrlString = newOrder.join(',')
+      // Encode commas for consistency
+      const newUrlString = newOrder.join('%2C')
       setParams((prevParams) => ({
         ...prevParams,
         col_order: newUrlString || undefined,
@@ -89,7 +90,8 @@ export function useTableColumnOrder() {
       }
 
       // Update URL Parameter with the locally calculated order
-      const newUrlString = newOrder.join(',')
+      // Encode commas for consistency
+      const newUrlString = newOrder.join('%2C')
       setParams((prevParams) => ({
         ...prevParams,
         col_order: newUrlString || undefined,
