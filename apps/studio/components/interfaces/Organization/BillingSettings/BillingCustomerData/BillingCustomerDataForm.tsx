@@ -166,7 +166,7 @@ export const BillingCustomerDataForm = ({
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent className="w-full p-0" align="start">
+                <PopoverContent sameWidthAsTrigger className="p-0" align="start">
                   <Command>
                     <CommandInput placeholder="Search country..." />
                     <CommandList>
@@ -275,7 +275,7 @@ export const BillingCustomerDataForm = ({
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent className="w-full p-0" align="start">
+                <PopoverContent sameWidthAsTrigger className="p-0" align="start">
                   <Command>
                     <CommandInput placeholder="Search tax ID..." />
                     <CommandList>
