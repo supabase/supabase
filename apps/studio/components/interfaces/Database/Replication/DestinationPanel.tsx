@@ -226,7 +226,7 @@ const DestinationPanel = ({
                   <div>
                     <SheetTitle>{editMode ? 'Edit Destination' : 'New Destination'}</SheetTitle>
                     <SheetDescription>
-                      {editMode ? 'Modify existing destination' : 'Send data to a new destination'}
+                      {editMode ? null : 'Send data to a new destination'}
                     </SheetDescription>
                   </div>
                   <div className="flex items-center gap-2">
@@ -239,9 +239,25 @@ const DestinationPanel = ({
                     <Label className="text-sm mx-2">Enable</Label>
                   </div>
                 </SheetHeader>
-                <SheetSection className="flex-grow overflow-auto pt-8">
+                <SheetSection className="flex-grow overflow-auto">
                   <Form_Shadcn_ {...form}>
                     <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            className="mb-8"
+                            label="Name"
+                            layout="vertical"
+                            description="A name you will use to identify this destination"
+                          >
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_ {...field} placeholder="Name" />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
                       <h3 className="mb-4">What data to send</h3>
 
                       <FormField_Shadcn_
@@ -252,7 +268,7 @@ const DestinationPanel = ({
                             className="mb-4"
                             label="Publication"
                             layout="vertical"
-                            description="Share table changes for replication"
+                            description="A publication is a collection of tables that you want to replicate "
                           >
                             <FormControl_Shadcn_>
                               <PublicationsComboBox
@@ -292,22 +308,7 @@ const DestinationPanel = ({
                           </FormItemLayout>
                         )}
                       ></FormField_Shadcn_>
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            className="mb-4"
-                            label="Name"
-                            layout="vertical"
-                            description="The name of the destination"
-                          >
-                            <FormControl_Shadcn_>
-                              <Input_Shadcn_ {...field} placeholder="Name" />
-                            </FormControl_Shadcn_>
-                          </FormItemLayout>
-                        )}
-                      />
+
                       <FormField_Shadcn_
                         control={form.control}
                         name="projectId"
@@ -316,7 +317,7 @@ const DestinationPanel = ({
                             className="mb-4"
                             label="Project Id"
                             layout="vertical"
-                            description="Send data to this BigQuery project"
+                            description="Which BigQuery project to send data to"
                           >
                             <FormControl_Shadcn_>
                               <Input_Shadcn_ {...field} placeholder="Project id" />
@@ -330,9 +331,8 @@ const DestinationPanel = ({
                         render={({ field }) => (
                           <FormItemLayout
                             className="mb-4"
-                            label="Dataset Id"
+                            label="Project's Dataset Id"
                             layout="vertical"
-                            description="Send data to this BigQuery dataset"
                           >
                             <FormControl_Shadcn_>
                               <Input_Shadcn_ {...field} placeholder="Dataset id" />
