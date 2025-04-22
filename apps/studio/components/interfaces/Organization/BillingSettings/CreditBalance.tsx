@@ -19,7 +19,7 @@ const CreditBalance = () => {
   const { slug } = useParams()
   const creditTopUpEnabled = useFlag('creditTopUp')
 
-  const { isLoading: isLoadingPermissions, can: canReadSubscriptions } =
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
     useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.subscriptions')
 
   const {
@@ -52,7 +52,7 @@ const CreditBalance = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {!isLoadingPermissions && !canReadSubscriptions ? (
+        {isPermissionsLoaded && !canReadSubscriptions ? (
           <NoPermission resourceText="view this organization's credits" />
         ) : (
           <>

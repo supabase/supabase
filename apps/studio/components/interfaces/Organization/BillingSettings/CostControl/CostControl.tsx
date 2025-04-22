@@ -28,7 +28,7 @@ const CostControl = ({}: CostControlProps) => {
   const { slug } = useParams()
   const { resolvedTheme } = useTheme()
 
-  const { isLoading: isLoadingPermissions, can: canReadSubscriptions } =
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
     useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.subscriptions')
 
   const snap = useOrgSettingsPageStateSnapshot()
@@ -83,7 +83,7 @@ const CostControl = ({}: CostControlProps) => {
           </div>
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {!isLoadingPermissions && !canReadSubscriptions ? (
+          {isPermissionsLoaded && !canReadSubscriptions ? (
             <NoPermission resourceText="update this organization's cost control" />
           ) : (
             <>

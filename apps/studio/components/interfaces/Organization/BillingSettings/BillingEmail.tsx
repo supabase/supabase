@@ -46,7 +46,7 @@ const BillingEmail = () => {
   const { name, billing_email } = selectedOrganization ?? {}
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-  const { isLoading: isLoadingPermissions, can: canReadBillingEmail } =
+  const { isSuccess: isPermissionsLoaded, can: canReadBillingEmail } =
     useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.subscriptions')
 
   const { data: billingCustomer, isLoading: loadingBillingCustomer } =
@@ -108,7 +108,7 @@ const BillingEmail = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {!isLoadingPermissions && !canReadBillingEmail ? (
+        {isPermissionsLoaded && !canReadBillingEmail ? (
           <NoPermission resourceText="view this organization's email recipients" />
         ) : (
           <Form {...form}>

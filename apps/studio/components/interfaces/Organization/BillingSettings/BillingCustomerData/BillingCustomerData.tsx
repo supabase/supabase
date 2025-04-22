@@ -30,7 +30,7 @@ const BillingCustomerData = () => {
   const { slug } = useParams()
   const selectedOrganization = useSelectedOrganization()
 
-  const { isLoading: isLoadingPermissions, can: canReadBillingCustomerData } =
+  const { isSuccess: isPermissionsLoaded, can: canReadBillingCustomerData } =
     useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.customer')
   const canUpdateBillingCustomerData = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
@@ -117,7 +117,7 @@ const BillingCustomerData = () => {
               installationId: selectedOrganization?.partner_id,
             }}
           />
-        ) : !isLoadingPermissions && !canReadBillingCustomerData ? (
+        ) : isPermissionsLoaded && !canReadBillingCustomerData ? (
           <NoPermission resourceText="view this organization's billing address" />
         ) : (
           <>

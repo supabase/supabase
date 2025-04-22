@@ -20,7 +20,7 @@ import UpcomingInvoice from './UpcomingInvoice'
 const BillingBreakdown = () => {
   const { slug: orgSlug } = useParams()
 
-  const { isLoading: isLoadingPermissions, can: canReadSubscriptions } =
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
     useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.subscriptions')
 
   const {
@@ -72,7 +72,7 @@ const BillingBreakdown = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {!isLoadingPermissions && !canReadSubscriptions ? (
+        {isPermissionsLoaded && !canReadSubscriptions ? (
           <NoPermission resourceText="view this organization's upcoming invoice" />
         ) : (
           <>

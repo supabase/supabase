@@ -9,7 +9,7 @@ import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import InvoicesSettings from './InvoicesSettings'
 
 const InvoicesSection = () => {
-  const { isLoading, can: canReadInvoices } = useAsyncCheckProjectPermissions(
+  const { isSuccess: isPermissionsLoaded, can: canReadInvoices } = useAsyncCheckProjectPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )
@@ -27,7 +27,7 @@ const InvoicesSection = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {!isLoading && !canReadInvoices ? (
+        {isPermissionsLoaded && !canReadInvoices ? (
           <NoPermission resourceText="view this organization's upcoming invoice" />
         ) : (
           <InvoicesSettings />

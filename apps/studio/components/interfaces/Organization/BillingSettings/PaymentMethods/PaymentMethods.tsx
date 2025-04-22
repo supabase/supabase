@@ -46,7 +46,7 @@ const PaymentMethods = () => {
     isSuccess,
   } = useOrganizationPaymentMethodsQuery({ slug })
 
-  const { isLoading: isLoadingPermissions, can: canReadPaymentMethods } =
+  const { isSuccess: isPermissionsLoaded, can: canReadPaymentMethods } =
     useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.payment_methods')
   const canUpdatePaymentMethods = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
@@ -74,7 +74,7 @@ const PaymentMethods = () => {
                 installationId: selectedOrganization?.partner_id,
               }}
             />
-          ) : !isLoadingPermissions && !canReadPaymentMethods ? (
+          ) : isPermissionsLoaded && !canReadPaymentMethods ? (
             <NoPermission resourceText="view this organization's payment methods" />
           ) : (
             <>
