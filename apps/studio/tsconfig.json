@@ -34,6 +34,6 @@
     "**/*.jsx",
     ".next/types/**/*.ts",
     "./../../packages/ui/src/**/*.d.ts"
-  ],
+, "../../tests/studio-tests/tests/common-functionality/download-csv.integration.test.ts"  ],
   "exclude": ["node_modules", "public/deno/*.ts"]
 }

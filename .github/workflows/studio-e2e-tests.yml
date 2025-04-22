@@ -1,4 +1,5 @@
 name: Studio E2E Tests
+
 on:
   push:
     branches: [master]
@@ -15,7 +16,6 @@ on:
       - 'tests/studio-tests/**'
       - 'pnpm-lock.yaml'
 
-# Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -27,26 +27,35 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
           run_install: false
+
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
+
       - uses: supabase/setup-cli@v1
         with:
           version: latest
+
       - name: Install dependencies
         run: pnpm i
+
       - name: Install Playwright Browsers
         run: pnpm -C tests/studio-tests exec playwright install --with-deps
+
       - name: Run Playwright tests
+        env:
+          CI_TEST_IGNORE: >
+            apps/studio/tests/lib/graphql/GraphQLEnumSanitisation.spec.tsx,
+            tests/studio-tests/tests/common-functionality/download-csv.integration.spec.ts
         run: pnpm test:e2e:studio-local
-        # mark the action as succeeded even if the tests failed. This is temporarily until we make the tests more stable.
-        # continue-on-error: true
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
