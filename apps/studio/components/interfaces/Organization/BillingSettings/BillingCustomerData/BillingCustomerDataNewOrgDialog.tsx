@@ -81,6 +81,7 @@ const BillingCustomerDataNewOrgDialog = ({
             // where the focus keeps going to the Dialog when tabbing across the input fields
             // This is just an attempt to manually refocus amongst the input and is imperfect so
             // feel free to remove if we feel like this is making it worse
+            // FWIW it's likely happening across the dashboard whereever we're using Dialog and FormField
             const formInputs = e.target.querySelector('form')?.querySelectorAll('input')
             if (e.target.role === 'dialog') {
               const formatted = Array.from(formInputs as any).map((x: any) => x.name)
