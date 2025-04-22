@@ -14,13 +14,13 @@ import { SELECT_COLUMN_KEY } from 'components/grid/constants'
  * and then update the 'col_order' URL parameter via setParams from the central hook.
  */
 export function useTableColumnOrder() {
-  const { setParams } = useTableEditorFiltersSort() // Only need setParams
+  const { columnOrder, setParams } = useTableEditorFiltersSort()
   const snap = useSafeTableEditorSnapshot()
 
   // Read current order directly from Valtio State
-  const columnOrder = useMemo(() => {
-    return snap.gridColumns?.map((col) => col.key).filter((key) => key !== SELECT_COLUMN_KEY) ?? []
-  }, [snap.gridColumns])
+  const columnOrderMemo = useMemo(() => {
+    return columnOrder.filter((key) => key !== SELECT_COLUMN_KEY)
+  }, [columnOrder])
 
   /**
    * Sets the entire column order.
@@ -51,56 +51,56 @@ export function useTableColumnOrder() {
   )
 
   /**
-   * Moves a column to a position relative to another column.
-   * @param sourceKey Key of the column to move.
-   * @param targetKey Key of the column to move before.
+   * Moves a column based on drag-and-drop indices.
+   * Intended for live updates during drag (hover).
+   * @param sourceKey Key of the column being moved.
+   * @param targetKey Key of the column being hovered over.
+   * @param sourceIndex Original index of the source column.
+   * @param targetIndex Index of the target column (where source should move to).
    */
   const moveColumn = useCallback(
-    (sourceKey: string, targetKey: string) => {
-      if (!snap.moveColumn || !snap.gridColumns) {
-        console.warn('[useTableColumnOrder] Valtio actions/gridColumns not available on snap.')
-        return
+    (sourceKey: string, targetKey: string, sourceIndex: number, targetIndex: number) => {
+      // Use the provided indices for accurate array manipulation
+      const currentOrder = columnOrder // Based on last committed URL state
+
+      // Check if indices match the keys in the current known order (optional defensive check)
+      if (currentOrder[sourceIndex] !== sourceKey || currentOrder[targetIndex] !== targetKey) {
+        console.warn('DnD indices/keys mismatch with current hook state. Recalculating indices.')
+        // Fallback to recalculating indices based on keys if mismatch detected
+        sourceIndex = currentOrder.indexOf(sourceKey)
+        targetIndex = currentOrder.indexOf(targetKey)
+        if (sourceIndex === -1 || targetIndex === -1) {
+          console.error('Cannot resolve index mismatch during column move.')
+          return
+        }
       }
 
-      // 1. Update Valtio State
-      snap.moveColumn(sourceKey, targetKey)
-
-      // 2. Update URL Parameter
-      // Recalculate order locally for immediate URL update, as snap updates async
-      const currentOrder = snap.gridColumns
-        .map((col) => col.key)
-        .filter((key) => key !== SELECT_COLUMN_KEY)
-
-      const sourceIndex = currentOrder.indexOf(sourceKey)
-      let targetIndex = currentOrder.indexOf(targetKey)
-
-      if (sourceIndex === -1) {
-        console.warn('Source key not found for moveColumn URL update')
-        return
-      }
-
+      // Reliable way to move element in array using indices
+      const element = currentOrder[sourceIndex]
       const newOrder = [...currentOrder]
-      const [movedItem] = newOrder.splice(sourceIndex, 1)
-      targetIndex = newOrder.indexOf(targetKey)
+      newOrder.splice(sourceIndex, 1) // Remove element from original position
+      newOrder.splice(targetIndex, 0, element) // Insert element at target position
 
-      if (targetIndex === -1) {
-        // Default to end if target not found
-        newOrder.push(movedItem)
+      // Update Valtio state (best effort for eventual consistency)
+      if (snap.moveColumn) {
+        snap.moveColumn(sourceKey, targetKey)
       } else {
-        newOrder.splice(targetIndex, 0, movedItem)
+        console.warn('[useTableColumnOrder] snap.moveColumn not available')
       }
 
+      // Update URL Parameter with the locally calculated order
       const newUrlString = newOrder.join(',')
       setParams((prevParams) => ({
         ...prevParams,
         col_order: newUrlString || undefined,
       }))
     },
-    [snap, setParams] // Depends on Valtio snap and setParams from central hook
+    // Depends on the order derived from URL, the Valtio snap, and setParams
+    [columnOrder, snap, setParams]
   )
 
   return {
-    columnOrder,
+    columnOrder: columnOrderMemo,
     setColumnOrder,
     moveColumn,
   }

@@ -194,7 +194,12 @@ export function useLoadTableEditorStateFromLocalStorageIntoUrl({
     const searchParams = new URLSearchParams(window.location.search)
     const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.name, table.schema)
 
-    let paramsToSet: { sort?: string[]; filter?: string[]; col_order?: string } = {}
+    let paramsToSet: {
+      sort?: string[]
+      filter?: string[]
+      col_order?: string
+      hidden_cols?: string
+    } = {}
     let needsUpdate = false
 
     if (searchParams.getAll('sort').length <= 0 && savedState?.sorts) {
@@ -214,6 +219,18 @@ export function useLoadTableEditorStateFromLocalStorageIntoUrl({
       if (savedOrder.length > 0) {
         const colOrderString = savedOrder.join(',')
         paramsToSet.col_order = colOrderString
+        needsUpdate = true
+      }
+    }
+
+    if (!searchParams.has('hidden_cols') && savedState?.gridColumns) {
+      const hiddenKeys = savedState.gridColumns
+        .filter((col) => (col as any).visible === false)
+        .map((col) => col.key)
+
+      if (hiddenKeys.length > 0) {
+        const hiddenColsString = hiddenKeys.join(',')
+        paramsToSet.hidden_cols = hiddenColsString
         needsUpdate = true
       }
     }
