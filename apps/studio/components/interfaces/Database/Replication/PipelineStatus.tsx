@@ -36,13 +36,13 @@ const PipelineStatus = ({
       {isLoading && <ShimmeringLoader></ShimmeringLoader>}
       {isError && <AlertError error={error} subject="Failed to retrieve pipeline status" />}
       {isSuccess && (
-        <div className="flex flex-row items-center">
+        <div className="flex flex-row items-center gap-2">
           {requestInFlight ? (
-            <Loader2 className="animate-spin mr-2" />
+            <Loader2 className="animate-spin" />
           ) : (
             <div
               className={cn(
-                'w-2 h-2 rounded-full mr-1',
+                'w-2 h-2 rounded-full',
                 pipelineEnabled ? 'bg-brand' : 'bg-warning-600'
               )}
             ></div>

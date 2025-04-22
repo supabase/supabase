@@ -1,11 +1,10 @@
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import type { NextPageWithLayout } from 'types'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import Destinations from 'components/interfaces/Database/Replication/Destinations'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useFlag } from 'hooks/ui/useFlag'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { Admonition } from 'ui-patterns'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
   const enablePgReplicate = useFlag('enablePgReplicate')
@@ -18,13 +17,10 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
         </ScaffoldContainer>
       ) : (
         <ScaffoldContainer>
-          <ScaffoldSection>
-            <div className="col-span-12">
-              <FormHeader
-                title="Feature Unavailable"
-                description="This feature is not available for you"
-              />
-            </div>
+          <ScaffoldSection isFullWidth>
+            <Admonition type="default" title="Coming soon">
+              <p className="!mb-0">Replication is not yet available for your project</p>
+            </Admonition>
           </ScaffoldSection>
         </ScaffoldContainer>
       )}

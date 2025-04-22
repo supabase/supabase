@@ -232,7 +232,7 @@ const DestinationPanel = ({
                       {editMode ? 'Modify existing destination' : 'Send data to a new destination'}
                     </SheetDescription>
                   </div>
-                  <div className="flex">
+                  <div className="flex items-center gap-2">
                     <Switch
                       checked={enabled}
                       onCheckedChange={(checked) => {
@@ -242,218 +242,203 @@ const DestinationPanel = ({
                     <Label className="text-sm mx-2">Enable</Label>
                   </div>
                 </SheetHeader>
-                <SheetSection className="flex-grow overflow-auto">
+                <SheetSection className="flex-grow overflow-auto pt-8">
                   <Form_Shadcn_ {...form}>
                     <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-                      <h3>What data to send</h3>
+                      <h3 className="mb-4">What data to send</h3>
 
-                      <Card className="mb-8 mt-4">
-                        <CardContent>
-                          <FormField_Shadcn_
-                            control={form.control}
-                            name="publicationName"
-                            render={({ field }) => (
-                              <FormItemLayout
-                                label="Publication"
-                                layout="flex-row-reverse"
-                                description="Share table changes for replication"
-                              >
-                                <FormControl_Shadcn_>
-                                  <PublicationsComboBox
-                                    publications={publications?.map((pub) => pub.name) || []}
-                                    loading={loadingPublications}
-                                    field={field}
-                                    onNewPublicationClick={() => setPublicationPanelVisible(true)}
-                                  />
-                                </FormControl_Shadcn_>
-                              </FormItemLayout>
-                            )}
-                          />
-                        </CardContent>
-                      </Card>
-                      <h3>Where to send that data</h3>
-                      <Card className="mb-8 mt-4">
-                        <CardContent>
-                          <FormField_Shadcn_
-                            name="type"
-                            control={form.control}
-                            render={({ field }) => (
-                              <FormItemLayout
-                                label="Type"
-                                layout="flex-row-reverse"
-                                description="The type of destination to send the data to"
-                              >
-                                <FormControl_Shadcn_>
-                                  <Select_Shadcn_ value={field.value}>
-                                    <SelectTrigger_Shadcn_>{field.value}</SelectTrigger_Shadcn_>
-                                    <SelectContent_Shadcn_>
-                                      <SelectGroup_Shadcn_>
-                                        <SelectItem_Shadcn_ value="BigQuery">
-                                          BigQuery
-                                        </SelectItem_Shadcn_>
-                                      </SelectGroup_Shadcn_>
-                                    </SelectContent_Shadcn_>
-                                  </Select_Shadcn_>
-                                </FormControl_Shadcn_>
-                              </FormItemLayout>
-                            )}
-                          ></FormField_Shadcn_>
-                        </CardContent>
-                        <CardContent>
-                          <FormField_Shadcn_
-                            control={form.control}
-                            name="name"
-                            render={({ field }) => (
-                              <FormItemLayout
-                                label="Name"
-                                layout="flex-row-reverse"
-                                description="The name of the destination"
-                              >
-                                <FormControl_Shadcn_>
-                                  <Input_Shadcn_ {...field} placeholder="Name" />
-                                </FormControl_Shadcn_>
-                              </FormItemLayout>
-                            )}
-                          />
-                        </CardContent>
-                        <CardContent>
-                          <FormField_Shadcn_
-                            control={form.control}
-                            name="projectId"
-                            render={({ field }) => (
-                              <FormItemLayout
-                                label="Project Id"
-                                layout="flex-row-reverse"
-                                description="Send data to this BigQuery project"
-                              >
-                                <FormControl_Shadcn_>
-                                  <Input_Shadcn_ {...field} placeholder="Project id" />
-                                </FormControl_Shadcn_>
-                              </FormItemLayout>
-                            )}
-                          />
-                        </CardContent>
-                        <CardContent>
-                          <FormField_Shadcn_
-                            control={form.control}
-                            name="datasetId"
-                            render={({ field }) => (
-                              <FormItemLayout
-                                label="Dataset Id"
-                                layout="flex-row-reverse"
-                                description="Send data to this BigQuery dataset"
-                              >
-                                <FormControl_Shadcn_>
-                                  <Input_Shadcn_ {...field} placeholder="Dataset id" />
-                                </FormControl_Shadcn_>
-                              </FormItemLayout>
-                            )}
-                          />
-                        </CardContent>
-                        <CardContent>
-                          <FormField_Shadcn_
-                            control={form.control}
-                            name="serviceAccountKey"
-                            render={({ field }) => (
-                              <FormItemLayout
-                                label="Service Account Key"
-                                layout="flex-row-reverse"
-                                description="The service account key for BigQuery"
-                              >
-                                <FormControl_Shadcn_>
-                                  <TextArea_Shadcn_
-                                    {...field}
-                                    rows={4}
-                                    maxLength={5000}
-                                    placeholder="Service account key"
-                                  />
-                                </FormControl_Shadcn_>
-                              </FormItemLayout>
-                            )}
-                          />
-                        </CardContent>
-                      </Card>
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="publicationName"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            className="mb-4"
+                            label="Publication"
+                            layout="vertical"
+                            description="Share table changes for replication"
+                          >
+                            <FormControl_Shadcn_>
+                              <PublicationsComboBox
+                                publications={publications?.map((pub) => pub.name) || []}
+                                loading={loadingPublications}
+                                field={field}
+                                onNewPublicationClick={() => setPublicationPanelVisible(true)}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+                      <h3 className="mb-4 mt-8">Where to send that data</h3>
+
+                      <FormField_Shadcn_
+                        name="type"
+                        control={form.control}
+                        render={({ field }) => (
+                          <FormItemLayout
+                            className="mb-4"
+                            label="Type"
+                            layout="vertical"
+                            description="The type of destination to send the data to"
+                          >
+                            <FormControl_Shadcn_>
+                              <Select_Shadcn_ value={field.value}>
+                                <SelectTrigger_Shadcn_>{field.value}</SelectTrigger_Shadcn_>
+                                <SelectContent_Shadcn_>
+                                  <SelectGroup_Shadcn_>
+                                    <SelectItem_Shadcn_ value="BigQuery">
+                                      BigQuery
+                                    </SelectItem_Shadcn_>
+                                  </SelectGroup_Shadcn_>
+                                </SelectContent_Shadcn_>
+                              </Select_Shadcn_>
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      ></FormField_Shadcn_>
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            className="mb-4"
+                            label="Name"
+                            layout="vertical"
+                            description="The name of the destination"
+                          >
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_ {...field} placeholder="Name" />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="projectId"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            className="mb-4"
+                            label="Project Id"
+                            layout="vertical"
+                            description="Send data to this BigQuery project"
+                          >
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_ {...field} placeholder="Project id" />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="datasetId"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            className="mb-4"
+                            label="Dataset Id"
+                            layout="vertical"
+                            description="Send data to this BigQuery dataset"
+                          >
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_ {...field} placeholder="Dataset id" />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="serviceAccountKey"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            label="Service Account Key"
+                            layout="vertical"
+                            description="The service account key for BigQuery"
+                          >
+                            <FormControl_Shadcn_>
+                              <TextArea_Shadcn_
+                                {...field}
+                                rows={4}
+                                maxLength={5000}
+                                placeholder="Service account key"
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
 
                       <Accordion_Shadcn_ type="single" collapsible>
                         <AccordionItem_Shadcn_ value="item-1" className="border-none">
-                          <AccordionTrigger_Shadcn_ className="font-normal gap-2 justify-start py-1">
+                          <AccordionTrigger_Shadcn_ className="font-normal gap-2 justify-start mb-0 mt-8">
                             Advanced Settings
                           </AccordionTrigger_Shadcn_>
                           <AccordionContent_Shadcn_ asChild className="!pb-0">
-                            <Card className="mt-4">
-                              <CardContent>
-                                <FormField_Shadcn_
-                                  control={form.control}
-                                  name="maxSize"
-                                  render={({ field }) => (
-                                    <FormItemLayout
-                                      label="Max Size"
-                                      layout="flex-row-reverse"
-                                      description="The maximum size of the data to send"
-                                    >
-                                      <FormControl_Shadcn_>
-                                        <Input_Shadcn_
-                                          {...field}
-                                          type="number"
-                                          {...form.register('maxSize', {
-                                            valueAsNumber: true, // Ensure the value is handled as a number
-                                          })}
-                                          placeholder="Max size"
-                                        />
-                                      </FormControl_Shadcn_>
-                                    </FormItemLayout>
-                                  )}
-                                />
-                              </CardContent>
-                              <CardContent>
-                                <FormField_Shadcn_
-                                  control={form.control}
-                                  name="maxFillSecs"
-                                  render={({ field }) => (
-                                    <FormItemLayout
-                                      label="Max Fill Seconds"
-                                      layout="flex-row-reverse"
-                                      description="The maximum amount of time to fill the data"
-                                    >
-                                      <FormControl_Shadcn_>
-                                        <Input_Shadcn_
-                                          {...field}
-                                          type="number"
-                                          {...form.register('maxFillSecs', {
-                                            valueAsNumber: true, // Ensure the value is handled as a number
-                                          })}
-                                          placeholder="Max fill seconds"
-                                        />
-                                      </FormControl_Shadcn_>
-                                    </FormItemLayout>
-                                  )}
-                                />
-                              </CardContent>
-                              <CardContent>
-                                <FormField_Shadcn_
-                                  control={form.control}
-                                  name="maxStalenessMins"
-                                  render={({ field }) => (
-                                    <FormItemLayout
-                                      label="Max Staleness"
-                                      layout="flex-row-reverse"
-                                      description="Maximum staleness time allowed"
-                                    >
-                                      <FormControl_Shadcn_>
-                                        <Input_Shadcn_
-                                          {...field}
-                                          type="number"
-                                          {...form.register('maxStalenessMins', {
-                                            valueAsNumber: true, // Ensure the value is handled as a number
-                                          })}
-                                          placeholder="Max staleness in minutes"
-                                        />
-                                      </FormControl_Shadcn_>
-                                    </FormItemLayout>
-                                  )}
-                                />
-                              </CardContent>
-                            </Card>
+                            <FormField_Shadcn_
+                              control={form.control}
+                              name="maxSize"
+                              render={({ field }) => (
+                                <FormItemLayout
+                                  className="mb-4"
+                                  label="Max Size"
+                                  layout="vertical"
+                                  description="The maximum size of the data to send"
+                                >
+                                  <FormControl_Shadcn_>
+                                    <Input_Shadcn_
+                                      {...field}
+                                      type="number"
+                                      {...form.register('maxSize', {
+                                        valueAsNumber: true, // Ensure the value is handled as a number
+                                      })}
+                                      placeholder="Max size"
+                                    />
+                                  </FormControl_Shadcn_>
+                                </FormItemLayout>
+                              )}
+                            />
+                            <FormField_Shadcn_
+                              control={form.control}
+                              name="maxFillSecs"
+                              render={({ field }) => (
+                                <FormItemLayout
+                                  className="mb-4"
+                                  label="Max Fill Seconds"
+                                  layout="vertical"
+                                  description="The maximum amount of time to fill the data"
+                                >
+                                  <FormControl_Shadcn_>
+                                    <Input_Shadcn_
+                                      {...field}
+                                      type="number"
+                                      {...form.register('maxFillSecs', {
+                                        valueAsNumber: true, // Ensure the value is handled as a number
+                                      })}
+                                      placeholder="Max fill seconds"
+                                    />
+                                  </FormControl_Shadcn_>
+                                </FormItemLayout>
+                              )}
+                            />
+                            <FormField_Shadcn_
+                              control={form.control}
+                              name="maxStalenessMins"
+                              render={({ field }) => (
+                                <FormItemLayout
+                                  className="mb-4"
+                                  label="Max Staleness"
+                                  layout="vertical"
+                                  description="Maximum staleness time allowed"
+                                >
+                                  <FormControl_Shadcn_>
+                                    <Input_Shadcn_
+                                      {...field}
+                                      type="number"
+                                      {...form.register('maxStalenessMins', {
+                                        valueAsNumber: true, // Ensure the value is handled as a number
+                                      })}
+                                      placeholder="Max staleness in minutes"
+                                    />
+                                  </FormControl_Shadcn_>
+                                </FormItemLayout>
+                              )}
+                            />
                           </AccordionContent_Shadcn_>
                         </AccordionItem_Shadcn_>
                       </Accordion_Shadcn_>
@@ -462,7 +447,7 @@ const DestinationPanel = ({
                           control={form.control}
                           name="enabled"
                           render={({ field }) => (
-                            <FormItemLayout layout="flex-row-reverse" label="Enabled">
+                            <FormItemLayout className="mb-4" layout="vertical" label="Enabled">
                               <FormControl_Shadcn_>
                                 <Switch
                                   checked={field.value}

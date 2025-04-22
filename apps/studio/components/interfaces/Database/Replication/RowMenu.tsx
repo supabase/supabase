@@ -6,6 +6,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
@@ -39,9 +40,9 @@ const RowMenu = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" className="px-1" icon={<MoreVertical />} />
+          <Button type="default" className="px-1.5" icon={<MoreVertical />} />
         </DropdownMenuTrigger>
-        <DropdownMenuContent side="bottom" align="end" className="w-32">
+        <DropdownMenuContent side="bottom" align="end" className="w-52">
           {pipelineEnabled ? (
             <DropdownMenuItem className="space-x-2" onClick={onDisableClick}>
               <Pause size={14} />
@@ -53,6 +54,7 @@ const RowMenu = ({
               <p>Enable</p>
             </DropdownMenuItem>
           )}
+          <DropdownMenuSeparator />
           <DropdownMenuItem className="space-x-2" onClick={onEditClick}>
             <Edit size={14} />
             <p>Edit destination</p>

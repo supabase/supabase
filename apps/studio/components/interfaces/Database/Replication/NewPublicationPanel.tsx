@@ -24,6 +24,7 @@ import {
   FormMessage_Shadcn_,
   Card,
   CardContent,
+  SheetDescription,
 } from 'ui'
 import { MultiSelector } from 'ui-patterns/multi-select'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -87,7 +88,12 @@ const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanel
           <div className="flex flex-col h-full">
             <SheetHeader>
               <div className="flex flex-row justify-between items-center">
-                <SheetTitle>New Publication</SheetTitle>
+                <div>
+                  <SheetTitle>New Publication</SheetTitle>
+                  <SheetDescription>
+                    Create a new publication to share table changes for replication
+                  </SheetDescription>
+                </div>
                 <SheetClose
                   className={cn(
                     'text-muted hover:opacity-100',
@@ -107,62 +113,51 @@ const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanel
                   onSubmit={form.handleSubmit(onSubmit)}
                   className="flex flex-col gap-y-4"
                 >
-                  <Card>
-                    <CardContent>
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            label="Name"
-                            layout="flex-row-reverse"
-                            description="The name of the publication"
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItemLayout label="Name" layout="vertical">
+                        <FormControl_Shadcn_>
+                          <Input_Shadcn_ {...field} placeholder="Name" />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="tables"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        label="Tables"
+                        description="Which tables to make available for replication"
+                      >
+                        <FormControl_Shadcn_>
+                          <MultiSelector
+                            values={field.value}
+                            onValuesChange={field.onChange}
+                            disabled={creatingPublication}
                           >
-                            <FormControl_Shadcn_>
-                              <Input_Shadcn_ {...field} placeholder="Name" />
-                            </FormControl_Shadcn_>
-                          </FormItemLayout>
-                        )}
-                      />
-                    </CardContent>
-                    <CardContent>
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="tables"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            label="Tables"
-                            layout="flex-row-reverse"
-                            description="Select the tables to include in the publication"
-                          >
-                            <FormControl_Shadcn_>
-                              <MultiSelector
-                                values={field.value}
-                                onValuesChange={field.onChange}
-                                disabled={creatingPublication}
-                              >
-                                <MultiSelector.Trigger>
-                                  <MultiSelector.Input placeholder="Select tables" />
-                                </MultiSelector.Trigger>
-                                <MultiSelector.Content>
-                                  <MultiSelector.List>
-                                    {tables?.tables.map((table) => (
-                                      <MultiSelector.Item
-                                        key={`${table.schema}.${table.name}`}
-                                        value={`${table.schema}.${table.name}`}
-                                      >
-                                        {`${table.schema}.${table.name}`}
-                                      </MultiSelector.Item>
-                                    ))}
-                                  </MultiSelector.List>
-                                </MultiSelector.Content>
-                              </MultiSelector>
-                            </FormControl_Shadcn_>
-                          </FormItemLayout>
-                        )}
-                      />
-                    </CardContent>
-                  </Card>
+                            <MultiSelector.Trigger>
+                              <MultiSelector.Input placeholder="Select tables" />
+                            </MultiSelector.Trigger>
+                            <MultiSelector.Content>
+                              <MultiSelector.List>
+                                {tables?.tables.map((table) => (
+                                  <MultiSelector.Item
+                                    key={`${table.schema}.${table.name}`}
+                                    value={`${table.schema}.${table.name}`}
+                                  >
+                                    {`${table.schema}.${table.name}`}
+                                  </MultiSelector.Item>
+                                ))}
+                              </MultiSelector.List>
+                            </MultiSelector.Content>
+                          </MultiSelector>
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
                 </form>
               </Form_Shadcn_>
             </SheetSection>
