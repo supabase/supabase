@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.20.12
+  version: 2.22.4
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -871,7 +871,7 @@ commands:
     title: supabase services
     summary: Show versions of all Supabase services
     tags:
-      - management-api
+      - local-dev
     links: []
     usage: supabase services
     subcommands: []
