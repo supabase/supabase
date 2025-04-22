@@ -5,6 +5,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useFlag } from 'hooks/ui/useFlag'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { Admonition } from 'ui-patterns'
+import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
   const enablePgReplicate = useFlag('enablePgReplicate')
@@ -30,9 +31,11 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
 
 DatabaseReplicationPage.getLayout = (page) => (
   <DefaultLayout>
-    <PageLayout title="Database Replication" subtitle="Send data to other destinations">
-      {page}
-    </PageLayout>
+    <DatabaseLayout title="Database">
+      <PageLayout title="Database Replication" subtitle="Send data to other destinations">
+        {page}
+      </PageLayout>
+    </DatabaseLayout>
   </DefaultLayout>
 )
 
