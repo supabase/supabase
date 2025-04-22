@@ -53,7 +53,7 @@ jobs:
         env:
           CI_TEST_IGNORE: >
             apps/studio/tests/lib/graphql/GraphQLEnumSanitisation.spec.tsx,
-            tests/studio-tests/tests/common-functionality/download-csv.integration.spec.ts
+            tests/studio-tests/tests/common-functionality/download-csv.integration.test.ts
         run: pnpm test:e2e:studio-local
 
       - uses: actions/upload-artifact@v4

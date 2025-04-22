@@ -1,8 +1,15 @@
 // apps/studio/playwright.config.ts
 import { defineConfig } from '@playwright/test';
+const extraIgnores = process.env.CI_TEST_IGNORE
+  ? process.env.CI_TEST_IGNORE.split(',').map((p) => p.trim())
+  : [];
 
 export default defineConfig({
   testDir: './tests',
+  testIgnore: [
+    '**/node_modules/**',
+    ...extraIgnores,  
+  ],
   timeout: 60_000,               // allow 1 min per test
   expect: { timeout: 10_000 },
   use: {
