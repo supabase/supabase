@@ -6,7 +6,6 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   DropdownMenu,
@@ -21,11 +20,13 @@ import { extractMethod, isValidHook } from './hooks.utils'
 
 interface AddHookDropdownProps {
   buttonText?: string
+  align?: 'end' | 'center'
   onSelectHook: (hook: HOOK_DEFINITION_TITLE) => void
 }
 
 export const AddHookDropdown = ({
   buttonText = 'Add hook',
+  align = 'end',
   onSelectHook,
 }: AddHookDropdownProps) => {
   const { ref: projectRef } = useParams()
@@ -66,13 +67,13 @@ export const AddHookDropdown = ({
   }
 
   return (
-    <DropdownMenu modal={false}>
+    <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button type="primary" iconRight={<ChevronDown className="w-4 h-4" strokeWidth={1} />}>
           {buttonText}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-76" align="end">
+      <DropdownMenuContent className="w-76" align={align}>
         <div>
           {nonEnterpriseHookOptions.map((h) => (
             <DropdownMenuItem key={h.title} onClick={() => onSelectHook(h.title)}>

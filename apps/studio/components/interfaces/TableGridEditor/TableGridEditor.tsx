@@ -6,6 +6,7 @@ import { useCallback } from 'react'
 import { useParams } from 'common'
 import { SupabaseGrid } from 'components/grid/SupabaseGrid'
 import { useLoadTableEditorStateFromLocalStorageIntoUrl } from 'components/grid/SupabaseGrid.utils'
+import { useEditorType } from 'components/layouts/editors/EditorsLayout.hooks'
 import {
   Entity,
   isMaterializedView,
@@ -16,10 +17,12 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useAppStateSnapshot } from 'state/app-state'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
-import { makeActiveTabPermanent } from 'state/tabs'
-import { TableGridSkeletonLoader } from './LoadingState'
-import NotFoundState from './NotFoundState'
+import { handleTabClose, makeActiveTabPermanent, useTabsStore } from 'state/tabs'
+import { Button } from 'ui'
+import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import { useIsTableEditorTabsEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
 import TableDefinition from './TableDefinition'
 
@@ -28,13 +31,17 @@ export interface TableGridEditorProps {
   selectedTable?: Entity
 }
 
-const TableGridEditor = ({
+export const TableGridEditor = ({
   isLoadingSelectedTable = false,
   selectedTable,
 }: TableGridEditorProps) => {
   const router = useRouter()
+  const editor = useEditorType()
   const project = useSelectedProject()
+  const appSnap = useAppStateSnapshot()
   const { ref: projectRef, id } = useParams()
+  const tabs = useTabsStore(projectRef)
+  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
 
   useLoadTableEditorStateFromLocalStorageIntoUrl({
     projectRef,
@@ -46,6 +53,7 @@ const TableGridEditor = ({
   const canEditTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
   const canEditColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
   const isReadOnly = !canEditTables && !canEditColumns
+  const tabId = !!id ? tabs.openTabs.find((x) => x.endsWith(id)) : undefined
 
   const onTableCreated = useCallback(
     (table: { id: number }) => {
@@ -54,13 +62,57 @@ const TableGridEditor = ({
     [projectRef, router]
   )
 
+  const onClearDashboardHistory = () => {
+    if (projectRef && editor) {
+      appSnap.setDashboardHistory(projectRef, editor === 'table' ? 'editor' : editor, undefined)
+    }
+  }
+
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isLoadingSelectedTable || !projectRef) {
-    return <TableGridSkeletonLoader />
+    return (
+      <div className="flex flex-col">
+        <div className="h-10 bg-dash-sidebar dark:bg-surface-100" />
+        <div className="h-9 border-y" />
+        <div className="p-2 col-span-full">
+          <GenericSkeletonLoader />
+        </div>
+      </div>
+    )
   }
 
   if (isUndefined(selectedTable)) {
-    return <NotFoundState id={Number(id)} />
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="w-[400px]">
+          <Admonition
+            type="default"
+            title={`Unable to find your table with ID ${id}`}
+            description="This table doesn't exist in your database"
+          >
+            {isTableEditorTabsEnabled && (
+              <Button
+                type="default"
+                className="mt-2"
+                onClick={() => {
+                  if (tabId) {
+                    handleTabClose({
+                      ref: projectRef,
+                      id: tabId,
+                      router,
+                      editor,
+                      onClearDashboardHistory,
+                    })
+                  }
+                }}
+              >
+                Close tab
+              </Button>
+            )}
+          </Admonition>
+        </div>
+      </div>
+    )
   }
 
   const isViewSelected = isView(selectedTable) || isMaterializedView(selectedTable)
@@ -113,5 +165,3 @@ const TableGridEditor = ({
     </div>
   )
 }
-
-export default TableGridEditor
