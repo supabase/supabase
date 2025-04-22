@@ -1,12 +1,21 @@
-import { useParams } from 'common'
-import { Settings2, Check, GripVertical, Lock } from 'lucide-react'
-import { useState, useEffect, useMemo, useCallback, DragEvent } from 'react'
+import { Check, GripVertical, Lock, Settings2 } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import { DragOverEvent, DragStartEvent, DragEndEvent } from '@dnd-kit/core'
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  arrayMove,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import { SELECT_COLUMN_KEY } from 'components/grid/constants'
+import { useTableColumnOrder } from 'components/grid/hooks/useTableColumnOrder'
+import { useTableColumnVisibility } from 'components/grid/hooks/useTableColumnVisibility'
+import { Sortable, SortableDragHandle } from 'components/ui/Sortable/sortable'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
-  Popover_Shadcn_ as Popover,
-  PopoverContent_Shadcn_ as PopoverContent,
-  PopoverTrigger_Shadcn_ as PopoverTrigger,
   Command_Shadcn_ as Command,
   CommandEmpty_Shadcn_ as CommandEmpty,
   CommandGroup_Shadcn_ as CommandGroup,
@@ -14,18 +23,14 @@ import {
   CommandItem_Shadcn_ as CommandItem,
   CommandList_Shadcn_ as CommandList,
   CommandSeparator_Shadcn_ as CommandSeparator,
+  Popover_Shadcn_ as Popover,
+  PopoverContent_Shadcn_ as PopoverContent,
+  PopoverTrigger_Shadcn_ as PopoverTrigger,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
   cn,
 } from 'ui'
-
-import { Sortable, SortableItem, SortableDragHandle } from 'components/ui/Sortable/sortable'
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-
-import { useTableColumnVisibility } from 'components/grid/hooks/useTableColumnVisibility'
-import { useTableColumnOrder } from 'components/grid/hooks/useTableColumnOrder'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 
 interface CommonColumnInfo {
   id: string
@@ -33,185 +38,177 @@ interface CommonColumnInfo {
   isFrozenOrPk: boolean
 }
 
+interface BaseColumnItemProps {
+  column: CommonColumnInfo
+  isVisible: boolean
+  onSelect: (id: string) => void
+}
+
+function PinnedColumnItem({ column, isVisible, onSelect }: BaseColumnItemProps) {
+  return (
+    <CommandItem
+      key={column.id}
+      value={column.name}
+      onSelect={() => onSelect(column.id)}
+      className="cursor-default opacity-75 p-0"
+    >
+      <div className="flex items-center justify-between w-full px-2 py-1.5">
+        <div className="flex items-center">
+          <div
+            className={cn(
+              'mr-2 flex h-4 w-4 items-center justify-center border-foreground-muted rounded border',
+              isVisible ? 'bg-foreground text-background' : 'opacity-50 [&_svg]:invisible'
+            )}
+          >
+            <Check className={cn('h-3 w-3')} strokeWidth={4} />
+          </div>
+          <span>{column.name}</span>
+        </div>
+        <Lock size={14} strokeWidth={1.5} className="text-foreground-lighter flex-shrink-0" />
+      </div>
+    </CommandItem>
+  )
+}
+
+function DraggableColumnItem({ column, isVisible, onSelect }: BaseColumnItemProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: column.id,
+  })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.75 : 1,
+  }
+
+  return (
+    <div ref={setNodeRef} style={style} className={cn('rounded-md')}>
+      <CommandItem
+        key={column.id}
+        value={column.name}
+        onSelect={() => onSelect(column.id)}
+        className="p-0 cursor-default data-[state=dragging]:bg-muted relative"
+      >
+        <div className="flex justify-between items-center w-full px-2 py-1.5">
+          <div className="flex items-center flex-grow min-w-0">
+            <div
+              className={cn(
+                'mr-2 flex h-4 w-4 items-center justify-center border-foreground-muted rounded border flex-shrink-0',
+                isVisible ? 'bg-foreground text-background' : 'opacity-50 [&_svg]:invisible'
+              )}
+            >
+              <Check className={cn('h-3 w-3')} strokeWidth={4} />
+            </div>
+            <span className="truncate">{column.name}</span>
+          </div>
+          <SortableDragHandle
+            size="tiny"
+            className="absolute right-2 size-5 text-foreground-lighter opacity-50 hover:opacity-100 cursor-grab data-[state=dragging]:cursor-grabbing p-1 flex-shrink-0"
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical size={14} strokeWidth={1.5} />
+          </SortableDragHandle>
+        </div>
+      </CommandItem>
+    </div>
+  )
+}
+
 export const ColumnVisibility = () => {
   const snap = useTableEditorTableStateSnapshot()
   const { hiddenColumns, hideColumn, showColumn } = useTableColumnVisibility()
-  const { columnOrder, setColumnOrder } = useTableColumnOrder()
+  const { columnOrder, moveColumn } = useTableColumnOrder()
 
   const [open, setOpen] = useState(false)
   const [frozenOrPkColumns, setFrozenOrPkColumns] = useState<CommonColumnInfo[]>([])
   const [draggableColumns, setDraggableColumns] = useState<CommonColumnInfo[]>([])
-  const [draggedItem, setDraggedItem] = useState<CommonColumnInfo | null>(null)
+  const [activeId, setActiveId] = useState<string | null>(null)
+  const [currentOverId, setCurrentOverId] = useState<string | null>(null)
 
-  const sortableItems = useMemo(
-    () => draggableColumns.map((col) => ({ id: col.id })),
-    [draggableColumns]
-  )
+  const sortableItemsIds = useMemo(() => draggableColumns.map((col) => col.id), [draggableColumns])
 
   useEffect(() => {
-    console.log('--- ColumnVisibility useEffect --- START ---')
-    const baseColumns = snap.table?.columns ?? []
-    console.log(
-      'useEffect: baseColumns:',
-      baseColumns.map((c) => c.name)
-    )
-    console.log('useEffect: columnOrder from hook:', columnOrder)
-
+    const baseColumnsInput = snap.gridColumns ?? []
+    const baseColumns = baseColumnsInput.filter((col) => {
+      if (!col.key || col.key === SELECT_COLUMN_KEY) return false
+      const effectiveName = typeof col.name === 'string' ? col.name : col.key
+      return !!effectiveName
+    })
     if (baseColumns.length === 0) {
-      console.log('useEffect: No base columns, resetting state.')
       setFrozenOrPkColumns([])
       setDraggableColumns([])
-      console.log('--- ColumnVisibility useEffect --- END ---')
       return
     }
-
     const frozen: CommonColumnInfo[] = []
     const draggable: CommonColumnInfo[] = []
     baseColumns.forEach((col) => {
-      const id = col.name
-      const info: CommonColumnInfo = { id, name: col.name, isFrozenOrPk: col.isPrimaryKey ?? false }
-      if (info.isFrozenOrPk) {
-        frozen.push(info)
-      } else {
-        draggable.push(info)
-      }
+      const id = col.key
+      const name = typeof col.name === 'string' ? col.name : col.key
+      const isPrimaryKey = (col as any).isPrimaryKey ?? false
+      const isFrozen = (col as any).frozen ?? false
+      const shouldBePinned = isPrimaryKey || isFrozen
+      const info: CommonColumnInfo = { id, name, isFrozenOrPk: shouldBePinned }
+      if (info.isFrozenOrPk) frozen.push(info)
+      else draggable.push(info)
     })
-    console.log(
-      'useEffect: Partitioned Frozen:',
-      frozen.map((c) => c.id)
-    )
-    console.log(
-      'useEffect: Partitioned Draggable:',
-      draggable.map((c) => c.id)
-    )
-
     setFrozenOrPkColumns(frozen)
-
-    let finalDraggableOrder = [...draggable]
+    let orderedDraggable = [...draggable]
     if (columnOrder.length > 0) {
-      console.log('useEffect: Applying custom order...')
       const orderMap = new Map(columnOrder.map((id, index) => [id, index]))
-      const columnsInOrderSet = new Set(columnOrder)
-
-      const orderedDraggable: CommonColumnInfo[] = []
-      const unorderedDraggable: CommonColumnInfo[] = []
-      draggable.forEach((col) => {
-        if (columnsInOrderSet.has(col.id)) {
-          orderedDraggable.push(col)
-        } else {
-          unorderedDraggable.push(col)
-        }
-      })
-      console.log(
-        'useEffect: Draggable split - Ordered:',
-        orderedDraggable.map((c) => c.id)
+      const draggableInOrder = draggable.filter((col) => orderMap.has(col.id))
+      const draggableNotInOrder = draggable.filter((col) => !orderMap.has(col.id))
+      draggableInOrder.sort(
+        (a, b) => (orderMap.get(a.id) ?? Infinity) - (orderMap.get(b.id) ?? Infinity)
       )
-      console.log(
-        'useEffect: Draggable split - Unordered:',
-        unorderedDraggable.map((c) => c.id)
-      )
-
-      orderedDraggable.sort((a, b) => {
-        const posA = orderMap.get(a.id) ?? Infinity
-        const posB = orderMap.get(b.id) ?? Infinity
-        return posA - posB
-      })
-      console.log(
-        'useEffect: Draggable after sorting ordered part:',
-        orderedDraggable.map((c) => c.id)
-      )
-
-      finalDraggableOrder = [...orderedDraggable, ...unorderedDraggable]
-    } else {
-      console.log('useEffect: No custom order found, using natural draggable order.')
+      orderedDraggable = [...draggableInOrder, ...draggableNotInOrder]
     }
-
-    console.log(
-      'useEffect: Setting final draggable order:',
-      finalDraggableOrder.map((c) => c.id)
-    )
-    setDraggableColumns(finalDraggableOrder)
-    console.log('--- ColumnVisibility useEffect --- END ---')
-  }, [snap.table?.columns, columnOrder])
+    setDraggableColumns(orderedDraggable)
+  }, [snap.gridColumns, columnOrder])
 
   const handleSelect = (columnId: string) => {
     const isHidden = hiddenColumns.has(columnId)
-    if (isHidden) {
-      showColumn(columnId)
-    } else {
-      hideColumn(columnId)
-    }
+    if (isHidden) showColumn(columnId)
+    else hideColumn(columnId)
   }
 
-  const handleOrderChange = useCallback(
-    (orderedItems: { id: string }[]) => {
-      const newDraggableOrder = orderedItems
-        .map((item) => draggableColumns.find((col) => col.id === item.id)!)
-        .filter(Boolean)
-
-      setDraggableColumns(newDraggableOrder)
-
-      const fullNewOrder = [
-        ...frozenOrPkColumns.map((col) => col.id),
-        ...newDraggableOrder.map((col) => col.id),
-      ]
-      setColumnOrder(fullNewOrder)
-    },
-    [draggableColumns, frozenOrPkColumns, setColumnOrder]
-  )
-
-  const handleDragStart = useCallback((e: DragEvent<HTMLDivElement>, item: CommonColumnInfo) => {
-    if (item.isFrozenOrPk) {
-      e.preventDefault()
-      return
-    }
-    setDraggedItem(item)
-    e.dataTransfer.effectAllowed = 'move'
-    e.dataTransfer.setData('text/plain', item.id)
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    setActiveId(event.active.id as string)
+    setCurrentOverId(null)
   }, [])
 
-  const handleDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'move'
-  }, [])
+  const handleDragOver = useCallback(
+    (event: DragOverEvent) => {
+      const { active, over } = event
+      if (!over || !active.id) return
 
-  const handleDrop = useCallback(
-    (e: DragEvent<HTMLDivElement>, targetItem: CommonColumnInfo) => {
-      e.preventDefault()
-      if (!draggedItem || targetItem.isFrozenOrPk || draggedItem.isFrozenOrPk) {
-        setDraggedItem(null)
-        return
-      }
-      if (draggedItem.id === targetItem.id) {
-        setDraggedItem(null)
+      const sourceId = active.id as string
+      const targetId = over.id as string
+
+      if (sourceId === targetId || targetId === currentOverId) {
         return
       }
 
-      const currentIndex = draggableColumns.findIndex(
-        (item: CommonColumnInfo) => item.id === draggedItem.id
-      )
-      const targetIndex = draggableColumns.findIndex(
-        (item: CommonColumnInfo) => item.id === targetItem.id
-      )
+      setCurrentOverId(targetId)
 
-      if (currentIndex === -1 || targetIndex === -1) {
-        setDraggedItem(null)
-        return
+      const sourceItem = draggableColumns.find((c) => c.id === sourceId)
+      const targetItem = draggableColumns.find((c) => c.id === targetId)
+
+      if (sourceItem && targetItem && !sourceItem.isFrozenOrPk && !targetItem.isFrozenOrPk) {
+        const sourceIndex = draggableColumns.findIndex((col) => col.id === sourceId)
+        const targetIndex = draggableColumns.findIndex((col) => col.id === targetId)
+
+        if (sourceIndex !== -1 && targetIndex !== -1 && sourceIndex !== targetIndex) {
+          moveColumn(sourceId, targetId, sourceIndex, targetIndex)
+        }
       }
-
-      const newOrderedDraggable = [...draggableColumns]
-      newOrderedDraggable.splice(currentIndex, 1)
-      newOrderedDraggable.splice(targetIndex, 0, draggedItem)
-
-      handleOrderChange(newOrderedDraggable)
-
-      setDraggedItem(null)
     },
-    [draggableColumns, draggedItem, handleOrderChange]
+    [draggableColumns, moveColumn, currentOverId]
   )
 
-  const handleDragEnd = useCallback(() => {
-    setDraggedItem(null)
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    setActiveId(null)
+    setCurrentOverId(null)
   }, [])
 
   if (frozenOrPkColumns.length === 0 && draggableColumns.length === 0) {
@@ -219,7 +216,7 @@ export const ColumnVisibility = () => {
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen} modal={false}>
+    <Popover open={open} onOpenChange={setOpen}>
       <Tooltip>
         <TooltipTrigger asChild>
           <PopoverTrigger asChild>
@@ -232,111 +229,56 @@ export const ColumnVisibility = () => {
         </TooltipTrigger>
         <TooltipContent side="bottom">Show/hide columns</TooltipContent>
       </Tooltip>
-      <PopoverContent className="p-0 w-60" side="bottom" align="start">
+      <PopoverContent className="!p-0 w-60 relative" side="bottom" align="start" portal={true}>
         <Command>
           <CommandInput placeholder="Filter columns..." />
           <CommandList>
             <CommandEmpty>No columns found.</CommandEmpty>
-
             {frozenOrPkColumns.length > 0 && (
               <CommandGroup heading="Pinned Columns">
                 {frozenOrPkColumns.map((column) => {
                   const isVisible = !hiddenColumns.has(column.id)
                   return (
-                    <CommandItem
+                    <PinnedColumnItem
                       key={column.id}
-                      value={column.name}
-                      onSelect={() => handleSelect(column.id)}
-                      className="cursor-default opacity-75 p-0"
-                    >
-                      <div className="flex items-center justify-between w-full px-2 py-1.5">
-                        <div className="flex items-center">
-                          <div
-                            className={cn(
-                              'mr-2 flex h-4 w-4 items-center justify-center border-foreground-muted rounded border',
-                              isVisible
-                                ? 'bg-foreground text-background'
-                                : 'opacity-50 [&_svg]:invisible'
-                            )}
-                          >
-                            <Check className={cn('h-3 w-3')} strokeWidth={4} />
-                          </div>
-                          <span>{column.name}</span>
-                        </div>
-                        <Lock
-                          size={14}
-                          strokeWidth={1.5}
-                          className="text-foreground-lighter flex-shrink-0"
-                        />
-                      </div>
-                    </CommandItem>
+                      column={column}
+                      isVisible={isVisible}
+                      onSelect={handleSelect}
+                    />
                   )
                 })}
               </CommandGroup>
             )}
 
-            {frozenOrPkColumns.length > 0 && draggableColumns.length > 0 && <CommandSeparator />}
+            {frozenOrPkColumns.length > 0 && draggableColumns.length > 0 && (
+              <CommandSeparator className="!mx-0 w-full" />
+            )}
 
-            {draggableColumns.length > 0 && (
-              <CommandGroup heading="Columns">
-                <Sortable
-                  value={sortableItems}
-                  onValueChange={handleOrderChange}
-                  orientation="vertical"
-                >
-                  <SortableContext items={sortableItems} strategy={verticalListSortingStrategy}>
+            <Sortable
+              value={draggableColumns}
+              orientation="vertical"
+              onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
+              onDragEnd={handleDragEnd}
+            >
+              {draggableColumns.length > 0 && (
+                <CommandGroup heading="Columns">
+                  <SortableContext items={sortableItemsIds} strategy={verticalListSortingStrategy}>
                     {draggableColumns.map((column) => {
                       const isVisible = !hiddenColumns.has(column.id)
-                      const isDraggable = true
                       return (
-                        <SortableItem key={column.id} value={column.id} asChild>
-                          <div
-                            draggable={isDraggable}
-                            onDragStart={(e) => handleDragStart(e, column)}
-                            onDragOver={handleDragOver}
-                            onDrop={(e) => handleDrop(e, column)}
-                            onDragEnd={handleDragEnd}
-                            className={cn(
-                              'cursor-grab rounded-md',
-                              draggedItem?.id === column.id ? 'opacity-50' : ''
-                            )}
-                            style={{ touchAction: 'none' }}
-                          >
-                            <CommandItem
-                              value={column.name}
-                              onSelect={() => handleSelect(column.id)}
-                              className="data-[state=dragging]:bg-muted p-0"
-                            >
-                              <div className="flex justify-between items-center w-full px-2 py-1.5">
-                                <div className="flex items-center flex-grow min-w-0">
-                                  <div
-                                    className={cn(
-                                      'mr-2 flex h-4 w-4 items-center justify-center border-foreground-muted rounded border flex-shrink-0',
-                                      isVisible
-                                        ? 'bg-foreground text-background'
-                                        : 'opacity-50 [&_svg]:invisible'
-                                    )}
-                                  >
-                                    <Check className={cn('h-3 w-3')} strokeWidth={4} />
-                                  </div>
-                                  <span className="truncate">{column.name}</span>
-                                </div>
-                                <SortableDragHandle
-                                  size="tiny"
-                                  className="size-5 text-foreground-lighter opacity-50 hover:opacity-100 cursor-grab data-[state=dragging]:cursor-grabbing p-1 flex-shrink-0"
-                                >
-                                  <GripVertical size={14} strokeWidth={1.5} />
-                                </SortableDragHandle>
-                              </div>
-                            </CommandItem>
-                          </div>
-                        </SortableItem>
+                        <DraggableColumnItem
+                          key={column.id}
+                          column={column}
+                          isVisible={isVisible}
+                          onSelect={handleSelect}
+                        />
                       )
                     })}
                   </SortableContext>
-                </Sortable>
-              </CommandGroup>
-            )}
+                </CommandGroup>
+              )}
+            </Sortable>
           </CommandList>
         </Command>
       </PopoverContent>

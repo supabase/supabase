@@ -36,16 +36,16 @@ export function useTableColumnVisibility() {
         console.warn('[useTableColumnVisibility] Valtio action/state not available.')
         return
       }
-      // 1. Update Valtio State
-      snap.setColumnVisibility(columnName, false)
-
-      // 2. Update URL Parameter
-      // Construct the new list of hidden keys AFTER the state update
+      // 1. Update URL Parameter first
+      // Construct the new list of hidden keys based on the INTENDED state change
       const currentHidden = new Set(hiddenColumnsSet)
       currentHidden.add(columnName)
       const newHiddenArray = Array.from(currentHidden).sort()
       const newUrlString = newHiddenArray.join(',')
       setParams((prev) => ({ ...prev, hidden_cols: newUrlString || undefined }))
+
+      // 2. Update Valtio State (after URL)
+      snap.setColumnVisibility(columnName, false)
     },
     [snap, setParams, hiddenColumnsSet] // Depend on snap, setParams, and current hidden set
   )
@@ -60,16 +60,16 @@ export function useTableColumnVisibility() {
         console.warn('[useTableColumnVisibility] Valtio action/state not available.')
         return
       }
-      // 1. Update Valtio State
-      snap.setColumnVisibility(columnName, true)
-
-      // 2. Update URL Parameter
-      // Construct the new list of hidden keys AFTER the state update
+      // 1. Update URL Parameter first
+      // Construct the new list of hidden keys based on the INTENDED state change
       const currentHidden = new Set(hiddenColumnsSet)
       currentHidden.delete(columnName)
       const newHiddenArray = Array.from(currentHidden).sort()
       const newUrlString = newHiddenArray.join(',')
       setParams((prev) => ({ ...prev, hidden_cols: newUrlString || undefined }))
+
+      // 2. Update Valtio State (after URL)
+      snap.setColumnVisibility(columnName, true)
     },
     [snap, setParams, hiddenColumnsSet] // Depend on snap, setParams, and current hidden set
   )

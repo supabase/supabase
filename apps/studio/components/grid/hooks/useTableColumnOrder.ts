@@ -28,24 +28,24 @@ export function useTableColumnOrder() {
    */
   const setColumnOrder = useCallback(
     (newOrder: string[]) => {
+      // 1. Update URL Parameter first
+      const newUrlString = newOrder.join(',')
+      setParams((prevParams) => ({
+        ...prevParams,
+        col_order: newUrlString || undefined,
+      }))
+
       const updateIdxAction = snap.updateColumnIdx
       if (!updateIdxAction) {
         console.warn('[useTableColumnOrder] Valtio updateColumnIdx action not available on snap.')
         return
       }
 
-      // 1. Update Valtio State
+      // 2. Update Valtio State (after URL)
       newOrder.forEach((columnKey, index) => {
-        // Assuming 0-based index is handled correctly by updateColumnIdx or sorting logic
+        // Assuming 0-based index is handled correctly by updateIdxAction or sorting logic
         updateIdxAction(columnKey, index)
       })
-
-      // 2. Update URL Parameter
-      const newUrlString = newOrder.join(',')
-      setParams((prevParams) => ({
-        ...prevParams,
-        col_order: newUrlString || undefined,
-      }))
     },
     [snap, setParams] // Depends on Valtio snap and setParams from central hook
   )
@@ -81,19 +81,19 @@ export function useTableColumnOrder() {
       newOrder.splice(sourceIndex, 1) // Remove element from original position
       newOrder.splice(targetIndex, 0, element) // Insert element at target position
 
+      // 1. Update URL Parameter with the locally calculated order first
+      const newUrlString = newOrder.join(',')
+      setParams((prevParams) => ({
+        ...prevParams,
+        col_order: newUrlString || undefined,
+      }))
+
       // Update Valtio state (best effort for eventual consistency)
       if (snap.moveColumn) {
         snap.moveColumn(sourceKey, targetKey)
       } else {
         console.warn('[useTableColumnOrder] snap.moveColumn not available')
       }
-
-      // Update URL Parameter with the locally calculated order
-      const newUrlString = newOrder.join(',')
-      setParams((prevParams) => ({
-        ...prevParams,
-        col_order: newUrlString || undefined,
-      }))
     },
     // Depends on the order derived from URL, the Valtio snap, and setParams
     [columnOrder, snap, setParams]
