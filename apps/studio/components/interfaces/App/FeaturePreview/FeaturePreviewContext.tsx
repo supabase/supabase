@@ -1,5 +1,7 @@
 import { noop } from 'lodash'
 
+import { FeatureFlagContext } from 'common'
+import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { EMPTY_OBJ } from 'lib/void'
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
@@ -15,7 +17,7 @@ export const FEATURE_PREVIEWS = [
     key: LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW,
     name: 'Layout Update for Organizations',
     content: <LayoutUpdatePreview />,
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/33670',
     isNew: false,
     isPlatformOnly: true,
   },
@@ -72,6 +74,19 @@ const FeaturePreviewContext = createContext<FeaturePreviewContextType>({
 export const useFeaturePreviewContext = () => useContext(FeaturePreviewContext)
 
 export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}>) => {
+  const { hasLoaded } = useContext(FeatureFlagContext)
+  const enableNewLayoutPreview = useFlag('newLayoutPreview')
+
+  // [Joshen] Similar logic to feature flagging previews, we can use flags to default opt in previews
+  const isDefaultOptIn = (feature: (typeof FEATURE_PREVIEWS)[number]) => {
+    switch (feature.key) {
+      case LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW:
+        return enableNewLayoutPreview
+      default:
+        return false
+    }
+  }
+
   const [flags, setFlags] = useState(() =>
     FEATURE_PREVIEWS.reduce((a, b) => {
       return { ...a, [b.key]: false }
@@ -82,11 +97,16 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
     if (typeof window !== 'undefined') {
       setFlags(
         FEATURE_PREVIEWS.reduce((a, b) => {
-          return { ...a, [b.key]: localStorage.getItem(b.key) === 'true' }
+          const defaultOptIn = isDefaultOptIn(b)
+          const localStorageValue = localStorage.getItem(b.key)
+          return {
+            ...a,
+            [b.key]: !localStorageValue ? defaultOptIn : localStorageValue === 'true',
+          }
         }, {})
       )
     }
-  }, [])
+  }, [hasLoaded])
 
   const value = {
     flags,
