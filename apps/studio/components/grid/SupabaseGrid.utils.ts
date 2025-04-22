@@ -142,6 +142,8 @@ export function saveTableEditorStateToLocalStorage({
   gridColumns,
   sorts,
   filters,
+  colOrderString,
+  hiddenColsString,
 }: {
   projectRef: string
   tableName: string
@@ -149,6 +151,8 @@ export function saveTableEditorStateToLocalStorage({
   gridColumns?: CalculatedColumn<any, any>[]
   sorts?: string[]
   filters?: string[]
+  colOrderString: string
+  hiddenColsString: string
 }) {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
   const savedStr = localStorage.getItem(storageKey)
@@ -158,6 +162,8 @@ export function saveTableEditorStateToLocalStorage({
     ...(gridColumns !== undefined && { gridColumns }),
     ...(sorts !== undefined && { sorts }),
     ...(filters !== undefined && { filters }),
+    ...(colOrderString && { colOrderString }),
+    ...(hiddenColsString && { hiddenColsString }),
   }
 
   let savedJson
@@ -176,6 +182,13 @@ export const saveTableEditorStateToLocalStorageDebounced = AwesomeDebouncePromis
   500
 )
 
+/**
+ * Hook that runs on initial page load.
+ * Ensures URL parameters reflect the desired initial state for sorts, filters, column order, and visibility.
+ * Priority is given to parameters already present in the URL.
+ * If a parameter is missing in the URL, its value is loaded from local storage (if available).
+ * Finally, it updates local storage to match this determined initial state, ensuring consistency.
+ */
 export function useLoadTableEditorStateFromLocalStorageIntoUrl({
   projectRef,
   table,
@@ -186,58 +199,120 @@ export function useLoadTableEditorStateFromLocalStorageIntoUrl({
   const [_, setParams] = useUrlState({
     arrayKeys: ['sort', 'filter'],
   })
+
   useEffect(() => {
-    if (!projectRef || !table) {
+    if (!projectRef || !table || !table.columns) {
       return
     }
+
+    // Get the set of currently valid column keys from the table prop
+    const validColumnKeys = new Set(table.columns.map((c) => c.name))
 
     const searchParams = new URLSearchParams(window.location.search)
     const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.name, table.schema)
 
-    let paramsToSet: {
+    let needsUrlUpdate = false
+    const paramsForUrl: {
       sort?: string[]
       filter?: string[]
       col_order?: string
       hidden_cols?: string
     } = {}
-    let needsUpdate = false
 
-    if (searchParams.getAll('sort').length <= 0 && savedState?.sorts) {
-      paramsToSet.sort = savedState.sorts
-      needsUpdate = true
+    // --- Determine final state, prioritizing URL over Local Storage ---
+
+    // Sorts (Assuming validation isn't strictly needed here unless columns are removed)
+    const urlSorts = searchParams.getAll('sort')
+    let finalSorts = urlSorts.length > 0 ? urlSorts : savedState?.sorts ?? []
+    if (urlSorts.length === 0 && finalSorts.length > 0) {
+      paramsForUrl.sort = finalSorts
+      needsUrlUpdate = true
     }
 
-    if (searchParams.getAll('filter').length <= 0 && savedState?.filters) {
-      paramsToSet.filter = savedState.filters
-      needsUpdate = true
+    // Filters (Assuming validation isn't strictly needed here unless columns are removed)
+    const urlFilters = searchParams.getAll('filter')
+    let finalFilters = urlFilters.length > 0 ? urlFilters : savedState?.filters ?? []
+    if (urlFilters.length === 0 && finalFilters.length > 0) {
+      paramsForUrl.filter = finalFilters
+      needsUrlUpdate = true
     }
 
-    if (!searchParams.has('col_order') && savedState?.gridColumns) {
+    // Column Order - Determine initial value (URL > LS)
+    const urlColOrder = searchParams.get('col_order')
+    let initialColOrderString = urlColOrder // URL has priority
+    if (urlColOrder === null && savedState?.gridColumns) {
       const savedOrder = savedState.gridColumns
-        .map((col) => col.key)
-        .filter((key) => key !== SELECT_COLUMN_KEY)
+        .map((col: any) => col.key)
+        .filter((key: string) => key !== SELECT_COLUMN_KEY)
       if (savedOrder.length > 0) {
-        const colOrderString = savedOrder.join(',')
-        paramsToSet.col_order = colOrderString
-        needsUpdate = true
+        initialColOrderString = savedOrder.join(',')
       }
     }
+    // Validate initial string and encode commas
+    const finalColOrderString = (initialColOrderString ?? '')
+      .split(',')
+      .filter((key) => key && validColumnKeys.has(key))
+      .join('%2C') // Join with encoded comma
+    // Check if URL needs update
+    if (
+      (urlColOrder === null && finalColOrderString !== '') ||
+      (urlColOrder !== null && urlColOrder.replace(/,/g, '%2C') !== finalColOrderString)
+    ) {
+      // Compare encoded versions
+      paramsForUrl.col_order = finalColOrderString
+      needsUrlUpdate = true
+    }
 
-    if (!searchParams.has('hidden_cols') && savedState?.gridColumns) {
+    // Hidden Columns - Determine initial value (URL > LS)
+    const urlHiddenCols = searchParams.get('hidden_cols')
+    let initialHiddenColsString = urlHiddenCols // URL has priority
+    if (urlHiddenCols === null && savedState?.gridColumns) {
       const hiddenKeys = savedState.gridColumns
-        .filter((col) => (col as any).visible === false)
-        .map((col) => col.key)
-
+        .filter((col: any) => col.visible === false)
+        .map((col: any) => col.key)
       if (hiddenKeys.length > 0) {
-        const hiddenColsString = hiddenKeys.join(',')
-        paramsToSet.hidden_cols = hiddenColsString
-        needsUpdate = true
+        initialHiddenColsString = hiddenKeys.join(',')
       }
     }
-
-    if (needsUpdate) {
-      setParams((prevParams) => ({ ...prevParams, ...paramsToSet }))
+    // Validate initial string and encode commas
+    const finalHiddenColsString = (initialHiddenColsString ?? '')
+      .split(',')
+      .filter((key) => key && validColumnKeys.has(key))
+      .join('%2C') // Join with encoded comma
+    // Check if URL needs update
+    if (
+      (urlHiddenCols === null && finalHiddenColsString !== '') ||
+      (urlHiddenCols !== null && urlHiddenCols.replace(/,/g, '%2C') !== finalHiddenColsString)
+    ) {
+      // Compare encoded versions
+      paramsForUrl.hidden_cols = finalHiddenColsString
+      needsUrlUpdate = true
     }
+
+    // --- Update URL if necessary --- (Passes encoded strings if needed)
+    if (needsUrlUpdate) {
+      console.log(
+        '[useLoadTableEditorStateFromLocalStorageIntoUrl] Updating URL with validated/loaded params:',
+        paramsForUrl
+      )
+      setParams((prevParams) => ({ ...prevParams, ...paramsForUrl }))
+    }
+
+    // --- Sync Local Storage --- (Passes encoded strings)
+    console.log(
+      '[useLoadTableEditorStateFromLocalStorageIntoUrl] Syncing LocalStorage to match effective state'
+    )
+    saveTableEditorStateToLocalStorage({
+      projectRef,
+      tableName: table.name,
+      schema: table.schema,
+      sorts: finalSorts,
+      filters: finalFilters,
+      // TODO: Adapt save function for these strings
+      gridColumns: undefined,
+      colOrderString: finalColOrderString, // Pass encoded string
+      hiddenColsString: finalHiddenColsString, // Pass encoded string
+    })
   }, [projectRef, table, setParams])
 }
 
