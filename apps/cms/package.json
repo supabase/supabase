@@ -32,10 +32,6 @@
     "@types/react-dom": "^18",
     "typescript": "^5"
   },
-  "engines": {
-    "node": ">=18.0.0 <=22.x.x",
-    "npm": ">=6.0.0"
-  },
   "strapi": {
     "uuid": "b85c4d47-a812-4181-9373-f0524815c5f0"
   }
