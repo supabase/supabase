@@ -1,21 +1,12 @@
-import { useParams } from 'common/hooks'
+import { useMonaco } from '@monaco-editor/react'
+import { useLocalStorage } from '@uidotdev/usehooks'
 import dayjs from 'dayjs'
+import { editor } from 'monaco-editor'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { IS_PLATFORM } from 'common'
-import {
-  Button,
-  Form,
-  Input,
-  Modal,
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from 'ui'
-
-import { useLocalStorage } from '@uidotdev/usehooks'
+import { IS_PLATFORM, useParams } from 'common'
 import {
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
   LOGS_TABLES,
@@ -34,6 +25,7 @@ import LogsQueryPanel, { SourceType } from 'components/interfaces/Settings/Logs/
 import LogTable from 'components/interfaces/Settings/Logs/LogTable'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import { createWarehouseQueryTemplates } from 'components/interfaces/Settings/Logs/Warehouse.utils'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
@@ -46,14 +38,22 @@ import {
   useContentUpsertMutation,
 } from 'data/content/content-upsert-mutation'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
+import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
+import {
+  Button,
+  Form,
+  Input,
+  Modal,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from 'ui'
 
 const PLACEHOLDER_WAREHOUSE_QUERY =
   '-- Fetch the last 10 logs in the last 7 days \nselect id, timestamp, event_message from `COLLECTION_NAME` \nwhere timestamp > timestamp_sub(current_timestamp(), interval 7 day) \norder by timestamp desc limit 10'
@@ -67,17 +67,19 @@ const PLACEHOLDER_QUERY = IS_PLATFORM ? PLATFORM_PLACEHOLDER_QUERY : LOCAL_PLACE
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
+  const monaco = useMonaco()
   const router = useRouter()
   const { profile } = useProfile()
   const { ref, q, queryId, source: routerSource } = useParams()
   const projectRef = ref as string
   const organization = useSelectedOrganization()
 
+  const editorRef = useRef<editor.IStandaloneCodeEditor>()
+  const [editorId] = useState<string>(uuidv4())
   const { timestampStart, timestampEnd, setTimeRange } = useLogsUrlState()
 
-  const [editorId, setEditorId] = useState<string>(uuidv4())
-  const [warehouseEditorId, setWarehouseEditorId] = useState<string>(uuidv4())
   const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
+  const [warehouseEditorId, setWarehouseEditorId] = useState<string>(uuidv4())
   const [warehouseEditorValue, setWarehouseEditorValue] = useState<string>(
     PLACEHOLDER_WAREHOUSE_QUERY
   )
@@ -165,22 +167,25 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   )
 
   const onSelectTemplate = (template: LogTemplate) => {
-    setEditorValue(template.searchString)
-    changeQuery(template.searchString)
-    setEditorId(uuidv4())
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, q: template.searchString },
-    })
+    if (editorRef.current && monaco) {
+      const editorModel = editorRef.current?.getModel()
+
+      editorRef.current.pushUndoStop()
+      editorRef.current.executeEdits(`insert-identifier`, [
+        {
+          text: template.searchString,
+          range: editorModel?.getFullModelRange() ?? new monaco.Range(1, 1, 1, 1),
+        },
+      ])
+      editorRef.current.pushUndoStop()
+      editorRef.current.focus()
+    }
+
     addRecentLogSqlSnippet({ sql: template.searchString })
   }
 
   const handleRun = (value?: string | React.MouseEvent<HTMLButtonElement>) => {
     const query = typeof value === 'string' ? value || editorValue : editorValue
-
-    if (value && typeof value === 'string') {
-      setEditorValue(value)
-    }
 
     if (sourceType === 'warehouse') {
       const whQuery = warehouseEditorValue
@@ -229,14 +234,28 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     if (sourceType === 'warehouse') {
       //TODO: Only one collection can be queried at a time, we need to replace the current collection from the query for the new one
       return setWarehouseEditorId(uuidv4())
-    }
+    } else {
+      if (editorRef.current && monaco) {
+        const editorModel = editorRef.current?.getModel()
+        const currentValue = editorRef.current.getValue()
+        const index = currentValue.indexOf('from')
 
-    setEditorValue((prev) => {
-      const index = prev.indexOf('from')
-      if (index === -1) return `${prev}${source}`
-      return `${prev.substring(0, index + 4)} ${source} ${prev.substring(index + 5)}`
-    })
-    setEditorId(uuidv4())
+        const updatedValue =
+          index < 0
+            ? `${currentValue}${source}`
+            : `${currentValue.substring(0, index + 4)} ${source} ${currentValue.substring(index + 5)}`
+
+        editorRef.current.pushUndoStop()
+        editorRef.current.executeEdits(`insert-identifier`, [
+          {
+            text: updatedValue,
+            range: editorModel?.getFullModelRange() ?? new monaco.Range(1, 1, 1, 1),
+          },
+        ])
+        editorRef.current.pushUndoStop()
+        editorRef.current.focus()
+      }
+    }
   }
 
   const handleCreateQuery = async (values: any, { setSubmitting }: any) => {
@@ -303,10 +322,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   useEffect(() => {
     // on mount, set initial values
     if (q) {
-      onSelectTemplate({
-        mode: 'custom',
-        searchString: q,
-      })
+      setEditorValue(q)
       setWarehouseEditorValue(q)
     }
   }, [q])
@@ -382,6 +398,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
           ) : (
             <CodeEditor
               id={editorId}
+              editorRef={editorRef}
               language="pgsql"
               defaultValue={editorValue}
               onInputChange={(v) => setEditorValue(v || '')}

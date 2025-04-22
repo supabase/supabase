@@ -17,6 +17,10 @@ on:
   schedule:
     - cron: '0 0 * * *'
 
+concurrency:
+  group: ${{ github.workflow }}-prod
+  cancel-in-progress: false
+
 permissions:
   contents: read
 

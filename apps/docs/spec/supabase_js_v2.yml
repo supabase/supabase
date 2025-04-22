@@ -1387,7 +1387,8 @@ functions:
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
-        description: Sends a "Confirm Email Change" email to the new email address.
+        description: |
+          Sends a "Confirm Email Change" email to the new address. If **Secure Email Change** is enabled (default), confirmation is also required from the **old email** before the change is applied. To skip dual confirmation and apply the change after only the new email is verified, disable **Secure Email Change** in the [Email Auth Provider settings](/dashboard/project/_/auth/providers?provider=Email).
         isSpotlight: false
         code: |
           ```js
