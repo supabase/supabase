@@ -1,19 +1,19 @@
-import { useState } from 'react'
+import { Pencil } from 'lucide-react'
+import { useRef, useState } from 'react'
 
 import {
   Button,
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogSectionSeparator,
   DialogTitle,
-  DialogFooter,
+  DialogTrigger,
   Form_Shadcn_ as Form,
 } from 'ui'
-import { Pencil } from 'lucide-react'
-
-import { FormCustomerData, useBillingCustomerDataForm } from './useBillingCustomerDataForm'
 import { BillingCustomerDataForm } from './BillingCustomerDataForm'
+import { FormCustomerData, useBillingCustomerDataForm } from './useBillingCustomerDataForm'
 
 interface BillingCustomerDataNewOrgDialogProps {
   onCustomerDataChange: (data: FormCustomerData) => void
@@ -22,6 +22,7 @@ interface BillingCustomerDataNewOrgDialogProps {
 const BillingCustomerDataNewOrgDialog = ({
   onCustomerDataChange,
 }: BillingCustomerDataNewOrgDialogProps) => {
+  const focusInputRef = useRef<number>(0)
   const [open, setOpen] = useState(false)
 
   const handleDialogClose = () => {
@@ -50,12 +51,18 @@ const BillingCustomerDataNewOrgDialog = ({
   const isSubmitDisabled = !isDirty
 
   return (
-    <>
-      <div>
-        <div className="flex items-center justify-between">
-          <label className="text-sm text-foreground-light" htmlFor="billing-address-btn">
-            {getAddressSummary()}
-          </label>
+    <div className="flex items-center justify-between">
+      <label className="text-sm text-foreground-light" htmlFor="billing-address-btn">
+        {getAddressSummary()}
+      </label>
+      <Dialog
+        open={open}
+        onOpenChange={(value) => {
+          if (!value) handleDialogClose()
+          else setOpen(true)
+        }}
+      >
+        <DialogTrigger asChild>
           <Button
             id="billing-address-btn"
             onClick={() => setOpen(true)}
@@ -66,17 +73,28 @@ const BillingCustomerDataNewOrgDialog = ({
           >
             <Pencil size={14} strokeWidth={1.5} />
           </Button>
-        </div>
-      </div>
-
-      <Dialog
-        open={open}
-        onOpenChange={(value) => {
-          if (!value) handleDialogClose()
-          else setOpen(true)
-        }}
-      >
-        <DialogContent size={'large'}>
+        </DialogTrigger>
+        <DialogContent
+          size="large"
+          onFocus={(e) => {
+            // [Joshen] There's something odd going on with using Dialog and RHF FormField here
+            // where the focus keeps going to the Dialog when tabbing across the input fields
+            // This is just an attempt to manually refocus amongst the input and is imperfect so
+            // feel free to remove if we feel like this is making it worse
+            const formInputs = e.target.querySelector('form')?.querySelectorAll('input')
+            if (e.target.role === 'dialog') {
+              const formatted = Array.from(formInputs as any).map((x: any) => x.name)
+              const currentFocus = formatted.findIndex((x) => x === focusInputRef.current)
+              if (currentFocus >= 0) {
+                const nextFocus = currentFocus + 1
+                if (nextFocus >= formatted.length) formInputs?.[0].focus()
+                else formInputs?.[nextFocus].focus()
+              }
+            } else {
+              focusInputRef.current = (e.target as any).name
+            }
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Billing Address &amp; Tax Id</DialogTitle>
           </DialogHeader>
@@ -108,7 +126,7 @@ const BillingCustomerDataNewOrgDialog = ({
           </Form>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   )
 }
 
