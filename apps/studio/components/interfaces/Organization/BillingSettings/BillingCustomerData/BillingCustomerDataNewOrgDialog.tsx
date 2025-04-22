@@ -1,6 +1,7 @@
 import { Pencil } from 'lucide-react'
 import { useRef, useState } from 'react'
 
+import { FocusTrap } from '@headlessui/react'
 import {
   Button,
   Dialog,
@@ -74,59 +75,47 @@ const BillingCustomerDataNewOrgDialog = ({
             <Pencil size={14} strokeWidth={1.5} />
           </Button>
         </DialogTrigger>
-        <DialogContent
-          size="large"
-          onFocus={(e) => {
-            // [Joshen] There's something odd going on with using Dialog and RHF FormField here
-            // where the focus keeps going to the Dialog when tabbing across the input fields
-            // This is just an attempt to manually refocus amongst the input and is imperfect so
-            // feel free to remove if we feel like this is making it worse
-            // FWIW it's likely happening across the dashboard whereever we're using Dialog and FormField
-            const formInputs = e.target.querySelector('form')?.querySelectorAll('input')
-            if (e.target.role === 'dialog') {
-              const formatted = Array.from(formInputs as any).map((x: any) => x.name)
-              const currentFocus = formatted.findIndex((x) => x === focusInputRef.current)
-              if (currentFocus >= 0) {
-                const nextFocus = currentFocus + 1
-                if (nextFocus >= formatted.length) formInputs?.[0].focus()
-                else formInputs?.[nextFocus].focus()
-              }
-            } else {
-              focusInputRef.current = (e.target as any).name
-            }
-          }}
-        >
+        <DialogContent size="large">
           <DialogHeader>
             <DialogTitle>Billing Address &amp; Tax Id</DialogTitle>
           </DialogHeader>
           <DialogSectionSeparator />
-          <Form {...form}>
-            <form
-              id="new-org-billing-data-form"
-              onSubmit={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                form.handleSubmit(handleSubmit)(e)
+          {/* 
+            [Joshen] There's something odd going on with using Dialog and RHF FormField here
+            where the focus keeps going to the Dialog when tabbing across the input fields, hence the FocusTrap
+            What's weirder is that once you've cycled the focus through all the inputs at least once, the focus
+            then no longer goes to the Dialog thereafter
+            FWIW it's likely happening across the dashboard whereever we're using Dialog and FormField
+          */}
+          <FocusTrap>
+            <Form {...form}>
+              <form
+                id="new-org-billing-data-form"
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  form.handleSubmit(handleSubmit)(e)
 
-                // Only close the dialog if the form is valid
-                if (!Object.keys(form.formState.errors).length) {
-                  handleDialogClose()
-                }
-              }}
-            >
-              <BillingCustomerDataForm className="p-5" form={form} />
-              <DialogFooter className="justify-end">
-                <div className="flex items-center gap-2">
-                  <Button type="default" onClick={handleClose}>
-                    Cancel
-                  </Button>
-                  <Button type="primary" htmlType="submit" disabled={isSubmitDisabled}>
-                    Continue
-                  </Button>
-                </div>
-              </DialogFooter>
-            </form>
-          </Form>
+                  // Only close the dialog if the form is valid
+                  if (!Object.keys(form.formState.errors).length) {
+                    handleDialogClose()
+                  }
+                }}
+              >
+                <BillingCustomerDataForm className="p-5" form={form} />
+                <DialogFooter className="justify-end">
+                  <div className="flex items-center gap-2">
+                    <Button type="default" onClick={handleClose}>
+                      Cancel
+                    </Button>
+                    <Button type="primary" htmlType="submit" disabled={isSubmitDisabled}>
+                      Continue
+                    </Button>
+                  </div>
+                </DialogFooter>
+              </form>
+            </Form>
+          </FocusTrap>
         </DialogContent>
       </Dialog>
     </div>
