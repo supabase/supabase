@@ -27,7 +27,6 @@ import {
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
-  Separator,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -39,8 +38,6 @@ import {
   TextArea_Shadcn_,
   WarningIcon,
   Label_Shadcn_ as Label,
-  Card,
-  CardContent,
 } from 'ui'
 import * as z from 'zod'
 import PublicationsComboBox from './PublicationsComboBox'
@@ -449,11 +446,7 @@ const DestinationPanel = ({
                           render={({ field }) => (
                             <FormItemLayout className="mb-4" layout="vertical" label="Enabled">
                               <FormControl_Shadcn_>
-                                <Switch
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                  disabled={field.disabled}
-                                />
+                                <Switch checked={field.value} onCheckedChange={field.onChange} />
                               </FormControl_Shadcn_>
                             </FormItemLayout>
                           )}
