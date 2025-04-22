@@ -6,6 +6,7 @@ import type {
   DraggableSyntheticListeners,
   DropAnimation,
   UniqueIdentifier,
+  DragOverEvent,
 } from '@dnd-kit/core'
 import {
   closestCenter,
@@ -82,6 +83,15 @@ interface SortableProps<TData extends { id: UniqueIdentifier }> extends DndConte
   onMove?: (event: { activeIndex: number; overIndex: number }) => void
 
   /**
+   * An optional callback function that is called when an item is dragged over another item.
+   * It receives an event object with `activeIndex` and `overIndex` properties, representing the original and new positions of the dragged item.
+   * @type (event: DragOverEvent) => void
+   * @example
+   * onDragOver={(event) => console.log(`Item dragged from index ${event.activeIndex} to index ${event.overIndex}`)}
+   */
+  onDragOver?: (event: DragOverEvent) => void
+
+  /**
    * A collision detection strategy that will be used to determine the closest sortable item.
    * @default closestCenter
    * @type DndContextProps["collisionDetection"]
@@ -127,6 +137,7 @@ function Sortable<TData extends { id: UniqueIdentifier }>({
   onDragStart,
   onDragEnd,
   onDragCancel,
+  onDragOver,
   collisionDetection = closestCenter,
   modifiers,
   strategy,
@@ -173,6 +184,7 @@ function Sortable<TData extends { id: UniqueIdentifier }>({
         setActiveId?.(null)
         onDragCancel?.(event)
       }}
+      onDragOver={onDragOver}
       collisionDetection={collisionDetection}
       {...props}
     >
