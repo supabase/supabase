@@ -1,7 +1,15 @@
-import { useParams } from 'common'
-import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import {
+  ScaffoldContainer,
+  ScaffoldContainerLegacy,
+  ScaffoldDivider,
+  ScaffoldTitle,
+} from 'components/layouts/Scaffold'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { cn } from 'ui'
 import { useOrgSubscriptionQuery } from '../../../../data/subscriptions/org-subscription-query'
+import InvoicesSection from '../InvoicesSettings/InvoicesSection'
 import BillingAddress from './BillingAddress/BillingAddress'
 import BillingBreakdown from './BillingBreakdown/BillingBreakdown'
 import BillingEmail from './BillingEmail'
@@ -16,11 +24,19 @@ const BillingSettings = () => {
     billingAccountData: isBillingAccountDataEnabledOnProfileLevel,
     billingPaymentMethods: isBillingPaymentMethodsEnabledOnProfileLevel,
     billingCredits: isBillingCreditsEnabledOnProfileLevel,
-  } = useIsFeatureEnabled(['billing:account_data', 'billing:payment_methods', 'billing:credits'])
+    billingInvoices: isBillingInvoicesEnabledOnProfileLevel,
+  } = useIsFeatureEnabled([
+    'billing:account_data',
+    'billing:payment_methods',
+    'billing:credits',
+    'billing:invoices',
+  ])
 
-  const { slug: orgSlug } = useParams()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
-  const isNotOrgWithPartnerBilling = !subscription?.billing_via_partner ?? true
+  const newLayoutPreview = useIsNewLayoutEnabled()
+
+  const org = useSelectedOrganization()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+  const isNotOrgWithPartnerBilling = !subscription?.billing_via_partner
 
   const billingAccountDataEnabled =
     isBillingAccountDataEnabledOnProfileLevel && isNotOrgWithPartnerBilling
@@ -29,7 +45,13 @@ const BillingSettings = () => {
 
   return (
     <>
-      <ScaffoldContainer id="subscription">
+      {newLayoutPreview && (
+        <ScaffoldContainerLegacy>
+          <ScaffoldTitle>Billing</ScaffoldTitle>
+        </ScaffoldContainerLegacy>
+      )}
+
+      <ScaffoldContainer id="subscription" className={cn(newLayoutPreview && '[&>div]:!pt-0')}>
         <Subscription />
       </ScaffoldContainer>
 
@@ -41,16 +63,17 @@ const BillingSettings = () => {
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id="breakdown">
-        <BillingBreakdown />
-      </ScaffoldContainer>
+      {org?.plan.id !== 'free' && (
+        <ScaffoldContainer id="breakdown">
+          <BillingBreakdown />
+        </ScaffoldContainer>
+      )}
 
-      {isBillingCreditsEnabledOnProfileLevel && (
+      {isBillingInvoicesEnabledOnProfileLevel && (
         <>
           <ScaffoldDivider />
-
-          <ScaffoldContainer id="credits-balance">
-            <CreditBalance />
+          <ScaffoldContainer id="invoices">
+            <InvoicesSection />
           </ScaffoldContainer>
         </>
       )}
@@ -61,6 +84,16 @@ const BillingSettings = () => {
 
           <ScaffoldContainer id="payment-methods">
             <PaymentMethods />
+          </ScaffoldContainer>
+        </>
+      )}
+
+      {isBillingCreditsEnabledOnProfileLevel && (
+        <>
+          <ScaffoldDivider />
+
+          <ScaffoldContainer id="credits-balance">
+            <CreditBalance />
           </ScaffoldContainer>
         </>
       )}

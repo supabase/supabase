@@ -408,7 +408,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
               strokeWidth={2}
             />
           ) : (
-            <DropdownMenu modal={false}>
+            <DropdownMenu>
               <DropdownMenuTrigger>
                 <div className="storage-row-menu opacity-0">
                   <MoreVertical size={16} strokeWidth={2} />

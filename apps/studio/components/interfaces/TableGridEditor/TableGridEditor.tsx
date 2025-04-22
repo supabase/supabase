@@ -18,7 +18,7 @@ import { useUrlState } from 'hooks/ui/useUrlState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import { makeActiveTabPermanent } from 'state/tabs'
-import { TableGridSkeletonLoader } from './LoadingState'
+import { GenericSkeletonLoader } from 'ui-patterns'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
 import TableDefinition from './TableDefinition'
@@ -56,7 +56,15 @@ const TableGridEditor = ({
 
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isLoadingSelectedTable || !projectRef) {
-    return <TableGridSkeletonLoader />
+    return (
+      <div className="flex flex-col">
+        <div className="h-10 bg-dash-sidebar dark:bg-surface-100" />
+        <div className="h-9 border-y" />
+        <div className="p-2 col-span-full">
+          <GenericSkeletonLoader />
+        </div>
+      </div>
+    )
   }
 
   if (isUndefined(selectedTable)) {

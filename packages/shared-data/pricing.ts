@@ -477,17 +477,6 @@ export const pricing: Pricing = {
         },
         usage_based: true,
       },
-      {
-        key: 'functions.scriptSize',
-        title: 'Script size',
-        plans: {
-          free: '20 MB',
-          pro: '20 MB',
-          team: '20 MB',
-          enterprise: 'Custom',
-        },
-        usage_based: false,
-      },
     ],
   },
   realtime: {
@@ -670,7 +659,7 @@ export const pricing: Pricing = {
         plans: {
           free: 'Owner, Admin, Developer',
           pro: 'Owner, Admin, Developer',
-          team: 'Owner, Admin, Developer, Read-only',
+          team: 'Owner, Admin, Developer, Read-only, Predefined project scoped roles',
           enterprise: 'Custom project scoped roles',
         },
         usage_based: false,

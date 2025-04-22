@@ -31,7 +31,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
+import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS, InstanceSpecs } from 'lib/constants'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Admonition } from 'ui-patterns/admonition'
@@ -56,7 +56,7 @@ const InfrastructureActivity = () => {
   const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: organization?.slug,
   })
-  const isFreePlan = subscription?.plan?.id === 'free'
+  const isFreePlan = organization?.plan?.id === 'free'
 
   const { data: resourceWarnings } = useResourceWarningsQuery()
   const projectResourceWarnings = resourceWarnings?.find((x) => x.project === projectRef)
@@ -72,7 +72,7 @@ const InfrastructureActivity = () => {
   function getCurrentComputeInstanceSpecs() {
     if (computeInstance?.variant.meta) {
       // If user has a compute instance (called addons) return that
-      return computeInstance?.variant.meta
+      return computeInstance?.variant.meta as InstanceSpecs
     } else {
       // Otherwise, return the default specs
       return project?.infra_compute_size === 'nano' ? INSTANCE_NANO_SPECS : INSTANCE_MICRO_SPECS
@@ -94,9 +94,9 @@ const InfrastructureActivity = () => {
   }, [dateRange, subscription])
 
   const upgradeUrl =
-    subscription === undefined
+    organization === undefined
       ? `/`
-      : subscription.plan.id === 'free'
+      : organization.plan.id === 'free'
         ? `/org/${organization?.slug ?? '[slug]'}/billing#subscription`
         : `/project/${projectRef}/settings/addons`
 
@@ -112,7 +112,7 @@ const InfrastructureActivity = () => {
       // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
       return new Date(dateRange?.period_start?.date ?? 0).toISOString().slice(0, -5) + 'Z'
     }
-  }, [dateRange, subscription])
+  }, [dateRange])
 
   const endDate = useMemo(() => {
     if (dateRange?.period_end?.date === 'Invalid Date') return undefined
@@ -127,7 +127,7 @@ const InfrastructureActivity = () => {
       // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
       return new Date(dateRange.period_end.date ?? 0).toISOString().slice(0, -5) + 'Z'
     }
-  }, [dateRange, subscription])
+  }, [dateRange])
 
   // Switch to hourly interval, if the timeframe is <48 hours
   let interval: '1d' | '1h' = '1d'

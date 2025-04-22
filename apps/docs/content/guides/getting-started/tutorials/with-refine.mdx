@@ -160,7 +160,7 @@ If you examine the `authProvider` object you can notice that it has a `login` me
 
 We want to use `supabaseClient` auth's `signInWithOtp` method inside `authProvider.login` method:
 
-```ts
+```ts name=src/authProvider.ts
 login: async ({ email }) => {
   try {
     const { error } = await supabaseClient.auth.signInWithOtp({ email });

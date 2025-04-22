@@ -58,7 +58,6 @@ const Addons = () => {
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
 
-  const computeSizeChangesDisabled = useFlag('disableComputeSizeChanges')
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
@@ -466,7 +465,7 @@ const Addons = () => {
                     <p className="text-sm text-foreground-light">Current option:</p>
                     <p>
                       {pitr !== undefined
-                        ? `Point in time recovery of ${pitr.variant.meta?.backup_duration_days} days is enabled`
+                        ? `Point in time recovery of ${(pitr.variant.meta as any)?.backup_duration_days} days is enabled`
                         : 'Point in time recovery is not enabled'}
                     </p>
                     {!sufficientPgVersion ? (
@@ -480,7 +479,7 @@ const Addons = () => {
                           </p>
                           <Button asChild type="default">
                             <Link
-                              href={`/support/new?ref=${projectRef}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
+                              href={`/support/new?projectRef=${projectRef}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
                             >
                               <a>Contact support</a>
                             </Link>

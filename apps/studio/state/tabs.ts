@@ -27,6 +27,7 @@ export interface Tab {
     name?: string // Optional name of the entity represented by the tab
     tableId?: number // Optional ID of the table associated with the tab
     sqlId?: string // Optional ID of the SQL query associated with the tab
+    scrollTop?: number // Optional scroll top of the tab (Currently just for SQL query)
   }
   isPreview?: boolean // Optional flag indicating if the tab is in preview mode
   createdAt?: Date // Optional timestamp for when the tab was created
@@ -143,7 +144,6 @@ export const addTab = (ref: string | undefined, tab: Tab) => {
 // this is used for removing tabs from the localstorage state
 // for handling a manual tab removal with a close action, use handleTabClose()
 export const removeTab = (ref: string | undefined, id: string) => {
-  console.log('removeTab')
   const store = getTabsStore(ref)
   const idx = store.openTabs.indexOf(id)
   store.openTabs = store.openTabs.filter((tabId) => tabId !== id)
@@ -165,10 +165,20 @@ export const removeTabs = (ref: string | undefined, ids: string[]) => {
   ids.forEach((id) => removeTab(ref, id))
 }
 
-export const renameTab = (ref: string, id: string, name: string) => {
+export const updateTab = (
+  ref: string,
+  id: string,
+  updates: { label?: string; scrollTop?: number }
+) => {
   const store = getTabsStore(ref)
+
   if (!!store.tabsMap[id]) {
-    store.tabsMap[id].label = name
+    if ('label' in updates) {
+      store.tabsMap[id].label = updates.label
+    }
+    if ('scrollTop' in updates && store.tabsMap[id].metadata) {
+      store.tabsMap[id].metadata.scrollTop = updates.scrollTop
+    }
   }
 }
 

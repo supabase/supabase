@@ -20,6 +20,17 @@ export type CustomerStoryType = {
 export const data: CustomerStoryType[] = [
   {
     type: 'Customer Story',
+    title: "Bree's Migration to Supabase from Fauna",
+    description:
+      'Discover how Bree found 10X performance gains, greater developer velocity, and a better foundation for AI when switching to Supabase.',
+    organization: 'Bree',
+    imgUrl: 'images/customers/logos/bree.png',
+    logo: '/images/customers/logos/bree.png',
+    logo_inverse: '/images/customers/logos/light/bree.png',
+    url: '/customers/bree',
+  },
+  {
+    type: 'Customer Story',
     title: 'Deriv: Accelerating Online Trading with a Scalable Postgres Backend',
     description: 'Accelerating Online Trading with a Scalable Postgres Backend',
     organization: 'Deriv',

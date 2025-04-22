@@ -8,21 +8,26 @@ import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilte
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
+import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
+import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
+import useSingleLog from 'hooks/analytics/useSingleLog'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Button } from 'ui'
+import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 import LogTable from './LogTable'
-import { LOGS_TABLES, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
+import { DatePickerValue } from './Logs.DatePickers'
+import {
+  LOGS_TABLES,
+  LOG_ROUTES_WITH_REPLICA_SUPPORT,
+  LogsTableName,
+  PREVIEWER_DATEPICKER_HELPERS,
+} from './Logs.constants'
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
 import { maybeShowUpgradePrompt } from './Logs.utils'
 import UpgradePrompt from './UpgradePrompt'
-import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
-import useSingleLog from 'hooks/analytics/useSingleLog'
-import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
-import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 /**
  * Acts as a container component for the entire log display
@@ -55,17 +60,41 @@ export const LogsPreviewer = ({
 }: PropsWithChildren<LogsPreviewerProps>) => {
   const router = useRouter()
   const { db } = useParams()
-  const [showChart, setShowChart] = useState(true)
-
   const organization = useSelectedOrganization()
   const state = useDatabaseSelectorStateSnapshot()
+
+  const [showChart, setShowChart] = useState(true)
+  const [selectedDatePickerValue, setSelectedDatePickerValue] = useState<DatePickerValue>(
+    getDefaultDatePickerValue()
+  )
+
   const { search, setSearch, timestampStart, timestampEnd, setTimeRange, filters, setFilters } =
     useLogsUrlState()
-
   const [selectedLogId, setSelectedLogId] = useSelectedLog()
-
   const { data: databases, isSuccess } = useReadReplicasQuery({ projectRef })
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+
+  // TODO: Move this to useLogsUrlState to simplify LogsPreviewer. - Jordi
+  function getDefaultDatePickerValue() {
+    const iso_timestamp_start = router.query.iso_timestamp_start as string
+    const iso_timestamp_end = router.query.iso_timestamp_end as string
+
+    if (iso_timestamp_start && iso_timestamp_end) {
+      return {
+        to: iso_timestamp_end,
+        from: iso_timestamp_start,
+        text: `${dayjs(iso_timestamp_start).format('DD MMM, HH:mm')} - ${dayjs(iso_timestamp_end).format('DD MMM, HH:mm')}`,
+        isHelper: false,
+      }
+    }
+
+    const defaultDatePickerValue = PREVIEWER_DATEPICKER_HELPERS.find((x) => x.default)
+    return {
+      to: defaultDatePickerValue!.calcTo(),
+      from: defaultDatePickerValue!.calcFrom(),
+      text: defaultDatePickerValue!.text,
+      isHelper: true,
+    }
+  }
 
   const table = !tableName ? LOGS_TABLES[queryType] : tableName
 
@@ -94,15 +123,52 @@ export const LogsPreviewer = ({
 
   const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(timestampStart)
 
+  const onSelectTemplate = (template: LogTemplate) => {
+    setFilters({ ...filters, search_query: template.searchString })
+  }
+
+  // [Joshen] For helper date picker values, reset the timestamp start to prevent data caching
+  // Since the helpers are "Last n minutes" -> hitting refresh, you'd expect to see the latest result
+  // Whereas if a specific range is selected, you'd not expect new data to show up
+  const handleRefresh = () => {
+    if (selectedDatePickerValue.isHelper) {
+      const helper = PREVIEWER_DATEPICKER_HELPERS.find(
+        (x) => x.text === selectedDatePickerValue.text
+      )
+      if (helper) {
+        const newTimestampStart = helper.calcFrom()
+        setTimeRange(newTimestampStart, timestampEnd)
+      }
+    }
+    refresh()
+  }
+
+  const handleSearch: LogSearchCallback = async (event, { query, to, from }) => {
+    if (event === 'search-input-change') {
+      setSearch(query || '')
+      setSelectedLogId(null)
+    } else if (event === 'event-chart-bar-click') {
+      setTimeRange(from || '', to || '')
+    } else if (event === 'datepicker-change') {
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from || '', organization?.plan?.id)
+
+      if (shouldShowUpgradePrompt) {
+        setShowUpgradePrompt(!showUpgradePrompt)
+      } else {
+        setTimeRange(from || '', to || '')
+      }
+    }
+  }
+
   // Show the prompt on page load based on query params
   useEffect(() => {
     if (timestampStart) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(timestampStart, subscription?.plan?.id)
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(timestampStart, organization?.plan?.id)
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       }
     }
-  }, [timestampStart, subscription])
+  }, [timestampStart, organization])
 
   useEffect(() => {
     if (db !== undefined) {
@@ -119,33 +185,6 @@ export const LogsPreviewer = ({
       }
     }
   }, [db, isSuccess])
-
-  const onSelectTemplate = (template: LogTemplate) => {
-    setFilters({ ...filters, search_query: template.searchString })
-  }
-
-  const handleRefresh = () => {
-    // Call refresh first to ensure we get the count with current timestamps
-    setTimeRange('', '')
-    refresh()
-  }
-
-  const handleSearch: LogSearchCallback = async (event, { query, to, from }) => {
-    if (event === 'search-input-change') {
-      setSearch(query || '')
-      setSelectedLogId(null)
-    } else if (event === 'event-chart-bar-click') {
-      setTimeRange(from || '', to || '')
-    } else if (event === 'datepicker-change') {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from || '', subscription?.plan?.id)
-
-      if (shouldShowUpgradePrompt) {
-        setShowUpgradePrompt(!showUpgradePrompt)
-      } else {
-        setTimeRange(from || '', to || '')
-      }
-    }
-  }
 
   return (
     <div className="flex-1 flex flex-col h-full">
@@ -177,6 +216,8 @@ export const LogsPreviewer = ({
             query: id !== projectRef ? { ...router.query, db: id } : params,
           })
         }}
+        selectedDatePickerValue={selectedDatePickerValue}
+        setSelectedDatePickerValue={setSelectedDatePickerValue}
       />
       {children}
       <div

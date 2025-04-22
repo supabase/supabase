@@ -23,9 +23,9 @@ import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-muta
 import { tableKeys } from 'data/tables/keys'
 import { getTables } from 'data/tables/tables-query'
 import { useUrlState } from 'hooks/ui/useUrlState'
-import { useGetImpersonatedRole } from 'state/role-impersonation-state'
+import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { createTabId, renameTab } from 'state/tabs'
+import { createTabId, updateTab } from 'state/tabs'
 import type { Dictionary } from 'types'
 import { SonnerProgress } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -103,7 +103,7 @@ const SidePanelEditor = ({
     onError: () => {},
   })
 
-  const getImpersonatedRole = useGetImpersonatedRole()
+  const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
   const saveRow = async (
     payload: any,
@@ -124,7 +124,7 @@ const SidePanelEditor = ({
           table: selectedTable,
           payload,
           enumArrayColumns,
-          impersonatedRole: getImpersonatedRole(),
+          roleImpersonationState: getImpersonatedRoleState(),
         })
       } catch (error: any) {
         saveRowError = error
@@ -141,7 +141,7 @@ const SidePanelEditor = ({
               configuration,
               payload,
               enumArrayColumns,
-              impersonatedRole: getImpersonatedRole(),
+              roleImpersonationState: getImpersonatedRoleState(),
             })
           } catch (error: any) {
             saveRowError = error
@@ -489,7 +489,7 @@ const SidePanelEditor = ({
           if (isTableEditorTabsEnabled && ref && payload.name) {
             // [Joshen] Only table entities can be updated via the dashboard
             const tabId = createTabId(ENTITY_TYPE.TABLE, { id: selectedTable.id })
-            renameTab(ref, tabId, payload.name)
+            updateTab(ref, tabId, { label: payload.name })
           }
           toast.success(`Successfully updated ${table.name}!`, { id: toastId })
         }

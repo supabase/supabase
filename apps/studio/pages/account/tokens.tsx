@@ -7,7 +7,7 @@ import {
   NewAccessTokenButton,
   NewTokenBanner,
 } from 'components/interfaces/Account'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AccountSettingsLayout from 'components/layouts/AccountLayout/AccountSettingsLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
@@ -25,7 +25,7 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 const UserAccessTokens: NextPageWithLayout = () => {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
   const [newToken, setNewToken] = useState<NewAccessToken | undefined>()
 
   const PageContent = () => (
