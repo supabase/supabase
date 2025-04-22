@@ -1,7 +1,7 @@
-import { Pencil } from 'lucide-react'
-import { useRef, useState } from 'react'
-
 import { FocusTrap } from '@headlessui/react'
+import { Pencil } from 'lucide-react'
+import { useState } from 'react'
+
 import {
   Button,
   Dialog,
@@ -20,10 +20,9 @@ interface BillingCustomerDataNewOrgDialogProps {
   onCustomerDataChange: (data: FormCustomerData) => void
 }
 
-const BillingCustomerDataNewOrgDialog = ({
+export const BillingCustomerDataNewOrgDialog = ({
   onCustomerDataChange,
 }: BillingCustomerDataNewOrgDialogProps) => {
-  const focusInputRef = useRef<number>(0)
   const [open, setOpen] = useState(false)
 
   const handleDialogClose = () => {
@@ -121,5 +120,3 @@ const BillingCustomerDataNewOrgDialog = ({
     </div>
   )
 }
-
-export default BillingCustomerDataNewOrgDialog

@@ -1,41 +1,38 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Pencil } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
+import AlertError from 'components/ui/AlertError'
+import NoPermission from 'components/ui/NoPermission'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
+import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
+import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
+import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogSectionSeparator,
   DialogTitle,
-  DialogFooter,
   Form_Shadcn_ as Form,
+  Label_Shadcn_ as Label,
 } from 'ui'
-import { Label_Shadcn_ as Label } from 'ui'
-import { Pencil } from 'lucide-react'
-
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import NoPermission from 'components/ui/NoPermission'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import AlertError from 'components/ui/AlertError'
-import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
-import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
-import { TAX_IDS } from './TaxID.constants'
-import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
-import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
 import { BillingCustomerDataForm } from './BillingCustomerDataForm'
-import { toast } from 'sonner'
+import { TAX_IDS } from './TaxID.constants'
+import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
 
-interface BillingCustomerDataExistingOrgDialogProps {
-  slug: string | undefined
-}
-
-const BillingCustomerDataExistingOrgDialog = ({
-  slug,
-}: BillingCustomerDataExistingOrgDialogProps) => {
+export const BillingCustomerDataExistingOrgDialog = () => {
   const [open, setOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const { slug } = useSelectedOrganization() ?? {}
 
   const canReadBillingCustomerData = useCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -61,10 +58,6 @@ const BillingCustomerDataExistingOrgDialog = ({
     isSuccess: isSuccessTaxId,
   } = useOrganizationTaxIdQuery({ slug })
 
-  const handleDialogClose = () => {
-    setOpen(false)
-  }
-
   const initialCustomerData = useMemo(
     () => ({
       ...customerProfile?.address,
@@ -80,10 +73,8 @@ const BillingCustomerDataExistingOrgDialog = ({
     [customerProfile, taxId]
   )
 
-  const { mutate: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation()
-  const { mutate: updateTaxId } = useOrganizationTaxIdUpdateMutation()
-
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation()
+  const { mutateAsync: updateTaxId } = useOrganizationTaxIdUpdateMutation()
 
   const { form, handleSubmit, handleReset, isDirty } = useBillingCustomerDataForm({
     initialCustomerData,
@@ -101,7 +92,7 @@ const BillingCustomerDataExistingOrgDialog = ({
 
         toast.success('Successfully updated billing data')
 
-        handleDialogClose()
+        setOpen(false)
 
         setIsSubmitting(false)
       } catch (error: any) {
@@ -113,7 +104,7 @@ const BillingCustomerDataExistingOrgDialog = ({
 
   const handleClose = () => {
     handleReset()
-    handleDialogClose()
+    setOpen(false)
   }
 
   const getAddressSummary = () => {
@@ -177,7 +168,7 @@ const BillingCustomerDataExistingOrgDialog = ({
       <Dialog
         open={open}
         onOpenChange={(value) => {
-          if (!value) handleDialogClose()
+          if (!value) setOpen(false)
           else setOpen(true)
         }}
       >
@@ -223,5 +214,3 @@ const BillingCustomerDataExistingOrgDialog = ({
     </>
   )
 }
-
-export default BillingCustomerDataExistingOrgDialog

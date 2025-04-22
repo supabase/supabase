@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import {
@@ -20,13 +21,12 @@ import {
   useCheckPermissions,
 } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { toast } from 'sonner'
 import { Button, Card, CardFooter, Form_Shadcn_ as Form } from 'ui'
 import { BillingCustomerDataForm } from './BillingCustomerDataForm'
 import { TAX_IDS } from './TaxID.constants'
 import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
 
-const BillingCustomerData = () => {
+export const BillingCustomerData = () => {
   const { slug } = useParams()
   const selectedOrganization = useSelectedOrganization()
 
@@ -176,5 +176,3 @@ const BillingCustomerData = () => {
     </ScaffoldSection>
   )
 }
-
-export default BillingCustomerData

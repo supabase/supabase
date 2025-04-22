@@ -1,6 +1,7 @@
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import type { PaymentMethod } from '@stripe/stripe-js'
 import { useQueryClient } from '@tanstack/react-query'
+import _ from 'lodash'
 import { Edit2, ExternalLink, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -16,6 +17,7 @@ import {
   invalidateOrganizationsQuery,
   useOrganizationsQuery,
 } from 'data/organizations/organizations-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -34,10 +36,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { useProjectsQuery } from 'data/projects/projects-query'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import _ from 'lodash'
-import BillingCustomerDataNewOrgDialog from '../BillingSettings/BillingCustomerData/BillingCustomerDataNewOrgDialog'
+import { BillingCustomerDataNewOrgDialog } from '../BillingSettings/BillingCustomerData/BillingCustomerDataNewOrgDialog'
 import { FormCustomerData } from '../BillingSettings/BillingCustomerData/useBillingCustomerDataForm'
 
 const ORG_KIND_TYPES = {
