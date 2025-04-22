@@ -58,13 +58,18 @@ const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
 const CONTAINER_CLASSES = 'px-6'
 
 interface SupportFormV2Props {
+  onProjectSelected: (value: string) => void
+  onOrganizationSelected: (value: string) => void
   setSentCategory: (value: string) => void
-  setSelectedProject: (value: string) => void
 }
 
 // [Joshen] Just naming it as V2 for now for PR review purposes so its easier to view
 // This is a rewrite of the old SupportForm to use the new form components
-export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFormV2Props) => {
+export const SupportFormV2 = ({
+  onProjectSelected: setSelectedProject,
+  onOrganizationSelected: setSelectedOrganization,
+  setSentCategory,
+}: SupportFormV2Props) => {
   const { profile } = useProfile()
   const {
     projectRef: ref,
@@ -294,6 +299,18 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
   useEffect(() => {
     if (urlMessage) form.setValue('message', urlMessage)
   }, [urlMessage])
+
+  // Sync organization selection with parent state
+  // Initialized as 'no-org' in parent if no org is selected
+  useEffect(() => {
+    setSelectedOrganization(organizationSlug)
+  }, [organizationSlug, setSelectedOrganization])
+
+  // Sync project selection with parent state
+  // Initialized as 'no-project' in parent if no project is selected
+  useEffect(() => {
+    setSelectedProject(projectRef)
+  }, [projectRef, setSelectedProject])
 
   return (
     <Form_Shadcn_ {...form}>
