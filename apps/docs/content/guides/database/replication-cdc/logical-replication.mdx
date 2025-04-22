@@ -1,21 +1,21 @@
 ---
 id: 'logical-replication'
-title: 'Logical Replication: An Introduction'
-description: 'Covering the concepts, terms and config of Logical Replication'
-sidebar_label: 'Logical Replication'
+title: 'Introduction to logical replication'
+description: 'Covering the concepts, terms and config of logical replication'
+sidebar_label: 'Introduction to logical replication'
 ---
 
-# Concepts and Terms
+## Concepts and terms
 
 ## Write Ahead Log (WAL)
 
 Postgres uses a system called the Write Ahead Log (WAL) to manage changes to the database. As you make changes, they are appended to the WAL (which is a series of files (also called "segments"), where the file size can be specified). Once one segment is full, Postgres will start appending to a new segment. After a period of time, a checkpoint occurs and Postgres synchronizes the WAL with your database. Once the checkpoint is complete, then the WAL files can be removed from disk and free up space.
 
-## Logical Replication and WAL
+## Logical replication and WAL
 
 Logical replication is a method of replication where Postgres uses the WAL files and transmit those changes to another Postgres database, or a system that supports reading WAL files. 
 
-## Logical Replication Architecture
+## Logical replication architecture
 
 When setting up logical replication, three key components are involved:
 
@@ -23,11 +23,11 @@ When setting up logical replication, three key components are involved:
 - `replication slot` - A slot used for replicating the data from a single publication. The slot, when created, will specify the output format of the changes
 - `subscription` - A subscription is created from an external system (i.e. another Postgres database) and must specify the name of the `publication`. If you do not specify a replication slot, one is automatically created
 
-## Logical Replication Output Format
+## Logical replication output format
 
 Logical replication is typically output in 2 forms, `pgoutput` and `wal2json`. The output method is how Postgres sends changes to any active replication slot.
 
-# Logical Replication Configuration
+## Logical replication configuration
 
 When using logical replication, Postgres is then configured to keep WAL files around for longer than it needs them. If the files are removed too quickly, then your `replication slot` will become inactive and, if the database receives a large number of changes in a short time, then the `replication slot` can become lost as it was not able to keep up.
 
