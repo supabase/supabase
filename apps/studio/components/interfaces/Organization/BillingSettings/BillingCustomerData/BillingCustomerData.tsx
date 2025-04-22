@@ -15,22 +15,23 @@ import { useOrganizationCustomerProfileQuery } from 'data/organizations/organiza
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
 import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import {
+  useAsyncCheckProjectPermissions,
+  useCheckPermissions,
+} from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { toast } from 'sonner'
 import { Button, Card, CardFooter, Form_Shadcn_ as Form } from 'ui'
 import { BillingCustomerDataForm } from './BillingCustomerDataForm'
 import { TAX_IDS } from './TaxID.constants'
 import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
-import { toast } from 'sonner'
 
 const BillingCustomerData = () => {
   const { slug } = useParams()
   const selectedOrganization = useSelectedOrganization()
 
-  const canReadBillingCustomerData = useCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.customer'
-  )
+  const { isLoading: isLoadingPermissions, can: canReadBillingCustomerData } =
+    useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.customer')
   const canUpdateBillingCustomerData = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.customer'
@@ -116,7 +117,7 @@ const BillingCustomerData = () => {
               installationId: selectedOrganization?.partner_id,
             }}
           />
-        ) : !canReadBillingCustomerData ? (
+        ) : !isLoadingPermissions && !canReadBillingCustomerData ? (
           <NoPermission resourceText="view this organization's billing address" />
         ) : (
           <>

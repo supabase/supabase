@@ -10,8 +10,9 @@ import {
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Alert, Button } from 'ui'
@@ -25,10 +26,9 @@ const Subscription = () => {
   const snap = useOrgSettingsPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
-  const canReadSubscriptions = useCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
-  )
+  const { isLoading: test } = usePermissionsQuery()
+  const { isLoading: isLoadingPermissions, can: canReadSubscriptions } =
+    useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.subscriptions')
 
   const {
     data: subscription,
@@ -61,7 +61,7 @@ const Subscription = () => {
           </div>
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {!canReadSubscriptions ? (
+          {!isLoadingPermissions && !canReadSubscriptions ? (
             <NoPermission resourceText="view this organization's subscription" />
           ) : (
             <>

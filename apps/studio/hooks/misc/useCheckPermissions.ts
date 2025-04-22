@@ -3,11 +3,11 @@ import jsonLogic from 'json-logic-js'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { IS_PLATFORM } from 'lib/constants'
 import type { Permission } from 'types'
 import { useSelectedOrganization } from './useSelectedOrganization'
 import { useSelectedProject } from './useSelectedProject'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 
 const toRegexpString = (actionOrResource: string) =>
   `^${actionOrResource.replace('.', '\\.').replace('%', '.*')}$`
@@ -197,7 +197,7 @@ export function useAsyncCheckProjectPermissions(
 
   if (!isLoggedIn)
     return {
-      isLoading: false,
+      isLoading: true,
       can: false,
     }
   if (!IS_PLATFORM)
