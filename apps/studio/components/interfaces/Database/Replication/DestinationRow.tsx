@@ -111,7 +111,7 @@ const DestinationRow = ({
   }
   const { mutateAsync: deleteSink } = useDeleteSinkMutation({})
   const { mutateAsync: deletePipeline } = useDeletePipelineMutation({
-    onSuccess: (res) => {
+    onSuccess: (_res: any) => {
       toast.success('Successfully deleted destination')
     },
   })

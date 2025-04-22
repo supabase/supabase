@@ -213,7 +213,7 @@ const DestinationPanel = ({
     if (editMode && sinkData && pipelineData) {
       form.reset(defaultValues)
     }
-  }, [sinkData, pipelineData, editMode])
+  }, [sinkData, pipelineData, editMode, defaultValues, form])
 
   return (
     <>
