@@ -10,16 +10,15 @@ import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortabl
 import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useSnapshot } from 'valtio'
 
 import { useParams } from 'common'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   editorEntityTypes,
-  getTabsStore,
   handleTabClose,
   handleTabDragEnd,
   handleTabNavigation,
+  useTabsStore,
   type Tab,
 } from 'state/tabs'
 import { cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
@@ -34,8 +33,7 @@ export const EditorTabs = () => {
   const appSnap = useAppStateSnapshot()
 
   const editor = useEditorType()
-  const store = getTabsStore(ref)
-  const tabs = useSnapshot(store)
+  const tabs = useTabsStore(ref)
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -54,8 +52,6 @@ export const EditorTabs = () => {
   const editorTabs = !!editor
     ? openTabs.filter((tab) => editorEntityTypes[editor]?.includes(tab.type))
     : []
-
-  console.log({ editorTabs, editor, tabs })
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event

@@ -21,14 +21,11 @@ const TableEditorPage: NextPageWithLayout = () => {
   const store = getTabsStore(projectRef)
 
   const { project } = useProjectContext()
-  const { data: selectedTable, isLoading } = useTableEditorQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      id,
-    },
-    { retry: false }
-  )
+  const { data: selectedTable, isLoading } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
 
   const router = useRouter()
   const onAfterDeleteTable = useCallback(

@@ -1,7 +1,7 @@
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { NextRouter } from 'next/router'
 import { ReactNode } from 'react'
-import { proxy, subscribe } from 'valtio'
+import { proxy, subscribe, useSnapshot } from 'valtio'
 import { addRecentItem } from './recent-items'
 
 /**
@@ -79,7 +79,7 @@ const defaultState: TabsState = {
 export const tabsStore = proxy<TabsStateMap>({})
 
 // Helper to get/create state for a specific ref
-export const getTabsStore = (ref: string | undefined): TabsState => {
+export const getTabsStore = (ref?: string): TabsState => {
   if (!ref) return proxy(defaultState)
   if (!tabsStore[ref]) {
     const stored = localStorage.getItem(getStorageKey(ref))
@@ -104,6 +104,11 @@ export const getTabsStore = (ref: string | undefined): TabsState => {
   }
 
   return tabsStore[ref]
+}
+
+export const useTabsStore = (ref?: string) => {
+  const store = getTabsStore(ref)
+  return useSnapshot(store)
 }
 
 // Subscribe to changes for each ref and save to localStorage
