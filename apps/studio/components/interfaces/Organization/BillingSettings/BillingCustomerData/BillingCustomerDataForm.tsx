@@ -20,12 +20,6 @@ import {
   Popover_Shadcn_ as Popover,
   PopoverContent_Shadcn_ as PopoverContent,
   PopoverTrigger_Shadcn_ as PopoverTrigger,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { COUNTRIES } from './BillingAddress.constants'
@@ -80,6 +74,7 @@ export const BillingCustomerDataForm = ({
   className,
 }: BillingCustomerDataFormProps) => {
   const [showCountriesPopover, setShowCountriesPopover] = useState(false)
+  const [showTaxIDsPopover, setShowTaxIDsPopover] = useState(false)
 
   const onSelectTaxIdType = (name: string) => {
     const selectedTaxIdOption = TAX_IDS.find((option) => option.name === name)
@@ -154,8 +149,8 @@ export const BillingCustomerDataForm = ({
                       size="medium"
                       disabled={disabled}
                       className={cn(
-                        'w-full justify-between',
-                        !field.value && 'text-muted-foreground'
+                        'w-full justify-between h-[34px]',
+                        !field.value && 'text-muted'
                       )}
                       iconRight={
                         <ChevronsUpDown
@@ -255,27 +250,63 @@ export const BillingCustomerDataForm = ({
           control={form.control}
           render={({ field }) => (
             <FormItemLayout hideMessage layout="vertical" label="Tax ID">
-              <FormControl>
-                <Select_Shadcn_
-                  {...field}
-                  disabled={disabled}
-                  value={field.value}
-                  onValueChange={(value) => onSelectTaxIdType(value)}
-                >
-                  <SelectTrigger_Shadcn_>
-                    <SelectValue_Shadcn_ placeholder="No Tax ID" />
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
-                    <SelectGroup_Shadcn_>
-                      {TAX_IDS.sort((a, b) => a.country.localeCompare(b.country)).map((option) => (
-                        <SelectItem_Shadcn_ key={option.name} value={option.name}>
-                          {option.country} - {option.name}
-                        </SelectItem_Shadcn_>
-                      ))}
-                    </SelectGroup_Shadcn_>
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
-              </FormControl>
+              <Popover open={showTaxIDsPopover} onOpenChange={setShowTaxIDsPopover}>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      type="default"
+                      role="combobox"
+                      size="medium"
+                      disabled={disabled}
+                      className={cn(
+                        'w-full justify-between h-[34px]',
+                        !selectedTaxId && 'text-muted'
+                      )}
+                      iconRight={
+                        <ChevronsUpDown
+                          className="ml-2 h-4 w-4 shrink-0 opacity-50"
+                          strokeWidth={1.5}
+                        />
+                      }
+                    >
+                      {selectedTaxId
+                        ? `${selectedTaxId.country} - ${selectedTaxId.name}`
+                        : 'Select tax ID'}
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search tax ID..." />
+                    <CommandList>
+                      <CommandEmpty>No tax ID found.</CommandEmpty>
+                      <CommandGroup>
+                        {TAX_IDS.sort((a, b) => a.country.localeCompare(b.country)).map(
+                          (option) => (
+                            <CommandItem
+                              key={option.name}
+                              value={`${option.country} - ${option.name}`}
+                              onSelect={() => {
+                                onSelectTaxIdType(option.name)
+                                setShowTaxIDsPopover(false)
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  'mr-2 h-4 w-4',
+                                  selectedTaxId?.name === option.name ? 'opacity-100' : 'opacity-0'
+                                )}
+                              />
+                              {option.country} - {option.name}
+                            </CommandItem>
+                          )
+                        )}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              <FormMessage />
             </FormItemLayout>
           )}
         />
