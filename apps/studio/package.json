@@ -82,7 +82,7 @@
     "mime-db": "^1.53.0",
     "mobx": "^6.10.2",
     "mobx-react-lite": "^4.0.5",
-    "monaco-editor": "0.33.0",
+    "monaco-editor": "0.52.2",
     "next": "catalog:",
     "next-themes": "^0.3.0",
     "nuqs": "^2.4.1",
