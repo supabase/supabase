@@ -5,7 +5,7 @@ import {
   RecentItem,
   removeRecentItems,
 } from 'state/recent-items'
-import { createTabId, getTabsStore, removeTabs } from 'state/tabs'
+import { createTabId, editorEntityTypes, getTabsStore, removeTabs, updateTab } from 'state/tabs'
 
 export const tableEditorTabsCleanUp = ({
   ref,
@@ -65,7 +65,7 @@ export const sqlEditorTabsCleanup = ({
   snippets,
 }: {
   ref: string
-  snippets: { id: string; type: string }[]
+  snippets: { id: string; type: string; name: string }[]
 }) => {
   // these are tabs that are static content
   // these canot be removed from localstorage based on this query request
@@ -95,4 +95,14 @@ export const sqlEditorTabsCleanup = ({
       ? recentItems.filter((item) => !currentContentIds.includes(item.id)).map((item) => item.id)
       : []
   )
+
+  // [Joshen] Validate for opened tabs, if their label matches the snippet's name - update label if not
+  const openSqlTabs = tabsStore.openTabs
+    .map((id) => tabsStore.tabsMap[id])
+    .filter((tab) => editorEntityTypes['sql']?.includes(tab.type))
+
+  openSqlTabs.forEach((tab) => {
+    const snippet = snippets?.find((x) => tab.metadata?.sqlId === x.id)
+    if (!!snippet && snippet.name !== tab.label) updateTab(ref, tab.id, { label: snippet.name })
+  })
 }
