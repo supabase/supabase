@@ -27,7 +27,7 @@ permissions:
 
 jobs:
   test-selfhosted:
-    if: github.event.pull_request.labels.*.name !contains 'skip-e2e'
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'skip-e2e') }}
     timeout-minutes: 60
     runs-on: ubuntu-latest
 
