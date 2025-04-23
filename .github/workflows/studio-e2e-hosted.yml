@@ -6,6 +6,7 @@ on:
     paths:
       - 'apps/studio/**'
       - 'tests/studio-tests/**'
+      - 'e2e/studio/**'
       - 'pnpm-lock.yaml'
 
 concurrency:
