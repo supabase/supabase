@@ -23,16 +23,18 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Checkbox } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
+import { useCallback } from 'react'
+import { useRouter } from 'next/router'
+import { useParams } from 'common'
 
 export type DeleteConfirmationDialogsProps = {
   selectedTable?: Entity | PostgresTable
-  onAfterDeleteTable?: (tables: TablesData) => void
 }
 
-const DeleteConfirmationDialogs = ({
-  selectedTable,
-  onAfterDeleteTable = noop,
-}: DeleteConfirmationDialogsProps) => {
+const DeleteConfirmationDialogs = ({ selectedTable }: DeleteConfirmationDialogsProps) => {
+  const { ref: projectRef } = useParams()
+  const router = useRouter()
+
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
@@ -211,6 +213,18 @@ const DeleteConfirmationDialogs = ({
       })
     }
   }
+
+  const onAfterDeleteTable = useCallback(
+    (tables: TablesData) => {
+      // For simplicity for now, we just open the first table within the same schema
+      if (tables.length > 0) {
+        router.push(`/project/${projectRef}/editor/${tables[0].id}`)
+      } else {
+        router.push(`/project/${projectRef}/editor`)
+      }
+    },
+    [router, projectRef]
+  )
 
   return (
     <>
