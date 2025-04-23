@@ -25,7 +25,7 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
     sendEvent({
       action: 'ai_assistant_in_support_form_clicked',
       groups: {
-        project: projectRef,
+        project: projectRef === 'no-project' ? undefined : projectRef,
         organization: organizationSlug,
       },
     })
