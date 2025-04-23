@@ -565,6 +565,15 @@ const nextConfig = {
     'icons',
     'libpg-query',
   ],
+  turbopack: {
+    rules: {
+      '*.md': {
+        loaders: ['raw-loader'],
+        as: '*.js',
+      },
+    },
+  },
+  // Both configs for turbopack and webpack need to exist (and sync) because Nextjs still uses webpack for production building
   webpack(config) {
     config.module?.rules
       .find((rule) => rule.oneOf)
