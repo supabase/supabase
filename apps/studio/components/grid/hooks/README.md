@@ -1,4 +1,4 @@
-# Table Filtering and Sorting Architecture
+# Table Filtering and Sorting Developer notes
 
 ## Overview
 
