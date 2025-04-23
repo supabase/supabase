@@ -1,4 +1,5 @@
-name: Studio E2E Tests
+name: Studio E2E Selfhosted
+
 on:
   push:
     branches: [master]
@@ -15,7 +16,6 @@ on:
       - 'tests/studio-tests/**'
       - 'pnpm-lock.yaml'
 
-# Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -24,18 +24,17 @@ permissions:
   contents: write
 
 jobs:
-  test:
+  test-selfhosted:
+    if: github.event.pull_request.labels.*.name !contains 'skip-e2e'
     timeout-minutes: 60
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
-        name: Install pnpm
         with:
           run_install: false
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
@@ -46,13 +45,31 @@ jobs:
         run: pnpm i
       - name: Install Playwright Browsers
         run: pnpm -C tests/studio-tests exec playwright install --with-deps
-      - name: Run Playwright tests
-        run: pnpm test:e2e:studio-local
-        # mark the action as succeeded even if the tests failed. This is temporarily until we make the tests more stable.
-        # continue-on-error: true
+
+      - name: Wait for Vercel Preview Deployment (Selfhosted Studio)
+        id: vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SELFHOSTED }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          scope: ${{ secrets.VERCEL_TEAM_ID }}
+          vercel-args: '--prod=false'
+
+      - name: Set ENV Vars for Selfhosted Test
+        run: |
+          echo "TEST_ENV=preview" >> $GITHUB_ENV
+          echo "BASE_URL=${{ steps.vercel.outputs.preview-url }}" >> $GITHUB_ENV
+          echo "API_BASE_URL=http://localhost:54323/api" >> $GITHUB_ENV
+          echo "PREVIEW_PROJECT_REF=default" >> $GITHUB_ENV
+
+      - name: Run Playwright selfhosted E2E tests
+        run: pnpm test:e2e:selfhosted
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-report
+          name: playwright-report-selfhosted
           path: tests/studio-tests/playwright-report/
           retention-days: 7

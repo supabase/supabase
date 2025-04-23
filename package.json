@@ -35,6 +35,7 @@
     "e2e:selfhosted": "pnpm --prefix e2e/studio run e2e:selfhosted",
     "e2e:staging": "pnpm --prefix e2e/studio run e2e:staging",
     "e2e:prod": "pnpm --prefix e2e/studio run e2e:prod",
+    "e2e:preview": "pnpm --prefix e2e/studio run e2e:preview",
     "e2e:supabase:start": "pnpm --prefix e2e/studio run supabase:start",
     "e2e:supabase:stop": "pnpm --prefix e2e/studio run supabase:stop",
 
