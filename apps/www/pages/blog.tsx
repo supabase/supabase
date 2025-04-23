@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
 import { getSortedPosts } from '~/lib/posts'
+import { getAllCMSPosts } from '~/lib/cms-posts'
 
 import type PostTypes from '~/types/post'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -100,7 +101,22 @@ function Blog(props: any) {
 }
 
 export async function getStaticProps() {
-  const allPostsData = getSortedPosts({ directory: '_blog', runner: '** BLOG PAGE **' })
+  // Get static blog posts
+  const staticPostsData = getSortedPosts({ directory: '_blog', runner: '** BLOG PAGE **' })
+
+  // Get CMS blog posts
+  const cmsPostsData = await getAllCMSPosts()
+
+  console.log('cmsPostsData', cmsPostsData)
+
+  // Combine both data sources
+  const allPostsData = [...staticPostsData, ...cmsPostsData].sort((a: any, b: any) => {
+    const dateA = a.date ? new Date(a.date).getTime() : new Date(a.formattedDate).getTime()
+    const dateB = b.date ? new Date(b.date).getTime() : new Date(b.formattedDate).getTime()
+    return dateB - dateA
+  })
+
+  // Generate RSS feed from combined posts
   const rss = generateRss(allPostsData)
 
   // create a rss feed in public directory
@@ -124,6 +140,7 @@ export async function getStaticProps() {
     props: {
       blogs: allPostsData,
     },
+    revalidate: 60 * 10, // Revalidate every 10 minutes
   }
 }
 

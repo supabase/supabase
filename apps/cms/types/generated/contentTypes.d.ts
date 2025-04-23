@@ -334,9 +334,39 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   }
 }
 
+export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
+  collectionName: 'authors'
+  info: {
+    description: ''
+    displayName: 'Author'
+    pluralName: 'authors'
+    singularName: 'author'
+  }
+  options: {
+    draftAndPublish: true
+  }
+  attributes: {
+    author: Schema.Attribute.String
+    author_id: Schema.Attribute.String
+    author_image_url: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>
+    author_url: Schema.Attribute.String
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    locale: Schema.Attribute.String & Schema.Attribute.Private
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::author.author'> &
+      Schema.Attribute.Private
+    position: Schema.Attribute.String
+    publishedAt: Schema.Attribute.DateTime
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    username: Schema.Attribute.String
+  }
+}
+
 export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
   collectionName: 'blog_posts'
   info: {
+    description: ''
     displayName: 'Blog Post'
     pluralName: 'blog-posts'
     singularName: 'blog-post'
@@ -345,7 +375,8 @@ export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
     draftAndPublish: true
   }
   attributes: {
-    author: Schema.Attribute.String
+    authors: Schema.Attribute.Relation<'oneToMany', 'api::author.author'>
+    categories: Schema.Attribute.Relation<'oneToMany', 'api::category.category'>
     content: Schema.Attribute.RichText
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
@@ -356,9 +387,56 @@ export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private
     publishedAt: Schema.Attribute.DateTime
     slug: Schema.Attribute.String
+    tags: Schema.Attribute.Relation<'oneToMany', 'api::tag.tag'>
     thumb: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios', true>
     Title: Schema.Attribute.String
     toc_depth: Schema.Attribute.Integer
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+  }
+}
+
+export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
+  collectionName: 'categories'
+  info: {
+    displayName: 'Category'
+    pluralName: 'categories'
+    singularName: 'category'
+  }
+  options: {
+    draftAndPublish: true
+  }
+  attributes: {
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    locale: Schema.Attribute.String & Schema.Attribute.Private
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::category.category'> &
+      Schema.Attribute.Private
+    name: Schema.Attribute.String
+    publishedAt: Schema.Attribute.DateTime
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+  }
+}
+
+export interface ApiTagTag extends Struct.CollectionTypeSchema {
+  collectionName: 'tags'
+  info: {
+    description: ''
+    displayName: 'Tag'
+    pluralName: 'tags'
+    singularName: 'tag'
+  }
+  options: {
+    draftAndPublish: true
+  }
+  attributes: {
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    locale: Schema.Attribute.String & Schema.Attribute.Private
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::tag.tag'> & Schema.Attribute.Private
+    name: Schema.Attribute.String
+    publishedAt: Schema.Attribute.DateTime
     updatedAt: Schema.Attribute.DateTime
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
   }
@@ -791,7 +869,10 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken
       'admin::transfer-token-permission': AdminTransferTokenPermission
       'admin::user': AdminUser
+      'api::author.author': ApiAuthorAuthor
       'api::blog-post.blog-post': ApiBlogPostBlogPost
+      'api::category.category': ApiCategoryCategory
+      'api::tag.tag': ApiTagTag
       'plugin::content-releases.release': PluginContentReleasesRelease
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction
       'plugin::i18n.locale': PluginI18NLocale
