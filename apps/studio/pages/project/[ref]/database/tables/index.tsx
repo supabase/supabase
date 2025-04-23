@@ -1,7 +1,5 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { useParams } from 'common'
-import { useState } from 'react'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { useMemo, useState } from 'react'
 
 import { TableList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
@@ -10,15 +8,21 @@ import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { Entity } from 'data/table-editor/table-editor-types'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import type { NextPageWithLayout } from 'types'
+import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
+import { useParams } from 'common'
+import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 
 const DatabaseTables: NextPageWithLayout = () => {
+  const { ref: projectRef } = useParams()
   const snap = useTableEditorStateSnapshot()
-  const { ref: projectRef = '' } = useParams()
   const [selectedTableToEdit, setSelectedTableToEdit] = useState<PostgresTable>()
+
+  // to do - @alaister - this is a temporary solution to get the table editor to work
+  const parsedTable = useMemo(() => {
+    return parseSupaTable(selectedTableToEdit)
+  }, [selectedTableToEdit])
 
   return (
     <>
@@ -45,19 +49,18 @@ const DatabaseTables: NextPageWithLayout = () => {
         </ScaffoldSection>
       </ScaffoldContainer>
 
-      {selectedTableToEdit && (
+      {selectedTableToEdit && projectRef && (
         <TableEditorTableStateContextProvider
+          key={`table-editor-table-${selectedTableToEdit.id}`}
           projectRef={projectRef}
-          table={{
-            ...selectedTableToEdit,
-            entity_type: ENTITY_TYPE.TABLE,
-            relationships: selectedTableToEdit.relationships || [],
-          }}
+          table={parsedTable}
           editable={true}
         >
           <DeleteConfirmationDialogs selectedTable={selectedTableToEdit} />
+          <DeleteConfirmationDialogs selectedTable={selectedTableToEdit} />
         </TableEditorTableStateContextProvider>
       )}
+
       <SidePanelEditor includeColumns selectedTable={selectedTableToEdit} />
     </>
   )

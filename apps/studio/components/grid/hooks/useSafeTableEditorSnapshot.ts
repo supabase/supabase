@@ -26,6 +26,8 @@ export function useSafeTableEditorSnapshot(): Partial<TableEditorTableState> {
   let snap: TableEditorTableState | undefined | null = undefined
   let errorOccurred = false
 
+  // To do - @Alaister to look at..
+
   try {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     snap = useTableEditorTableStateSnapshot()
