@@ -158,8 +158,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
             type === 'GitHub' && isBranchingEnabled
               ? {
                   title: 'Branching will be disabled for this project',
-                  description: ` Deleting this GitHub connection will remove all preview branches on this project,
-                and also disable branching for ${project.name}`,
+                  description: ` Deleting this GitHub connection will remove all preview branches on this project that are synced to a GitHub branch`,
                 }
               : undefined
           }
