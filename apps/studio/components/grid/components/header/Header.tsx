@@ -7,8 +7,6 @@ import { ReactNode, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
-import { useTableSort } from 'components/grid/hooks/useTableSort'
 import type { Filter, Sort } from 'components/grid/types'
 import GridHeaderActions from 'components/interfaces/TableGridEditor/GridHeaderActions'
 import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
@@ -95,9 +93,6 @@ const DefaultHeader = () => {
   const canCreateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { onApplyFilters, urlFilters } = useTableFilter()
-  const { onApplySorts, urlSorts } = useTableSort()
-
   const onAddRow =
     snap.editable && (snap.table.columns ?? []).length > 0 ? tableEditorSnap.onAddRow : undefined
   const onAddColumn = snap.editable ? tableEditorSnap.onAddColumn : undefined
@@ -108,8 +103,8 @@ const DefaultHeader = () => {
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <FilterPopover filters={urlFilters} onApplyFilters={onApplyFilters} />
-        <SortPopover sorts={urlSorts} onApplySorts={onApplySorts} />
+        <FilterPopover />
+        <SortPopover />
       </div>
       {canAddNew && (
         <>
