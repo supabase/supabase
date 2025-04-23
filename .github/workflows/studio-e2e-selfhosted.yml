@@ -24,6 +24,8 @@ concurrency:
 
 permissions:
   contents: write
+  pull-requests: write
+  deployments: write
 
 jobs:
   test-selfhosted:
