@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { withAuth } from 'hooks/misc/withAuth'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
@@ -24,7 +24,7 @@ export interface AccountLayoutProps {
 const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps>) => {
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
 
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,

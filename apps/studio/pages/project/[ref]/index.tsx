@@ -11,7 +11,7 @@ import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import { InlineLink } from 'components/ui/InlineLink'
-import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner'
+import { ProjectUpgradeFailedBanner } from 'components/ui/ProjectUpgradeFailedBanner'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDb, useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
@@ -142,7 +142,7 @@ const Home: NextPageWithLayout = () => {
 }
 
 Home.getLayout = (page) => (
-  <DefaultLayout showProductMenu={false}>
+  <DefaultLayout>
     <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
   </DefaultLayout>
 )

@@ -4,12 +4,10 @@ import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
 import type { VaultSecret } from 'types'
 import { Button, Form, Input, Modal } from 'ui'
-import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
 import { EyeOff, Eye } from 'lucide-react'
 
 interface EditSecretModalProps {
@@ -18,11 +16,9 @@ interface EditSecretModalProps {
 }
 
 const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
-  const [selectedKeyId, setSelectedKeyId] = useState<string>()
   const [showSecretValue, setShowSecretValue] = useState(false)
   const { project } = useProjectContext()
 
-  const { mutateAsync: addKeyMutation } = usePgSodiumKeyCreateMutation()
   const { mutateAsync: updateSecret } = useVaultSecretUpdateMutation()
 
   let INITIAL_VALUES = {
@@ -34,7 +30,6 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
   useEffect(() => {
     if (selectedSecret !== undefined) {
       setShowSecretValue(false)
-      setSelectedKeyId(selectedSecret.key_id)
     }
   }, [selectedSecret])
 
@@ -53,23 +48,6 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
       if (values.name !== selectedSecret?.name) payload.name = values.name
       if (values.description !== selectedSecret?.description)
         payload.description = values.description
-      if (selectedKeyId !== selectedSecret?.key_id) {
-        let encryptionKeyId = selectedKeyId
-        if (encryptionKeyId === 'create-new') {
-          const addKeyRes = await addKeyMutation({
-            projectRef: project?.ref!,
-            connectionString: project?.connectionString,
-            name: values.keyName || undefined,
-          })
-          if (addKeyRes.error) {
-            return toast.error(`Failed to create new key: ${addKeyRes.error.message}`)
-          } else {
-            encryptionKeyId = addKeyRes[0].id
-          }
-        }
-
-        payload.key_id = encryptionKeyId
-      }
       payload.secret = values.secret
 
       if (!isEmpty(payload) && selectedSecret) {
@@ -159,16 +137,6 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
                       />
                     </div>
                   }
-                />
-              </Modal.Content>
-              <Modal.Separator />
-              <Modal.Content className="space-y-4">
-                <EncryptionKeySelector
-                  nameId="keyName"
-                  label="Select a key to encrypt your secret with"
-                  labelOptional="Optional"
-                  selectedKeyId={selectedKeyId}
-                  onSelectKey={setSelectedKeyId}
                 />
               </Modal.Content>
               <Modal.Separator />
