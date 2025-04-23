@@ -3,10 +3,8 @@ import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 
-import {
-  formatFilterURLParams,
-  saveTableEditorStateToLocalStorageDebounced,
-} from 'components/grid/SupabaseGrid.utils'
+import { useParams } from 'common'
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import type { SupaRow } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseColumnDeleteMutation } from 'data/database-columns/database-column-delete-mutation'
@@ -17,15 +15,12 @@ import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-
 import { useTableDeleteMutation } from 'data/tables/table-delete-mutation'
 import { TablesData, useGetTables } from 'data/tables/tables-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { noop } from 'lib/void'
+import { useRouter } from 'next/router'
+import { useCallback } from 'react'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Checkbox } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
-import { useCallback } from 'react'
-import { useRouter } from 'next/router'
-import { useParams } from 'common'
 
 export type DeleteConfirmationDialogsProps = {
   selectedTable?: Entity | PostgresTable
