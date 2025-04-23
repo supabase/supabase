@@ -1278,8 +1278,8 @@ export interface SupportTicketSubmittedEvent {
  * @source studio
  * @page /dashboard/support/new
  */
-export interface AiAssistantClickedInSupportFormEvent {
-  action: 'ai_assistant_clicked_in_support_form'
+export interface AiAssistantInSupportFormClickedEvent {
+  action: 'ai_assistant_in_support_form_clicked'
   properties: {
     project?: string
     organization?: string
@@ -1380,4 +1380,4 @@ export type TelemetryEvent =
   | EdgeFunctionTestSidePanelOpenedEvent
   | SupabaseUiCommandCopyButtonClickedEvent
   | SupportTicketSubmittedEvent
-  | AiAssistantClickedInSupportFormEvent
+  | AiAssistantInSupportFormClickedEvent

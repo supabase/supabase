@@ -23,7 +23,7 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
 
   const onAiAssistantClicked = useCallback(() => {
     sendEvent({
-      action: 'ai_assistant_clicked_in_support_form',
+      action: 'ai_assistant_in_support_form_clicked',
       properties: {
         project: projectRef,
         organization: organizationSlug,
