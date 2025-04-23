@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
 
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/VercelGithub/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
 import VercelSection from 'components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
@@ -43,7 +43,7 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
 }
 
 const IntegrationSettings = () => {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
 
   const org = useSelectedOrganization()
 

@@ -922,7 +922,7 @@ const Wizard: NextPageWithLayout = () => {
 
                           <div>
                             <Button asChild type="default">
-                              <Link href={`/org/${slug}/invoices`}>View invoices</Link>
+                              <Link href={`/org/${slug}/billing#invoices`}>View invoices</Link>
                             </Button>
                           </div>
                         </div>

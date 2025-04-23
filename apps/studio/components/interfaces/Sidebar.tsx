@@ -6,6 +6,7 @@ import {
   Boxes,
   ChartArea,
   PanelLeftDashed,
+  Receipt,
   Settings,
   Users,
 } from 'lucide-react'
@@ -54,8 +55,8 @@ import {
 } from 'ui'
 import {
   useIsAPIDocsSidePanelEnabled,
+  useIsNewLayoutEnabled,
   useIsSQLEditorTabsEnabled,
-  useNewLayout,
 } from './App/FeaturePreview/FeaturePreviewContext'
 
 export const ICON_SIZE = 32
@@ -72,7 +73,7 @@ const SidebarMotion = motion(SidebarPrimitive) as FC<
 export interface SidebarProps extends ComponentPropsWithoutRef<typeof SidebarPrimitive> {}
 
 export const Sidebar = ({ className, ...props }: SidebarProps) => {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
 
   const { ref } = useParams()
 
@@ -100,10 +101,7 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
         {!hideSideBar && (
           <SidebarMotion
             {...props}
-            transition={{
-              delay: 0.4,
-              duration: 0.4,
-            }}
+            transition={{ delay: 0.4, duration: 0.4 }}
             overflowing={sidebarBehaviour === 'expandable'}
             collapsible="icon"
             variant="sidebar"
@@ -120,7 +118,7 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
                   <DropdownMenuTrigger asChild>
                     <Button
                       type="text"
-                      className="w-min px-1.5 mx-0.5 group-data-[state=expanded]:px-2"
+                      className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? '!px-2' : ''}`}
                       icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
                     />
                   </DropdownMenuTrigger>
@@ -149,16 +147,8 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
 }
 
 export const SidebarContent = ({ footer }: { footer?: ReactNode }) => {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
   const { ref: projectRef } = useParams()
-
-  // temporary logic to show settings route in sidebar footer
-  // this will be removed once we move to an updated org/project nav
-  const router = useRouter()
-  const { ref } = useParams()
-  const { project } = useProjectContext()
-  const settingsRoutes = generateSettingsRoutes(ref, project)
-  const activeRoute = router.pathname.split('/')[3]
 
   return (
     <>
@@ -206,7 +196,7 @@ export function SideBarNavLink({
   const buttonProps = {
     tooltip: sidebarBehaviour === 'closed' ? route.label : '',
     isActive: active,
-    className: 'text-sm',
+    className: cn('text-sm', sidebarBehaviour === 'open' ? '!px-2' : ''),
     size: 'default' as const,
     onClick: onClick,
   }
@@ -485,6 +475,12 @@ const OrganizationLinks = () => {
       icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
+      label: 'Billing',
+      href: `/org/${slug}/billing`,
+      key: 'billing',
+      icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+    },
+    {
       label: 'Organization settings',
       href: `/org/${slug}/general`,
       key: 'settings',
@@ -503,8 +499,6 @@ const OrganizationLinks = () => {
                 ? activeRoute === undefined
                 : item.key === 'settings'
                   ? router.pathname.includes('/general') ||
-                    router.pathname.includes('/billing') ||
-                    router.pathname.includes('/invoices') ||
                     router.pathname.includes('/apps') ||
                     router.pathname.includes('/audit') ||
                     router.pathname.includes('/documents')

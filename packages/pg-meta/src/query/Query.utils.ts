@@ -101,11 +101,13 @@ export function selectQuery(
     filters?: Filter[]
     pagination?: QueryPagination
     sorts?: Sort[]
-  }
+  },
+  isFinal = true,
+  isCTE = false
 ) {
   let query = ''
   const queryColumn = columns ?? '*'
-  query += `select ${queryColumn} from ${queryTable(table)}`
+  query += `select ${queryColumn} from ${isCTE ? queryCTE(table) : queryTable(table)}`
 
   const { filters, pagination, sorts } = options ?? {}
   if (filters) {
@@ -118,7 +120,7 @@ export function selectQuery(
     const { limit, offset } = pagination ?? {}
     query += ` limit ${literal(limit)} offset ${literal(offset)}`
   }
-  return query + ';'
+  return `${query}${isFinal ? ';' : ''}`
 }
 
 export function updateQuery(
@@ -235,4 +237,8 @@ function applySorts(query: string, sorts: Sort[]) {
 
 function queryTable(table: QueryTable) {
   return `${ident(table.schema)}.${ident(table.name)}`
+}
+
+function queryCTE(table: QueryTable) {
+  return `${ident(table.name)}`
 }

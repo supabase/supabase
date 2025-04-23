@@ -9,12 +9,15 @@ import useLatest from 'hooks/misc/useLatest'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { DEFAULT_HOME, IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useIsNewLayoutEnabled } from './FeaturePreview/FeaturePreviewContext'
 
 // Ideally these could all be within a _middleware when we use Next 12
 const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const { ref, slug, id } = useParams()
+  const newLayoutPreview = useIsNewLayoutEnabled()
 
   const isLoggedIn = useIsLoggedIn()
   const snap = useAppStateSnapshot()
@@ -30,6 +33,12 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
     ''
   )
+
+  const DEFAULT_HOME = IS_PLATFORM
+    ? newLayoutPreview
+      ? '/organizations'
+      : '/projects'
+    : '/project/default'
 
   /**
    * Array of urls/routes that should be ignored

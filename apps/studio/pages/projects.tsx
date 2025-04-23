@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { ProjectList } from 'components/interfaces/Home/ProjectList'
 import HomePageActions from 'components/interfaces/HomePageActions'
 
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { MAX_WIDTH_CLASSES, PADDING_CLASSES } from 'components/layouts/Scaffold'
@@ -19,7 +19,7 @@ import { cn } from 'ui'
 import { LOCAL_STORAGE_KEYS } from 'common'
 
 const ProjectsPage: NextPageWithLayout = () => {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
     ''

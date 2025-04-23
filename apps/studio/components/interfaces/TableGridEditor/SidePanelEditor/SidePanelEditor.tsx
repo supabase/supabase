@@ -25,7 +25,7 @@ import { getTables } from 'data/tables/tables-query'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { createTabId, renameTab } from 'state/tabs'
+import { createTabId, updateTab } from 'state/tabs'
 import type { Dictionary } from 'types'
 import { SonnerProgress } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -489,7 +489,7 @@ const SidePanelEditor = ({
           if (isTableEditorTabsEnabled && ref && payload.name) {
             // [Joshen] Only table entities can be updated via the dashboard
             const tabId = createTabId(ENTITY_TYPE.TABLE, { id: selectedTable.id })
-            renameTab(ref, tabId, payload.name)
+            updateTab(ref, tabId, { label: payload.name })
           }
           toast.success(`Successfully updated ${table.name}!`, { id: toastId })
         }

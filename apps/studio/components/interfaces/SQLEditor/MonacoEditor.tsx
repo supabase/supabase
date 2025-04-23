@@ -9,12 +9,12 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { makeActiveTabPermanent } from 'state/tabs'
 import { cn } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { untitledSnippetTitle } from './SQLEditor.constants'
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
-import { makeActiveTabPermanent } from 'state/tabs'
 
 export type MonacoEditorProps = {
   id: string
@@ -24,6 +24,7 @@ export type MonacoEditorProps = {
   autoFocus?: boolean
   executeQuery: () => void
   onHasSelection: (value: boolean) => void
+  onMount?: (editor: IStandaloneCodeEditor) => void
   onPrompt?: (value: {
     selection: string
     beforeSelection: string
@@ -42,6 +43,7 @@ const MonacoEditor = ({
   executeQuery,
   onHasSelection,
   onPrompt,
+  onMount,
 }: MonacoEditorProps) => {
   const router = useRouter()
   const { profile } = useProfile()
@@ -142,6 +144,8 @@ const MonacoEditor = ({
       if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
       editor.focus()
     }
+
+    onMount?.(editor)
   }
 
   const debouncedSetSql = debounce((id, value) => snapV2.setSql(id, value), 1000)
