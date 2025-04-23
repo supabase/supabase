@@ -119,10 +119,10 @@ export function FilterGroup({
             <React.Fragment key={index}>
               {index > 0 && (
                 <span
-                  className={`text-xs font-medium cursor-pointer ${
+                  className={`text-xs font-medium font-mono uppercase cursor-pointer bg-surface-300 border rounded px-0.5 ${
                     isHoveringOperator
                       ? 'bg-surface-400 text-foreground dark:bg-surface-400'
-                      : 'text-foreground-muted'
+                      : 'text-foreground-lighter'
                   }`}
                   onClick={handleLogicalOperatorClick}
                   onMouseEnter={handleLogicalOperatorMouseEnter}

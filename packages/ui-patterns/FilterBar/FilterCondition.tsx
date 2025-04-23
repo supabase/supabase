@@ -48,8 +48,11 @@ export function FilterCondition({
   if (!property) return null
 
   return (
-    <div className="flex items-center rounded px-2 h-6 bg-surface-400">
-      <span className="text-xs font-medium mr-1 font-mono cursor-pointer" onClick={onLabelClick}>
+    <div className="flex items-center rounded px-0.5 h-6 bg-surface-400 border">
+      <span
+        className="text-xs font-medium mr-1 font-mono cursor-pointer text-brand-600 bg-brand-200 px-1 py-0.5 rounded"
+        onClick={onLabelClick}
+      >
         {property.label}
       </span>
       <Input_Shadcn_
@@ -58,9 +61,9 @@ export function FilterCondition({
         onChange={(e) => onOperatorChange(e.target.value)}
         onFocus={onOperatorFocus}
         onBlur={onBlur}
-        className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 font-mono h-6 mr-1 text-foreground-light"
+        className="border-none bg-transparent px-0.5 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 font-mono h-6 mr-1 text-foreground-light"
         style={{
-          width: `${Math.max(condition.operator.length, 1)}ch`,
+          width: `${Math.max(condition.operator.length, 1) + 1}ch`,
           minWidth: '1ch',
         }}
         disabled={isLoading}
@@ -73,9 +76,9 @@ export function FilterCondition({
         onFocus={onValueFocus}
         onBlur={onBlur}
         onKeyDown={onKeyDown}
-        className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 font-mono h-6"
+        className="border-none bg-transparent px-0.5 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 font-mono h-6"
         style={{
-          width: `${Math.max(condition.value?.toString().length || 0, 1)}ch`,
+          width: `${Math.max(condition.value?.toString().length || 0, 1) + 1}ch`,
           minWidth: '1ch',
         }}
         disabled={isLoading}

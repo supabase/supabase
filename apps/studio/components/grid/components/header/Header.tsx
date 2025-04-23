@@ -41,6 +41,7 @@ import FilterPopover from './filter/FilterPopover'
 import { SortPopover } from './sort'
 import { useTableAdapter } from 'components/grid/tableAdapter'
 import { DataTableFilter } from 'components/data-table-filter-table-editor'
+import { TableEditorFilters } from './TableEditorFilters'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
@@ -72,7 +73,7 @@ const Header = ({ sorts: sortsProp, filters: filtersProp, customHeader, data }: 
 
   return (
     <div>
-      <div className="flex h-10 items-center justify-between bg-dash-sidebar dark:bg-surface-100 px-1.5 py-1.5 gap-2 overflow-x-auto ">
+      <div className="flex h-10 items-center justify-between bg-dash-sidebar dark:bg-surface-100 px-1.5 py-1.5 gap-2">
         {customHeader ? (
           <>{customHeader}</>
         ) : (
@@ -121,7 +122,8 @@ const DefaultHeader = ({ data }: { data: any }) => {
   return (
     <div className="flex items-center gap-4 justify-between grow">
       <div className="flex items-center gap-2">
-        <DataTableFilter table={tableAdapter} />
+        {/* <DataTableFilter table={tableAdapter} /> */}
+        <TableEditorFilters />
       </div>
       <div className="flex items-center gap-2">
         {/* <FilterPopover filters={urlFilters} onApplyFilters={onApplyFilters} /> */}
