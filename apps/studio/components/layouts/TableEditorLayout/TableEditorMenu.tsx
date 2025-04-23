@@ -21,6 +21,7 @@ import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { editorEntityTypes, updateTab, useTabsStore } from 'state/tabs'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -45,11 +46,11 @@ import { TableMenuEmptyState } from './TableMenuEmptyState'
 
 const TableEditorMenu = () => {
   const { ref, id: _id } = useParams()
+  const isMobile = useBreakpoint()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
-  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
-  const isMobile = useBreakpoint()
   const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
@@ -59,6 +60,7 @@ const TableEditorMenu = () => {
     'alphabetical'
   )
 
+  const tabs = useTabsStore(ref)
   const { project } = useProjectContext()
   const {
     data,
@@ -113,6 +115,21 @@ const TableEditorMenu = () => {
       setSelectedSchema(selectedTable.schema)
     }
   }, [selectedTable?.schema])
+
+  useEffect(() => {
+    // [Joshen] Clean up tab labels if the entity's name was updated, since the entity
+    // could've been renamed outside of the table editor (e.g SQL editor)
+    if (isTableEditorTabsEnabled && ref) {
+      const openTabs = tabs.openTabs
+        .map((id) => tabs.tabsMap[id])
+        .filter((tab) => editorEntityTypes['table']?.includes(tab.type))
+
+      openTabs.forEach((tab) => {
+        const entity = entityTypes?.find((x) => tab.metadata?.tableId === x.id)
+        if (!!entity && entity.name !== tab.label) updateTab(ref, tab.id, { label: entity.name })
+      })
+    }
+  }, [isTableEditorTabsEnabled, entityTypes])
 
   return (
     <>
