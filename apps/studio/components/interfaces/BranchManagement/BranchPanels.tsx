@@ -5,8 +5,10 @@ import {
   Clock,
   ExternalLink,
   GitPullRequest,
+  Github,
   Infinity,
   MoreVertical,
+  Pencil,
   RefreshCw,
   Shield,
   Trash2,
@@ -38,6 +40,7 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import BranchStatusBadge from './BranchStatusBadge'
 import WorkflowLogs from './WorkflowLogs'
+import EditBranchModal from './EditBranchModal'
 
 interface BranchManagementSectionProps {
   header: string
@@ -106,6 +109,7 @@ export const BranchRow = ({
   const isActive = projectRef === branch?.project_ref
 
   const canDeleteBranches = useCheckPermissions(PermissionAction.DELETE, 'preview_branches')
+  const canUpdateBranches = useCheckPermissions(PermissionAction.UPDATE, 'preview_branches')
 
   const daysFromNow = dayjs().diff(dayjs(branch.updated_at), 'day')
   const formattedTimeFromNow = dayjs(branch.updated_at).fromNow()
@@ -133,6 +137,7 @@ export const BranchRow = ({
 
   const [showConfirmResetModal, setShowConfirmResetModal] = useState(false)
   const [showBranchModeSwitch, setShowBranchModeSwitch] = useState(false)
+  const [showEditBranchModal, setShowEditBranchModal] = useState(false)
 
   const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
     onSuccess() {
@@ -187,6 +192,8 @@ export const BranchRow = ({
           </Link>
         </ButtonTooltip>
 
+        {branch.git_branch && <Github size={14} className="text-foreground-light" />}
+
         {isActive && <Badge>Current</Badge>}
         <BranchStatusBadge
           status={
@@ -230,13 +237,13 @@ export const BranchRow = ({
           </div>
         ) : (
           <div className="flex items-center gap-x-2">
-            {branch.pr_number === undefined ? (
+            {branch.git_branch && branch.pr_number === undefined ? (
               <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
                 <Link passHref target="_blank" rel="noreferrer" href={createPullRequestURL}>
                   Create Pull Request
                 </Link>
               </Button>
-            ) : (
+            ) : branch.pr_number !== undefined ? (
               <div className="flex items-center">
                 <Link
                   href={`https://github.com/${repo}/pull/${branch.pr_number}`}
@@ -258,7 +265,7 @@ export const BranchRow = ({
                   </Link>
                 </Button>
               </div>
-            )}
+            ) : null}
             <WorkflowLogs projectRef={branch.project_ref} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -308,6 +315,30 @@ export const BranchRow = ({
                     <TooltipContent side="left">
                       Branch is still initializing. Please wait for the branch to become healthy
                       before switching modes
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger
+                    asChild={canUpdateBranches && isBranchActiveHealthy}
+                    className="w-full"
+                  >
+                    <DropdownMenuItem
+                      className="gap-x-2"
+                      disabled={!canUpdateBranches || !isBranchActiveHealthy || isUpdating}
+                      onSelect={() => setShowEditBranchModal(true)}
+                      onClick={() => setShowEditBranchModal(true)}
+                    >
+                      <Pencil size={14} />
+                      Edit Branch
+                    </DropdownMenuItem>
+                  </TooltipTrigger>
+                  {(!canUpdateBranches || !isBranchActiveHealthy) && (
+                    <TooltipContent side="left">
+                      {!canUpdateBranches
+                        ? 'You need additional permissions to edit branches'
+                        : 'Branch is still initializing. Please wait for the branch to become healthy before editing.'}
                     </TooltipContent>
                   )}
                 </Tooltip>
@@ -373,6 +404,12 @@ export const BranchRow = ({
           </div>
         )}
       </div>
+
+      <EditBranchModal
+        branch={branch}
+        visible={showEditBranchModal}
+        onClose={() => setShowEditBranchModal(false)}
+      />
     </div>
   )
 }

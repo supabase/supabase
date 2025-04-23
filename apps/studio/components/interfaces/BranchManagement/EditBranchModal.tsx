@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Check, ExternalLink, Github, GitBranch, Loader2, DollarSign } from 'lucide-react'
+import { Check, ExternalLink, Github, GithubIcon, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -9,13 +9,12 @@ import * as z from 'zod'
 
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
-import { useBranchesQuery } from 'data/branches/branches-query'
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation' // Import update mutation
+import { Branch, useBranchesQuery } from 'data/branches/branches-query' // Import Branch type
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useAppStateSnapshot } from 'state/app-state'
 import { sidePanelsState } from 'state/side-panels'
 import {
   Button,
@@ -35,21 +34,20 @@ import {
   DialogSectionSeparator,
   cn,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import Image from 'next/image'
 import { BASE_PATH } from 'lib/constants'
 
-interface CreateBranchModalProps {
+interface EditBranchModalProps {
+  branch?: Branch // Accept the branch to edit
   visible: boolean
   onClose: () => void
 }
 
-const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
+const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalProps) => {
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
-  const snap = useAppStateSnapshot()
 
   const [isGitBranchValid, setIsGitBranchValid] = useState(false)
 
@@ -73,31 +71,34 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
       onError: () => {},
     })
 
-  const { mutate: createBranch, isLoading: isCreating } = useBranchCreateMutation({
+  // Use update mutation
+  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
     onSuccess: (data) => {
-      toast.success(`Successfully created preview branch "${data.name}"`)
+      toast.success(`Successfully updated branch "${data.name}"`)
       onClose()
     },
     onError: (error) => {
-      toast.error(`Failed to create branch: ${error.message}`)
+      toast.error(`Failed to update branch: ${error.message}`)
     },
   })
 
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
   const [repoOwner, repoName] = githubConnection?.repository.name.split('/') ?? []
 
-  const formId = 'create-branch-form'
+  const formId = 'edit-branch-form'
   const FormSchema = z
     .object({
       branchName: z
         .string()
         .min(1, 'Branch name cannot be empty')
         .refine(
-          (val) => /^[a-zA-Z0-9\-\_]+$/.test(val),
+          (val) => /^[a-zA-Z0-9\\-\\_]+$/.test(val),
           'Branch name can only contain alphanumeric characters, hyphens, and underscores.'
         )
         .refine(
-          (val) => (branches ?? []).every((branch) => branch.name !== val),
+          (val) =>
+            // Allow the current branch name during edit
+            val === branch?.name || (branches ?? []).every((b) => b.name !== val),
           'A branch with this name already exists'
         ),
       gitBranchName: z.string().optional(),
@@ -119,6 +120,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
           })
         }
       } else {
+        // If git branch is empty or removed, it's valid
         setIsGitBranchValid(!val.gitBranchName || val.gitBranchName.length === 0)
       }
     })
@@ -132,29 +134,55 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
 
   const isFormValid =
     form.formState.isValid && (!form.getValues('gitBranchName') || isGitBranchValid)
-  const canSubmit = isFormValid && !isCreating && !isChecking
+  const canSubmit = isFormValid && !isUpdating && !isChecking
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
-    createBranch({
+    if (!branch?.id) return console.error('Branch ID is required')
+
+    // Type conforms to BranchUpdateVariables (string | undefined for gitBranch)
+    const payload: {
+      projectRef: string
+      id: string
+      branchName: string
+      gitBranch?: string
+    } = {
       projectRef,
+      id: branch.id,
       branchName: data.branchName,
-      ...(data.gitBranchName && isGitBranchValid ? { gitBranch: data.gitBranchName } : {}),
-    })
+      // gitBranch is initially undefined
+    }
+
+    // Only add gitBranch to the payload if it is present and valid
+    if (data.gitBranchName && isGitBranchValid) {
+      payload.gitBranch = data.gitBranchName
+    }
+    // If gitBranchName is empty or invalid, gitBranch remains undefined in the payload
+
+    updateBranch(payload)
   }
 
+  // Pre-fill form when the modal becomes visible and branch data is available
   useEffect(() => {
-    if (form && visible) {
-      setIsGitBranchValid(false)
-      form.reset()
+    if (visible && branch) {
+      setIsGitBranchValid(!!branch.git_branch) // Initial validity based on existing link
+      form.reset({
+        branchName: branch.name ?? '',
+        gitBranchName: branch.git_branch ?? '',
+      })
     }
-  }, [form, visible])
+  }, [branch, visible, form])
 
+  // Handle initial state and changes for git branch validity
   useEffect(() => {
     setIsGitBranchValid(
       !form.getValues('gitBranchName') || form.getValues('gitBranchName')?.length === 0
     )
-  }, [githubConnection?.id, form.getValues('gitBranchName')])
+    // Trigger validation if a git branch name exists initially or is entered
+    if (form.getValues('gitBranchName')) {
+      form.trigger('gitBranchName')
+    }
+  }, [githubConnection?.id, form.getValues('gitBranchName'), form.trigger, visible, branch])
 
   const openLinkerPanel = () => {
     onClose()
@@ -165,7 +193,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
     <Dialog open={visible} onOpenChange={(open) => !open && onClose()}>
       <DialogContent size="large">
         <DialogHeader padding="small">
-          <DialogTitle>Create a new preview branch</DialogTitle>
+          <DialogTitle>Edit branch "{branch?.name}"</DialogTitle> {/* Update title */}
         </DialogHeader>
         <DialogSectionSeparator />
         <Form_Shadcn_ {...form}>
@@ -263,25 +291,21 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
               )}
             </DialogSection>
 
-            <DialogFooter className="sm:justify-between gap-2" padding="medium">
-              <p className="flex items-center gap-2 text-sm text-foreground">
-                <DollarSign size={16} strokeWidth={1.5} />
-                Each preview branch costs $0.32 per day
-              </p>
-              <div className="flex items-center gap-2">
-                <Button disabled={isCreating} type="default" onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button
-                  form={formId}
-                  disabled={!isSuccessConnections || isCreating || !canSubmit || isChecking}
-                  loading={isCreating}
-                  type="primary"
-                  htmlType="submit"
-                >
-                  Create branch
-                </Button>
-              </div>
+            <DialogFooter padding="medium">
+              {' '}
+              {/* Remove billing notice */}
+              <Button disabled={isUpdating} type="default" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                form={formId}
+                disabled={!isSuccessConnections || isUpdating || !canSubmit || isChecking}
+                loading={isUpdating}
+                type="primary"
+                htmlType="submit"
+              >
+                Update branch {/* Update button text */}
+              </Button>
             </DialogFooter>
           </form>
         </Form_Shadcn_>
@@ -290,4 +314,4 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
   )
 }
 
-export default CreateBranchModal
+export default EditBranchModal

@@ -17,6 +17,8 @@ const AccountConnections = () => {
     error,
   } = useGitHubAuthorizationQuery()
 
+  console.log('gitHubAuthorization', gitHubAuthorization)
+
   const isConnected = gitHubAuthorization !== null
 
   const handleConnect = () => {
