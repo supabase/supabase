@@ -157,6 +157,8 @@ export const SupportFormV2 = ({
         action: 'support_ticket_submitted',
         properties: {
           ticketCategory: variables.category,
+        },
+        groups: {
           project: variables.projectRef,
           organization: variables.organizationSlug,
         },

@@ -24,7 +24,7 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
   const onAiAssistantClicked = useCallback(() => {
     sendEvent({
       action: 'ai_assistant_in_support_form_clicked',
-      properties: {
+      groups: {
         project: projectRef,
         organization: organizationSlug,
       },
