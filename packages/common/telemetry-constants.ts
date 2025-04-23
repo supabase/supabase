@@ -1265,6 +1265,8 @@ export interface SupportTicketSubmittedEvent {
   action: 'support_ticket_submitted'
   properties: {
     ticketCategory: string
+  }
+  groups: {
     project?: string
     organization?: string
   }
@@ -1280,7 +1282,7 @@ export interface SupportTicketSubmittedEvent {
  */
 export interface AiAssistantInSupportFormClickedEvent {
   action: 'ai_assistant_in_support_form_clicked'
-  properties: {
+  groups: {
     project?: string
     organization?: string
   }
