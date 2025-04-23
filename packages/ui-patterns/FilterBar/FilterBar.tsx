@@ -1020,12 +1020,17 @@ export function FilterBar({
                 <CommandItem_Shadcn_
                   key={item.value}
                   onSelect={() => handleCommandSelect(item.value)}
-                  className={`text-xs font-mono ${
+                  className={`text-xs font-mono flex items-center gap-3 ${
                     index === selectedCommandIndex ? 'bg-surface-400' : ''
                   }`}
                 >
                   {item.icon}
-                  {item.label}
+                  {item.value}
+                  {item.label && (
+                    <span className="text-xs text-foreground-lighter/50 bg-surface-75 py-0.5 rounded px-1">
+                      {item.label}
+                    </span>
+                  )}
                 </CommandItem_Shadcn_>
               ))}
             </CommandGroup_Shadcn_>

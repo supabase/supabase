@@ -121,7 +121,7 @@ const DefaultHeader = ({ data }: { data: any }) => {
 
   return (
     <div className="flex items-center gap-4 justify-between grow">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 grow">
         {/* <DataTableFilter table={tableAdapter} /> */}
         <TableEditorFilters />
       </div>
