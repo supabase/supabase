@@ -10,6 +10,8 @@
     "test:local": "pnpm env:setup && export ENV=local && export PROJECT_REF=default && playwright test",
     "posttest:local": "supabase stop --no-backup",
     "test:staging": "export ENV=staging && playwright test",
+    "codegen:setup": "pnpm env:setup && NODE_ENV=test pnpm --prefix ../../apps/studio dev",
+    "codegen": "playwright codegen http://localhost:8082/project/default",
     "clean": "rimraf node_modules"
   },
   "keywords": [],

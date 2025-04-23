@@ -20,6 +20,7 @@ import CTABanner from '~/components/CTABanner'
 import LW11Summary from '~/components/LaunchWeek/11/LW11Summary'
 import LW12Summary from '~/components/LaunchWeek/12/LWSummary'
 import LW13Summary from '~/components/LaunchWeek/13/Releases/LWSummary'
+import LW14Summary from '~/components/LaunchWeek/14/Releases/LWSummary'
 import BlogLinks from '~/components/LaunchWeek/7/BlogLinks'
 import LWXSummary from '~/components/LaunchWeek/X/LWXSummary'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -137,6 +138,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   const isGAWeek = props.blog.launchweek?.toString().toLocaleLowerCase() === '11'
   const isLaunchWeek12 = props.blog.launchweek?.toString().toLocaleLowerCase() === '12'
   const isLaunchWeek13 = props.blog.launchweek?.toString().toLocaleLowerCase() === '13'
+  const isLaunchWeek14 = props.blog.launchweek?.toString().toLocaleLowerCase() === '14'
 
   const author = authorArray
     .map((authorId) => {
@@ -350,6 +352,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                   {isGAWeek && <LW11Summary />}
                   {isLaunchWeek12 && <LW12Summary />}
                   {isLaunchWeek13 && <LW13Summary />}
+                  {isLaunchWeek14 && <LW14Summary />}
                   <div className="block lg:hidden py-8">
                     <div className="text-foreground-lighter text-sm">Share this article</div>
                     <ShareArticleActions title={props.blog.title} slug={props.blog.slug} />

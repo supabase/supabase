@@ -685,7 +685,7 @@ To make these helpers more flexible as well as more maintainable and easier to u
 
 Therefore we're marking the `withApiAuth`, `withPageAuth`, and `withMiddlewareAuth` higher order functions as deprecated and they will be removed in the next **minor** release (v0.6.X).
 
-Please follow the steps below to update your API routes, pages, and middleware handlers. Thanks!
+Follow the steps below to update your API routes, pages, and middleware handlers. Thanks!
 
 #### `withApiAuth` deprecated!
 
@@ -874,9 +874,9 @@ export const config = {
 
 ### Migrating to v0.4.X and supabase-js v2
 
-With the update to `supabase-js` v2 the `auth` API routes are no longer required, therefore you can go ahead and delete your `auth` directory under the `/pages/api/` directory. Please refer to the [v2 migration guide](/docs/reference/javascript/v1/upgrade-guide) for the full set of changes within supabase-js.
+With the update to `supabase-js` v2 the `auth` API routes are no longer required, therefore you can go ahead and delete your `auth` directory under the `/pages/api/` directory. Refer to the [v2 migration guide](/docs/reference/javascript/v1/upgrade-guide) for the full set of changes within supabase-js.
 
-The `/api/auth/logout` API route has been removed, please use the `signout` method instead:
+The `/api/auth/logout` API route has been removed, use the `signout` method instead:
 
 ```jsx
 <button

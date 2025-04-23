@@ -24,7 +24,7 @@ const SignInWithGitHub = () => {
           process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
             ? location.origin
             : process.env.NEXT_PUBLIC_SITE_URL
-        }${BASE_PATH}/sign-in-mfa`
+        }${BASE_PATH}/sign-in-mfa?method=github`
       )
 
       const { error } = await auth.signInWithOAuth({

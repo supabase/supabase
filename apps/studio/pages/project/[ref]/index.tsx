@@ -6,11 +6,12 @@ import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/H
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 import { SecurityStatus } from 'components/interfaces/Home/SecurityStatus'
 import ServiceStatus from 'components/interfaces/Home/ServiceStatus'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import { InlineLink } from 'components/ui/InlineLink'
-import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner'
+import { ProjectUpgradeFailedBanner } from 'components/ui/ProjectUpgradeFailedBanner'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDb, useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
@@ -26,8 +27,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const Home: NextPageWithLayout = () => {
   const organization = useSelectedOrganization()
@@ -143,7 +142,7 @@ const Home: NextPageWithLayout = () => {
 }
 
 Home.getLayout = (page) => (
-  <DefaultLayout showProductMenu={false}>
+  <DefaultLayout>
     <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
   </DefaultLayout>
 )

@@ -391,7 +391,7 @@ All of this is glued together in a [Vercel Edge Function](https://vercel.com/doc
 
     With the relevant content for the user's question identified, we can now build the prompt and make a text completion request via the OpenAI API.
 
-    If successful, the OpenAI API will respond with a `text/event-stream` response that we can simply forward to the client where we'll process the event stream to smoothly print the answer to the user.
+    If successful, the OpenAI API will respond with a `text/event-stream` response that we can forward to the client where we'll process the event stream to smoothly print the answer to the user.
 
     </StepHikeCompact.Details>
 

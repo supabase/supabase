@@ -9,22 +9,26 @@ import {
   Label_Shadcn_,
   RadioGroup_Shadcn_,
   RadioGroupLargeItem_Shadcn_,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
   Separator,
   singleThemes,
-  Switch,
   Theme,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { DEFAULT_SIDEBAR_BEHAVIOR } from 'components/interfaces/Sidebar'
 
 export const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
 
-  const [allowNavPanelToExpand, setAllowNavPanelToExpand] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
-    true
+  const [sidebarBehaviour, setSidebarBehaviour] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
+    DEFAULT_SIDEBAR_BEHAVIOR
   )
-
   /**
    * Avoid Hydration Mismatch
    * https://github.com/pacocoursey/next-themes?tab=readme-ov-file#avoid-hydration-mismatch
@@ -83,15 +87,24 @@ export const ThemeSettings = () => {
       <Panel.Content>
         <FormItemLayout
           isReactForm={false}
-          label="Expand Navigation menu"
+          label="Sidebar behavior"
           layout="flex-row-reverse"
-          description="Allow the Navigation panel to expand on hover"
+          description="Choose your preferred sidebar behavior: open, closed, or expand on hover."
         >
-          <Switch
-            size="large"
-            checked={allowNavPanelToExpand}
-            onCheckedChange={setAllowNavPanelToExpand}
-          />
+          <Select_Shadcn_
+            value={sidebarBehaviour}
+            onValueChange={setSidebarBehaviour}
+            aria-label="Select an option"
+          >
+            <SelectTrigger_Shadcn_>
+              <SelectValue_Shadcn_ placeholder="Choose an option" />
+            </SelectTrigger_Shadcn_>
+            <SelectContent_Shadcn_>
+              <SelectItem_Shadcn_ value="open">Expanded</SelectItem_Shadcn_>
+              <SelectItem_Shadcn_ value="closed">Collapsed</SelectItem_Shadcn_>
+              <SelectItem_Shadcn_ value="expandable">Expand on hover</SelectItem_Shadcn_>
+            </SelectContent_Shadcn_>
+          </Select_Shadcn_>
         </FormItemLayout>
       </Panel.Content>
     </Panel>

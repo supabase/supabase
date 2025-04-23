@@ -1,32 +1,25 @@
-import { Eye, EyeOff, RefreshCw, Search, Terminal } from 'lucide-react'
+import dayjs from 'dayjs'
+import { Eye, EyeOff, RefreshCw, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
-import dayjs from 'dayjs'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useParams } from 'common'
-import CSVButton from 'components/ui/CSVButton'
+// import CSVButton from 'components/ui/CSVButton'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { IS_PLATFORM } from 'lib/constants'
-import { Button, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
-import { Calendar } from 'ui'
-import DatePickers from './Logs.DatePickers'
-import {
-  FILTER_OPTIONS,
-  LOG_ROUTES_WITH_REPLICA_SUPPORT,
-  LogsTableName,
-  PREVIEWER_DATEPICKER_HELPERS,
-  SQL_FILTER_TEMPLATES,
-} from './Logs.constants'
-import type { Filters, LogSearchCallback, LogTemplate } from './Logs.types'
-import { FilterBar } from 'ui-patterns/FilterBar'
+import { Button, Calendar, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 import type {
-  FilterGroup,
-  FilterCondition,
-  FilterProperty,
   CustomOptionProps,
+  FilterCondition,
+  FilterGroup,
+  FilterProperty,
 } from 'ui-patterns/FilterBar'
+import { FilterBar } from 'ui-patterns/FilterBar'
+import { DatePickerValue } from './Logs.DatePickers'
+import { FILTER_OPTIONS, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
+import type { Filters, LogSearchCallback, LogTemplate } from './Logs.types'
 
 interface CustomDateRangePickerProps {
   value?: { from: Date; to?: Date }
@@ -88,6 +81,8 @@ interface PreviewFilterPanelProps {
   filters: Filters
   onSelectedDatabaseChange: (id: string) => void
   className?: string
+  selectedDatePickerValue: DatePickerValue
+  setSelectedDatePickerValue: (value: DatePickerValue) => void
 }
 
 function useDebounce<T extends (...args: any[]) => void>(callback: T, delay: number) {
@@ -121,8 +116,8 @@ const PreviewFilterPanel = ({
   onRefresh,
   onSearch = () => {},
   defaultSearchValue = '',
-  defaultToValue = '',
-  defaultFromValue = '',
+  defaultFromValue,
+  defaultToValue,
   onExploreClick,
   queryUrl,
   condensedLayout,
@@ -134,9 +129,13 @@ const PreviewFilterPanel = ({
   table,
   onSelectedDatabaseChange,
   className,
+  selectedDatePickerValue,
+  setSelectedDatePickerValue,
 }: PreviewFilterPanelProps) => {
   const router = useRouter()
   const { ref } = useParams()
+
+  const logName = router.pathname.split('/').pop()
 
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
 
@@ -343,7 +342,7 @@ const PreviewFilterPanel = ({
             Chart
           </Button>
 
-          <CSVButton data={csvData} disabled={!Boolean(csvData)} title="Download data" />
+          {/* <CSVButton data={csvData} disabled={!Boolean(csvData)} title="Download data" /> */}
 
           {showDatabaseSelector ? (
             <>

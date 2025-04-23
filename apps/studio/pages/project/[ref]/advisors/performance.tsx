@@ -8,16 +8,16 @@ import LinterDataGrid from 'components/interfaces/Linter/LinterDataGrid'
 import LinterFilters from 'components/interfaces/Linter/LinterFilters'
 import LinterPageFooter from 'components/interfaces/Linter/LinterPageFooter'
 import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 import { LoadingLine } from 'ui'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
-  const { ref, preset, id } = useParams()
+  const { preset, id } = useParams()
 
   // need to maintain a list of filters for each tab
   const [filters, setFilters] = useState<{ level: LINTER_LEVELS; filters: string[] }[]>([

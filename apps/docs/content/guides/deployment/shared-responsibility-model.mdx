@@ -48,7 +48,7 @@ None of these are right or wrong. It depends on the stage of your project. You _
 
 Supabase isn't a silver-bullet for bad architectural decisions. A poorly designed database will run poorly, no matter where it’s hosted.
 
-You can get away with a poorly-designed database for a while by simply adding compute. After a while, things will start to break. The database schema is the area you want to spend _the most_ time thinking about. That’s the benefit of Supabase - you can spend more time designing a scalable database system and less time thinking about the mundane tasks like implementing CRUD APIs.
+You can get away with a poorly-designed database for a while by adding compute. After a while, things will start to break. The database schema is the area you want to spend _the most_ time thinking about. That’s the benefit of Supabase - you can spend more time designing a scalable database system and less time thinking about the mundane tasks like implementing CRUD APIs.
 
 If you don’t want to implement logic inside your database, that is 100% fine. You can use _any_ tools which work with Postgres.
 
@@ -81,6 +81,10 @@ You are responsible of provisioning enough compute to run the workload that your
 
 We recommend reviewing and applying the recommendations offered in our [Production Checklist](/docs/guides/platform/going-into-prod). This checklist covers the responsibilities discussed here and a few additional general production readiness best practices.
 
+## SOC 2 and compliance
+
+Supabase provides a SOC 2 compliant environment for hosting and managing sensitive data. We recommend reviewing the [SOC 2 compliance responsibilities document](/docs/guides/security/soc-2-compliance) alongside the aforementioned production checklist.
+
 ## Managing healthcare data
 
 You can use Supabase to store and process Protected Health Information (PHI). You are responsible for the following
@@ -97,3 +101,5 @@ You can use Supabase to store and process Protected Health Information (PHI). Yo
 - Not using [Edge functions](/docs/guides/functions) to process PHI.
 - Not storing PHI in [public Storage buckets](/docs/guides/storage/buckets/fundamentals#public-buckets).
 - Not [transferring projects](/docs/guides/platform/project-transfer) to a non-HIPAA organization.
+
+For more information on the shared responsibilities and rules under HIPAA, review the [HIPAA compliance responsibilities document](/docs/guides/security/hipaa-compliance).

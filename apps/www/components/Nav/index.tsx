@@ -23,7 +23,6 @@ import MenuItem from './MenuItem'
 import MobileMenu from './MobileMenu'
 import RightClickBrandLogo from './RightClickBrandLogo'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { TelemetryActions } from 'common/telemetry-constants'
 
 interface Props {
   hideNavbar: boolean
@@ -141,7 +140,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                         href="https://supabase.com/dashboard"
                         onClick={() =>
                           sendTelemetryEvent({
-                            action: TelemetryActions.SIGN_IN_BUTTON_CLICKED,
+                            action: 'sign_in_button_clicked',
                             properties: { buttonLocation: 'Header Nav' },
                           })
                         }
@@ -154,7 +153,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                         href="https://supabase.com/dashboard"
                         onClick={() =>
                           sendTelemetryEvent({
-                            action: TelemetryActions.START_PROJECT_BUTTON_CLICKED,
+                            action: 'start_project_button_clicked',
                             properties: { buttonLocation: 'Header Nav' },
                           })
                         }

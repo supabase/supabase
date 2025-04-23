@@ -462,9 +462,9 @@ Deno.serve(async (req) => {
 
       // Custom headers to report job status
       headers: {
-        'Content-Type': 'application/json',
-        'X-Completed-Jobs': completedJobs.length.toString(),
-        'X-Failed-Jobs': failedJobs.length.toString(),
+        'content-type': 'application/json',
+        'x-completed-jobs': completedJobs.length.toString(),
+        'x-failed-jobs': failedJobs.length.toString(),
       },
     }
   )
@@ -582,7 +582,7 @@ create table documents (
   id integer primary key generated always as identity,
   title text not null,
   content text not null,
-  embedding halfvec,
+  embedding halfvec(1536),
   created_at timestamp with time zone default now()
 );
 
@@ -590,7 +590,9 @@ create table documents (
 create index on documents using hnsw (embedding halfvec_cosine_ops);
 ```
 
-Our `documents` table stores the title and content of each document along with its vector embedding. We use a `halfvec` column to store the embeddings, which is a `pgvector` data type that stores float values in half precision (16 bits) to save space.
+Our `documents` table stores the title and content of each document along with its vector embedding. We use a `halfvec(1536)` column to store the embeddings.
+
+`halfvec` is a `pgvector` data type that stores float values in half precision (16 bits) to save space. Our Edge Function used OpenAI's `text-embedding-3-small` model which generates 1536-dimensional embeddings, so we use the same dimensionality here. Adjust this based on the number of dimensions your embedding model generates.
 
 We use an [HNSW index](/docs/guides/ai/vector-indexes/hnsw-indexes) on the vector column. Note that we are choosing `halfvec_cosine_ops` as the index method, which means our future queries will need to use cosine distance (`<=>`) to find similar embeddings. Also note that HNSW indexes support a maximum of 4000 dimensions for `halfvec` vectors, so keep this in mind when choosing an embedding model. If your model generates embeddings with more than 4000 dimensions, you will need to reduce the dimensionality before indexing them. See [Matryoshka embeddings](/blog/matryoshka-embeddings) for a potential solution to shortening dimensions.
 
@@ -777,11 +779,11 @@ The `embed` Edge Function processes a batch of embedding jobs and returns a `200
 It also returns the number of completed and failed jobs in the response headers. For example:
 
 ```
-X-Completed-Jobs: 1
-X-Failed-Jobs: 1
+x-completed-jobs: 1
+x-failed-jobs: 1
 ```
 
-You can also use the `X-Deno-Execution-Id` header to trace the execution of the Edge Function within the [dashboard](/dashboard/project/_/functions) logs.
+You can also use the `x-deno-execution-id` header to trace the execution of the Edge Function within the [dashboard](/dashboard/project/_/functions) logs.
 
 Each failed job includes an `error` field with a description of the failure. Reasons for a job failing could include:
 
@@ -798,7 +800,7 @@ select
 from
   net._http_response
 where
-  (headers->>'X-Failed-Jobs')::int > 0;
+  (headers->>'x-failed-jobs')::int > 0;
 ```
 
 ## Conclusion

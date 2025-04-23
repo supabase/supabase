@@ -9,14 +9,13 @@ database_id = "bb06ff88-e0a9-41bc-b00b-9afde10468a5"
 
 ## RLS performance and best practices
 
-Although most of the time spent on thinking about RLS is to get it to handle security needs, the impact of it on performance
-of your queries can be massive.
+Although most of the time spent on thinking about RLS is to get it to handle security needs, the impact of it on performance of your queries can be massive.
 This is especially true on queries that look at every row in a table like for many select operations and updates.
 Note that queries that use limit and offset will usually have to query all rows to determine order, not just the limit amount so they are impacted too.
 
-Please see the last section for ways to measure the performance of your queries as you test RLS improvements.
+See the last section for ways to measure the performance of your queries as you test RLS improvements.
 
-### Is RLS causing my performance issue (on a single table query)?
+### Is RLS causing performance issues (on a single table query)?
 
 For very slow queries, or if using the tools at end of article, run a query with RLS enabled on the table and then with it disabled (this should only be done in a non production environment). If the results are similar then your query itself is likely the performance issue. Although, remember any join tables in RLS will also need to run their RLS unless a security definer function is used to bypass them. You can also create a service_role client to run the query bypassing RLS if in a secure environment.
 

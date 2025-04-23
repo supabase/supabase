@@ -19,9 +19,13 @@ export const SqlRunButton = ({
 }: SqlRunButtonProps) => {
   const os = detectOS()
 
+  function handleOnClick() {
+    onClick()
+  }
+
   return (
     <Button
-      onClick={onClick}
+      onClick={handleOnClick}
       disabled={isDisabled}
       type="primary"
       size="tiny"

@@ -1,9 +1,9 @@
-import { streamText } from 'ai'
 import { openai } from '@ai-sdk/openai'
+import pgMeta from '@supabase/pg-meta'
+import { streamText } from 'ai'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getTools } from '../sql/tools'
-import { executeSql } from 'data/sql/execute-sql-query'
-import pgMeta from '@supabase/pg-meta'
 
 export const maxDuration = 30
 const openAiKey = process.env.OPENAI_API_KEY

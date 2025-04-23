@@ -13,7 +13,7 @@ If you have RLS enabled you can test quickly by disable RLS on the table. If you
 
 If you have policies that depend on having a signed in user (TO set to `authenticated` or using `auth.uid()`) then you can check by setting TO as `anon` and setting your policy to just `TRUE`. If that works then you don't have a signed in user (with a JWT in the authorization header) when you make the call.
 
-For more information on RLS please see https://supabase.com/docs/guides/auth/row-level-security
+For more information on RLS see https://supabase.com/docs/guides/auth/row-level-security
 
 Adding:
 To test if you have a user session at time of your call you can add this function with the SQL editor and an RPC call in your code at same place as your current database call.

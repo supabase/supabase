@@ -10,3 +10,11 @@ Rule003Spelling = "include('supa-mdx-lint/Rule003Spelling.toml')"
 [Rule002AdmonitionTypes]
 # Allowed admonition types are:
 admonition_types = ["note", "tip", "caution", "deprecation", "danger"]
+
+[Rule004ExcludeWords]
+rules.filler = "include('supa-mdx-lint/Rule004ExcludeWords/filler.toml')"
+rules.first_person = "include('supa-mdx-lint/Rule004ExcludeWords/first_person.toml')"
+rules.gender_neutral = "include('supa-mdx-lint/Rule004ExcludeWords/gender_neutral.toml')"
+rules.inclusive_wording = "include('supa-mdx-lint/Rule004ExcludeWords/inclusive_wording.toml')"
+rules.preferred_usage = "include('supa-mdx-lint/Rule004ExcludeWords/preferred_usage.toml')"
+rules.slang = "include('supa-mdx-lint/Rule004ExcludeWords/slang.toml')"

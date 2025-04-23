@@ -1,11 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { Filter, Plus } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
+import { useIsTableEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import AlertError from 'components/ui/AlertError'
@@ -44,12 +44,12 @@ import EntityListItem from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
 
 const TableEditorMenu = () => {
-  const { id: _id } = useParams()
-  const router = useRouter()
+  const { ref, id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const isMobile = useBreakpoint()
+  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
 
   const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
@@ -124,7 +124,6 @@ const TableEditorMenu = () => {
             onSelectSchema={(name: string) => {
               setSearchText('')
               setSelectedSchema(name)
-              router.push(`/project/${project?.ref}/editor?schema=${name}`)
             }}
             onSelectCreateSchema={() => snap.onAddSchema()}
           />
@@ -174,12 +173,10 @@ const TableEditorMenu = () => {
             <InnerSideBarFilterSearchInput
               autoFocus={!isMobile}
               name="search-tables"
-              aria-labelledby="Search tables"
-              onChange={(e) => {
-                setSearchText(e.target.value)
-              }}
               value={searchText}
               placeholder="Search tables..."
+              aria-labelledby="Search tables"
+              onChange={(e) => setSearchText(e.target.value)}
             >
               <InnerSideBarFilterSortDropdown
                 value={sort}

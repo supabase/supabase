@@ -10,6 +10,8 @@ Supabase Storage is compatible with the S3 protocol. You can use any S3 client t
 
 Storage supports [standard](/docs/guides/storage/uploads/standard-uploads), [resumable](/docs/guides/storage/uploads/resumable-uploads) and [S3 uploads](/docs/guides/storage/uploads/s3-uploads) and all these protocols are interoperable. You can upload a file with the S3 protocol and list it with the REST API or upload with Resumable uploads and list with S3.
 
+Storage supports presigning a URL using query parameters. Specifically, Supabase Storage expects requests to be made using [AWS Signature Version 4](https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-query-string-auth.html). To enable this feature, enable the S3 connection via S3 protocol in the Settings page for Supabase Storage.
+
 <Admonition type="note">
 
 The S3 protocol is currently in Public Alpha. If you encounter any issues or have feature requests, [contact us](/dashboard/support/new).

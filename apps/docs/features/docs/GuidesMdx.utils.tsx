@@ -15,12 +15,6 @@ import { BASE_PATH } from '~/lib/constants'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
 import { newEditLink } from './GuidesMdx.template'
 
-/**
- * [TODO Charis]
- *
- * This is kind of a dumb place for this to be, clean up later as part of
- * cleaning up navigation menus.
- */
 const PUBLISHED_SECTIONS = [
   'ai',
   'api',
@@ -37,6 +31,7 @@ const PUBLISHED_SECTIONS = [
   'queues',
   'realtime',
   'resources',
+  'security',
   'self-hosting',
   'storage',
   'telemetry',

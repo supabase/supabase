@@ -11,7 +11,6 @@ import StorageVisual from './StorageVisual'
 import VectorVisual from './VectorVisual'
 
 import { PRODUCT_MODULES_SHORTNAMES, PRODUCT_SHORTNAMES } from 'shared-data/products'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 import type { ProductType } from '~/data/MainProducts'
@@ -27,7 +26,7 @@ const Products: React.FC<Props> = (props) => {
     product: PRODUCT_SHORTNAMES | PRODUCT_MODULES_SHORTNAMES | 'data-api'
   ) => {
     return await _sendTelemetryEvent({
-      action: TelemetryActions.HOMEPAGE_PRODUCT_CARD_CLICKED,
+      action: 'homepage_product_card_clicked',
       properties: { product },
     })
   }

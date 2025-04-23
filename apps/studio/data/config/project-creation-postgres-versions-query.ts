@@ -55,21 +55,27 @@ export const useProjectCreationPostgresVersionsQuery = <TData = ProjectCreationP
     ({ signal }) =>
       getPostgresCreationVersions({ organizationSlug, cloudProvider, dbRegion }, signal),
     {
-      enabled: enabled && typeof organizationSlug !== 'undefined',
+      enabled:
+        enabled &&
+        typeof organizationSlug !== 'undefined' &&
+        organizationSlug !== '_' &&
+        typeof dbRegion !== 'undefined',
       ...options,
     }
   )
 }
 
-export const useAvailableOrioleImageVersion = ({
-  cloudProvider,
-  dbRegion,
-  organizationSlug,
-}: ProjectCreationPostgresVersionsVariables) => {
-  const { data } = useProjectCreationPostgresVersionsQuery({
-    cloudProvider,
-    dbRegion,
-    organizationSlug,
-  })
+export const useAvailableOrioleImageVersion = (
+  { cloudProvider, dbRegion, organizationSlug }: ProjectCreationPostgresVersionsVariables,
+  { enabled }: { enabled?: boolean }
+) => {
+  const { data } = useProjectCreationPostgresVersionsQuery(
+    {
+      cloudProvider,
+      dbRegion,
+      organizationSlug,
+    },
+    { enabled }
+  )
   return (data?.available_versions ?? []).find((x) => x.postgres_engine === '17-oriole')
 }

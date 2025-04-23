@@ -21,7 +21,7 @@ interface TerminalInstructionsProps extends ComponentPropsWithoutRef<typeof Coll
   removeBorder?: boolean
 }
 
-const TerminalInstructions = forwardRef<
+export const TerminalInstructions = forwardRef<
   ElementRef<typeof Collapsible_Shadcn_>,
   TerminalInstructionsProps
 >(({ closable = false, removeBorder = false, ...props }, ref) => {
@@ -45,7 +45,7 @@ const TerminalInstructions = forwardRef<
 
   // get the .co or .net TLD from the restUrl
   const restUrl = `https://${endpoint}`
-  const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
+  const restUrlTld = !!endpoint ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
   const commands: Commands[] = [
     {
@@ -158,5 +158,3 @@ const TerminalInstructions = forwardRef<
 })
 
 TerminalInstructions.displayName = 'TerminalInstructions'
-
-export default TerminalInstructions

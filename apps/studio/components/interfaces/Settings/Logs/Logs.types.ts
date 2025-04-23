@@ -91,7 +91,9 @@ export type QueryType =
   | 'supavisor'
   | 'postgrest'
   | 'warehouse'
+  | 'pg_upgrade'
   | 'pg_cron'
+  | 'pgbouncer'
 
 export type Mode = 'simple' | 'custom'
 

@@ -108,6 +108,21 @@ export const ChartConfig = ({
 
   const resultToRender = config.cumulative ? cumulativeResults : results.rows
 
+  const getDateFormat = (key: any) => {
+    const value = resultToRender?.[0]?.[key] || ''
+    if (typeof value === 'number') return 'number'
+    if (dayjs(value).isValid()) return 'date'
+    return 'string'
+  }
+
+  const xKeyDateFormat = getDateFormat(config.xKey)
+
+  const onFlip = () => {
+    const newY = config.xKey
+    const newX = config.yKey
+    onConfigChange({ ...config, xKey: newX, yKey: newY })
+  }
+
   if (!resultKeys.length) {
     return (
       <div className="p-2">
@@ -119,70 +134,45 @@ export const ChartConfig = ({
     )
   }
 
-  const getDateFormat = (key: any) => {
-    const value = resultToRender?.[0]?.[key] || ''
-    if (typeof value === 'number') return 'number'
-    if (dayjs(value).isValid()) return 'date'
-    return 'string'
-  }
-
-  const xKeyDateFormat = getDateFormat(config.xKey)
-
-  const ChartPanel = () => {
-    if (!hasConfig) {
-      return (
-        <ResizablePanel className="p-4 h-full" defaultSize={75}>
-          <NoDataPlaceholder
-            size="normal"
-            title="Configure your chart"
-            description="Select your X and Y axis in the chart options panel"
-          />
-        </ResizablePanel>
-      )
-    }
-
-    if (config.type === 'bar') {
-      return (
-        <BarChart
-          showLegend
-          size="normal"
-          xAxisIsDate={xKeyDateFormat === 'date'}
-          data={resultToRender}
-          xAxisKey={config.xKey}
-          yAxisKey={config.yKey}
-          showGrid={config.showGrid}
-          XAxisProps={{
-            angle: 0,
-            interval: 'preserveStart',
-            hide: !config.showLabels,
-            tickFormatter: (idx: string) => {
-              const value = resultToRender[+idx][config.xKey]
-              if (xKeyDateFormat === 'date') {
-                return dayjs(value).format('MMM D YYYY HH:mm')
-              }
-              return value
-            },
-          }}
-          YAxisProps={{
-            tickFormatter: (value: number) => value.toLocaleString(),
-            hide: !config.showLabels,
-            domain: [0, 'dataMax'],
-          }}
-        />
-      )
-    }
-  }
-
-  const onFlip = () => {
-    const newY = config.xKey
-    const newX = config.yKey
-    onConfigChange({ ...config, xKey: newX, yKey: newY })
-  }
-
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-grow h-full">
       <ResizablePanel className="p-4 h-full" defaultSize={75}>
-        <ChartPanel />
+        {!hasConfig ? (
+          <ResizablePanel className="p-4 h-full" defaultSize={75}>
+            <NoDataPlaceholder
+              size="normal"
+              title="Configure your chart"
+              description="Select your X and Y axis in the chart options panel"
+            />
+          </ResizablePanel>
+        ) : config.type === 'bar' ? (
+          <BarChart
+            showLegend
+            size="normal"
+            xAxisIsDate={xKeyDateFormat === 'date'}
+            data={resultToRender}
+            xAxisKey={config.xKey}
+            yAxisKey={config.yKey}
+            showGrid={config.showGrid}
+            XAxisProps={{
+              angle: 0,
+              interval: 'preserveStart',
+              hide: !config.showLabels,
+              tickFormatter: (idx: string) => {
+                const value = resultToRender[+idx][config.xKey]
+                if (xKeyDateFormat === 'date') {
+                  return dayjs(value).format('MMM D YYYY HH:mm')
+                }
+                return value
+              },
+            }}
+            YAxisProps={{
+              tickFormatter: (value: number) => value.toLocaleString(),
+              hide: !config.showLabels,
+              domain: [0, 'dataMax'],
+            }}
+          />
+        ) : null}
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel

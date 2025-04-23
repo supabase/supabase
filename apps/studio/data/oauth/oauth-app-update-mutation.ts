@@ -11,7 +11,7 @@ export type OAuthAppUpdateVariables = {
   slug: string
   name: string
   website: string
-  icon?: string | null
+  icon?: string
   scopes?: OAuthScope[]
   redirect_uris: string[]
 }
@@ -36,7 +36,7 @@ export async function updateOAuthApp({
     body: {
       name,
       website,
-      icon: icon as undefined, // Generated type is incorrect an allows for `string | undefined` only, while we need `null` here.
+      icon,
       scopes,
       redirect_uris,
     },

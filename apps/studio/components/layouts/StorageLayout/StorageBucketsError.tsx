@@ -20,7 +20,7 @@ const StorageBucketsError = ({ error }: StorageBucketsErrorProps) => {
           actions={[
             <Button key="contact-support" asChild type="default" className="ml-4">
               <Link
-                href={`/support/new?ref=${ref}&category=dashboard_bug&subject=Unable%20to%20fetch%20storage%20buckets`}
+                href={`/support/new?projectRef=${ref}&category=dashboard_bug&subject=Unable%20to%20fetch%20storage%20buckets`}
               >
                 Contact support
               </Link>

@@ -122,9 +122,7 @@ export async function generateReferenceMetadata(
   { params: { slug } }: { params: { slug: Array<string> } },
   resolvingParent: ResolvingMetadata
 ): Promise<Metadata> {
-  console.log('[ENTER] generateReferenceMetadata')
   const { alternates: parentAlternates, openGraph: parentOg } = await resolvingParent
-  console.log('[INFO] generateReferenceMetadata: post await resolvingParent')
 
   const parsedPath = parseReferencePath(slug)
   const isClientSdkReference = parsedPath.__type === 'clientSdk'
@@ -167,7 +165,6 @@ export async function generateReferenceMetadata(
       },
     }
   } else if (isCliReference) {
-    console.log('[PRE-RETURN] generateReferenceMetadata: isCliReference')
     return {
       title: 'CLI Reference | Supabase Docs',
       description: 'CLI reference for the Supabase CLI',

@@ -8,7 +8,7 @@ const Authentication: NextPageWithLayout = () => {
 
 Authentication.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout title="Authentication">{page}</AuthLayout>
+    <AuthLayout>{page}</AuthLayout>
   </DefaultLayout>
 )
 

@@ -42,7 +42,6 @@ import {
   validateFields,
 } from './TableEditor.utils'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 export interface TableEditorProps {
@@ -359,7 +358,7 @@ const TableEditor = ({
             checked={tableFields.isRealtimeEnabled}
             onChange={() => {
               sendEvent({
-                action: TelemetryActions.REALTIME_TOGGLE_TABLE_CLICKED,
+                action: 'realtime_toggle_table_clicked',
                 properties: {
                   newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
                   origin: 'tableSidePanel',

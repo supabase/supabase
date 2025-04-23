@@ -7,7 +7,6 @@ import TwitterSocialProofMobile from './Sections/TwitterSocialProofMobile'
 
 import Tweets from '~/data/tweets/Tweets.json'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { TelemetryActions } from 'common/telemetry-constants'
 
 const TwitterSocialSection = () => {
   const tweets = Tweets.slice(0, 18)
@@ -28,7 +27,7 @@ const TwitterSocialSection = () => {
               tabIndex={-1}
               onClick={() =>
                 sendTelemetryEvent({
-                  action: TelemetryActions.HOMEPAGE_GITHUB_DISCUSSIONS_BUTTON_CLICKED,
+                  action: 'homepage_github_discussions_button_clicked',
                 })
               }
             >
@@ -42,7 +41,7 @@ const TwitterSocialSection = () => {
               tabIndex={-1}
               onClick={() =>
                 sendTelemetryEvent({
-                  action: TelemetryActions.HOMEPAGE_DISCORD_BUTTON_CLICKED,
+                  action: 'homepage_discord_button_clicked',
                 })
               }
             >

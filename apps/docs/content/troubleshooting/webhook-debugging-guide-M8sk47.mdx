@@ -28,7 +28,7 @@ Otherwise, it is necessary to fast reboot your instance in the [Dashboard's Sett
 
 **2. Remove any triggers on net tables:**
 
-Using `pg_net` in triggers on most tables is fine; however, please do not add triggers to the `net._http_response` or `net.http_request_queue` tables.
+Using `pg_net` in triggers on most tables is fine; however, do not add triggers to the `net._http_response` or `net.http_request_queue` tables.
 
 The `net` tables are special and if triggers on them fail or call a pg_net function (`http_get`, `http_post`, `http_delete`), it can lead to an infinite loop. This warning is irrelevant to most projects, but it's worth specifying just in case.
 
@@ -85,4 +85,4 @@ If none of the above suggestions uncovered the cause of the error, for debugging
 
 **Conclusion:**
 
-If your issue still persists, please document it as an issue in the [PG_NET GitHub Repo](https://github.com/supabase/pg_net/issues). You are also welcome to contact Supabase Support from your project's [Dashboard](https://supabase.com/dashboard/project/_/) for more guidance.
+If your issue still persists, document it as an issue in the [PG_NET GitHub Repo](https://github.com/supabase/pg_net/issues). You are also welcome to contact Supabase Support from your project's [Dashboard](https://supabase.com/dashboard/project/_/) for more guidance.

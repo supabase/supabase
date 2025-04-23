@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { Button } from 'ui'
 import ProductIcon from '../ProductIcon'
 import { BookOpen } from 'lucide-react'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 type subheader = string
@@ -56,7 +55,7 @@ const ProductHeader = (props: Types) => {
                 as="https://supabase.com/dashboard"
                 onClick={() =>
                   sendTelemetryEvent({
-                    action: TelemetryActions.START_PROJECT_BUTTON_CLICKED,
+                    action: 'start_project_button_clicked',
                     properties: { buttonLocation: 'Product Page Header - ' + props.title },
                   })
                 }
@@ -72,7 +71,7 @@ const ProductHeader = (props: Types) => {
                   className="ml-2"
                   onClick={() =>
                     sendTelemetryEvent({
-                      action: TelemetryActions.SEE_DOCUMENTATION_BUTTON_CLICKED,
+                      action: 'see_documentation_button_clicked',
                       properties: {
                         buttonLocation: 'Product Page Header - ' + props.title,
                       },

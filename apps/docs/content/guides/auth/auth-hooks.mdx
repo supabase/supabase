@@ -238,7 +238,7 @@ uri = "http://host.docker.internal:54321/functions/v1/send_sms"
 secrets = "env(SEND_SMS_HOOK_SECRETS)"
 ```
 
-<Admonition type="info">
+<Admonition type="note">
 
 `host.docker.internal` is a special DNS name used in Docker to allow a container to access the host machine's network. This allows the Auth container to reach your HTTP function, no matter if it's a Supabase Edge Function or a custom endpoint.
 

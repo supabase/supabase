@@ -96,7 +96,6 @@ export const Admonition = forwardRef<
   ) => {
     const typeMapped = variant ? admonitionToAlertMapping[variant] : admonitionToAlertMapping[type]
 
-
     return (
       <Alert_Shadcn_
         ref={ref}

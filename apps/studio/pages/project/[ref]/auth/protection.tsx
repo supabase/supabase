@@ -1,45 +1,47 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import {
-  AuthProvidersForm,
-  ProtectionAuthSettingsForm,
-  ThirdPartyAuthForm,
-} from 'components/interfaces/Auth'
+import { ProtectionAuthSettingsForm } from 'components/interfaces/Auth'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ScaffoldHeader, ScaffoldContainer, ScaffoldTitle } from 'components/layouts/Scaffold'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 
-const PageLayout: NextPageWithLayout = () => {
-  const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
+const ProtectionPage: NextPageWithLayout = () => {
   const isPermissionsLoaded = usePermissionsLoaded()
+  const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
 
   if (isPermissionsLoaded && !canReadAuthSettings) {
     return <NoPermission isFullPage resourceText="access your project's auth provider settings" />
-  } else {
-    return (
-      <div>
-        <ScaffoldHeader className="pb-0">
-          <ScaffoldContainer id="auth-page-top">
-            <ScaffoldTitle>Attack Protection</ScaffoldTitle>
-          </ScaffoldContainer>
-        </ScaffoldHeader>
-
-        <ScaffoldContainer className="my-8 space-y-8">
-          <ProtectionAuthSettingsForm />
-        </ScaffoldContainer>
-      </div>
-    )
   }
-}
 
-PageLayout.getLayout = (page) => {
   return (
-    <DefaultLayout>
-      <AuthLayout>{page}</AuthLayout>
-    </DefaultLayout>
+    <ScaffoldContainer>
+      {!isPermissionsLoaded ? (
+        <div className="mt-12">
+          <GenericSkeletonLoader />
+        </div>
+      ) : (
+        <ProtectionAuthSettingsForm />
+      )}
+    </ScaffoldContainer>
   )
 }
-export default PageLayout
+
+ProtectionPage.getLayout = (page) => (
+  <DefaultLayout>
+    <AuthLayout>
+      <PageLayout
+        title="Attack Protection"
+        subtitle="Configure security settings to protect your project from attacks"
+      >
+        {page}
+      </PageLayout>
+    </AuthLayout>
+  </DefaultLayout>
+)
+
+export default ProtectionPage

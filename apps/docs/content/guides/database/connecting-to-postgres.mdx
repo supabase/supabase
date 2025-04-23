@@ -77,29 +77,25 @@ The connection string looks like this:
 postgresql://postgres:[YOUR-PASSWORD]@db.apbkobhfnmcqqzqeeqss.supabase.co:5432/postgres
 ```
 
-Get your project's direct string from the [Database Settings](/dashboard/project/_/settings/database) page:
+Get your project's direct connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
-1. Go to the `Settings` section.
-2. Click `Database`.
-3. Under `Connection string`, make sure `Display connection pooler` is unchecked. Copy the URI.
+## Shared pooler
 
-## Supavisor session mode
+Every Supabase project includes a free, shared connection pooler. This is ideal for persistent servers when IPv6 is not supported.
 
-The session mode connection string connects to your Postgres instance via a proxy. This is ideal for persistent servers when IPv6 is not supported.
+### Supavisor session mode
+
+The session mode connection string connects to your Postgres instance via a proxy.
 
 The connection string looks like this:
 
 ```
-postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pooler.supabase.com:5432/postgres
+postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
 ```
 
-Get your project's session mode string from the [Database Settings](/dashboard/project/_/settings/database) page:
+Get your project's Session pooler connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
-1. Go to the `Settings` section.
-2. Click `Database`.
-3. Under `Connection string`, make sure `Display connection pooler` is checked and `Session mode` is selected. Copy the URI.
-
-## Supavisor transaction mode
+### Supavisor transaction mode
 
 The transaction mode connection string connects to your Postgres instance via a proxy which serves as a connection pooler. This is ideal for serverless or edge functions, which require many transient connections.
 
@@ -112,14 +108,22 @@ Transaction mode does not support [prepared statements](https://postgresql.org/d
 The connection string looks like this:
 
 ```
-postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pooler.supabase.com:6543/postgres
+postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
 ```
 
-Get your project's transaction mode string from the [Database Settings](/dashboard/project/_/settings/database) page:
+Get your project's Transaction pooler connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
-1. Go to the `Settings` section.
-2. Click `Database`.
-3. Under `Connection string`, make sure `Display connection pooler` is checked and `Transaction mode` is selected. Copy the URI.
+## Dedicated pooler
+
+For paying customers, we provision a Dedicated Pooler ([PgBouncer](https://www.pgbouncer.org/)) that's co-located with your Postgres database. This will require you to connect with IPv6 or, if that's not an option, you can use the [IPv4 add-on](/docs/guides/platform/ipv4-address).
+
+The Dedicated Pooler ensures best performance and latency, while using up more of your project's compute resources. If your network supports IPv6 or you have the IPv4 add-on, we encourage you to use the Dedicated Pooler over the Shared Pooler.
+
+<Admonition type="note">
+
+PgBouncer always runs in Transaction mode and the current version does not support prepared statement (will be added in a few weeks).
+
+</Admonition>
 
 ## More about connection pooling
 

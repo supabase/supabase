@@ -35,7 +35,6 @@ const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) 
 
   return (
     <Modal
-      closable
       size="small"
       alignFooter="right"
       visible={selectedSecret !== undefined}
@@ -51,7 +50,7 @@ const DeleteSecretModal = ({ selectedSecret, onClose }: DeleteSecretModalProps) 
         <div className="space-y-1">
           <p className="text-sm">{selectedSecret?.description}</p>
           <p className="text-sm text-foreground-light">
-            ID: <span className="font-mono">{selectedSecret?.key_id}</span>
+            ID: <span className="font-mono">{selectedSecret?.id}</span>
           </p>
         </div>
       </Modal.Content>

@@ -41,8 +41,8 @@ const NotificationsPopoverV2 = () => {
   // so opting to simplify and implement it here for now
   const rowHeights = useRef<{ [key: number]: number }>({})
 
-  const { data: projects } = useProjectsQuery()
-  const { data: organizations } = useOrganizationsQuery()
+  const { data: projects } = useProjectsQuery({ enabled: open })
+  const { data: organizations } = useOrganizationsQuery({ enabled: open })
   const {
     data,
     error,
@@ -52,19 +52,22 @@ const NotificationsPopoverV2 = () => {
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
-  } = useNotificationsV2Query({
-    status:
-      activeTab === 'archived'
-        ? 'archived'
-        : snap.filterStatuses.includes('unread')
-          ? 'new'
-          : undefined,
-    filters: {
-      priority: snap.filterPriorities,
-      organizations: snap.filterOrganizations,
-      projects: snap.filterProjects,
+  } = useNotificationsV2Query(
+    {
+      status:
+        activeTab === 'archived'
+          ? 'archived'
+          : snap.filterStatuses.includes('unread')
+            ? 'new'
+            : undefined,
+      filters: {
+        priority: snap.filterPriorities,
+        organizations: snap.filterOrganizations,
+        projects: snap.filterProjects,
+      },
     },
-  })
+    { enabled: open }
+  )
   const { data: summary } = useNotificationsSummaryQuery()
   const { mutate: updateNotifications } = useNotificationsV2UpdateMutation()
   const { mutate: archiveAllNotifications, isLoading: isArchiving } =

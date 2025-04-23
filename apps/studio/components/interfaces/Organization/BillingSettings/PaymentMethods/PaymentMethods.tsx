@@ -1,9 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { CreditCardIcon, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
 import {
   ScaffoldSection,
@@ -21,7 +22,6 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { getURL } from 'lib/helpers'
-import { CreditCardIcon, Plus } from 'lucide-react'
 import { Alert, Button } from 'ui'
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
 import CreditCard from './CreditCard'
@@ -151,6 +151,8 @@ const PaymentMethods = () => {
                                 paymentMethodType={subscription?.payment_method_type}
                                 setSelectedMethodForUse={setSelectedMethodForUse}
                                 setSelectedMethodToDelete={setSelectedMethodToDelete}
+                                paymentMethodCount={paymentMethods?.data.length ?? 0}
+                                subscriptionPlan={subscription?.plan.id}
                               />
                             ))}
                           </div>

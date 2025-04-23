@@ -12,6 +12,7 @@ export enum EgressType {
   REALTIME = 'egress_realtime',
   FUNCTIONS = 'egress_functions',
   SUPAVISOR = 'egress_supavisor',
+  LOGDRAIN = 'egress_logdrain',
   UNIFIED = 'egress',
 }
 

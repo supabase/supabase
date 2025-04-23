@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
-import { ChevronRight, ExternalLink, Loader2, Mail, Plus, X } from 'lucide-react'
+import { ChevronRight, ExternalLink, Mail, Plus, X } from 'lucide-react'
 import Link from 'next/link'
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -14,7 +14,6 @@ import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import type { Project } from 'data/projects/project-detail-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import {
@@ -59,16 +58,21 @@ const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
 const CONTAINER_CLASSES = 'px-6'
 
 interface SupportFormV2Props {
+  onProjectSelected: (value: string) => void
+  onOrganizationSelected: (value: string) => void
   setSentCategory: (value: string) => void
-  setSelectedProject: (value: string) => void
 }
 
 // [Joshen] Just naming it as V2 for now for PR review purposes so its easier to view
 // This is a rewrite of the old SupportForm to use the new form components
-export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFormV2Props) => {
+export const SupportFormV2 = ({
+  onProjectSelected: setSelectedProject,
+  onOrganizationSelected: setSelectedOrganization,
+  setSentCategory,
+}: SupportFormV2Props) => {
   const { profile } = useProfile()
   const {
-    ref,
+    projectRef: ref,
     slug,
     category: urlCategory,
     subject: urlSubject,
@@ -113,7 +117,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
     subject: '',
     message: '',
     affectedServices: '',
-    allowSupportAccess: false,
+    allowSupportAccess: true,
   }
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -133,14 +137,10 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
     isSuccess: isSuccessOrganizations,
   } = useOrganizationsQuery()
 
-  const {
-    data: subscription,
-    isLoading: isLoadingSubscription,
-    isSuccess: isSuccessSubscription,
-  } = useOrgSubscriptionQuery({
-    orgSlug: organizationSlug === 'no-org' ? undefined : organizationSlug,
-  })
-
+  const selectedOrganization = useMemo(
+    () => organizations?.find((org) => org.slug === organizationSlug),
+    [organizationSlug, organizations]
+  )
   const {
     data: allProjects,
     isLoading: isLoadingProjects,
@@ -161,7 +161,8 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
   })
 
   const respondToEmail = profile?.primary_email ?? 'your email'
-  const subscriptionPlanId = subscription?.plan.id
+  const subscriptionPlanId = selectedOrganization?.plan.id
+
   const projects = [
     ...(allProjects ?? []).filter((project) => project.organization_slug === organizationSlug),
     { ref: 'no-project', name: 'No specific project' } as Partial<Project>,
@@ -268,9 +269,8 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
           form.setValue('projectRef', selectedProject.ref)
         }
       } else if (slug) {
-        const selectedOrganization = organizations?.find((org) => org.slug === slug)
-        if (selectedOrganization !== undefined) {
-          form.setValue('organizationSlug', selectedOrganization.slug)
+        if (organizations.some((it) => it.slug === slug)) {
+          form.setValue('organizationSlug', slug)
         }
       } else if (ref === undefined && slug === undefined) {
         const firstOrganization = organizations?.[0]
@@ -299,6 +299,18 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
   useEffect(() => {
     if (urlMessage) form.setValue('message', urlMessage)
   }, [urlMessage])
+
+  // Sync organization selection with parent state
+  // Initialized as 'no-org' in parent if no org is selected
+  useEffect(() => {
+    setSelectedOrganization(organizationSlug)
+  }, [organizationSlug, setSelectedOrganization])
+
+  // Sync project selection with parent state
+  // Initialized as 'no-project' in parent if no project is selected
+  useEffect(() => {
+    setSelectedProject(projectRef)
+  }, [projectRef, setSelectedProject])
 
   return (
     <Form_Shadcn_ {...form}>
@@ -333,10 +345,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                         ) : (
                           (organizations ?? []).find((o) => o.slug === field.value)?.name
                         )}
-                        {organizationSlug !== 'no-org' && isLoadingSubscription && (
-                          <Loader2 size={14} className="animate-spin" />
-                        )}
-                        {isSuccessSubscription && (
+                        {subscriptionPlanId && (
                           <Badge variant="outline" className="capitalize">
                             {subscriptionPlanId}
                           </Badge>
@@ -693,60 +702,78 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
             <FormField_Shadcn_
               name="allowSupportAccess"
               control={form.control}
-              render={({ field }) => (
-                <FormItemLayout
-                  name="allowSupportAccess"
-                  className="px-6"
-                  layout="flex"
-                  label="Allow Supabase Support and AI-Assisted Diagnostics access to your project"
-                  description={
-                    <Collapsible_Shadcn_>
+              render={({ field }) => {
+                return (
+                  <FormItemLayout
+                    name="allowSupportAccess"
+                    className="px-6"
+                    layout="flex"
+                    label={
                       <div className="flex items-center gap-x-2">
-                        <CollapsibleTrigger_Shadcn_ className="group flex items-center gap-x-2 ">
-                          <ChevronRight
-                            strokeWidth={2}
-                            size={14}
-                            className="transition-all group-data-[state=open]:rotate-90 text-foreground-lighter duration-200 -ml-1"
-                          />
-                          <p className="text-xs text-foreground-light underline">
-                            More information about temporary access
-                          </p>
-                        </CollapsibleTrigger_Shadcn_>
+                        <span className="text-foreground">
+                          Allow support access to your project
+                        </span>
+                        <Badge className="bg-opacity-100">Recommended</Badge>
                       </div>
-                      <CollapsibleContent_Shadcn_ className="text-xs text-foreground-light mt-2 space-y-2">
-                        <p>
-                          By enabling this, you grant permission for our support team to access your
-                          project temporarily and, if applicable, to use AI tools to assist in
-                          diagnosing and resolving issues. This access may involve analyzing
-                          database configurations, query performance, and other relevant data to
-                          expedite troubleshooting and enhance support accuracy. We are committed to
-                          maintaining strict data privacy and security standards in all support
-                          activities.{' '}
-                          <Link
-                            href="https://supabase.com/privacy"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-foreground-light underline hover:text-foreground transition"
+                    }
+                    description={
+                      <div className="flex flex-col">
+                        <span className="text-foreground-light">
+                          Human support and AI diagnostic access.
+                        </span>
+                        <Collapsible_Shadcn_ className="mt-2">
+                          <CollapsibleTrigger_Shadcn_
+                            className={
+                              'group flex items-center gap-x-1 group-data-[state=open]:text-foreground hover:text-foreground transition'
+                            }
                           >
-                            Privacy Policy
-                          </Link>
-                        </p>
-                      </CollapsibleContent_Shadcn_>
-                    </Collapsible_Shadcn_>
-                  }
-                >
-                  <Switch
-                    id="allowSupportAccess"
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormItemLayout>
-              )}
+                            <ChevronRight
+                              strokeWidth={2}
+                              size={14}
+                              className="transition-all group-data-[state=open]:rotate-90 text-foreground-muted -ml-1"
+                            />
+                            <span className="text-sm">More information</span>
+                          </CollapsibleTrigger_Shadcn_>
+                          <CollapsibleContent_Shadcn_ className="text-sm text-foreground-light mt-2 space-y-2">
+                            <p>
+                              By enabling this, you grant permission for our support team to access
+                              your project temporarily and, if applicable, to use AI tools to assist
+                              in diagnosing and resolving issues. This access may involve analyzing
+                              database configurations, query performance, and other relevant data to
+                              expedite troubleshooting and enhance support accuracy.
+                            </p>
+                            <p>
+                              We are committed to maintaining strict data privacy and security
+                              standards in all support activities.{' '}
+                              <Link
+                                href="https://supabase.com/privacy"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-foreground-light underline hover:text-foreground transition"
+                              >
+                                Privacy Policy
+                              </Link>
+                            </p>
+                          </CollapsibleContent_Shadcn_>
+                        </Collapsible_Shadcn_>
+                      </div>
+                    }
+                  >
+                    <Switch
+                      size="large"
+                      id="allowSupportAccess"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormItemLayout>
+                )
+              }}
             />
+            <Separator />
           </>
         )}
 
-        <div className={cn(CONTAINER_CLASSES, 'flex flex-col items-end gap-3 -mt-4')}>
+        <div className={cn(CONTAINER_CLASSES, 'flex flex-col items-end gap-3')}>
           <Button
             htmlType="submit"
             size="large"

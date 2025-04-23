@@ -7,28 +7,18 @@ import { useParams } from 'common'
 import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { usePrimaryDatabase } from 'data/read-replicas/replicas-query'
+import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { Parameter, parseParameters } from 'lib/sql-parameters'
 import { Dashboards } from 'types'
-import {
-  Button,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  cn,
-  CodeBlock,
-  SQL_ICON,
-} from 'ui'
-import { Admonition } from 'ui-patterns'
+import { ChartContainer, ChartTooltip, ChartTooltipContent, cn, CodeBlock, SQL_ICON } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
 import { ButtonTooltip } from '../ButtonTooltip'
+import SqlWarningAdmonition from '../SqlWarningAdmonition'
 import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
 import { ParametersPopover } from './ParametersPopover'
 import { getCumulativeResults } from './QueryBlock.utils'
-import SqlWarningAdmonition from '../SqlWarningAdmonition'
 
 export const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',
@@ -69,18 +59,24 @@ interface QueryBlockProps {
   draggable?: boolean
   /** Tooltip when hovering over the header of the block (Used in Assistant Panel) */
   tooltip?: ReactNode
+  /** Optional: Any initial results to render as part of the query*/
+  results?: any[]
+  /** Opt to show run button if query is not read only */
+  showRunButtonIfNotReadOnly?: boolean
   /** Not implemented yet: Will be the next part of ReportsV2 */
   onSetParameter?: (params: Parameter[]) => void
   /** Optional callback the SQL query is run */
   onRunQuery?: (queryType: 'select' | 'mutation') => void
   /** Optional callback on drag start */
   onDragStart?: (e: DragEvent<Element>) => void
+  /** Optional: callback when the results are returned from running the SQL query*/
+  onResults?: (results: any[]) => void
 
   // [Joshen] Params below are currently only used by ReportsV2 (Might revisit to see how to improve these)
   /** Optional height set to render the SQL query (Used in Reports) */
   queryHeight?: number
-  /** Override hiding Run Query button if SQL query is NOT readonly (Used in Reports) */
-  disableRunIfMutation?: boolean
+  /** UI to render if there's a read-only error while running the query */
+  readOnlyErrorPlaceholder?: ReactNode
   /** UI to render if there's no query results (Used in Reports) */
   noResultPlaceholder?: ReactNode
   /** To trigger a refresh of the query */
@@ -113,22 +109,34 @@ export const QueryBlock = ({
   lockColumns = false,
   draggable = false,
   isRefreshing = false,
-  disableRunIfMutation = false,
   noResultPlaceholder = null,
+  readOnlyErrorPlaceholder = null,
+  showRunButtonIfNotReadOnly = false,
   tooltip,
+  results,
   onRunQuery,
   onSetParameter,
   onUpdateChartConfig,
   onDragStart,
+  onResults,
 }: QueryBlockProps) => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
 
   const [chartSettings, setChartSettings] = useState<ChartConfig>(chartConfig)
   const { xKey, yKey, view = 'table' } = chartSettings
 
   const [showSql, setShowSql] = useState(_showSql)
-  const [queryResult, setQueryResult] = useState<any[]>()
+  const [readOnlyError, setReadOnlyError] = useState(false)
+  const [queryError, setQueryError] = useState<QueryResponseError>()
+  const [queryResult, setQueryResult] = useState<any[] | undefined>(results)
+
+  const formattedQueryResult = useMemo(() => {
+    // Make sure Y axis values are numbers
+    return queryResult?.map((row) => {
+      return Object.fromEntries(Object.entries(row).map(([key, value]) => [key, Number(value)]))
+    })
+  }, [queryResult])
+
   const [parameterValues, setParameterValues] = useState<Record<string, string>>({})
   const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
 
@@ -138,18 +146,31 @@ export const QueryBlock = ({
   }, [sql])
   // [Joshen] This is for when we introduced the concept of parameters into our reports
   // const combinedParameterValues = { ...extParameterValues, ...parameterValues }
-  const isReadOnlySelectSQL = isReadOnlySelect(sql ?? '')
+
+  const { database: primaryDatabase } = usePrimaryDatabase({ projectRef: ref })
+  const postgresConnectionString = primaryDatabase?.connectionString
+  const readOnlyConnectionString = primaryDatabase?.connection_string_read_only
 
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess: (data) => setQueryResult(data.result),
+    onSuccess: (data) => {
+      onResults?.(data.result)
+      setQueryResult(data.result)
+    },
+    onError: (error) => {
+      if (error?.message.includes('permission denied')) {
+        setReadOnlyError(true)
+        if (showRunButtonIfNotReadOnly) setShowWarning('hasWriteOperation')
+      } else {
+        setQueryError(error)
+      }
+    },
   })
 
   const handleExecute = () => {
     if (!sql || isLoading) return
 
-    if (!isReadOnlySelectSQL) {
-      const hasUnknownFunctions = containsUnknownFunction(sql)
-      return setShowWarning(hasUnknownFunctions ? 'hasUnknownFunctions' : 'hasWriteOperation')
+    if (readOnlyError) {
+      return setShowWarning('hasWriteOperation')
     }
 
     try {
@@ -157,7 +178,7 @@ export const QueryBlock = ({
       // const processedSql = processParameterizedSql(sql, combinedParameterValues)
       execute({
         projectRef: ref,
-        connectionString: project?.connectionString,
+        connectionString: readOnlyConnectionString,
         sql,
       })
     } catch (error: any) {
@@ -179,11 +200,10 @@ export const QueryBlock = ({
   }, [sql])
 
   useEffect(() => {
-    if (!!sql && !isLoading && runQuery && isReadOnlySelect(sql) && !!project) {
+    if (!!sql && !isLoading && runQuery && !!readOnlyConnectionString && !readOnlyError) {
       handleExecute()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sql, isLoading, runQuery, project])
+  }, [sql, isLoading, runQuery, readOnlyConnectionString])
 
   useEffect(() => {
     if (isRefreshing) handleExecute()
@@ -252,7 +272,7 @@ export const QueryBlock = ({
 
           <EditQueryButton id={id} title={label} sql={sql} />
 
-          {(isReadOnlySelectSQL || (!isReadOnlySelectSQL && !disableRunIfMutation)) && (
+          {(showRunButtonIfNotReadOnly || !readOnlyError) && (
             <ButtonTooltip
               type="text"
               size="tiny"
@@ -262,7 +282,7 @@ export const QueryBlock = ({
               disabled={isLoading}
               onClick={() => {
                 handleExecute()
-                if (!!sql && isReadOnlySelect(sql)) onRunQuery?.('select')
+                if (!!sql) onRunQuery?.('select')
               }}
               tooltip={{
                 content: {
@@ -294,7 +314,7 @@ export const QueryBlock = ({
               setShowWarning(undefined)
               execute({
                 projectRef: ref,
-                connectionString: project?.connectionString,
+                connectionString: postgresConnectionString,
                 sql,
               })
               onRunQuery?.('mutation')
@@ -333,7 +353,7 @@ export const QueryBlock = ({
       {view === 'chart' && queryResult !== undefined ? (
         <>
           {(queryResult ?? []).length === 0 ? (
-            <div className="flex w-full h-full items-center justify-center">
+            <div className="flex w-full h-full items-center justify-center py-3">
               <p className="text-foreground-light text-xs">No results returned from query</p>
             </div>
           ) : !xKey || !yKey ? (
@@ -355,8 +375,8 @@ export const QueryBlock = ({
                   margin={{ left: 0, right: 0 }}
                   data={
                     chartSettings.cumulative
-                      ? getCumulativeResults({ rows: queryResult ?? [] }, chartSettings)
-                      : queryResult
+                      ? getCumulativeResults({ rows: formattedQueryResult ?? [] }, chartSettings)
+                      : formattedQueryResult
                   }
                 >
                   <CartesianGrid vertical={false} />
@@ -376,7 +396,14 @@ export const QueryBlock = ({
         </>
       ) : (
         <>
-          {queryResult ? (
+          {!isExecuting && !!queryError ? (
+            <div
+              className={cn('flex-1 w-full overflow-auto relative border-t px-3.5 py-2')}
+              style={{ maxHeight: maxHeight ? `${maxHeight}px` : undefined }}
+            >
+              <span className="font-mono text-xs">ERROR: {queryError.message}</span>
+            </div>
+          ) : queryResult ? (
             <div
               className={cn('flex-1 w-full overflow-auto relative')}
               style={{ maxHeight: maxHeight ? `${maxHeight}px` : undefined }}
@@ -384,7 +411,11 @@ export const QueryBlock = ({
               <Results rows={queryResult} />
             </div>
           ) : !isExecuting ? (
-            noResultPlaceholder
+            readOnlyError ? (
+              readOnlyErrorPlaceholder
+            ) : (
+              noResultPlaceholder
+            )
           ) : null}
         </>
       )}

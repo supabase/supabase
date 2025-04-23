@@ -9,7 +9,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
+import ResizableAIWidget from 'components/ui/AIEditor/ResizableAIWidget'
 import { GridFooter } from 'components/ui/GridFooter'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
@@ -29,10 +29,14 @@ import { formatSql } from 'lib/formatSql'
 import { detectOS, uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
+import {
+  isRoleImpersonationEnabled,
+  useGetImpersonatedRoleState,
+} from 'state/role-impersonation-state'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { createTabId, getTabsStore, updateTab } from 'state/tabs'
 import {
   Button,
   DropdownMenu,
@@ -48,8 +52,8 @@ import {
   TooltipTrigger,
   cn,
 } from 'ui'
+import { useSnapshot } from 'valtio'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
-import ResizableAIWidget from 'components/ui/AIEditor/ResizableAIWidget'
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
 import {
@@ -79,14 +83,17 @@ export const SQLEditor = () => {
   const os = detectOS()
   const router = useRouter()
   const { ref, id: urlId } = useParams()
-  const org = useSelectedOrganization()
+
   const { profile } = useProfile()
-  const queryClient = useQueryClient()
   const project = useSelectedProject()
-  const organization = useSelectedOrganization()
-  const appSnap = useAppStateSnapshot()
+  const org = useSelectedOrganization()
+
+  const queryClient = useQueryClient()
+  const store = getTabsStore(ref)
+  const tabs = useSnapshot(store)
+  const aiSnap = useAiAssistantStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const getImpersonatedRole = useGetImpersonatedRole()
+  const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const isOptedInToAI = useOrgOptedIntoAi()
   const [selectedSchemas] = useSchemasForAi(project?.ref!)
@@ -109,6 +116,8 @@ export const SQLEditor = () => {
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<Monaco | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
+  const scrollTopRef = useRef<number>(0)
+
   const [hasSelection, setHasSelection] = useState<boolean>(false)
   const [lineHighlights, setLineHighlights] = useState<string[]>([])
   const [isDiffEditorMounted, setIsDiffEditorMounted] = useState(false)
@@ -134,7 +143,7 @@ export const SQLEditor = () => {
   useAddDefinitions(id, monacoRef.current)
 
   /** React query data fetching  */
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
@@ -290,7 +299,7 @@ export const SQLEditor = () => {
           setLineHighlights([])
         }
 
-        const impersonatedRole = getImpersonatedRole()
+        const impersonatedRoleState = getImpersonatedRoleState()
         const connectionString = databases?.find(
           (db) => db.identifier === databaseSelectorState.selectedDatabaseId
         )?.connectionString
@@ -304,12 +313,9 @@ export const SQLEditor = () => {
         execute({
           projectRef: project.ref,
           connectionString: connectionString,
-          sql: wrapWithRoleImpersonation(formattedSql, {
-            projectRef: project.ref,
-            role: impersonatedRole,
-          }),
+          sql: wrapWithRoleImpersonation(formattedSql, impersonatedRoleState),
           autoLimit: appendAutoLimit ? limit : undefined,
-          isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+          isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
           contextualInvalidation: true,
           handleError: (error) => {
             throw error
@@ -317,7 +323,7 @@ export const SQLEditor = () => {
         })
 
         sendEvent({
-          action: TelemetryActions.SQL_EDITOR_QUERY_RUN_BUTTON_CLICKED,
+          action: 'sql_editor_query_run_button_clicked',
           groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
         })
       }
@@ -330,7 +336,7 @@ export const SQLEditor = () => {
       project,
       hasHipaaAddon,
       execute,
-      getImpersonatedRole,
+      getImpersonatedRoleState,
       setAiTitle,
       databaseSelectorState.selectedDatabaseId,
       databases,
@@ -363,11 +369,25 @@ export const SQLEditor = () => {
     [profile?.id, project?.id, ref, router, snapV2]
   )
 
+  const onMount = (editor: IStandaloneCodeEditor) => {
+    const tabId = createTabId('sql', { id })
+    const tabData = tabs.tabsMap[tabId]
+
+    // [Joshen] Tiny timeout to give a bit of time for the content to load before scrolling
+    setTimeout(() => {
+      if (tabData?.metadata?.scrollTop) {
+        editor.setScrollTop(tabData.metadata.scrollTop)
+      }
+    }, 20)
+    editor.onDidScrollChange((e) => (scrollTopRef.current = e.scrollTop))
+  }
+
   const onDebug = useCallback(async () => {
     try {
       const snippet = snapV2.snippets[id]
       const result = snapV2.results[id]?.[0]
-      appSnap.setAiAssistantPanel({
+      aiSnap.newChat({
+        name: 'Debug SQL snippet',
         open: true,
         sqlSnippets: [
           (snippet.snippet.content?.sql ?? '').replace(sqlAiDisclaimerComment, '').trim(),
@@ -418,7 +438,7 @@ export const SQLEditor = () => {
       }
 
       sendEvent({
-        action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED,
+        action: 'assistant_sql_diff_handler_evaluated',
         properties: { handlerAccepted: true },
         groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
@@ -443,7 +463,7 @@ export const SQLEditor = () => {
 
   const discardAiHandler = useCallback(() => {
     sendEvent({
-      action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED,
+      action: 'assistant_sql_diff_handler_evaluated',
       properties: { handlerAccepted: false },
       groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
@@ -510,6 +530,12 @@ export const SQLEditor = () => {
     if (id) {
       closeDiff()
       setPromptState((prev) => ({ ...prev, isOpen: false }))
+    }
+    return () => {
+      if (ref) {
+        const tabId = createTabId('sql', { id })
+        updateTab(ref, tabId, { scrollTop: scrollTopRef.current })
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [closeDiff, id])
@@ -718,6 +744,7 @@ export const SQLEditor = () => {
                         monacoRef={monacoRef}
                         executeQuery={executeQuery}
                         onHasSelection={setHasSelection}
+                        onMount={onMount}
                         onPrompt={({
                           selection,
                           beforeSelection,

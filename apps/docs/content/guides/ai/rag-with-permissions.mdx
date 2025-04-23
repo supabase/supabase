@@ -119,7 +119,7 @@ RLS is latency-sensitive, so extra caution should be taken before implementing t
 
 <Admonition type="tip">
 
-For data sources other than Postgres, see [Foreign Data Wrappers](/docs/guides/database/extensions/wrappers/overview) for a list of external sources supported today. If your data lives in a source not provided in the list, please contact [support](https://supabase.com/dashboard/support/new) and we'll be happy to discuss your use case.
+For data sources other than Postgres, see [Foreign Data Wrappers](/docs/guides/database/extensions/wrappers/overview) for a list of external sources supported today. If your data lives in a source not provided in the list, contact [support](https://supabase.com/dashboard/support/new) and we'll be happy to discuss your use case.
 
 </Admonition>
 
@@ -226,6 +226,8 @@ order by document_sections.embedding <#> embedding;
 
 <Admonition type="caution">
 
+{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
+
 You might be tempted to discard RLS completely and simply filter by user within the `where` clause. Though this will work, we recommend RLS as a general best practice since RLS is always applied even as new queries and application logic is introduced in the future.
 
 </Admonition>
@@ -236,7 +238,7 @@ If you would like to use the auto-generated REST API to query your Supabase data
 
 See the [Clerk Supabase docs](https://clerk.com/docs/integrations/databases/supabase) for an example of how this can be done. Modify the instructions to work with your own auth provider as needed.
 
-Now we can simply use the same RLS policy from our first example:
+Now we can use the same RLS policy from our first example:
 
 ```sql
 -- enable row level security

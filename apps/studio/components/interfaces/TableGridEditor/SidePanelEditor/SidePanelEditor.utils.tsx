@@ -3,7 +3,7 @@ import { chunk, find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
 
-import { Query } from 'components/grid/query/Query'
+import { Query } from '@supabase/pg-meta/src/query'
 import SparkBar from 'components/ui/SparkBar'
 import { createDatabaseColumn } from 'data/database-columns/database-column-create-mutation'
 import { deleteDatabaseColumn } from 'data/database-columns/database-column-delete-mutation'
@@ -275,6 +275,7 @@ export const createColumn = async ({
     if (!skipSuccessMessage) {
       toast.success(`Successfully created column "${column.name}"`, { id: toastId })
     }
+    return { error: undefined }
   } catch (error: any) {
     toast.error(`An error occurred while creating the column "${payload.name}"`, { id: toastId })
     return { error }
@@ -702,7 +703,7 @@ export const updateTable = async ({
         ...column,
         isPrimaryKey: false,
       })
-      await createColumn({
+      const { error } = await createColumn({
         projectRef: projectRef,
         connectionString: connectionString,
         payload: columnPayload,
@@ -710,6 +711,7 @@ export const updateTable = async ({
         skipSuccessMessage: true,
         toastId,
       })
+      if (!!error) hasError = true
     } else {
       const originalColumn = find(originalColumns, { id: column.id })
       if (originalColumn) {
