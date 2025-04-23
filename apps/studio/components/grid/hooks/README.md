@@ -1,4 +1,6 @@
-# Table Filtering and Sorting Developer notes
+# Table State Management
+
+This document outlines how the filter and sort state is managed across URL parameters, browser local storage, React hooks, and the Valtio state store.
 
 ## Overview
 
@@ -8,7 +10,44 @@ The table filtering and sorting system uses a URL-based state persistence patter
 - **Separation of concerns**: Logic is separated from UI components
 - **Draft-then-apply pattern**: UI components maintain draft state until explicitly applied
 
+## Components of State Management
+
+1. **URL Parameters (`filter`, `sort`, `hidden_cols`, `col_order`)**
+
+   - **Role:** Represents the _active_ state for the current session. Makes the view shareable and bookmarkable.
+   - **Interaction:**
+     - Read by hooks on component render using `next/router` and `URLSearchParams`
+     - Written to when state changes are intentionally applied (e.g., "Apply Filters" clicked)
+
+2. **Browser Local Storage (`supabase_grid_state_...`)**
+
+   - **Role:** Persistent storage across browser sessions. Acts as fallback when revisiting without URL parameters.
+   - **Interaction:**
+     - Written to by the `saveTableEditorStateToLocalStorage` utility
+     - Read by `loadTableEditorStateFromLocalStorage` utility
+
+3. **React Hooks (Composition)**
+
+   - **Role:** Orchestrate state flow between URL, UI interactions, local storage, and Valtio store
+   - **Key Hooks:** Detailed in the "Core Hooks" section below
+
+4. **Valtio Store (`store`) / Snapshots (`snap`)**
+   - **Role:** Manages complementary UI state (pagination, loading, etc.)
+   - **Examples:** Current page, rows per page, table metadata, cell selection/editing state
+   - **Interaction:**
+     - Read by hooks for context (table name, etc.)
+     - Read by components for UI rendering
+     - Written to by hooks to trigger side effects (resetting pagination when filters change)
+
 ## Core Hooks
+
+### `useTableEditorFiltersSort`
+
+The foundation hook that directly interacts with URL parameters:
+
+- Reads and writes raw filter/sort strings to URL parameters
+- Provides `setParams` function to update URL
+- Used by more specialized hooks
 
 ### `useTableFilter`
 
@@ -75,6 +114,23 @@ function useTableSort() {
 
 Instead, we created `useSafeTableEditorSnapshot` which unconditionally calls the original snapshot hook and handles error cases. This allows `useTableSort` to always call the hook safely regardless of context.
 
+### `useSaveTableEditorState`
+
+Provides functions to save state and trigger side effects:
+
+- Functions like `saveFiltersAndTriggerSideEffects` that are called by filter/sort hooks
+- Reads context from the Valtio snapshot (table name, etc.)
+- Calls `saveTableEditorStateToLocalStorage` to write to local storage
+- Modifies the Valtio store (e.g., resetting pagination) to trigger side effects
+
+### `useLoadTableEditorStateFromLocalStorageIntoUrl`
+
+Handles initial load logic:
+
+- Checks for existing URL parameters
+- If empty, reads from local storage and updates URL
+- Ensures state persistence across page loads
+
 ## Component Implementation
 
 ### FilterPopoverPrimitive and SortPopoverPrimitive
@@ -86,16 +142,85 @@ These components follow a "draft and apply" pattern:
 3. **Apply operations**: Only when the user clicks "Apply" are the changes committed via the callback
 4. **Synchronization**: Local state is synchronized with props when external changes occur
 
-## Data Flow
+### SortPopoverPrimitive Implementation
 
-1. URL parameters store the raw filter/sort state
-2. Hooks read and format these parameters into usable objects
-3. UI components receive formatted objects and callbacks
-4. Components maintain draft state for editing
-5. When "Apply" is clicked, callbacks update URL parameters
-6. Side effects are triggered via dedicated save hooks
+The SortPopoverPrimitive component:
 
-## Component Usage
+1. **UI state**: Uses local state (`localSorts`) for all UI rendering to ensure consistent display
+
+   ```tsx
+   // UI elements reference localSorts, not props
+   <Button type={localSorts.length > 0 ? 'link' : 'text'} icon={<List />}>
+     {displayButtonText}
+   </Button>
+   ```
+
+2. **Change detection**: Implements property-specific comparison for "Apply" button state
+
+   ```tsx
+   // Compare relevant properties instead of full object equality
+   const hasChanges = useMemo(() => {
+     if (localSorts.length !== sorts.length) return true
+
+     return localSorts.some((localSort, index) => {
+       const propSort = sorts[index]
+       return (
+         !propSort ||
+         localSort.column !== propSort.column ||
+         localSort.ascending !== propSort.ascending
+       )
+     })
+   }, [localSorts, sorts])
+   ```
+
+### SortPopover Implementation
+
+The SortPopover component connects the hooks to the primitive component:
+
+```tsx
+const SortPopover = ({ portal = true }: SortPopoverProps) => {
+  const { urlSorts, onApplySorts } = useTableSort()
+  const tableState = useTableEditorTableStateSnapshot()
+  const tableName = tableState?.table?.name || ''
+
+  // Convert string[] to Sort[]
+  const sorts = useMemo(() => {
+    return tableName && urlSorts ? formatSortURLParams(tableName, urlSorts) : []
+  }, [tableName, urlSorts])
+
+  return <SortPopoverPrimitive portal={portal} sorts={sorts} onApplySorts={onApplySorts} />
+}
+```
+
+This implementation directly uses hooks to access state rather than using global variables.
+
+## Interaction Flows
+
+### Flow: Applying a Filter
+
+1. User interacts with `FilterPopover.tsx` UI and clicks "Apply"
+2. `FilterPopover.tsx` calls the `onApplyFilters` callback from `useTableFilter()`
+3. Inside `onApplyFilters`:
+   - Filter state is formatted into URL string array
+   - `setParams` updates the URL parameter
+   - `saveFiltersAndTriggerSideEffects` is called to persist to local storage
+4. Inside `saveFiltersAndTriggerSideEffects`:
+   - Reads table name from Valtio snapshot
+   - Saves to local storage
+   - Resets pagination in Valtio store
+5. URL and Valtio changes trigger re-renders
+6. Components re-fetch data with new filter state and reset pagination
+
+### Flow: Initial Page Load (No URL Params)
+
+1. User navigates to table page without specific params
+2. `useLoadTableEditorStateFromLocalStorageIntoUrl` hook runs
+3. It checks for URL params, finds none
+4. It loads previous state from local storage
+5. It updates the URL with the loaded state
+6. URL change triggers re-render with restored state
+
+## Component Usage Pattern
 
 Components using these hooks should follow this pattern:
 
@@ -124,3 +249,5 @@ function TableComponent() {
 - Filter and sort parameters are stored in URL using specific formats
 - Conversion utilities (`formatFilterURLParams`, `formatSortURLParams`, etc.) handle translation between URL strings and typed objects
 - Side effect hooks manage database persistence and related operations
+- When implementing new components, always maintain deep copies when updating state to avoid reference issues
+- Generate stable keys when rendering lists to improve reconciliation
