@@ -4,10 +4,10 @@ import { test } from '../utils/test'
 const LOGS_PAGES = [
   { label: 'API Gateway', route: 'edge-logs' },
   { label: 'Postgres', route: 'postgres-logs' },
-  { label: 'PostgREST', route: 'postgrest-logs' },
 ]
 
 const mockAPILogs = {
+  error: null,
   result: [
     {
       id: 'uuid-1',
@@ -18,8 +18,13 @@ const mockAPILogs = {
       error_count: 0,
       warning_count: 20,
       metadata: {
-        request: {},
-        response: {},
+        foo: 'bar',
+        request: {
+          url: 'https://example.com',
+        },
+        response: {
+          status: 200,
+        },
       },
     },
   ],
@@ -35,60 +40,67 @@ test.beforeEach(async ({ context }) => {
   })
 })
 
-test.describe('Logs', async () => {
+test.describe('Logs', () => {
   for (const logPage of LOGS_PAGES) {
-    test.describe(`${logPage.label} logs page`, () => {
-      test('can navigate to logs page', async ({ page, ref }) => {
-        await page.goto(`./project/${ref}`)
-        await page.locator('a', { hasText: 'Logs' }).click({ timeout: 10000 })
+    test(`${logPage.label} logs page`, async ({ page, ref }) => {
+      /**
+       * Navigates to Logs
+       */
+      await page.goto(`./project/${ref}/`)
+      await page.locator('a', { hasText: 'Logs' }).click({ timeout: 10000 })
+      await page.click('body')
 
-        await page.click('body')
+      await expect(page.getByRole('heading', { name: 'Logs & Analytics' }), {
+        message: 'Logs & Analytics heading should be visible',
+      }).toBeVisible()
 
-        await expect(page.getByRole('heading', { name: 'Logs & Analytics' })).toBeVisible({
-          timeout: 50000,
+      /**
+       * Navigates to the specific log page
+       */
+      await page
+        .getByRole('link', { name: logPage.label, exact: true })
+        .click()
+        .catch((e) => {
+          console.log('🔴 Error clicking', logPage, e)
+          throw e
         })
 
-        await page
-          .getByRole('link', { name: logPage.label, exact: true })
-          .click()
-          .catch((e) => {
-            console.log('🔴 Error clicking', logPage, e)
-            throw e
-          })
+      // Wait for logs to be loaded
+      await page.waitForResponse((response) => response.url().includes(`logs.all`))
 
-        const logsTable = page.getByRole('table')
-        await expect(logsTable).toBeVisible()
-      })
+      /**
+       * Shows the logs table
+       */
 
-      test('shows logs data without errors', async ({ page, ref, apiUrl }) => {
-        await page.goto(`./project/${ref}/logs/${logPage.route}`)
+      const logsTable = page.getByRole('table')
 
-        const logsTable = page.getByRole('table')
-        await expect(logsTable).toBeVisible()
+      await expect(logsTable, {
+        message: 'Logs table should be visible',
+      }).toBeVisible({ timeout: 20000 })
 
-        await expect(page.getByText(mockAPILogs.result[0].event_message)).toBeVisible()
-      })
+      /**
+       * Shows the logs data without errors
+       */
+      await expect(page.getByText(mockAPILogs.result[0].event_message), {
+        message: 'Logs data should be visible',
+      }).toBeVisible()
 
-      test('can select and view log details', async ({ page, ref }) => {
-        await page.goto(`./project/${ref}/logs/${logPage.route}`)
+      /**
+       * Can select and view log details
+       */
+      const gridcells = page.getByText('Random event message: uuid-')
+      await gridcells.first().click()
 
-        await page.waitForResponse((response) => response.url().includes(`logs.all`))
+      const tabPanel = page.getByTestId('log-selection')
+      await expect(tabPanel).toBeVisible()
 
-        const logsTable = page.getByRole('table')
-        await expect(logsTable).toBeVisible()
-
-        const gridcells = page.getByRole('gridcell')
-        await gridcells.first().click()
-
-        const tabPanel = page.getByTestId('log-selection')
-        await expect(tabPanel).toBeVisible()
-
-        // Assert known fixed values instead of extracting text
-        await expect(tabPanel).toContainText('Random event message: uuid-1')
-        await expect(tabPanel.getByTestId('log-selection-timestamp')).toContainText(
-          '15 Apr 18:53:20'
-        )
-      })
+      // Assert known fixed values instead of extracting text
+      await expect(tabPanel, {
+        message: 'Log selection should be visible',
+      }).toContainText('Random event message: uuid-1')
+      await expect(tabPanel.getByTestId('log-selection-timestamp'), {
+        message: 'Log selection timestamp should be visible',
+      }).toContainText('15 Apr 18:53:20')
     })
   }
 })

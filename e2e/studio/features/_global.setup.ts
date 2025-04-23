@@ -88,6 +88,7 @@ To start API locally, run:
    * TODO:
    * Check if user is running hosted or selfhosted
    * If user is running wrong studio for tests, stop and show error
+   * Not sure how to check this. - Jordi
    */
 
   /**
@@ -96,6 +97,15 @@ To start API locally, run:
   if (!ENVS_WITH_AUTH.includes(ENV)) {
     console.log(`\n 🔑 Skipping authentication for ${ENV}`)
     return
+  } else {
+    if (
+      !process.env.STAGING_EMAIL ||
+      !process.env.STAGING_PASSWORD ||
+      !process.env.STAGING_PROJECT_REF
+    ) {
+      console.error(`Missing environment variables. Check README.md for more information.`)
+      throw new Error('Missing environment variables')
+    }
   }
 
   console.log(`\n 🔑 Checking authentication status...`)

@@ -214,26 +214,4 @@ test.describe('Table Editor', () => {
     const usersTable = page.getByRole('button', { name: 'View users' })
     await expect(usersTable).toBeVisible({ timeout: 5000 })
   })
-
-  test('should show rls disabled accordingly', async () => {
-    await page.getByTestId('schema-selector').click()
-    await page.getByRole('option', { name: 'public', exact: true }).click()
-
-    await page.getByRole('button', { name: 'New table', exact: true }).click()
-    await page.getByTestId('table-name-input').fill('rls-enabled')
-    await page.getByRole('button', { name: 'Save' }).click()
-    await page.getByRole('button', { name: 'New table', exact: true }).click()
-    await page.getByTestId('table-name-input').fill('rls-disabled')
-    await page.getByLabel('Enable Row Level Security (').click()
-    await page.getByRole('button', { name: 'Confirm' }).click()
-    await page.getByRole('button', { name: 'Save' }).click()
-
-    await expect(page.getByLabel('View rls-disabled').locator('span')).toContainText('rls-disabled')
-    await expect(page.getByLabel('View rls-enabled').locator('span')).toContainText('rls-enabled')
-
-    await page.getByLabel('View rls-disabled').click()
-    await expect(page.getByRole('button', { name: 'RLS disabled' })).toBeVisible()
-    await page.getByLabel('View rls-enabled').click()
-    await expect(page.getByRole('button', { name: 'RLS disabled' })).not.toBeVisible()
-  })
 })

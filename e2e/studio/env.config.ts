@@ -24,7 +24,7 @@ export const ENV_URLS: Record<Env, string> = {
 export const API_URLS: Record<Env, string> = {
   production: 'https://api.supabase.com',
   staging: 'https://api.supabase.green',
-  selfhosted: 'http://localhost:8082/api',
+  selfhosted: 'http://localhost:54323/api',
   'dev-hosted': 'http://localhost:8080/api',
   'dev-selfhosted': 'http://localhost:8082/api',
   preview: process.env.API_BASE_URL || 'https://api.supabase.green',

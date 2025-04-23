@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test:e2e": "playwright test",
-    "test:e2e:staging": "TEST_ENV=staging playwright test",
-    "test:e2e:prod": "TEST_ENV=production playwright test",
-    "test:e2e:preview": "TEST_ENV=preview playwright test",
-    "test:e2e:selfhosted": "TEST_ENV=selfhosted playwright test",
-    "test:e2e:dev-selfhosted": "TEST_ENV=dev-selfhosted playwright test",
+    "e2e": "playwright test",
+    "e2e:staging": "TEST_ENV=staging playwright test",
+    "e2e:prod": "TEST_ENV=production playwright test",
+    "e2e:preview": "TEST_ENV=preview playwright test",
+    "e2e:selfhosted": "TEST_ENV=selfhosted playwright test",
+    "e2e:dev-selfhosted": "TEST_ENV=dev-selfhosted playwright test",
+    "e2e:dev-hosted": "TEST_ENV=dev-hosted playwright test",
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop"
   },
@@ -17,7 +18,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@playwright/test": "^1.51.1",
-    "dotenv": "^16.5.0"
+    "dotenv": "^16.5.0",
+    "playwright": "^1.52.0"
   }
 }

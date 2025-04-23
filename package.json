@@ -29,12 +29,12 @@
     "test:studio": "turbo run test --filter=studio",
     "test:studio:watch": "turbo run test --filter=studio -- watch",
 
-    "e2e": "pnpm --prefix e2e/studio run test:e2e",
-    "e2e:dev-hosted": "pnpm --prefix e2e/studio run test:e2e:dev-hosted",
-    "e2e:dev-selfhosted": "pnpm --prefix e2e/studio run test:e2e:dev-selfhosted",
-    "e2e:selfhosted": "pnpm --prefix e2e/studio run test:e2e:selfhosted",
-    "e2e:staging": "pnpm --prefix e2e/studio run test:e2e:staging",
-    "e2e:prod": "pnpm --prefix e2e/studio run test:e2e:prod",
+    "e2e": "pnpm --prefix e2e/studio run e2e",
+    "e2e:dev-hosted": "pnpm --prefix e2e/studio run e2e:dev-hosted",
+    "e2e:dev-selfhosted": "pnpm --prefix e2e/studio run e2e:dev-selfhosted",
+    "e2e:selfhosted": "pnpm --prefix e2e/studio run e2e:selfhosted",
+    "e2e:staging": "pnpm --prefix e2e/studio run e2e:staging",
+    "e2e:prod": "pnpm --prefix e2e/studio run e2e:prod",
     "e2e:supabase:start": "pnpm --prefix e2e/studio run supabase:start",
     "e2e:supabase:stop": "pnpm --prefix e2e/studio run supabase:stop",
 
