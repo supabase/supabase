@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { LayoutUpdateBanner } from 'components/interfaces/App/FeaturePreview/LayoutUpdatePreview'
 import { ProjectList } from 'components/interfaces/Home/ProjectList'
 import HomePageActions from 'components/interfaces/HomePageActions'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -37,12 +38,15 @@ const ProjectsPage: NextPageWithLayout = () => {
   return (
     <ScaffoldContainerLegacy>
       <div>
+        <LayoutUpdateBanner />
+
         <HomePageActions
           search={search}
           setSearch={setSearch}
           filterStatus={filterStatus}
           setFilterStatus={setFilterStatus}
         />
+
         <div className="my-6 space-y-8">
           <ProjectList
             filterToSlug

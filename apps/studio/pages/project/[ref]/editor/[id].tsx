@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 
 import { useParams } from 'common'
 import { useIsTableEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { TableGridEditor } from 'components/interfaces/TableGridEditor'
+import { TableGridEditor } from 'components/interfaces/TableGridEditor/TableGridEditor'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'

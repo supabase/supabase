@@ -7,7 +7,6 @@ import { createPortal } from 'react-dom'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useUrlState } from 'hooks/ui/useUrlState'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import { EMPTY_ARR } from 'lib/void'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
@@ -19,12 +18,11 @@ import Footer from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
 import Header, { HeaderProps } from './components/header/Header'
 import { RowContextMenu } from './components/menu'
-import { GridProps } from './types'
-
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
-import { DataTableFilter } from 'components/data-table-filter-table-editor'
 import { useTableAdapter } from './tableAdapter'
+import { GridProps } from './types'
+import { useUrlState } from 'hooks/ui/useUrlState'
 
 export const SupabaseGrid = ({
   customHeader,

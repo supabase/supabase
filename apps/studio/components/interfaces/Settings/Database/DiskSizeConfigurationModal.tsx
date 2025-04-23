@@ -118,7 +118,7 @@ const DiskSizeConfigurationModal = ({
                   </p>
                   <Button asChild type="default" className="mt-3">
                     <Link
-                      href={`/support/new?ref=${projectRef}&category=${SupportCategories.PERFORMANCE_ISSUES}&subject=Increase%20disk%20size%20beyond%20200GB`}
+                      href={`/support/new?projectRef=${projectRef}&category=${SupportCategories.PERFORMANCE_ISSUES}&subject=Increase%20disk%20size%20beyond%20200GB`}
                     >
                       Contact support
                     </Link>

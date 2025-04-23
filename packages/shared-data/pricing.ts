@@ -659,7 +659,7 @@ export const pricing: Pricing = {
         plans: {
           free: 'Owner, Admin, Developer',
           pro: 'Owner, Admin, Developer',
-          team: 'Owner, Admin, Developer, Read-only',
+          team: 'Owner, Admin, Developer, Read-only, Predefined project scoped roles',
           enterprise: 'Custom project scoped roles',
         },
         usage_based: false,
