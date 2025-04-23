@@ -204,16 +204,6 @@ const supabaseIntegrations: IntegrationDefinition[] = [
               loading: Loading,
             }
           )
-        case 'keys':
-          return dynamic(
-            () =>
-              import('../Vault/Keys/EncryptionKeysManagement').then(
-                (mod) => mod.EncryptionKeysManagement
-              ),
-            {
-              loading: Loading,
-            }
-          )
         case 'secrets':
           return dynamic(
             () => import('../Vault/Secrets/SecretsManagement').then((mod) => mod.SecretsManagement),
