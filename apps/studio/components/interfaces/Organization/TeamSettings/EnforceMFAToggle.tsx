@@ -38,10 +38,11 @@ const EnforceMFAToggle = ({ hasMFAEnabled }: EnforceMFAToggleProps) => {
   const { mutate: sendToggle } = useOrganizationMfaToggleMutation()
 
   const snap = useAppStateSnapshot()
+  snap.setIsMfaEnforced(mfa)
   const onToggleMfa = () => {
     const value = !snap.isMfaEnforced ? 'true' : 'false'
     snap.setIsMfaEnforced(value === 'true')
-    sendToggle({ slug: slug, enforced: value === 'true' })
+    sendToggle({ slug: slug, setEnforced: value === 'true' })
   }
 
   return (

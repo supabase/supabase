@@ -6,16 +6,16 @@ import type { ResponseError } from 'types'
 
 export type OrganizationMfaToggleVariables = {
   slug: string
-  enforced: boolean
+  setEnforced: boolean
 }
 
-export async function toggleOrganizationMfa({ slug, enforced }: OrganizationMfaToggleVariables) {
-  const { data, error } = await patch('/platform/organizations/{slug}/members/mfa/enforcement', {
+export async function toggleOrganizationMfa({ slug, setEnforced }: OrganizationMfaToggleVariables) {
+  const { enforced, error } = await patch('/platform/organizations/{slug}/members/mfa/enforcement', {
     params: { path: { slug } },
-    body: { enforced: enforced },
+    body: { enforced: setEnforced },
   })
   if (error) handleError(error)
-  return data.enforced
+  return enforced
 }
 
 type OrganizationMfaToggleData = Awaited<ReturnType<typeof toggleOrganizationMfa>>
