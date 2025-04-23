@@ -1,11 +1,9 @@
 import { isEqual } from 'lodash'
 import { ChevronDown, List } from 'lucide-react'
-import { useMemo, useCallback, useState } from 'react'
-import { DndProvider } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import type { Sort } from 'components/grid/types'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -13,39 +11,66 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-import SortRow from './SortRow'
 import { DropdownControl } from '../../common/DropdownControl'
+import SortRow from './SortRow'
 
 export interface SortPopoverPrimitiveProps {
   buttonText?: string
   sorts: Sort[]
   onApplySorts: (sorts: Sort[]) => void
   portal?: boolean
-  providedBackend?: any
 }
 
+/**
+ * SortPopoverPrimitive - A component for sorting table columns
+ *
+ * This component maintains a draft state of sorts while editing, then applies
+ * them to the parent component when "Apply" is clicked.
+ *
+ * To avoid issues with drag-and-drop reconciliation, we use a special sync mechanism
+ * that properly detects external vs. internal updates.
+ */
 const SortPopoverPrimitive = ({
   buttonText,
   sorts,
   onApplySorts,
   portal = true,
-  providedBackend,
 }: SortPopoverPrimitiveProps) => {
   const [open, setOpen] = useState(false)
   const snap = useTableEditorTableStateSnapshot()
 
-  // Internal state management
+  // Local state for draft sorts
   const [localSorts, setLocalSorts] = useState<Sort[]>(sorts)
 
-  // Update local state when sorts prop changes
-  useMemo(() => {
-    setLocalSorts(sorts)
+  // Track the last props we received for comparison
+  const lastSortsRef = useRef<Sort[]>(sorts)
+  // Track if we're in the middle of applying our own changes
+  const isApplyingRef = useRef(false)
+
+  // Sync with props when they change, but in a smarter way
+  useEffect(() => {
+    // If we're in the middle of applying changes, don't sync from props
+    if (isApplyingRef.current) {
+      isApplyingRef.current = false
+      return
+    }
+
+    // If the props changed unexpectedly (not due to our own actions)
+    // then we should update our local state
+    if (!isEqual(sorts, lastSortsRef.current)) {
+      setLocalSorts(sorts)
+      lastSortsRef.current = sorts
+    }
   }, [sorts])
 
+  // Fix: Use localSorts for button text, not sorts
   const displayButtonText =
     buttonText ??
-    (sorts.length > 0 ? `Sorted by ${sorts.length} rule${sorts.length > 1 ? 's' : ''}` : 'Sort')
+    (localSorts.length > 0
+      ? `Sorted by ${localSorts.length} rule${localSorts.length > 1 ? 's' : ''}`
+      : 'Sort')
 
+  // Filter available columns to exclude columns already in sorts
   const columns = useMemo(() => {
     if (!snap?.table?.columns) return []
     return snap.table.columns.filter((x) => {
@@ -55,10 +80,12 @@ const SortPopoverPrimitive = ({
     })
   }, [snap?.table?.columns, localSorts])
 
+  // Format the columns for the dropdown
   const dropdownOptions = useMemo(() => {
     return columns?.map((x) => ({ value: x.name, label: x.name })) || []
   }, [columns])
 
+  // Add a new sort
   const onAddSort = (columnName: string | number) => {
     const currentTableName = snap.table?.name
     if (currentTableName) {
@@ -69,10 +96,12 @@ const SortPopoverPrimitive = ({
     }
   }
 
+  // Remove a sort by column name
   const onDeleteSort = useCallback((column: string) => {
     setLocalSorts((currentSorts) => currentSorts.filter((sort) => sort.column !== column))
   }, [])
 
+  // Toggle ascending/descending for a column
   const onToggleSort = useCallback((column: string, ascending: boolean) => {
     setLocalSorts((currentSorts) => {
       const index = currentSorts.findIndex((x) => x.column === column)
@@ -82,6 +111,7 @@ const SortPopoverPrimitive = ({
     })
   }, [])
 
+  // Handle drag-and-drop reordering
   const onDragSort = useCallback((dragIndex: number, hoverIndex: number) => {
     setLocalSorts((currentSort) => {
       if (
@@ -105,11 +135,46 @@ const SortPopoverPrimitive = ({
     })
   }, [])
 
+  // Fix: Compare for meaningful changes (only column order and ascending)
+  const hasChanges = useMemo(() => {
+    if (localSorts.length !== sorts.length) return true
+
+    // Compare each sort by relevant properties
+    return localSorts.some((localSort, index) => {
+      const propSort = sorts[index]
+      return (
+        !propSort ||
+        localSort.column !== propSort.column ||
+        localSort.ascending !== propSort.ascending
+      )
+    })
+  }, [localSorts, sorts])
+
+  // Apply the sorts to the parent component
+  const onSelectApplySorts = () => {
+    // Mark that we're applying our changes to prevent re-syncing
+    isApplyingRef.current = true
+
+    // Update our last sorts ref to the current local state
+    lastSortsRef.current = [...localSorts]
+
+    // Create deep copies to avoid reference issues
+    const sortsCopy = localSorts.map((sort) => ({ ...sort }))
+
+    // Apply the sorts
+    onApplySorts(sortsCopy)
+  }
+
+  // Generate stable keys for SortRow components to avoid reconciliation issues
+  const getSortRowKey = (sort: Sort, index: number) => {
+    return `sort-${sort.table}-${sort.column}-${index}`
+  }
+
   const content = (
     <div className="space-y-2 py-2">
       {localSorts.map((sort, index) => (
         <SortRow
-          key={sort.column}
+          key={getSortRowKey(sort, index)}
           index={index}
           columnName={sort.column}
           sort={sort}
@@ -148,11 +213,7 @@ const SortPopoverPrimitive = ({
           <p className="text-sm text-foreground-light">All columns have been added</p>
         )}
         <div className="flex items-center">
-          <Button
-            disabled={isEqual(localSorts, sorts)}
-            type="default"
-            onClick={() => onApplySorts(localSorts)}
-          >
+          <Button disabled={!hasChanges} type="default" onClick={onSelectApplySorts}>
             Apply sorting
           </Button>
         </div>
@@ -163,12 +224,12 @@ const SortPopoverPrimitive = ({
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button type={sorts.length > 0 ? 'link' : 'text'} icon={<List />}>
+        <Button type={localSorts.length > 0 ? 'link' : 'text'} icon={<List />}>
           {displayButtonText}
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start" portal={portal}>
-        {providedBackend ? content : <DndProvider backend={HTML5Backend}>{content}</DndProvider>}
+        {content}
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
   )
