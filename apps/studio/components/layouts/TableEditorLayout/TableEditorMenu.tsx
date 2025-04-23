@@ -21,7 +21,6 @@ import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useTabsStore } from 'state/tabs'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -61,7 +60,6 @@ const TableEditorMenu = () => {
     'alphabetical'
   )
 
-  const tabs = useTabsStore(ref)
   const { project } = useProjectContext()
   const {
     data,
