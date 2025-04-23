@@ -9,6 +9,7 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
+import { useFlag } from 'hooks/ui/useFlag'
 
 export interface DatabaseLayoutProps {
   title?: string
@@ -29,6 +30,7 @@ const DatabaseProductMenu = () => {
   const pgNetExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_net') !== undefined
   const pitrEnabled = addons?.selected_addons.find((addon) => addon.type === 'pitr') !== undefined
   const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
+  const enablePgReplicate = useFlag('enablePgReplicate')
 
   return (
     <>
@@ -38,6 +40,7 @@ const DatabaseProductMenu = () => {
           pgNetExtensionExists,
           pitrEnabled,
           columnLevelPrivileges,
+          enablePgReplicate,
         })}
       />
     </>
