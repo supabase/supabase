@@ -21,7 +21,7 @@ import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { editorEntityTypes, updateTab, useTabsStore } from 'state/tabs'
+import { useTabsStore } from 'state/tabs'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -41,6 +41,7 @@ import {
   InnerSideBarFilters,
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { tableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import EntityListItem from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
 
@@ -117,19 +118,11 @@ const TableEditorMenu = () => {
   }, [selectedTable?.schema])
 
   useEffect(() => {
-    // [Joshen] Clean up tab labels if the entity's name was updated, since the entity
-    // could've been renamed outside of the table editor (e.g SQL editor)
-    if (isTableEditorTabsEnabled && ref) {
-      const openTabs = tabs.openTabs
-        .map((id) => tabs.tabsMap[id])
-        .filter((tab) => editorEntityTypes['table']?.includes(tab.type))
-
-      openTabs.forEach((tab) => {
-        const entity = entityTypes?.find((x) => tab.metadata?.tableId === x.id)
-        if (!!entity && entity.name !== tab.label) updateTab(ref, tab.id, { label: entity.name })
-      })
+    // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
+    if (isTableEditorTabsEnabled && ref && entityTypes && !searchText) {
+      tableEditorTabsCleanUp({ ref, schemas: [selectedSchema], entities: entityTypes })
     }
-  }, [isTableEditorTabsEnabled, entityTypes])
+  }, [entityTypes])
 
   return (
     <>

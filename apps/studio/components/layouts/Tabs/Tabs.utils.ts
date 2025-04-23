@@ -58,6 +58,18 @@ export const tableEditorTabsCleanUp = ({
 
   // perform tabs cleanup
   removeTabs(ref, tableEditorTabsToBeCleaned)
+
+  // [Joshen] Validate for opened tabs, if their label matches the entity's name - update label if not
+  // As the entity could've been renamed outside of the table editor
+  // e.g Using the SQL editor to rename the entity
+  const openTabs = tabsStore.openTabs
+    .map((id) => tabsStore.tabsMap[id])
+    .filter((tab) => editorEntityTypes['table']?.includes(tab.type))
+
+  openTabs.forEach((tab) => {
+    const entity = entities?.find((x) => tab.metadata?.tableId === x.id)
+    if (!!entity && entity.name !== tab.label) updateTab(ref, tab.id, { label: entity.name })
+  })
 }
 
 export const sqlEditorTabsCleanup = ({
@@ -97,6 +109,8 @@ export const sqlEditorTabsCleanup = ({
   )
 
   // [Joshen] Validate for opened tabs, if their label matches the snippet's name - update label if not
+  // As the snippets name could've been updated outside of the SQL Editor session
+  // e.g for a shared snippet, the owner could've updated the name of the snippet
   const openSqlTabs = tabsStore.openTabs
     .map((id) => tabsStore.tabsMap[id])
     .filter((tab) => editorEntityTypes['sql']?.includes(tab.type))
