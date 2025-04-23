@@ -6,13 +6,18 @@ type Database = {
   public: {
     Tables: DatabaseGenerated['public']['Tables']
     Views: DatabaseGenerated['public']['Views']
-    Functions: Omit<DatabaseGenerated['public']['Functions'], 'match_page_sections_v2'> & {
-      match_page_sections_v2: {
+    Functions: Omit<DatabaseGenerated['public']['Functions'], 'search_content'> & {
+      search_content: {
         Args: Omit<
-          DatabaseGenerated['public']['Functions']['match_page_sections_v2']['Args'],
+          DatabaseGenerated['public']['Functions']['search_content']['Args'],
           'embedding'
         > & { embedding: Array<number> }
-        Returns: DatabaseGenerated['public']['Functions']['match_page_sections_v2']['Returns']
+        Returns: Array<
+          Omit<
+            DatabaseGenerated['public']['Functions']['search_content']['Returns'][number],
+            'subsections'
+          > & { subsections: Array<{ title?: string; href?: string; content?: string }> }
+        >
       }
     }
     Enums: DatabaseGenerated['public']['Enums']

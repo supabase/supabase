@@ -2,28 +2,42 @@ import { convertPostgrestToApiError, type ApiErrorGeneric } from '~/app/api/util
 import { Result } from '~/features/helpers.fn'
 import { openAI } from '~/lib/openAi'
 import { supabase } from '~/lib/supabase'
+import { GuideModel } from '../guide/guideModel'
 import { type ISearchResultArgs } from './globalSearchSchema'
 
-export class SearchResultModel {
+export abstract class SearchResultModel {
   static async search(
-    args: ISearchResultArgs
+    args: ISearchResultArgs,
+    requestedFields: Array<string>
   ): Promise<Result<SearchResultModel[], ApiErrorGeneric>> {
     const query = args.query.trim()
+    const includeFullContent = requestedFields.includes('content')
     const embeddingResult = await openAI().createContentEmbedding(query)
 
     return embeddingResult.flatMapAsync(async (embedding) => {
       const matchResult = new Result(
-        await supabase().rpc('match_page_sections_v2', {
+        await supabase().rpc('search_content', {
           embedding,
-          match_threshold: 0.78,
-          min_content_length: 50,
+          include_full_content: includeFullContent,
         })
       )
         .map((matches) =>
-          matches.map(
-            ({ id, heading, content }) =>
-              new SearchResultModel({ id: String(id), title: heading, content })
-          )
+          matches
+            .map(({ id, type, page_title, href, content, subsections }) => {
+              switch (type) {
+                case 'markdown':
+                  return new GuideModel({
+                    id: String(id),
+                    title: page_title,
+                    href,
+                    content,
+                    subsections,
+                  })
+                default:
+                  return null
+              }
+            })
+            .filter(Boolean)
         )
         .mapError(convertPostgrestToApiError)
 
@@ -33,23 +47,7 @@ export class SearchResultModel {
 
   public id: string
   public title?: string
-  public description?: string
+  public href?: string
+  // public description?: string
   public content?: string
-
-  constructor({
-    id,
-    title,
-    description,
-    content,
-  }: {
-    id: string
-    title?: string
-    description?: string
-    content?: string
-  }) {
-    this.id = id
-    this.title = title
-    this.description = description
-    this.content = content
-  }
 }

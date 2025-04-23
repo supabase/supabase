@@ -1,15 +1,9 @@
-import {
-  GraphQLID,
-  GraphQLInterfaceType,
-  GraphQLNonNull,
-  GraphQLObjectType,
-  GraphQLString,
-} from 'graphql'
-import { createCollectionType, type InferArgTypes } from '../common'
+import { GraphQLID, GraphQLInterfaceType, GraphQLNonNull, GraphQLString } from 'graphql'
+import { type InferArgTypes } from '../utils/types'
 
 export const GRAPHQL_FIELD_SEARCH_GLOBAL = 'searchDocs'
 
-const searchResultArgs = {
+export const searchResultArgs = {
   query: {
     required: true,
     type: GraphQLString,
@@ -28,44 +22,17 @@ export const GraphQLInterfaceTypeSearchResult = new GraphQLInterfaceType({
       type: GraphQLString,
       description: 'The title of the matching content.',
     },
-    description: {
+    href: {
       type: GraphQLString,
-      description: 'A brief description of the matching content.',
+      description: 'The URL of the matching content.',
     },
-    content: {
-      type: GraphQLString,
-      description: 'The full content of the matching result.',
-    },
-  },
-  resolveType: () => 'DocSearchResult',
-})
-
-export const GraphQLObjectTypeDocSearchResult = new GraphQLObjectType({
-  name: 'DocSearchResult',
-  interfaces: [GraphQLInterfaceTypeSearchResult],
-  fields: {
-    id: {
-      type: new GraphQLNonNull(GraphQLID),
-      description: 'The unique identifier of the search result',
-    },
-    title: {
-      type: GraphQLString,
-      description: 'The title of the matcihng content',
-    },
-    description: {
-      type: GraphQLString,
-      description: 'A brief description of the matching content',
-    },
+    // description: {
+    //   type: GraphQLString,
+    //   description: 'A brief description of the matching content.',
+    // },
     content: {
       type: GraphQLString,
       description: 'The full content of the matching result.',
     },
   },
 })
-
-export const searchResultsSchema = {
-  [GRAPHQL_FIELD_SEARCH_GLOBAL]: {
-    args: searchResultArgs,
-    type: createCollectionType(GraphQLInterfaceTypeSearchResult, 'SearchResultCollection'),
-  },
-}

@@ -1,10 +1,17 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { POST } from './route'
 
 describe('GraphQL API endpoint', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
+  beforeAll(() => {
+    vi.mock('server-only', () => {
+      return {}
+    })
     vi.spyOn(console, 'error').mockImplementation(() => {})
+  })
+
+  afterAll(() => {
+    vi.restoreAllMocks()
+    vi.doUnmock('server-only')
   })
 
   it('should return error if request body is not valid JSON', async () => {

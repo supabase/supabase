@@ -1,10 +1,22 @@
-import { GraphQLError } from 'graphql'
-import { GraphQLCollectionBuilder } from '../common'
+import { GraphQLError, type GraphQLResolveInfo } from 'graphql'
 import { SearchResultModel } from './globalSearchModel'
-import { GRAPHQL_FIELD_SEARCH_GLOBAL, type ISearchResultArgs } from './globalSearchSchema'
+import {
+  GRAPHQL_FIELD_SEARCH_GLOBAL,
+  GraphQLInterfaceTypeSearchResult,
+  searchResultArgs,
+  type ISearchResultArgs,
+} from './globalSearchSchema'
+import { createCollectionType, GraphQLCollectionBuilder } from '../utils/connections'
+import { graphQLFields } from '../utils/fields'
 
-async function searchResolverImpl(args: ISearchResultArgs) {
-  const result = await SearchResultModel.search(args)
+async function resolveSearch(
+  _parent: unknown,
+  args: ISearchResultArgs,
+  _context: unknown,
+  info: GraphQLResolveInfo
+) {
+  const requestedFields = Object.keys(graphQLFields(info).nodes)
+  const result = await SearchResultModel.search(args, requestedFields)
   return result.match(
     (data) => {
       return GraphQLCollectionBuilder.create({ items: data })
@@ -16,6 +28,11 @@ async function searchResolverImpl(args: ISearchResultArgs) {
   )
 }
 
-export const searchResolver = {
-  [GRAPHQL_FIELD_SEARCH_GLOBAL]: searchResolverImpl,
+export const searchRoot = {
+  [GRAPHQL_FIELD_SEARCH_GLOBAL]: {
+    description: '',
+    args: searchResultArgs,
+    type: createCollectionType(GraphQLInterfaceTypeSearchResult, 'SearchResultCollection'),
+    resolve: resolveSearch,
+  },
 }
