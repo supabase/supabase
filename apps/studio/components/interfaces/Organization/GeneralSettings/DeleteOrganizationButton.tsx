@@ -3,12 +3,12 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useOrganizationDeleteMutation } from 'data/organizations/organization-delete-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { Button, Form, Input, Modal } from 'ui'
 
 const DeleteOrganizationButton = () => {

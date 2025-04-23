@@ -7,17 +7,7 @@ import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
-import {
-  Button,
-  Form,
-  Input,
-  Modal,
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from 'ui'
 
-import { useLocalStorage } from '@uidotdev/usehooks'
 import {
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
   LOGS_TABLES,
