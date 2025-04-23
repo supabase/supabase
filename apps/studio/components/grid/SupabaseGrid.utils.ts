@@ -11,6 +11,7 @@ import { FilterOperatorOptions } from './components/header/filter/Filter.constan
 import { STORAGE_KEY_PREFIX, SELECT_COLUMN_KEY } from './constants'
 import type { Sort, SupaColumn, SupaTable } from './types'
 import { formatClipboardValue } from './utils/common'
+import { mapUIFilterOperatorToPostgres } from './tableAdapter'
 
 export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] {
   if (Array.isArray(sort)) {
@@ -53,9 +54,13 @@ export function formatFilterURLParams(filter?: string[]): Filter[] {
 
 export function filtersToUrlParams(filters: Filter[]) {
   return filters.map((filter) => {
-    const selectedOperator = FilterOperatorOptions.find(
-      (option) => option.value === filter.operator
-    )
+    // Map UI operators like 'contains' to PostgreSQL operators like '~~*'
+    const pgOperator =
+      typeof mapUIFilterOperatorToPostgres === 'function'
+        ? mapUIFilterOperatorToPostgres(filter.operator)
+        : filter.operator
+
+    const selectedOperator = FilterOperatorOptions.find((option) => option.value === pgOperator)
 
     return `${filter.column}:${selectedOperator?.abbrev}:${filter.value}`
   })

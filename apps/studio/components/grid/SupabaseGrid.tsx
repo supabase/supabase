@@ -23,6 +23,8 @@ import { GridProps } from './types'
 
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
+import { DataTableFilter } from 'components/data-table-filter-table-editor'
+import { useTableAdapter } from './tableAdapter'
 
 export const SupabaseGrid = ({
   customHeader,
@@ -38,27 +40,19 @@ export const SupabaseGrid = ({
 
   const { project } = useProjectContext()
 
-  if (!project) {
-    return null
-  }
-
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
-
   const [_, setParams] = useUrlState({ arrayKeys: ['sort', 'filter'] })
-
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
-
   const { filters, onApplyFilters } = useTableFilter()
   const { sorts } = useTableSort()
-
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   const { data, error, isSuccess, isError, isLoading, isRefetching } = useTableRowsQuery(
     {
-      projectRef: project.ref,
-      connectionString: project.connectionString,
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
       tableId,
       sorts,
       filters,
@@ -83,17 +77,31 @@ export const SupabaseGrid = ({
     }
   )
 
+  const tableAdapter = useTableAdapter({
+    snap,
+    filters,
+    onApplyFilters,
+    tableData: data?.rows,
+    sorts,
+  })
+
   useEffect(() => {
     if (!mounted) setMounted(true)
   }, [])
+
+  if (!project) {
+    return null
+  }
 
   const rows = data?.rows ?? EMPTY_ARR
 
   return (
     <DndProvider backend={HTML5Backend} context={window}>
       <div className="sb-grid h-full flex flex-col">
-        <Header sorts={sorts} filters={filters} customHeader={customHeader} />
-
+        {/* <div className="flex px-3 py-1">
+          <DataTableFilter table={tableAdapter} />
+        </div> */}
+        <Header sorts={sorts} filters={filters} customHeader={customHeader} data={data} />
         {children || (
           <>
             <Grid
@@ -111,7 +119,6 @@ export const SupabaseGrid = ({
             <Shortcuts gridRef={gridRef} rows={rows} />
           </>
         )}
-
         {mounted && createPortal(<RowContextMenu rows={rows} />, document.body)}
       </div>
     </DndProvider>

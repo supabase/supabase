@@ -7,6 +7,7 @@ export const FilterOperatorOptions = [
   { value: '<=', label: 'less than or equal', preLabel: '[ <= ]', abbrev: 'lte' },
   { value: '~~', label: 'like operator', preLabel: '[ ~~ ]', abbrev: 'like' },
   { value: '~~*', label: 'ilike operator', preLabel: '[ ~~* ]', abbrev: 'ilike' },
+  // { value: 'contains', label: 'contains', preLabel: '[ contains ]', abbrev: 'cs' },
   { value: 'in', label: 'one of a list of values', preLabel: '[ in ]', abbrev: 'in' },
   {
     value: 'is',

@@ -39,6 +39,9 @@ import {
 import { ColumnVisibility } from './ColumnVisibility'
 import FilterPopover from './filter/FilterPopover'
 import { SortPopover } from './sort'
+import { useTableAdapter } from 'components/grid/tableAdapter'
+import { DataTableFilter } from 'components/data-table-filter-table-editor'
+
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
 // exporting. Either that or export as multiple CSV sheets with max n rows each
@@ -58,9 +61,10 @@ export type HeaderProps = {
   sorts: Sort[]
   filters: Filter[]
   customHeader: ReactNode
+  data: any
 }
 
-const Header = ({ sorts: sortsProp, filters: filtersProp, customHeader }: HeaderProps) => {
+const Header = ({ sorts: sortsProp, filters: filtersProp, customHeader, data }: HeaderProps) => {
   const snap = useTableEditorTableStateSnapshot()
 
   const filters = filtersProp
@@ -76,7 +80,7 @@ const Header = ({ sorts: sortsProp, filters: filtersProp, customHeader }: Header
             {snap.selectedRows.size > 0 ? (
               <RowHeader sorts={sorts} filters={filters} />
             ) : (
-              <DefaultHeader />
+              <DefaultHeader data={data} />
             )}
           </>
         )}
@@ -88,7 +92,7 @@ const Header = ({ sorts: sortsProp, filters: filtersProp, customHeader }: Header
 
 export default Header
 
-const DefaultHeader = () => {
+const DefaultHeader = ({ data }: { data: any }) => {
   const { ref: projectRef } = useParams()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
@@ -96,8 +100,8 @@ const DefaultHeader = () => {
   const canCreateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const { onApplyFilters, urlFilters } = useTableFilter()
-  const { onApplySorts, urlSorts } = useTableSort()
+  const { filters, onApplyFilters, urlFilters } = useTableFilter()
+  const { sorts, onApplySorts, urlSorts } = useTableSort()
 
   const onAddRow =
     snap.editable && (snap.table.columns ?? []).length > 0 ? tableEditorSnap.onAddRow : undefined
@@ -106,129 +110,140 @@ const DefaultHeader = () => {
 
   const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
+  const tableAdapter = useTableAdapter({
+    snap,
+    filters,
+    onApplyFilters,
+    tableData: data?.rows,
+    sorts,
+  })
+
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-4 justify-between grow">
       <div className="flex items-center gap-2">
-        <FilterPopover filters={urlFilters} onApplyFilters={onApplyFilters} />
-        <SortPopover sorts={urlSorts} onApplySorts={onApplySorts} />
-        <ColumnVisibility />
+        <DataTableFilter table={tableAdapter} />
       </div>
-      {canAddNew && (
-        <>
-          <div className="h-[20px] w-px border-r border-control" />
-          <div className="flex items-center gap-2">
-            {canCreateColumns && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    data-testid="table-editor-insert-new-row"
-                    type="primary"
-                    size="tiny"
-                    icon={<ChevronDown strokeWidth={1.5} />}
-                  >
-                    Insert
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="bottom" align="start">
-                  {[
-                    ...(onAddRow !== undefined
-                      ? [
-                          <DropdownMenuItem
-                            key="add-row"
-                            className="group space-x-2"
-                            onClick={onAddRow}
-                          >
-                            <div className="-mt-2 pr-1.5">
-                              <div className="border border-foreground-lighter w-[15px] h-[4px]" />
-                              <div className="border border-foreground-lighter w-[15px] h-[4px] my-[2px]" />
-                              <div
-                                className={cn([
-                                  'border border-foreground-light w-[15px] h-[4px] translate-x-0.5',
-                                  'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-x-0',
-                                ])}
-                              />
-                            </div>
-                            <div>
-                              <p>Insert row</p>
-                              <p className="text-foreground-light">
-                                Insert a new row into {snap.table.name}
-                              </p>
-                            </div>
-                          </DropdownMenuItem>,
-                        ]
-                      : []),
-                    ...(onAddColumn !== undefined
-                      ? [
-                          <DropdownMenuItem
-                            key="add-column"
-                            className="group space-x-2"
-                            onClick={onAddColumn}
-                          >
-                            <div className="flex -mt-2 pr-1.5">
-                              <div className="border border-foreground-lighter w-[4px] h-[15px]" />
-                              <div className="border border-foreground-lighter w-[4px] h-[15px] mx-[2px]" />
-                              <div
-                                className={cn([
-                                  'border border-foreground-light w-[4px] h-[15px] -translate-y-0.5',
-                                  'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-y-0',
-                                ])}
-                              />
-                            </div>
-                            <div>
-                              <p>Insert column</p>
-                              <p className="text-foreground-light">
-                                Insert a new column into {snap.table.name}
-                              </p>
-                            </div>
-                          </DropdownMenuItem>,
-                        ]
-                      : []),
-                    ...(onImportData !== undefined
-                      ? [
-                          <DropdownMenuItem
-                            key="import-data"
-                            className="group space-x-2"
-                            onClick={() => {
-                              onImportData()
-                              sendEvent({
-                                action: 'import_data_button_clicked',
-                                properties: { tableType: 'Existing Table' },
-                                groups: {
-                                  project: projectRef ?? 'Unknown',
-                                  organization: org?.slug ?? 'Unknown',
-                                },
-                              })
-                            }}
-                          >
-                            <div className="relative -mt-2">
-                              <FileText
-                                size={18}
-                                strokeWidth={1.5}
-                                className="-translate-x-[2px]"
-                              />
-                              <ArrowUp
-                                className={cn(
-                                  'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
-                                  'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand group-data-[highlighted]:opacity-100'
-                                )}
-                                strokeWidth={3}
-                                size={12}
-                              />
-                            </div>
-                            <div>
-                              <p>Import data from CSV</p>
-                              <p className="text-foreground-light">Insert new rows from a CSV</p>
-                            </div>
-                          </DropdownMenuItem>,
-                        ]
-                      : []),
-                  ]}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
-        </>
-      )}
+      <div className="flex items-center gap-2">
+        {/* <FilterPopover filters={urlFilters} onApplyFilters={onApplyFilters} /> */}
+        {/* <SortPopover sorts={urlSorts} onApplySorts={onApplySorts} /> */}
+        <ColumnVisibility />
+        {canAddNew && (
+          <>
+            <div className="h-[20px] w-px border-r border-control" />
+            <div className="flex items-center gap-2">
+              {canCreateColumns && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      data-testid="table-editor-insert-new-row"
+                      type="primary"
+                      size="tiny"
+                      icon={<ChevronDown strokeWidth={1.5} />}
+                    >
+                      Insert
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="bottom" align="start">
+                    {[
+                      ...(onAddRow !== undefined
+                        ? [
+                            <DropdownMenuItem
+                              key="add-row"
+                              className="group space-x-2"
+                              onClick={onAddRow}
+                            >
+                              <div className="-mt-2 pr-1.5">
+                                <div className="border border-foreground-lighter w-[15px] h-[4px]" />
+                                <div className="border border-foreground-lighter w-[15px] h-[4px] my-[2px]" />
+                                <div
+                                  className={cn([
+                                    'border border-foreground-light w-[15px] h-[4px] translate-x-0.5',
+                                    'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-x-0',
+                                  ])}
+                                />
+                              </div>
+                              <div>
+                                <p>Insert row</p>
+                                <p className="text-foreground-light">
+                                  Insert a new row into {snap.table.name}
+                                </p>
+                              </div>
+                            </DropdownMenuItem>,
+                          ]
+                        : []),
+                      ...(onAddColumn !== undefined
+                        ? [
+                            <DropdownMenuItem
+                              key="add-column"
+                              className="group space-x-2"
+                              onClick={onAddColumn}
+                            >
+                              <div className="flex -mt-2 pr-1.5">
+                                <div className="border border-foreground-lighter w-[4px] h-[15px]" />
+                                <div className="border border-foreground-lighter w-[4px] h-[15px] mx-[2px]" />
+                                <div
+                                  className={cn([
+                                    'border border-foreground-light w-[4px] h-[15px] -translate-y-0.5',
+                                    'transition duration-200 group-data-[highlighted]:border-brand group-data-[highlighted]:translate-y-0',
+                                  ])}
+                                />
+                              </div>
+                              <div>
+                                <p>Insert column</p>
+                                <p className="text-foreground-light">
+                                  Insert a new column into {snap.table.name}
+                                </p>
+                              </div>
+                            </DropdownMenuItem>,
+                          ]
+                        : []),
+                      ...(onImportData !== undefined
+                        ? [
+                            <DropdownMenuItem
+                              key="import-data"
+                              className="group space-x-2"
+                              onClick={() => {
+                                onImportData()
+                                sendEvent({
+                                  action: 'import_data_button_clicked',
+                                  properties: { tableType: 'Existing Table' },
+                                  groups: {
+                                    project: projectRef ?? 'Unknown',
+                                    organization: org?.slug ?? 'Unknown',
+                                  },
+                                })
+                              }}
+                            >
+                              <div className="relative -mt-2">
+                                <FileText
+                                  size={18}
+                                  strokeWidth={1.5}
+                                  className="-translate-x-[2px]"
+                                />
+                                <ArrowUp
+                                  className={cn(
+                                    'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
+                                    'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand group-data-[highlighted]:opacity-100'
+                                  )}
+                                  strokeWidth={3}
+                                  size={12}
+                                />
+                              </div>
+                              <div>
+                                <p>Import data from CSV</p>
+                                <p className="text-foreground-light">Insert new rows from a CSV</p>
+                              </div>
+                            </DropdownMenuItem>,
+                          ]
+                        : []),
+                    ]}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   )
 }
