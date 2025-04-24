@@ -53,9 +53,6 @@ type SubsectionCollection {
 type SubsectionEdge {
   """The item at the end of the edge"""
   node: Subsection!
-
-  """A cursor for use in pagination"""
-  cursor: String!
 }
 
 """A content chunk taken from a larger document in the Supabase docs"""
@@ -94,8 +91,5 @@ type SearchResultCollection {
 type SearchResultEdge {
   """The item at the end of the edge"""
   node: SearchResult!
-
-  """A cursor for use in pagination"""
-  cursor: String!
 }"
 `;

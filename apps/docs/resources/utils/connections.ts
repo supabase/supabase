@@ -51,7 +51,10 @@ function extractNodeTypeName(nodeType: GraphQLOutputType): string | undefined {
  * @param name Optional name for the edge (defaults to NodeType + 'Edge')
  * @returns A GraphQL Object Type for the edge
  */
-function createEdgeType(nodeType: GraphQLOutputType, name?: string): GraphQLObjectType {
+function createEdgeType(
+  nodeType: GraphQLOutputType,
+  { name, skipCursor = false }: { name?: string; skipCursor?: boolean } = {}
+): GraphQLObjectType {
   const edgeName = name || `${extractNodeTypeName(nodeType)}Edge`
 
   return new GraphQLObjectType({
@@ -62,10 +65,12 @@ function createEdgeType(nodeType: GraphQLOutputType, name?: string): GraphQLObje
         type: new GraphQLNonNull(nodeType),
         description: 'The item at the end of the edge',
       },
-      cursor: {
-        type: new GraphQLNonNull(GraphQLString),
-        description: 'A cursor for use in pagination',
-      },
+      ...(!skipCursor && {
+        cursor: {
+          type: new GraphQLNonNull(GraphQLString),
+          description: 'A cursor for use in pagination',
+        },
+      }),
     },
   })
 }
@@ -89,7 +94,7 @@ export function createCollectionType(
   } = {}
 ): GraphQLObjectType {
   const collectionName = name || `${extractNodeTypeName(nodeType)}Collection`
-  const edgeType = createEdgeType(nodeType)
+  const edgeType = createEdgeType(nodeType, { skipCursor: skipPageInfo })
 
   return new GraphQLObjectType({
     name: collectionName,
@@ -103,14 +108,12 @@ export function createCollectionType(
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(nodeType))),
         description: 'The nodes in this collection, directly accessible',
       },
-      ...(skipPageInfo
-        ? null
-        : {
-            pageInfo: {
-              type: new GraphQLNonNull(PageInfoType),
-              description: 'Pagination information',
-            },
-          }),
+      ...(!skipPageInfo && {
+        pageInfo: {
+          type: new GraphQLNonNull(PageInfoType),
+          description: 'Pagination information',
+        },
+      }),
       totalCount: {
         type: new GraphQLNonNull(GraphQLInt),
         description: 'The total count of items available in this collection',
