@@ -1,5 +1,6 @@
 export { default as BillingSettings } from './BillingSettings/BillingSettings'
 export { default as GeneralSettings } from './GeneralSettings/GeneralSettings'
+export { default as SecuritySettings } from './SecuritySettings/SecuritySettings'
 export { default as IntegrationSettings } from './IntegrationSettings/IntegrationSettings'
 export { default as InvoicesSettings } from './InvoicesSettings/InvoicesSettings'
 export { default as NewOrgForm } from './NewOrg/NewOrgForm'

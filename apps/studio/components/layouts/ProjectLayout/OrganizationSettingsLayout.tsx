@@ -39,6 +39,10 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
       label: 'General',
       href: `/org/${slug}/general`,
     },
+    {
+      label: 'Security',
+      href: `/org/${slug}/security`,
+    },
     !newLayoutPreview && {
       label: 'Team',
       href: `/org/${slug}/team`,
