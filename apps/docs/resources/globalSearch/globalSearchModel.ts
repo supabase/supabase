@@ -24,11 +24,10 @@ export abstract class SearchResultModel {
       )
         .map((matches) =>
           matches
-            .map(({ id, type, page_title, href, content, subsections }) => {
+            .map(({ type, page_title, href, content, subsections }) => {
               switch (type) {
                 case 'markdown':
                   return new GuideModel({
-                    id: String(id),
                     title: page_title,
                     href,
                     content,
@@ -46,9 +45,7 @@ export abstract class SearchResultModel {
     })
   }
 
-  public id: string
   public title?: string
   public href?: string
-  // public description?: string
   public content?: string
 }

@@ -37,7 +37,7 @@ export const searchRoot = {
   [GRAPHQL_FIELD_SEARCH_GLOBAL]: {
     description: '',
     args: searchResultArgs,
-    type: createCollectionType(GraphQLInterfaceTypeSearchResult, 'SearchResultCollection'),
+    type: createCollectionType(GraphQLInterfaceTypeSearchResult, { skipPageInfo: true }),
     resolve: resolveSearch,
   },
 }

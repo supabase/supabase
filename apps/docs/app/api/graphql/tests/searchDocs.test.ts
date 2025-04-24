@@ -17,7 +17,6 @@ const rpcSpy = vi.fn().mockImplementation((funcName, params) => {
     const limit = params?.max_result || 2
     const mockResults = [
       {
-        id: 1,
         type: 'markdown',
         page_title: 'Test Guide',
         href: '/guides/test',
@@ -28,7 +27,6 @@ const rpcSpy = vi.fn().mockImplementation((funcName, params) => {
         ],
       },
       {
-        id: 2,
         type: 'markdown',
         page_title: 'Another Guide',
         href: '/guides/another',
@@ -52,7 +50,6 @@ describe('/api/graphql searchDocs', () => {
       query {
         searchDocs(query: "authentication") {
           nodes {
-            id
             title
             href
           }
@@ -73,7 +70,6 @@ describe('/api/graphql searchDocs', () => {
     expect(json.data.searchDocs.nodes).toBeInstanceOf(Array)
     expect(json.data.searchDocs.nodes).toHaveLength(2)
     expect(json.data.searchDocs.nodes[0]).toMatchObject({
-      id: expect.any(String),
       title: 'Test Guide',
       href: '/guides/test',
     })
@@ -84,7 +80,6 @@ describe('/api/graphql searchDocs', () => {
       query {
         searchDocs(query: "database", limit: 1) {
           nodes {
-            id
             title
           }
         }
@@ -114,7 +109,6 @@ describe('/api/graphql searchDocs', () => {
       query {
         searchDocs(query: "api") {
           nodes {
-            id
             title
             content
           }
@@ -148,7 +142,6 @@ describe('/api/graphql searchDocs', () => {
       query {
         searchDocs(query: "failed query") {
           nodes {
-            id
             title
           }
         }
@@ -171,7 +164,6 @@ describe('/api/graphql searchDocs', () => {
       query {
         searchDocs {
           nodes {
-            id
             title
           }
         }

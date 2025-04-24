@@ -27,10 +27,6 @@ export const GraphQLObjectTypeGuide = new GraphQLObjectType({
   interfaces: [GraphQLInterfaceTypeSearchResult],
   isTypeOf: (value: unknown) => value instanceof GuideModel,
   fields: {
-    id: {
-      type: new GraphQLNonNull(GraphQLID),
-      description: 'The unique identifier of the search result',
-    },
     title: {
       type: GraphQLString,
       description: 'The title of the matching content',
@@ -39,16 +35,12 @@ export const GraphQLObjectTypeGuide = new GraphQLObjectType({
       type: GraphQLString,
       description: 'The URL of the guide',
     },
-    description: {
-      type: GraphQLString,
-      description: 'A brief description of the matching content',
-    },
     content: {
       type: GraphQLString,
       description: 'The full content of the matching result.',
     },
     subsections: {
-      type: createCollectionType(GraphQLObjectTypeSubsection),
+      type: createCollectionType(GraphQLObjectTypeSubsection, { skipPageInfo: true }),
       description: 'The subsections of the guide',
       resolve: (node: GuideModel) => GraphQLCollectionBuilder.create({ items: node.subsections }),
     },

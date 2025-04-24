@@ -16,10 +16,6 @@ export type ISearchResultArgs = InferArgTypes<typeof searchResultArgs>
 export const GraphQLInterfaceTypeSearchResult = new GraphQLInterfaceType({
   name: 'SearchResult',
   fields: {
-    id: {
-      type: new GraphQLNonNull(GraphQLID),
-      description: 'The unique identifier of the search result.',
-    },
     title: {
       type: GraphQLString,
       description: 'The title of the matching content.',
@@ -28,10 +24,6 @@ export const GraphQLInterfaceTypeSearchResult = new GraphQLInterfaceType({
       type: GraphQLString,
       description: 'The URL of the matching content.',
     },
-    // description: {
-    //   type: GraphQLString,
-    //   description: 'A brief description of the matching content.',
-    // },
     content: {
       type: GraphQLString,
       description: 'The full content of the matching result.',

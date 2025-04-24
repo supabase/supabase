@@ -78,14 +78,22 @@ function createEdgeType(nodeType: GraphQLOutputType, name?: string): GraphQLObje
  */
 export function createCollectionType(
   nodeType: GraphQLOutputType,
-  name?: string
+  {
+    name,
+    description,
+    skipPageInfo = false,
+  }: {
+    name?: string
+    description?: string
+    skipPageInfo?: boolean
+  } = {}
 ): GraphQLObjectType {
   const collectionName = name || `${extractNodeTypeName(nodeType)}Collection`
   const edgeType = createEdgeType(nodeType)
 
   return new GraphQLObjectType({
     name: collectionName,
-    description: `A collection of ${extractNodeTypeName(nodeType)} items`,
+    description: description || `A collection of ${extractNodeTypeName(nodeType)} nodes`,
     fields: {
       edges: {
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(edgeType))),
@@ -95,10 +103,14 @@ export function createCollectionType(
         type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(nodeType))),
         description: 'The nodes in this collection, directly accessible',
       },
-      pageInfo: {
-        type: new GraphQLNonNull(PageInfoType),
-        description: 'Information to aid in pagination',
-      },
+      ...(skipPageInfo
+        ? null
+        : {
+            pageInfo: {
+              type: new GraphQLNonNull(PageInfoType),
+              description: 'Pagination information',
+            },
+          }),
       totalCount: {
         type: new GraphQLNonNull(GraphQLInt),
         description: 'The total count of items available in this collection',

@@ -1,7 +1,6 @@
 import { SearchResultModel } from '../globalSearch/globalSearchModel'
 
 export class GuideModel implements SearchResultModel {
-  public id: string
   public title?: string
   public href?: string
   // public description?: string
@@ -9,24 +8,18 @@ export class GuideModel implements SearchResultModel {
   public subsections: Array<SubsectionModel>
 
   constructor({
-    id,
     title,
     href,
-    // description,
     content,
     subsections,
   }: {
-    id: string
     title?: string
     href?: string
-    // description?: string
     content?: string
     subsections?: Array<{ title?: string; href?: string; content?: string }>
   }) {
-    this.id = id
     this.title = title
     this.href = href
-    // this.description = description
     this.content = content
     this.subsections = subsections?.map((subsection) => new SubsectionModel(subsection)) ?? []
   }

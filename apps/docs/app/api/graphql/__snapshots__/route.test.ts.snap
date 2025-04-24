@@ -6,17 +6,11 @@ exports[`/api/graphql schema snapshot > should match snapshot 1`] = `
 }
 
 type Guide implements SearchResult {
-  """The unique identifier of the search result"""
-  id: ID!
-
   """The title of the matching content"""
   title: String
 
   """The URL of the guide"""
   href: String
-
-  """A brief description of the matching content"""
-  description: String
 
   """The full content of the matching result."""
   content: String
@@ -26,9 +20,6 @@ type Guide implements SearchResult {
 }
 
 interface SearchResult {
-  """The unique identifier of the search result."""
-  id: ID!
-
   """The title of the matching content."""
   title: String
 
@@ -39,16 +30,13 @@ interface SearchResult {
   content: String
 }
 
-"""A collection of Subsection items"""
+"""A collection of Subsection nodes"""
 type SubsectionCollection {
   """A list of edges containing nodes in this collection"""
   edges: [SubsectionEdge!]!
 
   """The nodes in this collection, directly accessible"""
   nodes: [Subsection!]!
-
-  """Information to aid in pagination"""
-  pageInfo: PageInfo!
 
   """The total count of items available in this collection"""
   totalCount: Int!
@@ -74,21 +62,6 @@ type Subsection {
   content: String
 }
 
-"""Information about pagination in a collection"""
-type PageInfo {
-  """Whether there are more items after the current page"""
-  hasNextPage: Boolean!
-
-  """Whether there are more items before the current page"""
-  hasPreviousPage: Boolean!
-
-  """Cursor pointing to the start of the current page"""
-  startCursor: String
-
-  """Cursor pointing to the end of the current page"""
-  endCursor: String
-}
-
 type RootQueryType {
   """Get the GraphQL schema for this endpoint"""
   schema: String
@@ -97,16 +70,13 @@ type RootQueryType {
   searchDocs(query: String!, limit: Int): SearchResultCollection
 }
 
-"""A collection of SearchResult items"""
+"""A collection of SearchResult nodes"""
 type SearchResultCollection {
   """A list of edges containing nodes in this collection"""
   edges: [SearchResultEdge!]!
 
   """The nodes in this collection, directly accessible"""
   nodes: [SearchResult!]!
-
-  """Information to aid in pagination"""
-  pageInfo: PageInfo!
 
   """The total count of items available in this collection"""
   totalCount: Int!
