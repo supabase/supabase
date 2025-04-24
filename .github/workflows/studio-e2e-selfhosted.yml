@@ -67,7 +67,7 @@ jobs:
           echo "PREVIEW_PROJECT_REF=default" >> $GITHUB_ENV
 
       - name: Run Playwright selfhosted E2E tests
-        run: pnpm e2e:preview
+        run: pnpm run e2e:preview
 
       - uses: actions/upload-artifact@v4
         if: always()
