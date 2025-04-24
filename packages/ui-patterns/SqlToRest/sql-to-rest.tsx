@@ -1,19 +1,6 @@
 'use client'
 
 import Editor, { useMonaco } from '@monaco-editor/react'
-import { ChevronUp, GitPullRequest } from 'lucide-react'
-import type { editor } from 'monaco-editor'
-import { useTheme } from 'next-themes'
-import {
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useState,
-} from 'react'
-import Markdown from 'react-markdown'
-import { format } from 'sql-formatter'
 import {
   HttpRequest,
   ParsingError,
@@ -28,6 +15,19 @@ import {
   renderHttp,
   renderSupabaseJs,
 } from '@supabase/sql-to-rest'
+import { ChevronUp, GitPullRequest } from 'lucide-react'
+import type { editor } from 'monaco-editor'
+import { useTheme } from 'next-themes'
+import {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from 'react'
+import Markdown from 'react-markdown'
+import { format } from 'sql-formatter'
 import { CodeBlock, Collapsible, Tabs, cn } from 'ui'
 import { Alert } from 'ui/src/components/shadcn/ui/alert'
 import { assumptions } from './assumptions'
@@ -287,11 +287,11 @@ export default function SqlToRest({
 
               // Format on cmd+s
               editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, async () => {
-                await editor.getAction('editor.action.formatDocument').run()
+                await editor.getAction('editor.action.formatDocument')?.run()
               })
 
               // Run format on the initial value
-              await editor.getAction('editor.action.formatDocument').run()
+              await editor.getAction('editor.action.formatDocument')?.run()
             }}
             onChange={async (sql) => {
               if (!sql) {

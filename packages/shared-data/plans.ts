@@ -113,8 +113,8 @@ export const plans: PricingInformation[] = [
         partners: [],
         features: [
           'SOC2',
+          'Project-scoped and read-only access',
           'HIPAA available as paid add-on',
-          'Read-only and Billing member roles',
           'SSO for Supabase Dashboard',
           'Priority email support & SLAs',
           'Daily backups stored for 14 days',

@@ -1,4 +1,7 @@
-import { MousePointerClick, X, Clipboard, Check } from 'lucide-react'
+import { Check, Clipboard, MousePointerClick, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
   Button,
   CodeBlock,
@@ -9,11 +12,9 @@ import {
   cn,
   copyToClipboard,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 import type { LogData, QueryType } from './Logs.types'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useEffect, useState } from 'react'
 
 export interface LogSelectionProps {
   log?: LogData
