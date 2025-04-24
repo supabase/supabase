@@ -5,9 +5,11 @@ export const GRAPHQL_FIELD_SEARCH_GLOBAL = 'searchDocs'
 
 export const searchResultArgs = {
   query: {
+    required: true,
     type: new GraphQLNonNull(GraphQLString),
   },
   limit: {
+    required: false,
     type: GraphQLInt,
   },
 } as const // const needed for proper type inference of required fields

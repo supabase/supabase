@@ -3,7 +3,6 @@ import { SearchResultModel } from '../globalSearch/globalSearchModel'
 export class GuideModel implements SearchResultModel {
   public title?: string
   public href?: string
-  // public description?: string
   public content?: string
   public subsections: Array<SubsectionModel>
 

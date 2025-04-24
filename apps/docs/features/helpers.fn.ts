@@ -79,9 +79,4 @@ export class Result<T, E> {
     if (this.isOk()) return onOk(this.internal.data)
     return onErr(this.internal.error)
   }
-
-  tapEither(fn: (self: Result<T, E>) => void) {
-    fn(this)
-    return this
-  }
 }

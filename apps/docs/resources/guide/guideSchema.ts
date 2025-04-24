@@ -32,24 +32,24 @@ export const GraphQLObjectTypeGuide = new GraphQLObjectType({
   fields: {
     title: {
       type: GraphQLString,
-      description: 'The title of the matching content',
+      description: 'The title of the document',
     },
     href: {
       type: GraphQLString,
-      description: 'The URL of the guide',
+      description: 'The URL of the document',
     },
     content: {
       type: GraphQLString,
       description:
-        'The full content of the matching result, including all subsections and possibly more content',
+        'The full content of the document, including all subsections (both those matching and not matching any query string) and possibly more content',
     },
     subsections: {
       type: createCollectionType(GraphQLObjectTypeSubsection, {
         skipPageInfo: true,
-        description:
-          'A collection of content chunks taken from a larger document in the Supabase docs',
+        description: 'A collection of content chunks from a larger document in the Supabase docs.',
       }),
-      description: 'The subsections of the guide',
+      description:
+        'The subsections of the document. If the document is returned from a search match, only matching content chunks are returned. For the full content of the original document, use the content field in the parent Guide.',
       resolve: (node: GuideModel) => GraphQLCollectionBuilder.create({ items: node.subsections }),
     },
   },

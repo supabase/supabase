@@ -1,7 +1,21 @@
-import { GraphQLObjectType, GraphQLSchema } from 'graphql'
+import { GraphQLObjectType, GraphQLSchema, GraphQLString, printSchema } from 'graphql'
 import { searchRoot } from './globalSearch/globalSearchResolver'
 import { GraphQLObjectTypeGuide } from './guide/guideSchema'
-import { introspectRoot } from './introspect/introspectResolver'
+
+const GRAPHQL_FIELD_INTROSPECT = 'schema'
+
+async function resolveIntrospect() {
+  const schema = printSchema(rootGraphQLSchema)
+  return schema
+}
+
+const introspectRoot = {
+  [GRAPHQL_FIELD_INTROSPECT]: {
+    description: 'Get the GraphQL schema for this endpoint',
+    type: GraphQLString,
+    resolve: resolveIntrospect,
+  },
+}
 
 export const rootGraphQLSchema = new GraphQLSchema({
   query: new GraphQLObjectType({
