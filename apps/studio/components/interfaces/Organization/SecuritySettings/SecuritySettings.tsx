@@ -1,10 +1,8 @@
-import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
-import { boolean, object } from 'yup'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { toast } from 'sonner'
 import Link from 'next/link'
-import { HelpCircle } from 'lucide-react'
 
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
@@ -35,11 +33,10 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import AlertError from 'components/ui/AlertError'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
-const schema = object({
-  enforceMfa: boolean().required(),
+const schema = z.object({
+  enforceMfa: z.boolean(),
 })
 
 const SecuritySettings = () => {
@@ -70,8 +67,8 @@ const SecuritySettings = () => {
     },
   })
 
-  const form = useForm({
-    resolver: yupResolver(schema),
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
     defaultValues: {
       enforceMfa: false,
     },
