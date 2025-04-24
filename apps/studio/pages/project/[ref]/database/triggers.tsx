@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 
 import { useIsInlineEditorEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { DeleteTrigger } from 'components/interfaces/Database'
+import { DeleteTrigger } from 'components/interfaces/Database/Triggers/DeleteTrigger'
 import { TriggerSheet } from 'components/interfaces/Database/Triggers/TriggerSheet'
 import { generateTriggerCreateSQL } from 'components/interfaces/Database/Triggers/TriggersList/TriggerList.utils'
 import TriggersList from 'components/interfaces/Database/Triggers/TriggersList/TriggersList'

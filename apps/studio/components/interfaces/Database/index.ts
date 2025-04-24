@@ -10,8 +10,6 @@ export { default as PublicationsTables } from './Publications/PublicationsTables
 
 export { default as BackupsList } from './Backups/BackupsList'
 
-export { default as DeleteTrigger } from './Triggers/DeleteTrigger'
-
 export { default as CreateFunction } from './Functions/CreateFunction'
 export { default as DeleteFunction } from './Functions/DeleteFunction'
 
