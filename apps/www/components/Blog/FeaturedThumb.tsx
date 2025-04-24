@@ -2,14 +2,21 @@ import Image from 'next/image'
 import Link from 'next/link'
 import authors from 'lib/authors.json'
 import PostTypes from '../../types/post'
+import { CMS_API_URL } from '~/lib/constants'
 
 // Extend PostTypes for CMS blog posts
 interface CMSPostTypes extends PostTypes {
   isCMS?: boolean
-  author_image_url?: string
-  author_url?: string
-  position?: string
-  author_image?: string
+  authors?: Array<{
+    author: string
+    author_id: string
+    position: string
+    author_url: string
+    author_image_url: {
+      url: string
+    }
+    username: string
+  }>
 }
 
 function FeaturedThumb(blog: PostTypes | CMSPostTypes) {
@@ -17,15 +24,13 @@ function FeaturedThumb(blog: PostTypes | CMSPostTypes) {
   if ('isCMS' in blog && blog.isCMS) {
     // For CMS posts, display author directly from the blog data
     const cmsBlog = blog as CMSPostTypes
-    const author = [
-      {
-        author: cmsBlog.author || 'Unknown Author',
-        author_image_url: cmsBlog.author_image_url,
-        author_image: cmsBlog.author_image,
-        author_url: cmsBlog.author_url,
-        position: cmsBlog.position,
-      },
-    ]
+    const author =
+      cmsBlog.authors?.map((author) => ({
+        author: author.author || 'Unknown Author',
+        author_image_url: author.author_image_url || null,
+        author_url: author.author_url || '#',
+        position: author.position || '',
+      })) || []
 
     return renderFeaturedThumb(blog, author)
   }
@@ -46,6 +51,20 @@ function FeaturedThumb(blog: PostTypes | CMSPostTypes) {
 }
 
 function renderFeaturedThumb(blog: PostTypes, author: any[]) {
+  console.log('blog', blog)
+  console.log('author', author)
+  const imageUrl = blog.isCMS
+    ? blog.thumb
+      ? `${CMS_API_URL}${blog.thumb}`
+      : blog.image
+        ? `${CMS_API_URL}${blog.image}`
+        : '/images/blog/blog-placeholder.png'
+    : blog.thumb
+      ? `/images/blog/${blog.thumb}`
+      : blog.image
+        ? `/images/blog/${blog.image}`
+        : '/images/blog/blog-placeholder.png'
+
   return (
     <div key={blog.slug} className="w-full">
       <Link
@@ -54,7 +73,7 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
       >
         <div className="relative w-full aspect-[2/1] lg:col-span-3 lg:aspect-[3/2] overflow-auto rounded-lg border">
           <Image
-            src={`/images/blog/` + (blog.thumb ? blog.thumb : blog.image)}
+            src={imageUrl}
             fill
             sizes="100%"
             quality={100}
@@ -76,15 +95,12 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
 
           <div className="flex flex-col w-max gap-2">
             {author.filter(Boolean).map((author: any, i: number) => {
-              // Support both naming conventions: author_image_url and author_image
-              const authorImageUrl = author.author_image_url || author.author_image
-
               return (
                 <div className="flex items-center space-x-2" key={i}>
-                  {authorImageUrl && (
+                  {author.author_image_url && (
                     <div className="relative h-6 w-6 overflow-auto">
                       <Image
-                        src={authorImageUrl}
+                        src={author.author_image_url}
                         alt={`${author.author} avatar`}
                         className="rounded-full object-cover"
                         fill
@@ -93,9 +109,7 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
                     </div>
                   )}
                   <div className="flex flex-col">
-                    <span className="text-foreground m-0 text-sm">
-                      {author?.author ?? author?.name}
-                    </span>
+                    <span className="text-foreground m-0 text-sm">{author.author}</span>
                   </div>
                 </div>
               )

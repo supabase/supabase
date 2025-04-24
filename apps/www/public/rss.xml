@@ -11,14 +11,14 @@
   <guid>https://supabase.com/blog/second-demo-post</guid>
   <title>Second demo post</title>
   <link>https://supabase.com/blog/second-demo-post</link>
-  <description></description>
+  <description>This is a description</description>
   <pubDate>Wed, 23 Apr 2025 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/first-test-blog-post</guid>
   <title>First test blog post</title>
   <link>https://supabase.com/blog/first-test-blog-post</link>
-  <description></description>
+  <description>Description for the first blog post.</description>
   <pubDate>Mon, 21 Apr 2025 00:00:00 -0700</pubDate>
 </item>
 <item>

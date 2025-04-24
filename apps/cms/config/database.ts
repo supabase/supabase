@@ -18,7 +18,7 @@ export default ({ env }) => {
       },
       pool: {
         min: 0,
-        max: 3,
+        max: 10,
         acquireTimeoutMillis: 300000,
         createTimeoutMillis: 300000,
         idleTimeoutMillis: 30000,

@@ -12,14 +12,18 @@
   },
   "attributes": {
     "Title": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "slug": {
-      "type": "string"
+      "type": "string",
+      "unique": true,
+      "regex": "^[a-z][a-z0-9-]{2,49}$",
+      "required": true
     },
     "thumb": {
       "type": "media",
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "allowedTypes": [
         "images",
@@ -33,7 +37,7 @@
     },
     "image": {
       "type": "media",
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "allowedTypes": [
         "images",
@@ -43,7 +47,8 @@
       ]
     },
     "toc_depth": {
-      "type": "integer"
+      "type": "integer",
+      "default": 2
     },
     "content": {
       "type": "richtext"
@@ -62,6 +67,9 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::category.category"
+    },
+    "description": {
+      "type": "text"
     }
   }
 }

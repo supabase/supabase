@@ -5,6 +5,7 @@ import React from 'react'
 import type Author from '~/types/author'
 import type PostTypes from '~/types/post'
 import dayjs from 'dayjs'
+import { CMS_API_URL } from '~/lib/constants'
 
 interface Props {
   post: PostTypes
@@ -24,6 +25,19 @@ const BlogGridItem = ({ post }: Props) => {
     }
   }
 
+  console.log('post', post)
+  const imageUrl = post.isCMS
+    ? post.thumb
+      ? `${CMS_API_URL}${post.thumb}`
+      : post.image
+        ? `${CMS_API_URL}${post.image}`
+        : '/images/blog/blog-placeholder.png'
+    : typeof post.thumb === 'string'
+      ? post.type === 'casestudy'
+        ? post.thumb
+        : `/images/blog/${post.thumb}`
+      : '/images/blog/blog-placeholder.png'
+
   return (
     <Link
       href={post.path}
@@ -36,13 +50,7 @@ const BlogGridItem = ({ post }: Props) => {
               fill
               sizes="100%"
               quality={100}
-              src={
-                !post.thumb
-                  ? `/images/blog/blog-placeholder.png`
-                  : post.type === 'casestudy'
-                    ? post.thumb
-                    : `/images/blog/${post.thumb}`
-              }
+              src={imageUrl}
               className="scale-100 object-cover overflow-hidden"
               alt={`${post.title} thumbnail`}
             />

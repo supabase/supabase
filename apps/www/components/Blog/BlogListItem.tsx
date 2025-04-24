@@ -17,11 +17,12 @@ const BlogListItem = ({ post }: Props) => {
 
   if (authorArray) {
     for (let i = 0; i < authorArray.length; i++) {
-      author.push(
-        authors.find((authors: Author) => {
-          return authors.author_id === authorArray[i]
-        })
-      )
+      const foundAuthor = authors.find((authors: Author) => {
+        return authors.author_id === authorArray[i]
+      })
+      if (foundAuthor) {
+        author.push(foundAuthor)
+      }
     }
   }
 
@@ -40,11 +41,11 @@ const BlogListItem = ({ post }: Props) => {
           {author.map((author: any, i: number) => {
             return (
               <div className="relative ring-background w-6 h-6 rounded-full ring-2" key={i}>
-                {author.author_image_url && (
+                {author && author.author_image_url && (
                   <Image
                     src={author.author_image_url}
                     className="rounded-full object-cover border border-default w-full h-full"
-                    alt={`${author.author} avatar`}
+                    alt={`${author?.author || 'Author'} avatar`}
                     fill
                   />
                 )}

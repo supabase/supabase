@@ -5,27 +5,36 @@ type CMSBlogPost = {
   id: number
   Title: string
   slug: string
+  description: string
   content: string
   date: string
   author: string
-  author_image_url?: string
+  author_image_url?: {
+    url: string
+  }
   author_url?: string
   position?: string
   toc_depth?: number
   tags?: string[]
   thumb?: {
-    data?: {
-      url: string
-    }
+    url: string
   }
   image?: {
-    data?: {
-      url: string
-    }
+    url: string
   }
   publishedAt: string
   createdAt: string
   updatedAt: string
+  authors?: {
+    author: string
+    author_id: string
+    position: string
+    author_url: string
+    author_image_url: {
+      url: string
+    }
+    username: string
+  }[]
 }
 
 type CMSResponse = {
@@ -75,10 +84,13 @@ export async function getAllCMSPostSlugs() {
  */
 export async function getCMSPostBySlug(slug: string) {
   try {
+    const populate =
+      'populate=authors.author_image_url&populate=tags&populate=categories&populate=thumb&populate=image'
     const response = await fetch(
-      `${CMS_API_URL}/api/blog-posts?filters[slug][$eq]=${slug}&populate=*`
+      `${CMS_API_URL}/api/blog-posts?filters[slug][$eq]=${slug}&${populate}`
     )
 
+    console.log('post response', response)
     if (!response.ok) {
       return null
     }
@@ -90,13 +102,15 @@ export async function getCMSPostBySlug(slug: string) {
     }
 
     const post = data.data[0]
+
+    console.log('post', post)
     const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
     const formattedDate = new Date(post.date || new Date()).toLocaleDateString('en-IN', options)
     const readingTime = generateReadingTime(post.content || '')
 
     // Extract thumb and image URLs from the nested structure
-    const thumbUrl = post.thumb?.data?.url
-    const imageUrl = post.image?.data?.url
+    const thumbUrl = (post.thumb as any)?.url
+    const imageUrl = (post.image as any)?.url
 
     // Generate TOC from content
     const tocResult = toc(post.content || '', {
@@ -104,17 +118,26 @@ export async function getCMSPostBySlug(slug: string) {
     })
     const processedContent = tocResult.content.replace(/%23/g, '')
 
+    console.log('author ££', post.authors)
     return {
       slug,
       source: post.content || '',
       title: post.Title || 'Untitled Post',
+      description: post.description || '',
       date: post.date || new Date().toISOString(),
       formattedDate,
       readingTime,
-      author: post.author || 'Unknown Author',
-      author_image_url: post.author_image_url || null,
-      author_url: post.author_url || '#',
-      position: post.position || '',
+      authors:
+        post.authors?.map((author: any) => ({
+          author: author.author || 'Unknown Author',
+          author_id: author.author_id || '',
+          position: author.position || '',
+          author_url: author.author_url || '#',
+          author_image_url: author.author_image_url?.url
+            ? `${CMS_API_URL}${author.author_image_url.url}`
+            : null,
+          username: author.username || '',
+        })) || [],
       toc_depth: post.toc_depth || 2,
       thumb: thumbUrl ? thumbUrl.replace(CMS_API_URL, '') : null,
       image: imageUrl ? imageUrl.replace(CMS_API_URL, '') : null,
@@ -123,10 +146,7 @@ export async function getCMSPostBySlug(slug: string) {
       isCMS: true,
       content: post.content || '',
       tags: post.tags || [],
-      toc: {
-        ...tocResult,
-        content: processedContent,
-      },
+      toc: processedContent,
     }
   } catch (error) {
     console.error('Error fetching CMS post by slug:', error)
@@ -152,8 +172,11 @@ export async function getAllCMSPosts({
       `${CMS_API_URL}/api/blog-posts?populate=*&pagination[pageSize]=100`
     )
 
+    const populate =
+      'populate=authors.author_image_url&populate=categories&populate=thumb&populate=image'
+
     const response = await fetch(
-      `${CMS_API_URL}/api/blog-posts?populate=*&pagination[pageSize]=100`
+      `${CMS_API_URL}/api/blog-posts?${populate}&pagination[pageSize]=100`
     )
 
     if (!response.ok) {
@@ -162,18 +185,15 @@ export async function getAllCMSPosts({
     }
 
     const data: CMSResponse = await response.json()
-    console.log('CMS API response data:', {
-      totalPosts: data.data.length,
-      pagination: data.meta.pagination,
-      firstPost: data.data[0]
-        ? {
-            slug: data.data[0].slug,
-            title: data.data[0].Title,
-          }
-        : 'No posts found',
-    })
+    // console.log('CMS API response data:', {
+    //   totalPosts: data.data.length,
+    //   pagination: data.meta.pagination,
+    //   firstPost: data.data[0],
+    // })
 
-    console.log('data', data)
+    // console.log('data', data)
+    // console.log('thumb$$', data.data[0].thumb)
+    // console.log('author$$', data.data[0].author)
 
     let posts = data.data
       .filter((post) => post.slug !== currentPostSlug)
@@ -187,19 +207,32 @@ export async function getAllCMSPosts({
         const readingTime = generateReadingTime(post.content || '')
 
         // Extract thumb and image URLs from the nested structure
-        const thumbUrl = post.thumb?.data?.url
-        const imageUrl = post.image?.data?.url
+        const thumbUrl = (post.thumb as any)?.url
+        const imageUrl = (post.image as any)?.url
+
+        // console.log('thumb', thumbUrl)
+        // console.log('image', imageUrl)
+        console.log('author ££', post.authors)
 
         return {
           slug: post.slug || '',
           title: post.Title || 'Untitled Post',
+          description: post.description || '',
           date: post.date || new Date().toISOString(),
           formattedDate,
           readingTime,
-          author: post.author || 'Unknown Author',
-          author_image_url: post.author_image_url || null,
-          author_url: post.author_url || '#',
-          position: post.position || '',
+          authors:
+            post.authors?.map((author: any) => ({
+              author: author.author || 'Unknown Author',
+              author_id: author.author_id || '',
+              position: author.position || '',
+              author_url: author.author_url || '#',
+              author_image_url: author.author_image_url?.url
+                ? `${CMS_API_URL}${author.author_image_url.url}`
+                : null,
+              username: author.username || '',
+            })) || [],
+          toc_depth: post.toc_depth || 2,
           thumb: thumbUrl ? thumbUrl.replace(CMS_API_URL, '') : null,
           image: imageUrl ? imageUrl.replace(CMS_API_URL, '') : null,
           url: `/blog/${post.slug || ''}`,

@@ -95,4 +95,10 @@ module.exports = [
     port: '',
     pathname: '/dms/image/**',
   },
+  {
+    protocol: 'http',
+    hostname: 'localhost',
+    port: '1337',
+    pathname: '/uploads/**',
+  },
 ]

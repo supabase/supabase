@@ -348,10 +348,11 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
   attributes: {
     author: Schema.Attribute.String
     author_id: Schema.Attribute.String
-    author_image_url: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>
+    author_image_url: Schema.Attribute.Media<'images'>
     author_url: Schema.Attribute.String
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
+    image: Schema.Attribute.Media<'images'>
     locale: Schema.Attribute.String & Schema.Attribute.Private
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::author.author'> &
       Schema.Attribute.Private
@@ -381,16 +382,17 @@ export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
     date: Schema.Attribute.DateTime
-    image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios', true>
+    description: Schema.Attribute.Text
+    image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>
     locale: Schema.Attribute.String & Schema.Attribute.Private
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::blog-post.blog-post'> &
       Schema.Attribute.Private
     publishedAt: Schema.Attribute.DateTime
-    slug: Schema.Attribute.String
+    slug: Schema.Attribute.String & Schema.Attribute.Required & Schema.Attribute.Unique
     tags: Schema.Attribute.Relation<'oneToMany', 'api::tag.tag'>
-    thumb: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios', true>
-    Title: Schema.Attribute.String
-    toc_depth: Schema.Attribute.Integer
+    thumb: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>
+    Title: Schema.Attribute.String & Schema.Attribute.Required
+    toc_depth: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<2>
     updatedAt: Schema.Attribute.DateTime
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
   }
