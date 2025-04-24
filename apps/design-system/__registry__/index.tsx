@@ -720,6 +720,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "filter-bar": {
+      name: "filter-bar",
+      type: "components:example",
+      registryDependencies: ["filter-bar"],
+      component: React.lazy(() => import("@/registry/default/example/filter-bar")),
+      source: "",
+      files: ["registry/default/example/filter-bar-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "hover-card-demo": {
       name: "hover-card-demo",
       type: "components:example",
@@ -1783,17 +1794,6 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/form-item-layout-after-label")),
       source: "",
       files: ["registry/default/example/form-item-layout-after-label.tsx"],
-      category: "undefined",
-      subcategory: "undefined",
-      chunks: []
-    },
-    "filter-bar-demo": {
-      name: "filter-bar-demo",
-      type: "components:example",
-      registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/filter-bar-demo")),
-      source: "",
-      files: ["registry/default/example/filter-bar-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
