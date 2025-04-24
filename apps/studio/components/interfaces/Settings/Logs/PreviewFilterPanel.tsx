@@ -1,64 +1,24 @@
-import dayjs from 'dayjs'
-import { Eye, EyeOff, RefreshCw, Terminal } from 'lucide-react'
+import { Eye, EyeOff, RefreshCw, Search, Terminal, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
-// import CSVButton from 'components/ui/CSVButton'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { IS_PLATFORM } from 'lib/constants'
-import { Button, Calendar, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
-import type {
-  CustomOptionProps,
-  FilterCondition,
-  FilterGroup,
-  FilterProperty,
-} from 'ui-patterns/FilterBar'
-import { FilterBar } from 'ui-patterns/FilterBar'
-import { DatePickerValue } from './Logs.DatePickers'
-import { FILTER_OPTIONS, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
+import { Button, Input, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
+import {
+  FILTER_OPTIONS,
+  LOG_ROUTES_WITH_REPLICA_SUPPORT,
+  LogsTableName,
+  PREVIEWER_DATEPICKER_HELPERS,
+} from './Logs.constants'
 import type { Filters, LogSearchCallback, LogTemplate } from './Logs.types'
-
-interface CustomDateRangePickerProps {
-  value?: { from: Date; to?: Date }
-  onChange: (range: { from: Date; to?: Date } | undefined) => void
-}
-
-function CustomDateRangePicker({ onChange, onCancel }: CustomOptionProps) {
-  const [dateRange, setDateRange] = useState<any | undefined>()
-
-  return (
-    <div className="w-full space-y-4">
-      <Calendar
-        initialFocus
-        mode="range"
-        defaultMonth={dateRange?.from}
-        selected={dateRange}
-        onSelect={setDateRange}
-        numberOfMonths={2}
-      />
-      <div className="flex justify-end gap-2 py-3 px-4 border-t">
-        <Button type="default" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button
-          type="primary"
-          onClick={() => {
-            if (dateRange?.from) {
-              const from = dayjs(dateRange.from).toISOString()
-              const to = dateRange.to ? dayjs(dateRange.to).toISOString() : dayjs().toISOString()
-              onChange(`${from}|${to}`)
-            }
-          }}
-        >
-          Apply
-        </Button>
-      </div>
-    </div>
-  )
-}
+import LogsFilterPopover from './LogsFilterPopover'
 
 interface PreviewFilterPanelProps {
   defaultSearchValue?: string
@@ -85,39 +45,15 @@ interface PreviewFilterPanelProps {
   setSelectedDatePickerValue: (value: DatePickerValue) => void
 }
 
-function useDebounce<T extends (...args: any[]) => void>(callback: T, delay: number) {
-  const timeoutRef = useRef<NodeJS.Timeout>()
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
-    }
-  }, [])
-
-  return useCallback(
-    (...args: Parameters<T>) => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
-
-      timeoutRef.current = setTimeout(() => {
-        callback(...args)
-      }, delay)
-    },
-    [callback, delay]
-  ) as T
-}
-
+/**
+ * Logs control panel header + wrapper
+ */
 const PreviewFilterPanel = ({
   isLoading,
   newCount,
   onRefresh,
   onSearch = () => {},
   defaultSearchValue = '',
-  defaultFromValue,
-  defaultToValue,
   onExploreClick,
   queryUrl,
   condensedLayout,
@@ -134,206 +70,159 @@ const PreviewFilterPanel = ({
 }: PreviewFilterPanelProps) => {
   const router = useRouter()
   const { ref } = useParams()
+  const [search, setSearch] = useState('')
 
   const logName = router.pathname.split('/').pop()
 
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
 
+  // [Joshen] These are the routes tested that can show replica logs
   const showDatabaseSelector =
     IS_PLATFORM && LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(router.pathname)
 
-  const filterProperties = useMemo(() => {
-    const tableFilters = FILTER_OPTIONS[table]
-    if (!tableFilters) return []
+  const hasEdits = search !== defaultSearchValue
 
-    const properties: FilterProperty[] = []
+  const handleInputSearch = (query: string) => onSearch('search-input-change', { query })
 
-    // Add date range filter
-    properties.push({
-      label: 'Time Range',
-      name: 'timerange',
-      type: 'string' as const,
-      operators: ['='],
-      options: [
-        {
-          label: 'Last 15 minutes',
-          value: `${dayjs().subtract(15, 'minute').toISOString()}|${dayjs().toISOString()}`,
-        },
-        {
-          label: 'Last 30 minutes',
-          value: `${dayjs().subtract(30, 'minute').toISOString()}|${dayjs().toISOString()}`,
-        },
-        {
-          label: 'Last hour',
-          value: `${dayjs().subtract(1, 'hour').toISOString()}|${dayjs().toISOString()}`,
-        },
-        {
-          label: 'Last 3 hours',
-          value: `${dayjs().subtract(3, 'hour').toISOString()}|${dayjs().toISOString()}`,
-        },
-        {
-          label: 'Last 24 hours',
-          value: `${dayjs().subtract(24, 'hour').toISOString()}|${dayjs().toISOString()}`,
-        },
-        {
-          label: 'Custom Range...',
-          component: (props: CustomOptionProps) => <CustomDateRangePicker {...props} />,
-        },
-      ],
-    })
-
-    // Add table-specific filters
-    Object.entries(tableFilters).forEach(([key, filterSet]) => {
-      properties.push({
-        label: filterSet.label,
-        name: filterSet.key,
-        type: 'string' as const,
-        operators: ['='],
-        options: filterSet.options.map((option) => ({
-          label: option.label,
-          value: option.key,
-          description: option.description,
-        })),
-      })
-    })
-
-    return properties
-  }, [table])
-
-  // Convert Logs.Filters to FilterBar.FilterGroup
-  const filterBarFilters = useMemo(() => {
-    const conditions: FilterCondition[] = []
-
-    // Handle date range - only add from defaultValues if no timerange filter exists
-    if ((defaultFromValue || defaultToValue) && !filters.timerange) {
-      conditions.push({
-        propertyName: 'timerange',
-        operator: '=',
-        value: `${defaultFromValue || ''}|${defaultToValue || ''}`,
-      })
+  // Sync local state with provided default value
+  useEffect(() => {
+    if (search !== defaultSearchValue) {
+      setSearch(defaultSearchValue)
     }
-
-    // Convert other filters
-    Object.entries(filters).forEach(([key, value]) => {
-      if (key === 'search_query') return // Skip search_query as it's handled in freeform text
-
-      if (typeof value === 'object' && value !== null) {
-        // If the filter object is empty, add a condition with no value
-        if (Object.keys(value).length === 0) {
-          conditions.push({
-            propertyName: key,
-            operator: '=',
-            value: '',
-          })
-          return
-        }
-
-        // Handle active filters
-        Object.entries(value as Record<string, boolean>).forEach(([subKey, isEnabled]) => {
-          if (isEnabled) {
-            conditions.push({
-              propertyName: key,
-              operator: '=',
-              value: subKey,
-            })
-          }
-        })
-      } else if (value !== undefined && value !== null) {
-        conditions.push({
-          propertyName: key,
-          operator: '=',
-          value: String(value),
-        })
-      }
-    })
-
-    return {
-      logicalOperator: 'AND',
-      conditions,
-    } as FilterGroup
-  }, [filters, defaultFromValue, defaultToValue])
-
-  const handleFilterChange = (filterGroup: FilterGroup) => {
-    const newFilters: Filters = {}
-    let hasTimeRange = false
-
-    filterGroup.conditions.forEach((condition) => {
-      if (!('propertyName' in condition)) return
-
-      const propertyName = condition.propertyName
-      if (!propertyName) return
-
-      if (propertyName === 'timerange') {
-        hasTimeRange = true
-        if (condition.value) {
-          const value = String(condition.value)
-          const [from, to] = value.split('|')
-          newFilters.timerange = { [value]: true }
-          onSearch('datepicker-change', { from, to })
-        } else {
-          newFilters.timerange = {}
-          onSearch('datepicker-change', { from: '', to: '' })
-        }
-      } else {
-        if (!newFilters[propertyName]) {
-          newFilters[propertyName] = {}
-        }
-
-        if (!condition.value) {
-          return
-        }
-
-        ;(newFilters[propertyName] as Record<string, boolean>)[condition.value] = true
-      }
-    })
-
-    // If timerange was completely removed from the filter group
-    if (!hasTimeRange) {
-      onSearch('datepicker-change', { from: '', to: '' })
-    }
-
-    onFiltersChange(newFilters)
-  }
+  }, [defaultSearchValue])
 
   return (
-    <div className={cn('flex w-full flex-col gap-2', condensedLayout ? ' p-3' : '', className)}>
-      <div className="flex items-center justify-between gap-x-2">
-        <div className="flex-1">
-          <FilterBar
-            filterProperties={filterProperties}
-            filters={filterBarFilters}
-            onFilterChange={handleFilterChange}
-            freeformText={defaultSearchValue}
-            onFreeformTextChange={(value) => onSearch('search-input-change', { query: value })}
-          />
-        </div>
-
-        <div className="flex items-center gap-x-2">
-          <Button
-            title="refresh"
-            type="default"
-            className="px-1.5"
+    <div
+      className={cn(
+        'flex w-full items-center justify-between',
+        condensedLayout ? ' p-3' : '',
+        className
+      )}
+    >
+      <div className="flex flex-row items-center gap-x-2">
+        <form
+          id="log-panel-search"
+          onSubmit={(e) => {
+            // prevent redirection
+            e.preventDefault()
+            handleInputSearch(search)
+          }}
+        >
+          <Input
+            className="w-60"
+            size="tiny"
+            placeholder="Search events"
+            onChange={(e) => setSearch(e.target.value)}
+            onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
+              setSearch(e.target.value)
+              handleInputSearch(e.target.value)
+            }}
             icon={
-              <div className="relative">
-                {newCount > 0 && (
-                  <div className="absolute -top-3 right-3 flex items-center justify-center">
-                    <div className="absolute z-20">
-                      <p style={{ fontSize: '0.6rem' }} className="text-white">
-                        {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
-                      </p>
-                    </div>
-                    <div className="h-4 w-4 animate-ping rounded-full bg-green-800 opacity-60"></div>
-                    <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
-                  </div>
-                )}
-                <RefreshCw />
+              <div className="text-foreground-lighter">
+                <Search size={14} />
               </div>
             }
-            loading={isLoading}
-            disabled={isLoading}
-            onClick={onRefresh}
-          />
+            value={search}
+            actions={
+              <div className="flex items-center gap-x-1 mr-0.5">
+                {hasEdits && (
+                  <ButtonTooltip
+                    icon={<span>↲</span>}
+                    type="text"
+                    className="px-1 h-[20px]"
+                    onClick={() => handleInputSearch(search)}
+                    tooltip={{ content: { side: 'bottom', text: 'Search for events' } }}
+                  />
+                )}
 
+                {search.length > 0 && (
+                  <ButtonTooltip
+                    icon={<X />}
+                    type="text"
+                    className="p-[1px] h-[20px]"
+                    onClick={() => handleInputSearch('')}
+                    tooltip={{ content: { side: 'bottom', text: 'Clear search' } }}
+                  />
+                )}
+              </div>
+            }
+          />
+        </form>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              title="refresh"
+              type="default"
+              className="px-1.5"
+              icon={
+                <div className="relative">
+                  {newCount > 0 && (
+                    <div className="absolute -top-3 right-3 flex items-center justify-center">
+                      <div className="absolute z-20">
+                        <p style={{ fontSize: '0.6rem' }} className="text-white">
+                          {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
+                        </p>
+                      </div>
+                      <div className="h-4 w-4 animate-ping rounded-full bg-green-800 opacity-60"></div>
+                      <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
+                    </div>
+                  )}
+                  <RefreshCw />
+                </div>
+              }
+              loading={isLoading}
+              disabled={isLoading}
+              onClick={onRefresh}
+            />
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="text-xs">
+            Refresh logs
+          </TooltipContent>
+        </Tooltip>
+
+        <LogsDatePicker
+          helpers={PREVIEWER_DATEPICKER_HELPERS}
+          onSubmit={(vals) => {
+            onSearch('datepicker-change', { to: vals.to, from: vals.from })
+            setSelectedDatePickerValue(vals)
+          }}
+          value={selectedDatePickerValue}
+        />
+
+        {FILTER_OPTIONS[table] !== undefined && (
+          <div className="flex items-center">
+            {FILTER_OPTIONS[table] &&
+              Object.values(FILTER_OPTIONS[table]).map((x, i: number) => {
+                const classes = []
+
+                if (Object.values(FILTER_OPTIONS[table]).length >= 2) {
+                  if (i === 0) {
+                    classes.push('rounded-tr-none rounded-br-none')
+                  } else if (i === Object.values(FILTER_OPTIONS[table]).length - 1) {
+                    classes.push('rounded-tl-none rounded-bl-none')
+                  } else {
+                    classes.push('rounded-none')
+                  }
+                }
+
+                const lastItemIndex = Object.values(FILTER_OPTIONS[table]).length - 1
+                const align = i === 0 ? 'start' : i === lastItemIndex ? 'end' : 'center'
+
+                return (
+                  <LogsFilterPopover
+                    buttonClassName={classes.join(' ')}
+                    key={`${x.key}-filter`}
+                    options={x}
+                    onFiltersChange={onFiltersChange}
+                    filters={filters}
+                    align={align}
+                  />
+                )
+              })}
+          </div>
+        )}
+        <div className="flex items-center space-x-2">
           <Button
             type="default"
             onClick={() => onToggleEventChart()}
@@ -341,39 +230,46 @@ const PreviewFilterPanel = ({
           >
             Chart
           </Button>
-
-          {/* <CSVButton data={csvData} disabled={!Boolean(csvData)} title="Download data" /> */}
-
-          {showDatabaseSelector ? (
-            <>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button asChild className="px-1.5" type="default" icon={<Terminal />}>
-                    <Link href={queryUrl} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="text-xs">
-                  Open query in Logs Explorer
-                </TooltipContent>
-              </Tooltip>
-              <DatabaseSelector
-                onSelectId={onSelectedDatabaseChange}
-                additionalOptions={
-                  table === LogsTableName.EDGE
-                    ? (loadBalancers ?? []).length > 0
-                      ? [{ id: `${ref}-all`, name: 'API Load Balancer' }]
-                      : []
-                    : []
-                }
-              />
-            </>
-          ) : (
-            <Button asChild type="default" onClick={onExploreClick}>
-              <Link href={queryUrl}>Explore via query</Link>
-            </Button>
-          )}
         </div>
+        {Boolean(csvData) && (
+          <DownloadResultsButton
+            iconOnly
+            type="default"
+            align="center"
+            results={csvData ?? []}
+            fileName={`supabase-${logName}-${ref}.csv`}
+          />
+        )}
       </div>
+
+      {showDatabaseSelector ? (
+        <div className="flex items-center justify-center gap-x-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button asChild className="px-1.5" type="default" icon={<Terminal />}>
+                <Link href={queryUrl} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="text-xs">
+              Open query in Logs Explorer
+            </TooltipContent>
+          </Tooltip>
+          <DatabaseSelector
+            onSelectId={onSelectedDatabaseChange}
+            additionalOptions={
+              table === LogsTableName.EDGE
+                ? (loadBalancers ?? []).length > 0
+                  ? [{ id: `${ref}-all`, name: 'API Load Balancer' }]
+                  : []
+                : []
+            }
+          />
+        </div>
+      ) : (
+        <Button asChild type="default" onClick={onExploreClick}>
+          <Link href={queryUrl}>Explore via query</Link>
+        </Button>
+      )}
     </div>
   )
 }
