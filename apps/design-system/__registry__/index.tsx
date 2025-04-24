@@ -720,11 +720,11 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "filter-bar": {
-      name: "filter-bar",
+    "filter-bar-demo": {
+      name: "filter-bar-demo",
       type: "components:example",
       registryDependencies: ["filter-bar"],
-      component: React.lazy(() => import("@/registry/default/example/filter-bar")),
+      component: React.lazy(() => import("@/registry/default/example/filter-bar-demo")),
       source: "",
       files: ["registry/default/example/filter-bar-demo.tsx"],
       category: "undefined",

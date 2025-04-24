@@ -468,7 +468,7 @@ export const examples: Registry = [
     files: ['example/dropdown-menu-radio-group.tsx'],
   },
   {
-    name: 'filter-bar',
+    name: 'filter-bar-demo',
     type: 'components:example',
     registryDependencies: ['filter-bar'],
     files: ['example/filter-bar-demo.tsx'],
