@@ -159,7 +159,7 @@ export const SupportFormV2 = ({
           ticketCategory: variables.category,
         },
         groups: {
-          project: variables.projectRef,
+          project: projectRef === 'no-project' ? undefined : projectRef,
           organization: variables.organizationSlug,
         },
       })
