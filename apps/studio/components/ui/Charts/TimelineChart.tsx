@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, ComponentProps } from 'react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Rectangle } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Rectangle, Label } from 'recharts'
 import { CHART_COLORS } from './Charts.constants'
 import { CommonChartProps } from './Charts.types'
 import { useChartSize, numberFormatter } from './Charts.utils'
@@ -27,6 +27,8 @@ export interface TimelineChartProps extends Omit<CommonChartProps<any>, 'data'> 
   labelWidth?: number
   onBarClick?: (entry: TimelineChartDatum) => void
   emptyStateMessage?: string
+  barSize?: number
+  barGap?: number
 }
 
 const TimelineChart = ({
@@ -45,9 +47,13 @@ const TimelineChart = ({
   YAxisProps,
   labelWidth = 120,
   onBarClick,
+  barSize = 20,
+  barGap = 0,
 }: TimelineChartProps) => {
   const [focusedItemId, setFocusedItemId] = useState<string | number | null>(null)
-  const { Container } = useChartSize(size)
+
+  // get largest duration value in data
+  const maxDuration = Math.max(...data.map((item) => item.duration))
 
   if (!data || data.length === 0) {
     return <NoDataPlaceholder message={emptyStateMessage} size={size} />
@@ -78,6 +84,12 @@ const TimelineChart = ({
     const barWidth = (item.duration / maxEndTime) * width
     const barX = x + (item.start / maxEndTime) * width
 
+    // Debug width - helps troubleshoot why text might not be showing
+    console.log(`Bar ${item.label}: width=${barWidth}px, x=${barX}`)
+
+    // Only show text if bar is wide enough (15px minimum)
+    const showText = barWidth > 15
+
     return (
       <g>
         <Rectangle
@@ -91,12 +103,28 @@ const TimelineChart = ({
           rx={2}
           ry={2}
         />
+
+        {/* Add text inside the bar if wide enough */}
+        {showText && (
+          <text
+            x={barX + 5}
+            y={y + height / 2 + 5}
+            fill="white"
+            fontSize={11}
+            fontWeight="bold"
+            style={{
+              pointerEvents: 'none',
+            }}
+          >
+            {item.label}
+          </text>
+        )}
       </g>
     )
   }
 
   return (
-    <div className={`flex flex-col gap-y-3 ${className}`}>
+    <div className={` ${className}`}>
       {title && (
         <ChartHeader
           title={title}
@@ -105,72 +133,81 @@ const TimelineChart = ({
           highlightedLabel={highlightedLabel}
         />
       )}
-      <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
-        <BarChart
-          layout="vertical"
-          data={data}
-          margin={{ top: 5, right: 30, left: labelWidth, bottom: 5 }}
-          barSize={20}
-          barGap={0}
+      max duration: {maxDuration}
+      <div className="overflow-x-auto">
+        <ChartContainer
+          config={chartConfig}
+          className="w-full overflow-x-auto"
+          style={{ height: `${data.length * 32}px`, width: `${maxDuration * 6}px` }}
         >
-          {showGrid && <CartesianGrid horizontal={false} stroke="var(--border)" />}
-          <XAxis
-            {...XAxisProps}
-            type="number"
-            domain={[0, maxEndTime]}
-            tickFormatter={(value) => `${value}${format ? ' ' + format : ''}`}
-            tickMargin={5}
-          />
-          <YAxis
-            {...YAxisProps}
-            type="category"
-            dataKey="label"
-            width={labelWidth}
-            tickLine={false}
-          />
-          <ChartTooltip
-            content={
-              <ChartTooltipContent
-                formatter={(value, name, entry: any) => {
-                  const item = entry.payload as TimelineChartDatum
-                  return (
-                    <div className="grid gap-1">
-                      <div className="flex justify-between">
-                        <span className="text-foreground-lighter mr-2">Start:</span>
-                        <span>
-                          {item.start} {format}
-                        </span>
+          <BarChart
+            layout="vertical"
+            data={data}
+            margin={{ top: 5, right: 30, left: labelWidth, bottom: 5 }}
+            // barSize={32}
+            // barGap={barGap}
+            barCategoryGap={2}
+          >
+            {showGrid && <CartesianGrid horizontal={false} stroke="var(--border)" />}
+            <XAxis
+              {...XAxisProps}
+              type="number"
+              domain={[0, maxEndTime]}
+              tickFormatter={(value) => `${value}${format ? ' ' + format : ''}`}
+              tickMargin={5}
+            />
+            <YAxis
+              {...YAxisProps}
+              type="category"
+              dataKey="label"
+              width={labelWidth}
+              tickLine={false}
+            />
+            <ChartTooltip
+              content={
+                <ChartTooltipContent
+                  formatter={(value, name, entry: any) => {
+                    const item = entry.payload as TimelineChartDatum
+                    const formatStr = typeof format === 'string' ? format : ''
+                    return (
+                      <div className="grid gap-1">
+                        <div className="flex justify-between">
+                          <span className="text-foreground-lighter mr-2">Start:</span>
+                          <span>
+                            {item.start} {formatStr}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-foreground-lighter mr-2">Duration:</span>
+                          <span>
+                            {item.duration} {formatStr}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-foreground-lighter mr-2">End:</span>
+                          <span>
+                            {item.start + item.duration} {formatStr}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-foreground-lighter mr-2">Duration:</span>
-                        <span>
-                          {item.duration} {format}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-foreground-lighter mr-2">End:</span>
-                        <span>
-                          {item.start + item.duration} {format}
-                        </span>
-                      </div>
-                    </div>
-                  )
-                }}
-              />
-            }
-          />
-          <Bar
-            dataKey="duration"
-            shape={renderTimelineBar}
-            onClick={(entry: any) => {
-              onBarClick && onBarClick(entry as TimelineChartDatum)
-            }}
-            onMouseEnter={(entry: any) => setFocusedItemId(entry.id)}
-            onMouseLeave={() => setFocusedItemId(null)}
-            isAnimationActive={false}
-          />
-        </BarChart>
-      </ChartContainer>
+                    )
+                  }}
+                />
+              }
+            />
+            <Bar
+              dataKey="duration"
+              shape={renderTimelineBar}
+              onClick={(entry: any) => {
+                onBarClick && onBarClick(entry as TimelineChartDatum)
+              }}
+              onMouseEnter={(entry: any) => setFocusedItemId(entry.id)}
+              onMouseLeave={() => setFocusedItemId(null)}
+              isAnimationActive={false}
+            />
+          </BarChart>
+        </ChartContainer>
+      </div>
     </div>
   )
 }

@@ -61,9 +61,33 @@ const TimelineExample = () => {
     const barWidth = item.duration * fullWidth
     const barX = x + item.start * fullWidth
 
+    // Debug width
+    console.log(`Bar ${item.name}: width=${barWidth}px`)
+
+    // Make threshold much smaller to show more text
+    const showText = barWidth > 15
+
     return (
       <g>
+        {/* The bar itself */}
         <rect x={barX} y={y} width={barWidth} height={height} fill={fill} rx={2} ry={2} />
+
+        {/* Show text for all bars except the tiniest ones */}
+        {showText && (
+          <text
+            x={barX + 5}
+            y={y + height / 2 + 4}
+            fill="white"
+            fontSize={10}
+            fontWeight="bold"
+            style={{
+              textShadow: '0px 0px 2px rgba(0,0,0,0.7)',
+              pointerEvents: 'none',
+            }}
+          >
+            {item.name}
+          </text>
+        )}
       </g>
     )
   }
