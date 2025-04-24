@@ -29,7 +29,7 @@
     "api-types": "workspace:*",
     "chalk": "^5.3.0",
     "dotenv": "^16.3.1",
-    "libpg-query": "15.2.0",
+    "libpg-query": "17.0.0",
     "mdast-util-from-markdown": "^2.0.0",
     "sql-formatter": "^15.0.0",
     "tsconfig": "workspace:*",
