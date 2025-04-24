@@ -1,17 +1,7 @@
-import { useState } from 'react'
-import { FilterBar, FilterGroup, CustomOptionProps } from 'ui-patterns'
-import {
-  Button_Shadcn_,
-  Input_Shadcn_,
-  Calendar,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Button,
-} from 'ui'
 import { format } from 'date-fns'
-import { Calendar as CalendarIcon } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { useState } from 'react'
+import { Button, Button_Shadcn_, Calendar, Input_Shadcn_ } from 'ui'
+import { CustomOptionProps, FilterBar, FilterGroup } from 'ui-patterns'
 
 function CustomDatePicker({ onChange, onCancel, search }: CustomOptionProps) {
   const [date, setDate] = useState<any | undefined>(
