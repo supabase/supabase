@@ -29,6 +29,7 @@ export interface TimelineChartProps extends Omit<CommonChartProps<any>, 'data'> 
   emptyStateMessage?: string
   barSize?: number
   barGap?: number
+  barCategoryGap?: number | string
 }
 
 const TimelineChart = ({
@@ -49,6 +50,7 @@ const TimelineChart = ({
   onBarClick,
   barSize = 20,
   barGap = 0,
+  barCategoryGap = '10%',
 }: TimelineChartProps) => {
   const [focusedItemId, setFocusedItemId] = useState<string | number | null>(null)
 
@@ -112,6 +114,7 @@ const TimelineChart = ({
             fill="white"
             fontSize={11}
             fontWeight="bold"
+            className="font-mono lowercase"
             style={{
               pointerEvents: 'none',
             }}
@@ -144,9 +147,9 @@ const TimelineChart = ({
             layout="vertical"
             data={data}
             margin={{ top: 5, right: 30, left: labelWidth, bottom: 5 }}
-            // barSize={32}
-            // barGap={barGap}
-            barCategoryGap={2}
+            barSize={barSize}
+            barGap={barGap}
+            barCategoryGap={barCategoryGap}
           >
             {showGrid && <CartesianGrid horizontal={false} stroke="var(--border)" />}
             <XAxis
