@@ -1,5 +1,5 @@
 {
-  "name": "studio",
+  "name": "e2e-studio",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
