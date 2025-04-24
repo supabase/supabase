@@ -347,7 +347,11 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
         <div>
           <p className="text-foreground mb-4">On this page</p>
           <div className="prose-toc">
-            {props.blog.toc && <ReactMarkdown>{props.blog.toc}</ReactMarkdown>}
+            {props.blog.toc && (
+              <ReactMarkdown>
+                {typeof props.blog.toc === 'string' ? props.blog.toc : props.blog.toc.content}
+              </ReactMarkdown>
+            )}
           </div>
         </div>
       </div>

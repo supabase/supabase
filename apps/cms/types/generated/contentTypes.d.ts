@@ -384,6 +384,7 @@ export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
     date: Schema.Attribute.DateTime
     description: Schema.Attribute.Text
     image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>
+    launchweek: Schema.Attribute.String
     locale: Schema.Attribute.String & Schema.Attribute.Private
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::blog-post.blog-post'> &
       Schema.Attribute.Private

@@ -7,13 +7,8 @@ type CMSBlogPost = {
   slug: string
   description: string
   content: string
-  date: string
-  author: string
-  author_image_url?: {
-    url: string
-  }
-  author_url?: string
-  position?: string
+  date?: string
+  launchweek?: string
   toc_depth?: number
   tags?: string[]
   thumb?: {
@@ -90,7 +85,6 @@ export async function getCMSPostBySlug(slug: string) {
       `${CMS_API_URL}/api/blog-posts?filters[slug][$eq]=${slug}&${populate}`
     )
 
-    console.log('post response', response)
     if (!response.ok) {
       return null
     }
@@ -103,7 +97,6 @@ export async function getCMSPostBySlug(slug: string) {
 
     const post = data.data[0]
 
-    console.log('post', post)
     const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
     const formattedDate = new Date(post.date || new Date()).toLocaleDateString('en-IN', options)
     const readingTime = generateReadingTime(post.content || '')
@@ -112,7 +105,7 @@ export async function getCMSPostBySlug(slug: string) {
     const thumbUrl = (post.thumb as any)?.url
     const imageUrl = (post.image as any)?.url
 
-    // Generate TOC from content
+    // Generate TOC from content for CMS posts
     const tocResult = toc(post.content || '', {
       maxdepth: post.toc_depth ? post.toc_depth : 2,
     })
@@ -123,10 +116,10 @@ export async function getCMSPostBySlug(slug: string) {
       slug,
       source: post.content || '',
       title: post.Title || 'Untitled Post',
-      description: post.description || '',
       date: post.date || new Date().toISOString(),
       formattedDate,
       readingTime,
+      launchweek: post.launchweek || null,
       authors:
         post.authors?.map((author: any) => ({
           author: author.author || 'Unknown Author',
@@ -146,7 +139,10 @@ export async function getCMSPostBySlug(slug: string) {
       isCMS: true,
       content: post.content || '',
       tags: post.tags || [],
-      toc: processedContent,
+      toc: {
+        content: processedContent,
+        json: tocResult.json,
+      },
     }
   } catch (error) {
     console.error('Error fetching CMS post by slug:', error)
@@ -185,15 +181,6 @@ export async function getAllCMSPosts({
     }
 
     const data: CMSResponse = await response.json()
-    // console.log('CMS API response data:', {
-    //   totalPosts: data.data.length,
-    //   pagination: data.meta.pagination,
-    //   firstPost: data.data[0],
-    // })
-
-    // console.log('data', data)
-    // console.log('thumb$$', data.data[0].thumb)
-    // console.log('author$$', data.data[0].author)
 
     let posts = data.data
       .filter((post) => post.slug !== currentPostSlug)
@@ -210,20 +197,16 @@ export async function getAllCMSPosts({
         const thumbUrl = (post.thumb as any)?.url
         const imageUrl = (post.image as any)?.url
 
-        // console.log('thumb', thumbUrl)
-        // console.log('image', imageUrl)
-        console.log('author ££', post.authors)
-
         return {
           slug: post.slug || '',
-          title: post.Title || 'Untitled Post',
+          title: post.Title || '',
           description: post.description || '',
           date: post.date || new Date().toISOString(),
           formattedDate,
           readingTime,
           authors:
             post.authors?.map((author: any) => ({
-              author: author.author || 'Unknown Author',
+              author: author.author || '',
               author_id: author.author_id || '',
               position: author.position || '',
               author_url: author.author_url || '#',
@@ -251,10 +234,10 @@ export async function getAllCMSPosts({
     if (tags && tags.length > 0) {
       // Note: This assumes tags are added to CMS content
       // You'll need to add a tags field to your CMS model
-      // posts = posts.filter(post => {
-      //   const found = tags.some(tag => post.tags?.includes(tag))
-      //   return found
-      // })
+      posts = posts.filter((post) => {
+        const found = tags.some((tag) => post.tags?.includes(tag))
+        return found
+      })
     }
 
     // Limit results if specified
