@@ -46,22 +46,25 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm -C e2e/studio exec playwright install --with-deps
 
-      - name: Get Vercel Deployment Info (Selfhosted)
-        id: vercel
-        uses: vercel/vercel-action@v2
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SELFHOSTED }}
-          scope: ${{ secrets.VERCEL_TEAM_ID }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          vercel-args: '--prebuilt'
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Get Vercel Preview URL for Selfhosted Studio
+        id: vercel_preview
+        run: |
+          npm install -g vercel@latest
+          vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_TEAM_ID }}
+          DEPLOYMENT_URL=$(vercel ls ${{ secrets.VERCEL_PROJECT_ID_SELFHOSTED }} --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_TEAM_ID }} --json | jq -r '.[0].url')
+          echo "DEPLOYMENT_URL=https://$DEPLOYMENT_URL" >> $GITHUB_ENV
 
       - name: Set ENV Vars for Selfhosted Test
         run: |
           echo "TEST_ENV=preview" >> $GITHUB_ENV
-          echo "BASE_URL=${{ steps.vercel.outputs.preview-url }}" >> $GITHUB_ENV
-          echo "API_BASE_URL=${{ steps.vercel.outputs.preview-url }}/api" >> $GITHUB_ENV
+          echo "BASE_URL=${{ env.DEPLOYMENT_URL }}" >> $GITHUB_ENV
+          echo "API_BASE_URL=${{ env.DEPLOYMENT_URL }}/api" >> $GITHUB_ENV
           echo "PREVIEW_PROJECT_REF=default" >> $GITHUB_ENV
 
       - name: Run Playwright selfhosted E2E tests
