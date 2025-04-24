@@ -1460,6 +1460,15 @@ importers:
         specifier: ^3.22.4
         version: 3.23.8
 
+  e2e/studio:
+    dependencies:
+      '@playwright/test':
+        specifier: ^1.52.0
+        version: 1.52.0
+      dotenv:
+        specifier: ^16.5.0
+        version: 16.5.0
+
   packages/ai-commands:
     dependencies:
       '@serafin/schema-builder':
@@ -8342,6 +8351,10 @@ packages:
 
   dotenv@16.4.7:
     resolution: {integrity: sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==}
+    engines: {node: '>=12'}
+
+  dotenv@16.5.0:
+    resolution: {integrity: sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==}
     engines: {node: '>=12'}
 
   dotty@0.1.2:
@@ -17506,7 +17519,6 @@ snapshots:
   '@playwright/test@1.52.0':
     dependencies:
       playwright: 1.52.0
-    optional: true
 
   '@polka/url@1.0.0-next.25': {}
 
@@ -18702,7 +18714,7 @@ snapshots:
       chokidar: 3.6.0
       colorette: 1.4.0
       core-js: 3.35.0
-      dotenv: 16.4.7
+      dotenv: 16.5.0
       form-data: 4.0.2
       get-port-please: 3.1.2
       glob: 7.2.3
@@ -18977,7 +18989,7 @@ snapshots:
       '@babel/core': 7.26.10(supports-color@8.1.1)
       '@sentry/babel-plugin-component-annotate': 2.22.7
       '@sentry/cli': 2.39.1(encoding@0.1.13)(supports-color@8.1.1)
-      dotenv: 16.4.7
+      dotenv: 16.5.0
       find-up: 5.0.0
       glob: 9.3.5
       magic-string: 0.30.8
@@ -21609,7 +21621,7 @@ snapshots:
       chokidar: 4.0.3
       confbox: 0.1.8
       defu: 6.1.4
-      dotenv: 16.4.7
+      dotenv: 16.5.0
       exsolve: 1.0.4
       giget: 2.0.0
       jiti: 2.4.2
@@ -22538,6 +22550,8 @@ snapshots:
   dotenv@16.4.5: {}
 
   dotenv@16.4.7: {}
+
+  dotenv@16.5.0: {}
 
   dotty@0.1.2: {}
 
@@ -27325,8 +27339,7 @@ snapshots:
 
   playwright-core@1.49.1: {}
 
-  playwright-core@1.52.0:
-    optional: true
+  playwright-core@1.52.0: {}
 
   playwright@1.49.1:
     dependencies:
@@ -27339,7 +27352,6 @@ snapshots:
       playwright-core: 1.52.0
     optionalDependencies:
       fsevents: 2.3.2
-    optional: true
 
   pluralize@8.0.0: {}
 
@@ -29026,7 +29038,7 @@ snapshots:
   static-browser-server@1.0.3:
     dependencies:
       '@open-draft/deferred-promise': 2.2.0
-      dotenv: 16.4.7
+      dotenv: 16.5.0
       mime-db: 1.53.0
       outvariant: 1.4.3
 
