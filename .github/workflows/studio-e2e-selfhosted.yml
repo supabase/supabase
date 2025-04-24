@@ -43,27 +43,25 @@ jobs:
           version: latest
       - name: Install dependencies
         run: pnpm i --filter e2e/studio... --frozen-lockfile
-      - name: Install E2E dependencies
-        run: pnpm -C e2e/studio i
       - name: Install Playwright Browsers
         run: pnpm -C e2e/studio exec playwright install --with-deps
 
-      - name: Wait for Vercel Preview Deployment (Selfhosted Studio)
+      - name: Get Vercel Deployment Info (Selfhosted)
         id: vercel
-        uses: amondnet/vercel-action@v25
+        uses: vercel/vercel-action@v2
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_STUDIO_SELFHOSTED_PROJECT_ID }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_SELFHOSTED }}
           scope: ${{ secrets.VERCEL_TEAM_ID }}
-          vercel-args: '--prod=false'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-args: '--prebuilt'
 
       - name: Set ENV Vars for Selfhosted Test
         run: |
           echo "TEST_ENV=preview" >> $GITHUB_ENV
           echo "BASE_URL=${{ steps.vercel.outputs.preview-url }}" >> $GITHUB_ENV
-          echo "API_BASE_URL=${{steps.vercel.outputs.preview-url}}/api" >> $GITHUB_ENV
+          echo "API_BASE_URL=${{ steps.vercel.outputs.preview-url }}/api" >> $GITHUB_ENV
           echo "PREVIEW_PROJECT_REF=default" >> $GITHUB_ENV
 
       - name: Run Playwright selfhosted E2E tests
