@@ -16,6 +16,7 @@ const SignInPage: NextPageWithLayout = () => {
   const searchParams = new URLSearchParams(router.query as Record<string, string>).toString()
 
   useEffect(() => {
+    console.log('#### sign-in.tsx')
     if (!IS_PLATFORM) {
       // on selfhosted instance just redirect to projects page
       router.replace('/project/default')
@@ -55,7 +56,7 @@ const SignInPage: NextPageWithLayout = () => {
         <div>
           <span className="text-foreground-light">Don't have an account?</span>{' '}
           <Link
-            href="/sign-up"
+            href="/sign-up?returnTo=%2Fconnect-aws?buyer_id=aws-marketplace"
             className="underline transition text-foreground hover:text-foreground-light"
           >
             Sign Up Now
