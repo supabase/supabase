@@ -23,21 +23,18 @@ import { handleTabClose, makeActiveTabPermanent, useTabsStore } from 'state/tabs
 import { Button } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { useIsTableEditorTabsEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
+import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
 import TableDefinition from './TableDefinition'
-import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
-import { TablesData } from 'data/tables/tables-query'
 
 export interface TableGridEditorProps {
   isLoadingSelectedTable?: boolean
   selectedTable?: Entity
-  onAfterDeleteTable?: (tables: TablesData) => void
 }
 
 export const TableGridEditor = ({
   isLoadingSelectedTable = false,
   selectedTable,
-  onAfterDeleteTable,
 }: TableGridEditorProps) => {
   const router = useRouter()
   const editor = useEditorType()
@@ -165,7 +162,9 @@ export const TableGridEditor = ({
           selectedTable={isTableLike(selectedTable) ? selectedTable : undefined}
           onTableCreated={onTableCreated}
         />
-        <DeleteConfirmationDialogs selectedTable={selectedTable} />
+        <DeleteConfirmationDialogs
+          selectedTable={isTableLike(selectedTable) ? selectedTable : undefined}
+        />
       </TableEditorTableStateContextProvider>
     </div>
   )

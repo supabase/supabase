@@ -1,4 +1,3 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -8,7 +7,7 @@ import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import type { SupaRow } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseColumnDeleteMutation } from 'data/database-columns/database-column-delete-mutation'
-import { Entity } from 'data/table-editor/table-editor-types'
+import { TableLike } from 'data/table-editor/table-editor-types'
 import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
@@ -23,7 +22,7 @@ import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Ch
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 export type DeleteConfirmationDialogsProps = {
-  selectedTable?: Entity | PostgresTable
+  selectedTable?: TableLike
 }
 
 const DeleteConfirmationDialogs = ({ selectedTable }: DeleteConfirmationDialogsProps) => {
@@ -187,13 +186,13 @@ const DeleteConfirmationDialogs = ({ selectedTable }: DeleteConfirmationDialogsP
         truncateRows({
           projectRef: project.ref,
           connectionString: project.connectionString,
-          table: selectedTable as any,
+          table: selectedTable,
         })
       } else {
         deleteAllRows({
           projectRef: project.ref,
           connectionString: project.connectionString,
-          table: selectedTable as any,
+          table: selectedTable,
           filters,
           roleImpersonationState: getImpersonatedRoleState(),
         })
@@ -202,7 +201,7 @@ const DeleteConfirmationDialogs = ({ selectedTable }: DeleteConfirmationDialogsP
       deleteRows({
         projectRef: project.ref,
         connectionString: project.connectionString,
-        table: selectedTable as any,
+        table: selectedTable,
         rows: selectedRowsToDelete as SupaRow[],
         roleImpersonationState: getImpersonatedRoleState(),
       })
