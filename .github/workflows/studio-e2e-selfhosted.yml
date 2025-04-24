@@ -42,9 +42,9 @@ jobs:
         with:
           version: latest
       - name: Install dependencies
-        run: pnpm i --filter e2e/studio... --frozen-lockfile
+        run: pnpm i --filter e2e/studio...
       - name: Install Playwright Browsers
-        run: pnpm -C e2e/studio exec playwright install --with-deps
+        run: pnpm -C e2e/studio exec playwright -C e2e/studio install --with-deps
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
@@ -68,7 +68,7 @@ jobs:
           echo "PREVIEW_PROJECT_REF=default" >> $GITHUB_ENV
 
       - name: Run Playwright selfhosted E2E tests
-        run: pnpm run e2e:preview
+        run: pnpm -C e2e/studio run e2e:preview
 
       - uses: actions/upload-artifact@v4
         if: always()
