@@ -1,0 +1,123 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`/api/graphql schema snapshot > should match snapshot 1`] = `
+"schema {
+  query: RootQueryType
+}
+
+type Guide implements SearchResult {
+  """The unique identifier of the search result"""
+  id: ID!
+
+  """The title of the matching content"""
+  title: String
+
+  """The URL of the guide"""
+  href: String
+
+  """A brief description of the matching content"""
+  description: String
+
+  """The full content of the matching result."""
+  content: String
+
+  """The subsections of the guide"""
+  subsections: SubsectionCollection
+}
+
+interface SearchResult {
+  """The unique identifier of the search result."""
+  id: ID!
+
+  """The title of the matching content."""
+  title: String
+
+  """The URL of the matching content."""
+  href: String
+
+  """The full content of the matching result."""
+  content: String
+}
+
+"""A collection of Subsection items"""
+type SubsectionCollection {
+  """A list of edges containing nodes in this collection"""
+  edges: [SubsectionEdge!]!
+
+  """The nodes in this collection, directly accessible"""
+  nodes: [Subsection!]!
+
+  """Information to aid in pagination"""
+  pageInfo: PageInfo!
+
+  """The total count of items available in this collection"""
+  totalCount: Int!
+}
+
+"""An edge in a collection for Subsection"""
+type SubsectionEdge {
+  """The item at the end of the edge"""
+  node: Subsection!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type Subsection {
+  """The title of the subsection"""
+  title: String
+
+  """The URL of the subsection"""
+  href: String
+
+  """The content of the subsection"""
+  content: String
+}
+
+"""Information about pagination in a collection"""
+type PageInfo {
+  """Whether there are more items after the current page"""
+  hasNextPage: Boolean!
+
+  """Whether there are more items before the current page"""
+  hasPreviousPage: Boolean!
+
+  """Cursor pointing to the start of the current page"""
+  startCursor: String
+
+  """Cursor pointing to the end of the current page"""
+  endCursor: String
+}
+
+type RootQueryType {
+  """Get the GraphQL schema for this endpoint"""
+  schema: String
+
+  """"""
+  searchDocs(query: String): SearchResultCollection
+}
+
+"""A collection of SearchResult items"""
+type SearchResultCollection {
+  """A list of edges containing nodes in this collection"""
+  edges: [SearchResultEdge!]!
+
+  """The nodes in this collection, directly accessible"""
+  nodes: [SearchResult!]!
+
+  """Information to aid in pagination"""
+  pageInfo: PageInfo!
+
+  """The total count of items available in this collection"""
+  totalCount: Int!
+}
+
+"""An edge in a collection for SearchResult"""
+type SearchResultEdge {
+  """The item at the end of the edge"""
+  node: SearchResult!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}"
+`;

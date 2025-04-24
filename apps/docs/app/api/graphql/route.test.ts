@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { POST } from './route'
 
-describe('GraphQL API endpoint', () => {
+describe('/api/graphql basic error statuses', () => {
   beforeAll(() => {
     vi.mock('server-only', () => {
       return {}
@@ -64,5 +64,28 @@ describe('GraphQL API endpoint', () => {
     const response = await POST(request)
     const json = await response.json()
     expect(json.errors[0].message).toBe('Internal Server Error')
+  })
+})
+
+describe('/api/graphql schema snapshot', () => {
+  it('should match snapshot', async () => {
+    const schemaQuery = `
+      query {
+        schema
+      }
+      `
+    const request = new Request('http://localhost/api/graphql', {
+      method: 'POST',
+      body: JSON.stringify({ query: schemaQuery }),
+    })
+
+    const response = await POST(request)
+    const json = await response.json()
+    expect(json.errors).toBeUndefined()
+
+    const {
+      data: { schema },
+    } = json
+    expect(schema).toMatchSnapshot()
   })
 })
