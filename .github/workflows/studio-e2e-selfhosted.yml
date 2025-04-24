@@ -42,7 +42,7 @@ jobs:
         with:
           version: latest
       - name: Install dependencies
-        run: pnpm i --filter e2e/studio...
+        run: pnpm i
       - name: Install Playwright Browsers
         run: pnpm -C e2e/studio exec playwright -C e2e/studio install --with-deps
 
