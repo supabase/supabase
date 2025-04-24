@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useRef, KeyboardEvent, useMemo, useState, useCallback, useEffect } from 'react'
 import { Search, Sparkles } from 'lucide-react'
 import {
