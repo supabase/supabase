@@ -94,7 +94,7 @@ type RootQueryType {
   schema: String
 
   """"""
-  searchDocs(query: String): SearchResultCollection
+  searchDocs(query: String!, limit: Int): SearchResultCollection
 }
 
 """A collection of SearchResult items"""

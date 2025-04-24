@@ -19,6 +19,7 @@ export abstract class SearchResultModel {
         await supabase().rpc('search_content', {
           embedding,
           include_full_content: includeFullContent,
+          max_result: args.limit,
         })
       )
         .map((matches) =>
