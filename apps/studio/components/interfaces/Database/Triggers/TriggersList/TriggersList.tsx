@@ -19,6 +19,7 @@ import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Input } from 'ui'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
+import { TriggerSheet } from '../TriggerSheet'
 import TriggerList from './TriggerList'
 
 interface TriggersListProps {
@@ -109,6 +110,8 @@ const TriggersList = ({
             </div>
             {!isLocked && (
               <div className="flex items-center gap-x-2">
+                <TriggerSheet />
+
                 <ButtonTooltip
                   disabled={!canCreateTriggers}
                   onClick={() => createTrigger()}
@@ -124,6 +127,7 @@ const TriggersList = ({
                 >
                   Create a new trigger
                 </ButtonTooltip>
+
                 <ButtonTooltip
                   type="default"
                   disabled={!canCreateTriggers}

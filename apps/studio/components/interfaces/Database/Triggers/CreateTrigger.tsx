@@ -367,13 +367,9 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
                 )}
               </div>
               <ChooseFunctionForm
-                triggerFunctions={triggerFunctions}
                 visible={_localState.chooseFunctionFormVisible}
                 setVisible={_localState.setChooseFunctionFormVisible}
-                onChange={(id: number) => {
-                  const selectedFn = (data ?? []).find((fn) => fn.id === id)
-                  if (selectedFn) _localState.onSelectFunction(selectedFn)
-                }}
+                onChange={_localState.onSelectFunction}
               />
             </CreateTriggerContext.Provider>
             <ConfirmationModal
