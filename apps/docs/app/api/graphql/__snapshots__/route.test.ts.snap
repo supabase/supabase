@@ -5,6 +5,9 @@ exports[`/api/graphql schema snapshot > should match snapshot 1`] = `
   query: RootQueryType
 }
 
+"""
+A document containing content from the Supabase docs. This is a guide, which might describe a concept, or explain the steps for using or implementing a feature.
+"""
 type Guide implements SearchResult {
   """The title of the matching content"""
   title: String
@@ -12,7 +15,9 @@ type Guide implements SearchResult {
   """The URL of the guide"""
   href: String
 
-  """The full content of the matching result."""
+  """
+  The full content of the matching result, including all subsections and possibly more content
+  """
   content: String
 
   """The subsections of the guide"""
@@ -30,7 +35,9 @@ interface SearchResult {
   content: String
 }
 
-"""A collection of Subsection nodes"""
+"""
+A collection of content chunks taken from a larger document in the Supabase docs
+"""
 type SubsectionCollection {
   """A list of edges containing nodes in this collection"""
   edges: [SubsectionEdge!]!
@@ -51,6 +58,7 @@ type SubsectionEdge {
   cursor: String!
 }
 
+"""A content chunk taken from a larger document in the Supabase docs"""
 type Subsection {
   """The title of the subsection"""
   title: String
@@ -66,11 +74,11 @@ type RootQueryType {
   """Get the GraphQL schema for this endpoint"""
   schema: String
 
-  """"""
+  """Search the Supabase docs for content matching a query string"""
   searchDocs(query: String!, limit: Int): SearchResultCollection
 }
 
-"""A collection of SearchResult nodes"""
+"""A collection of search results containing content from Supabase docs"""
 type SearchResultCollection {
   """A list of edges containing nodes in this collection"""
   edges: [SearchResultEdge!]!
