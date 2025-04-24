@@ -14,6 +14,7 @@ import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import type { Project } from 'data/projects/project-detail-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { detectBrowser } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import {
@@ -146,11 +147,22 @@ export const SupportFormV2 = ({
     isLoading: isLoadingProjects,
     isSuccess: isSuccessProjects,
   } = useProjectsQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const { mutate: submitSupportTicket } = useSendSupportTicketMutation({
     onSuccess: (res, variables) => {
       toast.success('Support request sent. Thank you!')
       setSentCategory(variables.category)
+      sendEvent({
+        action: 'support_ticket_submitted',
+        properties: {
+          ticketCategory: variables.category,
+        },
+        groups: {
+          project: projectRef === 'no-project' ? undefined : projectRef,
+          organization: variables.organizationSlug,
+        },
+      })
       setSelectedProject(variables.projectRef ?? 'no-project')
     },
     onError: (error) => {
