@@ -303,7 +303,7 @@ supabase link
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Deploy database changes">
+    <StepHikeCompact.Details title="Deploy database migrations">
       [Push](/docs/reference/cli/supabase-db-push) your migrations to the remote database.
     </StepHikeCompact.Details>
 
@@ -311,6 +311,24 @@ supabase link
 
 ```bash name=Terminal
 supabase db push
+```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Deploy database seed data (optional)">
+      [Push](/docs/reference/cli/supabase-db-push) your migrations and seed the remote database.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```bash name=Terminal
+supabase db push --include-seed
 ```
 
     </StepHikeCompact.Code>
