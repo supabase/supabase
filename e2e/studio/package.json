@@ -19,6 +19,6 @@
   "description": "",
   "dependencies": {
     "dotenv": "^16.5.0",
-    "playwright": "^1.52.0"
+    "@playwright/test": "^1.52.0"
   }
 }
