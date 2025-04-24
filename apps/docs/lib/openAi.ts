@@ -15,9 +15,13 @@ interface ModerationFlaggedDetails {
   categories: OpenAI.Moderations.Moderation.Categories
 }
 
-let openAIClient: OpenAIClient | null
+export interface OpenAIClientInterface {
+  createContentEmbedding(text: string): Promise<Result<Embedding, ApiErrorGeneric>>
+}
 
-class OpenAIClient {
+let openAIClient: OpenAIClientInterface | null
+
+class OpenAIClient implements OpenAIClientInterface {
   static CONTENT_EMBEDDING_MODEL = 'text-embedding-ada-002'
 
   constructor(private client: OpenAI) {}
@@ -55,7 +59,7 @@ class OpenAIClient {
   }
 }
 
-export function openAI(): OpenAIClient {
+export function openAI(): OpenAIClientInterface {
   if (!openAIClient) {
     openAIClient = new OpenAIClient(new OpenAI())
   }

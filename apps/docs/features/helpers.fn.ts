@@ -52,7 +52,7 @@ export class Result<T, E> {
   }
 
   isOk(): this is Result<T, never> {
-    return this.internal.error === null
+    return this.internal.error == null
   }
 
   map<U>(fn: (data: T) => U): Result<U, E> {
@@ -78,5 +78,10 @@ export class Result<T, E> {
   match<E2, U>(onOk: (data: T) => U, onErr: (error: E) => E2): U | E2 {
     if (this.isOk()) return onOk(this.internal.data)
     return onErr(this.internal.error)
+  }
+
+  tapEither(fn: (self: Result<T, E>) => void) {
+    fn(this)
+    return this
   }
 }
