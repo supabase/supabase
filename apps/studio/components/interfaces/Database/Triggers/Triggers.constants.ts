@@ -34,7 +34,7 @@ export const TRIGGER_ORIENTATIONS = [
   },
 ]
 
-export const TRIGGER_ENABLED_MODS = [
+export const TRIGGER_ENABLED_MODES = [
   { value: 'ORIGIN', label: 'Origin', description: 'This is the default behaviour' },
   {
     value: 'REPLICA',
