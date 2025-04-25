@@ -3,7 +3,6 @@ import { createComplexityLimitRule } from 'graphql-validation-complexity'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { ApiError, convertZodToInvalidRequestError, InvalidRequestError } from '~/app/api/utils'
-import { rootGraphQLResolver } from '~/resources/rootResolver'
 import { rootGraphQLSchema } from '~/resources/rootSchema'
 import { createQueryDepthLimiter } from './validators'
 
@@ -41,7 +40,6 @@ async function handleGraphQLRequest(request: Request): Promise<NextResponse> {
 
   const result = await graphql({
     schema: rootGraphQLSchema,
-    rootValue: rootGraphQLResolver,
     contextValue: { request },
     source: query,
     variableValues: variables,
