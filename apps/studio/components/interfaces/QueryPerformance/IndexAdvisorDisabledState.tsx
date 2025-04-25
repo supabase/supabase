@@ -6,7 +6,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { getIndexAdvisorExtensions } from 'lib/database/index-advisor'
+import { getIndexAdvisorExtensions } from './index-advisor.utils'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { Markdown } from '../Markdown'
 

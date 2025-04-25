@@ -5,7 +5,7 @@ import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
-import { hasIndexRecommendations } from 'lib/database/index-advisor-utils'
+import { hasIndexRecommendations } from './index-advisor.utils'
 import {
   Button,
   ResizableHandle,

@@ -1,5 +1,12 @@
 import { HTMLAttributes } from 'react'
-import { IndexAdvisorResult } from 'lib/database/index-advisor'
+import {
+  GetIndexAdvisorResultResponse,
+  GetIndexAdvisorResultVariables,
+} from 'data/database/retrieve-index-advisor-result-query'
+
+// Use the types from data/database instead of duplicating them
+export type IndexAdvisorResult = GetIndexAdvisorResultResponse
+export type IndexAdvisorConfig = GetIndexAdvisorResultVariables
 
 export interface IndexImprovementTextProps extends HTMLAttributes<HTMLParagraphElement> {
   indexStatements: string[]

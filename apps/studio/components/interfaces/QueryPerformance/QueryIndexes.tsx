@@ -7,12 +7,12 @@ import AlertError from 'components/ui/AlertError'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useGetIndexAdvisorResult } from 'data/database/retrieve-index-advisor-result-query'
 import { useGetIndexesFromSelectQuery } from 'data/database/retrieve-index-from-select-query'
-import { isQueryEligibleForIndexAdvisor } from 'lib/database/index-advisor'
 import {
   calculateImprovement,
   createIndexes,
   hasIndexRecommendations,
-} from 'lib/database/index-advisor-utils'
+  isQueryEligibleForIndexAdvisor,
+} from './index-advisor.utils'
 import { useIsIndexAdvisorAvailable } from 'hooks/misc/useIsIndexAdvisorAvailable'
 import {
   AccordionContent_Shadcn_,

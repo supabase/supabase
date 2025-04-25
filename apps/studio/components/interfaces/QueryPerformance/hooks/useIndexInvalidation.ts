@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { INDEX_ADVISOR_QUERY_KEYS } from 'lib/database/index-advisor-utils'
+import { INDEX_ADVISOR_QUERY_KEYS } from '../index-advisor.utils'
 
 /**
  * Hook to invalidate index-related queries in the QueryPerformance feature

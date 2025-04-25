@@ -1,6 +1,6 @@
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { getIndexAdvisorExtensions } from 'lib/database/index-advisor'
+import { getIndexAdvisorExtensions } from 'components/interfaces/QueryPerformance/index-advisor.utils'
 
 /**
  * Hook to check if index advisor functionality is available

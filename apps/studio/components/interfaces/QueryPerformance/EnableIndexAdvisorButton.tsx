@@ -5,7 +5,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useIsIndexAdvisorAvailable } from 'hooks/misc/useIsIndexAdvisorAvailable'
-import { getIndexAdvisorExtensions } from 'lib/database/index-advisor'
+import { getIndexAdvisorExtensions } from './index-advisor.utils'
 import {
   AlertDialog,
   AlertDialogAction,

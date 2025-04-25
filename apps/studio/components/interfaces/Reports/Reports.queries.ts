@@ -2,26 +2,6 @@ import useDbQuery from 'hooks/analytics/useDbQuery'
 import { PRESET_CONFIG } from './Reports.constants'
 import { Presets } from './Reports.types'
 
-export interface IndexAdvisorResult {
-  has_suggestion: boolean
-  startup_cost_before: number
-  startup_cost_after: number
-  total_cost_before: number
-  total_cost_after: number
-  index_statements: string[]
-}
-
-export const calculateQueryImprovement = (costBefore: number, costAfter: number): number => {
-  return ((costBefore - costAfter) / costBefore) * 100
-}
-
-export const calculateTotalQueryImprovement = (indexAdvisorResult: IndexAdvisorResult): number => {
-  return calculateQueryImprovement(
-    indexAdvisorResult.total_cost_before,
-    indexAdvisorResult.total_cost_after
-  )
-}
-
 export type QueryPerformanceSort = {
   column:
     | 'total_time'
