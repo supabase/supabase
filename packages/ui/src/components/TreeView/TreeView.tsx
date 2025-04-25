@@ -92,38 +92,28 @@ const TreeViewItem = forwardRef<
     const inputRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
-      const handleClickOutside = (event: MouseEvent) => {
-        if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
-          onEditSubmit?.(localValueState)
-        }
-      }
-      if (isEditing) document.addEventListener('mousedown', handleClickOutside)
-      return () => {
-        if (isEditing) document.removeEventListener('mousedown', handleClickOutside)
-      }
-    }, [isEditing])
-
-    useEffect(() => {
       if (isEditing) {
-        inputRef.current?.focus()
-
-        // When editing starts, select text up to the last dot
         if (inputRef.current) {
           const input = inputRef.current
 
-          // Need a slight delay to ensure focus is established
           setTimeout(() => {
-            const fileName = input.value
-            const lastDotIndex = fileName.lastIndexOf('.')
-            const startPos = 0
-            const endPos = lastDotIndex > 0 ? lastDotIndex : fileName.length
+            // [Ivan] For some reason, during initial render, the input loses focus ~50-60% of the time.
+            input.focus()
 
-            try {
-              input.setSelectionRange(startPos, endPos)
-            } catch (e) {
-              console.error('Could not set selection range', e)
-            }
-          }, 50)
+            // Need a slight delay to ensure focus is established. When editing starts, select text up to the last dot
+            setTimeout(() => {
+              const fileName = input.value
+              const lastDotIndex = fileName.lastIndexOf('.')
+              const startPos = 0
+              const endPos = lastDotIndex > 0 ? lastDotIndex : fileName.length
+
+              try {
+                input.setSelectionRange(startPos, endPos)
+              } catch (e) {
+                console.error('Could not set selection range', e)
+              }
+            }, 50)
+          }, 150)
         }
       } else {
         setLocalValueState(name)
