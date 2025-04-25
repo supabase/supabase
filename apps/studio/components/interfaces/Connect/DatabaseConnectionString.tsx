@@ -5,6 +5,7 @@ import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { InlineLink } from 'components/ui/InlineLink'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
@@ -489,7 +490,7 @@ export const DatabaseConnectionString = () => {
       {selectedTab === 'python' && (
         <>
           <Separator />
-          <Collapsible_Shadcn_ className="px-8 pt-5">
+          <Collapsible_Shadcn_ className="px-8 py-5">
             <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:!-rotate-180">
               <div className="flex items-center gap-x-2 w-full">
                 <p className="text-xs text-foreground-light group-hover:text-foreground transition">
@@ -518,6 +519,20 @@ export const DatabaseConnectionString = () => {
           </Collapsible_Shadcn_>
         </>
       )}
+
+      <Separator />
+      <div className="px-8 pt-5 flex flex-col gap-y-1">
+        <p className="text-sm">Reset your database password</p>
+        <p className="text-sm text-foreground-lighter">
+          You may reset your database password in your project's{' '}
+          <InlineLink
+            href={`/project/${projectRef}/settings/database`}
+            className="text-foreground-lighter hover:text-foreground"
+          >
+            Database Settings
+          </InlineLink>
+        </p>
+      </div>
     </div>
   )
 }
