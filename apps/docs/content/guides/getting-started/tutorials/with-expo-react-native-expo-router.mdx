@@ -1,0 +1,535 @@
+---
+title: 'Build a User Management App with Expo React Native and Expo Router'
+description: 'Learn how to use Supabase in your Expo Router-based React Native App.'
+tocVideo: 'AE7dKIKMJy4'
+---
+
+<$Partial path="quickstart_intro.mdx" />
+
+![Supabase User Management example](/docs/img/supabase-flutter-demo.png)
+
+<Admonition type="note">
+
+If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/expo-user-management).
+
+</Admonition>
+
+<$Partial path="project_setup.mdx" />
+
+## Building the app with Expo Router
+
+Letwith-expo-react-native( Expo Router ).mdx's start building the Expo Router-based React Native app from scratch.
+
+### Initialize a React Native app with Expo Router
+
+We will initialize an app called `expo-user-management` using Expo's template and Expo Router:
+
+```bash
+npx create-expo-app -t expo-template-blank-typescript expo-user-management
+cd expo-user-management
+npx expo install @supabase/supabase-js @react-native-async-storage/async-storage @rneui/themed expo-router
+```
+
+Now let's create a helper file to initialize the Supabase client.
+We need the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
+These variables are safe to expose in your Expo app since Supabase has
+[Row Level Security](/docs/guides/database/postgres/row-level-security) enabled on your Database.
+
+<Tabs
+  scrollable
+  size="large"
+  type="underlined"
+  defaultActiveId="async-storage"
+  queryGroup="auth-store"
+>
+  <TabPanel id="async-storage" label="AsyncStorage">
+
+    <$CodeTabs>
+
+    ```ts name=lib/supabase.ts
+    import AsyncStorage from '@react-native-async-storage/async-storage'
+    import { createClient } from '@supabase/supabase-js'
+
+    const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL
+    const supabaseAnonKey = YOUR_REACT_NATIVE_SUPABASE_ANON_KEY
+
+    export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        storage: AsyncStorage,
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: false,
+      },
+    })
+    ```
+
+    </$CodeTabs>
+
+  </TabPanel>
+  <TabPanel id="secure-store" label="SecureStore">
+
+    If you wish to encrypt the user's session information, you can use `aes-js` and store the encryption key in [Expo SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore). The [`aes-js` library](https://github.com/ricmoo/aes-js) is a reputable JavaScript-only implementation of the AES encryption algorithm in CTR mode. A new 256-bit encryption key is generated using the `react-native-get-random-values` library. This key is stored inside Expo's SecureStore, while the value is encrypted and placed inside AsyncStorage.
+
+    Make sure that:
+    - You keep the `expo-secure-storage`, `aes-js` and `react-native-get-random-values` libraries up-to-date.
+    - Choose the correct [`SecureStoreOptions`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestoreoptions) for your app's needs. E.g. [`SecureStore.WHEN_UNLOCKED`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestorewhen_unlocked) regulates when the data can be accessed.
+    - Carefully consider optimizations or other modifications to the above example, as those can lead to introducing subtle security vulnerabilities.
+
+    Install the necessary dependencies in the root of your Expo project:
+
+    ```bash
+    npm install @supabase/supabase-js
+    npm install @rneui/themed @react-native-async-storage/async-storage
+    npm install aes-js react-native-get-random-values
+    npm install --save-dev @types/aes-js
+    npx expo install expo-secure-store
+    ```
+
+    Implement a `LargeSecureStore` class to pass in as Auth storage for the `supabase-js` client:
+
+    <$CodeTabs>
+
+    ```ts name=lib/supabase.ts
+    import { createClient } from "@supabase/supabase-js";
+    import AsyncStorage from "@react-native-async-storage/async-storage";
+    import * as SecureStore from 'expo-secure-store';
+    import * as aesjs from 'aes-js';
+    import 'react-native-get-random-values';
+
+    // As Expo's SecureStore does not support values larger than 2048
+    // bytes, an AES-256 key is generated and stored in SecureStore, while
+    // it is used to encrypt/decrypt values stored in AsyncStorage.
+    class LargeSecureStore {
+      private async _encrypt(key: string, value: string) {
+        const encryptionKey = crypto.getRandomValues(new Uint8Array(256 / 8));
+
+        const cipher = new aesjs.ModeOfOperation.ctr(encryptionKey, new aesjs.Counter(1));
+        const encryptedBytes = cipher.encrypt(aesjs.utils.utf8.toBytes(value));
+
+        await SecureStore.setItemAsync(key, aesjs.utils.hex.fromBytes(encryptionKey));
+
+        return aesjs.utils.hex.fromBytes(encryptedBytes);
+      }
+
+      private async _decrypt(key: string, value: string) {
+        const encryptionKeyHex = await SecureStore.getItemAsync(key);
+        if (!encryptionKeyHex) {
+          return encryptionKeyHex;
+        }
+
+        const cipher = new aesjs.ModeOfOperation.ctr(aesjs.utils.hex.toBytes(encryptionKeyHex), new aesjs.Counter(1));
+        const decryptedBytes = cipher.decrypt(aesjs.utils.hex.toBytes(value));
+
+        return aesjs.utils.utf8.fromBytes(decryptedBytes);
+      }
+
+      async getItem(key: string) {
+        const encrypted = await AsyncStorage.getItem(key);
+        if (!encrypted) { return encrypted; }
+
+        return await this._decrypt(key, encrypted);
+      }
+
+      async removeItem(key: string) {
+        await AsyncStorage.removeItem(key);
+        await SecureStore.deleteItemAsync(key);
+      }
+
+      async setItem(key: string, value: string) {
+        const encrypted = await this._encrypt(key, value);
+
+        await AsyncStorage.setItem(key, encrypted);
+      }
+    }
+
+    const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL
+    const supabaseAnonKey = YOUR_REACT_NATIVE_SUPABASE_ANON_KEY
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        storage: new LargeSecureStore(),
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: false,
+      },
+    });
+    ```
+
+    </$CodeTabs>
+
+  </TabPanel>
+</Tabs>
+
+### Set up a login component
+
+Let's set up a React Native component to manage logins and sign ups.
+Users would be able to sign in with their email and password.
+
+<$CodeTabs>
+
+```tsx name=app/auth.tsx
+import React, { useState } from 'react'
+import { Alert, StyleSheet, View } from 'react-native'
+import { supabase } from '../lib/supabase'
+import { Button, Input } from '@rneui/themed'
+
+export default function Auth() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  async function signInWithEmail() {
+    setLoading(true)
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) Alert.alert(error.message)
+    setLoading(false)
+  }
+
+  async function signUpWithEmail() {
+    setLoading(true)
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.signUp({ email, password })
+    if (error) Alert.alert(error.message)
+    if (!session) Alert.alert('Please check your inbox for email verification!')
+    setLoading(false)
+  }
+
+  return (
+    <View style={styles.container}>
+      <Input label="Email" onChangeText={setEmail} value={email} />
+      <Input label="Password" secureTextEntry onChangeText={setPassword} value={password} />
+      <Button title="Sign in" disabled={loading} onPress={signInWithEmail} />
+      <Button title="Sign up" disabled={loading} onPress={signUpWithEmail} />
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  container: {
+    marginTop: 40,
+    padding: 12,
+  },
+})
+```
+
+</$CodeTabs>
+
+<Admonition type="note">
+
+By default Supabase Auth requires email verification before a session is created for the users. To support email verification you need to [implement deep link handling](/docs/guides/auth/native-mobile-deep-linking?platform=react-native)!
+
+While testing, you can disable email confirmation in your [project's email auth provider settings](/dashboard/project/_/auth/providers).
+
+</Admonition>
+
+### Account page
+
+After a user is signed in we can allow them to edit their profile details and manage their account.
+
+Let's create a new component for that called `Account.tsx`.
+
+<$CodeTabs>
+
+```tsx name=app/account.tsx
+import React, { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
+import { StyleSheet, View, Alert } from 'react-native'
+import { Button, Input } from '@rneui/themed'
+import { Session } from '@supabase/supabase-js'
+
+export default function Account({ session }: { session: Session }) {
+  const [username, setUsername] = useState('')
+  const [website, setWebsite] = useState('')
+  const [avatarUrl, setAvatarUrl] = useState('')
+
+  useEffect(() => {
+    if (session) getProfile()
+  }, [session])
+
+  async function getProfile() {
+    if (session?.user) {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('username, website, avatar_url')
+        .eq('id', session.user.id)
+        .single()
+
+      if (error) {
+        Alert.alert(error.message)
+      } else {
+        setUsername(data.username)
+        setWebsite(data.website)
+        setAvatarUrl(data.avatar_url)
+      }
+    }
+  }
+
+  async function updateProfile() {
+    if (session?.user) {
+      const { error } = await supabase.from('profiles').upsert({
+        id: session.user.id,
+        username,
+        website,
+        avatar_url: avatarUrl,
+      })
+
+      if (error) {
+        Alert.alert(error.message)
+      }
+    }
+  }
+
+  return (
+    <View style={styles.container}>
+      <Input label="Username" value={username} onChangeText={setUsername} />
+      <Input label="Website" value={website} onChangeText={setWebsite} />
+      <Button title="Update" onPress={updateProfile} />
+      <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  container: {
+    marginTop: 40,
+    padding: 12,
+  },
+})
+```
+
+</$CodeTabs>
+
+### Launch!
+
+Now that we have all the components in place, let's update `App.tsx`:
+
+<$CodeTabs>
+
+```tsx name=app/index.tsx
+import React, { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
+import { View } from 'react-native'
+import { Session } from '@supabase/supabase-js'
+import Auth from './auth'
+import Account from './account'
+
+export default function Index() {
+  const [session, setSession] = useState<Session | null>(null)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
+    supabase.auth.onAuthStateChange((_event, session) => setSession(session))
+  }, [])
+
+  return <View>{session ? <Account session={session} /> : <Auth />}</View>
+}
+```
+
+</$CodeTabs>
+
+Once that's done, run this in a terminal window:
+
+```bash
+npm start
+```
+
+And then press the appropriate key for the environment you want to test the app in and you should see the completed app.
+
+## Bonus: Profile photos
+
+Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like
+photos and videos.
+
+### Additional dependency installation
+
+You will need an image picker that works on the environment you will build the project for, we will use `expo-image-picker` in this example.
+
+```bash
+npx expo install expo-image-picker
+```
+
+### Create an upload widget
+
+Let's create an avatar for the user so that they can upload a profile photo.
+We can start by creating a new component:
+
+<$CodeTabs>
+
+```tsx name=components/Avatar.tsx
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
+import { StyleSheet, View, Alert, Image, Button } from 'react-native'
+import * as ImagePicker from 'expo-image-picker'
+
+interface Props {
+  size: number
+  url: string | null
+  onUpload: (filePath: string) => void
+}
+
+export default function Avatar({ url, size = 150, onUpload }: Props) {
+  const [uploading, setUploading] = useState(false)
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  const avatarSize = { height: size, width: size }
+
+  useEffect(() => {
+    if (url) downloadImage(url)
+  }, [url])
+
+  async function downloadImage(path: string) {
+    try {
+      const { data, error } = await supabase.storage.from('avatars').download(path)
+
+      if (error) {
+        throw error
+      }
+
+      const fr = new FileReader()
+      fr.readAsDataURL(data)
+      fr.onload = () => {
+        setAvatarUrl(fr.result as string)
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log('Error downloading image: ', error.message)
+      }
+    }
+  }
+
+  async function uploadAvatar() {
+    try {
+      setUploading(true)
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images, // Restrict to only images
+        allowsMultipleSelection: false, // Can only select one image
+        allowsEditing: true, // Allows the user to crop / rotate their photo before uploading it
+        quality: 1,
+        exif: false, // We don't want nor need that data.
+      })
+
+      if (result.canceled || !result.assets || result.assets.length === 0) {
+        console.log('User cancelled image picker.')
+        return
+      }
+
+      const image = result.assets[0]
+      console.log('Got image', image)
+
+      if (!image.uri) {
+        throw new Error('No image uri!') // Realistically, this should never happen, but just in case...
+      }
+
+      const arraybuffer = await fetch(image.uri).then((res) => res.arrayBuffer())
+
+      const fileExt = image.uri?.split('.').pop()?.toLowerCase() ?? 'jpeg'
+      const path = `${Date.now()}.${fileExt}`
+      const { data, error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(path, arraybuffer, {
+          contentType: image.mimeType ?? 'image/jpeg',
+        })
+
+      if (uploadError) {
+        throw uploadError
+      }
+
+      onUpload(data.path)
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert(error.message)
+      } else {
+        throw error
+      }
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  return (
+    <View>
+      {avatarUrl ? (
+        <Image
+          source={{ uri: avatarUrl }}
+          accessibilityLabel="Avatar"
+          style={[avatarSize, styles.avatar, styles.image]}
+        />
+      ) : (
+        <View style={[avatarSize, styles.avatar, styles.noImage]} />
+      )}
+      <View>
+        <Button
+          title={uploading ? 'Uploading ...' : 'Upload'}
+          onPress={uploadAvatar}
+          disabled={uploading}
+        />
+      </View>
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  avatar: {
+    borderRadius: 5,
+    overflow: 'hidden',
+    maxWidth: '100%',
+  },
+  image: {
+    objectFit: 'cover',
+    paddingTop: 0,
+  },
+  noImage: {
+    backgroundColor: '#333',
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: 'rgb(200, 200, 200)',
+    borderRadius: 5,
+  },
+})
+```
+
+</$CodeTabs>
+
+### Add the new widget
+
+And then we can add the widget to the Account page:
+
+<$CodeTabs>
+
+```tsx name=components/Account.tsx
+// Import the new component
+import Avatar from './Avatar'
+
+// ...
+return (
+  <View>
+    {/* Add to the body */}
+    <View>
+      <Avatar
+        size={200}
+        url={avatarUrl}
+        onUpload={(url: string) => {
+          setAvatarUrl(url)
+          updateProfile({ username, website, avatar_url: url })
+        }}
+      />
+    </View>
+    {/* ... */}
+  </View>
+)
+// ...
+```
+
+</$CodeTabs>
+
+Now you will need to run the prebuild command to get the application working on your chosen platform.
+
+```bash
+npx expo prebuild
+```
+
+At this stage you have a fully functional application!
