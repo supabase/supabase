@@ -1,20 +1,18 @@
 'use client'
 
-import Image from 'next/image'
+// import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { cn } from 'ui/src/lib/utils/cn'
 import { Button } from 'ui/src/components/Button/Button'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { useTheme } from 'next-themes'
+// import { useTheme } from 'next-themes'
 import announcement from '../Banners/data.json'
 import './styles.css'
 
-const LW14BG = `/docs/img/launchweek/14/promo-banner-bg.png`
-
 const PromoToast = () => {
   const [visible, setVisible] = useState(false)
-  const { resolvedTheme } = useTheme()
+  // const { resolvedTheme } = useTheme()
 
   useEffect(() => {
     const shouldHide =
@@ -47,9 +45,7 @@ const PromoToast = () => {
             fontFamily: 'Departure Mono, Source Code Pro, Office Code Pro, Menlo, monospace',
           }}
           className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7"
-        >
-          Top 10 Launches
-        </p>
+        ></p>
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
@@ -62,15 +58,15 @@ const PromoToast = () => {
           Dismiss
         </Button>
       </div>
-      <Image
-        src={LW14BG}
+      {/* <Image
+        src={}
         alt=""
         fill
         sizes="100%"
         quality={100}
         aria-hidden
         className="absolute not-sr-only object-cover z-0 inset-0 w-full h-auto"
-      />
+      /> */}
     </div>
   )
 }
