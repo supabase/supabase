@@ -28,7 +28,10 @@ import {
   StorageItemMetadata,
   StorageItemWithColumn,
 } from 'components/to-be-cleaned/Storage/Storage.types'
-import { downloadFile } from 'components/to-be-cleaned/Storage/StorageExplorer/StorageExplorer.utils'
+import {
+  downloadFile,
+  formatTime,
+} from 'components/to-be-cleaned/Storage/StorageExplorer/StorageExplorer.utils'
 import { convertFromBytes } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
 import { configKeys } from 'data/config/keys'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
@@ -409,7 +412,7 @@ class StorageExplorerStore {
       <SonnerProgress
         progress={progress}
         message={`Uploading ${totalFiles} file${totalFiles > 1 ? 's' : ''}...`}
-        progressPrefix={`${remainingTime && !isNaN(remainingTime) && isFinite(remainingTime) && remainingTime !== 0 ? `${this.formatTime(remainingTime)} remaining – ` : ''}`}
+        progressPrefix={`${remainingTime && !isNaN(remainingTime) && isFinite(remainingTime) && remainingTime !== 0 ? `${formatTime(remainingTime)} remaining – ` : ''}`}
         action={
           toastId && (
             <Button
@@ -1763,20 +1766,6 @@ class StorageExplorerStore {
     })
 
     return totalRemainingTime
-  }
-
-  private formatTime(seconds: number) {
-    const days = Math.floor(seconds / (24 * 3600))
-    seconds %= 24 * 3600
-    const hours = Math.floor(seconds / 3600)
-    seconds %= 3600
-    const minutes = Math.floor(seconds / 60)
-    seconds = Math.floor(seconds % 60)
-
-    if (days > 0) return `${days}d `
-    if (hours > 0) return `${hours}h `
-    if (minutes > 0) return `${minutes}m `
-    return `${seconds}s`
   }
 }
 
