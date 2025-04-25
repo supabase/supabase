@@ -2,7 +2,15 @@
 
 import { cva, VariantProps } from 'class-variance-authority'
 import { ChevronRight, FolderClosed, FolderOpen, Loader2 } from 'lucide-react'
-import { ComponentPropsWithoutRef, forwardRef, ReactNode, useEffect, useRef, useState } from 'react'
+import {
+  ComponentPropsWithoutRef,
+  FocusEvent,
+  forwardRef,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import TreeViewPrimitive, { flattenTree } from 'react-accessible-treeview'
 import { cn } from '../../lib/utils'
 import { Input } from '../shadcn/ui/input'
@@ -90,30 +98,34 @@ const TreeViewItem = forwardRef<
   ) => {
     const [localValueState, setLocalValueState] = useState(name)
     const inputRef = useRef<HTMLInputElement>(null)
+    const timeRef = useRef<number>(0)
 
     useEffect(() => {
       if (isEditing) {
         if (inputRef.current) {
           const input = inputRef.current
 
+          // [Ivan] For some reason, during initial render, the input loses focus ~50-60% of the time.
+          // [Joshen] This is really dirty, but I can't seem to identify why the focus is lost. But am opting
+          // for a more deterministic way to prevent accidental onBlur callbacks by checking that the onBlur event
+          // is being triggered within 200ms of the input field being in an edit state. 200ms is just an arbitary
+          // value which I think represents an "accidental" on blur
+          timeRef.current = Number(new Date())
+          input.focus()
+
+          // Need a slight delay to ensure focus is established. When editing starts, select text up to the last dot
           setTimeout(() => {
-            // [Ivan] For some reason, during initial render, the input loses focus ~50-60% of the time.
-            input.focus()
+            const fileName = input.value
+            const lastDotIndex = fileName.lastIndexOf('.')
+            const startPos = 0
+            const endPos = lastDotIndex > 0 ? lastDotIndex : fileName.length
 
-            // Need a slight delay to ensure focus is established. When editing starts, select text up to the last dot
-            setTimeout(() => {
-              const fileName = input.value
-              const lastDotIndex = fileName.lastIndexOf('.')
-              const startPos = 0
-              const endPos = lastDotIndex > 0 ? lastDotIndex : fileName.length
-
-              try {
-                input.setSelectionRange(startPos, endPos)
-              } catch (e) {
-                console.error('Could not set selection range', e)
-              }
-            }, 50)
-          }, 150)
+            try {
+              input.setSelectionRange(startPos, endPos)
+            } catch (e) {
+              console.error('Could not set selection range', e)
+            }
+          }, 50)
         }
       } else {
         setLocalValueState(name)
@@ -126,8 +138,16 @@ const TreeViewItem = forwardRef<
       }
     }, [isLoading])
 
-    const handleBlur = () => {
-      onEditSubmit?.(localValueState)
+    const handleBlur = (e: FocusEvent<HTMLInputElement, Element>) => {
+      const timestamp = Number(new Date())
+      const timeDiff = timestamp - timeRef.current
+
+      if (timeDiff < 200) {
+        e.preventDefault()
+        inputRef?.current?.focus()
+      } else {
+        onEditSubmit?.(localValueState)
+      }
     }
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -218,8 +238,9 @@ const TreeViewItem = forwardRef<
         <span className={cn(isEditing && 'hidden', 'truncate text-sm')} title={name}>
           {name}
         </span>
-        <form autoFocus onSubmit={handleSubmit} className={cn(!isEditing && 'hidden')}>
+        <form onSubmit={handleSubmit} className={cn(!isEditing && 'hidden')}>
           <Input
+            autoFocus
             ref={inputRef}
             onChange={(e) => {
               setLocalValueState(e.target.value)
