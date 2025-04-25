@@ -102,31 +102,40 @@ const TreeViewItem = forwardRef<
 
     useEffect(() => {
       if (isEditing) {
-        if (inputRef.current) {
+        // [Ivan] This component is supposed to focus on its input when it's rendered. The focus doesn't work every time because
+        // the initial render is triggered by a dropdown menu which at the end of the closing animation, steals focus from the input
+        //  and triggers the blur event (which closes the input). The issue is reported at https://github.com/radix-ui/primitives/issues/3106.
+
+        // [Joshen] This is to prevent accidental onBlur callbacks by checking that the onBlur event is being triggered
+        // within 400ms of the input field being in an edit state. 400ms is just an arbitary value which I think
+        // represents an "accidental" on blur
+        timeRef.current = Number(new Date())
+
+        // The focus will be attempted after a slight delay to ensure that the dropdown closing animations are complete.
+        setTimeout(() => {
           const input = inputRef.current
-
-          // [Ivan] For some reason, during initial render, the input loses focus ~50-60% of the time.
-          // [Joshen] This is really dirty, but I can't seem to identify why the focus is lost. But am opting
-          // for a more deterministic way to prevent accidental onBlur callbacks by checking that the onBlur event
-          // is being triggered within 400ms of the input field being in an edit state. 400ms is just an arbitary
-          // value which I think represents an "accidental" on blur
-          timeRef.current = Number(new Date())
-          input.focus()
-
-          // Need a slight delay to ensure focus is established. When editing starts, select text up to the last dot
-          setTimeout(() => {
-            const fileName = input.value
-            const lastDotIndex = fileName.lastIndexOf('.')
-            const startPos = 0
-            const endPos = lastDotIndex > 0 ? lastDotIndex : fileName.length
-
-            try {
-              input.setSelectionRange(startPos, endPos)
-            } catch (e) {
-              console.error('Could not set selection range', e)
+          if (input) {
+            // If the input is not the active element, focus it
+            if (document.activeElement !== input) {
+              input.focus()
             }
-          }, 50)
-        }
+
+            // Need a slight delay to ensure focus is established. When editing starts, select text up to the last dot
+            // When editing starts, select text up to the last dot
+            setTimeout(() => {
+              const fileName = input.value
+              const lastDotIndex = fileName.lastIndexOf('.')
+              const startPos = 0
+              const endPos = lastDotIndex > 0 ? lastDotIndex : fileName.length
+
+              try {
+                input.setSelectionRange(startPos, endPos)
+              } catch (e) {
+                console.error('Could not set selection range', e)
+              }
+            }, 50)
+          }
+        }, 200)
       } else {
         setLocalValueState(name)
       }
@@ -144,7 +153,7 @@ const TreeViewItem = forwardRef<
 
       if (timeDiff < 400) {
         e.preventDefault()
-        inputRef?.current?.focus()
+        inputRef.current?.focus()
       } else {
         onEditSubmit?.(localValueState)
       }
