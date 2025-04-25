@@ -7,7 +7,6 @@ import { createPortal } from 'react-dom'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useUrlState } from 'hooks/ui/useUrlState'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import { EMPTY_ARR } from 'lib/void'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
@@ -38,27 +37,21 @@ export const SupabaseGrid = ({
 
   const { project } = useProjectContext()
 
-  if (!project) {
-    return null
-  }
-
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
-
-  const [_, setParams] = useUrlState({ arrayKeys: ['sort', 'filter'] })
 
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
 
   const { filters, onApplyFilters } = useTableFilter()
-  const { sorts } = useTableSort()
+  const { sorts, onApplySorts } = useTableSort()
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   const { data, error, isSuccess, isError, isLoading, isRefetching } = useTableRowsQuery(
     {
-      projectRef: project.ref,
-      connectionString: project.connectionString,
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
       tableId,
       sorts,
       filters,
@@ -70,10 +63,7 @@ export const SupabaseGrid = ({
       keepPreviousData: true,
       retryDelay: (retryAttempt, error: any) => {
         if (error && error.message?.includes('does not exist')) {
-          setParams((prevParams) => ({
-            ...prevParams,
-            ...{ sort: undefined },
-          }))
+          onApplySorts([])
         }
         if (retryAttempt > 3) {
           return Infinity

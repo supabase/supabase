@@ -33,7 +33,7 @@ export type FeatureFlagContextType = {
   hasLoaded?: boolean
 }
 
-const FeatureFlagContext = createContext<FeatureFlagContextType>({
+export const FeatureFlagContext = createContext<FeatureFlagContextType>({
   API_URL: undefined,
   configcat: {},
   posthog: {},

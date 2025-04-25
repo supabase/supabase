@@ -1,20 +1,20 @@
-import { useCallback, useMemo } from 'react'
+import { formatSortURLParams, sortsToUrlParams } from 'components/grid/SupabaseGrid.utils'
 import type { Sort } from 'components/grid/types'
 import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
-import { formatSortURLParams, sortsToUrlParams } from 'components/grid/SupabaseGrid.utils'
+import { useCallback, useMemo } from 'react'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { useSaveTableEditorState } from './useSaveTableEditorState'
-import { useSafeTableEditorSnapshot } from './useSafeTableEditorSnapshot'
 
 /**
  * Hook for managing table sort URL parameters and saving.
- * Uses safe snapshot ONLY to get table name for formatting/mapping.
+ * Uses snapshot ONLY to get table name for formatting/mapping.
  * Uses useSaveTableEditorState for saving and side effects.
  * Does NOT format initial sorts (needs table name externally).
  * Does NOT interact with snapshot directly.
  */
 export function useTableSort() {
   const { sorts: urlSorts, setParams } = useTableEditorFiltersSort()
-  const snap = useSafeTableEditorSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
   const { saveSortsAndTriggerSideEffects } = useSaveTableEditorState()
 
   const tableName = useMemo(() => {
