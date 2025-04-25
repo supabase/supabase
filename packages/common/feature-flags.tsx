@@ -1,3 +1,5 @@
+'use client'
+
 import { FlagValues } from '@vercel/flags/react'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 
@@ -123,9 +125,9 @@ export const FeatureFlagProvider = ({
 
   return (
     <FeatureFlagContext.Provider value={store}>
-      {/* 
+      {/*
         [Joshen] Just support configcat flags in Vercel flags for now for simplicity
-        although I think it should be fairly simply to support PH too 
+        although I think it should be fairly simply to support PH too
       */}
       <FlagValues values={store.configcat} />
       {children}
