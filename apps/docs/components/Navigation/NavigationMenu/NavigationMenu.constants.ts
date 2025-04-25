@@ -351,8 +351,8 @@ export const gettingstarted: NavMenuConstant = {
         },
         {
           name: 'Expo React (with Expo Router)',
-          url: '/guides/getting-started/tutorials/with-expo-react-native-expo-router'
-        },               
+          url: '/guides/getting-started/tutorials/with-expo-react-native-expo-router',
+        },
         {
           name: 'Android Kotlin',
           url: '/guides/getting-started/tutorials/with-kotlin',
