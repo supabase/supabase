@@ -1,9 +1,9 @@
 import { isEqual } from 'lodash'
 import { Filter as FilterIcon, Plus } from 'lucide-react'
-import { KeyboardEvent, useCallback, useMemo, useState } from 'react'
+import { KeyboardEvent, useCallback, useState } from 'react'
 
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import type { Filter } from 'components/grid/types'
+import type { Filter, FilterOperator } from 'components/grid/types'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -12,6 +12,7 @@ import {
   Popover_Shadcn_,
 } from 'ui'
 import FilterRow from './FilterRow'
+import { useDebounceSync } from '../../../hooks/useDebounceSync'
 
 export interface FilterPopoverPrimitiveProps {
   buttonText?: string
@@ -20,6 +21,19 @@ export interface FilterPopoverPrimitiveProps {
   portal?: boolean
 }
 
+/**
+ * FilterPopoverPrimitive - A component for filtering table columns
+ *
+ * This component automatically applies filter changes with debouncing as users make them.
+ *
+ * Implementation note: This component uses a complex sync mechanism to avoid infinite update loops.
+ * While it may seem over-engineered, this approach is necessary to handle:
+ * 1. Bidirectional data flow (local state ↔ parent state)
+ * 2. Debounced updates to reduce update frequency
+ * 3. Preventing re-renders from creating endless update cycles
+ *
+ * The refs track different aspects of state to properly determine when and how to sync.
+ */
 const FilterPopoverPrimitive = ({
   buttonText,
   filters,
@@ -29,13 +43,8 @@ const FilterPopoverPrimitive = ({
   const [open, setOpen] = useState(false)
   const snap = useTableEditorTableStateSnapshot()
 
-  // Internal state management
-  const [localFilters, setLocalFilters] = useState<Filter[]>(filters)
-
-  // Update local state when filters prop changes
-  useMemo(() => {
-    setLocalFilters(filters)
-  }, [filters])
+  // Use synchronized state hook for filters
+  const [localFilters, setLocalFilters, applyFilters] = useDebounceSync(filters, onApplyFilters)
 
   const displayButtonText =
     buttonText ??
@@ -46,45 +55,46 @@ const FilterPopoverPrimitive = ({
   const onAddFilter = () => {
     const column = snap.table.columns[0]?.name
     if (column) {
-      setLocalFilters([
+      const newFilters: Filter[] = [
         ...localFilters,
         {
           column,
-          operator: '=',
+          operator: '=' as FilterOperator,
           value: '',
         },
-      ])
+      ]
+      setLocalFilters(newFilters)
+      applyFilters(newFilters)
     }
   }
 
-  const onChangeFilter = useCallback((index: number, filter: Filter) => {
-    setLocalFilters((currentFilters) => [
-      ...currentFilters.slice(0, index),
-      filter,
-      ...currentFilters.slice(index + 1),
-    ])
-  }, [])
+  const onChangeFilter = useCallback(
+    (index: number, filter: Filter) => {
+      const newFilters: Filter[] = [
+        ...localFilters.slice(0, index),
+        filter,
+        ...localFilters.slice(index + 1),
+      ]
+      setLocalFilters(newFilters)
+      applyFilters(newFilters)
+    },
+    [localFilters, setLocalFilters, applyFilters]
+  )
 
-  const onDeleteFilter = useCallback((index: number) => {
-    setLocalFilters((currentFilters) => [
-      ...currentFilters.slice(0, index),
-      ...currentFilters.slice(index + 1),
-    ])
-  }, [])
-
-  const onSelectApplyFilters = () => {
-    // [Joshen] Trim empty spaces in input for only UUID type columns
-    const formattedFilters = localFilters.map((f) => {
-      const column = snap.table.columns.find((c) => c.name === f.column)
-      if (column?.format === 'uuid') return { ...f, value: f.value.trim() }
-      else return f
-    })
-    setLocalFilters(formattedFilters)
-    onApplyFilters(formattedFilters)
-  }
+  const onDeleteFilter = useCallback(
+    (index: number) => {
+      const newFilters: Filter[] = [
+        ...localFilters.slice(0, index),
+        ...localFilters.slice(index + 1),
+      ]
+      setLocalFilters(newFilters)
+      applyFilters(newFilters)
+    },
+    [localFilters, setLocalFilters, applyFilters]
+  )
 
   function handleEnterKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter') onSelectApplyFilters()
+    // Enter key now just refocuses - immediate updates happen with debouncing
   }
 
   return (
@@ -120,13 +130,6 @@ const FilterPopoverPrimitive = ({
           <div className="px-3 flex flex-row justify-between">
             <Button icon={<Plus />} type="text" onClick={onAddFilter}>
               Add filter
-            </Button>
-            <Button
-              disabled={isEqual(localFilters, filters)}
-              type="default"
-              onClick={() => onSelectApplyFilters()}
-            >
-              Apply filter
             </Button>
           </div>
         </div>
