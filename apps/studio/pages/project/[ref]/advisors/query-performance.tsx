@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { useParams } from 'common'
 import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
 import { QUERY_PERFORMANCE_REPORT_TYPES } from 'components/interfaces/QueryPerformance/QueryPerformance.constants'
+import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance/EnableIndexAdvisorButton'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import {
   QueryPerformanceSort,
@@ -10,6 +11,7 @@ import {
 } from 'components/interfaces/Reports/Reports.queries'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
+import { useIsIndexAdvisorAvailable } from 'hooks/misc/useIsIndexAdvisorAvailable'
 import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
@@ -25,6 +27,7 @@ const PRESET_MAP = {
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef, search, sort, order, preset: urlPreset } = useParams()
+  const isAdvisorAvailable = useIsIndexAdvisorAvailable()
 
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const hooks = queriesFactory(config.queries, projectRef ?? 'default')
@@ -52,7 +55,12 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         className="py-4 px-6 !mb-0"
         title="Query Performance"
         docsUrl="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
-        actions={<DatabaseSelector />}
+        actions={
+          <div className="flex items-center gap-2">
+            {!isAdvisorAvailable && <EnableIndexAdvisorButton />}
+            <DatabaseSelector />
+          </div>
+        }
       />
       <QueryPerformance queryHitRate={queryHitRate} queryPerformanceQuery={queryPerformanceQuery} />
     </div>
