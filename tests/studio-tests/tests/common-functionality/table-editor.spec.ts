@@ -97,7 +97,9 @@ test.describe('Table Editor', () => {
     await page.getByRole('button', { name: 'Sort' }).click()
     await page.getByTestId('table-editor-pick-column-to-sort-button').click()
     await page.getByLabel('Pick a column to sort by').getByText('defaultValueColumn').click()
-    await page.getByRole('button', { name: 'Apply sorting' }).click()
+
+    // Wait for the debounced sort to be applied (500ms debounce + buffer)
+    await page.waitForTimeout(600)
 
     // Close the sorting dialog
     await page.keyboard.down('Escape')
@@ -116,7 +118,9 @@ test.describe('Table Editor', () => {
     await page.getByLabel('id').getByText('defaultValueColumn').click()
     await page.getByPlaceholder('Enter a value').click()
     await page.getByPlaceholder('Enter a value').fill('2')
-    await page.getByRole('button', { name: 'Apply filter' }).click()
+
+    // Wait for the debounced filter to be applied (500ms debounce + buffer)
+    await page.waitForTimeout(600)
 
     // Close the filter dialog
     await page.keyboard.down('Escape')
