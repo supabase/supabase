@@ -108,7 +108,7 @@ const TreeViewItem = forwardRef<
           // [Ivan] For some reason, during initial render, the input loses focus ~50-60% of the time.
           // [Joshen] This is really dirty, but I can't seem to identify why the focus is lost. But am opting
           // for a more deterministic way to prevent accidental onBlur callbacks by checking that the onBlur event
-          // is being triggered within 200ms of the input field being in an edit state. 200ms is just an arbitary
+          // is being triggered within 400ms of the input field being in an edit state. 400ms is just an arbitary
           // value which I think represents an "accidental" on blur
           timeRef.current = Number(new Date())
           input.focus()
@@ -142,7 +142,7 @@ const TreeViewItem = forwardRef<
       const timestamp = Number(new Date())
       const timeDiff = timestamp - timeRef.current
 
-      if (timeDiff < 200) {
+      if (timeDiff < 400) {
         e.preventDefault()
         inputRef?.current?.focus()
       } else {
