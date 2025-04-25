@@ -250,7 +250,7 @@ const TreeViewItem = forwardRef<
               // stop keyboard down bubbling up to TreeView.root
               // on enter key, send onEditSubmit callback
               if (e.key === 'Enter') {
-                onEditSubmit?.(localValueState)
+                inputRef.current?.blur()
               } else if (e.key === 'Escape') {
                 setLocalValueState(name)
                 onEditSubmit?.(name)
@@ -258,7 +258,7 @@ const TreeViewItem = forwardRef<
                 e.stopPropagation()
               }
             }}
-            className="block w-full text-sm px-2 py-1 h-7 w"
+            className="block w-full text-sm px-2 py-1 h-7"
             value={localValueState}
           />
         </form>
