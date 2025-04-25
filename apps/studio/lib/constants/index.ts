@@ -59,7 +59,6 @@ export const LOCAL_STORAGE_KEYS = {
 
   SQL_EDITOR_INTELLISENSE: 'supabase_sql-editor-intellisense-enabled',
   SQL_EDITOR_SPLIT_SIZE: 'supabase_sql-editor-split-size',
-  SQL_EDITOR_AI_PANEL_SPLIT_SIZE: 'supabase_sql-editor-ai-panel-split-size',
   // Key to track which schemas are ok to be sent to AI. The project ref is intentionally put at the end for easier search in the browser console.
   SQL_EDITOR_AI_SCHEMA: (ref: string) => `supabase_sql-editor-ai-schema-enabled-${ref}`,
   SQL_EDITOR_AI_OPEN: 'supabase_sql-editor-ai-open',
