@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "predev": "pnpm run codegen:references && pnpm run codegen:examples",
+    "predev": "pnpm run codegen:graphql && pnpm run codegen:references && pnpm run codegen:examples",
     "dev": "concurrently --kill-others \"next dev --port 3001\" \"pnpm run dev:watch:troubleshooting\"",
     "dev:watch:troubleshooting": "node ./scripts/troubleshooting/watch.mjs",
     "dev:secrets:pull": "AWS_PROFILE=supabase-dev node ../../scripts/getSecrets.js -n local/docs",
-    "prebuild": "pnpm run codegen:references && pnpm run codegen:examples",
+    "prebuild": "pnpm run codegen:graphql && pnpm run codegen:references && pnpm run codegen:examples",
     "build": "next build",
     "build:analyze": "ANALYZE=true next build",
     "build:sitemap": "tsx ./internals/generate-sitemap.ts",
@@ -17,6 +17,7 @@
     "start": "next start",
     "lint": "next lint",
     "lint:mdx": "supa-mdx-lint content --config ../../supa-mdx-lint.config.toml",
+    "pretypecheck": "pnpm run codegen:graphql",
     "typecheck": "tsc --noEmit",
     "pretest": "pnpm run codegen:examples",
     "test": "vitest --exclude \"**/*.smoke.test.ts\"",
@@ -27,9 +28,10 @@
     "last-changed": "tsx scripts/last-changed.ts",
     "last-changed:reset": "pnpm run last-changed -- --reset",
     "codegen:examples": "cp -r ../../examples ./examples",
-    "codegen:references": "tsx features/docs/Reference.generated.script.ts",
     "codemod:frontmatter": "node ./scripts/codemod/mdx-meta.mjs && prettier --write \"content/**/*.mdx\"",
-    "clean": "rimraf node_modules features/docs/generated examples"
+    "codegen:graphql": "tsx ./scripts/graphqlSchema.ts && graphql-codegen --config codegen.ts",
+    "codegen:references": "tsx features/docs/Reference.generated.script.ts",
+    "clean": "rimraf node_modules features/docs/generated examples __generated__"
   },
   "dependencies": {
     "@har-sdk/openapi-sampler": "^2.2.0",
@@ -114,6 +116,9 @@
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.410.0",
     "@graphiql/toolkit": "^0.9.1",
+    "@graphql-codegen/cli": "5.0.5",
+    "@graphql-codegen/typescript": "4.1.6",
+    "@graphql-codegen/typescript-resolvers": "4.5.0",
     "@supabase/supa-mdx-lint": "0.2.6-alpha",
     "@types/common-tags": "^1.8.4",
     "@types/estree": "1.0.5",
