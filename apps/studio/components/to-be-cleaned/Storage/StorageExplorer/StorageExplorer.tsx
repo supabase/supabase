@@ -1,8 +1,8 @@
-import { useParams } from 'common'
 import { compact, get, isEmpty, uniqBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
 
+import { useParams } from 'common'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import type { Bucket } from 'data/storage/buckets-query'
 import { IS_PLATFORM } from 'lib/constants'
@@ -63,7 +63,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   const [itemSearchString, setItemSearchString] = useState('')
 
   // Requires a fixed height to ensure that explorer is constrained to the viewport
-  const fileExplorerHeight = window.innerHeight - 105
+  const fileExplorerHeight = window.innerHeight - 122
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
