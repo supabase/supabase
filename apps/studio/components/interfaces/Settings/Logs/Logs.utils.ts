@@ -164,7 +164,7 @@ limit ${limit};
     case 'postgres_logs':
       if (IS_PLATFORM === false) {
         return `
-select postgres_logs.timestamp, id, event_message, parsed.error_severity
+select postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.detail, parsed.hint
 from postgres_logs
 ${joins}
 ${where}
@@ -172,7 +172,7 @@ ${orderBy}
 limit ${limit}
   `
       }
-      return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table}
+      return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.detail, parsed.hint from ${table}
   ${joins}
   ${where}
   ${orderBy}
@@ -204,6 +204,9 @@ limit ${limit}
   `
     case 'supavisor_logs':
       return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit ${limit}`
+
+    case 'pg_upgrade_logs':
+      return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit 100`
 
     default:
       return `select id, ${table}.timestamp, event_message from ${table}

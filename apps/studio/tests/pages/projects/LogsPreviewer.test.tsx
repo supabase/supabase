@@ -29,7 +29,7 @@ vi.mock('lib/gotrue', () => ({
 test.skip('Search will trigger a log refresh', async () => {
   render(<LogsPreviewer projectRef="123" queryType="auth" />)
 
-  userEvent.type(screen.getByPlaceholderText(/Search events/), 'something{enter}')
+  await userEvent.type(screen.getByPlaceholderText(/Search events/), 'something{enter}')
 
   await waitFor(
     () => {
@@ -57,7 +57,7 @@ test.skip('poll count for new messages', async () => {
   await waitFor(() => screen.getByText(/999/))
 
   // Refresh button only exists with the queryType param, which no longer shows the id column
-  userEvent.click(screen.getByTitle('refresh'))
+  await userEvent.click(screen.getByTitle('refresh'))
   await waitFor(() => screen.queryByText(/999/) === null)
   await screen.findByText(/200/)
 })

@@ -21,10 +21,10 @@ breadcrumb: 'Migrations'
 
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Get the new database connection string" fullWidth>
-      Go to the [project page](/dashboard/project/_/) and click the "**Connect**" button at the top of the page for the connection string.
+      On your project dashboard, click [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
       <Admonition type="note">
-        Use the Session pooler connection string by default. If your ISP supports IPv6, use the direct connection string.
+        Use the Session pooler connection string by default. If your ISP supports IPv6 or you have the IPv4 add-on enabled, use the direct connection string.
       </Admonition>
 
       Session pooler connection string:
@@ -131,7 +131,7 @@ breadcrumb: 'Migrations'
     <StepHikeCompact.Step step={4}>
 
     <StepHikeCompact.Details title="Get the database password" fullWidth>
-      Reset the password in the [Database Settings](/dashboard/project/_/settings/database).
+      Reset the password in the [project connect page](/dashboard/project/_?showConnect=true).
 
       Replace ```[YOUR-PASSWORD]``` in the connection string with the database password.
 

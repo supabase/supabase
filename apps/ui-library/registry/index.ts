@@ -4,7 +4,7 @@ import { examples } from '@/registry/examples'
 import type { RegistryItem } from 'shadcn/registry'
 import { blocks } from './blocks'
 import { clients } from './clients'
-import aiEditorRules from './default/ai-editor-rules/registry-item.json' assert { type: 'json' }
+import aiEditorRules from './default/ai-editor-rules/registry-item.json' with { type: 'json' }
 
 export const registry = {
   name: 'Supabase UI Library',

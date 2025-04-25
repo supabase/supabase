@@ -31,7 +31,6 @@ export interface VaultSecret {
   description: string
   secret: string
   decryptedSecret?: string
-  key_id: string
   created_at: string
   updated_at: string
 }

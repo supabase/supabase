@@ -417,8 +417,9 @@ const Wizard: NextPageWithLayout = () => {
 
   const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
 
-  const additionalMonthlySpend =
-    instanceSizeSpecs[instanceSize as DesiredInstanceSize]!.priceMonthly - availableComputeCredits
+  const additionalMonthlySpend = isFreePlan
+    ? 0
+    : instanceSizeSpecs[instanceSize as DesiredInstanceSize]!.priceMonthly - availableComputeCredits
 
   return (
     <Form_Shadcn_ {...form}>
@@ -922,7 +923,7 @@ const Wizard: NextPageWithLayout = () => {
 
                           <div>
                             <Button asChild type="default">
-                              <Link href={`/org/${slug}/invoices`}>View invoices</Link>
+                              <Link href={`/org/${slug}/billing#invoices`}>View invoices</Link>
                             </Button>
                           </div>
                         </div>

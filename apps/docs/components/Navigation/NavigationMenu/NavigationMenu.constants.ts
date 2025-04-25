@@ -119,6 +119,12 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'platform',
           },
           {
+            label: 'Security',
+            icon: 'security',
+            href: '/guides/security',
+            level: 'security',
+          },
+          {
             label: 'Telemetry',
             icon: 'telemetry',
             href: '/guides/telemetry',
@@ -1950,6 +1956,10 @@ export const local_development: NavMenuConstant = {
           url: '/guides/local-development/managing-config',
         },
         {
+          name: 'Restoring downloaded backup',
+          url: '/guides/local-development/restoring-downloaded-backup',
+        },
+        {
           name: 'Customizing email templates',
           url: '/guides/local-development/customizing-email-templates',
         },
@@ -2048,7 +2058,7 @@ export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof Ico
 ]
 
 export const security: NavMenuConstant = {
-  icon: 'platform',
+  icon: 'security',
   title: 'Security',
   url: '/guides/security',
   items: [

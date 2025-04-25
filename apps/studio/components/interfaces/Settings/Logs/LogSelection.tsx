@@ -1,4 +1,7 @@
-import { MousePointerClick, X, Clipboard, Check } from 'lucide-react'
+import { Check, Clipboard, MousePointerClick, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
   Button,
   CodeBlock,
@@ -9,11 +12,9 @@ import {
   cn,
   copyToClipboard,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 import type { LogData, QueryType } from './Logs.types'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useEffect, useState } from 'react'
 
 export interface LogSelectionProps {
   log?: LogData
@@ -63,6 +64,18 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
         }
 
         return <DefaultPreviewSelectionRenderer log={apiLog} />
+
+      case 'database':
+        const hint = log?.metadata?.[0]?.parsed?.[0]?.hint
+        const detail = log?.metadata?.[0]?.parsed?.[0]?.detail
+        const query = log?.metadata?.[0]?.parsed?.[0]?.query
+        const postgresLog = {
+          ...(hint && { hint }),
+          ...(detail && { detail }),
+          ...(query && { query }),
+          ...log,
+        }
+        return <DefaultPreviewSelectionRenderer log={postgresLog} />
       default:
         return <DefaultPreviewSelectionRenderer log={log} />
     }

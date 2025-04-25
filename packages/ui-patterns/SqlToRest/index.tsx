@@ -25,7 +25,7 @@ function FallbackComponent({ error }: FallbackProps) {
 }
 
 // Lazy load client side to prevent hydration issues when browser produces an error
-const SqlToRest = dynamic(() => import('./sql-to-rest'))
+const SqlToRest = dynamic(() => import('./sql-to-rest'), { ssr: false })
 
 export default function SqlToRestWithFallback(props: SqlToRestProps) {
   return (
