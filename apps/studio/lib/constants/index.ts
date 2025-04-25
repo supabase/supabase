@@ -54,7 +54,7 @@ export const LOCAL_STORAGE_KEYS = {
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
-  STORAGE_PREFERENCE: (ref: string) => `storage-preference-${ref}`,
+  STORAGE_PREFERENCE: (ref: string) => `storage-explorer-${ref}`,
 
   SQL_EDITOR_INTELLISENSE: 'supabase_sql-editor-intellisense-enabled',
   SQL_EDITOR_SPLIT_SIZE: 'supabase_sql-editor-split-size',

@@ -39,6 +39,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
     currentBucketName,
     openBucket,
 
+    loadExplorerPreferences,
     fetchFolderContents,
     fetchMoreFolderContents,
     fetchFoldersByPath,
@@ -102,7 +103,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
 
   useEffect(() => {
     // Load user preferences (view, sort, sortBy)
-    if (ref) snap.initExplorerPreference()
+    loadExplorerPreferences()
   }, [ref])
 
   useEffect(() => {

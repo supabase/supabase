@@ -1,7 +1,7 @@
-import { createContext, PropsWithChildren, useContext } from 'react'
-import { proxy, useSnapshot } from 'valtio'
+import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { useLatest } from 'react-use'
+import { proxy, snapshot, useSnapshot } from 'valtio'
 
-import { useConstant } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   STORAGE_SORT_BY,
@@ -12,7 +12,11 @@ import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-setti
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 
-type Folder = { id: string; name: string }
+const DEFAULT_PREFERENCES = {
+  view: STORAGE_VIEWS.COLUMNS,
+  sortBy: STORAGE_SORT_BY.NAME,
+  sortByOrder: STORAGE_SORT_BY_ORDER.ASC,
+}
 
 function createStorageExplorerState({
   projectRef,
@@ -23,14 +27,19 @@ function createStorageExplorerState({
   resumableUploadUrl: string
   serviceKey: string
 }) {
+  const localStorageKey = LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef)
+  const { view, sortBy, sortByOrder } =
+    (typeof window !== 'undefined' && tryParseJson(localStorage?.getItem(localStorageKey))) ||
+    DEFAULT_PREFERENCES
+
   const state = proxy({
     projectRef,
     resumableUploadUrl,
     serviceKey,
 
-    view: STORAGE_VIEWS.COLUMNS,
-    sortBy: STORAGE_SORT_BY.NAME,
-    sortByOrder: STORAGE_SORT_BY_ORDER.ASC,
+    view,
+    sortBy,
+    sortByOrder,
     isSearching: false,
 
     setView: (value: STORAGE_VIEWS) => {
@@ -46,21 +55,6 @@ function createStorageExplorerState({
       state.updateExplorerPreference()
     },
     setIsSearching: (value: boolean) => (state.isSearching = value),
-
-    initExplorerPreference: () => {
-      const localStorageKey = LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef)
-      const preferences = localStorage?.getItem(localStorageKey) ?? undefined
-      const preferenceJson = tryParseJson(preferences)
-
-      // [Joshen] Load into valtio store if any, otherwise save into local storage to initialize with default values
-      if (preferenceJson !== undefined) {
-        state.view = preferenceJson.view
-        state.sortBy = preferenceJson.sortBy
-        state.sortByOrder = preferenceJson.sortByOrder
-      } else {
-        state.updateExplorerPreference()
-      }
-    },
 
     updateExplorerPreference: () => {
       const localStorageKey = LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef)
@@ -81,19 +75,40 @@ const StorageExplorerStateContext = createContext<StorageExplorerState>(
 export const StorageExplorerStateContextProvider = ({ children }: PropsWithChildren) => {
   const { project } = useProjectContext()
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
+
   const endpoint = settings?.app_config?.endpoint
   const { serviceKey } = getAPIKeys(settings)
   const protocol = settings?.app_config?.protocol ?? 'https'
-
   const resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}/storage/v1/upload/resumable`
 
-  const state = useConstant(() =>
+  const [state, setState] = useState(() =>
     createStorageExplorerState({
       projectRef: project?.ref ?? '',
       resumableUploadUrl: !!settings ? resumableUploadUrl : '',
       serviceKey: serviceKey?.api_key ?? '',
     })
   )
+
+  const stateRef = useLatest(state)
+
+  useEffect(() => {
+    const snap = snapshot(stateRef.current)
+    const hasDataReady = !!project?.ref && !!settings
+    const isDifferentProject =
+      snap.projectRef !== project?.ref ||
+      snap.serviceKey !== serviceKey?.api_key ||
+      snap.resumableUploadUrl !== resumableUploadUrl
+
+    if (hasDataReady && isDifferentProject) {
+      setState(
+        createStorageExplorerState({
+          projectRef: project?.ref ?? '',
+          resumableUploadUrl: !!settings ? resumableUploadUrl : '',
+          serviceKey: serviceKey?.api_key ?? '',
+        })
+      )
+    }
+  }, [project?.ref, resumableUploadUrl, serviceKey?.api_key, settings, stateRef])
 
   return (
     <StorageExplorerStateContext.Provider value={state}>

@@ -21,6 +21,7 @@ import {
   STORAGE_ROW_TYPES,
   STORAGE_SORT_BY,
   STORAGE_SORT_BY_ORDER,
+  STORAGE_VIEWS,
 } from 'components/to-be-cleaned/Storage/Storage.constants'
 import {
   StorageColumn,
@@ -41,7 +42,8 @@ import { downloadBucketObject } from 'data/storage/bucket-object-download-mutati
 import { StorageObject, listBucketObjects } from 'data/storage/bucket-objects-list-mutation'
 import { Bucket } from 'data/storage/buckets-query'
 import { moveStorageObject } from 'data/storage/object-move-mutation'
-import { IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { tryParseJson } from 'lib/helpers'
 import { lookupMime } from 'lib/mime'
 import Link from 'next/link'
 import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
@@ -157,7 +159,7 @@ class StorageExplorerStore {
   }
 
   private getLocalStorageKey = () => {
-    return `supabase-storage-${this.projectRef}`
+    return LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(this.projectRef)
   }
 
   private getLatestColumnIndex = () => {
@@ -1710,12 +1712,28 @@ class StorageExplorerStore {
 
   private updateExplorerPreferences = () => {
     const localStorageKey = this.getLocalStorageKey()
-    const preferences = {
-      sortBy: this.sortBy,
-      sortByOrder: this.sortByOrder,
+    const existingPreferences = tryParseJson(localStorage?.getItem(localStorageKey))
+
+    if (this.projectRef) {
+      localStorage.setItem(
+        localStorageKey,
+        JSON.stringify({
+          sortBy: this.sortBy,
+          sortByOrder: this.sortByOrder,
+          view: existingPreferences?.view ?? STORAGE_VIEWS.COLUMNS,
+        })
+      )
     }
-    localStorage.setItem(localStorageKey, JSON.stringify(preferences))
-    return preferences
+  }
+
+  loadExplorerPreferences = () => {
+    const localStorageKey = this.getLocalStorageKey()
+    const preferences = localStorage?.getItem(localStorageKey) ?? undefined
+    if (preferences !== undefined) {
+      const { sortBy, sortByOrder } = JSON.parse(preferences)
+      this.sortBy = sortBy
+      this.sortByOrder = sortByOrder
+    }
   }
 
   selectRangeItems = (columnIndex: number, toItemIndex: number) => {
