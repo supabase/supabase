@@ -1,45 +1,97 @@
+import { Loader2 } from 'lucide-react'
+import { useState } from 'react'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
+  Button,
+  cn,
+  CodeBlock,
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-  WarningIcon,
-  cn,
-  CodeBlock,
   Separator,
+  WarningIcon,
 } from 'ui'
+import { IndexImprovementText } from './IndexImprovementText'
 import { QueryPanelScoreSection } from './QueryPanel'
+import { useIndexInvalidation } from './hooks/useIndexInvalidation'
+import { createIndexes } from './index-advisor.utils'
+import { IndexSuggestionIconProps } from './query-performance.types'
 
-interface IndexSuggestionIconProps {
-  indexAdvisorResult: {
-    has_suggestion: boolean
-    startup_cost_before: number
-    startup_cost_after: number
-    total_cost_before: number
-    total_cost_after: number
-    index_statements: string[]
-  }
-  query: string
-}
+export const IndexSuggestionIcon = ({
+  indexAdvisorResult,
+  onClickIcon,
+}: IndexSuggestionIconProps) => {
+  const { project } = useProjectContext()
+  const [isCreatingIndex, setIsCreatingIndex] = useState(false)
+  const [isHoverCardOpen, setIsHoverCardOpen] = useState(false)
+  const invalidateQueries = useIndexInvalidation()
 
-export const IndexSuggestionIcon = ({ indexAdvisorResult, query }: IndexSuggestionIconProps) => {
   if (!indexAdvisorResult?.has_suggestion) return null
 
-  const totalImprovement =
-    ((indexAdvisorResult.total_cost_before - indexAdvisorResult.total_cost_after) /
-      indexAdvisorResult.total_cost_before) *
-    100
+  /**
+   * Handles the creation of indexes based on the advisor's recommendations
+   * @param e - The mouse event to prevent propagation
+   */
+  const handleCreateIndex = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+
+    setIsCreatingIndex(true)
+
+    try {
+      await createIndexes({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        indexStatements: indexAdvisorResult.index_statements,
+        onSuccess: () => {
+          // Handle UI-specific logic
+          if (onClickIcon) {
+            onClickIcon()
+            setIsHoverCardOpen(false)
+          }
+        },
+      })
+
+      // Only invalidate queries if index creation was successful
+      invalidateQueries()
+    } catch (error) {
+      // Error is already handled by createIndexes with a toast notification
+      // But we could add component-specific error handling here if needed
+      console.error('Failed to create index:', error)
+      setIsCreatingIndex(false)
+    } finally {
+      // Reset the loading state after a short delay to show feedback
+      setTimeout(() => setIsCreatingIndex(false), 1000)
+    }
+  }
 
   return (
-    <HoverCard>
+    <HoverCard open={isHoverCardOpen} onOpenChange={setIsHoverCardOpen}>
       <HoverCardTrigger>
-        <WarningIcon />
+        <div
+          onClick={(e) => {
+            if (onClickIcon && !isCreatingIndex) {
+              e.stopPropagation()
+              onClickIcon()
+            }
+          }}
+          className="cursor-pointer"
+        >
+          {isCreatingIndex ? (
+            <Loader2 size={16} className="animate-spin text-foreground-light" />
+          ) : (
+            <WarningIcon />
+          )}
+        </div>
       </HoverCardTrigger>
       <HoverCardContent className="w-[520px] p-0 overflow-hidden" align="start" alignOffset={-32}>
         <div className="px-4 py-3 bg-surface-75">
-          <p className="text-sm">
-            Creating the following index can improve this query's performance by{' '}
-            <span className="text-brand">{totalImprovement.toFixed(2)}%</span>:
-          </p>
+          <IndexImprovementText
+            indexStatements={indexAdvisorResult.index_statements}
+            totalCostBefore={indexAdvisorResult.total_cost_before}
+            totalCostAfter={indexAdvisorResult.total_cost_after}
+            className="text-sm"
+          />
         </div>
         <Separator />
         <div>
@@ -70,6 +122,22 @@ export const IndexSuggestionIcon = ({ indexAdvisorResult, query }: IndexSuggesti
           before={indexAdvisorResult.startup_cost_before}
           after={indexAdvisorResult.startup_cost_after}
         />
+        <div className="p-3 flex gap-2 items-center border-t justify-end">
+          <Button
+            type="text"
+            onClick={(e) => {
+              e.stopPropagation()
+              if (onClickIcon && !isCreatingIndex) onClickIcon()
+              setIsHoverCardOpen(false)
+            }}
+            disabled={isCreatingIndex}
+          >
+            View details
+          </Button>
+          <Button onClick={handleCreateIndex} loading={isCreatingIndex} disabled={isCreatingIndex}>
+            Create index
+          </Button>
+        </div>
       </HoverCardContent>
     </HoverCard>
   )

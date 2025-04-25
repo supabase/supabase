@@ -1,11 +1,11 @@
-import { AlertTriangle, ArrowDown, ArrowUp, TextSearch, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, TextSearch, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
+import { hasIndexRecommendations } from 'lib/database/index-advisor-utils'
 import {
   Button,
   ResizableHandle,
@@ -15,16 +15,13 @@ import {
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
   Tabs_Shadcn_,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
   cn,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { QueryPerformanceSort } from '../Reports/Reports.queries'
+import { IndexSuggestionIcon } from './IndexSuggestionIcon'
 import { QueryDetail } from './QueryDetail'
 import { QueryIndexes } from './QueryIndexes'
-import { IndexSuggestionIcon } from './IndexSuggestionIcon'
 import {
   QUERY_PERFORMANCE_REPORTS,
   QUERY_PERFORMANCE_REPORT_TYPES,
@@ -39,7 +36,6 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
   const gridRef = useRef<DataGridHandle>(null)
   const { preset, sort: urlSort, order, roles, search } = useParams()
   const { isLoading, data } = queryPerformanceQuery
-  const { project } = useProjectContext()
 
   const defaultSortValue = router.query.sort
     ? ({ column: router.query.sort, order: router.query.order } as QueryPerformanceSort)
@@ -79,10 +75,14 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         if (col.id === 'query') {
           return (
             <div className="w-full flex items-center gap-x-2">
-              {props.row.index_advisor_result?.has_suggestion && (
+              {hasIndexRecommendations(props.row.index_advisor_result, true) && (
                 <IndexSuggestionIcon
                   indexAdvisorResult={props.row.index_advisor_result}
-                  query={props.row.query}
+                  onClickIcon={() => {
+                    setSelectedRow(props.rowIdx)
+                    setView('suggestion')
+                    gridRef.current?.scrollToCell({ idx: 0, rowIdx: props.rowIdx })
+                  }}
                 />
               )}
               <div className="font-mono text-xs">{value}</div>
@@ -115,7 +115,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
     (query.startsWith('select') ||
       query.startsWith('with pgrst_source') ||
       query.startsWith('with pgrst_payload')) &&
-    reportData[selectedRow!]?.index_advisor_result?.has_suggestion
+    hasIndexRecommendations(reportData[selectedRow!]?.index_advisor_result, true)
 
   const onSortChange = (column: string) => {
     let updatedSort = undefined
