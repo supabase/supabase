@@ -1,7 +1,8 @@
 import { useCallback, useMemo } from 'react'
 
 import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
-import { useSafeTableEditorSnapshot } from './useSafeTableEditorSnapshot'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+
 import { SELECT_COLUMN_KEY } from 'components/grid/constants'
 
 // Remove dependency on useSaveTableEditorState
@@ -15,7 +16,7 @@ import { SELECT_COLUMN_KEY } from 'components/grid/constants'
  */
 export function useTableColumnOrder() {
   const { columnOrder, setParams } = useTableEditorFiltersSort()
-  const snap = useSafeTableEditorSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
 
   // Read current order directly from Valtio State
   const columnOrderMemo = useMemo(() => {

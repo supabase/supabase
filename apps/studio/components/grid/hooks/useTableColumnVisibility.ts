@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 
 import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
-import { useSafeTableEditorSnapshot } from './useSafeTableEditorSnapshot'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 
 /**
  * Provides state and actions for managing table column visibility.
@@ -12,7 +12,7 @@ import { useSafeTableEditorSnapshot } from './useSafeTableEditorSnapshot'
  */
 export function useTableColumnVisibility() {
   const { setParams } = useTableEditorFiltersSort() // Only need setParams
-  const snap = useSafeTableEditorSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
 
   // Derive hidden columns Set directly from Valtio state
   const hiddenColumnsSet = useMemo(() => {
