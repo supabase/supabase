@@ -40,6 +40,9 @@ describe('_handleRevalidateRequest', () => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://localhost:3000'
     process.env.SUPABASE_SECRET_KEY = 'secret_key'
 
+    // Silence intentional console errors for cleaner test output
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+
     // Mock current date
     mockDate = new Date('2023-01-01T12:00:00Z')
     vi.setSystemTime(mockDate)
@@ -109,7 +112,7 @@ describe('_handleRevalidateRequest', () => {
       headers: {
         Authorization: 'Bearer basic_key',
       },
-      body: JSON.stringify({ tags: ['tag1', 'tag2'] }),
+      body: JSON.stringify({ tags: ['graphql', 'wrappers'] }),
     })
 
     vi.mocked(headers).mockReturnValue(new Headers(request.headers))
@@ -119,8 +122,8 @@ describe('_handleRevalidateRequest', () => {
     const response = await _handleRevalidateRequest(request)
     expect(response.status).toBe(204)
     expect(revalidateTag).toHaveBeenCalledTimes(2)
-    expect(revalidateTag).toHaveBeenCalledWith('tag1')
-    expect(revalidateTag).toHaveBeenCalledWith('tag2')
+    expect(revalidateTag).toHaveBeenCalledWith('graphql')
+    expect(revalidateTag).toHaveBeenCalledWith('wrappers')
   })
 
   it('should return 429 if last revalidation was less than 6 hours ago with basic permissions', async () => {
@@ -129,7 +132,7 @@ describe('_handleRevalidateRequest', () => {
       headers: {
         Authorization: 'Bearer basic_key',
       },
-      body: JSON.stringify({ tags: ['tag1'] }),
+      body: JSON.stringify({ tags: ['graphql'] }),
     })
 
     vi.mocked(headers).mockReturnValue(new Headers(request.headers))
@@ -150,7 +153,7 @@ describe('_handleRevalidateRequest', () => {
       headers: {
         Authorization: 'Bearer basic_key',
       },
-      body: JSON.stringify({ tags: ['tag1'] }),
+      body: JSON.stringify({ tags: ['graphql'] }),
     })
 
     vi.mocked(headers).mockReturnValue(new Headers(request.headers))
@@ -162,7 +165,7 @@ describe('_handleRevalidateRequest', () => {
 
     const response = await _handleRevalidateRequest(request)
     expect(response.status).toBe(204)
-    expect(revalidateTag).toHaveBeenCalledWith('tag1')
+    expect(revalidateTag).toHaveBeenCalledWith('graphql')
   })
 
   it('should revalidate regardless of last revalidation time with override permissions', async () => {
@@ -171,7 +174,7 @@ describe('_handleRevalidateRequest', () => {
       headers: {
         Authorization: 'Bearer override_key',
       },
-      body: JSON.stringify({ tags: ['tag1'] }),
+      body: JSON.stringify({ tags: ['graphql'] }),
     })
 
     vi.mocked(headers).mockReturnValue(new Headers(request.headers))
@@ -183,6 +186,6 @@ describe('_handleRevalidateRequest', () => {
 
     const response = await _handleRevalidateRequest(request)
     expect(response.status).toBe(204)
-    expect(revalidateTag).toHaveBeenCalledWith('tag1')
+    expect(revalidateTag).toHaveBeenCalledWith('graphql')
   })
 })
