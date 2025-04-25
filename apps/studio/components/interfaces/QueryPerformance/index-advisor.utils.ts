@@ -2,7 +2,7 @@ import { toast } from 'sonner'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { databaseKeys } from 'data/database/keys'
 import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
-import { IndexAdvisorConfig, IndexAdvisorResult } from './query-performance.types'
+import { IndexAdvisorResult } from './query-performance.types'
 
 /**
  * Returns the query keys that need to be invalidated after index operations
