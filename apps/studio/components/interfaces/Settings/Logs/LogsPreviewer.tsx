@@ -18,7 +18,13 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Button } from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 import LogTable from './LogTable'
-import { LOGS_TABLES, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
+import { DatePickerValue } from './Logs.DatePickers'
+import {
+  LOGS_TABLES,
+  LOG_ROUTES_WITH_REPLICA_SUPPORT,
+  LogsTableName,
+  PREVIEWER_DATEPICKER_HELPERS,
+} from './Logs.constants'
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
 import { maybeShowUpgradePrompt } from './Logs.utils'
 import UpgradePrompt from './UpgradePrompt'
@@ -54,16 +60,41 @@ export const LogsPreviewer = ({
 }: PropsWithChildren<LogsPreviewerProps>) => {
   const router = useRouter()
   const { db } = useParams()
-  const [showChart, setShowChart] = useState(true)
-
   const organization = useSelectedOrganization()
   const state = useDatabaseSelectorStateSnapshot()
+
+  const [showChart, setShowChart] = useState(true)
+  const [selectedDatePickerValue, setSelectedDatePickerValue] = useState<DatePickerValue>(
+    getDefaultDatePickerValue()
+  )
+
   const { search, setSearch, timestampStart, timestampEnd, setTimeRange, filters, setFilters } =
     useLogsUrlState()
-
   const [selectedLogId, setSelectedLogId] = useSelectedLog()
-
   const { data: databases, isSuccess } = useReadReplicasQuery({ projectRef })
+
+  // TODO: Move this to useLogsUrlState to simplify LogsPreviewer. - Jordi
+  function getDefaultDatePickerValue() {
+    const iso_timestamp_start = router.query.iso_timestamp_start as string
+    const iso_timestamp_end = router.query.iso_timestamp_end as string
+
+    if (iso_timestamp_start && iso_timestamp_end) {
+      return {
+        to: iso_timestamp_end,
+        from: iso_timestamp_start,
+        text: `${dayjs(iso_timestamp_start).format('DD MMM, HH:mm')} - ${dayjs(iso_timestamp_end).format('DD MMM, HH:mm')}`,
+        isHelper: false,
+      }
+    }
+
+    const defaultDatePickerValue = PREVIEWER_DATEPICKER_HELPERS.find((x) => x.default)
+    return {
+      to: defaultDatePickerValue!.calcTo(),
+      from: defaultDatePickerValue!.calcFrom(),
+      text: defaultDatePickerValue!.text,
+      isHelper: true,
+    }
+  }
 
   const table = !tableName ? LOGS_TABLES[queryType] : tableName
 
@@ -96,13 +127,18 @@ export const LogsPreviewer = ({
     setFilters({ ...filters, search_query: template.searchString })
   }
 
-  // [Joshen 180425] This logic here all seems unnecessary IMO? handleRefresh just should call refresh?
+  // [Joshen] For helper date picker values, reset the timestamp start to prevent data caching
+  // Since the helpers are "Last n minutes" -> hitting refresh, you'd expect to see the latest result
+  // Whereas if a specific range is selected, you'd not expect new data to show up
   const handleRefresh = () => {
-    if (timestampStart) {
-      const newTimestampStart = dayjs(timestampStart).toISOString()
-      setTimeRange(newTimestampStart, timestampEnd)
-    } else {
-      setTimeRange('', '')
+    if (selectedDatePickerValue.isHelper) {
+      const helper = PREVIEWER_DATEPICKER_HELPERS.find(
+        (x) => x.text === selectedDatePickerValue.text
+      )
+      if (helper) {
+        const newTimestampStart = helper.calcFrom()
+        setTimeRange(newTimestampStart, timestampEnd)
+      }
     }
     refresh()
   }
@@ -180,6 +216,8 @@ export const LogsPreviewer = ({
             query: id !== projectRef ? { ...router.query, db: id } : params,
           })
         }}
+        selectedDatePickerValue={selectedDatePickerValue}
+        setSelectedDatePickerValue={setSelectedDatePickerValue}
       />
       {children}
       <div

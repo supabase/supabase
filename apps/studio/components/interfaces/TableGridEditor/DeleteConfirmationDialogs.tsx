@@ -1,38 +1,34 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 
-import {
-  formatFilterURLParams,
-  saveTableEditorStateToLocalStorageDebounced,
-} from 'components/grid/SupabaseGrid.utils'
+import { useParams } from 'common'
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import type { SupaRow } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseColumnDeleteMutation } from 'data/database-columns/database-column-delete-mutation'
-import { Entity } from 'data/table-editor/table-editor-types'
+import { TableLike } from 'data/table-editor/table-editor-types'
 import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
 import { useTableDeleteMutation } from 'data/tables/table-delete-mutation'
 import { TablesData, useGetTables } from 'data/tables/tables-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { noop } from 'lib/void'
+import { useRouter } from 'next/router'
+import { useCallback } from 'react'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Checkbox } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 
 export type DeleteConfirmationDialogsProps = {
-  selectedTable?: Entity | PostgresTable
-  onAfterDeleteTable?: (tables: TablesData) => void
+  selectedTable?: TableLike
 }
 
-const DeleteConfirmationDialogs = ({
-  selectedTable,
-  onAfterDeleteTable = noop,
-}: DeleteConfirmationDialogsProps) => {
+const DeleteConfirmationDialogs = ({ selectedTable }: DeleteConfirmationDialogsProps) => {
+  const { ref: projectRef } = useParams()
+  const router = useRouter()
+
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
@@ -190,13 +186,13 @@ const DeleteConfirmationDialogs = ({
         truncateRows({
           projectRef: project.ref,
           connectionString: project.connectionString,
-          table: selectedTable as any,
+          table: selectedTable,
         })
       } else {
         deleteAllRows({
           projectRef: project.ref,
           connectionString: project.connectionString,
-          table: selectedTable as any,
+          table: selectedTable,
           filters,
           roleImpersonationState: getImpersonatedRoleState(),
         })
@@ -205,12 +201,24 @@ const DeleteConfirmationDialogs = ({
       deleteRows({
         projectRef: project.ref,
         connectionString: project.connectionString,
-        table: selectedTable as any,
+        table: selectedTable,
         rows: selectedRowsToDelete as SupaRow[],
         roleImpersonationState: getImpersonatedRoleState(),
       })
     }
   }
+
+  const onAfterDeleteTable = useCallback(
+    (tables: TablesData) => {
+      // For simplicity for now, we just open the first table within the same schema
+      if (tables.length > 0) {
+        router.push(`/project/${projectRef}/editor/${tables[0].id}`)
+      } else {
+        router.push(`/project/${projectRef}/editor`)
+      }
+    },
+    [router, projectRef]
+  )
 
   return (
     <>

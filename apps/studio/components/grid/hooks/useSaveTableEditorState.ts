@@ -1,16 +1,15 @@
-import { useCallback } from 'react'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { saveTableEditorStateToLocalStorage } from 'components/grid/SupabaseGrid.utils'
-import { useSafeTableEditorSnapshot } from './useSafeTableEditorSnapshot' // Import safe wrapper
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useCallback } from 'react'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 
 /**
  * Hook for saving state and triggering side effects.
- * Relies on useSafeTableEditorSnapshot to provide a stable snapshot object.
  */
 export function useSaveTableEditorState() {
   const { project } = useProjectContext()
   // Use the safe snapshot hook - it returns a guaranteed object (real or default)
-  const snap = useSafeTableEditorSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
 
   const saveDataAndTriggerSideEffects = useCallback(
     (dataToSave: { filters?: string[]; sorts?: string[] }) => {

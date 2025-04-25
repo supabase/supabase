@@ -77,11 +77,7 @@ The connection string looks like this:
 postgresql://postgres:[YOUR-PASSWORD]@db.apbkobhfnmcqqzqeeqss.supabase.co:5432/postgres
 ```
 
-Get your project's direct string from the [Database Settings](/dashboard/project/_/settings/database) page:
-
-1. Go to the `Settings` section.
-2. Click `Database`.
-3. Under `Connection string`, make sure `Display connection pooler` is unchecked. Copy the URI.
+Get your project's direct connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
 ## Shared pooler
 
@@ -97,11 +93,7 @@ The connection string looks like this:
 postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
 ```
 
-Get your project's session mode string from the [Database Settings](/dashboard/project/_/settings/database) page:
-
-1. Go to the `Settings` section.
-2. Click `Database`.
-3. Under `Connection string`, make sure `Display connection pooler` is checked and `Session mode` is selected. Copy the URI.
+Get your project's Session pooler connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
 ### Supavisor transaction mode
 
@@ -119,17 +111,15 @@ The connection string looks like this:
 postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
 ```
 
-Get your project's transaction mode string from the [Database Settings](/dashboard/project/_/settings/database) page:
-
-1. Go to the `Settings` section.
-2. Click `Database`.
-3. Under `Connection string`, make sure `Display connection pooler` is checked and `Transaction mode` is selected. Copy the URI.
+Get your project's Transaction pooler connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
 ## Dedicated pooler
 
 For paying customers, we provision a Dedicated Pooler ([PgBouncer](https://www.pgbouncer.org/)) that's co-located with your Postgres database. This will require you to connect with IPv6 or, if that's not an option, you can use the [IPv4 add-on](/docs/guides/platform/ipv4-address).
 
 The Dedicated Pooler ensures best performance and latency, while using up more of your project's compute resources. If your network supports IPv6 or you have the IPv4 add-on, we encourage you to use the Dedicated Pooler over the Shared Pooler.
+
+Get your project's Dedicated pooler connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
 <Admonition type="note">
 
