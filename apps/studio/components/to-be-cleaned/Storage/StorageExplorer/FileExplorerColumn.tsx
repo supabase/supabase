@@ -55,7 +55,6 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) =>
 
 export interface FileExplorerColumnProps {
   index: number
-  view: STORAGE_VIEWS
   column: StorageColumn
   fullWidth?: boolean
   openedFolders?: StorageItem[]
@@ -69,7 +68,6 @@ export interface FileExplorerColumnProps {
 
 const FileExplorerColumn = ({
   index = 0,
-  view = STORAGE_VIEWS.COLUMNS,
   column,
   fullWidth = false,
   openedFolders = [],
@@ -147,7 +145,7 @@ const FileExplorerColumn = ({
         ref={fileExplorerColumnRef}
         className={`
         ${fullWidth ? 'w-full' : 'w-64 border-r border-overlay'}
-        ${view === STORAGE_VIEWS.COLUMNS ? '' : ''}
+        ${snap.view === STORAGE_VIEWS.COLUMNS ? '' : ''}
         hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto
       `}
         onContextMenu={displayMenu}
@@ -160,7 +158,7 @@ const FileExplorerColumn = ({
         }}
       >
         {/* Checkbox selection for select all */}
-        {view === STORAGE_VIEWS.COLUMNS && (
+        {snap.view === STORAGE_VIEWS.COLUMNS && (
           <div
             className={`sticky top-0 z-10 mb-0 flex items-center bg-table-header-light px-2.5 [[data-theme*=dark]_&]:bg-table-header-dark ${
               haveSelectedItems ? 'h-10 py-3 opacity-100' : 'h-0 py-0 opacity-0'
@@ -181,7 +179,7 @@ const FileExplorerColumn = ({
         )}
 
         {/* List Interface Header */}
-        {view === STORAGE_VIEWS.LIST && (
+        {snap.view === STORAGE_VIEWS.LIST && (
           <div
             className="
           sticky top-0
@@ -218,7 +216,7 @@ const FileExplorerColumn = ({
         <InfiniteList
           items={columnItems}
           itemProps={{
-            view,
+            view: snap.view,
             columnIndex: index,
             selectedItems,
             openedFolders,
@@ -268,7 +266,7 @@ const FileExplorerColumn = ({
         />
       </div>
       {/* List interface footer */}
-      {view === STORAGE_VIEWS.LIST && (
+      {snap.view === STORAGE_VIEWS.LIST && (
         <div
           className="
           absolute bottom-0 rounded-b-md mt-auto

@@ -21,7 +21,6 @@ import {
   STORAGE_ROW_TYPES,
   STORAGE_SORT_BY,
   STORAGE_SORT_BY_ORDER,
-  STORAGE_VIEWS,
 } from 'components/to-be-cleaned/Storage/Storage.constants'
 import {
   StorageColumn,
@@ -72,7 +71,6 @@ const STORAGE_PROGRESS_INFO_TEXT = "Do not close the browser until it's complete
 
 class StorageExplorerStore {
   projectRef: string = ''
-  view: STORAGE_VIEWS = STORAGE_VIEWS.COLUMNS
   sortBy: STORAGE_SORT_BY = STORAGE_SORT_BY.NAME
   sortByOrder: STORAGE_SORT_BY_ORDER = STORAGE_SORT_BY_ORDER.ASC
   // selectedBucket will get initialized with a bucket before using
@@ -188,12 +186,6 @@ class StorageExplorerStore {
     this.clearOpenedFolders()
     this.closeFilePreview()
     this.clearSelectedItems()
-  }
-
-  setView = (view: STORAGE_VIEWS) => {
-    this.view = view
-    this.closeFilePreview()
-    this.updateExplorerPreferences()
   }
 
   setSortBy = async (sortBy: STORAGE_SORT_BY) => {
@@ -1759,28 +1751,11 @@ class StorageExplorerStore {
   private updateExplorerPreferences = () => {
     const localStorageKey = this.getLocalStorageKey()
     const preferences = {
-      view: this.view,
       sortBy: this.sortBy,
       sortByOrder: this.sortByOrder,
     }
     localStorage.setItem(localStorageKey, JSON.stringify(preferences))
     return preferences
-  }
-
-  loadExplorerPreferences = () => {
-    const localStorageKey = this.getLocalStorageKey()
-    const preferences = localStorage?.getItem(localStorageKey) ?? undefined
-    if (preferences !== undefined) {
-      const { view, sortBy, sortByOrder } = JSON.parse(preferences)
-      this.view = view
-      this.sortBy = sortBy
-      this.sortByOrder = sortByOrder
-    } else {
-      const { view, sortBy, sortByOrder } = this.updateExplorerPreferences()
-      this.view = view
-      this.sortBy = sortBy
-      this.sortByOrder = sortByOrder
-    }
   }
 
   selectRangeItems = (columnIndex: number, toItemIndex: number) => {
