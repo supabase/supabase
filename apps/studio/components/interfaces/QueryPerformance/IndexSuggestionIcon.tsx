@@ -27,7 +27,7 @@ export const IndexSuggestionIcon = ({
   const [isHoverCardOpen, setIsHoverCardOpen] = useState(false)
   const invalidateQueries = useIndexInvalidation()
 
-  if (!indexAdvisorResult?.has_suggestion) return null
+  if (!indexAdvisorResult?.index_statements?.length) return null
 
   /**
    * Handles the creation of indexes based on the advisor's recommendations
@@ -97,7 +97,7 @@ export const IndexSuggestionIcon = ({
         <div>
           <CodeBlock
             hideLineNumbers
-            value={indexAdvisorResult.index_statements[0]}
+            value={indexAdvisorResult.index_statements.join(';\n') + ';'}
             language="sql"
             className={cn(
               'border-none rounded-none',
