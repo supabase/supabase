@@ -189,6 +189,7 @@ allow_list = [
     "Logflare",
     "Lua",
     "Mailgun",
+	"Mailpit",
     "Mailtrap",
     "Mansueli",
     "Metabase",
