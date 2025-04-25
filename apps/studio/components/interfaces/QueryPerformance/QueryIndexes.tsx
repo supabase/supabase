@@ -13,7 +13,7 @@ import {
   hasIndexRecommendations,
   isQueryEligibleForIndexAdvisor,
 } from './index-advisor.utils'
-import { useIsIndexAdvisorAvailable } from 'hooks/misc/useIsIndexAdvisorAvailable'
+import { useIsIndexAdvisorAvailable } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorAvailable'
 import {
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
