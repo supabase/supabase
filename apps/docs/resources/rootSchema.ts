@@ -1,4 +1,10 @@
-import { GraphQLObjectType, GraphQLSchema, GraphQLString, printSchema } from 'graphql'
+import {
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLSchema,
+  GraphQLString,
+  printSchema,
+} from 'graphql'
 
 const GRAPHQL_FIELD_INTROSPECT = 'schema'
 
@@ -10,7 +16,7 @@ async function resolveIntrospect() {
 const introspectRoot = {
   [GRAPHQL_FIELD_INTROSPECT]: {
     description: 'Get the GraphQL schema for this endpoint',
-    type: GraphQLString,
+    type: new GraphQLNonNull(GraphQLString),
     resolve: resolveIntrospect,
   },
 }

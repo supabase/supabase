@@ -7,6 +7,6 @@ exports[`/api/graphql schema snapshot > should match snapshot 1`] = `
 
 type RootQueryType {
   """Get the GraphQL schema for this endpoint"""
-  schema: String
+  schema: String!
 }"
 `;
