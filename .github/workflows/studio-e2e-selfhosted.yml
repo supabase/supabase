@@ -57,8 +57,28 @@ jobs:
         run: |
           npm install -g vercel@latest
           vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_TEAM_ID }}
+
           DEPLOYMENT_URL=$(vercel ls ${{ secrets.VERCEL_PROJECT_ID_SELFHOSTED }} --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_TEAM_ID }} --json | jq -r '.[0].url')
           echo "DEPLOYMENT_URL=https://$DEPLOYMENT_URL" >> $GITHUB_ENV
+
+          echo "Waiting for deployment to become available..."
+
+          # Poll the deployment URL every 20 seconds, for up to 12 minutes (36 attempts)
+          for i in {1..36}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://$DEPLOYMENT_URL)
+            if [ "$STATUS" = "200" ]; then
+              echo "Deployment is live."
+              break
+            else
+              echo "Deployment not ready yet (status: $STATUS). Retrying in 20s..."
+              sleep 20
+            fi
+          done
+
+          if [ "$STATUS" != "200" ]; then
+            echo "Timed out waiting for deployment." >&2
+            exit 1
+          fi
 
       - name: Set ENV Vars for Selfhosted Test
         run: |
