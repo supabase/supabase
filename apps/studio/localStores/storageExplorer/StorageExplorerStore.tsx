@@ -28,6 +28,7 @@ import {
   StorageItemMetadata,
   StorageItemWithColumn,
 } from 'components/to-be-cleaned/Storage/Storage.types'
+import { downloadFile } from 'components/to-be-cleaned/Storage/StorageExplorer/StorageExplorer.utils'
 import { convertFromBytes } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
 import { configKeys } from 'data/config/keys'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
@@ -313,6 +314,7 @@ class StorageExplorerStore {
   }
 
   setFilePreview = async (file: StorageItemWithColumn) => {
+    console.log('asdasd', file)
     this.selectedFilePreview = file
   }
 
@@ -1050,7 +1052,12 @@ class StorageExplorerStore {
     const promises = formattedFilesWithPrefix.map((file) => {
       return () => {
         return new Promise<{ name: string; blob: Blob } | boolean>(async (resolve) => {
-          const data = await this.downloadFile(file, showIndividualToast, returnBlob)
+          const data = await downloadFile({
+            projectRef: this.projectRef,
+            bucketId: this.selectedBucket.id,
+            file,
+            returnBlob,
+          })
           progress = progress + 1 / formattedFilesWithPrefix.length
           if (isObject(data)) {
             resolve({ ...data, name: file.formattedPathToFile })
@@ -1093,57 +1100,6 @@ class StorageExplorerStore {
       closeButton: true,
       duration: SONNER_DEFAULT_DURATION,
     })
-  }
-
-  downloadFile = async (file: StorageItemWithColumn, showToast = true, returnBlob = false) => {
-    const fileName: string = file.name
-    const fileMimeType = file?.metadata?.mimetype ?? undefined
-
-    const toastId = showToast ? toast.loading(`Retrieving ${fileName}...`) : undefined
-
-    const pathToFile = this.openedFolders
-      .slice(0, file.columnIndex)
-      .map((folder) => folder.name)
-      .join('/')
-    const formattedPathToFile = pathToFile.length > 0 ? `${pathToFile}/${fileName}` : fileName
-    try {
-      const data = await downloadBucketObject({
-        projectRef: this.projectRef,
-        bucketId: this.selectedBucket.id,
-        path: formattedPathToFile,
-      })
-
-      const blob = await data.blob()
-      const newBlob = new Blob([blob], { type: fileMimeType })
-
-      if (returnBlob) return { name: fileName, blob: newBlob }
-
-      const blobUrl = window.URL.createObjectURL(newBlob)
-      const link = document.createElement('a')
-      link.href = blobUrl
-      link.setAttribute('download', `${fileName}`)
-      document.body.appendChild(link)
-      link.click()
-      link.parentNode?.removeChild(link)
-      window.URL.revokeObjectURL(blob)
-      if (toastId) {
-        toast.success(`Downloading ${fileName}`, {
-          id: toastId,
-          closeButton: true,
-          duration: SONNER_DEFAULT_DURATION,
-        })
-      }
-      return true
-    } catch {
-      if (toastId) {
-        toast.error(`Failed to download ${fileName}`, {
-          id: toastId,
-          closeButton: true,
-          duration: SONNER_DEFAULT_DURATION,
-        })
-      }
-      return false
-    }
   }
 
   renameFile = async (file: StorageItem, newName: string, columnIndex: number) => {
@@ -1224,7 +1180,7 @@ class StorageExplorerStore {
 
       this.updateRowStatus(folderName, STORAGE_ROW_STATUS.READY, index)
 
-      const formattedItems = this.formatFolderItems(data)
+      const formattedItems = this.formatFolderItems(data, prefix)
       this.pushColumnAtIndex(
         {
           id: folderId || folderName,
@@ -1623,7 +1579,7 @@ class StorageExplorerStore {
     return name
   }
 
-  private formatFolderItems = (items: StorageObject[] = []): StorageItem[] => {
+  private formatFolderItems = (items: StorageObject[] = [], prefix?: string): StorageItem[] => {
     const formattedItems =
       (items ?? [])
         ?.filter((item) => item.name !== EMPTY_FOLDER_PLACEHOLDER_FILE_NAME)
@@ -1649,6 +1605,7 @@ class StorageExplorerStore {
             type,
             status,
             isCorrupted,
+            path: !!prefix ? `${prefix}/${item.name}` : item.name,
           }
           return itemObj
         }) ?? []
