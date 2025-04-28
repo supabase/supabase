@@ -796,6 +796,9 @@ importers:
       react-markdown:
         specifier: ^8.0.3
         version: 8.0.7(@types/react@18.3.3)(react@18.3.1)(supports-color@8.1.1)
+      react-resizable:
+        specifier: 3.0.5
+        version: 3.0.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-simple-maps:
         specifier: 4.0.0-beta.6
         version: 4.0.0-beta.6(prop-types@15.8.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1616,7 +1619,7 @@ importers:
     dependencies:
       '@mertasan/tailwindcss-variables':
         specifier: ^2.2.3
-        version: 2.7.0(autoprefixer@10.4.16(postcss@8.4.38))(postcss@8.4.38)
+        version: 2.7.0(autoprefixer@10.4.16(postcss@8.5.3))(postcss@8.5.3)
       '@radix-ui/colors':
         specifier: ^0.1.8
         version: 0.1.9
@@ -16598,11 +16601,11 @@ snapshots:
       '@types/react': 18.3.3
       react: 18.3.1
 
-  '@mertasan/tailwindcss-variables@2.7.0(autoprefixer@10.4.16(postcss@8.4.38))(postcss@8.4.38)':
+  '@mertasan/tailwindcss-variables@2.7.0(autoprefixer@10.4.16(postcss@8.5.3))(postcss@8.5.3)':
     dependencies:
-      autoprefixer: 10.4.16(postcss@8.4.38)
+      autoprefixer: 10.4.16(postcss@8.5.3)
       lodash: 4.17.21
-      postcss: 8.4.38
+      postcss: 8.5.3
 
   '@mjackson/node-fetch-server@0.2.0': {}
 
@@ -22895,7 +22898,7 @@ snapshots:
       debug: 4.4.0(supports-color@8.1.1)
       enhanced-resolve: 5.17.1
       eslint: 8.57.0(supports-color@8.1.1)
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-plugin-import@2.29.1)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1))(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.5.2))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)
       fast-glob: 3.3.2
       get-tsconfig: 4.7.2
@@ -22907,7 +22910,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-plugin-import@2.29.1)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1))(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1):
+  eslint-module-utils@2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1):
     dependencies:
       debug: 3.2.7(supports-color@8.1.1)
     optionalDependencies:
@@ -22934,7 +22937,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.0(supports-color@8.1.1)
       eslint-import-resolver-node: 0.3.9(supports-color@8.1.1)
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-plugin-import@2.29.1)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1))(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)
       hasown: 2.0.2
       is-core-module: 2.13.1
       is-glob: 4.0.3
