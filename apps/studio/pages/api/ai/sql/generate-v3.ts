@@ -1,6 +1,6 @@
 import { openai } from '@ai-sdk/openai'
 import pgMeta from '@supabase/pg-meta'
-import { streamText, tool, type Tool, type ToolExecutionOptions } from 'ai'
+import { streamText, tool, type Tool } from 'ai'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 import { createSupabaseMCPClient } from './supabase-mcp'

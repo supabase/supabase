@@ -13,9 +13,6 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { identifyQueryType } from './AIAssistant.utils'
 
-// Define the internal config type again, or import if defined globally
-type InternalChartConfig = ChartConfig & { view?: 'table' | 'chart'; type?: string }
-
 interface DisplayBlockRendererProps {
   messageId: string
   manualId: string
@@ -51,7 +48,7 @@ export const DisplayBlockRenderer: React.FC<DisplayBlockRendererProps> = ({
     subject: { id: profile?.id },
   })
 
-  const [chartConfig, setChartConfig] = useState<InternalChartConfig>(() => ({
+  const [chartConfig, setChartConfig] = useState<ChartConfig>(() => ({
     ...DEFAULT_CHART_CONFIG,
     view: initialArgs.view === 'chart' ? 'chart' : 'table',
     xKey: initialArgs.xAxis ?? '',
@@ -87,7 +84,7 @@ export const DisplayBlockRenderer: React.FC<DisplayBlockRendererProps> = ({
   const handleUpdateChartConfig = ({
     chartConfig: updatedValues,
   }: {
-    chartConfig: Partial<InternalChartConfig>
+    chartConfig: Partial<ChartConfig>
   }) => {
     setChartConfig((prev) => ({ ...prev, ...updatedValues }))
   }
