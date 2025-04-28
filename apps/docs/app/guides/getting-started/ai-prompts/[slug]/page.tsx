@@ -8,11 +8,9 @@ import {
 export const dynamicParams = false
 
 export default async function AiPromptsPage(props: { params: Promise<{ slug: string }> }) {
-  const params = await props.params;
+  const params = await props.params
 
-  const {
-    slug
-  } = params;
+  const { slug } = params
 
   let { heading, content } = await getAiPrompt(slug)
   content = `

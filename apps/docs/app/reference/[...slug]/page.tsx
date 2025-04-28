@@ -14,16 +14,10 @@ import {
 
 export const dynamicParams = false
 
-export default async function ReferencePage(
-  props: {
-    params: Promise<{ slug: Array<string> }>
-  }
-) {
-  const params = await props.params;
+export default async function ReferencePage(props: { params: Promise<{ slug: Array<string> }> }) {
+  const params = await props.params
 
-  const {
-    slug
-  } = params;
+  const { slug } = params
 
   if (!Object.keys(REFERENCES).includes(slug[0].replaceAll('-', '_'))) {
     notFound()

@@ -43,7 +43,7 @@ interface Params {
 }
 
 const TerraformDocs = async (props: { params: Promise<Params> }) => {
-  const params = await props.params;
+  const params = await props.params
   const { meta, ...data } = await getContent(params)
 
   const options = {

@@ -8,16 +8,12 @@ import { PROD_URL } from '~/lib/constants'
 // export const revalidate = 86_400
 export const dynamicParams = false
 
-export default async function TroubleshootingEntryPage(
-  props: {
-    params: Promise<{ slug: string }>
-  }
-) {
-  const params = await props.params;
+export default async function TroubleshootingEntryPage(props: {
+  params: Promise<{ slug: string }>
+}) {
+  const params = await props.params
 
-  const {
-    slug
-  } = params;
+  const { slug } = params
 
   const allTroubleshootingEntries = await getAllTroubleshootingEntries()
   const entry = allTroubleshootingEntries.find((entry) => getArticleSlug(entry) === slug)
@@ -30,11 +26,9 @@ export default async function TroubleshootingEntryPage(
 }
 
 export const generateMetadata = async (props: { params: Promise<{ slug: string }> }) => {
-  const params = await props.params;
+  const params = await props.params
 
-  const {
-    slug
-  } = params;
+  const { slug } = params
 
   const allTroubleshootingEntries = await getAllTroubleshootingEntries()
   const entry = allTroubleshootingEntries.find((entry) => getArticleSlug(entry) === slug)

@@ -141,7 +141,7 @@ interface Params {
 }
 
 const WrappersDocs = async (props: { params: Promise<Params> }) => {
-  const params = await props.params;
+  const params = await props.params
   const { isExternal, meta, ...data } = await getContent(params)
 
   const options = isExternal

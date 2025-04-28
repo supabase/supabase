@@ -109,7 +109,7 @@ interface Params {
 }
 
 const PGGraphQLDocs = async (props: { params: Promise<Params> }) => {
-  const params = await props.params;
+  const params = await props.params
   const { meta, ...data } = await getContent(params)
 
   const options = {
@@ -165,7 +165,7 @@ const urlTransform: UrlTransformFunction = (url) => {
 
     const getRelativePath = () => {
       if (pathname.endsWith('.md')) {
-        return pathname.replace(/\.md$/, '');
+        return pathname.replace(/\.md$/, '')
       }
       if (isAbsolute(url)) {
         return relative(externalSiteUrl.pathname, pathname)
