@@ -8,8 +8,7 @@ import {
   STORAGE_SORT_BY_ORDER,
   STORAGE_VIEWS,
 } from 'components/to-be-cleaned/Storage/Storage.constants'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 
 const DEFAULT_PREFERENCES = {
@@ -18,15 +17,7 @@ const DEFAULT_PREFERENCES = {
   sortByOrder: STORAGE_SORT_BY_ORDER.ASC,
 }
 
-function createStorageExplorerState({
-  projectRef,
-  resumableUploadUrl,
-  serviceKey,
-}: {
-  projectRef: string
-  resumableUploadUrl: string
-  serviceKey: string
-}) {
+function createStorageExplorerState({ projectRef }: { projectRef: string }) {
   const localStorageKey = LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef)
   const { view, sortBy, sortByOrder } =
     (typeof window !== 'undefined' && tryParseJson(localStorage?.getItem(localStorageKey))) ||
@@ -34,8 +25,6 @@ function createStorageExplorerState({
 
   const state = proxy({
     projectRef,
-    resumableUploadUrl,
-    serviceKey,
 
     view,
     sortBy,
@@ -69,46 +58,31 @@ function createStorageExplorerState({
 type StorageExplorerState = ReturnType<typeof createStorageExplorerState>
 
 const StorageExplorerStateContext = createContext<StorageExplorerState>(
-  createStorageExplorerState({ projectRef: '', resumableUploadUrl: '', serviceKey: '' })
+  createStorageExplorerState({ projectRef: '' })
 )
 
 export const StorageExplorerStateContextProvider = ({ children }: PropsWithChildren) => {
   const { project } = useProjectContext()
-  const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
-
-  const endpoint = settings?.app_config?.endpoint
-  const { serviceKey } = getAPIKeys(settings)
-  const protocol = settings?.app_config?.protocol ?? 'https'
-  const resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}/storage/v1/upload/resumable`
-
   const [state, setState] = useState(() =>
-    createStorageExplorerState({
-      projectRef: project?.ref ?? '',
-      resumableUploadUrl: !!settings ? resumableUploadUrl : '',
-      serviceKey: serviceKey?.api_key ?? '',
-    })
+    createStorageExplorerState({ projectRef: project?.ref ?? '' })
   )
 
   const stateRef = useLatest(state)
 
+  // [Joshen] JFYI opting with the useEffect here as the storage explorer state was being loaded
+  // before the project details were ready, hence the store kept returning project ref as undefined
+  // Can be verified when we're saving the storage explorer preferences into local storage, that ref is undefined
+  // So the useEffect here is to make sure that the project ref is loaded into the state properly
+  // Although I'd be keen to re-investigate this to see if we can remove this
   useEffect(() => {
     const snap = snapshot(stateRef.current)
-    const hasDataReady = !!project?.ref && !!settings
-    const isDifferentProject =
-      snap.projectRef !== project?.ref ||
-      snap.serviceKey !== serviceKey?.api_key ||
-      snap.resumableUploadUrl !== resumableUploadUrl
+    const hasDataReady = !!project?.ref
+    const isDifferentProject = snap.projectRef !== project?.ref
 
     if (hasDataReady && isDifferentProject) {
-      setState(
-        createStorageExplorerState({
-          projectRef: project?.ref ?? '',
-          resumableUploadUrl: !!settings ? resumableUploadUrl : '',
-          serviceKey: serviceKey?.api_key ?? '',
-        })
-      )
+      setState(createStorageExplorerState({ projectRef: project?.ref ?? '' }))
     }
-  }, [project?.ref, resumableUploadUrl, serviceKey?.api_key, settings, stateRef])
+  }, [project?.ref, stateRef])
 
   return (
     <StorageExplorerStateContext.Provider value={state}>

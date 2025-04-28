@@ -319,7 +319,6 @@ class StorageExplorerStore {
   }
 
   setFilePreview = async (file: StorageItemWithColumn) => {
-    console.log('asdasd', file)
     this.selectedFilePreview = file
   }
 
