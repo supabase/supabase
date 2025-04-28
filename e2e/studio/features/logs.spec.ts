@@ -50,6 +50,10 @@ test.describe('Logs', () => {
       await page.locator('a', { hasText: 'Logs' }).click({ timeout: 10000 })
       await page.click('body')
 
+      // can take a sec or two for the page to load and redirect to the last logs page
+      // wait for 2 secs
+      await page.waitForTimeout(2000)
+
       await expect(page.getByRole('heading', { name: 'Logs & Analytics' }), {
         message: 'Logs & Analytics heading should be visible',
       }).toBeVisible()
@@ -88,8 +92,8 @@ test.describe('Logs', () => {
       /**
        * Can select and view log details
        */
-      const gridcells = page.getByText('Random event message: uuid-')
-      await gridcells.first().click()
+      const gridcells = page.getByText('Random event message')
+      await gridcells.click()
 
       const tabPanel = page.getByTestId('log-selection')
       await expect(tabPanel).toBeVisible()

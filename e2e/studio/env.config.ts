@@ -4,7 +4,7 @@ export type Env =
   | 'production' // Supabase.com
   | 'staging' // Supabase.green
   | 'selfhosted' // Supabase CLI Studio
-  | 'preview' // CI
+  | 'ci' // CI
   | 'dev-hosted' // Local Development for Hosted
   | 'dev-selfhosted' // Local Development for Self-Hosted
 
@@ -18,7 +18,7 @@ export const ENV_URLS: Record<Env, string> = {
   selfhosted: 'http://localhost:54323/',
   'dev-hosted': 'http://localhost:8082/',
   'dev-selfhosted': 'http://localhost:8082/',
-  preview: process.env.BASE_URL || '', // Set in CI
+  ci: process.env.BASE_URL || '', // Set in CI
 }
 
 export const API_URLS: Record<Env, string> = {
@@ -27,7 +27,7 @@ export const API_URLS: Record<Env, string> = {
   selfhosted: 'http://localhost:54323/api',
   'dev-hosted': 'http://localhost:8080/api',
   'dev-selfhosted': 'http://localhost:8082/api',
-  preview: process.env.API_BASE_URL || 'https://api.supabase.green',
+  ci: process.env.API_BASE_URL || 'https://api.supabase.green',
 }
 
 export const PROJECT_REFS: Record<Env, string> = {
@@ -36,7 +36,7 @@ export const PROJECT_REFS: Record<Env, string> = {
   'dev-hosted': process.env.DEV_HOSTED_PROJECT_REF,
   selfhosted: 'default',
   'dev-selfhosted': 'default',
-  preview: process.env.PREVIEW_PROJECT_REF,
+  ci: process.env.PREVIEW_PROJECT_REF,
 }
 
 export const STORAGE_STATE_PATH = path.resolve(__dirname, 'playwright/.auth/user.json')

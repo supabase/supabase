@@ -108,20 +108,6 @@ To start API locally, run:
     }
   }
 
-  console.log(`\n 🔑 Checking authentication status...`)
-
-  // Check if we're already signed in by visiting the projects page
-  await page.goto('./projects')
-
-  // If we can access the projects page, we're already signed in
-  if (page.url().includes('/projects')) {
-    console.log('\n ✅ Already signed in, skipping authentication')
-    await page.context().storageState({ path: STORAGE_STATE_PATH })
-    return
-  }
-
-  console.log(`\n 🔑 Not signed in. Authenticating with email: ${AUTH_ENV[ENV].email}`)
-
   await page.goto('./sign-in')
 
   const auth = AUTH_ENV[ENV]
