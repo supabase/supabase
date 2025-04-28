@@ -4,6 +4,7 @@ export interface NavItem {
   href?: string
   disabled?: boolean
   external?: boolean
+  new?: boolean
   icon?: any // to do: clean up later | keyof typeof Icons
   label?: string
   supportedFrameworks?: supportedFrameworks[]

@@ -1,11 +1,10 @@
+import { GuideTemplate } from '~/features/docs/GuidesMdx.template'
 import {
-  getGuidesMarkdown,
   genGuideMeta,
   genGuidesStaticParams,
+  getGuidesMarkdown,
 } from '~/features/docs/GuidesMdx.utils'
-import { GuideTemplate } from '~/features/docs/GuidesMdx.template'
-
-export const dynamicParams = false
+import { getEmptyArray } from '~/features/helpers.fn'
 
 type Params = { slug?: string[] }
 
@@ -16,10 +15,15 @@ const RealtimeGuidePage = async ({ params }: { params: Params }) => {
   return <GuideTemplate {...data!} />
 }
 
-const generateStaticParams = genGuidesStaticParams('realtime')
+const generateStaticParams =
+  // [Charis 2025-04-21] For some reason, using the IS_PROD export from common
+  // does not work (its type is a function when this is evaluated?)
+  process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
+    ? genGuidesStaticParams('realtime')
+    : getEmptyArray
 const generateMetadata = genGuideMeta((params: { slug?: string[] }) =>
   getGuidesMarkdown(['realtime', ...(params.slug ?? [])])
 )
 
 export default RealtimeGuidePage
-export { generateStaticParams, generateMetadata }
+export { generateMetadata, generateStaticParams }

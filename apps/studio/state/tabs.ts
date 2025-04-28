@@ -1,7 +1,7 @@
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { NextRouter } from 'next/router'
 import { ReactNode } from 'react'
-import { proxy, subscribe } from 'valtio'
+import { proxy, subscribe, useSnapshot } from 'valtio'
 import { addRecentItem } from './recent-items'
 
 /**
@@ -13,8 +13,27 @@ import { addRecentItem } from './recent-items'
  * So do not use this as reference for writing new valtio stores - refer to database-selector instead
  */
 
+// Object mapping editor types to their corresponding tab types
+export const editorEntityTypes = {
+  table: ['r', 'v', 'm', 'f', 'p'],
+  sql: ['sql'],
+}
+
 // Define the type of tabs available in the application
 export type TabType = ENTITY_TYPE | 'sql'
+
+type CreateTabIdParams = {
+  r: { id: number }
+  v: { id: number }
+  m: { id: number }
+  f: { id: number }
+  p: { id: number }
+  sql: { id: string }
+  schema: { schema: string }
+  view: never
+  function: never
+  new: never
+}
 
 export interface Tab {
   id: string // Unique identifier for the tab
@@ -27,6 +46,7 @@ export interface Tab {
     name?: string // Optional name of the entity represented by the tab
     tableId?: number // Optional ID of the table associated with the tab
     sqlId?: string // Optional ID of the SQL query associated with the tab
+    scrollTop?: number // Optional scroll top of the tab (Currently just for SQL query)
   }
   isPreview?: boolean // Optional flag indicating if the tab is in preview mode
   createdAt?: Date // Optional timestamp for when the tab was created
@@ -59,7 +79,7 @@ const defaultState: TabsState = {
 export const tabsStore = proxy<TabsStateMap>({})
 
 // Helper to get/create state for a specific ref
-export const getTabsStore = (ref: string | undefined): TabsState => {
+export const getTabsStore = (ref?: string): TabsState => {
   if (!ref) return proxy(defaultState)
   if (!tabsStore[ref]) {
     const stored = localStorage.getItem(getStorageKey(ref))
@@ -84,6 +104,11 @@ export const getTabsStore = (ref: string | undefined): TabsState => {
   }
 
   return tabsStore[ref]
+}
+
+export const useTabsStore = (ref?: string) => {
+  const store = getTabsStore(ref)
+  return useSnapshot(store)
 }
 
 // Subscribe to changes for each ref and save to localStorage
@@ -143,7 +168,6 @@ export const addTab = (ref: string | undefined, tab: Tab) => {
 // this is used for removing tabs from the localstorage state
 // for handling a manual tab removal with a close action, use handleTabClose()
 export const removeTab = (ref: string | undefined, id: string) => {
-  console.log('removeTab')
   const store = getTabsStore(ref)
   const idx = store.openTabs.indexOf(id)
   store.openTabs = store.openTabs.filter((tabId) => tabId !== id)
@@ -165,10 +189,20 @@ export const removeTabs = (ref: string | undefined, ids: string[]) => {
   ids.forEach((id) => removeTab(ref, id))
 }
 
-export const renameTab = (ref: string, id: string, name: string) => {
+export const updateTab = (
+  ref: string,
+  id: string,
+  updates: { label?: string; scrollTop?: number }
+) => {
   const store = getTabsStore(ref)
+
   if (!!store.tabsMap[id]) {
-    store.tabsMap[id].label = name
+    if ('label' in updates) {
+      store.tabsMap[id].label = updates.label
+    }
+    if ('scrollTop' in updates && store.tabsMap[id].metadata) {
+      store.tabsMap[id].metadata.scrollTop = updates.scrollTop
+    }
   }
 }
 
@@ -257,29 +291,26 @@ export const handleTabClose = ({
   if (!ref) return
 
   const store = getTabsStore(ref)
-  // tabs without the one we're closing
-  const currentTab = store.tabsMap[id]
-  const currentTabs = Object.values(store.tabsMap).filter((tab) => tab.id !== id)
+  const tabBeingClosed = store.tabsMap[id]
+  const tabsAfterClosing = Object.values(store.tabsMap).filter((tab) => tab.id !== id)
 
   const nextTabId = !editor
     ? undefined
-    : currentTabs.filter((tab) => {
+    : tabsAfterClosing.filter((tab) => {
         return editorEntityTypes[editor]?.includes(tab.type)
       })[0]?.id
-  delete store.tabsMap[id]
 
-  if (currentTab) {
-    // Update store
-    // If the tab being removed is logged in the store, update the open tabs
-    store.openTabs = [...currentTabs.map((tab) => tab.id).filter((id) => id !== currentTab.id)]
+  const { [id]: value, ...otherTabs } = store.tabsMap
+  store.tabsMap = otherTabs
+
+  if (tabBeingClosed) {
+    const updatedOpenTabs = [...store.openTabs].filter((x) => x !== id)
+    store.openTabs = updatedOpenTabs
   }
 
-  // Check if there is a preview tab and if it matches the tab being closed
-  if (store.previewTabId) {
-    if (store.previewTabId === id) {
-      // remove the preview tab if it matches the tab being closed
-      store.previewTabId = undefined
-    }
+  // Remove the preview tab if it matches the tab being closed
+  if (store.previewTabId === id) {
+    store.previewTabId = undefined
   }
 
   // [Joshen] Only navigate away if we're closing the tab that's currently in focus
@@ -291,7 +322,7 @@ export const handleTabClose = ({
       onClearDashboardHistory()
 
       // If no tabs of same type, go to the home of the current section
-      switch (currentTab?.type) {
+      switch (tabBeingClosed?.type) {
         case 'sql':
           router.push(`/project/${router.query.ref}/sql`)
           break
@@ -339,19 +370,6 @@ export const handleTabDragEnd = (
   handleTabNavigation(ref, tabId, router)
 }
 
-type CreateTabIdParams = {
-  r: { id: number }
-  v: { id: number }
-  m: { id: number }
-  f: { id: number }
-  p: { id: number }
-  sql: { id: string }
-  schema: { schema: string }
-  view: never
-  function: never
-  new: never
-}
-
 // Function to create a unique tab ID based on type and parameters
 export function createTabId<T extends TabType>(type: T, params: CreateTabIdParams[T]): string {
   switch (type) {
@@ -370,12 +388,6 @@ export function createTabId<T extends TabType>(type: T, params: CreateTabIdParam
     default:
       return ''
   }
-}
-
-// Object mapping editor types to their corresponding tab types
-export const editorEntityTypes = {
-  table: ['r', 'v', 'm', 'f', 'p'],
-  sql: ['sql'],
 }
 
 // Function to remove tabs based on their editor type
