@@ -1,6 +1,7 @@
+import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
-import { Search } from 'lucide-react'
+import { Plus, Search } from 'lucide-react'
 import { useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -23,8 +24,8 @@ import TriggerList from './TriggerList'
 
 interface TriggersListProps {
   createTrigger: () => void
-  editTrigger: (trigger: any) => void
-  deleteTrigger: (trigger: any) => void
+  editTrigger: (trigger: PostgresTrigger) => void
+  deleteTrigger: (trigger: PostgresTrigger) => void
 }
 
 const TriggersList = ({
@@ -111,6 +112,7 @@ const TriggersList = ({
               <div className="flex items-center gap-x-2">
                 <ButtonTooltip
                   disabled={!canCreateTriggers}
+                  icon={<Plus />}
                   onClick={() => createTrigger()}
                   className="flex-grow"
                   tooltip={{
@@ -122,8 +124,9 @@ const TriggersList = ({
                     },
                   }}
                 >
-                  Create a new trigger
+                  New trigger
                 </ButtonTooltip>
+
                 <ButtonTooltip
                   type="default"
                   disabled={!canCreateTriggers}
