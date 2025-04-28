@@ -53,6 +53,7 @@ import {
   cn,
 } from 'ui'
 import { useSnapshot } from 'valtio'
+import { useIsSQLEditorTabsEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
@@ -98,13 +99,13 @@ export const SQLEditor = () => {
   const isOptedInToAI = useOrgOptedIntoAi()
   const [selectedSchemas] = useSchemasForAi(project?.ref!)
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
+  const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   const {
     sourceSqlDiff,
     setSourceSqlDiff,
     selectedDiffType,
     setSelectedDiffType,
-    pendingTitle,
     setIsAcceptDiffLoading,
     isDiffOpen,
     defaultSqlDiff,
@@ -216,6 +217,10 @@ export const SQLEditor = () => {
       try {
         const { title: name } = await generateSqlTitle({ sql })
         snapV2.renameSnippet({ id, name })
+        if (isSQLEditorTabsEnabled && ref) {
+          const tabId = createTabId('sql', { id })
+          updateTab(ref, tabId, { label: name })
+        }
       } catch (error) {
         // [Joshen] No error handler required as this happens in the background and not necessary to ping the user
       }
@@ -431,10 +436,6 @@ export const SQLEditor = () => {
             range: editorModel.getFullModelRange(),
           },
         ])
-
-        if (pendingTitle) {
-          snapV2.renameSnippet({ id, name: pendingTitle })
-        }
       }
 
       sendEvent({
@@ -450,16 +451,7 @@ export const SQLEditor = () => {
       setIsAcceptDiffLoading(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    sourceSqlDiff,
-    selectedDiffType,
-    handleNewQuery,
-    generateSqlTitle,
-    router,
-    id,
-    pendingTitle,
-    snapV2,
-  ])
+  }, [sourceSqlDiff, selectedDiffType, handleNewQuery, generateSqlTitle, router, id, snapV2])
 
   const discardAiHandler = useCallback(() => {
     sendEvent({
