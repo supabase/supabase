@@ -37,6 +37,14 @@ const CHART_INTERVALS: ChartIntervals[] = [
     availableIn: ['free', 'pro', 'enterprise', 'team'],
   },
   {
+    key: '3hr',
+    label: 'Last 3 hours',
+    startValue: 3,
+    startUnit: 'hour',
+    format: 'MMM D, ha',
+    availableIn: ['free', 'pro', 'enterprise', 'team'],
+  },
+  {
     key: 'hourly',
     label: 'Last 24 hours',
     startValue: 24,
