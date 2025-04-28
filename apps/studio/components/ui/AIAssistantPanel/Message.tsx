@@ -99,7 +99,7 @@ export const Message = function Message({
             <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
           )}
 
-          <div className="flex-1 min-w-0 space-y-3">
+          <div className="flex-1 min-w-0 space-y-4">
             {shouldUsePartsRendering ? (
               parts.map((part: MessagePart, index: number) => {
                 switch (part.type) {
