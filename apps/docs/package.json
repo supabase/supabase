@@ -29,7 +29,7 @@
     "codegen:examples": "cp -r ../../examples ./examples",
     "codegen:references": "tsx features/docs/Reference.generated.script.ts",
     "codemod:frontmatter": "node ./scripts/codemod/mdx-meta.mjs && prettier --write \"content/**/*.mdx\"",
-    "clean": "rimraf node_modules features/docs/generated examples"
+    "clean": "rimraf .next .turbo node_modules features/docs/generated examples"
   },
   "dependencies": {
     "@har-sdk/openapi-sampler": "^2.2.0",
