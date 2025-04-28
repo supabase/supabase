@@ -1,5 +1,3 @@
-'use client'
-
 export * from './auth'
 export * from './constants'
 export * from './database-types'

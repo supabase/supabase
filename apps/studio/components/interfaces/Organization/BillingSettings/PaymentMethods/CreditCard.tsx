@@ -12,11 +12,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
+import { PlanId } from 'data/subscriptions/types'
 
 interface CreditCardProps {
   paymentMethod: OrganizationPaymentMethod
   canUpdatePaymentMethods?: boolean
   paymentMethodType?: string
+  paymentMethodCount: number
+  subscriptionPlan?: PlanId
   setSelectedMethodForUse?: (paymentMethod: OrganizationPaymentMethod) => void
   setSelectedMethodToDelete?: (paymentMethod: OrganizationPaymentMethod) => void
 }
@@ -25,10 +28,14 @@ const CreditCard = ({
   paymentMethod,
   canUpdatePaymentMethods = true,
   paymentMethodType,
+  subscriptionPlan,
+  paymentMethodCount,
   setSelectedMethodForUse,
   setSelectedMethodToDelete,
 }: CreditCardProps) => {
   const isActive = paymentMethod.is_default
+  const isRemovable =
+    !paymentMethod.is_default || (subscriptionPlan === 'free' && paymentMethodCount === 1)
 
   const expiryYear = paymentMethod.card?.exp_year ?? 0
   const expiryMonth = paymentMethod.card?.exp_month ?? 0
@@ -87,13 +94,15 @@ const CreditCard = ({
               )}
               <DropdownMenuItemTooltip
                 key="delete-method"
-                disabled={isActive}
+                disabled={!isRemovable}
                 className="!pointer-events-auto"
                 onClick={() => setSelectedMethodToDelete?.(paymentMethod)}
                 tooltip={{
                   content: {
                     side: 'left',
-                    text: isActive ? 'Unable to delete a card that is currently active' : undefined,
+                    text: !isRemovable
+                      ? 'Unable to delete a card that is currently active'
+                      : undefined,
                   },
                 }}
               >

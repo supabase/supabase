@@ -56,7 +56,7 @@ const InfrastructureActivity = () => {
   const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: organization?.slug,
   })
-  const isFreePlan = subscription?.plan?.id === 'free'
+  const isFreePlan = organization?.plan?.id === 'free'
 
   const { data: resourceWarnings } = useResourceWarningsQuery()
   const projectResourceWarnings = resourceWarnings?.find((x) => x.project === projectRef)
@@ -94,9 +94,9 @@ const InfrastructureActivity = () => {
   }, [dateRange, subscription])
 
   const upgradeUrl =
-    subscription === undefined
+    organization === undefined
       ? `/`
-      : subscription.plan.id === 'free'
+      : organization.plan.id === 'free'
         ? `/org/${organization?.slug ?? '[slug]'}/billing#subscription`
         : `/project/${projectRef}/settings/addons`
 
@@ -112,7 +112,7 @@ const InfrastructureActivity = () => {
       // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
       return new Date(dateRange?.period_start?.date ?? 0).toISOString().slice(0, -5) + 'Z'
     }
-  }, [dateRange, subscription])
+  }, [dateRange])
 
   const endDate = useMemo(() => {
     if (dateRange?.period_end?.date === 'Invalid Date') return undefined
@@ -127,7 +127,7 @@ const InfrastructureActivity = () => {
       // LF seems to have an issue with the milliseconds, causes infinite loading sometimes
       return new Date(dateRange.period_end.date ?? 0).toISOString().slice(0, -5) + 'Z'
     }
-  }, [dateRange, subscription])
+  }, [dateRange])
 
   // Switch to hourly interval, if the timeframe is <48 hours
   let interval: '1d' | '1h' = '1d'

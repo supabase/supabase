@@ -39,10 +39,8 @@ export const SecretsManagement = () => {
   const allSecrets = data || []
   const secrets = sortBy(
     searchValue.length > 0
-      ? allSecrets.filter(
-          (secret) =>
-            (secret?.name ?? '').toLowerCase().includes(searchValue.toLowerCase()) ||
-            secret.key_id.toLowerCase().includes(searchValue.toLowerCase())
+      ? allSecrets.filter((secret) =>
+          (secret?.name ?? '').toLowerCase().includes(searchValue.toLowerCase())
         )
       : allSecrets,
     (s) => {
@@ -98,14 +96,6 @@ export const SecretsManagement = () => {
                   label="Sort by name"
                 >
                   Name
-                </Listbox.Option>
-                <Listbox.Option
-                  id="key_id"
-                  className="max-w-[180px]"
-                  value="key_id"
-                  label="Sort by key ID"
-                >
-                  Key ID
                 </Listbox.Option>
               </Listbox>
             </div>

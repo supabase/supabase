@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -64,7 +64,7 @@ const BranchLink = ({
 }
 
 const BranchDropdown = () => {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
 
   const router = useRouter()
   const { ref } = useParams()

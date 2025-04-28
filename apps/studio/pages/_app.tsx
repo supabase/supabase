@@ -27,9 +27,9 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
+import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { ErrorInfo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 
 import { FeatureFlagProvider, PageTelemetry, ThemeProvider, useThemeSandbox } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
@@ -67,7 +67,7 @@ loader.config({
   // The alternative was to import * as monaco from 'monaco-editor' but i couldn't get it working
   paths: {
     vs: IS_PLATFORM
-      ? 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.37.0/min/vs'
+      ? 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs'
       : `${BASE_PATH}/monaco-editor`,
   },
 })

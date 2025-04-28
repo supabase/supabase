@@ -6,7 +6,6 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import Panel from 'components/ui/Panel'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -22,8 +21,7 @@ const CustomDomainConfig = () => {
 
   const customDomainsDisabledDueToQuota = useFlag('customDomainsDisabledDueToQuota')
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const plan = subscription?.plan?.id
+  const plan = organization?.plan?.id
 
   const { data: addons, isLoading: isLoadingAddons } = useProjectAddonsQuery({ projectRef: ref })
   const hasCustomDomainAddon = !!addons?.selected_addons.find((x) => x.type === 'custom_domain')
@@ -88,7 +86,7 @@ const CustomDomainConfig = () => {
               <AlertCircle size={16} strokeWidth={1.5} />
               <p className="text-sm text-foreground-light">
                 Failed to retrieve custom domain configuration. Please try again later or{' '}
-                <Link href={`/support/new?ref=${ref}&category=sales`} className="underline">
+                <Link href={`/support/new?projectRef=${ref}&category=sales`} className="underline">
                   contact support
                 </Link>
                 .
