@@ -4,7 +4,7 @@ packages:
   - 'tests/*'
 
 catalog:
-  '@types/node': ^20.0.0
+  '@types/node': ^22.0.0
   '@supabase/auth-js': 2.69.0-rc.3
   '@supabase/supabase-js': ^2.47.14
   '@supabase/realtime-js': ^2.11.3
