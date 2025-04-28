@@ -40,6 +40,24 @@ export async function constructHeaders(headersInit?: HeadersInit | undefined) {
   return headers
 }
 
+function pgMetaGuard(request: Request) {
+  // Only check for /platform/pg-meta/ endpoints
+  if (request.url.includes('/platform/pg-meta/')) {
+    // If there is no valid `x-connection-encrypted`, pg-meta will necesseraly fail to connect to the target database
+    // in such case, we save the hops and throw a 421 response instead
+    if (!request.headers.has('x-connection-encrypted')) {
+      // TODO: Maybe here add a sentry warning to monitor how often this happen
+      // Simulate a 421 response by throwing an error
+      throw {
+        code: 421,
+        message: 'x-connection-encrypted header is required for /platform/pg-meta/ requests',
+        requestId: request.headers.get('X-Request-Id'),
+      }
+    }
+  }
+  return request
+}
+
 // Middleware
 client.use(
   {
@@ -47,8 +65,7 @@ client.use(
     async onRequest({ request }) {
       const headers = await constructHeaders()
       headers.forEach((value, key) => request.headers.set(key, value))
-
-      return request
+      return pgMetaGuard(request)
     },
   },
   {
