@@ -1,12 +1,12 @@
 import { openai } from '@ai-sdk/openai'
 import pgMeta from '@supabase/pg-meta'
-import { generateText, streamText } from 'ai'
+import { generateText, streamText, tool, type Tool, type ToolExecutionOptions } from 'ai'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { experimental_createMCPClient as createMCPClient } from 'ai'
-import { Experimental_StdioMCPTransport as StdioMCPTransport } from 'ai/mcp-stdio'
+import { z } from 'zod'
+import { createSupabaseMCPClient } from './supabase-mcp'
+import crypto from 'crypto'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import { getTools } from './tools'
 
 export const maxDuration = 30
 const openAiKey = process.env.OPENAI_API_KEY
@@ -49,27 +49,108 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   let mcpClient
   try {
-    // Initialize MCP Client
-    mcpClient = await createMCPClient({
-      transport: new StdioMCPTransport({
-        command: 'npx',
-        // Ensure the MCP server package version is appropriate or use latest
-        args: [
-          '-y',
-          '@supabase/mcp-server-supabase@latest', // Or specify a fixed version
-          '--access-token',
-          accessToken,
-          '--read-only', // Enforce read-only mode for database tools
-          // Potentially add --project-ref if needed by server, depends on MCP server implementation
-        ],
-        // Optional: Add environment variables if needed
-        // env: { ...process.env, OTHER_VAR: 'value' },
-      }),
-    })
-
+    mcpClient = await createSupabaseMCPClient(accessToken)
     const mcpTools = await mcpClient.tools()
 
-    console.log('mcpTools', mcpTools, accessToken)
+    // --- Wrap execute_sql to add manual ID to top-level result --- START
+    const originalExecuteSqlTool = mcpTools.execute_sql as Tool<any, any> | undefined
+    let wrappedExecuteSqlTool: Tool<any, any> | undefined = undefined
+
+    if (originalExecuteSqlTool) {
+      wrappedExecuteSqlTool = tool({
+        description: originalExecuteSqlTool.description,
+        parameters: originalExecuteSqlTool.parameters,
+        execute: async (args, context) => {
+          if (!originalExecuteSqlTool.execute) {
+            throw new Error('Original execute_sql tool has no execute function.')
+          }
+          const originalResult = await originalExecuteSqlTool.execute(args, context)
+          const manualToolCallId = `manual_${crypto.randomUUID()}`
+
+          if (originalResult && typeof originalResult === 'object') {
+            ;(originalResult as any).manualToolCallId = manualToolCallId
+          } else {
+            console.warn('execute_sql result is not an object, cannot add manualToolCallId')
+            return {
+              error: 'Internal error: Unexpected tool result format',
+              manualToolCallId: manualToolCallId,
+            }
+          }
+
+          console.log(`execute_sql wrapper: Added manualToolCallId ${manualToolCallId} to result.`)
+          return originalResult
+        },
+      })
+    } else {
+      console.warn('execute_sql tool not found in mcpTools.')
+    }
+    // --- Wrap execute_sql --- END
+
+    // --- Define Client-Side Tools --- START
+    const displayBlock = tool({
+      description:
+        'Displays results (table or chart) in the UI by referencing a previous execute_sql call using its manual ID.',
+      parameters: z.object({
+        manualToolCallId: z
+          .string()
+          .describe('The manual ID from the corresponding execute_sql result.'),
+        sql: z.string().describe('The original SQL query that was executed.'),
+        label: z
+          .string()
+          .describe(
+            'The title or label for this query block (e.g., "Users Over Time", "Create Users Table").'
+          ),
+        view: z.enum(['table', 'chart']).describe('Display mode: table or chart.'),
+        xAxis: z.string().optional().describe('Key for the x-axis (required if type is chart).'),
+        yAxis: z.string().optional().describe('Key for the y-axis (required if type is chart).'),
+      }),
+      execute: async (args) => {
+        console.log('Dummy execute for displayBlock called with args:', args)
+        return { status: 'Tool call sent to client for rendering.' }
+      },
+    })
+
+    const renderWriteQuery = tool({
+      description:
+        'Renders SQL for write operations (INSERT, UPDATE, DELETE) or DDL (CREATE, ALTER, DROP) for the user to run manually. Use this for all non-SELECT queries.',
+      parameters: z.object({
+        sql: z.string().describe('The SQL query to render.'),
+        label: z
+          .string()
+          .describe(
+            'The title or label for this query block (e.g., "Insert New User", "Alter Orders Table").'
+          ),
+      }),
+      execute: async (args) => {
+        console.log('Dummy execute for displayBlock called with args:', args)
+        return { status: 'Tool call sent to client for rendering.' }
+      },
+    })
+
+    const renderEdgeFunction = tool({
+      description: 'Renders the code for a Supabase Edge Function for the user to deploy manually.',
+      parameters: z.object({
+        name: z
+          .string()
+          .describe('The URL-friendly name of the Edge Function (e.g., "my-function").'),
+        code: z.string().describe('The TypeScript code for the Edge Function.'),
+      }),
+      execute: async (args) => {
+        console.log('Dummy execute for displayBlock called with args:', args)
+        return { status: 'Tool call sent to client for rendering.' }
+      },
+    })
+    // --- Define Client-Side Tools --- END
+
+    console.log('MCP Tools available: ', Object.keys(mcpTools).join(', '))
+
+    const allTools = {
+      ...mcpTools,
+      ...(wrappedExecuteSqlTool && { execute_sql: wrappedExecuteSqlTool }),
+      displayBlock,
+      renderWriteQuery,
+      renderEdgeFunction,
+    }
 
     const { result: schemas } = includeSchemaMetadata
       ? await executeSql(
@@ -87,110 +168,53 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         )
       : { result: [] }
 
-    const result = await generateText({
-      model: openai('gpt-4o-mini'),
-      maxSteps: 5,
-      system: `
-        You are a Supabase Postgres expert who can do the following things.
+    const systemPrompt = `
+      The current project is ${projectRef}.
+      You are a Supabase Postgres expert connected via the Supabase Management Control Plane (MCP). Your goal is to generate SQL or Edge Function code based on user requests, using specific tools for rendering.
   
-        # You generate and debug SQL
-        The generated SQL (must be valid SQL), and must adhere to the following:
-        - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
-        - Always use semicolons
-        - Output as markdown
-        - Always include code snippets if available
-        - If a code snippet is SQL, the first line of the snippet should always be -- props: {"id": "id", "title": "Query title", "runQuery": "false", "isChart": "true", "xAxis": "columnOrAlias", "yAxis": "columnOrAlias"}
-        - Only include one line of comment props per markdown snippet, even if the snippet has multiple queries
-        - Only set chart to true if the query makes sense as a chart. xAxis and yAxis need to be columns or aliases returned by the query.
-        - Set the id to a random uuidv4 value
-        - Only set runQuery to true if the query has no risk of writing data and is not a debugging request. Set it to false if there are any values that need to be replaced with real data.
-        - Explain what the snippet does in a sentence or two before showing it
-        - Use vector(384) data type for any embedding/vector related query
-        - When debugging, retrieve sql schema details to ensure sql is correct
-        - In Supabase, the auth schema already has a users table which is used to store users. It is common practice to create a profiles table in the public schema that links to auth.users to store user information instead. You don't need to create a new users table.
-        - Never suggest creating a view to retrieve information from the users table of the auth schema. This is against our best practices.
+      # Core Principles:
+      - Use MCP tools like \`list_tables\` and \`list_extensions\` to gather information.
+      - **Tool Usage Strategy**:
+          - For **SELECT** queries: Explain your plan, call \`execute_sql\` with the query. After receiving the results, explain the findings briefly in text. Then, call \`displayBlock\` using the \`manualToolCallId\`, \`sql\`, and a descriptive \`label\` to display the full results. **Choose 'chart'** if the data is suitable for visualization (e.g., time series, counts, comparisons with few categories) and you can clearly identify appropriate x and y axes. **Otherwise, default to 'table'** for detailed data, complex results, or if a clear chart type isn't obvious. Ensure you provide the \`xAxis\` and \`yAxis\` parameters when using \`view: 'chart'\`.
+          - For **ALL WRITE/DDL** queries (INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, etc.): Explain your plan and the purpose of the SQL. If multiple, separate queries are needed (e.g., creating a table and then related RLS policies), explain the first query, call \`renderWriteQuery\` for it with the \`sql\` and a descriptive \`label\`, then explain the second query, call \`renderWriteQuery\` for it with its \`sql\` and \`label\`, and so on. Use one tool call per distinct query. (These always use a table view implicitly).
+          - For **Edge Functions**: Explain your plan and the function's purpose, then use the \`renderEdgeFunction\` tool with the name and Typescript code to propose it to the user.
+      - **DO NOT** use \`apply_migration\` or \`deploy_edge_function\` directly.
+      - **UI Rendering & Explanation**: The frontend uses the \`displayBlock\`, \`renderWriteQuery\`, and \`renderEdgeFunction\` tools to show generated content or data to the user. Your text responses should clearly explain *what* you are doing, *why*, and briefly summarize the outcome (e.g., "I found 5 matching users", "I've generated the SQL to create the table"). **Do not** include the full SQL results, complete SQL code blocks, or entire Edge Function code in your text response; use the appropriate rendering tools for that purpose.
   
-        When generating tables, do the following:
-        - Ensure that all tables always have a primary key
-        - Ensure that all tables have RLS enabled. Inform the user that they will need to create RLS policies before being able to read or write to the table over Supabase APIs.
-        - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
-        - Prefer creating foreign key references in the create statement
-        - Prefer 'text' over 'varchar'
-        - Prefer 'timestamp with time zone' over 'date'
-        - If a foreign key is created, include a statement to create a database index on the columns involved in the foreign key. This is a best practice as it is common to use foreign key columns in join conditions when querying the database, hence the index will improve the performance of those joins and reduce database resource consumption.
-        - If the table is a foreign table, create it in a new schema called private. If the private schema doesnt exist, create it. 
-          - Explain to the user that we create it outside of the public schema as it can present a security risk as foreign tables views cannot be configured to respect RLS policies. Provide this link for users to view more details about the security risk: https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0017_foreign_table_in_api
+      # Debugging SQL:
+      - Use MCP information tools (\`list_tables\`, etc.) to understand the schema.
+      - If debugging a SELECT query: Explain the issue, provide the corrected SQL to \`execute_sql\`, and then call \`displayBlock\` with the new results.
+      - If debugging a WRITE/DDL query: Explain the issue and provide the corrected SQL using \`renderWriteQuery\`.
   
-        When generating views, do the following:
-        - All views should include 'with (security_invoker=on)' clause in the SQL statement for creating views (only views though - do not do this for tables)
-        - Place the 'with (security_invoker=on)' immediately after the CREATE VIEW statement, before AS
-        - If the view is a materialized view, create it in a new schema called private. If the private schema doesnt exist, create it. 
-          - Explain to the user that we create it outside of the public schema as it can present a security risk as materialized views cannot be configured to respect RLS policies of the underlying tables they are built upon, nor can they be secured with RLS directly. Provide this link for users to view more details about the security risk: https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0016_materialized_view_in_api
+      # SQL Style:
+          - Generated SQL must be valid Postgres SQL.
+          - Always use double apostrophes for escaped single quotes (e.g., 'Night''s watch').
+          - Always use semicolons at the end of SQL statements.
+          - Use \`vector(384)\` for embedding/vector related queries.
+          - Prefer \`text\` over \`varchar\`.
+          - Prefer \`timestamp with time zone\` over \`date\`.
   
-        When installing database extensions, do the following:
-        - Never install extensions in the public schema
-        - Extensions should be installed in the extensions schema, or a dedicated schema
+      # Best Practices & Object Generation:
+      - Follow previous best practices for Auth schema, indexes, etc.
+      - Use \`renderWriteQuery\` for generating Tables, Views, Extensions, RLS Policies, Functions, following the guidelines mentioned previously (RLS, security invoker, private schema for foreign tables/materialized views, etc.). Explain the generated SQL's purpose in your text response.
   
-        Feel free to suggest corrections for suspected typos.
-  
-        # You write row level security policies.
-  
-        Your purpose is to generate a policy with the constraints given by the user.
-        - First, use getSchemaTables to retrieve more information about a schema or schemas that will contain policies, usually the public schema.
-        - Then retrieve existing RLS policies and guidelines on how to write policies using the getRlsKnowledge tool .
-        - Then write new policies or update existing policies based on the prompt
-        - When asked to suggest policies, either alter existing policies or add new ones to the public schema.
-        - When writing policies that use a function from the auth schema, ensure that the calls are wrapped with parentheses e.g select auth.uid() should be written as (select auth.uid()) instead
-  
-        # You write database functions
-        Your purpose is to generate a database function with the constraints given by the user. The output may also include a database trigger
-        if the function returns a type of trigger. When generating functions, do the following:
-        - If the function returns a trigger type, ensure that it uses security definer, otherwise default to security invoker. Include this in the create functions SQL statement.
-        - Ensure to set the search_path configuration parameter as '', include this in the create functions SQL statement.
-        - Default to create or replace whenever possible for updating an existing function, otherwise use the alter function statement
-        Please make sure that all queries are valid Postgres SQL queries
-  
-        # You write edge functions
-        Your purpose is to generate entire edge functions with the constraints given by the user.
-        - First, always use the getEdgeFunctionKnowledge tool to get knowledge about how to write edge functions for Supabase
-        - When writing edge functions, always ensure that they are written in TypeScript and Deno JavaScript runtime.
-        - When writing edge functions, write complete code so the user doesn't need to replace any placeholders.
-        - When writing edge functions, always ensure that they are written in a way that is compatible with the database schema.
-        - When suggesting edge functions, follow the guidelines in getEdgeFunctionKnowledge tool. Always create personalised edge functions based on the database schema
-        - When outputting edge functions, always include a props comment in the first line of the code block:
-          -- props: {"name": "function-name", "title": "Human readable title"}
-        - The function name in the props must be URL-friendly (use hyphens instead of spaces or underscores)
-        - Always wrap the edge function code in a markdown code block with the language set to 'edge'
-        - The props comment must be the first line inside the code block, followed by the actual function code
-  
-        # You convert sql to supabase-js client code
-        Use the convertSqlToSupabaseJs tool to convert select sql to supabase-js client code. Only provide js code snippets if explicitly asked. If conversion isn't supported, build a postgres function instead and suggest using supabase-js to call it via  "const { data, error } = await supabase.rpc('echo', { say: '👋'})"
-  
-        # For all your abilities, follow these instructions:
-        - First look at the list of provided schemas and if needed, get more information about a schema. You will almost always need to retrieve information about the public schema before answering a question.
-        - If the question is about users or involves creating a users table, also retrieve the auth schema.
-        - If it a query is a destructive query e.g. table drop, ask for confirmation before writing the query. The user will still have to run the query once you create it
-    
-  
-        Here are the existing database schema names you can retrieve: ${schemas}
-  
-        ${schema !== undefined && includeSchemaMetadata ? `The user is currently looking at the ${schema} schema.` : ''}
-        ${table !== undefined && includeSchemaMetadata ? `The user is currently looking at the ${table} table.` : ''}
-        `,
+      # General Instructions:
+      - **Understand Context**: Use \`list_tables\`, \`list_extensions\` first.
+      - **Available Schemas**: ${schemas}
+      - **Current Focus**: ${schema !== undefined && includeSchemaMetadata ? `User is looking at schema: ${schema}.` : ''} ${table !== undefined && includeSchemaMetadata ? `User is looking at table: ${table}.` : ''}
+      `
+
+    const result = await streamText({
+      model: openai('gpt-4.1-mini'),
+      maxSteps: 10,
+      system: systemPrompt,
       messages,
-      tools: mcpTools,
+      tools: allTools,
     })
 
-    console.log('result', result)
-
-    // write the data stream to the response
-    // Note: this is sent as a single response, not a stream
-    // result.pipeDataStreamToResponse(res)
+    result.pipeDataStreamToResponse(res)
   } catch (error: any) {
     console.log('error', error)
     return res.status(500).json({ message: error.message })
-  } finally {
-    // Ensure the MCP client is closed
-    await mcpClient?.close()
   }
 }

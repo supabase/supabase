@@ -69,8 +69,7 @@ const MemoizedMessage = memo(
       <Message
         key={message.id}
         id={message.id}
-        role={message.role}
-        content={message.content}
+        message={message}
         readOnly={message.role === 'user'}
         isLoading={isLoading}
         onResults={onResults}
@@ -136,7 +135,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   const handleError = useCallback((error: Error) => {
-    console.log('error', error)
     const errorMessage = JSON.parse(error.message).message
     toast.error(errorMessage)
   }, [])
