@@ -5,6 +5,8 @@ import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
 import { buttonVariants } from './../../Button'
+import { VariantProps } from 'class-variance-authority'
+import { cva } from 'class-variance-authority'
 
 const AlertDialog = AlertDialogPrimitive.Root
 
@@ -21,33 +23,68 @@ AlertDialogPortal.displayName = AlertDialogPrimitive.Portal.displayName
 
 const AlertDialogOverlay = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Overlay>,
-  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Overlay>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Overlay> & { centered?: boolean }
+>(({ className, centered = true, ...props }, ref) => (
   <AlertDialogPrimitive.Overlay
+    ref={ref}
     className={cn(
-      'fixed inset-0 z-50 bg-background/80 backdrop-blur-sm transition-opacity animate-in fade-in',
+      'bg-black/40 backdrop-blur-sm',
+      'z-50 fixed inset-0 grid place-items-center overflow-y-auto data-closed:animate-overlay-hide py-8',
+      !centered && 'flex flex-col flex-start pb-8 sm:pt-12 md:pt-20 lg:pt-32 xl:pt-40 px-5',
       className
     )}
     {...props}
-    ref={ref}
   />
 ))
 AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName
 
+const AlertDialogContentVariants = cva(
+  cn(
+    'relative z-50 w-full max-w-screen border shadow-md dark:shadow-sm',
+    'data-[state=open]:animate-in data-[state=closed]:animate-out',
+    'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+    'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%]',
+    'data-[state=open]:slide-in-from-left-[0%] data-[state=open]:slide-in-from-top-[0%]',
+    'sm:rounded-lg md:w-full',
+    'bg-dash-sidebar'
+  ),
+  {
+    variants: {
+      size: {
+        tiny: `sm:align-middle sm:w-full sm:max-w-xs`,
+        small: `sm:align-middle sm:w-full sm:max-w-sm`,
+        medium: `sm:align-middle sm:w-full sm:max-w-lg`,
+        large: `sm:align-middle sm:w-full md:max-w-xl`,
+        xlarge: `sm:align-middle sm:w-full md:max-w-3xl`,
+        xxlarge: `sm:align-middle sm:w-full md:max-w-6xl`,
+        xxxlarge: `sm:align-middle sm:w-full md:max-w-7xl`,
+      },
+    },
+    defaultVariants: {
+      size: 'medium',
+    },
+  }
+)
+
 const AlertDialogContent = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Content>
->(({ className, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Content> &
+    VariantProps<typeof AlertDialogContentVariants> & {
+      hideClose?: boolean
+      dialogOverlayProps?: React.ComponentPropsWithoutRef<typeof AlertDialogOverlay>
+      centered?: boolean
+    }
+>(({ className, children, size, dialogOverlayProps, centered = true, ...props }, ref) => (
   <AlertDialogPortal>
-    <AlertDialogOverlay />
-    <AlertDialogPrimitive.Content
-      ref={ref}
-      className={cn(
-        'fixed z-50 grid w-full max-w-lg scale-100 gap-4 border bg-background p-6 opacity-100 shadow-lg animate-in fade-in-90 slide-in-from-bottom-10 sm:rounded-lg sm:zoom-in-90 sm:slide-in-from-bottom-0 md:w-full',
-        className
-      )}
-      {...props}
-    />
+    <AlertDialogOverlay centered={centered} {...dialogOverlayProps}>
+      <AlertDialogPrimitive.Content
+        ref={ref}
+        className={cn(AlertDialogContentVariants({ size }), className)}
+        {...props}
+      >
+        {children}
+      </AlertDialogPrimitive.Content>
+    </AlertDialogOverlay>
   </AlertDialogPortal>
 ))
 AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName
@@ -59,7 +96,10 @@ AlertDialogHeader.displayName = 'AlertDialogHeader'
 
 const AlertDialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)}
+    className={cn(
+      'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 border-t py-3 px-5',
+      className
+    )}
     {...props}
   />
 )
@@ -71,7 +111,7 @@ const AlertDialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Title
     ref={ref}
-    className={cn('text-lg font-semibold', className)}
+    className={cn('text-base text-foreground border-b px-5 py-3', className)}
     {...props}
   />
 ))
@@ -83,7 +123,7 @@ const AlertDialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Description
     ref={ref}
-    className={cn('text-sm text-foreground-muted', className)}
+    className={cn('text-sm text-foreground-light px-5 py-3', className)}
     {...props}
   />
 ))
@@ -95,7 +135,7 @@ const AlertDialogAction = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Action
     ref={ref}
-    className={cn(buttonVariants({ type: 'secondary', size: 'small' }), className)}
+    className={cn(buttonVariants({ type: 'primary', size: 'tiny' }), className)}
     {...props}
   />
 ))
@@ -107,7 +147,7 @@ const AlertDialogCancel = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Cancel
     ref={ref}
-    className={cn(buttonVariants({ type: 'default', size: 'small' }), 'mt-2 sm:mt-0', className)}
+    className={cn(buttonVariants({ type: 'default', size: 'tiny' }), 'mt-2 sm:mt-0', className)}
     {...props}
   />
 ))
