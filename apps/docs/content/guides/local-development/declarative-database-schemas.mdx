@@ -73,8 +73,8 @@ Make sure your local database is stopped before diffing your schema.
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Start the local database">
-      The new migration file will be used when starting the database locally so you can validate your schema using the local Dashboard.
+    <StepHikeCompact.Details title="Apply the migration locally">
+      Start the local database and apply the new migration file. You can then validate your schema using the local Dashboard.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -82,7 +82,7 @@ Make sure your local database is stopped before diffing your schema.
 <$CodeTabs>
 
 ```bash name=Terminal
-supabase start
+supabase start && supabase migration up
 ```
 
 </$CodeTabs>
@@ -277,7 +277,7 @@ supabase db push
 
 ### Managing dependencies
 
-As your database schema evolves, you will probably start using more advanced entities like views and functions. These entities are notoriously verbose to manage using plain migrations because the entire body must be recreated whenever there is a change. Using declarative schema, you can now edit them in-place so it’s much easier to review.
+As your database schema evolves, you will probably start using more advanced entities like views and functions. These entities are notoriously verbose to manage using plain migrations because the entire body must be recreated whenever there is a change. Using declarative schema, you can now edit them in-place so it's much easier to review.
 
 <$CodeTabs>
 
@@ -381,7 +381,7 @@ If you need to use any of the entities below, remember to add them through [vers
 - [view owner and grants](https://github.com/djrobstep/migra/issues/160#issuecomment-1702983833)
 - [security invoker on views](https://github.com/djrobstep/migra/issues/234)
 - [materialized views](https://github.com/djrobstep/migra/issues/194)
-- doesn’t recreate views when altering column type
+- doesn't recreate views when altering column type
 
 ### RLS policies
 

@@ -1,0 +1,404 @@
+---
+id: 'solidstart'
+title: 'SolidStart'
+description: 'Learn how to implement server-side auth in SolidStart with Supabase.'
+---
+
+import { Tabs } from 'ui'
+import CodeBlock from '~/components/CodeBlock/CodeBlock'
+import NextSteps from '~/components/NextSteps'
+import { Heading } from '~/components/Marked'
+
+{/* <!--TOC--> */}
+
+This guide shows you how to implement server-side auth in SolidStart using the `@supabase/ssr` helper library.
+
+See the [server-side rendering guide](/docs/guides/auth/server-side-rendering) for more details on `@supabase/ssr`.
+
+## Prerequisites
+
+- A Supabase project. You can create one [here](https://database.new).
+- A SolidStart project. You can create one using `npm create solid@latest`. Select the `ssr` template.
+
+## Setup
+
+### Install the helper library
+
+Install the `@supabase/ssr` library and Supabase client library.
+
+```bash npm
+npm install @supabase/ssr @supabase/supabase-js solid-js@next solid-start@next @solidjs/router@next @solidjs/meta@next
+```
+
+```bash yarn
+yarn add @supabase/ssr @supabase/supabase-js solid-js@next solid-start@next @solidjs/router@next @solidjs/meta@next
+```
+
+```bash pnpm
+pnpm add @supabase/ssr @supabase/supabase-js solid-js@next solid-start@next @solidjs/router@next @solidjs/meta@next
+```
+
+<Admonition type="note">
+SolidStart is currently in beta. Ensure you install the `@next` tagged versions as shown above.
+</Admonition>
+
+### Environment Variables
+
+Retrieve your project URL and anon key from your Supabase project's [API settings](https://app.supabase.com/project/_/settings/api).
+
+Create a `.env` file in your project root:
+
+```bash title=".env"
+VITE_SUPABASE_URL=YOUR_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+```
+
+<Admonition type="caution">
+Do not prefix client-side environment variables with `VITE_` unless you understand the security implications. See SolidStart's [env vars documentation](https://start.solidjs.com/core-concepts/env-variables).
+</Admonition>
+
+### Supabase Client
+
+We need to create Supabase clients for both the server and client components. Create a file to manage these clients.
+
+```ts title="src/lib/supabase/client.ts"
+import { createBrowserClient } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
+import { type ParentComponent } from 'solid-js'
+import { createStore } from 'solid-js/store'
+import { isServer } from 'solid-js/web'
+import { FetchEvent, PageEvent, ServerError } from 'solid-start/server'
+import { ServerContext } from 'solid-start/server/ServerContext'
+
+export function getSupabaseEnv() {
+  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL!
+  const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY!
+
+  return { SUPABASE_URL, SUPABASE_ANON_KEY }
+}
+
+/** Supabase client for browser */
+export function getSupabaseBrowserClient() {
+  const { SUPABASE_URL, SUPABASE_ANON_KEY } = getSupabaseEnv()
+
+  return createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+}
+
+/** Supabase client for server */
+export function getSupabaseServerClient(event: FetchEvent) {
+  const { SUPABASE_URL, SUPABASE_ANON_KEY } = getSupabaseEnv()
+
+  return createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    cookies: {
+      get(key) {
+        return event.request.headers.get('cookie')?.[key]
+      },
+      set(key, value, options) {
+        event.responseHeaders.append(
+          'Set-Cookie',
+          `${key}=${value}; ${new URLSearchParams(options).toString()}`
+        )
+      },
+      remove(key, options) {
+         event.responseHeaders.append(
+          'Set-Cookie',
+          `${key}=; ${new URLSearchParams(options).toString()}`
+        )
+      },
+    },
+  })
+}
+
+// Higher-order component to provide Supabase client context
+// See: https://github.com/supabase/auth-helpers/issues/789
+// This is needed to avoid passing the event object down through components.
+export const withSupabase = (Page: ParentComponent): ParentComponent => {
+  return (props) => {
+    const event = useContext(ServerContext)
+    if (isServer && !event) {
+      throw new Error('ServerContext not found');
+    }
+
+    const serverClient = isServer ? getSupabaseServerClient(event as FetchEvent) : null
+    const [supabase] = createStore(serverClient || getSupabaseBrowserClient())
+
+    return (
+      <SupabaseContext.Provider value={supabase}>
+        <Page {...props} />
+      </SupabaseContext.Provider>
+    )
+  }
+}
+
+// Context for Supabase client
+const SupabaseContext = createContext<ReturnType<typeof createBrowserClient> | null>(null)
+
+export const useSupabase = () => {
+  const context = useContext(SupabaseContext);
+  if (!context) {
+    throw new Error('useSupabase must be used within a SupabaseProvider');
+  }
+  return context;
+};
+```
+
+<Admonition type="note">
+The `withSupabase` HOC and `useSupabase` hook simplify client access, especially on the server where the `FetchEvent` is needed. This pattern avoids prop drilling the event object. You might adapt this based on your application structure.
+</Admonition>
+
+Wrap your root component (`src/app.tsx`) with the provider if you choose to use the context pattern shown above. Otherwise, ensure you create the appropriate client (server or browser) where needed.
+
+```tsx title="src/app.tsx" {5, 11}
+// ... other imports
+import { MetaProvider, Title } from "@solidjs/meta";
+import { Router } from "@solidjs/router";
+import { FileRoutes } from "@solidjs/start";
+import { Suspense } from "solid-js";
+import { withSupabase } from "./lib/supabase/client"; // Import the HOC
+
+function App() {
+  return (
+    <Router
+      root={(props) => (
+        <MetaProvider>
+          <Title>SolidStart - Supabase SSR</Title>
+          {/* Wrap withSupabase here */}
+          <Suspense>{withSupabase(() => props.children)()}</Suspense>
+        </MetaProvider>
+      )}
+    >
+      <FileRoutes />
+    </Router>
+  );
+}
+
+export default App;
+```
+
+## Server-side Auth
+
+### Fetch user server-side
+
+Use SolidStart's `createRouteData` function to fetch the user session on the server. This data can then be accessed in your route components.
+
+```tsx title="src/routes/index.tsx"
+import { createRouteData, useRouteData } from 'solid-start'
+import { server$ } from '@solidjs/start/server'
+import { getSupabaseServerClient } from '~/lib/supabase/client' // Adjust path if needed
+
+export function routeData() {
+  return createRouteData(async (_, { request }) => {
+    // This code runs on the server
+    const event = { request, responseHeaders: new Headers() } // Mock FetchEvent parts needed
+    const supabase = getSupabaseServerClient(event)
+    const { data: { session } } = await supabase.auth.getSession()
+
+    return { user: session?.user }
+  })
+}
+
+export default function Home() {
+  const data = useRouteData<typeof routeData>()
+
+  return (
+    <main>
+      <h1>Home</h1>
+      <pre>{JSON.stringify(data()?.user, null, 2)}</pre>
+      {/* Add Login/Logout buttons here */}
+    </main>
+  )
+}
+```
+
+### Protected Routes
+
+Redirect users server-side if they are not authenticated. You can do this within the `createRouteData` function.
+
+```tsx title="src/routes/protected.tsx"
+import { createRouteData, useRouteData } from 'solid-start'
+import { server$, ServerError, redirect } from '@solidjs/start/server'
+import { getSupabaseServerClient } from '~/lib/supabase/client' // Adjust path if needed
+
+export function routeData() {
+  return createRouteData(async (_, { request }) => {
+    const event = { request, responseHeaders: new Headers() }
+    const supabase = getSupabaseServerClient(event)
+    const { data: { session } } = await supabase.auth.getSession()
+
+    if (!session) {
+      // User not logged in, redirect to login page
+      throw redirect('/login') // Or your login route
+    }
+
+    // Optionally fetch protected data here using the server client
+    // const { data } = await supabase.from('protected_table').select('*')
+
+    return { user: session.user }
+  })
+}
+
+export default function ProtectedPage() {
+  const data = useRouteData<typeof routeData>()
+
+  return (
+    <main>
+      <h1>Protected Page</h1>
+      <p>Welcome, {data()?.user?.email}</p>
+      {/* Display protected data */}
+    </main>
+  )
+}
+```
+
+## Client-side Auth
+
+### Auth Listener
+
+Listen to auth events on the client to update the UI in real-time when the user logs in or out.
+
+```tsx title="src/components/AuthListener.tsx"
+import { createEffect, onCleanup } from 'solid-js'
+import { useNavigate } from '@solidjs/router'
+import { getSupabaseBrowserClient } from '~/lib/supabase/client' // Adjust path
+
+export default function AuthListener() {
+  const navigate = useNavigate()
+  const supabase = getSupabaseBrowserClient() // Use browser client
+
+  createEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        // Optionally redirect to login on sign out
+        // navigate('/login', { replace: true })
+      } else if (event === 'SIGNED_IN') {
+         // Optionally redirect after sign in
+         // navigate('/', { replace: true })
+      }
+      // You might want to refresh server data or invalidate caches here
+    })
+
+    onCleanup(() => {
+      subscription.unsubscribe()
+    })
+  })
+
+  return null // This component doesn't render anything
+}
+```
+
+Include this `AuthListener` component in your main layout or root component (`src/app.tsx` or `src/root.tsx`).
+
+### Auth UI
+
+Use SolidStart's `server$` functions to handle auth actions like login and logout on the server.
+
+```tsx title="src/components/AuthUI.tsx"
+import { server$ } from '@solidjs/start/server'
+import { createSignal } from 'solid-js'
+import { getSupabaseServerClient } from '~/lib/supabase/client' // Adjust path
+
+const handleLogin = server$(async (formData: FormData) => {
+  'use server' // Mark as server function
+  const email = formData.get('email') as string
+  const password = formData.get('password') as string
+
+  // Server context isn't directly available here, need workaround or different client creation
+  // See https://github.com/solidjs/solid-start/issues/1042
+  // As a temporary workaround, we might need a separate utility for server functions
+  // OR pass necessary request info if possible. For simplicity, showing direct use:
+  // NOTE: This needs refinement based on SolidStart server function context access.
+  // The server client creation might need adjustment for use outside routeData.
+  // A possible approach is creating a client without request context for actions
+  // that don't need cookie manipulation *during* the action itself,
+  // relying on the browser client redirect/listener for session update.
+
+  // --- Simplified example assuming client creation works ---
+  // This part needs careful implementation based on SolidStart capabilities
+  /*
+  const event = { request: new Request(location.href), responseHeaders: new Headers() } // Placeholder!
+  const supabase = getSupabaseServerClient(event)
+  const { error } = await supabase.auth.signInWithPassword({ email, password })
+  if (error) {
+    console.error('Login error:', error.message)
+    // Handle error display
+  }
+  // Auth listener will handle redirect or UI update
+  */
+  console.warn('Server function login needs context handling refinement.')
+  // Simulate login for example purposes - Replace with actual Supabase call
+  console.log('Simulating login for:', email)
+  return { success: true } // Indicate success/failure
+})
+
+const handleLogout = server$(async () => {
+  'use server'
+  // --- Simplified example assuming client creation works ---
+  // This part needs careful implementation based on SolidStart capabilities
+  /*
+  const event = { request: new Request(location.href), responseHeaders: new Headers() } // Placeholder!
+  const supabase = getSupabaseServerClient(event)
+  const { error } = await supabase.auth.signOut()
+  if (error) console.error('Logout error:', error.message)
+  */
+  console.warn('Server function logout needs context handling refinement.')
+  return { success: true }
+})
+
+export default function AuthUI() {
+  const [email, setEmail] = createSignal('')
+  const [password, setPassword] = createSignal('')
+
+  const onLoginSubmit = async (e: SubmitEvent) => {
+    e.preventDefault()
+    const formData = new FormData(e.target as HTMLFormElement)
+    const result = await handleLogin(formData)
+    // Handle result (e.g., show error message)
+  }
+
+  const onLogoutClick = async () => {
+    const result = await handleLogout()
+    // Handle result
+  }
+
+  return (
+    <div>
+      <form onSubmit={onLoginSubmit}>
+        <h2>Login</h2>
+        <label>
+          Email:
+          <input type="email" name="email" value={email()} onInput={(e) => setEmail(e.target.value)} required />
+        </label>
+        <br />
+        <label>
+          Password:
+          <input type="password" name="password" value={password()} onInput={(e) => setPassword(e.target.value)} required />
+        </label>
+        <br />
+        <button type="submit">Log In</button>
+      </form>
+      <hr />
+      <button onClick={onLogoutClick}>Log Out</button>
+    </div>
+  )
+}
+
+```
+
+<Admonition type="caution" title="Server Function Context">
+Accessing request context (especially for setting cookies via `createServerClient`) within standalone `server$` functions in SolidStart requires careful consideration and might involve specific patterns or workarounds not fully detailed here due to SolidStart's evolving nature. The example above highlights the need for this. Relying on the browser client's `onAuthStateChange` listener after the server action completes is a common pattern.
+</Admonition>
+
+## Next Steps
+
+<NextSteps>
+  <NextSteps.Step
+    title="OAuth with PKCE"
+    description="Learn how to implement OAuth with PKCE flow for server-side rendering."
+    link="/docs/guides/auth/server-side/oauth-with-pkce-flow"
+  />
+  <NextSteps.Step
+    title="SolidStart Documentation"
+    description="Explore the official SolidStart documentation."
+    link="https://start.solidjs.com/"
+  />
+</NextSteps> 
