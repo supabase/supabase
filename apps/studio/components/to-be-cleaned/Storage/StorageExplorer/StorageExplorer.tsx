@@ -1,8 +1,8 @@
-import { useParams } from 'common'
 import { compact, get, isEmpty, uniqBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
 
+import { useParams } from 'common'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import type { Bucket } from 'data/storage/buckets-query'
 import { IS_PLATFORM } from 'lib/constants'

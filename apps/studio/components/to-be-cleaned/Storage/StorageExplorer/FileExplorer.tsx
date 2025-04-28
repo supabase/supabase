@@ -1,8 +1,9 @@
+import { noop } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef } from 'react'
 
-import { noop } from 'lodash'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import { cn } from 'ui'
 import { CONTEXT_MENU_KEYS, STORAGE_VIEWS } from '../Storage.constants'
 import type { StorageColumn, StorageItem, StorageItemWithColumn } from '../Storage.types'
 import ColumnContextMenu from './ColumnContextMenu'
@@ -46,7 +47,10 @@ const FileExplorer = ({
   return (
     <div
       ref={fileExplorerRef}
-      className="file-explorer flex flex-grow overflow-x-auto justify-between h-full w-full relative"
+      className={cn(
+        'file-explorer flex flex-grow overflow-x-auto justify-between h-full w-full relative',
+        snap.view === STORAGE_VIEWS.LIST && 'flex-col'
+      )}
     >
       <ColumnContextMenu id={CONTEXT_MENU_KEYS.STORAGE_COLUMN} />
       <ItemContextMenu id={CONTEXT_MENU_KEYS.STORAGE_ITEM} />

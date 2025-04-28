@@ -189,7 +189,6 @@ const CustomDomainVerify = ({ customDomain }: CustomDomainVerifyProps) => {
               type="default"
               onClick={onCancelCustomDomain}
               loading={isDeleting}
-              disabled={isValidating}
               className="self-end"
             >
               Cancel

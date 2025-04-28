@@ -1,3 +1,5 @@
+'use client'
+
 import { components } from 'api-types'
 import { useRouter } from 'next/compat/router'
 import { usePathname } from 'next/navigation'
