@@ -162,8 +162,6 @@ const FileExplorerHeader = ({
 
   const storageExplorerStore = useStorageStore()
   const {
-    view,
-    setView,
     columns,
     sortBy,
     setSortBy,
@@ -333,7 +331,7 @@ const FileExplorerHeader = ({
               ]}
             />
           </form>
-        ) : view === STORAGE_VIEWS.COLUMNS ? (
+        ) : snap.view === STORAGE_VIEWS.COLUMNS ? (
           <HeaderPathEdit
             loading={loading}
             isSearching={snap.isSearching}
@@ -368,7 +366,7 @@ const FileExplorerHeader = ({
               <Button
                 type="text"
                 icon={
-                  view === 'LIST' ? (
+                  snap.view === 'LIST' ? (
                     <List size={16} strokeWidth={2} />
                   ) : (
                     <Columns size={16} strokeWidth={2} />
@@ -380,10 +378,10 @@ const FileExplorerHeader = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40 min-w-0">
               {VIEW_OPTIONS.map((option) => (
-                <DropdownMenuItem key={option.key} onClick={() => setView(option.key)}>
+                <DropdownMenuItem key={option.key} onClick={() => snap.setView(option.key)}>
                   <div className="flex items-center justify-between w-full">
                     <p>{option.name}</p>
-                    {view === option.key && <Check className="text-brand" strokeWidth={2} />}
+                    {snap.view === option.key && <Check className="text-brand" strokeWidth={2} />}
                   </div>
                 </DropdownMenuItem>
               ))}

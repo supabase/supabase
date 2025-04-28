@@ -48,14 +48,13 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_CLS: 'supabase-ui-cls',
   UI_PREVIEW_INLINE_EDITOR: 'supabase-ui-preview-inline-editor',
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
-
   UI_TABLE_EDITOR_TABS: 'supabase-ui-table-editor-tabs',
   UI_SQL_EDITOR_TABS: 'supabase-ui-sql-editor-tabs',
   UI_NEW_LAYOUT_PREVIEW: 'supabase-ui-new-layout-preview',
-
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
+  STORAGE_PREFERENCE: (ref: string) => `storage-explorer-${ref}`,
 
   SQL_EDITOR_INTELLISENSE: 'supabase_sql-editor-intellisense-enabled',
   SQL_EDITOR_SPLIT_SIZE: 'supabase_sql-editor-split-size',
