@@ -51,17 +51,14 @@ export const DisplayBlockRenderer: React.FC<DisplayBlockRendererProps> = ({
     subject: { id: profile?.id },
   })
 
-  // --- State for this block's config ---
   const [chartConfig, setChartConfig] = useState<InternalChartConfig>(() => ({
-    ...DEFAULT_CHART_CONFIG, // Includes type: 'bar' now
+    ...DEFAULT_CHART_CONFIG,
     view: initialArgs.view === 'chart' ? 'chart' : 'table',
     xKey: initialArgs.xAxis ?? '',
     yKey: initialArgs.yAxis ?? '',
   }))
 
-  // --- Derived State & Data ---
   const isChart = initialArgs.view === 'chart'
-  // Use useMemo for potentially expensive lookups if messageParts is large/changes often
   const liveResultData = useMemo(
     () => findResultForManualId(messageParts, manualId),
     [messageParts, manualId]
@@ -92,33 +89,29 @@ export const DisplayBlockRenderer: React.FC<DisplayBlockRendererProps> = ({
   }: {
     chartConfig: Partial<InternalChartConfig>
   }) => {
-    // Use functional update to avoid stale state issues if updates happen rapidly
     setChartConfig((prev) => ({ ...prev, ...updatedValues }))
   }
 
   const handleDragStart = (e: DragEvent<Element>) => {
     e.dataTransfer.setData(
       'application/json',
-      JSON.stringify({ label, sql: sqlQuery, config: chartConfig }) // Use state config
+      JSON.stringify({ label, sql: sqlQuery, config: chartConfig })
     )
   }
 
   return (
-    // Apply negative margin if needed, or handle layout in Message.tsx
     <div className="w-auto -ml-[36px] overflow-x-hidden">
       <QueryBlock
         label={label}
         sql={sqlQuery}
         lockColumns={true}
-        // Show SQL based on the component's state
         showSql={true}
         results={displayData}
-        chartConfig={chartConfig} // Pass state config
-        isChart={isChart} // Pass derived state
-        showRunButtonIfNotReadOnly={true} // Or adjust based on query type if needed
-        isLoading={isLoading} // Pass down overall loading state
+        chartConfig={chartConfig}
+        isChart={isChart}
+        showRunButtonIfNotReadOnly={true}
+        isLoading={isLoading}
         draggable={isDraggableToReports}
-        // Callbacks
         onResults={(results) => onResults({ messageId, resultId: manualId, results })}
         onRunQuery={handleRunQuery}
         onUpdateChartConfig={handleUpdateChartConfig}

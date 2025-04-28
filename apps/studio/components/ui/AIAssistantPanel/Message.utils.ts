@@ -14,10 +14,7 @@ export const findResultForManualId = (
       part.toolInvocation.result?.manualToolCallId === manualId
   )
 
-  if (
-    invocationPart?.type === 'tool-invocation' &&
-    invocationPart.toolInvocation.result?.content?.[0]?.text
-  ) {
+  if (invocationPart?.toolInvocation.result?.content?.[0]?.text) {
     try {
       const parsedData = JSON.parse(invocationPart.toolInvocation.result.content[0].text)
       return Array.isArray(parsedData) ? parsedData : undefined
