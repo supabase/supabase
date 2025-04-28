@@ -1,5 +1,6 @@
 import RGL, { WidthProvider } from 'react-grid-layout'
 import 'react-grid-layout/css/styles.css'
+import 'react-resizable/css/styles.css'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
