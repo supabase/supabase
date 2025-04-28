@@ -94,7 +94,7 @@ function useLogsPreview({
 
   console.log('table:', table)
 
-  console.log('useLogsPreview SQL:', sql)
+  console.log('useLogsPreview SQL:', params.sql)
 
   const {
     data,
