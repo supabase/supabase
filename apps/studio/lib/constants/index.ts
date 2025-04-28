@@ -53,13 +53,12 @@ export const LOCAL_STORAGE_KEYS = {
   UI_SQL_EDITOR_TABS: 'supabase-ui-sql-editor-tabs',
   UI_NEW_LAYOUT_PREVIEW: 'supabase-ui-new-layout-preview',
 
-  SQL_SCRATCH_PAD_BANNER_ACKNOWLEDGED: 'supabase-sql-scratch-pad-banner-acknowledged',
+  NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
 
   SQL_EDITOR_INTELLISENSE: 'supabase_sql-editor-intellisense-enabled',
   SQL_EDITOR_SPLIT_SIZE: 'supabase_sql-editor-split-size',
-  SQL_EDITOR_AI_PANEL_SPLIT_SIZE: 'supabase_sql-editor-ai-panel-split-size',
   // Key to track which schemas are ok to be sent to AI. The project ref is intentionally put at the end for easier search in the browser console.
   SQL_EDITOR_AI_SCHEMA: (ref: string) => `supabase_sql-editor-ai-schema-enabled-${ref}`,
   SQL_EDITOR_AI_OPEN: 'supabase_sql-editor-ai-open',
@@ -72,7 +71,6 @@ export const LOCAL_STORAGE_KEYS = {
   GRAPHIQL_RLS_BYPASS_WARNING: 'graphiql-rls-bypass-warning-dismissed',
   CLS_DIFF_WARNING: 'cls-diff-warning-dismissed',
   CLS_SELECT_STAR_WARNING: 'cls-select-star-warning-dismissed',
-  PROJECT_LINT_IGNORE_LIST: 'supabase-project-lint-ignore-list',
   QUERY_PERF_SHOW_BOTTOM_SECTION: 'supabase-query-perf-show-bottom-section',
   // Key to track account deletion requests
   ACCOUNT_DELETION_REQUEST: 'supabase-account-deletion-request',
@@ -82,8 +80,6 @@ export const LOCAL_STORAGE_KEYS = {
   LAST_SIGN_IN_METHOD: 'supabase-last-sign-in-method',
   // Key to track the last selected schema. The project ref is intentionally put at the end for easier search in the browser console.
   LAST_SELECTED_SCHEMA: (ref: string) => `last-selected-schema-${ref}`,
-  // Key to show a warning on the SQL Editor AI Assistant that the org hasn't opted-in to sending anon data
-  SHOW_AI_NOT_OPTIMIZED_WARNING: (ref: string) => `supabase-show-ai-not-optimized-${ref}`,
   // Track position of nodes for schema visualizer
   SCHEMA_VISUALIZER_POSITIONS: (ref: string, schemaId: number) =>
     `schema-visualizer-positions-${ref}-${schemaId}`,
@@ -92,9 +88,7 @@ export const LOCAL_STORAGE_KEYS = {
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
   // Notice banner keys
   FLY_POSTGRES_DEPRECATION_WARNING: 'fly-postgres-deprecation-warning-dismissed',
-
   AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
-  STORAGE_BUCKETS_COLUMN_CONFIG: (ref: string) => `supabase-storage-buckets-columns-${ref}`,
 
   // api keys view switcher for new and legacy api keys
   API_KEYS_VIEW: (ref: string) => `supabase-api-keys-view-${ref}`,
