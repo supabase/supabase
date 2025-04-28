@@ -35,7 +35,6 @@ import {
   DialogSectionSeparator,
   cn,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import Image from 'next/image'
 import { BASE_PATH } from 'lib/constants'
@@ -100,7 +99,12 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
           (val) => (branches ?? []).every((branch) => branch.name !== val),
           'A branch with this name already exists'
         ),
-      gitBranchName: z.string().optional(),
+      gitBranchName: z
+        .string()
+        .refine(
+          (val) => !githubConnection?.id || (val && val.length > 0),
+          'Git branch name is required when Git is connected'
+        ),
     })
     .superRefine(async (val, ctx) => {
       if (val.gitBranchName && val.gitBranchName.length > 0 && githubConnection?.id) {
