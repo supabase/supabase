@@ -17,6 +17,7 @@ import {
 import { useContextMenu } from 'react-contexify'
 import SVG from 'react-inlinesvg'
 
+import { useParams } from 'common'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
@@ -46,7 +47,7 @@ import {
 } from '../Storage.constants'
 import { StorageItem, StorageItemWithColumn } from '../Storage.types'
 import FileExplorerRowEditing from './FileExplorerRowEditing'
-import { copyPathToFolder } from './StorageExplorer.utils'
+import { copyPathToFolder, downloadFile } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
 
 export const RowIcon = ({
@@ -111,6 +112,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   selectedItems = [],
   openedFolders = [],
 }) => {
+  const { ref: projectRef, bucketId } = useParams()
   const storageExplorerStore = useStorageStore()
   const {
     popColumnAtIndex,
@@ -126,7 +128,6 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
     setSelectedItemsToMove,
     setSelectedFileCustomExpiry,
     fetchFolderContents,
-    downloadFile,
     downloadFolder,
     selectRangeItems,
     selectedFilePreview,
@@ -260,7 +261,13 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
                       {
                         name: 'Download',
                         icon: <Download size={14} strokeWidth={1} />,
-                        onClick: async () => await downloadFile(itemWithColumnIndex),
+                        onClick: async () => {
+                          await downloadFile({
+                            projectRef,
+                            bucketId,
+                            file: itemWithColumnIndex,
+                          })
+                        },
                       },
                       { name: 'Separator', icon: undefined, onClick: undefined },
                     ]
