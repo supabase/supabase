@@ -140,7 +140,8 @@ interface Params {
   slug?: string[]
 }
 
-const WrappersDocs = async ({ params }: { params: Params }) => {
+const WrappersDocs = async (props: { params: Promise<Params> }) => {
+  const params = await props.params;
   const { isExternal, meta, ...data } = await getContent(params)
 
   const options = isExternal

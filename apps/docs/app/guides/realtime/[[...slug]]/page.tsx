@@ -9,7 +9,8 @@ import { getEmptyArray } from '~/features/helpers.fn'
 
 type Params = { slug?: string[] }
 
-const RealtimeGuidePage = async ({ params }: { params: Params }) => {
+const RealtimeGuidePage = async (props: { params: Promise<Params> }) => {
+  const params = await props.params;
   const slug = ['realtime', ...(params.slug ?? [])]
   const data = await getGuidesMarkdown(slug)
 

@@ -9,7 +9,8 @@ import { getEmptyArray } from '~/features/helpers.fn'
 
 type Params = { slug?: string[] }
 
-const StorageGuidePage = async ({ params }: { params: Params }) => {
+const StorageGuidePage = async (props: { params: Promise<Params> }) => {
+  const params = await props.params;
   const slug = ['storage', ...(params.slug ?? [])]
   const data = await getGuidesMarkdown(slug)
 
