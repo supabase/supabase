@@ -147,9 +147,12 @@ export const SQLEditor = () => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
-  const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
-    projectRef: ref,
-  })
+  const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery(
+    {
+      projectRef: ref,
+    },
+    { enabled: Boolean(project?.connectionString) }
+  )
 
   const { data, refetch: refetchEntityDefinitions } = useEntityDefinitionsQuery(
     {
@@ -157,7 +160,7 @@ export const SQLEditor = () => {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { enabled: includeSchemaMetadata }
+    { enabled: Boolean(project?.connectionString) && includeSchemaMetadata }
   )
   const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
 
@@ -308,6 +311,7 @@ export const SQLEditor = () => {
         const connectionString = databases?.find(
           (db) => db.identifier === databaseSelectorState.selectedDatabaseId
         )?.connectionString
+        // TODO: in which case if it's not "IS_PLATFORM" it would work ?
         if (IS_PLATFORM && !connectionString) {
           return toast.error('Unable to run query: Connection string is missing')
         }
