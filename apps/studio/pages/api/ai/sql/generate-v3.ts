@@ -72,6 +72,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       // Filter tools based on opt-in level
       if (aiOptInLevel === 'schema') {
         // Filter out tools that return or modify data for 'schema' level
+        // TODO: We probably want an allowed list of tools instead of a disallowed list
         const disallowedTools = ['execute_sql', 'apply_migration', 'get_logs']
         mcpTools = Object.fromEntries(
           Object.entries(availableMcpTools).filter(([key]) => !disallowedTools.includes(key))
