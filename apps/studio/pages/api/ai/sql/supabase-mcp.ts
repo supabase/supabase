@@ -3,7 +3,13 @@ import { experimental_createMCPClient as createMCPClient } from 'ai'
 import { createSupabaseMcpServer } from '@supabase/mcp-server-supabase'
 import { API_URL } from 'lib/constants'
 
-export async function createSupabaseMCPClient(accessToken: string) {
+export async function createSupabaseMCPClient({
+  accessToken,
+  projectRef,
+}: {
+  accessToken: string
+  projectRef: string
+}) {
   // Create an in-memory transport pair
   const clientTransport = new StreamTransport()
   const serverTransport = new StreamTransport()

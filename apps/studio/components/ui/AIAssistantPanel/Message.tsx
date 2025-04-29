@@ -122,43 +122,45 @@ export const Message = function Message({
                   case 'tool-invocation': {
                     const { toolCallId, toolName, args } = part.toolInvocation
                     switch (toolName) {
-                      case 'displayBlock': {
-                        return (
-                          <DisplayBlockRenderer
-                            key={`${id}-tool-${toolCallId}`}
-                            messageId={id}
-                            manualId={args.manualToolCallId}
-                            initialArgs={args}
-                            messageParts={parts}
-                            isLoading={isLoading}
-                            onResults={onResults}
-                          />
-                        )
-                      }
-                      case 'renderWriteQuery':
-                        return (
-                          <div
-                            key={`${id}-tool-${toolCallId}`}
-                            className="w-auto -ml-[36px] overflow-x-hidden"
-                          >
-                            <QueryBlock
-                              label={args.label || 'SQL Snippet'}
-                              sql={args.sql}
-                              showSql={true}
-                              isChart={false}
-                              showRunButtonIfNotReadOnly={true}
-                              isLoading={false}
+                      case 'displayQuery': {
+                        if (args.manualToolCallId) {
+                          return (
+                            <DisplayBlockRenderer
+                              key={`${id}-tool-${toolCallId}`}
+                              messageId={id}
+                              manualId={args.manualToolCallId}
+                              initialArgs={args}
+                              messageParts={parts}
+                              isLoading={isLoading}
+                              onResults={onResults}
                             />
-                          </div>
-                        )
-                      case 'renderEdgeFunction': {
+                          )
+                        } else {
+                          return (
+                            <div
+                              key={`${id}-tool-${toolCallId}`}
+                              className="w-auto -ml-[36px] overflow-x-hidden"
+                            >
+                              <QueryBlock
+                                label={args.label || 'SQL Snippet'}
+                                sql={args.sql}
+                                showSql={true}
+                                isChart={false}
+                                showRunButtonIfNotReadOnly={true}
+                                isLoading={false}
+                              />
+                            </div>
+                          )
+                        }
+                      }
+                      case 'displayEdgeFunction': {
                         return (
                           <div
                             key={`${id}-tool-${toolCallId}`}
                             className="w-auto -ml-[36px] overflow-x-hidden"
                           >
                             <EdgeFunctionBlock
-                              label={args.label || 'Edge Function'}
+                              label={args.name || 'Edge Function'}
                               code={args.code}
                               functionName={args.name || 'my-function'}
                               showCode={!readOnly}

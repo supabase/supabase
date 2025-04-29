@@ -1,30 +1,29 @@
 import Link from 'next/link'
-import { cn, Collapsible_Shadcn_, CollapsibleTrigger_Shadcn_, CollapsibleContent_Shadcn_ } from 'ui'
-import { useState } from 'react'
-import { ChevronRight } from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogSection,
+  DialogTitle,
+  DialogTrigger,
+  Button,
+} from 'ui'
 
 interface OptInToOpenAIToggleProps {
   className?: string
 }
 export default function OptInToOpenAIToggle({ className }: OptInToOpenAIToggleProps) {
-  const [open, setOpen] = useState(false)
-
   return (
-    <Collapsible_Shadcn_ open={open} onOpenChange={setOpen} className={cn('mt-4', className)}>
-      <CollapsibleTrigger_Shadcn_ asChild>
-        <div className="flex items-center space-x-2 cursor-pointer">
-          <ChevronRight
-            strokeWidth={2}
-            size={16}
-            className={cn('transition-all', open ? 'rotate-90' : '')}
-          />
-          <p className="text-sm text-foreground-light underline">
-            Important information regarding opting in
-          </p>
-        </div>
-      </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_>
-        <div className="space-y-2 py-4 text-sm text-foreground-light">
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button type="outline">Learn more about data privacy</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-2xl">
+        <DialogHeader padding="small" className="border-b">
+          <DialogTitle>Where does my data go?</DialogTitle>
+        </DialogHeader>
+        <DialogSection className="space-y-4 text-sm text-foreground-light" padding="small">
           <p>
             Supabase AI is a chatbot support tool powered by OpenAI. Supabase will share the query
             you submit and information about the databases you manage through Supabase with OpenAI,
@@ -58,14 +57,14 @@ export default function OptInToOpenAIToggle({ className }: OptInToOpenAITogglePr
               href="https://supabase.com/privacy"
               target="_blank"
               rel="noreferrer"
-              className="text-brand border-b border-brand"
+              className="text-brand hover:text-foreground"
             >
               privacy policy
             </Link>
             .
           </p>
-        </div>
-      </CollapsibleContent_Shadcn_>
-    </Collapsible_Shadcn_>
+        </DialogSection>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -88,11 +88,9 @@ interface AIAssistantProps {
 export const AIAssistant = ({ className }: AIAssistantProps) => {
   const router = useRouter()
   const project = useSelectedProject()
-  const isOptedInToAI = useOrgOptedIntoAi()
   const selectedOrganization = useSelectedOrganization()
   const { id: entityId } = useParams()
   const searchParams = useSearchParamsShallow()
-  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
@@ -100,6 +98,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const { ref: scrollContainerRef, isSticky, scrollToEnd } = useAutoScroll()
+
+  // TODO: How do we handle IS_PLATFORM here?
+  let aiOptInLevel = useOrgOptedIntoAi()
 
   // Add a ref to store the last user message
   const lastUserMessageRef = useRef<MessageType | null>(null)
@@ -167,7 +168,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     // and useChat expects a mutable array
     initialMessages: snap.activeChat?.messages as unknown as MessageType[] | undefined,
     body: {
-      includeSchemaMetadata,
+      aiOptInLevel,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       schema: currentSchema,
@@ -311,9 +312,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   </TooltipTrigger>
                   <TooltipContent className="w-80">
                     The Assistant is in Alpha and your prompts might be rate limited.{' '}
-                    {includeSchemaMetadata
-                      ? 'Project metadata is being shared to improve Assistant responses.'
-                      : 'Project metadata is not being shared. Opt in to improve Assistant responses.'}
+                    {aiOptInLevel === 'schema_and_data' &&
+                      'Schema and query data are being shared to improve Assistant responses.'}
+                    {aiOptInLevel === 'schema' &&
+                      'Only schema metadata is being shared to improve Assistant responses.'}
+                    {aiOptInLevel === 'disabled' &&
+                      'Project metadata is not being shared. Opt in to improve Assistant responses.'}
                   </TooltipContent>
                 </Tooltip>
               </div>
@@ -350,14 +354,22 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 </div>
               </div>
             </div>
-            {!includeSchemaMetadata && selectedOrganization && (
+            {IS_PLATFORM && aiOptInLevel !== 'schema_and_data' && selectedOrganization && (
               <Admonition
                 type="default"
-                title="Project metadata is not shared"
+                title={
+                  aiOptInLevel === 'disabled'
+                    ? 'Project metadata is not shared'
+                    : 'Limited metadata is shared'
+                }
                 description={
                   hasHipaaAddon
                     ? 'Your organization has the HIPAA addon and will not send any project metadata with your prompts.'
-                    : 'The Assistant can improve the quality of the answers if you send project metadata along with your prompts. Opt into sending anonymous data to share your schema and table definitions.'
+                    : aiOptInLevel === 'disabled'
+                      ? 'The Assistant can provide better answers if you opt-in to share schema metadata.'
+                      : aiOptInLevel === 'schema'
+                        ? 'Sharing sample query data in addition to schema can further improve responses. Update AI settings to enable this.'
+                        : ''
                 }
                 className="border-0 border-b rounded-none bg-background"
               >
@@ -599,7 +611,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             onValueChange={(e) => setValue(e.target.value)}
             onSubmit={(event) => {
               event.preventDefault()
-              if (includeSchemaMetadata) {
+              if (aiOptInLevel !== 'disabled') {
                 const sqlSnippetsString =
                   snap.sqlSnippets
                     ?.map((snippet: string) => '```sql\n' + snippet + '\n```')
@@ -609,6 +621,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 scrollToEnd()
               } else {
                 sendMessageToAssistant(value)
+                snap.setSqlSnippets([])
+                scrollToEnd()
               }
             }}
           />
@@ -624,7 +638,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         onConfirm={confirmOptInToShareSchemaData}
         loading={isUpdating}
       >
-        <p className="text-sm text-foreground-light">
+        <p className="text-sm text-foreground-light mb-4">
           By opting into sending anonymous data, Supabase AI can improve the answers it shows you.
           This is an organization-wide setting, and affects all projects in your organization.
         </p>
