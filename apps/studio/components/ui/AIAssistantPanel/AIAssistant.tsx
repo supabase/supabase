@@ -20,9 +20,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import {
-  useOrgAiOptInLevel,
-} from 'hooks/misc/useOrgOptedIntoAi'
+import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -40,7 +38,6 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { Admonition, AssistantChatForm, GenericSkeletonLoader } from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ButtonTooltip } from '../ButtonTooltip'
 import DotGrid from '../DotGrid'
 import { AIAssistantChatSelector } from './AIAssistantChatSelector'
@@ -48,6 +45,7 @@ import AIOnboarding from './AIOnboarding'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
 import { useAutoScroll } from './hooks'
+import { AIOptInModal } from './AIOptInModal'
 
 const MemoizedMessage = memo(
   ({
@@ -181,7 +179,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   })
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-  const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
   const updateMessage = useCallback(
     ({
@@ -240,30 +237,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
     }
-  }
-
-  const confirmOptInToShareSchemaData = async () => {
-    if (!canUpdateOrganization) {
-      return toast.error('You do not have the required permissions to update this organization')
-    }
-
-    if (!selectedOrganization?.slug) return console.error('Organization slug is required')
-
-    const existingOptInTags = selectedOrganization?.opt_in_tags ?? []
-
-    const updatedOptInTags = existingOptInTags.includes(OPT_IN_TAGS.AI_SQL)
-      ? existingOptInTags
-      : [...existingOptInTags, OPT_IN_TAGS.AI_SQL]
-
-    updateOrganization(
-      { slug: selectedOrganization?.slug, opt_in_tags: updatedOptInTags },
-      {
-        onSuccess: () => {
-          toast.success('Successfully opted-in')
-          setIsConfirmOptInModalOpen(false)
-        },
-      }
-    )
   }
 
   const handleClearMessages = () => {
@@ -631,22 +604,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         </div>
       </div>
 
-      <ConfirmationModal
+      <AIOptInModal
         visible={isConfirmOptInModalOpen}
-        size="large"
-        title="Confirm sending anonymous data to OpenAI"
-        confirmLabel="Confirm"
         onCancel={() => setIsConfirmOptInModalOpen(false)}
-        onConfirm={confirmOptInToShareSchemaData}
-        loading={isUpdating}
-      >
-        <p className="text-sm text-foreground-light mb-4">
-          By opting into sending anonymous data, Supabase AI can improve the answers it shows you.
-          This is an organization-wide setting, and affects all projects in your organization.
-        </p>
-
-        <OptInToOpenAIToggle />
-      </ConfirmationModal>
+      />
     </>
   )
 }
