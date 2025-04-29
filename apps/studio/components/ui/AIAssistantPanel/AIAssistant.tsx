@@ -20,7 +20,9 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import {
+  useOrgAiOptInLevel,
+} from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -100,7 +102,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { ref: scrollContainerRef, isSticky, scrollToEnd } = useAutoScroll()
 
   // TODO: How do we handle IS_PLATFORM here?
-  let aiOptInLevel = useOrgOptedIntoAi()
+  let aiOptInLevel = useOrgAiOptInLevel()
 
   // Add a ref to store the last user message
   const lastUserMessageRef = useRef<MessageType | null>(null)
