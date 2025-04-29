@@ -131,7 +131,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       schemasResult = fetchedSchemas
     }
 
-    // Define the merged displayQuery tool
     const displayQuery = tool({
       description:
         'Displays SQL query results (table or chart) or renders SQL for write/DDL operations. Use this for all query display needs. Optionally references a previous execute_sql call via manualToolCallId for displaying SELECT results.',
@@ -159,7 +158,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       }),
       execute: async (args) => {
         console.log('Dummy execute for displayQuery called with args:', args)
-        // Determine if it's a SELECT result display or a write/DDL render based on manualToolCallId
         const statusMessage = args.manualToolCallId
           ? 'Tool call sent to client for rendering SELECT results.'
           : 'Tool call sent to client for rendering write/DDL query.'
@@ -182,16 +180,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     })
 
     const allTools = {
-      // Include MCP tools based on opt-in level
       ...mcpTools, // mcpTools is already filtered based on aiOptInLevel
-      // Conditionally include wrapped execute_sql if available (only for schema_and_data)
       ...(wrappedExecuteSqlTool && { execute_sql: wrappedExecuteSqlTool }),
-      // Always include client-side tools
       displayQuery,
       displayEdgeFunction,
     }
 
-    // Construct system prompt conditionally
     let systemPrompt = `
       The current project is ${projectRef}.
       You are a Supabase Postgres expert. Your goal is to generate SQL or Edge Function code based on user requests, using specific tools for rendering.
@@ -202,7 +196,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     if (aiOptInLevel === 'schema_and_data') {
       systemPrompt += `
           - Use MCP tools like \`list_tables\` and \`list_extensions\` to gather information.
-          - For **SELECT** queries: Explain your plan, call \`execute_sql\` with the query. After receiving the results, explain the findings briefly in text. Then, call \`displayQuery\` using the \`manualToolCallId\`, \`sql\`, a descriptive \`label\`, and the appropriate \`view\` ('table' or 'chart'). **Choose 'chart'** if the data is suitable for visualization (e.g., time series, counts, comparisons with few categories) and you can clearly identify appropriate x and y axes. **Otherwise, default to 'table'** for detailed data, complex results, or if a clear chart type isn't obvious. Ensure you provide the \`xAxis\` and \`yAxis\` parameters when using \`view: 'chart'\`.`
+          - For **READ ONLY** queries: Explain your plan, call \`execute_sql\` with the query. After receiving the results, explain the findings briefly in text. Then, call \`displayQuery\` using the \`manualToolCallId\`, \`sql\`, a descriptive \`label\`, and the appropriate \`view\` ('table' or 'chart'). **Choose 'chart'** if the data is suitable for visualization (e.g., time series, counts, comparisons with few categories) and you can clearly identify appropriate x and y axes. **Otherwise, default to 'table'** for detailed data, complex results, or if a clear chart type isn't obvious. Ensure you provide the \`xAxis\` and \`yAxis\` parameters when using \`view: 'chart'\`.`
     } else if (aiOptInLevel === 'schema') {
       systemPrompt += `
           - Use available MCP tools like \`list_tables\` and \`list_extensions\` to understand the schema.
