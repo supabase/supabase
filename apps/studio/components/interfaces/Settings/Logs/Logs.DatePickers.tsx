@@ -10,6 +10,7 @@ import TimeSplitInput from 'components/ui/DatePicker/TimeSplitInput'
 import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
 import type { DatetimeHelper } from './Logs.types'
+import { copyToClipboard } from 'lib/helpers'
 
 export type DatePickerValue = {
   to: string
@@ -175,12 +176,13 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
     fromDate.setHours(+startTime.HH, +startTime.mm, +startTime.ss)
     toDate.setHours(+endTime.HH, +endTime.mm, +endTime.ss)
 
-    navigator.clipboard.writeText(
+    copyToClipboard(
       JSON.stringify({
         from: fromDate.toISOString(),
         to: toDate.toISOString(),
       })
     )
+
     setCopied(true)
   }
 
@@ -193,13 +195,15 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
   }, [pasted])
 
   useEffect(() => {
-    document.addEventListener('paste', handlePaste)
-    document.addEventListener('copy', handleCopy)
+    if (open) {
+      document.addEventListener('paste', handlePaste)
+      document.addEventListener('copy', handleCopy)
+    }
     return () => {
       document.removeEventListener('paste', handlePaste)
       document.removeEventListener('copy', handleCopy)
     }
-  }, [startDate, endDate])
+  }, [open, startDate, endDate])
 
   const isLargeRange =
     Math.abs(dayjs(startDate).diff(dayjs(endDate), 'days')) >
