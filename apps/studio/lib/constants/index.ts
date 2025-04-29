@@ -5,6 +5,7 @@ export * from './infrastructure'
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
 
 export const API_URL = (() => {
+  if (process.env.NODE_ENV === 'test') return 'http://localhost:3000/api'
   //  If running in platform, use API_URL from the env var
   if (IS_PLATFORM) return process.env.NEXT_PUBLIC_API_URL!
   // If running in browser, let it add the host

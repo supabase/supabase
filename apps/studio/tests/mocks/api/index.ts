@@ -1,84 +1,37 @@
-import { API_URL } from 'lib/constants'
 import { HttpResponse, http } from 'msw'
+import { API_LOGS_MOCK } from './logs'
 
-const PROJECT_REF = 'default'
+const API_URL = 'http://localhost:3000/api'
 
 export const APIMock = [
-  http.get(`${API_URL}/msw/test`, () => {
+  http.get(`/api/msw/test`, () => {
     return HttpResponse.json({ message: 'Hello from MSW!' })
   }),
-  http.get(`${API_URL}/platform/projects/${PROJECT_REF}/analytics/endpoints/logs.all`, () => {
-    return HttpResponse.json({
-      totalRequests: [
-        {
-          count: 12,
-          timestamp: '2024-05-13T20:00:00.000Z',
-        },
-      ],
-      errorCounts: [],
-      responseSpeed: [
-        {
-          avg: 1017.0000000000001,
-          timestamp: '2024-05-13T20:00:00',
-        },
-      ],
-      topRoutes: [
-        {
-          count: 6,
-          method: 'GET',
-          path: '/auth/v1/user',
-          search: null,
-          status_code: 200,
-        },
-        {
-          count: 4,
-          method: 'GET',
-          path: '/rest/v1/',
-          search: null,
-          status_code: 200,
-        },
-        {
-          count: 2,
-          method: 'HEAD',
-          path: '/rest/v1/',
-          search: null,
-          status_code: 200,
-        },
-      ],
-      topErrorRoutes: [],
-      topSlowRoutes: [
-        {
-          avg: 1093.5,
-          count: 4,
-          method: 'GET',
-          path: '/rest/v1/',
-          search: null,
-          status_code: 200,
-        },
-        {
-          avg: 1037.5,
-          count: 2,
-          method: 'HEAD',
-          path: '/rest/v1/',
-          search: null,
-          status_code: 200,
-        },
-        {
-          avg: 959.1666666666667,
-          count: 6,
-          method: 'GET',
-          path: '/auth/v1/health',
-          search: null,
-          status_code: 200,
-        },
-      ],
-      networkTraffic: [
-        {
-          egress_mb: 0.000666,
-          ingress_mb: 0,
-          timestamp: '2024-05-13T20:00:00.000Z',
-        },
-      ],
-    })
+  http.get(`${API_URL}/platform/projects/default/analytics/endpoints/logs.all`, () => {
+    return HttpResponse.json(API_LOGS_MOCK)
+  }),
+  http.get(`${API_URL}/platform/projects/default/databases`, () => {
+    return HttpResponse.json([
+      {
+        cloud_provider: 'AWS',
+        connectionString: '123',
+        connection_string_read_only: '123',
+        db_host: '123',
+        db_name: 'postgres',
+        db_port: 5432,
+        identifier: 'zfbgmottajndcknalagu',
+        inserted_at: '2025-02-16T22:24:42.115195',
+        region: 'us-east-1',
+        restUrl: 'https://zfbgmottajndcknalagu.supabase.co',
+        size: 't4g.nano',
+        status: 'ACTIVE_HEALTHY',
+      },
+    ])
+  }),
+
+  // MUST BE LAST HANDLER ON LIST
+  http.all('*', ({ request }) => {
+    console.warn('🚫 [MSW] Unhandled request:', request.method, request.url)
+    return HttpResponse.json({ message: '🚫 MSW missed' }, { status: 500 })
   }),
 ]

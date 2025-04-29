@@ -9,6 +9,7 @@ import { APIMock } from './mocks/api'
 import { routerMock } from './mocks/router'
 
 export const mswServer = setupServer(...APIMock)
+mswServer.listen({ onUnhandledRequest: 'error' })
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -25,9 +26,6 @@ Object.defineProperty(window, 'matchMedia', {
 })
 
 beforeAll(() => {
-  console.log('🤖 Starting MSW Server')
-
-  mswServer.listen({ onUnhandledRequest: 'error' })
   vi.mock('next/router', () => require('next-router-mock'))
   vi.mock('next/navigation', async () => {
     const actual = await vi.importActual('next/navigation')
