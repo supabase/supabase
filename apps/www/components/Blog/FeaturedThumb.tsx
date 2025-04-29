@@ -53,11 +53,22 @@ function FeaturedThumb(blog: PostTypes | CMSPostTypes) {
 function renderFeaturedThumb(blog: PostTypes, author: any[]) {
   console.log('blog', blog)
   console.log('author', author)
+  // const imageUrl = blog.isCMS
+  //   ? blog.thumb
+  //     ? `${CMS_API_URL}${blog.thumb}`
+  //     : blog.image
+  //       ? `${CMS_API_URL}${blog.image}`
+  //       : '/images/blog/blog-placeholder.png'
+  //   : blog.thumb
+  //     ? `/images/blog/${blog.thumb}`
+  //     : blog.image
+  //       ? `/images/blog/${blog.image}`
+  //       : '/images/blog/blog-placeholder.png'
   const imageUrl = blog.isCMS
     ? blog.thumb
-      ? `${CMS_API_URL}${blog.thumb}`
+      ? blog.thumb
       : blog.image
-        ? `${CMS_API_URL}${blog.image}`
+        ? blog.image
         : '/images/blog/blog-placeholder.png'
     : blog.thumb
       ? `/images/blog/${blog.thumb}`

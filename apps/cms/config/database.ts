@@ -13,7 +13,7 @@ export default ({ env }) => {
         password: env('DATABASE_PASSWORD', 'postgres'),
         schema: env('DATABASE_SCHEMA', 'public'),
         ssl: env.bool('DATABASE_SSL', false) && {
-          rejectUnauthorized: env.bool('DATABASE_SSL_REJECT_UNAUTHORIZED', false),
+          rejectUnauthorized: env.bool('DATABASE_SSL_REJECT_UNAUTHORIZED', true),
         },
       },
       pool: {

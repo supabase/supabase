@@ -107,4 +107,10 @@ module.exports = [
     port: '1337',
     pathname: '/api/uploads/**',
   },
+  {
+    protocol: 'https',
+    hostname: 'koovxkbhviltdcwwaqvc.supabase.co',
+    port: '',
+    pathname: '**',
+  },
 ]

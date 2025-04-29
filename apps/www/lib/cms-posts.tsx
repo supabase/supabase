@@ -64,7 +64,7 @@ type ProcessedPost = {
   description: string
   date: string
   formattedDate: string
-  readingTime: number
+  readingTime: string
   authors: Array<{
     author: string
     author_id: string
@@ -154,7 +154,9 @@ export async function getCMSPostBySlug(slug: string) {
           position: author.position || '',
           author_url: author.author_url || '#',
           author_image_url: author.author_image_url?.url
-            ? `${process.env.CMS_API_URL}${author.author_image_url.url}`
+            ? author.author_image_url.url.includes('http')
+              ? author.author_image_url?.url
+              : `${process.env.CMS_API_URL}${author.author_image_url.url}`
             : null,
           username: author.username || '',
         })) || [],
@@ -212,6 +214,8 @@ export async function getAllCMSPosts({
         const thumbUrl = (post.thumb as any)?.url
         const imageUrl = (post.image as any)?.url
 
+        console.log('imageUrl', imageUrl)
+
         return {
           slug: post.slug || '',
           title: post.Title || '',
@@ -226,7 +230,9 @@ export async function getAllCMSPosts({
               position: author.position || '',
               author_url: author.author_url || '#',
               author_image_url: author.author_image_url?.url
-                ? `${process.env.CMS_API_URL}${author.author_image_url.url}`
+                ? author.author_image_url.url.includes('http')
+                  ? author.author_image_url.url
+                  : `${process.env.CMS_API_URL}${author.author_image_url.url}`
                 : null,
               username: author.username || '',
             })) || [],

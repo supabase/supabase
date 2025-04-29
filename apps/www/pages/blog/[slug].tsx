@@ -358,7 +358,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
     </div>
   )
 
-  const imageUrl = isCMS ? `${CMS_API_URL}${props.blog.thumb}` : `/images/blog/${props.blog.thumb}`
+  const imageUrl = isCMS ? props.blog.thumb! : `/images/blog/${props.blog.thumb}`
 
   const meta = {
     title: props.blog.meta_title ?? props.blog.title,
