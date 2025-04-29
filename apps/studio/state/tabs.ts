@@ -291,29 +291,26 @@ export const handleTabClose = ({
   if (!ref) return
 
   const store = getTabsStore(ref)
-  // tabs without the one we're closing
-  const currentTab = store.tabsMap[id]
-  const currentTabs = Object.values(store.tabsMap).filter((tab) => tab.id !== id)
+  const tabBeingClosed = store.tabsMap[id]
+  const tabsAfterClosing = Object.values(store.tabsMap).filter((tab) => tab.id !== id)
 
   const nextTabId = !editor
     ? undefined
-    : currentTabs.filter((tab) => {
+    : tabsAfterClosing.filter((tab) => {
         return editorEntityTypes[editor]?.includes(tab.type)
       })[0]?.id
-  delete store.tabsMap[id]
 
-  if (currentTab) {
-    // Update store
-    // If the tab being removed is logged in the store, update the open tabs
-    store.openTabs = [...currentTabs.map((tab) => tab.id).filter((id) => id !== currentTab.id)]
+  const { [id]: value, ...otherTabs } = store.tabsMap
+  store.tabsMap = otherTabs
+
+  if (tabBeingClosed) {
+    const updatedOpenTabs = [...store.openTabs].filter((x) => x !== id)
+    store.openTabs = updatedOpenTabs
   }
 
-  // Check if there is a preview tab and if it matches the tab being closed
-  if (store.previewTabId) {
-    if (store.previewTabId === id) {
-      // remove the preview tab if it matches the tab being closed
-      store.previewTabId = undefined
-    }
+  // Remove the preview tab if it matches the tab being closed
+  if (store.previewTabId === id) {
+    store.previewTabId = undefined
   }
 
   // [Joshen] Only navigate away if we're closing the tab that's currently in focus
@@ -325,7 +322,7 @@ export const handleTabClose = ({
       onClearDashboardHistory()
 
       // If no tabs of same type, go to the home of the current section
-      switch (currentTab?.type) {
+      switch (tabBeingClosed?.type) {
         case 'sql':
           router.push(`/project/${router.query.ref}/sql`)
           break
