@@ -17,14 +17,15 @@ import { useTableEditorStateSnapshot } from './table-editor'
 export const createTableEditorTableState = ({
   projectRef,
   table: originalTable,
-  editable,
+  editable = true,
   onAddColumn,
   onExpandJSONEditor,
   onExpandTextEditor,
 }: {
   projectRef: string
   table: Entity
-  editable: boolean
+  /** If set to true, render an additional "+" column to support adding a new column in the grid editor */
+  editable?: boolean
   onAddColumn: () => void
   onExpandJSONEditor: (column: string, row: SupaRow) => void
   onExpandTextEditor: (column: string, row: SupaRow) => void

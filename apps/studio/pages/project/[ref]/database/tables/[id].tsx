@@ -56,7 +56,6 @@ const DatabaseTables: NextPageWithLayout = () => {
           key={`table-editor-table-${selectedTable.id}`}
           projectRef={project?.ref}
           table={selectedTable}
-          editable={true}
         >
           <DeleteConfirmationDialogs selectedTable={selectedTable} />
           <SidePanelEditor includeColumns selectedTable={selectedTable} />
