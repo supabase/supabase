@@ -82,11 +82,12 @@ export function isViewLike(entity?: Entity): entity is View | MaterializedView {
   return isView(entity) || isMaterializedView(entity)
 }
 
-export function postgresTableToEntity(table: PostgresTable): Entity {
+export function postgresTableToEntity(table: PostgresTable): Entity | undefined {
   if (table.columns === undefined || table.relationships === undefined) {
-    throw new Error(
-      'Unable to convert PostgresTable to Entity type. columns and relationships must not be undefined.'
+    console.error(
+      'Unable to convert PostgresTable to Entity type: columns and relationships must not be undefined.'
     )
+    return undefined
   }
 
   const tableRelationships: TableRelationship[] = table.relationships.map((rel) => ({
