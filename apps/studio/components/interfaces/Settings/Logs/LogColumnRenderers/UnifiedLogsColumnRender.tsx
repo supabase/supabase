@@ -46,6 +46,7 @@ export const UnifiedLogsColumnRender = ({ log }: UnifiedLogsColumnRenderProps) =
   return (
     <div className="flex flex-row gap-3 items-center" key={log.id}>
       <div className="flex items-center gap-2">
+        {log.method && <Badge>{log.method}</Badge>}
         <TimestampInfo utcTimestamp={log.timestamp} />
         {logLevel && (
           <span

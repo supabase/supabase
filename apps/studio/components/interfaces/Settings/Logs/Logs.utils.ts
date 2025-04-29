@@ -216,7 +216,8 @@ select
   CAST(edge_logs_response.status_code AS STRING) as code,
   'undefined' as level,
   edge_logs_request.path as path,
-  'undefined' as event_message
+  'undefined' as event_message,
+  edge_logs_request.method as method,
 from edge_logs as el
 cross join unnest(metadata) as edge_logs_metadata
 cross join unnest(edge_logs_metadata.request) as edge_logs_request
@@ -232,12 +233,13 @@ select
   pgl_parsed.sql_state_code as code,
   'undefined' as level,
   null as path,
-  'undefined' as event_message
+  'undefined' as event_message,
+  'undefined' as method,
 from postgres_logs as pgl
 cross join unnest(pgl.metadata) as pgl_metadata
 cross join unnest(pgl_metadata.parsed) as pgl_parsed
 
-union all
+union all 
 
 -- function event logs
 select 
@@ -248,6 +250,7 @@ select
   fl_metadata.level as level,
   null as path,
   fl.event_message as event_message, 
+  'undefined' as method,
   -- fl_metadata.function_id as function_id, 
   -- fl_metadata.event_type as event_type, 
 from function_logs as fl
@@ -264,6 +267,7 @@ select
   'undefined' as level,
   fel_request.url as path,
   'undefined' as event_message,
+  'undefined' as method,
   -- fel.event_message as event_message,
   -- fel_request.path as path,
   -- fel_metadata.function_id as function_id,
@@ -277,22 +281,51 @@ cross join unnest(fel_metadata.request) as fel_request
 
 union all
 
+-- OLDER QUERY FOR AUTH LOGS
+--
 -- auth logs
-select 
-  id, 
-  al.timestamp as timestamp, 
-  'auth' as log_type,
-  REGEXP_EXTRACT(al_metadata.msg, r'^(\d+):') as code, 
-  -- 'undefined' as code, 
-  al_metadata.level as level, 
-  al_metadata.path as path, 
-  'undefined' as event_message,
+-- select 
+--  id, 
+--  al.timestamp as timestamp, 
+--  'auth' as log_type,
+--  REGEXP_EXTRACT(al_metadata.msg, r'^(\d+):') as code, 
+--  -- 'undefined' as code, 
+--  al_metadata.level as level, 
+--  al_metadata.path as path, 
+--  'undefined' as event_message,
   -- al_metadata.status as status, 
+  -- 'undefined' as method,
+-- from auth_logs as al
+-- cross join unnest(metadata) as al_metadata
+
+-- NEW QUERY FOR AUTH LOGS
+-- THIS USES EDGE LOGS AS WELL TO GET STATUS AND PATH
+--
+select
+  al.id as id, 
+  el_in_al.timestamp as timestamp, 
+  el_in_al_request.path as path, 
+  'auth' as log_type,
+  CAST(el_in_al_response.status_code as STRING) as code,
+  'undefined' as level,
+  null as path,
+  el_in_al_request.method as method,
 from auth_logs as al
-cross join unnest(metadata) as al_metadata
+cross join unnest(metadata) as al_metadata left join (
+  edge_logs as el_in_al
+    cross join unnest (metadata) as el_in_al_metadata 
+    cross join unnest (el_in_al_metadata. response) as el_in_al_response 
+    cross join unnest (el_in_al_response.headers) as el_in_al_response_headers 
+    cross join unnest (el_in_al_metadata. request) as el_in_al_request
+)
+on al_metadata. request_id = el_in_al_response_headers.cf_ray
+-- filter out auth logs without a request_id
+-- it looks like most auth logs are logged twice, one of them has a request_id
+where al_metadata.request_id is not null
 
 union all
 
+-- supavisor logs
 select 
   id, 
   svl.timestamp as timestamp, 
@@ -300,9 +333,25 @@ select
   'undefined' as code,
   svl_metadata.level as level,
   null as path,
-  'undefined' as event_message 
+  'undefined' as event_message,
+  'undefined' as method,
 from supavisor_logs as svl
 cross join unnest(metadata) as svl_metadata
+
+union all
+
+-- pg_upgrade logs
+select 
+  id, 
+  pgul.timestamp as timestamp,
+  'postgres upgrade' as log_type,
+  'undefined' as code,
+  'undefined' as level,
+  -- pgul.level as level,
+  null as path,  
+  'undefined' as event_message,
+  'undefined' as method
+from pg_upgrade_logs as pgul
 
 
 ${where}
