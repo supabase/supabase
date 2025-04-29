@@ -36,6 +36,12 @@ export function useProjectByRef(
 export const useIsOrioleDb = () => {
   const project = useSelectedProject()
   const isOrioleDb =
-    project?.dbVersion?.endsWith('orioledb') && project?.cloud_provider === PROVIDERS.AWS.id
+    project?.dbVersion?.endsWith('orioledb')
   return isOrioleDb
+}
+
+export const useIsOrioleDbInAwsNew = () => {
+  const project = useSelectedProject()
+  const isOrioleDbInAwsNew = project?.cloud_provider === PROVIDERS.AWS.id
+  return isOrioleDbInAwsNew
 }
