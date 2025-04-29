@@ -8,8 +8,8 @@ import {
 } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { cn } from 'ui'
 import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
-import { Tabs } from '../Tabs'
 import { CollapseButton } from '../Tabs/CollapseButton'
+import { EditorTabs } from '../Tabs/Tabs'
 import { useEditorType } from './EditorsLayout.hooks'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
@@ -41,8 +41,7 @@ export const EditorBaseLayout = ({ children, title, product, ...props }: Explore
               !hideTabs ? 'bg-surface-200 dark:bg-alternative' : 'bg-surface-100'
             )}
           >
-            {hideTabs && <CollapseButton hideTabs={hideTabs} />}
-            {!hideTabs && <Tabs />}
+            {hideTabs ? <CollapseButton hideTabs={hideTabs} /> : <EditorTabs />}
           </div>
         ) : null}
         <div className="h-full">{children}</div>
