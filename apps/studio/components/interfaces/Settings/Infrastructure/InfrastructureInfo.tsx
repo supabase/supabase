@@ -13,6 +13,7 @@ import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-e
 import { useProjectServiceVersionsQuery } from 'data/projects/project-service-versions'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -62,7 +63,7 @@ const InfrastructureInfo = () => {
     current_app_version_release_channel && current_app_version_release_channel !== 'ga'
       ? current_app_version_release_channel
       : undefined
-  const isOrioleDb = (current_app_version ?? '').includes('orioledb')
+  const isOrioleDb = useIsOrioleDb()
   const latestPgVersion = (latest_app_version ?? '').split('supabase-postgres-')[1]
 
   const isInactive = project?.status === 'INACTIVE'
