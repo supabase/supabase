@@ -1,4 +1,4 @@
-import { Blocks, FileText, Lightbulb, List, Settings } from 'lucide-react'
+import { Blocks, FileText, Lightbulb, List, Logs, Settings } from 'lucide-react'
 
 import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
 import { generateAuthMenu } from 'components/layouts/AuthLayout/AuthLayout.utils'
@@ -148,6 +148,12 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
       label: 'Logs',
       icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/logs`),
+    },
+    {
+      key: 'unified-logs',
+      label: 'Unified Logs',
+      icon: <Logs size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/unified-logs`),
     },
     {
       key: 'api',
