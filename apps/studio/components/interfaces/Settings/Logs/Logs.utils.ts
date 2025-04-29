@@ -218,10 +218,16 @@ select
   edge_logs_request.path as path,
   'undefined' as event_message,
   edge_logs_request.method as method,
+  authorization_payload.role as api_role,
+  COALESCE(sb.auth_user, null) as auth_user,
 from edge_logs as el
 cross join unnest(metadata) as edge_logs_metadata
 cross join unnest(edge_logs_metadata.request) as edge_logs_request
 cross join unnest(edge_logs_metadata.response) as edge_logs_response
+left join unnest(edge_logs_request.sb) as sb
+left join unnest(sb.jwt) as jwt
+left join unnest(jwt.authorization) as auth
+left join unnest(auth.payload) as authorization_payload
 
 union all
 
@@ -235,6 +241,8 @@ select
   null as path,
   'undefined' as event_message,
   'undefined' as method,
+  'api_role' as api_role,
+  null as auth_user,
 from postgres_logs as pgl
 cross join unnest(pgl.metadata) as pgl_metadata
 cross join unnest(pgl_metadata.parsed) as pgl_parsed
@@ -251,6 +259,8 @@ select
   null as path,
   fl.event_message as event_message, 
   'undefined' as method,
+  'api_role' as api_role,
+  null as auth_user,
   -- fl_metadata.function_id as function_id, 
   -- fl_metadata.event_type as event_type, 
 from function_logs as fl
@@ -268,6 +278,8 @@ select
   fel_request.url as path,
   'undefined' as event_message,
   'undefined' as method,
+  'api_role' as api_role,
+  null as auth_user,
   -- fel.event_message as event_message,
   -- fel_request.path as path,
   -- fel_metadata.function_id as function_id,
@@ -310,6 +322,8 @@ select
   'undefined' as level,
   null as path,
   el_in_al_request.method as method,
+  authorization_payload.role as api_role,
+  COALESCE(sb.auth_user, null) as auth_user,
 from auth_logs as al
 cross join unnest(metadata) as al_metadata left join (
   edge_logs as el_in_al
@@ -317,6 +331,10 @@ cross join unnest(metadata) as al_metadata left join (
     cross join unnest (el_in_al_metadata. response) as el_in_al_response 
     cross join unnest (el_in_al_response.headers) as el_in_al_response_headers 
     cross join unnest (el_in_al_metadata. request) as el_in_al_request
+    left join unnest(el_in_al_request.sb) as sb
+    left join unnest(sb.jwt) as jwt
+    left join unnest(jwt.authorization) as auth
+    left join unnest(auth.payload) as authorization_payload
 )
 on al_metadata. request_id = el_in_al_response_headers.cf_ray
 -- filter out auth logs without a request_id
@@ -335,6 +353,8 @@ select
   null as path,
   'undefined' as event_message,
   'undefined' as method,
+  'api_role' as api_role,
+  null as auth_user,
 from supavisor_logs as svl
 cross join unnest(metadata) as svl_metadata
 
@@ -350,7 +370,9 @@ select
   -- pgul.level as level,
   null as path,  
   'undefined' as event_message,
-  'undefined' as method
+  'undefined' as method,
+  'api_role' as api_role,
+  null as auth_user,
 from pg_upgrade_logs as pgul
 
 
@@ -492,6 +514,109 @@ export const genChartQuery = (
   }
 
   let joins = genCrossJoinUnnests(table)
+
+  // For unified logs, we need a special query to combine data from multiple sources
+  if (table === LogsTableName.UNIFIED) {
+    return `
+WITH unified_data AS (
+  -- edge logs
+  SELECT
+    el.timestamp as timestamp,
+    CAST(edge_logs_response.status_code AS INT64) as status_code,
+    'undefined' as level
+  FROM edge_logs as el
+  CROSS JOIN UNNEST(metadata) as edge_logs_metadata
+  CROSS JOIN UNNEST(edge_logs_metadata.request) as edge_logs_request
+  CROSS JOIN UNNEST(edge_logs_metadata.response) as edge_logs_response
+  WHERE el.timestamp > '${startOffset.toISOString()}'
+  
+  UNION ALL
+  
+  -- postgres logs
+  SELECT
+    pgl.timestamp as timestamp,
+    CASE 
+      WHEN pgl_parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC') THEN 500
+      WHEN pgl_parsed.error_severity IN ('WARNING') THEN 400
+      ELSE 200
+    END as status_code,
+    pgl_parsed.error_severity as level
+  FROM postgres_logs as pgl
+  CROSS JOIN UNNEST(pgl.metadata) as pgl_metadata
+  CROSS JOIN UNNEST(pgl_metadata.parsed) as pgl_parsed
+  WHERE pgl.timestamp > '${startOffset.toISOString()}'
+  
+  UNION ALL
+  
+  -- function logs
+  SELECT
+    fl.timestamp as timestamp,
+    CASE 
+      WHEN fl_metadata.level IN ('error', 'fatal') THEN 500
+      WHEN fl_metadata.level IN ('warning') THEN 400
+      ELSE 200
+    END as status_code,
+    fl_metadata.level as level
+  FROM function_logs as fl
+  CROSS JOIN UNNEST(metadata) as fl_metadata
+  WHERE fl.timestamp > '${startOffset.toISOString()}'
+  
+  UNION ALL
+  
+  -- function edge logs
+  SELECT
+    fel.timestamp as timestamp,
+    CAST(fel_response.status_code AS INT64) as status_code,
+    'undefined' as level
+  FROM function_edge_logs as fel
+  CROSS JOIN UNNEST(metadata) as fel_metadata
+  CROSS JOIN UNNEST(fel_metadata.response) as fel_response
+  WHERE fel.timestamp > '${startOffset.toISOString()}'
+  
+  UNION ALL
+  
+  -- auth logs
+  SELECT
+    al.timestamp as timestamp,
+    CASE 
+      WHEN al_metadata.level = 'error' THEN 500
+      WHEN al_metadata.level = 'warning' THEN 400
+      ELSE 200
+    END as status_code,
+    al_metadata.level as level
+  FROM auth_logs as al
+  CROSS JOIN UNNEST(metadata) as al_metadata
+  WHERE al.timestamp > '${startOffset.toISOString()}'
+  
+  UNION ALL
+  
+  -- supavisor logs
+  SELECT
+    svl.timestamp as timestamp,
+    CASE 
+      WHEN svl_metadata.level = 'error' THEN 500
+      WHEN svl_metadata.level = 'warning' THEN 400
+      ELSE 200
+    END as status_code,
+    svl_metadata.level as level
+  FROM supavisor_logs as svl
+  CROSS JOIN UNNEST(metadata) as svl_metadata
+  WHERE svl.timestamp > '${startOffset.toISOString()}'
+)
+
+SELECT
+  timestamp_trunc(timestamp, ${trunc}) as timestamp,
+  count(CASE WHEN NOT (status_code >= 500 OR level IN ('error', 'fatal')) AND NOT (status_code >= 400 AND status_code < 500 OR level = 'warning') THEN 1 END) as ok_count,
+  count(CASE WHEN status_code >= 500 OR level IN ('error', 'fatal') THEN 1 END) as error_count,
+  count(CASE WHEN status_code >= 400 AND status_code < 500 OR level = 'warning' THEN 1 END) as warning_count
+FROM
+  unified_data
+GROUP BY
+  timestamp
+ORDER BY
+  timestamp ASC
+`
+  }
 
   const q = `
 SELECT
@@ -766,6 +891,8 @@ function getErrorCondition(table: LogsTableName): string {
       return "metadata.level IN ('error', 'fatal')"
     case 'pg_cron_logs':
       return "parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')"
+    case 'unified_logs':
+      return "(code >= '500' OR level = 'error' OR level = 'fatal')"
     default:
       return 'false'
   }
@@ -783,6 +910,8 @@ function getWarningCondition(table: LogsTableName): string {
       return 'response.status_code >= 400 AND response.status_code < 500'
     case 'function_logs':
       return "metadata.level IN ('warning')"
+    case 'unified_logs':
+      return "(code >= '400' AND code < '500') OR level = 'warning'"
     default:
       return 'false'
   }

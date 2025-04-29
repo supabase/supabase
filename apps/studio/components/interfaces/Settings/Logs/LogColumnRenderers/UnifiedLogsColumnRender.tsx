@@ -10,6 +10,7 @@ interface UnifiedLogsColumnRenderProps {
     method?: string
     code?: string
     level?: string
+    api_role?: string
   }
 }
 
@@ -47,6 +48,8 @@ export const UnifiedLogsColumnRender = ({ log }: UnifiedLogsColumnRenderProps) =
     <div className="flex flex-row gap-3 items-center" key={log.id}>
       <div className="flex items-center gap-2">
         {log.method && <Badge>{log.method}</Badge>}
+        {log.auth_user && <Badge>User: {log.auth_user}</Badge>}
+        {log.api_role && <Badge>{log.api_role}</Badge>}
         <TimestampInfo utcTimestamp={log.timestamp} />
         {logLevel && (
           <span
