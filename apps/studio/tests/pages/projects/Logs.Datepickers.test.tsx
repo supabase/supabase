@@ -2,12 +2,12 @@ import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { PREVIEWER_DATEPICKER_HELPERS } from 'components/interfaces/Settings/Logs/Logs.constants'
+import { DatetimeHelper } from 'components/interfaces/Settings/Logs/Logs.types'
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { expect, test, vi } from 'vitest'
 import { render } from '../../helpers'
-import { DatetimeHelper } from 'components/interfaces/Settings/Logs/Logs.types'
 
 dayjs.extend(timezone)
 dayjs.extend(utc)
@@ -77,8 +77,13 @@ test('renders datepicker selected dates in local time', async () => {
 
 test('datepicker onSubmit will return ISO string of selected dates', async () => {
   const mockFn = vi.fn()
-  const todayAt1300 = dayjs().hour(13).minute(0).second(0).millisecond(0).toISOString()
-  const todayAt2359 = dayjs().hour(23).minute(59).second(59).millisecond(0).toISOString()
+  const todayAt1300 = dayjs('2025-04-01').hour(13).minute(0).second(0).millisecond(0).toISOString()
+  const todayAt2359 = dayjs('2025-04-01')
+    .hour(23)
+    .minute(59)
+    .second(59)
+    .millisecond(0)
+    .toISOString()
 
   render(
     <LogsDatePicker
