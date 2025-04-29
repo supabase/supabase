@@ -97,7 +97,7 @@ A connection pool through Supavisor is also available for each Read Replica. Fin
 
 A load balancer is deployed to automatically balance requests between your Primary database and Read Replicas. Find its endpoint on the [API Settings page](/dashboard/project/_/settings/api).
 
-The load balancer enables geo-routing for Data API requests so that `GET` requests will automatically be routed to the Read Replica that is closest to your user ensuring the lowest latency. Non-`GET` requests can also be sent through this endpoint, and will be routed to the Primary database.
+The load balancer enables geo-routing for Data API requests so that `GET` requests will automatically be routed to the database that is closest to your user ensuring the lowest latency. Non-`GET` requests can also be sent through this endpoint, and will be routed to the Primary database.
 
 You can also interact with Supabase services (Auth, Edge Functions, Realtime, and Storage) through this load balancer so there's no need to worry about which endpoint to use and in which situations. However, geo-routing for these services are not yet available but is coming soon.
 
@@ -114,8 +114,8 @@ If you remove all Read Replicas from your project, the load balancer and its end
 <Admonition type="note">
 Starting on April 4th, 2025, we will be changing the routing behavior for eligible Data API requests:
 
-- Old behavior: Round-Robin distribution among all databases (all read replicas + primary) of your project
-- New behavior: Geo-routing, that directs requests to the closest available database
+- Old behavior: Round-Robin distribution among all databases (all read replicas + primary) of your project, regardless of location
+- New behavior: Geo-routing, that directs requests to the closest available database (all read replicas + primary)
 
 The new behavior delivers a better experience for your users by minimizing the latency to your project. You can take full advantage of this by placing Read Replicas close to your major customer bases.
 

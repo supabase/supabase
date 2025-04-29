@@ -2,6 +2,7 @@ import { Boxes } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
+import { LayoutUpdateBanner } from 'components/interfaces/App/FeaturePreview/LayoutUpdatePreview'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainerLegacy, ScaffoldTitle } from 'components/layouts/Scaffold'
@@ -27,6 +28,7 @@ const OrganizationsPage: NextPageWithLayout = () => {
   return (
     <>
       <ScaffoldContainerLegacy>
+        <LayoutUpdateBanner />
         <ScaffoldTitle>Your Organizations</ScaffoldTitle>
       </ScaffoldContainerLegacy>
       <ScaffoldContainerLegacy>
