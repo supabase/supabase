@@ -2,7 +2,7 @@ import { type DocumentNode, graphql, GraphQLError, parse, specifiedRules, valida
 import { createComplexityLimitRule } from 'graphql-validation-complexity'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { ApiError, InvalidRequestError } from '~/app/api/utils'
+import { ApiError, convertZodToInvalidRequestError, InvalidRequestError } from '~/app/api/utils'
 import { rootGraphQLResolver } from '~/resources/rootResolver'
 import { rootGraphQLSchema } from '~/resources/rootSchema'
 import { createQueryDepthLimiter } from './validators'
@@ -16,14 +16,14 @@ const graphQLRequestSchema = z.object({
 })
 
 async function handleGraphQLRequest(request: Request): Promise<NextResponse> {
-  const body = await request.json().catch(() => {
-    throw new InvalidRequestError('Request body must be valid JSON')
+  const body = await request.json().catch((error) => {
+    throw new InvalidRequestError('Request body must be valid JSON', error)
   })
   const parsedBody = graphQLRequestSchema.safeParse(body)
   if (!parsedBody.success) {
-    const errorMessage = parsedBody.error?.message
-    throw new InvalidRequestError(
-      `Request body must be a valid GraphQL request object${errorMessage ? `: ${errorMessage}` : ''}`
+    throw convertZodToInvalidRequestError(
+      parsedBody.error,
+      'Request body must be valid GraphQL request object'
     )
   }
 
@@ -47,10 +47,7 @@ async function handleGraphQLRequest(request: Request): Promise<NextResponse> {
     variableValues: variables,
     operationName,
   })
-  // return NextResponse.json(result)
-
-  // For now, just return a 404 response
-  return new NextResponse('Not Found', { status: 404 })
+  return NextResponse.json(result)
 }
 
 function validateGraphQLRequest(query: string): ReadonlyArray<GraphQLError> {
@@ -85,11 +82,13 @@ export async function POST(request: Request): Promise<NextResponse> {
     console.error(error)
 
     if (error instanceof ApiError) {
-      return new NextResponse(error.isPrivate() ? 'Internal Server Error' : error.message, {
-        status: error.statusCode(),
+      return NextResponse.json({
+        errors: [{ message: error.isPrivate() ? 'Internal Server Error' : error.message }],
       })
     } else {
-      return new NextResponse('Internal Server Error', { status: 500 })
+      return NextResponse.json({
+        errors: [{ message: 'Internal Server Error' }],
+      })
     }
   }
 }
