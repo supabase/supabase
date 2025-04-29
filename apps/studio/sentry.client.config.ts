@@ -7,10 +7,14 @@ import { IS_PLATFORM } from 'common/constants/environment'
 import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
 import { match } from 'path-to-regexp'
 
+// This is a workaround to ignore hCaptcha related errors.
 function isHCaptchaRelatedError(event: Sentry.Event): boolean {
   const errors = event.exception?.values ?? []
   for (const error of errors) {
-    if (error.stacktrace?.frames?.some((f) => f.abs_path?.includes('onload=hCaptchaOnLoad'))) {
+    if (
+      error.value?.includes('is not a function') &&
+      error.stacktrace?.frames?.some((f) => f.filename === 'api.js')
+    ) {
       return true
     }
   }

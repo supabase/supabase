@@ -142,15 +142,15 @@ describe('useRegisterCommand', () => {
 
     expect(screen.getByRole('listitem')).toHaveTextContent('Command one')
 
-    act(() => {
-      userEvent.click(screen.getByRole('button'))
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button'))
     })
     await waitFor(() => {
       expect(screen.queryByRole('listitem')).toBeNull()
     })
 
-    act(() => {
-      userEvent.click(screen.getByRole('button'))
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button'))
     })
     await waitFor(() => {
       expect(screen.getByRole('listitem')).toHaveTextContent('Command one')
@@ -169,8 +169,8 @@ describe('useRegisterCommand', () => {
 
     expect(screen.getAllByRole('listitem')).toHaveLength(2)
 
-    act(() => {
-      userEvent.click(screen.getByRole('button'))
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button'))
     })
     await waitFor(() => {
       expect(screen.queryAllByRole('listitem')).toHaveLength(0)
@@ -189,15 +189,15 @@ describe('useRegisterCommand', () => {
 
     expect(screen.getByRole('listitem')).toHaveTextContent('Command one')
 
-    act(() => {
-      userEvent.click(screen.getByRole('button'))
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button'))
     })
     await waitFor(() => {
       expect(screen.queryByRole('listitem')).toBeNull()
     })
 
-    act(() => {
-      userEvent.click(screen.getByRole('button'))
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button'))
     })
     await waitFor(() => {
       expect(screen.getByRole('listitem')).toHaveTextContent('Command one')
@@ -216,8 +216,8 @@ describe('useRegisterCommand', () => {
 
     expect(screen.getByText('Command one')).toBeVisible()
 
-    act(() => {
-      userEvent.click(screen.getByRole('button'))
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button'))
     })
     await waitFor(() => {
       expect(screen.queryByText('Command one')).toBeNull()
@@ -240,8 +240,8 @@ describe('useRegisterCommand', () => {
     // React renders twice in dev mode
     expect(mockCommandMenuRenderCount).toBe(2)
 
-    act(() => {
-      userEvent.click(screen.getByRole('button'))
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button'))
     })
     await waitFor(() => screen.getByText('Render flag: 1'))
 

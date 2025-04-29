@@ -93,21 +93,29 @@ export const createTableEditorTableState = ({
       state.gridColumns.splice(toIdx, 0, moveItem)
     },
     updateColumnSize: (index: number, width: number) => {
-      ;(state.gridColumns[index] as CalculatedColumn<any, any> & { width?: number }).width = width
+      if (state.gridColumns[index]) {
+        ;(state.gridColumns[index] as CalculatedColumn<any, any> & { width?: number }).width = width
+      }
     },
     freezeColumn: (columnKey: string) => {
       const index = state.gridColumns.findIndex((x) => x.key === columnKey)
-      ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen = true
+      if (state.gridColumns[index]) {
+        ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen =
+          true
+      }
     },
     unfreezeColumn: (columnKey: string) => {
       const index = state.gridColumns.findIndex((x) => x.key === columnKey)
-      ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen =
-        false
+      if (state.gridColumns[index]) {
+        ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen =
+          false
+      }
     },
     updateColumnIdx: (columnKey: string, columnIdx: number) => {
       const index = state.gridColumns.findIndex((x) => x.key === columnKey)
-      ;(state.gridColumns[index] as CalculatedColumn<any, any> & { idx?: number }).idx = columnIdx
-
+      if (state.gridColumns[index]) {
+        ;(state.gridColumns[index] as CalculatedColumn<any, any> & { idx?: number }).idx = columnIdx
+      }
       state.gridColumns.sort((a, b) => a.idx - b.idx)
     },
 

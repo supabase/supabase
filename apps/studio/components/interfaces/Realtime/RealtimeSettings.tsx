@@ -17,7 +17,6 @@ import {
   REALTIME_DEFAULT_CONFIG,
   useRealtimeConfigurationQuery,
 } from 'data/realtime/realtime-config-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
@@ -30,10 +29,8 @@ import {
   FormField_Shadcn_,
   FormMessage_Shadcn_,
   Input_Shadcn_,
-  Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const formId = 'realtime-configuration-form'
 
@@ -50,10 +47,8 @@ export const RealtimeSettings = () => {
   const { data, error, isLoading, isSuccess, isError } = useRealtimeConfigurationQuery({
     projectRef,
   })
-  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
-    orgSlug: organization?.slug,
-  })
-  const isUsageBillingEnabled = subscription?.usage_billing_enabled
+
+  const isUsageBillingEnabled = organization?.usage_billing_enabled
 
   const { mutate: updateRealtimeConfig, isLoading: isUpdatingConfig } =
     useRealtimeConfigurationUpdateMutation({
@@ -219,7 +214,7 @@ export const RealtimeSettings = () => {
                           />
                         </FormControl_Shadcn_>
                         <FormMessage_Shadcn_ />
-                        {isSuccessSubscription && !isUsageBillingEnabled && (
+                        {!isUsageBillingEnabled && (
                           <Admonition
                             showIcon={false}
                             type="default"

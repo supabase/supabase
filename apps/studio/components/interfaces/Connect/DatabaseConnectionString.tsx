@@ -5,14 +5,15 @@ import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { InlineLink } from 'components/ui/InlineLink'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from 'lib/constants'
 import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -67,10 +68,9 @@ export const DatabaseConnectionString = () => {
 
   const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const sharedPoolerPreferred = useMemo(() => {
-    return subscription?.plan?.id === 'free'
-  }, [subscription])
+    return org?.plan?.id === 'free'
+  }, [org])
 
   const {
     data: pgbouncerConfig,
@@ -96,15 +96,21 @@ export const DatabaseConnectionString = () => {
   } = useReadReplicasQuery({ projectRef })
 
   const poolerError = sharedPoolerPreferred ? pgbouncerError : supavisorConfigError
-  const isLoadingPoolerConfig = sharedPoolerPreferred
-    ? isLoadingPgbouncerConfig
-    : isLoadingSupavisorConfig
-  const isErrorPoolerConfig = sharedPoolerPreferred
-    ? isErrorPgbouncerConfig
-    : isErrorSupavisorConfig
-  const isSuccessPoolerConfig = sharedPoolerPreferred
-    ? isSuccessPgBouncerConfig
-    : isSuccessSupavisorConfig
+  const isLoadingPoolerConfig = !IS_PLATFORM
+    ? false
+    : sharedPoolerPreferred
+      ? isLoadingPgbouncerConfig
+      : isLoadingSupavisorConfig
+  const isErrorPoolerConfig = !IS_PLATFORM
+    ? undefined
+    : sharedPoolerPreferred
+      ? isErrorPgbouncerConfig
+      : isErrorSupavisorConfig
+  const isSuccessPoolerConfig = !IS_PLATFORM
+    ? true
+    : sharedPoolerPreferred
+      ? isSuccessPgBouncerConfig
+      : isSuccessSupavisorConfig
 
   const error = poolerError || readReplicasError
   const isLoading = isLoadingPoolerConfig || isLoadingReadReplicas
@@ -154,48 +160,22 @@ export const DatabaseConnectionString = () => {
     metadata: { projectRef },
   })
 
-  const connectionStrings =
-    isSuccessSupavisorConfig && poolingConfiguration !== undefined
-      ? getConnectionStrings({
-          connectionInfo,
-          poolingInfo: {
-            connectionString: isReplicaSelected
-              ? poolingConfiguration.connection_string.replace(
-                  poolingConfiguration.db_host,
-                  connectionInfo.db_host
-                )
-              : poolingConfiguration.connection_string,
-            db_host: isReplicaSelected ? connectionInfo.db_host : poolingConfiguration.db_host,
-            db_name: poolingConfiguration.db_name,
-            db_port: poolingConfiguration.db_port,
-            db_user: poolingConfiguration.db_user,
-          },
-          metadata: { projectRef },
-        })
-      : {
-          direct: {
-            uri: '',
-            psql: '',
-            golang: '',
-            jdbc: '',
-            dotnet: '',
-            nodejs: '',
-            php: '',
-            python: '',
-            sqlalchemy: '',
-          },
-          pooler: {
-            uri: '',
-            psql: '',
-            golang: '',
-            jdbc: '',
-            dotnet: '',
-            nodejs: '',
-            php: '',
-            python: '',
-            sqlalchemy: '',
-          },
-        }
+  const connectionStrings = getConnectionStrings({
+    connectionInfo,
+    poolingInfo: {
+      connectionString: isReplicaSelected
+        ? poolingConfiguration?.connection_string.replace(
+            poolingConfiguration?.db_host,
+            connectionInfo.db_host
+          ) ?? ''
+        : poolingConfiguration?.connection_string ?? '',
+      db_host: isReplicaSelected ? connectionInfo.db_host : poolingConfiguration?.db_host,
+      db_name: poolingConfiguration?.db_name ?? '',
+      db_port: poolingConfiguration?.db_port ?? 0,
+      db_user: poolingConfiguration?.db_user ?? '',
+    },
+    metadata: { projectRef },
+  })
 
   const lang = DATABASE_CONNECTION_TYPES.find((type) => type.id === selectedTab)?.lang ?? 'bash'
   const contentType =
@@ -352,130 +332,135 @@ export const DatabaseConnectionString = () => {
                 onCopyCallback={() => handleCopy(selectedTab, 'direct')}
               />
 
-              <ConnectionPanel
-                type="transaction"
-                title="Transaction pooler"
-                contentType={contentType}
-                lang={lang}
-                badge={poolerBadge}
-                fileTitle={fileTitle}
-                description="Ideal for stateless applications like serverless functions where each interaction with Postgres is brief and isolated."
-                connectionString={connectionStrings['pooler'][selectedTab]}
-                ipv4Status={{
-                  type: !sharedPoolerPreferred && !ipv4Addon ? 'error' : 'success',
-                  title:
-                    !sharedPoolerPreferred && !ipv4Addon
-                      ? 'Not IPv4 compatible'
-                      : 'IPv4 compatible',
-                  description:
-                    !sharedPoolerPreferred && !ipv4Addon
-                      ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
-                      : sharedPoolerPreferred
-                        ? 'Transaction pooler connections are IPv4 proxied for free.'
-                        : IPV4_ADDON_TEXT,
-                  links: !sharedPoolerPreferred ? buttonLinks : undefined,
-                }}
-                notice={['Does not support PREPARE statements']}
-                parameters={[
-                  { ...CONNECTION_PARAMETERS.host, value: poolingConfiguration?.db_host ?? '' },
-                  {
-                    ...CONNECTION_PARAMETERS.port,
-                    value: poolingConfiguration?.db_port.toString() ?? '6543',
-                  },
-                  {
-                    ...CONNECTION_PARAMETERS.database,
-                    value: poolingConfiguration?.db_name ?? '',
-                  },
-                  { ...CONNECTION_PARAMETERS.user, value: poolingConfiguration?.db_user ?? '' },
-                  { ...CONNECTION_PARAMETERS.pool_mode, value: 'transaction' },
-                ]}
-                onCopyCallback={() => handleCopy(selectedTab, 'transaction_pooler')}
-              >
-                {!sharedPoolerPreferred && !ipv4Addon && (
-                  <Collapsible_Shadcn_ className="group">
-                    <CollapsibleTrigger_Shadcn_
-                      asChild
-                      className="w-full justify-start !last:rounded-b group-data-[state=open]:rounded-b-none border-light mt-4 px-3"
+              {IS_PLATFORM && (
+                <>
+                  <ConnectionPanel
+                    type="transaction"
+                    title="Transaction pooler"
+                    contentType={contentType}
+                    lang={lang}
+                    badge={poolerBadge}
+                    fileTitle={fileTitle}
+                    description="Ideal for stateless applications like serverless functions where each interaction with Postgres is brief and isolated."
+                    connectionString={connectionStrings['pooler'][selectedTab]}
+                    ipv4Status={{
+                      type: !sharedPoolerPreferred && !ipv4Addon ? 'error' : 'success',
+                      title:
+                        !sharedPoolerPreferred && !ipv4Addon
+                          ? 'Not IPv4 compatible'
+                          : 'IPv4 compatible',
+                      description:
+                        !sharedPoolerPreferred && !ipv4Addon
+                          ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
+                          : sharedPoolerPreferred
+                            ? 'Transaction pooler connections are IPv4 proxied for free.'
+                            : IPV4_ADDON_TEXT,
+                      links: !sharedPoolerPreferred ? buttonLinks : undefined,
+                    }}
+                    notice={['Does not support PREPARE statements']}
+                    parameters={[
+                      { ...CONNECTION_PARAMETERS.host, value: poolingConfiguration?.db_host ?? '' },
+                      {
+                        ...CONNECTION_PARAMETERS.port,
+                        value: poolingConfiguration?.db_port.toString() ?? '6543',
+                      },
+                      {
+                        ...CONNECTION_PARAMETERS.database,
+                        value: poolingConfiguration?.db_name ?? '',
+                      },
+                      { ...CONNECTION_PARAMETERS.user, value: poolingConfiguration?.db_user ?? '' },
+                      { ...CONNECTION_PARAMETERS.pool_mode, value: 'transaction' },
+                    ]}
+                    onCopyCallback={() => handleCopy(selectedTab, 'transaction_pooler')}
+                  >
+                    {!sharedPoolerPreferred && !ipv4Addon && (
+                      <Collapsible_Shadcn_ className="group">
+                        <CollapsibleTrigger_Shadcn_
+                          asChild
+                          className="w-full justify-start !last:rounded-b group-data-[state=open]:rounded-b-none border-light mt-4 px-3"
+                        >
+                          <Button
+                            type="default"
+                            size="large"
+                            iconRight={
+                              <ChevronDown className="transition group-data-[state=open]:rotate-180" />
+                            }
+                            className="text-foreground !bg-dash-sidebar justify-between"
+                          >
+                            <div className="text-xs flex items-center p-2">
+                              <span>Using the Shared Pooler</span>
+                              <Badge variant={'brand'} size={'small'} className="ml-2">
+                                IPv4 compatible
+                              </Badge>
+                            </div>
+                          </Button>
+                        </CollapsibleTrigger_Shadcn_>
+                        <CollapsibleContent_Shadcn_ className="bg-dash-sidebar rounded-b border text-xs">
+                          <p className="px-3 py-2">
+                            Only recommended when your network does not support IPv6. Added latency
+                            compared to dedicated pooler.
+                          </p>
+                          <CodeBlock
+                            wrapperClassName={cn(
+                              '[&_pre]:border-x-0 [&_pre]:border-b-0 [&_pre]:px-4 [&_pre]:py-3',
+                              '[&_pre]:rounded-t-none'
+                            )}
+                            language={lang}
+                            value={supavisorConnectionStrings['pooler'][selectedTab]}
+                            className="[&_code]:text-[12px] [&_code]:text-foreground"
+                            hideLineNumbers
+                            onCopyCallback={() => handleCopy(selectedTab, 'transaction_pooler')}
+                          />
+                        </CollapsibleContent_Shadcn_>
+                      </Collapsible_Shadcn_>
+                    )}
+                  </ConnectionPanel>
+
+                  {sharedPoolerPreferred && ipv4Addon && (
+                    <Admonition
+                      type="warning"
+                      title="Highly recommended to not use Session Pooler"
+                      className="[&>div]:gap-0 px-8 [&>svg]:left-7 border-0 border-b rounded-none border-border-muted !py-4 mb-0"
                     >
-                      <Button
-                        type="default"
-                        size="large"
-                        iconRight={
-                          <ChevronDown className="transition group-data-[state=open]:rotate-180" />
-                        }
-                        className="text-foreground !bg-dash-sidebar justify-between"
-                      >
-                        <div className="text-xs flex items-center p-2">
-                          <span>Using the Shared Pooler</span>
-                          <Badge variant={'brand'} size={'small'} className="ml-2">
-                            IPv4 compatible
-                          </Badge>
-                        </div>
-                      </Button>
-                    </CollapsibleTrigger_Shadcn_>
-                    <CollapsibleContent_Shadcn_ className="bg-dash-sidebar rounded-b border text-xs">
-                      <p className="px-3 py-2">
-                        Only recommended when your network does not support IPv6. Added latency
-                        compared to dedicated pooler.
+                      <p className="text-sm text-foreground-lighter !mb-0">
+                        If you are using Session Pooler, we recommend switching to Direct
+                        Connection.
                       </p>
-                      <CodeBlock
-                        wrapperClassName={cn(
-                          '[&_pre]:border-x-0 [&_pre]:border-b-0 [&_pre]:px-4 [&_pre]:py-3',
-                          '[&_pre]:rounded-t-none'
-                        )}
-                        language={lang}
-                        value={supavisorConnectionStrings['pooler'][selectedTab]}
-                        className="[&_code]:text-[12px] [&_code]:text-foreground"
-                        hideLineNumbers
-                        onCopyCallback={() => handleCopy(selectedTab, 'transaction_pooler')}
-                      />
-                    </CollapsibleContent_Shadcn_>
-                  </Collapsible_Shadcn_>
-                )}
-              </ConnectionPanel>
+                    </Admonition>
+                  )}
 
-              {sharedPoolerPreferred && ipv4Addon && (
-                <Admonition
-                  type="warning"
-                  title="Highly recommended to not use Session Pooler"
-                  className="[&>div]:gap-0 px-8 [&>svg]:left-7 border-0 border-b rounded-none border-border-muted !py-4 mb-0"
-                >
-                  <p className="text-sm text-foreground-lighter !mb-0">
-                    If you are using Session Pooler, we recommend switching to Direct Connection.
-                  </p>
-                </Admonition>
+                  <ConnectionPanel
+                    type="session"
+                    title="Session pooler"
+                    contentType={contentType}
+                    lang={lang}
+                    badge="Shared Pooler"
+                    fileTitle={fileTitle}
+                    description="Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network."
+                    connectionString={supavisorConnectionStrings['pooler'][selectedTab].replace(
+                      '6543',
+                      '5432'
+                    )}
+                    ipv4Status={{
+                      type: 'success',
+                      title: 'IPv4 compatible',
+                      description: 'Session pooler connections are IPv4 proxied for free',
+                      links: undefined,
+                    }}
+                    parameters={[
+                      { ...CONNECTION_PARAMETERS.host, value: sharedPoolerConfig?.db_host ?? '' },
+                      { ...CONNECTION_PARAMETERS.port, value: '5432' },
+                      {
+                        ...CONNECTION_PARAMETERS.database,
+                        value: sharedPoolerConfig?.db_name ?? '',
+                      },
+                      { ...CONNECTION_PARAMETERS.user, value: sharedPoolerConfig?.db_user ?? '' },
+                      { ...CONNECTION_PARAMETERS.pool_mode, value: 'session' },
+                    ]}
+                    onCopyCallback={() => handleCopy(selectedTab, 'session_pooler')}
+                  />
+                </>
               )}
-
-              <ConnectionPanel
-                type="session"
-                title="Session pooler"
-                contentType={contentType}
-                lang={lang}
-                badge="Shared Pooler"
-                fileTitle={fileTitle}
-                description="Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network."
-                connectionString={supavisorConnectionStrings['pooler'][selectedTab].replace(
-                  '6543',
-                  '5432'
-                )}
-                ipv4Status={{
-                  type: 'success',
-                  title: 'IPv4 compatible',
-                  description: 'Session pooler connections are IPv4 proxied for free',
-                  links: undefined,
-                }}
-                parameters={[
-                  { ...CONNECTION_PARAMETERS.host, value: sharedPoolerConfig?.db_host ?? '' },
-                  { ...CONNECTION_PARAMETERS.port, value: '5432' },
-                  {
-                    ...CONNECTION_PARAMETERS.database,
-                    value: sharedPoolerConfig?.db_name ?? '',
-                  },
-                  { ...CONNECTION_PARAMETERS.user, value: sharedPoolerConfig?.db_user ?? '' },
-                  { ...CONNECTION_PARAMETERS.pool_mode, value: 'session' },
-                ]}
-                onCopyCallback={() => handleCopy(selectedTab, 'session_pooler')}
-              />
             </div>
           </div>
 
@@ -505,7 +490,7 @@ export const DatabaseConnectionString = () => {
       {selectedTab === 'python' && (
         <>
           <Separator />
-          <Collapsible_Shadcn_ className="px-8 pt-5">
+          <Collapsible_Shadcn_ className="px-8 py-5">
             <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:!-rotate-180">
               <div className="flex items-center gap-x-2 w-full">
                 <p className="text-xs text-foreground-light group-hover:text-foreground transition">
@@ -534,6 +519,20 @@ export const DatabaseConnectionString = () => {
           </Collapsible_Shadcn_>
         </>
       )}
+
+      <Separator />
+      <div className="px-8 pt-5 flex flex-col gap-y-1">
+        <p className="text-sm">Reset your database password</p>
+        <p className="text-sm text-foreground-lighter">
+          You may reset your database password in your project's{' '}
+          <InlineLink
+            href={`/project/${projectRef}/settings/database`}
+            className="text-foreground-lighter hover:text-foreground"
+          >
+            Database Settings
+          </InlineLink>
+        </p>
+      </div>
     </div>
   )
 }

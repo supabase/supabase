@@ -3,26 +3,38 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useOrganizationDeleteMutation } from 'data/organizations/organization-delete-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { Button, Form, Input, Modal } from 'ui'
 
 const DeleteOrganizationButton = () => {
   const router = useRouter()
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
   const selectedOrganization = useSelectedOrganization()
   const { slug: orgSlug, name: orgName } = selectedOrganization ?? {}
 
   const [isOpen, setIsOpen] = useState(false)
   const [value, setValue] = useState('')
 
+  const [_, setLastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
+
   const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const { mutate: deleteOrganization, isLoading: isDeleting } = useOrganizationDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted ${orgName}`)
-      router.push(newLayoutPreview ? '/organizations' : '/projects')
+      if (newLayoutPreview) {
+        setLastVisitedOrganization('')
+        router.push('/organizations')
+      } else {
+        router.push('/projects')
+      }
     },
   })
 

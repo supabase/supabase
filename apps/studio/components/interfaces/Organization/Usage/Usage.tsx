@@ -1,24 +1,23 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
+import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   ScaffoldContainer,
   ScaffoldContainerLegacy,
   ScaffoldTitle,
 } from 'components/layouts/Scaffold'
-
 import AlertError from 'components/ui/AlertError'
 import DateRangePicker from 'components/ui/DateRangePicker'
-import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { cn, Listbox } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -28,10 +27,9 @@ import Bandwidth from './Bandwidth'
 import Compute from './Compute'
 import SizeAndCounts from './SizeAndCounts'
 import TotalUsage from './TotalUsage'
-import Link from 'next/link'
 
 const Usage = () => {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
 
   const { slug, projectRef } = useParams()
   const [dateRange, setDateRange] = useState<any>()

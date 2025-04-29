@@ -4,11 +4,10 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
@@ -29,7 +28,7 @@ import {
 } from 'ui'
 
 const OrganizationDropdown = () => {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
 
   const router = useRouter()
   const { slug: routeSlug } = useParams()
@@ -40,7 +39,6 @@ const OrganizationDropdown = () => {
 
   const slug = selectedOrganization?.slug
   const orgName = selectedOrganization?.name
-  const { data: subscription, isSuccess } = useOrgSubscriptionQuery({ orgSlug: slug })
 
   const [open, setOpen] = useState(false)
 
@@ -56,7 +54,7 @@ const OrganizationDropdown = () => {
           <span className="text-foreground max-w-32 lg:max-w-none truncate hidden md:block">
             {orgName}
           </span>
-          {isSuccess && <Badge variant="default">{subscription?.plan.name}</Badge>}
+          <Badge variant="default">{selectedOrganization?.plan.name}</Badge>
         </Link>
       )}
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
@@ -64,14 +62,14 @@ const OrganizationDropdown = () => {
           {newLayoutPreview ? (
             <Button
               type="text"
-              className={cn('px-0.25 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
+              className={cn('px-1.5 py-4 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
               iconRight={<ChevronsUpDown strokeWidth={1.5} />}
             />
           ) : (
             <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
               <div className="flex items-center space-x-2">
                 <p className={'text-xs'}>{orgName}</p>
-                {isSuccess && <Badge variant="default">{subscription?.plan.name}</Badge>}
+                <Badge variant="default">{selectedOrganization?.plan.name}</Badge>
               </div>
             </Button>
           )}

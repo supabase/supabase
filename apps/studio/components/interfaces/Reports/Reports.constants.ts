@@ -12,22 +12,34 @@ interface ReportsDatetimeHelper extends DatetimeHelper {
 
 export const REPORTS_DATEPICKER_HELPERS: ReportsDatetimeHelper[] = [
   {
+    text: 'Last 10 minutes',
+    calcFrom: () => dayjs().subtract(10, 'minute').toISOString(),
+    calcTo: () => dayjs().toISOString(),
+    availableIn: ['team', 'enterprise'],
+  },
+  {
+    text: 'Last 30 minutes',
+    calcFrom: () => dayjs().subtract(30, 'minute').toISOString(),
+    calcTo: () => dayjs().toISOString(),
+    availableIn: ['team', 'enterprise'],
+  },
+  {
     text: 'Last 60 minutes',
     calcFrom: () => dayjs().subtract(1, 'hour').startOf('day').toISOString(),
-    calcTo: () => '',
+    calcTo: () => dayjs().toISOString(),
     default: true,
     availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
     text: 'Last 3 hours',
     calcFrom: () => dayjs().subtract(3, 'hour').startOf('day').toISOString(),
-    calcTo: () => '',
+    calcTo: () => dayjs().toISOString(),
     availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
     text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
-    calcTo: () => '',
+    calcTo: () => dayjs().toISOString(),
     availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
@@ -53,7 +65,7 @@ export const REPORTS_DATEPICKER_HELPERS: ReportsDatetimeHelper[] = [
 export const createFilteredDatePickerHelpers = (planId: PlanId) => {
   return REPORTS_DATEPICKER_HELPERS.map((helper) => ({
     ...helper,
-    disabled: !helper.availableIn.includes(planId),
+    disabled: !helper.availableIn?.includes(planId),
   }))
 }
 

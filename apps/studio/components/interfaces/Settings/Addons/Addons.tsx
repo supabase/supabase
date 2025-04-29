@@ -63,7 +63,6 @@ const Addons = () => {
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
 
-  const computeSizeChangesDisabled = useFlag('disableComputeSizeChanges')
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
@@ -485,7 +484,7 @@ const Addons = () => {
                           </p>
                           <Button asChild type="default">
                             <Link
-                              href={`/support/new?ref=${projectRef}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
+                              href={`/support/new?projectRef=${projectRef}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
                             >
                               <a>Contact support</a>
                             </Link>
