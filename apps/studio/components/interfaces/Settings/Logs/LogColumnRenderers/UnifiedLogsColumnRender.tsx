@@ -1,4 +1,5 @@
 import { LogData } from 'components/interfaces/Settings/Logs/Logs.types'
+import { Badge } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 interface UnifiedLogsColumnRenderProps {
@@ -9,6 +10,7 @@ interface UnifiedLogsColumnRenderProps {
     method?: string
     code?: string
     level?: string
+    api_role?: string
   }
 }
 
@@ -45,6 +47,9 @@ export const UnifiedLogsColumnRender = ({ log }: UnifiedLogsColumnRenderProps) =
   return (
     <div className="flex flex-row gap-3 items-center" key={log.id}>
       <div className="flex items-center gap-2">
+        {log.method && <Badge>{log.method}</Badge>}
+        {log.auth_user && <Badge>User: {log.auth_user}</Badge>}
+        {log.api_role && <Badge>{log.api_role}</Badge>}
         <TimestampInfo utcTimestamp={log.timestamp} />
         {logLevel && (
           <span
@@ -59,7 +64,8 @@ export const UnifiedLogsColumnRender = ({ log }: UnifiedLogsColumnRenderProps) =
             {logLevel}
           </span>
         )}
-        <span className="text-xs text-foreground-light">{log_type}</span>
+        <Badge>{log_type}</Badge>
+        {/* <span className="text-xs text-foreground-light">{log_type}</span> */}
         {logCode && <span className="text-xs text-foreground-light">{logCode}</span>}
       </div>
       {logPath && <div className="text-xs text-foreground-light">{logPath}</div>}
