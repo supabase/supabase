@@ -1282,6 +1282,9 @@ importers:
       '@radix-ui/react-dialog':
         specifier: ^1.0.5
         version: 1.0.5(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@strapi/client':
+        specifier: ^1.3.0
+        version: 1.3.0(supports-color@8.1.1)
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.49.3(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -6370,6 +6373,10 @@ packages:
       react-router-dom: ^6.0.0
       styled-components: ^6.0.0
 
+  '@strapi/client@1.3.0':
+    resolution: {integrity: sha512-qRssxOR+vOrDZDLpugDoZyLYJw2nZjDgTQttddAPgbqhdt+elf+zW1NZW7uEbTY9yIpTokw/FSq+2lJ2qVDHaA==}
+    engines: {node: '>=20.18.2 <=22.x.x'}
+
   '@strapi/cloud-cli@5.12.5':
     resolution: {integrity: sha512-wJEroc222oYosDijaC2Xqb89hR3/+QqJo9a+rsjvby8PJ1DtC9bWWiM9NsvkPwlsxe+8GbLWNJ+tXyEqtGbqNA==}
     engines: {node: '>=18.0.0 <=22.x.x', npm: '>=6.0.0'}
@@ -10415,6 +10422,7 @@ packages:
 
   formidable@2.1.2:
     resolution: {integrity: sha512-CM3GuJ57US06mlpQ47YcunuUZ9jpm8Vx+P2CGt2j7HpgkKZO/DJYQ0Bobim8G6PFQmK5lOqOOdUXboU+h73A4g==}
+    deprecated: 'ACTION REQUIRED: SWITCH TO v3 - v1 and v2 are VULNERABLE! v1 is DEPRECATED FOR OVER 2 YEARS! Use formidable@latest or try formidable-mini for fresh projects'
 
   formik@2.4.5:
     resolution: {integrity: sha512-Gxlht0TD3vVdzMDHwkiNZqJ7Mvg77xQNfmBRrNtvzcHZs72TJppSTDKHpImCMJZwcWPBJ8jSQQ95GJzXFf1nAQ==}
@@ -15572,10 +15580,6 @@ packages:
 
   side-channel-weakmap@1.0.2:
     resolution: {integrity: sha512-WPS/HvHQTYnHisLo9McqBHOJk2FkHO/tlpvldyrnem4aeQp4hai3gythswg6p01oSoTl58rcpiFAjF2br2Ak2A==}
-    engines: {node: '>= 0.4'}
-
-  side-channel@1.0.6:
-    resolution: {integrity: sha512-fDW/EZ6Q9RiO8eFG8Hj+7u/oW+XrPTIChwCOM2+th2A6OblDtYYIpve9m+KvI9Z4C9qSEXlaGR6bTEYHReuglA==}
     engines: {node: '>= 0.4'}
 
   side-channel@1.1.0:
@@ -22812,6 +22816,13 @@ snapshots:
       - supports-color
       - tedious
 
+  '@strapi/client@1.3.0(supports-color@8.1.1)':
+    dependencies:
+      debug: 4.4.0(supports-color@8.1.1)
+      qs: 6.14.0
+    transitivePeerDependencies:
+      - supports-color
+
   '@strapi/cloud-cli@5.12.5(supports-color@8.1.1)':
     dependencies:
       '@strapi/utils': 5.12.5
@@ -26687,7 +26698,7 @@ snapshots:
     dependencies:
       '@hapi/bourne': 3.0.0
       inflation: 2.1.0
-      qs: 6.11.1
+      qs: 6.14.0
       raw-body: 2.5.2
       type-is: 1.6.18
 
@@ -28634,7 +28645,7 @@ snapshots:
       dezalgo: 1.0.4
       hexoid: 1.0.0
       once: 1.4.0
-      qs: 6.11.1
+      qs: 6.14.0
 
   formik@2.4.5(react@18.3.1):
     dependencies:
@@ -29793,7 +29804,7 @@ snapshots:
     dependencies:
       es-errors: 1.3.0
       hasown: 2.0.2
-      side-channel: 1.0.6
+      side-channel: 1.1.0
 
   internmap@2.0.3: {}
 
@@ -30083,7 +30094,7 @@ snapshots:
   is-weakset@2.0.2:
     dependencies:
       call-bind: 1.0.7
-      get-intrinsic: 1.2.7
+      get-intrinsic: 1.3.0
 
   is-what@4.1.15: {}
 
@@ -33837,7 +33848,7 @@ snapshots:
 
   qs@6.11.1:
     dependencies:
-      side-channel: 1.0.6
+      side-channel: 1.1.0
 
   qs@6.14.0:
     dependencies:
@@ -35380,23 +35391,16 @@ snapshots:
     dependencies:
       call-bound: 1.0.4
       es-errors: 1.3.0
-      get-intrinsic: 1.2.7
+      get-intrinsic: 1.3.0
       object-inspect: 1.13.4
 
   side-channel-weakmap@1.0.2:
     dependencies:
       call-bound: 1.0.4
       es-errors: 1.3.0
-      get-intrinsic: 1.2.7
+      get-intrinsic: 1.3.0
       object-inspect: 1.13.4
       side-channel-map: 1.0.1
-
-  side-channel@1.0.6:
-    dependencies:
-      call-bind: 1.0.7
-      es-errors: 1.3.0
-      get-intrinsic: 1.2.4
-      object-inspect: 1.13.1
 
   side-channel@1.1.0:
     dependencies:
@@ -35751,7 +35755,7 @@ snapshots:
       internal-slot: 1.0.7
       regexp.prototype.flags: 1.5.2
       set-function-name: 2.0.2
-      side-channel: 1.0.6
+      side-channel: 1.1.0
 
   string.prototype.padend@3.1.5:
     dependencies:

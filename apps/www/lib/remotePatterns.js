@@ -101,4 +101,10 @@ module.exports = [
     port: '1337',
     pathname: '/uploads/**',
   },
+  {
+    protocol: 'http',
+    hostname: 'localhost',
+    port: '1337',
+    pathname: '/api/uploads/**',
+  },
 ]

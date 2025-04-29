@@ -1,4 +1,4 @@
-export default [
+export default ({ env }) => [
   'strapi::logger',
   'strapi::errors',
   {

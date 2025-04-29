@@ -352,7 +352,6 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
     author_url: Schema.Attribute.String
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> & Schema.Attribute.Private
-    image: Schema.Attribute.Media<'images'>
     locale: Schema.Attribute.String & Schema.Attribute.Private
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::author.author'> &
       Schema.Attribute.Private

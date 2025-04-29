@@ -16,4 +16,7 @@ export default ({ env }) => ({
       },
     },
   },
+  'strapi-provider-upload-supabase': {
+    enabled: true,
+  },
 })

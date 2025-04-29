@@ -1,5 +1,13 @@
 import { generateReadingTime } from './helpers'
+// @ts-ignore - Strapi client types are not properly exported
+import { strapi } from '@strapi/client'
 const toc = require('markdown-toc')
+
+// Initialize Strapi client with authentication
+const client = strapi({
+  baseURL: process.env.CMS_API_URL || 'http://localhost:1337/api',
+  auth: process.env.STRAPI_API_TOKEN, // You'll need to add this to your .env
+})
 
 type CMSBlogPost = {
   id: number
@@ -44,26 +52,49 @@ type CMSResponse = {
   }
 }
 
-// The base URL of your CMS API
-const CMS_API_URL = process.env.CMS_API_URL || 'http://localhost:1337'
+type PostSlug = {
+  params: {
+    slug: string
+  }
+}
+
+type ProcessedPost = {
+  slug: string
+  title: string
+  description: string
+  date: string
+  formattedDate: string
+  readingTime: number
+  authors: Array<{
+    author: string
+    author_id: string
+    position: string
+    author_url: string
+    author_image_url: string | null
+    username: string
+  }>
+  toc_depth: number
+  thumb: string | null
+  image: string | null
+  url: string
+  path: string
+  isCMS: boolean
+  tags: string[]
+}
 
 /**
  * Fetch all blog post slugs from the CMS
  */
-export async function getAllCMSPostSlugs() {
+export async function getAllCMSPostSlugs(): Promise<PostSlug[]> {
   try {
-    const response = await fetch(
-      `${CMS_API_URL}/api/blog-posts?fields[0]=slug&pagination[pageSize]=100`
-    )
+    const response = await client.collection('blog-posts').find({
+      fields: ['slug'],
+      pagination: {
+        pageSize: 100,
+      },
+    })
 
-    if (!response.ok) {
-      console.error('Failed to fetch CMS posts')
-      return []
-    }
-
-    const data: CMSResponse = await response.json()
-
-    return data.data.map((post) => ({
+    return response.data.map((post: CMSBlogPost) => ({
       params: {
         slug: post.slug,
       },
@@ -79,23 +110,20 @@ export async function getAllCMSPostSlugs() {
  */
 export async function getCMSPostBySlug(slug: string) {
   try {
-    const populate =
-      'populate=authors.author_image_url&populate=tags&populate=categories&populate=thumb&populate=image'
-    const response = await fetch(
-      `${CMS_API_URL}/api/blog-posts?filters[slug][$eq]=${slug}&${populate}`
-    )
+    const response = await client.collection('blog-posts').find({
+      filters: {
+        slug: {
+          $eq: slug,
+        },
+      },
+      populate: ['authors.author_image_url', 'tags', 'categories', 'thumb', 'image'],
+    })
 
-    if (!response.ok) {
+    if (!response.data.length) {
       return null
     }
 
-    const data: CMSResponse = await response.json()
-
-    if (!data.data.length) {
-      return null
-    }
-
-    const post = data.data[0]
+    const post = response.data[0]
 
     const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
     const formattedDate = new Date(post.date || new Date()).toLocaleDateString('en-IN', options)
@@ -111,7 +139,6 @@ export async function getCMSPostBySlug(slug: string) {
     })
     const processedContent = tocResult.content.replace(/%23/g, '')
 
-    console.log('author ££', post.authors)
     return {
       slug,
       source: post.content || '',
@@ -127,13 +154,13 @@ export async function getCMSPostBySlug(slug: string) {
           position: author.position || '',
           author_url: author.author_url || '#',
           author_image_url: author.author_image_url?.url
-            ? `${CMS_API_URL}${author.author_image_url.url}`
+            ? `${process.env.CMS_API_URL}${author.author_image_url.url}`
             : null,
           username: author.username || '',
         })) || [],
       toc_depth: post.toc_depth || 2,
-      thumb: thumbUrl ? thumbUrl.replace(CMS_API_URL, '') : null,
-      image: imageUrl ? imageUrl.replace(CMS_API_URL, '') : null,
+      thumb: thumbUrl ? thumbUrl.replace(process.env.CMS_API_URL || '', '') : null,
+      image: imageUrl ? imageUrl.replace(process.env.CMS_API_URL || '', '') : null,
       url: `/blog/${slug}`,
       path: `/blog/${slug}`,
       isCMS: true,
@@ -161,30 +188,18 @@ export async function getAllCMSPosts({
   limit?: number
   tags?: string[]
   currentPostSlug?: string
-} = {}) {
+} = {}): Promise<ProcessedPost[]> {
   try {
-    console.log(
-      'Fetching CMS posts from:',
-      `${CMS_API_URL}/api/blog-posts?populate=*&pagination[pageSize]=100`
-    )
+    const response = await client.collection('blog-posts').find({
+      populate: ['authors.author_image_url', 'categories', 'thumb', 'image'],
+      pagination: {
+        pageSize: 100,
+      },
+    })
 
-    const populate =
-      'populate=authors.author_image_url&populate=categories&populate=thumb&populate=image'
-
-    const response = await fetch(
-      `${CMS_API_URL}/api/blog-posts?${populate}&pagination[pageSize]=100`
-    )
-
-    if (!response.ok) {
-      console.error('CMS API response not OK:', response.status, response.statusText)
-      return []
-    }
-
-    const data: CMSResponse = await response.json()
-
-    let posts = data.data
-      .filter((post) => post.slug !== currentPostSlug)
-      .map((post) => {
+    let posts = response.data
+      .filter((post: CMSBlogPost) => post.slug !== currentPostSlug)
+      .map((post: CMSBlogPost) => {
         const options: Intl.DateTimeFormatOptions = {
           month: 'long',
           day: 'numeric',
@@ -211,13 +226,13 @@ export async function getAllCMSPosts({
               position: author.position || '',
               author_url: author.author_url || '#',
               author_image_url: author.author_image_url?.url
-                ? `${CMS_API_URL}${author.author_image_url.url}`
+                ? `${process.env.CMS_API_URL}${author.author_image_url.url}`
                 : null,
               username: author.username || '',
             })) || [],
           toc_depth: post.toc_depth || 2,
-          thumb: thumbUrl ? thumbUrl.replace(CMS_API_URL, '') : null,
-          image: imageUrl ? imageUrl.replace(CMS_API_URL, '') : null,
+          thumb: thumbUrl ? thumbUrl.replace(process.env.CMS_API_URL || '', '') : null,
+          image: imageUrl ? imageUrl.replace(process.env.CMS_API_URL || '', '') : null,
           url: `/blog/${post.slug || ''}`,
           path: `/blog/${post.slug || ''}`,
           isCMS: true,
@@ -225,16 +240,15 @@ export async function getAllCMSPosts({
         }
       })
 
-    console.log('Processed CMS posts:', posts.length)
-
     // Sort by date (newest first)
-    posts = posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    posts = posts.sort(
+      (a: ProcessedPost, b: ProcessedPost) =>
+        new Date(b.date).getTime() - new Date(a.date).getTime()
+    )
 
     // Filter by tags if provided
     if (tags && tags.length > 0) {
-      // Note: This assumes tags are added to CMS content
-      // You'll need to add a tags field to your CMS model
-      posts = posts.filter((post) => {
+      posts = posts.filter((post: ProcessedPost) => {
         const found = tags.some((tag) => post.tags?.includes(tag))
         return found
       })
