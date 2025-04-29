@@ -16,7 +16,7 @@ import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsOrioleDb, useIsOrioleDbInAwsNew } from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDb, useIsOrioleDbInAws } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
@@ -52,7 +52,7 @@ const PITR = () => {
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
   const isOrioleDb = useIsOrioleDb()
-  const isOrioleDbInAwsNew = useIsOrioleDbInAwsNew()
+  const isOrioleDbInAws = useIsOrioleDbInAws()
   const { data: backups, error, isLoading, isError, isSuccess } = useBackupsQuery({ projectRef })
 
   const plan = organization?.plan?.id
@@ -66,7 +66,7 @@ const PITR = () => {
     return <NoPermission resourceText="view PITR backups" />
   }
 
-  if (isOrioleDb && !isOrioleDbInAwsNew) {
+  if (isOrioleDb && isOrioleDbInAws) {
     return (
       <Admonition
         type="default"

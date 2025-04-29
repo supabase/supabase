@@ -34,7 +34,7 @@ import type { ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   useIsOrioleDb,
-  useIsOrioleDbInAwsNew,
+  useIsOrioleDbInAws,
   useProjectByRef,
 } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -58,7 +58,7 @@ const Addons = () => {
   const isBranch = parentProject !== undefined
   const isProjectActive = useIsProjectActive()
   const isOrioleDb = useIsOrioleDb()
-  const isOrioleDbInAwsNew = useIsOrioleDbInAwsNew()
+  const isOrioleDbInAws = useIsOrioleDbInAws()
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
@@ -491,7 +491,7 @@ const Addons = () => {
                           </Button>
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
-                    ) : isOrioleDb && !isOrioleDbInAwsNew ? (
+                    ) : isOrioleDb && isOrioleDbInAws ? (
                       <ButtonTooltip
                         disabled
                         type="default"

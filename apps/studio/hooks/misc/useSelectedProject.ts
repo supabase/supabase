@@ -39,8 +39,8 @@ export const useIsOrioleDb = () => {
   return isOrioleDb
 }
 
-export const useIsOrioleDbInAwsNew = () => {
+export const useIsOrioleDbInAws = () => {
   const project = useSelectedProject()
-  const isOrioleDbInAwsNew = project?.cloud_provider === PROVIDERS.AWS_NEW.id
-  return isOrioleDbInAwsNew
+  const isOrioleDbInAws = project?.cloud_provider === PROVIDERS.AWS.id
+  return isOrioleDbInAws
 }
