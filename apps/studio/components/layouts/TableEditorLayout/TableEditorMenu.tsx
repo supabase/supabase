@@ -40,16 +40,17 @@ import {
   InnerSideBarFilters,
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { tableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import EntityListItem from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
 
 const TableEditorMenu = () => {
   const { ref, id: _id } = useParams()
+  const isMobile = useBreakpoint()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
-  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
-  const isMobile = useBreakpoint()
   const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
@@ -113,6 +114,13 @@ const TableEditorMenu = () => {
       setSelectedSchema(selectedTable.schema)
     }
   }, [selectedTable?.schema])
+
+  useEffect(() => {
+    // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
+    if (isTableEditorTabsEnabled && ref && entityTypes && !searchText) {
+      tableEditorTabsCleanUp({ ref, schemas: [selectedSchema], entities: entityTypes })
+    }
+  }, [entityTypes])
 
   return (
     <>
