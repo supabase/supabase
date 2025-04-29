@@ -63,7 +63,7 @@ jobs:
         env:
           BASE_REF: ${{ github.base_ref }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_NAME: ${{ github.head_ref }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           set -o pipefail
           run_lints() {
@@ -76,6 +76,6 @@ jobs:
           LINT_EXIT_CODE=$?
           set -e
           if [[ $LINT_EXIT_CODE -ne 0 ]]; then
-            gh pr comment "$BRANCH_NAME" --body "$LINT_RESULTS"
+            gh pr comment "$PR_NUMBER" --body "$LINT_RESULTS"
             exit 1
           fi

@@ -1,8 +1,10 @@
 import Link from 'next/link'
-import React, { ReactNode, useState } from 'react'
+import { ReactNode, useState } from 'react'
 
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 import { IS_PLATFORM } from 'common'
 import Table from 'components/to-be-cleaned/Table'
+import dayjs from 'dayjs'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
 import { copyToClipboard } from 'lib/helpers'
@@ -26,11 +28,9 @@ import {
   LOGS_SOURCE_DESCRIPTION,
   LogsTableName,
 } from './Logs.constants'
-import { LogsDatePicker, DatePickerValue } from './Logs.DatePickers'
+import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import { LogsWarning, LogTemplate, WarehouseCollection } from './Logs.types'
 import { WarehouseQueryTemplate } from './Warehouse.utils'
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
-import dayjs from 'dayjs'
 
 export type SourceType = 'logs' | 'warehouse'
 export interface LogsQueryPanelProps {

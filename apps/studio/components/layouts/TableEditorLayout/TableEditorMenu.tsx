@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
+import { useIsTableEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import AlertError from 'components/ui/AlertError'
@@ -39,14 +40,16 @@ import {
   InnerSideBarFilters,
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { tableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import EntityListItem from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
 
 const TableEditorMenu = () => {
-  const { id: _id } = useParams()
+  const { ref, id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
   const isMobile = useBreakpoint()
 
   const [showModal, setShowModal] = useState(false)
@@ -111,6 +114,13 @@ const TableEditorMenu = () => {
       setSelectedSchema(selectedTable.schema)
     }
   }, [selectedTable?.schema])
+
+  useEffect(() => {
+    // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
+    if (isTableEditorTabsEnabled && ref && entityTypes && !searchText) {
+      tableEditorTabsCleanUp({ ref, schemas: [selectedSchema], entities: entityTypes })
+    }
+  }, [entityTypes])
 
   return (
     <>

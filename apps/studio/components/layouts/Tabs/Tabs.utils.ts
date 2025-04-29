@@ -5,7 +5,7 @@ import {
   RecentItem,
   removeRecentItems,
 } from 'state/recent-items'
-import { createTabId, getTabsStore, removeTabs } from 'state/tabs'
+import { createTabId, editorEntityTypes, getTabsStore, removeTabs, updateTab } from 'state/tabs'
 
 export const tableEditorTabsCleanUp = ({
   ref,
@@ -58,6 +58,18 @@ export const tableEditorTabsCleanUp = ({
 
   // perform tabs cleanup
   removeTabs(ref, tableEditorTabsToBeCleaned)
+
+  // [Joshen] Validate for opened tabs, if their label matches the entity's name - update label if not
+  // As the entity could've been renamed outside of the table editor
+  // e.g Using the SQL editor to rename the entity
+  const openTabs = tabsStore.openTabs
+    .map((id) => tabsStore.tabsMap[id])
+    .filter((tab) => editorEntityTypes['table']?.includes(tab.type))
+
+  openTabs.forEach((tab) => {
+    const entity = entities?.find((x) => tab.metadata?.tableId === x.id)
+    if (!!entity && entity.name !== tab.label) updateTab(ref, tab.id, { label: entity.name })
+  })
 }
 
 export const sqlEditorTabsCleanup = ({
@@ -65,7 +77,7 @@ export const sqlEditorTabsCleanup = ({
   snippets,
 }: {
   ref: string
-  snippets: { id: string; type: string }[]
+  snippets: { id: string; type: string; name: string }[]
 }) => {
   // these are tabs that are static content
   // these canot be removed from localstorage based on this query request
@@ -95,4 +107,16 @@ export const sqlEditorTabsCleanup = ({
       ? recentItems.filter((item) => !currentContentIds.includes(item.id)).map((item) => item.id)
       : []
   )
+
+  // [Joshen] Validate for opened tabs, if their label matches the snippet's name - update label if not
+  // As the snippets name could've been updated outside of the SQL Editor session
+  // e.g for a shared snippet, the owner could've updated the name of the snippet
+  const openSqlTabs = tabsStore.openTabs
+    .map((id) => tabsStore.tabsMap[id])
+    .filter((tab) => editorEntityTypes['sql']?.includes(tab.type))
+
+  openSqlTabs.forEach((tab) => {
+    const snippet = snippets?.find((x) => tab.metadata?.sqlId === x.id)
+    if (!!snippet && snippet.name !== tab.label) updateTab(ref, tab.id, { label: snippet.name })
+  })
 }

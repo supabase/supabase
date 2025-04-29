@@ -95,7 +95,6 @@ const RenameQueryModal = ({
       // [Joshen] For SQL V2 - content is loaded on demand so we need to fetch the data if its not already loaded in the valtio state
       if (!('content' in localSnippet)) {
         localSnippet = await getContentById({ projectRef: ref, id })
-
         snapV2.addSnippet({ projectRef: ref, snippet: localSnippet })
       }
 
@@ -109,10 +108,12 @@ const RenameQueryModal = ({
       })
 
       snapV2.renameSnippet({ id, name: nameInput, description: descriptionInput })
+
       if (isSQLEditorTabsEnabled && ref) {
         const tabId = createTabId('sql', { id })
         updateTab(ref, tabId, { label: nameInput })
       }
+
       toast.success('Successfully renamed snippet!')
       if (onComplete) onComplete()
     } catch (error: any) {
