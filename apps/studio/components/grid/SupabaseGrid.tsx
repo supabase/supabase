@@ -82,7 +82,7 @@ export const SupabaseGrid = ({
   return (
     <DndProvider backend={HTML5Backend} context={window}>
       <div className="sb-grid h-full flex flex-col">
-        <Header sorts={sorts} filters={filters} customHeader={customHeader} />
+        <Header customHeader={customHeader} />
 
         {children || (
           <>

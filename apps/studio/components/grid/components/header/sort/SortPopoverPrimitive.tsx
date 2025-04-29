@@ -30,7 +30,7 @@ export interface SortPopoverPrimitiveProps {
  * To avoid issues with drag-and-drop reconciliation, we use a special sync mechanism
  * that properly detects external vs. internal updates.
  */
-const SortPopoverPrimitive = ({
+export const SortPopoverPrimitive = ({
   buttonText,
   sorts,
   onApplySorts,
@@ -234,5 +234,3 @@ const SortPopoverPrimitive = ({
     </Popover_Shadcn_>
   )
 }
-
-export default SortPopoverPrimitive

@@ -2,8 +2,8 @@ import { isEqual } from 'lodash'
 import { Filter as FilterIcon, Plus } from 'lucide-react'
 import { KeyboardEvent, useCallback, useMemo, useState } from 'react'
 
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import type { Filter } from 'components/grid/types'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -20,7 +20,7 @@ export interface FilterPopoverPrimitiveProps {
   portal?: boolean
 }
 
-const FilterPopoverPrimitive = ({
+export const FilterPopoverPrimitive = ({
   buttonText,
   filters,
   onApplyFilters,
@@ -134,5 +134,3 @@ const FilterPopoverPrimitive = ({
     </Popover_Shadcn_>
   )
 }
-
-export default FilterPopoverPrimitive

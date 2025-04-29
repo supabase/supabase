@@ -54,11 +54,7 @@ const TableEditorPage: NextPageWithLayout = () => {
     }
   }, [selectedTable, id, projectRef, isTableEditorTabsEnabled])
 
-  return (
-    <>
-      <TableGridEditor isLoadingSelectedTable={isLoading} selectedTable={selectedTable} />
-    </>
-  )
+  return <TableGridEditor isLoadingSelectedTable={isLoading} selectedTable={selectedTable} />
 }
 
 TableEditorPage.getLayout = (page) => (
