@@ -46,7 +46,6 @@ The `useTableSort` hook manages sort state with these responsibilities:
 
 Key design aspects:
 
-- Uses safe snapshot ONLY to get table name for formatting
 - Handles applying table name to sort objects
 - Maintains URL parameters as source of truth
 - Forwards sort changes to URL and triggers application-specific side effects
