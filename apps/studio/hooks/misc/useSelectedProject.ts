@@ -35,8 +35,7 @@ export function useProjectByRef(
 
 export const useIsOrioleDb = () => {
   const project = useSelectedProject()
-  const isOrioleDb =
-    project?.dbVersion?.endsWith('orioledb')
+  const isOrioleDb = project?.dbVersion?.endsWith('orioledb')
   return isOrioleDb
 }
 
