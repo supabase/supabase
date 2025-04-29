@@ -77,13 +77,8 @@ test('renders datepicker selected dates in local time', async () => {
 
 test('datepicker onSubmit will return ISO string of selected dates', async () => {
   const mockFn = vi.fn()
-  const todayAt1300 = dayjs('2025-04-01').hour(13).minute(0).second(0).millisecond(0).toISOString()
-  const todayAt2359 = dayjs('2025-04-01')
-    .hour(23)
-    .minute(59)
-    .second(59)
-    .millisecond(0)
-    .toISOString()
+  const todayAt1300 = dayjs().hour(13).minute(0).second(0).millisecond(0).toISOString()
+  const todayAt2359 = dayjs().hour(23).minute(59).second(59).millisecond(0).toISOString()
 
   render(
     <LogsDatePicker
