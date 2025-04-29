@@ -40,7 +40,7 @@ import NewOrgAwsMarketplaceForm, {
 } from '../components/interfaces/Organization/CloudMarketplace/NewOrgAwsMarketplaceForm'
 
 const LinkAwsMarketplace: NextPageWithLayout = () => {
-  const orgsExisting = false
+  const orgsExisting = true
 
   const router = useRouter()
   const {
@@ -114,20 +114,26 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
     <>
       <ScaffoldContainer>
         <ScaffoldHeader>
-          <ScaffoldTitle>Complete AWS Marketplace Setup</ScaffoldTitle>
+          <ScaffoldTitle>AWS Marketplace Onboarding</ScaffoldTitle>
         </ScaffoldHeader>
         <ScaffoldDivider />
         <ScaffoldSection>
           <ScaffoldSectionDetail>
             {orgsExisting ? (
               <>
-                <h1 className="text-xl mb-0">Link your organization</h1>
-                <p className="mb-10">
-                  Select an organization from the list on the right to link it to your AWS
-                  Marketplace subscription. It will be managed through AWS Marketplace, with billing
-                  handled by AWS.
+                <h1 className="text-xl mb-0">Link your Supabase organization</h1>
+                <p className="mb-5 text-foreground">
+                  Choose an organization on the right and link it to the AWS Marketplace contract
+                  you just accepted so we can route billing through AWS.
                 </p>
                 <p>
+                  <span className="font-bold">Billing through AWS</span>
+                  <br /> That means that Supabase no longer invoices you directly. Instead, AWS
+                  issues a monthly bill for your Supabase subscription and charges the payment
+                  method you’ve saved in your AWS account. Any plan upgrades or downgrades are
+                  managed through the AWS Marketplace.
+                </p>
+                <p className="mt-14">
                   <span className="font-bold">Want to start fresh?</span> Create a new organization
                   and it will be linked automatically.
                 </p>
@@ -146,11 +152,18 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
               </>
             ) : (
               <>
-                <h1 className="font-bold text-xl mb-0">Link your organization</h1>
-                <p>
+                <h1 className="font-bold text-xl mb-0">Create and link a Supabase organization</h1>
+                <p className="mb-8">
                   You don’t have any organizations yet. To continue, you’ll need to create one. Once
-                  created, it will be automatically linked to your AWS Marketplace subscription for
-                  billing and usage tracking.
+                  created, it will be automatically linked to the AWS Marketplace contract you just
+                  accepted so we can route billing through AWS.
+                </p>
+                <p>
+                  <span className="font-bold">Billing through AWS</span>
+                  <br /> That means that Supabase no longer invoices you directly. Instead, AWS
+                  issues a monthly bill for your Supabase subscription and charges the payment
+                  method you’ve saved in your AWS account. Any plan upgrades or downgrades are
+                  managed through the AWS Marketplace.
                 </p>
               </>
             )}
