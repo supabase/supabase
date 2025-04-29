@@ -1,4 +1,5 @@
 import { LogData } from 'components/interfaces/Settings/Logs/Logs.types'
+import { Badge } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 interface UnifiedLogsColumnRenderProps {
@@ -59,7 +60,8 @@ export const UnifiedLogsColumnRender = ({ log }: UnifiedLogsColumnRenderProps) =
             {logLevel}
           </span>
         )}
-        <span className="text-xs text-foreground-light">{log_type}</span>
+        <Badge>{log_type}</Badge>
+        {/* <span className="text-xs text-foreground-light">{log_type}</span> */}
         {logCode && <span className="text-xs text-foreground-light">{logCode}</span>}
       </div>
       {logPath && <div className="text-xs text-foreground-light">{logPath}</div>}

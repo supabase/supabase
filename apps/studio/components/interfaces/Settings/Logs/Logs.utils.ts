@@ -206,39 +206,9 @@ limit ${limit}
       return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit ${limit}`
 
     case 'unified_logs':
-      if (IS_PLATFORM === false) {
-        return `
-select 
-  id,
-  el.timestamp as timestamp,
-  'edge' as log_type,
-  edge_logs_response.status_code as code,
-  'undefined' as level,
-  edge_logs_request.path as path,
-  'undefined' as event_message
-from edge_logs as el
-cross join unnest(el.metadata) as edge_logs_metadata
-cross join unnest(edge_logs_metadata.request) as edge_logs_request
-cross join unnest(edge_logs_metadata.response) as edge_logs_response
-
-union all
-
-select 
-  id,
-  pgl.timestamp as timestamp,
-  'postgres' as log_type,
-  'undefined' as code,
-  'undefined' as level,
-  'undefined' as path,
-  'undefined' as event_message
-from postgres_logs as pgl
-
-${where}
-${orderBy}
-limit ${limit}
-`
-      }
       return `
+
+-- edge logs
 select 
   id,
   el.timestamp as timestamp,
@@ -254,6 +224,7 @@ cross join unnest(edge_logs_metadata.response) as edge_logs_response
 
 union all
 
+-- postgres logs
 select 
   id,
   pgl.timestamp as timestamp,
@@ -265,6 +236,74 @@ select
 from postgres_logs as pgl
 cross join unnest(pgl.metadata) as pgl_metadata
 cross join unnest(pgl_metadata.parsed) as pgl_parsed
+
+union all
+
+-- function event logs
+select 
+  id, 
+  fl.timestamp as timestamp,
+  'function logs' as log_type,
+  'undefined' as code,
+  fl_metadata.level as level,
+  null as path,
+  fl.event_message as event_message, 
+  -- fl_metadata.function_id as function_id, 
+  -- fl_metadata.event_type as event_type, 
+from function_logs as fl
+cross join unnest(metadata) as fl_metadata
+
+union all
+
+-- function edge logs
+select 
+  id, 
+  fel.timestamp as timestamp,
+  'edge function' as log_type,
+  CAST(fel_response.status_code as STRING) as code,
+  'undefined' as level,
+  fel_request.url as path,
+  'undefined' as event_message,
+  -- fel.event_message as event_message,
+  -- fel_request.path as path,
+  -- fel_metadata.function_id as function_id,
+  -- fel_metadata.execution_time_ms as execution_time_ms, 
+  -- fel_metadata.deployment_id as deployment_id, 
+  -- fel_metadata.version as version 
+from function_edge_logs as fel
+cross join unnest(metadata) as fel_metadata
+cross join unnest(fel_metadata.response) as fel_response
+cross join unnest(fel_metadata.request) as fel_request
+
+union all
+
+-- auth logs
+select 
+  id, 
+  al.timestamp as timestamp, 
+  'auth' as log_type,
+  REGEXP_EXTRACT(al_metadata.msg, r'^(\d+):') as code, 
+  -- 'undefined' as code, 
+  al_metadata.level as level, 
+  al_metadata.path as path, 
+  'undefined' as event_message,
+  -- al_metadata.status as status, 
+from auth_logs as al
+cross join unnest(metadata) as al_metadata
+
+union all
+
+select 
+  id, 
+  svl.timestamp as timestamp, 
+  'supavisor' as log_type,
+  'undefined' as code,
+  svl_metadata.level as level,
+  null as path,
+  'undefined' as event_message 
+from supavisor_logs as svl
+cross join unnest(metadata) as svl_metadata
+
 
 ${where}
 ${orderBy}
