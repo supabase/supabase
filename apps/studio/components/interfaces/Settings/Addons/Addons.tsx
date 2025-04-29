@@ -32,11 +32,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import {
-  useIsOrioleDb,
-  useIsOrioleDbInAws,
-  useProjectByRef,
-} from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDb, useIsOrioleDbInAws, useProjectByRef } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
