@@ -17,7 +17,7 @@ import { useBackupsQuery } from 'data/database/backups-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDb, useIsOrioleDbInAwsNew } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
@@ -53,6 +53,7 @@ const PITR = () => {
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
   const isOrioleDb = useIsOrioleDb()
+  const isOrioleDbInAwsNew = useIsOrioleDbInAwsNew()
   const { data: backups, error, isLoading, isError, isSuccess } = useBackupsQuery({ projectRef })
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
@@ -68,7 +69,7 @@ const PITR = () => {
     return <NoPermission resourceText="view PITR backups" />
   }
 
-  if (isOrioleDb) {
+  if (isOrioleDb && !isOrioleDbInAwsNew) {
     return (
       <Admonition
         type="default"

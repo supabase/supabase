@@ -14,7 +14,7 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDb, useIsOrioleDbInAwsNew } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -25,6 +25,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
   const { data: backups, error, isLoading, isError, isSuccess } = useBackupsQuery({ projectRef })
 
   const isOrioleDb = useIsOrioleDb()
+  const isOrioleDbInAwsNew = useIsOrioleDbInAwsNew()
   const isPitrEnabled = backups?.pitr_enabled
   const isPermissionsLoaded = usePermissionsLoaded()
 
@@ -39,7 +40,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
 
             <DatabaseBackupsNav active="scheduled" />
 
-            {isOrioleDb ? (
+            {isOrioleDb && !isOrioleDbInAwsNew ? (
               <Admonition
                 type="default"
                 title="Database backups are not available for OrioleDB"
