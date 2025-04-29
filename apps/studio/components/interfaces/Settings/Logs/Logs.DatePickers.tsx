@@ -1,16 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import DatePicker from 'react-datepicker'
 import dayjs from 'dayjs'
-import { useEffect, useState } from 'react'
-
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
-import type { DatetimeHelper } from './Logs.types'
 import { ChevronLeft, ChevronRight, Clock, XIcon } from 'lucide-react'
-import TimeSplitInput from 'components/ui/DatePicker/TimeSplitInput'
-import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
+import { PropsWithChildren, useEffect, useState } from 'react'
+import DatePicker from 'react-datepicker'
+
 import { Label } from '@ui/components/shadcn/ui/label'
+import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
+import TimeSplitInput from 'components/ui/DatePicker/TimeSplitInput'
+import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
-import { PropsWithChildren } from 'react'
+import type { DatetimeHelper } from './Logs.types'
 
 export type DatePickerValue = {
   to: string
