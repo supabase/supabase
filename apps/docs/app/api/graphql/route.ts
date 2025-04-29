@@ -3,11 +3,33 @@ import { createComplexityLimitRule } from 'graphql-validation-complexity'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { ApiError, convertZodToInvalidRequestError, InvalidRequestError } from '~/app/api/utils'
-import { rootGraphQLResolver } from '~/resources/rootResolver'
+import { BASE_PATH, IS_DEV } from '~/lib/constants'
 import { rootGraphQLSchema } from '~/resources/rootSchema'
 import { createQueryDepthLimiter } from './validators'
 
 export const runtime = 'edge'
+
+const MAX_DEPTH = 9
+
+const validationRules = [
+  ...specifiedRules,
+  createQueryDepthLimiter(MAX_DEPTH),
+  createComplexityLimitRule(1500, {
+    scalarCost: 1,
+    objectCost: 2,
+    listFactor: 10,
+  }),
+]
+
+function isDevGraphiQL(request: Request) {
+  const origin = request.headers.get('Origin')
+  const referrer = request.headers.get('Referer')
+  return (
+    IS_DEV &&
+    origin.startsWith('http://localhost') &&
+    referrer === `${origin}${BASE_PATH ?? ''}/graphiql`
+  )
+}
 
 const graphQLRequestSchema = z.object({
   query: z.string(),
@@ -28,7 +50,7 @@ async function handleGraphQLRequest(request: Request): Promise<NextResponse> {
   }
 
   const { query, variables, operationName } = parsedBody.data
-  const validationErrors = validateGraphQLRequest(query)
+  const validationErrors = validateGraphQLRequest(query, isDevGraphiQL(request))
   if (validationErrors.length > 0) {
     return NextResponse.json({
       errors: validationErrors.map((error) => ({
@@ -41,7 +63,6 @@ async function handleGraphQLRequest(request: Request): Promise<NextResponse> {
 
   const result = await graphql({
     schema: rootGraphQLSchema,
-    rootValue: rootGraphQLResolver,
     contextValue: { request },
     source: query,
     variableValues: variables,
@@ -50,9 +71,7 @@ async function handleGraphQLRequest(request: Request): Promise<NextResponse> {
   return NextResponse.json(result)
 }
 
-function validateGraphQLRequest(query: string): ReadonlyArray<GraphQLError> {
-  const MAX_DEPTH = 9
-
+function validateGraphQLRequest(query: string, isDevGraphiQL = false): ReadonlyArray<GraphQLError> {
   let documentAST: DocumentNode
   try {
     documentAST = parse(query)
@@ -63,16 +82,8 @@ function validateGraphQLRequest(query: string): ReadonlyArray<GraphQLError> {
       throw error
     }
   }
-  const validationRules = [
-    ...specifiedRules,
-    createQueryDepthLimiter(MAX_DEPTH),
-    createComplexityLimitRule(1500, {
-      scalarCost: 1,
-      objectCost: 2,
-      listFactor: 10,
-    }),
-  ]
-  return validate(rootGraphQLSchema, documentAST, validationRules)
+  const rules = isDevGraphiQL ? specifiedRules : validationRules
+  return validate(rootGraphQLSchema, documentAST, rules)
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
