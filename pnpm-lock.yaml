@@ -808,6 +808,9 @@ importers:
       react-markdown:
         specifier: ^8.0.3
         version: 8.0.7(@types/react@18.3.20)(react@18.3.1)(supports-color@8.1.1)
+      react-resizable:
+        specifier: 3.0.5
+        version: 3.0.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-simple-maps:
         specifier: 4.0.0-beta.6
         version: 4.0.0-beta.6(prop-types@15.8.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -997,7 +1000,7 @@ importers:
         version: 2.7.5(@types/node@20.17.32)(typescript@5.5.4)
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@15.3.1(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0))(react@18.3.1)
+        version: 0.9.13(next@15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0))(react@18.3.1)
       postcss:
         specifier: ^8.4.31
         version: 8.5.3
@@ -2138,7 +2141,7 @@ importers:
         version: link:../api-types
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@15.3.1(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0))(react@18.3.1)
+        version: 0.9.13(next@15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0))(react@18.3.1)
       typescript:
         specifier: ~5.5.0
         version: 5.5.4
@@ -8945,6 +8948,7 @@ packages:
     resolution: {integrity: sha512-X41YRfKkVCooILai2N0aN0Q5O0imu+MbNt894QWU683A82xJJXIR01dEqxwYJ91M6IdExtyFB3GCOJb4eBMBMQ==}
     peerDependencies:
       eslint: '>= 5'
+    bundledDependencies: []
 
   eslint-plugin-import@2.31.0:
     resolution: {integrity: sha512-ixmkI62Rbc2/w8Vfxyh1jQRTdRTF52VxwRVHl/ykPAmqG+Nb7/kNn+byLP0LxPgI7zWA16Jt82SybJInmMia3A==}
@@ -20984,7 +20988,7 @@ snapshots:
 
   '@types/connect@3.4.36':
     dependencies:
-      '@types/node': 20.17.32
+      '@types/node': 22.15.3
 
   '@types/cookie@0.6.0': {}
 
@@ -21229,11 +21233,11 @@ snapshots:
 
   '@types/mysql@2.15.26':
     dependencies:
-      '@types/node': 20.17.32
+      '@types/node': 22.15.3
 
   '@types/node-fetch@2.6.12':
     dependencies:
-      '@types/node': 20.17.32
+      '@types/node': 22.15.3
       form-data: 4.0.2
 
   '@types/node@18.19.87':
@@ -21252,7 +21256,7 @@ snapshots:
 
   '@types/papaparse@5.3.15':
     dependencies:
-      '@types/node': 20.17.32
+      '@types/node': 22.15.3
 
   '@types/parse-numeric-range@0.0.1': {}
 
@@ -21268,7 +21272,7 @@ snapshots:
 
   '@types/pg@8.6.1':
     dependencies:
-      '@types/node': 20.17.32
+      '@types/node': 22.15.3
       pg-protocol: 1.9.5
       pg-types: 2.2.0
 
@@ -21280,7 +21284,7 @@ snapshots:
 
   '@types/randombytes@2.0.3':
     dependencies:
-      '@types/node': 20.17.32
+      '@types/node': 22.15.3
 
   '@types/react-beautiful-dnd@13.1.8':
     dependencies:
@@ -21368,7 +21372,7 @@ snapshots:
 
   '@types/tedious@4.0.14':
     dependencies:
-      '@types/node': 20.17.32
+      '@types/node': 22.15.3
 
   '@types/tern@0.23.9':
     dependencies:
@@ -21402,7 +21406,7 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 20.17.32
+      '@types/node': 22.15.3
 
   '@types/yauzl@2.10.3':
     dependencies:
@@ -27339,7 +27343,7 @@ snapshots:
     dependencies:
       js-yaml-loader: 1.2.2
 
-  next-router-mock@0.9.13(next@15.3.1(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0))(react@18.3.1):
+  next-router-mock@0.9.13(next@15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0))(react@18.3.1):
     dependencies:
       next: 15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0)
       react: 18.3.1
