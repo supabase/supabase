@@ -94,17 +94,16 @@ test('datepicker onSubmit will return ISO string of selected dates', async () =>
   // open the datepicker
   userEvent.click(screen.getByText(/13:00/i))
 
-  // Get today's date and tomorrow's date
   const day15 = dayjs().date(15)
   const day16 = day15.add(1, 'day')
 
-  // Find and click on today's date
-  const todayElement = await screen.findByText(day15.format('D'))
-  userEvent.click(todayElement)
+  // Find and click on first date
+  const day15Element = await screen.findByText(day15.format('D'))
+  userEvent.click(day15Element)
 
-  // Find and click on tomorrow's date
-  const tomorrowElement = await screen.findByText(day16.format('D'))
-  userEvent.click(tomorrowElement)
+  // Find and click on second date
+  const day16Element = await screen.findByText(day16.format('D'))
+  userEvent.click(day16Element)
 
   await userEvent.click(await screen.findByText('Apply'))
   expect(mockFn).toBeCalled()
