@@ -72,3 +72,7 @@ export const LW14_TWEET_TEXT_SECRET = `Found the secret golden ticket for @supab
 export const LW14_URL = `${SITE_ORIGIN}/launch-week`
 
 export const SITE_NAME = 'Supabase'
+
+export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+
+export const CMS_API_URL = process.env.CMS_API_URL || 'http://localhost:1337'
