@@ -37,7 +37,7 @@ const TableEditorPage: NextPageWithLayout = () => {
         const lastTab = tabStore.tabsMap[lastTabId]
         if (lastTab) router.push(`/project/${projectRef}/editor/${lastTab.metadata?.tableId}`)
       }
-    } else {
+    } else if (lastOpenedTab) {
       router.push(`/project/${projectRef}/editor/${appSnap.dashboardHistory.editor}`)
     }
   }, [isTableEditorTabsEnabled])
