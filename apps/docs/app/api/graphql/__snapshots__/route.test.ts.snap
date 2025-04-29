@@ -1,0 +1,12 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`/api/graphql schema snapshot > should match snapshot 1`] = `
+"schema {
+  query: RootQueryType
+}
+
+type RootQueryType {
+  """Get the GraphQL schema for this endpoint"""
+  schema: String!
+}"
+`;
