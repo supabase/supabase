@@ -124,6 +124,7 @@ const Subscription = () => {
                       ))}
                     {!subscription?.usage_billing_enabled && (
                       <Admonition
+                        className="mt-2"
                         type="default"
                         title="This organization is limited by the included usage"
                       >
