@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   getDefaultColumnCheckedStates,
   getDefaultTableCheckedStates,
@@ -15,6 +15,7 @@ import PrivilegesHead from 'components/interfaces/Database/Privileges/Privileges
 import PrivilegesTable from 'components/interfaces/Database/Privileges/PrivilegesTable'
 import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
@@ -38,10 +39,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
   const { ref, table: paramTable } = useParams()
   const { project } = useProjectContext()
   const snap = useAppStateSnapshot()
-
-  const featurePreviewContext = useFeaturePreviewContext()
-  const { flags } = featurePreviewContext
-  const isEnabled = flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
+  const isEnabled = useIsColumnLevelPrivilegesEnabled()
 
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [selectedTable, setSelectedTable] = useState<string | undefined>(paramTable)
@@ -361,7 +359,9 @@ const PrivilegesPage: NextPageWithLayout = () => {
 }
 
 PrivilegesPage.getLayout = (page) => (
-  <DatabaseLayout title="Column Privileges">{page}</DatabaseLayout>
+  <DefaultLayout>
+    <DatabaseLayout title="Column Privileges">{page}</DatabaseLayout>
+  </DefaultLayout>
 )
 
 export default PrivilegesPage

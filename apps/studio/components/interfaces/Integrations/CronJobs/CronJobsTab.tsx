@@ -8,10 +8,10 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
 import { Button, Input, Sheet, SheetContent } from 'ui'
 import { CronJobCard } from './CronJobCard'
 import { DeleteCronJob } from './DeleteCronJob'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const EMPTY_CRON_JOB = {
   jobname: '',
@@ -22,6 +22,7 @@ const EMPTY_CRON_JOB = {
 
 export const CronjobsTab = () => {
   const { project } = useProjectContext()
+  const org = useSelectedOrganization()
 
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
   const [createCronJobSheetShown, setCreateCronJobSheetShown] = useQueryState(
@@ -60,16 +61,22 @@ export const CronjobsTab = () => {
       </div>
     )
 
-  const filteredCronJobs = (cronJobs ?? []).filter((cj) => cj?.jobname?.includes(searchQuery || ''))
+  const filteredCronJobs =
+    searchQuery.length > 0
+      ? (cronJobs ?? []).filter((cj) => cj?.jobname?.includes(searchQuery || ''))
+      : cronJobs ?? []
 
   const onOpenCreateJobSheet = () => {
-    sendEvent({ action: TelemetryActions.CRON_JOB_CREATE_CLICKED })
+    sendEvent({
+      action: 'cron_job_create_clicked',
+      groups: { project: project?.ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+    })
     setCreateCronJobSheetShown(true)
   }
 
   return (
     <>
-      <div className="w-full space-y-4 p-10">
+      <div className="w-full space-y-4 p-4 md:p-10">
         {(cronJobs ?? []).length == 0 ? (
           <div className="border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4 border-dashed">
             <p className="text-sm text-foreground">No cron jobs created yet</p>

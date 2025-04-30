@@ -288,15 +288,6 @@
     "product_url": null
   },
   {
-    "name": "pg_stat_monitor",
-    "comment": "The pg_stat_monitor is a PostgreSQL Query Performance Monitoring tool, based on PostgreSQL contrib module pg_stat_statements. pg_stat_monitor provides aggregated statistics, client information, plan details including plan, and histogram information.",
-    "tags": ["Utility"],
-    "link": "/guides/database/extensions/pg_stat_monitor",
-    "github_url": null,
-    "product": null,
-    "product_url": null
-  },
-  {
     "name": "pg_stat_statements",
     "comment": "track execution statistics of all SQL statements executed",
     "tags": ["Admin", "Utility"],

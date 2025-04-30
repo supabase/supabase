@@ -1,5 +1,3 @@
-'use client'
-
 export * from './auth'
 export * from './constants'
 export * from './database-types'
@@ -9,3 +7,4 @@ export * from './hooks'
 export * from './MetaFavicons/pages-router'
 export * from './Providers'
 export * from './telemetry'
+export * from './feature-flags'

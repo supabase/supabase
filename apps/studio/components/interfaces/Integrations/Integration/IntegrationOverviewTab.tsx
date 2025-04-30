@@ -50,7 +50,7 @@ export const IntegrationOverviewTab = ({
     <div className="flex flex-col gap-8 py-10">
       <BuiltBySection integration={integration} />
       {dependsOnExtension && (
-        <div className="px-10 max-w-4xl">
+        <div className="px-4 md:px-10 max-w-4xl">
           <Admonition
             showIcon={false}
             type="default"

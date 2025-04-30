@@ -11,6 +11,7 @@ import {
   cn,
 } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import pricingAddOn from '~/data/PricingAddOnTable.json'
 
 const plans = [
@@ -210,10 +211,10 @@ const ComputePricingCalculator = () => {
             <div className="flex items-center gap-1 w-full justify-between">
               <span>Total Estimate</span>
               <span className="text-foreground font-mono flex items-center gap-1">
-                <InformationCircleIcon
-                  data-tip="This estimate only includes Plan and Compute add-on monthly costs. Other resources might concur in the final invoice."
-                  className="w-3 h-3"
-                />{' '}
+                <InfoTooltip side="top" className="max-w-[250px]">
+                  This estimate only includes Plan and Compute add-on monthly costs. Other resources
+                  might concur in the final invoice.
+                </InfoTooltip>
                 ${activePrice}
               </span>
             </div>

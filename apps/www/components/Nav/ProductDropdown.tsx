@@ -10,6 +10,7 @@ import { NavigationMenuLink } from 'ui/src/components/shadcn/ui/navigation-menu'
 import MenuItem from './MenuItem'
 
 import ComparisonsData from '~/data/Comparisons'
+import SolutionsData from '~/data/Solutions'
 import CustomersData from '~/data/CustomerStories'
 import MainProductsData from '~/data/MainProducts'
 import ProductModulesData from '~/data/ProductModules'
@@ -123,8 +124,8 @@ const ProductDropdown = () => {
           </div>
         </div>
       </div>
-      <div className="bg-surface-75 border-t xl:border-t-0 xl:border-l p-6 gap-8 grid grid-cols-5 xl:flex xl:flex-col w-full xl:w-[350px]">
-        <div className="col-span-3 flex flex-col gap-8 xl:w-auto">
+      <div className="bg-surface-75 border-t xl:border-t-0 xl:border-l p-6 gap-8 flex flex-col w-full xl:w-[400px]">
+        <div className="col-span-3 flex flex-row gap-8 xl:w-auto">
           <div>
             <Link
               href="/customers"
@@ -133,8 +134,8 @@ const ProductDropdown = () => {
               Customer Stories
               <ChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
             </Link>
-            <ul className="flex flex-col gap-2">
-              {CustomersData.slice(0, isTablet ? 2 : 1).map((customer) => (
+            <ul className="flex flex-row gap-2">
+              {CustomersData.slice(0, isTablet ? 1 : 1).map((customer) => (
                 <li key={customer.organization}>
                   <Link
                     href={customer.url}
@@ -159,13 +160,30 @@ const ProductDropdown = () => {
             </ul>
           </div>
         </div>
-        <div className="col-span-2 grid grid-cols-1 gap-6 xl:gap-2">
-          <div>
+        <div className="w-full col-span-2 grid grid-cols-4 xl:grid-cols-5 gap-6 xl:gap-2">
+          <div className="col-span-2 xl:col-span-3">
             <p className="text-foreground-lighter text-xs uppercase tracking-widest font-mono mb-3">
               {ComparisonsData.label}
             </p>
             <ul className="flex flex-col gap-2">
               {ComparisonsData.comparisons.map((link) => (
+                <li key={link.text}>
+                  <TextLink
+                    chevronAnimation="fadeIn"
+                    url={link.url}
+                    label={link.text}
+                    className="mt-0 hover:text-foreground focus-visible:text-foreground focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay"
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="col-span-2">
+            <p className="text-foreground-lighter text-xs uppercase tracking-widest font-mono mb-3">
+              {SolutionsData.label}
+            </p>
+            <ul className="flex flex-col gap-2">
+              {SolutionsData.solutions.map((link) => (
                 <li key={link.text}>
                   <TextLink
                     chevronAnimation="fadeIn"

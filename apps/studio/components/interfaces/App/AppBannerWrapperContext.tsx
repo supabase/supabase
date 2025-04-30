@@ -3,44 +3,40 @@ import { PropsWithChildren, createContext, useContext, useEffect, useState } fro
 
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
-const AUTH_SMTP_CHANGES_WARNING_KEY = LOCAL_STORAGE_KEYS.AUTH_SMTP_CHANGES_WARNING
+const FLY_POSTGRES_DEPRECATION_WARNING_KEY = LOCAL_STORAGE_KEYS.FLY_POSTGRES_DEPRECATION_WARNING
 
 // [Joshen] This file is meant to be dynamic - update this as and when we need to use the NoticeBanner
 
 type AppBannerContextType = {
-  authSmtpBannerAcknowledged: string[]
-  onUpdateAcknowledged: (key: 'auth-smtp', value: boolean | string) => void
+  flyPostgresBannerAcknowledged: boolean
+  onUpdateAcknowledged: (key: 'fly-postgres') => void
 }
 
 const AppBannerContext = createContext<AppBannerContextType>({
-  authSmtpBannerAcknowledged: [],
+  flyPostgresBannerAcknowledged: false,
   onUpdateAcknowledged: noop,
 })
 
 export const useAppBannerContext = () => useContext(AppBannerContext)
 
 export const AppBannerContextProvider = ({ children }: PropsWithChildren<{}>) => {
-  // [Joshen] If project specific, can take a list of refs instead - comma separated strings, no spaces
-  // Otherwise just a boolean will be fine
-  const [authSmtpBannerAcknowledged, setAuthSmtpBannerAcknowledged] = useState<string[]>([])
+  const [flyPostgresBannerAcknowledged, setFlyPostgresBannerAcknowledged] = useState<boolean>(false)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const acknowledgedProjectRefs =
-        localStorage.getItem(AUTH_SMTP_CHANGES_WARNING_KEY)?.split(',') ?? []
-      setAuthSmtpBannerAcknowledged(acknowledgedProjectRefs)
+      const acknowledged = localStorage.getItem(FLY_POSTGRES_DEPRECATION_WARNING_KEY) === 'true'
+      setFlyPostgresBannerAcknowledged(acknowledged)
     }
   }, [])
 
   const value = {
-    authSmtpBannerAcknowledged,
-    onUpdateAcknowledged: (key: 'auth-smtp', value: boolean | string) => {
-      if (key === 'auth-smtp' && typeof value === 'string' && value.length > 0) {
-        const updatedRefs = authSmtpBannerAcknowledged.concat([value])
+    flyPostgresBannerAcknowledged,
+    onUpdateAcknowledged: (key: 'fly-postgres') => {
+      if (key === 'fly-postgres') {
         if (typeof window !== 'undefined') {
-          window.localStorage.setItem(AUTH_SMTP_CHANGES_WARNING_KEY, updatedRefs.join(','))
+          window.localStorage.setItem(FLY_POSTGRES_DEPRECATION_WARNING_KEY, 'true')
         }
-        setAuthSmtpBannerAcknowledged(updatedRefs)
+        setFlyPostgresBannerAcknowledged(true)
       }
     },
   }
@@ -49,6 +45,6 @@ export const AppBannerContextProvider = ({ children }: PropsWithChildren<{}>) =>
 }
 
 export const useIsNoticeBannerShown = () => {
-  const { authSmtpBannerAcknowledged } = useAppBannerContext()
-  return authSmtpBannerAcknowledged
+  const { flyPostgresBannerAcknowledged } = useAppBannerContext()
+  return flyPostgresBannerAcknowledged
 }

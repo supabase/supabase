@@ -1,4 +1,3 @@
-import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import matter from 'gray-matter'
 import { serialize } from 'next-mdx-remote/serialize'
 import type { SerializeOptions } from 'next-mdx-remote/dist/types'
@@ -15,8 +14,9 @@ import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 // with outputFileTracingIncludes (not auto-traced) will not be found at
 // runtime.
 export const DOCS_DIRECTORY = process.cwd()
-export const EXAMPLES_DIRECTORY = join(DOCS_DIRECTORY, '..', '..', 'examples')
+export const EXAMPLES_DIRECTORY = join(DOCS_DIRECTORY, 'examples')
 export const GUIDES_DIRECTORY = join(DOCS_DIRECTORY, 'content/guides')
+export const PARTIALS_DIRECTORY = join(DOCS_DIRECTORY, 'content/_partials')
 export const REF_DOCS_DIRECTORY = join(DOCS_DIRECTORY, 'docs/ref')
 export const SPEC_DIRECTORY = join(DOCS_DIRECTORY, 'spec')
 
@@ -26,7 +26,7 @@ export type GuideFrontmatter = {
   description?: string
   canonical?: string
   hideToc?: boolean
-  // @deprecated
+  /** @deprecated */
   hide_table_of_contents?: boolean
   tocVideo?: string
 }
@@ -126,22 +126,10 @@ export async function getGuidesStaticProps(
     return
   }
 
-  const codeHikeOptions: CodeHikeConfig = {
-    theme: codeHikeTheme,
-    lineNumbers: true,
-    showCopyButton: true,
-    skipLanguages: [],
-    autoImport: false,
-  }
-
   const mdxOptions: SerializeOptions = {
     mdxOptions: {
       useDynamicImport: true,
-      remarkPlugins: [
-        [remarkMath, { singleDollarTextMath: false }],
-        remarkGfm,
-        [remarkCodeHike, codeHikeOptions],
-      ],
+      remarkPlugins: [[remarkMath, { singleDollarTextMath: false }], remarkGfm],
       rehypePlugins: [rehypeKatex as any],
     },
   }

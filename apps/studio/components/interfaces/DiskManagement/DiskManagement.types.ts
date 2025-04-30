@@ -1,4 +1,4 @@
-import { AddonVariantId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import { AddonVariantId } from 'data/subscriptions/types'
 
 export type ComputeInstanceAddonVariantId =
   | Extract<
@@ -30,6 +30,7 @@ export type ComputeInstanceSize =
   | '16XL'
 
 export type InfraInstanceSize =
+  | 'pico'
   | 'nano'
   | 'micro'
   | 'small'

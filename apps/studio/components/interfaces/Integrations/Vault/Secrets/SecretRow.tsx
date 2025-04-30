@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
@@ -11,6 +10,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Input,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -59,18 +61,10 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           )}
         </div>
         <div className="flex items-center space-x-2 group">
-          <Key
-            size={14}
-            strokeWidth={2}
-            className="text-foreground-light transition group-hover:text-brand"
-          />
-          <Link
-            href={`/project/${ref}/integrations/vault/keys?search=${secret.key_id}`}
-            className="text-foreground-light font-mono text-xs cursor-pointer transition group-hover:text-brand"
-            title={secret.key_id}
-          >
-            {secret.key_id}
-          </Link>
+          <Key size={14} strokeWidth={2} className="text-foreground-light transition" />
+          <p className="text-foreground-light font-mono text-xs transition" title={secret.id}>
+            {secret.id}
+          </p>
         </div>
       </div>
       <div className="flex items-center space-x-2 w-[40%]">
@@ -105,9 +99,9 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           <DropdownMenuTrigger asChild>
             <Button type="text" className="px-1" icon={<MoreVertical />} />
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom">
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
+          <DropdownMenuContent side="bottom" align="end" className="w-32">
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <DropdownMenuItem
                   className="space-x-2"
                   disabled={!canManageSecrets}
@@ -116,28 +110,16 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
                   <Edit3 size="14" />
                   <p>Edit</p>
                 </DropdownMenuItem>
-              </Tooltip.Trigger>
+              </TooltipTrigger>
               {!canManageSecrets && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to edit secrets
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
+                <TooltipContent side="bottom">
+                  You need additional permissions to edit secrets
+                </TooltipContent>
               )}
-            </Tooltip.Root>
+            </Tooltip>
 
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <DropdownMenuItem
                   className="space-x-2"
                   disabled={!canManageSecrets}
@@ -146,25 +128,13 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
                   <Trash stroke="red" size="14" />
                   <p className="text-foreground-light">Delete</p>
                 </DropdownMenuItem>
-              </Tooltip.Trigger>
+              </TooltipTrigger>
               {!canManageSecrets && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to delete secrets
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
+                <TooltipContent side="bottom">
+                  You need additional permissions to delete secrets
+                </TooltipContent>
               )}
-            </Tooltip.Root>
+            </Tooltip>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

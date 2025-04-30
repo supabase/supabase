@@ -42,4 +42,31 @@ jobs:
         run: |
           echo "Applying triage label for new issue"
           gh issue edit "$NUMBER" --add-label "$LABELS"
-
+  spam-detection:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Check GitHub Issue for spam
+        env:
+          POST_URL: ${{ secrets.POST_URL }}
+          BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
+          NUMBER: ${{ github.event.issue.number }}
+        run: |
+          RESPONSE=$(curl -s -X POST "$POST_URL" \
+            -H "Authorization: Bearer $BEARER_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"issue_id": $NUMBER}')
+          echo "spam_response=$RESPONSE" >> $GITHUB_OUTPUT
+      - name: Use spam detector output to label issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.issue.number }}
+          LABEL: flagged
+        run: |
+          IS_SPAM=$(echo "$SPAM_RESPONSE" | jq -r '.spam')
+          if [ "$IS_SPAM" == "true" ]; then
+            echo "Applying flagged label for new issue suspected of spam"
+            gh issue edit "$NUMBER" --add-label "$LABEL"
+          fi

@@ -39,19 +39,36 @@ const NavigationMenuGuideList = ({
     }
   }
 
+  // Inject federated prompts into the 'AI Tools > Prompts' section
   if (id === MenuId.GettingStarted && additionalNavItems?.prompts) {
-    const promptsSectionIndex = menu.items.findIndex((item) => item.name === 'AI Prompts')
-    if (promptsSectionIndex !== -1) {
-      menu = {
-        ...menu,
-        items: [
-          ...menu.items.slice(0, promptsSectionIndex),
-          {
-            ...menu.items[promptsSectionIndex],
-            items: [...menu.items[promptsSectionIndex].items, ...additionalNavItems.prompts],
-          },
-          ...menu.items.slice(promptsSectionIndex + 1),
-        ],
+    const aiToolsSectionIndex = menu.items.findIndex((item) => item.name === 'AI Tools')
+    if (aiToolsSectionIndex !== -1) {
+      const beforeAITools = menu.items.slice(0, aiToolsSectionIndex)
+      const afterAITools = menu.items.slice(aiToolsSectionIndex + 1)
+
+      const aiToolsSection = menu.items[aiToolsSectionIndex]
+      const promptsSectionIndex = aiToolsSection.items.findIndex((item) => item.name === 'Prompts')
+
+      if (promptsSectionIndex !== -1) {
+        const beforePrompts = aiToolsSection.items.slice(0, promptsSectionIndex)
+        const afterPrompts = aiToolsSection.items.slice(promptsSectionIndex + 1)
+
+        const promptsSection = aiToolsSection.items[promptsSectionIndex]
+
+        const modifiedPromptsSection = {
+          ...promptsSection,
+          items: additionalNavItems.prompts,
+        }
+
+        const modifiedAIToolsSection = {
+          ...aiToolsSection,
+          items: [...beforePrompts, modifiedPromptsSection, ...afterPrompts],
+        }
+
+        menu = {
+          ...menu,
+          items: [...beforeAITools, modifiedAIToolsSection, ...afterAITools],
+        }
       }
     }
   }

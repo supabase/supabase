@@ -1,0 +1,135 @@
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="mac"
+  queryGroup="os"
+>
+
+  <TabPanel id="mac" label="macOS">
+
+    ```json
+    {
+      "inputs": [
+        {
+          "type": "promptString",
+          "id": "supabase-access-token",
+          "description": "Supabase personal access token",
+          "password": true
+        }
+      ],
+      "servers": {
+        "supabase": {
+          "command": "npx",
+          "args": ["-y", "@supabase/mcp-server-supabase@latest"],
+          "env": {
+            "SUPABASE_ACCESS_TOKEN": "${input:supabase-access-token}"
+          }
+        }
+      }
+    }
+    ```
+
+  </TabPanel>
+
+  <TabPanel id="windows" label="Windows">
+
+    ```json
+    {
+      "inputs": [
+        {
+          "type": "promptString",
+          "id": "supabase-access-token",
+          "description": "Supabase personal access token",
+          "password": true
+        }
+      ],
+      "servers": {
+        "supabase": {
+          "command": "cmd",
+          "args": ["/c", "npx", "-y", "@supabase/mcp-server-supabase@latest"],
+          "env": {
+            "SUPABASE_ACCESS_TOKEN": "${input:supabase-access-token}"
+          }
+        }
+      }
+    }
+    ```
+
+    <Admonition type="note">
+
+    Make sure that `node` and `npx` are available in your system `PATH`. Assuming `node` is installed, you can get the path by running:
+
+    ```shell
+    npm config get prefix
+    ```
+
+    Then add it to your system `PATH` by running:
+
+    ```shell
+    setx PATH "%PATH%;<path-to-dir>"
+    ```
+
+    Replacing `<path-to-dir>` with the path you got from the previous command.
+
+    Finally restart VS Code for the changes to take effect.
+
+    </Admonition>
+
+  </TabPanel>
+
+  <TabPanel id="wsl" label="Windows (WSL)">
+
+    ```json
+    {
+      "inputs": [
+        {
+          "type": "promptString",
+          "id": "supabase-access-token",
+          "description": "Supabase personal access token",
+          "password": true
+        }
+      ],
+      "servers": {
+        "supabase": {
+          "command": "wsl",
+          "args": ["npx", "-y", "@supabase/mcp-server-supabase@latest"],
+          "env": {
+            "SUPABASE_ACCESS_TOKEN": "${input:supabase-access-token}"
+          }
+        }
+      }
+    }
+    ```
+
+    This assumes you have Windows Subsystem for Linux (WSL) enabled and `node`/`npx` are installed within the WSL environment.
+
+  </TabPanel>
+
+  <TabPanel id="linux" label="Linux">
+
+    ```json
+    {
+      "inputs": [
+        {
+          "type": "promptString",
+          "id": "supabase-access-token",
+          "description": "Supabase personal access token",
+          "password": true
+        }
+      ],
+      "servers": {
+        "supabase": {
+          "command": "npx",
+          "args": ["-y", "@supabase/mcp-server-supabase@latest"],
+          "env": {
+            "SUPABASE_ACCESS_TOKEN": "${input:supabase-access-token}"
+          }
+        }
+      }
+    }
+    ```
+
+  </TabPanel>
+
+</Tabs>

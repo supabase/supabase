@@ -1,23 +1,18 @@
 'use client'
 
-import Image from 'next/image'
+// import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { cn } from 'ui/src/lib/utils/cn'
 import { Button } from 'ui/src/components/Button/Button'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { useTheme } from 'next-themes'
-import announcement from 'ui/src/layout/banners/data/Announcement.json'
-
-const LW13BGDark =
-  'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/images/launch-week/lw13/assets/lw13-bg-dark.png?t=2024-11-22T23%3A10%3A37.646Z'
-const LW13BGLight =
-  'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/images/launch-week/lw13/assets/lw13-bg-light.png?t=2024-11-22T23%3A10%3A37.646Z'
+// import { useTheme } from 'next-themes'
+import announcement from '../Banners/data.json'
+import './styles.css'
 
 const PromoToast = () => {
   const [visible, setVisible] = useState(false)
-  const { resolvedTheme } = useTheme()
-  const bgImage = resolvedTheme?.includes('dark') ? LW13BGDark : LW13BGLight
+  // const { resolvedTheme } = useTheme()
 
   useEffect(() => {
     const shouldHide =
@@ -43,17 +38,17 @@ const PromoToast = () => {
         visible && 'opacity-100 translate-y-0'
       )}
     >
-      <div className="relative z-10 text-foreground-lighter leading-3 flex flex-col font-mono uppercase tracking-wide w-full text-xs">
-        <div className="text-foreground uppercase tracking-wider text-lg -mb-1">Launch Week 13</div>
-        <p className="text-foreground-lighter uppercase tracking-wider text-xl md:text-lg leading-snug">
-          2—6 Dec
-        </p>
-      </div>
-      <div className="relative z-10 text-foreground-lighter flex flex-col text-sm uppercase font-mono tracking-widest w-full -mt-1">
-        A week of new features
+      <div className="relative z-10 text-foreground-lighter uppercase flex flex-col text-sm w-full font-mono mb-2">
+        <span className="mb-1">{announcement.text}</span>
+        <p
+          style={{
+            fontFamily: 'Departure Mono, Source Code Pro, Office Code Pro, Menlo, monospace',
+          }}
+          className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7"
+        ></p>
       </div>
 
-      <div className="relative z-10 flex items-center space-x-2 mt-2">
+      <div className="relative z-10 flex items-center space-x-2">
         <Button asChild type="secondary">
           <Link target="_blank" rel="noreferrer" href={`https://supabase.com${announcement.link}`}>
             Learn more
@@ -63,15 +58,15 @@ const PromoToast = () => {
           Dismiss
         </Button>
       </div>
-      <Image
-        src={bgImage}
+      {/* <Image
+        src={}
         alt=""
         fill
         sizes="100%"
         quality={100}
         aria-hidden
         className="absolute not-sr-only object-cover z-0 inset-0 w-full h-auto"
-      />
+      /> */}
     </div>
   )
 }

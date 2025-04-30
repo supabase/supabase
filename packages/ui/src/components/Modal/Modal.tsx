@@ -21,14 +21,14 @@ export interface ModalProps extends React.ComponentProps<typeof DialogContent> {
   Separator?: React.ComponentType
   Content?: React.ComponentType
   visible?: boolean
-  // @deprecated please add the footer directly in component children. This is to prepare for using <DialogFooter/> component
+  /** @deprecated please add the footer directly in component children. This is to prepare for using <DialogFooter/> component */
   customFooter?: React.ReactNode
   description?: string
-  // @deprecated please add the footer directly in component children. This is to prepare for using <DialogFooter/> component
+  /** @deprecated please add the footer directly in component children. This is to prepare for using <DialogFooter/> component */
   hideFooter?: boolean
-  // @deprecated please add the footer directly in component children. This is to prepare for using <DialogFooter/> component
+  /** @deprecated please add the footer directly in component children. This is to prepare for using <DialogFooter/> component */
   alignFooter?: 'right' | 'left'
-  // @deprecated please add the footer directly in component children. This is to prepare for using <DialogFooter/> component
+  /** @deprecated please add the footer directly in component children. This is to prepare for using <DialogFooter/> component */
   layout?: 'horizontal' | 'vertical'
   loading?: boolean
   onCancel?: any
@@ -37,14 +37,14 @@ export interface ModalProps extends React.ComponentProps<typeof DialogContent> {
   confirmText?: string
   showCloseButton?: boolean
   footerBackground?: boolean
-  // @deprecated please add the footer directly in component children. This is to prepare for using <DialogFooter/> component
+  /** @deprecated please add the footer directly in component children. This is to prepare for using <DialogFooter/> component */
   variant?: ButtonVariantProps['type']
   overlayStyle?: React.CSSProperties
   contentStyle?: React.CSSProperties
   dialogOverlayProps?: React.ComponentProps<typeof DialogContent>['dialogOverlayProps']
-  // @deprecated please consider using <Dialog/> and <DialogTrigger/> components
+  /** @deprecated please consider using <Dialog/> and <DialogTrigger/> components */
   triggerElement?: React.ReactNode
-  // @deprecated please consider using <Dialog/> and <DialogHeader/> components
+  /** @deprecated please consider using <Dialog/> and <DialogHeader/> components */
   header?: React.ReactNode
   modal?: React.ComponentProps<typeof Dialog>['modal']
   defaultOpen?: React.ComponentProps<typeof Dialog>['defaultOpen']
@@ -62,7 +62,7 @@ interface ModalType
   Separator: React.ComponentType
 }
 
-// @deprecated use <Dialog/> instead
+/** @deprecated use <Dialog/> instead */
 const Modal = forwardRef<
   React.ElementRef<typeof DialogContent>,
   React.ComponentPropsWithoutRef<typeof DialogContent> & ModalProps

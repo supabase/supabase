@@ -1,16 +1,15 @@
 import { ArrowRight, Check, Minus, User, X } from 'lucide-react'
-import Image from 'next/legacy/image'
-import { useState } from 'react'
 
-import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import PartnerIcon from 'components/ui/PartnerIcon'
+import { ProfileImage } from 'components/ui/ProfileImage'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { getGitHubProfileImgUrl } from 'lib/github'
 import { useProfile } from 'lib/profile'
+import Link from 'next/link'
 import {
   Badge,
   HoverCardContent_Shadcn_,
@@ -22,7 +21,6 @@ import {
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
 import { MemberActions } from './MemberActions'
-import Link from 'next/link'
 
 interface MemberRowProps {
   member: OrganizationMember
@@ -35,7 +33,6 @@ const MEMBER_ORIGIN_TO_MANAGED_BY = {
 export const MemberRow = ({ member }: MemberRowProps) => {
   const { profile } = useProfile()
   const selectedOrganization = useSelectedOrganization()
-  const [hasInvalidImg, setHasInvalidImg] = useState(false)
 
   const { data: projects } = useProjectsQuery()
   const { data: roles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({
@@ -48,6 +45,9 @@ export const MemberRow = ({ member }: MemberRowProps) => {
   const isInvitedUser = Boolean(member.invited_id)
   const isEmailUser = member.username === member.primary_email
   const isFlyUser = Boolean(member.primary_email?.endsWith('customer.fly.io'))
+
+  const profileImageUrl =
+    isInvitedUser || isEmailUser || isFlyUser ? undefined : getGitHubProfileImgUrl(member.username)
 
   // [Joshen] From project role POV, mask any roles for other projects
   const isObfuscated =
@@ -71,25 +71,22 @@ export const MemberRow = ({ member }: MemberRowProps) => {
   return (
     <Table.tr>
       <Table.td>
-        <div className="flex items-center space-x-4">
-          <div>
-            {isInvitedUser || isEmailUser || isFlyUser || hasInvalidImg ? (
-              <div className="w-[40px] h-[40px] bg-surface-100 border border-overlay rounded-full text-foreground-lighter flex items-center justify-center">
+        <div className="flex items-center gap-x-4">
+          <ProfileImage
+            alt={member.username}
+            src={profileImageUrl}
+            className="border rounded-full w-[32px] h-[32px] md:w-[40px] md:h-[40px]"
+            placeholder={
+              <div
+                className={cn(
+                  'w-[32px] h-[32px] md:w-[40px] md:h-[40px]',
+                  'bg-surface-100 border border-overlay rounded-full text-foreground-lighter flex items-center justify-center'
+                )}
+              >
                 <User size={20} strokeWidth={1.5} />
               </div>
-            ) : (
-              <Image
-                alt={member.username}
-                src={`https://github.com/${member.username}.png?size=80`}
-                width="40"
-                height="40"
-                className="border rounded-full"
-                onError={() => {
-                  setHasInvalidImg(true)
-                }}
-              />
-            )}
-          </div>
+            }
+          />
           <div className="flex item-center gap-x-2">
             {isInvitedUser === undefined ? (
               <p className="text-foreground-light truncate">{member.primary_email}</p>
@@ -119,6 +116,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             {isInviteExpired(member.invited_at) ? 'Expired' : 'Invited'}
           </Badge>
         )}
+        {member.is_sso_user && <Badge variant="default">SSO</Badge>}
       </Table.td>
 
       <Table.td>

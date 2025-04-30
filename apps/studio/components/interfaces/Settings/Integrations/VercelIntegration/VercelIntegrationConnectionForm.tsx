@@ -11,6 +11,9 @@ import type {
 } from 'data/integrations/integrations.types'
 import { useVercelConnectionUpdateMutation } from 'data/integrations/vercel-connection-update-mutate'
 import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
@@ -21,6 +24,8 @@ import {
   Input_Shadcn_,
   Switch,
 } from 'ui'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import Link from 'next/link'
 
 const VercelIntegrationConnectionForm = ({
   disabled,
@@ -31,7 +36,11 @@ const VercelIntegrationConnectionForm = ({
   connection: IntegrationProjectConnection
   integration: Integration
 }) => {
-  const envSyncTargets = connection.env_sync_targets ?? []
+  // NOTE(kamil): Ignore sync targets for Vercel Marketplace as it's not synchronized using integration,
+  // but through a separate marketplace mechanism. It's not theoretically necessary, but we might have some stale data.
+  const org = useSelectedOrganization()
+  const envSyncTargets =
+    org?.managed_by === 'vercel-marketplace' ? [] : connection.env_sync_targets ?? []
 
   const FormSchema = z.object({
     environmentVariablesProduction: z.boolean().default(envSyncTargets.includes('production')),
@@ -88,76 +97,101 @@ const VercelIntegrationConnectionForm = ({
         className={'w-full space-y-6'}
       >
         <div className="px-6 py-4 flex flex-col gap-y-4">
-          <h5 className="text-foreground text-sm">
-            Sync environment variables for selected target environments
-          </h5>
           <div className="flex flex-col gap-4">
-            <FormField_Shadcn_
-              control={form.control}
-              name="environmentVariablesProduction"
-              render={({ field }) => (
-                <FormItem_Shadcn_ className="space-y-0 flex gap-x-4">
-                  <FormControl_Shadcn_>
-                    <Switch
-                      disabled={disabled}
-                      className="mt-1"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl_Shadcn_>
-                  <div>
-                    <FormLabel_Shadcn_ className="!text">Production</FormLabel_Shadcn_>
-                    <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
-                      Sync environment variables for <code>production</code> environment.
-                    </FormDescription_Shadcn_>
-                  </div>
-                </FormItem_Shadcn_>
-              )}
-            />
-            <FormField_Shadcn_
-              control={form.control}
-              name="environmentVariablesPreview"
-              render={({ field }) => (
-                <FormItem_Shadcn_ className="space-y-0 flex gap-x-4">
-                  <FormControl_Shadcn_>
-                    <Switch
-                      disabled={disabled}
-                      className="mt-1"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl_Shadcn_>
-                  <div>
-                    <FormLabel_Shadcn_ className="!text">Preview</FormLabel_Shadcn_>
-                    <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
-                      Sync environment variables for <code>preview</code> environment.
-                    </FormDescription_Shadcn_>
-                  </div>
-                </FormItem_Shadcn_>
-              )}
-            />
-            <FormField_Shadcn_
-              control={form.control}
-              name="environmentVariablesDevelopment"
-              render={({ field }) => (
-                <FormItem_Shadcn_ className="space-y-0 flex gap-x-4">
-                  <FormControl_Shadcn_>
-                    <Switch
-                      disabled={disabled}
-                      className="mt-1"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl_Shadcn_>
-                  <div>
-                    <FormLabel_Shadcn_ className="!text">Development</FormLabel_Shadcn_>
-                    <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
-                      Sync environment variables for <code>development</code> environment.
-                    </FormDescription_Shadcn_>
-                  </div>
-                </FormItem_Shadcn_>
-              )}
-            />
+            {org?.managed_by === 'vercel-marketplace' ? (
+              <Alert_Shadcn_>
+                <AlertTitle_Shadcn_ className="text-sm">
+                  Vercel Marketplace managed project
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_ className="text-xs">
+                  This project is managed via Vercel Marketplace. Environment variables are
+                  automatically synchronized for your connected Vercel projects. This integration
+                  purpose is synchronizing preview deployments environment variables with our{' '}
+                  <Link
+                    target="_blank"
+                    rel="noreferrer"
+                    href="https://supabase.com/docs/guides/platform/branching"
+                    className="underline"
+                  >
+                    Branching
+                  </Link>{' '}
+                  feature.
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            ) : (
+              <div>
+                <h5 className="text-foreground text-sm">
+                  Sync environment variables for selected target environments
+                </h5>
+
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="environmentVariablesProduction"
+                  render={({ field }) => (
+                    <FormItem_Shadcn_ className="space-y-0 flex gap-x-4">
+                      <FormControl_Shadcn_>
+                        <Switch
+                          disabled={disabled}
+                          className="mt-1"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl_Shadcn_>
+                      <div>
+                        <FormLabel_Shadcn_ className="!text">Production</FormLabel_Shadcn_>
+                        <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
+                          Sync environment variables for <code>production</code> environment.
+                        </FormDescription_Shadcn_>
+                      </div>
+                    </FormItem_Shadcn_>
+                  )}
+                />
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="environmentVariablesPreview"
+                  render={({ field }) => (
+                    <FormItem_Shadcn_ className="space-y-0 flex gap-x-4">
+                      <FormControl_Shadcn_>
+                        <Switch
+                          disabled={disabled}
+                          className="mt-1"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl_Shadcn_>
+                      <div>
+                        <FormLabel_Shadcn_ className="!text">Preview</FormLabel_Shadcn_>
+                        <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
+                          Sync environment variables for <code>preview</code> environment.
+                        </FormDescription_Shadcn_>
+                      </div>
+                    </FormItem_Shadcn_>
+                  )}
+                />
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="environmentVariablesDevelopment"
+                  render={({ field }) => (
+                    <FormItem_Shadcn_ className="space-y-0 flex gap-x-4">
+                      <FormControl_Shadcn_>
+                        <Switch
+                          disabled={disabled}
+                          className="mt-1"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl_Shadcn_>
+                      <div>
+                        <FormLabel_Shadcn_ className="!text">Development</FormLabel_Shadcn_>
+                        <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
+                          Sync environment variables for <code>development</code> environment.
+                        </FormDescription_Shadcn_>
+                      </div>
+                    </FormItem_Shadcn_>
+                  )}
+                />
+              </div>
+            )}
           </div>
           <h5 className="mt-2 text-foreground text-sm">
             Customize public environment variable prefix

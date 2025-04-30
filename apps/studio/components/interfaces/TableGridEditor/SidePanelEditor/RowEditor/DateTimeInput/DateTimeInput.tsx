@@ -20,6 +20,7 @@ interface DateTimeInputProps {
   isNullable: boolean
   description: string | ReactNode
   onChange: (value: string) => void
+  disabled?: boolean
 }
 
 /**
@@ -34,6 +35,7 @@ const DateTimeInput = ({
   isNullable,
   format,
   description,
+  disabled = false,
 }: DateTimeInputProps) => {
   const inputType = getColumnType(format)
 
@@ -56,33 +58,36 @@ const DateTimeInput = ({
       type={inputType}
       step={inputType == 'datetime-local' || inputType == 'time' ? '1' : undefined}
       actions={
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button type="default" icon={<Edit />} className="px-1.5" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-28">
-            {isNullable && (
-              <DropdownMenuItem onClick={() => onChange('')}>Set to NULL</DropdownMenuItem>
-            )}
-            <DropdownMenuItem
-              onClick={() =>
-                onChange(
-                  dayjs().format(
-                    format === 'date'
-                      ? 'YYYY-MM-DD'
-                      : ['time', 'timetz'].includes(format)
-                        ? 'HH:mm:ss'
-                        : 'YYYY-MM-DDTHH:mm:ss'
+        !disabled && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="default" icon={<Edit />} className="px-1.5" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-28 pointer-events-auto">
+              {isNullable && (
+                <DropdownMenuItem onClick={() => onChange('')}>Set to NULL</DropdownMenuItem>
+              )}
+              <DropdownMenuItem
+                onClick={() =>
+                  onChange(
+                    dayjs().format(
+                      format === 'date'
+                        ? 'YYYY-MM-DD'
+                        : ['time', 'timetz'].includes(format)
+                          ? 'HH:mm:ss'
+                          : 'YYYY-MM-DDTHH:mm:ss'
+                    )
                   )
-                )
-              }
-            >
-              Set to now
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+                }
+              >
+                Set to now
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
       }
       onChange={(e) => onChange(e.target.value)}
+      disabled={disabled}
     />
   )
 }

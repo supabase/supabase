@@ -10,12 +10,13 @@ import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeatureP
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import APIDocsButton from 'components/ui/APIDocsButton'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { authKeys } from 'data/auth/keys'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUsersCountQuery } from 'data/auth/users-count-query'
-import { useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
+import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import {
@@ -43,10 +44,10 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import AddUserDropdown from './AddUserDropdown'
+import { DeleteUserModal } from './DeleteUserModal'
 import { UserPanel } from './UserPanel'
 import { MAX_BULK_DELETE, PROVIDER_FILTER_OPTIONS } from './Users.constants'
 import { formatUserColumns, formatUsersData, isAtBottom } from './Users.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 export type UsersTableColumn = {
@@ -76,19 +77,23 @@ export const UsersV2 = () => {
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
   const gridRef = useRef<DataGridHandle>(null)
+  const xScroll = useRef<number>(0)
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
   const [columns, setColumns] = useState<Column<any>[]>([])
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<Filter>('all')
   const [filterKeywords, setFilterKeywords] = useState('')
-  const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
   const [selectedColumns, setSelectedColumns] = useState<string[]>([])
   const [selectedProviders, setSelectedProviders] = useState<string[]>([])
-  const [selectedUser, setSelectedUser] = useState<string>()
   const [sortByValue, setSortByValue] = useState<string>('created_at:desc')
+
+  const [selectedUser, setSelectedUser] = useState<string>()
+  const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
+  const [selectedUserToDelete, setSelectedUserToDelete] = useState<User>()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeletingUsers, setIsDeletingUsers] = useState(false)
+
   const [
     columnConfiguration,
     setColumnConfiguration,
@@ -109,6 +114,7 @@ export const UsersV2 = () => {
     isError,
     isFetchingNextPage,
     refetch,
+    hasNextPage,
     fetchNextPage,
   } = useUsersInfiniteQuery(
     {
@@ -122,6 +128,9 @@ export const UsersV2 = () => {
     },
     {
       keepPreviousData: Boolean(filterKeywords),
+      // [Joshen] This is to prevent the dashboard from invalidating when refocusing as it may create
+      // a barrage of requests to invalidate each page esp when the project has many many users.
+      staleTime: Infinity,
     }
   )
 
@@ -138,10 +147,21 @@ export const UsersV2 = () => {
   const totalUsers = countData ?? 0
   const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
   // [Joshen] Only relevant for when selecting one user only
-  const selectedUserToDelete = users.find((u) => u.id === [...selectedUsers][0])
+  const selectedUserFromCheckbox = users.find((u) => u.id === [...selectedUsers][0])
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
-    if (isLoading || !isAtBottom(event)) return
+    const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
+    xScroll.current = event.currentTarget.scrollLeft
+
+    if (
+      isLoading ||
+      isFetchingNextPage ||
+      isScrollingHorizontally ||
+      !isAtBottom(event) ||
+      !hasNextPage
+    ) {
+      return
+    }
     fetchNextPage()
   }
 
@@ -221,6 +241,7 @@ export const UsersV2 = () => {
         users: users ?? [],
         visibleColumns: selectedColumns,
         setSortByValue,
+        onSelectDeleteUser: setSelectedUserToDelete,
       })
       setColumns(columns)
       if (columns.length < USERS_TABLE_COLUMNS.length) {
@@ -242,7 +263,7 @@ export const UsersV2 = () => {
     <>
       <div className="h-full flex flex-col">
         <FormHeader className="py-4 px-6 !mb-0" title="Users" />
-        <div className="bg-surface-200 py-3 px-6 flex items-center justify-between border-t">
+        <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-center justify-between gap-2 border-t">
           {selectedUsers.size > 0 ? (
             <div className="flex items-center gap-x-2">
               <Button type="default" icon={<Trash />} onClick={() => setShowDeleteModal(true)}>
@@ -258,7 +279,7 @@ export const UsersV2 = () => {
             </div>
           ) : (
             <>
-              <div className="flex items-center gap-x-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Input
                   size="tiny"
                   className="w-52 pl-7 bg-transparent"
@@ -361,6 +382,7 @@ export const UsersV2 = () => {
                       users: users ?? [],
                       visibleColumns: value,
                       setSortByValue,
+                      onSelectDeleteUser: setSelectedUserToDelete,
                     })
 
                     setSelectedColumns(value)
@@ -484,12 +506,14 @@ export const UsersV2 = () => {
                     return (
                       <Row
                         {...props}
-                        key={props.row.id}
                         onClick={() => {
-                          const idx = users.indexOf(users.find((u) => u.id === id) ?? {})
-                          if (props.row.id) {
-                            setSelectedUser(props.row.id)
-                            gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
+                          const user = users.find((u) => u.id === id)
+                          if (user) {
+                            const idx = users.indexOf(user)
+                            if (props.row.id) {
+                              setSelectedUser(props.row.id)
+                              gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
+                            }
                           }
                         }}
                       />
@@ -562,12 +586,20 @@ export const UsersV2 = () => {
           {selectedUsers.size === 1 ? (
             <span className="text-foreground">
               {' '}
-              {selectedUserToDelete?.email ?? selectedUserToDelete?.phone ?? 'this user'}
+              {selectedUserFromCheckbox?.email ?? selectedUserFromCheckbox?.phone ?? 'this user'}
             </span>
           ) : null}
           ?
         </p>
       </ConfirmationModal>
+
+      {/* [Joshen] For deleting via context menu, the dialog above is dependent on the selectedUsers state */}
+      <DeleteUserModal
+        visible={!!selectedUserToDelete}
+        selectedUser={selectedUserToDelete}
+        onClose={() => setSelectedUserToDelete(undefined)}
+        onDeleteSuccess={() => setSelectedUserToDelete(undefined)}
+      />
     </>
   )
 }

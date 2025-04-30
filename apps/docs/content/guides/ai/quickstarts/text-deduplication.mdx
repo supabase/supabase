@@ -13,7 +13,7 @@ This guide will walk you through a ["Semantic Text Deduplication"](https://githu
 1. Use the `sentence-transformers/all-MiniLM-L6-v2` model to create an embedding representing the semantic meaning of each review.
 1. Search for all duplicates.
 
-<DatabaseSetup />
+<$Partial path="database_setup.mdx" />
 
 ## Launching a notebook
 
@@ -41,7 +41,7 @@ DB_CONNECTION = "postgresql://<user>:<password>@<host>:<port>/<db_name>"
 vx = vecs.create_client(DB_CONNECTION)
 ```
 
-Replace the `DB_CONNECTION` with your own connection string for your database. You can find the Postgres connection string in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database) of your Supabase project.
+Replace the `DB_CONNECTION` with your own connection string. You can find the connection string on your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
 <Admonition type='note'>
 
@@ -63,7 +63,7 @@ You can view the inserted items in the [Table Editor](https://supabase.com/dashb
 
 ![Colab documents](/docs/img/ai/google-colab/colab-documents.png)
 
-<HuggingFaceDeployment />
+<$Partial path="ai/quickstart_hf_deployment.mdx" />
 
 ## Next steps
 

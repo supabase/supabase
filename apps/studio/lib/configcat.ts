@@ -1,4 +1,3 @@
-import type { User } from '@supabase/supabase-js'
 import * as configcat from 'configcat-js'
 
 let client: configcat.IConfigCatClient
@@ -11,15 +10,16 @@ function getClient() {
   client = configcat.getClient(
     process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY ?? '',
     configcat.PollingMode.AutoPoll,
-    { pollIntervalSeconds: 600 }
+    { pollIntervalSeconds: 7 * 60 } // 7 minutes
   )
 
   return client
 }
 
-export async function getFlags(user?: User) {
-  if (user) {
-    return getClient().getAllValuesAsync(new configcat.User(user?.email ?? ''))
+export async function getFlags(userEmail: string = '') {
+  if (userEmail) {
+    return getClient().getAllValuesAsync(new configcat.User(userEmail))
   }
+
   return []
 }

@@ -59,7 +59,7 @@ const buttonVariants = cva(
           data-[state=open]:border-foreground-lighter
           data-[state=open]:outline-border-strong
         `,
-        // @deprecated use 'primary' instead
+        /** @deprecated use 'primary' instead */
         alternative: `
           text-foreground
           bg-brand-400 hover:bg-brand-500

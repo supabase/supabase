@@ -39,7 +39,7 @@ export const ProjectUsageLoadingState = () => {
   return (
     <div className="space-y-4">
       <ShimmeringLoader className="w-40 h-7" />
-      <div className="flex md:gap-4 lg:gap-8">
+      <div className="flex flex-col md:flex-row gap-2 md:gap-4 lg:gap-8">
         <ShimmeringLoader className="w-full h-[304px]" />
         <ShimmeringLoader className="w-full h-[304px]" />
         <ShimmeringLoader className="w-full h-[304px]" />

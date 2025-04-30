@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { components } from 'api-types'
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import type { Dashboards, LogSqlSnippets, SqlSnippets } from 'types'
 import { contentKeys } from './keys'
 
@@ -28,21 +28,24 @@ export type ContentType = Content['type']
 interface GetContentVariables {
   projectRef?: string
   type: ContentType
+  name?: string
+  limit?: number
 }
 
-export async function getContent({ projectRef, type }: GetContentVariables, signal?: AbortSignal) {
+export async function getContent(
+  { projectRef, type, name, limit = 10 }: GetContentVariables,
+  signal?: AbortSignal
+) {
   if (typeof projectRef === 'undefined') {
     throw new Error('projectRef is required for getContent')
   }
 
   const { data, error } = await get('/platform/projects/{ref}/content', {
-    params: { path: { ref: projectRef }, query: { type } },
+    params: { path: { ref: projectRef }, query: { type, name, limit: limit.toString() } },
     signal,
   })
 
-  if (error) {
-    throw error
-  }
+  if (error) handleError(error)
 
   return {
     cursor: data.cursor,
@@ -53,12 +56,13 @@ export async function getContent({ projectRef, type }: GetContentVariables, sign
 export type ContentData = Awaited<ReturnType<typeof getContent>>
 export type ContentError = unknown
 
+/** @deprecated Use useContentInfiniteQuery from content-infinite-query instead */
 export const useContentQuery = <TData = ContentData>(
-  { projectRef, type }: GetContentVariables,
+  { projectRef, type, name, limit }: GetContentVariables,
   { enabled = true, ...options }: UseQueryOptions<ContentData, ContentError, TData> = {}
 ) =>
   useQuery<ContentData, ContentError, TData>(
-    contentKeys.list(projectRef, type),
-    ({ signal }) => getContent({ projectRef, type }, signal),
+    contentKeys.list(projectRef, { type, name, limit }),
+    ({ signal }) => getContent({ projectRef, type, name, limit }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )

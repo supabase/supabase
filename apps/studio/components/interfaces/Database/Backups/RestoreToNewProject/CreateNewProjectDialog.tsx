@@ -9,7 +9,6 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useProjectCloneMutation } from 'data/projects/clone-mutation'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { passwordStrength } from 'lib/helpers'
 import { generateStrongPassword } from 'lib/project'
@@ -30,6 +29,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { AdditionalMonthlySpend } from './AdditionalMonthlySpend'
+import { NewProjectPrice } from './RestoreToNewProject.utils'
 
 interface CreateNewProjectDialogProps {
   open: boolean
@@ -37,6 +37,7 @@ interface CreateNewProjectDialogProps {
   recoveryTimeTarget: number | null
   onOpenChange: (value: boolean) => void
   onCloneSuccess: () => void
+  additionalMonthlySpend: NewProjectPrice
 }
 
 export const CreateNewProjectDialog = ({
@@ -45,6 +46,7 @@ export const CreateNewProjectDialog = ({
   recoveryTimeTarget,
   onOpenChange,
   onCloneSuccess,
+  additionalMonthlySpend,
 }: CreateNewProjectDialogProps) => {
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
@@ -65,8 +67,7 @@ export const CreateNewProjectDialog = ({
     },
   })
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const isFreePlan = subscription?.plan?.id === 'free'
+  const isFreePlan = organization?.plan?.id === 'free'
 
   const { data: cloneBackups } = useCloneBackupsQuery(
     { projectRef: project?.ref },
@@ -188,7 +189,7 @@ export const CreateNewProjectDialog = ({
                 )}
               />
             </DialogSection>
-            <AdditionalMonthlySpend />
+            <AdditionalMonthlySpend additionalMonthlySpend={additionalMonthlySpend} />
             <DialogFooter>
               <Button htmlType="reset" type="outline" onClick={() => onOpenChange(false)}>
                 Cancel

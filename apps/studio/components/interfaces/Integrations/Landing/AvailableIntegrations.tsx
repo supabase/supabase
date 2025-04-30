@@ -49,7 +49,7 @@ export const AvailableIntegrations = () => {
         value={selectedCategory}
         onValueChange={(value) => setSelectedCategory(value as IntegrationCategory)}
       >
-        <TabsList_Shadcn_ className="px-10 gap-2 border-b-0 border-t pt-5">
+        <TabsList_Shadcn_ className="px-4 md:px-10 gap-2 border-b-0 border-t pt-5">
           {CATEGORIES.map((category) => (
             <TabsTrigger_Shadcn_
               key={category.key}
@@ -86,7 +86,7 @@ export const AvailableIntegrations = () => {
           />
         </TabsList_Shadcn_>
       </Tabs_Shadcn_>
-      <div className="p-10 py-8 flex flex-col gap-y-5">
+      <div className="p-4 md:p-10 md:py-8 flex flex-col gap-y-5">
         <div className="grid xl:grid-cols-3 2xl:grid-cols-4 gap-x-4 gap-y-3">
           {isLoading &&
             new Array(3)

@@ -69,6 +69,11 @@ export function isEnumColumn(type: string) {
   return ENUM_TYPES.indexOf(type.toLowerCase()) > -1
 }
 
+const BINARY_TYPES = ['bytea']
+export function isBinaryColumn(type: string) {
+  return BINARY_TYPES.indexOf(type.toLowerCase()) > -1
+}
+
 export function isForeignKeyColumn(columnDef: SupaColumn) {
   const { targetTableSchema, targetTableName, targetColumnName } = columnDef?.foreignKey ?? {}
   return !!targetTableSchema && !!targetTableName && !!targetColumnName

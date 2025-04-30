@@ -2,12 +2,12 @@ import { prettyDOM, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import LogTable from 'components/interfaces/Settings/Logs/LogTable'
 import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import timezone from 'dayjs/plugin/timezone'
+import utc from 'dayjs/plugin/utc'
 import { beforeAll, expect, test, vi } from 'vitest'
 import { render } from '../../helpers'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-import utc from 'dayjs/plugin/utc'
-import timezone from 'dayjs/plugin/timezone'
-import relativeTime from 'dayjs/plugin/relativeTime'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -51,7 +51,7 @@ test.skip('can display log data', async () => {
 
   const row = await screen.findByText(/event message/)
 
-  userEvent.click(row)
+  await userEvent.click(row)
 
   // [Joshen] commenting out for now - seems like we need to mock more stuff
   await screen.findByText(/my_key/)
@@ -79,7 +79,7 @@ test('can run if no queryType provided', async () => {
   )
 
   const run = await screen.findByText('Run')
-  userEvent.click(run)
+  await userEvent.click(run)
   // expect(mockRun).toBeCalled()
 })
 
@@ -104,7 +104,7 @@ test('can run if no queryType provided', async () => {
   )
 
   const run = await screen.findByText('Run')
-  userEvent.click(run)
+  await userEvent.click(run)
   // expect(mockRun).toBeCalled()
 })
 
@@ -156,7 +156,7 @@ test("closes the selection if the selected row's data changes", async () => {
     />
   )
   const text = await screen.findByText(/some event message/)
-  userEvent.click(text)
+  await userEvent.click(text)
 
   rerender(
     <LogTable
@@ -199,7 +199,7 @@ test.each([
         function_id: '001b0b08-331c-403e-810c-a2004b03a019',
         timestamp: 1659545029083869,
         id: '4475cf6f-2929-4296-ab44-ce2c17069937',
-        level: null,
+        level: undefined,
       },
     ],
     includes: [/uncaughtException/],

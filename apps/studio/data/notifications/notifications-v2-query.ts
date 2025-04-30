@@ -39,14 +39,14 @@ export async function getNotifications(options: NotificationVariables, signal?: 
   const { status, filters, page = 0, limit = NOTIFICATIONS_PAGE_LIMIT } = options
   const { data, error } = await get('/platform/notifications', {
     params: {
-      // @ts-expect-error maybe the types from the API aren't quite right?
       query: {
         offset: String(page * limit),
         limit: String(limit),
-        ...(status !== undefined ? { status } : { status: ['new', 'seen'] }),
-        ...(filters.priority.length > 0 ? { priority: filters.priority } : {}),
-        ...(filters.organizations.length > 0 ? { org_slug: filters.organizations } : {}),
-        ...(filters.projects.length > 0 ? { project_ref: filters.projects } : {}),
+        // [Alaister]: 'as any' is needed because the API types don't reflect an array of strings
+        ...(status !== undefined ? { status } : { status: ['new', 'seen'].join(',') as any }),
+        ...(filters.priority.length > 0 ? { priority: filters.priority.join(',') as any } : {}),
+        ...(filters.organizations.length > 0 ? { org_slug: filters.organizations.join(',') } : {}),
+        ...(filters.projects.length > 0 ? { project_ref: filters.projects.join(',') } : {}),
       },
     },
     headers: { Version: '2' },

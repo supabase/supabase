@@ -19,6 +19,6 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   if (process.env.OPENAI_API_KEY) {
     return res.status(200).json({ hasKey: true })
   } else {
-    return res.status(404).json({ hasKey: false })
+    return res.status(200).json({ hasKey: false })
   }
 }

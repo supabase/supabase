@@ -29,17 +29,22 @@ jobs:
           sparse-checkout: |
             apps/docs
 
-      - name: Set up Node.js
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm i
 
       - name: Run Troubleshooting script
-        run: npm --prefix=apps/docs run troubleshooting:sync
+        run: pnpm run -F docs troubleshooting:sync
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f # v7.0.5

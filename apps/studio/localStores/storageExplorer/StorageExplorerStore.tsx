@@ -29,22 +29,24 @@ import {
   StorageItemMetadata,
   StorageItemWithColumn,
 } from 'components/to-be-cleaned/Storage/Storage.types'
+import {
+  downloadFile,
+  formatTime,
+} from 'components/to-be-cleaned/Storage/StorageExplorer/StorageExplorer.utils'
 import { convertFromBytes } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
 import { configKeys } from 'data/config/keys'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
 import { getQueryClient } from 'data/query-client'
 import { deleteBucketObject } from 'data/storage/bucket-object-delete-mutation'
 import { downloadBucketObject } from 'data/storage/bucket-object-download-mutation'
-import { getPublicUrlForBucketObject } from 'data/storage/bucket-object-get-public-url-mutation'
-import { signBucketObject } from 'data/storage/bucket-object-sign-mutation'
 import { StorageObject, listBucketObjects } from 'data/storage/bucket-objects-list-mutation'
 import { Bucket } from 'data/storage/buckets-query'
 import { moveStorageObject } from 'data/storage/object-move-mutation'
-import { IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { tryParseJson } from 'lib/helpers'
 import { lookupMime } from 'lib/mime'
 import Link from 'next/link'
 import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
 type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string }
 
@@ -69,15 +71,12 @@ export function useStorageStore() {
 const CORRUPTED_THRESHOLD_MS = 15 * 60 * 1000 // 15 minutes
 const LIMIT = 200
 const OFFSET = 0
-const DEFAULT_EXPIRY = 10 * 365 * 24 * 60 * 60 // in seconds, default to 10 years
-const PREVIEW_SIZE_LIMIT = 10000000 // 10MB
 const BATCH_SIZE = 2
 const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
 const STORAGE_PROGRESS_INFO_TEXT = "Do not close the browser until it's completed"
 
 class StorageExplorerStore {
   projectRef: string = ''
-  view: STORAGE_VIEWS = STORAGE_VIEWS.COLUMNS
   sortBy: STORAGE_SORT_BY = STORAGE_SORT_BY.NAME
   sortByOrder: STORAGE_SORT_BY_ORDER = STORAGE_SORT_BY_ORDER.ASC
   // selectedBucket will get initialized with a bucket before using
@@ -87,7 +86,7 @@ class StorageExplorerStore {
   selectedItems: StorageItemWithColumn[] = []
   selectedItemsToDelete: StorageItemWithColumn[] = []
   selectedItemsToMove: StorageItemWithColumn[] = []
-  selectedFilePreview: (StorageItemWithColumn & { previewUrl: string | undefined }) | null = null
+  selectedFilePreview: StorageItemWithColumn | null = null
   selectedFileCustomExpiry: StorageItem | undefined = undefined
 
   private DEFAULT_OPTIONS = {
@@ -105,9 +104,6 @@ class StorageExplorerStore {
     'public',
     any
   >
-
-  /* FE Cacheing for file previews */
-  private filePreviewCache: CachedFile[] = []
 
   /* For file uploads, from 0 to 1 */
   private uploadProgresses: UploadProgress[] = []
@@ -162,21 +158,8 @@ class StorageExplorerStore {
     )
   }
 
-  private updateFileInPreviewCache = (fileCache: CachedFile) => {
-    const updatedFilePreviewCache = this.filePreviewCache.map((file) => {
-      if (file.id === fileCache.id) return fileCache
-      return file
-    })
-    this.filePreviewCache = updatedFilePreviewCache
-  }
-
-  private addFileToPreviewCache = (fileCache: CachedFile) => {
-    const updatedFilePreviewCache = this.filePreviewCache.concat([fileCache])
-    this.filePreviewCache = updatedFilePreviewCache
-  }
-
   private getLocalStorageKey = () => {
-    return `supabase-storage-${this.projectRef}`
+    return LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(this.projectRef)
   }
 
   private getLatestColumnIndex = () => {
@@ -184,7 +167,7 @@ class StorageExplorerStore {
   }
 
   // Probably refactor this to ignore bucket by default
-  private getPathAlongOpenedFolders = (includeBucket = true) => {
+  getPathAlongOpenedFolders = (includeBucket = true) => {
     if (includeBucket) {
       return this.openedFolders.length > 0
         ? `${this.selectedBucket.name}/${this.openedFolders.map((folder) => folder.name).join('/')}`
@@ -209,12 +192,6 @@ class StorageExplorerStore {
     this.clearOpenedFolders()
     this.closeFilePreview()
     this.clearSelectedItems()
-  }
-
-  setView = (view: STORAGE_VIEWS) => {
-    this.view = view
-    this.closeFilePreview()
-    this.updateExplorerPreferences()
   }
 
   setSortBy = async (sortBy: STORAGE_SORT_BY) => {
@@ -342,80 +319,11 @@ class StorageExplorerStore {
   }
 
   setFilePreview = async (file: StorageItemWithColumn) => {
-    const size = file.metadata?.size
-    const mimeType = file.metadata?.mimetype
-
-    if (mimeType && size) {
-      // Skip fetching of file preview if file is too big
-      if (size > PREVIEW_SIZE_LIMIT) {
-        this.selectedFilePreview = { ...file, previewUrl: 'skipped' }
-        return
-      }
-
-      // Either retrieve file preview from FE cache or retrieve signed url
-      this.selectedFilePreview = { ...file, previewUrl: 'loading' }
-      const cachedPreview = this.filePreviewCache.find((cache) => cache.id === file.id)
-
-      const fetchedAt = cachedPreview?.fetchedAt ?? null
-      const expiresIn = cachedPreview?.expiresIn ?? null
-      const existsInCache = fetchedAt !== null && expiresIn !== null
-      const isExpired = existsInCache ? fetchedAt + expiresIn * 1000 < Date.now() : true
-
-      if (!isExpired) {
-        this.selectedFilePreview = { ...file, previewUrl: cachedPreview?.url }
-      } else {
-        const previewUrl = await this.fetchFilePreview(file.name)
-        const formattedPreviewUrl = this.selectedBucket.public
-          ? `${previewUrl}?t=${new Date().toISOString()}`
-          : previewUrl
-        this.selectedFilePreview = { ...file, previewUrl: formattedPreviewUrl }
-
-        const fileCache: CachedFile = {
-          id: file.id as string,
-          url: previewUrl,
-          expiresIn: DEFAULT_EXPIRY,
-          fetchedAt: Date.now(),
-        }
-        if (!existsInCache) {
-          this.addFileToPreviewCache(fileCache)
-        } else {
-          this.updateFileInPreviewCache(fileCache)
-        }
-      }
-    } else {
-      this.selectedFilePreview = { ...file, previewUrl: undefined }
-    }
+    this.selectedFilePreview = file
   }
 
   closeFilePreview = () => {
     this.selectedFilePreview = null
-  }
-
-  getFileUrl = async (file: StorageItem, expiresIn = 0) => {
-    const filePreview = this.filePreviewCache.find((cache) => cache.id === file.id)
-    if (filePreview !== undefined && expiresIn === 0) {
-      return filePreview.url
-    } else {
-      const signedUrl = await this.fetchFilePreview(file.name, expiresIn)
-      try {
-        const formattedUrl = new URL(signedUrl!)
-        formattedUrl.searchParams.set('t', new Date().toISOString())
-        const fileUrl = formattedUrl.toString()
-
-        // Also save it to cache
-        const fileCache: CachedFile = {
-          id: file.id as string,
-          url: fileUrl,
-          expiresIn: DEFAULT_EXPIRY,
-          fetchedAt: Date.now(),
-        }
-        this.addFileToPreviewCache(fileCache)
-        return fileUrl
-      } catch (error) {
-        console.error('Failed to get file URL', error)
-        return ''
-      }
-    }
   }
 
   /* Methods that involve the storage client library */
@@ -505,7 +413,7 @@ class StorageExplorerStore {
       <SonnerProgress
         progress={progress}
         message={`Uploading ${totalFiles} file${totalFiles > 1 ? 's' : ''}...`}
-        progressPrefix={`${remainingTime && !isNaN(remainingTime) && isFinite(remainingTime) && remainingTime !== 0 ? `${this.formatTime(remainingTime)} remaining – ` : ''}`}
+        progressPrefix={`${remainingTime && !isNaN(remainingTime) && isFinite(remainingTime) && remainingTime !== 0 ? `${formatTime(remainingTime)} remaining – ` : ''}`}
         action={
           toastId && (
             <Button
@@ -694,6 +602,7 @@ class StorageExplorerStore {
       }
 
       let startingBytes = 0
+      const bucketName = this.selectedBucket.name
 
       return () => {
         return new Promise<void>(async (resolve, reject) => {
@@ -730,7 +639,7 @@ class StorageExplorerStore {
             uploadDataDuringCreation: uploadDataDuringCreation,
             removeFingerprintOnSuccess: true,
             metadata: {
-              bucketName: this.selectedBucket.name,
+              bucketName,
               objectName: formattedPathToFile,
               ...fileOptions,
             },
@@ -932,47 +841,9 @@ class StorageExplorerStore {
 
     toast.dismiss(toastId)
 
-    // Clear file preview cache if moved files exist in cache
-    const idsOfItemsToMove = this.selectedItemsToMove.map((item) => item.id)
-    const updatedFilePreviewCache = this.filePreviewCache.filter(
-      (file) => !idsOfItemsToMove.includes(file.id)
-    )
-    this.filePreviewCache = updatedFilePreviewCache
-
+    // TODO: invalidate the file preview cache when moving files
     await this.refetchAllOpenedFolders()
     this.clearSelectedItemsToMove()
-  }
-
-  private fetchFilePreview = async (fileName: string, expiresIn: number = 0) => {
-    const includeBucket = false
-    const pathToFile = this.getPathAlongOpenedFolders(includeBucket)
-    const formattedPathToFile = pathToFile.length > 0 ? `${pathToFile}/${fileName}` : fileName
-
-    if (this.selectedBucket.public) {
-      try {
-        const data = await getPublicUrlForBucketObject({
-          projectRef: this.projectRef,
-          bucketId: this.selectedBucket.id,
-          path: formattedPathToFile,
-        })
-        return data.publicUrl
-      } catch (error: any) {
-        toast.error(`Failed to fetch public file preview: ${error.message}`)
-      }
-    } else {
-      try {
-        const data = await signBucketObject({
-          projectRef: this.projectRef,
-          bucketId: this.selectedBucket.id,
-          path: formattedPathToFile,
-          expiresIn: expiresIn || DEFAULT_EXPIRY,
-        })
-        return data.signedUrl
-      } catch (error: any) {
-        toast.error(`Failed to fetch signed url preview: ${error.message}`)
-      }
-    }
-    return ''
   }
 
   // the method accepts either files with column index or with prefix.
@@ -1027,13 +898,6 @@ class StorageExplorerStore {
       )
     }, Promise.resolve())
 
-    // Clear file preview cache if deleted files exist in cache
-    const idsOfFilesDeleted = files.map((file) => file.id)
-    const updatedFilePreviewCache = this.filePreviewCache.filter(
-      (file) => !idsOfFilesDeleted.includes(file.id)
-    )
-    this.filePreviewCache = updatedFilePreviewCache
-
     if (!isDeleteFolder) {
       // If parent folders are empty, reinstate .emptyFolderPlaceholder to persist them
       const parentFolderPrefixes = uniq(
@@ -1074,7 +938,7 @@ class StorageExplorerStore {
       )
 
       const promises = files.map((file) => {
-        const fileMimeType = file.metadata?.mimetype ?? null
+        const fileMimeType = (file.metadata?.mimetype as string) ?? null
         return () => {
           return new Promise<
             | {
@@ -1192,7 +1056,12 @@ class StorageExplorerStore {
     const promises = formattedFilesWithPrefix.map((file) => {
       return () => {
         return new Promise<{ name: string; blob: Blob } | boolean>(async (resolve) => {
-          const data = await this.downloadFile(file, showIndividualToast, returnBlob)
+          const data = await downloadFile({
+            projectRef: this.projectRef,
+            bucketId: this.selectedBucket.id,
+            file,
+            returnBlob,
+          })
           progress = progress + 1 / formattedFilesWithPrefix.length
           if (isObject(data)) {
             resolve({ ...data, name: file.formattedPathToFile })
@@ -1237,57 +1106,6 @@ class StorageExplorerStore {
     })
   }
 
-  downloadFile = async (file: StorageItemWithColumn, showToast = true, returnBlob = false) => {
-    const fileName: string = file.name
-    const fileMimeType = file?.metadata?.mimetype ?? undefined
-
-    const toastId = showToast ? toast.loading(`Retrieving ${fileName}...`) : undefined
-
-    const pathToFile = this.openedFolders
-      .slice(0, file.columnIndex)
-      .map((folder) => folder.name)
-      .join('/')
-    const formattedPathToFile = pathToFile.length > 0 ? `${pathToFile}/${fileName}` : fileName
-    try {
-      const data = await downloadBucketObject({
-        projectRef: this.projectRef,
-        bucketId: this.selectedBucket.id,
-        path: formattedPathToFile,
-      })
-
-      const blob = await data.blob()
-      const newBlob = new Blob([blob], { type: fileMimeType })
-
-      if (returnBlob) return { name: fileName, blob: newBlob }
-
-      const blobUrl = window.URL.createObjectURL(newBlob)
-      const link = document.createElement('a')
-      link.href = blobUrl
-      link.setAttribute('download', `${fileName}`)
-      document.body.appendChild(link)
-      link.click()
-      link.parentNode?.removeChild(link)
-      window.URL.revokeObjectURL(blob)
-      if (toastId) {
-        toast.success(`Downloading ${fileName}`, {
-          id: toastId,
-          closeButton: true,
-          duration: SONNER_DEFAULT_DURATION,
-        })
-      }
-      return true
-    } catch {
-      if (toastId) {
-        toast.error(`Failed to download ${fileName}`, {
-          id: toastId,
-          closeButton: true,
-          duration: SONNER_DEFAULT_DURATION,
-        })
-      }
-      return false
-    }
-  }
-
   renameFile = async (file: StorageItem, newName: string, columnIndex: number) => {
     const originalName = file.name
     if (originalName === newName || newName.length === 0) {
@@ -1310,11 +1128,7 @@ class StorageExplorerStore {
 
         toast.success(`Successfully renamed "${originalName}" to "${newName}"`)
 
-        // Clear file preview cache if the renamed file exists in the cache
-        const updatedFilePreviewCache = this.filePreviewCache.filter(
-          (fileCache) => fileCache.id !== file.id
-        )
-        this.filePreviewCache = updatedFilePreviewCache
+        // TODO: Should we invalidate the file preview cache when renaming files?
 
         if (this.selectedFilePreview?.name === originalName) {
           const { previewUrl, ...fileData } = file as any
@@ -1339,6 +1153,7 @@ class StorageExplorerStore {
     if (this.selectedBucket.id === undefined) return
 
     this.abortApiCalls()
+
     this.updateRowStatus(folderName, STORAGE_ROW_STATUS.LOADING, index)
     this.pushColumnAtIndex(
       { id: folderId, name: folderName, status: STORAGE_ROW_STATUS.LOADING, items: [] },
@@ -1369,7 +1184,7 @@ class StorageExplorerStore {
 
       this.updateRowStatus(folderName, STORAGE_ROW_STATUS.READY, index)
 
-      const formattedItems = this.formatFolderItems(data)
+      const formattedItems = this.formatFolderItems(data, prefix)
       this.pushColumnAtIndex(
         {
           id: folderId || folderName,
@@ -1382,7 +1197,9 @@ class StorageExplorerStore {
         index
       )
     } catch (error: any) {
-      if (!error.message.includes('aborted')) {
+      if (error.name === 'AbortError') {
+        this.updateRowStatus(folderName, STORAGE_ROW_STATUS.READY, index)
+      } else {
         toast.error(`Failed to retrieve folder contents from "${folderName}": ${error.message}`)
       }
     }
@@ -1643,12 +1460,7 @@ class StorageExplorerStore {
       }
       await this.refetchAllOpenedFolders()
 
-      // Clear file preview cache if the moved file exists in the cache
-      const fileIds = files.map((file) => file.id)
-      const updatedFilePreviewCache = this.filePreviewCache.filter(
-        (fileCache) => !fileIds.includes(fileCache.id)
-      )
-      this.filePreviewCache = updatedFilePreviewCache
+      // TODO: Should we invalidate the file preview cache when renaming folders?
     } catch (e: any) {
       toast.error(`Failed to rename folder to ${newName}: ${e.message}`, {
         id: toastId,
@@ -1771,7 +1583,7 @@ class StorageExplorerStore {
     return name
   }
 
-  private formatFolderItems = (items: StorageObject[] = []): StorageItem[] => {
+  private formatFolderItems = (items: StorageObject[] = [], prefix?: string): StorageItem[] => {
     const formattedItems =
       (items ?? [])
         ?.filter((item) => item.name !== EMPTY_FOLDER_PLACEHOLDER_FILE_NAME)
@@ -1797,6 +1609,7 @@ class StorageExplorerStore {
             type,
             status,
             isCorrupted,
+            path: !!prefix ? `${prefix}/${item.name}` : item.name,
           }
           return itemObj
         }) ?? []
@@ -1898,26 +1711,25 @@ class StorageExplorerStore {
 
   private updateExplorerPreferences = () => {
     const localStorageKey = this.getLocalStorageKey()
-    const preferences = {
-      view: this.view,
-      sortBy: this.sortBy,
-      sortByOrder: this.sortByOrder,
+    const existingPreferences = tryParseJson(localStorage?.getItem(localStorageKey))
+
+    if (this.projectRef) {
+      localStorage.setItem(
+        localStorageKey,
+        JSON.stringify({
+          sortBy: this.sortBy,
+          sortByOrder: this.sortByOrder,
+          view: existingPreferences?.view ?? STORAGE_VIEWS.COLUMNS,
+        })
+      )
     }
-    localStorage.setItem(localStorageKey, JSON.stringify(preferences))
-    return preferences
   }
 
   loadExplorerPreferences = () => {
     const localStorageKey = this.getLocalStorageKey()
     const preferences = localStorage?.getItem(localStorageKey) ?? undefined
     if (preferences !== undefined) {
-      const { view, sortBy, sortByOrder } = JSON.parse(preferences)
-      this.view = view
-      this.sortBy = sortBy
-      this.sortByOrder = sortByOrder
-    } else {
-      const { view, sortBy, sortByOrder } = this.updateExplorerPreferences()
-      this.view = view
+      const { sortBy, sortByOrder } = JSON.parse(preferences)
       this.sortBy = sortBy
       this.sortByOrder = sortByOrder
     }
@@ -1971,20 +1783,6 @@ class StorageExplorerStore {
     })
 
     return totalRemainingTime
-  }
-
-  private formatTime(seconds: number) {
-    const days = Math.floor(seconds / (24 * 3600))
-    seconds %= 24 * 3600
-    const hours = Math.floor(seconds / 3600)
-    seconds %= 3600
-    const minutes = Math.floor(seconds / 60)
-    seconds = Math.floor(seconds % 60)
-
-    if (days > 0) return `${days}d `
-    if (hours > 0) return `${hours}h `
-    if (minutes > 0) return `${minutes}m `
-    return `${seconds}s`
   }
 }
 

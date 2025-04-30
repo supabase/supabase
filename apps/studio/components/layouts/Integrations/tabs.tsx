@@ -3,10 +3,10 @@ import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { ComponentProps, ComponentType, useRef } from 'react'
 
-import { useParams } from 'common'
+import { useBreakpoint, useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import { NavMenu, NavMenuItem } from 'ui'
+import { cn, NavMenu, NavMenuItem } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 
 const MotionNavMenu = motion(NavMenu) as ComponentType<ComponentProps<typeof NavMenu> & MotionProps>
@@ -26,6 +26,7 @@ export const IntegrationTabs = ({ scroll, isSticky }: IntegrationTabsProps) => {
   const navRef = useRef(null)
   const { project } = useProjectContext()
   const { id, pageId, childId } = useParams()
+  const isMobile = useBreakpoint('md')
 
   const { installedIntegrations } = useInstalledIntegrations()
   // Find the integration details based on ID
@@ -51,7 +52,7 @@ export const IntegrationTabs = ({ scroll, isSticky }: IntegrationTabsProps) => {
       <div className="sticky top-[0px] z-[1] bg-dash-sidebar" ref={navRef}>
         <MotionNavMenu
           transition={{ duration: 0.2 }}
-          className="px-10 [&_ul]:items-center bg-200"
+          className={cn('px-4 md:px-10 [&_ul]:items-center bg-200', isMobile && '!px-4')}
           aria-label="Integration menu"
           style={{ paddingLeft: !isSticky ? (navInnerLeftPaddingX as unknown as number) : 40 }}
         >

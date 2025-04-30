@@ -1,5 +1,5 @@
 import { includes, noop } from 'lodash'
-import { Edit, Edit2, Link } from 'lucide-react'
+import { Edit, Edit2, Eye } from 'lucide-react'
 
 import {
   Button,
@@ -21,7 +21,6 @@ import { DATETIME_TYPES, JSON_TYPES, TEXT_TYPES } from '../SidePanelEditor.const
 import { DateTimeInput } from './DateTimeInput'
 import type { EditValue, RowField } from './RowEditor.types'
 import { isValueTruncated } from './RowEditor.utils'
-import { checkDomainOfScale } from 'recharts/types/util/ChartUtils'
 
 export interface InputFieldProps {
   field: RowField
@@ -98,6 +97,7 @@ const InputField = ({
       <Input
         data-testid={`${field.name}-input`}
         layout="horizontal"
+        placeholder="NULL"
         label={field.name}
         value={field.value ?? ''}
         descriptionText={
@@ -120,15 +120,21 @@ const InputField = ({
         error={errors[field.name]}
         onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
         actions={
-          <Button
-            type="default"
-            className="mr-1"
-            htmlType="button"
-            onClick={onSelectForeignKey}
-            icon={<Link />}
-          >
-            Select record
-          </Button>
+          isEditable && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button type="default" icon={<Edit />} className="px-1.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-28">
+                {field.isNullable && (
+                  <DropdownMenuItem onClick={() => onUpdateField({ [field.name]: null })}>
+                    Set to NULL
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={onSelectForeignKey}>Select record</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )
         }
       />
     )
@@ -176,9 +182,11 @@ const InputField = ({
                 <Button type="default" icon={<Edit />} className="px-1.5" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-28">
-                <DropdownMenuItem onClick={() => onUpdateField({ [field.name]: null })}>
-                  Set to NULL
-                </DropdownMenuItem>
+                {isEditable && (
+                  <DropdownMenuItem onClick={() => onUpdateField({ [field.name]: null })}>
+                    Set to NULL
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem
                   onClick={() => onEditText({ column: field.name, value: field.value || '' })}
                 >
@@ -223,9 +231,9 @@ const InputField = ({
             type="default"
             htmlType="button"
             onClick={() => onEditJson({ column: field.name, value: field.value })}
-            icon={<Edit2 />}
+            icon={isEditable ? <Edit2 /> : <Eye />}
           >
-            Edit JSON
+            {isEditable ? 'Edit JSON' : 'View JSON'}
           </Button>
         }
       />
@@ -246,6 +254,7 @@ const InputField = ({
           </>
         }
         onChange={(value: any) => onUpdateField({ [field.name]: value })}
+        disabled={!isEditable}
       />
     )
   }
@@ -271,6 +280,7 @@ const InputField = ({
         <Select_Shadcn_
           value={defaultValue === null ? 'null' : defaultValue}
           onValueChange={(value: string) => onUpdateField({ [field.name]: value })}
+          disabled={!isEditable}
         >
           <SelectTrigger_Shadcn_>
             <SelectValue_Shadcn_ placeholder="Select a value" />
@@ -286,6 +296,28 @@ const InputField = ({
           </SelectContent_Shadcn_>
         </Select_Shadcn_>
       </FormItemLayout>
+    )
+  }
+
+  if (field.format === 'bytea') {
+    return (
+      <Input
+        data-testid={`${field.name}-input`}
+        layout="horizontal"
+        label={field.name}
+        descriptionText={
+          <>
+            {field.comment && <p>{field.comment}</p>}
+            <p>Bytea columns are edited and displayed as hex in the dashboard</p>
+          </>
+        }
+        labelOptional={field.format}
+        error={errors[field.name]}
+        value={field.value ?? ''}
+        placeholder={`\\x`}
+        disabled={!isEditable}
+        onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+      />
     )
   }
 

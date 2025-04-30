@@ -175,10 +175,6 @@ const VercelIntegration: NextPageWithLayout = () => {
       : false
   }, [installed, selectedOrg, source, dataLoading])
 
-  const hasVercelManagedOrgSelected = useMemo(() => {
-    return !!selectedOrg && selectedOrg.managed_by === 'vercel-marketplace'
-  }, [selectedOrg])
-
   const disableInstallationForm =
     (isLoadingVercelIntegrationCreateMutation && !dataLoading) ||
     // disables installation button if integration is already installed and it is Marketplace flow
@@ -231,21 +227,11 @@ const VercelIntegration: NextPageWithLayout = () => {
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
             )}
-            {hasVercelManagedOrgSelected && (
-              <p className="prose text-sm text-red-900">
-                Vercel Integration cannot be used with Vercel-managed organizations. Choose a
-                different organization or create a Vercel resource directly.
-              </p>
-            )}
             <div className="flex flex-row w-full justify-end">
               <Button
                 size="medium"
                 className="self-end"
-                disabled={
-                  disableInstallationForm ||
-                  isLoadingVercelIntegrationCreateMutation ||
-                  hasVercelManagedOrgSelected
-                }
+                disabled={disableInstallationForm || isLoadingVercelIntegrationCreateMutation}
                 loading={isLoadingVercelIntegrationCreateMutation}
                 onClick={onInstall}
               >

@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { compact, isEqual, isNull, isString, omitBy } from 'lodash'
 import type { Dictionary } from 'types'
 
-import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
+import { MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
 import { minifyJSON, tryParseJson } from 'lib/helpers'
 import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import {
@@ -121,6 +121,8 @@ export const parseValue = (originalValue: any, format: string) => {
       return originalValue
     } else if (typeof originalValue === 'number' || !format) {
       return originalValue
+    } else if (format === 'bytea') {
+      return convertByteaToHex(originalValue)
     } else if (typeof originalValue === 'object') {
       return JSON.stringify(originalValue)
     } else if (typeof originalValue === 'boolean') {
@@ -261,4 +263,13 @@ export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) =
  */
 export const isValueTruncated = (value: string | null | undefined) => {
   return value?.endsWith('...') && (value ?? '').length > MAX_CHARACTERS
+}
+
+export const convertByteaToHex = (value: { type: 'Buffer'; data: number[] }) => {
+  // [Alaister] this is just a safeguard to catch sneaky null values
+  try {
+    return `\\x${Buffer.from(value.data).toString('hex')}`
+  } catch {
+    return value
+  }
 }

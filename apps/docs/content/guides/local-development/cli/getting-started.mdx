@@ -108,9 +108,19 @@ scoop update supabase
 </TabPanel>
 <TabPanel id="linux" label="Linux">
 
+#### Homebrew
+
 ```sh
 brew upgrade supabase
 ```
+
+#### Linux package manager
+
+1. Download the latest package from the [Supabase CLI releases page](https://github.com/supabase/cli/releases/latest)
+2. Install the package using the same commands as the [initial installation](#linux-packages):
+   - `sudo apk add --allow-untrusted <...>.apk`
+   - `sudo dpkg -i <...>.deb`
+   - `sudo rpm -i <...>.rpm`
 
 </TabPanel>
 <TabPanel id="npm" label="npm / Bun">
@@ -245,7 +255,7 @@ The local development environment includes Supabase Studio, a graphical interfac
 postgresql://postgres:postgres@localhost:54322/postgres
 ```
 
-The local Postgres instance can be accessed through [`psql`](https://www.postgresql.org/docs/current/app-psql.html) or any other Postgres client, such as [pgadmin](https://www.pgadmin.org/). For example:
+The local Postgres instance can be accessed through [`psql`](https://www.postgresql.org/docs/current/app-psql.html) or any other Postgres client, such as [pgAdmin](https://www.pgadmin.org/). For example:
 
 ```bash
 psql 'postgresql://postgres:postgres@localhost:54322/postgres'

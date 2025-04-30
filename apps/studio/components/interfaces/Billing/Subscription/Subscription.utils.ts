@@ -26,6 +26,8 @@ export const billingPartnerLabel = (billingPartner?: string) => {
       return 'Fly.io'
     case 'aws':
       return 'AWS'
+    case 'vercel_marketplace':
+      return 'Vercel'
     default:
       return billingPartner
   }

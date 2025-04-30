@@ -33,8 +33,8 @@ export const DiskManagementDiskSizeReadReplicas = ({
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
-  const beforePrice = totalSize * DISK_PRICING[oldStorageType]?.storage ?? 0
-  const afterPrice = newTotalSize * DISK_PRICING[newStorageType]?.storage ?? 0
+  const beforePrice = totalSize * DISK_PRICING[oldStorageType]?.storage
+  const afterPrice = newTotalSize * DISK_PRICING[newStorageType]?.storage
 
   if (readReplicas.length === 0) return null
 
@@ -146,9 +146,9 @@ export const DiskManagementIOPSReadReplicas = ({
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
 
   const beforePrice =
-    (oldIOPS - DISK_LIMITS[oldStorageType]?.includedIops) * DISK_PRICING[oldStorageType]?.iops ?? 0
+    (oldIOPS - DISK_LIMITS[oldStorageType]?.includedIops) * DISK_PRICING[oldStorageType]?.iops
   const afterPrice =
-    (newIOPS - DISK_LIMITS[newStorageType]?.includedIops) * DISK_PRICING[newStorageType]?.iops ?? 0
+    (newIOPS - DISK_LIMITS[newStorageType]?.includedIops) * DISK_PRICING[newStorageType]?.iops
 
   if (readReplicas.length === 0) return null
 
@@ -205,12 +205,12 @@ export const DiskManagementThroughputReadReplicas = ({
   const beforePrice =
     oldStorageType === DiskType.GP3
       ? (oldThroughput - DISK_LIMITS[oldStorageType].includedThroughput) *
-          DISK_PRICING[oldStorageType]?.throughput ?? 0
+        DISK_PRICING[oldStorageType]?.throughput
       : 0
   const afterPrice =
     newStorageType === DiskType.GP3
       ? (newThroughput - DISK_LIMITS[newStorageType].includedThroughput) *
-          DISK_PRICING[newStorageType]?.throughput ?? 0
+        DISK_PRICING[newStorageType]?.throughput
       : 0
 
   if (readReplicas.length === 0) return null

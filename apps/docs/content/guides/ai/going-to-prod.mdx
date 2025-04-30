@@ -29,7 +29,7 @@ On the other hand, if you need to scale your application, you will need to [crea
 `pgvector` supports two types of indexes: HNSW and IVFFlat. We recommend using [HNSW](/docs/guides/ai/vector-indexes/hnsw-indexes) because of its [performance](https://supabase.com/blog/increase-performance-pgvector-hnsw#hnsw-performance-1536-dimensions) and [robustness against changing data](/docs/guides/ai/vector-indexes/hnsw-indexes#when-should-you-create-hnsw-indexes).
 
 <Image
-  alt="dbpedia embeddings comparing ivfflat and hnsw queries-per-second using the 4XL compute addon"
+  alt="dbpedia embeddings comparing ivfflat and hnsw queries-per-second using the 4XL compute add-on"
   src={{
     light: '/docs/img/ai/going-prod/dbpedia-ivfflat-vs-hnsw-4xl--light.png',
     dark: '/docs/img/ai/going-prod/dbpedia-ivfflat-vs-hnsw-4xl--dark.png',
@@ -83,12 +83,12 @@ You can find more examples of how `lists` and `probes` constants affect accuracy
 
 First, a few generic tips which you can pick and choose from:
 
-1. The Supabase managed platform will automatically optimize Postgres configs for you based on your compute addon. But if you self-host, consider **adjusting your Postgres config** based on RAM & CPU cores. See [example optimizations](https://gist.github.com/egor-romanov/323e2847851bbd758081511785573c08) for more details.
+1. The Supabase managed platform will automatically optimize Postgres configs for you based on your compute add-on. But if you self-host, consider **adjusting your Postgres config** based on RAM & CPU cores. See [example optimizations](https://gist.github.com/egor-romanov/323e2847851bbd758081511785573c08) for more details.
 2. Prefer `inner-product` to `L2` or `Cosine` distances if your vectors are normalized (like `text-embedding-ada-002`). If embeddings are not normalized, `Cosine` distance should give the best results with an index.
 3. **Pre-warm your database.** Implement the warm-up technique before transitioning to production or running benchmarks.
    - Use [pg_prewarm](https://www.postgresql.org/docs/current/pgprewarm.html) to load the index into RAM `select pg_prewarm('vecs.docs_vec_idx');`. This will help to avoid cold cache issues.
    - Execute 10,000 to 50,000 "warm-up" queries before each benchmark/prod. This will help to utilize cache and buffers more efficiently.
-4. **Establish your workload.** Finetune `m` and `ef_construction` or `lists` constants for the pgvector index to accelerate your queries (at the expense of a slower build times). For instance, for benchmarks with 1,000,000 OpenAI embeddings, we set `m` and `ef_construction` to 32 and 80, and it resulted in 35% higher QPS than 24 and 56 values respectively.
+4. **Establish your workload.** Fine-tune `m` and `ef_construction` or `lists` constants for the pgvector index to accelerate your queries (at the expense of a slower build times). For instance, for benchmarks with 1,000,000 OpenAI embeddings, we set `m` and `ef_construction` to 32 and 80, and it resulted in 35% higher QPS than 24 and 56 values respectively.
 5. **Benchmark your own specific workloads.** Doing this during cache warm-up helps gauge the best value for the index build parameters, balancing accuracy with queries per second (QPS).
 
 ## Going into production
