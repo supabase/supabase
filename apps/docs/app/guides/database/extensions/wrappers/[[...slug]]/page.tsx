@@ -28,10 +28,10 @@ const externalSite = 'https://supabase.github.io/wrappers'
 
 type TagQueryResponse = {
   repository: {
-    releases: {
+    refs: {
       nodes:
         | {
-            tagName: string
+            name: string
           }[]
         | null
       pageInfo: {
@@ -45,16 +45,17 @@ type TagQueryResponse = {
 const tagQuery = `
     query TagQuery($owner: String!, $name: String!, $after: String) {
       repository(owner: $owner, name: $name) {
-        releases(
+        refs(
+          refPrefix: "refs/tags/",
           orderBy: {
-            field: CREATED_AT,
+            field: TAG_COMMIT_DATE,
             direction: DESC
           },
           first: 5,
           after: $after
         ) {
           nodes {
-            tagName
+            name
           }
           pageInfo {
             hasNextPage
@@ -69,7 +70,7 @@ async function getLatestRelease(after: string | null = null) {
   try {
     const {
       repository: {
-        releases: {
+        refs: {
           nodes,
           pageInfo: { hasNextPage, endCursor },
         },
@@ -85,7 +86,7 @@ async function getLatestRelease(after: string | null = null) {
     })
 
     return (
-      nodes?.find((node) => node?.tagName?.match(/^v\d+\.\d+\.\d+/)).tagName ??
+      nodes?.find((node) => node?.name?.match(/^docs_v\d+\.\d+\.\d+/))?.name ??
       (hasNextPage && endCursor ? await getLatestRelease(endCursor) : null)
     )
   } catch (error) {
