@@ -1,3 +1,5 @@
+import { Query } from '@supabase/pg-meta/src/query'
+import { getTableRowsSql } from '@supabase/pg-meta/src/query/table-row-query'
 import {
   useQuery,
   useQueryClient,
@@ -5,8 +7,6 @@ import {
   type UseQueryOptions,
 } from '@tanstack/react-query'
 
-import { Query } from '@supabase/pg-meta/src/query'
-import { getTableRowsSql } from '@supabase/pg-meta/src/query/table-row-query'
 import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
@@ -142,9 +142,9 @@ export const fetchAllTableRows = async ({
     )
 
     try {
-      const { result } = await executeWithRetry(async () =>
+      const { result } = await executeWithRetry(async () => {
         executeSql({ projectRef, connectionString, sql: query })
-      )
+      })
       rows.push(...result)
       progressCallback?.(rows.length)
 
@@ -153,7 +153,7 @@ export const fetchAllTableRows = async ({
       await sleep(THROTTLE_DELAY)
     } catch (error) {
       throw new Error(
-        `Error fetching table rows: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Error fetching all table rows: ${error instanceof Error ? error.message : 'Unknown error'}`
       )
     }
   }
@@ -202,23 +202,28 @@ export async function getTableRows(
     getTableRowsSql({ table: entity, filters, sorts, limit, page }),
     roleImpersonationState
   )
-  const { result } = await executeSql(
-    {
-      projectRef,
-      connectionString,
-      sql,
-      queryKey: ['table-rows', table?.id],
-      isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
-    },
-    signal
-  )
 
-  const rows = result.map((x: any, index: number) => {
-    return { idx: index, ...x }
-  }) as SupaRow[]
+  try {
+    const { result } = await executeSql(
+      {
+        projectRef,
+        connectionString,
+        sql,
+        queryKey: ['table-rows', table?.id],
+        isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+      },
+      signal
+    )
 
-  return {
-    rows,
+    const rows = result.map((x: any, index: number) => {
+      return { idx: index, ...x }
+    }) as SupaRow[]
+
+    return { rows }
+  } catch (error) {
+    throw new Error(
+      `Error fetching table rows: ${error instanceof Error ? error.message : 'Unknown error'}`
+    )
   }
 }
 
