@@ -28,15 +28,18 @@ import { getSemver, semverGte, semverLte } from './LocalVersionPopover.utils'
 export const LocalVersionPopover = () => {
   const { data, isSuccess } = useCLIReleaseVersionQuery()
   const currentCliVersion = data?.current
-  const hasLatestCLIVersion = isSuccess && !!data?.latest
+  const latestCliVersion = data?.latest
+  const hasLatestCLIVersion = isSuccess && !!latestCliVersion
 
-  const current = getSemver(data?.current)
-  const latest = getSemver(data?.latest)
+  const current = getSemver(currentCliVersion)
+  const latest = getSemver(latestCliVersion)
 
   const hasUpdate =
-    !!current && !!latest ? data?.current !== data?.latest && semverLte(current, latest) : false
+    !!current && !!latest
+      ? currentCliVersion !== latestCliVersion && semverLte(current, latest)
+      : false
   const isBeta =
-    !!current && !!latest && data?.current !== data?.latest && semverGte(current, latest)
+    !!current && !!latest && currentCliVersion !== latestCliVersion && semverGte(current, latest)
 
   const approximateNextRelease = !!data?.published_at
     ? dayjs(data?.published_at).utc().add(14, 'day').format('DD MMM YYYY')
@@ -180,7 +183,7 @@ export const LocalVersionPopover = () => {
           {hasLatestCLIVersion && hasUpdate && !isBeta && (
             <div className="flex flex-col gap-y-1">
               <p className="text-xs">Available version:</p>
-              <p className="text-sm font-mono">{data.latest}</p>
+              <p className="text-sm font-mono">{latestCliVersion}</p>
             </div>
           )}
         </div>
