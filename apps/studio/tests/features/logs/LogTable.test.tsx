@@ -1,4 +1,4 @@
-import { prettyDOM, screen, waitFor } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import LogTable from 'components/interfaces/Settings/Logs/LogTable'
 import dayjs from 'dayjs'
