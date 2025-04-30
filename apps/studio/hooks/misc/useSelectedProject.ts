@@ -1,8 +1,9 @@
+import { useMemo } from 'react'
+
 import { useIsLoggedIn, useParams } from 'common'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { PROVIDERS } from 'lib/constants'
-import { useMemo } from 'react'
 
 export function useSelectedProject({ enabled = true } = {}) {
   const { ref } = useParams()
@@ -41,6 +42,7 @@ export const useIsOrioleDb = () => {
 
 export const useIsOrioleDbInAws = () => {
   const project = useSelectedProject()
-  const isOrioleDbInAws = project?.cloud_provider === PROVIDERS.AWS.id
+  const isOrioleDbInAws =
+    project?.dbVersion?.endsWith('orioledb') && project?.cloud_provider === PROVIDERS.AWS.id
   return isOrioleDbInAws
 }

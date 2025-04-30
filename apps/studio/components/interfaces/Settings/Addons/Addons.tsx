@@ -487,7 +487,7 @@ const Addons = () => {
                           </Button>
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
-                    ) : isOrioleDb && isOrioleDbInAws ? (
+                    ) : isOrioleDbInAws ? (
                       <ButtonTooltip
                         disabled
                         type="default"

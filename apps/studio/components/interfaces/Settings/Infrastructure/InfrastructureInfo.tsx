@@ -148,18 +148,16 @@ const InfrastructureInfo = () => {
                               </Tooltip>
                             ),
                             isOrioleDb && (
-                              <>
-                                <Tooltip>
-                                  <TooltipTrigger>
-                                    <Badge variant="default" className="mr-1">
-                                      OrioleDB
-                                    </Badge>
-                                  </TooltipTrigger>
-                                  <TooltipContent side="bottom" className="w-44 text-center">
-                                    This project uses OrioleDB
-                                  </TooltipContent>
-                                </Tooltip>
-                              </>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <Badge variant="default" className="mr-1">
+                                    OrioleDB
+                                  </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom" className="w-44 text-center">
+                                  This project uses OrioleDB
+                                </TooltipContent>
+                              </Tooltip>
                             ),
                             isOnLatestVersion && (
                               <Tooltip>
