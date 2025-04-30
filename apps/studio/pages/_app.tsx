@@ -52,7 +52,7 @@ import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
 import { SonnerToaster, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
-import { useConsent } from 'ui-patterns/ConsentToast'
+import { useConsent } from 'ui-patterns/consent'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)

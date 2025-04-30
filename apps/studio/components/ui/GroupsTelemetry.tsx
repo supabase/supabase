@@ -42,13 +42,6 @@ const GroupsTelemetry = ({ hasAcceptedConsent }: { hasAcceptedConsent: boolean }
   useTelemetryCookie({ hasAcceptedConsent, title, referrer })
 
   useEffect(() => {
-    if (hasAcceptedConsent) {
-      snap.setIsOptedInTelemetry(hasAcceptedConsent)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasAcceptedConsent])
-
-  useEffect(() => {
     // don't set the sentry user id if the user hasn't logged in (so that Sentry errors show null user id instead of anonymous id)
     if (!user?.id) {
       return

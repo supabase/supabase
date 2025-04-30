@@ -1,7 +1,7 @@
 'use client'
 
 import { IS_PLATFORM, PageTelemetry as PageTelemetryImpl } from 'common'
-import { useConsent } from 'ui-patterns/ConsentToast'
+import { useConsent } from 'ui-patterns/consent'
 import { API_URL } from '~/lib/constants'
 
 const PageTelemetry = () => {

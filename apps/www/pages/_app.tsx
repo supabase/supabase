@@ -16,7 +16,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { SonnerToaster, themes, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
-import { useConsent } from 'ui-patterns/ConsentToast'
+import { useConsent } from 'ui-patterns/consent'
 
 import MetaFaviconsPagesRouter, {
   DEFAULT_FAVICON_ROUTE,

@@ -67,5 +67,3 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
     </div>
   )
 }
-
-export { useConsent, useConsentValue } from '../shared/consent'

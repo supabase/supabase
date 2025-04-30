@@ -137,6 +137,7 @@
         "NEXT_PUBLIC_API_URL",
         "NODE_ENV",
         "HIDE_TAILWIND_INDICATOR",
+        "NEXT_PUBLIC_USERCENTRICS_RULESET_ID",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
         "NEXT_PUBLIC_AUTH_DEBUG_KEY",
