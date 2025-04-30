@@ -1,4 +1,4 @@
-import { CollectionConfig } from 'payload/types'
+import { CollectionConfig } from 'payload'
 
 const BlogPost: CollectionConfig = {
   slug: 'blog-posts',
@@ -22,9 +22,9 @@ const BlogPost: CollectionConfig = {
       admin: {
         position: 'sidebar',
       },
-      validate: (value) => {
+      validate: (value: string | string[] | null | undefined) => {
         const regex = /^[a-z][a-z0-9-]{2,49}$/
-        if (!regex.test(value)) {
+        if (!regex.test(value as string)) {
           return 'Slug must start with a letter, contain only lowercase letters, numbers, and hyphens, and be between 3-50 characters'
         }
         return true
