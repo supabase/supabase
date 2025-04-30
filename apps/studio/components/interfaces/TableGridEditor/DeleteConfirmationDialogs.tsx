@@ -1,106 +1,50 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 
-import {
-  formatFilterURLParams,
-  saveTableEditorStateToLocalStorageDebounced,
-} from 'components/grid/SupabaseGrid.utils'
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import type { SupaRow } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseColumnDeleteMutation } from 'data/database-columns/database-column-delete-mutation'
-import { Entity } from 'data/table-editor/table-editor-types'
+import { TableLike } from 'data/table-editor/table-editor-types'
 import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
 import { useTableDeleteMutation } from 'data/tables/table-delete-mutation'
-import { TablesData, useGetTables } from 'data/tables/tables-query'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { noop } from 'lib/void'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Checkbox } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
 
 export type DeleteConfirmationDialogsProps = {
-  selectedTable?: Entity | PostgresTable
-  onAfterDeleteTable?: (tables: TablesData) => void
+  selectedTable?: TableLike
+  onTableDeleted?: () => void
 }
 
 const DeleteConfirmationDialogs = ({
   selectedTable,
-  onAfterDeleteTable = noop,
+  onTableDeleted,
 }: DeleteConfirmationDialogsProps) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
-  const { selectedSchema } = useQuerySchemaState()
-
-  const { filters: filter, setParams } = useTableEditorFiltersSort()
-  const filters = formatFilterURLParams(filter as string[])
-
-  const getTables = useGetTables({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { filters, onApplyFilters } = useTableFilter()
 
   const removeDeletedColumnFromFiltersAndSorts = ({
-    ref,
-    tableName,
-    schema,
     columnName,
   }: {
-    ref: string
-    tableName: string
-    schema: string
+    ref?: string
+    tableName?: string
+    schema?: string
     columnName: string
   }) => {
-    setParams((prevParams) => {
-      const existingFilters = (prevParams?.filter ?? []) as string[]
-      const existingSorts = (prevParams?.sort ?? []) as string[]
-
-      const newFiltersAndSorts = {
-        filter: existingFilters.filter((filter: string) => {
-          const [column] = filter.split(':')
-          if (column !== columnName) return filter
-        }),
-        sort: existingSorts.filter((sort: string) => {
-          const [column] = sort.split(':')
-          if (column !== columnName) return sort
-        }),
-      }
-
-      // Overwrite local storage without the deleted column
-      saveTableEditorStateToLocalStorageDebounced({
-        projectRef: ref,
-        tableName,
-        schema,
-        filters: newFiltersAndSorts.filter,
-        sorts: newFiltersAndSorts.sort,
-      })
-
-      return {
-        ...prevParams,
-        ...newFiltersAndSorts,
-      }
-    })
+    onApplyFilters(filters.filter((filter) => filter.column !== columnName))
   }
 
   const { mutate: deleteColumn } = useDatabaseColumnDeleteMutation({
     onSuccess: () => {
       if (!(snap.confirmationDialog?.type === 'column')) return
       const selectedColumnToDelete = snap.confirmationDialog.column
-      if (!project?.ref) return
-      if (!selectedTable?.name) return
-
-      removeDeletedColumnFromFiltersAndSorts({
-        ref: project?.ref,
-        tableName: selectedTable?.name,
-        schema: selectedColumnToDelete.schema,
-        columnName: selectedColumnToDelete.name,
-      })
-
+      removeDeletedColumnFromFiltersAndSorts({ columnName: selectedColumnToDelete.name })
       toast.success(`Successfully deleted column "${selectedColumnToDelete.name}"`)
     },
     onError: (error) => {
@@ -114,9 +58,8 @@ const DeleteConfirmationDialogs = ({
   })
   const { mutate: deleteTable } = useTableDeleteMutation({
     onSuccess: async () => {
-      const tables = await getTables(selectedSchema)
-      onAfterDeleteTable(tables)
       toast.success(`Successfully deleted table "${selectedTable?.name}"`)
+      onTableDeleted?.()
     },
     onError: (error) => {
       toast.error(`Failed to delete ${selectedTable?.name}: ${error.message}`)
@@ -231,13 +174,13 @@ const DeleteConfirmationDialogs = ({
         truncateRows({
           projectRef: project.ref,
           connectionString: project.connectionString,
-          table: selectedTable as any,
+          table: selectedTable,
         })
       } else {
         deleteAllRows({
           projectRef: project.ref,
           connectionString: project.connectionString,
-          table: selectedTable as any,
+          table: selectedTable,
           filters,
           roleImpersonationState: getImpersonatedRoleState(),
         })
@@ -246,7 +189,7 @@ const DeleteConfirmationDialogs = ({
       deleteRows({
         projectRef: project.ref,
         connectionString: project.connectionString,
-        table: selectedTable as any,
+        table: selectedTable,
         rows: selectedRowsToDelete as SupaRow[],
         roleImpersonationState: getImpersonatedRoleState(),
       })
