@@ -8,6 +8,19 @@
 
 Examples: /logs /reports /projects /database-settings /auth
 
+## Custom Render and Custom Render Hook
+
+`customRender` and `customRenderHook` are wrappers around `render` and `renderHook` that add some necessary providers like `QueryClientProvider`, `TooltipProvider` and `NuqsTestingAdapter`.
+
+Generally use those instead of the default `render` and `renderHook` functions.
+
+```ts
+import { customRender, customRenderHook } from 'tests/lib/custom-render'
+
+customRender(<MyComponent />)
+customRenderHook(() => useMyHook())
+```
+
 ## Mocking API Requests
 
 To mock API requests, we use the `msw` library.
@@ -39,6 +52,20 @@ This will make debugging and updating the mocks easier.
 test('mock is working', async () => {
   const response = await fetch('/api/my-endpoint')
   expect(response.json()).resolves.toEqual({ data: { foo: 'bar' } })
+})
+```
+
+## Mocking Nuqs URL Parameters
+
+To render a component that uses Nuqs with some predefined query parameters, you can use `customRender` with the `nuqs` prop.
+
+```ts
+customRender(<MyComponent />, {
+  nuqs: {
+    searchParams: {
+      search: 'hello world',
+    },
+  },
 })
 ```
 
