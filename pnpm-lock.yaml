@@ -1249,11 +1249,11 @@ importers:
         specifier: ^2.3.0
         version: 2.3.0(react@18.3.1)
       '@next/bundle-analyzer':
-        specifier: ^14.2.3
-        version: 14.2.3
+        specifier: 15.3.1
+        version: 15.3.1
       '@next/mdx':
-        specifier: ^14.2.3
-        version: 14.2.3(@mdx-js/loader@2.3.0(supports-color@8.1.1)(webpack@5.94.0(esbuild@0.25.2)))(@mdx-js/react@2.3.0(react@18.3.1))
+        specifier: 15.3.1
+        version: 15.3.1(@mdx-js/loader@2.3.0(supports-color@8.1.1)(webpack@5.94.0(esbuild@0.25.2)))(@mdx-js/react@2.3.0(react@18.3.1))
       '@octokit/auth-app':
         specifier: ^7.0.0
         version: 7.1.5
@@ -1336,17 +1336,17 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0
       next:
-        specifier: 'catalog:'
-        version: 14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
+        specifier: 15.3.1
+        version: 15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
       next-contentlayer2:
         specifier: 0.5.3
-        version: 0.5.3(contentlayer2@0.5.3(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.25.2)(markdown-wasm@1.2.0)(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@8.1.1)
+        version: 0.5.3(contentlayer2@0.5.3(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.25.2)(markdown-wasm@1.2.0)(next@15.3.1(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@8.1.1)
       next-mdx-remote:
         specifier: ^4.4.1
         version: 4.4.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@8.1.1)
       next-seo:
         specifier: ^6.5.0
-        version: 6.5.0(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 6.5.0(next@15.3.1(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-themes:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -3961,9 +3961,6 @@ packages:
     resolution: {integrity: sha512-z6okREyK8in0486a22Oro0k+YsuyEjDXJt46FpgeOgXqKJ9ElM8QPll0iuLBkpbH33ENiNbIPLd1cuClRQnhiw==}
     engines: {node: '>=18.0.0'}
 
-  '@next/bundle-analyzer@14.2.3':
-    resolution: {integrity: sha512-Z88hbbngMs7njZKI8kTJIlpdLKYfMSLwnsqYe54AP4aLmgL70/Ynx/J201DQ+q2Lr6FxFw1uCeLGImDrHOl2ZA==}
-
   '@next/bundle-analyzer@15.3.1':
     resolution: {integrity: sha512-NqUZrjVruGbdQaPE3OSEXP+ZuULqumeHVTuU9pOX1V0/9BWY9FOck3jgQGFdBtG41nOYuO8+CoHKDQAVIPQJrw==}
 
@@ -3975,17 +3972,6 @@ packages:
 
   '@next/eslint-plugin-next@14.2.4':
     resolution: {integrity: sha512-svSFxW9f3xDaZA3idQmlFw7SusOuWTpDTAeBlO3AEPDltrraV+lqs7mAc6A27YdnpQVVIA3sODqUAAHdWhVWsA==}
-
-  '@next/mdx@14.2.3':
-    resolution: {integrity: sha512-oVz7BWpoLQ9dKvCKxPIX9X6BILPTrpTJnYDn2lAsZvK7J9Ela6xNm57vNwgZ8q7xw1THSDdSlbPNgIalM7U/+A==}
-    peerDependencies:
-      '@mdx-js/loader': '>=0.15.0'
-      '@mdx-js/react': '>=0.15.0'
-    peerDependenciesMeta:
-      '@mdx-js/loader':
-        optional: true
-      '@mdx-js/react':
-        optional: true
 
   '@next/mdx@15.3.1':
     resolution: {integrity: sha512-dnpuJRfqqCPFfLDy2hIej41JAl424zk1JOgRd7jjWu2aTeX6oi0gXdcnMAK4lhf7Xl9zSkL2stzDc1YtlB1xyg==}
@@ -18435,13 +18421,6 @@ snapshots:
 
   '@netlify/serverless-functions-api@1.36.0': {}
 
-  '@next/bundle-analyzer@14.2.3':
-    dependencies:
-      webpack-bundle-analyzer: 4.10.1
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-
   '@next/bundle-analyzer@15.3.1':
     dependencies:
       webpack-bundle-analyzer: 4.10.1
@@ -18457,7 +18436,7 @@ snapshots:
     dependencies:
       glob: 10.3.10
 
-  '@next/mdx@14.2.3(@mdx-js/loader@2.3.0(supports-color@8.1.1)(webpack@5.94.0(esbuild@0.25.2)))(@mdx-js/react@2.3.0(react@18.3.1))':
+  '@next/mdx@15.3.1(@mdx-js/loader@2.3.0(supports-color@8.1.1)(webpack@5.94.0(esbuild@0.25.2)))(@mdx-js/react@2.3.0(react@18.3.1))':
     dependencies:
       source-map: 0.7.4
     optionalDependencies:
@@ -28850,12 +28829,12 @@ snapshots:
       - markdown-wasm
       - supports-color
 
-  next-contentlayer2@0.5.3(contentlayer2@0.5.3(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.25.2)(markdown-wasm@1.2.0)(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@8.1.1):
+  next-contentlayer2@0.5.3(contentlayer2@0.5.3(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.25.2)(markdown-wasm@1.2.0)(next@15.3.1(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@8.1.1):
     dependencies:
       '@contentlayer2/core': 0.5.3(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1)
       '@contentlayer2/utils': 0.5.3
       contentlayer2: 0.5.3(esbuild@0.25.2)(markdown-wasm@1.2.0)(supports-color@8.1.1)
-      next: 14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
+      next: 15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
     transitivePeerDependencies:
@@ -28884,9 +28863,9 @@ snapshots:
       next: 15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
       react: 18.3.1
 
-  next-seo@6.5.0(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  next-seo@6.5.0(next@15.3.1(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
-      next: 14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
+      next: 15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
