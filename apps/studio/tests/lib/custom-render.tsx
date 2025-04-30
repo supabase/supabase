@@ -3,7 +3,7 @@ import { render, renderHook, RenderOptions } from '@testing-library/react'
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
 import { TooltipProvider } from 'ui'
 
-type AdapterProps = Parameters<typeof NuqsTestingAdapter>[0]
+type AdapterProps = Partial<Parameters<typeof NuqsTestingAdapter>[0]>
 
 const CustomWrapper = ({
   children,
