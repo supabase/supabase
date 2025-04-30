@@ -1,15 +1,18 @@
-import { renderHook, screen, waitFor } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { expect, test, vi } from 'vitest'
+import { beforeEach, expect, test, vi } from 'vitest'
 import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import { customRender, customRenderHook } from 'tests/lib/custom-render'
 import userEvent from '@testing-library/user-event'
 
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
+import { LOGS_API_MOCKS } from './logs.mocks'
+import { addAPIMock } from 'tests/lib/msw'
 
 dayjs.extend(utc)
+
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal()
   return {
@@ -26,14 +29,18 @@ vi.mock('lib/gotrue', async (importOriginal) => ({
   auth: { onAuthStateChange: vi.fn() },
 }))
 
+beforeEach(() => {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/projects/default/analytics/endpoints/logs.all',
+    response: LOGS_API_MOCKS,
+  })
+})
+
 test.skip('search loads with whatever is on the URL', async () => {
   customRender(
     <LogsPreviewer queryType="api" projectRef="default" tableName={LogsTableName.EDGE} />
   )
-
-  await waitFor(() => {
-    expect(screen.getByTestId('logs-table')).toBeInTheDocument()
-  })
 })
 
 test('useLogsPreview returns data from MSW', async () => {
@@ -50,6 +57,24 @@ test('useLogsPreview returns data from MSW', async () => {
 
   await waitFor(() => {
     expect(result.current.logData.length).toBeGreaterThan(0)
+  })
+
+  expect(result.current.logData).toEqual(LOGS_API_MOCKS.result)
+})
+
+test('LogsPreviewer renders the expected data from the API', async () => {
+  customRender(
+    <LogsPreviewer queryType="api" projectRef="default" tableName={LogsTableName.EDGE} />
+  )
+
+  await waitFor(() => {
+    expect(screen.getByRole('table')).toBeInTheDocument()
+  })
+
+  const firstLogEventMessage = LOGS_API_MOCKS.result[0].event_message
+
+  await waitFor(() => {
+    expect(screen.getAllByText(firstLogEventMessage)[0]).toBeInTheDocument()
   })
 })
 
@@ -76,7 +101,9 @@ test('can click load older', async () => {
     <LogsPreviewer queryType="api" projectRef="default" tableName={LogsTableName.EDGE} />
   )
 
-  const loadOlder = await waitFor(() => screen.getByRole('button', { name: /Load older/i }))
+  const loadOlder = await waitFor(
+    async () => await screen.findByRole('button', { name: /Load older/i })
+  )
 
   loadOlder.onclick = vi.fn()
 

@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { LogsExplorerPage } from 'pages/project/[ref]/logs/explorer/index'
 import { clickDropdown } from 'tests/helpers'
 import { customRender as render } from 'tests/lib/custom-render'
-import { routerMock } from 'tests/mocks/router'
+import { routerMock } from 'tests/lib/route-mock'
 import { beforeAll, describe, expect, test, vi } from 'vitest'
 
 const router = routerMock

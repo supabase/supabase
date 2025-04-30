@@ -1,4 +1,4 @@
-export const API_LOGS_MOCK = {
+export const LOGS_API_MOCKS = {
   result: [
     {
       id: 'uuid',

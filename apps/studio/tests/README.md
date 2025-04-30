@@ -1,6 +1,48 @@
 # UI Testing Notes
 
-### `<Popover>` vs `<Dropdown>`
+## Rules
+
+- All tests should be run consistently (avoid situations whereby tests fails "sometimes")
+
+- Group tests in folders based on the feature they are testing. Avoid file/folder based folder names since those can change and we will forget to update the tests.
+
+Examples: /logs /reports /projects /database-settings /auth
+
+## Mocking API Requests
+
+To mock API requests, we use the `msw` library.
+
+Global mocks can be found in `tests/lib/msw-global-api-mocks.ts`.
+
+To mock an endpoint you can use the `addAPIMock` function.
+
+```ts
+beforeEach(() => {
+  addAPIMock({
+    method: 'get',
+    path: '/api/my-endpoint',
+    response: {
+      data: { foo: 'bar' },
+    },
+  })
+})
+```
+
+### API Mocking Tips:
+
+- Keep mocks in the same folder as the tests that use them
+- Add a test to verify the mock is working
+
+This will make debugging and updating the mocks easier.
+
+```ts
+test('mock is working', async () => {
+  const response = await fetch('/api/my-endpoint')
+  expect(response.json()).resolves.toEqual({ data: { foo: 'bar' } })
+})
+```
+
+## `<Popover>` vs `<Dropdown>`
 
 When simulating clicks on these components, do the following:
 
@@ -13,7 +55,3 @@ await userEvent.click('Hello world')
 import clickDropdown from 'tests/helpers'
 clickDropdown('Hello world')
 ```
-
-### Rules
-
-- All tests should be run consistently (avoid situations whereby tests fails "sometimes")
