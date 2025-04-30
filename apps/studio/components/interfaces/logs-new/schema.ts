@@ -3,10 +3,10 @@ import {
   RANGE_DELIMITER,
   SLIDER_DELIMITER,
 } from 'components/interfaces/DataTableDemo/lib/delimiters'
-import { METHODS } from 'components/interfaces/DataTableDemo/constants/method'
-import { REGIONS } from 'components/interfaces/DataTableDemo/constants/region'
+import { METHODS } from './constants/method'
+import { REGIONS } from './constants/region'
 import { z } from 'zod'
-import { LEVELS } from 'components/interfaces/DataTableDemo/constants/levels'
+import { LEVELS } from './constants/levels'
 
 // https://github.com/colinhacks/zod/issues/2985#issue-2008642190
 const stringToBoolean = z

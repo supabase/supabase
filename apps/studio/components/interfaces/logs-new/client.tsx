@@ -1,5 +1,8 @@
 'use client'
 
+import { useQueryState, useQueryStates } from 'nuqs'
+import * as React from 'react'
+
 import { useInfiniteQuery } from '@tanstack/react-query'
 import {
   ColumnFiltersState,
@@ -20,23 +23,13 @@ import { DataTableInfinite } from 'components/interfaces/data-table/data-table-i
 import { TimelineChart } from 'components/interfaces/data-table/timeline-chart'
 import { useHotKey } from 'components/interfaces/DataTableDemo/hooks/use-hot-key'
 import { LiveRow } from 'components/interfaces/DataTableDemo/infinite/_components/live-row'
-import {
-  filterFields as defaultFilterFields,
-  sheetFields,
-} from 'components/interfaces/DataTableDemo/infinite/constants'
-import { dataOptions } from 'components/interfaces/DataTableDemo/infinite/query-options'
-import { searchParamsParser } from 'components/interfaces/DataTableDemo/infinite/search-params'
+
 import {
   getLevelLabel,
   getLevelRowClassName,
 } from 'components/interfaces/DataTableDemo/lib/request/level'
 import { arrSome, inDateRange } from 'components/interfaces/DataTableDemo/lib/table/filterfns'
-import { useQueryState, useQueryStates } from 'nuqs'
-import * as React from 'react'
 import { ChartConfig, cn } from 'ui'
-import { DataTableHeaderLayout } from '../data-table/data-table-header-layout'
-import { DataTableSideBarLayout } from '../data-table/data-table-side-bar-layout'
-import { FilterSideBar } from '../data-table/filter-side-bar'
 import { DataTableFilterCommand } from 'components/interfaces/DataTableDemo/components/data-table/data-table-filter-command'
 import { DataTableProvider } from 'components/interfaces/DataTableDemo/components/data-table/data-table-provider'
 import { DataTableSheetDetails } from 'components/interfaces/DataTableDemo/components/data-table/data-table-sheet/data-table-sheet-details'
@@ -46,13 +39,18 @@ import { LiveButton } from 'components/interfaces/DataTableDemo/infinite/_compon
 import { RefreshButton } from 'components/interfaces/DataTableDemo/infinite/_components/refresh-button'
 import { Percentile } from 'components/interfaces/DataTableDemo/lib/request/percentile'
 
+// components pulled out and modified
+import { FilterSideBar } from '../data-table/filter-side-bar'
+import { DataTableHeaderLayout } from '../data-table/data-table-header-layout'
+import { DataTableSideBarLayout } from '../data-table/data-table-side-bar-layout'
+
 // specific imports
-import { MemoizedDataTableSheetContent } from 'components/interfaces/logs-new/data-table-sheet-content'
-import type {
-  FacetMetadataSchema,
-  TimelineChartSchema,
-} from 'components/interfaces/logs-new/schema'
-import { columns } from 'components/interfaces/logs-new/columns'
+import { MemoizedDataTableSheetContent } from './components/data-table-sheet-content'
+import type { FacetMetadataSchema, TimelineChartSchema } from './schema'
+import { columns } from './columns'
+import { searchParamsParser } from './search-params'
+import { dataOptions } from './query-options'
+import { filterFields as defaultFilterFields, sheetFields } from './constants'
 
 function TooltipLabel({ level }: { level: keyof Omit<TimelineChartSchema, 'timestamp'> }) {
   return (
