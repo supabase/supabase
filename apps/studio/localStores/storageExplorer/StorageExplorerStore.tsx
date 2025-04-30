@@ -13,6 +13,7 @@ import {
   uniqBy,
 } from 'lodash'
 import { makeAutoObservable } from 'mobx'
+import Link from 'next/link'
 import { toast } from 'sonner'
 import * as tus from 'tus-js-client'
 
@@ -30,6 +31,7 @@ import {
   StorageItemWithColumn,
 } from 'components/to-be-cleaned/Storage/Storage.types'
 import {
+  calculateTotalRemainingTime,
   downloadFile,
   formatTime,
 } from 'components/to-be-cleaned/Storage/StorageExplorer/StorageExplorer.utils'
@@ -45,7 +47,6 @@ import { moveStorageObject } from 'data/storage/object-move-mutation'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 import { lookupMime } from 'lib/mime'
-import Link from 'next/link'
 import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
 
 type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string }
@@ -87,7 +88,6 @@ class StorageExplorerStore {
   selectedItemsToDelete: StorageItemWithColumn[] = []
   selectedItemsToMove: StorageItemWithColumn[] = []
   selectedFilePreview: StorageItemWithColumn | null = null
-  selectedFileCustomExpiry: StorageItem | undefined = undefined
 
   private DEFAULT_OPTIONS = {
     limit: LIMIT,
@@ -190,20 +190,20 @@ class StorageExplorerStore {
   private setSelectedBucket = (bucket: Bucket) => {
     this.selectedBucket = bucket
     this.clearOpenedFolders()
-    this.closeFilePreview()
+    // this.closeFilePreview()
     this.clearSelectedItems()
   }
 
   setSortBy = async (sortBy: STORAGE_SORT_BY) => {
     this.sortBy = sortBy
-    this.closeFilePreview()
+    // this.closeFilePreview()
     this.updateExplorerPreferences()
     await this.refetchAllOpenedFolders()
   }
 
   setSortByOrder = async (sortByOrder: STORAGE_SORT_BY_ORDER) => {
     this.sortByOrder = sortByOrder
-    this.closeFilePreview()
+    // this.closeFilePreview()
     this.updateExplorerPreferences()
     await this.refetchAllOpenedFolders()
   }
@@ -270,10 +270,6 @@ class StorageExplorerStore {
     this.selectedItemsToMove = []
   }
 
-  setSelectedFileCustomExpiry = (item: StorageItem | undefined) => {
-    this.selectedFileCustomExpiry = item
-  }
-
   addNewFolderPlaceholder = (columnIndex: number) => {
     const isPrepend = true
     const folderName = 'Untitled folder'
@@ -316,14 +312,6 @@ class StorageExplorerStore {
         paths: [`${pathToFolder}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`],
       })
     }
-  }
-
-  setFilePreview = async (file: StorageItemWithColumn) => {
-    this.selectedFilePreview = file
-  }
-
-  closeFilePreview = () => {
-    this.selectedFilePreview = null
   }
 
   /* Methods that involve the storage client library */
@@ -407,7 +395,7 @@ class StorageExplorerStore {
     const progress =
       (this.uploadProgresses.reduce((acc, { percentage }) => acc + percentage, 0) / totalFiles) *
       100
-    const remainingTime = this.calculateTotalRemainingTime(this.uploadProgresses)
+    const remainingTime = calculateTotalRemainingTime(this.uploadProgresses)
 
     return toast(
       <SonnerProgress
@@ -851,7 +839,7 @@ class StorageExplorerStore {
     files: (StorageItemWithColumn & { prefix?: string })[],
     isDeleteFolder = false
   ) => {
-    this.closeFilePreview()
+    // this.closeFilePreview()
     let progress = 0
 
     // If every file has the 'prefix' property, then just construct the prefix
@@ -1132,7 +1120,7 @@ class StorageExplorerStore {
 
         if (this.selectedFilePreview?.name === originalName) {
           const { previewUrl, ...fileData } = file as any
-          this.setFilePreview({ ...fileData, name: newName })
+          // this.setFilePreview({ ...fileData, name: newName })
         }
 
         await this.refetchAllOpenedFolders()
@@ -1767,22 +1755,6 @@ class StorageExplorerStore {
       // Select items within the range
       this.setSelectedItems(uniqBy(this.selectedItems.concat(rangeToSelect), 'id'))
     }
-  }
-
-  private calculateTotalRemainingTime(progresses: UploadProgress[]) {
-    let totalRemainingTime = 0
-    let totalRemainingBytes = 0
-
-    progresses.forEach((progress) => {
-      totalRemainingBytes += progress.remainingBytes
-      if (totalRemainingBytes === 0) {
-        return
-      }
-      const weight = progress.remainingBytes / totalRemainingBytes
-      totalRemainingTime += weight * progress.remainingTime
-    })
-
-    return totalRemainingTime
   }
 }
 

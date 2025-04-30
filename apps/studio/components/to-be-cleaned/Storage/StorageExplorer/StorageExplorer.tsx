@@ -6,7 +6,6 @@ import { useParams } from 'common'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import type { Bucket } from 'data/storage/buckets-query'
 import { IS_PLATFORM } from 'lib/constants'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import { ConfirmDeleteModal } from './ConfirmDeleteModal'
@@ -22,24 +21,17 @@ interface StorageExplorerProps {
 }
 
 const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
-  const storageExplorerStore = useStorageStore()
+  const { ref } = useParams()
+  const storageExplorerRef = useRef(null)
   const {
+    view,
     columns,
-    closeFilePreview,
     selectedItems,
-    setSelectedItems,
-    clearSelectedItems,
     selectedItemsToDelete,
-    clearSelectedItemsToDelete,
     openedFolders,
-    popColumnAtIndex,
-    popOpenedFoldersAtIndex,
     selectedItemsToMove,
-    clearSelectedItemsToMove,
-    currentBucketName,
+    selectedBucket,
     openBucket,
-
-    loadExplorerPreferences,
     fetchFolderContents,
     fetchMoreFolderContents,
     fetchFoldersByPath,
@@ -47,11 +39,14 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
     uploadFiles,
     deleteFiles,
     moveFiles,
-  } = storageExplorerStore
-
-  const { ref } = useParams()
-  const storageExplorerRef = useRef(null)
-  const snap = useStorageExplorerStateSnapshot()
+    popColumnAtIndex,
+    popOpenedFoldersAtIndex,
+    setSelectedItems,
+    clearSelectedItems,
+    setSelectedFilePreview,
+    setSelectedItemsToMove,
+    setSelectedItemsToDelete,
+  } = useStorageExplorerStateSnapshot()
 
   // [Joshen] This is to ensure that StorageExplorerStore can get the storage file size limit
   // Will be better once we deprecate the mobx store entirely, which we will get there
@@ -68,43 +63,47 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const fetchContents = async () => {
-      if (snap.view === STORAGE_VIEWS.LIST) {
+      if (view === STORAGE_VIEWS.LIST) {
         const currentFolderIdx = openedFolders.length - 1
         const currentFolder = openedFolders[currentFolderIdx]
 
         if (itemSearchString) {
           if (!currentFolder) {
             // At root of bucket
-            await fetchFolderContents(bucket.id, bucket.name, -1, itemSearchString)
+            await fetchFolderContents({
+              folderId: bucket.id,
+              folderName: bucket.name,
+              index: -1,
+              searchString: itemSearchString,
+            })
           } else {
-            await fetchFolderContents(
-              currentFolder.id,
-              currentFolder.name,
-              currentFolderIdx,
-              itemSearchString
-            )
+            await fetchFolderContents({
+              folderId: currentFolder.id,
+              folderName: currentFolder.name,
+              index: currentFolderIdx,
+              searchString: itemSearchString,
+            })
           }
         } else {
           if (!currentFolder) {
             // At root of bucket
-            await fetchFolderContents(bucket.id, bucket.name, -1)
+            await fetchFolderContents({ folderId: bucket.id, folderName: bucket.name, index: -1 })
           } else {
-            await fetchFolderContents(currentFolder.id, currentFolder.name, currentFolderIdx)
+            await fetchFolderContents({
+              folderId: currentFolder.id,
+              folderName: currentFolder.name,
+              index: currentFolderIdx,
+            })
           }
         }
-      } else if (snap.view === STORAGE_VIEWS.COLUMNS) {
+      } else if (view === STORAGE_VIEWS.COLUMNS) {
         const paths = openedFolders.map((folder) => folder.name)
-        fetchFoldersByPath(paths, itemSearchString, true)
+        fetchFoldersByPath({ paths, searchString: itemSearchString, showLoading: true })
       }
     }
 
     fetchContents()
   }, [itemSearchString])
-
-  useEffect(() => {
-    // Load user preferences (view, sort, sortBy)
-    loadExplorerPreferences()
-  }, [ref])
 
   useEffect(() => {
     openBucket(bucket)
@@ -143,7 +142,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
     event.persist()
     const items = event.target.files || event.dataTransfer.items
     const isDrop = !isEmpty(get(event, ['dataTransfer', 'items'], []))
-    await uploadFiles(items, columnIndex, isDrop)
+    await uploadFiles({ files: items, columnIndex, isDrop })
     event.target.value = ''
   }
 
@@ -161,11 +160,11 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
           await deleteFolder(itemToDelete)
           break
         case STORAGE_ROW_TYPES.FILE:
-          await deleteFiles([itemToDelete])
+          await deleteFiles({ files: [itemToDelete] })
           break
       }
     } else {
-      await deleteFiles(selectedItemsToDelete)
+      await deleteFiles({ files: selectedItemsToDelete })
     }
   }
 
@@ -173,17 +172,14 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   const onSelectColumnEmptySpace = (columnIndex: number) => {
     popColumnAtIndex(columnIndex)
     popOpenedFoldersAtIndex(columnIndex - 1)
-    closeFilePreview()
+    setSelectedFilePreview(undefined)
     clearSelectedItems()
   }
 
   return (
     <div
       ref={storageExplorerRef}
-      className="
-        bg-studio border rounded-md
-        border-overlay flex
-        h-full w-full flex-col"
+      className="bg-studio border rounded-md border-overlay flex h-full w-full flex-col"
     >
       {selectedItems.length === 0 ? (
         <FileExplorerHeader
@@ -204,7 +200,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
           onSelectAllItemsInColumn={onSelectAllItemsInColumn}
           onSelectColumnEmptySpace={onSelectColumnEmptySpace}
           onColumnLoadMore={(index, column) =>
-            fetchMoreFolderContents(index, column, itemSearchString)
+            fetchMoreFolderContents({ index, column, searchString: itemSearchString })
           }
         />
         <PreviewPane />
@@ -212,14 +208,14 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
       <ConfirmDeleteModal
         visible={selectedItemsToDelete.length > 0}
         selectedItemsToDelete={selectedItemsToDelete}
-        onSelectCancel={clearSelectedItemsToDelete}
+        onSelectCancel={() => setSelectedItemsToDelete([])}
         onSelectDelete={onDeleteSelectedFiles}
       />
       <MoveItemsModal
-        bucketName={currentBucketName}
+        bucketName={selectedBucket.name}
         visible={selectedItemsToMove.length > 0}
         selectedItemsToMove={selectedItemsToMove}
-        onSelectCancel={clearSelectedItemsToMove}
+        onSelectCancel={() => setSelectedItemsToMove([])}
         onSelectMove={onMoveSelectedFiles}
       />
       <CustomExpiryModal />
