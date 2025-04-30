@@ -56,7 +56,6 @@ Now we can choose a `statement_cost_filter` value between the total cost for the
 
 {/* prettier-ignore */}
 ```sql
-load 'plan_filter';
 set plan_filter.statement_cost_limit = 50; -- between 2.49 and 135.0
 
 select * from book where id = 1;
