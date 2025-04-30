@@ -7,14 +7,16 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import type { Table as TTable } from '@tanstack/react-table'
 import { useQueryState, useQueryStates } from 'nuqs'
 import * as React from 'react'
-import { LiveRow } from './_components/live-row'
-import { columns } from './columns'
-import { filterFields as defaultFilterFields, sheetFields } from './constants'
-import { DataTableInfinite } from './data-table-infinite'
-import { dataOptions } from './query-options'
-import type { FacetMetadataSchema } from './schema'
-import { searchParamsParser } from './search-params'
-import { TimelineChart } from './timeline-chart'
+import { LiveRow } from 'components/interfaces/DataTableDemo/infinite/_components/live-row'
+import { columns } from 'components/interfaces/DataTableDemo/unified-logs/columns'
+import {
+  filterFields as defaultFilterFields,
+  sheetFields,
+} from 'components/interfaces/DataTableDemo/infinite/constants'
+import { DataTableInfinite } from 'components/interfaces/DataTableDemo/infinite/data-table-infinite'
+import { dataOptions } from 'components/interfaces/DataTableDemo/infinite/query-options'
+import type { FacetMetadataSchema } from 'components/interfaces/DataTableDemo/infinite/schema'
+import { searchParamsParser } from 'components/interfaces/DataTableDemo/infinite/search-params'
 
 export function Client() {
   const [search] = useQueryStates(searchParamsParser)
@@ -77,8 +79,6 @@ export function Client() {
 
   return (
     <>
-      {/* TODO: move up to client component */}
-      {/* <TimelineChart data={chartData ?? []} className="-mb-2" columnId={'date'} /> */}
       <DataTableInfinite
         columns={columns}
         data={flatData}

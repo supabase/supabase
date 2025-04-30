@@ -419,14 +419,16 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                       <Button
                         disabled={isFetching || isLoading}
                         onClick={() => fetchNextPage()}
-                        size="sm"
-                        variant="outline"
+                        size="small"
+                        type="outline"
+                        icon={
+                          isFetching ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : null
+                        }
                       >
-                        {isFetching ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : null}
                         Load More
                       </Button>
                     ) : (
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-foreground-lighter py-4">
                         No more data to load (
                         <span className="font-mono font-medium">
                           {formatCompactNumber(filterRows)}

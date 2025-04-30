@@ -54,33 +54,46 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
 
               column?.setFilterValue(newValue)
             }}
+            className="flex items-center gap-2"
           >
-            <Search />
+            <Search size={16} />
             Include
           </DropdownMenuItem>
         )
       case 'input':
         return (
-          <DropdownMenuItem onClick={() => column?.setFilterValue(value)}>
-            <Search />
+          <DropdownMenuItem
+            onClick={() => column?.setFilterValue(value)}
+            className="flex items-center gap-2"
+          >
+            <Search size={16} />
             Include
           </DropdownMenuItem>
         )
       case 'slider':
         return (
           <DropdownMenuGroup>
-            <DropdownMenuItem onClick={() => column?.setFilterValue([0, value])}>
+            <DropdownMenuItem
+              onClick={() => column?.setFilterValue([0, value])}
+              className="flex items-center gap-2"
+            >
               {/* FIXME: change icon as it is not clear */}
-              <ChevronLeft />
+              <ChevronLeft size={16} />
               Less or equal than
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => column?.setFilterValue([value, 5000])}>
+            <DropdownMenuItem
+              onClick={() => column?.setFilterValue([value, 5000])}
+              className="flex items-center gap-2"
+            >
               {/* FIXME: change icon as it is not clear */}
-              <ChevronRight />
+              <ChevronRight size={16} />
               Greater or equal than
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => column?.setFilterValue([value])}>
-              <Equal />
+            <DropdownMenuItem
+              onClick={() => column?.setFilterValue([value])}
+              className="flex items-center gap-2"
+            >
+              <Equal size={16} />
               Equal to
             </DropdownMenuItem>
           </DropdownMenuGroup>
@@ -89,8 +102,11 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
         const date = new Date(value)
         return (
           <DropdownMenuGroup>
-            <DropdownMenuItem onClick={() => column?.setFilterValue([date])}>
-              <CalendarSearch />
+            <DropdownMenuItem
+              onClick={() => column?.setFilterValue([date])}
+              className="flex items-center gap-2"
+            >
+              <CalendarSearch size={16} />
               Exact timestamp
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -99,8 +115,9 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
                 const end = endOfHour(date)
                 column?.setFilterValue([start, end])
               }}
+              className="flex items-center gap-2"
             >
-              <CalendarClock />
+              <CalendarClock size={16} />
               Same hour
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -109,8 +126,9 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
                 const end = endOfDay(date)
                 column?.setFilterValue([start, end])
               }}
+              className="flex items-center gap-2"
             >
-              <CalendarDays />
+              <CalendarDays size={16} />
               Same day
             </DropdownMenuItem>
           </DropdownMenuGroup>
@@ -147,8 +165,11 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
       <DropdownMenuContent align="start" side="left">
         {renderOptions()}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => copy(String(value), { timeout: 1000 })}>
-          <Copy />
+        <DropdownMenuItem
+          onClick={() => copy(String(value), { timeout: 1000 })}
+          className="flex items-center gap-2"
+        >
+          <Copy size={16} />
           Copy value
         </DropdownMenuItem>
       </DropdownMenuContent>
