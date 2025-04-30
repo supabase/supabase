@@ -414,17 +414,11 @@ export const QueryBlock = ({
                   />
                   <YAxis tickLine={false} axisLine={false} tickMargin={4} />
                   <Tooltip content={<ChartTooltipContent className="w-[150px]" />} />
-                  <Bar
-                    radius={1}
-                    dataKey={yKey}
-                    fill="var(--chart-1)"
-                    enableBackground={12}
-                    activeBar={{}}
-                  >
-                    {chartData?.map((_entry: any, index: number) => (
+                  <Bar radius={1} dataKey={yKey}>
+                    {chartData?.map((_: any, index: number) => (
                       <Cell
                         key={`cell-${index}`}
-                        className={`transition-all duration-300`}
+                        className="transition-all duration-100"
                         fill="var(--chart-1)"
                         opacity={focusDataIndex === undefined || focusDataIndex === index ? 1 : 0.4}
                         enableBackground={12}
