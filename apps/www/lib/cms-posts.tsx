@@ -1,20 +1,16 @@
 import { generateReadingTime } from './helpers'
-// @ts-ignore - Strapi client types are not properly exported
-import { strapi } from '@strapi/client'
 const toc = require('markdown-toc')
 
-// Initialize Strapi client with authentication
-const client = strapi({
-  baseURL: process.env.CMS_API_URL || 'http://localhost:1337/api',
-  auth: process.env.STRAPI_API_TOKEN, // You'll need to add this to your .env
-})
+// Payload API configuration
+const PAYLOAD_API_URL = process.env.NEXT_PUBLIC_PAYLOAD_API_URL || 'http://localhost:3000/api'
+const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY
 
 type CMSBlogPost = {
-  id: number
+  id: string
   Title: string
   slug: string
   description: string
-  content: string
+  content: any
   date?: string
   launchweek?: string
   toc_depth?: number
@@ -25,7 +21,6 @@ type CMSBlogPost = {
   image?: {
     url: string
   }
-  publishedAt: string
   createdAt: string
   updatedAt: string
   authors?: {
@@ -38,24 +33,6 @@ type CMSBlogPost = {
     }
     username: string
   }[]
-}
-
-type CMSResponse = {
-  data: CMSBlogPost[]
-  meta: {
-    pagination: {
-      page: number
-      pageSize: number
-      pageCount: number
-      total: number
-    }
-  }
-}
-
-type PostSlug = {
-  params: {
-    slug: string
-  }
 }
 
 type ProcessedPost = {
@@ -85,16 +62,21 @@ type ProcessedPost = {
 /**
  * Fetch all blog post slugs from the CMS
  */
-export async function getAllCMSPostSlugs(): Promise<PostSlug[]> {
+export async function getAllCMSPostSlugs() {
   try {
-    const response = await client.collection('blog-posts').find({
-      fields: ['slug'],
-      pagination: {
-        pageSize: 100,
+    const response = await fetch(`${PAYLOAD_API_URL}/blog-posts?limit=100&depth=0`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
       },
     })
 
-    return response.data.map((post: CMSBlogPost) => ({
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+    return data.docs.map((post: CMSBlogPost) => ({
       params: {
         slug: post.slug,
       },
@@ -110,28 +92,35 @@ export async function getAllCMSPostSlugs(): Promise<PostSlug[]> {
  */
 export async function getCMSPostBySlug(slug: string) {
   try {
-    const response = await client.collection('blog-posts').find({
-      filters: {
-        slug: {
-          $eq: slug,
+    const response = await fetch(
+      `${PAYLOAD_API_URL}/blog-posts?where[slug][equals]=${slug}&depth=2`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
         },
-      },
-      populate: ['authors.author_image_url', 'tags', 'categories', 'thumb', 'image'],
-    })
+      }
+    )
 
-    if (!response.data.length) {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    if (!data.docs.length) {
       return null
     }
 
-    const post = response.data[0]
+    const post = data.docs[0]
 
     const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
     const formattedDate = new Date(post.date || new Date()).toLocaleDateString('en-IN', options)
     const readingTime = generateReadingTime(post.content || '')
 
     // Extract thumb and image URLs from the nested structure
-    const thumbUrl = (post.thumb as any)?.url
-    const imageUrl = (post.image as any)?.url
+    const thumbUrl = post.thumb?.url
+    const imageUrl = post.image?.url
 
     // Generate TOC from content for CMS posts
     const tocResult = toc(post.content || '', {
@@ -156,13 +145,13 @@ export async function getCMSPostBySlug(slug: string) {
           author_image_url: author.author_image_url?.url
             ? author.author_image_url.url.includes('http')
               ? author.author_image_url?.url
-              : `${process.env.CMS_API_URL}${author.author_image_url.url}`
+              : `${PAYLOAD_API_URL.replace('/api', '')}${author.author_image_url.url}`
             : null,
           username: author.username || '',
         })) || [],
       toc_depth: post.toc_depth || 2,
-      thumb: thumbUrl ? thumbUrl.replace(process.env.CMS_API_URL || '', '') : null,
-      image: imageUrl ? imageUrl.replace(process.env.CMS_API_URL || '', '') : null,
+      thumb: thumbUrl ? thumbUrl.replace(PAYLOAD_API_URL.replace('/api', ''), '') : null,
+      image: imageUrl ? imageUrl.replace(PAYLOAD_API_URL.replace('/api', ''), '') : null,
       url: `/blog/${slug}`,
       path: `/blog/${slug}`,
       isCMS: true,
@@ -192,14 +181,20 @@ export async function getAllCMSPosts({
   currentPostSlug?: string
 } = {}): Promise<ProcessedPost[]> {
   try {
-    const response = await client.collection('blog-posts').find({
-      populate: ['authors.author_image_url', 'categories', 'thumb', 'image'],
-      pagination: {
-        pageSize: 100,
+    const response = await fetch(`${PAYLOAD_API_URL}/blog-posts?depth=2&limit=100`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
       },
     })
 
-    let posts = response.data
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    let posts = data.docs
       .filter((post: CMSBlogPost) => post.slug !== currentPostSlug)
       .map((post: CMSBlogPost) => {
         const options: Intl.DateTimeFormatOptions = {
@@ -211,10 +206,8 @@ export async function getAllCMSPosts({
         const readingTime = generateReadingTime(post.content || '')
 
         // Extract thumb and image URLs from the nested structure
-        const thumbUrl = (post.thumb as any)?.url
-        const imageUrl = (post.image as any)?.url
-
-        console.log('imageUrl', imageUrl)
+        const thumbUrl = post.thumb?.url
+        const imageUrl = post.image?.url
 
         return {
           slug: post.slug || '',
@@ -232,13 +225,13 @@ export async function getAllCMSPosts({
               author_image_url: author.author_image_url?.url
                 ? author.author_image_url.url.includes('http')
                   ? author.author_image_url.url
-                  : `${process.env.CMS_API_URL}${author.author_image_url.url}`
+                  : `${PAYLOAD_API_URL.replace('/api', '')}${author.author_image_url.url}`
                 : null,
               username: author.username || '',
             })) || [],
           toc_depth: post.toc_depth || 2,
-          thumb: thumbUrl ? thumbUrl.replace(process.env.CMS_API_URL || '', '') : null,
-          image: imageUrl ? imageUrl.replace(process.env.CMS_API_URL || '', '') : null,
+          thumb: thumbUrl ? thumbUrl.replace(PAYLOAD_API_URL.replace('/api', ''), '') : null,
+          image: imageUrl ? imageUrl.replace(PAYLOAD_API_URL.replace('/api', ''), '') : null,
           url: `/blog/${post.slug || ''}`,
           path: `/blog/${post.slug || ''}`,
           isCMS: true,
