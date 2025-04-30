@@ -15,8 +15,11 @@ type Database = {
         Returns: Array<
           Omit<
             DatabaseGenerated['public']['Functions']['search_content']['Returns'][number],
-            'subsections'
-          > & { subsections: Array<{ title?: string; href?: string; content?: string }> }
+            'subsections' | 'metadata'
+          > & {
+            metadata: { language?: string; methodName?: string }
+            subsections: Array<{ title?: string; href?: string; content?: string }>
+          }
         >
       }
     }
@@ -38,3 +41,5 @@ export function supabase() {
 
   return _supabase
 }
+
+export type { Database as DatabaseCorrected }

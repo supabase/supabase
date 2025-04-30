@@ -1,4 +1,4 @@
-import { SearchResultInterface } from '../globalSearch/globalSearchInterface'
+import { type SearchResultInterface } from '../globalSearch/globalSearchInterface'
 
 export class GuideModel implements SearchResultInterface {
   public title?: string
