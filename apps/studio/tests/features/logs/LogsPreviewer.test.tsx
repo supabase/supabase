@@ -37,10 +37,25 @@ beforeEach(() => {
   })
 })
 
-test.skip('search loads with whatever is on the URL', async () => {
+test('search loads with whatever is on the URL', async () => {
   customRender(
-    <LogsPreviewer queryType="api" projectRef="default" tableName={LogsTableName.EDGE} />
+    <LogsPreviewer queryType="api" projectRef="default" tableName={LogsTableName.EDGE} />,
+    {
+      nuqs: {
+        searchParams: {
+          s: 'test-search-box-value',
+        },
+      },
+    }
   )
+
+  await waitFor(() => {
+    expect(screen.getByRole('textbox')).toHaveValue('test-search-box-value')
+  })
+
+  await waitFor(() => {
+    expect(screen.getByRole('textbox')).not.toHaveValue('WRONGVALUE!🪿')
+  })
 })
 
 test('useLogsPreview returns data from MSW', async () => {
