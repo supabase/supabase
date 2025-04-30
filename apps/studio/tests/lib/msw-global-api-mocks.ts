@@ -23,10 +23,4 @@ export const GlobalAPIMocks = [
       },
     ])
   }),
-
-  // MUST BE LAST HANDLER ON LIST
-  // http.all('*', ({ request }) => {
-  //   console.warn('🚫 [MSW] Unhandled request:', request.method, request.url)
-  //   return HttpResponse.json({ message: '🚫 MSW missed' }, { status: 500 })
-  // }),
 ]
