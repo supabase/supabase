@@ -1,3 +1,5 @@
+'use client'
+
 import type Usercentrics from '@usercentrics/cmp-browser-sdk'
 import type { BaseCategory, UserDecision } from '@usercentrics/cmp-browser-sdk'
 import { LOCAL_STORAGE_KEYS, handlePageTelemetry, isBrowser, useFeatureFlags } from 'common'
