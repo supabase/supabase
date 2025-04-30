@@ -764,6 +764,7 @@ export const updateTable = async ({
     queryClient.invalidateQueries(databaseKeys.foreignKeyConstraints(projectRef, table.schema)),
     queryClient.invalidateQueries(databaseKeys.tableDefinition(projectRef, table.id)),
     queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
+    queryClient.invalidateQueries(tableKeys.list(projectRef, table.schema, true)),
   ])
 
   // We need to invalidate tableRowsAndCount after tableEditor
