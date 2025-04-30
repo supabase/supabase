@@ -60,7 +60,6 @@ const SecuritySettings = () => {
 
   const { mutate: toggleMfa, isLoading: isUpdatingMfa } = useOrganizationMfaToggleMutation({
     onError: (error) => {
-      toast.error(`Failed to update MFA settings: ${error?.message}`)
       if (mfaConfig !== undefined) form.reset({ enforceMfa: mfaConfig })
     },
     onSuccess: (data) => {
@@ -159,7 +158,6 @@ const SecuritySettings = () => {
                               <Switch
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
-                                {...field}
                                 disabled={
                                   !isPaidPlan ||
                                   !canUpdateMfaConfig ||
@@ -203,7 +201,7 @@ const SecuritySettings = () => {
                         !isPaidPlan ||
                         !canUpdateMfaConfig ||
                         isUpdatingMfa ||
-                        isUpdatingMfa ||
+                        isLoadingMfa ||
                         !form.formState.isDirty
                       }
                       loading={isUpdatingMfa}
