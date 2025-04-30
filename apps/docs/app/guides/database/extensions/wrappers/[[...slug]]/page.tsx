@@ -198,6 +198,7 @@ const getContent = async (params: Params) => {
     editLink = `${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`
 
     const response = await fetch(`https://raw.githubusercontent.com/${repoPath}`, {
+      cache: 'force-cache',
       next: { tags: [REVALIDATION_TAGS.WRAPPERS] },
     })
     const rawContent = await response.text()

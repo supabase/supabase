@@ -5,7 +5,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "predev": "pnpm run codegen:references && pnpm run codegen:examples",
-    "dev": "concurrently --kill-others \"next dev --turbopack --port 3001\" \"pnpm run dev:watch:troubleshooting\"",
+    "dev": "concurrently --kill-others \"next dev --port 3001\" \"pnpm run dev:watch:troubleshooting\"",
     "dev:watch:troubleshooting": "node ./scripts/troubleshooting/watch.mjs",
     "dev:secrets:pull": "AWS_PROFILE=supabase-dev node ../../scripts/getSecrets.js -n local/docs",
     "prebuild": "pnpm run codegen:references && pnpm run codegen:examples",

@@ -138,7 +138,7 @@ const getContent = async ({ slug }: Params) => {
 
   const response = await fetch(
     `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${docsDir}/${remoteFile}`,
-    { next: { tags: [REVALIDATION_TAGS.GRAPHQL] } }
+    { cache: 'force-cache', next: { tags: [REVALIDATION_TAGS.GRAPHQL] } }
   )
 
   const content = await response.text()
