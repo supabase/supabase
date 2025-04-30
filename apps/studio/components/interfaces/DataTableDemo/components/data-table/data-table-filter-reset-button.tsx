@@ -30,12 +30,12 @@ export function DataTableFilterResetButton<TData>({ value: _value }: DataTableFi
           column?.setFilterValue(undefined)
         }
       }}
+      icon={<X className="h-2.5 w-2.5 text-muted-foreground" />}
       asChild
     >
       {/* REMINDER: `AccordionTrigger` is also a button(!) and we get Hydration error when rendering button within button */}
       <div role="button" tabIndex={0}>
         <span>{filters.length}</span>
-        <X className="ml-1 h-2.5 w-2.5 text-muted-foreground" />
       </div>
     </Button>
   )

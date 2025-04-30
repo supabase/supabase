@@ -28,6 +28,7 @@ import { format } from 'date-fns'
 import { Calendar as CalendarIcon } from 'lucide-react'
 import * as React from 'react'
 import type { DateRange } from 'react-day-picker'
+import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 
 interface DatePickerWithRangeProps extends React.HTMLAttributes<HTMLDivElement> {
   date: DateRange | undefined
@@ -68,8 +69,8 @@ export function DatePickerWithRange({
               'max-w-full justify-start truncate text-left font-normal hover:bg-muted/50',
               !date && 'text-muted-foreground'
             )}
+            icon={<CalendarIcon className="mr-2 h-4 w-4" />}
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
             {date?.from ? (
               date.to ? (
                 <span className="truncate">
@@ -83,7 +84,7 @@ export function DatePickerWithRange({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent className="w-auto p-0" align="start" portal={true}>
           <div className="flex flex-col justify-between sm:flex-row">
             <div className="hidden sm:block">
               <DatePresets onSelect={setDate} selected={date} presets={presets} />
@@ -91,7 +92,7 @@ export function DatePickerWithRange({
             <div className="block p-3 sm:hidden">
               <DatePresetsSelect onSelect={setDate} selected={date} presets={presets} />
             </div>
-            <Separator orientation="vertical" className="h-auto w-px" />
+            <PopoverSeparator className="h-auto w-px" />
             <Calendar
               initialFocus
               mode="range"
@@ -101,7 +102,7 @@ export function DatePickerWithRange({
               numberOfMonths={1}
             />
           </div>
-          <Separator />
+          <PopoverSeparator />
           <CustomDateRange onSelect={setDate} selected={date} />
         </PopoverContent>
       </Popover>
@@ -127,16 +128,16 @@ function DatePresets({
           return (
             <Button
               key={label}
-              variant={isActive ? 'outline' : 'ghost'}
+              type={isActive ? 'secondary' : 'default'}
               size="small"
               onClick={() => onSelect({ from, to })}
-              className={cn(
-                'flex items-center justify-between gap-6',
-                !isActive && 'border border-transparent'
-              )}
+              className="text-left"
+              // className={cn(!isActive && 'border border-transparent')}
             >
-              <span className="mr-auto">{label}</span>
-              <span className={cn(kbdVariants(), 'uppercase')}>{shortcut}</span>
+              <div className="flex items-center justify-between gap-6">
+                <span className="mr-auto">{label}</span>
+                <span className={cn(kbdVariants(), 'uppercase')}>{shortcut}</span>
+              </div>
             </Button>
           )
         })}
