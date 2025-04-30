@@ -3,6 +3,7 @@ import { useParams } from 'common'
 import { last } from 'lodash'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import type { UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 import Link from 'next/link'
@@ -50,7 +51,6 @@ const EnableBranchingModal = () => {
   const selectedOrg = useSelectedOrganization()
   const project = useSelectedProject()
 
-  // Keep track if the optional GitHub branch is valid
   const [isGitBranchValid, setIsGitBranchValid] = useState(false)
 
   const {
@@ -97,19 +97,28 @@ const EnableBranchingModal = () => {
   const FormSchema = z
     .object({
       productionBranchName: z.string().min(1, 'Production branch name cannot be empty'),
-      branchName: z.string().optional(), // Optional GitHub branch name
+      branchName: z.string().optional(),
     })
     .superRefine(async (val, ctx) => {
-      // Validate optional GitHub branch name only if provided and connection exists
-      if (val.branchName && val.branchName.length > 0 && githubConnection?.id) {
+      if (githubConnection && (!val.branchName || val.branchName.length === 0)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'GitHub branch is required when a repository is connected.',
+          path: ['branchName'],
+        })
+        setIsGitBranchValid(false)
+        return
+      }
+
+      if (githubConnection && val.branchName && val.branchName.length > 0) {
         try {
           await checkGithubBranchValidity({
             connectionId: githubConnection.id,
             branchName: val.branchName,
           })
-          setIsGitBranchValid(true) // Set validity state for UI feedback
+          setIsGitBranchValid(true)
         } catch (error) {
-          setIsGitBranchValid(false) // Set validity state for UI feedback
+          setIsGitBranchValid(false)
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: `Unable to find branch "${val.branchName}" in ${repoOwner}/${repoName}`,
@@ -117,14 +126,13 @@ const EnableBranchingModal = () => {
           })
         }
       } else {
-        // Reset validity state if field is empty or no connection
-        setIsGitBranchValid(!val.branchName || val.branchName.length === 0)
+        setIsGitBranchValid(true)
       }
     })
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
-    reValidateMode: 'onChange', // Keep reValidateMode to ensure async validation triggers
+    reValidateMode: 'onChange',
     resolver: zodResolver(FormSchema),
     defaultValues: { productionBranchName: 'main', branchName: '' },
   })
@@ -133,8 +141,7 @@ const EnableBranchingModal = () => {
   const isError = isErrorConnections
   const isSuccess = isSuccessConnections
 
-  // Form is valid if production branch name is set AND (either no git branch name is provided OR it's provided and valid)
-  const isFormValid = form.formState.isValid && (!form.getValues('branchName') || isGitBranchValid)
+  const isFormValid = form.formState.isValid
   const canSubmit = isFormValid && !isCreating && !isChecking
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
@@ -153,7 +160,6 @@ const EnableBranchingModal = () => {
     }
   }, [form, snap.showEnableBranchingModal])
 
-  // Reset git branch validity when connection changes or modal opens/closes
   useEffect(() => {
     setIsGitBranchValid(!form.getValues('branchName') || form.getValues('branchName')?.length === 0)
   }, [githubConnection?.id, form.getValues('branchName')])
@@ -215,7 +221,6 @@ const EnableBranchingModal = () => {
                     </DialogSection>
                   ) : (
                     <>
-                      {/* Production Branch Name Input */}
                       <DialogSectionSeparator />
                       <DialogSection padding="medium" className="space-y-4">
                         <FormField_Shadcn_
@@ -234,37 +239,38 @@ const EnableBranchingModal = () => {
                           )}
                         />
                         {githubConnection ? (
-                          <div className="space-y-4">
-                            <div>
-                              <p className="text-sm">GitHub Repository</p>
-                              <div className="flex items-center space-x-2">
-                                <Github size={14} />
-                                <p className="text-sm text-foreground-light">
-                                  Connected to{' '}
-                                  <Link
-                                    href={`https://github.com/${repoOwner}/${repoName}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="text-foreground hover:underline"
-                                  >
-                                    {repoOwner}/{repoName}
-                                  </Link>
-                                </p>
-                                <Link
-                                  href={`https://github.com/${repoOwner}/${repoName}`}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                >
-                                  <ExternalLink size={14} strokeWidth={1.5} />
-                                </Link>
-                              </div>
-                            </div>
+                          <>
                             <FormField_Shadcn_
                               control={form.control}
                               name="branchName"
                               render={({ field }) => (
                                 <FormItem_Shadcn_ className="relative">
-                                  <Label>Link GitHub Branch (Optional)</Label>
+                                  <div className="flex items-center justify-between mb-2">
+                                    <Label>
+                                      Link GitHub Branch{' '}
+                                      {githubConnection && (
+                                        <span className="text-destructive">*</span>
+                                      )}
+                                    </Label>
+                                    <div className="flex items-center gap-2 text-sm">
+                                      <Github size={14} />
+                                      <Link
+                                        href={`https://github.com/${repoOwner}/${repoName}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="text-foreground hover:underline"
+                                      >
+                                        {repoOwner}/{repoName}
+                                      </Link>
+                                      <Link
+                                        href={`https://github.com/${repoOwner}/${repoName}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                      >
+                                        <ExternalLink size={14} strokeWidth={1.5} />
+                                      </Link>
+                                    </div>
+                                  </div>
                                   <FormControl_Shadcn_>
                                     <Input_Shadcn_
                                       {...field}
@@ -282,27 +288,7 @@ const EnableBranchingModal = () => {
                                 </FormItem_Shadcn_>
                               )}
                             />
-
-                            {/* Display Migration Info if GitHub is connected */}
-                            <div className="flex flex-row gap-4">
-                              <div>
-                                <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
-                                  <FileText className="text-info" size={20} strokeWidth={2} />
-                                </figure>
-                              </div>
-                              <div className="flex flex-col gap-y-1">
-                                <p className="text-sm text-foreground">
-                                  Migrations are applied from your GitHub repository
-                                </p>
-                                <p className="text-sm text-foreground-light">
-                                  Migration files in your{' '}
-                                  <code className="text-xs">./supabase</code> directory will run on
-                                  both Preview Branches and Production when pushing and merging
-                                  branches.
-                                </p>
-                              </div>
-                            </div>
-                          </div>
+                          </>
                         ) : (
                           <div className="flex items-center gap-2 justify-between">
                             <div>
@@ -322,10 +308,29 @@ const EnableBranchingModal = () => {
                   )}
                   <DialogSectionSeparator />
 
-                  {/* Billing and Migration Info */}
                   <DialogSection padding="medium" className="flex flex-col gap-4">
                     <h3 className="text-sm text-foreground">Please keep in mind the following:</h3>
-                    {/* Dollar Sign Section */}
+
+                    {githubConnection && (
+                      <div className="flex flex-row gap-4">
+                        <div>
+                          <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
+                            <FileText className="text-info" size={20} strokeWidth={2} />
+                          </figure>
+                        </div>
+                        <div className="flex flex-col gap-y-1">
+                          <p className="text-sm text-foreground">
+                            Migrations are applied from your GitHub repository
+                          </p>
+                          <p className="text-sm text-foreground-light">
+                            Migration files in your <code className="text-xs">./supabase</code>{' '}
+                            directory will run on both Preview Branches and Production when pushing
+                            and merging branches.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="flex flex-row gap-4">
                       <div>
                         <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
@@ -341,7 +346,6 @@ const EnableBranchingModal = () => {
                         </p>
                       </div>
                     </div>
-                    {/* PITR Notice - Only show if not already enabled */}
                     {!hasPitrEnabled && <BranchingPITRNotice />}
                   </DialogSection>
                   <DialogSectionSeparator />
@@ -374,10 +378,7 @@ const EnableBranchingModal = () => {
         </DialogContent>
       </Dialog>
 
-      <SidePanelGitHubRepoLinker
-        projectRef={ref}
-        // Optional: Add onSuccess/onCancel callbacks if needed after linking
-      />
+      <SidePanelGitHubRepoLinker projectRef={ref} />
     </>
   )
 }
