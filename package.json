@@ -14,6 +14,8 @@
     "clean": "turbo run clean --parallel && rimraf -G node_modules/{*,.bin,.modules.yaml}",
     "dev": "turbo run dev --parallel",
     "dev:cms": "turbo run dev --filter=cms --parallel",
+    "dev:cms:payload": "turbo run dev --filter=cms-payload --parallel",
+    "build:cms:payload": "turbo run build --filter=cms-payload --parallel",
     "dev:reference": "turbo run dev --filter=reference --parallel",
     "dev:studio": "turbo run dev --filter=studio --parallel",
     "dev:studio-local": "pnpm run --dir tests/studio-tests codegen:setup",
