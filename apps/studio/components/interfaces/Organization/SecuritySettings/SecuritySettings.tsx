@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import Link from 'next/link'
+import { useEffect } from 'react'
 
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
@@ -73,6 +74,12 @@ const SecuritySettings = () => {
       enforceMfa: false,
     },
   })
+
+  useEffect(() => {
+    if (mfaConfig !== undefined) {
+      form.reset({ enforceMfa: mfaConfig })
+    }
+  }, [mfaConfig, form.reset])
 
   const hasMFAEnabled =
     members?.find((member) => member.primary_email == profile?.primary_email)?.mfa_enabled || false
@@ -152,6 +159,7 @@ const SecuritySettings = () => {
                               <Switch
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
+                                {...field}
                                 disabled={
                                   !isPaidPlan ||
                                   !canUpdateMfaConfig ||
