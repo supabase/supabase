@@ -8,19 +8,9 @@ description: 'Block queries over a total cost limit'
 
 ## Enable the extension
 
-`pg_plan_filter` can be enabled on a per connection basis:
+The extension is already enabled by default via `shared_preload_libraries` setting. 
 
-{/* prettier-ignore */}
-```sql
-load 'plan_filter';
-```
-
-or for all connections:
-
-{/* prettier-ignore */}
-```sql
-alter database some_db set session_preload_libraries = 'plan_filter';
-```
+You can simply follow the instructions below.
 
 ## API
 
