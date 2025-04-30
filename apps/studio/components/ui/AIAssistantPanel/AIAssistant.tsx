@@ -343,7 +343,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                     : aiOptInLevel === 'disabled'
                       ? 'The Assistant can provide better answers if you opt-in to share schema metadata.'
                       : aiOptInLevel === 'schema'
-                        ? 'Sharing sample query data in addition to schema can further improve responses. Update AI settings to enable this.'
+                        ? 'Sharing query data in addition to schema can further improve responses. Update AI settings to enable this.'
                         : ''
                 }
                 className="border-0 border-b rounded-none bg-background"

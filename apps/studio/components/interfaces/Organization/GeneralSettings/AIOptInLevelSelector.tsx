@@ -20,10 +20,9 @@ export const AIOptInLevelSelector = ({
 }: AIOptInLevelSelectorProps) => {
   const content = (
     <div className="space-y-4">
-      {/* Wrap RadioGroupCard with FormField_Shadcn_ providing name and render */}
       <FormField_Shadcn_
-        control={control}
-        name="aiOptInLevel" // Ensure this name matches the form schema
+        control={control as any}
+        name="aiOptInLevel"
         render={({ field }) => (
           <RadioGroupCard
             value={field.value}
@@ -36,7 +35,7 @@ export const AIOptInLevelSelector = ({
               key="disabled"
               value="disabled"
               label={
-                <span className="flex flex-col gap-2">
+                <span className="flex flex-col gap-1">
                   <span className="text-foreground">Disabled</span>
                   <span className="text-foreground-light text-xs">
                     No data is sent to OpenAI, responses will be generic.
@@ -49,7 +48,7 @@ export const AIOptInLevelSelector = ({
               key="schema"
               value="schema"
               label={
-                <span className="flex flex-col gap-2">
+                <span className="flex flex-col gap-1">
                   <span className="text-foreground">Schema Only</span>
                   <span className="text-foreground-light text-xs">
                     Send only your database schema to OpenAI for better responses.
@@ -62,8 +61,8 @@ export const AIOptInLevelSelector = ({
               key="schema_and_data"
               value="schema_and_data"
               label={
-                <span className="flex flex-col gap-2">
-                  <span className="text-foreground">Schema & Sample Data</span>
+                <span className="flex flex-col gap-1">
+                  <span className="text-foreground">Schema & Data</span>
                   <span className="text-foreground-light text-xs">
                     Send schema and SQL query data for the best AI responses.
                   </span>
@@ -81,14 +80,11 @@ export const AIOptInLevelSelector = ({
     <FormItemLayout
       label={label}
       description={
-        <>
-          <p className="mb-4">
-            By opting into sending anonymous data, Supabase AI can improve the answers it shows you.
-            This is an organization-wide setting. Select the level of data you are comfortable
-            sharing.
-          </p>
-          <OptInToOpenAIToggle />
-        </>
+        <p className="my-4">
+          By opting into sending anonymous data, Supabase AI can improve the answers it shows you.
+          This is an organization-wide setting. Select the level of data you are comfortable
+          sharing. <OptInToOpenAIToggle />.
+        </p>
       }
       layout={layout}
     >

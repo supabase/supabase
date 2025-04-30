@@ -68,19 +68,28 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       })
 
       let availableMcpTools = await mcpClient.tools()
+      const disallowedTools = ['execute_sql', 'apply_migration', 'get_logs']
+      const privacyMessage =
+        'Fetching data requires a higher privacy level. Please enable this in your org settings'
 
-      // Filter tools based on opt-in level
       if (aiOptInLevel === 'schema') {
-        // Filter out tools that return or modify data for 'schema' level
-        // TODO: We probably want an allowed list of tools instead of a disallowed list
-        const disallowedTools = ['execute_sql', 'apply_migration', 'get_logs']
         mcpTools = Object.fromEntries(
-          Object.entries(availableMcpTools).filter(([key]) => !disallowedTools.includes(key))
+          Object.entries(availableMcpTools).map(([key, toolInstance]) => {
+            if (disallowedTools.includes(key)) {
+              return [
+                key,
+                {
+                  ...toolInstance,
+                  execute: async (_args: any, _context: any) => ({ status: privacyMessage }),
+                },
+              ]
+            }
+            return [key, toolInstance]
+          })
         )
       } else if (aiOptInLevel === 'schema_and_data') {
-        mcpTools = availableMcpTools // Include all tools
+        mcpTools = availableMcpTools
 
-        // Wrap execute_sql only when data sharing is allowed
         const originalExecuteSqlTool = mcpTools.execute_sql as Tool<any, any> | undefined
 
         if (originalExecuteSqlTool) {
@@ -115,7 +124,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         }
       }
 
-      // Fetch schemas if schema or schema_and_data level
       const { result: fetchedSchemas } = await executeSql(
         {
           projectRef,
@@ -181,7 +189,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     })
 
     const allTools = {
-      ...mcpTools, // mcpTools is already filtered based on aiOptInLevel
+      ...mcpTools,
       ...(wrappedExecuteSqlTool && { execute_sql: wrappedExecuteSqlTool }),
       displayQuery,
       displayEdgeFunction,

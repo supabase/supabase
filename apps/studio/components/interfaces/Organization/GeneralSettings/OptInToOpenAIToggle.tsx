@@ -17,7 +17,12 @@ export default function OptInToOpenAIToggle({ className }: OptInToOpenAITogglePr
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="outline">Learn more about data privacy</Button>
+        <Button
+          type="text"
+          className="text-brand border-b p-0 hover:bg-transparent hover:text-foreground text-sm"
+        >
+          Learn more about data privacy
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader padding="small" className="border-b">
