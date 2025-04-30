@@ -21,13 +21,15 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 })
 
-configure({
-  getElementError: (message, container) => {
-    const error = new Error(message ?? 'Element not found')
-    error.name = 'ElementNotFoundError'
-    return error
-  },
-})
+// Uncomment this if HTML in errors are being annoying.
+//
+// configure({
+//   getElementError: (message, container) => {
+//     const error = new Error(message ?? 'Element not found')
+//     error.name = 'ElementNotFoundError'
+//     return error
+//   },
+// })
 
 beforeAll(() => {
   vi.mock('next/router', () => require('next-router-mock'))
