@@ -1,7 +1,7 @@
 import { getQueryClient } from 'components/interfaces/DataTableDemo/providers/get-query-client'
 // import { SearchParams } from 'nuqs' // No longer needed directly
 import * as React from 'react'
-import { Client } from 'components/interfaces/unified-logs/client'
+import { Client } from 'components/interfaces/infinite-logs-example/client'
 import { dataOptions } from 'components/interfaces/DataTableDemo/light/query-options'
 import { searchParamsParser } from 'components/interfaces/DataTableDemo/light/search-params' // Import the parser
 // import { useSearchParams } from 'next/navigation' // Switch to useQueryStates

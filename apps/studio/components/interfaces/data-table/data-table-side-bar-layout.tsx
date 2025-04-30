@@ -1,4 +1,3 @@
-import { Header } from '@tanstack/react-table'
 import { useDataTable } from 'components/interfaces/DataTableDemo/components/data-table/data-table-provider'
 import * as React from 'react'
 import { cn } from 'ui'

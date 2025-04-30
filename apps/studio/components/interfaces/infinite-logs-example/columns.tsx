@@ -18,7 +18,7 @@ import { HoverCardPortal } from '@radix-ui/react-hover-card'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Minus } from 'lucide-react'
 import { HoverCardTimestamp } from 'components/interfaces/DataTableDemo/infinite/_components/hover-card-timestamp'
-import type { ColumnSchema } from 'components/interfaces/unified-logs/schema'
+import type { ColumnSchema } from 'components/interfaces/infinite-logs-example/schema'
 
 export const columns: ColumnDef<ColumnSchema>[] = [
   {

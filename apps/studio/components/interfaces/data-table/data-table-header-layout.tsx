@@ -1,4 +1,4 @@
-import { forwardRef, PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { forwardRef, PropsWithChildren, useEffect, useRef } from 'react'
 import { cn } from 'ui'
 
 export const DataTableHeaderLayout = forwardRef<

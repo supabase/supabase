@@ -1,19 +1,7 @@
 'use client'
 
-import {
-  FetchPreviousPageOptions,
-  RefetchOptions,
-  type FetchNextPageOptions,
-} from '@tanstack/react-query'
-import type {
-  ColumnDef,
-  ColumnFiltersState,
-  Row,
-  RowSelectionState,
-  SortingState,
-  Table as TTable,
-  VisibilityState,
-} from '@tanstack/react-table'
+import { type FetchNextPageOptions } from '@tanstack/react-query'
+import type { ColumnDef, Row, Table as TTable, VisibilityState } from '@tanstack/react-table'
 import { flexRender } from '@tanstack/react-table'
 import {
   Table,
@@ -23,20 +11,11 @@ import {
   TableHeader,
   TableRow,
 } from 'components/interfaces/DataTableDemo/components/custom/table'
-import { DataTableFilterCommand } from 'components/interfaces/DataTableDemo/components/data-table/data-table-filter-command'
-import { DataTableFilterControls } from 'components/interfaces/DataTableDemo/components/data-table/data-table-filter-controls'
-import { DataTableResetButton } from 'components/interfaces/DataTableDemo/components/data-table/data-table-reset-button'
-import { DataTableToolbar } from 'components/interfaces/DataTableDemo/components/data-table/data-table-toolbar' // TODO: check where to put this
-import type { DataTableFilterField } from 'components/interfaces/DataTableDemo/components/data-table/types'
 import { useHotKey } from 'components/interfaces/DataTableDemo/hooks/use-hot-key'
-import { LiveButton } from 'components/interfaces/DataTableDemo/infinite/_components/live-button'
-import { RefreshButton } from 'components/interfaces/DataTableDemo/infinite/_components/refresh-button'
-import { SocialsFooter } from 'components/interfaces/DataTableDemo/infinite/_components/socials-footer'
-import { BaseChartSchema } from 'components/interfaces/DataTableDemo/infinite/schema'
 import { searchParamsParser } from 'components/interfaces/DataTableDemo/infinite/search-params'
 import { formatCompactNumber } from 'components/interfaces/DataTableDemo/lib/format'
 import { LoaderCircle } from 'lucide-react'
-import { useQueryState, useQueryStates } from 'nuqs'
+import { useQueryState } from 'nuqs'
 import * as React from 'react'
 import { Button, cn } from 'ui'
 
@@ -44,56 +23,37 @@ import { Button, cn } from 'ui'
 export interface DataTableInfiniteProps<TData, TValue, TMeta> {
   table: TTable<TData>
   columns: ColumnDef<TData, TValue>[]
-  data: TData[]
   defaultColumnVisibility?: VisibilityState
-  filterFields?: DataTableFilterField<TData>[]
   totalRows?: number
   filterRows?: number
   totalRowsFetched?: number
-
   isFetching?: boolean
   isLoading?: boolean
   hasNextPage?: boolean
   fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<unknown>
-  fetchPreviousPage?: (options?: FetchPreviousPageOptions | undefined) => Promise<unknown>
-  refetch: (options?: RefetchOptions | undefined) => void
   renderLiveRow?: (props?: { row: Row<TData> }) => React.ReactNode
-  columnFilters: ColumnFiltersState
-  sorting: SortingState
   setColumnOrder: (columnOrder: string[]) => void
   setColumnVisibility: (columnVisibility: VisibilityState) => void
-  setRowSelection: (rowSelection: RowSelectionState) => void
-  rowSelection: RowSelectionState
 }
 
 export function DataTableInfinite<TData, TValue, TMeta>({
   table,
   columns,
-  data,
   defaultColumnVisibility = {},
-  filterFields = [],
   isFetching,
   isLoading,
   fetchNextPage,
   hasNextPage,
-  fetchPreviousPage,
-  refetch,
   totalRows = 0,
   filterRows = 0,
   totalRowsFetched = 0,
   renderLiveRow,
-  columnFilters,
-  sorting,
   setColumnOrder,
   setColumnVisibility,
-  setRowSelection,
-  rowSelection,
 }: DataTableInfiniteProps<TData, TValue, TMeta>) {
-  const topBarRef = React.useRef<HTMLDivElement>(null)
   const tableRef = React.useRef<HTMLTableElement>(null)
   // const [topBarHeight, setTopBarHeight] = React.useState(0)
   // FIXME: searchParamsParser needs to be passed as property
-  const [_, setSearch] = useQueryStates(searchParamsParser)
 
   const onScroll = React.useCallback(
     (e: React.UIEvent<HTMLElement>) => {
@@ -107,63 +67,6 @@ export function DataTableInfinite<TData, TValue, TMeta>({
     },
     [fetchNextPage, isFetching, filterRows, totalRowsFetched]
   )
-
-  // React.useEffect(() => {
-  //   const observer = new ResizeObserver(() => {
-  //     const rect = topBarRef.current?.getBoundingClientRect()
-  //     if (rect) {
-  //       setTopBarHeight(rect.height)
-  //     }
-  //   })
-
-  //   const topBar = topBarRef.current
-  //   if (!topBar) return
-
-  //   observer.observe(topBar)
-  //   return () => observer.unobserve(topBar)
-  // }, [topBarRef])
-
-  React.useEffect(() => {
-    const columnFiltersWithNullable = filterFields.map((field) => {
-      const filterValue = columnFilters.find((filter) => filter.id === field.value)
-      if (!filterValue) return { id: field.value, value: null }
-      return { id: field.value, value: filterValue.value }
-    })
-
-    const search = columnFiltersWithNullable.reduce(
-      (prev, curr) => {
-        prev[curr.id as string] = curr.value
-        return prev
-      },
-      {} as Record<string, unknown>
-    )
-
-    setSearch(search)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [columnFilters])
-
-  React.useEffect(() => {
-    setSearch({ sort: sorting?.[0] || null })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sorting])
-
-  const selectedRow = React.useMemo(() => {
-    if ((isLoading || isFetching) && !data.length) return
-    const selectedRowKey = Object.keys(rowSelection)?.[0]
-    return table.getCoreRowModel().flatRows.find((row) => row.id === selectedRowKey)
-  }, [rowSelection, table, isLoading, isFetching, data])
-
-  // TODO: can only share uuid within the first batch
-  React.useEffect(() => {
-    if (isLoading || isFetching) return
-    if (Object.keys(rowSelection)?.length && !selectedRow) {
-      setSearch({ uuid: null })
-      setRowSelection({})
-    } else {
-      setSearch({ uuid: Object.keys(rowSelection)?.[0] || null })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rowSelection, selectedRow, isLoading, isFetching])
 
   useHotKey(() => {
     setColumnOrder([])

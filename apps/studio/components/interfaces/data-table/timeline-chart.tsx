@@ -7,26 +7,27 @@ import { useMemo, useState } from 'react'
 import { format } from 'date-fns'
 import { cn } from 'ui'
 import type { CategoricalChartFunc } from 'recharts/types/chart/generateCategoricalChart'
-import { getLevelLabel } from 'components/interfaces/DataTableDemo/lib/request/level'
+// import { getLevelLabel } from 'components/interfaces/DataTableDemo/lib/request/level'
 import { useDataTable } from 'components/interfaces/DataTableDemo/components/data-table/data-table-provider'
-import { BaseChartSchema, TimelineChartSchema } from './schema'
+// import { TimelineChartSchema } from './schema'
 
+export type BaseChartSchema = { timestamp: number; [key: string]: number }
 export const description = 'A stacked bar chart'
 
-const chartConfig = {
-  success: {
-    label: <TooltipLabel level="success" />,
-    color: 'hsl(var(--foreground-muted))',
-  },
-  warning: {
-    label: <TooltipLabel level="warning" />,
-    color: 'hsl(var(--warning-default))',
-  },
-  error: {
-    label: <TooltipLabel level="error" />,
-    color: 'hsl(var(--destructive-default))',
-  },
-} satisfies ChartConfig
+// const chartConfig = {
+//   success: {
+//     label: <TooltipLabel level="success" />,
+//     color: 'hsl(var(--foreground-muted))',
+//   },
+//   warning: {
+//     label: <TooltipLabel level="warning" />,
+//     color: 'hsl(var(--warning-default))',
+//   },
+//   error: {
+//     label: <TooltipLabel level="error" />,
+//     color: 'hsl(var(--destructive-default))',
+//   },
+// } satisfies ChartConfig
 
 interface TimelineChartProps<TChart extends BaseChartSchema> {
   className?: string
@@ -39,12 +40,14 @@ interface TimelineChartProps<TChart extends BaseChartSchema> {
    * Same data as of the InfiniteQueryMeta.
    */
   data: TChart[]
+  chartConfig: ChartConfig
 }
 
 export function TimelineChart<TChart extends BaseChartSchema>({
   data,
   className,
   columnId,
+  chartConfig,
 }: TimelineChartProps<TChart>) {
   const { table } = useDataTable()
   const [refAreaLeft, setRefAreaLeft] = useState<string | null>(null)
@@ -183,11 +186,11 @@ function calculatePeriod(interval: number): '10m' | '1d' | '1w' | '1mo' {
 }
 
 // TODO: use a `formatTooltipLabel` function instead for composability
-function TooltipLabel({ level }: { level: keyof Omit<TimelineChartSchema, 'timestamp'> }) {
-  return (
-    <div className="mr-2 flex w-20 items-center justify-between gap-2 font-mono">
-      <div className="capitalize text-foreground/70">{level}</div>
-      <div className="text-xs text-muted-foreground/70">{getLevelLabel(level)}</div>
-    </div>
-  )
-}
+// function TooltipLabel({ level }: { level: keyof Omit<TimelineChartSchema, 'timestamp'> }) {
+//   return (
+//     <div className="mr-2 flex w-20 items-center justify-between gap-2 font-mono">
+//       <div className="capitalize text-foreground/70">{level}</div>
+//       <div className="text-xs text-muted-foreground/70">{getLevelLabel(level)}</div>
+//     </div>
+//   )
+// }

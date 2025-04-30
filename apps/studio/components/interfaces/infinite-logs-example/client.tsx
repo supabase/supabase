@@ -16,38 +16,68 @@ import {
   VisibilityState,
   type Table as TTable,
 } from '@tanstack/react-table'
+import { DataTableInfinite } from 'components/interfaces/data-table/data-table-infinite'
+import { TimelineChart } from 'components/interfaces/data-table/timeline-chart'
 import { useHotKey } from 'components/interfaces/DataTableDemo/hooks/use-hot-key'
 import { LiveRow } from 'components/interfaces/DataTableDemo/infinite/_components/live-row'
 import {
   filterFields as defaultFilterFields,
   sheetFields,
 } from 'components/interfaces/DataTableDemo/infinite/constants'
-import { DataTableInfinite } from 'components/interfaces/unified-logs/global/data-table-infinite'
 import { dataOptions } from 'components/interfaces/DataTableDemo/infinite/query-options'
-import type { FacetMetadataSchema } from 'components/interfaces/DataTableDemo/infinite/schema'
+import type {
+  FacetMetadataSchema,
+  TimelineChartSchema,
+} from 'components/interfaces/infinite-logs-example/schema'
 import { searchParamsParser } from 'components/interfaces/DataTableDemo/infinite/search-params'
-import { getLevelRowClassName } from 'components/interfaces/DataTableDemo/lib/request/level'
+import {
+  getLevelLabel,
+  getLevelRowClassName,
+} from 'components/interfaces/DataTableDemo/lib/request/level'
 import { arrSome, inDateRange } from 'components/interfaces/DataTableDemo/lib/table/filterfns'
-import { columns } from 'components/interfaces/unified-logs/columns'
+import { columns } from 'components/interfaces/infinite-logs-example/columns'
 import { useQueryState, useQueryStates } from 'nuqs'
 import * as React from 'react'
-import { cn } from 'ui'
-import { DataTableProvider } from '../DataTableDemo/components/data-table/data-table-provider'
-import { MemoizedDataTableSheetContent } from '../DataTableDemo/components/data-table/data-table-sheet/data-table-sheet-content'
-import { DataTableSheetDetails } from '../DataTableDemo/components/data-table/data-table-sheet/data-table-sheet-details'
-import { useLocalStorage } from '../DataTableDemo/hooks/use-local-storage'
-import { Percentile } from '../DataTableDemo/lib/request/percentile'
-import { TimelineChart } from 'components/interfaces/unified-logs/global/timeline-chart'
-import { DataTableSideBarLayout } from './global/data-table-side-bar-layout'
-import { FilterSideBar } from './global/filter-side-bar'
-import { DataTableHeaderLayout } from './global/data-table-header-layout'
-import { RefreshButton } from '../DataTableDemo/infinite/_components/refresh-button'
-import { DataTableToolbar } from '../DataTableDemo/components/data-table/data-table-toolbar'
-import { DataTableFilterCommand } from '../DataTableDemo/components/data-table/data-table-filter-command'
-import { LiveButton } from '../DataTableDemo/infinite/_components/live-button'
+import { ChartConfig, cn } from 'ui'
+import { DataTableHeaderLayout } from '../data-table/data-table-header-layout'
+import { DataTableSideBarLayout } from '../data-table/data-table-side-bar-layout'
+import { FilterSideBar } from '../data-table/filter-side-bar'
+import { DataTableFilterCommand } from 'components/interfaces/DataTableDemo/components/data-table/data-table-filter-command'
+import { DataTableProvider } from 'components/interfaces/DataTableDemo/components/data-table/data-table-provider'
+import { MemoizedDataTableSheetContent } from 'components/interfaces/infinite-logs-example/data-table-sheet-content'
+import { DataTableSheetDetails } from 'components/interfaces/DataTableDemo/components/data-table/data-table-sheet/data-table-sheet-details'
+import { DataTableToolbar } from 'components/interfaces/DataTableDemo/components/data-table/data-table-toolbar'
+import { useLocalStorage } from 'components/interfaces/DataTableDemo/hooks/use-local-storage'
+import { LiveButton } from 'components/interfaces/DataTableDemo/infinite/_components/live-button'
+import { RefreshButton } from 'components/interfaces/DataTableDemo/infinite/_components/refresh-button'
+import { Percentile } from 'components/interfaces/DataTableDemo/lib/request/percentile'
 
+function TooltipLabel({ level }: { level: keyof Omit<TimelineChartSchema, 'timestamp'> }) {
+  return (
+    <div className="mr-2 flex w-20 items-center justify-between gap-2 font-mono">
+      <div className="capitalize text-foreground/70">{level}</div>
+      <div className="text-xs text-muted-foreground/70">{getLevelLabel(level)}</div>
+    </div>
+  )
+}
+
+const chartConfig = {
+  success: {
+    label: <TooltipLabel level="success" />,
+    color: 'hsl(var(--foreground-muted))',
+  },
+  warning: {
+    label: <TooltipLabel level="warning" />,
+    color: 'hsl(var(--warning-default))',
+  },
+  error: {
+    label: <TooltipLabel level="error" />,
+    color: 'hsl(var(--destructive-default))',
+  },
+} satisfies ChartConfig
 export function Client() {
-  const [search] = useQueryStates(searchParamsParser)
+  const [search, setSearch] = useQueryStates(searchParamsParser)
+
   const { data, isFetching, isLoading, fetchNextPage, hasNextPage, fetchPreviousPage, refetch } =
     useInfiniteQuery(dataOptions(search))
   useResetFocus()
@@ -176,6 +206,42 @@ export function Client() {
     return table.getCoreRowModel().flatRows.find((row) => row.id === selectedRowKey)
   }, [rowSelection, table, isLoading, isFetching, flatData])
 
+  React.useEffect(() => {
+    const columnFiltersWithNullable = filterFields.map((field) => {
+      const filterValue = columnFilters.find((filter) => filter.id === field.value)
+      if (!filterValue) return { id: field.value, value: null }
+      return { id: field.value, value: filterValue.value }
+    })
+
+    const search = columnFiltersWithNullable.reduce(
+      (prev, curr) => {
+        prev[curr.id as string] = curr.value
+        return prev
+      },
+      {} as Record<string, unknown>
+    )
+
+    setSearch(search)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [columnFilters])
+
+  React.useEffect(() => {
+    setSearch({ sort: sorting?.[0] || null })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sorting])
+
+  // TODO: can only share uuid within the first batch
+  React.useEffect(() => {
+    if (isLoading || isFetching) return
+    if (Object.keys(rowSelection)?.length && !selectedRow) {
+      setSearch({ uuid: null })
+      setRowSelection({})
+    } else {
+      setSearch({ uuid: Object.keys(rowSelection)?.[0] || null })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rowSelection, selectedRow, isLoading, isFetching])
+
   return (
     <>
       <DataTableProvider
@@ -212,33 +278,30 @@ export function Client() {
                   ) : null,
                 ]}
               />
-              <TimelineChart data={chartData ?? []} className="-mb-2" columnId={'date'} />
+              <TimelineChart
+                data={chartData ?? []}
+                className="-mb-2"
+                columnId={'date'}
+                chartConfig={chartConfig}
+              />
             </DataTableHeaderLayout>
             <DataTableInfinite
               table={table}
               columns={columns}
-              data={flatData}
               totalRows={totalDBRowCount}
               filterRows={filterDBRowCount}
               totalRowsFetched={totalFetched}
-              filterFields={filterFields}
               isFetching={isFetching}
               isLoading={isLoading}
               fetchNextPage={fetchNextPage}
               hasNextPage={hasNextPage}
-              fetchPreviousPage={fetchPreviousPage}
-              refetch={refetch}
               renderLiveRow={(props) => {
                 if (!liveMode.timestamp) return null
                 if (props?.row.original.uuid !== liveMode?.row?.uuid) return null
                 return <LiveRow />
               }}
-              columnFilters={columnFilters}
-              sorting={sorting}
               setColumnOrder={setColumnOrder}
               setColumnVisibility={setColumnVisibility}
-              setRowSelection={setRowSelection}
-              rowSelection={rowSelection}
             />
           </div>
           <DataTableSheetDetails title={selectedRow?.original?.pathname} titleClassName="font-mono">
