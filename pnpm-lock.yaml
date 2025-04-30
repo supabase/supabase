@@ -747,7 +747,7 @@ importers:
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       nuqs:
         specifier: ^2.4.1
-        version: 2.4.1(next@15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react-router@7.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 2.4.1(next@15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       openai:
         specifier: ^4.20.1
         version: 4.71.1(encoding@0.1.13)(zod@3.23.8)
@@ -1057,7 +1057,7 @@ importers:
         version: 1.1.8(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@react-router/fs-routes':
         specifier: ^7.4.0
-        version: 7.4.0(@react-router/dev@7.4.0(@types/node@22.13.14)(jiti@2.4.2)(react-router@7.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(sass@1.72.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.2.6(@types/node@22.13.14)(jiti@2.4.2)(sass@1.72.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(yaml@2.4.5))(typescript@5.5.2)
+        version: 7.4.0(@react-router/dev@7.4.0(@types/node@22.13.14)(jiti@2.4.2)(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(sass@1.72.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.2.6(@types/node@22.13.14)(jiti@2.4.2)(sass@1.72.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(yaml@2.4.5))(typescript@5.5.2)
       '@supabase/postgrest-js':
         specifier: '*'
         version: 1.19.2
@@ -1148,7 +1148,7 @@ importers:
     devDependencies:
       '@react-router/dev':
         specifier: ^7.1.5
-        version: 7.4.0(@types/node@22.13.14)(jiti@2.4.2)(react-router@7.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(sass@1.72.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.2.6(@types/node@22.13.14)(jiti@2.4.2)(sass@1.72.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(yaml@2.4.5)
+        version: 7.4.0(@types/node@22.13.14)(jiti@2.4.2)(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(sass@1.72.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.2.6(@types/node@22.13.14)(jiti@2.4.2)(sass@1.72.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(yaml@2.4.5)
       '@shikijs/compat':
         specifier: ^1.1.7
         version: 1.6.0
@@ -1192,8 +1192,8 @@ importers:
         specifier: ^14.3.8
         version: 14.3.8(react@18.3.1)
       react-router:
-        specifier: ^7.4.0
-        version: 7.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^7.5.2
+        version: 7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       rimraf:
         specifier: ^4.1.3
         version: 4.4.1
@@ -12518,8 +12518,8 @@ packages:
     peerDependencies:
       react: '>= 16.3'
 
-  react-router@7.4.0:
-    resolution: {integrity: sha512-Y2g5ObjkvX3VFeVt+0CIPuYd9PpgqCslG7ASSIdN73LwA1nNWzcMLaoMRJfP3prZFI92svxFwbn7XkLJ+UPQ6A==}
+  react-router@7.5.3:
+    resolution: {integrity: sha512-3iUDM4/fZCQ89SXlDa+Ph3MevBrozBAI655OAfWQlTm9nBR0IKlrmNwFow5lPHttbwvITZfkeeeZFP6zt3F7pw==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       react: '>=18'
@@ -18651,7 +18651,7 @@ snapshots:
     dependencies:
       react: 18.3.1
 
-  '@react-router/dev@7.4.0(@types/node@22.13.14)(jiti@2.4.2)(react-router@7.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(sass@1.72.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.2.6(@types/node@22.13.14)(jiti@2.4.2)(sass@1.72.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(yaml@2.4.5)':
+  '@react-router/dev@7.4.0(@types/node@22.13.14)(jiti@2.4.2)(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(sass@1.72.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.2.6(@types/node@22.13.14)(jiti@2.4.2)(sass@1.72.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(yaml@2.4.5)':
     dependencies:
       '@babel/core': 7.26.10(supports-color@8.1.1)
       '@babel/generator': 7.27.0
@@ -18662,7 +18662,7 @@ snapshots:
       '@babel/traverse': 7.27.0(supports-color@8.1.1)
       '@babel/types': 7.27.0
       '@npmcli/package-json': 4.0.1
-      '@react-router/node': 7.4.0(react-router@7.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.5.2)
+      '@react-router/node': 7.4.0(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.5.2)
       arg: 5.0.2
       babel-dead-code-elimination: 1.0.9(supports-color@8.1.1)
       chokidar: 4.0.3
@@ -18676,7 +18676,7 @@ snapshots:
       picocolors: 1.1.1
       prettier: 2.8.8
       react-refresh: 0.14.2
-      react-router: 7.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-router: 7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       semver: 7.7.1
       set-cookie-parser: 2.7.1
       valibot: 0.41.0(typescript@5.5.2)
@@ -18700,17 +18700,17 @@ snapshots:
       - tsx
       - yaml
 
-  '@react-router/fs-routes@7.4.0(@react-router/dev@7.4.0(@types/node@22.13.14)(jiti@2.4.2)(react-router@7.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(sass@1.72.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.2.6(@types/node@22.13.14)(jiti@2.4.2)(sass@1.72.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(yaml@2.4.5))(typescript@5.5.2)':
+  '@react-router/fs-routes@7.4.0(@react-router/dev@7.4.0(@types/node@22.13.14)(jiti@2.4.2)(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(sass@1.72.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.2.6(@types/node@22.13.14)(jiti@2.4.2)(sass@1.72.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(yaml@2.4.5))(typescript@5.5.2)':
     dependencies:
-      '@react-router/dev': 7.4.0(@types/node@22.13.14)(jiti@2.4.2)(react-router@7.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(sass@1.72.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.2.6(@types/node@22.13.14)(jiti@2.4.2)(sass@1.72.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(yaml@2.4.5)
+      '@react-router/dev': 7.4.0(@types/node@22.13.14)(jiti@2.4.2)(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(sass@1.72.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.2.6(@types/node@22.13.14)(jiti@2.4.2)(sass@1.72.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(yaml@2.4.5)
       minimatch: 9.0.5
     optionalDependencies:
       typescript: 5.5.2
 
-  '@react-router/node@7.4.0(react-router@7.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.5.2)':
+  '@react-router/node@7.4.0(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.5.2)':
     dependencies:
       '@mjackson/node-fetch-server': 0.2.0
-      react-router: 7.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-router: 7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       source-map-support: 0.5.21
       stream-slice: 0.1.2
       undici: 6.21.2
@@ -26945,13 +26945,13 @@ snapshots:
       mitt: 3.0.1
       next: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
 
-  nuqs@2.4.1(next@15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react-router@7.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
+  nuqs@2.4.1(next@15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
     dependencies:
       mitt: 3.0.1
       react: 18.3.1
     optionalDependencies:
       next: 15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
-      react-router: 7.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-router: 7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
   nwsapi@2.2.20:
     optional: true
@@ -28074,9 +28074,8 @@ snapshots:
     transitivePeerDependencies:
       - react-dom
 
-  react-router@7.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
-      '@types/cookie': 0.6.0
       cookie: 1.0.2
       react: 18.3.1
       set-cookie-parser: 2.7.1
