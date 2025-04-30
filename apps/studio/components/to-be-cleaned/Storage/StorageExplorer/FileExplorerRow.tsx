@@ -114,15 +114,16 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   openedFolders = [],
 }) => {
   const { ref: projectRef, bucketId } = useParams()
-  const snap = useStorageExplorerStateSnapshot()
-  const { selectedFilePreview, setSelectedFilePreview, setSelectedFileCustomExpiry } = snap
 
   const {
+    selectedBucket,
+    selectedFilePreview,
     popColumnAtIndex,
     pushOpenedFolderAtIndex,
     popOpenedFoldersAtIndex,
     clearSelectedItems,
-    selectedBucket,
+    setSelectedFilePreview,
+    setSelectedFileCustomExpiry,
     setSelectedItems,
     setSelectedItemsToDelete,
     setSelectedItemToRename,
