@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronRight, Clipboard, Download, Edit, Move, Trash2 } from 'lucide-react'
-import { observer } from 'mobx-react-lite'
 import { Item, Menu, Separator, Submenu } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
 
@@ -108,4 +107,4 @@ const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
   )
 }
 
-export default observer(ItemContextMenu)
+export default ItemContextMenu
