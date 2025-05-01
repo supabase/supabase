@@ -69,7 +69,7 @@ const LogsFilterPopover = ({
           <span>{options.label}</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align={align} className="p-0 w-60">
+      <PopoverContent align={align} className="p-0 w-60" portal={true}>
         <form
           onSubmit={(e) => {
             e.preventDefault()

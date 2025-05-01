@@ -103,7 +103,6 @@ export const Admonition = forwardRef<
         {...props}
         className={cn(
           'mb-2',
-          '[&_a]:underline',
           admonitionSVG({ type: typeMapped }),
           admonitionBase({ type: typeMapped }),
           props.className
