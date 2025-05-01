@@ -33,6 +33,9 @@ catalogs:
     react-dom:
       specifier: ^18.3.0
       version: 18.3.1
+    valtio:
+      specifier: ^1.12.0
+      version: 1.12.0
 
 overrides:
   '@supabase/supabase-js>@supabase/auth-js': 2.69.0-rc.3
@@ -439,7 +442,7 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1
       valtio:
-        specifier: ^1.12.0
+        specifier: 'catalog:'
         version: 1.12.0(@types/react@18.3.3)(react@18.3.1)
       yaml:
         specifier: ^2.4.5
@@ -866,7 +869,7 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1
       valtio:
-        specifier: ^1.12.0
+        specifier: 'catalog:'
         version: 1.12.0(@types/react@18.3.3)(react@18.3.1)
       yup:
         specifier: ^1.4.0
@@ -1583,9 +1586,12 @@ importers:
       '@types/dat.gui':
         specifier: ^0.7.12
         version: 0.7.12
+      '@usercentrics/cmp-browser-sdk':
+        specifier: ^4.42.0
+        version: 4.42.0
       '@vercel/flags':
         specifier: ^2.6.0
-        version: 2.6.0(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 2.6.0(next@15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       api-types:
         specifier: workspace:*
         version: link:../api-types
@@ -1600,7 +1606,7 @@ importers:
         version: 4.17.21
       next:
         specifier: 'catalog:'
-        version: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
+        version: 15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
       next-themes:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1613,6 +1619,9 @@ importers:
       react-use:
         specifier: ^17.4.0
         version: 17.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      valtio:
+        specifier: 'catalog:'
+        version: 1.12.0(@types/react@18.3.3)(react@18.3.1)
     devDependencies:
       '@types/lodash':
         specifier: 4.17.5
@@ -1997,9 +2006,6 @@ importers:
       '@supabase/sql-to-rest':
         specifier: ^0.1.6
         version: 0.1.6(encoding@0.1.13)(supports-color@8.1.1)
-      '@usercentrics/cmp-browser-sdk':
-        specifier: ^4.42.0
-        version: 4.42.0
       class-variance-authority:
         specifier: ^0.6.0
         version: 0.6.1
@@ -2106,7 +2112,7 @@ importers:
         specifier: ^5.0.0
         version: 5.0.0
       valtio:
-        specifier: '*'
+        specifier: 'catalog:'
         version: 1.12.0(@types/react@18.3.3)(react@18.3.1)
       zod:
         specifier: ^3.22.4
@@ -20918,14 +20924,6 @@ snapshots:
       dynamic-import-polyfill: 0.1.1
       lz-string: 1.5.0
       uuid: 9.0.1
-
-  '@vercel/flags@2.6.0(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      jose: 5.2.1
-    optionalDependencies:
-      next: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
 
   '@vercel/flags@2.6.0(next@15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:

@@ -5,7 +5,7 @@ import { createContext, PropsWithChildren, useContext, useEffect, useState } fro
 
 import { components } from 'api-types'
 import { useUser } from './auth'
-import { LOCAL_STORAGE_KEYS } from './constants'
+import { hasConsented } from './consent-state'
 import { get, post } from './fetchWrappers'
 import { ensurePlatformSuffix } from './helpers'
 
@@ -19,10 +19,7 @@ export async function getFeatureFlags(API_URL: string) {
 }
 
 export async function trackFeatureFlag(API_URL: string, body: TrackFeatureFlagVariables) {
-  const consent =
-    (typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      : null) === 'true'
+  const consent = hasConsented()
 
   if (!consent) return undefined
   await post(`${ensurePlatformSuffix(API_URL)}/telemetry/feature-flags/track`, { body })

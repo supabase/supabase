@@ -4,13 +4,13 @@ import { components } from 'api-types'
 import { useRouter } from 'next/compat/router'
 import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useRef } from 'react'
-import { LOCAL_STORAGE_KEYS } from './constants'
+import { useUser } from './auth'
+import { hasConsented } from './consent-state'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useTelemetryCookie } from './hooks'
 import { TelemetryEvent } from './telemetry-constants'
-import { useUser } from './auth'
 import { getSharedTelemetryData } from './telemetry-utils'
 
 //---
@@ -161,11 +161,7 @@ export const PageTelemetry = ({
 type EventBody = components['schemas']['TelemetryEventBodyV2Dto']
 
 export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathname?: string) {
-  const consent =
-    (typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      : null) === 'true'
-
+  const consent = hasConsented()
   if (!consent) return
 
   const body: EventBody = {
@@ -187,10 +183,7 @@ export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathn
 type IdentifyBody = components['schemas']['TelemetryIdentifyBodyV2']
 
 export function sendTelemetryIdentify(API_URL: string, body: IdentifyBody) {
-  const consent =
-    (typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      : null) === 'true'
+  const consent = hasConsented()
 
   if (!consent) return Promise.resolve()
 

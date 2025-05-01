@@ -52,7 +52,7 @@ import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
 import { SonnerToaster, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
-import { useConsent } from 'ui-patterns/consent'
+import { useConsentToast } from 'ui-patterns/consent'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -96,7 +96,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   // Although this is "technically" breaking the rules of hooks
   // IS_PLATFORM never changes within a session, so this won't cause any issues
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const { hasAcceptedConsent } = IS_PLATFORM ? useConsent() : { hasAcceptedConsent: true }
+  const { hasAcceptedConsent } = IS_PLATFORM ? useConsentToast() : { hasAcceptedConsent: true }
 
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 

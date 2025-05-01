@@ -9,7 +9,6 @@ import { useSendGroupsResetMutation } from 'data/telemetry/send-groups-reset-mut
 import { usePrevious } from 'hooks/deprecated'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useAppStateSnapshot } from 'state/app-state'
 
 const getAnonId = async (id: string) => {
   const encoder = new TextEncoder()
@@ -29,7 +28,6 @@ const GroupsTelemetry = ({ hasAcceptedConsent }: { hasAcceptedConsent: boolean }
   const user = useUser()
   const router = useRouter()
   const { ref, slug } = useParams()
-  const snap = useAppStateSnapshot()
   const organization = useSelectedOrganization()
 
   const previousPathname = usePrevious(router.pathname)

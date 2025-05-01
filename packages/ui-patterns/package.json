@@ -14,7 +14,6 @@
     "@hookform/resolvers": "^3.1.1",
     "@monaco-editor/react": "^4.6.0",
     "@supabase/sql-to-rest": "^0.1.6",
-    "@usercentrics/cmp-browser-sdk": "^4.42.0",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
     "cmdk": "^1.0.0",
@@ -49,7 +48,7 @@
     "tsconfig": "workspace:*",
     "ui": "workspace:*",
     "unist-util-visit": "^5.0.0",
-    "valtio": "*",
+    "valtio": "catalog:",
     "zod": "^3.22.4"
   },
   "devDependencies": {
