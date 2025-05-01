@@ -143,78 +143,145 @@ export async function getAllCMSPostSlugs() {
 /**
  * Fetch a single blog post from the CMS by slug
  */
-export async function getCMSPostBySlug(slug: string) {
+export async function getCMSPostBySlug(slug: string, preview = false) {
+  const PAYLOAD_URL =
+    process.env.NEXT_PUBLIC_PAYLOAD_URL ||
+    process.env.NEXT_PUBLIC_CMS_URL ||
+    'http://localhost:3030'
+  console.log(
+    `[getCMSPostBySlug] Fetching post '${slug}', preview: ${preview}, from ${PAYLOAD_URL}`
+  )
+
   try {
-    const response = await fetch(`${PAYLOAD_URL}/api/posts?where[slug][equals]=${slug}&depth=2`, {
+    // When in preview mode, specify draft=true to get the latest draft content
+    const url = `${PAYLOAD_URL}/api/posts?where[slug][equals]=${slug}&depth=2${preview ? '&draft=true' : ''}`
+    console.log(`[getCMSPostBySlug] API URL: ${url}`)
+
+    const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
         ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
       },
+      // Important: don't cache draft content
+      cache: preview ? 'no-store' : 'default',
     })
 
     if (!response.ok) {
+      console.error(`[getCMSPostBySlug] HTTP error: ${response.status} ${response.statusText}`)
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
     const data = await response.json()
+    console.log(
+      `[getCMSPostBySlug] API responded with ${data.docs?.length || 0} posts, draft mode: ${preview}`
+    )
 
-    if (!data.docs.length) {
+    // In preview mode, we want to return the draft even if it's not published
+    if (!data.docs.length && !preview) {
+      console.log(`[getCMSPostBySlug] No docs found, not in preview mode, returning null`)
       return null
     }
 
+    // If we're in preview mode and there's no draft, try to get the published version
+    if (!data.docs.length && preview) {
+      console.log(`[getCMSPostBySlug] No draft found but in preview mode, trying published version`)
+      const publishedUrl = `${PAYLOAD_URL}/api/posts?where[slug][equals]=${slug}&depth=2`
+      console.log(`[getCMSPostBySlug] Published API URL: ${publishedUrl}`)
+
+      const publishedResponse = await fetch(publishedUrl, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+        },
+      })
+
+      if (!publishedResponse.ok) {
+        console.error(
+          `[getCMSPostBySlug] HTTP error for published version: ${publishedResponse.status}`
+        )
+        throw new Error(`HTTP error! status: ${publishedResponse.status}`)
+      }
+
+      const publishedData = await publishedResponse.json()
+      console.log(
+        `[getCMSPostBySlug] Published API responded with ${publishedData.docs?.length || 0} posts`
+      )
+
+      if (!publishedData.docs.length) {
+        console.log(`[getCMSPostBySlug] No published version found either, returning null`)
+        return null
+      }
+
+      console.log(`[getCMSPostBySlug] Found published version, returning that instead of draft`)
+      return processPostData(publishedData.docs[0])
+    }
+
+    console.log(`[getCMSPostBySlug] Found ${preview ? 'draft' : 'published'} post, processing data`)
+
+    // If we have a post (either draft or published), process it
     const post = data.docs[0]
 
-    const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
-    const formattedDate = new Date(post.date || new Date()).toLocaleDateString('en-IN', options)
-    const markdownContent = convertRichTextToMarkdown(post.content)
-    const readingTime = post.readingTime || generateReadingTime(markdownContent)
+    // Let's log some key data to ensure it's what we expect
+    console.log(`[getCMSPostBySlug] Post title: ${post.title}`)
+    console.log(`[getCMSPostBySlug] Post status: ${post._status || 'published'}`)
+    console.log(`[getCMSPostBySlug] Post content type:`, typeof post.content)
 
-    // Extract thumb and image URLs from the nested structure
-    const thumbUrl = `${PAYLOAD_URL}${post.thumb?.url}`
-    const imageUrl = `${PAYLOAD_URL}${post.image?.url}`
-
-    // Generate TOC from content for CMS posts
-    const tocResult = toc(markdownContent, {
-      maxdepth: post.toc_depth ? post.toc_depth : 2,
-    })
-
-    return {
-      slug,
-      source: markdownContent,
-      title: post.title || 'Untitled Post',
-      date: post.date || new Date().toISOString(),
-      formattedDate,
-      readingTime,
-      launchweek: post.launchweek || null,
-      authors:
-        post.authors?.map((author: any) => ({
-          author: author.author || 'Unknown Author',
-          author_id: author.author_id || '',
-          position: author.position || '',
-          author_url: author.author_url || '#',
-          author_image_url: author.author_image_url?.url
-            ? author.author_image_url.url.includes('http')
-              ? author.author_image_url?.url
-              : `${PAYLOAD_URL}${author.author_image_url.url}`
-            : null,
-          username: author.username || '',
-        })) || [],
-      toc_depth: post.toc_depth || 2,
-      thumb: thumbUrl,
-      image: imageUrl,
-      url: `/blog/${slug}`,
-      path: `/blog/${slug}`,
-      isCMS: true,
-      content: markdownContent,
-      tags: post.tags || [],
-      toc: {
-        content: tocResult.content,
-        json: tocResult.json,
-      },
-    }
+    return processPostData(post)
   } catch (error) {
     console.error('Error fetching CMS post by slug:', error)
     return null
+  }
+}
+
+// Helper function to process post data
+function processPostData(post: any) {
+  const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
+  const formattedDate = new Date(post.date || new Date()).toLocaleDateString('en-IN', options)
+  const markdownContent = convertRichTextToMarkdown(post.content)
+  const readingTime = post.readingTime || generateReadingTime(markdownContent)
+
+  // Extract thumb and image URLs from the nested structure
+  const thumbUrl = post.thumb?.url ? `${PAYLOAD_URL}${post.thumb.url}` : null
+  const imageUrl = post.image?.url ? `${PAYLOAD_URL}${post.image.url}` : null
+
+  // Generate TOC from content for CMS posts
+  const tocResult = toc(markdownContent, {
+    maxdepth: post.toc_depth ? post.toc_depth : 2,
+  })
+
+  return {
+    slug: post.slug,
+    source: markdownContent,
+    title: post.title || 'Untitled Post',
+    date: post.date || new Date().toISOString(),
+    formattedDate,
+    readingTime,
+    launchweek: post.launchweek || null,
+    authors:
+      post.authors?.map((author: any) => ({
+        author: author.author || 'Unknown Author',
+        author_id: author.author_id || '',
+        position: author.position || '',
+        author_url: author.author_url || '#',
+        author_image_url: author.author_image_url?.url
+          ? author.author_image_url.url.includes('http')
+            ? author.author_image_url?.url
+            : `${PAYLOAD_URL}${author.author_image_url.url}`
+          : null,
+        username: author.username || '',
+      })) || [],
+    toc_depth: post.toc_depth || 2,
+    thumb: thumbUrl,
+    image: imageUrl,
+    url: `/blog/${post.slug}`,
+    path: `/blog/${post.slug}`,
+    isCMS: true,
+    content: markdownContent,
+    tags: post.tags || [],
+    toc: {
+      content: tocResult.content,
+      json: tocResult.json,
+    },
   }
 }
 

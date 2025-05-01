@@ -1327,6 +1327,9 @@ importers:
       '@octokit/rest':
         specifier: ^21.0.0
         version: 21.1.1
+      '@payloadcms/live-preview-react':
+        specifier: ^3.36.1
+        version: 3.36.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-dialog':
         specifier: ^1.0.5
         version: 1.0.5(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1704,7 +1707,7 @@ importers:
     dependencies:
       '@mertasan/tailwindcss-variables':
         specifier: ^2.2.3
-        version: 2.7.0(autoprefixer@10.4.21(postcss@8.5.3))(postcss@8.5.3)
+        version: 2.7.0(autoprefixer@10.4.21(postcss@8.4.38))(postcss@8.4.38)
       '@radix-ui/colors':
         specifier: ^0.1.8
         version: 0.1.9
@@ -5338,6 +5341,15 @@ packages:
     peerDependencies:
       graphql: ^16.8.1
       payload: 3.33.0
+
+  '@payloadcms/live-preview-react@3.36.1':
+    resolution: {integrity: sha512-tnsAtB5VeSVoWZAeb1XhU+bLPYUK9iJ4+6eyCDI73gTVaEuFlLr2bqzd0deZzz5OwKGt6G4LIYCdJ42tEOOwXA==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc-65a56d0e-20241020
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc-65a56d0e-20241020
+
+  '@payloadcms/live-preview@3.36.1':
+    resolution: {integrity: sha512-Rc3SQhFbtEE34vULR4FxUPkj/NQ4OdW05uUlpvYoKqvDjJPsHUOtEDj9eUol7Sta+0UGqY8HziX2+n9j5OwPUA==}
 
   '@payloadcms/next@3.33.0':
     resolution: {integrity: sha512-gdiMalPLmzUJaRfBU4hWMNbEktXkc7Xqh/40h1FJ5sORl68/mYz8H9I0SqmLNe2jXAEEfptUwTwVPF9LTv2l7A==}
@@ -10435,7 +10447,6 @@ packages:
     resolution: {integrity: sha512-t0q23FIpvHDTtnORW+bDJziGsal5uh9RJTJ1fyH8drd4lICOoXhJ5pLMUZ5C0VQei6dNmwTzzoTRgMkO9JgHEQ==}
     peerDependencies:
       eslint: '>= 5'
-    bundledDependencies: []
 
   eslint-plugin-import@2.29.1:
     resolution: {integrity: sha512-BbPC0cuExzhiMo4Ff1BTVwHpjjv28C5R+btTOGaCRC7UEz801up0JadwkeSk5Ued6TG34uaczuVuH6qyy5YUxw==}
@@ -20316,11 +20327,11 @@ snapshots:
       '@types/react': 18.3.3
       react: 18.3.1
 
-  '@mertasan/tailwindcss-variables@2.7.0(autoprefixer@10.4.21(postcss@8.5.3))(postcss@8.5.3)':
+  '@mertasan/tailwindcss-variables@2.7.0(autoprefixer@10.4.21(postcss@8.4.38))(postcss@8.4.38)':
     dependencies:
-      autoprefixer: 10.4.21(postcss@8.5.3)
+      autoprefixer: 10.4.21(postcss@8.4.38)
       lodash: 4.17.21
-      postcss: 8.5.3
+      postcss: 8.4.38
 
   '@mjackson/node-fetch-server@0.2.0': {}
 
@@ -21337,6 +21348,14 @@ snapshots:
       tsx: 4.19.2
     transitivePeerDependencies:
       - typescript
+
+  '@payloadcms/live-preview-react@3.36.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@payloadcms/live-preview': 3.36.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
+  '@payloadcms/live-preview@3.36.1': {}
 
   '@payloadcms/next@3.33.0(@types/react@19.1.0)(graphql@16.11.0)(monaco-editor@0.52.2)(next@15.3.0(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.77.4))(payload@3.33.0(bufferutil@4.0.9)(graphql@16.11.0)(typescript@5.7.3)(utf-8-validate@5.0.10))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(supports-color@8.1.1)(typescript@5.7.3)':
     dependencies:
@@ -26040,14 +26059,14 @@ snapshots:
       postcss: 8.5.3
       postcss-value-parser: 4.2.0
 
-  autoprefixer@10.4.21(postcss@8.5.3):
+  autoprefixer@10.4.21(postcss@8.4.38):
     dependencies:
       browserslist: 4.24.4
       caniuse-lite: 1.0.30001716
       fraction.js: 4.3.7
       normalize-range: 0.1.2
       picocolors: 1.1.1
-      postcss: 8.5.3
+      postcss: 8.4.38
       postcss-value-parser: 4.2.0
 
   available-typed-arrays@1.0.7:
@@ -27905,7 +27924,7 @@ snapshots:
       '@typescript-eslint/parser': 7.2.0(eslint@9.25.1(jiti@2.4.2)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.7.3)
       eslint: 9.25.1(jiti@2.4.2)(supports-color@8.1.1)
       eslint-import-resolver-node: 0.3.9(supports-color@8.1.1)
-      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@7.2.0(eslint@9.25.1(jiti@2.4.2)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-plugin-import@2.29.1)(eslint@9.25.1(jiti@2.4.2)(supports-color@8.1.1))(supports-color@8.1.1)
+      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@7.2.0(eslint@9.25.1(jiti@2.4.2)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-plugin-import@2.31.0)(eslint@9.25.1(jiti@2.4.2)(supports-color@8.1.1))(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 

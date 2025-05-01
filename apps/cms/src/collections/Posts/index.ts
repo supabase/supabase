@@ -34,21 +34,36 @@ export const Posts: CollectionConfig = {
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
       url: ({ data, req }) => {
-        const path = generatePreviewPath({
-          slug: typeof data?.slug === 'string' ? data.slug : '',
-          collection: 'posts',
-          req,
-        })
-
-        return path
+        const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
+        const isDraft = data?._status === 'draft'
+        return `${baseUrl}/blog/${data?.slug}${isDraft ? '?preview=true' : ''}`
       },
+      breakpoints: [
+        {
+          label: 'Desktop',
+          name: 'desktop',
+          width: 1920,
+          height: 1080,
+        },
+        {
+          label: 'Tablet',
+          name: 'tablet',
+          width: 768,
+          height: 1024,
+        },
+        {
+          label: 'Mobile',
+          name: 'mobile',
+          width: 375,
+          height: 667,
+        },
+      ],
     },
-    preview: (data, { req }) =>
-      generatePreviewPath({
-        slug: typeof data?.slug === 'string' ? data.slug : '',
-        collection: 'posts',
-        req,
-      }),
+    preview: (data) => {
+      const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
+      const isDraft = data?._status === 'draft'
+      return `${baseUrl}/blog/${data?.slug}${isDraft ? '?preview=true' : ''}`
+    },
   },
   access: {
     create: authenticated,

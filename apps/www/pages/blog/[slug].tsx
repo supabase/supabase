@@ -10,6 +10,8 @@ import { Badge } from 'ui'
 import dayjs from 'dayjs'
 import { remark } from 'remark'
 import html from 'remark-html'
+import { useState, useMemo } from 'react'
+import { useLivePreview } from '@payloadcms/live-preview-react'
 
 import authors from 'lib/authors.json'
 import { generateReadingTime, isNotNullOrUndefined } from '~/lib/helpers'
@@ -29,6 +31,7 @@ import BlogLinks from '~/components/LaunchWeek/7/BlogLinks'
 import LWXSummary from '~/components/LaunchWeek/X/LWXSummary'
 import DefaultLayout from '~/components/Layouts/Default'
 import { ChevronLeft } from 'lucide-react'
+import { LivePreview } from '~/components/Blog/LivePreview'
 
 type Post = ReturnType<typeof getSortedPosts>[number]
 
@@ -149,6 +152,12 @@ type Tag =
     }
 type Category = string | { name: string }
 
+// Add a new type for processed blog data
+type ProcessedBlogData = BlogData &
+  Blog & {
+    needsSerialization?: boolean
+  }
+
 export async function getStaticPaths() {
   // Get paths from static files
   const staticPaths = getAllPostSlugs('_blog')
@@ -165,55 +174,26 @@ export async function getStaticPaths() {
   }
 }
 
-export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async ({ params }) => {
-  if (params?.slug === undefined) {
+export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async ({
+  params,
+  preview = false,
+}) => {
+  if (!params?.slug) {
     throw new Error('Missing slug for pages/blog/[slug].tsx')
   }
 
-  const filePath = `${params.slug}`
+  const slug = `${params.slug}`
+  console.log(
+    `[getStaticProps] generating for slug: '${slug}', preview mode: ${preview ? 'true' : 'false'}`
+  )
 
+  // Try static post first
   try {
-    // First, check if this is a static blog post
-    let blogPost: any = null
-    let isStaticPost = true
-    let mdxSource: any = null
-    let content = ''
-
-    try {
-      const postContent = await getPostdata(filePath, '_blog')
-      const parsedContent = matter(postContent) as unknown as MatterReturn
-      content = parsedContent.content
-      mdxSource = await mdxSerialize(content)
-      blogPost = { ...parsedContent.data }
-    } catch (error) {
-      isStaticPost = false
-    }
-
-    // If not a static post, try to get it from the CMS
-    if (!isStaticPost) {
-      const cmsPost = await getCMSPostBySlug(filePath)
-      if (!cmsPost) {
-        return { notFound: true }
-      }
-
-      // For CMS posts, we need to convert the rich text to markdown/HTML
-      const processedContent = await remark().use(html).process(cmsPost.content)
-      const contentHtml = processedContent.toString()
-
-      // Normalize CMS post data to match the structure expected by the component
-      blogPost = {
-        ...cmsPost,
-        // Make sure these fields exist to prevent undefined errors
-        tags: cmsPost.tags || [],
-        authors: cmsPost.authors || [], // Use authors array from CMS
-        isCMS: true,
-      }
-
-      content = cmsPost.content || '' // Use original markdown content
-
-      // For CMS posts, we should still use mdxSerialize instead of passing HTML directly
-      mdxSource = await mdxSerialize(content)
-    }
+    const postContent = await getPostdata(slug, '_blog')
+    const parsedContent = matter(postContent) as unknown as MatterReturn
+    const content = parsedContent.content
+    const mdxSource = await mdxSerialize(content)
+    const blogPost = { ...parsedContent.data }
 
     // Get all posts for navigation and related posts
     const allStaticPosts = getSortedPosts({ directory: '_blog' })
@@ -221,73 +201,202 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
     const allPosts = [...allStaticPosts, ...allCmsPosts].sort(
       (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
     )
-
-    // Find related posts based on tags (if available)
-    const relatedPosts = isStaticPost
-      ? (getSortedPosts({
-          directory: '_blog',
-          limit: 3,
-          tags: mdxSource.scope.tags,
-          currentPostSlug: filePath,
-        }) as unknown as (BlogData & Post)[])
-      : [] // Add logic for CMS related posts when tags are available
-
-    // Find current post index for next/prev navigation
-    const currentIndex = allPosts.findIndex((post) => post.slug === filePath)
+    const currentIndex = allPosts.findIndex((post) => post.slug === slug)
     const nextPost = currentIndex === allPosts.length - 1 ? null : allPosts[currentIndex + 1]
     const prevPost = currentIndex === 0 ? null : allPosts[currentIndex - 1]
-
-    const tocResult = isStaticPost
-      ? toc(content, { maxdepth: blogPost.toc_depth ? blogPost.toc_depth : 2 })
-      : blogPost.toc
-
-    const processedContent = isStaticPost
-      ? tocResult.content.replace(/%23/g, '')
-      : typeof blogPost.toc === 'string'
-        ? blogPost.toc
-        : blogPost.toc?.content || ''
+    const tocResult = toc(content, { maxdepth: blogPost.toc_depth ? blogPost.toc_depth : 2 })
+    const processedContent = tocResult.content.replace(/%23/g, '')
+    const relatedPosts = getSortedPosts({
+      directory: '_blog',
+      limit: 3,
+      tags: mdxSource.scope.tags,
+      currentPostSlug: slug,
+    }) as unknown as (BlogData & Post)[]
 
     return {
       props: {
-        prevPost: prevPost,
-        nextPost: nextPost,
+        prevPost,
+        nextPost,
         relatedPosts,
         blog: {
-          slug: `${params.slug}`,
-          source: content,
           ...blogPost,
           content: mdxSource,
-          toc: isStaticPost
-            ? {
-                ...tocResult,
-                content: processedContent,
-              }
-            : processedContent,
+          toc: {
+            ...tocResult,
+            content: processedContent,
+          },
         },
       },
-      revalidate: 60 * 10, // Revalidate every 10 minutes
+      revalidate: 60 * 10,
     }
   } catch (error) {
-    console.error('Error in getStaticProps:', error)
+    console.log('[getStaticProps] Static post not found, trying CMS post...')
+    // Not a static post, try CMS
+  }
+
+  // Try CMS post (handle preview/draft logic)
+  const cmsPost = await getCMSPostBySlug(slug, preview)
+
+  if (!cmsPost) {
+    console.log(
+      '[getStaticProps] No CMS post found, checking published version (if in preview mode)...'
+    )
+    // Try to fetch published version if preview mode failed
+    if (preview) {
+      console.log(
+        '[getStaticProps] In preview mode but no draft found, trying published version...'
+      )
+      const publishedPost = await getCMSPostBySlug(slug, false)
+      if (!publishedPost) {
+        console.log('[getStaticProps] No published version found either, returning 404')
+        return { notFound: true }
+      }
+      console.log('[getStaticProps] Found published version, using that for preview')
+      const mdxSource = await mdxSerialize(publishedPost.content || '')
+      return {
+        props: {
+          prevPost: null,
+          nextPost: null,
+          relatedPosts: [],
+          blog: {
+            ...publishedPost,
+            tags: publishedPost.tags || [],
+            authors: publishedPost.authors || [],
+            isCMS: true,
+            content: mdxSource,
+            toc: publishedPost.toc,
+            image: publishedPost.image ?? undefined,
+            thumb: publishedPost.thumb ?? undefined,
+          },
+        },
+        revalidate: 60 * 10,
+      }
+    }
+    console.log('[getStaticProps] Not in preview mode and no CMS post found, returning 404')
     return { notFound: true }
+  }
+
+  // For CMS posts, process content
+  console.log('[getStaticProps] Processing CMS post data for render')
+  const mdxSource = await mdxSerialize(cmsPost.content || '')
+
+  return {
+    props: {
+      prevPost: null,
+      nextPost: null,
+      relatedPosts: [],
+      blog: {
+        ...cmsPost,
+        tags: cmsPost.tags || [],
+        authors: cmsPost.authors || [],
+        isCMS: true,
+        content: mdxSource,
+        toc: cmsPost.toc,
+        image: cmsPost.image ?? undefined,
+        thumb: cmsPost.thumb ?? undefined,
+      },
+    },
+    revalidate: 60 * 10,
   }
 }
 
 function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
-  const content = props.blog.content
-  const isCMS = props.blog.isCMS
-  const isLaunchWeek7 = props.blog.launchweek === '7'
-  const isLaunchWeekX = props.blog.launchweek?.toString().toLocaleLowerCase() === 'x'
-  const isGAWeek = props.blog.launchweek?.toString().toLocaleLowerCase() === '11'
-  const isLaunchWeek12 = props.blog.launchweek?.toString().toLocaleLowerCase() === '12'
-  const isLaunchWeek13 = props.blog.launchweek?.toString().toLocaleLowerCase() === '13'
-  const isLaunchWeek14 = props.blog.launchweek?.toString().toLocaleLowerCase() === '14'
+  const router = useRouter()
+  const isPreview = router.query.preview === 'true'
+  const [previewData, setPreviewData] = useState<ProcessedBlogData>(props.blog)
+
+  const { data: livePreviewData } = useLivePreview({
+    initialData: props.blog,
+    serverURL: process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030',
+    depth: 2,
+  })
+
+  console.log('[BlogPostPage] LivePreview data from hook:', livePreviewData)
+
+  // For LivePreview, we'll use the raw content directly with ReactMarkdown
+  // instead of trying to use MDXRemote which requires specific serialization
+  const isLivePreview = isPreview && (livePreviewData !== undefined || previewData !== props.blog)
+
+  // Extract raw content from data if available
+  const livePreviewContent = useMemo(() => {
+    // Priority 1: Use data from LivePreview hook
+    if (livePreviewData) {
+      console.log('[BlogPostPage] Using livePreviewData for content')
+
+      // If content is a string, use it directly
+      if (typeof livePreviewData.content === 'string') {
+        return livePreviewData.content
+      }
+
+      // If content is from source property
+      if (livePreviewData.source && typeof livePreviewData.source === 'string') {
+        return livePreviewData.source
+      }
+    }
+
+    // Priority 2: Use data from postMessage updates
+    if (previewData !== props.blog) {
+      console.log('[BlogPostPage] Using previewData from postMessage for content')
+
+      // If content is a string, use it directly
+      if (typeof previewData.content === 'string') {
+        return previewData.content
+      }
+
+      // If content is from source property
+      if (previewData.source && typeof previewData.source === 'string') {
+        return previewData.source
+      }
+    }
+
+    // Fallback to props.blog.source
+    return props.blog.source || ''
+  }, [livePreviewData, previewData, props.blog])
+
+  // Only use the live preview data for metadata
+  const blogMetaData = useMemo(() => {
+    if (isPreview) {
+      // Priority 1: Use data from LivePreview hook
+      if (livePreviewData) {
+        return livePreviewData
+      }
+
+      // Priority 2: Use data from postMessage updates
+      if (previewData !== props.blog) {
+        return previewData
+      }
+    }
+
+    // Fallback to props.blog
+    return props.blog
+  }, [isPreview, livePreviewData, previewData, props.blog])
+
+  const handlePreviewUpdate = (data: any) => {
+    console.log('[BlogPostPage] Received preview update:', data)
+    setPreviewData((prev) => {
+      const updatedData = {
+        ...prev,
+        ...data,
+      }
+      console.log('[BlogPostPage] Updated previewData:', updatedData)
+      return updatedData
+    })
+  }
+
+  const content = blogMetaData.content
+  const isCMS = blogMetaData.isCMS
+  const isLaunchWeek7 = blogMetaData.launchweek === '7'
+  const isLaunchWeekX = blogMetaData.launchweek?.toString().toLocaleLowerCase() === 'x'
+  const isGAWeek = blogMetaData.launchweek?.toString().toLocaleLowerCase() === '11'
+  const isLaunchWeek12 = blogMetaData.launchweek?.toString().toLocaleLowerCase() === '12'
+  const isLaunchWeek13 = blogMetaData.launchweek?.toString().toLocaleLowerCase() === '13'
+  const isLaunchWeek14 = blogMetaData.launchweek?.toString().toLocaleLowerCase() === '14'
 
   // For CMS posts, the author info is already included
   // For static posts, we need to look up the author in authors.json
   const author = isCMS
-    ? (props.blog.authors as CMSAuthor[]) || []
-    : (props.blog.author as string)
+    ? (blogMetaData.authors as CMSAuthor[]) || []
+    : (blogMetaData.author as string)
         ?.split(',')
         .map((authorId: string) => {
           const foundAuthor = authors.find((author) => author.author_id === authorId)
@@ -328,11 +437,11 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
     )
   }
 
-  const toc = props.blog.toc && (
+  const toc = blogMetaData.toc && (
     <div className="space-y-8 py-8 lg:py-0">
       <div>
         <div className="flex flex-wrap gap-2">
-          {(props.blog.tags as Tag[])?.map((tag) => {
+          {(blogMetaData.tags as Tag[])?.map((tag) => {
             const tagName = typeof tag === 'string' ? tag : tag.name
             const tagId = typeof tag === 'string' ? tag : tag.id.toString()
             return (
@@ -347,9 +456,9 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
         <div>
           <p className="text-foreground mb-4">On this page</p>
           <div className="prose-toc">
-            {props.blog.toc && (
+            {blogMetaData.toc && (
               <ReactMarkdown>
-                {typeof props.blog.toc === 'string' ? props.blog.toc : props.blog.toc.content}
+                {typeof blogMetaData.toc === 'string' ? blogMetaData.toc : blogMetaData.toc.content}
               </ReactMarkdown>
             )}
           </div>
@@ -358,12 +467,12 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
     </div>
   )
 
-  const imageUrl = isCMS ? props.blog.thumb! : `/images/blog/${props.blog.thumb}`
+  const imageUrl = isCMS ? blogMetaData.thumb! : `/images/blog/${blogMetaData.thumb}`
 
   const meta = {
-    title: props.blog.meta_title ?? props.blog.title,
-    description: props.blog.meta_description ?? props.blog.description,
-    url: `https://supabase.com/blog/${props.blog.slug}`,
+    title: blogMetaData.meta_title ?? blogMetaData.title,
+    description: blogMetaData.meta_description ?? blogMetaData.description,
+    url: `https://supabase.com/blog/${blogMetaData.slug}`,
   }
 
   const processTag = (tag: Tag): string => {
@@ -374,15 +483,15 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
     return typeof category === 'string' ? category : category.name
   }
 
-  const tags = props.blog.tags
-    ? Array.isArray(props.blog.tags)
-      ? (props.blog.tags as Tag[]).map(processTag)
+  const tags = blogMetaData.tags
+    ? Array.isArray(blogMetaData.tags)
+      ? (blogMetaData.tags as Tag[]).map(processTag)
       : []
     : []
 
-  const categories = props.blog.categories
-    ? Array.isArray(props.blog.categories)
-      ? (props.blog.categories as Category[]).map(processCategory)
+  const categories = blogMetaData.categories
+    ? Array.isArray(blogMetaData.categories)
+      ? (blogMetaData.categories as Category[]).map(processCategory)
       : []
     : []
 
@@ -404,11 +513,11 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
           description: meta.description,
           url: meta.url,
           type: 'article',
-          videos: props.blog.video
+          videos: blogMetaData.video
             ? [
                 {
                   // youtube based video meta
-                  url: props.blog.video,
+                  url: blogMetaData.video,
                   type: 'application/x-shockwave-flash',
                   width: 640,
                   height: 385,
@@ -419,7 +528,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
             //
             // to do: add expiration and modified dates
             // https://github.com/garmeeh/next-seo#article
-            publishedTime: props.blog.date,
+            publishedTime: blogMetaData.date,
             //
             // to do: author urls should be internal in future
             // currently we have external links to github profiles
@@ -429,11 +538,12 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
           images: [
             {
               url: imageUrl,
-              alt: `${props.blog.title} thumbnail`,
+              alt: `${blogMetaData.title} thumbnail`,
             },
           ],
         }}
       />
+      {isPreview && <LivePreview onUpdate={handlePreviewUpdate} />}
       <DefaultLayout className="overflow-x-hidden">
         <div
           className="
@@ -459,11 +569,11 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                   <Link href="/blog" className="text-brand hidden lg:inline">
                     Blog
                   </Link>
-                  <h1 className="text-2xl sm:text-4xl">{props.blog.title}</h1>
+                  <h1 className="text-2xl sm:text-4xl">{blogMetaData.title}</h1>
                   <div className="text-light flex space-x-3 text-sm">
-                    <p>{dayjs(props.blog.date).format('DD MMM YYYY')}</p>
+                    <p>{dayjs(blogMetaData.date).format('DD MMM YYYY')}</p>
                     <p>•</p>
-                    <p>{generateReadingTime(props.blog.source)}</p>
+                    <p>{generateReadingTime(blogMetaData.source)}</p>
                   </div>
                   {author.length > 0 && (
                     <div className="hidden lg:flex justify-between">
@@ -517,21 +627,21 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                 <div className="col-span-12 lg:col-span-7 xl:col-span-7">
                   <article>
                     <div className={['prose prose-docs'].join(' ')}>
-                      {props.blog.youtubeHero ? (
+                      {blogMetaData.youtubeHero ? (
                         <iframe
                           className="w-full"
                           width="700"
                           height="350"
-                          src={props.blog.youtubeHero}
+                          src={blogMetaData.youtubeHero}
                           allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                           allowFullScreen={true}
                         />
                       ) : (
-                        props.blog.thumb && (
+                        blogMetaData.thumb && (
                           <div className="hidden md:block relative mb-8 w-full aspect-video overflow-auto rounded-lg border">
                             <Image
                               src={imageUrl}
-                              alt={props.blog.title}
+                              alt={blogMetaData.title}
                               fill
                               quality={100}
                               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -540,7 +650,12 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                           </div>
                         )
                       )}
-                      <MDXRemote {...content} components={mdxComponents('blog')} />
+                      {/* Use ReactMarkdown for LivePreview mode, MDXRemote for normal mode */}
+                      {isLivePreview ? (
+                        <ReactMarkdown>{livePreviewContent}</ReactMarkdown>
+                      ) : (
+                        <MDXRemote {...props.blog.content} components={mdxComponents('blog')} />
+                      )}
                     </div>
                   </article>
                   {isLaunchWeek7 && <BlogLinks />}
@@ -551,7 +666,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                   {isLaunchWeek14 && <LW14Summary />}
                   <div className="block lg:hidden py-8">
                     <div className="text-foreground-lighter text-sm">Share this article</div>
-                    <ShareArticleActions title={props.blog.title} slug={props.blog.slug} />
+                    <ShareArticleActions title={blogMetaData.title} slug={blogMetaData.slug} />
                   </div>
                   <div className="grid gap-8 py-8 lg:grid-cols-1">
                     <div>
@@ -570,7 +685,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                     <div className="hidden lg:block">{toc}</div>
                     <div className="hidden lg:block">
                       <div className="text-foreground text-sm">Share this article</div>
-                      <ShareArticleActions title={props.blog.title} slug={props.blog.slug} />
+                      <ShareArticleActions title={blogMetaData.title} slug={blogMetaData.slug} />
                     </div>
                   </div>
                 </div>

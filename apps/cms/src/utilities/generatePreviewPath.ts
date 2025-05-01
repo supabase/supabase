@@ -1,7 +1,7 @@
 import { PayloadRequest, CollectionSlug } from 'payload'
 
 const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {
-  posts: '/posts',
+  posts: '/blog',
   pages: '',
 }
 
@@ -12,6 +12,12 @@ type Props = {
 }
 
 export const generatePreviewPath = ({ collection, slug }: Props) => {
+  if (collection === 'posts') {
+    const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
+    // Use our preview API route for post previews
+    return `${baseUrl}/api/preview?slug=${slug}`
+  }
+
   const encodedParams = new URLSearchParams({
     slug,
     collection,
