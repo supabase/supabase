@@ -1,8 +1,8 @@
 import { Toggle } from 'ui'
 
+import { useConsentState } from 'common'
 import Panel from 'components/ui/Panel'
 import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
-import { useConsentState } from 'ui-patterns/consent'
 
 export const AnalyticsSettings = () => {
   const { hasAccepted, acceptAll, denyAll } = useConsentState()
