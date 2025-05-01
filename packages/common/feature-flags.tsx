@@ -80,15 +80,21 @@ export const FeatureFlagProvider = ({
 
       let flagStore: FeatureFlagContextType = { configcat: {}, posthog: {} }
 
-      // Load PH flags
-      const flags = await getFeatureFlags(API_URL)
+      // Run both async operations in parallel
+      const [flags, flagValues] = await Promise.all([
+        getFeatureFlags(API_URL),
+        typeof getConfigCatFlags === 'function'
+          ? getConfigCatFlags(user?.email)
+          : Promise.resolve([]),
+      ])
+
+      // Process PostHog flags
       if (flags) {
         flagStore.posthog = flags
       }
 
-      // Load ConfigCat flags
+      // Process ConfigCat flags
       if (typeof getConfigCatFlags === 'function') {
-        const flagValues = await getConfigCatFlags(user?.email)
         let overridesCookieValue: Record<string, boolean> = {}
         try {
           const cookies = getCookies()
