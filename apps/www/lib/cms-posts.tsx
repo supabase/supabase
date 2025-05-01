@@ -1,8 +1,7 @@
-import { generateReadingTime } from './helpers'
 const toc = require('markdown-toc')
 
 // Payload API configuration
-const PAYLOAD_API_URL = process.env.NEXT_PUBLIC_PAYLOAD_API_URL || 'http://localhost:3000/api'
+const PAYLOAD_URL = process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://localhost:3000'
 const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY
 
 type CMSBlogPost = {
@@ -14,6 +13,7 @@ type CMSBlogPost = {
   date?: string
   launchweek?: string
   toc_depth?: number
+  readingTime?: number
   tags?: string[]
   thumb?: {
     url: string
@@ -64,12 +64,14 @@ type ProcessedPost = {
  */
 export async function getAllCMSPostSlugs() {
   try {
-    const response = await fetch(`${PAYLOAD_API_URL}/blog-posts?limit=100&depth=0`, {
+    const response = await fetch(`${PAYLOAD_URL}/api/blog-posts?limit=100&depth=1`, {
       headers: {
         'Content-Type': 'application/json',
         ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
       },
     })
+
+    console.log('response', response)
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
@@ -93,7 +95,7 @@ export async function getAllCMSPostSlugs() {
 export async function getCMSPostBySlug(slug: string) {
   try {
     const response = await fetch(
-      `${PAYLOAD_API_URL}/blog-posts?where[slug][equals]=${slug}&depth=2`,
+      `${PAYLOAD_URL}/api/blog-posts?where[slug][equals]=${slug}&depth=2`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -116,17 +118,18 @@ export async function getCMSPostBySlug(slug: string) {
 
     const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
     const formattedDate = new Date(post.date || new Date()).toLocaleDateString('en-IN', options)
-    const readingTime = generateReadingTime(post.content || '')
 
     // Extract thumb and image URLs from the nested structure
-    const thumbUrl = post.thumb?.url
-    const imageUrl = post.image?.url
+    const thumbUrl = `${PAYLOAD_URL}${post.thumb?.url}`
+    const imageUrl = `${PAYLOAD_URL}${post.image?.url}`
 
     // Generate TOC from content for CMS posts
     const tocResult = toc(post.content || '', {
       maxdepth: post.toc_depth ? post.toc_depth : 2,
     })
-    const processedContent = tocResult.content.replace(/%23/g, '')
+    const processedContent = tocResult.content
+
+    console.log('cms-post slug', post)
 
     return {
       slug,
@@ -134,7 +137,6 @@ export async function getCMSPostBySlug(slug: string) {
       title: post.Title || 'Untitled Post',
       date: post.date || new Date().toISOString(),
       formattedDate,
-      readingTime,
       launchweek: post.launchweek || null,
       authors:
         post.authors?.map((author: any) => ({
@@ -145,13 +147,13 @@ export async function getCMSPostBySlug(slug: string) {
           author_image_url: author.author_image_url?.url
             ? author.author_image_url.url.includes('http')
               ? author.author_image_url?.url
-              : `${PAYLOAD_API_URL.replace('/api', '')}${author.author_image_url.url}`
+              : `${PAYLOAD_URL}${author.author_image_url.url}`
             : null,
           username: author.username || '',
         })) || [],
       toc_depth: post.toc_depth || 2,
-      thumb: thumbUrl ? thumbUrl.replace(PAYLOAD_API_URL.replace('/api', ''), '') : null,
-      image: imageUrl ? imageUrl.replace(PAYLOAD_API_URL.replace('/api', ''), '') : null,
+      thumb: thumbUrl,
+      image: imageUrl,
       url: `/blog/${slug}`,
       path: `/blog/${slug}`,
       isCMS: true,
@@ -181,12 +183,13 @@ export async function getAllCMSPosts({
   currentPostSlug?: string
 } = {}): Promise<ProcessedPost[]> {
   try {
-    const response = await fetch(`${PAYLOAD_API_URL}/blog-posts?depth=2&limit=100`, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
-      },
-    })
+    // const response = await fetch(`${PAYLOAD_API_URL}/blog-posts?depth=2&limit=100`, {
+    //   // headers: {
+    //   //   'Content-Type': 'application/json',
+    //   //   ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+    //   // },
+    // })
+    const response = await fetch('http://localhost:3030/api/blog-posts?depth=1&draft=false')
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
@@ -203,11 +206,13 @@ export async function getAllCMSPosts({
           year: 'numeric',
         }
         const formattedDate = new Date(post.date || new Date()).toLocaleDateString('en-IN', options)
-        const readingTime = generateReadingTime(post.content || '')
 
-        // Extract thumb and image URLs from the nested structure
-        const thumbUrl = post.thumb?.url
-        const imageUrl = post.image?.url
+        // // Extract thumb and image URLs from the nested structure
+        const thumbUrl = `${PAYLOAD_URL}${post.thumb?.url}`
+        const imageUrl = `${PAYLOAD_URL}${post.image?.url}`
+
+        console.log('post', post)
+        console.log('imageUrl', imageUrl)
 
         return {
           slug: post.slug || '',
@@ -215,7 +220,7 @@ export async function getAllCMSPosts({
           description: post.description || '',
           date: post.date || new Date().toISOString(),
           formattedDate,
-          readingTime,
+          readingTime: post.readingTime || 0,
           authors:
             post.authors?.map((author: any) => ({
               author: author.author || '',
@@ -225,13 +230,13 @@ export async function getAllCMSPosts({
               author_image_url: author.author_image_url?.url
                 ? author.author_image_url.url.includes('http')
                   ? author.author_image_url.url
-                  : `${PAYLOAD_API_URL.replace('/api', '')}${author.author_image_url.url}`
+                  : `${PAYLOAD_URL}${author.author_image_url.url}`
                 : null,
               username: author.username || '',
             })) || [],
           toc_depth: post.toc_depth || 2,
-          thumb: thumbUrl ? thumbUrl.replace(PAYLOAD_API_URL.replace('/api', ''), '') : null,
-          image: imageUrl ? imageUrl.replace(PAYLOAD_API_URL.replace('/api', ''), '') : null,
+          thumb: thumbUrl,
+          image: imageUrl,
           url: `/blog/${post.slug || ''}`,
           path: `/blog/${post.slug || ''}`,
           isCMS: true,

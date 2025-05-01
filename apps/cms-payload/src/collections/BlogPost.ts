@@ -100,8 +100,18 @@ const BlogPost: CollectionConfig = {
         position: 'sidebar',
       },
     },
+    {
+      name: 'readingTime',
+      type: 'number',
+      admin: {
+        hidden: true,
+      },
+    },
   ],
   timestamps: true,
+  // hooks: {
+  //   beforeValidate: [generateReadingTime],
+  // },
 }
 
 export default BlogPost

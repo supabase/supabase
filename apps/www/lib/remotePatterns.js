@@ -98,14 +98,14 @@ module.exports = [
   {
     protocol: 'http',
     hostname: 'localhost',
-    port: '1337',
-    pathname: '/uploads/**',
+    port: '3030',
+    pathname: '/api/**',
   },
   {
     protocol: 'http',
     hostname: 'localhost',
-    port: '1337',
-    pathname: '/api/uploads/**',
+    port: '3030',
+    pathname: '/api/media/**',
   },
   {
     protocol: 'https',

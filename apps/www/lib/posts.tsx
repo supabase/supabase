@@ -2,7 +2,6 @@ import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
 import { generateReadingTime } from './helpers'
-import { BlogPost } from '../.contentlayer/generated'
 
 type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives' | '_events'
 

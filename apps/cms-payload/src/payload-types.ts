@@ -190,6 +190,7 @@ export interface BlogPost {
   categories?: (number | Category)[] | null;
   description?: string | null;
   launchweek?: string | null;
+  readingTime?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -352,6 +353,7 @@ export interface BlogPostsSelect<T extends boolean = true> {
   categories?: T;
   description?: T;
   launchweek?: T;
+  readingTime?: T;
   updatedAt?: T;
   createdAt?: T;
 }
