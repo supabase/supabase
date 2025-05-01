@@ -29,6 +29,8 @@ export const DEFAULT_CHART_CONFIG: ChartConfig = {
   showLabels: false,
   showGrid: false,
   view: 'table',
+  primaryKey: '',
+  secondaryKey: '',
 }
 
 interface QueryBlockProps {
@@ -82,6 +84,8 @@ interface QueryBlockProps {
   noResultPlaceholder?: ReactNode
   /** To trigger a refresh of the query */
   isRefreshing?: boolean
+  /** Hide the actions button */
+  hideActions?: boolean
   /** Optional callback whenever a chart configuration is updated (Used in Reports) */
   onUpdateChartConfig?: ({
     chart,
@@ -98,6 +102,7 @@ export const QueryBlock = ({
   id,
   label,
   sql,
+  hideActions = false,
   chartConfig = DEFAULT_CHART_CONFIG,
   maxHeight = 250,
   queryHeight,
@@ -246,78 +251,80 @@ export const QueryBlock = ({
       }
       label={label}
       actions={
-        <>
-          <ButtonTooltip
-            type="text"
-            size="tiny"
-            className="w-7 h-7"
-            icon={<Code size={14} />}
-            onClick={() => setShowSql(!showSql)}
-            tooltip={{
-              content: { side: 'bottom', text: showSql ? 'Hide query' : 'Show query' },
-            }}
-          />
-
-          {queryResult && (
-            <>
-              {/* [Joshen ReportsV2] Won't see this just yet as this is intended for Reports V2 */}
-              {parameters.length > 0 && (
-                <ParametersPopover
-                  parameters={parameters}
-                  parameterValues={parameterValues}
-                  onSubmit={setParameterValues}
-                />
-              )}
-              {isChart && (
-                <BlockViewConfiguration
-                  view={view}
-                  isChart={isChart}
-                  lockColumns={lockColumns}
-                  chartConfig={chartSettings}
-                  columns={Object.keys(queryResult[0] || {})}
-                  changeView={(view) => {
-                    if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: { view } })
-                    setChartSettings({ ...chartSettings, view })
-                  }}
-                  updateChartConfig={(config) => {
-                    if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: config })
-                    setChartSettings(config)
-                  }}
-                />
-              )}
-            </>
-          )}
-
-          <EditQueryButton id={id} title={label} sql={sql} />
-
-          {(showRunButtonIfNotReadOnly || !readOnlyError) && (
+        !hideActions && (
+          <>
             <ButtonTooltip
               type="text"
               size="tiny"
               className="w-7 h-7"
-              icon={<Play size={14} />}
-              loading={isExecuting || isLoading}
-              disabled={isLoading}
-              onClick={() => {
-                handleExecute()
-                if (!!sql) onRunQuery?.('select')
-              }}
+              icon={<Code size={14} />}
+              onClick={() => setShowSql(!showSql)}
               tooltip={{
-                content: {
-                  side: 'bottom',
-                  className: 'max-w-56 text-center',
-                  text: isExecuting ? (
-                    <p>{`Query is running. You may cancel ongoing queries via the [SQL Editor](/project/${ref}/sql?viewOngoingQueries=true).`}</p>
-                  ) : (
-                    'Run query'
-                  ),
-                },
+                content: { side: 'bottom', text: showSql ? 'Hide query' : 'Show query' },
               }}
             />
-          )}
 
-          {actions}
-        </>
+            {queryResult && (
+              <>
+                {/* [Joshen ReportsV2] Won't see this just yet as this is intended for Reports V2 */}
+                {parameters.length > 0 && (
+                  <ParametersPopover
+                    parameters={parameters}
+                    parameterValues={parameterValues}
+                    onSubmit={setParameterValues}
+                  />
+                )}
+                {isChart && (
+                  <BlockViewConfiguration
+                    view={view}
+                    isChart={isChart}
+                    lockColumns={lockColumns}
+                    chartConfig={chartSettings}
+                    columns={Object.keys(queryResult[0] || {})}
+                    changeView={(view) => {
+                      if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: { view } })
+                      setChartSettings({ ...chartSettings, view })
+                    }}
+                    updateChartConfig={(config) => {
+                      if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: config })
+                      setChartSettings(config)
+                    }}
+                  />
+                )}
+              </>
+            )}
+
+            <EditQueryButton id={id} title={label} sql={sql} />
+
+            {(showRunButtonIfNotReadOnly || !readOnlyError) && (
+              <ButtonTooltip
+                type="text"
+                size="tiny"
+                className="w-7 h-7"
+                icon={<Play size={14} />}
+                loading={isExecuting || isLoading}
+                disabled={isLoading}
+                onClick={() => {
+                  handleExecute()
+                  if (!!sql) onRunQuery?.('select')
+                }}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    className: 'max-w-56 text-center',
+                    text: isExecuting ? (
+                      <p>{`Query is running. You may cancel ongoing queries via the [SQL Editor](/project/${ref}/sql?viewOngoingQueries=true).`}</p>
+                    ) : (
+                      'Run query'
+                    ),
+                  },
+                }}
+              />
+            )}
+
+            {actions}
+          </>
+        )
       }
     >
       {!!showWarning && (
@@ -413,6 +420,8 @@ export const QueryBlock = ({
             </div>
           )}
         </>
+      ) : view === 'number' && queryResult !== undefined ? (
+        <NumberChartView config={chartSettings} results={queryResult} />
       ) : (
         <>
           {!isExecuting && !!queryError ? (
@@ -439,5 +448,73 @@ export const QueryBlock = ({
         </>
       )}
     </ReportBlockContainer>
+  )
+}
+
+// Add a simple component for rendering the number view
+const NumberChartView = ({ config, results }: { config: ChartConfig; results?: any[] }) => {
+  const primaryRawValue = results?.[0]?.[config.primaryKey ?? '']
+  const secondaryRawValue = config.secondaryKey ? results?.[0]?.[config.secondaryKey] : undefined
+
+  const primaryValue =
+    typeof primaryRawValue === 'number' ? primaryRawValue : parseFloat(primaryRawValue)
+  const secondaryValue =
+    typeof secondaryRawValue === 'number' ? secondaryRawValue : parseFloat(secondaryRawValue)
+
+  const percentageDiff = useMemo(() => {
+    if (!isNaN(primaryValue) && !isNaN(secondaryValue) && secondaryValue !== 0) {
+      const diff = ((primaryValue - secondaryValue) / Math.abs(secondaryValue)) * 100
+      return diff
+    }
+    return null
+  }, [primaryValue, secondaryValue])
+
+  const formattedPercentageDiff = useMemo(() => {
+    if (percentageDiff === null) return null
+    const sign = percentageDiff >= 0 ? '+' : ''
+    const trend = percentageDiff >= 0 ? 'Increase' : 'Decrease'
+    // Use toLocaleString for better number formatting
+    return `${sign}${percentageDiff.toLocaleString(undefined, { maximumFractionDigits: 1 })}% ${trend}`
+  }, [percentageDiff])
+
+  const renderValue = (value: any) => {
+    if (value === null || value === undefined) return 'N/A'
+    if (typeof value === 'number' && !isNaN(value)) {
+      // Format numbers nicely
+      return value.toLocaleString()
+    }
+    return value.toString()
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center h-full p-4">
+      {!config.primaryKey ? (
+        <p className="text-sm text-foreground-lighter">
+          Select a primary key in the chart options.
+        </p>
+      ) : results && results.length === 0 ? (
+        <p className="text-sm text-foreground-lighter">No results returned from query</p>
+      ) : (
+        <div className="flex flex-col items-center justify-center w-40 h-40 rounded-full border border-default">
+          <p className="text-4xl font-mono">{renderValue(primaryRawValue)}</p>
+          {config.secondaryKey &&
+            secondaryRawValue === undefined &&
+            results &&
+            results.length > 0 && (
+              <p className="text-xs text-foreground-light mt-1">(Secondary key not found)</p>
+            )}
+          {formattedPercentageDiff !== null && (
+            <p
+              className={cn(
+                'text-xs font-mono mt-1',
+                percentageDiff! >= 0 ? 'text-brand-600' : 'text-destructive'
+              )}
+            >
+              {formattedPercentageDiff}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
   )
 }

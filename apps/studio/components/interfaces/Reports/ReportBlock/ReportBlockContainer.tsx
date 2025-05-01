@@ -39,7 +39,7 @@ export const ReportBlockContainer = ({
         <TooltipTrigger asChild>
           <div
             className={cn(
-              'grid-item-drag-handle flex py-1 pl-3 pr-1 items-center gap-2 z-10 shrink-0 group',
+              'grid-item-drag-handle flex py-2 pl-3 pr-1 items-center gap-2 z-10 shrink-0 group',
               draggable && 'cursor-move'
             )}
           >
@@ -62,7 +62,10 @@ export const ReportBlockContainer = ({
                 <GripHorizontal size={16} strokeWidth={1.5} />
               </div>
             )}
-            <h3 title={label} className="text-xs font-medium text-foreground-light flex-1 truncate">
+            <h3
+              title={label}
+              className="text-xs uppercase text-foreground-light font-mono flex-1 truncate"
+            >
               {label}
             </h3>
             <div className="flex items-center">{actions}</div>

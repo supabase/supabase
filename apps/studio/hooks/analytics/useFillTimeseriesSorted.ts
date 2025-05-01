@@ -7,12 +7,24 @@ import { useMemo } from 'react'
 export const useFillTimeseriesSorted = (...args: Parameters<typeof fillTimeseries>) => {
   return useMemo(() => {
     const [data, timestampKey] = args
-    if (!data[0]?.[timestampKey])
+
+    // Add check for invalid/empty data before accessing data[0]
+    if (!Array.isArray(data) || data.length === 0) {
       return {
-        data,
+        data: [], // Return empty array for invalid input
         error: undefined,
         isError: false,
       }
+    }
+
+    // Original check (now safe)
+    if (!data[0]?.[timestampKey]) {
+      return {
+        data: [], // Return empty array if first item lacks timestamp key
+        error: undefined,
+        isError: false,
+      }
+    }
 
     try {
       const filled = fillTimeseries(...args)

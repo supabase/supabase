@@ -1,4 +1,4 @@
-import { BarChart2, Settings2, Table } from 'lucide-react'
+import { BarChart2, Settings2, Table, Type } from 'lucide-react'
 
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import {
@@ -19,11 +19,11 @@ import { ButtonTooltip } from '../ButtonTooltip'
 
 interface BlockViewConfigurationProps {
   columns: string[]
-  view: 'chart' | 'table'
+  view: 'chart' | 'table' | 'number'
   isChart: boolean
   lockColumns?: boolean
   chartConfig?: ChartConfig
-  changeView: (value: 'chart' | 'table') => void
+  changeView: (value: 'chart' | 'table' | 'number') => void
   updateChartConfig: (config: ChartConfig) => void
 }
 
@@ -53,21 +53,22 @@ export const BlockViewConfiguration = ({
             type="single"
             value={view}
             className="w-full"
-            onValueChange={(view: 'chart' | 'table') => {
+            onValueChange={(view: 'chart' | 'table' | 'number') => {
               if (view) changeView(view)
             }}
           >
             <ToggleGroupItem className="w-full" value="table" aria-label="Show as table">
               <Table className="h-4 w-4" />
-              <p className="text-xs ml-2">As table</p>
             </ToggleGroupItem>
             <ToggleGroupItem className="w-full" value="chart" aria-label="Show as chart">
               <BarChart2 className="h-4 w-4" />
-              <p className="text-xs ml-2">As chart</p>
+            </ToggleGroupItem>
+            <ToggleGroupItem className="w-full" value="number" aria-label="Show as number">
+              <Type className="h-4 w-4" />
             </ToggleGroupItem>
           </ToggleGroup>
 
-          {isChart && chartConfig && (
+          {view === 'chart' && isChart && chartConfig && (
             <>
               <Select_Shadcn_
                 disabled={lockColumns}
@@ -122,6 +123,55 @@ export const BlockViewConfiguration = ({
                   Cumulative
                 </Label_Shadcn_>
               </div>
+            </>
+          )}
+
+          {view === 'number' && chartConfig && (
+            <>
+              <Select_Shadcn_
+                value={chartConfig?.primaryKey ?? ''}
+                onValueChange={(value) =>
+                  updateChartConfig({ ...chartConfig, primaryKey: value || undefined })
+                }
+              >
+                <SelectTrigger_Shadcn_ className="text-left">
+                  Primary Value {chartConfig?.primaryKey && `- ${chartConfig.primaryKey}`}
+                </SelectTrigger_Shadcn_>
+                <SelectContent_Shadcn_>
+                  <SelectGroup_Shadcn_>
+                    {columns.map((key) => (
+                      <SelectItem_Shadcn_ value={key} key={key}>
+                        {key}
+                      </SelectItem_Shadcn_>
+                    ))}
+                  </SelectGroup_Shadcn_>
+                </SelectContent_Shadcn_>
+              </Select_Shadcn_>
+
+              <Select_Shadcn_
+                value={chartConfig?.secondaryKey ?? ''}
+                onValueChange={(value) => {
+                  const newSecondaryKey = value === '__none__' ? undefined : value
+                  updateChartConfig({ ...chartConfig, secondaryKey: newSecondaryKey })
+                }}
+              >
+                <SelectTrigger_Shadcn_ className="text-left">
+                  Secondary Value{' '}
+                  {chartConfig?.secondaryKey ? `- ${chartConfig.secondaryKey}` : '(Optional)'}
+                </SelectTrigger_Shadcn_>
+                <SelectContent_Shadcn_>
+                  <SelectGroup_Shadcn_>
+                    <SelectItem_Shadcn_ value="__none__" key="none">
+                      None
+                    </SelectItem_Shadcn_>
+                    {columns.map((key) => (
+                      <SelectItem_Shadcn_ value={key} key={key}>
+                        {key}
+                      </SelectItem_Shadcn_>
+                    ))}
+                  </SelectGroup_Shadcn_>
+                </SelectContent_Shadcn_>
+              </Select_Shadcn_>
             </>
           )}
         </form>

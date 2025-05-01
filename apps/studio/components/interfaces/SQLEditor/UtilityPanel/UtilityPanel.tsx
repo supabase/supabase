@@ -30,6 +30,8 @@ const DEFAULT_CHART_CONFIG: ChartConfig = {
   yKey: '',
   showLabels: false,
   showGrid: false,
+  primaryKey: '',
+  secondaryKey: '',
 }
 
 const UtilityPanel = ({

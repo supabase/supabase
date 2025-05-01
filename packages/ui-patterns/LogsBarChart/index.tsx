@@ -14,6 +14,7 @@ const CHART_COLORS = {
   RED_2: 'hsl(var(--destructive-500))',
   YELLOW_1: 'hsl(var(--warning-default))',
   YELLOW_2: 'hsl(var(--warning-500))',
+  GRAY: 'hsl(var(--background-surface-300))',
 }
 type LogsBarChartDatum = {
   timestamp: string
@@ -24,13 +25,17 @@ type LogsBarChartDatum = {
 export const LogsBarChart = ({
   data,
   onBarClick,
+  barHeight = 80,
   EmptyState,
+  isSubtle = false,
   DateTimeFormat = 'MMM D, YYYY, hh:mma',
 }: {
   data: LogsBarChartDatum[]
   onBarClick?: (datum: LogsBarChartDatum, tooltipData?: CategoricalChartState) => void
   EmptyState?: ReactNode
   DateTimeFormat?: string
+  barHeight?: number
+  isSubtle?: boolean
 }) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
@@ -58,7 +63,7 @@ export const LogsBarChart = ({
             },
           } satisfies ChartConfig
         }
-        className="h-[80px]"
+        className={cn(`h-[${barHeight}px]`)}
       >
         <RechartBarChart
           data={data}
@@ -132,9 +137,11 @@ export const LogsBarChart = ({
                 className="cursor-pointer transition-colors"
                 key={`success-${index}`}
                 fill={
-                  focusDataIndex === index || focusDataIndex === null
-                    ? CHART_COLORS.GREEN_1
-                    : CHART_COLORS.GREEN_2
+                  isSubtle
+                    ? CHART_COLORS.GRAY
+                    : focusDataIndex === index || focusDataIndex === null
+                      ? CHART_COLORS.GREEN_1
+                      : CHART_COLORS.GREEN_2
                 }
               />
             ))}
@@ -142,7 +149,7 @@ export const LogsBarChart = ({
         </RechartBarChart>
       </ChartContainer>
       {data && (
-        <div className="text-foreground-lighter -mt-10 flex items-center justify-between text-[10px] font-mono">
+        <div className="text-foreground-lighter -mt-10 flex items-center justify-between text-[10px] font-mono px-4">
           <span>{startDate}</span>
           <span>{endDate}</span>
         </div>

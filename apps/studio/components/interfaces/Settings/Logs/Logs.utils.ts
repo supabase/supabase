@@ -235,7 +235,7 @@ limit ${limit}
  * Hardcoded cross join unnests and aliases for each table.
  * Should be used together with the getWhereStatements to allow for filtering on aliases
  */
-const genCrossJoinUnnests = (table: LogsTableName) => {
+export const genCrossJoinUnnests = (table: LogsTableName) => {
   switch (table) {
     case 'edge_logs':
       return `cross join unnest(metadata) as m
@@ -595,7 +595,7 @@ export function checkForWildcard(query: string) {
   return wildcardRegex.test(queryWithoutCount)
 }
 
-function getErrorCondition(table: LogsTableName): string {
+export function getErrorCondition(table: LogsTableName): string {
   switch (table) {
     case 'edge_logs':
       return 'response.status_code >= 500'
@@ -614,7 +614,7 @@ function getErrorCondition(table: LogsTableName): string {
   }
 }
 
-function getWarningCondition(table: LogsTableName): string {
+export function getWarningCondition(table: LogsTableName): string {
   switch (table) {
     case 'edge_logs':
       return 'response.status_code >= 400 AND response.status_code < 500'

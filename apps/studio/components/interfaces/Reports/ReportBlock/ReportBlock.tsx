@@ -20,6 +20,7 @@ interface ReportBlockProps {
   endDate: string
   interval: AnalyticsInterval
   disableUpdate: boolean
+  hideActions: boolean
   isRefreshing: boolean
   onRemoveChart: ({ metric }: { metric: { key: string } }) => void
   onUpdateChart: ({
@@ -38,6 +39,7 @@ export const ReportBlock = ({
   interval,
   disableUpdate,
   isRefreshing,
+  hideActions = false,
   onRemoveChart,
   onUpdateChart,
 }: ReportBlockProps) => {
@@ -79,6 +81,7 @@ export const ReportBlock = ({
           sql={sql}
           maxHeight={232}
           queryHeight={232}
+          hideActions={hideActions}
           actions={
             <ButtonTooltip
               type="text"

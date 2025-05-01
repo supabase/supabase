@@ -2,9 +2,8 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { partition } from 'lodash'
 import { ChevronDown, Globe2, Loader2, Network } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import ReactFlow, { Background, Edge, ReactFlowProvider, useReactFlow } from 'reactflow'
+import { useMemo, useRef, useState } from 'react'
+import { ReactFlowProvider } from 'reactflow'
 import 'reactflow/dist/style.css'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -18,7 +17,6 @@ import {
 } from 'data/read-replicas/replicas-status-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
-import { timeout } from 'lib/helpers'
 import Link from 'next/link'
 import { type AWS_REGIONS_KEYS } from 'shared-data'
 import {
@@ -33,17 +31,13 @@ import {
 import DeployNewReplicaPanel from './DeployNewReplicaPanel'
 import DropAllReplicasConfirmationModal from './DropAllReplicasConfirmationModal'
 import DropReplicaConfirmationModal from './DropReplicaConfirmationModal'
-import { SmoothstepEdge } from './Edge'
 import { REPLICA_STATUS } from './InstanceConfiguration.constants'
-import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceConfiguration.utils'
-import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
+import InstanceDiagram from './InstanceDiagram'
 
 const InstanceConfigurationUI = () => {
-  const reactFlow = useReactFlow()
   const isOrioleDb = useIsOrioleDb()
-  const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const numTransition = useRef<number>()
   const { project, isLoading: isLoadingProject } = useProjectContext()
@@ -117,95 +111,6 @@ const InstanceConfigurationUI = () => {
     }
   )
 
-  const backgroundPatternColor =
-    resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'
-
-  const nodes = useMemo(
-    () =>
-      isSuccessReplicas && isSuccessLoadBalancers && primary !== undefined
-        ? generateNodes({
-            primary,
-            replicas,
-            loadBalancers: loadBalancers ?? [],
-            onSelectRestartReplica: setSelectedReplicaToRestart,
-            onSelectDropReplica: setSelectedReplicaToDrop,
-          })
-        : [],
-    [isSuccessReplicas, isSuccessLoadBalancers, primary, replicas, loadBalancers]
-  )
-
-  const edges: Edge[] = useMemo(
-    () =>
-      isSuccessReplicas && isSuccessLoadBalancers
-        ? [
-            ...((loadBalancers ?? []).length > 0
-              ? [
-                  {
-                    id: `load-balancer-${primary.identifier}`,
-                    source: 'load-balancer',
-                    target: primary.identifier,
-                    type: 'smoothstep',
-                    animated: true,
-                    className: '!cursor-default',
-                  },
-                ]
-              : []),
-            ...replicas.map((database) => {
-              return {
-                id: `${primary.identifier}-${database.identifier}`,
-                source: primary.identifier,
-                target: database.identifier,
-                type: 'smoothstep',
-                animated: true,
-                className: '!cursor-default',
-                data: {
-                  status: database.status,
-                  identifier: database.identifier,
-                  connectionString: database.connectionString,
-                },
-              }
-            }),
-          ]
-        : [],
-    [isSuccessLoadBalancers, isSuccessReplicas, loadBalancers, primary?.identifier, replicas]
-  )
-
-  const nodeTypes = useMemo(
-    () => ({
-      PRIMARY: PrimaryNode,
-      READ_REPLICA: ReplicaNode,
-      REGION: RegionNode,
-      LOAD_BALANCER: LoadBalancerNode,
-    }),
-    []
-  )
-
-  const edgeTypes = useMemo(
-    () => ({
-      smoothstep: SmoothstepEdge,
-    }),
-    []
-  )
-
-  const setReactFlow = async () => {
-    const graph = getDagreGraphLayout(nodes, edges)
-    const { nodes: updatedNodes } = addRegionNodes(graph.nodes, graph.edges)
-    reactFlow.setNodes(updatedNodes)
-    reactFlow.setEdges(graph.edges)
-
-    // [Joshen] Odd fix to ensure that react flow snaps back to center when adding nodes
-    await timeout(1)
-    reactFlow.fitView({ maxZoom: 0.9, minZoom: 0.9 })
-  }
-
-  // [Joshen] Just FYI this block is oddly triggering whenever we refocus on the viewport
-  // even if I change the dependency array to just data. Not blocker, just an area to optimize
-  useEffect(() => {
-    if (isSuccessReplicas && isSuccessLoadBalancers && nodes.length > 0 && view === 'flow') {
-      setReactFlow()
-    }
-  }, [isSuccessReplicas, isSuccessLoadBalancers, nodes, edges, view])
-
   return (
     <div className="nowheel border-y">
       <div
@@ -213,13 +118,11 @@ const InstanceConfigurationUI = () => {
           isSuccessReplicas && !isLoadingProject ? '' : 'flex items-center justify-center px-28'
         }`}
       >
-        {/* Sometimes the read replicas are loaded before the project info and causes  read replicas to be shown on Fly deploys.
-            You can replicate this to going to this page and refresh. This isLoadingProject flag fixes that. */}
         {(isLoading || isLoadingProject) && (
           <Loader2 className="animate-spin text-foreground-light" />
         )}
         {isError && <AlertError error={error} subject="Failed to retrieve replicas" />}
-        {isSuccessReplicas && !isLoadingProject && (
+        {isSuccessReplicas && !isLoadingProject && primary && (
           <>
             <div className="z-10 absolute top-4 right-4 flex items-center justify-center gap-x-2">
               <div className="flex items-center justify-center">
@@ -286,25 +189,7 @@ const InstanceConfigurationUI = () => {
               )}
             </div>
             {view === 'flow' ? (
-              <ReactFlow
-                fitView
-                fitViewOptions={{ minZoom: 0.9, maxZoom: 0.9 }}
-                className="instance-configuration"
-                zoomOnPinch={false}
-                zoomOnScroll={false}
-                nodesDraggable={false}
-                nodesConnectable={false}
-                zoomOnDoubleClick={false}
-                edgesFocusable={false}
-                edgesUpdatable={false}
-                defaultNodes={[]}
-                defaultEdges={[]}
-                nodeTypes={nodeTypes}
-                edgeTypes={edgeTypes}
-                proOptions={{ hideAttribution: true }}
-              >
-                <Background color={backgroundPatternColor} />
-              </ReactFlow>
+              <InstanceDiagram />
             ) : (
               <MapView
                 onSelectDeployNewReplica={(region) => {
