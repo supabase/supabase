@@ -1,3 +1,4 @@
+import { generateReadingTime } from './helpers'
 const toc = require('markdown-toc')
 
 // Payload API configuration
@@ -6,10 +7,22 @@ const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY
 
 type CMSBlogPost = {
   id: string
-  Title: string
+  title: string
   slug: string
   description: string
-  content: any
+  content: {
+    root: {
+      children: Array<{
+        type: string
+        children: Array<{
+          text: string
+          type: string
+          [key: string]: any
+        }>
+        [key: string]: any
+      }>
+    }
+  }
   date?: string
   launchweek?: string
   toc_depth?: number
@@ -57,6 +70,46 @@ type ProcessedPost = {
   path: string
   isCMS: boolean
   tags: string[]
+  content: string
+}
+
+/**
+ * Convert Payload rich text content to markdown
+ */
+function convertRichTextToMarkdown(content: CMSBlogPost['content']): string {
+  if (!content?.root?.children) return ''
+
+  return content.root.children
+    .map((node) => {
+      if (node.type === 'heading') {
+        const level = node.tag?.replace('h', '') || '1'
+        const text = node.children?.map((child) => child.text).join('') || ''
+        return `${'#'.repeat(Number(level))} ${text}`
+      }
+      if (node.type === 'paragraph') {
+        return node.children?.map((child) => child.text).join('') || ''
+      }
+      if (node.type === 'list') {
+        const items = node.children
+          ?.map((item) => {
+            if (item.type === 'list-item') {
+              return `- ${item.children?.map((child: { text: any }) => child.text).join('') || ''}`
+            }
+            return ''
+          })
+          .filter(Boolean)
+          .join('\n')
+        return items
+      }
+      if (node.type === 'link') {
+        const text = node.children?.map((child) => child.text).join('') || ''
+        const url = node.url || ''
+        return `[${text}](${url})`
+      }
+      return ''
+    })
+    .filter(Boolean)
+    .join('\n\n')
 }
 
 /**
@@ -64,14 +117,12 @@ type ProcessedPost = {
  */
 export async function getAllCMSPostSlugs() {
   try {
-    const response = await fetch(`${PAYLOAD_URL}/api/blog-posts?limit=100&depth=1`, {
+    const response = await fetch(`${PAYLOAD_URL}/api/posts?limit=100&depth=1`, {
       headers: {
         'Content-Type': 'application/json',
         ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
       },
     })
-
-    console.log('response', response)
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
@@ -94,15 +145,12 @@ export async function getAllCMSPostSlugs() {
  */
 export async function getCMSPostBySlug(slug: string) {
   try {
-    const response = await fetch(
-      `${PAYLOAD_URL}/api/blog-posts?where[slug][equals]=${slug}&depth=2`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
-        },
-      }
-    )
+    const response = await fetch(`${PAYLOAD_URL}/api/posts?where[slug][equals]=${slug}&depth=2`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+      },
+    })
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
@@ -118,25 +166,25 @@ export async function getCMSPostBySlug(slug: string) {
 
     const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
     const formattedDate = new Date(post.date || new Date()).toLocaleDateString('en-IN', options)
+    const markdownContent = convertRichTextToMarkdown(post.content)
+    const readingTime = post.readingTime || generateReadingTime(markdownContent)
 
     // Extract thumb and image URLs from the nested structure
     const thumbUrl = `${PAYLOAD_URL}${post.thumb?.url}`
     const imageUrl = `${PAYLOAD_URL}${post.image?.url}`
 
     // Generate TOC from content for CMS posts
-    const tocResult = toc(post.content || '', {
+    const tocResult = toc(markdownContent, {
       maxdepth: post.toc_depth ? post.toc_depth : 2,
     })
-    const processedContent = tocResult.content
-
-    console.log('cms-post slug', post)
 
     return {
       slug,
-      source: post.content || '',
-      title: post.Title || 'Untitled Post',
+      source: markdownContent,
+      title: post.title || 'Untitled Post',
       date: post.date || new Date().toISOString(),
       formattedDate,
+      readingTime,
       launchweek: post.launchweek || null,
       authors:
         post.authors?.map((author: any) => ({
@@ -157,10 +205,10 @@ export async function getCMSPostBySlug(slug: string) {
       url: `/blog/${slug}`,
       path: `/blog/${slug}`,
       isCMS: true,
-      content: post.content || '',
+      content: markdownContent,
       tags: post.tags || [],
       toc: {
-        content: processedContent,
+        content: tocResult.content,
         json: tocResult.json,
       },
     }
@@ -183,13 +231,12 @@ export async function getAllCMSPosts({
   currentPostSlug?: string
 } = {}): Promise<ProcessedPost[]> {
   try {
-    // const response = await fetch(`${PAYLOAD_API_URL}/blog-posts?depth=2&limit=100`, {
-    //   // headers: {
-    //   //   'Content-Type': 'application/json',
-    //   //   ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
-    //   // },
-    // })
-    const response = await fetch('http://localhost:3030/api/blog-posts?depth=1&draft=false')
+    const response = await fetch(`${PAYLOAD_URL}/api/posts?depth=1&draft=false`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+      },
+    })
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
@@ -206,31 +253,33 @@ export async function getAllCMSPosts({
           year: 'numeric',
         }
         const formattedDate = new Date(post.date || new Date()).toLocaleDateString('en-IN', options)
+        const markdownContent = convertRichTextToMarkdown(post.content)
+        const readingTime = post.readingTime || generateReadingTime(markdownContent)
 
-        // // Extract thumb and image URLs from the nested structure
+        // Extract thumb and image URLs from the nested structure
         const thumbUrl = `${PAYLOAD_URL}${post.thumb?.url}`
         const imageUrl = `${PAYLOAD_URL}${post.image?.url}`
 
-        console.log('post', post)
-        console.log('imageUrl', imageUrl)
-
         return {
           slug: post.slug || '',
-          title: post.Title || '',
+          title: post.title || '',
           description: post.description || '',
           date: post.date || new Date().toISOString(),
           formattedDate,
-          readingTime: post.readingTime || 0,
+          readingTime,
           authors:
             post.authors?.map((author: any) => ({
               author: author.author || '',
               author_id: author.author_id || '',
               position: author.position || '',
               author_url: author.author_url || '#',
+              // author_image_url: author.author_image_url?.url
+              //   ? author.author_image_url.url.includes('http')
+              //     ? author.author_image_url.url
+              //     : `${PAYLOAD_URL}${author.author_image_url.url}`
+              //   : null,
               author_image_url: author.author_image_url?.url
-                ? author.author_image_url.url.includes('http')
-                  ? author.author_image_url.url
-                  : `${PAYLOAD_URL}${author.author_image_url.url}`
+                ? `${PAYLOAD_URL}${author.author_image_url.url}`
                 : null,
               username: author.username || '',
             })) || [],
@@ -241,6 +290,7 @@ export async function getAllCMSPosts({
           path: `/blog/${post.slug || ''}`,
           isCMS: true,
           tags: post.tags || [],
+          content: markdownContent,
         }
       })
 

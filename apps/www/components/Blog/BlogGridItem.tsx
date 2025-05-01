@@ -5,7 +5,6 @@ import React from 'react'
 import type Author from '~/types/author'
 import type PostTypes from '~/types/post'
 import dayjs from 'dayjs'
-import { CMS_API_URL } from '~/lib/constants'
 
 interface Props {
   post: PostTypes
@@ -25,18 +24,6 @@ const BlogGridItem = ({ post }: Props) => {
     }
   }
 
-  console.log('post', post)
-  // const imageUrl = post.isCMS
-  //   ? post.thumb
-  //     ? `${CMS_API_URL}${post.thumb}`
-  //     : post.image
-  //       ? `${CMS_API_URL}${post.image}`
-  //       : '/images/blog/blog-placeholder.png'
-  //   : typeof post.thumb === 'string'
-  //     ? post.type === 'casestudy'
-  //       ? post.thumb
-  //       : `/images/blog/${post.thumb}`
-  //     : '/images/blog/blog-placeholder.png'
   const imageUrl = post.isCMS
     ? post.thumb
       ? post.thumb

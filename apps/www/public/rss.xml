@@ -8,18 +8,11 @@
       <lastBuildDate>Thu, 01 May 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
-  <guid>https://supabase.com/blog/first-payload-blog-post</guid>
-  <title>First Blog Post - Payload CMS</title>
-  <link>https://supabase.com/blog/first-payload-blog-post</link>
-  <description>Yoyyo</description>
+  <guid>https://supabase.com/blog/post-from-payload-cms</guid>
+  <title>Post from Payload CMS</title>
+  <link>https://supabase.com/blog/post-from-payload-cms</link>
+  <description>Post description here</description>
   <pubDate>Thu, 01 May 2025 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/second-payload-cms-post</guid>
-  <title>Second Payload CMS post</title>
-  <link>https://supabase.com/blog/second-payload-cms-post</link>
-  <description>asdf</description>
-  <pubDate>Tue, 29 Apr 2025 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/launch-week-14-top-10</guid>

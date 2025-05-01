@@ -1,38 +1,57 @@
 {
   "name": "cms",
-  "version": "0.1.0",
-  "private": true,
-  "description": "A Strapi application",
+  "version": "1.0.0",
+  "description": "CMS based on Payload",
+  "license": "MIT",
+  "type": "module",
   "scripts": {
-    "build": "strapi build",
-    "console": "strapi console",
-    "deploy": "strapi deploy",
-    "dev": "strapi develop --debug",
-    "develop": "strapi develop",
-    "start": "strapi start",
-    "strapi": "strapi",
-    "upgrade": "npx @strapi/upgrade latest",
-    "upgrade:dry": "npx @strapi/upgrade latest --dry"
+    "build": "cross-env NODE_OPTIONS=--no-deprecation next build --turbopack",
+    "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --turbopack --port 3030",
+    "devsafe": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next dev",
+    "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
+    "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
+    "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
+    "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
+    "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
+    "ci": "cross-env NODE_OPTIONS=--no-deprecation payload migrate && pnpm build"
   },
   "dependencies": {
-    "@strapi/plugin-cloud": "5.12.5",
-    "@strapi/plugin-users-permissions": "5.12.5",
-    "@strapi/strapi": "5.12.5",
-    "better-sqlite3": "11.3.0",
-    "pg": "^8.13.1",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "react-router-dom": "^6.0.0",
-    "strapi-provider-upload-supabase": "^1.0.0",
-    "styled-components": "^6.0.0"
+    "@payloadcms/db-postgres": "3.33.0",
+    "@payloadcms/next": "3.33.0",
+    "@payloadcms/payload-cloud": "3.33.0",
+    "@payloadcms/plugin-form-builder": "3.33.0",
+    "@payloadcms/plugin-nested-docs": "3.33.0",
+    "@payloadcms/plugin-redirects": "3.33.0",
+    "@payloadcms/plugin-search": "3.33.0",
+    "@payloadcms/plugin-seo": "3.33.0",
+    "@payloadcms/richtext-lexical": "3.33.0",
+    "@payloadcms/storage-s3": "^3.33.0",
+    "@payloadcms/ui": "3.33.0",
+    "cross-env": "^7.0.3",
+    "graphql": "^16.8.1",
+    "next": "15.3.0",
+    "payload": "3.33.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "sharp": "0.32.6"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "typescript": "^5"
+    "@eslint/eslintrc": "^3.2.0",
+    "@types/node": "^22.5.4",
+    "@types/react": "19.1.0",
+    "@types/react-dom": "19.1.2",
+    "eslint": "^9.16.0",
+    "eslint-config-next": "15.3.0",
+    "prettier": "^3.4.2",
+    "typescript": "5.7.3"
   },
-  "strapi": {
-    "uuid": "b85c4d47-a812-4181-9373-f0524815c5f0"
+  "engines": {
+    "node": "^18.20.2 || >=20.9.0",
+    "pnpm": "^9 || ^10"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp"
+    ]
   }
 }
