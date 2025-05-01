@@ -37,6 +37,7 @@
     "knip": "pnpx knip@~5.50.0"
   },
   "devDependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.410.0",
     "@types/node": "catalog:",
     "eslint": "^8.57.0",
     "prettier": "3.2.4",
@@ -59,12 +60,21 @@
       "@tanstack/directive-functions-plugin>vite": "6.2.6",
       "@tanstack/react-start-plugin>vite": "6.2.6"
     },
-    "neverBuiltDependencies": ["libpg-query"]
+    "neverBuiltDependencies": [
+      "libpg-query"
+    ]
   },
   "engines": {
     "pnpm": ">=9",
     "node": ">=20"
   },
-  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
+  "keywords": [
+    "postgres",
+    "firebase",
+    "storage",
+    "functions",
+    "database",
+    "auth"
+  ],
   "packageManager": "pnpm@9.15.5"
 }
