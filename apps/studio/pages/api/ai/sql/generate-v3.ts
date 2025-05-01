@@ -113,9 +113,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
                 }
               }
 
-              console.log(
-                `execute_sql wrapper: Added manualToolCallId ${manualToolCallId} to result.`
-              )
               return originalResult
             },
           })
@@ -166,7 +163,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         yAxis: z.string().optional().describe('Key for the y-axis (required if view is chart).'),
       }),
       execute: async (args) => {
-        console.log('Dummy execute for displayQuery called with args:', args)
         const statusMessage = args.manualToolCallId
           ? 'Tool call sent to client for rendering SELECT results.'
           : 'Tool call sent to client for rendering write/DDL query.'
@@ -183,10 +179,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         code: z.string().describe('The TypeScript code for the Edge Function.'),
       }),
       execute: async (args) => {
-        console.log('Dummy execute for displayEdgeFunction called with args:', args)
         return { status: 'Tool call sent to client for rendering.' }
       },
     })
+
+    console.log('mcpTools', mcpTools)
 
     const allTools = {
       ...mcpTools,
