@@ -541,6 +541,9 @@ importers:
 
   apps/studio:
     dependencies:
+      '@ai-sdk/amazon-bedrock':
+        specifier: ^2.2.8
+        version: 2.2.8(zod@3.23.8)
       '@ai-sdk/openai':
         specifier: ^1.3.18
         version: 1.3.20(zod@3.23.8)
@@ -1000,7 +1003,7 @@ importers:
         version: 2.7.5(@types/node@20.17.32)(typescript@5.5.4)
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0))(react@18.3.1)
+        version: 0.9.13(next@15.3.1(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0))(react@18.3.1)
       postcss:
         specifier: ^8.4.31
         version: 8.5.3
@@ -1160,7 +1163,7 @@ importers:
         version: 1.117.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-start':
         specifier: ^1.114.25
-        version: 1.118.0(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@tanstack/react-router@1.117.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.15.3)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(vite@6.3.3(@types/node@22.15.3)(jiti@2.4.2)(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1))(webpack@5.99.7(esbuild@0.25.3))(yaml@2.7.1)
+        version: 1.118.0(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@tanstack/react-router@1.117.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.15.3)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(vite@6.3.3(@types/node@22.15.3)(jiti@2.4.2)(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1))(webpack@5.99.7(esbuild@0.25.3))(yaml@2.7.1)
       '@types/lodash':
         specifier: ^4.17.16
         version: 4.17.16
@@ -2141,7 +2144,7 @@ importers:
         version: link:../api-types
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0))(react@18.3.1)
+        version: 0.9.13(next@15.3.1(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0))(react@18.3.1)
       typescript:
         specifier: ~5.5.0
         version: 5.5.4
@@ -2174,6 +2177,12 @@ packages:
 
   '@adobe/css-tools@4.4.2':
     resolution: {integrity: sha512-baYZExFpsdkBNuvGKTKWCwKH57HRZLVtycZS05WTQNVOiXVSeAki3nU35zlRbToeMW8aHlJfyS+1C4BOv27q0A==}
+
+  '@ai-sdk/amazon-bedrock@2.2.8':
+    resolution: {integrity: sha512-VEdiQ2hnxaWiqcaM1FTOxX64qkrWanwsl4taMUJe2ePdfqNZdeeoHrJbvQbkr90t6EWMyc/m2MKjjmlVs4rY5Q==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.0.0
 
   '@ai-sdk/openai@0.0.72':
     resolution: {integrity: sha512-IKsgxIt6KJGkEHyMp975xW5VPmetwhI8g9H6dDmwvemBB41IRQa78YMNttiJqPcgmrZX2QfErOICv1gQvZ1gZg==}
@@ -2285,6 +2294,10 @@ packages:
   '@antfu/ni@23.3.1':
     resolution: {integrity: sha512-C90iyzm/jLV7Lomv2UzwWUzRv9WZr1oRsFRKsX5HjQL4EXrbi9H/RtBkjCP+NF+ABZXUKpAa4F1dkoTaea4zHg==}
     hasBin: true
+
+  '@aws-crypto/crc32@5.2.0':
+    resolution: {integrity: sha512-nLbCWqQNgUiwwtFsen1AdzAtvuLRsQS8rYgMuxCrdKf9kOssamGLuPwyTY9wyYblNr9+1XM8v6zoDTPPSIeANg==}
+    engines: {node: '>=16.0.0'}
 
   '@aws-crypto/sha256-browser@5.2.0':
     resolution: {integrity: sha512-AXfN/lGotSQwu6HNcEsIASo7kWXZ5HYWvfOmSNKDsEqC4OashTp8alTmaz+F7TC2L083SFv5RdB+qU3Vs1kZqw==}
@@ -5896,6 +5909,10 @@ packages:
     resolution: {integrity: sha512-32lVig6jCaWBHnY+OEQ6e6Vnt5vDHaLiydGrwYMW9tPqO688hPGTYRamYJ1EptxEC2rAwJrHWmPoKRBl4iTa8w==}
     engines: {node: '>=18.0.0'}
 
+  '@smithy/eventstream-codec@4.0.2':
+    resolution: {integrity: sha512-p+f2kLSK7ZrXVfskU/f5dzksKTewZk8pJLPvER3aFHPt76C2MxD9vNatSfLzzQSQB4FNO96RK4PSXfhD1TTeMQ==}
+    engines: {node: '>=18.0.0'}
+
   '@smithy/fetch-http-handler@5.0.2':
     resolution: {integrity: sha512-+9Dz8sakS9pe7f2cBocpJXdeVjMopUDLgZs1yWeu7h++WqSbjUYv/JAJwKwXw1HV6gq1jyWjxuyn24E2GhoEcQ==}
     engines: {node: '>=18.0.0'}
@@ -7527,6 +7544,9 @@ packages:
     resolution: {integrity: sha512-7q4WPsYiD8Omvi/yHL314DkvsD/lM//Z2/KcU1vWk0xJotiV0GMJTgHTpWl3n90HJqpXKg7qX+VVNs5YbQyPRQ==}
     engines: {node: '>=8', npm: '>=5'}
 
+  aws4fetch@1.0.20:
+    resolution: {integrity: sha512-/djoAN709iY65ETD6LKCtyyEI04XIBP5xVvfmNxsEP0uJB5tyaGBztSryRr4HqMStr9R06PisQE7m9zDTXKu6g==}
+
   axe-core@4.10.3:
     resolution: {integrity: sha512-Xm7bpRXnDSX2YE2YFfBk2FnF0ep6tmG7xPh8iHee8MIcrgq762Nkce856dYtJYLkuIoYZvGfTs/PbZhideTcEg==}
     engines: {node: '>=4'}
@@ -8948,7 +8968,6 @@ packages:
     resolution: {integrity: sha512-X41YRfKkVCooILai2N0aN0Q5O0imu+MbNt894QWU683A82xJJXIR01dEqxwYJ91M6IdExtyFB3GCOJb4eBMBMQ==}
     peerDependencies:
       eslint: '>= 5'
-    bundledDependencies: []
 
   eslint-plugin-import@2.31.0:
     resolution: {integrity: sha512-ixmkI62Rbc2/w8Vfxyh1jQRTdRTF52VxwRVHl/ykPAmqG+Nb7/kNn+byLP0LxPgI7zWA16Jt82SybJInmMia3A==}
@@ -15349,6 +15368,15 @@ snapshots:
 
   '@adobe/css-tools@4.4.2': {}
 
+  '@ai-sdk/amazon-bedrock@2.2.8(zod@3.23.8)':
+    dependencies:
+      '@ai-sdk/provider': 1.1.3
+      '@ai-sdk/provider-utils': 2.2.7(zod@3.23.8)
+      '@smithy/eventstream-codec': 4.0.2
+      '@smithy/util-utf8': 4.0.0
+      aws4fetch: 1.0.20
+      zod: 3.23.8
+
   '@ai-sdk/openai@0.0.72(zod@3.23.8)':
     dependencies:
       '@ai-sdk/provider': 0.0.26
@@ -15457,6 +15485,12 @@ snapshots:
       '@jridgewell/trace-mapping': 0.3.25
 
   '@antfu/ni@23.3.1': {}
+
+  '@aws-crypto/crc32@5.2.0':
+    dependencies:
+      '@aws-crypto/util': 5.2.0
+      '@aws-sdk/types': 3.775.0
+      tslib: 2.8.1
 
   '@aws-crypto/sha256-browser@5.2.0':
     dependencies:
@@ -19889,6 +19923,13 @@ snapshots:
       '@smithy/url-parser': 4.0.2
       tslib: 2.8.1
 
+  '@smithy/eventstream-codec@4.0.2':
+    dependencies:
+      '@aws-crypto/crc32': 5.2.0
+      '@smithy/types': 4.2.0
+      '@smithy/util-hex-encoding': 4.0.0
+      tslib: 2.8.1
+
   '@smithy/fetch-http-handler@5.0.2':
     dependencies:
       '@smithy/protocol-http': 5.1.0
@@ -20383,7 +20424,7 @@ snapshots:
       tiny-invariant: 1.3.3
       tiny-warning: 1.0.3
 
-  '@tanstack/react-start-client@1.117.1(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)':
+  '@tanstack/react-start-client@1.117.1(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)':
     dependencies:
       '@tanstack/react-router': 1.117.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/router-core': 1.117.1
@@ -20394,7 +20435,7 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       tiny-invariant: 1.3.3
       tiny-warning: 1.0.3
-      vinxi: 0.5.6(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
+      vinxi: 0.5.6(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -20437,7 +20478,7 @@ snapshots:
       - xml2js
       - yaml
 
-  '@tanstack/react-start-config@1.118.0(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@tanstack/react-router@1.117.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.15.3)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(vite@6.3.3(@types/node@22.15.3)(jiti@2.4.2)(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1))(webpack@5.99.7(esbuild@0.25.3))(yaml@2.7.1)':
+  '@tanstack/react-start-config@1.118.0(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@tanstack/react-router@1.117.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.15.3)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(vite@6.3.3(@types/node@22.15.3)(jiti@2.4.2)(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1))(webpack@5.99.7(esbuild@0.25.3))(yaml@2.7.1)':
     dependencies:
       '@tanstack/react-start-plugin': 1.115.0(@types/node@22.15.3)(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
       '@tanstack/router-core': 1.117.1
@@ -20447,11 +20488,11 @@ snapshots:
       '@tanstack/start-server-functions-handler': 1.117.1
       '@vitejs/plugin-react': 4.4.1(supports-color@8.1.1)(vite@6.3.3(@types/node@22.15.3)(jiti@2.4.2)(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1))
       import-meta-resolve: 4.1.0
-      nitropack: 2.11.10(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(encoding@0.1.13)(supports-color@8.1.1)
+      nitropack: 2.11.10(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(aws4fetch@1.0.20)(encoding@0.1.13)(supports-color@8.1.1)
       ofetch: 1.4.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      vinxi: 0.5.3(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
+      vinxi: 0.5.3(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
       vite: 6.3.3(@types/node@22.15.3)(jiti@2.4.2)(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
       zod: 3.24.3
     transitivePeerDependencies:
@@ -20528,11 +20569,11 @@ snapshots:
       - tsx
       - yaml
 
-  '@tanstack/react-start-router-manifest@1.117.1(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)':
+  '@tanstack/react-start-router-manifest@1.117.1(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)':
     dependencies:
       '@tanstack/router-core': 1.117.1
       tiny-invariant: 1.3.3
-      vinxi: 0.5.3(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
+      vinxi: 0.5.3(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -20590,13 +20631,13 @@ snapshots:
       tiny-warning: 1.0.3
       unctx: 2.4.1
 
-  '@tanstack/react-start@1.118.0(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@tanstack/react-router@1.117.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.15.3)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(vite@6.3.3(@types/node@22.15.3)(jiti@2.4.2)(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1))(webpack@5.99.7(esbuild@0.25.3))(yaml@2.7.1)':
+  '@tanstack/react-start@1.118.0(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@tanstack/react-router@1.117.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.15.3)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(vite@6.3.3(@types/node@22.15.3)(jiti@2.4.2)(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1))(webpack@5.99.7(esbuild@0.25.3))(yaml@2.7.1)':
     dependencies:
-      '@tanstack/react-start-client': 1.117.1(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
-      '@tanstack/react-start-config': 1.118.0(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@tanstack/react-router@1.117.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.15.3)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(vite@6.3.3(@types/node@22.15.3)(jiti@2.4.2)(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1))(webpack@5.99.7(esbuild@0.25.3))(yaml@2.7.1)
-      '@tanstack/react-start-router-manifest': 1.117.1(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
+      '@tanstack/react-start-client': 1.117.1(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
+      '@tanstack/react-start-config': 1.118.0(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@tanstack/react-router@1.117.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.15.3)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(vite@6.3.3(@types/node@22.15.3)(jiti@2.4.2)(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1))(webpack@5.99.7(esbuild@0.25.3))(yaml@2.7.1)
+      '@tanstack/react-start-router-manifest': 1.117.1(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
       '@tanstack/react-start-server': 1.117.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@tanstack/start-api-routes': 1.117.1(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
+      '@tanstack/start-api-routes': 1.117.1(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
       '@tanstack/start-server-functions-client': 1.117.1(@types/node@22.15.3)(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
       '@tanstack/start-server-functions-handler': 1.117.1
       '@tanstack/start-server-functions-server': 1.115.0(@types/node@22.15.3)(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
@@ -20740,11 +20781,11 @@ snapshots:
       - tsx
       - yaml
 
-  '@tanstack/start-api-routes@1.117.1(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)':
+  '@tanstack/start-api-routes@1.117.1(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)':
     dependencies:
       '@tanstack/router-core': 1.117.1
       '@tanstack/start-server-core': 1.117.1
-      vinxi: 0.5.3(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
+      vinxi: 0.5.3(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -22274,6 +22315,8 @@ snapshots:
   awesome-only-resolves-last-promise@1.0.3:
     dependencies:
       awesome-imperative-promise: 1.0.1
+
+  aws4fetch@1.0.20: {}
 
   axe-core@4.10.3: {}
 
@@ -27343,7 +27386,7 @@ snapshots:
     dependencies:
       js-yaml-loader: 1.2.2
 
-  next-router-mock@0.9.13(next@15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0))(react@18.3.1):
+  next-router-mock@0.9.13(next@15.3.1(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0))(react@18.3.1):
     dependencies:
       next: 15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0)
       react: 18.3.1
@@ -27419,7 +27462,7 @@ snapshots:
 
   nice-try@1.0.5: {}
 
-  nitropack@2.11.10(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(encoding@0.1.13)(supports-color@8.1.1):
+  nitropack@2.11.10(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(aws4fetch@1.0.20)(encoding@0.1.13)(supports-color@8.1.1):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.4.0
       '@netlify/functions': 3.1.2(encoding@0.1.13)(rollup@4.40.1)(supports-color@8.1.1)
@@ -27487,7 +27530,7 @@ snapshots:
       unenv: 2.0.0-rc.15
       unimport: 5.0.0
       unplugin-utils: 0.2.4
-      unstorage: 1.16.0(@netlify/blobs@8.2.0)(db0@0.3.2(@electric-sql/pglite@0.2.17))(ioredis@5.6.1(supports-color@8.1.1))
+      unstorage: 1.16.0(@netlify/blobs@8.2.0)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.17))(ioredis@5.6.1(supports-color@8.1.1))
       untyped: 2.0.0
       unwasm: 0.3.9
       youch: 4.1.0-beta.7
@@ -31138,7 +31181,7 @@ snapshots:
       '@unrs/resolver-binding-win32-ia32-msvc': 1.7.2
       '@unrs/resolver-binding-win32-x64-msvc': 1.7.2
 
-  unstorage@1.16.0(@netlify/blobs@8.2.0)(db0@0.3.2(@electric-sql/pglite@0.2.17))(ioredis@5.6.1(supports-color@8.1.1)):
+  unstorage@1.16.0(@netlify/blobs@8.2.0)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.17))(ioredis@5.6.1(supports-color@8.1.1)):
     dependencies:
       anymatch: 3.1.3
       chokidar: 4.0.3
@@ -31150,6 +31193,7 @@ snapshots:
       ufo: 1.6.1
     optionalDependencies:
       '@netlify/blobs': 8.2.0
+      aws4fetch: 1.0.20
       db0: 0.3.2(@electric-sql/pglite@0.2.17)
       ioredis: 5.6.1(supports-color@8.1.1)
 
@@ -31358,7 +31402,7 @@ snapshots:
       d3-time: 3.1.0
       d3-timer: 3.0.1
 
-  vinxi@0.5.3(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1):
+  vinxi@0.5.3(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1):
     dependencies:
       '@babel/core': 7.26.10(supports-color@8.1.1)
       '@babel/plugin-syntax-jsx': 7.25.9(@babel/core@7.26.10(supports-color@8.1.1))
@@ -31380,7 +31424,7 @@ snapshots:
       hookable: 5.5.3
       http-proxy: 1.18.1
       micromatch: 4.0.8
-      nitropack: 2.11.10(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(encoding@0.1.13)(supports-color@8.1.1)
+      nitropack: 2.11.10(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(aws4fetch@1.0.20)(encoding@0.1.13)(supports-color@8.1.1)
       node-fetch-native: 1.6.6
       path-to-regexp: 6.3.0
       pathe: 1.1.2
@@ -31391,7 +31435,7 @@ snapshots:
       ufo: 1.6.1
       unctx: 2.4.1
       unenv: 1.10.0
-      unstorage: 1.16.0(@netlify/blobs@8.2.0)(db0@0.3.2(@electric-sql/pglite@0.2.17))(ioredis@5.6.1(supports-color@8.1.1))
+      unstorage: 1.16.0(@netlify/blobs@8.2.0)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.17))(ioredis@5.6.1(supports-color@8.1.1))
       vite: 6.3.3(@types/node@22.15.3)(jiti@2.4.2)(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
       zod: 3.23.8
     transitivePeerDependencies:
@@ -31436,7 +31480,7 @@ snapshots:
       - xml2js
       - yaml
 
-  vinxi@0.5.6(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1):
+  vinxi@0.5.6(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(@types/node@22.15.3)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.17))(encoding@0.1.13)(ioredis@5.6.1(supports-color@8.1.1))(jiti@2.4.2)(sass@1.87.0)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1):
     dependencies:
       '@babel/core': 7.26.10(supports-color@8.1.1)
       '@babel/plugin-syntax-jsx': 7.25.9(@babel/core@7.26.10(supports-color@8.1.1))
@@ -31458,7 +31502,7 @@ snapshots:
       hookable: 5.5.3
       http-proxy: 1.18.1
       micromatch: 4.0.8
-      nitropack: 2.11.10(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(encoding@0.1.13)(supports-color@8.1.1)
+      nitropack: 2.11.10(@electric-sql/pglite@0.2.17)(@netlify/blobs@8.2.0)(aws4fetch@1.0.20)(encoding@0.1.13)(supports-color@8.1.1)
       node-fetch-native: 1.6.6
       path-to-regexp: 6.3.0
       pathe: 1.1.2
@@ -31469,7 +31513,7 @@ snapshots:
       ufo: 1.6.1
       unctx: 2.4.1
       unenv: 1.10.0
-      unstorage: 1.16.0(@netlify/blobs@8.2.0)(db0@0.3.2(@electric-sql/pglite@0.2.17))(ioredis@5.6.1(supports-color@8.1.1))
+      unstorage: 1.16.0(@netlify/blobs@8.2.0)(aws4fetch@1.0.20)(db0@0.3.2(@electric-sql/pglite@0.2.17))(ioredis@5.6.1(supports-color@8.1.1))
       vite: 6.3.3(@types/node@22.15.3)(jiti@2.4.2)(sass@1.87.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.1)
       zod: 3.24.3
     transitivePeerDependencies:
