@@ -11,6 +11,7 @@ import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { ChevronRight } from 'lucide-react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import type { NextPageWithLayout } from 'types'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
@@ -50,11 +51,16 @@ const DatabaseTables: NextPageWithLayout = () => {
         </ScaffoldSection>
       </ScaffoldContainer>
 
-      <DeleteConfirmationDialogs selectedTable={selectedTable} />
-      <SidePanelEditor
-        includeColumns
-        selectedTable={isTableLike(selectedTable) ? selectedTable : undefined}
-      />
+      {project?.ref !== undefined && selectedTable !== undefined && isTableLike(selectedTable) && (
+        <TableEditorTableStateContextProvider
+          key={`table-editor-table-${selectedTable.id}`}
+          projectRef={project?.ref}
+          table={selectedTable}
+        >
+          <DeleteConfirmationDialogs selectedTable={selectedTable} />
+          <SidePanelEditor includeColumns selectedTable={selectedTable} />
+        </TableEditorTableStateContextProvider>
+      )}
     </>
   )
 }

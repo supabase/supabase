@@ -1,9 +1,10 @@
-import { Button } from 'ui'
-import { MessageSquare, Send, X } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { AnimatePresence, motion } from 'framer-motion'
+import { MessageSquare, X } from 'lucide-react'
+import Link from 'next/link'
+import { useCallback, useEffect, useState } from 'react'
+import { Button } from 'ui'
 
 interface AIAssistantOptionProps {
   projectRef: string
@@ -13,11 +14,22 @@ interface AIAssistantOptionProps {
 export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantOptionProps) => {
   const [isVisible, setIsVisible] = useState(false)
   const { data: projects } = useProjectsQuery()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 800)
     return () => clearTimeout(timer)
   }, [])
+
+  const onAiAssistantClicked = useCallback(() => {
+    sendEvent({
+      action: 'ai_assistant_in_support_form_clicked',
+      groups: {
+        project: projectRef === 'no-project' ? undefined : projectRef,
+        organization: organizationSlug,
+      },
+    })
+  }, [projectRef, organizationSlug, sendEvent])
 
   if (!organizationSlug || organizationSlug === 'no-org') {
     return null
@@ -59,7 +71,7 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
                 </p>
               </div>
               <div>
-                <Link href={aiLink}>
+                <Link href={aiLink} onClick={onAiAssistantClicked}>
                   <Button size="tiny" type="default">
                     Ask AI assistant
                   </Button>

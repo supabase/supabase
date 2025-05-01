@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { Eye, EyeOff, RefreshCw, Search, Terminal, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -42,6 +41,8 @@ interface PreviewFilterPanelProps {
   filters: Filters
   onSelectedDatabaseChange: (id: string) => void
   className?: string
+  selectedDatePickerValue: DatePickerValue
+  setSelectedDatePickerValue: (value: DatePickerValue) => void
 }
 
 /**
@@ -64,6 +65,8 @@ const PreviewFilterPanel = ({
   table,
   onSelectedDatabaseChange,
   className,
+  selectedDatePickerValue,
+  setSelectedDatePickerValue,
 }: PreviewFilterPanelProps) => {
   const router = useRouter()
   const { ref } = useParams()
@@ -78,30 +81,6 @@ const PreviewFilterPanel = ({
     IS_PLATFORM && LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(router.pathname)
 
   const hasEdits = search !== defaultSearchValue
-
-  function getDefaultDatePickerValue() {
-    // if we have values in the URL, use them
-    const iso_timestamp_start = router.query.iso_timestamp_start as string
-    const iso_timestamp_end = router.query.iso_timestamp_end as string
-    if (iso_timestamp_start && iso_timestamp_end) {
-      return {
-        to: iso_timestamp_end,
-        from: iso_timestamp_start,
-        text: `${dayjs(iso_timestamp_start).format('DD MMM, HH:mm')} - ${dayjs(iso_timestamp_end).format('DD MMM, HH:mm')}`,
-        isHelper: false,
-      }
-    }
-    return {
-      to: PREVIEWER_DATEPICKER_HELPERS[2].calcTo(),
-      from: PREVIEWER_DATEPICKER_HELPERS[2].calcFrom(),
-      text: 'Last hour',
-      isHelper: true,
-    }
-  }
-
-  const [selectedDatePickerValue, setSelectedDatePickerValue] = useState<DatePickerValue>(
-    getDefaultDatePickerValue()
-  )
 
   const handleInputSearch = (query: string) => onSearch('search-input-change', { query })
 

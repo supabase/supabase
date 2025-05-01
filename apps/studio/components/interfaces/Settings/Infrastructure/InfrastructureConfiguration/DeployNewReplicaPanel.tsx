@@ -191,7 +191,9 @@ const DeployNewReplicaPanel = ({
 
   const availableRegions =
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-      ? AVAILABLE_REPLICA_REGIONS.filter((x) => x.key === 'SOUTHEAST_ASIA')
+      ? AVAILABLE_REPLICA_REGIONS.filter((x) =>
+          ['SOUTHEAST_ASIA', 'CENTRAL_EU', 'EAST_US'].includes(x.key)
+        )
       : AVAILABLE_REPLICA_REGIONS
 
   const onSubmit = async () => {

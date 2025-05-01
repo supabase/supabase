@@ -76,7 +76,7 @@ export const PostgresVersionSelector = ({
       const defaultValue = gaVersion ? formatValue(gaVersion) : formatValue(availableVersions[0])
       form.setValue('postgresVersionSelection', defaultValue)
     }
-  }, [isSuccess, form])
+  }, [isSuccess, availableVersions, form])
 
   return (
     <FormItemLayout label="Postgres Version" layout={layout}>
