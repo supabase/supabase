@@ -28,6 +28,7 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 import AlertError from 'components/ui/AlertError'
 import { useParams } from 'common'
+import { ProjectUsageBars } from './ProjectUsageBars'
 
 interface ProjectLogsChartProps {
   projectRef: string
@@ -244,7 +245,7 @@ const ProjectLogsChart = ({ projectRef, startDate, endDate, interval }: ProjectL
     <div className="relative z-10">
       <div>
         {/* Main Content Area */}
-        <div className="max-w-7xl w-full mx-auto">
+        <div className="max-w-7xl w-full mx-auto flex items-center justify-between">
           <div>
             {/* Filter and Total Count (Moved to the right) */}
             <div className="col-span-1 md:col-span-2">
@@ -329,13 +330,14 @@ const ProjectLogsChart = ({ projectRef, startDate, endDate, interval }: ProjectL
               </div>
             </div>
           </div>
+          <ProjectUsageBars projectRef={projectRef} />
         </div>
       </div>
 
       {/* Chart Area */}
       <div className="p-0">
         {isLoading && (
-          <div className="space-y-2 mt-8">
+          <div className="space-y-2 mt-12">
             <ShimmeringLoader />
             <ShimmeringLoader className="w-3/4" />
           </div>
@@ -352,7 +354,7 @@ const ProjectLogsChart = ({ projectRef, startDate, endDate, interval }: ProjectL
                 <p className="text-xs text-foreground-lighter">In the last two hours</p>
               </div>
             ) : (
-              <div>
+              <div className="pt-12">
                 <LogsBarChart isSubtle barHeight={300} data={chartData} />
               </div>
             )}

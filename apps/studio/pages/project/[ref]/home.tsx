@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo } from 'react'
+import { useEffect, useRef, useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { Check, ChevronRight, FileText } from 'lucide-react'
@@ -59,6 +59,7 @@ import { ExternalLink } from 'lucide-react'
 import Image from 'next/image'
 import AssistantButton from 'components/layouts/AppLayout/AssistantButton'
 import { GettingStarted } from 'components/interfaces/Home/GettingStarted'
+import { ProjectUsageBars } from 'components/interfaces/Home/ProjectUsageBars'
 
 const Home: NextPageWithLayout = () => {
   const organization = useSelectedOrganization()
@@ -66,6 +67,10 @@ const Home: NextPageWithLayout = () => {
   const isOrioleDb = useIsOrioleDb()
   const snap = useAppStateSnapshot()
   const { enableBranching } = useParams()
+
+  // State to manage header opacity and scale based on scroll
+  const [headerOpacity, setHeaderOpacity] = useState(1)
+  const [headerScale, setHeaderScale] = useState(1)
 
   const hasShownEnableBranchingModalRef = useRef(false)
   useEffect(() => {
@@ -75,6 +80,43 @@ const Home: NextPageWithLayout = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enableBranching])
+
+  // Effect to handle scroll and update opacity/scale
+  // useEffect(() => {
+  //   // Try to find the main scrollable element
+  //   // Adjust the selector if your main scroll container is different
+  //   const scrollContainer = document.querySelector('main') as HTMLElement | null
+
+  //   const handleScroll = () => {
+  //     let scrollPosition = 0
+  //     if (scrollContainer) {
+  //       scrollPosition = scrollContainer.scrollTop
+  //     } else {
+  //       // Fallback to window scroll if main isn't found
+  //       scrollPosition = window.scrollY
+  //     }
+  //     // Fade out opacity over the first 200 pixels, min 0.15
+  //     const newOpacity = Math.max(0.0, 1 - scrollPosition / 200)
+  //     setHeaderOpacity(newOpacity)
+
+  //     // Scale down over the first 200 pixels, min 0.98
+  //     const scaleFactor = 0.02 // Amount to scale down (1 - 0.98)
+  //     const newScale = Math.max(0.98, 1 - (scrollPosition / 200) * scaleFactor)
+  //     setHeaderScale(newScale)
+  //   }
+
+  //   const targetElement = scrollContainer || window
+  //   targetElement.addEventListener('scroll', handleScroll)
+
+  //   // Initial call to set opacity based on initial scroll position
+  //   handleScroll()
+
+  //   // Cleanup function to remove the event listener
+  //   return () => {
+  //     targetElement.removeEventListener('scroll', handleScroll)
+  //   }
+  //   // Re-run effect if scrollContainer reference changes (though unlikely with querySelector)
+  // }, [])
 
   const projectName =
     project?.ref !== 'default' && project?.name !== undefined
@@ -140,40 +182,52 @@ const Home: NextPageWithLayout = () => {
 
   return (
     <div className="mx-auto w-full mb-12 md:mb-16 max-w-full">
-      <div className="relative pt-16">
-        {project?.status !== PROJECT_STATUS.INACTIVE && project?.cloud_provider !== 'FLY' && (
+      {/* Apply dynamic opacity and scale to the sticky header with transition */}
+      <div
+        className="relative pt-12 bg-gradient-to-b from-background-surface-100/50 to-background-surface-57 top-0 transition-all duration-200 ease-out origin-top"
+        style={{
+          opacity: headerOpacity,
+          transform: `scale(${headerScale})`,
+          transformOrigin: 'top', // Ensure scaling originates from the top
+        }}
+      >
+        {/* {project?.status !== PROJECT_STATUS.INACTIVE && project?.cloud_provider !== 'FLY' && (
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background-surface-75" />
 
             <InstanceDiagram height={300} />
           </div>
-        )}
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-3 max-w-7xl mx-auto w-full mb-6">
-          <h1 className="relative z-10">{projectName}</h1>
-
-          {isOrioleDb && (
-            <Tooltip>
-              <TooltipTrigger>
-                <Badge variant="warning">OrioleDB</Badge>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" align="start" className="max-w-80 text-center">
-                This project is using Postgres with OrioleDB which is currently in preview and not
-                suitable for production workloads. View our{' '}
-                <InlineLink href="https://supabase.com/docs/guides/database/orioledb">
-                  documentation
-                </InlineLink>{' '}
-                for all limitations.
-              </TooltipContent>
-            </Tooltip>
-          )}
-          <ComputeBadgeWrapper
-            project={{
-              ref: project?.ref,
-              organization_slug: organization?.slug,
-              cloud_provider: project?.cloud_provider,
-              infra_compute_size: project?.infra_compute_size,
-            }}
-          />
+        )} */}
+        <div className="relative z-10 flex flex-row items-start justify-between gap-3 max-w-7xl mx-auto w-full mb-6">
+          {/* Left side: Title and Badges */}
+          <div className="flex flex-col md:flex-row md:items-center gap-3">
+            <h1 className="relative z-10">{projectName}</h1>
+            <div className="flex items-center gap-x-3">
+              {isOrioleDb && (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Badge variant="warning">OrioleDB</Badge>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" align="start" className="max-w-80 text-center">
+                    This project is using Postgres with OrioleDB which is currently in preview and
+                    not suitable for production workloads. View our{' '}
+                    <InlineLink href="https://supabase.com/docs/guides/database/orioledb">
+                      documentation
+                    </InlineLink>{' '}
+                    for all limitations.
+                  </TooltipContent>
+                </Tooltip>
+              )}
+              <ComputeBadgeWrapper
+                project={{
+                  ref: project?.ref,
+                  organization_slug: organization?.slug,
+                  cloud_provider: project?.cloud_provider,
+                  infra_compute_size: project?.infra_compute_size,
+                }}
+              />
+            </div>
+          </div>
         </div>
         <div className="max-w-7xl mx-auto w-full mb-6 relative z-10">
           <svg
@@ -231,7 +285,7 @@ const Home: NextPageWithLayout = () => {
 
       {project?.status !== PROJECT_STATUS.INACTIVE && (
         <>
-          <div className="max-w-7xl mx-auto w-full mt-12">
+          <div className="max-w-7xl mx-auto w-full mt-12 relative z-10 bg-surface-75">
             <GettingStarted projectRef={project?.ref!} />
             {/* [Charmer End] Getting Started guide */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -331,7 +385,7 @@ const Home: NextPageWithLayout = () => {
               )}
 
               {!isLoadingReports && reportContent && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {reportContent.layout
                     .sort((a, b) => {
                       if (a.y !== b.y) {

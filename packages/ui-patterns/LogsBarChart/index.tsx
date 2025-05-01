@@ -1,7 +1,7 @@
 'use client'
 import dayjs from 'dayjs'
 import { ReactNode, useState } from 'react'
-import { Bar, Cell, BarChart as RechartBarChart, XAxis, YAxis } from 'recharts'
+import { Bar, CartesianGrid, Cell, BarChart as RechartBarChart, XAxis, YAxis } from 'recharts'
 import type { CategoricalChartState } from 'recharts/types/chart/types'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
 
@@ -78,6 +78,8 @@ export const LogsBarChart = ({
             if (onBarClick) onBarClick(datum, tooltipData)
           }}
         >
+          <CartesianGrid vertical={false} />
+
           <YAxis
             tick={false}
             width={0}
