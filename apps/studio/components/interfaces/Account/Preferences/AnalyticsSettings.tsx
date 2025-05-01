@@ -9,7 +9,6 @@ export const AnalyticsSettings = () => {
   const { mutate: sendReset } = useSendResetMutation()
 
   const onToggleOptIn = () => {
-    console.log('onToggleOptIn:', onToggleOptIn)
     if (hasAccepted) {
       denyAll()
       sendReset()
