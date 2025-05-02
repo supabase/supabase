@@ -5,7 +5,9 @@ import { analyticsKeys } from './keys'
 
 export type ProjectLogStatsVariables = {
   projectRef?: string
-  interval?: operations['UsageApiController_getApiCounts']['parameters']['query']['interval']
+  interval?: NonNullable<
+    operations['UsageApiController_getApiCounts']['parameters']['query']
+  >['interval']
 }
 
 export type ProjectLogStatsResponse = {

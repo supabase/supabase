@@ -18,7 +18,7 @@ export async function getInvoices(
   const { data, error } = await get(`/platform/organizations/{slug}/billing/invoices`, {
     params: {
       path: { slug },
-      query: { offset: offset.toString(), limit: limit.toString() },
+      query: { offset, limit },
     },
     signal,
   })

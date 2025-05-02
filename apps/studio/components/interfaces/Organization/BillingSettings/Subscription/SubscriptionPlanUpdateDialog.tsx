@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Check, ExternalLink, InfoIcon } from 'lucide-react'
+import { Check, InfoIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import tweets from 'shared-data/tweets'
@@ -10,29 +10,17 @@ import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { organizationKeys } from 'data/organizations/keys'
 import { OrganizationBillingSubscriptionPreviewResponse } from 'data/organizations/organization-billing-subscription-preview'
+import { ProjectInfo } from 'data/projects/projects-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { SubscriptionTier } from 'data/subscriptions/types'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PRICING_TIER_PRODUCT_IDS, PROJECT_STATUS } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
-import {
-  Badge,
-  Button,
-  Card,
-  CardContent,
-  Dialog,
-  DialogContent,
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-} from 'ui'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import PaymentMethodSelection from './PaymentMethodSelection'
-import { ProjectInfo } from 'data/projects/projects-query'
+import { Badge, Button, Dialog, DialogContent, Table, TableBody, TableCell, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { BillingCustomerDataExistingOrgDialog } from '../BillingCustomerData/BillingCustomerDataExistingOrgDialog'
+import PaymentMethodSelection from './PaymentMethodSelection'
 
 const getRandomTweet = () => {
   const filteredTweets = tweets.filter((it) => it.text.length < 180)
@@ -71,12 +59,11 @@ interface Props {
   billingPartner?: string
   selectedOrganization: any
   subscription: any
-  slug?: string
   currentPlanMeta: any
   projects: ProjectInfo[]
 }
 
-const SubscriptionPlanUpdateDialog = ({
+export const SubscriptionPlanUpdateDialog = ({
   selectedTier,
   onClose,
   subscriptionPlanMeta,
@@ -89,11 +76,11 @@ const SubscriptionPlanUpdateDialog = ({
   billingPartner,
   selectedOrganization,
   subscription,
-  slug,
   currentPlanMeta,
   projects,
 }: Props) => {
   const queryClient = useQueryClient()
+  const { slug } = useSelectedOrganization() ?? {}
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [testimonialTweet, setTestimonialTweet] = useState(getRandomTweet())
 
@@ -167,6 +154,24 @@ const SubscriptionPlanUpdateDialog = ({
         })
       : []
 
+  // Calculate remaining days in current billing cycle
+  const now = Math.floor(Date.now() / 1000) // current time in seconds
+  const remainingSeconds = subscription?.current_period_end - now
+  const totalSeconds = subscription?.current_period_end - subscription?.current_period_start
+  const remainingRatio = remainingSeconds / totalSeconds
+
+  // Calculate prorated credit for current plan
+  const currentPlanMonthlyPrice = currentPlanMeta?.price ?? 0
+  const proratedCredit = currentPlanMonthlyPrice * remainingRatio
+
+  // Calculate new plan cost
+  const newPlanCost = subscriptionPlanMeta?.priceMonthly ?? 0
+
+  const customerBalance = ((subscription?.customer_balance ?? 0) / 100) * -1
+
+  // Calculate total charge (new plan - prorated credit)
+  const totalCharge = Math.max(0, newPlanCost - proratedCredit - customerBalance)
+
   return (
     <Dialog
       open={selectedTier !== undefined && selectedTier !== 'tier_free'}
@@ -200,352 +205,266 @@ const SubscriptionPlanUpdateDialog = ({
               )}
               {subscriptionPreviewInitialized && (
                 <>
-                  <Table className="mt-2 mb-4 text-foreground-light">
-                    <TableBody>
-                      {(() => {
-                        // Calculate remaining days in current billing cycle
-                        const now = Math.floor(Date.now() / 1000) // current time in seconds
-                        const remainingSeconds = subscription?.current_period_end - now
-                        const totalSeconds =
-                          subscription?.current_period_end - subscription?.current_period_start
-                        const remainingRatio = remainingSeconds / totalSeconds
-
-                        // Calculate prorated credit for current plan
-                        const currentPlanMonthlyPrice = currentPlanMeta?.price ?? 0
-                        const proratedCredit = currentPlanMonthlyPrice * remainingRatio
-
-                        // Calculate new plan cost
-                        const newPlanCost = subscriptionPlanMeta?.priceMonthly ?? 0
-
-                        const customerBalance = ((subscription?.customer_balance ?? 0) / 100) * -1
-
-                        // Calculate total charge (new plan - prorated credit)
-                        const totalCharge = Math.max(
-                          0,
-                          newPlanCost - proratedCredit - customerBalance
-                        )
-
-                        return (
-                          <>
-                            <TableRow>
-                              <TableCell className="py-2 pl-0 flex items-center gap-1">
-                                <span>{subscriptionPlanMeta?.name} Plan</span>
-                                <Badge variant={'brand'} size={'small'} className="ml-1">
-                                  New
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="py-2 pr-0 text-right">
-                                {formatCurrency(newPlanCost)}
-                              </TableCell>
-                            </TableRow>
-                            {subscription?.plan?.id !== 'free' && (
-                              <TableRow>
-                                <TableCell className="py-2 pl-0 flex items-center gap-1">
-                                  <span>Unused Time on {subscription?.plan?.name} Plan</span>
-                                  <InfoTooltip className="max-w-sm">
-                                    Your previous plan was charged upfront, so a plan change will
-                                    prorate any unused time in credits. If the prorated credits
-                                    exceed the new plan charge, the excessive credits are added to
-                                    your organization for future use.
-                                  </InfoTooltip>
-                                </TableCell>
-                                <TableCell className="py-2 pr-0 text-right">
-                                  -{formatCurrency(proratedCredit)}
-                                </TableCell>
-                              </TableRow>
-                            )}
-
-                            {/* Ignore rare case with negative balance (debt) */}
-                            {customerBalance > 0 && (
-                              <TableRow>
-                                <TableCell className="py-2 pl-0 flex items-center gap-1">
-                                  <span>Credits</span>
-                                  <InfoTooltip>
-                                    Credits will be used first before charging your card.
-                                  </InfoTooltip>
-                                </TableCell>
-                                <TableCell className="py-2 pr-0 text-right">
-                                  {formatCurrency(customerBalance)}
-                                </TableCell>
-                              </TableRow>
-                            )}
-                            <TableRow className="text-foreground">
-                              <TableCell className="py-2 pl-0 border-t">Charge today</TableCell>
-                              <TableCell className="py-2 pr-0 text-right border-t">
-                                {formatCurrency(totalCharge)}
-                              </TableCell>
-                            </TableRow>
-                            {subscription?.plan?.id !== 'free' && (
-                              <TableRow>
-                                <TableCell className="py-2 pl-0 flex items-center gap-1">
-                                  <span>+ current cycle usage</span>
-                                  <InfoTooltip className="max-w-sm">
-                                    Changing your plan resets your billing cycle. If your previous
-                                    billing cycle still has any outstanding usage charges, they will
-                                    be added to your total charge today.
-                                  </InfoTooltip>
-                                </TableCell>
-                                <TableCell className="py-2 pr-0 text-right">
-                                  <Link
-                                    href={`/org/${slug}/billing#breakdown`}
-                                    className="text-sm text-brand hover:text-brand-600 transition"
-                                    target="_blank"
-                                  >
-                                    View spend
-                                  </Link>
-                                </TableCell>
-                              </TableRow>
-                            )}
-                          </>
-                        )
-                      })()}
-                    </TableBody>
-                  </Table>
-                  <HoverCard>
-                    <HoverCardTrigger asChild>
-                      <Card className="cursor-help text-sm">
-                        <CardContent className="flex items-center gap-2 py-2 px-3 text-foreground-light hover:text-foreground">
-                          <InfoIcon strokeWidth={1.5} size={16} className="text-foreground-light" />
-                          Monthly invoice estimate is{' '}
-                          {formatCurrency(
-                            Math.round(
-                              subscriptionPreview?.breakdown.reduce(
-                                (prev: number, cur) => prev + cur.total_price,
-                                0
-                              ) ?? 0
-                            )
-                          )}
-                        </CardContent>
-                      </Card>
-                    </HoverCardTrigger>
-                    <HoverCardContent className="w-[520px] p-6">
-                      <h3 className="text-md font-medium mb-2">Your new monthly invoice</h3>
-
-                      {subscriptionPreviewError && (
-                        <AlertError
-                          error={subscriptionPreviewError}
-                          subject="Failed to preview subscription."
-                        />
-                      )}
-
-                      {subscriptionPreviewIsLoading && (
-                        <div className="space-y-2 p-6">
-                          <span className="text-sm">Estimating monthly costs...</span>
-                          <ShimmeringLoader />
-                          <ShimmeringLoader className="w-3/4" />
-                          <ShimmeringLoader className="w-1/2" />
+                  <div className="mt-2 mb-4 text-foreground-light text-sm">
+                    <div className="flex items-center justify-between gap-2 border-b border-muted">
+                      <div className="py-2 pl-0 flex items-center gap-1">
+                        <span>{subscriptionPlanMeta?.name} Plan</span>
+                        <Badge variant={'brand'} size={'small'} className="ml-1">
+                          New
+                        </Badge>
+                      </div>
+                      <div className="py-2 pr-0 text-right">{formatCurrency(newPlanCost)}</div>
+                    </div>
+                    {subscription?.plan?.id !== 'free' && (
+                      <div className="flex items-center justify-between gap-2 border-b border-muted">
+                        <div className="py-2 pl-0 flex items-center gap-1">
+                          <span>Unused Time on {subscription?.plan?.name} Plan</span>
+                          <InfoTooltip className="max-w-sm">
+                            Your previous plan was charged upfront, so a plan change will prorate
+                            any unused time in credits. If the prorated credits exceed the new plan
+                            charge, the excessive credits are added to your organization for future
+                            use.
+                          </InfoTooltip>
                         </div>
-                      )}
+                        <div className="py-2 pr-0 text-right">
+                          -{formatCurrency(proratedCredit)}
+                        </div>
+                      </div>
+                    )}
 
-                      {subscriptionPreviewInitialized && (
-                        <>
-                          <Table className="[&_tr:last-child]:border-t font-mono text-xs">
-                            <TableBody>
-                              {/* Non-compute items and Projects list */}
-                              {(() => {
-                                // Combine all compute-related projects
-                                const computeItems =
-                                  subscriptionPreview?.breakdown?.filter(
-                                    (item) =>
-                                      item.description?.toLowerCase().includes('compute') &&
-                                      item.breakdown?.length > 0
-                                  ) || []
+                    {/* Ignore rare case with negative balance (debt) */}
+                    {customerBalance > 0 && (
+                      <div className="flex items-center justify-between gap-2 border-b border-muted">
+                        <div className="py-2 pl-0 flex items-center gap-1">
+                          <span>Credits</span>
+                          <InfoTooltip>
+                            Credits will be used first before charging your card.
+                          </InfoTooltip>
+                        </div>
+                        <div className="py-2 pr-0 text-right">
+                          {formatCurrency(customerBalance)}
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between gap-2 border-b border-muted text-foreground">
+                      <div className="py-2 pl-0">Charge today</div>
+                      <div className="py-2 pr-0 text-right">
+                        {formatCurrency(totalCharge)}
+                        {subscription?.plan?.id !== 'free' && (
+                          <>
+                            {' '}
+                            <Link
+                              href={`/org/${slug}/billing#breakdown`}
+                              className="text-sm text-brand hover:text-brand-600 transition"
+                              target="_blank"
+                            >
+                              + current spend
+                            </Link>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between gap-2 text-foreground-lighter text-xs">
+                      <div className="py-2 pl-0 flex items-center gap-1">
+                        <span>Monthly invoice estimate</span>
+                        <InfoTooltip side="right">
+                          <div className="w-[520px] p-6">
+                            <h3 className="text-base font-medium mb-2">Your new monthly invoice</h3>
+                            <p className="prose text-xs mb-2">
+                              Each paid project runs on a dedicated 24/7 server. First project uses
+                              Compute Credits; additional ones cost $10+/month regardless of usage.{' '}
+                              <Link
+                                href={'/docs/guides/platform/manage-your-usage/compute'}
+                                target="_blank"
+                              >
+                                Learn more
+                              </Link>
+                              .
+                            </p>
 
-                                const computeCreditsItem =
-                                  subscriptionPreview?.breakdown?.find((item) =>
-                                    item.description.startsWith('Compute Credits')
-                                  ) ?? null
+                            {subscriptionPreviewError && (
+                              <AlertError
+                                error={subscriptionPreviewError}
+                                subject="Failed to preview subscription."
+                              />
+                            )}
 
-                                const planItem = subscriptionPreview?.breakdown?.find((item) =>
-                                  item.description?.toLowerCase().includes('plan')
-                                )
+                            {subscriptionPreviewIsLoading && (
+                              <div className="space-y-2 p-6">
+                                <span className="text-sm">Estimating monthly costs...</span>
+                                <ShimmeringLoader />
+                                <ShimmeringLoader className="w-3/4" />
+                                <ShimmeringLoader className="w-1/2" />
+                              </div>
+                            )}
 
-                                const allProjects = computeItems.flatMap((item) =>
-                                  item.breakdown.map((project) => ({
-                                    ...project,
-                                    computeType: item.description,
-                                    computeCosts: Math.round(
-                                      item.total_price / item.breakdown.length
-                                    ),
-                                  }))
-                                )
+                            {subscriptionPreviewInitialized && (
+                              <>
+                                <Table className="[&_tr:last-child]:border-t font-mono text-xs">
+                                  <TableBody>
+                                    {/* Non-compute items and Projects list */}
+                                    {(() => {
+                                      // Combine all compute-related projects
+                                      const computeItems =
+                                        subscriptionPreview?.breakdown?.filter(
+                                          (item) =>
+                                            item.description?.toLowerCase().includes('compute') &&
+                                            item.breakdown?.length > 0
+                                        ) || []
 
-                                const otherItems =
-                                  subscriptionPreview?.breakdown?.filter(
-                                    (item) =>
-                                      !item.description?.toLowerCase().includes('compute') &&
-                                      !item.description?.toLowerCase().includes('plan')
-                                  ) || []
+                                      const computeCreditsItem =
+                                        subscriptionPreview?.breakdown?.find((item) =>
+                                          item.description.startsWith('Compute Credits')
+                                        ) ?? null
 
-                                const content = (
-                                  <>
-                                    {/* Combined projects section */}
-                                    {allProjects.length > 0 && (
-                                      <>
-                                        <TableRow className="text-foreground-light">
-                                          <TableCell className="!py-2 px-0">
-                                            {planItem?.description}
-                                          </TableCell>
-                                          <TableCell className="text-right py-2 px-0">
-                                            {formatCurrency(planItem?.total_price)}
-                                          </TableCell>
-                                        </TableRow>
+                                      const planItem = subscriptionPreview?.breakdown?.find(
+                                        (item) => item.description?.toLowerCase().includes('plan')
+                                      )
 
-                                        <TableRow className="text-foreground-light">
-                                          <TableCell className="!py-2 px-0 flex items-center gap-1">
-                                            <span>Compute</span>
-                                            <InfoTooltip className="max-w-sm p-3">
-                                              <p className="prose text-xs mb-2">
-                                                Each project on a paid plan is a dedicated server
-                                                running 24/7 with no pausing. The first project is
-                                                covered by Compute Credits. Additional projects will
-                                                incur compute costs starting at $10/month,
-                                                independent of activity. See{' '}
-                                                <Link
-                                                  href={
-                                                    '/docs/guides/platform/manage-your-usage/compute'
-                                                  }
-                                                  target="_blank"
+                                      const allProjects = computeItems.flatMap((item) =>
+                                        item.breakdown.map((project) => ({
+                                          ...project,
+                                          computeType: item.description,
+                                          computeCosts: Math.round(
+                                            item.total_price / item.breakdown.length
+                                          ),
+                                        }))
+                                      )
+
+                                      const otherItems =
+                                        subscriptionPreview?.breakdown?.filter(
+                                          (item) =>
+                                            !item.description?.toLowerCase().includes('compute') &&
+                                            !item.description?.toLowerCase().includes('plan')
+                                        ) || []
+
+                                      const content = (
+                                        <>
+                                          {/* Combined projects section */}
+                                          {allProjects.length > 0 && (
+                                            <>
+                                              <TableRow className="text-foreground-light">
+                                                <TableCell className="!py-2 px-0">
+                                                  {planItem?.description}
+                                                </TableCell>
+                                                <TableCell className="text-right py-2 px-0">
+                                                  {formatCurrency(planItem?.total_price)}
+                                                </TableCell>
+                                              </TableRow>
+
+                                              <TableRow className="text-foreground-light">
+                                                <TableCell className="!py-2 px-0 flex items-center gap-1">
+                                                  <span>Compute</span>
+                                                </TableCell>
+                                                <TableCell className="text-right py-2 px-0">
+                                                  {formatCurrency(
+                                                    computeItems.reduce(
+                                                      (sum: number, item) => sum + item.total_price,
+                                                      0
+                                                    ) + (computeCreditsItem?.total_price ?? 0)
+                                                  )}
+                                                </TableCell>
+                                              </TableRow>
+                                              {/* Show first 3 projects */}
+                                              {allProjects.map((project) => (
+                                                <TableRow
+                                                  key={project.project_ref}
+                                                  className="text-foreground-light"
                                                 >
-                                                  docs
-                                                </Link>
-                                                .
-                                              </p>
-                                              {subscription?.plan?.id === 'free' && (
-                                                <>
-                                                  <p className="text-xs text-foreground-light mb-3">
-                                                    Mixing paid and non-paid projects in a single
-                                                    organization is not possible. If you want
-                                                    projects to be on the Free Plan, use self-serve
-                                                    project transfers.
-                                                  </p>
-                                                  <div className="space-x-3">
-                                                    <Button
-                                                      asChild
-                                                      type="default"
-                                                      icon={<ExternalLink strokeWidth={1.5} />}
-                                                    >
-                                                      <Link
-                                                        href="/docs/guides/platform/manage-your-usage/compute"
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                      >
-                                                        How billing for Compute works
-                                                      </Link>
-                                                    </Button>
-                                                    <Button
-                                                      asChild
-                                                      type="default"
-                                                      icon={<ExternalLink strokeWidth={1.5} />}
-                                                    >
-                                                      <Link
-                                                        href="/docs/guides/platform/project-transfer"
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                      >
-                                                        Project transfers
-                                                      </Link>
-                                                    </Button>
-                                                  </div>
-                                                </>
+                                                  <TableCell className="!py-2 px-0 pl-6">
+                                                    {project.project_name} ({project.computeType}) |{' '}
+                                                    {formatCurrency(project.computeCosts)}
+                                                  </TableCell>
+                                                </TableRow>
+                                              ))}
+                                              {computeCreditsItem && (
+                                                <TableRow className="text-foreground-light">
+                                                  <TableCell className="!py-2 px-0 pl-6">
+                                                    Compute Credits |{' '}
+                                                    {formatCurrency(computeCreditsItem.total_price)}
+                                                  </TableCell>
+                                                </TableRow>
                                               )}
-                                            </InfoTooltip>
-                                          </TableCell>
-                                          <TableCell className="text-right py-2 px-0">
-                                            {formatCurrency(
-                                              computeItems.reduce(
-                                                (sum: number, item) => sum + item.total_price,
-                                                0
-                                              ) + (computeCreditsItem?.total_price ?? 0)
-                                            )}
-                                          </TableCell>
-                                        </TableRow>
-                                        {/* Show first 3 projects */}
-                                        {allProjects.map((project) => (
-                                          <TableRow
-                                            key={project.project_ref}
-                                            className="text-foreground-light"
-                                          >
-                                            <TableCell className="!py-2 px-0 pl-6">
-                                              {project.project_name} ({project.computeType}) |{' '}
-                                              {formatCurrency(project.computeCosts)}
-                                            </TableCell>
-                                          </TableRow>
-                                        ))}
-                                        {computeCreditsItem && (
-                                          <TableRow className="text-foreground-light">
-                                            <TableCell className="!py-2 px-0 pl-6">
-                                              Compute Credits |{' '}
-                                              {formatCurrency(computeCreditsItem.total_price)}
-                                            </TableCell>
-                                          </TableRow>
+                                            </>
+                                          )}
+
+                                          {/* Non-compute items */}
+                                          {otherItems.map((item) => (
+                                            <TableRow
+                                              key={item.description}
+                                              className="text-foreground-light"
+                                            >
+                                              <TableCell className="text-xs py-2 px-0">
+                                                <div className="flex items-center gap-1">
+                                                  <span>{item.description ?? 'Unknown'}</span>
+                                                  {item.breakdown.length > 0 && (
+                                                    <InfoTooltip className="max-w-sm">
+                                                      <p>Projects using {item.description}:</p>
+                                                      <ul className="ml-6 list-disc">
+                                                        {item.breakdown.map((breakdown) => (
+                                                          <li
+                                                            key={`${item.description}-breakdown-${breakdown.project_ref}`}
+                                                          >
+                                                            {breakdown.project_name}
+                                                          </li>
+                                                        ))}
+                                                      </ul>
+                                                    </InfoTooltip>
+                                                  )}
+                                                </div>
+                                              </TableCell>
+                                              <TableCell className="text-right text-xs py-2 px-0">
+                                                {formatCurrency(item.total_price)}
+                                              </TableCell>
+                                            </TableRow>
+                                          ))}
+                                        </>
+                                      )
+                                      return content
+                                    })()}
+
+                                    <TableRow>
+                                      <TableCell className="font-medium py-2 px-0">
+                                        Total per month (excluding other usage)
+                                      </TableCell>
+                                      <TableCell className="text-right font-medium py-2 px-0">
+                                        {formatCurrency(
+                                          Math.round(
+                                            subscriptionPreview?.breakdown?.reduce(
+                                              (prev, cur) => prev + cur.total_price,
+                                              0
+                                            ) ?? 0
+                                          ) ?? 0
                                         )}
-                                      </>
-                                    )}
-
-                                    {/* Non-compute items */}
-                                    {otherItems.map((item) => (
-                                      <TableRow
-                                        key={item.description}
-                                        className="text-foreground-light"
-                                      >
-                                        <TableCell className="text-xs py-2 px-0">
-                                          <div className="flex items-center gap-1">
-                                            <span>{item.description ?? 'Unknown'}</span>
-                                            {item.breakdown.length > 0 && (
-                                              <InfoTooltip className="max-w-sm">
-                                                <p>Projects using {item.description}:</p>
-                                                <ul className="ml-6 list-disc">
-                                                  {item.breakdown.map((breakdown) => (
-                                                    <li
-                                                      key={`${item.description}-breakdown-${breakdown.project_ref}`}
-                                                    >
-                                                      {breakdown.project_name}
-                                                    </li>
-                                                  ))}
-                                                </ul>
-                                              </InfoTooltip>
-                                            )}
-                                          </div>
-                                        </TableCell>
-                                        <TableCell className="text-right text-xs py-2 px-0">
-                                          {formatCurrency(item.total_price)}
-                                        </TableCell>
-                                      </TableRow>
-                                    ))}
-                                  </>
-                                )
-                                return content
-                              })()}
-
-                              <TableRow>
-                                <TableCell className="font-medium py-2 px-0">
-                                  Total per month (excluding other usage)
-                                </TableCell>
-                                <TableCell className="text-right font-medium py-2 px-0">
-                                  {formatCurrency(
-                                    Math.round(
-                                      subscriptionPreview?.breakdown?.reduce(
-                                        (prev, cur) => prev + cur.total_price,
-                                        0
-                                      ) ?? 0
-                                    ) ?? 0
-                                  )}
-                                </TableCell>
-                              </TableRow>
-                            </TableBody>
-                          </Table>
-                        </>
-                      )}
-                    </HoverCardContent>
-                  </HoverCard>
+                                      </TableCell>
+                                    </TableRow>
+                                  </TableBody>
+                                </Table>
+                              </>
+                            )}
+                          </div>
+                        </InfoTooltip>
+                      </div>
+                      <div className="py-2 pr-0 text-right">
+                        {formatCurrency(
+                          Math.round(
+                            subscriptionPreview?.breakdown.reduce(
+                              (prev: number, cur) => prev + cur.total_price,
+                              0
+                            ) ?? 0
+                          )
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </>
               )}
             </div>
 
-            <div className="mt-4 pt-4">
+            <div className="pt-6">
               {!billingViaPartner ? (
-                <div className="space-y-4">
+                <div className="space-y-2 mb-4">
+                  <BillingCustomerDataExistingOrgDialog />
                   <PaymentMethodSelection
                     selectedPaymentMethod={selectedPaymentMethod}
                     onSelectPaymentMethod={setSelectedPaymentMethod}
@@ -586,8 +505,8 @@ const SubscriptionPlanUpdateDialog = ({
                 </div>
               )}
 
-              <div className="flex space-x-4">
-                <Button type="default" onClick={onClose} className="flex-1">
+              <div className="flex space-x-2">
+                <Button type="default" size="medium" onClick={onClose} className="flex-1">
                   Cancel
                 </Button>
                 <Button
@@ -595,6 +514,7 @@ const SubscriptionPlanUpdateDialog = ({
                   type="primary"
                   onClick={onUpdateSubscription}
                   className="flex-1"
+                  size="medium"
                 >
                   Confirm {planMeta?.change_type === 'downgrade' ? 'downgrade' : 'upgrade'}
                 </Button>
@@ -666,5 +586,3 @@ const SubscriptionPlanUpdateDialog = ({
     </Dialog>
   )
 }
-
-export default SubscriptionPlanUpdateDialog
