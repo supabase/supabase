@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import dayjs from 'dayjs'
 import { WifiOff } from 'lucide-react'
+import { Database, DatabaseZap, Server } from 'lucide-react'
 
 import { useParams } from 'common'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
@@ -8,6 +9,10 @@ import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { GB } from 'lib/constants'
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider, cn } from 'ui'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
 interface UsageBarProps {
   label: string
@@ -90,6 +95,7 @@ interface ProjectUsageBarsProps {
 }
 
 export const ProjectUsageBars = ({ projectRef }: ProjectUsageBarsProps) => {
+  const project = useSelectedProject()
   const interval = '1h'
   const now = dayjs()
   // Fetch data slightly further back to ensure data points are available
@@ -194,36 +200,119 @@ export const ProjectUsageBars = ({ projectRef }: ProjectUsageBarsProps) => {
     [ioBudgetData]
   )
 
+  // Tables
+  const {
+    data: tablesData,
+    error: tablesError,
+    isLoading: isLoadingTables,
+  } = useTablesQuery(
+    { projectRef, schema: 'public', connectionString: project?.connectionString },
+    {
+      enabled: !!projectRef,
+    }
+  )
+
+  // Edge Functions
+  const {
+    data: edgeFunctionsData,
+    error: edgeFunctionsError,
+    isLoading: isLoadingEdgeFunctions,
+  } = useEdgeFunctionsQuery(
+    { projectRef },
+    {
+      enabled: !!projectRef,
+    }
+  )
+
+  // Replicas
+  const {
+    data: replicasData,
+    error: replicasError,
+    isLoading: isLoadingReplicas,
+  } = useReadReplicasQuery(
+    { projectRef },
+    {
+      enabled: !!projectRef,
+    }
+  )
+
   if (!projectRef) return null // Don't render if projectRef is missing
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <UsageBar
-        label="Disk"
-        usage={diskUsagePercent}
-        isLoading={isLoadingDiskUtil}
-        error={diskUtilError as Error | null}
-        warningThreshold={80} // Adjusted thresholds for disk
-        dangerThreshold={95}
-      />
-      <UsageBar
-        label="Memory"
-        usage={latestMemoryUsage ? Number(latestMemoryUsage) : undefined}
-        isLoading={isLoadingMemoryUsage}
-        error={memoryUsageError as Error | null}
-      />
-      <UsageBar
-        label="CPU"
-        usage={latestCpuUsage ? Number(latestCpuUsage) : undefined}
-        isLoading={isLoadingCpuUsage}
-        error={cpuUsageError as Error | null}
-      />
-      <UsageBar
-        label="IO"
-        usage={latestIoBudgetUsage ? Number(latestIoBudgetUsage) : undefined}
-        isLoading={isLoadingIoBudget}
-        error={ioBudgetError as Error | null}
-      />
+    <div className="flex items-center gap-6">
+      <div className="flex gap-6 pr-6 mr-6 border-r">
+        <CountStat
+          label="Tables"
+          count={tablesData?.length}
+          isLoading={isLoadingTables}
+          error={tablesError}
+          icon={<Database size={14} strokeWidth={1.5} />}
+        />
+        <CountStat
+          label="Functions"
+          count={edgeFunctionsData?.length}
+          isLoading={isLoadingEdgeFunctions}
+          error={edgeFunctionsError}
+          icon={<DatabaseZap size={14} strokeWidth={1.5} />}
+        />
+        <CountStat
+          label="Replicas"
+          count={replicasData?.length ? replicasData.length - 1 : undefined} // Subtract primary
+          isLoading={isLoadingReplicas}
+          error={replicasError}
+          icon={<Server size={14} strokeWidth={1.5} />}
+        />
+      </div>
+      <div className="flex flex-col gap-1">
+        <UsageBar
+          label="Disk"
+          usage={diskUsagePercent}
+          isLoading={isLoadingDiskUtil}
+          error={diskUtilError as Error | null}
+          warningThreshold={80} // Adjusted thresholds for disk
+          dangerThreshold={95}
+        />
+        <UsageBar
+          label="Memory"
+          usage={latestMemoryUsage ? Number(latestMemoryUsage) : undefined}
+          isLoading={isLoadingMemoryUsage}
+          error={memoryUsageError as Error | null}
+        />
+        <UsageBar
+          label="CPU"
+          usage={latestCpuUsage ? Number(latestCpuUsage) : undefined}
+          isLoading={isLoadingCpuUsage}
+          error={cpuUsageError as Error | null}
+        />
+        <UsageBar
+          label="IO"
+          usage={latestIoBudgetUsage ? Number(latestIoBudgetUsage) : undefined}
+          isLoading={isLoadingIoBudget}
+          error={ioBudgetError as Error | null}
+        />
+      </div>
+    </div>
+  )
+}
+
+interface CountStatProps {
+  label: string
+  count: number | undefined
+  isLoading: boolean
+  error: any
+  icon?: React.ReactNode
+}
+
+const CountStat = ({ label, count, isLoading, error, icon }: CountStatProps) => {
+  const displayValue = isLoading ? '-' : error ? 'ERR' : count ?? 0
+
+  return (
+    <div>
+      <div className="flex items-center gap-1.5 text-xs text-foreground-light">
+        {icon}
+        {label}
+      </div>
+      <span className="text-2xl font-mono tabular-nums">{displayValue}</span>
     </div>
   )
 }

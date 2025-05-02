@@ -288,7 +288,7 @@ const Home: NextPageWithLayout = () => {
           <div className="max-w-7xl mx-auto w-full mt-12 relative z-10 bg-surface-75">
             <GettingStarted projectRef={project?.ref!} />
             {/* [Charmer End] Getting Started guide */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 pb-12 border-b border-muted">
               {project?.ref && <AdvisorWidget projectRef={project.ref} />}
 
               {/* [Charmer] Add Recent Branches card */}

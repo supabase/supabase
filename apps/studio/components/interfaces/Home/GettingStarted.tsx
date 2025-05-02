@@ -1,6 +1,7 @@
-import { Check, ChevronRight, Plug, X } from 'lucide-react'
+import { Book, Check, ChevronRight, ExternalLink, Plug, X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useTheme } from 'next-themes'
 import {
   Button,
   Select_Shadcn_,
@@ -14,6 +15,8 @@ import { Card, CardContent, CardHeader, CardTitle } from 'ui'
 import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { AiIconAnimation } from 'ui'
 import { useState } from 'react'
+import { EXAMPLE_PROJECTS } from './Home.constants'
+import { BASE_PATH } from 'lib/constants'
 
 interface GettingStartedProps {
   projectRef: string
@@ -21,6 +24,7 @@ interface GettingStartedProps {
 
 export const GettingStarted = ({ projectRef }: GettingStartedProps) => {
   const [show, setShow] = useState(true)
+  const { resolvedTheme } = useTheme()
 
   if (!show) {
     return null
@@ -72,12 +76,22 @@ export const GettingStarted = ({ projectRef }: GettingStartedProps) => {
                 <ChevronRight size={16} />
               </TabsTrigger_Shadcn_>
               <TabsTrigger_Shadcn_
+                value="review-example"
+                className="py-2 px-3 text-sm w-full !justify-between data-[state=active]:bg-surface-300 data-[state=active]:border-default"
+              >
+                <div className="flex items-center gap-2">
+                  <Check strokeWidth={1.5} size={16} className="text-foreground-muted" />
+                  Review an example
+                </div>
+                <ChevronRight size={16} />
+              </TabsTrigger_Shadcn_>
+              <TabsTrigger_Shadcn_
                 value="review-rls"
                 className="py-2 px-3 text-sm w-full !justify-between data-[state=active]:bg-surface-300 data-[state=active]:border-default border-b border-muted"
               >
                 <div className="flex items-center gap-2">
                   <Check strokeWidth={1.5} size={16} className="text-foreground-muted" />
-                  Review your RLS policies
+                  Create your first RLS policy
                 </div>
                 <ChevronRight size={16} />
               </TabsTrigger_Shadcn_>
@@ -201,12 +215,11 @@ export const GettingStarted = ({ projectRef }: GettingStartedProps) => {
                         </SelectGroup_Shadcn_>
                       </SelectContent_Shadcn_>
                     </Select_Shadcn_>
-                    <Button
-                      className="w-fit"
-                      size={'small'}
-                      icon={<Plug size={16} strokeWidth={1.5} />}
-                    >
+                    <Button size={'small'} icon={<Plug size={14} strokeWidth={1.5} />}>
                       Connect
+                    </Button>
+                    <Button type="default" icon={<Book size={16} strokeWidth={1.5} />} size="small">
+                      Docs
                     </Button>
                   </div>
                 </div>
@@ -226,10 +239,11 @@ export const GettingStarted = ({ projectRef }: GettingStartedProps) => {
                     data and ensure your application's security from the database level.
                   </p>
                   <div className="flex items-center gap-2 mt-6">
-                    <Button size="medium" asChild type="default">
-                      <Link href={`/project/${projectRef}/auth/policies`}>
-                        Review Auth Policies
-                      </Link>
+                    <Button size="small" icon={<AiIconAnimation />}>
+                      Create with Assistant
+                    </Button>
+                    <Button size="small" asChild type="default">
+                      <Link href={`/project/${projectRef}/auth/policies`}>Create a policy</Link>
                     </Button>
                   </div>
                 </div>
@@ -249,10 +263,60 @@ export const GettingStarted = ({ projectRef }: GettingStartedProps) => {
                     built-in auth UI components or create your own custom authentication flow.
                   </p>
                   <div className="flex items-center gap-2 mt-6">
-                    <Button size="medium" asChild type="default">
+                    <Button size="small" asChild type="default">
                       <Link href={`/project/${projectRef}/auth/users`}>Manage Users</Link>
                     </Button>
                   </div>
+                </div>
+              </TabsContent_Shadcn_>
+              <TabsContent_Shadcn_
+                value="review-example"
+                className="mt-0 data-[state=active]:h-80 flex flex-col items-stretch overflow-y-auto"
+              >
+                <div className="p-8">
+                  <h3 className="mb-1">Explore example projects</h3>
+                  <p className="text-sm text-foreground-light mb-4">
+                    Check out these starter templates and examples to see Supabase in action.
+                  </p>
+                  <ul className="space-y-1 -mx-3">
+                    {EXAMPLE_PROJECTS.sort((a, b) => a.title.localeCompare(b.title)).map(
+                      (project) => (
+                        <li key={project.title}>
+                          <Button
+                            asChild
+                            type="text"
+                            size="small"
+                            className="w-full justify-start"
+                            icon={
+                              <img
+                                src={`${BASE_PATH}/img/libraries/${project.framework.toLowerCase()}${
+                                  ['expo', 'nextjs'].includes(project.framework.toLowerCase()) &&
+                                  resolvedTheme?.includes('dark')
+                                    ? '-dark'
+                                    : ''
+                                }-icon.svg`}
+                                width="16"
+                                height="16"
+                                alt={`${project.framework} logo`}
+                                className="mr-2"
+                              />
+                            }
+                            iconRight={
+                              <ExternalLink
+                                size={14}
+                                strokeWidth={1.5}
+                                className="ml-1 text-foreground-muted"
+                              />
+                            }
+                          >
+                            <Link href={project.url} target="_blank" rel="noopener noreferrer">
+                              {project.title}
+                            </Link>
+                          </Button>
+                        </li>
+                      )
+                    )}
+                  </ul>
                 </div>
               </TabsContent_Shadcn_>
             </div>

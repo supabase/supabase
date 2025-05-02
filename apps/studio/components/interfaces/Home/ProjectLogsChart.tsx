@@ -238,7 +238,7 @@ const ProjectLogsChart = ({ projectRef, startDate, endDate, interval }: ProjectL
       return 'text-foreground-lighter'
     }
     // Generally, more requests might be good or neutral, let's use brand color for increase
-    return totalPercentageChange > 0 ? 'text-brand-600' : 'text-brand'
+    return totalPercentageChange > 0 ? 'text-brand' : 'text-warning'
   }, [totalPercentageChange])
 
   return (
@@ -256,7 +256,7 @@ const ProjectLogsChart = ({ projectRef, startDate, endDate, interval }: ProjectL
                     isLoading ? (
                       <ShimmeringLoader className="w-24 h-24 rounded-full" />
                     ) : isSuccess && chartStatusData.length > 0 ? (
-                      <ResponsiveContainer width={40} height={40}>
+                      <ResponsiveContainer width={46} height={46}>
                         <PieChart>
                           <Tooltip
                             content={<CustomTooltip previousCounts={previousCounts} />}
@@ -269,7 +269,7 @@ const ProjectLogsChart = ({ projectRef, startDate, endDate, interval }: ProjectL
                             cx="50%"
                             cy="50%"
                             innerRadius={17} // Adjust for donut thickness
-                            outerRadius={20} // Adjust for size
+                            outerRadius={23} // Adjust for size
                             paddingAngle={chartStatusData.length > 1 ? 2 : 0} // Add padding between segments if more than one
                           >
                             {chartStatusData.map((entry, index) => (
