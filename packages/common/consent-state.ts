@@ -2,7 +2,6 @@ import type Usercentrics from '@usercentrics/cmp-browser-sdk'
 import type { BaseCategory, UserDecision } from '@usercentrics/cmp-browser-sdk'
 import { proxy, snapshot, useSnapshot } from 'valtio'
 import { LOCAL_STORAGE_KEYS } from './constants'
-import { isBrowser } from './helpers'
 
 export const consentState = proxy({
   // Usercentrics state
@@ -60,9 +59,6 @@ export const consentState = proxy({
 })
 
 async function initUserCentrics() {
-  // Usercentrics is not available on the server
-  if (!isBrowser) return
-
   const { default: Usercentrics } = await import('@usercentrics/cmp-browser-sdk')
 
   const UC = new Usercentrics(process.env.NEXT_PUBLIC_USERCENTRICS_RULESET_ID!, {
@@ -87,7 +83,10 @@ async function initUserCentrics() {
   }
 }
 
-initUserCentrics()
+// Usercentrics is not available on the server
+if (typeof window !== 'undefined') {
+  initUserCentrics()
+}
 
 // Public API for consent
 
