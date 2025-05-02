@@ -7140,6 +7140,9 @@ export interface components {
       postgrest?: string
       'supabase-postgres': string
     }
+    SetupIntentRequest: {
+      hcaptchaToken?: string
+    }
     SetupIntentResponse: {
       client_secret: string
       payment_method:
@@ -11740,7 +11743,9 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        fly_organization_id: string
+      }
       cookie?: never
     }
     requestBody?: never
@@ -15665,7 +15670,7 @@ export interface operations {
   ContentController_deleteContents: {
     parameters: {
       query: {
-        ids: string
+        ids: string[]
       }
       header?: never
       path: {
@@ -15798,7 +15803,7 @@ export interface operations {
   ContentFoldersController_DeleteFolder: {
     parameters: {
       query: {
-        ids: string
+        ids: string[]
       }
       header?: never
       path?: never
@@ -16436,7 +16441,7 @@ export interface operations {
   ProjectAdvisorNotificationsController_deleteNotificationExceptions: {
     parameters: {
       query: {
-        ids: string
+        ids: string[]
       }
       header?: never
       path: {
@@ -18609,7 +18614,11 @@ export interface operations {
       path?: never
       cookie?: never
     }
-    requestBody?: never
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SetupIntentRequest']
+      }
+    }
     responses: {
       201: {
         headers: {

@@ -933,6 +933,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/network-bans/retrieve/enriched': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** [Beta] Gets project's network bans with additional information about which databases they affect */
+    post: operations['v1-list-all-network-bans-enriched']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/network-restrictions': {
     parameters: {
       query?: never
@@ -1864,6 +1881,16 @@ export interface components {
       verify_jwt?: boolean
       version: number
     }
+    FunctionDeployBody: {
+      file?: string[]
+      metadata: {
+        entrypoint_path: string
+        import_map_path?: string
+        name?: string
+        static_patterns?: string[]
+        verify_jwt?: boolean
+      }
+    }
     FunctionResponse: {
       created_at: number
       entrypoint_path?: string
@@ -2071,6 +2098,13 @@ export interface components {
     NetworkBanResponse: {
       banned_ipv4_addresses: string[]
     }
+    NetworkBanResponseEnriched: {
+      banned_ipv4_addresses: {
+        banned_address: string
+        identifier: string
+        type: string
+      }[]
+    }
     NetworkRestrictionsRequest: {
       dbAllowedCidrs?: string[]
       dbAllowedCidrsV6?: string[]
@@ -2198,6 +2232,7 @@ export interface components {
     /** @enum {string} */
     ReleaseChannel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
     RemoveNetworkBanRequest: {
+      identifier?: string
       ipv4_addresses: string[]
     }
     RemoveReadReplicaBody: {
@@ -2612,6 +2647,21 @@ export interface components {
         | '3_challenge_verified'
         | '4_origin_setup_completed'
         | '5_services_reconfigured'
+    }
+    UpdateFunctionBody: {
+      args?: string[]
+      /** @enum {string} */
+      behavior?: 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
+      config_params?: {
+        [key: string]: string
+      }
+      definition?: string
+      id?: number
+      language?: string
+      name?: string
+      return_type?: string
+      schema?: string
+      security_definer?: boolean
     }
     UpdatePgsodiumConfigBody: {
       root_key: string
@@ -5410,7 +5460,12 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody?: never
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateFunctionBody']
+        'application/vnd.denoland.eszip': components['schemas']['UpdateFunctionBody']
+      }
+    }
     responses: {
       200: {
         headers: {
@@ -5484,7 +5539,11 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody?: never
+    requestBody: {
+      content: {
+        'multipart/form-data': components['schemas']['FunctionDeployBody']
+      }
+    }
     responses: {
       201: {
         headers: {
@@ -5512,7 +5571,7 @@ export interface operations {
   'v1-get-services-health': {
     parameters: {
       query: {
-        services: string
+        services: ('auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage')[]
         timeout_ms?: number
       }
       header?: never
@@ -5611,6 +5670,41 @@ export interface operations {
         content?: never
       }
       /** @description Failed to retrieve project's network bans */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-list-all-network-bans-enriched': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['NetworkBanResponseEnriched']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve project's enriched network bans */
       500: {
         headers: {
           [name: string]: unknown
