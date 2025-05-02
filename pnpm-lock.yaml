@@ -1861,9 +1861,12 @@ importers:
       '@tailwindcss/typography':
         specifier: ^0.5.9
         version: 0.5.10(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2)))
+      '@tanstack/react-table':
+        specifier: ^8.21.3
+        version: 8.21.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       autoprefixer:
         specifier: ^10.4.14
-        version: 10.4.16(postcss@8.5.3)
+        version: 10.4.16(postcss@8.4.38)
       class-variance-authority:
         specifier: ^0.6.1
         version: 0.6.1
