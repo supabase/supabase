@@ -629,8 +629,8 @@ importers:
         specifier: ^0.4.0
         version: 0.4.0(supports-color@8.1.1)
       '@supabase/mcp-utils':
-        specifier: ^0.1.3
-        version: 0.1.3(supports-color@8.1.1)
+        specifier: ^0.2.0
+        version: 0.2.0(supports-color@8.1.1)
       '@supabase/pg-meta':
         specifier: workspace:*
         version: link:../../packages/pg-meta
@@ -1018,7 +1018,7 @@ importers:
         version: 2.7.5(@types/node@20.17.32)(typescript@5.5.4)
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0))(react@18.3.1)
+        version: 0.9.13(next@15.3.1(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0))(react@18.3.1)
       postcss:
         specifier: ^8.4.31
         version: 8.5.3
@@ -2159,7 +2159,7 @@ importers:
         version: link:../api-types
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0))(react@18.3.1)
+        version: 0.9.13(next@15.3.1(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0))(react@18.3.1)
       typescript:
         specifier: ~5.5.0
         version: 5.5.4
@@ -3714,8 +3714,8 @@ packages:
   '@mjackson/node-fetch-server@0.2.0':
     resolution: {integrity: sha512-EMlH1e30yzmTpGLQjlFmaDAjyOeZhng1/XCd7DExR8PNAnG/G1tyruZxEoUe11ClnwGhGrtsdnyyUx1frSzjng==}
 
-  '@modelcontextprotocol/sdk@1.10.2':
-    resolution: {integrity: sha512-rb6AMp2DR4SN+kc6L1ta2NCpApyA9WYNx3CrTSZvGxq9wH71bRur+zRqPfg0vQ9mjywR7qZdX2RGHOPq3ss+tA==}
+  '@modelcontextprotocol/sdk@1.11.0':
+    resolution: {integrity: sha512-k/1pb70eD638anoi0e8wUGAlbMJXyvdV4p62Ko+EZ7eBe1xMx8Uhak1R5DgfoofsK5IBBnRwsYGTaLZl+6/+RQ==}
     engines: {node: '>=18'}
 
   '@monaco-editor/loader@1.5.0':
@@ -6122,9 +6122,6 @@ packages:
   '@supabase/mcp-server-supabase@0.4.0':
     resolution: {integrity: sha512-dVVe0QzZXJUllAOO+eFCsDA2OAdNuxbbUPW+5LZ74aTVzRnerK96Sv8zbl6GfFuH0Ic96BKLXyfgu6ur9wD/MA==}
     hasBin: true
-
-  '@supabase/mcp-utils@0.1.3':
-    resolution: {integrity: sha512-WydcShLsJ9xG2nbLqf2q2k1KN+L2Yq30ay7/UNEh1kLY1lvjqZbnIb9Q7z25icTZuSYscRDxn8Jljj+F3bXdhw==}
 
   '@supabase/mcp-utils@0.2.0':
     resolution: {integrity: sha512-enAUrxkij9+hNgG38Y1HMFHCLCRGbqOGpeTIE5SRxIHN8LXIY7oqP6OmYJgRWDTqEyV4JOP7wXeuJNtMY5Qrdw==}
@@ -9009,7 +9006,6 @@ packages:
     resolution: {integrity: sha512-X41YRfKkVCooILai2N0aN0Q5O0imu+MbNt894QWU683A82xJJXIR01dEqxwYJ91M6IdExtyFB3GCOJb4eBMBMQ==}
     peerDependencies:
       eslint: '>= 5'
-    bundledDependencies: []
 
   eslint-plugin-import@2.31.0:
     resolution: {integrity: sha512-ixmkI62Rbc2/w8Vfxyh1jQRTdRTF52VxwRVHl/ykPAmqG+Nb7/kNn+byLP0LxPgI7zWA16Jt82SybJInmMia3A==}
@@ -17437,7 +17433,7 @@ snapshots:
 
   '@mjackson/node-fetch-server@0.2.0': {}
 
-  '@modelcontextprotocol/sdk@1.10.2(supports-color@8.1.1)':
+  '@modelcontextprotocol/sdk@1.11.0(supports-color@8.1.1)':
     dependencies:
       content-type: 1.0.5
       cors: 2.8.5
@@ -20314,7 +20310,7 @@ snapshots:
   '@supabase/mcp-server-supabase@0.4.0(supports-color@8.1.1)':
     dependencies:
       '@deno/eszip': 0.84.0
-      '@modelcontextprotocol/sdk': 1.10.2(supports-color@8.1.1)
+      '@modelcontextprotocol/sdk': 1.11.0(supports-color@8.1.1)
       '@supabase/mcp-utils': 0.2.0(supports-color@8.1.1)
       common-tags: 1.8.2
       openapi-fetch: 0.13.5
@@ -20322,17 +20318,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@supabase/mcp-utils@0.1.3(supports-color@8.1.1)':
-    dependencies:
-      '@modelcontextprotocol/sdk': 1.10.2(supports-color@8.1.1)
-      zod: 3.24.3
-      zod-to-json-schema: 3.24.5(zod@3.24.3)
-    transitivePeerDependencies:
-      - supports-color
-
   '@supabase/mcp-utils@0.2.0(supports-color@8.1.1)':
     dependencies:
-      '@modelcontextprotocol/sdk': 1.10.2(supports-color@8.1.1)
+      '@modelcontextprotocol/sdk': 1.11.0(supports-color@8.1.1)
       zod: 3.24.3
       zod-to-json-schema: 3.24.5(zod@3.24.3)
     transitivePeerDependencies:
@@ -27568,7 +27556,7 @@ snapshots:
     dependencies:
       js-yaml-loader: 1.2.2
 
-  next-router-mock@0.9.13(next@15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0))(react@18.3.1):
+  next-router-mock@0.9.13(next@15.3.1(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0))(react@18.3.1):
     dependencies:
       next: 15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.87.0)
       react: 18.3.1
