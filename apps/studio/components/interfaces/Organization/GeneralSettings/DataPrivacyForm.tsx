@@ -1,0 +1,47 @@
+import { useEffect } from 'react'
+import * as z from 'zod'
+import { Form_Shadcn_, Card, CardContent, CardFooter } from 'ui'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { useAIOptInForm } from 'hooks/forms/useAIOptInForm'
+import { AIOptInLevelSelector } from './AIOptInLevelSelector'
+
+const DataPrivacyForm = () => {
+  const { form, onSubmit, isUpdating, canUpdateOrganization, currentOptInLevel } = useAIOptInForm()
+
+  useEffect(() => {
+    form.reset({ aiOptInLevel: currentOptInLevel })
+  }, [currentOptInLevel, form.reset])
+
+  const permissionsHelperText = !canUpdateOrganization
+    ? "You need additional permissions to manage this organization's settings"
+    : undefined
+
+  return (
+    <Form_Shadcn_ {...form}>
+      <form id="org-privacy-form" onSubmit={form.handleSubmit(onSubmit)}>
+        <Card>
+          <CardContent className="pt-6">
+            <AIOptInLevelSelector
+              control={form.control}
+              disabled={!canUpdateOrganization || isUpdating}
+              layout="flex-row-reverse"
+              label="Supabase AI Opt-in Level"
+            />
+          </CardContent>
+          <CardFooter className="flex justify-end p-4 md:px-8">
+            <FormActions
+              form="org-privacy-form"
+              isSubmitting={isUpdating}
+              hasChanges={form.formState.isDirty}
+              handleReset={() => form.reset()}
+              helper={permissionsHelperText}
+              disabled={!canUpdateOrganization}
+            />
+          </CardFooter>
+        </Card>
+      </form>
+    </Form_Shadcn_>
+  )
+}
+
+export default DataPrivacyForm
