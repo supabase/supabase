@@ -113,9 +113,9 @@ export function DiskManagementForm() {
             form.reset(formValues)
             setRefetchInterval(false)
             toast.success('Disk configuration changes have been successfully applied!')
-          } else {
-            setRefetchInterval(2000)
           }
+        } else {
+          setRefetchInterval(2000)
         }
       },
       enabled: project != null && !isFlyArchitecture,
