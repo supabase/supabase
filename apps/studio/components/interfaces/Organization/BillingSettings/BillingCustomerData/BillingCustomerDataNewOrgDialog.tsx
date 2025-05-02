@@ -41,7 +41,7 @@ export const BillingCustomerDataNewOrgDialog = ({
   const getAddressSummary = () => {
     const { line1, city, state, country, billing_name } = form.getValues()
 
-    if (!line1 && !billing_name) return 'Optionally add a billing address'
+    if (!line1) return 'Optionally add a billing address'
 
     const parts = [billing_name, line1, city, state, country].filter(Boolean)
 

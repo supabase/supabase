@@ -108,8 +108,7 @@ export const BillingCustomerDataExistingOrgDialog = () => {
   }
 
   const getAddressSummary = () => {
-    if (!customerProfile?.address?.line1 && !customerProfile?.billing_name)
-      return 'Optionally add a billing address'
+    if (!customerProfile?.address?.line1) return 'Optionally add a billing address'
 
     const parts = [
       customerProfile?.billing_name,
