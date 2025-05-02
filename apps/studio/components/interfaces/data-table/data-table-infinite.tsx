@@ -18,10 +18,10 @@ import { LoaderCircle } from 'lucide-react'
 import { useQueryState } from 'nuqs'
 import * as React from 'react'
 import { Button, cn } from 'ui'
+import { useDataTable } from '../DataTableDemo/components/data-table/data-table-provider'
 
 // TODO: add a possible chartGroupBy
 export interface DataTableInfiniteProps<TData, TValue, TMeta> {
-  table: TTable<TData>
   columns: ColumnDef<TData, TValue>[]
   defaultColumnVisibility?: VisibilityState
   totalRows?: number
@@ -37,7 +37,6 @@ export interface DataTableInfiniteProps<TData, TValue, TMeta> {
 }
 
 export function DataTableInfinite<TData, TValue, TMeta>({
-  table,
   columns,
   defaultColumnVisibility = {},
   isFetching,
@@ -51,6 +50,8 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   setColumnOrder,
   setColumnVisibility,
 }: DataTableInfiniteProps<TData, TValue, TMeta>) {
+  const { table } = useDataTable()
+
   const tableRef = React.useRef<HTMLTableElement>(null)
   // const [topBarHeight, setTopBarHeight] = React.useState(0)
   // FIXME: searchParamsParser needs to be passed as property
