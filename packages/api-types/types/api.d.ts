@@ -2648,21 +2648,6 @@ export interface components {
         | '4_origin_setup_completed'
         | '5_services_reconfigured'
     }
-    UpdateFunctionBody: {
-      args?: string[]
-      /** @enum {string} */
-      behavior?: 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
-      config_params?: {
-        [key: string]: string
-      }
-      definition?: string
-      id?: number
-      language?: string
-      name?: string
-      return_type?: string
-      schema?: string
-      security_definer?: boolean
-    }
     UpdatePgsodiumConfigBody: {
       root_key: string
     }
@@ -3083,6 +3068,11 @@ export interface components {
       owner: string
       public: boolean
       updated_at: string
+    }
+    V1UpdateFunctionBody: {
+      body?: string
+      name?: string
+      verify_jwt?: boolean
     }
     V1UpdatePostgrestConfigBody: {
       db_extra_search_path?: string
@@ -5462,8 +5452,8 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateFunctionBody']
-        'application/vnd.denoland.eszip': components['schemas']['UpdateFunctionBody']
+        'application/json': components['schemas']['V1UpdateFunctionBody']
+        'application/vnd.denoland.eszip': components['schemas']['V1UpdateFunctionBody']
       }
     }
     responses: {
