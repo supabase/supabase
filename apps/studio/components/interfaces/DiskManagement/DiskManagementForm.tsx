@@ -29,6 +29,7 @@ import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { GB, PROJECT_STATUS } from 'lib/constants'
+import { CloudProvider } from 'shared-data'
 import {
   Button,
   cn,
@@ -55,7 +56,6 @@ import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
 import { DiskType, RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
-import { CloudProvider } from 'shared-data'
 
 export function DiskManagementForm() {
   // isLoading is used to avoid a useCheckPermissions() race condition
@@ -113,6 +113,8 @@ export function DiskManagementForm() {
             form.reset(formValues)
             setRefetchInterval(false)
             toast.success('Disk configuration changes have been successfully applied!')
+          } else {
+            setRefetchInterval(2000)
           }
         }
       },
