@@ -43,6 +43,40 @@ export const columns: ColumnDef<ColumnSchema>[] = [
     },
   },
   {
+    accessorKey: 'id',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
+    cell: ({ row }) => {
+      const value = row.getValue<ColumnSchema['id']>('id')
+      return <TextWithTooltip text={value} />
+    },
+    size: 130,
+    minSize: 130,
+    meta: {
+      headerClassName: 'w-[--header-id-size] max-w-[--header-id-size] min-w-[--header-id-size]',
+      cellClassName: 'w-[--col-id-size] max-w-[--col-id-size] min-w-[--col-id-size]',
+    },
+  },
+  {
+    accessorKey: 'log_type',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Log Type" />,
+    cell: ({ row }) => {
+      const logType = row.getValue<ColumnSchema['log_type']>('log_type')
+      return <TextWithTooltip text={logType} />
+    },
+    enableHiding: false,
+    enableResizing: false,
+    filterFn: 'arrSome',
+    size: 69,
+    minSize: 69,
+    maxSize: 69,
+    meta: {
+      headerClassName:
+        'w-[--header-log_type-size] max-w-[--header-log_type-size] min-w-[--header-log_type-size]',
+      cellClassName:
+        'font-mono w-[--col-log_type-size] max-w-[--col-log_type-size] min-w-[--col-log_type-size]',
+    },
+  },
+  {
     accessorKey: 'date',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Date" />,
     cell: ({ row }) => {
@@ -188,180 +222,6 @@ export const columns: ColumnDef<ColumnSchema>[] = [
         'w-[--header-regions-size] max-w-[--header-regions-size] min-w-[--header-regions-size]',
       cellClassName:
         'font-mono w-[--col-regions-size] max-w-[--col-regions-size] min-w-[--col-regions-size]',
-    },
-  },
-  {
-    accessorKey: 'timing',
-    header: () => <div className="whitespace-nowrap">Timing Phases</div>,
-    cell: ({ row }) => {
-      const timing = {
-        'timing.dns': row.getValue<ColumnSchema['timing.dns']>('timing.dns'),
-        'timing.connection': row.getValue<ColumnSchema['timing.connection']>('timing.connection'),
-        'timing.tls': row.getValue<ColumnSchema['timing.tls']>('timing.tls'),
-        'timing.ttfb': row.getValue<ColumnSchema['timing.ttfb']>('timing.ttfb'),
-        'timing.transfer': row.getValue<ColumnSchema['timing.transfer']>('timing.transfer'),
-      }
-      const latency = row.getValue<ColumnSchema['latency']>('latency')
-      const percentage = getTimingPercentage(timing, latency)
-      // TODO: create a separate component for this in _components
-      return (
-        <HoverCard openDelay={50} closeDelay={50}>
-          <HoverCardTrigger
-            className="opacity-70 hover:opacity-100 data-[state=open]:opacity-100"
-            asChild
-          >
-            <div className="flex">
-              {Object.entries(timing).map(([key, value]) => (
-                <div
-                  key={key}
-                  className={cn(getTimingColor(key as keyof typeof timing), 'h-4')}
-                  style={{ width: `${(value / latency) * 100}%` }}
-                />
-              ))}
-            </div>
-          </HoverCardTrigger>
-          {/* REMINDER: allows us to port the content to the document.body, which is helpful when using opacity-50 on the row element */}
-          <HoverCardPortal>
-            <HoverCardContent side="bottom" align="end" className="z-10 w-auto p-2">
-              <div className="flex flex-col gap-1">
-                {timingPhases.map((phase) => {
-                  const color = getTimingColor(phase)
-                  const percentageValue = percentage[phase]
-                  return (
-                    <div key={phase} className="grid grid-cols-2 gap-4 text-xs">
-                      <div className="flex items-center gap-2">
-                        <div className={cn(color, 'h-2 w-2 rounded-full')} />
-                        <div className="font-mono uppercase text-accent-foreground">
-                          {getTimingLabel(phase)}
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between gap-4">
-                        <div className="font-mono text-muted-foreground">{percentageValue}</div>
-                        <div className="font-mono">
-                          {new Intl.NumberFormat('en-US', {
-                            maximumFractionDigits: 3,
-                          }).format(timing[phase])}
-                          <span className="text-muted-foreground">ms</span>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </HoverCardContent>
-          </HoverCardPortal>
-        </HoverCard>
-      )
-    },
-    enableResizing: false,
-    size: 130,
-    minSize: 130,
-    meta: {
-      label: 'Timing Phases',
-      headerClassName:
-        'w-[--header-timing-size] max-w-[--header-timing-size] min-w-[--header-timing-size]',
-      cellClassName:
-        'font-mono w-[--col-timing-size] max-w-[--col-timing-size] min-w-[--col-timing-size]',
-    },
-  },
-  {
-    id: 'timing.dns',
-    accessorFn: (row) => row['timing.dns'],
-    header: ({ column }) => <DataTableColumnHeader column={column} title="DNS" />,
-    cell: ({ row }) => {
-      const value = row.getValue<ColumnSchema['timing.dns']>('timing.dns')
-      return <DataTableColumnLatency value={value} />
-    },
-    filterFn: 'inNumberRange',
-    enableResizing: false,
-    size: 110,
-    minSize: 110,
-    meta: {
-      label: 'DNS',
-      headerClassName:
-        'w-[--header-timing-dns-size] max-w-[--header-timing-dns-size] min-w-[--header-timing-dns-size]',
-      cellClassName:
-        'font-mono w-[--col-timing-dns-size] max-w-[--col-timing-dns-size] min-w-[--col-timing-dns-size]',
-    },
-  },
-  {
-    id: 'timing.connection',
-    accessorFn: (row) => row['timing.connection'],
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Connection" />,
-    cell: ({ row }) => {
-      const value = row.getValue<ColumnSchema['timing.connection']>('timing.connection')
-      return <DataTableColumnLatency value={value} />
-    },
-    filterFn: 'inNumberRange',
-    enableResizing: false,
-    size: 110,
-    minSize: 110,
-    meta: {
-      label: 'Connection',
-      headerClassName:
-        'w-[--header-timing-connection-size] max-w-[--header-timing-connection-size] min-w-[--header-timing-connection-size]',
-      cellClassName:
-        'font-mono w-[--col-timing-connection-size] max-w-[--col-timing-connection-size] min-w-[--col-timing-connection-size]',
-    },
-  },
-  {
-    id: 'timing.tls',
-    accessorFn: (row) => row['timing.tls'],
-    header: ({ column }) => <DataTableColumnHeader column={column} title="TLS" />,
-    cell: ({ row }) => {
-      const value = row.getValue<ColumnSchema['timing.tls']>('timing.tls')
-      return <DataTableColumnLatency value={value} />
-    },
-    filterFn: 'inNumberRange',
-    enableResizing: false,
-    size: 110,
-    minSize: 110,
-    meta: {
-      label: 'TLS',
-      headerClassName:
-        'w-[--header-timing-tls-size] max-w-[--header-timing-tls-size] min-w-[--header-timing-tls-size]',
-      cellClassName:
-        'font-mono w-[--col-timing-tls-size] max-w-[--col-timing-tls-size] min-w-[--col-timing-tls-size]',
-    },
-  },
-  {
-    id: 'timing.ttfb',
-    accessorFn: (row) => row['timing.ttfb'],
-    header: ({ column }) => <DataTableColumnHeader column={column} title="TTFB" />,
-    cell: ({ row }) => {
-      const value = row.getValue<ColumnSchema['timing.ttfb']>('timing.ttfb')
-      return <DataTableColumnLatency value={value} />
-    },
-    filterFn: 'inNumberRange',
-    enableResizing: false,
-    size: 110,
-    minSize: 110,
-    meta: {
-      label: 'TTFB',
-      headerClassName:
-        'w-[--header-timing-ttfb-size] max-w-[--header-timing-ttfb-size] min-w-[--header-timing-ttfb-size]',
-      cellClassName:
-        'font-mono w-[--col-timing-ttfb-size] max-w-[--col-timing-ttfb-size] min-w-[--col-timing-ttfb-size]',
-    },
-  },
-  {
-    id: 'timing.transfer',
-    accessorFn: (row) => row['timing.transfer'],
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Transfer" />,
-    cell: ({ row }) => {
-      const value = row.getValue<ColumnSchema['timing.transfer']>('timing.transfer')
-      return <DataTableColumnLatency value={value} />
-    },
-    filterFn: 'inNumberRange',
-    enableResizing: false,
-    size: 110,
-    minSize: 110,
-    meta: {
-      label: 'Transfer',
-      headerClassName:
-        'w-[--header-timing-transfer-size] max-w-[--header-timing-transfer-size] min-w-[--header-timing-transfer-size]',
-      cellClassName:
-        'font-mono w-[--col-timing-transfer-size] max-w-[--col-timing-transfer-size] min-w-[--col-timing-transfer-size]',
     },
   },
 ]

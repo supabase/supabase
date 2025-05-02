@@ -49,8 +49,9 @@ import { MemoizedDataTableSheetContent } from './components/data-table-sheet-con
 import type { FacetMetadataSchema, TimelineChartSchema } from './schema'
 import { columns } from './columns'
 import { searchParamsParser } from './search-params'
-import { dataOptions } from './query-options'
+import { dataOptions, useChartData } from './query-options-new'
 import { filterFields as defaultFilterFields, sheetFields } from './constants'
+import { useParams } from 'common'
 
 function TooltipLabel({ level }: { level: keyof Omit<TimelineChartSchema, 'timestamp'> }) {
   return (
@@ -77,9 +78,19 @@ const chartConfig = {
 } satisfies ChartConfig
 export function Client() {
   const [search, setSearch] = useQueryStates(searchParamsParser)
+  const { ref: projectRef } = useParams()
 
   const { data, isFetching, isLoading, fetchNextPage, hasNextPage, fetchPreviousPage, refetch } =
-    useInfiniteQuery(dataOptions(search))
+    useInfiniteQuery(dataOptions(search, projectRef ?? ''))
+
+  // Add the chart data query for the entire time period
+  const { data: chartDataResult, isLoading: isChartLoading } = useChartData(
+    search,
+    projectRef ?? ''
+  )
+
+  console.log('>>> [Client] chartDataResult:', chartDataResult)
+
   useResetFocus()
 
   const [topBarHeight, setTopBarHeight] = React.useState(0)
@@ -96,7 +107,8 @@ export function Client() {
   const totalDBRowCount = lastPage?.meta?.totalRowCount
   const filterDBRowCount = lastPage?.meta?.filterRowCount
   const metadata = lastPage?.meta?.metadata
-  const chartData = lastPage?.meta?.chartData
+  // Use chart data from the separate query if available, fallback to the default
+  const chartData = chartDataResult?.chartData || lastPage?.meta?.chartData
   const facets = lastPage?.meta?.facets
   const totalFetched = flatData?.length
 
@@ -112,11 +124,12 @@ export function Client() {
   const defaultColumnSorting = sort ? [sort] : []
   const defaultColumnVisibility = {
     uuid: false,
-    'timing.dns': false,
-    'timing.connection': false,
-    'timing.tls': false,
-    'timing.ttfb': false,
-    'timing.transfer': false,
+    // Remove timing fields since they don't exist in schema anymore
+    // 'timing.dns': false,
+    // 'timing.connection': false,
+    // 'timing.tls': false,
+    // 'timing.ttfb': false,
+    // 'timing.transfer': false,
   }
   const defaultRowSelection = search.uuid ? { [search.uuid]: true } : {}
 
@@ -159,13 +172,15 @@ export function Client() {
   }, [facets])
 
   // --- DEBUG: Check props before passing to DataTableInfinite ---
-  console.log('>>> [Client] flatData length:', flatData?.length)
-  console.log('>>> [Client] filterDBRowCount:', filterDBRowCount)
-  console.log('>>> [Client] data object:', data) // Log the raw react-query data
+  // console.log('>>> [Client] flatData length:', flatData?.length)
+  // console.log('>>> [Client] filterDBRowCount:', filterDBRowCount)
+  // console.log('>>> [Client] data object:', data) // Log the raw react-query data
   // --- END DEBUG ---
 
-  const getRowClassName = <TData extends { date: Date; level: string }>(row: Row<TData>) => {
-    const rowTimestamp = row.original.date.getTime()
+  const getRowClassName = <TData extends { date: Date; level: string; timestamp: number }>(
+    row: Row<TData>
+  ) => {
+    const rowTimestamp = row.original.timestamp
     const isPast = rowTimestamp <= (liveMode.timestamp || -1)
     const levelClassName = getLevelRowClassName(row.original.level)
     return cn(levelClassName, isPast ? 'opacity-50' : 'opacity-100')
@@ -193,8 +208,8 @@ export function Client() {
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getTTableFacetedUniqueValues(),
-    getFacetedMinMaxValues: getTTableFacetedMinMaxValues(),
+    getFacetedUniqueValues: getFacetedUniqueValues(facets),
+    getFacetedMinMaxValues: getFacetedMinMaxValues(facets),
     filterFns: { inDateRange, arrSome },
     debugAll: process.env.NEXT_PUBLIC_TABLE_DEBUG === 'true',
     meta: { getRowClassName },
@@ -278,6 +293,9 @@ export function Client() {
                   ) : null,
                 ]}
               />
+              <div className="px-4 text-xs text-muted-foreground mb-1">
+                Last hour of logs {search.date ? '(custom time range)' : '(default)'}
+              </div>
               <TimelineChart
                 data={chartData ?? []}
                 className="-mb-2"
@@ -286,7 +304,6 @@ export function Client() {
               />
             </DataTableHeaderLayout>
             <DataTableInfinite
-              table={table}
               columns={columns}
               totalRows={totalDBRowCount}
               filterRows={filterDBRowCount}

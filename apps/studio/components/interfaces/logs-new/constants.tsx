@@ -109,41 +109,6 @@ export const filterFields = [
     min: 0,
     max: 5000,
   },
-  {
-    label: 'DNS',
-    value: 'timing.dns',
-    type: 'slider',
-    min: 0,
-    max: 5000,
-  },
-  {
-    label: 'Connection',
-    value: 'timing.connection',
-    type: 'slider',
-    min: 0,
-    max: 5000,
-  },
-  {
-    label: 'TLS',
-    value: 'timing.tls',
-    type: 'slider',
-    min: 0,
-    max: 5000,
-  },
-  {
-    label: 'TTFB',
-    value: 'timing.ttfb',
-    type: 'slider',
-    min: 0,
-    max: 5000,
-  },
-  {
-    label: 'Transfer',
-    value: 'timing.transfer',
-    type: 'slider',
-    min: 0,
-    max: 5000,
-  },
 ] satisfies DataTableFilterField<ColumnSchema>[]
 
 export const sheetFields = [
@@ -210,29 +175,6 @@ export const sheetFields = [
       </>
     ),
     skeletonClassName: 'w-16',
-  },
-  {
-    id: 'percentile',
-    label: 'Percentile',
-    type: 'readonly',
-    component: (props) => {
-      return (
-        <PopoverPercentile
-          data={props}
-          percentiles={props.metadata?.currentPercentiles}
-          filterRows={props.metadata?.filterRows as number}
-          className="ml-auto"
-        />
-      )
-    },
-    skeletonClassName: 'w-12',
-  },
-  {
-    id: 'timing.dns', // REMINDER: cannot be 'timing' as it is a property of the object
-    label: 'Timing Phases',
-    type: 'readonly',
-    component: (props) => <SheetTimingPhases latency={props.latency} timing={props} />,
-    className: 'flex-col items-start w-full gap-1',
   },
   {
     id: 'headers',

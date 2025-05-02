@@ -38,6 +38,7 @@ export const parseAsSort = createParser({
 export const searchParamsParser = {
   // CUSTOM FILTERS
   level: parseAsArrayOf(parseAsStringLiteral(LEVELS), ARRAY_DELIMITER),
+  log_type: parseAsArrayOf(parseAsString, ARRAY_DELIMITER),
   latency: parseAsArrayOf(parseAsInteger, SLIDER_DELIMITER),
   'timing.dns': parseAsArrayOf(parseAsInteger, SLIDER_DELIMITER),
   'timing.connection': parseAsArrayOf(parseAsInteger, SLIDER_DELIMITER),
