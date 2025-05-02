@@ -123,7 +123,7 @@ const SchemaSelector = ({
             </Button>
           </PopoverTrigger_Shadcn_>
           <PopoverContent_Shadcn_
-            className="p-0 min-w-[200px]"
+            className="p-0 min-w-[200px] pointer-events-auto"
             side="bottom"
             align="start"
             portal={true}

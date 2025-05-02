@@ -26,9 +26,8 @@ import DowngradeModal from './DowngradeModal'
 import { EnterpriseCard } from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
-import SubscriptionPlanUpdateDialog from './SubscriptionPlanUpdateDialog'
+import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
-import { PROJECT_STATUS } from 'lib/constants'
 
 const PlanUpdateSidePanel = () => {
   const router = useRouter()
@@ -305,7 +304,6 @@ const PlanUpdateSidePanel = () => {
         billingPartner={billingPartner}
         subscription={subscription}
         projects={orgProjects}
-        slug={slug}
         currentPlanMeta={{
           ...availablePlans.find((p) => p.id === subscription?.plan?.id),
           features:
