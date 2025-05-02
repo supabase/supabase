@@ -20,7 +20,8 @@ const Table = React.forwardRef<HTMLTableElement, React.ComponentPropsWithRef<typ
       {...props}
       className={cn('', className)}
       containerProps={{
-        className: 'max-h-[calc(100vh_-_var(--top-bar-height))]',
+        className:
+          'table-fixed w-max caption-bottom text-sm max-h-[calc(100vh_-_var(--top-bar-height))]',
         ...props.containerProps,
       }}
       // REMINDER: we are not scrolling the table, but the container

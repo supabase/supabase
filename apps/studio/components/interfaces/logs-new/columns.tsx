@@ -21,6 +21,7 @@ import { HoverCardTimestamp } from 'components/interfaces/DataTableDemo/infinite
 
 // custom imports
 import type { ColumnSchema } from './schema'
+import { LogTypeIcon } from './LogTypeIcon'
 
 export const columns: ColumnDef<ColumnSchema>[] = [
   {
@@ -32,48 +33,14 @@ export const columns: ColumnDef<ColumnSchema>[] = [
     },
     enableHiding: false,
     enableResizing: false,
-    filterFn: 'arrSome',
-    size: 27,
-    minSize: 27,
-    maxSize: 27,
+    // filterFn: 'arrSome',
+    size: 48,
+    minSize: 48,
+    maxSize: 48,
     meta: {
       headerClassName:
         'w-[--header-level-size] max-w-[--header-level-size] min-w-[--header-level-size]',
       cellClassName: 'w-[--col-level-size] max-w-[--col-level-size] min-w-[--col-level-size]',
-    },
-  },
-  {
-    accessorKey: 'id',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
-    cell: ({ row }) => {
-      const value = row.getValue<ColumnSchema['id']>('id')
-      return <TextWithTooltip text={value} />
-    },
-    size: 130,
-    minSize: 130,
-    meta: {
-      headerClassName: 'w-[--header-id-size] max-w-[--header-id-size] min-w-[--header-id-size]',
-      cellClassName: 'w-[--col-id-size] max-w-[--col-id-size] min-w-[--col-id-size]',
-    },
-  },
-  {
-    accessorKey: 'log_type',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Log Type" />,
-    cell: ({ row }) => {
-      const logType = row.getValue<ColumnSchema['log_type']>('log_type')
-      return <TextWithTooltip text={logType} />
-    },
-    enableHiding: false,
-    filterFn: 'arrSome',
-    size: 70,
-    minSize: 70,
-    maxSize: 70,
-    enableResizing: false,
-    meta: {
-      headerClassName:
-        'w-[--header-log_type-size] max-w-[--header-log_type-size] min-w-[--header-log_type-size]',
-      cellClassName:
-        'font-mono w-[--col-log_type-size] max-w-[--col-log_type-size] min-w-[--col-log_type-size]',
     },
   },
   {
@@ -85,9 +52,9 @@ export const columns: ColumnDef<ColumnSchema>[] = [
     },
     filterFn: 'inDateRange',
     enableResizing: false,
-    size: 200,
-    minSize: 200,
-    maxSize: 200,
+    size: 190,
+    minSize: 190,
+    maxSize: 190,
     meta: {
       headerClassName:
         'w-[--header-date-size] max-w-[--header-date-size] min-w-[--header-date-size]',
@@ -95,31 +62,93 @@ export const columns: ColumnDef<ColumnSchema>[] = [
         'font-mono w-[--col-date-size] max-w-[--col-date-size] min-w-[--col-date-size]',
     },
   },
+  // {
+  //   accessorKey: 'id',
+  //   header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
+  //   cell: ({ row }) => {
+  //     const value = row.getValue<ColumnSchema['id']>('id')
+  //     return <TextWithTooltip text={value} />
+  //   },
+  //   size: 130,
+  //   minSize: 130,
+  //   meta: {
+  //     headerClassName: 'w-[--header-id-size] max-w-[--header-id-size] min-w-[--header-id-size]',
+  //     cellClassName: 'w-[--col-id-size] max-w-[--col-id-size] min-w-[--col-id-size]',
+  //   },
+  // },
+  // {
+  //   id: 'uuid',
+  //   accessorKey: 'uuid',
+  //   header: 'Request Id',
+  //   cell: ({ row }) => {
+  //     const value = row.getValue<ColumnSchema['uuid']>('uuid')
+  //     return <TextWithTooltip text={value} />
+  //   },
+  //   enableResizing: false,
+  //   size: 130,
+  //   minSize: 130,
+  //   meta: {
+  //     label: 'Request Id',
+  //     cellClassName:
+  //       'font-mono w-[--col-uuid-size] max-w-[--col-uuid-size] min-w-[--col-uuid-size]',
+  //     headerClassName:
+  //       'min-w-[--header-uuid-size] w-[--header-uuid-size] max-w-[--header-uuid-size]',
+  //   },
+  // },
   {
-    id: 'uuid',
-    accessorKey: 'uuid',
-    header: 'Request Id',
+    accessorKey: 'log_type',
+    header: null,
     cell: ({ row }) => {
-      const value = row.getValue<ColumnSchema['uuid']>('uuid')
-      return <TextWithTooltip text={value} />
+      const logType = row.getValue<ColumnSchema['log_type']>('log_type')
+      return (
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 text-right">
+          <LogTypeIcon type={logType} size={16} className="text-foreground/70" />
+        </div>
+      )
+    },
+    enableHiding: false,
+    filterFn: 'arrSome',
+    size: 48,
+    minSize: 48,
+    maxSize: 48,
+    enableResizing: false,
+    meta: {
+      headerClassName:
+        'w-[--header-log_type-size] max-w-[--header-log_type-size] min-w-[--header-log_type-size]',
+      cellClassName:
+        'text-right px-0 relative justify-end items-center font-mono w-[--col-log_type-size] max-w-[--col-log_type-size] min-w-[--col-log_type-size]',
+    },
+  },
+  {
+    // TODO: make it a type of MethodSchema!
+    accessorKey: 'method',
+    header: 'Method',
+    filterFn: 'arrIncludesSome',
+    cell: ({ row }) => {
+      const value = row.getValue<ColumnSchema['method']>('method')
+      return <span className="text-foreground-lighter">{value}</span>
     },
     enableResizing: false,
-    size: 130,
-    minSize: 130,
+    size: 69,
+    minSize: 69,
     meta: {
-      label: 'Request Id',
       cellClassName:
-        'font-mono w-[--col-uuid-size] max-w-[--col-uuid-size] min-w-[--col-uuid-size]',
+        'font-mono text-muted-foreground w-[--col-method-size] max-w-[--col-method-size] min-w-[--col-method-size]',
       headerClassName:
-        'min-w-[--header-uuid-size] w-[--header-uuid-size] max-w-[--header-uuid-size]',
+        'w-[--header-method-size] max-w-[--header-method-size] min-w-[--header-method-size]',
     },
   },
   {
     accessorKey: 'status',
-    header: 'Status',
+    header: '',
     cell: ({ row }) => {
       const value = row.getValue<ColumnSchema['status']>('status')
-      return <DataTableColumnStatusCode value={value} />
+      return (
+        <DataTableColumnStatusCode
+          value={value}
+          level={row.getValue<ColumnSchema['level']>('level')}
+        />
+      )
     },
     filterFn: 'arrSome',
     enableResizing: false,
@@ -132,35 +161,21 @@ export const columns: ColumnDef<ColumnSchema>[] = [
         'font-mono w-[--col-status-size] max-w-[--col-status-size] min-w-[--col-status-size]',
     },
   },
+
   {
-    // TODO: make it a type of MethodSchema!
-    accessorKey: 'method',
-    header: 'Method',
-    filterFn: 'arrIncludesSome',
-    enableResizing: false,
-    size: 69,
-    minSize: 69,
+    accessorKey: 'host',
+    header: 'Host',
+    cell: ({ row }) => {
+      const value = row.getValue<ColumnSchema['host']>('host')
+      return <TextWithTooltip text={value} />
+    },
+    size: 125,
+    minSize: 125,
     meta: {
-      cellClassName:
-        'font-mono text-muted-foreground w-[--col-method-size] max-w-[--col-method-size] min-w-[--col-method-size]',
-      headerClassName:
-        'w-[--header-method-size] max-w-[--header-method-size] min-w-[--header-method-size]',
+      cellClassName: 'font-mono w-[--col-host-size] max-w-[--col-host-size]',
+      headerClassName: 'min-w-[--header-host-size] w-[--header-host-size]',
     },
   },
-  // {
-  //   accessorKey: 'host',
-  //   header: 'Host',
-  //   cell: ({ row }) => {
-  //     const value = row.getValue<ColumnSchema['host']>('host')
-  //     return <TextWithTooltip text={value} />
-  //   },
-  //   size: 125,
-  //   minSize: 125,
-  //   meta: {
-  //     cellClassName: 'font-mono w-[--col-host-size] max-w-[--col-host-size]',
-  //     headerClassName: 'min-w-[--header-host-size] w-[--header-host-size]',
-  //   },
-  // },
   {
     accessorKey: 'pathname',
     header: 'Pathname',
@@ -175,25 +190,25 @@ export const columns: ColumnDef<ColumnSchema>[] = [
       headerClassName: 'min-w-[--header-pathname-size] w-[--header-pathname-size]',
     },
   },
-  {
-    accessorKey: 'latency',
-    // TODO: check if we can right align the table header/cell (makes is easier to read)
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Latency" />,
-    cell: ({ row }) => {
-      const value = row.getValue<ColumnSchema['latency']>('latency')
-      return <DataTableColumnLatency value={value} />
-    },
-    filterFn: 'inNumberRange',
-    enableResizing: false,
-    size: 110,
-    minSize: 110,
-    meta: {
-      headerClassName:
-        'w-[--header-latency-size] max-w-[--header-latency-size] min-w-[--header-latency-size]',
-      cellClassName:
-        'font-mono w-[--col-latency-size] max-w-[--col-latency-size] min-w-[--col-latency-size]',
-    },
-  },
+  // {
+  //   accessorKey: 'latency',
+  //   // TODO: check if we can right align the table header/cell (makes is easier to read)
+  //   header: ({ column }) => <DataTableColumnHeader column={column} title="Latency" />,
+  //   cell: ({ row }) => {
+  //     const value = row.getValue<ColumnSchema['latency']>('latency')
+  //     return <DataTableColumnLatency value={value} />
+  //   },
+  //   filterFn: 'inNumberRange',
+  //   enableResizing: false,
+  //   size: 110,
+  //   minSize: 110,
+  //   meta: {
+  //     headerClassName:
+  //       'w-[--header-latency-size] max-w-[--header-latency-size] min-w-[--header-latency-size]',
+  //     cellClassName:
+  //       'font-mono w-[--col-latency-size] max-w-[--col-latency-size] min-w-[--col-latency-size]',
+  //   },
+  // },
   // {
   //   accessorKey: 'regions',
   //   header: 'Region',
@@ -226,4 +241,23 @@ export const columns: ColumnDef<ColumnSchema>[] = [
   //       'font-mono w-[--col-regions-size] max-w-[--col-regions-size] min-w-[--col-regions-size]',
   //   },
   // },
+  {
+    accessorKey: 'event_message',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="event_message" />,
+    cell: ({ row }) => {
+      const value = row.getValue<ColumnSchema['event_message']>('event_message')
+      if (!value) return null
+      return <TextWithTooltip text={value} />
+    },
+    enableResizing: true, // allow manual resizing
+    size: 300,
+    minSize: 100,
+    // ❌ don't set maxSize — let it grow
+    meta: {
+      headerClassName:
+        'w-[--header-event_message-size] max-w-[--header-event_message-size] min-w-[--header-event_message-size]',
+      cellClassName:
+        'font-mono w-[--col-event_message-size] max-w-[--col-event_message-size] min-w-[--col-event_message-size]',
+    },
+  },
 ]

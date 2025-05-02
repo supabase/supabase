@@ -122,7 +122,25 @@ export const sheetFields = [
     id: 'date',
     label: 'Date',
     type: 'timerange',
-    component: (props) => format(new Date(props.date), 'LLL dd, y HH:mm:ss'),
+    component: (props) => {
+      const date = new Date(props.date)
+      const month = format(date, 'LLL')
+      const day = format(date, 'dd')
+      const year = format(date, 'y')
+      const time = format(date, 'HH:mm:ss')
+
+      return (
+        <div className="font-mono whitespace-nowrap flex items-center gap-1">
+          <span>{month}</span>
+          <span className="text-foreground/50">·</span>
+          <span>{day}</span>
+          <span className="text-foreground/50">·</span>
+          <span>{year}</span>
+          <span className="text-foreground/50">·</span>
+          <span>{time}</span>
+        </div>
+      )
+    },
     skeletonClassName: 'w-36',
   },
   {

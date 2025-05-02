@@ -19,7 +19,7 @@ export function determineLogLevelFromStatus(statusCode: string | number | undefi
 
   // Determine level based on status code ranges
   if (code >= 200 && code < 300) return 'success'
-  if (code >= 400 && code < 500) return 'warn'
+  if (code >= 400 && code < 500) return 'warning'
   if (code >= 500) return 'error'
 
   // Default for other codes
@@ -41,6 +41,7 @@ export function determineLogLevel(
   // Handle specific log types
   switch (logType) {
     case 'edge':
+      return determineLogLevelFromStatus(statusCode)
     case 'auth':
     case 'edge function':
       return determineLogLevelFromStatus(statusCode)

@@ -49,13 +49,14 @@ export const columnSchema = z.object({
   host: z.string(),
   pathname: z.string(),
   level: z.enum(LEVELS),
-  latency: z.number(),
+  // latency: z.number(),
   status: z.number(),
-  regions: z.enum(REGIONS).array(),
+  // regions: z.enum(REGIONS).array(),
   date: z.date(),
-  headers: z.record(z.string()),
-  message: z.string().optional(),
+  // headers: z.record(z.string()),
+  // message: z.string().optional(),
   timestamp: z.number(),
+  event_message: z.string().optional(),
   // percentile: z.number().optional(),
 })
 // .merge(timingSchema)

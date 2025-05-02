@@ -7,7 +7,6 @@ import { useParams } from 'common'
 import { get, handleError } from 'data/fetchers'
 import { ColumnSchema } from './schema'
 import dayjs from 'dayjs'
-import { determineLogLevel } from './logs.utils'
 import { useQuery } from '@tanstack/react-query'
 
 // Define the basic types we need
@@ -347,9 +346,14 @@ select
   el.timestamp as timestamp,
   'edge' as log_type,
   CAST(edge_logs_response.status_code AS STRING) as status,
-  -- 'undefined' as level,
+  CASE
+    WHEN CAST(edge_logs_response.status_code AS INT64) BETWEEN 200 AND 299 THEN 'success'
+    WHEN CAST(edge_logs_response.status_code AS INT64) BETWEEN 400 AND 499 THEN 'warning'
+    WHEN CAST(edge_logs_response.status_code AS INT64) >= 500 THEN 'error'
+    ELSE 'success'
+  END as level,
   edge_logs_request.path as path,
-  'undefined' as event_message,
+  null as event_message,
   edge_logs_request.method as method,
   authorization_payload.role as api_role,
   COALESCE(sb.auth_user, null) as auth_user
@@ -370,9 +374,14 @@ select
   pgl.timestamp as timestamp,
   'postgres' as log_type,
   pgl_parsed.sql_state_code as status,
-  -- 'undefined' as level,
+  CASE
+    WHEN pgl_parsed.error_severity = 'LOG' THEN 'success'
+    WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
+    WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
+    ELSE null
+  END as level,
   null as path,
-  'undefined' as event_message,
+  null as event_message,
   null as method,
   'api_role' as api_role,
   null as auth_user
@@ -388,7 +397,11 @@ select
   fl.timestamp as timestamp,
   'function events' as log_type,
   'undefined' as status,
-  -- fl_metadata.level as level,
+  CASE
+    WHEN LOWER(fl_metadata.level) = 'error' THEN 'error'
+    WHEN LOWER(fl_metadata.level) = 'warn' OR LOWER(fl_metadata.level) = 'warning' THEN 'warning'
+    ELSE 'success'
+  END as level,
   null as path,
   fl.event_message as event_message, 
   null as method,
@@ -405,9 +418,14 @@ select
   fel.timestamp as timestamp,
   'edge function' as log_type,
   CAST(fel_response.status_code as STRING) as status,
-  -- 'undefined' as level,
+  CASE
+    WHEN CAST(fel_response.status_code AS INT64) BETWEEN 200 AND 299 THEN 'success'
+    WHEN CAST(fel_response.status_code AS INT64) BETWEEN 400 AND 499 THEN 'warning'
+    WHEN CAST(fel_response.status_code AS INT64) >= 500 THEN 'error'
+    ELSE 'success'
+  END as level,
   fel_request.url as path,
-  'undefined' as event_message,
+  null as event_message,
   null as method,
   'api_role' as api_role,
   null as auth_user
@@ -424,9 +442,14 @@ select
   el_in_al.timestamp as timestamp, 
   'auth' as log_type,
   CAST(el_in_al_response.status_code as STRING) as status,
-  -- 'undefined' as level,
+  CASE
+    WHEN CAST(el_in_al_response.status_code AS INT64) BETWEEN 200 AND 299 THEN 'success'
+    WHEN CAST(el_in_al_response.status_code AS INT64) BETWEEN 400 AND 499 THEN 'warning'
+    WHEN CAST(el_in_al_response.status_code AS INT64) >= 500 THEN 'error'
+    ELSE 'success'
+  END as level,
   el_in_al_request.path as path,
-  'undefined' as event_message,
+  null as event_message,
   el_in_al_request.method as method,
   authorization_payload.role as api_role,
   COALESCE(sb.auth_user, null) as auth_user
@@ -454,9 +477,13 @@ select
   svl.timestamp as timestamp, 
   'supavisor' as log_type,
   'undefined' as status,
-  --svl_metadata.level as level,
+  CASE
+    WHEN LOWER(svl_metadata.level) = 'error' THEN 'error'
+    WHEN LOWER(svl_metadata.level) = 'warn' OR LOWER(svl_metadata.level) = 'warning' THEN 'warning'
+    ELSE 'success'
+  END as level,
   null as path,
-  'undefined' as event_message,
+  null as event_message,
   null as method,
   'api_role' as api_role,
   null as auth_user
@@ -471,9 +498,9 @@ select
   pgul.timestamp as timestamp,
   'postgres upgrade' as log_type,
   'undefined' as status,
-  -- 'undefined' as level,
+  'undefined' as level,
   null as path,  
-  'undefined' as event_message,
+  null as event_message,
   null as method,
   'api_role' as api_role,
   null as auth_user
@@ -540,8 +567,8 @@ from pg_upgrade_logs as pgul
           // The timestamp is in microseconds, need to convert to milliseconds for JS Date
           const date = new Date(Number(row.timestamp) / 1000)
 
-          // Ensure level is always a valid LogLevel type
-          const level = determineLogLevel(row.log_type, row.status) as LogLevel
+          // Use the level directly from SQL rather than determining it in TypeScript
+          const level = row.level as LogLevel
 
           return {
             id: uniqueId,
