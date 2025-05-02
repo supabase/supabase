@@ -1,7 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { useCreatePipelineMutation } from 'data/replication/create-pipeline-mutation'
-import { useCreateSinkMutation } from 'data/replication/create-sink-mutation'
 import { useCreateTenantSourceMutation } from 'data/replication/create-tenant-source-mutation'
 import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
@@ -47,6 +45,7 @@ import { useReplicationSinkByIdQuery } from 'data/replication/sink-by-id-query'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useCreateSinkPipelineMutation } from 'data/replication/create-sink-pipeline-mutation'
 
 interface DestinationPanelProps {
   visible: boolean
@@ -68,10 +67,10 @@ const DestinationPanel = ({
 }: DestinationPanelProps) => {
   const { ref: projectRef } = useParams()
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
-  const { mutateAsync: createTenantSource, isLoading: creatingSource } =
+  const { mutateAsync: createTenantSource, isLoading: creatingTenantSource } =
     useCreateTenantSourceMutation()
-  const { mutateAsync: createSink, isLoading: creatingSink } = useCreateSinkMutation()
-  const { mutateAsync: createPipeline, isLoading: creatingPipeline } = useCreatePipelineMutation()
+  const { mutateAsync: createSinkPipeline, isLoading: creatingSinkPipeline } =
+    useCreateSinkPipelineMutation()
   const { mutateAsync: startPipeline, isLoading: startingPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline, isLoading: stoppingPipeline } = useStopPipelineMutation()
   const { mutateAsync: updateSink, isLoading: updatingSink } = useUpdateSinkMutation()
@@ -91,7 +90,7 @@ const DestinationPanel = ({
     pipelineId: existingDestination?.pipelineId,
   })
 
-  const isCreating = creatingSource || creatingSink || creatingPipeline || startingPipeline
+  const isCreating = creatingTenantSource || creatingSinkPipeline || startingPipeline
   const isUpdating = updatingSink || updatingPipeline || stoppingPipeline || startingPipeline
   const isSubmitting = isCreating || isUpdating
   const editMode = !!existingDestination
@@ -178,20 +177,22 @@ const DestinationPanel = ({
           console.error('Source id is required')
           return
         }
-        const { id: sinkId } = await createSink({
+        const { pipeline_id: pipelineId } = await createSinkPipeline({
           projectRef,
           sinkName: data.name,
-          projectId: data.projectId,
-          datasetId: data.datasetId,
-          serviceAccountKey: data.serviceAccountKey,
-          maxStalenessMins: data.maxStalenessMins,
-        })
-        const { id: pipelineId } = await createPipeline({
-          projectRef,
+          sinkConfig: {
+            bigQuery: {
+              projectId: data.projectId,
+              datasetId: data.datasetId,
+              serviceAccountKey: data.serviceAccountKey,
+              maxStalenessMins: data.maxStalenessMins,
+            },
+          },
           sourceId,
-          sinkId,
           publicationName: data.publicationName,
-          config: { config: { maxSize: data.maxSize, maxFillSecs: data.maxFillSecs } },
+          pipelinConfig: {
+            config: { maxSize: data.maxSize, maxFillSecs: data.maxFillSecs },
+          },
         })
         if (data.enabled) {
           await startPipeline({ projectRef, pipelineId })

@@ -3281,6 +3281,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/replication/{ref}/sinks-pipelines': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Creates a replication sink and pipeline. */
+    post: operations['ReplicationSinksPipelinesController_createSinkPipeline']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/replication/{ref}/sinks/{sink_id}': {
     parameters: {
       query?: never
@@ -4622,9 +4639,37 @@ export interface components {
       /** @description Sink name */
       sink_name: string
     }
+    CreateReplicationSinkPipelineBody: {
+      pipeline_config: {
+        config: {
+          max_fill_secs: number
+          max_size: number
+        }
+      }
+      publication_name: string
+      sink_config: {
+        big_query: {
+          /** @description BigQuery dataset id */
+          dataset_id: string
+          /** @description Max staleness in minutes */
+          max_staleness_mins: number
+          /** @description BigQuery project id */
+          project_id: string
+          /** @description BigQuery service account key */
+          service_account_key: string
+        }
+      }
+      /** @description Sink name */
+      sink_name: string
+      source_id: number
+    }
     CreateSchemaBody: {
       name: string
       owner: string
+    }
+    CreateSinkPipelineResponse: {
+      pipeline_id: number
+      sink_id: number
     }
     CreateSinkResponse: {
       id: number
@@ -6952,9 +6997,13 @@ export interface components {
     ReplicationSinkResponse: {
       config: {
         big_query: {
+          /** @description BigQuery dataset id */
           dataset_id: string
+          /** @description Max staleness in minutes */
           max_staleness_mins: number
+          /** @description BigQuery project id */
           project_id: string
+          /** @description BigQuery service account key */
           service_account_key: string
         }
       }
@@ -6966,9 +7015,13 @@ export interface components {
       sinks: {
         config: {
           big_query: {
+            /** @description BigQuery dataset id */
             dataset_id: string
+            /** @description Max staleness in minutes */
             max_staleness_mins: number
+            /** @description BigQuery project id */
             project_id: string
+            /** @description BigQuery service account key */
             service_account_key: string
           }
         }
@@ -17483,6 +17536,46 @@ export interface operations {
         content?: never
       }
       /** @description Failed to create sink */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationSinksPipelinesController_createSinkPipeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateReplicationSinkPipelineBody']
+      }
+    }
+    responses: {
+      /** @description Returns the created replication sink and pipeline ids. */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateSinkPipelineResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Returned when the API fails to create the replication sink or pipeline. */
       500: {
         headers: {
           [name: string]: unknown
