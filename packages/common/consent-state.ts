@@ -59,6 +59,8 @@ export const consentState = proxy({
 })
 
 async function initUserCentrics() {
+  if (process.env.NODE_ENV === 'test') return
+
   const { default: Usercentrics } = await import('@usercentrics/cmp-browser-sdk')
 
   const UC = new Usercentrics(process.env.NEXT_PUBLIC_USERCENTRICS_RULESET_ID!, {
