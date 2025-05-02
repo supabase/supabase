@@ -42,6 +42,12 @@ create table "employees" (
   </StepHikeCompact.Step>
 </StepHikeCompact>
 
+<Admonition type="note">
+
+Make sure your local database is stopped before diffing your schema.
+
+</Admonition>
+
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={2}>
@@ -63,12 +69,6 @@ supabase db diff -f create_employees_table
 
   </StepHikeCompact.Step>
 </StepHikeCompact>
-
-<Admonition type="note">
-
-Make sure your local database is stopped before diffing your schema.
-
-</Admonition>
 
 <StepHikeCompact>
 

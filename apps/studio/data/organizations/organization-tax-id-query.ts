@@ -20,14 +20,10 @@ export async function getOrganizationTaxId(
   const { data, error } = await get(`/platform/organizations/{slug}/tax-ids`, {
     params: { path: { slug } },
     signal,
-    headers: {
-      Version: '2',
-    },
   })
   if (error) throw handleError(error)
 
-  // @ts-ignore wrong typing due to mgmt api versioning
-  return (data as components['schemas']['TaxIdV2Response']).tax_id
+  return (data as components['schemas']['TaxIdResponse']).tax_id
 }
 
 export type OrganizationTaxIdData = Awaited<ReturnType<typeof getOrganizationTaxId>>
