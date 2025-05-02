@@ -143,7 +143,7 @@ export const fetchAllTableRows = async ({
 
     try {
       const { result } = await executeWithRetry(async () => {
-        executeSql({ projectRef, connectionString, sql: query })
+        return executeSql({ projectRef, connectionString, sql: query })
       })
       rows.push(...result)
       progressCallback?.(rows.length)
