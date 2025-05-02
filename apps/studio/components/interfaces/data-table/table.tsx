@@ -99,7 +99,7 @@ const TableCell = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ShadcnTableCell
     ref={ref}
-    className={cn('text-xs !py-1 p-2 [&>[role=checkbox]]:translate-y-[2px]', className)}
+    className={cn('text-[0.8rem] !py-1 p-2 [&>[role=checkbox]]:translate-y-[2px]', className)}
     {...props}
   />
 ))
