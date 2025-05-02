@@ -45,11 +45,11 @@ async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function executeWithRetry(
-  fn: () => Promise<any>,
+export async function executeWithRetry<T>(
+  fn: () => Promise<T>,
   maxRetries: number = 3,
   baseDelay: number = 500
-): Promise<any> {
+): Promise<T> {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn()
@@ -64,6 +64,7 @@ async function executeWithRetry(
       throw error
     }
   }
+  throw new Error('Max retries reached without success')
 }
 
 // TODO: fetchAllTableRows is used for CSV export, but since it doesn't actually truncate anything, (compare to getTableRows)
