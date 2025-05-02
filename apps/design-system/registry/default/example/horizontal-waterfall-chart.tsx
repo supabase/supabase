@@ -1,8 +1,6 @@
 import { HorizontalWaterfallChart, WaterfallDataItem } from 'ui-patterns/HorizontalWaterfallChart'
 
 export default function HorizontalWaterfallChartDemo() {
-  const data = [900, 345, 393, -108, -154, 135, 178, 286, -119, -361, -203]
-
   const requestWaterfall: WaterfallDataItem[] = [
     { label: 'DNS Lookup', start: 0, duration: 50, type: 'dns' },
     { label: 'TCP Connect', start: 50, duration: 100, type: 'tcp' },
