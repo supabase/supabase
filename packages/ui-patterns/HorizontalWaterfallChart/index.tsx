@@ -71,7 +71,8 @@ export const HorizontalWaterfallChart = ({
           type: 'category',
           data: data.map((item) => item.label),
           axisLabel: {
-            fontSize: '10px',
+            interval: 0, // force axisLabels to show
+            fontSize: '9px',
             fontFamily: 'Source Code Pro, Office Code Pro, Menlo, monospace',
           },
         },
@@ -91,7 +92,6 @@ export const HorizontalWaterfallChart = ({
             itemStyle: {
               color: 'rgba(0,0,0,0)',
             },
-            barCategoryGap: '15%',
           },
           {
             type: 'bar',
