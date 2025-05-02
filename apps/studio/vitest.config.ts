@@ -31,5 +31,31 @@ export default defineConfig({
       resolve(dirname, './tests/setup/polyfills.js'),
       resolve(dirname, './tests/setup/radix.js'),
     ],
+    reporters: [
+      [
+        'default',
+        {
+          summary: false,
+        },
+      ],
+    ],
+    coverage: {
+      reporter: ['lcov'],
+      exclude: [
+        'node_modules',
+        'dist',
+        'build',
+        'public',
+        'src/generated',
+        'components',
+        'data',
+        'fonts',
+        'pages',
+        'static-data',
+        'styles',
+        'tests',
+      ],
+      include: ['lib/**/*.ts'],
+    },
   },
 })
