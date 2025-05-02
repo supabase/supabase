@@ -1221,4 +1221,9 @@ export const examples: Registry = [
     type: 'components:example',
     files: ['example/logs-bar-chart.tsx'],
   },
+  {
+    name: 'horizontal-waterfall-chart',
+    type: 'components:example',
+    files: ['example/horizontal-waterfall-chart.tsx'],
+  },
 ]
