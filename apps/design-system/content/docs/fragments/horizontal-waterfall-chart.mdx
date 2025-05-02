@@ -1,0 +1,33 @@
+---
+title: Horizontal Waterfall Chart
+description: A waterfall chart to visualize request/traces timeline.
+fragment: true
+---
+
+<ComponentPreview name="horizontal-waterfall-chart" peekCode wide />
+
+## Usage
+
+This component is used to display a horizontal waterfall chart.
+
+It requires that the `data` prop is an array of objects with the following shape:
+
+```ts
+export type WaterfallDataItem = {
+  label: string
+  start: number
+  duration: number
+  [key: string]: any
+}
+```
+
+## Quick explanation on waterfall chart implementation
+
+A waterfall chart visualizes how an initial value is affected by a series of positive and negative values. The waterfall chart is implemented by using stacked bar charts.
+
+Each column in a waterfall chart consists of two components:
+
+1. An transparent "support" bar at the bottom.
+2. A visible bar that represents the actual data value.
+
+For any given column, the height of the invisible support bar equals the cumulative sum of all previous values. This ensures each visible bar appears to "float" at the correct position.

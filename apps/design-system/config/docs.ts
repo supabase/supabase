@@ -128,6 +128,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Horizontal Waterfall Chart',
+          href: '/docs/fragments/horizontal-waterfall-chart',
+          items: [],
+        },
+        {
           title: 'Table of Contents (TOC)',
           href: '/docs/fragments/toc',
           items: [],
