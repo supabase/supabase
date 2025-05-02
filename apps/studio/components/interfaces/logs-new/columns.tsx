@@ -64,11 +64,11 @@ export const columns: ColumnDef<ColumnSchema>[] = [
       return <TextWithTooltip text={logType} />
     },
     enableHiding: false,
-    enableResizing: false,
     filterFn: 'arrSome',
-    size: 69,
-    minSize: 69,
-    maxSize: 69,
+    size: 70,
+    minSize: 70,
+    maxSize: 70,
+    enableResizing: false,
     meta: {
       headerClassName:
         'w-[--header-log_type-size] max-w-[--header-log_type-size] min-w-[--header-log_type-size]',
@@ -87,6 +87,7 @@ export const columns: ColumnDef<ColumnSchema>[] = [
     enableResizing: false,
     size: 200,
     minSize: 200,
+    maxSize: 200,
     meta: {
       headerClassName:
         'w-[--header-date-size] max-w-[--header-date-size] min-w-[--header-date-size]',
@@ -102,6 +103,7 @@ export const columns: ColumnDef<ColumnSchema>[] = [
       const value = row.getValue<ColumnSchema['uuid']>('uuid')
       return <TextWithTooltip text={value} />
     },
+    enableResizing: false,
     size: 130,
     minSize: 130,
     meta: {
@@ -145,20 +147,20 @@ export const columns: ColumnDef<ColumnSchema>[] = [
         'w-[--header-method-size] max-w-[--header-method-size] min-w-[--header-method-size]',
     },
   },
-  {
-    accessorKey: 'host',
-    header: 'Host',
-    cell: ({ row }) => {
-      const value = row.getValue<ColumnSchema['host']>('host')
-      return <TextWithTooltip text={value} />
-    },
-    size: 125,
-    minSize: 125,
-    meta: {
-      cellClassName: 'font-mono w-[--col-host-size] max-w-[--col-host-size]',
-      headerClassName: 'min-w-[--header-host-size] w-[--header-host-size]',
-    },
-  },
+  // {
+  //   accessorKey: 'host',
+  //   header: 'Host',
+  //   cell: ({ row }) => {
+  //     const value = row.getValue<ColumnSchema['host']>('host')
+  //     return <TextWithTooltip text={value} />
+  //   },
+  //   size: 125,
+  //   minSize: 125,
+  //   meta: {
+  //     cellClassName: 'font-mono w-[--col-host-size] max-w-[--col-host-size]',
+  //     headerClassName: 'min-w-[--header-host-size] w-[--header-host-size]',
+  //   },
+  // },
   {
     accessorKey: 'pathname',
     header: 'Pathname',
@@ -192,36 +194,36 @@ export const columns: ColumnDef<ColumnSchema>[] = [
         'font-mono w-[--col-latency-size] max-w-[--col-latency-size] min-w-[--col-latency-size]',
     },
   },
-  {
-    accessorKey: 'regions',
-    header: 'Region',
-    cell: ({ row }) => {
-      const value = row.getValue<ColumnSchema['regions']>('regions')
-      if (Array.isArray(value)) {
-        if (value.length > 1) {
-          return <div className="text-muted-foreground">{value.join(', ')}</div>
-        } else {
-          return (
-            <div className="whitespace-nowrap">
-              <DataTableColumnRegion value={value[0]} />
-            </div>
-          )
-        }
-      }
-      if (typeof value === 'string') {
-        return <DataTableColumnRegion value={value} />
-      }
-      return <Minus className="h-4 w-4 text-muted-foreground/50" />
-    },
-    filterFn: 'arrIncludesSome',
-    enableResizing: false,
-    size: 163,
-    minSize: 163,
-    meta: {
-      headerClassName:
-        'w-[--header-regions-size] max-w-[--header-regions-size] min-w-[--header-regions-size]',
-      cellClassName:
-        'font-mono w-[--col-regions-size] max-w-[--col-regions-size] min-w-[--col-regions-size]',
-    },
-  },
+  // {
+  //   accessorKey: 'regions',
+  //   header: 'Region',
+  //   cell: ({ row }) => {
+  //     const value = row.getValue<ColumnSchema['regions']>('regions')
+  //     if (Array.isArray(value)) {
+  //       if (value.length > 1) {
+  //         return <div className="text-muted-foreground">{value.join(', ')}</div>
+  //       } else {
+  //         return (
+  //           <div className="whitespace-nowrap">
+  //             <DataTableColumnRegion value={value[0]} />
+  //           </div>
+  //         )
+  //       }
+  //     }
+  //     if (typeof value === 'string') {
+  //       return <DataTableColumnRegion value={value} />
+  //     }
+  //     return <Minus className="h-4 w-4 text-muted-foreground/50" />
+  //   },
+  //   filterFn: 'arrIncludesSome',
+  //   enableResizing: false,
+  //   size: 163,
+  //   minSize: 163,
+  //   meta: {
+  //     headerClassName:
+  //       'w-[--header-regions-size] max-w-[--header-regions-size] min-w-[--header-regions-size]',
+  //     cellClassName:
+  //       'font-mono w-[--col-regions-size] max-w-[--col-regions-size] min-w-[--col-regions-size]',
+  //   },
+  // },
 ]

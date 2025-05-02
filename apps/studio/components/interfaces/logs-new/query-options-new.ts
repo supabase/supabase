@@ -512,7 +512,8 @@ from pg_upgrade_logs as pgul
                 ? isoTimestampEnd
                 : search.date?.[1]
                   ? new Date(search.date[1]).toISOString()
-                  : undefined,
+                  : new Date().toISOString(),
+              project: projectRef,
             },
           },
         })
@@ -533,7 +534,7 @@ from pg_upgrade_logs as pgul
         // Transform results to expected schema
         const result = resultData.map((row: any) => {
           // Create a unique ID using the timestamp
-          const uniqueId = `${row.id || 'id'}-${row.timestamp}`
+          const uniqueId = `${row.id || 'id'}-${row.timestamp}-${new Date().getTime()}`
 
           // Create a date object for display purposes
           // The timestamp is in microseconds, need to convert to milliseconds for JS Date

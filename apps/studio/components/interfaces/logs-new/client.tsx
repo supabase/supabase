@@ -284,7 +284,6 @@ export function Client() {
           >
             <DataTableHeaderLayout setTopBarHeight={setTopBarHeight}>
               <DataTableFilterCommand searchParamsParser={searchParamsParser} />
-              {/* TBD: better flexibility with compound components? */}
               <DataTableToolbar
                 renderActions={() => [
                   <RefreshButton key="refresh" onClick={refetch} />,

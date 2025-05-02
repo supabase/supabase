@@ -10,7 +10,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from 'components/interfaces/DataTableDemo/components/custom/table'
+} from 'components/interfaces/data-table/table'
 import { useHotKey } from 'components/interfaces/DataTableDemo/hooks/use-hot-key'
 import { searchParamsParser } from 'components/interfaces/DataTableDemo/infinite/search-params'
 import { formatCompactNumber } from 'components/interfaces/DataTableDemo/lib/format'
@@ -78,29 +78,19 @@ export function DataTableInfinite<TData, TValue, TMeta>({
     <>
       <div className="z-0">
         <Table
-          ref={tableRef}
-          onScroll={onScroll}
-          // REMINDER: https://stackoverflow.com/questions/50361698/border-style-do-not-work-with-sticky-position-element
-          className="border-separate border-spacing-0"
-          containerClassName="max-h-[calc(100vh_-_var(--top-bar-height))]"
+          containerProps={{
+            onScroll,
+          }}
+          ref={tableRef} // REMINDER: https://stackoverflow.com/questions/50361698/border-style-do-not-work-with-sticky-position-element
         >
-          <TableHeader className={cn('sticky top-0 z-20 bg-background')}>
+          <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow
-                key={headerGroup.id}
-                className={cn(
-                  'bg-muted/50 hover:bg-muted/50',
-                  '[&>*]:border-t [&>:not(:last-child)]:border-r'
-                )}
-              >
+              <TableRow key={headerGroup.id} className="bg-surface-75">
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead
                       key={header.id}
-                      className={cn(
-                        'relative select-none truncate border-b border-border [&>.cursor-col-resize]:last:opacity-0',
-                        header.column.columnDef.meta?.headerClassName
-                      )}
+                      className={header.column.columnDef.meta?.headerClassName}
                       aria-sort={
                         header.column.getIsSorted() === 'asc'
                           ? 'ascending'
@@ -132,7 +122,6 @@ export function DataTableInfinite<TData, TValue, TMeta>({
           <TableBody
             id="content"
             tabIndex={-1}
-            className="outline-1 -outline-offset-1 outline-primary transition-colors focus-visible:outline"
             // REMINDER: avoids scroll (skipping the table header) when using skip to content
             style={{
               scrollMarginTop: 'calc(var(--top-bar-height) + 40px)',
@@ -221,8 +210,8 @@ function Row<TData>({
         }
       }}
       className={cn(
-        '[&>:not(:last-child)]:border-r',
-        'outline-1 -outline-offset-1 outline-primary transition-colors focus-visible:bg-muted/50 focus-visible:outline data-[state=selected]:outline',
+        // '[&>:not(:last-child)]:border-r',
+        // 'outline-1 -outline-offset-1 outline-primary transition-colors focus-visible:bg-muted/50 focus-visible:outline data-[state=selected]:outline',
         table.options.meta?.getRowClassName?.(row)
       )}
     >
@@ -230,7 +219,7 @@ function Row<TData>({
         <TableCell
           key={cell.id}
           className={cn(
-            'truncate border-b border-border',
+            // 'truncate border-b border-border',
             cell.column.columnDef.meta?.cellClassName
           )}
         >
