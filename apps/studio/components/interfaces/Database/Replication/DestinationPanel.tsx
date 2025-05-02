@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { useCreatePipelineMutation } from 'data/replication/create-pipeline-mutation'
 import { useCreateSinkMutation } from 'data/replication/create-sink-mutation'
-import { useCreateSourceMutation } from 'data/replication/create-source-mutation'
+import { useCreateTenantSourceMutation } from 'data/replication/create-tenant-source-mutation'
 import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useUpdateSinkMutation } from 'data/replication/update-sink-mutation'
@@ -68,7 +68,8 @@ const DestinationPanel = ({
 }: DestinationPanelProps) => {
   const { ref: projectRef } = useParams()
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
-  const { mutateAsync: createSource, isLoading: creatingSource } = useCreateSourceMutation()
+  const { mutateAsync: createTenantSource, isLoading: creatingSource } =
+    useCreateTenantSourceMutation()
   const { mutateAsync: createSink, isLoading: creatingSink } = useCreateSinkMutation()
   const { mutateAsync: createPipeline, isLoading: creatingPipeline } = useCreatePipelineMutation()
   const { mutateAsync: startPipeline, isLoading: startingPipeline } = useStartPipelineMutation()
@@ -204,7 +205,7 @@ const DestinationPanel = ({
   }
   const onEnableReplication = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    await createSource({ projectRef })
+    await createTenantSource({ projectRef })
   }
 
   const { enabled } = form.watch()

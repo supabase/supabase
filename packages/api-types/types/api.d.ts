@@ -1881,16 +1881,6 @@ export interface components {
       verify_jwt?: boolean
       version: number
     }
-    FunctionDeployBody: {
-      file?: string[]
-      metadata: {
-        entrypoint_path: string
-        import_map_path?: string
-        name?: string
-        static_patterns?: string[]
-        verify_jwt?: boolean
-      }
-    }
     FunctionResponse: {
       created_at: number
       entrypoint_path?: string
@@ -3068,11 +3058,6 @@ export interface components {
       owner: string
       public: boolean
       updated_at: string
-    }
-    V1UpdateFunctionBody: {
-      body?: string
-      name?: string
-      verify_jwt?: boolean
     }
     V1UpdatePostgrestConfigBody: {
       db_extra_search_path?: string
@@ -5450,12 +5435,7 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V1UpdateFunctionBody']
-        'application/vnd.denoland.eszip': components['schemas']['V1UpdateFunctionBody']
-      }
-    }
+    requestBody?: never
     responses: {
       200: {
         headers: {
@@ -5529,11 +5509,7 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody: {
-      content: {
-        'multipart/form-data': components['schemas']['FunctionDeployBody']
-      }
-    }
+    requestBody?: never
     responses: {
       201: {
         headers: {
@@ -5561,7 +5537,7 @@ export interface operations {
   'v1-get-services-health': {
     parameters: {
       query: {
-        services: ('auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage')[]
+        services: string
         timeout_ms?: number
       }
       header?: never

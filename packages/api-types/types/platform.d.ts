@@ -3370,6 +3370,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/replication/{ref}/tenants-sources': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Creates a replication tenant and source. */
+    post: operations['ReplicationTenantsSourcesController_createTenantSource']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/reset-password': {
     parameters: {
       query?: never
@@ -4639,6 +4656,10 @@ export interface components {
       country?: string
       type: string
       value: string
+    }
+    CreateTenantSourceResponse: {
+      source_id: number
+      tenant_id: string
     }
     CreateTriggerBody: {
       /** @enum {string} */
@@ -11743,9 +11764,7 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path: {
-        fly_organization_id: string
-      }
+      path?: never
       cookie?: never
     }
     requestBody?: never
@@ -15670,7 +15689,7 @@ export interface operations {
   ContentController_deleteContents: {
     parameters: {
       query: {
-        ids: string[]
+        ids: string
       }
       header?: never
       path: {
@@ -15803,7 +15822,7 @@ export interface operations {
   ContentFoldersController_DeleteFolder: {
     parameters: {
       query: {
-        ids: string[]
+        ids: string
       }
       header?: never
       path?: never
@@ -16441,7 +16460,7 @@ export interface operations {
   ProjectAdvisorNotificationsController_deleteNotificationExceptions: {
     parameters: {
       query: {
-        ids: string[]
+        ids: string
       }
       header?: never
       path: {
@@ -17807,6 +17826,42 @@ export interface operations {
         content?: never
       }
       /** @description Returned when the API fails to get source tables. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationTenantsSourcesController_createTenantSource: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Returns the created replication tenant and source ids. */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateTenantSourceResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Returned when the API fails to create the replication tenant or source. */
       500: {
         headers: {
           [name: string]: unknown
