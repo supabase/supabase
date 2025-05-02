@@ -655,6 +655,11 @@ function createStorageExplorerState({
             duration: SONNER_DEFAULT_DURATION,
           })
         }
+
+        if (state.openedFolders[columnIndex].name === folder.name) {
+          state.setSelectedFilePreview(undefined)
+          state.popOpenedFoldersAtIndex(columnIndex - 1)
+        }
         await state.refetchAllOpenedFolders()
 
         // TODO: Should we invalidate the file preview cache when renaming folders?
