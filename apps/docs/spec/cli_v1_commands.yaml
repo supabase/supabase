@@ -3384,6 +3384,12 @@ commands:
   - id: supabase-config-push
     title: supabase config push
     summary: Pushes local config.toml to the linked project
+    description: |
+      Updates the configurations of a linked Supabase project with the local `supabase/config.toml` file.
+      
+      This command allows you to manage project configuration as code by defining settings locally and then pushing them to your remote project.
+      
+      You must first link your project using `supabase link` before you can push configuration.
     tags: []
     links: []
     usage: supabase config push
