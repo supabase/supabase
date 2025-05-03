@@ -6,7 +6,14 @@ import { DataTableColumnLatency } from 'components/interfaces/DataTableDemo/comp
 import { DataTableColumnLevelIndicator } from 'components/interfaces/DataTableDemo/components/data-table/data-table-column/data-table-column-level-indicator'
 import { DataTableColumnRegion } from 'components/interfaces/DataTableDemo/components/data-table/data-table-column/data-table-column-region'
 import { DataTableColumnStatusCode } from 'components/interfaces/DataTableDemo/components/data-table/data-table-column/data-table-column-status-code'
-import { HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+  TooltipTrigger,
+  Tooltip,
+  TooltipContent,
+} from 'ui'
 import {
   getTimingColor,
   getTimingLabel,
@@ -246,8 +253,29 @@ export const columns: ColumnDef<ColumnSchema>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title="event_message" />,
     cell: ({ row }) => {
       const value = row.getValue<ColumnSchema['event_message']>('event_message')
-      if (!value) return null
-      return <TextWithTooltip text={value} />
+      const logCount = row.original.log_count
+
+      return (
+        <div className="flex flex-row gap-2 items-center">
+          {logCount && (
+            <Tooltip>
+              <TooltipTrigger>
+                <span className="text-foreground-lighter bg-surface-400 px-[6px] py-[2px] h-fit rounded-md text-[0.8rem] leading-none">
+                  {logCount}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                {logCount} {logCount === 1 ? 'log' : 'logs'} for this execution
+              </TooltipContent>
+            </Tooltip>
+          )}
+          {value && (
+            <span className="text-muted-foreground">
+              <TextWithTooltip text={value} />
+            </span>
+          )}
+        </div>
+      )
     },
     enableResizing: true, // allow manual resizing
     size: 400,

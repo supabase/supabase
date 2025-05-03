@@ -57,6 +57,7 @@ export const columnSchema = z.object({
   // message: z.string().optional(),
   timestamp: z.number(),
   event_message: z.string().optional(),
+  log_count: z.number().optional(), // used to count function logs for a given execution_id
   // percentile: z.number().optional(),
 })
 // .merge(timingSchema)

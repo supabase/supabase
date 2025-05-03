@@ -10,6 +10,45 @@ import dayjs from 'dayjs'
 import { useQuery } from '@tanstack/react-query'
 
 // Define the basic types we need
+
+// -- function event logs
+// -- select
+// --   id,
+// --   fl.timestamp as timestamp,
+// --   'function events' as log_type,
+// --   'undefined' as status,
+// --   CASE
+// --     WHEN LOWER(fl_metadata.level) = 'error' THEN 'error'
+// --     WHEN LOWER(fl_metadata.level) = 'warn' OR LOWER(fl_metadata.level) = 'warning' THEN 'warning'
+// --     ELSE 'success'
+// --   END as level,
+// --   null as path,
+// --   null as host,
+// --   fl.event_message as event_message,
+// --   null as method,
+// --   'api_role' as api_role,
+// --   null as auth_user
+// -- from function_logs as fl
+// -- cross join unnest(metadata) as fl_metadata
+
+// -- union all
+
+// union all
+
+// select
+//   id,
+//   pgul.timestamp as timestamp,
+//   'postgres upgrade' as log_type,
+//   'undefined' as status,
+//   'undefined' as level,
+//   null as path,
+//   null as host,
+//   null as event_message,
+//   null as method,
+//   'api_role' as api_role,
+//   null as auth_user,
+//   null as log_count,
+// from pg_upgrade_logs as pgul
 export type UnifiedLogSchema = {
   id: string
   timestamp: Date
@@ -340,7 +379,6 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
 
         // The actual SQL query template with your UNION ALL statements - without timestamp conditions
         let sql = `
--- edge logs
 select 
   id,
   el.timestamp as timestamp,
@@ -357,7 +395,8 @@ select
   null as event_message,
   edge_logs_request.method as method,
   authorization_payload.role as api_role,
-  COALESCE(sb.auth_user, null) as auth_user
+  COALESCE(sb.auth_user, null) as auth_user,
+  null as log_count,
 from edge_logs as el
 cross join unnest(metadata) as edge_logs_metadata
 cross join unnest(edge_logs_metadata.request) as edge_logs_request
@@ -369,7 +408,6 @@ left join unnest(auth.payload) as authorization_payload
 
 union all
 
--- postgres logs
 select 
   id,
   pgl.timestamp as timestamp,
@@ -386,36 +424,14 @@ select
   event_message as event_message,
   null as method,
   'api_role' as api_role,
-  null as auth_user
+  null as auth_user,
+  null as log_count,
 from postgres_logs as pgl
 cross join unnest(pgl.metadata) as pgl_metadata
 cross join unnest(pgl_metadata.parsed) as pgl_parsed
 
 union all 
 
--- function event logs
-select 
-  id, 
-  fl.timestamp as timestamp,
-  'function events' as log_type,
-  'undefined' as status,
-  CASE
-    WHEN LOWER(fl_metadata.level) = 'error' THEN 'error'
-    WHEN LOWER(fl_metadata.level) = 'warn' OR LOWER(fl_metadata.level) = 'warning' THEN 'warning'
-    ELSE 'success'
-  END as level,
-  null as path,
-  null as host,
-  fl.event_message as event_message, 
-  null as method,
-  'api_role' as api_role,
-  null as auth_user
-from function_logs as fl
-cross join unnest(metadata) as fl_metadata
-
-union all
-
--- function edge logs
 select 
   id, 
   fel.timestamp as timestamp,
@@ -428,19 +444,33 @@ select
     ELSE 'success'
   END as level,
   fel_request.url as path,
-  null as host,
-  null as event_message,
-  null as method,
-  'api_role' as api_role,
-  null as auth_user
+  fel_request.host as host,
+  COALESCE(function_logs_agg.last_event_message, '') as event_message,
+  fel_request.method as method,
+  authorization_payload.role as api_role,
+  COALESCE(sb.auth_user, null) as auth_user,
+  function_logs_agg.function_log_count as log_count
 from function_edge_logs as fel
 cross join unnest(metadata) as fel_metadata
 cross join unnest(fel_metadata.response) as fel_response
 cross join unnest(fel_metadata.request) as fel_request
+left join unnest(fel_request.sb) as sb
+left join unnest(sb.jwt) as jwt
+left join unnest(jwt.authorization) as auth
+left join unnest(auth.payload) as authorization_payload
+left join (
+  SELECT
+    fl_metadata.execution_id,
+    COUNT(fl.id) as function_log_count,
+    ANY_VALUE(fl.event_message) as last_event_message -- TODO: add last event message
+  FROM function_logs as fl
+  CROSS JOIN UNNEST(fl.metadata) as fl_metadata
+  WHERE fl_metadata.execution_id IS NOT NULL
+  GROUP BY fl_metadata.execution_id
+) as function_logs_agg on fel_metadata.execution_id = function_logs_agg.execution_id
 
 union all
 
--- auth logs
 select
   al.id as id, 
   el_in_al.timestamp as timestamp, 
@@ -453,11 +483,12 @@ select
     ELSE 'success'
   END as level,
   el_in_al_request.path as path,
-  null as host,
+  el_in_al_request.host as host,
   null as event_message,
   el_in_al_request.method as method,
   authorization_payload.role as api_role,
-  COALESCE(sb.auth_user, null) as auth_user
+  COALESCE(sb.auth_user, null) as auth_user,
+  null as log_count,
 from auth_logs as al
 cross join unnest(metadata) as al_metadata 
 left join (
@@ -476,7 +507,6 @@ where al_metadata.request_id is not null
 
 union all
 
--- supavisor logs
 select 
   id, 
   svl.timestamp as timestamp, 
@@ -492,26 +522,12 @@ select
   null as event_message,
   null as method,
   'api_role' as api_role,
-  null as auth_user
+  null as auth_user,
+  null as log_count,
 from supavisor_logs as svl
 cross join unnest(metadata) as svl_metadata
 
-union all
 
--- pg_upgrade logs
-select 
-  id, 
-  pgul.timestamp as timestamp,
-  'postgres upgrade' as log_type,
-  'undefined' as status,
-  'undefined' as level,
-  null as path,  
-  null as host,
-  null as event_message,
-  null as method,
-  'api_role' as api_role,
-  null as auth_user
-from pg_upgrade_logs as pgul
 `
 
         // Apply any additional search criteria to the query
@@ -577,6 +593,8 @@ from pg_upgrade_logs as pgul
           // Use the level directly from SQL rather than determining it in TypeScript
           const level = row.level as LogLevel
 
+          console.log(row.log_count)
+
           return {
             id: uniqueId,
             uuid: uniqueId,
@@ -593,6 +611,7 @@ from pg_upgrade_logs as pgul
             regions: row.region ? [row.region] : [],
             log_type: row.log_type || '',
             latency: row.latency || 0,
+            log_count: row.log_count || null,
           }
         })
 
