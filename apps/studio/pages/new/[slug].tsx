@@ -188,6 +188,10 @@ const Wizard: NextPageWithLayout = () => {
         properties: {
           instanceSize: form.getValues('instanceSize'),
         },
+        groups: {
+          project: res.ref,
+          organization: res.organization_slug,
+        },
       })
       router.push(`/project/${res.ref}/building`)
     },
@@ -320,6 +324,9 @@ const Wizard: NextPageWithLayout = () => {
         action: 'project_creation_simple_version_confirm_modal_opened',
         properties: {
           instanceSize: values.instanceSize,
+        },
+        groups: {
+          organization: currentOrg?.slug ?? 'Unknown',
         },
       })
       setIsComputeCostsConfirmationModalVisible(true)
