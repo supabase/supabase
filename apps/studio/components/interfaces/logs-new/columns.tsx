@@ -169,8 +169,8 @@ export const columns: ColumnDef<ColumnSchema>[] = [
       const value = row.getValue<ColumnSchema['host']>('host')
       return <TextWithTooltip text={value} />
     },
-    size: 125,
-    minSize: 125,
+    size: 220,
+    minSize: 220,
     meta: {
       cellClassName: 'font-mono w-[--col-host-size] max-w-[--col-host-size]',
       headerClassName: 'min-w-[--header-host-size] w-[--header-host-size]',
@@ -183,8 +183,8 @@ export const columns: ColumnDef<ColumnSchema>[] = [
       const value = row.getValue<ColumnSchema['pathname']>('pathname')
       return <TextWithTooltip text={value} />
     },
-    size: 130,
-    minSize: 130,
+    size: 320,
+    minSize: 320,
     meta: {
       cellClassName: 'font-mono w-[--col-pathname-size] max-w-[--col-pathname-size]',
       headerClassName: 'min-w-[--header-pathname-size] w-[--header-pathname-size]',
@@ -250,8 +250,8 @@ export const columns: ColumnDef<ColumnSchema>[] = [
       return <TextWithTooltip text={value} />
     },
     enableResizing: true, // allow manual resizing
-    size: 300,
-    minSize: 100,
+    size: 400,
+    minSize: 400,
     // ❌ don't set maxSize — let it grow
     meta: {
       headerClassName:

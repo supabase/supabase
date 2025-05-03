@@ -353,6 +353,7 @@ select
     ELSE 'success'
   END as level,
   edge_logs_request.path as path,
+  edge_logs_request.host as host,
   null as event_message,
   edge_logs_request.method as method,
   authorization_payload.role as api_role,
@@ -381,7 +382,8 @@ select
     ELSE null
   END as level,
   null as path,
-  null as event_message,
+  null as host,
+  event_message as event_message,
   null as method,
   'api_role' as api_role,
   null as auth_user
@@ -403,6 +405,7 @@ select
     ELSE 'success'
   END as level,
   null as path,
+  null as host,
   fl.event_message as event_message, 
   null as method,
   'api_role' as api_role,
@@ -425,6 +428,7 @@ select
     ELSE 'success'
   END as level,
   fel_request.url as path,
+  null as host,
   null as event_message,
   null as method,
   'api_role' as api_role,
@@ -449,6 +453,7 @@ select
     ELSE 'success'
   END as level,
   el_in_al_request.path as path,
+  null as host,
   null as event_message,
   el_in_al_request.method as method,
   authorization_payload.role as api_role,
@@ -483,6 +488,7 @@ select
     ELSE 'success'
   END as level,
   null as path,
+  null as host,
   null as event_message,
   null as method,
   'api_role' as api_role,
@@ -500,6 +506,7 @@ select
   'undefined' as status,
   'undefined' as level,
   null as path,  
+  null as host,
   null as event_message,
   null as method,
   'api_role' as api_role,
@@ -577,8 +584,8 @@ from pg_upgrade_logs as pgul
             timestamp: row.timestamp, // Original timestamp from the database
             level,
             status: row.status || 200,
-            method: row.method || 'GET',
-            host: (row.url || '').split('/')[2] || '',
+            method: row.method,
+            host: row.host,
             pathname: (row.url || '').replace(/^https?:\/\/[^\/]+/, '') || row.path || '',
             event_message: row.event_message || row.body || '',
             headers:
