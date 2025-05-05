@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { ExternalLink, PauseCircle } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -157,13 +157,6 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
       postgresVersionSelection: '',
     },
   })
-
-  useEffect(() => {
-    const defaultValue = availablePostgresVersions?.available_versions[0]
-      ? formatValue(availablePostgresVersions?.available_versions[0])
-      : ''
-    form.setValue('postgresVersionSelection', defaultValue)
-  }, [availablePostgresVersions, form])
 
   return (
     <>
