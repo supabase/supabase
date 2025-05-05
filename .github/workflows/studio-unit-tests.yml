@@ -57,5 +57,4 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./apps/studio/coverage/lcov.info
-          debug: true
           base-path: './apps/studio'
