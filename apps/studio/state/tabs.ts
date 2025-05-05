@@ -51,8 +51,6 @@ export interface Tab {
   isPreview?: boolean // Optional flag indicating if the tab is in preview mode
   createdAt?: Date // Optional timestamp for when the tab was created
   updatedAt?: Date // Optional timestamp for when the tab was last updated
-  // Stores the names of columns hidden by the user for this specific tab (session state)
-  hiddenColumns?: string[]
 }
 
 // Interface representing the state of tabs
