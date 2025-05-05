@@ -55,6 +55,14 @@ export const componentPages: SidebarNavGroup = {
       commandItemLabel: 'Password-Based Auth',
     },
     {
+      title: 'Social Auth',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/social-auth',
+      items: [],
+      new: true,
+      commandItemLabel: 'Social Auth',
+    },
+    {
       title: 'Dropzone',
       supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
       href: '/docs/nextjs/dropzone',
@@ -88,6 +96,14 @@ export const componentPages: SidebarNavGroup = {
       href: '/docs/nextjs/realtime-chat',
       items: [],
       commandItemLabel: 'Realtime Chat',
+    },
+    {
+      title: 'Infinite Query Hook',
+      supportedFrameworks: [],
+      href: '/docs/infinite-query-hook',
+      new: true,
+      items: [],
+      commandItemLabel: 'Infinite Query Hook',
     },
   ],
 }

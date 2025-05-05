@@ -1,6 +1,6 @@
 import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { Fragment, type PropsWithChildren } from 'react'
+import { type PropsWithChildren } from 'react'
 
 import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import PartnerIcon from 'components/ui/PartnerIcon'
@@ -138,17 +138,24 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
     },
   ]
 
-  const OrganizationLayoutContentWrapper = !newLayoutPreview ? WithSidebar : Fragment
+  if (newLayoutPreview) {
+    return (
+      <>
+        {!newLayoutPreview && <LayoutHeader />}
+        <OrganizationLayoutContent>{children}</OrganizationLayoutContent>
+      </>
+    )
+  }
 
   return (
-    <OrganizationLayoutContentWrapper
+    <WithSidebar
       title={selectedOrganization?.name ?? 'Supabase'}
       breadcrumbs={[{ key: `org-settings`, label: 'Settings' }]}
       sections={sectionsWithHeaders}
     >
       {!newLayoutPreview && <LayoutHeader />}
       <OrganizationLayoutContent>{children}</OrganizationLayoutContent>
-    </OrganizationLayoutContentWrapper>
+    </WithSidebar>
   )
 }
 

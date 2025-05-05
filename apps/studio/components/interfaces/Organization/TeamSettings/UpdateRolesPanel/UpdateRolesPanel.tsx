@@ -142,14 +142,12 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
 
     if (isApplyAllProjects) {
       if (originalConfigurationType === 'org-scope') {
-        console.log('Reset: Org scoped')
         setProjectsRoleConfiguration(originalConfiguration)
       } else {
         setProjectsRoleConfiguration([{ ref: undefined, roleId: roleIdToApply }])
       }
     } else {
       if (originalConfigurationType === 'project-scope') {
-        console.log('Reset: Project scoped')
         setProjectsRoleConfiguration(originalConfiguration)
       } else {
         setProjectsRoleConfiguration(

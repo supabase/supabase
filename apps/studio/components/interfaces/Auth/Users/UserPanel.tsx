@@ -1,4 +1,4 @@
-import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
+import { SimpleCodeBlock } from 'ui'
 import { User } from 'data/auth/users-infinite-query'
 import { X } from 'lucide-react'
 import { useState } from 'react'

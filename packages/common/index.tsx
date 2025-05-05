@@ -1,6 +1,5 @@
-'use client'
-
 export * from './auth'
+export * from './consent-state'
 export * from './constants'
 export * from './database-types'
 export * from './gotrue'

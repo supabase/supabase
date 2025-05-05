@@ -46,6 +46,7 @@ export function generateRegistryTree(registryPath: string): RegistryNode[] {
       // Remove any paths in the file content that point to the block directory.
       const content = file.content
         .replaceAll(/@\/registry\/default\/blocks\/.+?\//gi, '@/')
+        .replaceAll(/@\/registry\/default\/fixtures\//gi, '@/')
         .replaceAll(/@\/registry\/default\//gi, '@/')
         .replaceAll(/@\/clients\/.+?\//gi, '@/')
 
