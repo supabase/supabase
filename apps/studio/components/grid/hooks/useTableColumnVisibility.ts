@@ -30,13 +30,8 @@ export function useTableColumnVisibility() {
         return
       }
 
-      // Check if column is already hidden to prevent redundant updates
-      if (hiddenColumnsMemo.has(columnName)) {
-        return
-      }
-
       // 1. Update URL Parameter first
-      const currentHidden = new Set(hiddenColumnsMemo)
+      const currentHidden = new Set(hiddenColumns)
       currentHidden.add(columnName)
       const newHiddenArray = Array.from(currentHidden).sort()
       const newUrlString = newHiddenArray.join(',')
@@ -45,7 +40,7 @@ export function useTableColumnVisibility() {
       // 2. Update Valtio State (after URL)
       snap.setColumnVisibility(columnName, false)
     },
-    [snap, setParams, hiddenColumnsMemo]
+    [snap, setParams, hiddenColumns]
   )
 
   /**
@@ -59,13 +54,8 @@ export function useTableColumnVisibility() {
         return
       }
 
-      // Check if column is already visible to prevent redundant updates
-      if (!hiddenColumnsMemo.has(columnName)) {
-        return
-      }
-
       // 1. Update URL Parameter first
-      const currentHidden = new Set(hiddenColumnsMemo)
+      const currentHidden = new Set(hiddenColumns)
       currentHidden.delete(columnName)
       const newHiddenArray = Array.from(currentHidden).sort()
       const newUrlString = newHiddenArray.join(',')
@@ -74,7 +64,7 @@ export function useTableColumnVisibility() {
       // 2. Update Valtio State (after URL)
       snap.setColumnVisibility(columnName, true)
     },
-    [snap, setParams, hiddenColumnsMemo]
+    [snap, setParams, hiddenColumns]
   )
 
   return {
