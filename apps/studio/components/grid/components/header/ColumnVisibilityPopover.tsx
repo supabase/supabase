@@ -105,7 +105,16 @@ function SortableItem({
   style?: React.CSSProperties
 }) {
   return (
-    <div ref={setNodeRef} style={style} className={cn('rounded-md')}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        'rounded-md',
+        // Add padding to create a larger drag target and prevent boundary issues
+        'py-0.5 px-0.5'
+      )}
+      data-sortable-item
+    >
       <CommandItem
         key={column.id}
         value={column.name}
@@ -142,7 +151,8 @@ function DraggableColumnItem({ column, isVisible, onSelect }: BaseColumnItemProp
   // CSS properties for sortable container
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    // Disable transitions during active dragging to improve fluidity
+    transition: isDragging ? 'none' : transition,
     opacity: isDragging ? 0.75 : 1,
   }
 
