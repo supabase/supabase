@@ -1,13 +1,8 @@
 import { Check, GripVertical, Lock, Settings2 } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { DragOverEvent, DragStartEvent, DragEndEvent } from '@dnd-kit/core'
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  useSortable,
-  arrayMove,
-} from '@dnd-kit/sortable'
+import { DragEndEvent, DragOverEvent, DragStartEvent } from '@dnd-kit/core'
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { SELECT_COLUMN_KEY } from 'components/grid/constants'
 import { useTableColumnOrder } from 'components/grid/hooks/useTableColumnOrder'
