@@ -1,31 +1,33 @@
 import { type SearchResultInterface } from '../globalSearch/globalSearchInterface'
 
 export const SDKLanguages: Record<string, { value: string; pathSection: string }> = {
-  JavaScript: {
+  JAVASCRIPT: {
     value: 'JavaScript',
     pathSection: 'javascript',
   },
-  Swift: {
+  SWIFT: {
     value: 'Swift',
     pathSection: 'swift',
   },
-  Dart: {
+  DART: {
     value: 'Dart',
     pathSection: 'dart',
   },
-  CSharp: {
+  CSHARP: {
     value: 'C#',
     pathSection: 'csharp',
   },
-  Kotlin: {
+  KOTLIN: {
     value: 'Kotlin',
     pathSection: 'kotlin',
   },
-  Python: {
+  PYTHON: {
     value: 'Python',
     pathSection: 'python',
   },
 }
+
+export const SDKLanguageValues = Object.values(SDKLanguages).map(({ value }) => value)
 
 export class ReferenceSDKFunctionModel implements SearchResultInterface {
   public title?: string
@@ -50,7 +52,10 @@ export class ReferenceSDKFunctionModel implements SearchResultInterface {
     this.title = title
     this.href = href
     this.content = content
-    this.language = language
     this.methodName = methodName
+
+    if (SDKLanguageValues.includes(language)) {
+      this.language = language
+    }
   }
 }

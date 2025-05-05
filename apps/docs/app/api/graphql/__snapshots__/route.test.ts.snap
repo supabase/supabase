@@ -91,12 +91,12 @@ type ClientLibraryFunctionReference implements SearchResult {
 }
 
 enum Language {
-  JavaScript
-  Swift
-  Dart
-  CSharp
-  Kotlin
-  Python
+  JAVASCRIPT
+  SWIFT
+  DART
+  CSHARP
+  KOTLIN
+  PYTHON
 }
 
 type RootQueryType {

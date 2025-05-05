@@ -4,7 +4,7 @@ import { Result } from '~/features/helpers.fn'
 import { openAI } from '~/lib/openAi'
 import { supabase, type DatabaseCorrected } from '~/lib/supabase'
 import { GuideModel } from '../guide/guideModel'
-import { ReferenceSDKFunctionModel, SDKLanguages } from '../reference/referenceSDKModel'
+import { ReferenceSDKFunctionModel, SDKLanguageValues } from '../reference/referenceSDKModel'
 import { SearchResultInterface } from './globalSearchInterface'
 
 export abstract class SearchResultModel {
@@ -50,7 +50,7 @@ function createModelFromMatch({
       })
     case 'reference':
       const { language } = metadata
-      if (Object.keys(SDKLanguages).includes(language)) {
+      if (SDKLanguageValues.includes(language)) {
         return new ReferenceSDKFunctionModel({
           title: page_title,
           href,
