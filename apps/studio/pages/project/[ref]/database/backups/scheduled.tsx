@@ -5,6 +5,7 @@ import { useParams } from 'common'
 import { BackupsList } from 'components/interfaces/Database'
 import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -14,17 +15,16 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDbInAws } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
 
   const { data: backups, error, isLoading, isError, isSuccess } = useBackupsQuery({ projectRef })
 
-  const isOrioleDb = useIsOrioleDb()
+  const isOrioleDbInAws = useIsOrioleDbInAws()
   const isPitrEnabled = backups?.pitr_enabled
   const isPermissionsLoaded = usePermissionsLoaded()
 
@@ -39,7 +39,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
 
             <DatabaseBackupsNav active="scheduled" />
 
-            {isOrioleDb ? (
+            {isOrioleDbInAws ? (
               <Admonition
                 type="default"
                 title="Database backups are not available for OrioleDB"

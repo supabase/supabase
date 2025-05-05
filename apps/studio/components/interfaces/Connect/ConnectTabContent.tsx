@@ -6,14 +6,13 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
 import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { pluckObjectFields } from 'lib/helpers'
 import { cn } from 'ui'
-import type { projectKeys } from './Connect.types'
-import { getConnectionStrings as getConnectionStringsV2 } from './DatabaseSettings.utils'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { getAddons } from '../Billing/Subscription/Subscription.utils'
+import type { projectKeys } from './Connect.types'
+import { getConnectionStrings } from './DatabaseSettings.utils'
 
 interface ConnectContentTabProps extends HTMLAttributes<HTMLDivElement> {
   projectKeys: projectKeys
@@ -24,6 +23,7 @@ interface ConnectContentTabProps extends HTMLAttributes<HTMLDivElement> {
     transactionDedicated?: string
     sessionDedicated?: string
     ipv4SupportedForDedicatedPooler: boolean
+    direct?: string
   }
 }
 
@@ -31,8 +31,7 @@ const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabProps>(
   ({ projectKeys, filePath, ...props }, ref) => {
     const { ref: projectRef } = useParams()
     const selectedOrg = useSelectedOrganization()
-    const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
-    const allowPgBouncerSelection = useMemo(() => subscription?.plan.id !== 'free', [subscription])
+    const allowPgBouncerSelection = useMemo(() => selectedOrg?.plan.id !== 'free', [selectedOrg])
 
     const { data: settings } = useProjectSettingsV2Query({ projectRef })
     const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })
@@ -46,24 +45,21 @@ const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabProps>(
     const poolingConfigurationShared = supavisorConfig?.find((x) => x.database_type === 'PRIMARY')
     const poolingConfigurationDedicated = allowPgBouncerSelection ? pgbouncerConfig : undefined
 
-    const connectionStringsShared =
-      poolingConfigurationShared !== undefined
-        ? getConnectionStringsV2({
-            connectionInfo,
-            poolingInfo: {
-              connectionString: poolingConfigurationShared.connection_string,
-              db_host: poolingConfigurationShared.db_host,
-              db_name: poolingConfigurationShared.db_name,
-              db_port: poolingConfigurationShared.db_port,
-              db_user: poolingConfigurationShared.db_user,
-            },
-            metadata: { projectRef },
-          })
-        : { direct: { uri: '' }, pooler: { uri: '' } }
+    const connectionStringsShared = getConnectionStrings({
+      connectionInfo,
+      poolingInfo: {
+        connectionString: poolingConfigurationShared?.connection_string ?? '',
+        db_host: poolingConfigurationShared?.db_host ?? '',
+        db_name: poolingConfigurationShared?.db_name ?? '',
+        db_port: poolingConfigurationShared?.db_port ?? 0,
+        db_user: poolingConfigurationShared?.db_user ?? '',
+      },
+      metadata: { projectRef },
+    })
 
     const connectionStringsDedicated =
       poolingConfigurationDedicated !== undefined
-        ? getConnectionStringsV2({
+        ? getConnectionStrings({
             connectionInfo,
             poolingInfo: {
               connectionString: poolingConfigurationDedicated.connection_string,
@@ -97,6 +93,7 @@ const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabProps>(
             transactionDedicated: connectionStringsDedicated?.pooler.uri,
             sessionDedicated: connectionStringsDedicated?.pooler.uri.replace('6543', '5432'),
             ipv4SupportedForDedicatedPooler: !!ipv4Addon,
+            direct: connectionStringsShared.direct.uri,
           }}
         />
       </div>

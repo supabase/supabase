@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 
 import LegacyAPIKeys from 'components/interfaces/APIKeys/LegacyAPIKeys'
 import { PublishableAPIKeys } from 'components/interfaces/APIKeys/PublishableAPIKeys'
@@ -9,7 +9,6 @@ import ApiKeysLayout from 'components/layouts/project/[ref]/settings/APIKeysLayo
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Separator } from 'ui'
 

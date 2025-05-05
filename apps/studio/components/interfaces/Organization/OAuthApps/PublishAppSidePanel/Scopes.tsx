@@ -79,7 +79,7 @@ const Scope = ({
             <p>{accessDescription}</p>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" className="w-40">
           <DropdownMenuLabel>Select an access level</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <ScopeDropdownCheckboxItem scopeName={readScopeName} scopes={scopes} onChange={setScopes}>

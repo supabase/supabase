@@ -237,6 +237,48 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/advisors/performance': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Gets project performance advisors.
+     * @deprecated
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     */
+    get: operations['getPerformanceAdvisors']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/advisors/security': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Gets project security advisors.
+     * @deprecated
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     */
+    get: operations['getSecurityAdvisors']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/analytics/endpoints/logs.all': {
     parameters: {
       query?: never
@@ -244,7 +286,15 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** Gets project's logs */
+    /**
+     * Gets project's logs
+     * @description Executes a SQL query on the project's logs.
+     *
+     *     Either the 'iso_timestamp_start' and 'iso_timestamp_end' parameters must be provided.
+     *     If both are not provided, only the last 1 minute of logs will be queried.
+     *     The timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.
+     *
+     */
     get: operations['getLogs']
     put?: never
     post?: never
@@ -883,6 +933,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/network-bans/retrieve/enriched': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** [Beta] Gets project's network bans with additional information about which databases they affect */
+    post: operations['v1-list-all-network-bans-enriched']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/network-restrictions': {
     parameters: {
       query?: never
@@ -1339,21 +1406,18 @@ export interface components {
             | 'ci_8xlarge'
             | 'ci_12xlarge'
             | 'ci_16xlarge'
+            | 'ci_24xlarge'
+            | 'ci_24xlarge_optimized_cpu'
+            | 'ci_24xlarge_optimized_memory'
+            | 'ci_24xlarge_high_memory'
+            | 'ci_48xlarge'
+            | 'ci_48xlarge_optimized_cpu'
+            | 'ci_48xlarge_optimized_memory'
+            | 'ci_48xlarge_high_memory'
           )
         | 'cd_default'
         | ('pitr_7' | 'pitr_14' | 'pitr_28')
         | 'ipv4_default'
-    }
-    AttributeMapping: {
-      keys: {
-        [key: string]: components['schemas']['AttributeValue']
-      }
-    }
-    AttributeValue: {
-      array?: boolean
-      default?: Record<string, never> | number | string | boolean
-      name?: string
-      names?: string[]
     }
     AuthConfigResponse: {
       api_max_request_duration: number | null
@@ -1422,6 +1486,7 @@ export interface components {
       external_twitter_client_id: string | null
       external_twitter_enabled: boolean | null
       external_twitter_secret: string | null
+      external_web3_solana_enabled: boolean | null
       external_workos_client_id: string | null
       external_workos_enabled: boolean | null
       external_workos_secret: string | null
@@ -1481,6 +1546,7 @@ export interface components {
       rate_limit_sms_sent: number | null
       rate_limit_token_refresh: number | null
       rate_limit_verify: number | null
+      rate_limit_web3: number | null
       refresh_token_rotation_enabled: boolean | null
       saml_allow_encrypted_assertions: boolean | null
       saml_enabled: boolean | null
@@ -1526,10 +1592,6 @@ export interface components {
       smtp_sender_name: string | null
       smtp_user: string | null
       uri_allow_list: string | null
-    }
-    AuthHealthResponse: {
-      /** @enum {string} */
-      name: 'GoTrue'
     }
     /** @enum {string} */
     BillingPlanId: 'free' | 'pro' | 'team' | 'enterprise'
@@ -1611,7 +1673,7 @@ export interface components {
       status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
       verify_jwt?: boolean
       version: number
-    }
+    }[]
     BulkUpdateFunctionResponse: {
       functions: {
         created_at: number
@@ -1627,12 +1689,6 @@ export interface components {
         verify_jwt?: boolean
         version: number
       }[]
-    }
-    CfResponse: {
-      errors: Record<string, never>[]
-      messages: Record<string, never>[]
-      result: components['schemas']['CustomHostnameDetails']
-      success: boolean
     }
     CreateApiKeyBody: {
       description?: string | null
@@ -1658,6 +1714,14 @@ export interface components {
         | '8xlarge'
         | '12xlarge'
         | '16xlarge'
+        | '24xlarge'
+        | '24xlarge_optimized_memory'
+        | '24xlarge_optimized_cpu'
+        | '24xlarge_high_memory'
+        | '48xlarge'
+        | '48xlarge_optimized_memory'
+        | '48xlarge_optimized_cpu'
+        | '48xlarge_high_memory'
       git_branch?: string
       persistent?: boolean
       /**
@@ -1679,7 +1743,16 @@ export interface components {
       name: string
     }
     CreateProviderBody: {
-      attribute_mapping?: components['schemas']['AttributeMapping']
+      attribute_mapping?: {
+        keys: {
+          [key: string]: {
+            array?: boolean
+            default?: Record<string, never> | number | string | boolean
+            name?: string
+            names?: string[]
+          }
+        }
+      }
       domains?: string[]
       metadata_url?: string
       metadata_xml?: string
@@ -1691,9 +1764,29 @@ export interface components {
     }
     CreateProviderResponse: {
       created_at?: string
-      domains?: components['schemas']['Domain'][]
+      domains?: {
+        created_at?: string
+        domain?: string
+        id: string
+        updated_at?: string
+      }[]
       id: string
-      saml?: components['schemas']['SamlDescriptor']
+      saml?: {
+        attribute_mapping?: {
+          keys: {
+            [key: string]: {
+              array?: boolean
+              default?: Record<string, never> | number | string | boolean
+              name?: string
+              names?: string[]
+            }
+          }
+        }
+        entity_id: string
+        id: string
+        metadata_url?: string
+        metadata_xml?: string
+      }
       updated_at?: string
     }
     CreateSecretBody: {
@@ -1703,7 +1796,7 @@ export interface components {
        */
       name: string
       value: string
-    }
+    }[]
     CreateSigningKeyBody: {
       /** @enum {string} */
       algorithm: 'EdDSA' | 'ES256' | 'RS256' | 'HS256'
@@ -1714,15 +1807,6 @@ export interface components {
       custom_jwks?: unknown
       jwks_url?: string
       oidc_issuer_url?: string
-    }
-    CustomHostnameDetails: {
-      custom_origin_server: string
-      hostname: string
-      id: string
-      ownership_verification: components['schemas']['OwnershipVerification']
-      ssl: components['schemas']['SslValidation']
-      status: string
-      verification_errors?: string[]
     }
     DatabaseUpgradeStatusResponse: {
       databaseUpgradeStatus: {
@@ -1758,9 +1842,29 @@ export interface components {
     }
     DeleteProviderResponse: {
       created_at?: string
-      domains?: components['schemas']['Domain'][]
+      domains?: {
+        created_at?: string
+        domain?: string
+        id: string
+        updated_at?: string
+      }[]
       id: string
-      saml?: components['schemas']['SamlDescriptor']
+      saml?: {
+        attribute_mapping?: {
+          keys: {
+            [key: string]: {
+              array?: boolean
+              default?: Record<string, never> | number | string | boolean
+              name?: string
+              names?: string[]
+            }
+          }
+        }
+        entity_id: string
+        id: string
+        metadata_url?: string
+        metadata_xml?: string
+      }
       updated_at?: string
     }
     DeployFunctionResponse: {
@@ -1776,12 +1880,6 @@ export interface components {
       updated_at?: number
       verify_jwt?: boolean
       version: number
-    }
-    Domain: {
-      created_at?: string
-      domain?: string
-      id: string
-      updated_at?: string
     }
     FunctionDeployBody: {
       file?: string[]
@@ -1838,9 +1936,29 @@ export interface components {
     }
     GetProviderResponse: {
       created_at?: string
-      domains?: components['schemas']['Domain'][]
+      domains?: {
+        created_at?: string
+        domain?: string
+        id: string
+        updated_at?: string
+      }[]
       id: string
-      saml?: components['schemas']['SamlDescriptor']
+      saml?: {
+        attribute_mapping?: {
+          keys: {
+            [key: string]: {
+              array?: boolean
+              default?: Record<string, never> | number | string | boolean
+              name?: string
+              names?: string[]
+            }
+          }
+        }
+        entity_id: string
+        id: string
+        metadata_url?: string
+        metadata_xml?: string
+      }
       updated_at?: string
     }
     ListProjectAddonsResponseDto: {
@@ -1868,6 +1986,14 @@ export interface components {
                 | 'ci_8xlarge'
                 | 'ci_12xlarge'
                 | 'ci_16xlarge'
+                | 'ci_24xlarge'
+                | 'ci_24xlarge_optimized_cpu'
+                | 'ci_24xlarge_optimized_memory'
+                | 'ci_24xlarge_high_memory'
+                | 'ci_48xlarge'
+                | 'ci_48xlarge_optimized_cpu'
+                | 'ci_48xlarge_optimized_memory'
+                | 'ci_48xlarge_high_memory'
               )
             | 'cd_default'
             | ('pitr_7' | 'pitr_14' | 'pitr_28')
@@ -1875,9 +2001,8 @@ export interface components {
             | 'auth_mfa_phone_default'
             | 'auth_mfa_web_authn_default'
             | 'log_drain_default'
-          meta?: {
-            [key: string]: number | boolean | string | string[]
-          }
+          /** @description Any JSON-serializable value */
+          meta?: unknown
           name: string
           price: {
             amount: number
@@ -1912,6 +2037,14 @@ export interface components {
                 | 'ci_8xlarge'
                 | 'ci_12xlarge'
                 | 'ci_16xlarge'
+                | 'ci_24xlarge'
+                | 'ci_24xlarge_optimized_cpu'
+                | 'ci_24xlarge_optimized_memory'
+                | 'ci_24xlarge_high_memory'
+                | 'ci_48xlarge'
+                | 'ci_48xlarge_optimized_cpu'
+                | 'ci_48xlarge_optimized_memory'
+                | 'ci_48xlarge_high_memory'
               )
             | 'cd_default'
             | ('pitr_7' | 'pitr_14' | 'pitr_28')
@@ -1919,9 +2052,8 @@ export interface components {
             | 'auth_mfa_phone_default'
             | 'auth_mfa_web_authn_default'
             | 'log_drain_default'
-          meta?: {
-            [key: string]: number | boolean | string | string[]
-          }
+          /** @description Any JSON-serializable value */
+          meta?: unknown
           name: string
           price: {
             amount: number
@@ -1935,10 +2067,43 @@ export interface components {
       }[]
     }
     ListProvidersResponse: {
-      items: components['schemas']['Provider'][]
+      items: {
+        created_at?: string
+        domains?: {
+          created_at?: string
+          domain?: string
+          id: string
+          updated_at?: string
+        }[]
+        id: string
+        saml?: {
+          attribute_mapping?: {
+            keys: {
+              [key: string]: {
+                array?: boolean
+                default?: Record<string, never> | number | string | boolean
+                name?: string
+                names?: string[]
+              }
+            }
+          }
+          entity_id: string
+          id: string
+          metadata_url?: string
+          metadata_xml?: string
+        }
+        updated_at?: string
+      }[]
     }
     NetworkBanResponse: {
       banned_ipv4_addresses: string[]
+    }
+    NetworkBanResponseEnriched: {
+      banned_ipv4_addresses: {
+        banned_address: string
+        identifier: string
+        type: string
+      }[]
     }
     NetworkRestrictionsRequest: {
       dbAllowedCidrs?: string[]
@@ -1987,11 +2152,6 @@ export interface components {
     OrganizationResponseV1: {
       id: string
       name: string
-    }
-    OwnershipVerification: {
-      name: string
-      type: string
-      value: string
     }
     PgsodiumConfigResponse: {
       root_key: string
@@ -2064,36 +2224,19 @@ export interface components {
     ProjectUpgradeInitiateResponse: {
       tracking_id: string
     }
-    Provider: {
-      created_at?: string
-      domains?: components['schemas']['Domain'][]
-      id: string
-      saml?: components['schemas']['SamlDescriptor']
-      updated_at?: string
-    }
     ReadOnlyStatusResponse: {
       enabled: boolean
       override_active_until: string
       override_enabled: boolean
     }
-    RealtimeHealthResponse: {
-      connected_cluster: number
-    }
     /** @enum {string} */
     ReleaseChannel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
     RemoveNetworkBanRequest: {
+      identifier?: string
       ipv4_addresses: string[]
     }
     RemoveReadReplicaBody: {
       database_identifier: string
-    }
-    RestoreProjectBodyDto: Record<string, never>
-    SamlDescriptor: {
-      attribute_mapping?: components['schemas']['AttributeMapping']
-      entity_id: string
-      id: string
-      metadata_url?: string
-      metadata_xml?: string
     }
     SecretResponse: {
       name: string
@@ -2213,11 +2356,6 @@ export interface components {
         database: boolean
       }
     }
-    SslValidation: {
-      status: string
-      validation_errors?: components['schemas']['ValidationError'][]
-      validation_records: components['schemas']['ValidationRecord'][]
-    }
     StorageConfigResponse: {
       features: {
         imageTransformation: {
@@ -2271,180 +2409,186 @@ export interface components {
       } | null
     }
     UpdateAuthConfigBody: {
-      api_max_request_duration?: number
-      db_max_pool_size?: number
-      disable_signup?: boolean
-      external_anonymous_users_enabled?: boolean
-      external_apple_additional_client_ids?: string
-      external_apple_client_id?: string
-      external_apple_enabled?: boolean
-      external_apple_secret?: string
-      external_azure_client_id?: string
-      external_azure_enabled?: boolean
-      external_azure_secret?: string
-      external_azure_url?: string
-      external_bitbucket_client_id?: string
-      external_bitbucket_enabled?: boolean
-      external_bitbucket_secret?: string
-      external_discord_client_id?: string
-      external_discord_enabled?: boolean
-      external_discord_secret?: string
-      external_email_enabled?: boolean
-      external_facebook_client_id?: string
-      external_facebook_enabled?: boolean
-      external_facebook_secret?: string
-      external_figma_client_id?: string
-      external_figma_enabled?: boolean
-      external_figma_secret?: string
-      external_github_client_id?: string
-      external_github_enabled?: boolean
-      external_github_secret?: string
-      external_gitlab_client_id?: string
-      external_gitlab_enabled?: boolean
-      external_gitlab_secret?: string
-      external_gitlab_url?: string
-      external_google_additional_client_ids?: string
-      external_google_client_id?: string
-      external_google_enabled?: boolean
-      external_google_secret?: string
-      external_google_skip_nonce_check?: boolean
-      external_kakao_client_id?: string
-      external_kakao_enabled?: boolean
-      external_kakao_secret?: string
-      external_keycloak_client_id?: string
-      external_keycloak_enabled?: boolean
-      external_keycloak_secret?: string
-      external_keycloak_url?: string
-      external_linkedin_oidc_client_id?: string
-      external_linkedin_oidc_enabled?: boolean
-      external_linkedin_oidc_secret?: string
-      external_notion_client_id?: string
-      external_notion_enabled?: boolean
-      external_notion_secret?: string
-      external_phone_enabled?: boolean
-      external_slack_client_id?: string
-      external_slack_enabled?: boolean
-      external_slack_oidc_client_id?: string
-      external_slack_oidc_enabled?: boolean
-      external_slack_oidc_secret?: string
-      external_slack_secret?: string
-      external_spotify_client_id?: string
-      external_spotify_enabled?: boolean
-      external_spotify_secret?: string
-      external_twitch_client_id?: string
-      external_twitch_enabled?: boolean
-      external_twitch_secret?: string
-      external_twitter_client_id?: string
-      external_twitter_enabled?: boolean
-      external_twitter_secret?: string
-      external_workos_client_id?: string
-      external_workos_enabled?: boolean
-      external_workos_secret?: string
-      external_workos_url?: string
-      external_zoom_client_id?: string
-      external_zoom_enabled?: boolean
-      external_zoom_secret?: string
-      hook_custom_access_token_enabled?: boolean
-      hook_custom_access_token_secrets?: string
-      hook_custom_access_token_uri?: string
-      hook_mfa_verification_attempt_enabled?: boolean
-      hook_mfa_verification_attempt_secrets?: string
-      hook_mfa_verification_attempt_uri?: string
-      hook_password_verification_attempt_enabled?: boolean
-      hook_password_verification_attempt_secrets?: string
-      hook_password_verification_attempt_uri?: string
-      hook_send_email_enabled?: boolean
-      hook_send_email_secrets?: string
-      hook_send_email_uri?: string
-      hook_send_sms_enabled?: boolean
-      hook_send_sms_secrets?: string
-      hook_send_sms_uri?: string
-      jwt_exp?: number
-      mailer_allow_unverified_email_sign_ins?: boolean
-      mailer_autoconfirm?: boolean
+      api_max_request_duration?: number | null
+      db_max_pool_size?: number | null
+      disable_signup?: boolean | null
+      external_anonymous_users_enabled?: boolean | null
+      external_apple_additional_client_ids?: string | null
+      external_apple_client_id?: string | null
+      external_apple_enabled?: boolean | null
+      external_apple_secret?: string | null
+      external_azure_client_id?: string | null
+      external_azure_enabled?: boolean | null
+      external_azure_secret?: string | null
+      external_azure_url?: string | null
+      external_bitbucket_client_id?: string | null
+      external_bitbucket_enabled?: boolean | null
+      external_bitbucket_secret?: string | null
+      external_discord_client_id?: string | null
+      external_discord_enabled?: boolean | null
+      external_discord_secret?: string | null
+      external_email_enabled?: boolean | null
+      external_facebook_client_id?: string | null
+      external_facebook_enabled?: boolean | null
+      external_facebook_secret?: string | null
+      external_figma_client_id?: string | null
+      external_figma_enabled?: boolean | null
+      external_figma_secret?: string | null
+      external_github_client_id?: string | null
+      external_github_enabled?: boolean | null
+      external_github_secret?: string | null
+      external_gitlab_client_id?: string | null
+      external_gitlab_enabled?: boolean | null
+      external_gitlab_secret?: string | null
+      external_gitlab_url?: string | null
+      external_google_additional_client_ids?: string | null
+      external_google_client_id?: string | null
+      external_google_enabled?: boolean | null
+      external_google_secret?: string | null
+      external_google_skip_nonce_check?: boolean | null
+      external_kakao_client_id?: string | null
+      external_kakao_enabled?: boolean | null
+      external_kakao_secret?: string | null
+      external_keycloak_client_id?: string | null
+      external_keycloak_enabled?: boolean | null
+      external_keycloak_secret?: string | null
+      external_keycloak_url?: string | null
+      external_linkedin_oidc_client_id?: string | null
+      external_linkedin_oidc_enabled?: boolean | null
+      external_linkedin_oidc_secret?: string | null
+      external_notion_client_id?: string | null
+      external_notion_enabled?: boolean | null
+      external_notion_secret?: string | null
+      external_phone_enabled?: boolean | null
+      external_slack_client_id?: string | null
+      external_slack_enabled?: boolean | null
+      external_slack_oidc_client_id?: string | null
+      external_slack_oidc_enabled?: boolean | null
+      external_slack_oidc_secret?: string | null
+      external_slack_secret?: string | null
+      external_spotify_client_id?: string | null
+      external_spotify_enabled?: boolean | null
+      external_spotify_secret?: string | null
+      external_twitch_client_id?: string | null
+      external_twitch_enabled?: boolean | null
+      external_twitch_secret?: string | null
+      external_twitter_client_id?: string | null
+      external_twitter_enabled?: boolean | null
+      external_twitter_secret?: string | null
+      external_web3_solana_enabled?: boolean | null
+      external_workos_client_id?: string | null
+      external_workos_enabled?: boolean | null
+      external_workos_secret?: string | null
+      external_workos_url?: string | null
+      external_zoom_client_id?: string | null
+      external_zoom_enabled?: boolean | null
+      external_zoom_secret?: string | null
+      hook_custom_access_token_enabled?: boolean | null
+      hook_custom_access_token_secrets?: string | null
+      hook_custom_access_token_uri?: string | null
+      hook_mfa_verification_attempt_enabled?: boolean | null
+      hook_mfa_verification_attempt_secrets?: string | null
+      hook_mfa_verification_attempt_uri?: string | null
+      hook_password_verification_attempt_enabled?: boolean | null
+      hook_password_verification_attempt_secrets?: string | null
+      hook_password_verification_attempt_uri?: string | null
+      hook_send_email_enabled?: boolean | null
+      hook_send_email_secrets?: string | null
+      hook_send_email_uri?: string | null
+      hook_send_sms_enabled?: boolean | null
+      hook_send_sms_secrets?: string | null
+      hook_send_sms_uri?: string | null
+      jwt_exp?: number | null
+      mailer_allow_unverified_email_sign_ins?: boolean | null
+      mailer_autoconfirm?: boolean | null
       mailer_otp_exp?: number
-      mailer_otp_length?: number
-      mailer_secure_email_change_enabled?: boolean
-      mailer_subjects_confirmation?: string
-      mailer_subjects_email_change?: string
-      mailer_subjects_invite?: string
-      mailer_subjects_magic_link?: string
-      mailer_subjects_reauthentication?: string
-      mailer_subjects_recovery?: string
-      mailer_templates_confirmation_content?: string
-      mailer_templates_email_change_content?: string
-      mailer_templates_invite_content?: string
-      mailer_templates_magic_link_content?: string
-      mailer_templates_reauthentication_content?: string
-      mailer_templates_recovery_content?: string
-      mfa_max_enrolled_factors?: number
-      mfa_phone_enroll_enabled?: boolean
-      mfa_phone_max_frequency?: number
-      mfa_phone_otp_length?: number
-      mfa_phone_template?: string
-      mfa_phone_verify_enabled?: boolean
-      mfa_totp_enroll_enabled?: boolean
-      mfa_totp_verify_enabled?: boolean
-      mfa_web_authn_enroll_enabled?: boolean
-      mfa_web_authn_verify_enabled?: boolean
-      password_hibp_enabled?: boolean
-      password_min_length?: number
-      /** @enum {string} */
+      mailer_otp_length?: number | null
+      mailer_secure_email_change_enabled?: boolean | null
+      mailer_subjects_confirmation?: string | null
+      mailer_subjects_email_change?: string | null
+      mailer_subjects_invite?: string | null
+      mailer_subjects_magic_link?: string | null
+      mailer_subjects_reauthentication?: string | null
+      mailer_subjects_recovery?: string | null
+      mailer_templates_confirmation_content?: string | null
+      mailer_templates_email_change_content?: string | null
+      mailer_templates_invite_content?: string | null
+      mailer_templates_magic_link_content?: string | null
+      mailer_templates_reauthentication_content?: string | null
+      mailer_templates_recovery_content?: string | null
+      mfa_max_enrolled_factors?: number | null
+      mfa_phone_enroll_enabled?: boolean | null
+      mfa_phone_max_frequency?: number | null
+      mfa_phone_otp_length?: number | null
+      mfa_phone_template?: string | null
+      mfa_phone_verify_enabled?: boolean | null
+      mfa_totp_enroll_enabled?: boolean | null
+      mfa_totp_verify_enabled?: boolean | null
+      mfa_web_authn_enroll_enabled?: boolean | null
+      mfa_web_authn_verify_enabled?: boolean | null
+      password_hibp_enabled?: boolean | null
+      password_min_length?: number | null
+      /** @enum {string|null} */
       password_required_characters?:
         | 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
         | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
         | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789:!@#$%^&*()_+-=[]{};\'\\\\:"|<>?,./`~'
         | ''
-      rate_limit_anonymous_users?: number
-      rate_limit_email_sent?: number
-      rate_limit_otp?: number
-      rate_limit_sms_sent?: number
-      rate_limit_token_refresh?: number
-      rate_limit_verify?: number
-      refresh_token_rotation_enabled?: boolean
-      saml_enabled?: boolean
-      saml_external_url?: string
-      security_captcha_enabled?: boolean
-      security_captcha_provider?: string
-      security_captcha_secret?: string
-      security_manual_linking_enabled?: boolean
-      security_refresh_token_reuse_interval?: number
-      security_update_password_require_reauthentication?: boolean
-      sessions_inactivity_timeout?: number
-      sessions_single_per_user?: boolean
-      sessions_tags?: string
-      sessions_timebox?: number
-      site_url?: string
-      sms_autoconfirm?: boolean
-      sms_max_frequency?: number
-      sms_messagebird_access_key?: string
-      sms_messagebird_originator?: string
-      sms_otp_exp?: number
+        | null
+      rate_limit_anonymous_users?: number | null
+      rate_limit_email_sent?: number | null
+      rate_limit_otp?: number | null
+      rate_limit_sms_sent?: number | null
+      rate_limit_token_refresh?: number | null
+      rate_limit_verify?: number | null
+      rate_limit_web3?: number | null
+      refresh_token_rotation_enabled?: boolean | null
+      saml_enabled?: boolean | null
+      saml_external_url?: string | null
+      security_captcha_enabled?: boolean | null
+      /** @enum {string|null} */
+      security_captcha_provider?: 'turnstile' | 'hcaptcha' | null
+      security_captcha_secret?: string | null
+      security_manual_linking_enabled?: boolean | null
+      security_refresh_token_reuse_interval?: number | null
+      security_update_password_require_reauthentication?: boolean | null
+      sessions_inactivity_timeout?: number | null
+      sessions_single_per_user?: boolean | null
+      sessions_tags?: string | null
+      sessions_timebox?: number | null
+      site_url?: string | null
+      sms_autoconfirm?: boolean | null
+      sms_max_frequency?: number | null
+      sms_messagebird_access_key?: string | null
+      sms_messagebird_originator?: string | null
+      sms_otp_exp?: number | null
       sms_otp_length?: number
-      sms_provider?: string
-      sms_template?: string
-      sms_test_otp?: string
-      sms_test_otp_valid_until?: string
-      sms_textlocal_api_key?: string
-      sms_textlocal_sender?: string
-      sms_twilio_account_sid?: string
-      sms_twilio_auth_token?: string
-      sms_twilio_content_sid?: string
-      sms_twilio_message_service_sid?: string
-      sms_twilio_verify_account_sid?: string
-      sms_twilio_verify_auth_token?: string
-      sms_twilio_verify_message_service_sid?: string
-      sms_vonage_api_key?: string
-      sms_vonage_api_secret?: string
-      sms_vonage_from?: string
-      smtp_admin_email?: string
-      smtp_host?: string
-      smtp_max_frequency?: number
-      smtp_pass?: string
-      smtp_port?: string
-      smtp_sender_name?: string
-      smtp_user?: string
-      uri_allow_list?: string
+      /** @enum {string|null} */
+      sms_provider?: 'messagebird' | 'textlocal' | 'twilio' | 'twilio_verify' | 'vonage' | null
+      sms_template?: string | null
+      sms_test_otp?: string | null
+      /** Format: date-time */
+      sms_test_otp_valid_until?: string | null
+      sms_textlocal_api_key?: string | null
+      sms_textlocal_sender?: string | null
+      sms_twilio_account_sid?: string | null
+      sms_twilio_auth_token?: string | null
+      sms_twilio_content_sid?: string | null
+      sms_twilio_message_service_sid?: string | null
+      sms_twilio_verify_account_sid?: string | null
+      sms_twilio_verify_auth_token?: string | null
+      sms_twilio_verify_message_service_sid?: string | null
+      sms_vonage_api_key?: string | null
+      sms_vonage_api_secret?: string | null
+      sms_vonage_from?: string | null
+      smtp_admin_email?: string | null
+      smtp_host?: string | null
+      smtp_max_frequency?: number | null
+      smtp_pass?: string | null
+      smtp_port?: string | null
+      smtp_sender_name?: string | null
+      smtp_user?: string | null
+      uri_allow_list?: string | null
     }
     UpdateBranchBody: {
       branch_name?: string
@@ -2469,7 +2613,33 @@ export interface components {
     }
     UpdateCustomHostnameResponse: {
       custom_hostname: string
-      data: components['schemas']['CfResponse']
+      data: {
+        errors: unknown[]
+        messages: unknown[]
+        result: {
+          custom_origin_server: string
+          hostname: string
+          id: string
+          ownership_verification: {
+            name: string
+            type: string
+            value: string
+          }
+          ssl: {
+            status: string
+            validation_errors?: {
+              message: string
+            }[]
+            validation_records: {
+              txt_name: string
+              txt_value: string
+            }[]
+          }
+          status: string
+          verification_errors?: string[]
+        }
+        success: boolean
+      }
       /** @enum {string} */
       status:
         | '1_not_started'
@@ -2509,16 +2679,45 @@ export interface components {
       work_mem?: string
     }
     UpdateProviderBody: {
-      attribute_mapping?: components['schemas']['AttributeMapping']
+      attribute_mapping?: {
+        keys: {
+          [key: string]: {
+            array?: boolean
+            default?: Record<string, never> | number | string | boolean
+            name?: string
+            names?: string[]
+          }
+        }
+      }
       domains?: string[]
       metadata_url?: string
       metadata_xml?: string
     }
     UpdateProviderResponse: {
       created_at?: string
-      domains?: components['schemas']['Domain'][]
+      domains?: {
+        created_at?: string
+        domain?: string
+        id: string
+        updated_at?: string
+      }[]
       id: string
-      saml?: components['schemas']['SamlDescriptor']
+      saml?: {
+        attribute_mapping?: {
+          keys: {
+            [key: string]: {
+              array?: boolean
+              default?: Record<string, never> | number | string | boolean
+              name?: string
+              names?: string[]
+            }
+          }
+        }
+        entity_id: string
+        id: string
+        metadata_url?: string
+        metadata_xml?: string
+      }
       updated_at?: string
     }
     UpdateSigningKeyBody: {
@@ -2555,20 +2754,20 @@ export interface components {
     }
     V1AnalyticsResponse: {
       error?:
-        | {
-            code?: number
-            errors?: {
-              domain?: string
-              location?: string
-              locationType?: string
-              message?: string
-              reason?: string
-            }[]
-            message?: string
-            status?: string
-          }
         | string
-      result?: Record<string, never>[]
+        | {
+            code: number
+            errors: {
+              domain: string
+              location: string
+              locationType: string
+              message: string
+              reason: string
+            }[]
+            message: string
+            status: string
+          }
+      result?: unknown[]
     }
     V1Backup: {
       inserted_at: string
@@ -2582,12 +2781,6 @@ export interface components {
       pitr_enabled: boolean
       region: string
       walg_enabled: boolean
-    }
-    V1CreateFunctionBody: {
-      body: string
-      name: string
-      slug: string
-      verify_jwt?: boolean
     }
     V1CreateMigrationBody: {
       name?: string
@@ -2608,6 +2801,14 @@ export interface components {
         | '8xlarge'
         | '12xlarge'
         | '16xlarge'
+        | '24xlarge'
+        | '24xlarge_optimized_memory'
+        | '24xlarge_optimized_cpu'
+        | '24xlarge_high_memory'
+        | '48xlarge'
+        | '48xlarge_optimized_memory'
+        | '48xlarge_optimized_cpu'
+        | '48xlarge_high_memory'
       /**
        * @deprecated
        * @description This field is deprecated and is ignored in this request
@@ -2702,6 +2903,59 @@ export interface components {
       db_schema: string
       max_rows: number
     }
+    V1ProjectAdvisorsResponseDto: {
+      lints: {
+        cache_key: string
+        categories: ('PERFORMANCE' | 'SECURITY')[]
+        description: string
+        detail: string
+        /** @enum {string} */
+        facing: 'EXTERNAL'
+        /** @enum {string} */
+        level: 'ERROR' | 'WARN' | 'INFO'
+        metadata?: {
+          entity?: string
+          fkey_columns?: number[]
+          fkey_name?: string
+          name?: string
+          schema?: string
+          /** @enum {string} */
+          type?: 'table' | 'view' | 'auth' | 'function' | 'extension' | 'compliance'
+        }
+        /** @enum {string} */
+        name:
+          | 'unindexed_foreign_keys'
+          | 'auth_users_exposed'
+          | 'auth_rls_initplan'
+          | 'no_primary_key'
+          | 'unused_index'
+          | 'multiple_permissive_policies'
+          | 'policy_exists_rls_disabled'
+          | 'rls_enabled_no_policy'
+          | 'duplicate_index'
+          | 'security_definer_view'
+          | 'function_search_path_mutable'
+          | 'rls_disabled_in_public'
+          | 'extension_in_public'
+          | 'rls_references_user_metadata'
+          | 'materialized_view_in_api'
+          | 'foreign_table_in_api'
+          | 'unsupported_reg_types'
+          | 'auth_otp_long_expiry'
+          | 'auth_otp_short_length'
+          | 'ssl_not_enforced'
+          | 'network_restrictions_not_set'
+          | 'password_requirements_min_length'
+          | 'pitr_not_enabled'
+          | 'auth_leaked_password_protection'
+          | 'auth_insufficient_mfa_options'
+          | 'auth_password_policy_missing'
+          | 'leaked_service_key'
+          | 'no_backup_admin'
+        remediation: string
+        title: string
+      }[]
+    }
     V1ProjectRefResponse: {
       /** Format: int64 */
       id: number
@@ -2791,8 +3045,17 @@ export interface components {
       error?: string
       healthy: boolean
       info?:
-        | components['schemas']['AuthHealthResponse']
-        | components['schemas']['RealtimeHealthResponse']
+        | {
+            description: string
+            /** @enum {string} */
+            name: 'GoTrue'
+            version: string
+          }
+        | {
+            connected_cluster: number
+            db_connected: boolean
+            healthy: boolean
+          }
       /** @enum {string} */
       name: 'auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage'
       /** @enum {string} */
@@ -2817,13 +3080,6 @@ export interface components {
       db_schema?: string
       max_rows?: number
     }
-    ValidationError: {
-      message: string
-    }
-    ValidationRecord: {
-      txt_name: string
-      txt_value: string
-    }
     VanitySubdomainBody: {
       vanity_subdomain: string
     }
@@ -2846,6 +3102,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Branch ID */
         branch_id: string
       }
       cookie?: never
@@ -2874,6 +3131,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Branch ID */
         branch_id: string
       }
       cookie?: never
@@ -2902,6 +3160,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Branch ID */
         branch_id: string
       }
       cookie?: never
@@ -2934,6 +3193,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Branch ID */
         branch_id: string
       }
       cookie?: never
@@ -2966,6 +3226,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Branch ID */
         branch_id: string
       }
       cookie?: never
@@ -2998,6 +3259,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Branch ID */
         branch_id: string
       }
       cookie?: never
@@ -3032,7 +3294,9 @@ export interface operations {
         code_challenge?: string
         code_challenge_method?: 'plain' | 'sha256' | 'S256'
         redirect_uri: string
-        response_type: string
+        response_mode?: string
+        response_type: 'code' | 'token' | 'id_token token'
+        scope?: string
         state?: string
       }
       header?: never
@@ -3154,6 +3418,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -3181,6 +3446,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Organization slug */
         slug: string
       }
       cookie?: never
@@ -3308,6 +3574,62 @@ export interface operations {
       }
     }
   }
+  getPerformanceAdvisors: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V1ProjectAdvisorsResponseDto']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  getSecurityAdvisors: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V1ProjectAdvisorsResponseDto']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   getLogs: {
     parameters: {
       query?: {
@@ -3317,6 +3639,7 @@ export interface operations {
       }
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3342,10 +3665,12 @@ export interface operations {
   'v1-get-project-api-keys': {
     parameters: {
       query?: {
+        /** @description Boolean string, true or false */
         reveal?: boolean
       }
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3371,10 +3696,12 @@ export interface operations {
   createApiKey: {
     parameters: {
       query?: {
+        /** @description Boolean string, true or false */
         reveal?: boolean
       }
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3404,11 +3731,13 @@ export interface operations {
   getApiKey: {
     parameters: {
       query?: {
+        /** @description Boolean string, true or false */
         reveal?: boolean
       }
       header?: never
       path: {
         id: string
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3434,11 +3763,13 @@ export interface operations {
   deleteApiKey: {
     parameters: {
       query?: {
+        /** @description Boolean string, true or false */
         reveal?: boolean
       }
       header?: never
       path: {
         id: string
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3464,11 +3795,13 @@ export interface operations {
   updateApiKey: {
     parameters: {
       query?: {
+        /** @description Boolean string, true or false */
         reveal?: boolean
       }
       header?: never
       path: {
         id: string
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3500,6 +3833,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3534,6 +3868,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3570,22 +3905,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        addon_variant:
-          | 'ci_micro'
-          | 'ci_small'
-          | 'ci_medium'
-          | 'ci_large'
-          | 'ci_xlarge'
-          | 'ci_2xlarge'
-          | 'ci_4xlarge'
-          | 'ci_8xlarge'
-          | 'ci_12xlarge'
-          | 'ci_16xlarge'
-          | 'cd_default'
-          | 'pitr_7'
-          | 'pitr_14'
-          | 'pitr_28'
-          | 'ipv4_default'
+        addon_variant: unknown
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3618,6 +3939,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3652,6 +3974,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3690,6 +4013,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3796,6 +4120,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3823,6 +4148,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3856,6 +4182,7 @@ export interface operations {
       header?: never
       path: {
         id: string
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3884,6 +4211,7 @@ export interface operations {
       header?: never
       path: {
         id: string
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -3912,6 +4240,7 @@ export interface operations {
       header?: never
       path: {
         id: string
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4129,6 +4458,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4156,6 +4486,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4187,6 +4518,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
         tpa_id: string
       }
@@ -4215,6 +4547,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
         tpa_id: string
       }
@@ -4278,6 +4611,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4306,6 +4640,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4702,6 +5037,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4731,6 +5067,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4758,6 +5095,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4790,8 +5128,12 @@ export interface operations {
   'v1-apply-a-migration': {
     parameters: {
       query?: never
-      header?: never
+      header?: {
+        /** @description A unique key to ensure the same migration is tracked only once. */
+        'Idempotency-Key'?: string
+      }
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4830,6 +5172,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4901,6 +5244,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -4935,13 +5279,14 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['BulkUpdateFunctionBody'][]
+        'application/json': components['schemas']['BulkUpdateFunctionBody']
       }
     }
     responses: {
@@ -4972,24 +5317,22 @@ export interface operations {
     parameters: {
       query?: {
         entrypoint_path?: string
+        /** @description Boolean string, true or false */
         import_map?: boolean
         import_map_path?: string
         name?: string
         slug?: string
+        /** @description Boolean string, true or false */
         verify_jwt?: boolean
       }
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V1CreateFunctionBody']
-        'application/vnd.denoland.eszip': components['schemas']['V1CreateFunctionBody']
-      }
-    }
+    requestBody?: never
     responses: {
       201: {
         headers: {
@@ -5019,7 +5362,9 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Function slug */
         function_slug: string
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5054,7 +5399,9 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Function slug */
         function_slug: string
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5086,14 +5433,19 @@ export interface operations {
     parameters: {
       query?: {
         entrypoint_path?: string
+        /** @description Boolean string, true or false */
         import_map?: boolean
         import_map_path?: string
         name?: string
+        slug?: string
+        /** @description Boolean string, true or false */
         verify_jwt?: boolean
       }
       header?: never
       path: {
+        /** @description Function slug */
         function_slug: string
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5133,7 +5485,9 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Function slug */
         function_slug: string
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5164,11 +5518,13 @@ export interface operations {
   'v1-deploy-a-function': {
     parameters: {
       query?: {
+        /** @description Boolean string, true or false */
         bundleOnly?: boolean
         slug?: string
       }
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5245,6 +5601,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5281,6 +5638,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5310,11 +5668,47 @@ export interface operations {
       }
     }
   }
+  'v1-list-all-network-bans-enriched': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['NetworkBanResponseEnriched']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve project's enriched network bans */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-get-network-restrictions': {
     parameters: {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5349,6 +5743,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5413,6 +5808,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5447,6 +5843,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5559,6 +5956,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5595,6 +5993,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5699,6 +6098,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5726,15 +6126,12 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RestoreProjectBodyDto']
-      }
-    }
+    requestBody?: never
     responses: {
       200: {
         headers: {
@@ -5755,6 +6152,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5780,6 +6178,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5814,13 +6213,14 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateSecretBody'][]
+        'application/json': components['schemas']['CreateSecretBody']
       }
     }
     responses: {
@@ -5850,6 +6250,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5888,6 +6289,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5922,6 +6324,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -5997,6 +6400,7 @@ export interface operations {
       }
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -6031,6 +6435,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -6069,6 +6474,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -6105,6 +6511,7 @@ export interface operations {
       }
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -6139,6 +6546,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -6173,6 +6581,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -6205,6 +6614,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -6243,6 +6653,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
+        /** @description Project ref */
         ref: string
       }
       cookie?: never
@@ -6281,6 +6692,7 @@ export interface operations {
       query?: {
         cursor?: string
         limit?: string
+        /** @description Project ref */
         project_ref?: string
         sort_by?: 'name' | 'inserted_at'
         sort_order?: 'asc' | 'desc'

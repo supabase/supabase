@@ -129,7 +129,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const currentTable = tables?.find((t) => t.id.toString() === entityId)
   const currentSchema = searchParams?.get('schema') ?? 'public'
-  const currentChat = snap.chats[snap.activeChatId ?? ''].name
+  const currentChat = snap.activeChat?.name
 
   const { ref } = useParams()
   const org = useSelectedOrganization()

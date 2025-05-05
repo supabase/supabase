@@ -1,5 +1,11 @@
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { BASE_PATH } from 'lib/constants'
+import { ExternalLink, X } from 'lucide-react'
 import Image from 'next/image'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge, Button } from 'ui'
+import { useIsNewLayoutEnabled } from './FeaturePreviewContext'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 export const LayoutUpdatePreview = () => {
   return (
@@ -35,5 +41,50 @@ export const LayoutUpdatePreview = () => {
         </ul>
       </div>
     </div>
+  )
+}
+
+export const LayoutUpdateBanner = () => {
+  const newLayoutPreview = useIsNewLayoutEnabled()
+  const [newLayoutPreviewState] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW, '')
+  const [newLayoutAcknowledged, setNewLayoutAcknowledged] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.NEW_LAYOUT_NOTICE_ACKNOWLEDGED,
+    false
+  )
+  const isDefaultOptedInNewLayout = newLayoutPreview && newLayoutPreviewState === ''
+
+  if (!isDefaultOptedInNewLayout || newLayoutAcknowledged) return null
+
+  return (
+    <Alert_Shadcn_ className="mb-4 relative">
+      <AlertTitle_Shadcn_>
+        <Badge variant="brand" className="mr-2">
+          NEW
+        </Badge>
+        Dashboard layout has been updated!
+      </AlertTitle_Shadcn_>
+      <AlertDescription_Shadcn_>
+        We've updated the dashboard layout to make it easier to find and manage your organization
+        settings.
+      </AlertDescription_Shadcn_>
+      <AlertDescription_Shadcn_ className="mt-4 flex items-center gap-x-2">
+        <Button asChild type="default" icon={<ExternalLink />}>
+          <a
+            target="_blank"
+            rel="noreferrer noopener"
+            href="https://github.com/orgs/supabase/discussions/33670"
+          >
+            View announcement
+          </a>
+        </Button>
+      </AlertDescription_Shadcn_>
+      <ButtonTooltip
+        type="text"
+        icon={<X />}
+        className="absolute top-2 right-2 px-1"
+        onClick={() => setNewLayoutAcknowledged(true)}
+        tooltip={{ content: { side: 'bottom', text: 'Dismiss' } }}
+      />
+    </Alert_Shadcn_>
   )
 }

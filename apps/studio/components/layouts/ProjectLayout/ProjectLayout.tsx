@@ -208,7 +208,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                   className={cn('w-full xl:min-w-[600px] bg-dash-sidebar')}
                 >
                   <main
-                    className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden @container [contain:layout]"
+                    className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden @container"
                     ref={ref}
                   >
                     {showPausedState ? (

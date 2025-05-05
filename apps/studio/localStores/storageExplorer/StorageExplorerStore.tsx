@@ -29,6 +29,10 @@ import {
   StorageItemMetadata,
   StorageItemWithColumn,
 } from 'components/to-be-cleaned/Storage/Storage.types'
+import {
+  downloadFile,
+  formatTime,
+} from 'components/to-be-cleaned/Storage/StorageExplorer/StorageExplorer.utils'
 import { convertFromBytes } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
 import { configKeys } from 'data/config/keys'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
@@ -39,9 +43,11 @@ import { StorageObject, listBucketObjects } from 'data/storage/bucket-objects-li
 import { Bucket } from 'data/storage/buckets-query'
 import { moveStorageObject } from 'data/storage/object-move-mutation'
 import { IS_PLATFORM } from 'lib/constants'
+import { tryParseJson } from 'lib/helpers'
 import { lookupMime } from 'lib/mime'
 import Link from 'next/link'
 import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string }
 
@@ -72,7 +78,6 @@ const STORAGE_PROGRESS_INFO_TEXT = "Do not close the browser until it's complete
 
 class StorageExplorerStore {
   projectRef: string = ''
-  view: STORAGE_VIEWS = STORAGE_VIEWS.COLUMNS
   sortBy: STORAGE_SORT_BY = STORAGE_SORT_BY.NAME
   sortByOrder: STORAGE_SORT_BY_ORDER = STORAGE_SORT_BY_ORDER.ASC
   // selectedBucket will get initialized with a bucket before using
@@ -155,7 +160,7 @@ class StorageExplorerStore {
   }
 
   private getLocalStorageKey = () => {
-    return `supabase-storage-${this.projectRef}`
+    return LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(this.projectRef)
   }
 
   private getLatestColumnIndex = () => {
@@ -188,12 +193,6 @@ class StorageExplorerStore {
     this.clearOpenedFolders()
     this.closeFilePreview()
     this.clearSelectedItems()
-  }
-
-  setView = (view: STORAGE_VIEWS) => {
-    this.view = view
-    this.closeFilePreview()
-    this.updateExplorerPreferences()
   }
 
   setSortBy = async (sortBy: STORAGE_SORT_BY) => {
@@ -415,7 +414,7 @@ class StorageExplorerStore {
       <SonnerProgress
         progress={progress}
         message={`Uploading ${totalFiles} file${totalFiles > 1 ? 's' : ''}...`}
-        progressPrefix={`${remainingTime && !isNaN(remainingTime) && isFinite(remainingTime) && remainingTime !== 0 ? `${this.formatTime(remainingTime)} remaining – ` : ''}`}
+        progressPrefix={`${remainingTime && !isNaN(remainingTime) && isFinite(remainingTime) && remainingTime !== 0 ? `${formatTime(remainingTime)} remaining – ` : ''}`}
         action={
           toastId && (
             <Button
@@ -1058,7 +1057,12 @@ class StorageExplorerStore {
     const promises = formattedFilesWithPrefix.map((file) => {
       return () => {
         return new Promise<{ name: string; blob: Blob } | boolean>(async (resolve) => {
-          const data = await this.downloadFile(file, showIndividualToast, returnBlob)
+          const data = await downloadFile({
+            projectRef: this.projectRef,
+            bucketId: this.selectedBucket.id,
+            file,
+            returnBlob,
+          })
           progress = progress + 1 / formattedFilesWithPrefix.length
           if (isObject(data)) {
             resolve({ ...data, name: file.formattedPathToFile })
@@ -1101,57 +1105,6 @@ class StorageExplorerStore {
       closeButton: true,
       duration: SONNER_DEFAULT_DURATION,
     })
-  }
-
-  downloadFile = async (file: StorageItemWithColumn, showToast = true, returnBlob = false) => {
-    const fileName: string = file.name
-    const fileMimeType = file?.metadata?.mimetype ?? undefined
-
-    const toastId = showToast ? toast.loading(`Retrieving ${fileName}...`) : undefined
-
-    const pathToFile = this.openedFolders
-      .slice(0, file.columnIndex)
-      .map((folder) => folder.name)
-      .join('/')
-    const formattedPathToFile = pathToFile.length > 0 ? `${pathToFile}/${fileName}` : fileName
-    try {
-      const data = await downloadBucketObject({
-        projectRef: this.projectRef,
-        bucketId: this.selectedBucket.id,
-        path: formattedPathToFile,
-      })
-
-      const blob = await data.blob()
-      const newBlob = new Blob([blob], { type: fileMimeType })
-
-      if (returnBlob) return { name: fileName, blob: newBlob }
-
-      const blobUrl = window.URL.createObjectURL(newBlob)
-      const link = document.createElement('a')
-      link.href = blobUrl
-      link.setAttribute('download', `${fileName}`)
-      document.body.appendChild(link)
-      link.click()
-      link.parentNode?.removeChild(link)
-      window.URL.revokeObjectURL(blob)
-      if (toastId) {
-        toast.success(`Downloading ${fileName}`, {
-          id: toastId,
-          closeButton: true,
-          duration: SONNER_DEFAULT_DURATION,
-        })
-      }
-      return true
-    } catch {
-      if (toastId) {
-        toast.error(`Failed to download ${fileName}`, {
-          id: toastId,
-          closeButton: true,
-          duration: SONNER_DEFAULT_DURATION,
-        })
-      }
-      return false
-    }
   }
 
   renameFile = async (file: StorageItem, newName: string, columnIndex: number) => {
@@ -1232,7 +1185,7 @@ class StorageExplorerStore {
 
       this.updateRowStatus(folderName, STORAGE_ROW_STATUS.READY, index)
 
-      const formattedItems = this.formatFolderItems(data)
+      const formattedItems = this.formatFolderItems(data, prefix)
       this.pushColumnAtIndex(
         {
           id: folderId || folderName,
@@ -1631,7 +1584,7 @@ class StorageExplorerStore {
     return name
   }
 
-  private formatFolderItems = (items: StorageObject[] = []): StorageItem[] => {
+  private formatFolderItems = (items: StorageObject[] = [], prefix?: string): StorageItem[] => {
     const formattedItems =
       (items ?? [])
         ?.filter((item) => item.name !== EMPTY_FOLDER_PLACEHOLDER_FILE_NAME)
@@ -1657,6 +1610,7 @@ class StorageExplorerStore {
             type,
             status,
             isCorrupted,
+            path: !!prefix ? `${prefix}/${item.name}` : item.name,
           }
           return itemObj
         }) ?? []
@@ -1758,26 +1712,25 @@ class StorageExplorerStore {
 
   private updateExplorerPreferences = () => {
     const localStorageKey = this.getLocalStorageKey()
-    const preferences = {
-      view: this.view,
-      sortBy: this.sortBy,
-      sortByOrder: this.sortByOrder,
+    const existingPreferences = tryParseJson(localStorage?.getItem(localStorageKey))
+
+    if (this.projectRef) {
+      localStorage.setItem(
+        localStorageKey,
+        JSON.stringify({
+          sortBy: this.sortBy,
+          sortByOrder: this.sortByOrder,
+          view: existingPreferences?.view ?? STORAGE_VIEWS.COLUMNS,
+        })
+      )
     }
-    localStorage.setItem(localStorageKey, JSON.stringify(preferences))
-    return preferences
   }
 
   loadExplorerPreferences = () => {
     const localStorageKey = this.getLocalStorageKey()
     const preferences = localStorage?.getItem(localStorageKey) ?? undefined
     if (preferences !== undefined) {
-      const { view, sortBy, sortByOrder } = JSON.parse(preferences)
-      this.view = view
-      this.sortBy = sortBy
-      this.sortByOrder = sortByOrder
-    } else {
-      const { view, sortBy, sortByOrder } = this.updateExplorerPreferences()
-      this.view = view
+      const { sortBy, sortByOrder } = JSON.parse(preferences)
       this.sortBy = sortBy
       this.sortByOrder = sortByOrder
     }
@@ -1831,20 +1784,6 @@ class StorageExplorerStore {
     })
 
     return totalRemainingTime
-  }
-
-  private formatTime(seconds: number) {
-    const days = Math.floor(seconds / (24 * 3600))
-    seconds %= 24 * 3600
-    const hours = Math.floor(seconds / 3600)
-    seconds %= 3600
-    const minutes = Math.floor(seconds / 60)
-    seconds = Math.floor(seconds % 60)
-
-    if (days > 0) return `${days}d `
-    if (hours > 0) return `${hours}h `
-    if (minutes > 0) return `${minutes}m `
-    return `${seconds}s`
   }
 }
 

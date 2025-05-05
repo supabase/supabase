@@ -287,7 +287,7 @@ const AIEditor = ({
       {isDiffMode ? (
         <div className="w-full h-full">
           <DiffEditor
-            theme="vs-dark"
+            theme="supabase"
             language={language}
             original={diffValue.original}
             modified={diffValue.modified}

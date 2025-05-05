@@ -1,4 +1,4 @@
-import { AlertOctagon, MinusCircle, PauseCircle } from 'lucide-react'
+import { MinusCircle, PauseCircle } from 'lucide-react'
 
 import type { ProjectInfo } from 'data/projects/projects-query'
 import type { OrgSubscription, ProjectAddon } from 'data/subscriptions/types'

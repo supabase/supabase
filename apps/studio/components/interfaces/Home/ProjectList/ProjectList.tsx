@@ -243,7 +243,9 @@ const OrganizationProjects = ({
           {!!overdueInvoices.length && (
             <div>
               <Button asChild type="danger">
-                <Link href={`/org/${organization.slug}/invoices`}>Outstanding Invoices</Link>
+                <Link href={`/org/${organization.slug}/billing#invoices`}>
+                  Outstanding Invoices
+                </Link>
               </Button>
             </div>
           )}

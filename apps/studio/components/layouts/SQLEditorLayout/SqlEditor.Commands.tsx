@@ -72,7 +72,7 @@ export function useSnippetCommands() {
   )
 
   useRegisterCommands(
-    COMMAND_MENU_SECTIONS.ACTIONS,
+    COMMAND_MENU_SECTIONS.SQL,
     [
       {
         id: 'run-snippet',
@@ -279,7 +279,7 @@ export function useQueryTableCommands(options?: CommandOptions) {
   )
 
   useRegisterCommands(
-    COMMAND_MENU_SECTIONS.ACTIONS,
+    COMMAND_MENU_SECTIONS.SQL,
     [
       {
         id: 'query-table',

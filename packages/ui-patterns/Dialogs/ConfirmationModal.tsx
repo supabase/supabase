@@ -11,8 +11,8 @@ import {
   DialogTitle,
   cn,
 } from 'ui'
-import { Admonition } from './../admonition'
 import { DialogDescription, DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
+import { Admonition } from './../admonition'
 
 export interface ConfirmationModalProps {
   loading?: boolean
@@ -85,7 +85,7 @@ const ConfirmationModal = forwardRef<
       >
         <DialogContent ref={ref} className="p-0 gap-0 pb-5 !block" size={size}>
           <DialogHeader className={cn('border-b')} padding={'small'}>
-            <DialogTitle className="">{title}</DialogTitle>
+            <DialogTitle>{title}</DialogTitle>
             {description && <DialogDescription>{description}</DialogDescription>}
           </DialogHeader>
           {alert && (

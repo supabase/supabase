@@ -2,12 +2,12 @@ import { ArrowLeft, ArrowRight, HelpCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
-import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { THRESHOLD_COUNT, useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import { useUrlState } from 'hooks/ui/useUrlState'
+import { RoleImpersonationState } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
@@ -40,8 +40,7 @@ const Pagination = () => {
   // rowsCountEstimate is only applicable to table entities
   const rowsCountEstimate = isTableLike(selectedTable) ? selectedTable.live_rows_estimate : null
 
-  const [{ filter }] = useUrlState({ arrayKeys: ['filter'] })
-  const filters = formatFilterURLParams(filter as string[])
+  const { filters } = useTableFilter()
   const page = snap.page
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
@@ -60,10 +59,10 @@ const Pagination = () => {
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      tableId: id,
+      tableId: snap.table.id,
       filters,
       enforceExactCount: snap.enforceExactCount,
-      impersonatedRole: roleImpersonationState.role,
+      roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     {
       keepPreviousData: true,

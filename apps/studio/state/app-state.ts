@@ -1,8 +1,7 @@
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
-import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS, LOCAL_STORAGE_KEYS } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 export type Template = {
   name: string
@@ -52,7 +51,6 @@ const getInitialState = () => {
       activeDocsSection: ['introduction'],
       docsLanguage: 'js',
       showProjectApiDocs: false,
-      isOptedInTelemetry: false,
       showEnableBranchingModal: false,
       showFeaturePreviewModal: false,
       selectedFeaturePreview: '',
@@ -84,7 +82,6 @@ const getInitialState = () => {
     activeDocsSection: ['introduction'],
     docsLanguage: 'js',
     showProjectApiDocs: false,
-    isOptedInTelemetry: false,
     showEnableBranchingModal: false,
     showFeaturePreviewModal: false,
     selectedFeaturePreview: '',
@@ -122,14 +119,6 @@ export const appState = proxy({
   },
   setDocsLanguage: (value: 'js' | 'bash') => {
     appState.docsLanguage = value
-  },
-
-  isOptedInTelemetry: false,
-  setIsOptedInTelemetry: (value: boolean | null) => {
-    appState.isOptedInTelemetry = value === null ? false : value
-    if (typeof window !== 'undefined' && value !== null) {
-      localStorage.setItem(COMMON_LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
-    }
   },
 
   showEnableBranchingModal: false,

@@ -14,5 +14,6 @@ export interface ContentFileProps {
     transactionDedicated?: string
     sessionDedicated?: string
     ipv4SupportedForDedicatedPooler: boolean
+    direct?: string
   }
 }

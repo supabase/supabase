@@ -3,10 +3,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { IS_PLATFORM, useParams } from 'common'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
 import {
@@ -40,7 +39,7 @@ const HomePageActions = ({
   setSearch,
   setFilterStatus,
 }: HomePageActionsProps) => {
-  const newLayoutPreview = useNewLayout()
+  const newLayoutPreview = useIsNewLayoutEnabled()
 
   const router = useRouter()
   const { slug } = useParams()
@@ -48,9 +47,6 @@ const HomePageActions = ({
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
   const { isSuccess: orgsLoaded } = useOrganizationsQuery()
-
-  const projectCreationExperimentGroup = useFlag<string>('projectCreationExperimentGroup')
-  const newProjectPath = projectCreationExperimentGroup === 'group-b' ? '/new/v2' : '/new'
 
   return (
     <div className="flex flex-col gap-2 md:gap-3 md:flex-row">
@@ -74,10 +70,7 @@ const HomePageActions = ({
               {organizations
                 .sort((a, b) => a.name.localeCompare(b.name))
                 .map((x) => (
-                  <DropdownMenuItem
-                    key={x.slug}
-                    onClick={() => router.push(`${newProjectPath}/${x.slug}`)}
-                  >
+                  <DropdownMenuItem key={x.slug} onClick={() => router.push(`/new/${x.slug}`)}>
                     {x.name}
                   </DropdownMenuItem>
                 ))}

@@ -1,21 +1,13 @@
-import { useParams } from 'common/hooks'
+import { useMonaco } from '@monaco-editor/react'
+import { useLocalStorage } from '@uidotdev/usehooks'
 import dayjs from 'dayjs'
+import { editor } from 'monaco-editor'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { IS_PLATFORM } from 'common'
-import {
-  Button,
-  Form,
-  Input,
-  Modal,
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from 'ui'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
 
-import { useLocalStorage } from '@uidotdev/usehooks'
 import {
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
   LOGS_TABLES,
@@ -34,6 +26,7 @@ import LogsQueryPanel, { SourceType } from 'components/interfaces/Settings/Logs/
 import LogTable from 'components/interfaces/Settings/Logs/LogTable'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import { createWarehouseQueryTemplates } from 'components/interfaces/Settings/Logs/Warehouse.utils'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
@@ -45,15 +38,22 @@ import {
   UpsertContentPayload,
   useContentUpsertMutation,
 } from 'data/content/content-upsert-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
+import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import {
+  Button,
+  Form,
+  Input,
+  Modal,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from 'ui'
 
 const PLACEHOLDER_WAREHOUSE_QUERY =
   '-- Fetch the last 10 logs in the last 7 days \nselect id, timestamp, event_message from `COLLECTION_NAME` \nwhere timestamp > timestamp_sub(current_timestamp(), interval 7 day) \norder by timestamp desc limit 10'
@@ -67,15 +67,19 @@ const PLACEHOLDER_QUERY = IS_PLATFORM ? PLATFORM_PLACEHOLDER_QUERY : LOCAL_PLACE
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
+  const monaco = useMonaco()
   const router = useRouter()
   const { profile } = useProfile()
-  const { ref, q, ite, its, queryId, source: routerSource } = useParams()
+  const { ref, q, queryId, source: routerSource } = useParams()
   const projectRef = ref as string
   const organization = useSelectedOrganization()
 
-  const [editorId, setEditorId] = useState<string>(uuidv4())
-  const [warehouseEditorId, setWarehouseEditorId] = useState<string>(uuidv4())
+  const editorRef = useRef<editor.IStandaloneCodeEditor>()
+  const [editorId] = useState<string>(uuidv4())
+  const { timestampStart, timestampEnd, setTimeRange } = useLogsUrlState()
+
   const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
+  const [warehouseEditorId, setWarehouseEditorId] = useState<string>(uuidv4())
   const [warehouseEditorValue, setWarehouseEditorValue] = useState<string>(
     PLACEHOLDER_WAREHOUSE_QUERY
   )
@@ -95,7 +99,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   })
   const query = content?.content.find((x) => x.id === queryId)
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const {
     params,
     logData,
@@ -103,12 +106,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     isLoading: logsLoading,
     changeQuery,
     runQuery,
-    setParams,
   } = useLogsQuery(
     projectRef,
     {
-      iso_timestamp_start: its ? (its as string) : undefined,
-      iso_timestamp_end: ite ? (ite as string) : undefined,
+      iso_timestamp_start: timestampStart,
+      iso_timestamp_end: timestampEnd,
     },
     sourceType === 'logs'
   )
@@ -165,22 +167,25 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   )
 
   const onSelectTemplate = (template: LogTemplate) => {
-    setEditorValue(template.searchString)
-    changeQuery(template.searchString)
-    setEditorId(uuidv4())
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, q: template.searchString },
-    })
+    if (editorRef.current && monaco) {
+      const editorModel = editorRef.current?.getModel()
+
+      editorRef.current.pushUndoStop()
+      editorRef.current.executeEdits(`insert-identifier`, [
+        {
+          text: template.searchString,
+          range: editorModel?.getFullModelRange() ?? new monaco.Range(1, 1, 1, 1),
+        },
+      ])
+      editorRef.current.pushUndoStop()
+      editorRef.current.focus()
+    }
+
     addRecentLogSqlSnippet({ sql: template.searchString })
   }
 
   const handleRun = (value?: string | React.MouseEvent<HTMLButtonElement>) => {
     const query = typeof value === 'string' ? value || editorValue : editorValue
-
-    if (value && typeof value === 'string') {
-      setEditorValue(value)
-    }
 
     if (sourceType === 'warehouse') {
       const whQuery = warehouseEditorValue
@@ -229,14 +234,28 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     if (sourceType === 'warehouse') {
       //TODO: Only one collection can be queried at a time, we need to replace the current collection from the query for the new one
       return setWarehouseEditorId(uuidv4())
-    }
+    } else {
+      if (editorRef.current && monaco) {
+        const editorModel = editorRef.current?.getModel()
+        const currentValue = editorRef.current.getValue()
+        const index = currentValue.indexOf('from')
 
-    setEditorValue((prev) => {
-      const index = prev.indexOf('from')
-      if (index === -1) return `${prev}${source}`
-      return `${prev.substring(0, index + 4)} ${source} ${prev.substring(index + 5)}`
-    })
-    setEditorId(uuidv4())
+        const updatedValue =
+          index < 0
+            ? `${currentValue}${source}`
+            : `${currentValue.substring(0, index + 4)} ${source} ${currentValue.substring(index + 5)}`
+
+        editorRef.current.pushUndoStop()
+        editorRef.current.executeEdits(`insert-identifier`, [
+          {
+            text: updatedValue,
+            range: editorModel?.getFullModelRange() ?? new monaco.Range(1, 1, 1, 1),
+          },
+        ])
+        editorRef.current.pushUndoStop()
+        editorRef.current.focus()
+      }
+    }
   }
 
   const handleCreateQuery = async (values: any, { setSubmitting }: any) => {
@@ -287,20 +306,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   const handleDateChange = ({ to, from }: DatePickerToFrom) => {
-    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, subscription?.plan?.id)
+    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, organization?.plan?.id)
 
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(!showUpgradePrompt)
     } else {
-      setParams((prev) => ({
-        ...prev,
-        iso_timestamp_start: from || '',
-        iso_timestamp_end: to || '',
-      }))
-      router.push({
-        pathname: router.pathname,
-        query: { ...router.query, its: from || '', ite: to || '' },
-      })
+      setTimeRange(from || '', to || '')
     }
   }
 
@@ -311,18 +322,15 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   useEffect(() => {
     // on mount, set initial values
     if (q) {
-      onSelectTemplate({
-        mode: 'custom',
-        searchString: q,
-      })
+      setEditorValue(q)
       setWarehouseEditorValue(q)
     }
   }, [q])
 
   useEffect(() => {
     let newWarnings = []
-    const start = params.iso_timestamp_start ? dayjs(params.iso_timestamp_start) : dayjs()
-    const end = params.iso_timestamp_end ? dayjs(params.iso_timestamp_end) : dayjs()
+    const start = timestampStart ? dayjs(timestampStart) : dayjs()
+    const end = timestampEnd ? dayjs(timestampEnd) : dayjs()
     const daysDiff = Math.abs(start.diff(end, 'days'))
 
     if (daysDiff >= LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD) {
@@ -334,25 +342,17 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       newWarnings.push({ text: 'When querying large date ranges, include a LIMIT clause.' })
     }
     setWarnings(newWarnings)
-  }, [
-    editorValue,
-    ite,
-    its,
-    router.query,
-    params.iso_timestamp_end,
-    params.iso_timestamp_start,
-    params,
-  ])
+  }, [editorValue, timestampStart, timestampEnd])
 
   // Show the prompt on page load based on query params
   useEffect(() => {
-    if (its) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(its as string, subscription?.plan?.id)
+    if (timestampStart) {
+      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(timestampStart, organization?.plan?.id)
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       }
     }
-  }, [its, subscription])
+  }, [timestampStart, organization])
 
   return (
     <div className="w-full h-full mx-auto">
@@ -363,8 +363,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       >
         <ResizablePanel collapsible minSize={5}>
           <LogsQueryPanel
-            defaultFrom={params.iso_timestamp_start || ''}
-            defaultTo={params.iso_timestamp_end || ''}
+            defaultFrom={timestampStart || ''}
+            defaultTo={timestampEnd || ''}
             onDateChange={handleDateChange}
             onSelectSource={handleInsertSource}
             templates={TEMPLATES.filter((template) => template.mode === 'custom')}
@@ -398,6 +398,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
           ) : (
             <CodeEditor
               id={editorId}
+              editorRef={editorRef}
               language="pgsql"
               defaultValue={editorValue}
               onInputChange={(v) => setEditorValue(v || '')}
