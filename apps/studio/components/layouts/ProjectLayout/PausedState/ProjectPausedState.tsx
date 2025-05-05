@@ -13,11 +13,7 @@ import { useParams } from 'common'
 import { PostgresVersionSelector } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import {
-  PostgresEngine,
-  ProjectUnpausePostgresVersion,
-  ReleaseChannel,
-} from 'data/config/project-unpause-postgres-versions-query'
+import { PostgresEngine, ReleaseChannel } from 'data/config/project-unpause-postgres-versions-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
@@ -48,10 +44,6 @@ export interface ProjectPausedStateProps {
 interface PostgresVersionDetails {
   postgresEngine: PostgresEngine
   releaseChannel: ReleaseChannel
-}
-
-const formatValue = ({ postgres_engine, release_channel }: ProjectUnpausePostgresVersion) => {
-  return `${postgres_engine}|${release_channel}`
 }
 
 export const extractPostgresVersionDetails = (value: string): PostgresVersionDetails => {

@@ -82,9 +82,7 @@ export const PostgresVersionSelector = ({
 
   const { data: unpauseVersions, isLoading: isLoadingProjectUnpauseVersions } =
     useProjectUnpausePostgresVersionsQuery(
-      {
-        projectRef: project?.ref,
-      },
+      { projectRef: project?.ref },
       { enabled: type === 'unpause' }
     )
 
