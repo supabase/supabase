@@ -112,7 +112,6 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.410.0",
     "@graphiql/toolkit": "^0.9.1",
     "@supabase/supa-mdx-lint": "0.2.6-alpha",
     "@types/common-tags": "^1.8.4",

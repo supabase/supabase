@@ -60,21 +60,12 @@
       "@tanstack/directive-functions-plugin>vite": "6.2.6",
       "@tanstack/react-start-plugin>vite": "6.2.6"
     },
-    "neverBuiltDependencies": [
-      "libpg-query"
-    ]
+    "neverBuiltDependencies": ["libpg-query"]
   },
   "engines": {
     "pnpm": ">=9",
     "node": ">=20"
   },
-  "keywords": [
-    "postgres",
-    "firebase",
-    "storage",
-    "functions",
-    "database",
-    "auth"
-  ],
+  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
   "packageManager": "pnpm@9.15.5"
 }

@@ -132,7 +132,6 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.410.0",
     "@radix-ui/react-use-escape-keydown": "^1.0.3",
     "@supabase/postgres-meta": "^0.64.4",
     "@tailwindcss/container-queries": "^0.1.1",
