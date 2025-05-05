@@ -1,6 +1,6 @@
 import { Code, Play } from 'lucide-react'
 import { DragEvent, ReactNode, useEffect, useMemo, useState } from 'react'
-import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
+import { Bar, BarChart, CartesianGrid, Cell, Tooltip, XAxis, YAxis } from 'recharts'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -9,11 +9,13 @@ import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartC
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { usePrimaryDatabase } from 'data/read-replicas/replicas-query'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import dayjs from 'dayjs'
 import { Parameter, parseParameters } from 'lib/sql-parameters'
 import { Dashboards } from 'types'
-import { ChartContainer, ChartTooltip, ChartTooltipContent, cn, CodeBlock, SQL_ICON } from 'ui'
+import { ChartContainer, ChartTooltipContent, cn, CodeBlock, SQL_ICON } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { ButtonTooltip } from '../ButtonTooltip'
+import { CHART_COLORS } from '../Charts/Charts.constants'
 import SqlWarningAdmonition from '../SqlWarningAdmonition'
 import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
@@ -129,13 +131,19 @@ export const QueryBlock = ({
   const [readOnlyError, setReadOnlyError] = useState(false)
   const [queryError, setQueryError] = useState<QueryResponseError>()
   const [queryResult, setQueryResult] = useState<any[] | undefined>(results)
+  const [focusDataIndex, setFocusDataIndex] = useState<number>()
 
   const formattedQueryResult = useMemo(() => {
     // Make sure Y axis values are numbers
     return queryResult?.map((row) => {
-      return Object.fromEntries(Object.entries(row).map(([key, value]) => [key, Number(value)]))
+      return Object.fromEntries(
+        Object.entries(row).map(([key, value]) => {
+          if (key === yKey) return [key, Number(value)]
+          else return [key, value]
+        })
+      )
     })
-  }, [queryResult])
+  }, [queryResult, yKey])
 
   const [parameterValues, setParameterValues] = useState<Record<string, string>>({})
   const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
@@ -151,6 +159,10 @@ export const QueryBlock = ({
   const postgresConnectionString = primaryDatabase?.connectionString
   const readOnlyConnectionString = primaryDatabase?.connection_string_read_only
 
+  const chartData = chartSettings.cumulative
+    ? getCumulativeResults({ rows: formattedQueryResult ?? [] }, chartSettings)
+    : formattedQueryResult
+
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: (data) => {
       onResults?.(data.result)
@@ -165,6 +177,14 @@ export const QueryBlock = ({
       }
     },
   })
+
+  const getDateFormat = (key: any) => {
+    const value = chartData?.[0]?.[key] || ''
+    if (typeof value === 'number') return 'number'
+    if (dayjs(value).isValid()) return 'date'
+    return 'string'
+  }
+  const xKeyDateFormat = getDateFormat(xKey)
 
   const handleExecute = () => {
     if (!sql || isLoading) return
@@ -361,10 +381,9 @@ export const QueryBlock = ({
               <p className="text-foreground-light text-xs">Select columns for the X and Y axes</p>
             </div>
           ) : (
-            <div className={cn('flex-1 w-full')}>
+            <div className="flex-1 w-full">
               <ChartContainer
                 className="aspect-auto px-3 py-2"
-                config={{}}
                 style={{
                   height: maxHeight ? `${maxHeight}px` : undefined,
                   minHeight: maxHeight ? `${maxHeight}px` : undefined,
@@ -372,23 +391,40 @@ export const QueryBlock = ({
               >
                 <BarChart
                   accessibilityLayer
-                  margin={{ left: 0, right: 0 }}
-                  data={
-                    chartSettings.cumulative
-                      ? getCumulativeResults({ rows: formattedQueryResult ?? [] }, chartSettings)
-                      : formattedQueryResult
-                  }
+                  margin={{ left: -20, right: 0, top: 10 }}
+                  data={chartData}
+                  onMouseMove={(e: any) => {
+                    if (e.activeTooltipIndex !== focusDataIndex) {
+                      setFocusDataIndex(e.activeTooltipIndex)
+                    }
+                  }}
+                  onMouseLeave={() => setFocusDataIndex(undefined)}
                 >
-                  <CartesianGrid vertical={false} />
+                  <CartesianGrid vertical={false} stroke={CHART_COLORS.AXIS} />
                   <XAxis
                     dataKey={xKey}
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={8}
+                    tickLine={{ stroke: CHART_COLORS.AXIS }}
+                    axisLine={{ stroke: CHART_COLORS.AXIS }}
+                    interval="preserveStartEnd"
+                    tickMargin={4}
                     minTickGap={32}
+                    tickFormatter={(value) =>
+                      xKeyDateFormat === 'date' ? dayjs(value).format('MMM D YYYY HH:mm') : value
+                    }
                   />
-                  <ChartTooltip content={<ChartTooltipContent className="w-[150px]" />} />
-                  <Bar dataKey={yKey} fill="var(--chart-1)" radius={4} />
+                  <YAxis tickLine={false} axisLine={false} tickMargin={4} />
+                  <Tooltip content={<ChartTooltipContent className="w-[150px]" />} />
+                  <Bar radius={1} dataKey={yKey}>
+                    {chartData?.map((_: any, index: number) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        className="transition-all duration-100"
+                        fill="var(--chart-1)"
+                        opacity={focusDataIndex === undefined || focusDataIndex === index ? 1 : 0.4}
+                        enableBackground={12}
+                      />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ChartContainer>
             </div>

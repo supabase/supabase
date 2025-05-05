@@ -79,11 +79,6 @@ const logos = [
     name: 'humata',
   },
   {
-    image: `/images/logos/publicity/krea.svg`,
-    alt: 'krea',
-    name: 'krea',
-  },
-  {
     image: `/images/logos/publicity/udio.svg`,
     alt: 'udio',
     name: 'udio',
