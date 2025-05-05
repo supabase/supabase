@@ -33,6 +33,9 @@ catalogs:
     react-dom:
       specifier: ^18.3.0
       version: 18.3.1
+    valtio:
+      specifier: ^1.12.0
+      version: 1.12.0
 
 overrides:
   '@supabase/supabase-js>@supabase/auth-js': 2.69.0-rc.3
@@ -439,7 +442,7 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1
       valtio:
-        specifier: ^1.12.0
+        specifier: 'catalog:'
         version: 1.12.0(@types/react@18.3.3)(react@18.3.1)
       yaml:
         specifier: ^2.4.5
@@ -875,7 +878,7 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1
       valtio:
-        specifier: ^1.12.0
+        specifier: 'catalog:'
         version: 1.12.0(@types/react@18.3.3)(react@18.3.1)
       yup:
         specifier: ^1.4.0
@@ -1592,9 +1595,12 @@ importers:
       '@types/dat.gui':
         specifier: ^0.7.12
         version: 0.7.12
+      '@usercentrics/cmp-browser-sdk':
+        specifier: ^4.42.0
+        version: 4.42.0
       '@vercel/flags':
         specifier: ^2.6.0
-        version: 2.6.0(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 2.6.0(next@15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       api-types:
         specifier: workspace:*
         version: link:../api-types
@@ -1609,7 +1615,7 @@ importers:
         version: 4.17.21
       next:
         specifier: 'catalog:'
-        version: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
+        version: 15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
       next-themes:
         specifier: ^0.3.0
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1622,6 +1628,9 @@ importers:
       react-use:
         specifier: ^17.4.0
         version: 17.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      valtio:
+        specifier: 'catalog:'
+        version: 1.12.0(@types/react@18.3.3)(react@18.3.1)
     devDependencies:
       '@types/lodash':
         specifier: 4.17.5
@@ -2044,7 +2053,7 @@ importers:
         version: 0.52.2
       next:
         specifier: '*'
-        version: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
+        version: 15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
       next-themes:
         specifier: '*'
         version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2112,7 +2121,7 @@ importers:
         specifier: ^5.0.0
         version: 5.0.0
       valtio:
-        specifier: '*'
+        specifier: 'catalog:'
         version: 1.12.0(@types/react@18.3.3)(react@18.3.1)
       zod:
         specifier: ^3.22.4
@@ -2153,7 +2162,7 @@ importers:
         version: link:../api-types
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react@18.3.1)
+        version: 0.9.13(next@15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react@18.3.1)
       typescript:
         specifier: ~5.5.0
         version: 5.5.2
@@ -6678,6 +6687,9 @@ packages:
   '@types/cookie@0.6.0':
     resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
 
+  '@types/crypto-js@4.2.2':
+    resolution: {integrity: sha512-sDOLlVbHhXpAUAL0YHDUUwDZf3iN4Bwi4W6a0W0b+QcAezUbRtH4FVb+9J4h+XFPW7l/gQ9F8qC7P+Ec4k8QVQ==}
+
   '@types/d3-array@3.0.8':
     resolution: {integrity: sha512-2xAVyAUgaXHX9fubjcCbGAUOqYfRJN1em1EKR2HfzWBpObZhwfnZKvofTN4TplMqJdFQao61I+NVSai/vnBvDQ==}
 
@@ -6866,6 +6878,10 @@ packages:
 
   '@types/lodash@4.17.5':
     resolution: {integrity: sha512-MBIOHVZqVqgfro1euRDWX7OO0fBVUUMrN6Pwm8LQsz8cWhEpihlvR70ENj3f40j58TNxZaWv2ndSkInykNBBJw==}
+
+  '@types/lz-string@1.5.0':
+    resolution: {integrity: sha512-s84fKOrzqqNCAPljhVyC5TjAo6BH4jKHw9NRNFNiRUY5QSgZCmVm5XILlWbisiKl+0OcS7eWihmKGS5akc2iQw==}
+    deprecated: This is a stub types definition. lz-string provides its own type definitions, so you do not need this installed.
 
   '@types/markdown-table@3.0.0':
     resolution: {integrity: sha512-vX5zya26rnLLHdAKA3E9ZOT07CJslYp2gZfAZiXKUY5vd2RRiJyOQKrSlmUjyJ+eNoDAPkHflebG3PsfqC32aA==}
@@ -7081,6 +7097,9 @@ packages:
 
   '@ungap/structured-clone@1.2.0':
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
+
+  '@usercentrics/cmp-browser-sdk@4.42.0':
+    resolution: {integrity: sha512-/cik01TdeiYUV1+EasK83Ip05TDqmowM5tmWGfRDdaOrneSic5BedBdJHKya4pP2vwiYAtzDYVJe4BwPt2M16g==}
 
   '@vercel/flags@2.6.0':
     resolution: {integrity: sha512-GvLX0CK/OsIqq672OBvcCeu0k3tb3QdE0lRn1P5zulMQJIPTLlUDEH0y9TeAyC7TMWlpTTT5Bealqu0rmncyXQ==}
@@ -8759,6 +8778,9 @@ packages:
 
   duplexer@0.1.2:
     resolution: {integrity: sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==}
+
+  dynamic-import-polyfill@0.1.1:
+    resolution: {integrity: sha512-m953zv0w5oDagTItWm6Auhmk/pY7EiejaqiVbnzSS3HIjh1FCUeK7WzuaVtWPNs58A+/xpIE+/dVk6pKsrua8g==}
 
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
@@ -21555,6 +21577,8 @@ snapshots:
 
   '@types/cookie@0.6.0': {}
 
+  '@types/crypto-js@4.2.2': {}
+
   '@types/d3-array@3.0.8': {}
 
   '@types/d3-axis@3.0.6':
@@ -21759,6 +21783,10 @@ snapshots:
   '@types/lodash@4.17.16': {}
 
   '@types/lodash@4.17.5': {}
+
+  '@types/lz-string@1.5.0':
+    dependencies:
+      lz-string: 1.5.0
 
   '@types/markdown-table@3.0.0':
     dependencies:
@@ -22018,13 +22046,15 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vercel/flags@2.6.0(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@usercentrics/cmp-browser-sdk@4.42.0':
     dependencies:
-      jose: 5.2.1
-    optionalDependencies:
-      next: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
+      '@types/crypto-js': 4.2.2
+      '@types/lz-string': 1.5.0
+      '@types/uuid': 8.3.4
+      crypto-js: 4.2.0
+      dynamic-import-polyfill: 0.1.1
+      lz-string: 1.5.0
+      uuid: 9.0.1
 
   '@vercel/flags@2.6.0(next@15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
@@ -23903,6 +23933,8 @@ snapshots:
 
   duplexer@0.1.2: {}
 
+  dynamic-import-polyfill@0.1.1: {}
+
   eastasianwidth@0.2.0: {}
 
   ee-first@1.1.1: {}
@@ -24265,7 +24297,7 @@ snapshots:
       debug: 4.4.0(supports-color@8.1.1)
       enhanced-resolve: 5.17.1
       eslint: 8.57.0(supports-color@8.1.1)
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-plugin-import@2.29.1)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1))(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.5.2))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)
       fast-glob: 3.3.2
       get-tsconfig: 4.7.2
@@ -24277,7 +24309,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1):
+  eslint-module-utils@2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-plugin-import@2.29.1)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1))(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1):
     dependencies:
       debug: 3.2.7(supports-color@8.1.1)
     optionalDependencies:
@@ -24304,7 +24336,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.0(supports-color@8.1.1)
       eslint-import-resolver-node: 0.3.9(supports-color@8.1.1)
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.5.2))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-plugin-import@2.29.1)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1))(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)
       hasown: 2.0.2
       is-core-module: 2.13.1
       is-glob: 4.0.3
@@ -27979,11 +28011,6 @@ snapshots:
   next-plugin-yaml@1.0.1:
     dependencies:
       js-yaml-loader: 1.2.2
-
-  next-router-mock@0.9.13(next@14.2.26(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react@18.3.1):
-    dependencies:
-      next: 14.2.26(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
-      react: 18.3.1
 
   next-router-mock@0.9.13(next@15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0))(react@18.3.1):
     dependencies:

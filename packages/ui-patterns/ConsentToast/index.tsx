@@ -17,7 +17,7 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
     <div className="py-1 flex flex-col gap-y-3 w-full">
       <div>
         <p className="text-sm text-foreground">
-          We use first-party cookies to improve our services.{' '}
+          We use cookies to collect data and improve our services.{' '}
           <a
             target="_blank"
             rel="noreferrer noopener"
@@ -67,5 +67,3 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
     </div>
   )
 }
-
-export { useConsent, useConsentValue } from '../shared/consent'
