@@ -17,7 +17,6 @@ import {
   PostgresEngine,
   ProjectUnpausePostgresVersion,
   ReleaseChannel,
-  useProjectUnpausePostgresVersionsQuery,
 } from 'data/config/project-unpause-postgres-versions-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
@@ -98,11 +97,6 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     { enabled: isFreePlan }
   )
 
-  const { data: availablePostgresVersions } = useProjectUnpausePostgresVersionsQuery({
-    projectRef: project?.ref,
-  })
-  const availableVersions = availablePostgresVersions?.available_versions || []
-
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
   const [showFreeProjectLimitWarning, setShowFreeProjectLimitWarning] = useState(false)
@@ -153,9 +147,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     mode: 'onChange',
-    defaultValues: {
-      postgresVersionSelection: '',
-    },
+    defaultValues: { postgresVersionSelection: '' },
   })
 
   return (
