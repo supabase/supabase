@@ -9,7 +9,7 @@ import { useSendGroupsResetMutation } from 'data/telemetry/send-groups-reset-mut
 import { usePrevious } from 'hooks/deprecated'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useAppStateSnapshot } from 'state/app-state'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 
 const getAnonId = async (id: string) => {
   const encoder = new TextEncoder()

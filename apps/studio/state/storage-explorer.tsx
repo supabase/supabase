@@ -8,7 +8,7 @@ import {
   STORAGE_SORT_BY_ORDER,
   STORAGE_VIEWS,
 } from 'components/to-be-cleaned/Storage/Storage.constants'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { tryParseJson } from 'lib/helpers'
 
 const DEFAULT_PREFERENCES = {
