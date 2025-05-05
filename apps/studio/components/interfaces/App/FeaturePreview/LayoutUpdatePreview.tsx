@@ -1,10 +1,11 @@
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { BASE_PATH, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { BASE_PATH } from 'lib/constants'
 import { ExternalLink, X } from 'lucide-react'
 import Image from 'next/image'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge, Button } from 'ui'
 import { useIsNewLayoutEnabled } from './FeaturePreviewContext'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 export const LayoutUpdatePreview = () => {
   return (

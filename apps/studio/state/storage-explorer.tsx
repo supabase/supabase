@@ -7,6 +7,7 @@ import { proxy, snapshot, useSnapshot } from 'valtio'
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   STORAGE_ROW_STATUS,
@@ -40,7 +41,7 @@ import { downloadBucketObject } from 'data/storage/bucket-object-download-mutati
 import { listBucketObjects, StorageObject } from 'data/storage/bucket-objects-list-mutation'
 import { Bucket } from 'data/storage/buckets-query'
 import { moveStorageObject } from 'data/storage/object-move-mutation'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 import { lookupMime } from 'lib/mime'
 import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'

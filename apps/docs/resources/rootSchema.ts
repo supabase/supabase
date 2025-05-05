@@ -5,10 +5,13 @@ import {
   GraphQLString,
   printSchema,
 } from 'graphql'
+import { RootQueryTypeResolvers } from '~/__generated__/graphql'
 
-const GRAPHQL_FIELD_INTROSPECT = 'schema'
+const GRAPHQL_FIELD_INTROSPECT = 'schema' as const
 
-async function resolveIntrospect() {
+type IntrospectResolver = RootQueryTypeResolvers[typeof GRAPHQL_FIELD_INTROSPECT]
+
+const resolveIntrospect: IntrospectResolver = async () => {
   const schema = printSchema(rootGraphQLSchema)
   return schema
 }

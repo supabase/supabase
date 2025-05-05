@@ -13,9 +13,10 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { cn } from 'ui'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const newLayoutPreview = useIsNewLayoutEnabled()
