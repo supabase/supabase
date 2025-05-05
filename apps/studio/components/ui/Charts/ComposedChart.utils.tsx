@@ -184,11 +184,11 @@ const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: Custom
     const isHovered = hoveredLabel === entry.name
 
     const Label = () => (
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 p-1">
         {getIcon(entry.name, entry.color)}
         <span
           className={cn(
-            'text-nowrap text-foreground-lighter pr-2',
+            'text-nowrap text-foreground-lighter',
             hoveredLabel && !isHovered && 'opacity-50'
           )}
         >
@@ -203,7 +203,7 @@ const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: Custom
       <div
         key={entry.name}
         className="inline-flex md:flex-col gap-1 md:gap-0 w-fit text-foreground"
-        onMouseEnter={() => handleMouseEnter(entry.name)}
+        onMouseOver={() => handleMouseEnter(entry.name)}
         onMouseOutCapture={handleMouseLeave}
       >
         {!!attribute?.tooltip ? (
