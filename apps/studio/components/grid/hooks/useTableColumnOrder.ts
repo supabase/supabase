@@ -61,43 +61,36 @@ export function useTableColumnOrder() {
    */
   const moveColumn = useCallback(
     (sourceKey: string, targetKey: string, sourceIndex: number, targetIndex: number) => {
-      // Use the provided indices for accurate array manipulation
-      const currentOrder = columnOrder // Based on last committed URL state
+      // Always recalculate indices based on the actual columnOrder to avoid discrepancies
+      const currentOrder = [...columnOrder] // Clone to avoid direct mutation
+      const actualSourceIndex = currentOrder.indexOf(sourceKey)
+      const actualTargetIndex = currentOrder.indexOf(targetKey)
 
-      // Check if indices match the keys in the current known order (optional defensive check)
-      if (currentOrder[sourceIndex] !== sourceKey || currentOrder[targetIndex] !== targetKey) {
-        console.warn('DnD indices/keys mismatch with current hook state. Recalculating indices.')
-        // Fallback to recalculating indices based on keys if mismatch detected
-        sourceIndex = currentOrder.indexOf(sourceKey)
-        targetIndex = currentOrder.indexOf(targetKey)
-        if (sourceIndex === -1 || targetIndex === -1) {
-          console.error('Cannot resolve index mismatch during column move.')
-          return
-        }
+      // If either column is not found, we can't proceed
+      if (actualSourceIndex === -1 || actualTargetIndex === -1) {
+        console.error(
+          'Column not found in current order:',
+          actualSourceIndex === -1 ? sourceKey : targetKey
+        )
+        return
       }
 
-      // Reliable way to move element in array using indices
-      const element = currentOrder[sourceIndex]
+      // Remove the source column and insert it at the target position
       const newOrder = [...currentOrder]
-      newOrder.splice(sourceIndex, 1) // Remove element from original position
-      newOrder.splice(targetIndex, 0, element) // Insert element at target position
+      newOrder.splice(actualSourceIndex, 1)
+      newOrder.splice(actualTargetIndex, 0, sourceKey)
 
-      // 1. Update URL Parameter with the locally calculated order first
+      // First update the URL parameters for immediate visual feedback
       const newUrlString = newOrder.join(',')
       setParams((prevParams) => ({
         ...prevParams,
         col_order: newUrlString || undefined,
       }))
 
-      // Update Valtio state (best effort for eventual consistency)
-      if (snap.moveColumn) {
-        snap.moveColumn(sourceKey, targetKey)
-      } else {
-        console.warn('[useTableColumnOrder] snap.moveColumn not available')
-      }
+      // Use setColumnOrder which properly handles updating all columns at once
+      setColumnOrder(newOrder)
     },
-    // Depends on the order derived from URL, the Valtio snap, and setParams
-    [columnOrder, snap, setParams]
+    [columnOrder, setParams, setColumnOrder]
   )
 
   return {
