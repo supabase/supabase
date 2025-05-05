@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { useParams } from 'common'
+import { PostgresVersionSelector } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
@@ -26,28 +27,20 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag, usePHFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
+import { AWS_REGIONS, CloudProvider } from 'shared-data'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
-  Badge,
   Button,
-  FormControl_Shadcn_,
   FormField_Shadcn_,
   Form_Shadcn_,
   Modal,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  Select_Shadcn_,
 } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { PauseDisabledState } from './PauseDisabledState'
-import { RestorePaidPlanProjectNotice } from '../RestorePaidPlanProjectNotice'
 import { useProjectContext } from '../ProjectContext'
+import { RestorePaidPlanProjectNotice } from '../RestorePaidPlanProjectNotice'
+import { PauseDisabledState } from './PauseDisabledState'
 
 export interface ProjectPausedStateProps {
   product?: string
@@ -75,6 +68,8 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const enforceNinetyDayUnpauseExpiry = useFlag('enforceNinetyDayUnpauseExpiry')
   const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
   const enableProBenefitWording = usePHFlag('proBenefitWording')
+
+  const region = Object.values(AWS_REGIONS).find((x) => x.code === project?.region)
 
   const orgSlug = selectedOrganization?.slug
   const {
@@ -324,56 +319,15 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                     control={form.control}
                     name="postgresVersionSelection"
                     render={({ field }) => (
-                      <FormItemLayout label="Select the version of Postgres to restore to">
-                        <FormControl_Shadcn_>
-                          <Select_Shadcn_
-                            value={field.value}
-                            onValueChange={field.onChange}
-                            disabled={availableVersions.length <= 1}
-                          >
-                            <SelectTrigger_Shadcn_ className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start">
-                              <SelectValue_Shadcn_ placeholder="Select a Postgres version" />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
-                              <SelectGroup_Shadcn_>
-                                {availableVersions.map((value) => {
-                                  const postgresVersion = value.version
-                                    .split('supabase-postgres-')[1]
-                                    ?.replace('-orioledb', '')
-                                  return (
-                                    <SelectItem_Shadcn_
-                                      key={formatValue(value)}
-                                      value={formatValue(value)}
-                                      className="w-full [&>:nth-child(2)]:w-full"
-                                    >
-                                      <div className="flex flex-row items-center justify-between w-full">
-                                        <span className="text-foreground">{postgresVersion}</span>
-                                        <div>
-                                          {value.release_channel !== 'ga' && (
-                                            <Badge variant="warning" className="mr-1 capitalize">
-                                              {value.release_channel}
-                                            </Badge>
-                                          )}
-                                          {value.postgres_engine.includes('oriole-preview') && (
-                                            <span>
-                                              <Badge variant="warning" className="mr-1">
-                                                OrioleDB
-                                              </Badge>
-                                              <Badge variant="warning" className="mr-1">
-                                                Preview
-                                              </Badge>
-                                            </span>
-                                          )}
-                                        </div>
-                                      </div>
-                                    </SelectItem_Shadcn_>
-                                  )
-                                })}
-                              </SelectGroup_Shadcn_>
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
+                      <PostgresVersionSelector
+                        field={field}
+                        form={form}
+                        label="Select the version of Postgres to restore to"
+                        layout="vertical"
+                        dbRegion={region?.displayName ?? ''}
+                        cloudProvider={(project?.cloud_provider ?? 'AWS') as CloudProvider}
+                        organizationSlug={selectedOrganization?.slug}
+                      />
                     )}
                   />
                 </div>
