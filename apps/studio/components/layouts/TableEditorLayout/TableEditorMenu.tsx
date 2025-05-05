@@ -46,11 +46,11 @@ import { TableMenuEmptyState } from './TableMenuEmptyState'
 
 const TableEditorMenu = () => {
   const { ref, id: _id } = useParams()
-  const isMobile = useBreakpoint()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
-  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
+  const isMobile = useBreakpoint()
 
   const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')

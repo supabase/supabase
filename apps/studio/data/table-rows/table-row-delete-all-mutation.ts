@@ -2,8 +2,9 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'sonner'
 
 import { Query } from '@supabase/pg-meta/src/query'
-import type { Filter, SupaTable } from 'components/grid/types'
+import type { Filter } from 'components/grid/types'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { Entity } from 'data/table-editor/table-editor-types'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import type { ResponseError } from 'types'
@@ -13,7 +14,7 @@ import { formatFilterValue } from './utils'
 export type TableRowDeleteAllVariables = {
   projectRef: string
   connectionString?: string
-  table: SupaTable
+  table: Entity
   filters: Filter[]
   roleImpersonationState?: RoleImpersonationState
 }
