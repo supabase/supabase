@@ -1,9 +1,8 @@
-import { isEqual } from 'lodash'
 import { Filter as FilterIcon, Plus } from 'lucide-react'
-import { KeyboardEvent, useCallback, useState } from 'react'
+import { KeyboardEvent, useCallback, useMemo, useState } from 'react'
 
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import type { Filter, FilterOperator } from 'components/grid/types'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -11,8 +10,8 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-import FilterRow from './FilterRow'
 import { useDebounceSync } from '../../../hooks/useDebounceSync'
+import FilterRow from './FilterRow'
 
 export interface FilterPopoverPrimitiveProps {
   buttonText?: string
@@ -34,7 +33,7 @@ export interface FilterPopoverPrimitiveProps {
  *
  * The refs track different aspects of state to properly determine when and how to sync.
  */
-const FilterPopoverPrimitive = ({
+export const FilterPopoverPrimitive = ({
   buttonText,
   filters,
   onApplyFilters,
@@ -45,6 +44,11 @@ const FilterPopoverPrimitive = ({
 
   // Use synchronized state hook for filters
   const [localFilters, setLocalFilters, applyFilters] = useDebounceSync(filters, onApplyFilters)
+
+  // Update local state when filters prop changes
+  useMemo(() => {
+    setLocalFilters(filters)
+  }, [filters])
 
   const displayButtonText =
     buttonText ??
@@ -137,5 +141,3 @@ const FilterPopoverPrimitive = ({
     </Popover_Shadcn_>
   )
 }
-
-export default FilterPopoverPrimitive

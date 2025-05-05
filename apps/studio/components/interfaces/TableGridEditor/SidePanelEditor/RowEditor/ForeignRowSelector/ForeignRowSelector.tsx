@@ -5,7 +5,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 
 import { useParams } from 'common'
 import RefreshButton from 'components/grid/components/header/RefreshButton'
-import FilterPopoverPrimitive from 'components/grid/components/header/filter/FilterPopoverPrimitive'
+import { FilterPopoverPrimitive } from 'components/grid/components/header/filter/FilterPopoverPrimitive'
 import { SortPopoverPrimitive } from 'components/grid/components/header/sort'
 import type { Filter } from 'components/grid/types'
 import { Sort } from 'components/grid/types'

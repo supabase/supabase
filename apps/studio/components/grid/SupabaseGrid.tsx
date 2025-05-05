@@ -62,10 +62,13 @@ export const SupabaseGrid = ({
     {
       keepPreviousData: true,
       retryDelay: (retryAttempt, error: any) => {
-        if (error && error.message?.includes('does not exist')) {
-          onApplySorts([])
-        }
-        if (retryAttempt > 3) {
+        const doesNotExistError = error && error.message?.includes('does not exist')
+        const tooManyRequestsError = error.message?.includes('Too Many Requests')
+        const vaultError = error.message?.includes('query vault failed')
+
+        if (doesNotExistError) onApplySorts([])
+
+        if (retryAttempt > 3 || doesNotExistError || tooManyRequestsError || vaultError) {
           return Infinity
         }
         return 5000
@@ -82,7 +85,7 @@ export const SupabaseGrid = ({
   return (
     <DndProvider backend={HTML5Backend} context={window}>
       <div className="sb-grid h-full flex flex-col">
-        <Header sorts={sorts} filters={filters} customHeader={customHeader} />
+        <Header customHeader={customHeader} />
 
         {children || (
           <>

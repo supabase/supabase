@@ -1,7 +1,8 @@
-import { useCallback } from 'react'
+import { filtersToUrlParams, formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import type { Filter } from 'components/grid/types'
 import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
-import { filtersToUrlParams, formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
+import { useCallback } from 'react'
+
 import { useSaveTableEditorState } from './useSaveTableEditorState'
 
 /**
@@ -18,7 +19,6 @@ export function useTableFilter() {
     (appliedFilters: Filter[]) => {
       const newUrlFilters = filtersToUrlParams(appliedFilters)
       setParams((prevParams) => ({ ...prevParams, filter: newUrlFilters }))
-      // Trigger save AND side effects using the dedicated hook
       saveFiltersAndTriggerSideEffects(newUrlFilters)
     },
     [setParams, saveFiltersAndTriggerSideEffects]

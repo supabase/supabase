@@ -1,4 +1,3 @@
-import { isEqual } from 'lodash'
 import { ChevronDown, List } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 
@@ -11,9 +10,9 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
+import { useDebounceSync } from '../../../hooks/useDebounceSync'
 import { DropdownControl } from '../../common/DropdownControl'
 import SortRow from './SortRow'
-import { useDebounceSync } from '../../../hooks/useDebounceSync'
 
 export interface SortPopoverPrimitiveProps {
   buttonText?: string
@@ -28,7 +27,7 @@ export interface SortPopoverPrimitiveProps {
  * This component maintains a draft state of sorts that are automatically applied
  * with debouncing as changes are made.
  */
-const SortPopoverPrimitive = ({
+export const SortPopoverPrimitive = ({
   buttonText,
   sorts,
   onApplySorts,
@@ -195,5 +194,3 @@ const SortPopoverPrimitive = ({
     </Popover_Shadcn_>
   )
 }
-
-export default SortPopoverPrimitive

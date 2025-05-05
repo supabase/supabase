@@ -2,6 +2,7 @@ import { formatSortURLParams, sortsToUrlParams } from 'components/grid/SupabaseG
 import type { Sort } from 'components/grid/types'
 import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
 import { useCallback, useMemo } from 'react'
+
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { useSaveTableEditorState } from './useSaveTableEditorState'
 
@@ -17,9 +18,7 @@ export function useTableSort() {
   const snap = useTableEditorTableStateSnapshot()
   const { saveSortsAndTriggerSideEffects } = useSaveTableEditorState()
 
-  const tableName = useMemo(() => {
-    return snap.table?.name || ''
-  }, [snap])
+  const tableName = useMemo(() => snap.table?.name || '', [snap])
 
   const sorts = useMemo(() => {
     return formatSortURLParams(tableName, urlSorts)
@@ -27,14 +26,13 @@ export function useTableSort() {
 
   const onApplySorts = useCallback(
     (appliedSorts: Sort[]) => {
-      const localTableName = snap.table?.name || ''
-
-      if (!localTableName) {
-        console.warn('[useTableSort] Table name missing in callback, cannot apply sort correctly.')
-        return
+      if (!tableName) {
+        return console.warn(
+          '[useTableSort] Table name missing in callback, cannot apply sort correctly.'
+        )
       }
 
-      const sortsWithTable = appliedSorts.map((sort) => ({ ...sort, table: localTableName }))
+      const sortsWithTable = appliedSorts.map((sort) => ({ ...sort, table: tableName }))
       const newUrlSorts = sortsToUrlParams(sortsWithTable)
 
       setParams((prevParams) => ({ ...prevParams, sort: newUrlSorts }))
