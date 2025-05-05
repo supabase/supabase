@@ -42,11 +42,12 @@ import { downloadBucketObject } from 'data/storage/bucket-object-download-mutati
 import { StorageObject, listBucketObjects } from 'data/storage/bucket-objects-list-mutation'
 import { Bucket } from 'data/storage/buckets-query'
 import { moveStorageObject } from 'data/storage/object-move-mutation'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 import { lookupMime } from 'lib/mime'
 import Link from 'next/link'
 import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string }
 

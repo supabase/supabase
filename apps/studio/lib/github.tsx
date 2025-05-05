@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS } from './constants'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { makeRandomString } from './helpers'
 
 const GITHUB_INTEGRATION_APP_NAME =

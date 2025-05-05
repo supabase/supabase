@@ -16,8 +16,7 @@ import {
   TabsTrigger_Shadcn_,
 } from 'ui'
 
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 
 const ApiKeysLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef } = useParams()

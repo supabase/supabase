@@ -1,7 +1,7 @@
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
+import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS, LOCAL_STORAGE_KEYS } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 export type Template = {
   name: string
