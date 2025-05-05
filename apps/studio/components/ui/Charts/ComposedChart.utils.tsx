@@ -6,6 +6,7 @@ import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { DateTimeFormats } from './Charts.constants'
 import { numberFormatter } from './Charts.utils'
 import { MultiAttribute } from './ComposedChartHandler'
+import { formatBytes } from 'lib/helpers'
 
 interface CustomIconProps {
   color: string
@@ -32,14 +33,6 @@ interface TooltipProps {
   valuePrecision?: number
   showMaxValue?: boolean
   showTotal?: boolean
-}
-
-export const formatBytes = (bytes: number, precision: number = 1) => {
-  if (bytes === 0) return '0 Bytes'
-  const k = 1024
-  const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return `${(bytes / Math.pow(k, i)).toFixed(precision)} ${sizes[i]}`
 }
 
 const isMaxAttribute = (attributes?: MultiAttribute[]) => attributes?.find((a) => a.isMaxValue)

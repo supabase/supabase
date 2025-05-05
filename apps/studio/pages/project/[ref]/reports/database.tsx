@@ -61,10 +61,10 @@ const DatabaseUsage = () => {
   const isReportsV2 = useFlag('reportsDatabaseV2')
 
   const state = useDatabaseSelectorStateSnapshot()
-  const defaultStart = dayjs().subtract(7, 'day').toISOString()
+  const defaultStart = dayjs().subtract(1, 'day').toISOString()
   const defaultEnd = dayjs().toISOString()
   const [dateRange, setDateRange] = useState<any>({
-    period_start: { date: defaultStart, time_period: '7d' },
+    period_start: { date: defaultStart, time_period: '1d' },
     period_end: { date: defaultEnd, time_period: 'today' },
     interval: '1h',
   })
@@ -179,7 +179,7 @@ const DatabaseUsage = () => {
 
   const updateDateRange: UpdateDateRange = (from: string, to: string) => {
     setDateRange({
-      period_start: { date: from, time_period: '7d' },
+      period_start: { date: from, time_period: '1d' },
       period_end: { date: to, time_period: 'today' },
       interval: handleIntervalGranularity(from, to),
     })
@@ -208,7 +208,7 @@ const DatabaseUsage = () => {
             <div className="flex items-center gap-3">
               <DateRangePicker
                 loading={false}
-                value={'7d'}
+                value={'1d'}
                 options={TIME_PERIODS_INFRA}
                 currentBillingPeriodStart={undefined}
                 onChange={(values) => {
@@ -258,6 +258,7 @@ const DatabaseUsage = () => {
                 REPORT_ATTRIBUTES.filter((attr) => !attr.hide).map((attr) => (
                   <ChartHandler
                     key={attr.id}
+                    {...attr}
                     provider="infra-monitoring"
                     attribute={attr.id}
                     label={attr.label}

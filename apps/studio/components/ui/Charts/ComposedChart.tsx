@@ -26,15 +26,11 @@ import {
 } from './Charts.constants'
 import { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
-import {
-  calculateTotalChartAggregate,
-  CustomLabel,
-  CustomTooltip,
-  formatBytes,
-} from './ComposedChart.utils'
+import { calculateTotalChartAggregate, CustomLabel, CustomTooltip } from './ComposedChart.utils'
 import { MultiAttribute } from './ComposedChartHandler'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
+import { formatBytes } from 'lib/helpers'
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   attributes: MultiAttribute[]
@@ -56,6 +52,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   chartStyle?: string
   onChartStyleChange?: (style: string) => void
   updateDateRange: any
+  hideYAxis?: boolean
 }
 
 export default function ComposedChart({
@@ -88,6 +85,7 @@ export default function ComposedChart({
   chartStyle,
   onChartStyleChange,
   updateDateRange,
+  hideYAxis,
 }: BarChartProps) {
   const { resolvedTheme } = useTheme()
   const [_activePayload, setActivePayload] = useState<any>(null)
@@ -95,9 +93,11 @@ export default function ComposedChart({
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
   const [hoveredLabel, setHoveredLabel] = useState<string | null>(null)
 
+  const isDarkMode = resolvedTheme?.includes('dark')
+
   // Update chart colors when theme changes
   useEffect(() => {
-    updateStackedChartColors(resolvedTheme?.includes('dark') ?? false)
+    updateStackedChartColors(isDarkMode ?? false)
   }, [resolvedTheme])
 
   const { Container } = useChartSize(size)
@@ -258,7 +258,14 @@ export default function ComposedChart({
           }}
         >
           {showGrid && <CartesianGrid stroke={CHART_COLORS.AXIS} />}
-          <YAxis {..._YAxisProps} hide domain={isPercentage ? yDomain : undefined} key={yAxisKey} />
+          <YAxis
+            {..._YAxisProps}
+            hide={hideYAxis}
+            axisLine={{ stroke: CHART_COLORS.AXIS }}
+            tickLine={{ stroke: CHART_COLORS.AXIS }}
+            domain={isPercentage ? yDomain : undefined}
+            key={yAxisKey}
+          />
           <XAxis
             {..._XAxisProps}
             axisLine={{ stroke: CHART_COLORS.AXIS }}

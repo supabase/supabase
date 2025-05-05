@@ -124,6 +124,7 @@ const ComposedChartHandler = ({
   updateDateRange,
   valuePrecision,
   isVisible = true,
+  ...otherProps
 }: PropsWithChildren<ComposedChartHandlerProps>) => {
   const router = useRouter()
   const { ref } = router.query
@@ -252,7 +253,6 @@ const ComposedChartHandler = ({
         </div>
         <ComposedChart
           attributes={attributes}
-          YAxisProps={{ width: 1 }}
           data={combinedData as DataPoint[]}
           format={format}
           xAxisKey="period_start"
@@ -270,6 +270,7 @@ const ComposedChartHandler = ({
           updateDateRange={updateDateRange}
           valuePrecision={valuePrecision}
           hideChartType={hideChartType}
+          {...otherProps}
         />
       </Panel.Content>
     </Panel>

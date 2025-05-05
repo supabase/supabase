@@ -1,3 +1,6 @@
+import { numberFormatter } from 'components/ui/Charts/Charts.utils'
+import { formatBytes } from 'lib/helpers'
+
 export const getReportAttributes = (isFreePlan: boolean) => [
   { id: 'ram_usage', label: 'Memory usage', hide: false },
   { id: 'avg_cpu_usage', label: 'Average CPU usage', hide: false },
@@ -31,6 +34,8 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
     hideChartType: false,
     defaultChartStyle: 'line',
     showMaxValue: false,
+    showGrid: true,
+    YAxisProps: { width: 55, tickFormatter: (value: any) => formatBytes(value, 0) },
     attributes: [
       {
         attribute: 'ram_usage_used',
@@ -71,6 +76,8 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
     showTooltip: true,
     showLegend: true,
     showMaxValue: false,
+    showGrid: true,
+    YAxisProps: { width: 40, tickFormatter: (value: any) => `${numberFormatter(value, 2)}%` },
     hideChartType: false,
     defaultChartStyle: 'line',
     attributes: [
@@ -121,6 +128,8 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
     showTooltip: true,
     showLegend: true,
     hideChartType: false,
+    showGrid: true,
+    YAxisProps: { width: 30, tickFormatter: (value: any) => numberFormatter(value, 2) },
     defaultChartStyle: 'line',
     attributes: [
       {
@@ -147,6 +156,8 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
     showTooltip: false,
     showLegend: false,
     showMaxValue: false,
+    showGrid: true,
+    YAxisProps: { width: 20 },
     hideChartType: false,
     defaultChartStyle: 'line',
     attributes: [
@@ -166,6 +177,8 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
     showTooltip: false,
     showLegend: false,
     showMaxValue: false,
+    showGrid: true,
+    YAxisProps: { width: 30 },
     hideChartType: false,
     defaultChartStyle: 'line',
     attributes: [
@@ -185,6 +198,8 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
     showTooltip: false,
     showLegend: false,
     showMaxValue: false,
+    showGrid: true,
+    YAxisProps: { width: 30 },
     hideChartType: false,
     defaultChartStyle: 'line',
     attributes: [
