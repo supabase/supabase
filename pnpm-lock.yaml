@@ -2015,6 +2015,9 @@ importers:
       '@supabase/sql-to-rest':
         specifier: ^0.1.6
         version: 0.1.6(encoding@0.1.13)(supports-color@8.1.1)
+      '@supabase/supabase-js':
+        specifier: 'catalog:'
+        version: 2.49.3
       class-variance-authority:
         specifier: ^0.6.0
         version: 0.6.1
@@ -2039,6 +2042,9 @@ importers:
       github-slugger:
         specifier: ^2.0.0
         version: 2.0.0
+      icons:
+        specifier: workspace:*
+        version: link:../icons
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
