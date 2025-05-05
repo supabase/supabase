@@ -67,7 +67,6 @@ export const useNewQuery = () => {
 export function useSqlEditorDiff() {
   const [sourceSqlDiff, setSourceSqlDiff] = useState<ContentDiff>()
   const [selectedDiffType, setSelectedDiffType] = useState<DiffType>()
-  const [pendingTitle, setPendingTitle] = useState<string>()
   const [isAcceptDiffLoading, setIsAcceptDiffLoading] = useState(false)
 
   const isDiffOpen = !!sourceSqlDiff
@@ -91,7 +90,6 @@ export function useSqlEditorDiff() {
 
   const closeDiff = useCallback(() => {
     setSourceSqlDiff(undefined)
-    setPendingTitle(undefined)
     setSelectedDiffType(undefined)
   }, [])
 
@@ -100,8 +98,6 @@ export function useSqlEditorDiff() {
     setSourceSqlDiff,
     selectedDiffType,
     setSelectedDiffType,
-    pendingTitle,
-    setPendingTitle,
     isAcceptDiffLoading,
     setIsAcceptDiffLoading,
     isDiffOpen,

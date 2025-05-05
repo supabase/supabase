@@ -12,7 +12,7 @@ import type { CloudProvider } from 'shared-data'
 import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 
 const RESTRICTED_POOL = [
-  'EAST_US',
+  'EAST_US_2',
   'CENTRAL_EU',
   'NORTH_EU',
   'WEST_EU',

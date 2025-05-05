@@ -1,14 +1,15 @@
-import { useParams } from 'common'
 import { compact, get, isEmpty, uniqBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
 
+import { useParams } from 'common'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import type { Bucket } from 'data/storage/buckets-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
-import ConfirmDeleteModal from './ConfirmDeleteModal'
+import { ConfirmDeleteModal } from './ConfirmDeleteModal'
 import CustomExpiryModal from './CustomExpiryModal'
 import FileExplorer from './FileExplorer'
 import FileExplorerHeader from './FileExplorerHeader'
@@ -35,7 +36,6 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
     popOpenedFoldersAtIndex,
     selectedItemsToMove,
     clearSelectedItemsToMove,
-    view,
     currentBucketName,
     openBucket,
 
@@ -49,9 +49,9 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
     moveFiles,
   } = storageExplorerStore
 
-  const storageExplorerRef = useRef(null)
-
   const { ref } = useParams()
+  const storageExplorerRef = useRef(null)
+  const snap = useStorageExplorerStateSnapshot()
 
   // [Joshen] This is to ensure that StorageExplorerStore can get the storage file size limit
   // Will be better once we deprecate the mobx store entirely, which we will get there
@@ -68,7 +68,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const fetchContents = async () => {
-      if (view === STORAGE_VIEWS.LIST) {
+      if (snap.view === STORAGE_VIEWS.LIST) {
         const currentFolderIdx = openedFolders.length - 1
         const currentFolder = openedFolders[currentFolderIdx]
 
@@ -92,7 +92,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
             await fetchFolderContents(currentFolder.id, currentFolder.name, currentFolderIdx)
           }
         }
-      } else if (view === STORAGE_VIEWS.COLUMNS) {
+      } else if (snap.view === STORAGE_VIEWS.COLUMNS) {
         const paths = openedFolders.map((folder) => folder.name)
         fetchFoldersByPath(paths, itemSearchString, true)
       }
@@ -102,9 +102,9 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   }, [itemSearchString])
 
   useEffect(() => {
-    // Load user preferences (view and sort)
+    // Load user preferences (view, sort, sortBy)
     loadExplorerPreferences()
-  }, [])
+  }, [ref])
 
   useEffect(() => {
     openBucket(bucket)
@@ -196,7 +196,6 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
       )}
       <div className="flex h-full" style={{ height: fileExplorerHeight }}>
         <FileExplorer
-          view={view}
           columns={columns}
           openedFolders={openedFolders}
           selectedItems={selectedItems}

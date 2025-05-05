@@ -46,34 +46,9 @@ The `useTableSort` hook manages sort state with these responsibilities:
 
 Key design aspects:
 
-- Uses safe snapshot ONLY to get table name for formatting
 - Handles applying table name to sort objects
 - Maintains URL parameters as source of truth
 - Forwards sort changes to URL and triggers application-specific side effects
-
-### `useSafeTableEditorSnapshot`
-
-```typescript
-// Returns: Partial<TableEditorTableState>
-```
-
-This hook exists is to satisfy React's rules of hooks:
-
-React hooks CANNOT be called conditionally. Since `useTableSort` is a hook that needs table state, we cannot write:
-
-```typescript
-// THIS VIOLATES REACT'S RULES - NOT ALLOWED
-function useTableSort() {
-  const { sorts: urlSorts } = useTableEditorFiltersSort()
-
-  // Conditional hook usage is forbidden in React!
-  const snap = hasTableContext ? useTableEditorTableStateSnapshot() : null
-
-  // ...rest of hook
-}
-```
-
-Instead, we created `useSafeTableEditorSnapshot` which unconditionally calls the original snapshot hook and handles error cases. This allows `useTableSort` to always call the hook safely regardless of context.
 
 ## Component Implementation
 

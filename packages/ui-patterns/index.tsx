@@ -3,7 +3,7 @@
  * import directly from here.
  */
 export * from './CommandMenu'
-export * from './ConsentToast'
+export * from './consent'
 export * from './CountdownWidget'
 export * from './ExpandableVideo'
 export * from './GlassPanel'
@@ -22,5 +22,6 @@ export * from './PromoToast'
 export * from './admonition'
 export * from './ComputeBadge'
 export * from './TimestampInfo'
+export * from './FilterBar'
 export * from './Toc'
 export * from './LogsBarChart'
