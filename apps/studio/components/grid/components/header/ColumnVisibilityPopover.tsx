@@ -115,7 +115,7 @@ function DraggableColumnItem({ column, isVisible, onSelect }: BaseColumnItemProp
   )
 }
 
-export const ColumnVisibility = () => {
+export const ColumnVisibilityPopover = () => {
   const snap = useTableEditorTableStateSnapshot()
   const { hiddenColumns, hideColumn, showColumn } = useTableColumnVisibility()
   const { columnOrder, moveColumn } = useTableColumnOrder()

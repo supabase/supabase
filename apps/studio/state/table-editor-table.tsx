@@ -13,11 +13,9 @@ import { getInitialGridColumns } from 'components/grid/utils/column'
 import { getGridColumns } from 'components/grid/utils/gridColumns'
 import { Entity } from 'data/table-editor/table-editor-types'
 import { useTableEditorStateSnapshot } from './table-editor'
+import { ExtendedCalculatedColumn } from 'components/grid/types/base'
 
 // 1. Define Type
-interface ExtendedCalculatedColumn extends CalculatedColumn<any, any> {
-  visible?: boolean
-}
 
 export const createTableEditorTableState = ({
   projectRef,
