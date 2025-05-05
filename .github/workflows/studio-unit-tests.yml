@@ -56,6 +56,5 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: ./coverage
+          path-to-lcov: ./apps/studio/coverage/
           debug: true
-          base-path: apps/studio
