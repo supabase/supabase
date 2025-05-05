@@ -85,51 +85,9 @@ The `useTableSort` hook manages sort state with these responsibilities:
 
 Key design aspects:
 
-- Uses safe snapshot ONLY to get table name for formatting
 - Handles applying table name to sort objects
 - Maintains URL parameters as source of truth
 - Forwards sort changes to URL and triggers application-specific side effects
-
-### `useSafeTableEditorSnapshot`
-
-```typescript
-// Returns: Partial<TableEditorTableState>
-```
-
-This hook exists is to satisfy React's rules of hooks:
-
-React hooks CANNOT be called conditionally. Since `useTableSort` is a hook that needs table state, we cannot write:
-
-```typescript
-// THIS VIOLATES REACT'S RULES - NOT ALLOWED
-function useTableSort() {
-  const { sorts: urlSorts } = useTableEditorFiltersSort()
-
-  // Conditional hook usage is forbidden in React!
-  const snap = hasTableContext ? useTableEditorTableStateSnapshot() : null
-
-  // ...rest of hook
-}
-```
-
-Instead, we created `useSafeTableEditorSnapshot` which unconditionally calls the original snapshot hook and handles error cases. This allows `useTableSort` to always call the hook safely regardless of context.
-
-### `useSaveTableEditorState`
-
-Provides functions to save state and trigger side effects:
-
-- Functions like `saveFiltersAndTriggerSideEffects` that are called by filter/sort hooks
-- Reads context from the Valtio snapshot (table name, etc.)
-- Calls `saveTableEditorStateToLocalStorage` to write to local storage
-- Modifies the Valtio store (e.g., resetting pagination) to trigger side effects
-
-### `useLoadTableEditorStateFromLocalStorageIntoUrl`
-
-Handles initial load logic:
-
-- Checks for existing URL parameters
-- If empty, reads from local storage and updates URL
-- Ensures state persistence across page loads
 
 ## Component Implementation
 

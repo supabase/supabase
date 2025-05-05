@@ -2,13 +2,13 @@ import { useMemo } from 'react'
 
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
-import FilterPopoverPrimitive from './FilterPopoverPrimitive'
+import { FilterPopoverPrimitive } from './FilterPopoverPrimitive'
 
 export interface FilterPopoverProps {
   portal?: boolean
 }
 
-const FilterPopover = ({ portal = true }: FilterPopoverProps) => {
+export const FilterPopover = ({ portal = true }: FilterPopoverProps) => {
   const { urlFilters, onApplyFilters } = useTableFilter()
 
   // Convert string[] to Filter[]
@@ -20,5 +20,3 @@ const FilterPopover = ({ portal = true }: FilterPopoverProps) => {
     <FilterPopoverPrimitive portal={portal} filters={filters} onApplyFilters={onApplyFilters} />
   )
 }
-
-export default FilterPopover

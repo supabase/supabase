@@ -7,7 +7,8 @@ import { ReactNode, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import type { Filter, Sort } from 'components/grid/types'
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
+import { useTableSort } from 'components/grid/hooks/useTableSort'
 import GridHeaderActions from 'components/interfaces/TableGridEditor/GridHeaderActions'
 import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -35,8 +36,8 @@ import {
   SonnerProgress,
 } from 'ui'
 import { ColumnVisibility } from './ColumnVisibility'
-import FilterPopover from './filter/FilterPopover'
-import { SortPopover } from './sort'
+import { FilterPopover } from './filter/FilterPopover'
+import { SortPopover } from './sort/SortPopover'
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
 // exporting. Either that or export as multiple CSV sheets with max n rows each
@@ -53,30 +54,21 @@ export const MAX_EXPORT_ROW_COUNT_MESSAGE = (
 )
 
 export type HeaderProps = {
-  sorts: Sort[]
-  filters: Filter[]
   customHeader: ReactNode
 }
 
-const Header = ({ sorts: sortsProp, filters: filtersProp, customHeader }: HeaderProps) => {
+const Header = ({ customHeader }: HeaderProps) => {
   const snap = useTableEditorTableStateSnapshot()
-
-  const filters = filtersProp
-  const sorts = sortsProp
 
   return (
     <div>
       <div className="flex h-10 items-center justify-between bg-dash-sidebar dark:bg-surface-100 px-1.5 py-1.5 gap-2 overflow-x-auto ">
         {customHeader ? (
-          <>{customHeader}</>
+          customHeader
+        ) : snap.selectedRows.size > 0 ? (
+          <RowHeader />
         ) : (
-          <>
-            {snap.selectedRows.size > 0 ? (
-              <RowHeader sorts={sorts} filters={filters} />
-            ) : (
-              <DefaultHeader />
-            )}
-          </>
+          <DefaultHeader />
         )}
         <GridHeaderActions table={snap.originalTable} />
       </div>
@@ -228,17 +220,16 @@ const DefaultHeader = () => {
   )
 }
 
-type RowHeaderProps = {
-  sorts: Sort[]
-  filters: Filter[]
-}
-const RowHeader = ({ sorts, filters }: RowHeaderProps) => {
+const RowHeader = () => {
   const { project } = useProjectContext()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
   const isImpersonatingRole = roleImpersonationState.role !== undefined
+
+  const { filters } = useTableFilter()
+  const { sorts } = useTableSort()
 
   const [isExporting, setIsExporting] = useState(false)
 

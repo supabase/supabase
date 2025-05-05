@@ -1,10 +1,7 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useCallback } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import type { SupaRow } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -14,8 +11,6 @@ import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-a
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
 import { useTableDeleteMutation } from 'data/tables/table-delete-mutation'
-import { TablesData, useGetTables } from 'data/tables/tables-query'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Checkbox } from 'ui'
@@ -23,21 +18,16 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 export type DeleteConfirmationDialogsProps = {
   selectedTable?: TableLike
+  onTableDeleted?: () => void
 }
 
-const DeleteConfirmationDialogs = ({ selectedTable }: DeleteConfirmationDialogsProps) => {
-  const { ref: projectRef } = useParams()
-  const router = useRouter()
+const DeleteConfirmationDialogs = ({
+  selectedTable,
+  onTableDeleted,
+}: DeleteConfirmationDialogsProps) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
-  const { selectedSchema } = useQuerySchemaState()
-
   const { filters, onApplyFilters } = useTableFilter()
-
-  const getTables = useGetTables({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
 
   const removeDeletedColumnFromFiltersAndSorts = ({
     columnName,
@@ -68,9 +58,8 @@ const DeleteConfirmationDialogs = ({ selectedTable }: DeleteConfirmationDialogsP
   })
   const { mutate: deleteTable } = useTableDeleteMutation({
     onSuccess: async () => {
-      const tables = await getTables(selectedSchema)
-      onAfterDeleteTable(tables)
       toast.success(`Successfully deleted table "${selectedTable?.name}"`)
+      onTableDeleted?.()
     },
     onError: (error) => {
       toast.error(`Failed to delete ${selectedTable?.name}: ${error.message}`)
@@ -206,18 +195,6 @@ const DeleteConfirmationDialogs = ({ selectedTable }: DeleteConfirmationDialogsP
       })
     }
   }
-
-  const onAfterDeleteTable = useCallback(
-    (tables: TablesData) => {
-      // For simplicity for now, we just open the first table within the same schema
-      if (tables.length > 0) {
-        router.push(`/project/${projectRef}/editor/${tables[0].id}`)
-      } else {
-        router.push(`/project/${projectRef}/editor`)
-      }
-    },
-    [router, projectRef]
-  )
 
   return (
     <>

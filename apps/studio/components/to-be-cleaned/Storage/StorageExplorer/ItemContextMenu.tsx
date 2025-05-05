@@ -4,10 +4,12 @@ import { observer } from 'mobx-react-lite'
 import { Item, Menu, Separator, Submenu } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
 
+import { useParams } from 'common'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItemWithColumn } from '../Storage.types'
+import { downloadFile } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
 
 interface ItemContextMenuProps {
@@ -15,9 +17,9 @@ interface ItemContextMenuProps {
 }
 
 const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
+  const { ref: projectRef, bucketId } = useParams()
   const storageExplorerStore = useStorageStore()
   const {
-    downloadFile,
     selectedBucket,
     setSelectedItemsToDelete,
     setSelectedItemToRename,
@@ -39,7 +41,7 @@ const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
       case 'move':
         return setSelectedItemsToMove([item])
       case 'download':
-        return await downloadFile(item)
+        return await downloadFile({ projectRef, bucketId, file: item })
       default:
         break
     }

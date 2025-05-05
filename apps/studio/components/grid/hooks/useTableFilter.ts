@@ -19,7 +19,6 @@ export function useTableFilter() {
     (appliedFilters: Filter[]) => {
       const newUrlFilters = filtersToUrlParams(appliedFilters)
       setParams((prevParams) => ({ ...prevParams, filter: newUrlFilters }))
-      // Trigger save AND side effects using the dedicated hook
       saveFiltersAndTriggerSideEffects(newUrlFilters)
     },
     [setParams, saveFiltersAndTriggerSideEffects]

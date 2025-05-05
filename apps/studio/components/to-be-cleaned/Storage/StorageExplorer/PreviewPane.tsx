@@ -4,6 +4,7 @@ import { isEmpty } from 'lodash'
 import { AlertCircle, ChevronDown, Clipboard, Download, Loader, Trash2, X } from 'lucide-react'
 import SVG from 'react-inlinesvg'
 
+import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
@@ -18,6 +19,7 @@ import {
 } from 'ui'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
+import { downloadFile } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
 import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
 
@@ -115,9 +117,9 @@ const PreviewFile = ({ item }: { item: StorageItem }) => {
 }
 
 const PreviewPane = () => {
+  const { ref: projectRef, bucketId } = useParams()
   const storageExplorerStore = useStorageStore()
   const {
-    downloadFile,
     selectedBucket,
     selectedFilePreview: file,
     closeFilePreview,
@@ -128,9 +130,7 @@ const PreviewPane = () => {
 
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
-  if (!file) {
-    return null
-  }
+  if (!file) return null
 
   const width = 450
   const isOpen = !isEmpty(file)
@@ -211,7 +211,7 @@ const PreviewPane = () => {
                 type="default"
                 icon={<Download size={16} strokeWidth={2} />}
                 disabled={file.isCorrupted}
-                onClick={async () => await downloadFile(file)}
+                onClick={async () => await downloadFile({ projectRef, bucketId, file })}
               >
                 Download
               </Button>

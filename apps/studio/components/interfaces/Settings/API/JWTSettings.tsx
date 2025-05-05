@@ -9,10 +9,14 @@ import {
   ChevronDown,
   Eye,
   EyeOff,
+  Hourglass,
   Key,
+  KeyRound,
   Loader2,
   PenTool,
+  Power,
   RefreshCw,
+  Undo,
 } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { toast } from 'sonner'
@@ -20,12 +24,13 @@ import { number, object } from 'yup'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { FormActions } from 'components/ui/Forms/FormActions'
 import Panel from 'components/ui/Panel'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useJwtSecretUpdateMutation } from 'data/config/jwt-secret-update-mutation'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { uuidv4 } from 'lib/helpers'
 import {
@@ -38,21 +43,18 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Form,
   Input,
   InputNumber,
   Modal,
   WarningIcon,
-  Form,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
 } from './API.constants'
-import { Admonition } from 'ui-patterns'
-import { FormActions } from 'components/ui/Forms/FormActions'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 
 const schema = object({
   JWT_EXP: number()
@@ -133,7 +135,10 @@ const JWTSettings = () => {
       toast(
         'Successfully submitted JWT secret update request. Please wait while your project is updated.'
       )
-    } catch (error) {}
+    } catch (error) {
+      toast.error('Failed to update JWT secret. Please try again.')
+      console.error('Failed to update JWT secret:', error)
+    }
   }
 
   return (
@@ -296,30 +301,67 @@ const JWTSettings = () => {
 
       <ConfirmationModal
         variant={'destructive'}
-        size="medium"
+        size="large"
         visible={isRegeneratingKey}
-        title="Confirm to generate a new JWT secret"
+        title="Generate a new JWT secret"
         confirmLabel="Generate new secret"
         confirmLabelLoading="Generating"
         onCancel={() => setIsGeneratingKey(false)}
         onConfirm={() => handleJwtSecretUpdate('ROLL', setIsGeneratingKey)}
-        alert={{
-          title: 'This will invalidate all existing API keys',
-          description: (
-            <>
-              Generating a new JWT secret will invalidate <u className="text-foreground">all</u> of
-              your API keys, including your <code className="text-xs">service_role</code> and{' '}
-              <code className="text-xs">anon</code> keys. Your project will also be restarted during
-              this process, which will terminate any existing connections. You may receive API
-              errors for up to 2 minutes while the new secret is deployed.
-            </>
-          ),
-        }}
       >
-        <p className="text-foreground text-sm">
-          This action cannot be undone and the old JWT secret will be lost. All existing API keys
-          will be invalidated, and any open connections will be terminated.
-        </p>
+        <ul className="mt-4 space-y-5 text-sm">
+          <li className="flex gap-4">
+            <span className="shrink-0 mt-1">
+              <KeyRound size={24} className="flex-shrink-0" />
+            </span>
+            <div>
+              <p className="font-bold">This will invalidate all API keys</p>
+              <p>
+                Generating a new JWT secret will invalidate <u className="text-foreground">all</u>{' '}
+                existing keys, including <code className="text-xs text-code">service_role</code>{' '}
+                <code className="text-xs text-code !bg-destructive !text-white !border-destructive">
+                  secret
+                </code>{' '}
+                and <code className="text-xs text-code">anon</code>{' '}
+                <code className="text-xs text-code">public</code>.
+              </p>
+            </div>
+          </li>
+
+          <li className="flex gap-4">
+            <span className="shrink-0 mt-1">
+              <Power size={24} className="flex-shrink-0" />
+            </span>
+            <div>
+              <p className="font-bold">Your project will be restarted</p>
+              <p>
+                This process restarts your project, terminating existing connections. You may see
+                API errors for up to 2 minutes while the new secret is deployed.
+              </p>
+            </div>
+          </li>
+          <li className="flex gap-4">
+            <span className="shrink-0 mt-1">
+              <Hourglass size={24} className="flex-shrink-0" />
+            </span>
+            <div>
+              <p className="font-bold">20-minute cooldown</p>
+              <p>Keys can only be regenerated every 20 minutes.</p>
+            </div>
+          </li>
+          <li className="flex gap-4">
+            <span className="shrink-0 mt-1">
+              <Undo size={24} className="flex-shrink-0" />
+            </span>
+            <div>
+              <p className="font-bold">This cannot be undone</p>
+              <p>
+                The old JWT secret will be lost, all API keys invalidated, and open connections
+                terminated.
+              </p>
+            </div>
+          </li>
+        </ul>
       </ConfirmationModal>
 
       <Modal

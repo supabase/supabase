@@ -1,11 +1,11 @@
+import { IS_PROD } from 'common'
+import { GuideTemplate } from '~/features/docs/GuidesMdx.template'
 import {
-  getGuidesMarkdown,
   genGuideMeta,
   genGuidesStaticParams,
+  getGuidesMarkdown,
 } from '~/features/docs/GuidesMdx.utils'
-import { GuideTemplate } from '~/features/docs/GuidesMdx.template'
-
-export const dynamicParams = false
+import { getEmptyArray } from '~/features/helpers.fn'
 
 type Params = { slug?: string[] }
 
@@ -16,10 +16,10 @@ const RealtimeGuidePage = async ({ params }: { params: Params }) => {
   return <GuideTemplate {...data!} />
 }
 
-const generateStaticParams = genGuidesStaticParams('realtime')
+const generateStaticParams = IS_PROD ? genGuidesStaticParams('realtime') : getEmptyArray
 const generateMetadata = genGuideMeta((params: { slug?: string[] }) =>
   getGuidesMarkdown(['realtime', ...(params.slug ?? [])])
 )
 
 export default RealtimeGuidePage
-export { generateStaticParams, generateMetadata }
+export { generateMetadata, generateStaticParams }

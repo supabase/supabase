@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { PostgresTable } from '@supabase/postgres-meta'
 
 import { useParams } from 'common'
 import { TableList } from 'components/interfaces/Database'
@@ -50,12 +51,12 @@ const DatabaseTables: NextPageWithLayout = () => {
             key={`table-editor-table-${selectedTableToEdit.id}`}
             projectRef={projectRef}
             table={selectedTableToEdit}
-            editable={true}
           >
             <DeleteConfirmationDialogs selectedTable={selectedTableToEdit} />
-            <SidePanelEditor includeColumns selectedTable={selectedTableToEdit} />
           </TableEditorTableStateContextProvider>
         )}
+
+      <SidePanelEditor includeColumns selectedTable={selectedTableToEdit as PostgresTable} />
     </>
   )
 }

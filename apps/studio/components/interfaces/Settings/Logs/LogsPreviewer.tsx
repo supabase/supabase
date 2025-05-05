@@ -28,6 +28,8 @@ import {
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
 import { maybeShowUpgradePrompt } from './Logs.utils'
 import UpgradePrompt from './UpgradePrompt'
+import { useFlag } from 'hooks/ui/useFlag'
+import { PreviewFilterPanelWithUniversal } from './PreviewFilterPanelWithUniversal'
 
 /**
  * Acts as a container component for the entire log display
@@ -58,6 +60,8 @@ export const LogsPreviewer = ({
   EmptyState,
   filterPanelClassName,
 }: PropsWithChildren<LogsPreviewerProps>) => {
+  const useUniversalFilterBar = useFlag('universalFilterBar')
+
   const router = useRouter()
   const { db } = useParams()
   const organization = useSelectedOrganization()
@@ -186,39 +190,48 @@ export const LogsPreviewer = ({
     }
   }, [db, isSuccess])
 
+  // Common props shared between both filter panel components to avoid duplication
+  const filterPanelProps = {
+    className: filterPanelClassName,
+    csvData: logData,
+    isLoading,
+    newCount,
+    onRefresh: handleRefresh,
+    onSearch: handleSearch,
+    defaultSearchValue: search,
+    defaultToValue: timestampEnd,
+    defaultFromValue: timestampStart,
+    queryUrl: `/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
+      params.sql || ''
+    )}&its=${encodeURIComponent(timestampStart)}&ite=${encodeURIComponent(timestampEnd)}`,
+    onSelectTemplate,
+    filters,
+    onFiltersChange: setFilters,
+    table,
+    condensedLayout,
+    isShowingEventChart: showChart,
+    onToggleEventChart: () => setShowChart(!showChart),
+    onSelectedDatabaseChange: (id: string) => {
+      setFilters({ ...filters, database: id !== projectRef ? id : undefined })
+      const { db, ...params } = router.query
+      router.push({
+        pathname: router.pathname,
+        query: id !== projectRef ? { ...router.query, db: id } : params,
+      })
+    },
+    selectedDatePickerValue,
+    setSelectedDatePickerValue,
+  }
+
   return (
     <div className="flex-1 flex flex-col h-full">
-      <PreviewFilterPanel
-        className={filterPanelClassName}
-        csvData={logData}
-        isLoading={isLoading}
-        newCount={newCount}
-        onRefresh={handleRefresh}
-        onSearch={handleSearch}
-        defaultSearchValue={search}
-        defaultToValue={timestampEnd}
-        defaultFromValue={timestampStart}
-        queryUrl={`/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
-          params.sql || ''
-        )}&its=${encodeURIComponent(timestampStart)}&ite=${encodeURIComponent(timestampEnd)}`}
-        onSelectTemplate={onSelectTemplate}
-        filters={filters}
-        onFiltersChange={setFilters}
-        table={table}
-        condensedLayout={condensedLayout}
-        isShowingEventChart={showChart}
-        onToggleEventChart={() => setShowChart(!showChart)}
-        onSelectedDatabaseChange={(id: string) => {
-          setFilters({ ...filters, database: id !== projectRef ? id : undefined })
-          const { db, ...params } = router.query
-          router.push({
-            pathname: router.pathname,
-            query: id !== projectRef ? { ...router.query, db: id } : params,
-          })
-        }}
-        selectedDatePickerValue={selectedDatePickerValue}
-        setSelectedDatePickerValue={setSelectedDatePickerValue}
-      />
+      {useUniversalFilterBar ? (
+        // Experimental Universal Filter Bar
+        <PreviewFilterPanelWithUniversal {...filterPanelProps} />
+      ) : (
+        // Legacy Filter Panel
+        <PreviewFilterPanel {...filterPanelProps} />
+      )}
       {children}
       <div
         className={

@@ -11,8 +11,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Separator,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -71,36 +71,6 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
 
     return (
       <>
-        {snap.editable && (
-          <Tooltip>
-            <TooltipTrigger asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
-              <DropdownMenuItem className="space-x-2" onClick={onEditColumn} disabled={isEncrypted}>
-                <Edit size={14} />
-                <p>Edit column</p>
-              </DropdownMenuItem>
-            </TooltipTrigger>
-            {isEncrypted && (
-              <TooltipContent side="bottom">Encrypted columns cannot be edited</TooltipContent>
-            )}
-          </Tooltip>
-        )}
-        <DropdownMenuItem
-          className="space-x-2"
-          onClick={column.frozen ? onUnfreezeColumn : onFreezeColumn}
-        >
-          {column.frozen ? (
-            <>
-              <Unlock size={14} />
-              <p>Unfreeze column</p>
-            </>
-          ) : (
-            <>
-              <Lock size={14} />
-              <p>Freeze column</p>
-            </>
-          )}
-        </DropdownMenuItem>
-        <Separator />
         <DropdownMenuItem
           className={cn(
             'space-x-2',
@@ -108,8 +78,8 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
           )}
           onClick={() => onSortColumn(true)}
         >
-          <ArrowUp size={14} strokeWidth={currentSort?.ascending ? 3 : 1} />
-          <p>Sort Ascending</p>
+          <ArrowUp size={14} strokeWidth={currentSort?.ascending ? 3 : 1.5} />
+          <span>Sort Ascending</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           className={cn(
@@ -120,15 +90,51 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
           )}
           onClick={() => onSortColumn(false)}
         >
-          <ArrowDown size={14} strokeWidth={currentSort && !currentSort.ascending ? 3 : 1} />
-          <p>Sort Descending</p>
+          <ArrowDown size={14} strokeWidth={currentSort && !currentSort.ascending ? 3 : 1.5} />
+          <span>Sort Descending</span>
         </DropdownMenuItem>
         {snap.editable && (
           <>
-            <Separator />
+            <DropdownMenuSeparator />
+            <Tooltip>
+              <TooltipTrigger asChild className={`${isEncrypted ? 'opacity-50' : ''}`}>
+                <DropdownMenuItem
+                  className="space-x-2"
+                  onClick={onEditColumn}
+                  disabled={isEncrypted}
+                >
+                  <Edit size={14} strokeWidth={1.5} />
+                  <span>Edit column</span>
+                </DropdownMenuItem>
+              </TooltipTrigger>
+              {isEncrypted && (
+                <TooltipContent side="bottom">Encrypted columns cannot be edited</TooltipContent>
+              )}
+            </Tooltip>
+          </>
+        )}
+        <DropdownMenuItem
+          className="space-x-2"
+          onClick={column.frozen ? onUnfreezeColumn : onFreezeColumn}
+        >
+          {column.frozen ? (
+            <>
+              <Unlock size={14} strokeWidth={1.5} />
+              <span>Unfreeze column</span>
+            </>
+          ) : (
+            <>
+              <Lock size={14} strokeWidth={1.5} />
+              <span>Freeze column</span>
+            </>
+          )}
+        </DropdownMenuItem>
+        {snap.editable && (
+          <>
+            <DropdownMenuSeparator />
             <DropdownMenuItem className="space-x-2" onClick={onDeleteColumn}>
-              <Trash size={14} stroke="red" />
-              <p>Delete column</p>
+              <Trash size={14} className="text-destructive" />
+              <span>Delete column</span>
             </DropdownMenuItem>
           </>
         )}
