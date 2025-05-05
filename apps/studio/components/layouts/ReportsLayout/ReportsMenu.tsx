@@ -112,6 +112,11 @@ const ReportsMenu = () => {
           key: 'database',
           url: `/project/${ref}/reports/database`,
         },
+        {
+          name: 'Auth',
+          key: 'auth',
+          url: `/project/${ref}/reports/auth`,
+        },
       ],
     },
   ]
