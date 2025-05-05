@@ -12,7 +12,10 @@ import { CSS } from '@dnd-kit/utilities'
 import { SELECT_COLUMN_KEY } from 'components/grid/constants'
 import { useTableColumnOrder } from 'components/grid/hooks/useTableColumnOrder'
 import { useTableColumnVisibility } from 'components/grid/hooks/useTableColumnVisibility'
-import { Sortable, SortableDragHandle } from 'components/ui/Sortable/sortable'
+import {
+  Sortable,
+  SortableDragHandle as SortableDragHandlePrimitive,
+} from 'components/ui/Sortable/sortable'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
@@ -44,6 +47,8 @@ interface BaseColumnItemProps {
   onSelect: (id: string) => void
 }
 
+// base component for each Column item
+// used for pinned columns and draggable overlay
 function PinnedColumnItem({ column, isVisible, onSelect }: BaseColumnItemProps) {
   return (
     <CommandItem
@@ -70,17 +75,40 @@ function PinnedColumnItem({ column, isVisible, onSelect }: BaseColumnItemProps) 
   )
 }
 
-function DraggableColumnItem({ column, isVisible, onSelect }: BaseColumnItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: column.id,
-  })
+// drag handle for sortable columns
+// used for Sortable dragging
+function SortableDragHandle({ attributes, listeners }: { attributes: any; listeners: any }) {
+  return (
+    <SortableDragHandlePrimitive
+      size="tiny"
+      className="absolute right-2 size-5 text-foreground-lighter opacity-50 hover:opacity-100 cursor-grab data-[state=dragging]:cursor-grabbing p-1 flex-shrink-0"
+      {...attributes}
+      {...listeners}
+    >
+      <GripVertical size={14} strokeWidth={1.5} />
+    </SortableDragHandlePrimitive>
+  )
+}
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.75 : 1,
-  }
-
+/**
+ * Renders a sortable column item with checkbox and custom drag handle.
+ * Used as the base component for draggable columns in the list.
+ */
+function SortableItem({
+  handle,
+  column,
+  isVisible,
+  onSelect,
+  setNodeRef,
+  style,
+}: BaseColumnItemProps & {
+  // drag handle for sortable columns
+  handle?: React.ReactNode
+  // ref callback for sortable container
+  setNodeRef?: React.RefCallback<HTMLDivElement>
+  // CSS properties for sortable container
+  style?: React.CSSProperties
+}) {
   return (
     <div ref={setNodeRef} style={style} className={cn('rounded-md')}>
       <CommandItem
@@ -101,20 +129,45 @@ function DraggableColumnItem({ column, isVisible, onSelect }: BaseColumnItemProp
             </div>
             <span className="truncate">{column.name}</span>
           </div>
-          <SortableDragHandle
-            size="tiny"
-            className="absolute right-2 size-5 text-foreground-lighter opacity-50 hover:opacity-100 cursor-grab data-[state=dragging]:cursor-grabbing p-1 flex-shrink-0"
-            {...attributes}
-            {...listeners}
-          >
-            <GripVertical size={14} strokeWidth={1.5} />
-          </SortableDragHandle>
+          {handle}
         </div>
       </CommandItem>
     </div>
   )
 }
 
+/**
+ * Handles SortableItem with drag behaviour
+ */
+function DraggableColumnItem({ column, isVisible, onSelect }: BaseColumnItemProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: column.id,
+  })
+
+  // CSS properties for sortable container
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.75 : 1,
+  }
+
+  return (
+    <SortableItem
+      handle={<SortableDragHandle attributes={attributes} listeners={listeners} />}
+      column={column}
+      isVisible={isVisible}
+      onSelect={onSelect}
+      setNodeRef={setNodeRef}
+      style={style}
+    />
+  )
+}
+
+/**
+ * A component that renders a column visibility popover.
+ * It allows users to show/hide columns and reorder them.
+ *
+ */
 export const ColumnVisibilityPopover = () => {
   const snap = useTableEditorTableStateSnapshot()
   const { hiddenColumns, hideColumn, showColumn } = useTableColumnVisibility()
@@ -215,6 +268,9 @@ export const ColumnVisibilityPopover = () => {
     return null
   }
 
+  // Find the active column for the overlay
+  const activeColumn = activeId ? draggableColumns.find((col) => col.id === activeId) : null
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <Tooltip>
@@ -260,6 +316,15 @@ export const ColumnVisibilityPopover = () => {
               onDragStart={handleDragStart}
               onDragOver={handleDragOver}
               onDragEnd={handleDragEnd}
+              overlay={
+                activeColumn ? (
+                  <SortableItem
+                    column={activeColumn}
+                    isVisible={!hiddenColumns.has(activeColumn.id)}
+                    onSelect={handleSelect}
+                  />
+                ) : null
+              }
             >
               {draggableColumns.length > 0 && (
                 <CommandGroup heading="Columns">
