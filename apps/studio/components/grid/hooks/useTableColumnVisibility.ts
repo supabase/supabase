@@ -18,6 +18,7 @@ export function useTableColumnVisibility() {
   const hiddenColumnsMemo = useMemo(() => {
     return new Set(hiddenColumns)
   }, [hiddenColumns])
+
   /**
    * Hides a specific column.
    * @param columnName Key of the column to hide.
@@ -28,17 +29,23 @@ export function useTableColumnVisibility() {
         console.warn('[useTableColumnVisibility] Valtio action/state not available.')
         return
       }
+
+      // Check if column is already hidden to prevent redundant updates
+      if (hiddenColumnsMemo.has(columnName)) {
+        return
+      }
+
       // 1. Update URL Parameter first
-      // Construct the new list of hidden keys based on the INTENDED state change
       const currentHidden = new Set(hiddenColumnsMemo)
       currentHidden.add(columnName)
       const newHiddenArray = Array.from(currentHidden).sort()
       const newUrlString = newHiddenArray.join(',')
       setParams((prev) => ({ ...prev, hidden_cols: newUrlString || undefined }))
+
       // 2. Update Valtio State (after URL)
       snap.setColumnVisibility(columnName, false)
     },
-    [snap, setParams, hiddenColumnsMemo] // Depend on snap, setParams, and current hidden set
+    [snap, setParams, hiddenColumnsMemo]
   )
 
   /**
@@ -51,17 +58,23 @@ export function useTableColumnVisibility() {
         console.warn('[useTableColumnVisibility] Valtio action/state not available.')
         return
       }
+
+      // Check if column is already visible to prevent redundant updates
+      if (!hiddenColumnsMemo.has(columnName)) {
+        return
+      }
+
       // 1. Update URL Parameter first
-      // Construct the new list of hidden keys based on the INTENDED state change
       const currentHidden = new Set(hiddenColumnsMemo)
       currentHidden.delete(columnName)
       const newHiddenArray = Array.from(currentHidden).sort()
       const newUrlString = newHiddenArray.join(',')
       setParams((prev) => ({ ...prev, hidden_cols: newUrlString || undefined }))
+
       // 2. Update Valtio State (after URL)
       snap.setColumnVisibility(columnName, true)
     },
-    [snap, setParams, hiddenColumnsMemo] // Depend on snap, setParams, and current hidden set
+    [snap, setParams, hiddenColumnsMemo]
   )
 
   return {
