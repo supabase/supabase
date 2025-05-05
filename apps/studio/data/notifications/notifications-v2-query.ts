@@ -40,8 +40,8 @@ export async function getNotifications(options: NotificationVariables, signal?: 
   const { data, error } = await get('/platform/notifications', {
     params: {
       query: {
-        offset: String(page * limit),
-        limit: String(limit),
+        offset: page * limit,
+        limit,
         // [Alaister]: 'as any' is needed because the API types don't reflect an array of strings
         ...(status !== undefined ? { status } : { status: ['new', 'seen'].join(',') as any }),
         ...(filters.priority.length > 0 ? { priority: filters.priority.join(',') as any } : {}),

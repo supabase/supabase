@@ -28,7 +28,7 @@ import {
   useSnippetFolders,
   useSqlEditorV2StateSnapshot,
 } from 'state/sql-editor-v2'
-import { createTabId, getTabsStore, makeTabPermanent, removeTabs } from 'state/tabs'
+import { createTabId, getTabsStore, makeTabPermanent, removeTabs, useTabsStore } from 'state/tabs'
 import { SqlSnippets } from 'types'
 import { Separator, TreeView } from 'ui'
 import {
@@ -39,7 +39,6 @@ import {
   InnerSideMenuSeparator,
 } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useSnapshot } from 'valtio'
 import SQLEditorLoadingSnippets from './SQLEditorLoadingSnippets'
 import { formatFolderResponseForTreeView, getLastItemIds, ROOT_NODE } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
@@ -60,7 +59,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const tabStore = getTabsStore(projectRef)
-  const tabs = useSnapshot(tabStore)
+  const tabs = useTabsStore(projectRef)
   const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   const [sectionVisibility, setSectionVisibility] = useLocalStorage<SectionState>(
@@ -539,11 +538,10 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   }, [projectRef, sharedSqlSnippetsData?.pages])
 
   useEffect(() => {
-    if (projectRef && isSuccess && isSharedSqlSnippetsSuccess && isSQLEditorTabsEnabled) {
+    if (projectRef && isSuccess && isSQLEditorTabsEnabled) {
       sqlEditorTabsCleanup({ ref: projectRef, snippets: allSnippetsInView as any })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, isSharedSqlSnippetsSuccess, allSnippetsInView])
+  }, [isSuccess, isSharedSqlSnippetsSuccess, allSnippetsInView, isSQLEditorTabsEnabled])
 
   return (
     <>

@@ -51,7 +51,6 @@ const getInitialState = () => {
       activeDocsSection: ['introduction'],
       docsLanguage: 'js',
       showProjectApiDocs: false,
-      isOptedInTelemetry: false,
       showEnableBranchingModal: false,
       showFeaturePreviewModal: false,
       selectedFeaturePreview: '',
@@ -83,7 +82,6 @@ const getInitialState = () => {
     activeDocsSection: ['introduction'],
     docsLanguage: 'js',
     showProjectApiDocs: false,
-    isOptedInTelemetry: false,
     showEnableBranchingModal: false,
     showFeaturePreviewModal: false,
     selectedFeaturePreview: '',
@@ -121,14 +119,6 @@ export const appState = proxy({
   },
   setDocsLanguage: (value: 'js' | 'bash') => {
     appState.docsLanguage = value
-  },
-
-  isOptedInTelemetry: false,
-  setIsOptedInTelemetry: (value: boolean | null) => {
-    appState.isOptedInTelemetry = value === null ? false : value
-    if (typeof window !== 'undefined' && value !== null) {
-      localStorage.setItem(COMMON_LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
-    }
   },
 
   showEnableBranchingModal: false,
