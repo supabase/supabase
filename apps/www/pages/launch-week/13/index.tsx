@@ -93,8 +93,7 @@ export default function LaunchWeekIndex() {
           <LWHeader />
           <MainStage className="relative z-10" />
           <BuildStage />
-         
-  
+
           <CTABanner />
         </DefaultLayout>
       </ConfDataContext.Provider>
