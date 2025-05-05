@@ -9,10 +9,21 @@ export const useTableEditorFiltersSort = () => {
     return new URLSearchParams(queryString ?? '')
   }, [router.asPath])
 
-  const filters = useMemo(() => urlParams.getAll('filter'), [urlParams])
-  const sorts = useMemo(() => urlParams.getAll('sort'), [urlParams])
-  const hiddenColsParam = useMemo(() => urlParams.get('hidden_cols'), [urlParams])
-  const colOrderParam = useMemo(() => urlParams.get('col_order'), [urlParams])
+  const filters = useMemo(() => {
+    return urlParams.getAll('filter')
+  }, [urlParams])
+
+  const sorts = useMemo(() => {
+    return urlParams.getAll('sort')
+  }, [urlParams])
+
+  const hiddenColsParam = useMemo(() => {
+    return urlParams.get('hidden_cols')
+  }, [urlParams])
+
+  const colOrderParam = useMemo(() => {
+    return urlParams.get('col_order')
+  }, [urlParams])
 
   const hiddenColumns = useMemo(() => {
     return hiddenColsParam ? hiddenColsParam.split(',') : []
