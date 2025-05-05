@@ -5,7 +5,8 @@ description: 'Monitoring replication status'
 sidebar_label: 'Monitoring replication slots'
 ---
 
-# To Monitor
+# Monitoring 
+
 Monitoring replication lag is important and there are 3 ways to do this:
 1. Dashboard - Under the [Reports](/guides/platform/reports) of the dashboard, you can view the replication lag of your project
 2. Database -
@@ -16,3 +17,16 @@ Monitoring replication lag is important and there are 3 ways to do this:
     - replication_slots_max_lag_bytes  -  this is the more important one
     - pg_stat_replication_replay_lag  - lag to replay WAL files from the source DB on the target DB (throttled by disk or high activity)
     - pg_stat_replication_send_lag  - lag in sending WAL files from the source DB (a high lag means that the publisher is not being asked to send new WAL files OR a network issues)
+
+# Replication slot status
+
+A replication slot can be in one of three states:
+- `active` - The slot is active and is receiving data
+- `inactive` - The slot is not active and is not receiving data
+- `lost` - The slot is lost and is not receiving data
+
+The state can be checked using the `pg_replication_slots` table:
+
+```sql
+select slot_name, active, state from pg_replication_slots;
+```

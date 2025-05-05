@@ -965,13 +965,9 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Overview', url: '/guides/database/replication-cdc/overview',},
         { name: 'Logical Replication', url: '/guides/database/replication-cdc/logical-replication' },
+        { name: 'Setting up replication', url: '/guides/database/replication-cdc/setting-up-replication' },
+        { name: 'Monitoring replication', url: '/guides/database/replication-cdc/monitoring-replication' },
         { name: 'FAQ', url: '/guides/database/replication/faq' },
-        { name: 'CDC with Artie', url: 'https://supabase.com/partners/integrations/artie' },
-        { name: 'CDC with Estuary', url: 'https://supabase.com/partners/integrations/estuary' },
-        { name: 'CDC with Airbyte', url: '/guides/database/replication-cdc/services/etl-airbyte' },
-        { name: 'CDC with Fivetran', url: '/guides/database/replication-cdc/services/etl-fivetran' },
-        { name: 'CDC with Materialize', url: '/guides/database/replication-cdc/services/etl-materialize' },
-        { name: 'CDC with Stitch', url: '/guides/database/replication-cdc/services/etl-stitch' },
       ],
     },
     {
