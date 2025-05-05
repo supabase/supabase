@@ -126,14 +126,13 @@
     "ui-patterns": "workspace:*",
     "use-debounce": "^7.0.1",
     "uuid": "^9.0.1",
-    "valtio": "^1.12.0",
+    "valtio": "catalog:",
     "yup": "^1.4.0",
     "yup-password": "^0.3.0",
     "zod": "^3.22.4",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.410.0",
     "@radix-ui/react-use-escape-keydown": "^1.0.3",
     "@supabase/postgres-meta": "^0.64.4",
     "@tailwindcss/container-queries": "^0.1.1",

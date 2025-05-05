@@ -15,7 +15,7 @@ import CopyToClipboard from 'react-copy-to-clipboard'
 import { withErrorBoundary } from 'react-error-boundary'
 import { proxy, useSnapshot } from 'valtio'
 
-import { useIsLoggedIn, useIsUserLoading } from 'common'
+import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsUserLoading } from 'common'
 import { Button_Shadcn_ as Button, Input_Shadcn_ as Input, cn } from 'ui'
 
 import {
@@ -36,7 +36,7 @@ import { useOrganizationsQuery } from '~/lib/fetch/organizations'
 import { type SupavisorConfigData, useSupavisorConfigQuery } from '~/lib/fetch/pooler'
 import { useProjectApiQuery } from '~/lib/fetch/projectApi'
 import { isProjectPaused, type ProjectsData, useProjectsQuery } from '~/lib/fetch/projects'
-import { LOCAL_STORAGE_KEYS, retrieve, storeOrRemoveNull } from '~/lib/storage'
+import { retrieve, storeOrRemoveNull } from '~/lib/storage'
 import { useOnLogout } from '~/lib/userAuth'
 
 type ProjectOrgDataState =
