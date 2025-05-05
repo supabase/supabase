@@ -1,12 +1,11 @@
 'use client'
 
-import { useState } from 'react'
 import dayjs from 'dayjs'
+import { useState } from 'react'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { DateTimeFormats } from './Charts.constants'
 import { numberFormatter } from './Charts.utils'
 import { MultiAttribute } from './ComposedChartHandler'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { cn } from 'ui'
 
 interface CustomIconProps {
   color: string
@@ -232,4 +231,4 @@ const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: Custom
   )
 }
 
-export { CustomTooltip, CustomLabel }
+export { CustomLabel, CustomTooltip }

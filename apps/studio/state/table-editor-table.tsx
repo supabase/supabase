@@ -17,14 +17,15 @@ import { useTableEditorStateSnapshot } from './table-editor'
 export const createTableEditorTableState = ({
   projectRef,
   table: originalTable,
-  editable,
+  editable = true,
   onAddColumn,
   onExpandJSONEditor,
   onExpandTextEditor,
 }: {
   projectRef: string
   table: Entity
-  editable: boolean
+  /** If set to true, render an additional "+" column to support adding a new column in the grid editor */
+  editable?: boolean
   onAddColumn: () => void
   onExpandJSONEditor: (column: string, row: SupaRow) => void
   onExpandTextEditor: (column: string, row: SupaRow) => void
@@ -93,21 +94,29 @@ export const createTableEditorTableState = ({
       state.gridColumns.splice(toIdx, 0, moveItem)
     },
     updateColumnSize: (index: number, width: number) => {
-      ;(state.gridColumns[index] as CalculatedColumn<any, any> & { width?: number }).width = width
+      if (state.gridColumns[index]) {
+        ;(state.gridColumns[index] as CalculatedColumn<any, any> & { width?: number }).width = width
+      }
     },
     freezeColumn: (columnKey: string) => {
       const index = state.gridColumns.findIndex((x) => x.key === columnKey)
-      ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen = true
+      if (state.gridColumns[index]) {
+        ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen =
+          true
+      }
     },
     unfreezeColumn: (columnKey: string) => {
       const index = state.gridColumns.findIndex((x) => x.key === columnKey)
-      ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen =
-        false
+      if (state.gridColumns[index]) {
+        ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen =
+          false
+      }
     },
     updateColumnIdx: (columnKey: string, columnIdx: number) => {
       const index = state.gridColumns.findIndex((x) => x.key === columnKey)
-      ;(state.gridColumns[index] as CalculatedColumn<any, any> & { idx?: number }).idx = columnIdx
-
+      if (state.gridColumns[index]) {
+        ;(state.gridColumns[index] as CalculatedColumn<any, any> & { idx?: number }).idx = columnIdx
+      }
       state.gridColumns.sort((a, b) => a.idx - b.idx)
     },
 

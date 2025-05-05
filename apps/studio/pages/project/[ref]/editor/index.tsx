@@ -25,8 +25,8 @@ const TableEditorPage: NextPageWithLayout = () => {
   }
 
   useEffect(() => {
+    const lastOpenedTab = appSnap.dashboardHistory.editor
     if (isTableEditorTabsEnabled) {
-      const lastOpenedTab = appSnap.dashboardHistory.editor
       const lastTabId = tabStore.openTabs.find((id) =>
         editorEntityTypes.table.includes(tabStore.tabsMap[id]?.type)
       )
@@ -37,6 +37,8 @@ const TableEditorPage: NextPageWithLayout = () => {
         const lastTab = tabStore.tabsMap[lastTabId]
         if (lastTab) router.push(`/project/${projectRef}/editor/${lastTab.metadata?.tableId}`)
       }
+    } else if (lastOpenedTab) {
+      router.push(`/project/${projectRef}/editor/${appSnap.dashboardHistory.editor}`)
     }
   }, [isTableEditorTabsEnabled])
 

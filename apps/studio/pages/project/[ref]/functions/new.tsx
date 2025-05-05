@@ -281,7 +281,7 @@ const NewFunctionPage = () => {
                 Templates
               </Button>
             </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="w-[300px] p-0" align="end">
+            <PopoverContent_Shadcn_ portal className="w-[300px] p-0" align="end">
               <Command_Shadcn_>
                 <CommandInput_Shadcn_ placeholder="Search templates..." />
                 <CommandList_Shadcn_>

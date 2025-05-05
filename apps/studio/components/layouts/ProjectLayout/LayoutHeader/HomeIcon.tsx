@@ -7,7 +7,8 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useShowLayoutHeader } from 'hooks/misc/useShowLayoutHeader'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 export const HomeIcon = () => {
   const newLayoutPreview = useIsNewLayoutEnabled()
