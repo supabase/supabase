@@ -25,17 +25,19 @@ export async function CodeBlock({
   lineNumbers = true,
   contents,
   children,
+  skipTypeGeneration,
 }: PropsWithChildren<{
   className?: string
   lang?: string
   lineNumbers?: boolean
   contents?: string
+  skipTypeGeneration?: boolean
 }>) {
   let code = (contents || extractCode(children)).trim()
   const lang = tryToBundledLanguage(langSetting) || extractLang(children)
 
   let twoslashed = null as null | Map<number, Map<number, Array<NodeHover>>>
-  if (TWOSLASHABLE_LANGS.includes(lang)) {
+  if (!skipTypeGeneration && TWOSLASHABLE_LANGS.includes(lang)) {
     try {
       const { code: editedCode, nodes } = twoslasher(code)
       const hoverNodes: Array<NodeHover> = nodes.filter((node) => node.type === 'hover')

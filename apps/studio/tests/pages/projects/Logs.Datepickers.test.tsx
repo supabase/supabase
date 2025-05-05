@@ -2,12 +2,12 @@ import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { PREVIEWER_DATEPICKER_HELPERS } from 'components/interfaces/Settings/Logs/Logs.constants'
+import { DatetimeHelper } from 'components/interfaces/Settings/Logs/Logs.types'
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { expect, test, vi } from 'vitest'
 import { render } from '../../helpers'
-import { DatetimeHelper } from 'components/interfaces/Settings/Logs/Logs.types'
 
 dayjs.extend(timezone)
 dayjs.extend(utc)
@@ -94,17 +94,16 @@ test('datepicker onSubmit will return ISO string of selected dates', async () =>
   // open the datepicker
   userEvent.click(screen.getByText(/13:00/i))
 
-  // Get today's date and tomorrow's date
-  const today = dayjs()
-  const tomorrow = today.add(1, 'day')
+  const day15 = dayjs().date(15)
+  const day16 = day15.add(1, 'day')
 
-  // Find and click on today's date
-  const todayElement = await screen.findByText(today.format('D'))
-  userEvent.click(todayElement)
+  // Find and click on first date
+  const day15Element = await screen.findByText(day15.format('D'))
+  userEvent.click(day15Element)
 
-  // Find and click on tomorrow's date
-  const tomorrowElement = await screen.findByText(tomorrow.format('D'))
-  userEvent.click(tomorrowElement)
+  // Find and click on second date
+  const day16Element = await screen.findByText(day16.format('D'))
+  userEvent.click(day16Element)
 
   await userEvent.click(await screen.findByText('Apply'))
   expect(mockFn).toBeCalled()
@@ -112,8 +111,8 @@ test('datepicker onSubmit will return ISO string of selected dates', async () =>
   const call = mockFn.mock.calls[0][0]
 
   expect(call).toMatchObject({
-    from: dayjs().date(today.date()).hour(13).minute(0).second(0).millisecond(0).toISOString(),
-    to: dayjs().date(tomorrow.date()).hour(23).minute(59).second(59).millisecond(0).toISOString(),
+    from: dayjs().date(day15.date()).hour(13).minute(0).second(0).millisecond(0).toISOString(),
+    to: dayjs().date(day16.date()).hour(23).minute(59).second(59).millisecond(0).toISOString(),
   })
 })
 
