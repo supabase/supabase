@@ -413,7 +413,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
 
                 <SelectContent_Shadcn_>
                   {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => (
-                    <SelectItem_Shadcn_ key={k} value={k}>
+                    <SelectItem_Shadcn_ key={k} value={k} translate="no">
                       {v}
                     </SelectItem_Shadcn_>
                   ))}
