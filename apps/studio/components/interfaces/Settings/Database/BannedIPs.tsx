@@ -12,17 +12,26 @@ import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mu
 import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
-import { Badge, Button } from 'ui'
+import { Badge, Button, Skeleton } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { DocsButton } from 'components/ui/DocsButton'
+import Link from 'next/link'
 
 const BannedIPs = () => {
   const { ref } = useParams()
   const { project } = useProjectContext()
   const [selectedIPToUnban, setSelectedIPToUnban] = useState<string | null>(null) // Track the selected IP for unban
-  const { data: ipList } = useBannedIPsQuery({
+  const {
+    isLoading: isLoadingIPList,
+    isFetching: isFetchingIPList,
+    data: ipList,
+    error: ipListError,
+    refetch,
+  } = useBannedIPsQuery({
     projectRef: ref,
   })
+
+  const ipListLoading = isLoadingIPList || isFetchingIPList
 
   const [showUnban, setShowUnban] = useState(false)
   const [confirmingIP, setConfirmingIP] = useState<string | null>(null) // Track the IP being confirmed for unban
@@ -79,7 +88,35 @@ const BannedIPs = () => {
         <DocsButton href="https://supabase.com/docs/reference/cli/supabase-network-bans" />
       </div>
       <FormPanel>
-        {ipList && ipList.banned_ipv4_addresses.length > 0 ? (
+        {ipListLoading ? (
+          <div className="px-8 py-4 space-y-4">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+          </div>
+        ) : ipListError ? (
+          <div className="px-8 py-4 text-foreground-light text-sm">
+            <p className="">
+              There was an error trying to retrieve the banned IP addresses. Please try again.
+            </p>
+            <p>
+              If the problem persists, please{' '}
+              <Link className="underline" href="/support/new">
+                contact support
+              </Link>
+              .
+            </p>
+            <div className="mt-4">
+              <Button
+                type="outline"
+                onClick={() => {
+                  refetch()
+                }}
+              >
+                Try again
+              </Button>
+            </div>
+          </div>
+        ) : ipList && ipList.banned_ipv4_addresses.length > 0 ? (
           ipList.banned_ipv4_addresses.map((ip) => (
             <div key={ip} className="px-8 py-4 flex items-center justify-between">
               <div className="flex items-center space-x-5">
