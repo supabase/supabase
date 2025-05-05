@@ -114,7 +114,6 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.410.0",
     "@graphiql/toolkit": "^0.9.1",
     "@graphql-codegen/cli": "5.0.5",
     "@graphql-codegen/typescript": "4.1.6",
