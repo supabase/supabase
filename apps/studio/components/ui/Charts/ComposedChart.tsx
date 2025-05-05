@@ -354,7 +354,10 @@ export default function ComposedChart({
         <ChartHighlightActions chartHighlight={chartHighlight} updateDateRange={updateDateRange} />
       </Container>
       {data && (
-        <div className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs">
+        <div
+          className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs"
+          style={{ marginLeft: YAxisProps?.width }}
+        >
           <span>
             {xAxisIsDate ? day(data[0]?.timestamp).format(customDateFormat) : data[0]?.timestamp}
           </span>

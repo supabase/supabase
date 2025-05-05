@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 import dayjs from 'dayjs'
-import { ArrowRight, SearchIcon } from 'lucide-react'
+import { ArrowRight, LogsIcon, SearchIcon } from 'lucide-react'
 import {
   cn,
   DropdownMenu,
@@ -20,6 +21,8 @@ const ChartHighlightActions = ({
   chartHighlight?: ChartHighlight
   updateDateRange: UpdateDateRange
 }) => {
+  const router = useRouter()
+  const { ref } = router.query
   const { left: selectedRangeStart, right: selectedRangeEnd, clearHighlight } = chartHighlight ?? {}
   const [isOpen, setIsOpen] = useState(!!chartHighlight?.popoverPosition)
 
@@ -31,6 +34,12 @@ const ChartHighlightActions = ({
   const handleZoomIn = () => {
     if (disableZoomIn) return
     updateDateRange(selectedRangeStart!, selectedRangeEnd!)
+    clearHighlight && clearHighlight()
+  }
+
+  const handleOpenLogsExplorer = () => {
+    const rangeQueryParams = `?its=${selectedRangeStart}&ite=${selectedRangeEnd}`
+    router.push(`/project/${ref}/logs/postgres-logs${rangeQueryParams}`)
     clearHighlight && clearHighlight()
   }
 
@@ -65,6 +74,14 @@ const ChartHighlightActions = ({
             {disableZoomIn && (
               <span className="text-foreground-muted text-xs">10 minutes min.</span>
             )}
+          </button>
+        </DropdownMenuItem>
+        <DropdownMenuItem className={cn('group', disableZoomIn && '!bg-transparent')}>
+          <button onClick={handleOpenLogsExplorer} className="w-full flex items-center gap-1.5">
+            <LogsIcon className="text-foreground-lighter" size={12} />
+            <span className="flex-grow text-left text-foreground-light">
+              Open range in Logs Explorer
+            </span>
           </button>
         </DropdownMenuItem>
       </DropdownMenuContent>
