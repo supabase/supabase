@@ -109,7 +109,7 @@
     "unist-util-filter": "^4.0.1",
     "unist-util-visit": "^4.1.2",
     "uuid": "^9.0.1",
-    "valtio": "^1.12.0",
+    "valtio": "catalog:",
     "yaml": "^2.4.5",
     "zod": "^3.22.4"
   },

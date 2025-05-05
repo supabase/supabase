@@ -3,7 +3,7 @@
  * import directly from here.
  */
 export * from './CommandMenu'
-export * from './ConsentToast'
+export * from './consent'
 export * from './CountdownWidget'
 export * from './ExpandableVideo'
 export * from './GlassPanel'
