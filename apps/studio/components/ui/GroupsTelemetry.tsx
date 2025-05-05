@@ -3,12 +3,13 @@ import * as Sentry from '@sentry/nextjs'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
-import { useParams, useTelemetryCookie, useUser } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams, useTelemetryCookie, useUser } from 'common'
 import { useSendGroupsIdentifyMutation } from 'data/telemetry/send-groups-identify-mutation'
 import { useSendGroupsResetMutation } from 'data/telemetry/send-groups-reset-mutation'
 import { usePrevious } from 'hooks/deprecated'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
+import { IS_PLATFORM } from 'lib/constants'
 
 const getAnonId = async (id: string) => {
   const encoder = new TextEncoder()
