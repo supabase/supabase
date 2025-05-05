@@ -122,20 +122,26 @@ export const createApiQueryString = (params: Record<string, any>): string => {
 
 // Build SQL WHERE clause from search params
 function buildWhereClause(search: SearchParamsType): string {
-  const conditions = []
+  const conditions: string[] = []
 
-  // Handle date range
-  if (search.date && search.date.length === 2) {
-    conditions.push(`timestamp >= '${new Date(search.date[0]).toISOString()}'`)
-    conditions.push(`timestamp <= '${new Date(search.date[1]).toISOString()}'`)
-  }
+  // Process all filters dynamically
+  Object.entries(search).forEach(([key, value]) => {
+    // Skip pagination/control parameters and date (handled separately via API params)
+    if (['sort', 'start', 'size', 'uuid', 'cursor', 'direction', 'live', 'date'].includes(key)) {
+      return
+    }
 
-  // Handle log type filtering
-  if (search.log_type && search.log_type.length > 0) {
-    conditions.push(`log_type IN (${search.log_type.map((type) => `'${type}'`).join(',')})`)
-  }
+    // Handle array filters (IN clause)
+    if (Array.isArray(value) && value.length > 0) {
+      conditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(',')})`)
+      return
+    }
 
-  // Add more conditions as they are implemented in search-params.ts
+    // Handle scalar values
+    if (value !== null && value !== undefined) {
+      conditions.push(`${key} = '${value}'`)
+    }
+  })
 
   return conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
 }

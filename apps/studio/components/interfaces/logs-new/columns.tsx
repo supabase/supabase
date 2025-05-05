@@ -104,7 +104,7 @@ export const columns: ColumnDef<ColumnSchema>[] = [
   // },
   {
     accessorKey: 'log_type',
-    header: null,
+    header: '',
     cell: ({ row }) => {
       const logType = row.getValue<ColumnSchema['log_type']>('log_type')
       return (
