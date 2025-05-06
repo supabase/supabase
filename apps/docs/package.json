@@ -29,7 +29,7 @@
     "last-changed:reset": "pnpm run last-changed -- --reset",
     "codegen:examples": "cp -r ../../examples ./examples",
     "codemod:frontmatter": "node ./scripts/codemod/mdx-meta.mjs && prettier --write \"content/**/*.mdx\"",
-    "codegen:graphql": "tsx ./scripts/graphqlSchema.ts && graphql-codegen --config codegen.ts",
+    "codegen:graphql": "tsx --conditions=react-server ./scripts/graphqlSchema.ts && graphql-codegen --config codegen.ts",
     "codegen:references": "tsx features/docs/Reference.generated.script.ts",
     "clean": "rimraf node_modules features/docs/generated examples __generated__"
   },
@@ -114,7 +114,6 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.410.0",
     "@graphiql/toolkit": "^0.9.1",
     "@graphql-codegen/cli": "5.0.5",
     "@graphql-codegen/typescript": "4.1.6",

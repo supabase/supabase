@@ -29,6 +29,7 @@ import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import InfoTooltip from '~/features/ui/InfoTooltip'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import { ShowUntil } from '~/features/ui/ShowUntil'
+import { Price } from '~/components/Price'
 
 const components = {
   Accordion,
@@ -80,6 +81,7 @@ const components = {
     </Heading>
   ),
   pre: CodeBlock,
+  Price,
 }
 
 export { components }

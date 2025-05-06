@@ -47,6 +47,9 @@ importers:
 
   .:
     devDependencies:
+      '@aws-sdk/client-secrets-manager':
+        specifier: ^3.410.0
+        version: 3.468.0
       '@types/node':
         specifier: 'catalog:'
         version: 20.12.11
@@ -451,9 +454,6 @@ importers:
         specifier: ^3.22.4
         version: 3.23.8
     devDependencies:
-      '@aws-sdk/client-secrets-manager':
-        specifier: ^3.410.0
-        version: 3.468.0
       '@graphiql/toolkit':
         specifier: ^0.9.1
         version: 0.9.1(@types/node@20.12.11)(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(graphql@16.10.0)
@@ -893,9 +893,6 @@ importers:
         specifier: ^4.4.2
         version: 4.4.2
     devDependencies:
-      '@aws-sdk/client-secrets-manager':
-        specifier: ^3.410.0
-        version: 3.468.0
       '@radix-ui/react-use-escape-keydown':
         specifier: ^1.0.3
         version: 1.1.0(@types/react@18.3.3)(react@18.3.1)
