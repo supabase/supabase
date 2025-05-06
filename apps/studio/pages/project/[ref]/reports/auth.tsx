@@ -199,9 +199,9 @@ const DatabaseUsage = () => {
 
         <div className="grid grid-cols-1 gap-4">
           {dateRange &&
-            AUTH_REPORT_ATTRIBUTES.filter((attr) => !attr.hide).map((attr) => (
+            AUTH_REPORT_ATTRIBUTES.filter((attr) => !attr.hide).map((attr, i) => (
               <ComposedChartHandler
-                key={attr.id}
+                key={`${attr.id}-${i}`}
                 {...attr}
                 attributes={attr.attributes as MultiAttribute[]}
                 interval={dateRange.interval}

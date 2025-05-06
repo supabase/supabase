@@ -13,11 +13,12 @@ import { ProjectDailyStatsAttribute } from 'data/analytics/project-daily-stats-q
 import { useProjectDailyStatsQueries } from 'data/analytics/project-daily-stats-queries'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useChartHighlight } from './useChartHighlight'
+import { getMockDataForAttribute } from 'data/reports/auth-charts'
 
 import type { ChartData } from './Charts.types'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 
-type Provider = 'infra-monitoring' | 'daily-stats'
+type Provider = 'infra-monitoring' | 'daily-stats' | 'mock'
 
 export type MultiAttribute = {
   attribute: string
@@ -31,6 +32,7 @@ export type MultiAttribute = {
   type?: 'line' | 'area-bar'
   omitFromTotal?: boolean
   tooltip?: string
+  enabled?: boolean
 }
 
 interface ComposedChartHandlerProps {
@@ -159,22 +161,34 @@ const ComposedChartHandler = ({
     // Get all unique timestamps from all datasets
     const timestamps = new Set<string>()
     attributeQueries.forEach((query: any) => {
-      query.data?.data?.forEach((point: any) => {
-        timestamps.add(point.period_start)
+      query.data?.data?.forEach((dataPoint: any) => {
+        timestamps.add(dataPoint.period_start)
       })
     })
+
+    // Get only enabled attributes (or those without an enabled property)
+    const enabledAttributes = attributes.filter((attr) => attr.enabled !== false)
 
     // Combine data points for each timestamp
     const combined = Array.from(timestamps)
       .sort()
       .map((timestamp) => {
-        const point: any = { timestamp }
-        attributes.forEach((attr, index) => {
-          const queryData = attributeQueries[index].data?.data
-          const matchingPoint = queryData?.find((p: any) => p.period_start === timestamp)
-          point[attr.attribute] = matchingPoint?.[attr.attribute] ?? 0
+        const dataPoint: any = { period_start: timestamp, timestamp: timestamp }
+
+        // Only include data for enabled attributes
+        enabledAttributes.forEach((attr) => {
+          const queryIndex = attributeQueries.findIndex(
+            (q: any) => q.data?.data?.[0]?.[attr.attribute] !== undefined
+          )
+
+          if (queryIndex >= 0) {
+            const queryData = attributeQueries[queryIndex].data?.data
+            const matchingPoint = queryData?.find((p: any) => p.period_start === timestamp)
+            dataPoint[attr.attribute] = matchingPoint?.[attr.attribute] ?? 0
+          }
         })
-        return point as DataPoint
+
+        return dataPoint
       })
 
     return combined as DataPoint[]
@@ -292,6 +306,7 @@ const useAttributeQueries = (
   const dailyStatsAttributes = attributes
     .filter((attr) => attr.provider === 'daily-stats')
     .map((attr) => attr.attribute as ProjectDailyStatsAttribute)
+  const mockAttributes = attributes.filter((attr) => attr.provider === 'mock')
 
   const infraQueries = useInfraMonitoringQueries(
     infraAttributes,
@@ -314,7 +329,23 @@ const useAttributeQueries = (
     isVisible
   )
 
-  return [...infraQueries, ...dailyStatsQueries]
+  // Handle mock data queries
+  const mockQueries = useMemo(() => {
+    return mockAttributes
+      .filter((attr) => attr.enabled !== false)
+      .map((attr) => {
+        // Use the attribute value to determine which mock data to fetch
+        const mockData = getMockDataForAttribute(attr.attribute)
+
+        // The mock data is already in the correct format
+        return {
+          isLoading: false,
+          data: mockData,
+        }
+      })
+  }, [])
+
+  return [...infraQueries, ...dailyStatsQueries, ...mockQueries]
 }
 
 export default function LazyComposedChartHandler(props: ComposedChartHandlerProps) {
