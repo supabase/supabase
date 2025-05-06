@@ -24,9 +24,12 @@ permissions:
   contents: read
 
 jobs:
-  check:
+  test:
     # Uses larger hosted runner as it significantly decreases build times
     runs-on: [larger-runner-4cpu]
+    strategy:
+      matrix:
+        test_number: [1]
 
     steps:
       - uses: actions/checkout@v4
@@ -52,6 +55,7 @@ jobs:
           NODE_OPTIONS: '--max_old_space_size=3072'
         run: pnpm run test:ci
         working-directory: ./apps/studio
+
       - name: Upload coverage results to Coveralls
         uses: coverallsapp/github-action@master
         with:
@@ -62,7 +66,8 @@ jobs:
           base-path: './apps/studio'
 
   finish:
-    needs: check
+    needs: test
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
       - name: Coveralls Finished

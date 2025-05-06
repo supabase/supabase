@@ -15,8 +15,11 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test_number: [1]
 
     steps:
       - uses: actions/checkout@v4
@@ -52,11 +55,12 @@ jobs:
           base-path: './packages/ui'
 
   finish:
-    needs: build
+    needs: test
+    if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
       - name: Coveralls Finished
-        uses: coverallsapp/github-action@v1
+        uses: coverallsapp/github-action@master
         with:
           parallel-finished: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
