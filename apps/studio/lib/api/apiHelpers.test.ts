@@ -13,7 +13,7 @@ describe('apiHelpers', () => {
     })
 
     it('should return default headers when no headers are provided', () => {
-      const result = constructHeaders(null)
+      const result = constructHeaders({})
       expect(result).toEqual({
         'Content-Type': 'application/json',
         Accept: 'application/json',
