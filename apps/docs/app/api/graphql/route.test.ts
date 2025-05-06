@@ -1,7 +1,19 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { POST } from './route'
 
 describe('/api/graphql basic error statuses', () => {
+  beforeAll(() => {
+    vi.mock('server-only', () => {
+      return {}
+    })
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+  })
+
+  afterAll(() => {
+    vi.restoreAllMocks()
+    vi.doUnmock('server-only')
+  })
+
   beforeEach(() => {
     vi.clearAllMocks()
     vi.spyOn(console, 'error').mockImplementation(() => {})
