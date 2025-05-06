@@ -8,6 +8,7 @@ import {
 import { RootQueryTypeResolvers } from '~/__generated__/graphql'
 import { searchRoot } from './globalSearch/globalSearchResolver'
 import { GraphQLObjectTypeGuide } from './guide/guideSchema'
+import { GraphQLObjectTypeReferenceCLICommand } from './reference/referenceCLISchema'
 import { GraphQLObjectTypeReferenceSDKFunction } from './reference/referenceSDKSchema'
 import { GraphQLObjectTypeTroubleshooting } from './troubleshooting/troubleshootingSchema'
 
@@ -38,6 +39,7 @@ export const rootGraphQLSchema = new GraphQLSchema({
   }),
   types: [
     GraphQLObjectTypeGuide,
+    GraphQLObjectTypeReferenceCLICommand,
     GraphQLObjectTypeReferenceSDKFunction,
     GraphQLObjectTypeTroubleshooting,
   ],
