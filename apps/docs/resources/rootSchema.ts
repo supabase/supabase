@@ -8,6 +8,7 @@ import {
 import { RootQueryTypeResolvers } from '~/__generated__/graphql'
 import { searchRoot } from './globalSearch/globalSearchResolver'
 import { GraphQLObjectTypeGuide } from './guide/guideSchema'
+import { GraphQLObjectTypeReferenceSDKFunction } from './reference/referenceSDKSchema'
 
 const GRAPHQL_FIELD_INTROSPECT = 'schema' as const
 
@@ -34,5 +35,5 @@ export const rootGraphQLSchema = new GraphQLSchema({
       ...searchRoot,
     },
   }),
-  types: [GraphQLObjectTypeGuide],
+  types: [GraphQLObjectTypeGuide, GraphQLObjectTypeReferenceSDKFunction],
 })
