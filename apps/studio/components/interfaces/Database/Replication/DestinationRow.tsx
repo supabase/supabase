@@ -128,7 +128,6 @@ const DestinationRow = ({
 
     try {
       await stopPipeline({ projectRef, pipelineId: pipeline.id })
-      await deletePipeline({ projectRef, pipelineId: pipeline.id })
       await deleteSink({ projectRef, sinkId })
     } catch (error) {
       toast.error('Failed to delete destination')
