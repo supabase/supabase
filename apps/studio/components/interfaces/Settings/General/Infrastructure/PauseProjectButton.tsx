@@ -73,7 +73,7 @@ const PauseProjectButton = () => {
                 ? 'You need additional permissions to pause this project'
                 : !isProjectActive
                   ? 'Unable to pause project as project is not active'
-                  : !isPaidAndNotAwsNew
+                  : isPaidAndNotAwsNew
                     ? 'Projects on a paid plan will always be running'
                     : undefined,
           },
