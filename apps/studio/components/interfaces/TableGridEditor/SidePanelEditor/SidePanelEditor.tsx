@@ -246,7 +246,7 @@ const SidePanelEditor = ({
       : await updateColumn({
           projectRef: project?.ref!,
           connectionString: project?.connectionString,
-          id: columnId as string,
+          originalColumn: selectedColumnToEdit as PostgresColumn,
           payload: payload as UpdateColumnPayload,
           selectedTable,
           primaryKey,
