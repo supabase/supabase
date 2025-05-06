@@ -14,6 +14,7 @@ import { useProjectPauseMutation } from 'data/projects/project-pause-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useIsOrioleDb, useIsOrioleDbInAws } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -31,8 +32,11 @@ const PauseProjectButton = () => {
     PermissionAction.INFRA_EXECUTE,
     'queue_jobs.projects.pause'
   )
+  const isOrioleDbInAws = useIsOrioleDbInAws()
+  const isOrioleDb = useIsOrioleDb()
 
   const isFreePlan = organization?.plan.id === 'free'
+  const isPaidAndNotAwsNew = !isFreePlan && !(isOrioleDb && !isOrioleDbInAws)
 
   const { mutate: pauseProject, isLoading: isPausing } = useProjectPauseMutation({
     onSuccess: (res, variables) => {
@@ -50,7 +54,7 @@ const PauseProjectButton = () => {
   }
 
   const buttonDisabled =
-    !isFreePlan || project === undefined || isPaused || !canPauseProject || !isProjectActive
+    isPaidAndNotAwsNew || project === undefined || isPaused || !canPauseProject || !isProjectActive
 
   return (
     <>
@@ -69,7 +73,7 @@ const PauseProjectButton = () => {
                 ? 'You need additional permissions to pause this project'
                 : !isProjectActive
                   ? 'Unable to pause project as project is not active'
-                  : !isFreePlan
+                  : !isPaidAndNotAwsNew
                     ? 'Projects on a paid plan will always be running'
                     : undefined,
           },
