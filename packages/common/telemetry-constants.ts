@@ -272,6 +272,10 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
   properties: {
     instanceSize: string
   }
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -288,6 +292,9 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
    */
   properties: {
     instanceSize: string
+  }
+  groups: {
+    organization: string
   }
 }
 
@@ -602,6 +609,10 @@ export interface AssistantSuggestionRunQueryClickedEvent {
     queryType: string
     category?: string
   }
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -658,6 +669,10 @@ export interface AssistantEditInSqlEditorClickedEvent {
  */
 export interface CustomReportAddSQLBlockClicked {
   action: 'custom_report_add_sql_block_clicked'
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -669,6 +684,10 @@ export interface CustomReportAddSQLBlockClicked {
  */
 export interface CustomReportAssistantSQLBlockAdded {
   action: 'custom_report_assistant_sql_block_added'
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**

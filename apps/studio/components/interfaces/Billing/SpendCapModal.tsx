@@ -48,61 +48,61 @@ const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
               <TableRow>
                 <TableCell>Disk Size</TableCell>
                 <TableCell>8 GB per project</TableCell>
-                <TableCell>$0.125 per GB</TableCell>
+                <TableCell translate="no">$0.125 per GB</TableCell>
               </TableRow>
 
               <TableRow>
                 <TableCell>Egress</TableCell>
                 <TableCell>250 GB</TableCell>
-                <TableCell>$0.09 per GB</TableCell>
+                <TableCell translate="no">$0.09 per GB</TableCell>
               </TableRow>
 
               <TableRow>
                 <TableCell>Auth MAUs</TableCell>
                 <TableCell>100,000</TableCell>
-                <TableCell>$0.00325 per user</TableCell>
+                <TableCell translate="no">$0.00325 per user</TableCell>
               </TableRow>
 
               <TableRow>
                 <TableCell>Auth Third-Party MAUs</TableCell>
                 <TableCell>100,000</TableCell>
-                <TableCell>$0.00325 per user</TableCell>
+                <TableCell translate="no">$0.00325 per user</TableCell>
               </TableRow>
 
               <TableRow>
                 <TableCell>Auth Single Sign-On MAUs</TableCell>
                 <TableCell>50</TableCell>
-                <TableCell>$0.015 per user</TableCell>
+                <TableCell translate="no">$0.015 per user</TableCell>
               </TableRow>
 
               <TableRow>
                 <TableCell>Storage Size</TableCell>
                 <TableCell>100 GB</TableCell>
-                <TableCell>$0.021 per GB</TableCell>
+                <TableCell translate="no">$0.021 per GB</TableCell>
               </TableRow>
 
               <TableRow>
                 <TableCell>Storage Image Transformations</TableCell>
                 <TableCell>100 origin images</TableCell>
-                <TableCell>$5 per 1000 images</TableCell>
+                <TableCell translate="no">$5 per 1000 images</TableCell>
               </TableRow>
 
               <TableRow>
                 <TableCell>Realtime Concurrent Peak Connections</TableCell>
                 <TableCell>500</TableCell>
-                <TableCell>$10 per 1000</TableCell>
+                <TableCell translate="no">$10 per 1000</TableCell>
               </TableRow>
 
               <TableRow>
                 <TableCell>Realtime Messages</TableCell>
                 <TableCell>5 Million</TableCell>
-                <TableCell>$2.50 per Million</TableCell>
+                <TableCell translate="no">$2.50 per Million</TableCell>
               </TableRow>
 
               <TableRow>
                 <TableCell>Function Invocations</TableCell>
                 <TableCell>2 Million</TableCell>
-                <TableCell>$2 per Million</TableCell>
+                <TableCell translate="no">$2 per Million</TableCell>
               </TableRow>
             </TableBody>
           </Table>

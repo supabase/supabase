@@ -75,19 +75,6 @@ const Header = () => {
 }
 
 const Team = () => {
-  interface iIconLink {
-    link: string
-    icon: React.ReactNode
-  }
-
-  const IconLink = ({ link, icon }: iIconLink) => {
-    return (
-      <a href={link} target="_blank">
-        <div className="opacity-50 transition-opacity hover:opacity-75">{icon}</div>
-      </a>
-    )
-  }
-
   return (
     <div className="border-t border-default">
       <SectionContainer>
@@ -110,53 +97,6 @@ const Team = () => {
             </a>
           </div>
         </div>
-        {/* <div className="mt-5 grid md:gap-8 grid-cols-2 lg:grid-cols-4 w-full">
-        {TeamData.filter((x) => x.active).map((x) => (
-          <div key={x.name}>
-            <div className="flex flex-col lg:flex-row space-y-3 lg:space-y-0 lg:space-x-4">
-              <div>
-                <Image
-                  src={x.img}
-                  alt={x.name}
-                  width={40}
-                  height={40}
-                  className="rounded-md shadow-md object-contain"
-                />
-              </div>
-              <div className="flex flex-col justify-center space-y-2">
-                <div>
-                  <h5 className="mb-0">
-                    {x.name}
-                  </h5>
-                  <p className="mb-0">
-                    {x.department}
-                  </p>
-                </div>
-                <div className="flex space-x-2 text-gray-300 dark:text-gray-500">
-                  {x.twitter && (
-                    <IconLink
-                      icon={<IconTwitter size={14} strokeWidth={2} fill={'currentColor'} />}
-                      link={x.twitter}
-                    />
-                  )}
-                  {x.github && (
-                    <IconLink
-                      icon={<IconGitHub size={14} strokeWidth={2} fill={'currentColor'} />}
-                      link={x.github}
-                    />
-                  )}
-                  {x.linkedin && (
-                    <IconLink
-                      icon={<IconLinkedin size={14} strokeWidth={2} fill={'currentColor'} />}
-                      link={x.linkedin}
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div> */}
       </SectionContainer>
     </div>
   )
@@ -167,19 +107,6 @@ const Community = () => {
 
   return (
     <SectionContainer className="pt-0 lg:pt-0">
-      {/* <SectionHeader
-        title={'Community'}
-        paragraph={
-          <>
-            <p>
-              <p className="text-lg">
-                Join one of the world's fastest growing open source communities. Let's build
-                together.
-              </p>
-            </p>
-          </>
-        }
-      /> */}
       <div className="space-y-16">
         <div className="relative grid max-w-5xl grid-cols-2 gap-8 lg:grid-cols-4 ">
           {CommunityData.map((x, i) => (
