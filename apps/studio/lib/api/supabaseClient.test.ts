@@ -5,6 +5,8 @@ vi.mock('lib/constants', () => ({
   IS_PLATFORM: true,
 }))
 
+const readOnlyErrMessage = 'Read only error'
+
 vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(() => ({
     from: vi.fn(() => ({
