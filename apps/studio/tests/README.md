@@ -27,7 +27,7 @@ To mock API requests, we use the `msw` library.
 
 Global mocks can be found in `tests/lib/msw-global-api-mocks.ts`.
 
-To mock an endpoint you can use the `addAPIMock` function. Make sure to add the mock in the `beforeEach` hook. It won't work with beforeAll if you have many tests.
+To mock an endpoint you can use the `addAPIMock` function. Make sure to add the mock in the `beforeEach` hook. It won't work with `beforeAll` if you have many tests.
 
 ```ts
 beforeEach(() => {
