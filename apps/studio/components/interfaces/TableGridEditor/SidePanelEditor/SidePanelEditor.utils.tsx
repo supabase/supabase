@@ -230,7 +230,7 @@ export const createColumn = async ({
   try {
     // Once pg-meta supports composite keys, we can remove this logic
     const { isPrimaryKey, ...formattedPayload } = payload
-    await createDatabaseColumn({
+    const column = await createDatabaseColumn({
       projectRef: projectRef,
       connectionString: connectionString,
       payload: formattedPayload,
@@ -246,18 +246,18 @@ export const createColumn = async ({
         await dropConstraint(
           projectRef,
           connectionString,
-          selectedTable.schema,
-          selectedTable.name,
+          column.schema,
+          column.table,
           primaryKey.name
         )
       }
 
-      const primaryKeyColumns = existingPrimaryKeys.concat([formattedPayload.name])
+      const primaryKeyColumns = existingPrimaryKeys.concat([column.name])
       await addPrimaryKey(
         projectRef,
         connectionString,
-        selectedTable.schema,
-        selectedTable.name,
+        column.schema,
+        column.table,
         primaryKeyColumns
       )
     }
@@ -267,13 +267,13 @@ export const createColumn = async ({
       await addForeignKey({
         projectRef,
         connectionString,
-        table: { schema: selectedTable.schema, name: selectedTable.name },
+        table: { schema: column.schema, name: column.table },
         foreignKeys: foreignKeyRelations,
       })
     }
 
     if (!skipSuccessMessage) {
-      toast.success(`Successfully created column "${formattedPayload.name}"`, { id: toastId })
+      toast.success(`Successfully created column "${column.name}"`, { id: toastId })
     }
     return { error: undefined }
   } catch (error: any) {
