@@ -1,4 +1,4 @@
-import { prettyDOM, screen, waitFor } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import LogTable from 'components/interfaces/Settings/Logs/LogTable'
 import dayjs from 'dayjs'
@@ -26,36 +26,29 @@ beforeAll(() => {
 
 const fakeMicroTimestamp = dayjs().unix() * 1000
 
-test.skip('can display log data', async () => {
+const LOG_DATA = {
+  id: 'some-uuid',
+  timestamp: 1621323232312,
+  event_message: 'event message',
+  metadata: {
+    my_key: 'something_value',
+  },
+}
+
+test('can display log data', async () => {
   render(
     <>
-      <LogTable
-        projectRef="projectRef"
-        data={[
-          {
-            id: 'some-uuid',
-            timestamp: 1621323232312,
-            event_message: 'event message',
-            metadata: {
-              my_key: 'something_value',
-            },
-          },
-        ]}
-      />
+      <LogTable projectRef="default" data={[LOG_DATA]} />
     </>
   )
 
-  await screen.findByText(/event message/)
+  await screen.findAllByText(LOG_DATA.timestamp)
+})
 
-  prettyDOM(screen.getByText(/event message/))
+test('Shows total results', async () => {
+  render(<LogTable projectRef="default" data={[LOG_DATA]} />)
 
-  const row = await screen.findByText(/event message/)
-
-  await userEvent.click(row)
-
-  // [Joshen] commenting out for now - seems like we need to mock more stuff
-  await screen.findByText(/my_key/)
-  await screen.findByText(/something_value/)
+  await screen.getByText(/results \(1\)/i)
 })
 
 test('can run if no queryType provided', async () => {
