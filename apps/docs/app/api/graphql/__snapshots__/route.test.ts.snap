@@ -99,6 +99,18 @@ enum Language {
   PYTHON
 }
 
+"""A document describing how to troubleshoot an issue when using Supabase"""
+type TroubleshootingGuide implements SearchResult {
+  """The title of the troubleshooting guide"""
+  title: String
+
+  """The URL of the troubleshooting guide"""
+  href: String
+
+  """The full content of the troubleshooting guide"""
+  content: String
+}
+
 type RootQueryType {
   """Get the GraphQL schema for this endpoint"""
   schema: String!
