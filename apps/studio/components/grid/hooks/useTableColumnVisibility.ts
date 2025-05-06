@@ -20,8 +20,7 @@ export function useTableColumnVisibility() {
   }, [hiddenColumns])
 
   /**
-   * Hides a specific column.
-   * @param columnName Key of the column to hide.
+   * Hide a specific column.
    */
   const hideColumn = useCallback(
     (columnName: string) => {
@@ -44,8 +43,7 @@ export function useTableColumnVisibility() {
   )
 
   /**
-   * Shows a specific column.
-   * @param columnName Key of the column to show.
+   * Show a specific column.
    */
   const showColumn = useCallback(
     (columnName: string) => {

@@ -54,10 +54,6 @@ export function useTableColumnOrder() {
   /**
    * Moves a column based on drag-and-drop indices.
    * Intended for live updates during drag (hover).
-   * @param sourceKey Key of the column being moved.
-   * @param targetKey Key of the column being hovered over.
-   * @param sourceIndex Original index of the source column.
-   * @param targetIndex Index of the target column (where source should move to).
    */
   const moveColumn = useCallback(
     (sourceKey: string, targetKey: string, sourceIndex: number, targetIndex: number) => {
