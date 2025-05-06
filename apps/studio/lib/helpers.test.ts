@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
   tryParseJson,
   minifyJSON,
@@ -189,7 +189,7 @@ describe('copyToClipboard', () => {
   })
 
   it('falls back to writeText if clipboard.write not available', async () => {
-    delete navigator.clipboard.write
+    ;(navigator.clipboard as any).write = undefined
     await copyToClipboard('hello')
     expect(writeTextMock).toHaveBeenCalledWith('hello')
   })
