@@ -1,4 +1,4 @@
-import { openai } from '@ai-sdk/openai'
+import { bedrock } from '@ai-sdk/amazon-bedrock'
 import pgMeta from '@supabase/pg-meta'
 import { streamText, tool, type Tool } from 'ai'
 import { NextApiRequest, NextApiResponse } from 'next'
@@ -6,17 +6,16 @@ import { z } from 'zod'
 import { createSupabaseMCPClient } from './supabase-mcp'
 import crypto from 'crypto'
 import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-
 import { executeSql } from 'data/sql/execute-sql-query'
 
 export const maxDuration = 30
-const openAiKey = process.env.OPENAI_API_KEY
+const awsAccessKeyId = process.env.AWS_ACCESS_KEY_ID
 const pgMetaSchemasList = pgMeta.schemas.list()
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (!openAiKey) {
+  if (!awsAccessKeyId) {
     return res.status(500).json({
-      error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
+      error: 'No AWS_ACCESS_KEY_ID set. Create this environment variable to use AI features.',
     })
   }
 
@@ -183,8 +182,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       },
     })
 
-    console.log('mcpTools', mcpTools)
-
     const allTools = {
       ...mcpTools,
       ...(wrappedExecuteSqlTool && { execute_sql: wrappedExecuteSqlTool }),
@@ -337,9 +334,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const result = await streamText({
-      model: openai('gpt-4.1-mini'),
+      model: bedrock('us.anthropic.claude-3-7-sonnet-20250219-v1:0'),
       maxSteps: 10,
-      system: systemPrompt.trim(), // Trim any leading/trailing whitespace
+      system: systemPrompt.trim(),
       messages,
       tools: allTools,
     })
