@@ -13,7 +13,7 @@ export type UpdateTableBody = components['schemas']['UpdateTableBody']
 
 export type TableUpdateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: number
   schema: string
   payload: UpdateTableBody

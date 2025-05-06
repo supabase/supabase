@@ -41,7 +41,7 @@ export interface ProjectBase {
  */
 export interface Project extends ProjectBase {
   // available after projects.fetchDetail
-  connectionString?: string
+  connectionString?: string | null
   dbVersion?: string
   restUrl?: string
   lastDatabaseResizeAt?: string | null

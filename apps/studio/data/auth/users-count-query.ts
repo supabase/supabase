@@ -6,7 +6,7 @@ import { Filter } from './users-infinite-query'
 
 type UsersCountVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   keywords?: string
   filter?: Filter
   providers?: string[]

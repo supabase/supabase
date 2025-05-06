@@ -43,7 +43,7 @@ const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
  */
 export const addPrimaryKey = async (
   projectRef: string,
-  connectionString: string | undefined,
+  connectionString: string | undefined | null,
   schema: string,
   table: string,
   columns: string[]
@@ -60,7 +60,7 @@ export const addPrimaryKey = async (
 
 export const dropConstraint = async (
   projectRef: string,
-  connectionString: string | undefined,
+  connectionString: string | undefined | null,
   schema: string,
   table: string,
   name: string
@@ -124,7 +124,7 @@ export const addForeignKey = async ({
   foreignKeys,
 }: {
   projectRef: string
-  connectionString: string | undefined
+  connectionString?: string | null
   table: { schema: string; name: string }
   foreignKeys: ForeignKey[]
 }) => {
@@ -165,7 +165,7 @@ export const removeForeignKey = async ({
   foreignKeys,
 }: {
   projectRef: string
-  connectionString: string | undefined
+  connectionString?: string | null
   table: { schema: string; name: string }
   foreignKeys: ForeignKey[]
 }) => {
@@ -185,7 +185,7 @@ export const updateForeignKey = async ({
   foreignKeys,
 }: {
   projectRef: string
-  connectionString: string | undefined
+  connectionString?: string | null
   table: { schema: string; name: string }
   foreignKeys: ForeignKey[]
 }) => {
@@ -218,7 +218,7 @@ export const createColumn = async ({
   toastId: _toastId,
 }: {
   projectRef: string
-  connectionString: string | undefined
+  connectionString?: string | null
   payload: CreateColumnPayload
   selectedTable: PostgresTable
   primaryKey?: Constraint
@@ -295,7 +295,7 @@ export const updateColumn = async ({
   skipSuccessMessage = false,
 }: {
   projectRef: string
-  connectionString: string | undefined
+  connectionString?: string | null
   id: string
   payload: UpdateColumnPayload
   selectedTable: PostgresTable
@@ -362,7 +362,7 @@ export const updateColumn = async ({
 
 export const duplicateTable = async (
   projectRef: string,
-  connectionString: string | undefined,
+  connectionString: string | undefined | null,
   payload: { name: string; comment?: string },
   metadata: {
     duplicateTable: PostgresTable
@@ -452,7 +452,7 @@ export const createTable = async ({
   importContent,
 }: {
   projectRef: string
-  connectionString: string | undefined
+  connectionString?: string | null
   toastId: string | number
   payload: {
     name: string
@@ -642,7 +642,7 @@ export const updateTable = async ({
   primaryKey,
 }: {
   projectRef: string
-  connectionString: string | undefined
+  connectionString?: string | null
   toastId: string | number
   table: PostgresTable
   payload: any
@@ -783,7 +783,7 @@ export const updateTable = async ({
 
 export const insertRowsViaSpreadsheet = async (
   projectRef: string,
-  connectionString: string | undefined,
+  connectionString: string | undefined | null,
   file: any,
   table: PostgresTable,
   selectedHeaders: string[],
@@ -845,7 +845,7 @@ export const insertRowsViaSpreadsheet = async (
 
 export const insertTableRows = async (
   projectRef: string,
-  connectionString: string | undefined,
+  connectionString: string | undefined | null,
   table: PostgresTable,
   rows: any,
   selectedHeaders: string[],
@@ -908,7 +908,7 @@ const updateForeignKeys = async ({
   existingForeignKeyRelations,
 }: {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   table: { schema: string; name: string }
   foreignKeys: ForeignKey[]
   existingForeignKeyRelations: ForeignKeyConstraint[]
