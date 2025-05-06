@@ -200,15 +200,18 @@ export function useLoadTableEditorStateFromLocalStorageIntoUrl({
       col_order?: string
       hidden_cols?: string
     } = {}
+    // Flag to track if we need to update URL params - avoids unnecessary URL updates
     let needsUpdate = false
 
     if (searchParams.getAll('sort').length <= 0 && savedState?.sorts) {
       paramsToSet.sort = savedState.sorts
+      // Mark for update: restore saved sort settings to URL
       needsUpdate = true
     }
 
     if (searchParams.getAll('filter').length <= 0 && savedState?.filters) {
       paramsToSet.filter = savedState.filters
+      // Mark for update: restore saved filter settings to URL
       needsUpdate = true
     }
 
@@ -219,6 +222,7 @@ export function useLoadTableEditorStateFromLocalStorageIntoUrl({
       if (savedOrder.length > 0) {
         const colOrderString = savedOrder.join(',')
         paramsToSet.col_order = colOrderString
+        // Mark for update: restore saved column ordering to URL
         needsUpdate = true
       }
     }
@@ -231,10 +235,12 @@ export function useLoadTableEditorStateFromLocalStorageIntoUrl({
       if (hiddenKeys.length > 0) {
         const hiddenColsString = hiddenKeys.join(',')
         paramsToSet.hidden_cols = hiddenColsString
+        // Mark for update: restore saved hidden columns to URL
         needsUpdate = true
       }
     }
 
+    // Only update URL params if we have something to restore from localStorage
     if (needsUpdate) {
       setParams((prevParams) => ({ ...prevParams, ...paramsToSet }))
     }
