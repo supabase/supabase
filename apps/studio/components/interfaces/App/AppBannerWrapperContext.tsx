@@ -1,7 +1,6 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { noop } from 'lodash'
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
-
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 const FLY_POSTGRES_DEPRECATION_WARNING_KEY = LOCAL_STORAGE_KEYS.FLY_POSTGRES_DEPRECATION_WARNING
 

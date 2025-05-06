@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import LogoLoader from '@ui/components/LogoLoader'
+import { LogoLoader } from 'ui'
 import { useParams } from 'common'
 import { DeployEdgeFunctionWarningModal } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
 import DefaultLayout from 'components/layouts/DefaultLayout'

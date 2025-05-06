@@ -8,7 +8,7 @@ type GitHubRepositoryRelease = {
   published_at: string
 }
 
-const current = process.env.CURRENT_CLI_VERSION
+const current = `v${process.env.CURRENT_CLI_VERSION}`
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
