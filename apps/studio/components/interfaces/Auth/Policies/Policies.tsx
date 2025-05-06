@@ -110,7 +110,7 @@ const Policies = ({
     deleteDatabasePolicy({
       projectRef: project.ref,
       connectionString: project.connectionString,
-      id: selectedPolicyToDelete.id,
+      originalPolicy: selectedPolicyToDelete,
     })
   }
 
