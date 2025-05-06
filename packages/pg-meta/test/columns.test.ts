@@ -214,7 +214,7 @@ withTestDatabase('retrieve, create, update, delete column', async ({ executeQuer
       "check": null,
       "comment": "foo",
       "data_type": "smallint",
-      "default_value": "'42'::smallint",
+      "default_value": "42",
       "enums": [],
       "format": "int2",
       "id": StringMatching /\\^\\\\d\\+\\\\\\.1\\$/,
@@ -519,6 +519,66 @@ withTestDatabase('column with default value', async ({ executeQuery }) => {
       "default_value": "now()",
       "enums": [],
       "format": "timestamptz",
+      "id": StringMatching /\\^\\\\d\\+\\\\\\.1\\$/,
+      "identity_generation": null,
+      "is_generated": false,
+      "is_identity": false,
+      "is_nullable": true,
+      "is_unique": false,
+      "is_updatable": true,
+      "name": "c",
+      "ordinal_position": 1,
+      "schema": "public",
+      "table": "t",
+      "table_id": Any<Number>,
+    }
+  `
+  )
+})
+
+withTestDatabase('column with escaped quote', async ({ executeQuery }) => {
+  // Create test table using pure SQL
+  await executeQuery('CREATE TABLE t ()')
+
+  // Get table ID
+  const tableId = Number(
+    (
+      await executeQuery(
+        "SELECT oid FROM pg_class WHERE relname = 't' AND relnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'public')"
+      )
+    )[0].oid
+  )
+
+  // Create column with default value
+  const { sql: createColumnSql } = await pgMeta.columns.create({
+    table_id: tableId,
+    name: 'c',
+    type: 'text',
+    default_value: `quote's`,
+  })
+  await executeQuery(createColumnSql)
+
+  // Retrieve and verify the created column
+  const { sql: retrieveSql, zod: retrieveZod } = await pgMeta.columns.retrieve({
+    schema: 'public',
+    table: 't',
+    name: 'c',
+  })
+  const column = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+
+  expect(column).toMatchInlineSnapshot(
+    {
+      id: expect.stringMatching(/^\d+\.1$/),
+      table_id: expect.any(Number),
+    },
+    `
+    {
+      "check": null,
+      "comment": null,
+      "data_type": "text",
+      "default_value": "'quote''s'::text",
+      "enums": [],
+      "format": "text",
       "id": StringMatching /\\^\\\\d\\+\\\\\\.1\\$/,
       "identity_generation": null,
       "is_generated": false,

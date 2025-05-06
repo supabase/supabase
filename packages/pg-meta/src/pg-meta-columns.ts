@@ -138,25 +138,31 @@ function create({
   comment?: string
   check?: string
 }): { sql: string } {
-  let defaultValueClause = ''
+  // Any literal containing quotes should be added as arg
+  const clauses = ['ADD COLUMN %I', '%s']
+  const args = [literal(name), literal(type)]
+
   if (is_identity) {
     if (default_value !== undefined) {
       throw new Error('Columns cannot both be identity and have a default value')
     }
-    defaultValueClause = `GENERATED ${identity_generation} AS IDENTITY`
+    clauses.push(`GENERATED ${identity_generation} AS IDENTITY`)
   } else if (default_value !== undefined) {
-    const formattedDefault =
-      // Here we must wrap the litteral value into a String in case it receive a direct number to quote and escape
-      // for the execute(format()) call. Maybe we should change the `default_value` to only accept a string instead ?
-      default_value_format === 'expression' ? default_value : `'${literal(String(default_value))}'`
-    defaultValueClause = `DEFAULT ${formattedDefault}`
+    if (default_value_format === 'literal' && typeof default_value === 'string') {
+      clauses.push('DEFAULT %L')
+    } else {
+      clauses.push('DEFAULT %s')
+    }
+    args.push(literal(default_value))
   }
 
-  const constraints: string[] = []
-  if (is_nullable === false) constraints.push('NOT NULL')
-  if (is_primary_key) constraints.push('PRIMARY KEY')
-  if (is_unique) constraints.push('UNIQUE')
-  if (check) constraints.push(`CHECK (${check})`)
+  if (is_nullable === false) clauses.push('NOT NULL')
+  if (is_primary_key) clauses.push('PRIMARY KEY')
+  if (is_unique) clauses.push('UNIQUE')
+  if (check) {
+    clauses.push('CHECK (%s)')
+    args.push(literal(check))
+  }
 
   const sql = `
 DO $$
@@ -174,11 +180,8 @@ BEGIN
   END IF;
 
   execute(format(
-    'ALTER TABLE %I.%I ADD COLUMN %I %s ${defaultValueClause} ${constraints.join(' ')}',
-    v_schema,
-    v_table,
-    ${literal(name)},
-    ${literal(type)}
+    'ALTER TABLE %I.%I ${clauses.join(' ')}',
+    v_schema, v_table, ${args.join(', ')}
   ));
   
   ${comment ? `execute(format('COMMENT ON COLUMN %I.%I.%I IS %L', v_schema, v_table, ${literal(name)}, quote_ident(${literal(comment)})));` : ''}
