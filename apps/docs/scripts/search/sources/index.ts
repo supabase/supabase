@@ -116,7 +116,7 @@ export async function fetchCliLibReferenceSource() {
   return new CliReferenceLoader(
     'cli',
     '/reference/cli',
-    { title: 'CLI Reference' },
+    { title: 'CLI Reference', platform: 'cli' },
     'spec/cli_v1_commands.yaml',
     'spec/common-cli-sections.json'
   ).load()
