@@ -57,7 +57,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const { project } = useProjectContext()
   const selectedOrganization = useSelectedOrganization()
   const enforceNinetyDayUnpauseExpiry = useFlag('enforceNinetyDayUnpauseExpiry')
-  const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
+  const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const enableProBenefitWording = usePHFlag('proBenefitWording')
 
   const region = Object.values(AWS_REGIONS).find((x) => x.code === project?.region)
@@ -117,7 +117,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
       return toast.error('Unable to restore: project is required')
     }
 
-    if (projectVersionSelectionDisabled) {
+    if (!showPostgresVersionSelector) {
       restoreProject({ ref: project.ref })
     } else {
       const { postgresVersionSelection } = values
@@ -289,7 +289,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
       >
         <Form_Shadcn_ {...form}>
           <form onSubmit={form.handleSubmit(onConfirmRestore)}>
-            {!projectVersionSelectionDisabled && (
+            {showPostgresVersionSelector && (
               <Modal.Content>
                 <div className="space-y-2">
                   <FormField_Shadcn_
