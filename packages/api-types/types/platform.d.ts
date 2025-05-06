@@ -3298,6 +3298,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/replication/{ref}/sinks-pipelines/{sink_id}/{pipeline_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Updates a replication sink and pipeline */
+    post: operations['ReplicationSinksPipelinesController_updateSinkPipeline']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/replication/{ref}/sinks/{sink_id}': {
     parameters: {
       query?: never
@@ -7928,6 +7945,30 @@ export interface components {
       service_account_key: string
       /** @description Sink name */
       sink_name: string
+    }
+    UpdateReplicationSinkPipelineBody: {
+      pipeline_config: {
+        config: {
+          max_fill_secs: number
+          max_size: number
+        }
+      }
+      publication_name: string
+      sink_config: {
+        big_query: {
+          /** @description BigQuery dataset id */
+          dataset_id: string
+          /** @description Max staleness in minutes */
+          max_staleness_mins: number
+          /** @description BigQuery project id */
+          project_id: string
+          /** @description BigQuery service account key */
+          service_account_key: string
+        }
+      }
+      /** @description Sink name */
+      sink_name: string
+      source_id: number
     }
     UpdateSchemaBody: {
       name?: string
@@ -17576,6 +17617,47 @@ export interface operations {
         content?: never
       }
       /** @description Returned when the API fails to create the replication sink or pipeline. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationSinksPipelinesController_updateSinkPipeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Pipeline id */
+        pipeline_id: number
+        /** @description Project ref */
+        ref: string
+        /** @description Sink id */
+        sink_id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateReplicationSinkPipelineBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Returned when the API fails to update the replication sink or pipeline */
       500: {
         headers: {
           [name: string]: unknown

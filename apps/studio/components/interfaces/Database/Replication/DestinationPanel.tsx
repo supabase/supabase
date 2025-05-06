@@ -3,8 +3,6 @@ import { useParams } from 'common'
 import { useCreateTenantSourceMutation } from 'data/replication/create-tenant-source-mutation'
 import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
-import { useUpdateSinkMutation } from 'data/replication/update-sink-mutation'
-import { useUpdatePipelineMutation } from 'data/replication/update-pipeline-mutation'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -46,6 +44,7 @@ import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useCreateSinkPipelineMutation } from 'data/replication/create-sink-pipeline-mutation'
+import { useUpdateSinkPipelineMutation } from 'data/replication/update-sink-pipeline-mutation'
 
 interface DestinationPanelProps {
   visible: boolean
@@ -73,8 +72,8 @@ const DestinationPanel = ({
     useCreateSinkPipelineMutation()
   const { mutateAsync: startPipeline, isLoading: startingPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline, isLoading: stoppingPipeline } = useStopPipelineMutation()
-  const { mutateAsync: updateSink, isLoading: updatingSink } = useUpdateSinkMutation()
-  const { mutateAsync: updatePipeline, isLoading: updatingPipeline } = useUpdatePipelineMutation()
+  const { mutateAsync: updateSinkPipeline, isLoading: updatingSinkPipeline } =
+    useUpdateSinkPipelineMutation()
   const { data: publications, isLoading: loadingPublications } = useReplicationPublicationsQuery({
     projectRef,
     sourceId,
@@ -91,7 +90,7 @@ const DestinationPanel = ({
   })
 
   const isCreating = creatingTenantSource || creatingSinkPipeline || startingPipeline
-  const isUpdating = updatingSink || updatingPipeline || stoppingPipeline || startingPipeline
+  const isUpdating = updatingSinkPipeline || stoppingPipeline || startingPipeline
   const isSubmitting = isCreating || isUpdating
   const editMode = !!existingDestination
 
@@ -144,26 +143,25 @@ const DestinationPanel = ({
           return
         }
         // Update existing destination
-        await updateSink({
-          projectRef,
+        await updateSinkPipeline({
           sinkId: existingDestination.sinkId,
+          pipelineId: existingDestination.pipelineId,
+          projectRef,
           sinkName: data.name,
-          projectId: data.projectId,
-          datasetId: data.datasetId,
-          serviceAccountKey: data.serviceAccountKey,
-          maxStalenessMins: data.maxStalenessMins,
+          sinkConfig: {
+            bigQuery: {
+              projectId: data.projectId,
+              datasetId: data.datasetId,
+              serviceAccountKey: data.serviceAccountKey,
+              maxStalenessMins: data.maxStalenessMins,
+            },
+          },
+          pipelinConfig: {
+            config: { maxSize: data.maxSize, maxFillSecs: data.maxFillSecs },
+          },
+          publicationName: data.publicationName,
+          sourceId,
         })
-
-        if (existingDestination.pipelineId) {
-          await updatePipeline({
-            projectRef,
-            pipelineId: existingDestination.pipelineId,
-            sourceId,
-            sinkId: existingDestination.sinkId,
-            publicationName: data.publicationName,
-            config: { config: { maxSize: data.maxSize, maxFillSecs: data.maxFillSecs } },
-          })
-        }
         if (data.enabled) {
           await startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         } else {
