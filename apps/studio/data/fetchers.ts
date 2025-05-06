@@ -28,10 +28,10 @@ const client = createClient<paths>({
 })
 
 export function isValidConnString(connString?: string | null) {
-  // If there is no valid `connectionString`, pg-meta will necesseraly fail to connect to the target database
-  // This only apply if IS_PLATFORM is true, otherwise (test / local-dev) pg-meta won't need this parameter
-  // and will connect to the local running DB_URL instead
-  return Boolean(IS_PLATFORM && connString)
+  // If there is no `connectionString` on platform, pg-meta will necessarily fail to connect to the target database.
+  // This only applies if IS_PLATFORM is true; otherwise (test/local-dev), pg-meta won't need this parameter
+  // and will connect to the locally running DB_URL instead.
+  return IS_PLATFORM ? Boolean(connString) : true
 }
 
 export async function constructHeaders(headersInit?: HeadersInit | undefined) {
