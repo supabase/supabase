@@ -334,7 +334,7 @@ function InvoiceLineItemAmount({
       </div>
     )
   } else {
-    return <span translate="no">formatCurrency(amount)</span>
+    return <span translate="no">{formatCurrency(amount)}</span>
   }
 }
 
