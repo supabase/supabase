@@ -23,6 +23,7 @@ import {
 } from 'data/content/content-upsert-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Metric, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -42,6 +43,7 @@ const Reports = () => {
   const { id, ref } = useParams()
   const { profile } = useProfile()
   const { project } = useProjectContext()
+  const selectedOrg = useSelectedOrganization()
   const queryClient = useQueryClient()
   const state = useDatabaseSelectorStateSnapshot()
 
@@ -336,7 +338,10 @@ const Reports = () => {
         },
       }
     )
-    sendEvent({ action: 'custom_report_assistant_sql_block_added' })
+    sendEvent({
+      action: 'custom_report_assistant_sql_block_added',
+      groups: { project: ref ?? 'Unknown', organization: selectedOrg?.slug ?? 'Unknown' },
+    })
   }
 
   useEffect(() => {
