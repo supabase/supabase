@@ -12,11 +12,11 @@ vi.mock('./apiAuthenticate', () => ({
 }))
 
 describe('apiWrapper', () => {
-  const mockReq = {}
+  const mockReq = {} as any
   const mockRes = {
     status: vi.fn().mockReturnThis(),
     json: vi.fn().mockReturnThis(),
-  }
+  } as any
   const mockHandler = vi.fn()
 
   beforeEach(() => {
@@ -30,7 +30,7 @@ describe('apiWrapper', () => {
   })
 
   it('should attach user to request and call handler when authentication succeeds', async () => {
-    const mockUser = { id: '123', email: 'test@example.com' }
+    const mockUser = { id: '123', email: 'test@example.com' } as any as any
     vi.mocked(apiAuthenticate).mockResolvedValue(mockUser)
 
     await apiWrapper(mockReq, mockRes, mockHandler, { withAuth: true })
