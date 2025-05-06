@@ -58,3 +58,4 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./apps/studio/coverage/lcov.info
           base-path: './apps/studio'
+          flag: studio

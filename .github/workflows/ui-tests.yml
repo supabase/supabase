@@ -48,3 +48,4 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./packages/ui/coverage/lcov.info
           base-path: './packages/ui'
+          flag: packages-ui
