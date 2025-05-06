@@ -115,7 +115,10 @@ test.describe('Table Editor', () => {
     await page.getByRole('button', { name: 'Filter' }).click()
     await page.getByRole('button', { name: 'Add filter' }).click()
     await page.getByRole('button', { name: 'id' }).click()
-    await page.getByLabel('id').getByText('defaultValueColumn').click()
+
+    // Wait for dropdown content to be visible, then click the option
+    await page.getByRole('menuitem').filter({ hasText: 'defaultValueColumn' }).click()
+
     await page.getByPlaceholder('Enter a value').click()
     await page.getByPlaceholder('Enter a value').fill('2')
 
