@@ -151,7 +151,7 @@ export const SQLEditor = () => {
     {
       projectRef: ref,
     },
-    { enabled: Boolean(project?.connectionString) }
+    { enabled: Boolean(IS_PLATFORM && project?.connectionString) }
   )
 
   const { data, refetch: refetchEntityDefinitions } = useEntityDefinitionsQuery(
@@ -160,7 +160,7 @@ export const SQLEditor = () => {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { enabled: Boolean(project?.connectionString) && includeSchemaMetadata }
+    { enabled: Boolean(IS_PLATFORM && project?.connectionString) && includeSchemaMetadata }
   )
   const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
 

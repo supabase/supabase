@@ -9,6 +9,7 @@ import {
 } from 'lib/role-impersonation'
 import type { ResponseError } from 'types'
 import { sqlKeys } from './keys'
+import { IS_PLATFORM } from 'common'
 
 export type ExecuteSqlVariables = {
   projectRef?: string
@@ -42,7 +43,7 @@ export async function executeSql(
   headersInit?: HeadersInit
 ): Promise<{ result: any }> {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!connectionString) throw new Error('Project connection string is required')
+  if (IS_PLATFORM && !connectionString) throw new Error('Project connection string is required')
 
   const sqlSize = new Blob([sql]).size
   // [Joshen] I think the limit is around 1MB from testing, but its not exactly 1MB it seems

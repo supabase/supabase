@@ -5,6 +5,7 @@ import { uuidv4 } from 'lib/helpers'
 import createClient from 'openapi-fetch'
 import { ResponseError } from 'types'
 import type { paths } from './api' // generated from openapi-typescript
+import { IS_PLATFORM } from 'common'
 
 const DEFAULT_HEADERS = {
   Accept: 'application/json',
@@ -45,7 +46,9 @@ function pgMetaGuard(request: Request) {
   if (request.url.includes('/platform/pg-meta/')) {
     // If there is no valid `x-connection-encrypted`, pg-meta will necesseraly fail to connect to the target database
     // in such case, we save the hops and throw a 421 response instead
-    if (!request.headers.has('x-connection-encrypted')) {
+    // This only apply if IS_PLATFORM is true, otherwise (test / local-dev) pg-meta won't need this parameter
+    // and will connect to the local running DB_URL instead
+    if (IS_PLATFORM && !request.headers.has('x-connection-encrypted')) {
       // TODO: Maybe here add a sentry warning to monitor how often this happen
       // Simulate a 421 response by throwing an error
       throw {
