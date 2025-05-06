@@ -75,7 +75,6 @@ export const AIOptInLevelSelector = ({
     </div>
   )
 
-  // Conditional rendering with FormItemLayout remains the same
   return (
     <FormItemLayout
       label={label}
@@ -91,6 +90,4 @@ export const AIOptInLevelSelector = ({
       {content}
     </FormItemLayout>
   )
-
-  return content
 }

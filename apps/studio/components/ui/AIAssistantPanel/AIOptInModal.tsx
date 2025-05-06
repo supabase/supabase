@@ -36,7 +36,7 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
 
   return (
     <Dialog open={visible} onOpenChange={onOpenChange}>
-      <DialogContent size="xlarge">
+      <DialogContent size="large">
         <Form_Shadcn_ {...form}>
           <form id="ai-opt-in-form" onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader padding="small">

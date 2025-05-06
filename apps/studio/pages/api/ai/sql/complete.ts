@@ -1,4 +1,4 @@
-import { openai } from '@ai-sdk/openai'
+import { bedrock } from '@ai-sdk/amazon-bedrock'
 import pgMeta from '@supabase/pg-meta'
 import { streamText } from 'ai'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -6,14 +6,14 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { getTools } from '../sql/tools'
 
 export const maxDuration = 30
-const openAiKey = process.env.OPENAI_API_KEY
+const awsAccessKeyId = process.env.AWS_ACCESS_KEY_ID
 const pgMetaSchemasList = pgMeta.schemas.list()
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (!openAiKey) {
+  if (!awsAccessKeyId) {
     return new Response(
       JSON.stringify({
-        error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
+        error: 'No AWS_ACCESS_KEY_ID set. Create this environment variable to use AI features.',
       }),
       {
         status: 500,
@@ -60,7 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       : { result: [] }
 
     const result = await streamText({
-      model: openai('gpt-4o-mini-2024-07-18'),
+      model: bedrock('us.anthropic.claude-3-7-sonnet-20250219-v1:0'),
       maxSteps: 5,
       tools: getTools({ projectRef, connectionString, authorization, includeSchemaMetadata }),
       system: `

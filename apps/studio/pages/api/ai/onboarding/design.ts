@@ -1,10 +1,10 @@
-import { openai } from '@ai-sdk/openai'
+import { bedrock } from '@ai-sdk/amazon-bedrock'
 import { streamText } from 'ai'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { tool } from 'ai'
 import { z } from 'zod'
 
-const openAiKey = process.env.OPENAI_API_KEY
+const awsAccessKeyId = process.env.AWS_ACCESS_KEY_ID
 
 export const maxDuration = 30
 
@@ -47,9 +47,9 @@ const getTools = () => {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (!openAiKey) {
+  if (!awsAccessKeyId) {
     return res.status(400).json({
-      error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
+      error: 'No AWS_ACCESS_KEY_ID set. Create this environment variable to use AI features.',
     })
   }
 
@@ -68,7 +68,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { messages } = req.body
 
   const result = await streamText({
-    model: openai('gpt-4o-mini'),
+    model: bedrock('us.anthropic.claude-3-7-sonnet-20250219-v1:0'),
     maxSteps: 7,
     system: `
       You are a Supabase expert who helps people set up their Supabase project. You specializes in database schema design. You are to help the user design a database schema for their application but also suggest Supabase services they should use. 
