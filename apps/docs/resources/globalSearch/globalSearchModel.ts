@@ -6,6 +6,7 @@ import { supabase, type DatabaseCorrected } from '~/lib/supabase'
 import { GuideModel } from '../guide/guideModel'
 import { ReferenceSDKFunctionModel, SDKLanguageValues } from '../reference/referenceSDKModel'
 import { SearchResultInterface } from './globalSearchInterface'
+import { TroubleshootingModel } from '../troubleshooting/troubleshootingModel'
 
 export abstract class SearchResultModel {
   static async search(
@@ -59,6 +60,12 @@ function createModelFromMatch({
           methodName: metadata.methodName,
         })
       }
+    case 'github-discussions':
+      return new TroubleshootingModel({
+        title: page_title,
+        href,
+        content,
+      })
     default:
       return null
   }
