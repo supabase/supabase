@@ -181,6 +181,7 @@ export const TableGridEditor = ({
             <TableDefinition entity={selectedTable} />
           )}
         </SupabaseGrid>
+
         <SidePanelEditor
           editable={editable}
           selectedTable={isTableLike(selectedTable) ? selectedTable : undefined}
