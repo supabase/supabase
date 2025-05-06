@@ -85,8 +85,7 @@ Migrate existing users to Supabase Auth. This requires two main steps: first, ch
     // ---cut---
     const { data, error } = await supabase.auth.admin.createUser({
       email: 'valid.email@supabase.io',
-      password_hash:
-        '<Price price="2" />y<Price price="10" />$a9pghn27d7m0ltXvlX8LiOowy7XfFw0hW0G80OjKYQ1jaoejaA7NC',
+      password_hash: '$2y$10$a9pghn27d7m0ltXvlX8LiOowy7XfFw0hW0G80OjKYQ1jaoejaA7NC',
       email_confirm: true,
     })
     ```
