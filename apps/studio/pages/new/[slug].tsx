@@ -761,7 +761,10 @@ const Wizard: NextPageWithLayout = () => {
                                                   )}{' '}
                                                   CPU
                                                 </span>
-                                                <p className="text-xs text-muted instance-details">
+                                                <p
+                                                  className="text-xs text-muted instance-details"
+                                                  translate="no"
+                                                >
                                                   ${instanceSizeSpecs[option].priceHourly}/hour (~$
                                                   {instanceSizeSpecs[option].priceMonthly}/month)
                                                 </p>
