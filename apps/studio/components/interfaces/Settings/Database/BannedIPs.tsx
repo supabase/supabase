@@ -1,35 +1,38 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink, Globe } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Globe } from 'lucide-react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mutations'
 import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
+import { useUserIPAddressQuery } from 'data/misc/user-ip-address-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { BASE_PATH } from 'lib/constants'
-import { Badge, Button, Skeleton } from 'ui'
+import { Badge, Skeleton } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { DocsButton } from 'components/ui/DocsButton'
-import Link from 'next/link'
 
 const BannedIPs = () => {
   const { ref } = useParams()
   const { project } = useProjectContext()
+
   const [selectedIPToUnban, setSelectedIPToUnban] = useState<string | null>(null) // Track the selected IP for unban
+
   const {
     isLoading: isLoadingIPList,
     isFetching: isFetchingIPList,
     data: ipList,
     error: ipListError,
-    refetch,
   } = useBannedIPsQuery({
     projectRef: ref,
   })
+
+  const { data: userIPAddress } = useUserIPAddressQuery()
 
   const ipListLoading = isLoadingIPList || isFetchingIPList
 
@@ -67,16 +70,6 @@ const BannedIPs = () => {
     setShowUnban(true)
   }
 
-  const [userIPAddress, setUserIPAddress] = useState<string | null>(null)
-
-  // [TODO] Convert this to a react query
-  useEffect(() => {
-    // Fetch user's IP address
-    fetch(`${BASE_PATH}/api/get-ip-address`)
-      .then((response) => response.json())
-      .then((data) => setUserIPAddress(data.ipAddress))
-  }, [])
-
   return (
     <div id="banned-ips">
       <div className="flex items-center justify-between mb-6">
@@ -94,28 +87,11 @@ const BannedIPs = () => {
             <Skeleton className="h-4 w-full" />
           </div>
         ) : ipListError ? (
-          <div className="px-8 py-4 text-foreground-light text-sm">
-            <p className="">
-              There was an error trying to retrieve the banned IP addresses. Please try again.
-            </p>
-            <p>
-              If the problem persists, please{' '}
-              <Link className="underline" href="/support/new">
-                contact support
-              </Link>
-              .
-            </p>
-            <div className="mt-4">
-              <Button
-                type="outline"
-                onClick={() => {
-                  refetch()
-                }}
-              >
-                Try again
-              </Button>
-            </div>
-          </div>
+          <AlertError
+            className="border-0 rounded-none"
+            error={ipListError}
+            subject="Failed to retrieve banned IP addresses"
+          />
         ) : ipList && ipList.banned_ipv4_addresses.length > 0 ? (
           ipList.banned_ipv4_addresses.map((ip) => (
             <div key={ip} className="px-8 py-4 flex items-center justify-between">
