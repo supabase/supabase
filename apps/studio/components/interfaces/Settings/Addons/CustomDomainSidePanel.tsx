@@ -178,7 +178,9 @@ const CustomDomainSidePanel = () => {
                       Use the default supabase domain for your API
                     </p>
                     <div className="flex items-center space-x-1 mt-2">
-                      <p className="text-foreground text-sm">$0</p>
+                      <p className="text-foreground text-sm" translate="no">
+                        $0
+                      </p>
                       <p className="text-foreground-light translate-y-[1px]"> / month</p>
                     </div>
                   </div>
@@ -203,7 +205,9 @@ const CustomDomainSidePanel = () => {
                         Present a branded experience to your users
                       </p>
                       <div className="flex items-center space-x-1 mt-2">
-                        <p className="text-foreground text-sm">{formatCurrency(option.price)}</p>
+                        <p className="text-foreground text-sm" translate="no">
+                          {formatCurrency(option.price)}
+                        </p>
                         <p className="text-foreground-light translate-y-[1px]"> / month</p>
                       </div>
                     </div>

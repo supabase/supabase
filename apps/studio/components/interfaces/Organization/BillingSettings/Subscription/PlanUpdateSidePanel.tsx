@@ -194,7 +194,9 @@ const PlanUpdateSidePanel = () => {
                           <ShimmeringLoader className="w-[30px] h-[24px]" />
                         </div>
                       ) : (
-                        <p className="text-foreground text-lg">{formatCurrency(price)}</p>
+                        <p className="text-foreground text-lg" translate="no">
+                          {formatCurrency(price)}
+                        </p>
                       )}
                       <p className="text-foreground-light text-sm">{plan.costUnit}</p>
                     </div>
