@@ -80,7 +80,9 @@ const PolicyRow = ({
                 {policy.roles.slice(0, 3).map((role, i) => (
                   <code key={`policy-${role}-${i}`} className="text-foreground-light text-xs">
                     {role}
-                    {policy.roles.length > 1 ? '' : ' '}
+                    {policy.roles.length > 1
+                      ? i < policy.roles.length - 1 ? ', ' : ' '
+                      : ' '}
                   </code>
                 ))}
                 {policy.roles.length > 1 ? 'roles' : 'role'}
