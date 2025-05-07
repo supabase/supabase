@@ -1,8 +1,8 @@
-import { noop } from 'lodash'
-import { FeatureFlagContext } from 'common'
+import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
 import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
 import { EMPTY_OBJ } from 'lib/void'
+import { noop } from 'lodash'
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 import { APISidePanelPreview } from './APISidePanelPreview'
 import { CLSPreview } from './CLSPreview'
@@ -10,7 +10,6 @@ import { InlineEditorPreview } from './InlineEditorPreview'
 import { LayoutUpdatePreview } from './LayoutUpdatePreview'
 import { SqlEditorTabsPreview } from './SqlEditorTabs'
 import { TableEditorTabsPreview } from './TableEditorTabs'
-import { LOCAL_STORAGE_KEYS } from 'common'
 
 export const FEATURE_PREVIEWS = [
   {
@@ -148,10 +147,4 @@ export const useIsSQLEditorTabsEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   if (!IS_PLATFORM) return false
   return flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
-}
-
-export const useIsNewLayoutEnabled = (): boolean => {
-  const { flags } = useFeaturePreviewContext()
-  if (!IS_PLATFORM) return false
-  return flags[LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW]
 }

@@ -1,11 +1,11 @@
+import { ExternalLink, X } from 'lucide-react'
+import Image from 'next/image'
+
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { BASE_PATH } from 'lib/constants'
-import { ExternalLink, X } from 'lucide-react'
-import Image from 'next/image'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge, Button } from 'ui'
-import { useIsNewLayoutEnabled } from './FeaturePreviewContext'
-import { LOCAL_STORAGE_KEYS } from 'common'
 
 export const LayoutUpdatePreview = () => {
   return (
@@ -44,14 +44,18 @@ export const LayoutUpdatePreview = () => {
   )
 }
 
+/**
+ * [Joshen] We can probably remove this a month from now (e.g June) after a full roll out of the new layout
+ * We've already toggled this as a default opt in since mid May
+ */
 export const LayoutUpdateBanner = () => {
-  const newLayoutPreview = useIsNewLayoutEnabled()
   const [newLayoutPreviewState] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW, '')
   const [newLayoutAcknowledged, setNewLayoutAcknowledged] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.NEW_LAYOUT_NOTICE_ACKNOWLEDGED,
     false
   )
-  const isDefaultOptedInNewLayout = newLayoutPreview && newLayoutPreviewState === ''
+
+  const isDefaultOptedInNewLayout = newLayoutPreviewState === ''
 
   if (!isDefaultOptedInNewLayout || newLayoutAcknowledged) return null
 

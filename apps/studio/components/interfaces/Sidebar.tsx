@@ -1,15 +1,6 @@
 import { AnimatePresence, motion, MotionProps } from 'framer-motion'
 import { isUndefined } from 'lodash'
-import {
-  ArrowUpRight,
-  Blocks,
-  Boxes,
-  ChartArea,
-  PanelLeftDashed,
-  Receipt,
-  Settings,
-  Users,
-} from 'lucide-react'
+import { Blocks, Boxes, ChartArea, PanelLeftDashed, Receipt, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
@@ -22,7 +13,6 @@ import {
   generateToolRoutes,
 } from 'components/layouts/ProjectLayout/NavigationBar/NavigationBar.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { useHideSidebar } from 'hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -45,17 +35,14 @@ import {
   SidebarContent as SidebarContentPrimitive,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   Sidebar as SidebarPrimitive,
-  SidebarSeparator,
   useSidebar,
 } from 'ui'
 import {
   useIsAPIDocsSidePanelEnabled,
-  useIsNewLayoutEnabled,
   useIsSQLEditorTabsEnabled,
 } from './App/FeaturePreview/FeaturePreviewContext'
 
@@ -73,10 +60,6 @@ const SidebarMotion = motion(SidebarPrimitive) as FC<
 export interface SidebarProps extends ComponentPropsWithoutRef<typeof SidebarPrimitive> {}
 
 export const Sidebar = ({ className, ...props }: SidebarProps) => {
-  const newLayoutPreview = useIsNewLayoutEnabled()
-
-  const { ref } = useParams()
-
   const { setOpen } = useSidebar()
   const hideSideBar = useHideSidebar()
 
@@ -91,63 +74,56 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
     if (sidebarBehaviour === 'closed') setOpen(false)
   }, [sidebarBehaviour, setOpen])
 
-  if (!newLayoutPreview && !ref) {
-    return null
-  }
-
   return (
-    <>
-      <AnimatePresence>
-        {!hideSideBar && (
-          <SidebarMotion
-            {...props}
-            transition={{ delay: 0.4, duration: 0.4 }}
-            overflowing={sidebarBehaviour === 'expandable'}
-            collapsible="icon"
-            variant="sidebar"
-            onMouseEnter={() => {
-              if (sidebarBehaviour === 'expandable') setOpen(true)
-            }}
-            onMouseLeave={() => {
-              if (sidebarBehaviour === 'expandable') setOpen(false)
-            }}
-          >
-            <SidebarContent
-              footer={
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      type="text"
-                      className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? '!px-2' : ''}`}
-                      icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
-                    />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent side="top" align="start" className="w-40">
-                    <DropdownMenuRadioGroup
-                      value={sidebarBehaviour}
-                      onValueChange={(value) => setSidebarBehaviour(value as SidebarBehaviourType)}
-                    >
-                      <DropdownMenuLabel>Sidebar control</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuRadioItem value="open">Expanded</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="closed">Collapsed</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="expandable">
-                        Expand on hover
-                      </DropdownMenuRadioItem>
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              }
-            />
-          </SidebarMotion>
-        )}
-      </AnimatePresence>
-    </>
+    <AnimatePresence>
+      {!hideSideBar && (
+        <SidebarMotion
+          {...props}
+          transition={{ delay: 0.4, duration: 0.4 }}
+          overflowing={sidebarBehaviour === 'expandable'}
+          collapsible="icon"
+          variant="sidebar"
+          onMouseEnter={() => {
+            if (sidebarBehaviour === 'expandable') setOpen(true)
+          }}
+          onMouseLeave={() => {
+            if (sidebarBehaviour === 'expandable') setOpen(false)
+          }}
+        >
+          <SidebarContent
+            footer={
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="text"
+                    className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? '!px-2' : ''}`}
+                    icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="top" align="start" className="w-40">
+                  <DropdownMenuRadioGroup
+                    value={sidebarBehaviour}
+                    onValueChange={(value) => setSidebarBehaviour(value as SidebarBehaviourType)}
+                  >
+                    <DropdownMenuLabel>Sidebar control</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuRadioItem value="open">Expanded</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="closed">Collapsed</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="expandable">
+                      Expand on hover
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            }
+          />
+        </SidebarMotion>
+      )}
+    </AnimatePresence>
   )
 }
 
 export const SidebarContent = ({ footer }: { footer?: ReactNode }) => {
-  const newLayoutPreview = useIsNewLayoutEnabled()
   const { ref: projectRef } = useParams()
 
   return (
@@ -166,7 +142,7 @@ export const SidebarContent = ({ footer }: { footer?: ReactNode }) => {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
             >
-              {newLayoutPreview ? <OrganizationLinks /> : <HomePageLinks />}
+              <OrganizationLinks />
             </motion.div>
           )}
         </SidebarContentPrimitive>
@@ -364,78 +340,6 @@ const ProjectLinks = () => {
             key={`settings-routes-${i}`}
             route={route}
             active={activeRoute === route.key}
-          />
-        ))}
-      </SidebarGroup>
-    </SidebarMenu>
-  )
-}
-
-const HomePageLinks = () => {
-  const { data: organizations = [] } = useOrganizationsQuery()
-  const organizationLinks = organizations.map((org) => {
-    return { label: org.name, href: `/org/${org.slug}/general`, key: org.slug }
-  })
-  const accountLinks = [
-    { label: 'Preferences', href: `/account/me`, key: 'preferences' },
-    { label: 'Access Tokens', href: `/account/tokens`, key: 'account-tokens' },
-    { label: 'Security', href: `/account/security`, key: 'security' },
-    { label: 'Audit Logs', href: `/account/audit`, key: 'audit-logs' },
-  ]
-  const docsLinks = [
-    { label: 'Guides', href: `https://supabase.com/docs`, key: 'guides', icon: <ArrowUpRight /> },
-    {
-      label: 'API Reference',
-      href: `https://supabase.com/docs/guides/api`,
-      key: 'api-reference',
-      icon: <ArrowUpRight />,
-    },
-  ]
-
-  return (
-    <SidebarMenu className="flex flex-col gap-y-1 items-start">
-      <SidebarGroupLabel className="px-4 h-auto pt-4">Organizations</SidebarGroupLabel>
-      <SidebarGroup className="gap-0.5">
-        {organizationLinks.map((x) => (
-          <SideBarNavLink
-            key={x.key}
-            active={false}
-            route={{
-              label: x.label,
-              link: x.href,
-              key: x.label,
-            }}
-          />
-        ))}
-      </SidebarGroup>
-      <SidebarSeparator className="!bg-border-overlay w-full mx-0" />
-      <SidebarGroupLabel className="px-4 h-auto pt-4">Account</SidebarGroupLabel>
-      <SidebarGroup className="gap-0.5">
-        {accountLinks.map((x) => (
-          <SideBarNavLink
-            key={x.key}
-            active={false}
-            route={{
-              label: x.label,
-              link: x.href,
-              key: x.label,
-            }}
-          />
-        ))}
-      </SidebarGroup>
-      <SidebarSeparator className="!bg-border-overlay w-full mx-0" />
-      <SidebarGroupLabel className="px-4 h-auto pt-4">Documentation</SidebarGroupLabel>
-      <SidebarGroup className="gap-0.5">
-        {docsLinks.map((x) => (
-          <SideBarNavLink
-            key={x.key}
-            active={false}
-            route={{
-              label: x.label,
-              link: x.href,
-              key: x.label,
-              icon: x.icon,
-            }}
           />
         ))}
       </SidebarGroup>

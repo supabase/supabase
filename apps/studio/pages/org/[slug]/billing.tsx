@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 
 import { useParams } from 'common'
-import { BillingSettings } from 'components/interfaces/Organization'
+import { BillingSettings } from 'components/interfaces/Organization/BillingSettings/BillingSettings'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
