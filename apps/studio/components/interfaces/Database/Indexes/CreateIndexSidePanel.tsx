@@ -105,7 +105,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     }))
 
   const generatedSQL = `
-CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexType} (${selectedColumns
+CREATE INDEX CONCURRENTLY ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexType} (${selectedColumns
     .map((column) => `"${column}"`)
     .join(', ')});
 `.trim()
