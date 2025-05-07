@@ -33,3 +33,6 @@ public/llms/
 
 # Copied examples folder
 /examples/
+
+# Sentry Config File
+.env.sentry-build-plugin
