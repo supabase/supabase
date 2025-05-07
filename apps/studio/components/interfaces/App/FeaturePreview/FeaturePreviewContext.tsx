@@ -1,25 +1,16 @@
-import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
-import { useFlag } from 'hooks/ui/useFlag'
-import { IS_PLATFORM } from 'lib/constants'
-import { EMPTY_OBJ } from 'lib/void'
 import { noop } from 'lodash'
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
+
+import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
+import { IS_PLATFORM } from 'lib/constants'
+import { EMPTY_OBJ } from 'lib/void'
 import { APISidePanelPreview } from './APISidePanelPreview'
 import { CLSPreview } from './CLSPreview'
 import { InlineEditorPreview } from './InlineEditorPreview'
-import { LayoutUpdatePreview } from './LayoutUpdatePreview'
 import { SqlEditorTabsPreview } from './SqlEditorTabs'
 import { TableEditorTabsPreview } from './TableEditorTabs'
 
 export const FEATURE_PREVIEWS = [
-  {
-    key: LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW,
-    name: 'Layout Update for Organizations',
-    content: <LayoutUpdatePreview />,
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/33670',
-    isNew: false,
-    isPlatformOnly: true,
-  },
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
     name: 'Directly edit database entities',
@@ -74,13 +65,10 @@ export const useFeaturePreviewContext = () => useContext(FeaturePreviewContext)
 
 export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}>) => {
   const { hasLoaded } = useContext(FeatureFlagContext)
-  const enableNewLayoutPreview = useFlag('newLayoutPreview')
 
   // [Joshen] Similar logic to feature flagging previews, we can use flags to default opt in previews
   const isDefaultOptIn = (feature: (typeof FEATURE_PREVIEWS)[number]) => {
     switch (feature.key) {
-      case LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW:
-        return enableNewLayoutPreview
       default:
         return false
     }
