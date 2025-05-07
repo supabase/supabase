@@ -13,6 +13,9 @@ import { getInitialGridColumns } from 'components/grid/utils/column'
 import { getGridColumns } from 'components/grid/utils/gridColumns'
 import { Entity } from 'data/table-editor/table-editor-types'
 import { useTableEditorStateSnapshot } from './table-editor'
+import { ExtendedCalculatedColumn } from 'components/grid/types/base'
+
+// 1. Define Type
 
 export const createTableEditorTableState = ({
   projectRef,
@@ -84,7 +87,7 @@ export const createTableEditorTableState = ({
     },
 
     /* Columns */
-    gridColumns,
+    gridColumns: gridColumns as ExtendedCalculatedColumn[],
     moveColumn: (fromKey: string, toKey: string) => {
       const fromIdx = state.gridColumns.findIndex((x) => x.key === fromKey)
       const toIdx = state.gridColumns.findIndex((x) => x.key === toKey)
@@ -118,6 +121,12 @@ export const createTableEditorTableState = ({
         ;(state.gridColumns[index] as CalculatedColumn<any, any> & { idx?: number }).idx = columnIdx
       }
       state.gridColumns.sort((a, b) => a.idx - b.idx)
+    },
+    setColumnVisibility: (columnKey: string, isVisible: boolean) => {
+      const column = state.gridColumns.find((x) => x.key === columnKey)
+      if (column) {
+        column.visible = isVisible
+      }
     },
 
     /* Cells */

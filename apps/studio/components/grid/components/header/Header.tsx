@@ -35,6 +35,7 @@ import {
   Separator,
   SonnerProgress,
 } from 'ui'
+import { ColumnVisibilityPopover } from './ColumnVisibilityPopover'
 import { FilterPopover } from './filter/FilterPopover'
 import { SortPopover } from './sort/SortPopover'
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
@@ -97,6 +98,7 @@ const DefaultHeader = () => {
       <div className="flex items-center gap-2">
         <FilterPopover />
         <SortPopover />
+        <ColumnVisibilityPopover />
       </div>
       {canAddNew && (
         <>

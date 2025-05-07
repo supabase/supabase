@@ -1,4 +1,4 @@
-import { forwardRef, memo, useRef } from 'react'
+import { forwardRef, memo, useRef, useMemo } from 'react'
 import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
 
 import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
@@ -10,6 +10,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import { SELECT_COLUMN_KEY } from '../../constants'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import type { Filter, GridProps, SupaRow } from '../../types'
@@ -52,6 +53,21 @@ export const Grid = memo(
     ) => {
       const tableEditorSnap = useTableEditorStateSnapshot()
       const snap = useTableEditorTableStateSnapshot()
+
+      const processedColumns = useMemo(() => {
+        if (!snap.gridColumns) return []
+
+        let selectColumn: CalculatedColumn<any, any> | undefined = undefined
+        const visibleDataColumns = snap.gridColumns.filter((col) => {
+          if (col.key === SELECT_COLUMN_KEY) {
+            selectColumn = col
+            return false
+          }
+          return col.visible ?? true
+        })
+
+        return selectColumn ? [selectColumn, ...visibleDataColumns] : visibleDataColumns
+      }, [snap.gridColumns])
 
       const onRowsChange = useOnRowsChange(rows)
 
@@ -182,7 +198,7 @@ export const Grid = memo(
             ref={ref}
             className={`${gridClass} flex-grow`}
             rowClass={rowClass}
-            columns={snap.gridColumns as CalculatedColumn<any, any>[]}
+            columns={processedColumns as CalculatedColumn<any, any>[]}
             rows={rows ?? []}
             renderers={{ renderRow: RowRenderer }}
             rowKeyGetter={rowKeyGetter}

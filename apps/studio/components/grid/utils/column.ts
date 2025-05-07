@@ -1,12 +1,13 @@
 import { CalculatedColumn } from 'react-data-grid'
 import { ADD_COLUMN_KEY, SELECT_COLUMN_KEY } from '../constants'
 import type { SavedState } from '../types'
+import { ExtendedCalculatedColumn } from '../types/base'
 
 export function getInitialGridColumns(
-  gridColumns: CalculatedColumn<any, any>[],
+  gridColumns: ExtendedCalculatedColumn[],
   savedState?: SavedState
-) {
-  let result = gridColumns
+): ExtendedCalculatedColumn[] {
+  let result = gridColumns as ExtendedCalculatedColumn[]
 
   if (savedState?.gridColumns) {
     result = []
@@ -17,8 +18,15 @@ export function getInitialGridColumns(
     for (let i = 0; i < stateColumnsFiltered.length; i++) {
       const state = stateColumnsFiltered[i]
       const found = gridColumns.find((y) => y.key === state.key)
-      // merge with savedState item props: width
-      if (found) result.push({ ...found, width: state.width, frozen: state.frozen })
+      // merge with savedState item props: width, frozen, visible
+      if (found) {
+        result.push({
+          ...found,
+          width: state.width,
+          frozen: state.frozen,
+          visible: state.visible,
+        })
+      }
     }
 
     // check for newly created columns

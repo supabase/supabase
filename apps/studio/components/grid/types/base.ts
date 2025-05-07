@@ -1,10 +1,12 @@
-import { Filter, Sort } from '@supabase/pg-meta/src/query'
 import { CalculatedColumn, RenderHeaderCellProps } from 'react-data-grid'
 
+export interface ExtendedCalculatedColumn extends CalculatedColumn<any, any> {
+  visible?: boolean
+}
 export interface SavedState {
   filters?: string[]
   sorts?: string[]
-  gridColumns: CalculatedColumn<any, any>[]
+  gridColumns: ExtendedCalculatedColumn[]
 }
 
 export interface DragItem {

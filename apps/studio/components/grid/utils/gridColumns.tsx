@@ -66,6 +66,7 @@ export function getGridColumns(
       minWidth: COLUMN_MIN_WIDTH,
       frozen: x.isPrimaryKey || false,
       isLastFrozenColumn: false,
+      draggable: (options?.editable && !x.isPrimaryKey) || false,
       renderHeaderCell: (props) => (
         <ColumnHeader
           {...props}
@@ -88,20 +89,17 @@ export function getGridColumns(
       renderCell: getCellRenderer(x, columnType, {
         tableId: options?.tableId,
       }),
-
-      // [Next 18 Refactor] Double check if this is correct
       parent: undefined,
       level: 0,
       maxWidth: undefined,
-      draggable: false,
     }
 
     return columnDefinition
   })
 
-  const gridColumns = [SelectColumn, ...columns]
+  const gridColumns = [{ ...SelectColumn, draggable: false }, ...columns]
   if (options?.onAddColumn) {
-    gridColumns.push(AddColumn)
+    gridColumns.push({ ...AddColumn, draggable: false })
   }
 
   return gridColumns
