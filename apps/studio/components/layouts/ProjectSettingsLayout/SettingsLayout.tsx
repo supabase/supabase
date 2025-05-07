@@ -47,6 +47,7 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
   ])
 
   const newApiKeys = useFlag('newApiKeys')
+  const newJwtSecrets = useFlag('newJwtSecrets')
 
   const menuRoutes = generateSettingsMenu(ref, project, organization, {
     auth: authEnabled,
@@ -54,6 +55,7 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     storage: storageEnabled,
     invoices: invoicesEnabled,
     newApiKeys,
+    newJwtSecrets,
   })
 
   return (

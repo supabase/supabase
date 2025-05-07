@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import JWTSecretKeysTable from 'components/interfaces/JwtSecrets/JWTSecretKeysTable'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
@@ -11,14 +12,22 @@ import {
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { useParams } from 'common'
+import { useFlag } from 'hooks/ui/useFlag'
+import { useRouter } from 'next/router'
 import type { NextPageWithLayout } from 'types'
 
 const AuthSettings: NextPageWithLayout = () => {
+  const newJwtSecrets = useFlag('newJwtSecrets')
+  const router = useRouter()
+
   const { ref } = useParams()
   const isPermissionsLoaded = usePermissionsLoaded()
   // TODO: check if these permissions cover third party auth as well
   const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'api_keys')
+
+  if (!newJwtSecrets) {
+    router.push(`/project/${ref}/settings/api-keys`)
+  }
 
   return (
     <>
