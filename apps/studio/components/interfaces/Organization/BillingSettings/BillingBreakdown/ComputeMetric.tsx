@@ -35,7 +35,6 @@ const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeM
     return usageMeta.project_allocations.sort((a, b) => b.usage - a.usage)
   }, [usageMeta])
 
-
   return (
     <HoverCard openDelay={50} closeDelay={200}>
       <HoverCardTrigger>
