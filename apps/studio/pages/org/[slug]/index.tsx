@@ -1,6 +1,5 @@
 import { useState } from 'react'
 
-import { LayoutUpdateBanner } from 'components/interfaces/App/FeaturePreview/LayoutUpdatePreview'
 import { ProjectList } from 'components/interfaces/Home/ProjectList'
 import HomePageActions from 'components/interfaces/HomePageActions'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -22,8 +21,6 @@ const ProjectsPage: NextPageWithLayout = () => {
   return (
     <ScaffoldContainerLegacy>
       <div>
-        <LayoutUpdateBanner />
-
         <HomePageActions
           search={search}
           setSearch={setSearch}
