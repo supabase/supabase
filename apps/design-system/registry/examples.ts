@@ -1227,8 +1227,6 @@ export const examples: Registry = [
     type: 'components:example',
     files: ['example/logs-bar-chart.tsx'],
   },
-<<<<<<< Updated upstream
-=======
   {
     name: 'horizontal-waterfall-chart',
     type: 'components:example',
@@ -1263,5 +1261,4 @@ export const examples: Registry = [
     registryDependencies: ['flame-graph'],
     files: ['example/flame-graph-multiple-root.tsx'],
   },
->>>>>>> Stashed changes
 ]
