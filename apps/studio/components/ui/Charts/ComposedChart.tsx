@@ -1,21 +1,21 @@
 'use client'
 
-import { useState, ComponentProps, useEffect } from 'react'
 import dayjs from 'dayjs'
+import { useTheme } from 'next-themes'
+import { ComponentProps, useEffect, useState } from 'react'
 import {
   Area,
   Bar,
-  ComposedChart as RechartComposedChart,
-  XAxis,
-  YAxis,
   CartesianGrid,
   Line,
+  ComposedChart as RechartComposedChart,
   ReferenceArea,
   Tooltip,
+  XAxis,
+  YAxis,
 } from 'recharts'
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
-import { useTheme } from 'next-themes'
 import ChartHeader from './ChartHeader'
 import ChartHighlightActions from './ChartHighlightActions'
 import {
@@ -24,17 +24,17 @@ import {
   STACKED_CHART_COLORS,
   updateStackedChartColors,
 } from './Charts.constants'
-import { Datum, CommonChartProps } from './Charts.types'
-import { useChartSize, numberFormatter } from './Charts.utils'
-import { ChartHighlight } from './useChartHighlight'
-import NoDataPlaceholder from './NoDataPlaceholder'
-import { MultiAttribute } from './ComposedChartHandler'
+import { CommonChartProps, Datum } from './Charts.types'
+import { numberFormatter, useChartSize } from './Charts.utils'
 import {
   calculateTotalChartAggregate,
   CustomLabel,
   CustomTooltip,
   formatBytes,
 } from './ComposedChart.utils'
+import { MultiAttribute } from './ComposedChartHandler'
+import NoDataPlaceholder from './NoDataPlaceholder'
+import { ChartHighlight } from './useChartHighlight'
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   attributes: MultiAttribute[]

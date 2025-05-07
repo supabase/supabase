@@ -125,7 +125,7 @@ const InvoicesSettings = () => {
                     <Table.td>
                       <p>{dayjs(x.period_end * 1000).format('MMM DD, YYYY')}</p>
                     </Table.td>
-                    <Table.td>
+                    <Table.td translate="no">
                       <p>{formatCurrency(x.amount_due / 100)}</p>
                     </Table.td>
                     <Table.td>
