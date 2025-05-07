@@ -11,7 +11,7 @@ const getSelectors = (tableName: string) => ({
   signedIntOption: (page) => page.getByText('Signed two-byte integer'),
   defaultValueField: (page) => page.getByTestId('defaultValueColumn-default-value'),
   saveBtn: (page) => page.getByRole('button', { name: 'Save' }),
-  definitionTab: (page) => page.getByText('definition'),
+  definitionTab: (page) => page.getByText('definition', { exact: true }),
   viewLines: (page) => page.locator('div.view-lines'),
   insertRowBtn: (page) => page.getByTestId('table-editor-insert-new-row'),
   insertModal: (page) => page.getByText('Insert a new row into'),
@@ -19,21 +19,25 @@ const getSelectors = (tableName: string) => ({
   actionBarSaveRow: (page) => page.getByTestId('action-bar-save-row'),
   grid: (page) => page.getByRole('grid'),
   row: (page) => page.getByRole('row'),
-  sortBtn: (page) => page.getByRole('button', { name: 'Sort' }),
+  sortBtn: (page) => page.getByRole('button', { name: 'Sort', exact: true }),
   pickSortColumnBtn: (page) => page.getByTestId('table-editor-pick-column-to-sort-button'),
   sortColumnOption: (page) =>
     page.getByLabel('Pick a column to sort by').getByText('defaultValueColumn'),
   applySortingBtn: (page) => page.getByRole('button', { name: 'Apply sorting' }),
   sortedByRuleBtn: (page) => page.getByRole('button', { name: 'Sorted by 1 rule' }),
-  filterBtn: (page) => page.getByRole('button', { name: 'Filter' }),
+  filterBtn: (page) => page.getByRole('button', { name: 'Filter', exact: true }),
   addFilterBtn: (page) => page.getByRole('button', { name: 'Add filter' }),
   columnPickerBtn: (page) => page.getByRole('button', { name: 'id' }),
   filterColumnOption: (page) => page.getByLabel('id').getByText('defaultValueColumn'),
   filterInput: (page) => page.getByPlaceholder('Enter a value'),
   applyFilterBtn: (page) => page.getByRole('button', { name: 'Apply filter' }),
-  viewTableLabel: (page) => page.getByLabel(`View ${tableName}`),
+  viewTableLabel: (page) => page.getByLabel(`View ${tableName}`, { exact: true }),
   deleteTableBtn: (page) => page.getByText('Delete table'),
   confirmDeleteBtn: (page) => page.getByRole('button', { name: 'Delete' }),
+  rlsCheckbox: (page) => page.getByLabel('Enable Row Level Security ('),
+  rlsConfirmBtn: (page) => page.getByRole('button', { name: 'Confirm' }),
+  deleteTableToast: (page) =>
+    page.getByText(`Successfully deleted table "${tableName}"`, { exact: true }),
 })
 
 const createTestTable = async (page: Page, tableName: string) => {
@@ -63,6 +67,24 @@ const deleteTestTable = async (page: Page, tableName: string) => {
   await s.viewTableLabel(page).getByRole('button').nth(1).click()
   await s.deleteTableBtn(page).click()
   await s.confirmDeleteBtn(page).click()
+  await expect(s.deleteTableToast(page)).toBeVisible()
+}
+
+// Clean up all tables with prefix playwright-test-*
+const cleanupTables = async (page: Page) => {
+  let tablesToDelete = []
+  const tableRows = page.getByTestId('tables-list').locator('a')
+  const count = await tableRows.count()
+  for (let i = 0; i < count; ++i) {
+    const tableName = await tableRows.nth(i).textContent()
+    if (tableName.includes('playwright-test-')) {
+      tablesToDelete.push(tableName)
+    }
+  }
+
+  for (const table of tablesToDelete.reverse()) {
+    await deleteTestTable(page, table)
+  }
 }
 
 test.describe('Table Editor', () => {
@@ -77,11 +99,12 @@ test.describe('Table Editor', () => {
   })
 
   test.afterEach(async () => {
+    await cleanupTables(page)
     await page.close()
   })
 
   test('should create a new table', async () => {
-    const tableName = `test-table-${Math.floor(Math.random() * 10000)}`
+    const tableName = `playwright-test-creation`
     await createTestTable(page, tableName)
 
     // Verify table exists
@@ -92,7 +115,7 @@ test.describe('Table Editor', () => {
   })
 
   test('should view table definition', async () => {
-    const tableName = `test-table-${Math.floor(Math.random() * 10000)}`
+    const tableName = 'playwright-test-definition-1'
     await createTestTable(page, tableName)
 
     const s = getSelectors(tableName)
@@ -107,7 +130,7 @@ test.describe('Table Editor', () => {
   })
 
   test('should insert new rows', async () => {
-    const tableName = `test-table-${Math.floor(Math.random() * 10000)}`
+    const tableName = `playwright-test-insert-rows`
     await createTestTable(page, tableName)
 
     const s = getSelectors(tableName)
@@ -127,7 +150,7 @@ test.describe('Table Editor', () => {
   })
 
   test('should sort rows by column', async ({ apiUrl, ref }) => {
-    const tableName = `test-table-${Math.floor(Math.random() * 10000)}`
+    const tableName = `playwright-test-sorting`
     await createTestTable(page, tableName)
 
     const s = getSelectors(tableName)
@@ -167,7 +190,7 @@ test.describe('Table Editor', () => {
   })
 
   test('should filter rows', async () => {
-    const tableName = `test-table-${Math.floor(Math.random() * 10000)}`
+    const tableName = `playwright-test-filter-rows`
     await createTestTable(page, tableName)
 
     const s = getSelectors(tableName)
@@ -213,5 +236,30 @@ test.describe('Table Editor', () => {
     // Try to find the users table directly
     const usersTable = page.getByRole('button', { name: 'View users' })
     await expect(usersTable).toBeVisible({ timeout: 5000 })
+  })
+
+  test('should show rls disabled accordingly', async () => {
+    const tableNameRlsEnabled = `playwright-test-rls-enabled`
+    const tableNameRlsDisabled = `playwright-test-rls-disabled`
+    await createTestTable(page, tableNameRlsEnabled)
+
+    // testing rls enabled
+    await page.getByRole('button', { name: tableNameRlsEnabled }).click()
+    await expect(page.getByRole('link', { name: 'Add RLS policy' })).toBeVisible()
+
+    // testing rls disabled
+    const s2 = getSelectors(tableNameRlsDisabled)
+    await s2.newTableBtn(page).click()
+    await s2.tableNameInput(page).fill(tableNameRlsDisabled)
+    await s2.rlsCheckbox(page).click()
+    await s2.rlsConfirmBtn(page).click()
+    await s2.saveBtn(page).click()
+
+    await page.getByRole('button', { name: tableNameRlsDisabled }).click()
+    await expect(page.getByRole('button', { name: 'RLS disabled' })).toBeVisible()
+
+    // cleanup
+    await deleteTestTable(page, tableNameRlsEnabled)
+    await deleteTestTable(page, tableNameRlsDisabled)
   })
 })
