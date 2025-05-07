@@ -143,7 +143,7 @@ const Wizard: NextPageWithLayout = () => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
-  const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
+  const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
   const allowOrioleDB = useFlag('allowOrioleDb')
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
@@ -846,7 +846,7 @@ const Wizard: NextPageWithLayout = () => {
                       />
                     </Panel.Content>
 
-                    {!projectVersionSelectionDisabled && (
+                    {showPostgresVersionSelector && (
                       <Panel.Content>
                         <FormField_Shadcn_
                           control={form.control}
