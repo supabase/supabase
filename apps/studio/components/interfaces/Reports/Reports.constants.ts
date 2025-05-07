@@ -498,12 +498,3 @@ export const DEPRECATED_REPORTS = [
   'total_storage_patch_requests',
   'total_options_requests',
 ]
-
-export interface IndexAdvisorResult {
-  has_suggestion: boolean
-  startup_cost_before: number
-  startup_cost_after: number
-  total_cost_before: number
-  total_cost_after: number
-  index_statements: string[]
-}

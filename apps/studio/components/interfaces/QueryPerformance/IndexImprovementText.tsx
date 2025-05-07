@@ -1,6 +1,13 @@
+import { HTMLAttributes } from 'react'
+
 import { cn } from 'ui'
 import { calculateImprovement } from './index-advisor.utils'
-import { IndexImprovementTextProps } from './query-performance.types'
+
+interface IndexImprovementTextProps extends HTMLAttributes<HTMLParagraphElement> {
+  indexStatements: string[]
+  totalCostBefore: number
+  totalCostAfter: number
+}
 
 export const IndexImprovementText = ({
   indexStatements,

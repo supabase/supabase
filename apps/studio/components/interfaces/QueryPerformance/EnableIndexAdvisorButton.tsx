@@ -1,11 +1,10 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import { useIsIndexAdvisorAvailable } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorAvailable'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useIsIndexAdvisorAvailable } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorAvailable'
-import { getIndexAdvisorExtensions } from './index-advisor.utils'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,41 +22,22 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { getIndexAdvisorExtensions } from './index-advisor.utils'
 
-/**
- * EnableIndexAdvisorButton
- *
- * A component that displays a button to enable the Index Advisor functionality.
- * When clicked, it shows a confirmation dialog with details about the extensions
- * that will be enabled (index_advisor and hypopg).
- *
- * The button is only shown when the required extensions are not already enabled.
- */
 export const EnableIndexAdvisorButton = () => {
   const { project } = useProjectContext()
   const isAdvisorAvailable = useIsIndexAdvisorAvailable()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  // Query available extensions to check if index_advisor and hypopg are installed
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   const { hypopg, indexAdvisor } = getIndexAdvisorExtensions(extensions)
 
-  // Mutation hook for enabling database extensions
   const { mutateAsync: enableExtension, isLoading: isEnablingExtension } =
     useDatabaseExtensionEnableMutation()
 
-  // Don't render anything if index advisor is already available
-  if (isAdvisorAvailable) {
-    return null
-  }
-
-  /**
-   * Enables both required extensions (hypopg and index_advisor)
-   * Only enables extensions that aren't already installed
-   */
   const onEnableIndexAdvisor = async () => {
     if (project === undefined) return toast.error('Project is required')
 
@@ -90,9 +70,10 @@ export const EnableIndexAdvisorButton = () => {
     }
   }
 
+  if (isAdvisorAvailable) return null
+
   return (
     <AlertDialog open={isDialogOpen} onOpenChange={() => setIsDialogOpen(!isDialogOpen)}>
-      {/* Button with tooltip */}
       <Tooltip>
         <TooltipTrigger asChild>
           <AlertDialogTrigger asChild>
@@ -104,7 +85,6 @@ export const EnableIndexAdvisorButton = () => {
         <TooltipContent side="top">Recommends indexes to improve query performance</TooltipContent>
       </Tooltip>
 
-      {/* Confirmation dialog */}
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Enable Index Advisor</AlertDialogTitle>

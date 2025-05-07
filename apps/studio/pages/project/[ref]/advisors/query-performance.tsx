@@ -5,7 +5,10 @@ import { useParams } from 'common'
 import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance/EnableIndexAdvisorButton'
 import { useIsIndexAdvisorAvailable } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorAvailable'
 import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
-import { QUERY_PERFORMANCE_REPORT_TYPES } from 'components/interfaces/QueryPerformance/QueryPerformance.constants'
+import {
+  QUERY_PERFORMANCE_PRESET_MAP,
+  QUERY_PERFORMANCE_REPORT_TYPES,
+} from 'components/interfaces/QueryPerformance/QueryPerformance.constants'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import {
   QueryPerformanceSort,
@@ -18,12 +21,6 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
-
-const PRESET_MAP = {
-  [QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING]: 'mostTimeConsuming',
-  [QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT]: 'mostFrequentlyInvoked',
-  [QUERY_PERFORMANCE_REPORT_TYPES.SLOWEST_EXECUTION]: 'slowestExecutionTime',
-} as const
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const router = useRouter()
@@ -41,7 +38,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const hooks = queriesFactory(config.queries, projectRef ?? 'default')
   const queryHitRate = hooks.queryHitRate()
 
-  const preset = PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES]
+  const preset = QUERY_PERFORMANCE_PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES]
   const orderBy = !!sort ? ({ column: sort, order } as QueryPerformanceSort) : undefined
   const roles = router?.query?.roles ?? []
 

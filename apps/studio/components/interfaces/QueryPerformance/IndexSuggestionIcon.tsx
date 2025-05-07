@@ -1,7 +1,8 @@
 import { Loader2 } from 'lucide-react'
-import { useState } from 'react'
+import { MouseEvent, useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { GetIndexAdvisorResultResponse } from 'data/database/retrieve-index-advisor-result-query'
 import {
   Button,
   cn,
@@ -16,7 +17,11 @@ import { IndexImprovementText } from './IndexImprovementText'
 import { QueryPanelScoreSection } from './QueryPanel'
 import { useIndexInvalidation } from './hooks/useIndexInvalidation'
 import { createIndexes } from './index-advisor.utils'
-import { IndexSuggestionIconProps } from './query-performance.types'
+
+interface IndexSuggestionIconProps {
+  indexAdvisorResult: GetIndexAdvisorResultResponse
+  onClickIcon?: () => void
+}
 
 export const IndexSuggestionIcon = ({
   indexAdvisorResult,
@@ -25,15 +30,10 @@ export const IndexSuggestionIcon = ({
   const { project } = useProjectContext()
   const [isCreatingIndex, setIsCreatingIndex] = useState(false)
   const [isHoverCardOpen, setIsHoverCardOpen] = useState(false)
+
   const invalidateQueries = useIndexInvalidation()
 
-  if (!indexAdvisorResult?.index_statements?.length) return null
-
-  /**
-   * Handles the creation of indexes based on the advisor's recommendations
-   * @param e - The mouse event to prevent propagation
-   */
-  const handleCreateIndex = async (e: React.MouseEvent) => {
+  const handleCreateIndex = async (e: MouseEvent) => {
     e.stopPropagation()
 
     setIsCreatingIndex(true)
@@ -64,6 +64,8 @@ export const IndexSuggestionIcon = ({
       setTimeout(() => setIsCreatingIndex(false), 1000)
     }
   }
+
+  if (!indexAdvisorResult?.index_statements?.length) return null
 
   return (
     <HoverCard open={isHoverCardOpen} onOpenChange={setIsHoverCardOpen}>

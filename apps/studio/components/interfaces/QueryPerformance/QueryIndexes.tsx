@@ -103,9 +103,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
         projectRef: project?.ref,
         connectionString: project?.connectionString,
         indexStatements: index_statements,
-        onSuccess: () => {
-          refetch()
-        },
+        onSuccess: () => refetch(),
       })
 
       // Only invalidate queries if index creation was successful

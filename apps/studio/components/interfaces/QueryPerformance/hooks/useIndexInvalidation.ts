@@ -1,20 +1,49 @@
-import { useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { INDEX_ADVISOR_QUERY_KEYS } from '../index-advisor.utils'
+import { useRouter } from 'next/router'
+import { parseAsString, useQueryStates } from 'nuqs'
+import { useCallback } from 'react'
 
-/**
- * Hook to invalidate index-related queries in the QueryPerformance feature
- */
+import {
+  QueryPerformanceSort,
+  useQueryPerformanceQuery,
+} from 'components/interfaces/Reports/Reports.queries'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { databaseIndexesKeys } from 'data/database-indexes/keys'
+import { databaseKeys } from 'data/database/keys'
+import {
+  QUERY_PERFORMANCE_PRESET_MAP,
+  QUERY_PERFORMANCE_REPORT_TYPES,
+} from '../QueryPerformance.constants'
+import { useIsIndexAdvisorAvailable } from './useIsIndexAdvisorAvailable'
+
 export function useIndexInvalidation() {
+  const router = useRouter()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
+  const isAdvisorAvailable = useIsIndexAdvisorAvailable()
+
+  const [{ preset: urlPreset, search: searchQuery, order, sort }] = useQueryStates({
+    sort: parseAsString,
+    search: parseAsString.withDefault(''),
+    order: parseAsString,
+    preset: parseAsString.withDefault(QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING),
+  })
+
+  const preset = QUERY_PERFORMANCE_PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES]
+  const orderBy = !!sort ? ({ column: sort, order } as QueryPerformanceSort) : undefined
+  const roles = router?.query?.roles ?? []
+
+  const queryPerformanceQuery = useQueryPerformanceQuery({
+    searchQuery,
+    orderBy,
+    preset,
+    roles: typeof roles === 'string' ? [roles] : roles,
+    runIndexAdvisor: isAdvisorAvailable,
+  })
 
   return useCallback(() => {
-    // Invalidate index advisor results
-    queryClient.invalidateQueries(INDEX_ADVISOR_QUERY_KEYS.indexAdvisor(project?.ref))
-
-    // Invalidate query performance grid data
-    queryClient.invalidateQueries(INDEX_ADVISOR_QUERY_KEYS.queryPerformance)
-  }, [queryClient, project?.ref])
+    queryPerformanceQuery.runQuery()
+    queryClient.invalidateQueries(databaseKeys.indexAdvisorFromQuery(project?.ref, ''))
+    queryClient.invalidateQueries(databaseIndexesKeys.list(project?.ref))
+  }, [queryPerformanceQuery, queryClient, project?.ref])
 }

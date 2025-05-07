@@ -250,7 +250,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
               >
                 <QueryDetail
                   reportType={reportType}
-                  selectedRow={reportData[selectedRow!]}
+                  selectedRow={reportData[selectedRow]}
                   onClickViewSuggestion={() => setView('suggestion')}
                 />
               </TabsContent_Shadcn_>
@@ -258,7 +258,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                 value="suggestion"
                 className="mt-0 flex-grow min-h-0 overflow-y-auto"
               >
-                <QueryIndexes selectedRow={reportData[selectedRow!]} />
+                <QueryIndexes selectedRow={reportData[selectedRow]} />
               </TabsContent_Shadcn_>
             </Tabs_Shadcn_>
           </ResizablePanel>

@@ -1,16 +1,8 @@
-import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
-import { databaseKeys } from 'data/database/keys'
-import { executeSql } from 'data/sql/execute-sql-query'
 import { toast } from 'sonner'
-import { IndexAdvisorResult } from './query-performance.types'
 
-/**
- * Returns the query keys that need to be invalidated after index operations
- */
-export const INDEX_ADVISOR_QUERY_KEYS = {
-  indexAdvisor: (projectRef?: string) => databaseKeys.indexAdvisorFromQuery(projectRef, ''),
-  queryPerformance: ['query-performance'],
-}
+import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
+import { GetIndexAdvisorResultResponse } from 'data/database/retrieve-index-advisor-result-query'
+import { executeSql } from 'data/sql/execute-sql-query'
 
 /**
  * Gets the required extensions for index advisor
@@ -104,7 +96,7 @@ export async function createIndexes({
  * @returns Whether there are index recommendations available
  */
 export function hasIndexRecommendations(
-  result: IndexAdvisorResult | undefined,
+  result: GetIndexAdvisorResultResponse | undefined,
   isSuccess: boolean
 ): boolean {
   return Boolean(isSuccess && result?.index_statements && result.index_statements.length > 0)
