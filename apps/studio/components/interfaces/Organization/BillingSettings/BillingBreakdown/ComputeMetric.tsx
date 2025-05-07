@@ -69,7 +69,7 @@ const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeM
                 Each Preview branch is a separate environment with all Supabase services (Database,
                 Auth, Storage, etc.).{' '}
                 <Link
-                  href="https://supabase.com/docs/guides/platform/manage-your-usage/branchinge"
+                  href="https://supabase.com/docs/guides/platform/manage-your-usage/branching"
                   target="_blank"
                   className="transition text-brand hover:text-brand-600 underline"
                 >
