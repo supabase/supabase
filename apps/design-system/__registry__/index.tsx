@@ -2216,8 +2216,6 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-<<<<<<< Updated upstream
-=======
     "horizontal-waterfall-chart": {
       name: "horizontal-waterfall-chart",
       type: "components:example",
@@ -2284,7 +2282,6 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
->>>>>>> Stashed changes
     "chart-area-axes": {
       name: "chart-area-axes",
       type: "components:block",
