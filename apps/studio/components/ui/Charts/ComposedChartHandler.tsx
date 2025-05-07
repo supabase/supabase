@@ -17,7 +17,7 @@ import { useChartHighlight } from './useChartHighlight'
 import type { ChartData } from './Charts.types'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 
-type Provider = 'infra-monitoring' | 'daily-stats'
+type Provider = 'infra-monitoring' | 'daily-stats' | 'custom'
 
 export type MultiAttribute = {
   attribute: string
@@ -31,6 +31,7 @@ export type MultiAttribute = {
   type?: 'line' | 'area-bar'
   omitFromTotal?: boolean
   tooltip?: string
+  customValue?: number
 }
 
 interface ComposedChartHandlerProps {
@@ -171,6 +172,12 @@ const ComposedChartHandler = ({
       .map((timestamp) => {
         const point: any = { timestamp }
         attributes.forEach((attr, index) => {
+          // Handle custom value attributes (like disk size)
+          if (attr.customValue !== undefined) {
+            point[attr.attribute] = attr.customValue
+            return
+          }
+
           const queryData = attributeQueries[index].data?.data
           const matchingPoint = queryData?.find((p: any) => p.period_start === timestamp)
           point[attr.attribute] = matchingPoint?.[attr.attribute] ?? 0

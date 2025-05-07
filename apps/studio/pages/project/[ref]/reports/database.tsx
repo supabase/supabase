@@ -96,7 +96,24 @@ const DatabaseUsage = () => {
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
   const REPORT_ATTRIBUTES = getReportAttributes(isFreePlan)
-  const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(isFreePlan)
+  const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(isFreePlan).map((attr) => {
+    if (attr.id === 'ram-usage') {
+      return {
+        ...attr,
+        attributes: attr.attributes.map((attribute) => {
+          if (attribute.attribute === 'ram_disk_size') {
+            return {
+              ...attribute,
+              customValue: currentDiskSize * 1024 * 1024 * 1024, // Convert GB to bytes
+            }
+          }
+          return attribute
+        }),
+      }
+    }
+
+    return attr
+  })
 
   const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
     onSuccess: (_, variables) => {

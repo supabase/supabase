@@ -33,7 +33,7 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
     showLegend: true,
     hideChartType: false,
     defaultChartStyle: 'line',
-    showMaxValue: false,
+    showMaxValue: true,
     showGrid: true,
     YAxisProps: { width: 55, tickFormatter: (value: any) => formatBytes(value, 0) },
     attributes: [
@@ -64,6 +64,13 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
         label: 'Swap',
         tooltip:
           'Memory swapped to disk when RAM is full. An instance has 1GB of SWAP. High swap with high disk I/O signals memory stress.',
+      },
+      {
+        attribute: 'ram_disk_size',
+        provider: 'custom',
+        label: 'Provisioned Disk Size',
+        isMaxValue: true,
+        tooltip: 'Total disk size provisioned for this database instance.',
       },
     ],
   },

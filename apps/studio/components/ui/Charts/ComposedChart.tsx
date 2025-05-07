@@ -263,7 +263,7 @@ export default function ComposedChart({
             hide={hideYAxis}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
-            domain={isPercentage ? yDomain : undefined}
+            domain={isPercentage && !showMaxValue ? yDomain : undefined}
             key={yAxisKey}
           />
           <XAxis
