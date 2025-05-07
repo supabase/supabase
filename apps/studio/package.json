@@ -80,8 +80,6 @@
     "markdown-table": "^3.0.3",
     "memoize-one": "^5.0.1",
     "mime-db": "^1.53.0",
-    "mobx": "^6.10.2",
-    "mobx-react-lite": "^4.0.5",
     "monaco-editor": "0.52.2",
     "next": "~15.3.0",
     "next-themes": "^0.3.0",
