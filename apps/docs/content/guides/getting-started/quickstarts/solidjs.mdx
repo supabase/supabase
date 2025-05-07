@@ -51,12 +51,34 @@ hideToc: true
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Query data from the app">
+    <StepHikeCompact.Details title="Declare Supabase Environment Variables">
 
-    In `App.jsx`, create a Supabase client using your project URL and public API (anon) key:
+    Create a `.env.local` file and populate with your Supabase connection variables:
 
     <ProjectConfigVariables variable="url" />
     <ProjectConfigVariables variable="anonKey" />
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      <$CodeTabs>
+
+        ```text name=.env.local
+        VITE_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+        VITE_SUPABASE_ANON_KEY=<SUBSTITUTE_SUPABASE_ANON_KEY>
+        ```
+
+      </$CodeTabs>
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Query data from the app">
+
+    In `App.jsx`, create a Supabase client to fetch the instruments data.
 
     Add a `getInstruments` function to fetch the data and display the query result to the page.
 
@@ -92,7 +114,7 @@ hideToc: true
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={5}>
+  <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Start the app">
 
     Start the app and go to http://localhost:3000 in a browser and you should see the list of instruments.
