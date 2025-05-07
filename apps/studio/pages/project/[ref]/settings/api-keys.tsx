@@ -1,16 +1,19 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 
-import LegacyAPIKeys from 'components/interfaces/APIKeys/LegacyAPIKeys'
+import { LegacyAPIKeys } from 'components/interfaces/APIKeys/LegacyAPIKeys'
 import { PublishableAPIKeys } from 'components/interfaces/APIKeys/PublishableAPIKeys'
 import { SecretAPIKeys } from 'components/interfaces/APIKeys/SecretAPIKeys'
+import {
+  ApiKeysComingSoonBanner,
+  ApiKeysCreateCallout,
+} from 'components/interfaces/APIKeys/ApiKeysIllustrations'
+import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ApiKeysLayout from 'components/layouts/project/[ref]/settings/APIKeysLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import type { NextPageWithLayout } from 'types'
-import { Separator } from 'ui'
+import { Separator, cn } from 'ui'
 
 const ApiKeysSettings: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
@@ -19,21 +22,25 @@ const ApiKeysSettings: NextPageWithLayout = () => {
     undefined
   )
 
-  // const isPermissionsLoaded = usePermissionsLoaded()
-  // TODO: check if these permissions cover third party auth as well
-  const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'api_keys')
+  const { isInRollout, shouldDisableUI } = useApiKeysVisibility()
 
   return (
     <>
-      {apiKeysView !== 'legacy-keys' ? (
-        <>
-          <PublishableAPIKeys />
-          <Separator />
-          <SecretAPIKeys />
-        </>
-      ) : (
-        <LegacyAPIKeys />
-      )}
+      {!isInRollout && <ApiKeysComingSoonBanner />}
+
+      <ApiKeysCreateCallout />
+
+      <div className={cn(shouldDisableUI && 'opacity-50 pointer-events-none')}>
+        {apiKeysView !== 'legacy-keys' ? (
+          <>
+            <PublishableAPIKeys />
+            <Separator />
+            <SecretAPIKeys />
+          </>
+        ) : (
+          <LegacyAPIKeys />
+        )}
+      </div>
     </>
   )
 }

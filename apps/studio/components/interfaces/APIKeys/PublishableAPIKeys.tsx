@@ -10,7 +10,7 @@ import { useMemo } from 'react'
 import { cn, EyeOffIcon, Input_Shadcn_, Skeleton, WarningIcon } from 'ui'
 import QuickKeyCopyWrapper from './QuickKeyCopy'
 // to add in later with follow up PR
-// import CreatePublishableAPIKeyModal from './CreatePublishableAPIKeyModal'
+// import CreatePublishableAPIKeyDialog from './CreatePublishableAPIKeyDialog'
 // to add in later with follow up PR
 // import ShowPublicJWTsDialogComposer from '../JwtSecrets/ShowPublicJWTsDialogComposer'
 

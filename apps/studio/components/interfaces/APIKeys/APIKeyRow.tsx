@@ -47,7 +47,7 @@ export const APIKeyRow = ({
       <TableCell className="py-2">{apiKey.description || '/'}</TableCell>
       <TableCell className="py-2">
         <div className="flex flex-row gap-2">
-          <Input apiKey={apiKey} />
+          <SecretAPIKeyInput apiKey={apiKey} />
         </div>
       </TableCell>
 
@@ -71,7 +71,7 @@ export const APIKeyRow = ({
   )
 }
 
-function Input({
+export function SecretAPIKeyInput({
   apiKey,
 }: {
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>

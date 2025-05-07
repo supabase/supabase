@@ -1,7 +1,7 @@
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import DisplayApiSettings from 'components/ui/ProjectSettings/DisplayApiSettings'
 
-const LegacyAPIKeys = () => {
+export function LegacyAPIKeys() {
   return (
     <div>
       <FormHeader
@@ -13,5 +13,3 @@ const LegacyAPIKeys = () => {
   )
   return
 }
-
-export default LegacyAPIKeys
