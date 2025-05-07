@@ -1,6 +1,7 @@
+import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
-import { Search } from 'lucide-react'
+import { Plus, Search } from 'lucide-react'
 import { useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -16,15 +17,15 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Input } from 'ui'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
 import TriggerList from './TriggerList'
 
 interface TriggersListProps {
   createTrigger: () => void
-  editTrigger: (trigger: any) => void
-  deleteTrigger: (trigger: any) => void
+  editTrigger: (trigger: PostgresTrigger) => void
+  deleteTrigger: (trigger: PostgresTrigger) => void
 }
 
 const TriggersList = ({
@@ -33,7 +34,7 @@ const TriggersList = ({
   deleteTrigger = noop,
 }: TriggersListProps) => {
   const { project } = useProjectContext()
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [filterString, setFilterString] = useState<string>('')
 
@@ -111,6 +112,7 @@ const TriggersList = ({
               <div className="flex items-center gap-x-2">
                 <ButtonTooltip
                   disabled={!canCreateTriggers}
+                  icon={<Plus />}
                   onClick={() => createTrigger()}
                   className="flex-grow"
                   tooltip={{
@@ -122,15 +124,17 @@ const TriggersList = ({
                     },
                   }}
                 >
-                  Create a new trigger
+                  New trigger
                 </ButtonTooltip>
+
                 <ButtonTooltip
                   type="default"
                   disabled={!canCreateTriggers}
                   className="px-1 pointer-events-auto"
                   icon={<AiIconAnimation size={16} />}
                   onClick={() =>
-                    setAiAssistantPanel({
+                    aiSnap.newChat({
+                      name: 'Create new trigger',
                       open: true,
                       initialInput: `Create a new trigger for the schema ${selectedSchema} that does ...`,
                       suggestions: {

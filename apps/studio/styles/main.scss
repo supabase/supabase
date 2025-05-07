@@ -2,10 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-@import '~ui/build/css/source/global.css';
-@import '~ui/build/css/themes/dark.css';
-@import '~ui/build/css/themes/light.css';
-@import '~ui/build/css/themes/classic-dark.css';
+@import './../../../packages/ui/build/css/source/global.css';
+@import './../../../packages/ui/build/css/source/global.css';
+@import './../../../packages/ui/build/css/themes/dark.css';
+@import './../../../packages/ui/build/css/themes/light.css';
+@import './../../../packages/ui/build/css/themes/classic-dark.css';
 
 :root {
   --chart-1: hsl(var(--brand-default));
@@ -25,6 +26,9 @@
   --sidebar-ring: 217.2 91.2% 59.8%;
 }
 
+[data-theme='deep-dark'],
+.deep-dark,
+[data-theme='dark'],
 .dark {
   --chart-1: hsl(var(--brand-default));
   --chart-2: 160 60% 45%;
@@ -62,7 +66,7 @@ html,
 body,
 #__next,
 .main {
-  @apply bg-studio relative;
+  @apply bg-dash-sidebar relative;
   @apply text-foreground;
   @apply overflow-x-clip;
   -moz-osx-font-smoothing: grayscale;
@@ -248,12 +252,6 @@ div[data-radix-portal]:not(.portal--toast) {
   button {
     display: block;
     width: 100%;
-  }
-}
-
-.text-area-text-sm {
-  textarea {
-    @apply text-sm;
   }
 }
 

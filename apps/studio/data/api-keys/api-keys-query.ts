@@ -4,6 +4,45 @@ import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { apiKeysKeys } from './keys'
 
+type LegacyKeys = {
+  api_key: string
+  description?: string | null
+  hash?: string | null
+  id?: string | null
+  inserted_at?: string | null
+  name: string
+  prefix?: string | null
+  secret_jwt_template?: { role: string } | null
+  type: 'legacy' | null
+  updated_at?: string | null
+}
+
+type SecretKeys = {
+  api_key: string
+  description?: string
+  hash: string
+  id: string
+  inserted_at: string
+  name: string
+  prefix: string
+  secret_jwt_template: { role: string }
+  type: 'secret'
+  updated_at?: string
+}
+
+type PublishableKeys = {
+  api_key: string
+  description?: string
+  hash?: string
+  id: string
+  inserted_at: string
+  name: string
+  prefix?: string
+  secret_jwt_template?: { role: string } | null
+  type: 'publishable'
+  updated_at?: string
+}
+
 export interface APIKeysVariables {
   projectRef?: string
   reveal: boolean
@@ -22,8 +61,8 @@ export async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signa
   }
 
   // [Jonny]: Overriding the types here since some stuff is not actually nullable or optional
-  return data as unknown as // // Legacy keys //
-  (| {
+  return data as unknown as ( // // Legacy keys //
+    | {
         api_key: string
         description?: string | null
         hash?: string | null

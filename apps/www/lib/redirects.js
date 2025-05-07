@@ -2974,6 +2974,11 @@ module.exports = [
     source: '/docs/guides/project-management/api',
     destination: '/docs/reference/api/introduction',
   },
+  {
+    permanent: false,
+    source: '/mcp',
+    destination: '/docs/guides/getting-started/mcp',
+  },
 
   // marketing
 
@@ -2993,5 +2998,10 @@ module.exports = [
     permanent: true,
     source: '/features/fly-postgres',
     destination: '/features/postgres-database',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/fly-postgres',
+    destination: '/docs/guides/database/overview',
   },
 ]

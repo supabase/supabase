@@ -1,43 +1,10 @@
 'use client'
 
-import { type PropsWithChildren, type ReactNode, forwardRef } from 'react'
-
+import { type PropsWithChildren, forwardRef } from 'react'
 import { CommandItem_Shadcn_, cn } from 'ui'
 import { useCrossCompatRouter } from '../api/hooks/useCrossCompatRouter'
-import { useQuery } from '../api/hooks/queryHooks'
 import { useSetCommandMenuOpen } from '../api/hooks/viewHooks'
-
-type ICommand = IActionCommand | IRouteCommand
-
-interface IBaseCommand {
-  id: string
-  name: string
-  value?: string
-  className?: string
-  forceMount?: boolean
-  badge?: () => ReactNode
-  icon?: () => ReactNode
-  /**
-   * Whether the item should be hidden until searched
-   */
-  defaultHidden?: boolean
-  /**
-   * Currently unused
-   */
-  keywords?: string[]
-  /**
-   * Currently unused
-   */
-  shortcut?: string
-}
-
-interface IActionCommand extends IBaseCommand {
-  action: () => void
-}
-
-interface IRouteCommand extends IBaseCommand {
-  route: `/${string}` | `http${string}`
-}
+import { type ICommand, type IActionCommand, type IRouteCommand } from './types'
 
 const isActionCommand = (command: ICommand): command is IActionCommand => 'action' in command
 const isRouteCommand = (command: ICommand): command is IRouteCommand => 'route' in command
@@ -123,5 +90,4 @@ const CommandItem = forwardRef<
 })
 CommandItem.displayName = CommandItem_Shadcn_.displayName
 
-export { CommandItem, generateCommandClassNames, isActionCommand, isRouteCommand }
-export type { ICommand }
+export { CommandItem, generateCommandClassNames }

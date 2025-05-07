@@ -26,6 +26,7 @@ export interface RowEditorProps {
   row?: Dictionary<any>
   selectedTable: PostgresTable
   visible: boolean
+  editable?: boolean
   closePanel: () => void
   saveChanges: (payload: any, isNewRecord: boolean, configuration: any, resolve: () => void) => void
   updateEditorDirty: () => void
@@ -35,6 +36,7 @@ const RowEditor = ({
   row,
   selectedTable,
   visible = false,
+  editable = true,
   closePanel = noop,
   saveChanges = noop,
   updateEditorDirty = noop,
@@ -180,6 +182,7 @@ const RowEditor = ({
                       onEditJson={setSelectedValueForJsonEdit}
                       onEditText={setSelectedValueForTextEdit}
                       onSelectForeignKey={() => onOpenForeignRowSelector(field)}
+                      isEditable={editable}
                     />
                   )
                 })}
@@ -206,6 +209,7 @@ const RowEditor = ({
                           onEditText={setSelectedValueForTextEdit}
                           onEditJson={setSelectedValueForJsonEdit}
                           onSelectForeignKey={() => onOpenForeignRowSelector(field)}
+                          isEditable={editable}
                         />
                       )
                     })}
@@ -223,6 +227,7 @@ const RowEditor = ({
                 onUpdateField({ [selectedValueForTextEdit?.column ?? '']: value })
                 setSelectedValueForTextEdit(undefined)
               }}
+              readOnly={!editable}
             />
             <JsonEditor
               visible={isEditingJson}
@@ -233,6 +238,7 @@ const RowEditor = ({
                 onUpdateField({ [selectedValueForJsonEdit?.column ?? '']: value })
                 setSelectedValueForJsonEdit(undefined)
               }}
+              readOnly={!editable}
             />
           </div>
           <div className="flex-shrink">
@@ -241,6 +247,7 @@ const RowEditor = ({
               backButtonLabel="Cancel"
               applyButtonLabel="Save"
               closePanel={closePanel}
+              hideApply={!editable}
             />
           </div>
         </div>

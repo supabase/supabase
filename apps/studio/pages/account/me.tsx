@@ -1,8 +1,14 @@
-import { AccountInformation, AnalyticsSettings } from 'components/interfaces/Account/Preferences'
 import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
+import { AccountIdentities } from 'components/interfaces/Account/Preferences/AccountIdentities'
+import { AnalyticsSettings } from 'components/interfaces/Account/Preferences/AnalyticsSettings'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import { ThemeSettings } from 'components/interfaces/Account/Preferences/ThemeSettings'
+import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import AccountSettingsLayout from 'components/layouts/AccountLayout/AccountSettingsLayout'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import {
   ScaffoldContainer,
   ScaffoldDescription,
@@ -17,6 +23,12 @@ import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
 
 const User: NextPageWithLayout = () => {
+  const newLayoutPreview = useIsNewLayoutEnabled()
+
+  if (newLayoutPreview) {
+    return <ProfileCard />
+  }
+
   return (
     <ScaffoldContainer>
       <ScaffoldHeader>
@@ -31,24 +43,22 @@ const User: NextPageWithLayout = () => {
 }
 
 User.getLayout = (page) => (
-  <AccountLayout
-    title="Preferences"
-    breadcrumbs={[
-      {
-        key: `supabase-settings`,
-        label: 'Preferences',
-      },
-    ]}
-  >
-    {page}
-  </AccountLayout>
+  <AppLayout>
+    <DefaultLayout headerTitle="Account">
+      <OrganizationLayout>
+        <AccountLayout title="Preferences">
+          <AccountSettingsLayout>{page}</AccountSettingsLayout>
+        </AccountLayout>
+      </OrganizationLayout>
+    </DefaultLayout>
+  </AppLayout>
 )
 
 export default User
 
 const ProfileCard = () => {
   const profileUpdateEnabled = useIsFeatureEnabled('profile:update')
-  const { profile, error, isLoading, isError, isSuccess } = useProfile()
+  const { error, isLoading, isError, isSuccess } = useProfile()
 
   return (
     <article>
@@ -68,10 +78,8 @@ const ProfileCard = () => {
       )}
       {isSuccess && (
         <>
-          <section>
-            <AccountInformation profile={profile} />
-          </section>
-          {profileUpdateEnabled && isSuccess ? <ProfileInformation profile={profile!} /> : null}
+          {profileUpdateEnabled && isSuccess ? <ProfileInformation /> : null}
+          <AccountIdentities />
         </>
       )}
 

@@ -417,7 +417,7 @@ from books;
 ```js
 const { data, error } = await supabase.from('books').select(`
     title,
-    description:  metadata->description,
+    description:  metadata->>description,
     price:        metadata->price,
     low_age:      metadata->ages->0,
     high_age:     metadata->ages->1
@@ -433,7 +433,7 @@ try await supabase
   .select(
     """
       title,
-      description:  metadata->description,
+      description:  metadata->>description,
       price:        metadata->price,
       low_age:      metadata->ages->0,
       high_age:     metadata->ages->1
@@ -448,7 +448,7 @@ try await supabase
 ```kotlin
 val data = supabase.from("books").select(Columns.raw("""
     title,
-    description: metadata->description,
+    description: metadata->>description,
     price: metadata->price,
     low_age: metadata->ages->0,
     high_age: metadata->ages->1
@@ -461,7 +461,7 @@ val data = supabase.from("books").select(Columns.raw("""
 ```python
 data = supabase.from_('books').select("""
   title,
-  description: metadata->description,
+  description: metadata->>description,
   price: metadata->price,
   low_age: metadata->ages->0,
   high_age: metadata->ages->1

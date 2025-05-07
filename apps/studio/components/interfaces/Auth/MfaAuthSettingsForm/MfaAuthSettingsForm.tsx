@@ -11,7 +11,6 @@ import NoPermission from 'components/ui/NoPermission'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
@@ -81,12 +80,7 @@ const phoneSchema = object({
 
 const MfaAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
-  const {
-    data: authConfig,
-    error: authConfigError,
-    isLoading,
-    isError,
-  } = useAuthConfigQuery({ projectRef })
+  const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
   // Separate loading states for each form
@@ -97,17 +91,8 @@ const MfaAuthSettingsForm = () => {
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   const organization = useSelectedOrganization()
-  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
-    orgSlug: organization?.slug,
-  })
-
-  const isProPlanAndUp = isSuccessSubscription && subscription?.plan?.id !== 'free'
+  const isProPlanAndUp = organization?.plan?.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
-
-  const projectAddons = subscription?.project_addons.find((addon) => addon.ref === projectRef)
-  const hasPurchasedAuthMFAAddOn = projectAddons?.addons.some(
-    (addon) => addon.type === 'auth_mfa_phone'
-  )
 
   // For now, we support Twilio and Vonage. Twilio Verify is not supported and the remaining providers are community maintained.
   const sendSMSHookIsEnabled =
@@ -234,7 +219,8 @@ const MfaAuthSettingsForm = () => {
 
   const phoneMFAIsEnabled =
     phoneForm.watch('MFA_PHONE') === 'Enabled' || phoneForm.watch('MFA_PHONE') === 'Verify Enabled'
-  const hasUpgradedPhoneMFA = authConfig?.MFA_PHONE_VERIFY_ENABLED === false && phoneMFAIsEnabled
+  const hasUpgradedPhoneMFA =
+    authConfig && !authConfig.MFA_PHONE_VERIFY_ENABLED && phoneMFAIsEnabled
 
   return (
     <>
@@ -433,9 +419,10 @@ const MfaAuthSettingsForm = () => {
                   <Alert_Shadcn_ variant="warning">
                     <WarningIcon />
                     <AlertTitle_Shadcn_>
-                      Enabling advanced MFA with phone will result in an additional charge of $75
-                      per month for the first project in the organization and an additional $10 per
-                      month for additional projects.
+                      Enabling advanced MFA with phone will result in an additional charge of{' '}
+                      <span translate="no">$75</span>
+                      per month for the first project in the organization and an additional{' '}
+                      <span translate="no">$10</span> per month for additional projects.
                     </AlertTitle_Shadcn_>
                   </Alert_Shadcn_>
                 </CardContent>

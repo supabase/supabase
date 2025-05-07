@@ -10,10 +10,12 @@ import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { constructHeaders } from 'data/fetchers'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { prettifyJSON } from 'lib/helpers'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
-import { useGetImpersonatedRole } from 'state/role-impersonation-state'
+import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import {
   Badge,
   Button,
@@ -75,6 +77,8 @@ type FormValues = z.infer<typeof FormSchema>
 
 export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTesterSheetProps) => {
   const { ref: projectRef, functionSlug } = useParams()
+  const { mutate: sendEvent } = useSendEventMutation()
+  const org = useSelectedOrganization()
   const [response, setResponse] = useState<ResponseData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -82,7 +86,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
-  const getImpersonatedRole = useGetImpersonatedRole()
+  const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const { serviceKey } = getAPIKeys(settings)
 
   const protocol = settings?.app_config?.protocol ?? 'https'
@@ -149,7 +153,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
       }
 
       let testAuthorization: string | undefined
-      const role = getImpersonatedRole()
+      const role = getImpersonatedRoleState().role
 
       if (
         projectRef !== undefined &&
@@ -429,8 +433,25 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
 
             <SheetFooter className="px-5 py-3 border-t">
               <div className="flex items-center gap-2">
-                <RoleImpersonationPopover />
-                <Button type="primary" htmlType="submit" loading={isLoading} disabled={isLoading}>
+                <RoleImpersonationPopover portal={false} />
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={isLoading}
+                  disabled={isLoading}
+                  onClick={() =>
+                    sendEvent({
+                      action: 'edge_function_test_send_button_clicked',
+                      properties: {
+                        httpMethod: method,
+                      },
+                      groups: {
+                        project: projectRef ?? 'Unknown',
+                        organization: org?.slug ?? 'Unknown',
+                      },
+                    })
+                  }
+                >
                   Send Request
                 </Button>
               </div>

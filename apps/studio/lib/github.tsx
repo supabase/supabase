@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS } from './constants'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { makeRandomString } from './helpers'
 
 const GITHUB_INTEGRATION_APP_NAME =
@@ -65,5 +65,5 @@ export function openInstallGitHubIntegrationWindow(type: 'install' | 'authorize'
 }
 
 export const getGitHubProfileImgUrl = (username: string) => {
-  return `https://github.com/${username}.png?size=80`
+  return `https://github.com/${username}.png?size=96`
 }

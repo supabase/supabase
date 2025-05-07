@@ -34,7 +34,7 @@ Usage is shown as "Auth MFA Phone Hours" on your invoice.
 
 ## Pricing
 
-<PricingMfaPhone />
+<$Partial path="billing/pricing/pricing_mfa_phone.mdx" />
 
 ## Billing examples
 
@@ -42,32 +42,32 @@ Usage is shown as "Auth MFA Phone Hours" on your invoice.
 
 The project has MFA Phone activated throughout the entire billing cycle.
 
-| Line Item                     | Hours | Costs    |
-| ----------------------------- | ----- | -------- |
-| Pro Plan                      | -     | $25      |
-| Compute Hours Micro Project 1 | 744   | $10      |
-| MFA Phone Hours               | 744   | $75      |
-| **Subtotal**                  |       | **$110** |
-| Compute Credits               |       | -$10     |
-| **Total**                     |       | **$100** |
+| Line Item                     | Hours | Costs                     |
+| ----------------------------- | ----- | ------------------------- |
+| Pro Plan                      | -     | <Price price="25" />      |
+| Compute Hours Micro Project 1 | 744   | <Price price="10" />      |
+| MFA Phone Hours               | 744   | <Price price="75" />      |
+| **Subtotal**                  |       | **<Price price="110" />** |
+| Compute Credits               |       | -<Price price="10" />     |
+| **Total**                     |       | **<Price price="100" />** |
 
 ### Multiple projects
 
 All projects have MFA Phone activated throughout the entire billing cycle.
 
-| Line Item                     | Hours | Costs    |
-| ----------------------------- | ----- | -------- |
-| Pro Plan                      | -     | $25      |
-|                               |       |          |
-| Compute Hours Micro Project 1 | 744   | $10      |
-| MFA Phone Hours Project 1     | 744   | $75      |
-|                               |       |          |
-| Compute Hours Micro Project 2 | 744   | $10      |
-| MFA Phone Hours Project 2     | 744   | $10      |
-|                               |       |          |
-| Compute Hours Micro Project 3 | 744   | $10      |
-| MFA Phone Hours Project 3     | 744   | $10      |
-|                               |       |          |
-| **Subtotal**                  |       | **$150** |
-| Compute Credits               |       | -$10     |
-| **Total**                     |       | **$140** |
+| Line Item                     | Hours | Costs                     |
+| ----------------------------- | ----- | ------------------------- |
+| Pro Plan                      | -     | <Price price="25" />      |
+|                               |       |                           |
+| Compute Hours Micro Project 1 | 744   | <Price price="10" />      |
+| MFA Phone Hours Project 1     | 744   | <Price price="75" />      |
+|                               |       |                           |
+| Compute Hours Micro Project 2 | 744   | <Price price="10" />      |
+| MFA Phone Hours Project 2     | 744   | <Price price="10" />      |
+|                               |       |                           |
+| Compute Hours Micro Project 3 | 744   | <Price price="10" />      |
+| MFA Phone Hours Project 3     | 744   | <Price price="10" />      |
+|                               |       |                           |
+| **Subtotal**                  |       | **<Price price="150" />** |
+| Compute Credits               |       | -<Price price="10" />     |
+| **Total**                     |       | **<Price price="140" />** |

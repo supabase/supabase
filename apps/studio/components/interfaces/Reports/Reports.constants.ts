@@ -2,32 +2,72 @@ import dayjs from 'dayjs'
 
 import type { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
+import { PlanId } from 'data/subscriptions/types'
 
 export const LAYOUT_COLUMN_COUNT = 2
 
-export const REPORTS_DATEPICKER_HELPERS: DatetimeHelper[] = [
+interface ReportsDatetimeHelper extends DatetimeHelper {
+  availableIn: PlanId[]
+}
+
+export const REPORTS_DATEPICKER_HELPERS: ReportsDatetimeHelper[] = [
+  {
+    text: 'Last 10 minutes',
+    calcFrom: () => dayjs().subtract(10, 'minute').toISOString(),
+    calcTo: () => dayjs().toISOString(),
+    availableIn: ['team', 'enterprise'],
+  },
+  {
+    text: 'Last 30 minutes',
+    calcFrom: () => dayjs().subtract(30, 'minute').toISOString(),
+    calcTo: () => dayjs().toISOString(),
+    availableIn: ['team', 'enterprise'],
+  },
+  {
+    text: 'Last 60 minutes',
+    calcFrom: () => dayjs().subtract(1, 'hour').startOf('day').toISOString(),
+    calcTo: () => dayjs().toISOString(),
+    default: true,
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
+  },
+  {
+    text: 'Last 3 hours',
+    calcFrom: () => dayjs().subtract(3, 'hour').startOf('day').toISOString(),
+    calcTo: () => dayjs().toISOString(),
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
+  },
   {
     text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
-    calcTo: () => '',
-    default: true,
+    calcTo: () => dayjs().toISOString(),
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
     text: 'Last 7 days',
     calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
     calcTo: () => '',
+    availableIn: ['pro', 'team', 'enterprise'],
   },
   {
     text: 'Last 14 days',
     calcFrom: () => dayjs().subtract(14, 'day').startOf('day').toISOString(),
     calcTo: () => '',
+    availableIn: ['team', 'enterprise'],
   },
   {
-    text: 'Last 30 days',
-    calcFrom: () => dayjs().subtract(30, 'day').startOf('day').toISOString(),
+    text: 'Last 28 days',
+    calcFrom: () => dayjs().subtract(28, 'day').startOf('day').toISOString(),
     calcTo: () => '',
+    availableIn: ['team', 'enterprise'],
   },
 ]
+
+export const createFilteredDatePickerHelpers = (planId: PlanId) => {
+  return REPORTS_DATEPICKER_HELPERS.map((helper) => ({
+    ...helper,
+    disabled: !helper.availableIn?.includes(planId),
+  }))
+}
 
 export const DEFAULT_QUERY_PARAMS = {
   iso_timestamp_start: REPORTS_DATEPICKER_HELPERS[0].calcFrom(),
@@ -388,3 +428,16 @@ select
     },
   },
 }
+
+export const DEPRECATED_REPORTS = [
+  'total_realtime_ingress',
+  'total_rest_options_requests',
+  'total_auth_ingress',
+  'total_auth_get_requests',
+  'total_auth_post_requests',
+  'total_auth_patch_requests',
+  'total_auth_options_requests',
+  'total_storage_options_requests',
+  'total_storage_patch_requests',
+  'total_options_requests',
+]

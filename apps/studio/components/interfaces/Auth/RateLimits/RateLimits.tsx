@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -14,9 +15,6 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Card,
   CardContent,
@@ -25,14 +23,12 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  WarningIcon,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
-import { ScaffoldSection } from 'components/layouts/Scaffold'
 
 const RateLimits = () => {
   const { ref: projectRef } = useParams()
@@ -199,7 +195,7 @@ const RateLimits = () => {
                               </p>
                               <div className="mt-3">
                                 <Button asChild type="default" size="tiny">
-                                  <Link href={`/project/${projectRef}/settings/auth`}>
+                                  <Link href={`/project/${projectRef}/auth/smtp`}>
                                     View SMTP settings
                                   </Link>
                                 </Button>
@@ -375,7 +371,7 @@ const RateLimits = () => {
                           <p className="mt-1">Enable anonymous logins to update this rate limit</p>
                           <div className="mt-3">
                             <Button asChild type="default" size="tiny">
-                              <Link href={`/project/${projectRef}/settings/auth`}>
+                              <Link href={`/project/${projectRef}/auth/providers`}>
                                 View auth settings
                               </Link>
                             </Button>

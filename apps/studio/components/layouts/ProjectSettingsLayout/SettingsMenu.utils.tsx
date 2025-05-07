@@ -14,7 +14,6 @@ export const generateSettingsMenu = (
     edgeFunctions?: boolean
     storage?: boolean
     invoices?: boolean
-    diskAndCompute?: boolean
     newApiKeys?: boolean
   }
 ): ProductMenuGroup[] => {
@@ -24,7 +23,6 @@ export const generateSettingsMenu = (
   const authEnabled = features?.auth ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
-  const newDiskComputeEnabled = features?.diskAndCompute ?? false
 
   return [
     {
@@ -36,7 +34,7 @@ export const generateSettingsMenu = (
           url: `/project/${ref}/settings/general`,
           items: [],
         },
-        ...(IS_PLATFORM && newDiskComputeEnabled
+        ...(IS_PLATFORM
           ? [
               {
                 name: 'Compute and Disk',

@@ -125,6 +125,19 @@ const AIEditor = ({
       }
     }
 
+    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/deno/lib.deno.d.ts`)
+      .then((response) => response.text())
+      .then((code) => {
+        monaco.languages.typescript.typescriptDefaults.addExtraLib(code)
+      })
+
+    // Add edge runtime types to the TS language service
+    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/deno/edge-runtime.d.ts`)
+      .then((response) => response.text())
+      .then((code) => {
+        monaco.languages.typescript.typescriptDefaults.addExtraLib(code)
+      })
+
     if (!!executeQueryRef.current) {
       editor.addAction({
         id: 'run-query',
@@ -274,7 +287,7 @@ const AIEditor = ({
       {isDiffMode ? (
         <div className="w-full h-full">
           <DiffEditor
-            theme="vs-dark"
+            theme="supabase"
             language={language}
             original={diffValue.original}
             modified={diffValue.modified}

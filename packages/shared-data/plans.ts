@@ -113,8 +113,8 @@ export const plans: PricingInformation[] = [
         partners: [],
         features: [
           'SOC2',
+          'Project-scoped and read-only access',
           'HIPAA available as paid add-on',
-          'Read-only and Billing member roles',
           'SSO for Supabase Dashboard',
           'Priority email support & SLAs',
           'Daily backups stored for 14 days',
@@ -136,7 +136,7 @@ export const plans: PricingInformation[] = [
         features: [
           'Designated Support manager',
           'Uptime SLAs',
-          'On-premise support',
+          'BYO Cloud supported',
           '24×7×365 premium enterprise support',
           'Private Slack channel',
           'Custom Security Questionnaires',

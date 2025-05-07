@@ -20,6 +20,50 @@ export type CustomerStoryType = {
 export const data: CustomerStoryType[] = [
   {
     type: 'Customer Story',
+    title: 'Euka used Supabase to unlock faster growth',
+    description:
+      'Supabase helped Euka accelerate development, simplify AI feature rollout, and scale creator marketing faster than ever.',
+    organization: 'Euka',
+    imgUrl: 'images/customers/logos/euka.png',
+    logo: '/images/customers/logos/euka.png',
+    logo_inverse: '/images/customers/logos/light/euka.png',
+    url: '/customers/euka',
+  },
+  {
+    type: 'Customer Story',
+    title: "Bree's Migration to Supabase from Fauna",
+    description:
+      'Discover how Bree found 10X performance gains, greater developer velocity, and a better foundation for AI when switching to Supabase.',
+    organization: 'Bree',
+    imgUrl: 'images/customers/logos/bree.png',
+    logo: '/images/customers/logos/bree.png',
+    logo_inverse: '/images/customers/logos/light/bree.png',
+    url: '/customers/bree',
+  },
+  {
+    type: 'Customer Story',
+    title: 'Deriv: Accelerating Online Trading with a Scalable Postgres Backend',
+    description: 'Accelerating Online Trading with a Scalable Postgres Backend',
+    organization: 'Deriv',
+    imgUrl: 'images/customers/logos/deriv.png',
+    logo: '/images/customers/logos/deriv.png',
+    logo_inverse: '/images/customers/logos/light/deriv.png',
+    url: '/customers/deriv',
+  },
+  {
+    type: 'Customer Story',
+    title:
+      'Quilia Empowers Personal Injury Clients with Streamlined Data Management using Supabase',
+    description:
+      'Migrating to Supabase resulted in a 75% reduction in development time, 50% lower costs, and enhanced security for sensitive client data.',
+    organization: 'Quilia',
+    imgUrl: 'images/customers/logos/quilia.png',
+    logo: '/images/customers/logos/quilia.png',
+    logo_inverse: '/images/customers/logos/light/quilia.png',
+    url: '/customers/quilia',
+  },
+  {
+    type: 'Customer Story',
     title: "Resend's Journey with Supabase: Scaling Email Infrastructure with Ease",
     description:
       'Scaling seamlessly to 5,000+ paying customers & millions of emails sent daily with Supabase',

@@ -22,9 +22,10 @@ const EnableBranchingButton = ({ isNewNav = false }: EnableBranchingButtonProps)
   return (
     <ButtonTooltip
       disabled={isDisabled}
-      type={isNewNav ? 'default' : 'text'}
+      type={'text'}
       icon={<GitBranch strokeWidth={1.5} />}
       onClick={() => snap.setShowEnableBranchingModal(true)}
+      className="bg-none hover:bg-none text-foreground-light hover:text-foreground [&_span]:w-full [&_span]:text-left "
       tooltip={{
         content: {
           side: 'bottom',

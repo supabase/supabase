@@ -1,5 +1,4 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import dayjs from 'dayjs'
 
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
@@ -37,8 +36,8 @@ export type OrganizationAuditLogsResponse = {
 
 export type OrganizationAuditLogsVariables = {
   slug?: string
-  iso_timestamp_start?: string
-  iso_timestamp_end?: string
+  iso_timestamp_start: string
+  iso_timestamp_end: string
 }
 
 export async function getOrganizationAuditLogs(
@@ -68,11 +67,12 @@ export const useOrganizationAuditLogsQuery = <TData = OrganizationAuditLogsData>
   }: UseQueryOptions<OrganizationAuditLogsData, OrganizationAuditLogsError, TData> = {}
 ) => {
   const { slug, iso_timestamp_start, iso_timestamp_end } = vars
-  const date_start = dayjs(iso_timestamp_start).utc().format('YYYY-MM-DD')
-  const date_end = dayjs(iso_timestamp_end).utc().format('YYYY-MM-DD')
 
   return useQuery<OrganizationAuditLogsData, OrganizationAuditLogsError, TData>(
-    organizationKeys.auditLogs(slug, { date_start, date_end }),
+    organizationKeys.auditLogs(slug, {
+      date_start: iso_timestamp_start,
+      date_end: iso_timestamp_end,
+    }),
     ({ signal }) => getOrganizationAuditLogs(vars, signal),
     {
       enabled: enabled && typeof slug !== 'undefined',

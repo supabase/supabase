@@ -37,10 +37,10 @@ import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
 
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn } from 'ui'
 import { RoleImpersonationSelector } from '../RoleImpersonationSelector'
 import styles from './graphiql.module.css'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 export interface GraphiQLProps {
   fetcher: Fetcher

@@ -59,14 +59,15 @@ Usage is shown as "Egress GB" on your invoice.
 
 ## Pricing
 
-$0.09 per GB per month. You are only charged for usage exceeding your subscription plan's quota.
+<Price price="0.09" /> per GB per month. You are only charged for usage exceeding your subscription plan's
+quota.
 
-| Plan       | Unified Egress Quota | Over-Usage per month |
-| ---------- | -------------------- | -------------------- |
-| Free       | 5 GB                 | -                    |
-| Pro        | 250 GB               | $0.09 per GB         |
-| Team       | 250 GB               | $0.09 per GB         |
-| Enterprise | Custom               | Custom               |
+| Plan       | Unified Egress Quota | Over-Usage per month          |
+| ---------- | -------------------- | ----------------------------- |
+| Free       | 5 GB                 | -                             |
+| Pro        | 250 GB               | <Price price="0.09" /> per GB |
+| Team       | 250 GB               | <Price price="0.09" /> per GB |
+| Enterprise | Custom               | Custom                        |
 
 ## Billing examples
 
@@ -74,27 +75,27 @@ $0.09 per GB per month. You are only charged for usage exceeding your subscripti
 
 The organization's Egress usage is within the quota, so no charges for Egress apply.
 
-| Line Item           | Units     | Costs   |
-| ------------------- | --------- | ------- |
-| Pro Plan            | 1         | $25     |
-| Compute Hours Micro | 744 hours | $10     |
-| Egress              | 200 GB    | $0      |
-| **Subtotal**        |           | **$35** |
-| Compute Credits     |           | -$10    |
-| **Total**           |           | **$25** |
+| Line Item           | Units     | Costs                    |
+| ------------------- | --------- | ------------------------ |
+| Pro Plan            | 1         | <Price price="25" />     |
+| Compute Hours Micro | 744 hours | <Price price="10" />     |
+| Egress              | 200 GB    | <Price price="0" />      |
+| **Subtotal**        |           | **<Price price="35" />** |
+| Compute Credits     |           | -<Price price="10" />    |
+| **Total**           |           | **<Price price="25" />** |
 
 ### Exceeding quota
 
 The organization's Egress usage exceeds the quota by 50 GB, incurring charges for this additional usage.
 
-| Line Item           | Units     | Costs     |
-| ------------------- | --------- | --------- |
-| Pro Plan            | 1         | $25       |
-| Compute Hours Micro | 744 hours | $10       |
-| Egress              | 300 GB    | $4.5      |
-| **Subtotal**        |           | **$39.5** |
-| Compute Credits     |           | -$10      |
-| **Total**           |           | **$29.5** |
+| Line Item           | Units     | Costs                      |
+| ------------------- | --------- | -------------------------- |
+| Pro Plan            | 1         | <Price price="25" />       |
+| Compute Hours Micro | 744 hours | <Price price="10" />       |
+| Egress              | 300 GB    | <Price price="4.5" />      |
+| **Subtotal**        |           | **<Price price="39.5" />** |
+| Compute Credits     |           | -<Price price="10" />      |
+| **Total**           |           | **<Price price="29.5" />** |
 
 ## View usage
 

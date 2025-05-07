@@ -1,9 +1,11 @@
+'use client'
+
 import { FlagValues } from '@vercel/flags/react'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 
 import { components } from 'api-types'
 import { useUser } from './auth'
-import { LOCAL_STORAGE_KEYS } from './constants'
+import { hasConsented } from './consent-state'
 import { get, post } from './fetchWrappers'
 import { ensurePlatformSuffix } from './helpers'
 
@@ -17,10 +19,7 @@ export async function getFeatureFlags(API_URL: string) {
 }
 
 export async function trackFeatureFlag(API_URL: string, body: TrackFeatureFlagVariables) {
-  const consent =
-    (typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      : null) === 'true'
+  const consent = hasConsented()
 
   if (!consent) return undefined
   await post(`${ensurePlatformSuffix(API_URL)}/telemetry/feature-flags/track`, { body })
@@ -33,7 +32,7 @@ export type FeatureFlagContextType = {
   hasLoaded?: boolean
 }
 
-const FeatureFlagContext = createContext<FeatureFlagContextType>({
+export const FeatureFlagContext = createContext<FeatureFlagContextType>({
   API_URL: undefined,
   configcat: {},
   posthog: {},
@@ -81,15 +80,21 @@ export const FeatureFlagProvider = ({
 
       let flagStore: FeatureFlagContextType = { configcat: {}, posthog: {} }
 
-      // Load PH flags
-      const flags = await getFeatureFlags(API_URL)
+      // Run both async operations in parallel
+      const [flags, flagValues] = await Promise.all([
+        getFeatureFlags(API_URL),
+        typeof getConfigCatFlags === 'function'
+          ? getConfigCatFlags(user?.email)
+          : Promise.resolve([]),
+      ])
+
+      // Process PostHog flags
       if (flags) {
         flagStore.posthog = flags
       }
 
-      // Load ConfigCat flags
+      // Process ConfigCat flags
       if (typeof getConfigCatFlags === 'function') {
-        const flagValues = await getConfigCatFlags(user?.email)
         let overridesCookieValue: Record<string, boolean> = {}
         try {
           const cookies = getCookies()
@@ -123,9 +128,9 @@ export const FeatureFlagProvider = ({
 
   return (
     <FeatureFlagContext.Provider value={store}>
-      {/* 
+      {/*
         [Joshen] Just support configcat flags in Vercel flags for now for simplicity
-        although I think it should be fairly simply to support PH too 
+        although I think it should be fairly simply to support PH too
       */}
       <FlagValues values={store.configcat} />
       {children}

@@ -52,7 +52,9 @@ export const RegionSelector = ({
         <>
           <p>Select the region closest to your users for the best performance.</p>
           {showNonProdFields && (
-            <p className="text-warning">Note: Only SG is supported for local/staging projects</p>
+            <p className="text-warning">
+              Note: Only US (NV), Frankfurt and SG are supported for local/staging projects
+            </p>
           )}
         </>
       }

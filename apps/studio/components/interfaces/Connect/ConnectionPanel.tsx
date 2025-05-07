@@ -1,9 +1,10 @@
 import { ChevronRight, FileCode, X } from 'lucide-react'
 import Link from 'next/link'
+import { PropsWithChildren, ReactNode } from 'react'
 
 import { useParams } from 'common'
-import Panel from 'components/ui/Panel'
 import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
+import { IS_PLATFORM } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
@@ -29,7 +30,7 @@ interface ConnectionPanelProps {
   ipv4Status: {
     type: 'error' | 'success'
     title: string
-    description?: string
+    description?: string | ReactNode
     links?: { text: string; url: string }[]
   }
   notice?: string[]
@@ -51,13 +52,13 @@ const IPv4StatusIcon = ({ className, active }: { className?: string; active: boo
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
-        stroke-width="1"
+        strokeWidth="1"
         stroke="currentColor"
         className="size-6 stroke-foreground-lighter"
       >
         <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"
         />
       </svg>
@@ -111,8 +112,9 @@ export const ConnectionPanel = ({
   parameters = [],
   lang = 'bash',
   fileTitle,
+  children,
   onCopyCallback,
-}: ConnectionPanelProps) => {
+}: PropsWithChildren<ConnectionPanelProps>) => {
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
@@ -151,17 +153,6 @@ export const ConnectionPanel = ({
             </Admonition>
           ) : (
             <>
-              {/* [Joshen] Can probably remove this after Feb 28 */}
-              {type === 'session' && isSessionMode && (
-                <Panel.Notice
-                  layout="vertical"
-                  className="border rounded mb-2"
-                  title="Deprecating Session Mode on Port 6543"
-                  description="Please use port 5432 for Session Mode as Supavisor will be deprecating Session Mode on port 6543 on February 28, 2025."
-                  href="https://github.com/orgs/supabase/discussions/32755"
-                  buttonText="Read the announcement"
-                />
-              )}
               <CodeBlock
                 wrapperClassName={cn(
                   '[&_pre]:rounded-b-none [&_pre]:px-4 [&_pre]:py-3',
@@ -185,6 +176,7 @@ export const ConnectionPanel = ({
               {parameters.length > 0 && <ConnectionParameters parameters={parameters} />}
             </>
           )}
+          {children}
         </div>
       </div>
       <div className="flex flex-col items-end">
@@ -215,28 +207,35 @@ export const ConnectionPanel = ({
             </>
           )}
 
-          <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b">
-            <div className="flex items-center gap-2">
-              <IPv4StatusIcon active={ipv4Status.type === 'success'} />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xs text-foreground">{ipv4Status.title}</span>
-              {ipv4Status.description && (
-                <span className="text-xs text-foreground-lighter">{ipv4Status.description}</span>
-              )}
-              {links.length > 0 && (
-                <div className="flex items-center gap-x-2 mt-2">
-                  {links.map((link) => (
-                    <Button key={link.text} asChild type="default" size="tiny">
-                      <Link href={link.url} className="text-xs text-light hover:text-foreground">
-                        {link.text}
-                      </Link>
-                    </Button>
+          {IS_PLATFORM && (
+            <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b">
+              <div className="flex items-center gap-2">
+                <IPv4StatusIcon active={ipv4Status.type === 'success'} />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs text-foreground">{ipv4Status.title}</span>
+                {ipv4Status.description &&
+                  (typeof ipv4Status.description === 'string' ? (
+                    <span className="text-xs text-foreground-lighter">
+                      {ipv4Status.description}
+                    </span>
+                  ) : (
+                    ipv4Status.description
                   ))}
-                </div>
-              )}
+                {links.length > 0 && (
+                  <div className="flex items-center gap-x-2 mt-2">
+                    {links.map((link) => (
+                      <Button key={link.text} asChild type="default" size="tiny">
+                        <Link href={link.url} className="text-xs text-light hover:text-foreground">
+                          {link.text}
+                        </Link>
+                      </Button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           {type === 'session' && (
             <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b bg-alternative/50">
@@ -252,7 +251,7 @@ export const ConnectionPanel = ({
             </div>
           )}
 
-          {ipv4Status.type === 'error' && (
+          {IS_PLATFORM && ipv4Status.type === 'error' && (
             <Collapsible_Shadcn_ className="group -space-y-px">
               <CollapsibleTrigger_Shadcn_
                 asChild

@@ -1,7 +1,9 @@
+import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   cn,
-  CodeBlock,
   copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
@@ -9,12 +11,20 @@ import {
   DropdownMenuTrigger,
   Separator,
 } from 'ui'
-import type { PreviewLogData, LogSearchCallback } from '../Logs.types'
-import { toast } from 'sonner'
 import { TimestampInfo } from 'ui-patterns'
-import { useState, useEffect } from 'react'
+import type { LogSearchCallback, PreviewLogData } from '../Logs.types'
 import { ResponseCodeFormatter } from '../LogsFormatters'
-import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
+
+const LogRowCodeBlock = ({ value, className }: { value: string; className?: string }) => (
+  <pre
+    className={cn(
+      'px-1 bg-surface-300 w-full pt-1 max-w-full border-none text-xs prose-sm transition-all overflow-auto rounded-md',
+      className
+    )}
+  >
+    {JSON.stringify(value, null, 2)}
+  </pre>
+)
 
 const LogRowSeparator = () => <Separator className="bg-border my-1" />
 
@@ -27,7 +37,7 @@ const PropertyRow = ({
   value: any
   dataTestId?: string
 }) => {
-  const { search, setSearch } = useLogsUrlState()
+  const { setSearch } = useLogsUrlState()
   const handleSearch: LogSearchCallback = async (event: string, { query }: { query?: string }) => {
     setSearch(query || '')
   }
@@ -72,17 +82,12 @@ const PropertyRow = ({
         <div className="flex flex-col gap-1">
           <h3 className="text-foreground-lighter text-sm pl-3 py-2">{keyName}</h3>
           <div>
-            <CodeBlock
-              hideLineNumbers
-              className={cn(
-                '!bg-surface-300 w-full pt-1 max-w-full border-none text-xs prose-sm transition-all',
-                {
-                  'max-h-[80px]': !isExpanded,
-                  'max-h-[400px]': isExpanded,
-                }
-              )}
-              value={JSON.stringify(value, null, 2)}
-              language="json"
+            <LogRowCodeBlock
+              className={cn('px-2.5', {
+                'max-h-[80px]': !isExpanded,
+                'max-h-[400px]': isExpanded,
+              })}
+              value={value}
             />
             <Button
               className="mt-1 w-full"
@@ -124,7 +129,7 @@ const PropertyRow = ({
               })}
             >
               {isExpanded ? (
-                <CodeBlock value={JSON.stringify(value, null, 2)} />
+                <LogRowCodeBlock value={value} />
               ) : isTimestamp ? (
                 <TimestampInfo className="text-sm" utcTimestamp={value} />
               ) : isStatus ? (
@@ -170,6 +175,7 @@ const PropertyRow = ({
 
 const DefaultPreviewSelectionRenderer = ({ log }: { log: PreviewLogData }) => {
   const { timestamp, event_message, metadata, id, status, ...rest } = log
+  const log_file = log?.metadata?.[0]?.log_file
 
   return (
     <div data-testid="log-selection" className={`p-2 flex flex-col`}>
@@ -188,9 +194,10 @@ const DefaultPreviewSelectionRenderer = ({ log }: { log: PreviewLogData }) => {
       })}
 
       {log?.event_message && (
-        <PropertyRow key={'event_message'} keyName={'event_message'} value={log.event_message} />
+        <PropertyRow key="event_message" keyName="event_message" value={log.event_message} />
       )}
-      {log?.metadata && <PropertyRow key={'metadata'} keyName={'metadata'} value={log.metadata} />}
+      {!!log_file && <PropertyRow key="log_file" keyName="log_file" value={log_file} />}
+      {log?.metadata && <PropertyRow key="metadata" keyName="metadata" value={log.metadata} />}
     </div>
   )
 }

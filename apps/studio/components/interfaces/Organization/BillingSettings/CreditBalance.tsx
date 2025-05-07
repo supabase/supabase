@@ -11,7 +11,7 @@ import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection'
 import NoPermission from 'components/ui/NoPermission'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import { CreditTopUp } from './CreditTopUp'
 
@@ -19,10 +19,8 @@ const CreditBalance = () => {
   const { slug } = useParams()
   const creditTopUpEnabled = useFlag('creditTopUp')
 
-  const canReadSubscriptions = useCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
-  )
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
+    useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.subscriptions')
 
   const {
     data: subscription,
@@ -54,7 +52,7 @@ const CreditBalance = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {!canReadSubscriptions ? (
+        {isPermissionsLoaded && !canReadSubscriptions ? (
           <NoPermission resourceText="view this organization's credits" />
         ) : (
           <>
