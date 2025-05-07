@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import LegacyAPIKeys from 'components/interfaces/APIKeys/LegacyAPIKeys'
 import { PublishableAPIKeys } from 'components/interfaces/APIKeys/PublishableAPIKeys'
 import { SecretAPIKeys } from 'components/interfaces/APIKeys/SecretAPIKeys'

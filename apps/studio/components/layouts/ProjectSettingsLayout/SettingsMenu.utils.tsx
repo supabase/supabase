@@ -15,6 +15,7 @@ export const generateSettingsMenu = (
     storage?: boolean
     invoices?: boolean
     newApiKeys?: boolean
+    newJwtSecrets?: boolean
   }
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -64,6 +65,17 @@ export const generateSettingsMenu = (
                       name: 'API Keys',
                       key: 'api-keys',
                       url: `/project/${ref}/settings/api-keys`,
+                      items: [],
+                      label: 'NEW',
+                    },
+                  ]
+                : []),
+              ...(features?.newJwtSecrets
+                ? [
+                    {
+                      name: 'JWT Secrets',
+                      key: 'jwt-secrets',
+                      url: `/project/${ref}/settings/jwt-secrets`,
                       items: [],
                       label: 'NEW',
                     },
