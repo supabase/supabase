@@ -1,25 +1,49 @@
-import { bedrock } from '@ai-sdk/amazon-bedrock'
+import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock'
+import { fromNodeProviderChain } from '@aws-sdk/credential-providers'
 import pgMeta from '@supabase/pg-meta'
 import { streamText, tool, type Tool } from 'ai'
+import crypto from 'crypto'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 import { createSupabaseMCPClient } from './supabase-mcp'
-import crypto from 'crypto'
-import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { executeSql } from 'data/sql/execute-sql-query'
 
 export const maxDuration = 30
-const awsAccessKeyId = process.env.AWS_ACCESS_KEY_ID
 const pgMetaSchemasList = pgMeta.schemas.list()
 
+const credentialProvider = fromNodeProviderChain()
+
+const bedrock = createAmazonBedrock({
+  credentialProvider,
+})
+
+async function hasAwsCredentials() {
+  try {
+    const credentials = await credentialProvider()
+    return !!credentials
+  } catch (error) {
+    return false
+  }
+}
+
+const hasCredentials = await hasAwsCredentials()
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (!awsAccessKeyId) {
+  const { method } = req
+
+  if (!process.env.AWS_REGION) {
     return res.status(500).json({
-      error: 'No AWS_ACCESS_KEY_ID set. Create this environment variable to use AI features.',
+      error: 'AWS_REGION is not set',
     })
   }
 
-  const { method } = req
+  if (!hasCredentials) {
+    return res.status(500).json({
+      error:
+        'AWS credentials are not configured. Set up a local profile or add environment variables.',
+    })
+  }
 
   switch (method) {
     case 'POST':
