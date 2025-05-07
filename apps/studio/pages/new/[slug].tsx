@@ -1002,16 +1002,7 @@ const instanceLabel = (instance: string | undefined): string => {
 }
 
 const PageLayout = withAuth(({ children }: PropsWithChildren) => {
-  const { slug } = useParams()
-
-  const { data: organizations } = useOrganizationsQuery()
-  const currentOrg = organizations?.find((o) => o.slug === slug)
-
-  return (
-    <WizardLayoutWithoutAuth organization={currentOrg} project={null}>
-      {children}
-    </WizardLayoutWithoutAuth>
-  )
+  return <WizardLayoutWithoutAuth>{children}</WizardLayoutWithoutAuth>
 })
 
 Wizard.getLayout = (page) => (
