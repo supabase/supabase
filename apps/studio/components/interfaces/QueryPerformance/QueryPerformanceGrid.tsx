@@ -5,7 +5,6 @@ import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
-import { hasIndexRecommendations } from './index-advisor.utils'
 import {
   Button,
   ResizableHandle,
@@ -19,6 +18,7 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { QueryPerformanceSort } from '../Reports/Reports.queries'
+import { hasIndexRecommendations } from './index-advisor.utils'
 import { IndexSuggestionIcon } from './IndexSuggestionIcon'
 import { QueryDetail } from './QueryDetail'
 import { QueryIndexes } from './QueryIndexes'
@@ -91,7 +91,11 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         }
 
         const isTime = col.name.includes('time')
-        const formattedValue = isTime ? `${value.toFixed(0)}ms` : value.toLocaleString()
+        const formattedValue = !!value
+          ? isTime
+            ? `${value.toFixed(0)}ms`
+            : value.toLocaleString()
+          : ''
         return (
           <div
             className={cn(

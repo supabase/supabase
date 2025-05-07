@@ -1,8 +1,8 @@
 import dayjs from 'dayjs'
 
+import { PlanId } from 'data/subscriptions/types'
 import type { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
-import { PlanId } from 'data/subscriptions/types'
 
 export const LAYOUT_COLUMN_COUNT = 2
 
@@ -506,15 +506,4 @@ export interface IndexAdvisorResult {
   total_cost_before: number
   total_cost_after: number
   index_statements: string[]
-}
-
-export const calculateQueryImprovement = (costBefore: number, costAfter: number): number => {
-  return ((costBefore - costAfter) / costBefore) * 100
-}
-
-export const calculateTotalQueryImprovement = (indexAdvisorResult: IndexAdvisorResult): number => {
-  return calculateQueryImprovement(
-    indexAdvisorResult.total_cost_before,
-    indexAdvisorResult.total_cost_after
-  )
 }

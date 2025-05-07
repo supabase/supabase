@@ -1,7 +1,7 @@
-import { toast } from 'sonner'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { databaseKeys } from 'data/database/keys'
 import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
+import { databaseKeys } from 'data/database/keys'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { toast } from 'sonner'
 import { IndexAdvisorResult } from './query-performance.types'
 
 /**
@@ -21,20 +21,6 @@ export function getIndexAdvisorExtensions(extensions: DatabaseExtension[] = []) 
   const hypopg = extensions.find((ext) => ext.name === 'hypopg')
   const indexAdvisor = extensions.find((ext) => ext.name === 'index_advisor')
   return { hypopg, indexAdvisor }
-}
-
-/**
- * Checks if a query is eligible for index advisor suggestions
- * @param query SQL query string to check
- * @returns boolean indicating if query is eligible
- */
-export function isQueryEligibleForIndexAdvisor(query: string | undefined): boolean {
-  if (!query) return false
-  return (
-    query.toLowerCase().startsWith('select') ||
-    query.toLowerCase().startsWith('with pgrst_source') ||
-    query.toLowerCase().startsWith('with pgrst_payload')
-  )
 }
 
 /**
@@ -58,39 +44,6 @@ export function calculateImprovement(
   }
 
   return ((costBefore - costAfter) / costBefore) * 100
-}
-
-/**
- * Calculates the percentage improvement between two cost values
- * @param costBefore Cost before optimization
- * @param costAfter Cost after optimization
- * @returns Percentage improvement
- */
-export function calculateQueryImprovement(costBefore: number, costAfter: number): number {
-  return ((costBefore - costAfter) / costBefore) * 100
-}
-
-/**
- * Calculates the total query improvement percentage from index advisor results
- * @param indexAdvisorResult Result from index advisor containing before/after costs
- * @returns Total percentage improvement
- */
-export function calculateTotalQueryImprovement(indexAdvisorResult: IndexAdvisorResult): number {
-  return calculateQueryImprovement(
-    indexAdvisorResult.total_cost_before,
-    indexAdvisorResult.total_cost_after
-  )
-}
-
-/**
- * Generates the improvement description text with consistent styling
- *
- * @param indexCount Number of indexes being created
- * @param improvementPercentage The calculated improvement percentage
- * @returns JSX for the improvement description
- */
-export function getImprovementText(indexCount: number, improvementPercentage: number): string {
-  return `Creating the following ${indexCount > 1 ? 'indexes' : 'index'} can improve this query's performance by ${improvementPercentage.toFixed(2)}%:`
 }
 
 interface CreateIndexParams {

@@ -2,18 +2,12 @@ import { Check, Lightbulb, Table2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
+import { useIsIndexAdvisorAvailable } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorAvailable'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useGetIndexAdvisorResult } from 'data/database/retrieve-index-advisor-result-query'
 import { useGetIndexesFromSelectQuery } from 'data/database/retrieve-index-from-select-query'
-import {
-  calculateImprovement,
-  createIndexes,
-  hasIndexRecommendations,
-  isQueryEligibleForIndexAdvisor,
-} from './index-advisor.utils'
-import { useIsIndexAdvisorAvailable } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorAvailable'
 import {
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
@@ -33,6 +27,7 @@ import { IndexAdvisorDisabledState } from './IndexAdvisorDisabledState'
 import { IndexImprovementText } from './IndexImprovementText'
 import { QueryPanelContainer, QueryPanelScoreSection, QueryPanelSection } from './QueryPanel'
 import { useIndexInvalidation } from './hooks/useIndexInvalidation'
+import { calculateImprovement, createIndexes, hasIndexRecommendations } from './index-advisor.utils'
 
 interface QueryIndexesProps {
   selectedRow: any
