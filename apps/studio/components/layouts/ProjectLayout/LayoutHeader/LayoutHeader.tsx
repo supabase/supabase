@@ -16,7 +16,6 @@ import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/Over
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useShowLayoutHeader } from 'hooks/misc/useShowLayoutHeader'
 import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
@@ -58,7 +57,6 @@ const LayoutHeader = ({
   headerTitle,
   showProductMenu,
 }: LayoutHeaderProps) => {
-  const showLayoutHeader = useShowLayoutHeader()
   const { ref: projectRef, slug } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
