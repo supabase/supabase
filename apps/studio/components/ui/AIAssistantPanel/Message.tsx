@@ -107,7 +107,7 @@ export const Message = function Message({
                     return (
                       <ReactMarkdown
                         key={`${id}-part-${index}`}
-                        className="space-y-5 [&>*>code]:text-xs [&>*>*>code]:text-xs [&_li]:space-y-4"
+                        className="prose prose-sm [&_ol>li]:pl-4 [&_ol>li]:my-0 [&_li>p]:mt-0 space-y-5 [&>*>code]:text-xs [&>*>*>code]:text-xs [&_li]:space-y-4"
                         remarkPlugins={[remarkGfm]}
                         components={{
                           ...baseMarkdownComponents,
@@ -139,7 +139,7 @@ export const Message = function Message({
                           return (
                             <div
                               key={`${id}-tool-${toolCallId}`}
-                              className="w-auto -ml-[36px] overflow-x-hidden"
+                              className="w-auto overflow-x-hidden"
                             >
                               <QueryBlock
                                 label={args.label || 'SQL Snippet'}
@@ -183,7 +183,7 @@ export const Message = function Message({
               })
             ) : hasTextContent ? (
               <ReactMarkdown
-                className="space-y-5 flex-1 [&>*>code]:text-xs [&>*>*>code]:text-xs min-w-0 [&_li]:space-y-4"
+                className="prose prose-sm [&_ol>li]:pl-4 [&_ol>li]:my-0 space-y-5 flex-1 [&>*>code]:text-xs [&>*>*>code]:text-xs min-w-0 [&_li]:space-y-4"
                 remarkPlugins={[remarkGfm]}
                 components={allMarkdownComponents}
               >
