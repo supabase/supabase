@@ -52,9 +52,13 @@ const InfrastructureInfo = () => {
     isSuccess: isSuccessServiceVersions,
   } = useProjectServiceVersionsQuery({ projectRef: ref })
 
+  const { data: projectUpgradeEligibilityData } = useProjectUpgradeEligibilityQuery({
+    projectRef: ref,
+  })
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
   const { current_app_version, current_app_version_release_channel, latest_app_version } =
     data || {}
+
   const isOnLatestVersion = current_app_version === latest_app_version
   const currentPgVersion = (current_app_version ?? '')
     .split('supabase-postgres-')[1]
@@ -194,12 +198,13 @@ const InfrastructureInfo = () => {
                         variant="warning"
                         title="A new version of Postgres is available for your project"
                       >
-                        <AlertTitle_Shadcn_>New version of Postgres available</AlertTitle_Shadcn_>
+                        <AlertTitle_Shadcn_>
+                          A new version of Postgres is available
+                        </AlertTitle_Shadcn_>
                         <AlertDescription_Shadcn_ className="flex flex-col gap-3">
                           <div>
                             <p className="mb-1">
-                              This project cannot be upgraded due to the following extension
-                              dependent objects:
+                              You'll need to remove the following extensions before upgrading:
                             </p>
 
                             <ul className="pl-4">
@@ -211,15 +216,16 @@ const InfrastructureInfo = () => {
                             </ul>
                           </div>
                           <p>
-                            Once the above objects are exported and removed, you can proceed to
-                            upgrade your project, and re-import the objects after the upgrade
-                            operation is complete. Please refer to the docs on additional extensions
-                            that might also need to be dropped.
+                            {projectUpgradeEligibilityData?.potential_breaking_changes?.includes(
+                              'pg17_upgrade_unsupported_extensions'
+                            ) &&
+                              'You can add them back after the upgrade is done. Check the docs for which ones might need to be removed.'}
                           </p>
+
                           <div>
                             <Button size="tiny" type="default" asChild>
                               <a
-                                href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
+                                href="https://supabase.com/docs/guides/platform/upgrading#extensions"
                                 target="_blank"
                                 rel="noreferrer"
                               >

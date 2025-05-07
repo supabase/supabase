@@ -213,7 +213,9 @@ export const SubscriptionPlanUpdateDialog = ({
                           New
                         </Badge>
                       </div>
-                      <div className="py-2 pr-0 text-right">{formatCurrency(newPlanCost)}</div>
+                      <div className="py-2 pr-0 text-right" translate="no">
+                        {formatCurrency(newPlanCost)}
+                      </div>
                     </div>
                     {subscription?.plan?.id !== 'free' && (
                       <div className="flex items-center justify-between gap-2 border-b border-muted">
@@ -226,7 +228,7 @@ export const SubscriptionPlanUpdateDialog = ({
                             use.
                           </InfoTooltip>
                         </div>
-                        <div className="py-2 pr-0 text-right">
+                        <div className="py-2 pr-0 text-right" translate="no">
                           -{formatCurrency(proratedCredit)}
                         </div>
                       </div>
@@ -241,14 +243,14 @@ export const SubscriptionPlanUpdateDialog = ({
                             Credits will be used first before charging your card.
                           </InfoTooltip>
                         </div>
-                        <div className="py-2 pr-0 text-right">
+                        <div className="py-2 pr-0 text-right" translate="no">
                           {formatCurrency(customerBalance)}
                         </div>
                       </div>
                     )}
                     <div className="flex items-center justify-between gap-2 border-b border-muted text-foreground">
                       <div className="py-2 pl-0">Charge today</div>
-                      <div className="py-2 pr-0 text-right">
+                      <div className="py-2 pr-0 text-right" translate="no">
                         {formatCurrency(totalCharge)}
                         {subscription?.plan?.id !== 'free' && (
                           <>
@@ -272,7 +274,8 @@ export const SubscriptionPlanUpdateDialog = ({
                             <h3 className="text-base font-medium mb-2">Your new monthly invoice</h3>
                             <p className="prose text-xs mb-2">
                               Each paid project runs on a dedicated 24/7 server. First project uses
-                              Compute Credits; additional ones cost $10+/month regardless of usage.{' '}
+                              Compute Credits; additional ones cost <span translate="no">$10+</span>
+                              /month regardless of usage.{' '}
                               <Link
                                 href={'/docs/guides/platform/manage-your-usage/compute'}
                                 target="_blank"
@@ -347,7 +350,10 @@ export const SubscriptionPlanUpdateDialog = ({
                                                 <TableCell className="!py-2 px-0">
                                                   {planItem?.description}
                                                 </TableCell>
-                                                <TableCell className="text-right py-2 px-0">
+                                                <TableCell
+                                                  className="text-right py-2 px-0"
+                                                  translate="no"
+                                                >
                                                   {formatCurrency(planItem?.total_price)}
                                                 </TableCell>
                                               </TableRow>
@@ -356,7 +362,10 @@ export const SubscriptionPlanUpdateDialog = ({
                                                 <TableCell className="!py-2 px-0 flex items-center gap-1">
                                                   <span>Compute</span>
                                                 </TableCell>
-                                                <TableCell className="text-right py-2 px-0">
+                                                <TableCell
+                                                  className="text-right py-2 px-0"
+                                                  translate="no"
+                                                >
                                                   {formatCurrency(
                                                     computeItems.reduce(
                                                       (sum: number, item) => sum + item.total_price,
@@ -371,7 +380,10 @@ export const SubscriptionPlanUpdateDialog = ({
                                                   key={project.project_ref}
                                                   className="text-foreground-light"
                                                 >
-                                                  <TableCell className="!py-2 px-0 pl-6">
+                                                  <TableCell
+                                                    className="!py-2 px-0 pl-6"
+                                                    translate="no"
+                                                  >
                                                     {project.project_name} ({project.computeType}) |{' '}
                                                     {formatCurrency(project.computeCosts)}
                                                   </TableCell>
@@ -379,7 +391,10 @@ export const SubscriptionPlanUpdateDialog = ({
                                               ))}
                                               {computeCreditsItem && (
                                                 <TableRow className="text-foreground-light">
-                                                  <TableCell className="!py-2 px-0 pl-6">
+                                                  <TableCell
+                                                    className="!py-2 px-0 pl-6"
+                                                    translate="no"
+                                                  >
                                                     Compute Credits |{' '}
                                                     {formatCurrency(computeCreditsItem.total_price)}
                                                   </TableCell>
@@ -413,7 +428,10 @@ export const SubscriptionPlanUpdateDialog = ({
                                                   )}
                                                 </div>
                                               </TableCell>
-                                              <TableCell className="text-right text-xs py-2 px-0">
+                                              <TableCell
+                                                className="text-right text-xs py-2 px-0"
+                                                translate="no"
+                                              >
                                                 {formatCurrency(item.total_price)}
                                               </TableCell>
                                             </TableRow>
@@ -427,7 +445,10 @@ export const SubscriptionPlanUpdateDialog = ({
                                       <TableCell className="font-medium py-2 px-0">
                                         Total per month (excluding other usage)
                                       </TableCell>
-                                      <TableCell className="text-right font-medium py-2 px-0">
+                                      <TableCell
+                                        className="text-right font-medium py-2 px-0"
+                                        translate="no"
+                                      >
                                         {formatCurrency(
                                           Math.round(
                                             subscriptionPreview?.breakdown?.reduce(
@@ -445,7 +466,7 @@ export const SubscriptionPlanUpdateDialog = ({
                           </div>
                         </InfoTooltip>
                       </div>
-                      <div className="py-2 pr-0 text-right">
+                      <div className="py-2 pr-0 text-right" translate="no">
                         {formatCurrency(
                           Math.round(
                             subscriptionPreview?.breakdown.reduce(

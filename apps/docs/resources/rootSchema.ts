@@ -6,6 +6,11 @@ import {
   printSchema,
 } from 'graphql'
 import { RootQueryTypeResolvers } from '~/__generated__/graphql'
+import { searchRoot } from './globalSearch/globalSearchResolver'
+import { GraphQLObjectTypeGuide } from './guide/guideSchema'
+import { GraphQLObjectTypeReferenceCLICommand } from './reference/referenceCLISchema'
+import { GraphQLObjectTypeReferenceSDKFunction } from './reference/referenceSDKSchema'
+import { GraphQLObjectTypeTroubleshooting } from './troubleshooting/troubleshootingSchema'
 
 const GRAPHQL_FIELD_INTROSPECT = 'schema' as const
 
@@ -29,6 +34,13 @@ export const rootGraphQLSchema = new GraphQLSchema({
     name: 'RootQueryType',
     fields: {
       ...introspectRoot,
+      ...searchRoot,
     },
   }),
+  types: [
+    GraphQLObjectTypeGuide,
+    GraphQLObjectTypeReferenceCLICommand,
+    GraphQLObjectTypeReferenceSDKFunction,
+    GraphQLObjectTypeTroubleshooting,
+  ],
 })

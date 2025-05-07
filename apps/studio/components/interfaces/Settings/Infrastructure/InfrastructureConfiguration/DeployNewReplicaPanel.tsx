@@ -444,13 +444,15 @@ const DeployNewReplicaPanel = ({
                   <CollapsibleTrigger_Shadcn_ className="w-full flex items-center justify-between [&[data-state=open]>svg]:!-rotate-180">
                     <p className="text-sm text-left">
                       New replica will cost an additional{' '}
-                      {formatCurrency(
-                        estComputeMonthlyCost +
-                          additionalCostDiskSize +
-                          Number(additionalCostIOPS) +
-                          Number(additionalCostThroughput)
-                      )}
-                      /month
+                      <span translate="no">
+                        {formatCurrency(
+                          estComputeMonthlyCost +
+                            additionalCostDiskSize +
+                            Number(additionalCostIOPS) +
+                            Number(additionalCostThroughput)
+                        )}
+                        /month
+                      </span>
                     </p>
                     <ChevronDown size={14} className="transition" />
                   </CollapsibleTrigger_Shadcn_>
@@ -474,7 +476,7 @@ const DeployNewReplicaPanel = ({
                         <TableRow>
                           <TableCell className="pl-0">Compute size</TableCell>
                           <TableCell>{selectedComputeMeta?.name}</TableCell>
-                          <TableCell className="text-right font-mono pr-0">
+                          <TableCell className="text-right font-mono pr-0" translate="no">
                             {formatCurrency(estComputeMonthlyCost)}
                           </TableCell>
                         </TableRow>
@@ -483,14 +485,14 @@ const DeployNewReplicaPanel = ({
                           <TableCell>
                             {((size_gb ?? 0) * 1.25).toLocaleString()} GB ({type})
                           </TableCell>
-                          <TableCell className="text-right font-mono pr-0">
+                          <TableCell className="text-right font-mono pr-0" translate="no">
                             {formatCurrency(additionalCostDiskSize)}
                           </TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell className="pl-0">IOPS</TableCell>
                           <TableCell>{iops?.toLocaleString()} IOPS</TableCell>
-                          <TableCell className="text-right font-mono pr-0">
+                          <TableCell className="text-right font-mono pr-0" translate="no">
                             {formatCurrency(+additionalCostIOPS)}
                           </TableCell>
                         </TableRow>
@@ -514,7 +516,10 @@ const DeployNewReplicaPanel = ({
                 read replica on the{' '}
                 <span className="text-foreground">{selectedComputeMeta?.name}</span> size incurs
                 additional{' '}
-                <span className="text-foreground">{selectedComputeMeta?.price_description}</span>.
+                <span className="text-foreground" translate="no">
+                  {selectedComputeMeta?.price_description}
+                </span>
+                .
               </p>
             )}
 
