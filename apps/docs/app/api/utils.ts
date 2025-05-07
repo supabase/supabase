@@ -1,7 +1,16 @@
-import { z, type ZodError } from 'zod'
+import { type PostgrestError } from '@supabase/supabase-js'
+import { type ZodError } from 'zod'
 
-export class ApiError extends Error {
-  constructor(message: string) {
+type ObjectOrNever = object | never
+
+export type ApiErrorGeneric = ApiError<ObjectOrNever>
+
+export class ApiError<Details extends ObjectOrNever = never> extends Error {
+  constructor(
+    message: string,
+    public source?: unknown,
+    public details?: Details
+  ) {
     super(message)
   }
 
@@ -14,9 +23,9 @@ export class ApiError extends Error {
   }
 }
 
-export class InvalidRequestError extends ApiError {
-  constructor(message: string, source?: unknown) {
-    super(`Invalid request: ${message}`)
+export class InvalidRequestError<Details extends ObjectOrNever = never> extends ApiError<Details> {
+  constructor(message: string, source?: unknown, details?: Details) {
+    super(`Invalid request: ${message}`, source, details)
   }
 
   isPrivate() {
@@ -26,6 +35,15 @@ export class InvalidRequestError extends ApiError {
   statusCode() {
     return 400
   }
+}
+
+export function convertUnknownToApiError(error: unknown): ApiError {
+  return new ApiError('Unknown error', error)
+}
+
+export function convertPostgrestToApiError(error: PostgrestError): ApiError {
+  const message = `${error.code}: ${error.hint}`
+  return new ApiError(message, error)
 }
 
 export function convertZodToInvalidRequestError(

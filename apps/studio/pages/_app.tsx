@@ -31,7 +31,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { ErrorInfo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
-import { FeatureFlagProvider, PageTelemetry, ThemeProvider, useThemeSandbox } from 'common'
+import { FeatureFlagProvider, ThemeProvider, useThemeSandbox } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 import { RouteValidationWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
@@ -41,18 +41,17 @@ import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/Featur
 import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
 import { GenerateSql } from 'components/interfaces/SqlGenerator/SqlGenerator'
 import { ErrorBoundaryState } from 'components/ui/ErrorBoundaryState'
-import GroupsTelemetry from 'components/ui/GroupsTelemetry'
 import { useRootQueryClient } from 'data/query-client'
 import { customFont, sourceCodePro } from 'fonts'
 import { AuthProvider } from 'lib/auth'
 import { getFlags as getConfigCatFlags } from 'lib/configcat'
 import { API_URL, BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
+import { Telemetry } from 'lib/telemetry'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
 import { SonnerToaster, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
-import { useConsent } from 'ui-patterns/ConsentToast'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -92,11 +91,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   }
 
   useThemeSandbox()
-
-  // Although this is "technically" breaking the rules of hooks
-  // IS_PLATFORM never changes within a session, so this won't cause any issues
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const { hasAcceptedConsent } = IS_PLATFORM ? useConsent() : { hasAcceptedConsent: true }
 
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
@@ -146,12 +140,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       </ThemeProvider>
                     </RouteValidationWrapper>
                   </TooltipProvider>
-                  <PageTelemetry
-                    API_URL={API_URL}
-                    hasAcceptedConsent={hasAcceptedConsent}
-                    enabled={IS_PLATFORM}
-                  />
-                  <GroupsTelemetry hasAcceptedConsent={hasAcceptedConsent} />
+                  <Telemetry />
                   {!isTestEnv && <HCaptchaLoadedStore />}
                   {!isTestEnv && (
                     <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />

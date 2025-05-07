@@ -1,6 +1,6 @@
 import { GraphQLInterfaceType, GraphQLString } from 'graphql'
 
-export const GRAPHQL_FIELD_SEARCH_GLOBAL = 'searchDocs'
+export const GRAPHQL_FIELD_SEARCH_GLOBAL = 'searchDocs' as const
 
 export const GraphQLInterfaceTypeSearchResult = new GraphQLInterfaceType({
   name: 'SearchResult',

@@ -1,6 +1,6 @@
 import { useState } from 'react'
-
 import { PostgresTable } from '@supabase/postgres-meta'
+
 import { useParams } from 'common'
 import { TableList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'

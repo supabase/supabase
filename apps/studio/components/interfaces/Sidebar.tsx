@@ -14,7 +14,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   generateOtherRoutes,
   generateProductRoutes,
@@ -30,7 +30,6 @@ import { useLints } from 'hooks/misc/useLints'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useFlag } from 'hooks/ui/useFlag'
 import { Home } from 'icons'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,

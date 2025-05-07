@@ -37,6 +37,7 @@
     "knip": "pnpx knip@~5.50.0"
   },
   "devDependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.410.0",
     "@types/node": "catalog:",
     "eslint": "^8.57.0",
     "prettier": "3.2.4",

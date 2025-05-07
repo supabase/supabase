@@ -1593,6 +1593,7 @@ functions:
       - If you require your user to reauthenticate before updating their password, you need to enable the **Secure password change** option in your [project's email provider settings](/dashboard/project/_/auth/providers).
       - A user is only require to reauthenticate before updating their password if **Secure password change** is enabled and the user **hasn't recently signed in**. A user is deemed recently signed in if the session was created in the last 24 hours.
       - This method will send a nonce to the user's email. If the user doesn't have a confirmed email address, the method will send the nonce to the user's confirmed phone number instead.
+      - After receiving the OTP, include it as the `nonce` in your `updateUser()` call to finalize the password change.
     examples:
       - id: send-reauthentication-nonce
         name: Send reauthentication nonce

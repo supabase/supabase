@@ -43,7 +43,7 @@ export const LogsBarChart = ({
   const endDate = dayjs(data[data?.length - 1]?.['timestamp']).format(DateTimeFormat)
 
   return (
-    <div className={cn('flex flex-col gap-y-3')}>
+    <div data-testid="logs-bar-chart" className={cn('flex flex-col gap-y-3')}>
       <ChartContainer
         config={
           {

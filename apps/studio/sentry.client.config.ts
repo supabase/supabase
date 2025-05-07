@@ -3,8 +3,8 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs'
+import { hasConsented } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
-import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
 import { match } from 'path-to-regexp'
 
 // This is a workaround to ignore hCaptcha related errors.
@@ -26,12 +26,9 @@ Sentry.init({
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
   beforeSend(event, hint) {
-    const consent =
-      typeof window !== 'undefined'
-        ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-        : null
+    const consent = hasConsented()
 
-    if (IS_PLATFORM && consent === 'true') {
+    if (IS_PLATFORM && consent) {
       // Ignore invalid URL events for 99% of the time because it's using up a lot of quota.
       const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
         `Failed to construct 'URL': Invalid URL`
