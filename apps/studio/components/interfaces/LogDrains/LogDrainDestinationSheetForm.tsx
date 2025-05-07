@@ -542,8 +542,8 @@ export function LogDrainDestinationSheetForm({
                 <li className="text-brand-link text-base" translate="no">
                   $60 per drain per month
                 </li>
-                <li translate="no">$0.20 per million events</li>
-                <li translate="no">$0.09 per GB egress</li>
+                <li translate="no">+ $0.20 per million events</li>
+                <li translate="no">+ $0.09 per GB egress</li>
               </ul>
             </FormItemLayout>
           </SheetSection>

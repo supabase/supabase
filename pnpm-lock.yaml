@@ -742,12 +742,6 @@ importers:
       mime-db:
         specifier: ^1.53.0
         version: 1.53.0
-      mobx:
-        specifier: ^6.10.2
-        version: 6.11.0
-      mobx-react-lite:
-        specifier: ^4.0.5
-        version: 4.0.5(mobx@6.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       monaco-editor:
         specifier: 0.52.2
         version: 0.52.2
@@ -11638,19 +11632,6 @@ packages:
 
   mnemonist@0.39.6:
     resolution: {integrity: sha512-A/0v5Z59y63US00cRSLiloEIw3t5G+MiKz4BhX21FI+YBJXBOGW0ohFxTxO08dsOYlzxo87T7vGfZKYp2bcAWA==}
-
-  mobx-react-lite@4.0.5:
-    resolution: {integrity: sha512-StfB2wxE8imKj1f6T8WWPf4lVMx3cYH9Iy60bbKXEs21+HQ4tvvfIBZfSmMXgQAefi8xYEwQIz4GN9s0d2h7dg==}
-    peerDependencies:
-      mobx: ^6.9.0
-      react: ^16.8.0 || ^17 || ^18
-      react-dom: '*'
-      react-native: '*'
-    peerDependenciesMeta:
-      react-dom:
-        optional: true
-      react-native:
-        optional: true
 
   mobx-react-lite@4.1.0:
     resolution: {integrity: sha512-QEP10dpHHBeQNv1pks3WnHRCem2Zp636lq54M2nKO2Sarr13pL4u6diQXf65yzXUn0mkk18SyIDCm9UOJYTi1w==}
@@ -25320,7 +25301,7 @@ snapshots:
 
   has-tostringtag@1.0.2:
     dependencies:
-      has-symbols: 1.0.3
+      has-symbols: 1.1.0
 
   has-unicode@2.0.1: {}
 
@@ -27816,14 +27797,6 @@ snapshots:
     dependencies:
       obliterator: 2.0.4
 
-  mobx-react-lite@4.0.5(mobx@6.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
-    dependencies:
-      mobx: 6.11.0
-      react: 18.3.1
-      use-sync-external-store: 1.2.0(react@18.3.1)
-    optionalDependencies:
-      react-dom: 18.3.1(react@18.3.1)
-
   mobx-react-lite@4.1.0(mobx@6.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       mobx: 6.11.0
@@ -28792,7 +28765,7 @@ snapshots:
 
   periscopic@3.1.0:
     dependencies:
-      '@types/estree': 1.0.5
+      '@types/estree': 1.0.7
       estree-walker: 3.0.3
       is-reference: 3.0.3
 

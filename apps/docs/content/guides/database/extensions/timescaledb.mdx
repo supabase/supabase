@@ -35,7 +35,7 @@ Supabase projects come with [TimescaleDB Apache 2 Edition](https://docs.timescal
 {/* prettier-ignore */}
 ```sql
 -- Enable the "timescaledb" extension
-create extension timescaledb;
+create extension timescaledb with schema extensions;
 
 -- Disable the "timescaledb" extension
 drop extension if exists timescaledb;
@@ -43,6 +43,10 @@ drop extension if exists timescaledb;
 
 </TabPanel>
 </Tabs>
+
+Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension". To disable an extension you can call `drop extension`.
+
+It's good practice to create the extension within a separate schema (like `extensions`) to keep your `public` schema clean.
 
 ## Usage
 
