@@ -6,7 +6,6 @@ import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeatureP
 import APIDocsButton from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import {
   Check,
   ChevronLeft,
@@ -160,7 +159,6 @@ const FileExplorerHeader = ({
   const uploadButtonRef: any = useRef(null)
   const previousBreadcrumbs: any = useRef(null)
 
-  const storageExplorerStore = useStorageStore()
   const {
     columns,
     sortBy,
@@ -175,9 +173,9 @@ const FileExplorerHeader = ({
     refetchAllOpenedFolders,
     addNewFolderPlaceholder,
     clearOpenedFolders,
-    closeFilePreview,
+    setSelectedFilePreview,
     selectedBucket,
-  } = storageExplorerStore
+  } = useStorageExplorerStateSnapshot()
 
   const breadcrumbs = columns.map((column) => column.name)
   const backDisabled = columns.length <= 1
@@ -206,7 +204,7 @@ const FileExplorerHeader = ({
   const onSelectBack = () => {
     popColumn()
     popOpenedFolders()
-    closeFilePreview()
+    setSelectedFilePreview(undefined)
   }
 
   const onSelectUpload = () => {
@@ -239,11 +237,11 @@ const FileExplorerHeader = ({
     if (paths.length === 0) {
       popColumnAtIndex(0)
       clearOpenedFolders()
-      closeFilePreview()
+      setSelectedFilePreview(undefined)
     } else {
       const pathString = paths.join('/')
       setLoading({ isLoading: true, message: `Navigating to ${pathString}...` })
-      await fetchFoldersByPath(paths)
+      await fetchFoldersByPath({ paths })
       setLoading({ isLoading: false, message: '' })
     }
   }

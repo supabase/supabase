@@ -26,9 +26,8 @@ import DowngradeModal from './DowngradeModal'
 import { EnterpriseCard } from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
-import SubscriptionPlanUpdateDialog from './SubscriptionPlanUpdateDialog'
+import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
-import { PROJECT_STATUS } from 'lib/constants'
 
 const PlanUpdateSidePanel = () => {
   const router = useRouter()
@@ -195,7 +194,9 @@ const PlanUpdateSidePanel = () => {
                           <ShimmeringLoader className="w-[30px] h-[24px]" />
                         </div>
                       ) : (
-                        <p className="text-foreground text-lg">{formatCurrency(price)}</p>
+                        <p className="text-foreground text-lg" translate="no">
+                          {formatCurrency(price)}
+                        </p>
                       )}
                       <p className="text-foreground-light text-sm">{plan.costUnit}</p>
                     </div>
@@ -305,7 +306,6 @@ const PlanUpdateSidePanel = () => {
         billingPartner={billingPartner}
         subscription={subscription}
         projects={orgProjects}
-        slug={slug}
         currentPlanMeta={{
           ...availablePlans.find((p) => p.id === subscription?.plan?.id),
           features:

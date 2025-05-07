@@ -307,6 +307,14 @@ export const mapComputeSizeNameToAddonVariantId = (
     '8xlarge': 'ci_8xlarge',
     '12xlarge': 'ci_12xlarge',
     '16xlarge': 'ci_16xlarge',
+    '24xlarge': 'ci_24xlarge',
+    '24xlarge_optimized_memory': 'ci_24xlarge_optimized_memory',
+    '24xlarge_optimized_cpu': 'ci_24xlarge_optimized_cpu',
+    '24xlarge_high_memory': 'ci_24xlarge_high_memory',
+    '48xlarge': 'ci_48xlarge',
+    '48xlarge_optimized_memory': 'ci_48xlarge_optimized_memory',
+    '48xlarge_optimized_cpu': 'ci_48xlarge_optimized_cpu',
+    '48xlarge_high_memory': 'ci_48xlarge_high_memory',
   }[computeSize ?? 'nano'] as ComputeInstanceAddonVariantId
 }
 
@@ -325,6 +333,14 @@ export const mapAddOnVariantIdToComputeSize = (
     ci_8xlarge: '8XL',
     ci_12xlarge: '12XL',
     ci_16xlarge: '16XL',
+    ci_24xlarge: '24XL',
+    ci_24xlarge_optimized_memory: '24XL - Optimized Memory',
+    ci_24xlarge_optimized_cpu: '24XL - Optimized CPU',
+    ci_24xlarge_high_memory: '24XL - High Memory',
+    ci_48xlarge: '48XL',
+    ci_48xlarge_optimized_memory: '48XL - Optimized Memory',
+    ci_48xlarge_optimized_cpu: '48XL - Optimized CPU',
+    ci_48xlarge_high_memory: '48XL - High Memory',
   }[addonVariantId] as ComputeInstanceSize
 }
 

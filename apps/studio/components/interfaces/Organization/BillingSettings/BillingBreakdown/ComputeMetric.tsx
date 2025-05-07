@@ -49,13 +49,17 @@ const ComputeMetric = ({ slug, metric, usage, relativeToSubscription }: ComputeM
           </Link>
           <span className="text-sm">{usageLabel}</span>&nbsp;
           {relativeToSubscription && usageMeta?.cost && usageMeta.cost > 0 ? (
-            <span className="text-sm">({formatCurrency(usageMeta?.cost)})</span>
+            <span className="text-sm" translate="no">
+              ({formatCurrency(usageMeta?.cost)})
+            </span>
           ) : null}
         </div>
       </HoverCardTrigger>
       <HoverCardContent side="bottom" align="center" className="w-[500px]" animate="slide-in">
         <div className="text-sm text-foreground space-y-2">
-          <p className="font-medium">{usageMeta?.unit_price_desc}</p>
+          <p className="font-medium" translate="no">
+            {usageMeta?.unit_price_desc}
+          </p>
 
           <div className="my-2">
             <p className="text-sm">

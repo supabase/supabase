@@ -143,7 +143,7 @@ const Wizard: NextPageWithLayout = () => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
-  const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
+  const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
   const allowOrioleDB = useFlag('allowOrioleDb')
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
@@ -187,6 +187,10 @@ const Wizard: NextPageWithLayout = () => {
         action: 'project_creation_simple_version_submitted',
         properties: {
           instanceSize: form.getValues('instanceSize'),
+        },
+        groups: {
+          project: res.ref,
+          organization: res.organization_slug,
         },
       })
       router.push(`/project/${res.ref}/building`)
@@ -320,6 +324,9 @@ const Wizard: NextPageWithLayout = () => {
         action: 'project_creation_simple_version_confirm_modal_opened',
         properties: {
           instanceSize: values.instanceSize,
+        },
+        groups: {
+          organization: currentOrg?.slug ?? 'Unknown',
         },
       })
       setIsComputeCostsConfirmationModalVisible(true)
@@ -754,7 +761,10 @@ const Wizard: NextPageWithLayout = () => {
                                                   )}{' '}
                                                   CPU
                                                 </span>
-                                                <p className="text-xs text-muted instance-details">
+                                                <p
+                                                  className="text-xs text-muted instance-details"
+                                                  translate="no"
+                                                >
                                                   ${instanceSizeSpecs[option].priceHourly}/hour (~$
                                                   {instanceSizeSpecs[option].priceMonthly}/month)
                                                 </p>
@@ -836,7 +846,7 @@ const Wizard: NextPageWithLayout = () => {
                       />
                     </Panel.Content>
 
-                    {!projectVersionSelectionDisabled && (
+                    {showPostgresVersionSelector && (
                       <Panel.Content>
                         <FormField_Shadcn_
                           control={form.control}
