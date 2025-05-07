@@ -24,7 +24,6 @@ export type MultiAttribute = {
   attribute: string
   provider: Provider
   label?: string
-  color?: string
   format?: 'percent' | 'number'
   description?: string
   docsLink?: string
@@ -33,6 +32,10 @@ export type MultiAttribute = {
   omitFromTotal?: boolean
   tooltip?: string
   enabled?: boolean
+  color?: {
+    light: string
+    dark: string
+  }
 }
 
 interface ComposedChartHandlerProps {
@@ -57,6 +60,7 @@ interface ComposedChartHandlerProps {
   updateDateRange: UpdateDateRange
   valuePrecision?: number
   isVisible?: boolean
+  titleTooltip?: string
 }
 
 /**
@@ -126,6 +130,7 @@ const ComposedChartHandler = ({
   updateDateRange,
   valuePrecision,
   isVisible = true,
+  titleTooltip,
 }: PropsWithChildren<ComposedChartHandlerProps>) => {
   const router = useRouter()
   const { ref } = router.query
@@ -284,6 +289,7 @@ const ComposedChartHandler = ({
           updateDateRange={updateDateRange}
           valuePrecision={valuePrecision}
           hideChartType={hideChartType}
+          titleTooltip={titleTooltip}
         />
       </Panel.Content>
     </Panel>

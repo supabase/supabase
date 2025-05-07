@@ -32,9 +32,9 @@ import {
   CustomTooltip,
   formatBytes,
 } from './ComposedChart.utils'
-import { MultiAttribute } from './ComposedChartHandler'
-import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
+import NoDataPlaceholder from './NoDataPlaceholder'
+import { MultiAttribute } from './ComposedChartHandler'
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   attributes: MultiAttribute[]
@@ -56,6 +56,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   chartStyle?: string
   onChartStyleChange?: (style: string) => void
   updateDateRange: any
+  titleTooltip?: string
 }
 
 export default function ComposedChart({
@@ -88,6 +89,7 @@ export default function ComposedChart({
   chartStyle,
   onChartStyleChange,
   updateDateRange,
+  titleTooltip,
 }: BarChartProps) {
   const { resolvedTheme } = useTheme()
   const [_activePayload, setActivePayload] = useState<any>(null)
@@ -151,10 +153,17 @@ export default function ComposedChart({
               att.name !== maxAttribute?.attribute &&
               attributes.some((attr) => attr.attribute === att.name && attr.enabled !== false)
           )
-          .map((att, index) => ({
-            ...att,
-            color: STACKED_CHART_COLORS[index % STACKED_CHART_COLORS.length],
-          }))
+          .map((att, index) => {
+            const attribute = attributes.find((attr) => attr.attribute === att.name)
+            return {
+              ...att,
+              color: attribute?.color
+                ? resolvedTheme?.includes('dark')
+                  ? attribute.color.dark
+                  : attribute.color.light
+                : STACKED_CHART_COLORS[index % STACKED_CHART_COLORS.length],
+            }
+          })
       : []
 
   const lastDataPoint = !!data[data.length - 1]
@@ -239,6 +248,7 @@ export default function ComposedChart({
         onChartStyleChange={onChartStyleChange}
         showMaxValue={_showMaxValue}
         setShowMaxValue={maxAttribute ? setShowMaxValue : undefined}
+        titleTooltip={titleTooltip}
       />
       <Container className="relative z-10">
         <RechartComposedChart

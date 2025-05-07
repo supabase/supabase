@@ -2,7 +2,7 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
   // User Authentication Metrics
   {
     id: 'signups-by-provider',
-    label: 'Total Sign Ups',
+    label: 'Sign Ups',
     valuePrecision: 0,
     hide: false,
     showTooltip: true,
@@ -10,6 +10,7 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
     showMaxValue: false,
     hideChartType: false,
     defaultChartStyle: 'bar',
+    titleTooltip: 'The total number of sign ups by provider.',
     attributes: [
       { attribute: 'Email', provider: 'mock', label: 'Email', enabled: true },
       { attribute: 'Phone', provider: 'mock', label: 'Phone', enabled: false },
@@ -36,20 +37,21 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
     ],
   },
   // Active Users - Only DAU
-  {
-    id: 'active-users',
-    label: 'Active Users',
-    valuePrecision: 0,
-    hide: false,
-    showTooltip: false,
-    showLegend: false,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'bar',
-    attributes: [
-      { attribute: 'DAU', provider: 'mock', label: 'Daily Active Users', enabled: true },
-    ],
-  },
+  // {
+  //   id: 'active-users',
+  //   label: 'Active Users',
+  //   valuePrecision: 0,
+  //   hide: false,
+  //   showTooltip: false,
+  //   showLegend: false,
+  //   showMaxValue: false,
+  //   hideChartType: false,
+  //   defaultChartStyle: 'bar',
+  //   titleTooltip: 'The total number of active users by provider.',
+  //   attributes: [
+  //     { attribute: 'DAU', provider: 'mock', label: 'Daily Active Users', enabled: true },
+  //   ],
+  // },
   // New vs Returning
   // {
   //   id: 'user-types',
@@ -67,21 +69,108 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
   //   ],
   // },
   // Authentication Sessions
+  // {
+  //   id: 'auth-sessions',
+  //   label: 'Auth Sessions',
+  //   valuePrecision: 0,
+  //   hide: false,
+  //   showTooltip: false,
+  //   showLegend: false,
+  //   showMaxValue: false,
+  //   hideChartType: false,
+  //   defaultChartStyle: 'bar',
+  //   titleTooltip: 'The total number of active users by provider.',
+  //   attributes: [
+  //     { attribute: 'TotalSessions', provider: 'mock', label: 'Total Active Sessions' },
+  //     // { attribute: 'WebSessions', provider: 'mock', label: 'Web Sessions' },
+  //     // { attribute: 'MobileSessions', provider: 'mock', label: 'Mobile Sessions' },
+  //   ],
+  // },
   {
     id: 'auth-sessions',
-    label: 'Auth Sessions',
+    label: 'Sessions',
     valuePrecision: 0,
     hide: false,
-    showTooltip: false,
-    showLegend: false,
+    showTooltip: true,
+    showLegend: true,
     showMaxValue: false,
     hideChartType: false,
     defaultChartStyle: 'bar',
+    titleTooltip: 'The total number of auth sessions by provider.',
     attributes: [
-      { attribute: 'TotalSessions', provider: 'mock', label: 'Total Active Sessions' },
-      // { attribute: 'WebSessions', provider: 'mock', label: 'Web Sessions' },
-      // { attribute: 'MobileSessions', provider: 'mock', label: 'Mobile Sessions' },
+      { attribute: 'EmailSessions', provider: 'mock', label: 'Email', enabled: true },
+      { attribute: 'PhoneSessions', provider: 'mock', label: 'Phone', enabled: false },
+      { attribute: 'SAMLSessions', provider: 'mock', label: 'SAML 2.0', enabled: false },
+      { attribute: 'AppleSessions', provider: 'mock', label: 'Apple', enabled: false },
+      { attribute: 'AzureSessions', provider: 'mock', label: 'Azure', enabled: false },
+      { attribute: 'BitbucketSessions', provider: 'mock', label: 'Bitbucket', enabled: false },
+      { attribute: 'DiscordSessions', provider: 'mock', label: 'Discord', enabled: false },
+      { attribute: 'FacebookSessions', provider: 'mock', label: 'Facebook', enabled: false },
+      { attribute: 'FigmaSessions', provider: 'mock', label: 'Figma', enabled: false },
+      { attribute: 'GitHubSessions', provider: 'mock', label: 'GitHub', enabled: true },
+      { attribute: 'GitLabSessions', provider: 'mock', label: 'GitLab', enabled: false },
+      { attribute: 'GoogleSessions', provider: 'mock', label: 'Google', enabled: true },
+      { attribute: 'KakaoSessions', provider: 'mock', label: 'Kakao', enabled: false },
+      { attribute: 'KeyCloakSessions', provider: 'mock', label: 'KeyCloak', enabled: false },
+      { attribute: 'LinkedInSessions', provider: 'mock', label: 'LinkedIn (OIDC)', enabled: false },
+      { attribute: 'NotionSessions', provider: 'mock', label: 'Notion', enabled: false },
+      { attribute: 'TwitchSessions', provider: 'mock', label: 'Twitch', enabled: false },
+      { attribute: 'TwitterSessions', provider: 'mock', label: 'Twitter', enabled: false },
+      { attribute: 'SlackSessions', provider: 'mock', label: 'Slack (OIDC)', enabled: false },
+      { attribute: 'SpotifySessions', provider: 'mock', label: 'Spotify', enabled: false },
+      { attribute: 'WorkOSSessions', provider: 'mock', label: 'WorkOS', enabled: false },
+      { attribute: 'ZoomSessions', provider: 'mock', label: 'Zoom', enabled: false },
     ],
+  },
+  {
+    id: 'churn',
+    label: 'Churn',
+    valuePrecision: 0,
+    hide: false,
+    showTooltip: true,
+    showLegend: true,
+    showMaxValue: false,
+    hideChartType: false,
+    defaultChartStyle: 'bar',
+    titleTooltip: 'The number of users who have deleted their account.',
+    attributes: [
+      { attribute: 'EmailChurn', provider: 'mock', label: 'Email', enabled: true },
+      { attribute: 'PhoneChurn', provider: 'mock', label: 'Phone', enabled: false },
+      { attribute: 'SAMLChurn', provider: 'mock', label: 'SAML 2.0', enabled: false },
+      { attribute: 'AppleChurn', provider: 'mock', label: 'Apple', enabled: false },
+      { attribute: 'AzureChurn', provider: 'mock', label: 'Azure', enabled: false },
+      { attribute: 'BitbucketChurn', provider: 'mock', label: 'Bitbucket', enabled: false },
+      { attribute: 'DiscordChurn', provider: 'mock', label: 'Discord', enabled: false },
+      { attribute: 'FacebookChurn', provider: 'mock', label: 'Facebook', enabled: false },
+      { attribute: 'FigmaChurn', provider: 'mock', label: 'Figma', enabled: false },
+      { attribute: 'GitHubChurn', provider: 'mock', label: 'GitHub', enabled: true },
+      { attribute: 'GitLabChurn', provider: 'mock', label: 'GitLab', enabled: false },
+      { attribute: 'GoogleChurn', provider: 'mock', label: 'Google', enabled: true },
+      { attribute: 'KakaoChurn', provider: 'mock', label: 'Kakao', enabled: false },
+      { attribute: 'KeyCloakChurn', provider: 'mock', label: 'KeyCloak', enabled: false },
+      { attribute: 'LinkedInChurn', provider: 'mock', label: 'LinkedIn (OIDC)', enabled: false },
+      { attribute: 'NotionChurn', provider: 'mock', label: 'Notion', enabled: false },
+      { attribute: 'TwitchChurn', provider: 'mock', label: 'Twitch', enabled: false },
+      { attribute: 'TwitterChurn', provider: 'mock', label: 'Twitter', enabled: false },
+      { attribute: 'SlackChurn', provider: 'mock', label: 'Slack (OIDC)', enabled: false },
+      { attribute: 'SpotifyChurn', provider: 'mock', label: 'Spotify', enabled: false },
+      { attribute: 'WorkOSChurn', provider: 'mock', label: 'WorkOS', enabled: false },
+      { attribute: 'ZoomChurn', provider: 'mock', label: 'Zoom', enabled: false },
+    ],
+  },
+  {
+    id: 'churn-rate',
+    label: 'Churn Rate',
+    valuePrecision: 1,
+    hide: false,
+    showTooltip: true,
+    showLegend: true,
+    showMaxValue: false,
+    hideChartType: false,
+    defaultChartStyle: 'bar',
+    format: '%',
+    titleTooltip: 'The percentage of users who have deleted their account.',
+    attributes: [{ attribute: 'ChurnRate', provider: 'mock', label: 'Churn Rate', enabled: true }],
   },
   // Session Duration
   // {
@@ -111,6 +200,7 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
     showMaxValue: false,
     hideChartType: false,
     defaultChartStyle: 'bar',
+    titleTooltip: 'The total number of password resets.',
     attributes: [
       { attribute: 'PasswordResetRequests', provider: 'mock', label: 'Reset Requests' },
       { attribute: 'PasswordResetCompleted', provider: 'mock', label: 'Completed Resets' },
@@ -191,11 +281,44 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
     showMaxValue: false,
     hideChartType: false,
     defaultChartStyle: 'bar',
+    titleTooltip: 'The total number of auth errors.',
     attributes: [
-      { attribute: 'Status403', provider: 'mock', label: '403 Forbidden' },
-      { attribute: 'Status422', provider: 'mock', label: '422 Unprocessable Entity' },
-      { attribute: 'Status429', provider: 'mock', label: '429 Too Many Requests' },
-      { attribute: 'Status500', provider: 'mock', label: '500 Internal Server Error' },
+      {
+        attribute: 'Status403',
+        provider: 'mock',
+        label: '403 Forbidden',
+        color: {
+          light: '#FFB74D', // Orange 300
+          dark: '#FFCC80', // Orange 200
+        },
+      },
+      {
+        attribute: 'Status422',
+        provider: 'mock',
+        label: '422 Unprocessable Entity',
+        color: {
+          light: '#FF9800', // Orange 500
+          dark: '#FFB74D', // Orange 300
+        },
+      },
+      {
+        attribute: 'Status429',
+        provider: 'mock',
+        label: '429 Too Many Requests',
+        color: {
+          light: '#E65100', // Orange 900
+          dark: '#F57C00', // Orange 700
+        },
+      },
+      {
+        attribute: 'Status500',
+        provider: 'mock',
+        label: '500 Internal Server Error',
+        color: {
+          light: '#B71C1C', // Red 900
+          dark: '#D32F2F', // Red 700
+        },
+      },
     ],
   },
   // Error Rate by Provider
@@ -216,27 +339,6 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
   //     { attribute: 'FacebookErrorRate', provider: 'mock', label: 'Facebook' },
   //   ],
   // },
-  // Rate Limiting
-  {
-    id: 'rate-limiting',
-    label: 'Rate Limiting Events',
-    valuePrecision: 0,
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'bar',
-    attributes: [
-      { attribute: 'IPRateLimited', provider: 'mock', label: 'IP Address Rate Limited' },
-      { attribute: 'UserRateLimited', provider: 'mock', label: 'User Account Rate Limited' },
-      {
-        attribute: 'BruteForceAttempts',
-        provider: 'mock',
-        label: 'Potential Brute Force Attempts',
-      },
-    ],
-  },
   // API Latency
   {
     id: 'auth-latency',
@@ -248,10 +350,33 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
     showMaxValue: false,
     hideChartType: false,
     defaultChartStyle: 'bar',
+    titleTooltip: 'The average latency of auth API requests.',
     attributes: [
       { attribute: 'SignInLatency', provider: 'mock', label: 'Sign In' },
       { attribute: 'SignUpLatency', provider: 'mock', label: 'Sign Up' },
       { attribute: 'TokenRefreshLatency', provider: 'mock', label: 'Token Refresh' },
+    ],
+  },
+  // Rate Limiting
+  {
+    id: 'rate-limiting',
+    label: 'Rate Limiting Events',
+    valuePrecision: 0,
+    hide: false,
+    showTooltip: true,
+    showLegend: true,
+    showMaxValue: false,
+    hideChartType: false,
+    defaultChartStyle: 'bar',
+    titleTooltip: 'The total number of rate limiting events.',
+    attributes: [
+      { attribute: 'IPRateLimited', provider: 'mock', label: 'IP Address Rate Limited' },
+      { attribute: 'UserRateLimited', provider: 'mock', label: 'User Account Rate Limited' },
+      {
+        attribute: 'BruteForceAttempts',
+        provider: 'mock',
+        label: 'Potential Brute Force Attempts',
+      },
     ],
   },
   // Security Events
@@ -276,22 +401,23 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
   //   ],
   // },
   // Token Usage
-  // {
-  //   id: 'token-usage',
-  //   label: 'Token Activity',
-  //   valuePrecision: 0,
-  //   hide: false,
-  //   showTooltip: true,
-  //   showLegend: true,
-  //   showMaxValue: false,
-  //   hideChartType: false,
-  //   defaultChartStyle: 'bar',
-  //   attributes: [
-  //     { attribute: 'TokenIssuance', provider: 'mock', label: 'Tokens Issued' },
-  //     { attribute: 'TokenRefresh', provider: 'mock', label: 'Token Refreshes' },
-  //     { attribute: 'TokenRevocation', provider: 'mock', label: 'Token Revocations' },
-  //   ],
-  // },
+  {
+    id: 'token-usage',
+    label: 'Token Activity',
+    valuePrecision: 0,
+    hide: false,
+    showTooltip: true,
+    showLegend: true,
+    showMaxValue: false,
+    hideChartType: false,
+    defaultChartStyle: 'bar',
+    titleTooltip: 'The total number of token activity.',
+    attributes: [
+      { attribute: 'TokenIssuance', provider: 'mock', label: 'Tokens Issued' },
+      { attribute: 'TokenRefresh', provider: 'mock', label: 'Token Refreshes' },
+      { attribute: 'TokenRevocation', provider: 'mock', label: 'Token Revocations' },
+    ],
+  },
 
   // Conversion Metrics
   // Auth Conversion Funnel
@@ -439,6 +565,109 @@ export const getAuthRequestsMockData = (provider: string) => {
     yAxisLimit: 100,
     format: '',
     totalAverage: parseFloat(totalAverage.toFixed(2)),
+    total,
+  }
+}
+
+// Add new mock data generator for provider-specific sessions
+export const getProviderSessionsMockData = (provider: string) => {
+  let values: number[] = []
+
+  // Generate higher base values for sessions compared to signups
+  if (provider === 'EmailSessions') {
+    values = generatePatternedValues(DEFAULT_TIME_POINTS.length, 15, 8, 0.1, 2)
+  } else if (provider === 'GoogleSessions') {
+    values = generatePatternedValues(DEFAULT_TIME_POINTS.length, 12, 6, 0.1, 2.5)
+  } else if (provider === 'GitHubSessions') {
+    values = generatePatternedValues(DEFAULT_TIME_POINTS.length, 10, 5, 0.1, 2.2)
+  } else {
+    // For other providers, generate lower values
+    values = generatePatternedValues(DEFAULT_TIME_POINTS.length, 5, 3, 0.1, 2)
+  }
+
+  const data = DEFAULT_TIME_POINTS.map((time, index) => ({
+    period_start: time,
+    [provider]: values[index],
+  }))
+
+  const total = values.reduce((sum, val) => sum + val, 0)
+  const totalAverage = total / values.length
+
+  return {
+    data,
+    yAxisLimit: Math.max(...values) * 1.2,
+    format: '',
+    totalAverage: parseFloat(totalAverage.toFixed(2)),
+    total,
+  }
+}
+
+// Add new mock data generator for provider-specific churn rates
+export const getProviderChurnMockData = (provider: string) => {
+  let values: number[] = []
+
+  // Generate realistic churn rates (typically between 2-15%)
+  if (provider === 'EmailChurn') {
+    // Email typically has higher churn
+    values = generatePatternedValues(DEFAULT_TIME_POINTS.length, 2, 10, 0.1, 5.2).map((v) =>
+      Math.min(v, 20)
+    )
+  } else if (provider === 'GoogleChurn') {
+    // Google typically has lower churn due to account persistence
+    values = generatePatternedValues(DEFAULT_TIME_POINTS.length, 8, 2, 0.1, 1.3).map((v) =>
+      Math.min(v, 15)
+    )
+  } else if (provider === 'GitHubChurn') {
+    // GitHub has moderate churn
+    values = generatePatternedValues(DEFAULT_TIME_POINTS.length, 10, 2.5, 0.1, 1.2).map((v) =>
+      Math.min(v, 18)
+    )
+  } else {
+    // Other providers have varying churn rates
+    values = generatePatternedValues(DEFAULT_TIME_POINTS.length, 9, 3, 0.1, 1.4).map((v) =>
+      Math.min(v, 20)
+    )
+  }
+
+  const data = DEFAULT_TIME_POINTS.map((time, index) => ({
+    period_start: time,
+    [provider]: values[index],
+  }))
+
+  const total = values.reduce((sum, val) => sum + val, 0)
+  const totalAverage = total / values.length
+
+  return {
+    data,
+    yAxisLimit: 20, // Max 20% churn rate
+    format: '%',
+    totalAverage: parseFloat(totalAverage.toFixed(1)),
+    total,
+  }
+}
+
+// Add new mock data generator for churn rates
+export const getChurnRateMockData = (attribute: string) => {
+  let values: number[] = []
+
+  // Overall churn rate with some variance
+  values = generatePatternedValues(DEFAULT_TIME_POINTS.length, 0.6, 2, 0.15, 2.6)
+    .map((v) => Math.max(0, v - 0.25)) // Allow some values to go to 0
+    .map((v) => Math.min(v, 3.2))
+
+  const data = DEFAULT_TIME_POINTS.map((time, index) => ({
+    period_start: time,
+    [attribute]: values[index],
+  }))
+
+  const total = values.reduce((sum, val) => sum + val, 0)
+  const totalAverage = total / values.length
+
+  return {
+    data,
+    yAxisLimit: 1.5, // Max 1.5% churn rate
+    format: '%',
+    totalAverage: parseFloat(totalAverage.toFixed(1)),
     total,
   }
 }
@@ -744,11 +973,44 @@ export const getErrorSecurityChartAttributes = () => [
     showMaxValue: false,
     hideChartType: false,
     defaultChartStyle: 'bar',
+    titleTooltip: 'The total number of auth errors.',
     attributes: [
-      { attribute: 'Status403', provider: 'mock', label: '403 Forbidden' },
-      { attribute: 'Status422', provider: 'mock', label: '422 Unprocessable Entity' },
-      { attribute: 'Status429', provider: 'mock', label: '429 Too Many Requests' },
-      { attribute: 'Status500', provider: 'mock', label: '500 Internal Server Error' },
+      {
+        attribute: 'Status403',
+        provider: 'mock',
+        label: '403 Forbidden',
+        color: {
+          light: '#FFB74D', // Orange 300
+          dark: '#FFCC80', // Orange 200
+        },
+      },
+      {
+        attribute: 'Status422',
+        provider: 'mock',
+        label: '422 Unprocessable Entity',
+        color: {
+          light: '#FF9800', // Orange 500
+          dark: '#FFB74D', // Orange 300
+        },
+      },
+      {
+        attribute: 'Status429',
+        provider: 'mock',
+        label: '429 Too Many Requests',
+        color: {
+          light: '#E65100', // Orange 900
+          dark: '#F57C00', // Orange 700
+        },
+      },
+      {
+        attribute: 'Status500',
+        provider: 'mock',
+        label: '500 Internal Server Error',
+        color: {
+          light: '#B71C1C', // Red 900
+          dark: '#D32F2F', // Red 700
+        },
+      },
     ],
   },
   // Error Rate by Provider
@@ -1269,6 +1531,71 @@ export const getMockDataForAttribute = (attribute: string) => {
     ].includes(attribute)
   ) {
     return getAuthRequestsMockData(attribute)
+  }
+
+  // Provider-specific sessions
+  if (
+    [
+      'EmailSessions',
+      'PhoneSessions',
+      'SAMLSessions',
+      'AppleSessions',
+      'AzureSessions',
+      'BitbucketSessions',
+      'DiscordSessions',
+      'FacebookSessions',
+      'FigmaSessions',
+      'GitHubSessions',
+      'GitLabSessions',
+      'GoogleSessions',
+      'KakaoSessions',
+      'KeyCloakSessions',
+      'LinkedInSessions',
+      'NotionSessions',
+      'TwitchSessions',
+      'TwitterSessions',
+      'SlackSessions',
+      'SpotifySessions',
+      'WorkOSSessions',
+      'ZoomSessions',
+    ].includes(attribute)
+  ) {
+    return getProviderSessionsMockData(attribute)
+  }
+
+  // Provider-specific churn
+  if (
+    [
+      'EmailChurn',
+      'PhoneChurn',
+      'SAMLChurn',
+      'AppleChurn',
+      'AzureChurn',
+      'BitbucketChurn',
+      'DiscordChurn',
+      'FacebookChurn',
+      'FigmaChurn',
+      'GitHubChurn',
+      'GitLabChurn',
+      'GoogleChurn',
+      'KakaoChurn',
+      'KeyCloakChurn',
+      'LinkedInChurn',
+      'NotionChurn',
+      'TwitchChurn',
+      'TwitterChurn',
+      'SlackChurn',
+      'SpotifyChurn',
+      'WorkOSChurn',
+      'ZoomChurn',
+    ].includes(attribute)
+  ) {
+    return getProviderChurnMockData(attribute)
+  }
+
+  // Overall churn rate
+  if (attribute === 'ChurnRate') {
+    return getChurnRateMockData(attribute)
   }
 
   // Active Users charts
