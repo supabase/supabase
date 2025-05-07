@@ -65,6 +65,7 @@ const CustomTooltip = ({
       maxValueAttribute && payload?.find((p: any) => p.dataKey === maxValueAttribute.attribute)
     const maxValue = maxValueData?.value
     const isRamChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
+    const isDiskChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_space_'))
     const total =
       showTotal &&
       calculateTotalChartAggregate(
@@ -93,7 +94,7 @@ const CustomTooltip = ({
             {attribute?.label || entry.name}
           </span>
           <span className="ml-3.5 flex items-end gap-1">
-            {isRamChart
+            {isRamChart || isDiskChart
               ? formatBytes(entry.value, valuePrecision)
               : numberFormatter(entry.value, valuePrecision)}
             {isPercentage ? '%' : ''}
@@ -119,7 +120,9 @@ const CustomTooltip = ({
               <span className="flex-grow text-foreground-lighter">Total</span>
               <div className="flex items-end gap-1">
                 <span className="text-base">
-                  {isRamChart ? formatBytes(total as number, 1) : numberFormatter(total as number)}
+                  {isRamChart || isDiskChart
+                    ? formatBytes(total as number, 1)
+                    : numberFormatter(total as number)}
                   {isPercentage ? '%' : ''}
                 </span>
                 {maxValueAttribute &&

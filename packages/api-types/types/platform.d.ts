@@ -4778,8 +4778,10 @@ export interface components {
     DatabaseDetailResponse: {
       /** @enum {string} */
       cloud_provider: 'AWS' | 'AWS_K8S' | 'FLY'
-      connection_string_read_only: string
-      connectionString: string
+      /** @default null */
+      connection_string_read_only?: string | null
+      /** @default null */
+      connectionString?: string | null
       db_host: string
       db_name: string
       db_port: number
@@ -6258,7 +6260,7 @@ export interface components {
       work_mem?: string
     }
     /** @enum {string} */
-    PostgresEngine: '15' | '17-oriole'
+    PostgresEngine: '15' | '17' | '17-oriole'
     PostgresExtension: {
       comment: string | null
       default_version: string
@@ -6686,7 +6688,8 @@ export interface components {
     }
     ProjectDetailResponse: {
       cloud_provider: string
-      connectionString: string
+      /** @default null */
+      connectionString?: string | null
       db_host: string
       dbVersion?: string
       id: number
@@ -16270,15 +16273,19 @@ export interface operations {
           | 'cpu_usage_busy_irqs'
           | 'cpu_usage_busy_other'
           | 'cpu_usage_busy_idle'
-          | 'client_connections_pgbouncer'
           | 'max_cpu_usage'
           | 'avg_cpu_usage'
+          | 'client_connections_pgbouncer'
           | 'disk_io_budget'
           | 'disk_io_consumption'
           | 'disk_iops_read'
           | 'disk_iops_write'
           | 'disk_bytes_read'
           | 'disk_bytes_written'
+          | 'disk_space_used'
+          | 'disk_space_available'
+          | 'disk_space_total'
+          | 'pg_database_size'
           | 'ram_usage'
           | 'ram_usage_total'
           | 'ram_usage_used'

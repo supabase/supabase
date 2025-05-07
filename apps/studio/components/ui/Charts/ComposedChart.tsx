@@ -181,7 +181,7 @@ export default function ComposedChart({
   const stackedAttributes = chartData.filter((att) => !att.name.includes('max'))
   const isPercentage = format === '%'
   const isRamChart = chartData?.some((att: any) => att.name.toLowerCase().includes('ram_'))
-
+  const isDiskChart = chartData?.some((att: any) => att.name.toLowerCase().includes('disk_space_'))
   //*
   // Set the y-axis domain
   // to the highest value in the chart data for percentage charts
@@ -213,7 +213,7 @@ export default function ComposedChart({
         customDateFormat={customDateFormat}
         highlightedValue={
           typeof resolvedHighlightedValue === 'number'
-            ? isRamChart
+            ? isRamChart || isDiskChart
               ? formatBytes(resolvedHighlightedValue, valuePrecision)
               : numberFormatter(resolvedHighlightedValue, valuePrecision)
             : resolvedHighlightedValue
