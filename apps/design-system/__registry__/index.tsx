@@ -2216,6 +2216,75 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+<<<<<<< Updated upstream
+=======
+    "horizontal-waterfall-chart": {
+      name: "horizontal-waterfall-chart",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/horizontal-waterfall-chart")),
+      source: "",
+      files: ["registry/default/example/horizontal-waterfall-chart.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "flame-graph": {
+      name: "flame-graph",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/flame-graph")),
+      source: "",
+      files: ["registry/default/example/flame-graph.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "flame-graph-data-violations": {
+      name: "flame-graph-data-violations",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/flame-graph-data-violations")),
+      source: "",
+      files: ["registry/default/example/flame-graph-data-violations.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "flame-graph-orphan-children": {
+      name: "flame-graph-orphan-children",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/flame-graph-orphan-children")),
+      source: "",
+      files: ["registry/default/example/flame-graph-orphan-children.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "flame-graph-no-root": {
+      name: "flame-graph-no-root",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/flame-graph-no-root")),
+      source: "",
+      files: ["registry/default/example/flame-graph-no-root.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "flame-graph-multiple-root": {
+      name: "flame-graph-multiple-root",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/flame-graph-multiple-root")),
+      source: "",
+      files: ["registry/default/example/flame-graph-multiple-root.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+>>>>>>> Stashed changes
     "chart-area-axes": {
       name: "chart-area-axes",
       type: "components:block",

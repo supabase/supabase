@@ -1,5 +1,9 @@
 # Supabase Design System
+<<<<<<< Updated upstream
 Last updated: 2025-04-24T06:00:07.374Z
+=======
+Last updated: 2025-05-06T03:00:49.735Z
+>>>>>>> Stashed changes
 
 ## Overview
 The Design System used in Supabase Studio.
@@ -130,10 +134,17 @@ The Design System used in Supabase Studio.
     - Displays a callout for user attention.
 - [Assistant Chat](https://supabase-design-system.vercel.app/design-system/docs/fragments/assistant-chat)
     - Bespoke Assistant chat text area, with support for a commands Popover.
+<<<<<<< Updated upstream
 - [Filter Bar](https://supabase-design-system.vercel.app/design-system/docs/fragments/filter-bar)
     - An advanced filtering component with support for multiple conditions and operators.
+=======
+- [Flame Chart](https://supabase-design-system.vercel.app/design-system/docs/fragments/flame-chart)
+    - A flame chart visualizes a distributed request trace and represents each service call that occurred during the request's execution path with a timed, color-coded, horizontal bar.
+>>>>>>> Stashed changes
 - [Form Item Layout](https://supabase-design-system.vercel.app/design-system/docs/fragments/form-item-layout)
     - A helper component that provides a layout for form items.
+- [Horizontal Waterfall Chart](https://supabase-design-system.vercel.app/design-system/docs/fragments/horizontal-waterfall-chart)
+    - A waterfall chart to visualize request/traces timeline.
 - [Info Tooltip](https://supabase-design-system.vercel.app/design-system/docs/fragments/info-tooltip)
     - InfoTooltip provides a tooltip with an information icon.
 - [Inner Side Menu](https://supabase-design-system.vercel.app/design-system/docs/fragments/inner-side-menu)
