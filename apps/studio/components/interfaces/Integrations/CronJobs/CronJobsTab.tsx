@@ -53,7 +53,9 @@ export const CronjobsTab = () => {
     searchTerm: debouncedSearchQuery,
   })
 
-  const cronJobs = useMemo(() => cronJobsPages?.pages.flat(), [cronJobsPages]) ?? []
+  const cronJobs =
+    useMemo(() => cronJobsPages?.pages.map((p) => p.data).flat(), [cronJobsPages]) ?? []
+  console.log(cronJobs)
 
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,

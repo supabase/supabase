@@ -4,7 +4,7 @@ export const databaseCronJobsKeys = {
   alter: () => ['cronjobs', 'alter'] as const,
   detail: (projectRef: string | undefined, jobName: string) =>
     ['projects', projectRef, 'cron-jobs', jobName] as const,
-  list: (projectRef: string | undefined, searchTerm: string | undefined) =>
+  list: (projectRef: string | undefined, searchTerm?: string | undefined) =>
     ['projects', projectRef, 'cron-jobs', { searchTerm }] as const,
   run: (projectRef: string | undefined, jobId: number) => [
     'projects',

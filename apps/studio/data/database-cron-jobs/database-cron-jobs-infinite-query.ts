@@ -15,27 +15,27 @@ export const CRON_JOBS_PAGE_SIZE = 5
 
 const cronJobSqlQuery = (searchTerm: string = '', skip: number) => {
   return `
-with
-  job_count as (
-    select
-      count(*) as total_count
-    from
-      cron.job
-    ${searchTerm ? `where jobname like '%${searchTerm}%'` : ''}
-  )
-select
-  count,
-  *
-from
-  job_count,
-  cron.job
-${searchTerm ? `where jobname like '%${searchTerm}%'` : ''}
-order by
-  jobid
-limit
-  5
-offset
-  50;`
+  with
+    job_count as (
+      select
+        count(*) as count
+      from
+        cron.job
+      ${searchTerm ? `where jobname like '%${searchTerm}%'` : ''}
+    )
+  select
+
+    *
+  from
+    job_count,
+    cron.job
+  ${searchTerm ? `where jobname like '%${searchTerm}%'` : ''}
+  order by
+    jobid
+  limit
+    5
+  offset
+    50;`
 }
 
 export async function getDatabaseCronJobs({
