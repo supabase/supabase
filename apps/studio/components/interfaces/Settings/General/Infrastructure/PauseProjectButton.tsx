@@ -32,11 +32,14 @@ const PauseProjectButton = () => {
     PermissionAction.INFRA_EXECUTE,
     'queue_jobs.projects.pause'
   )
-  const isOrioleDbInAws = useIsOrioleDbInAws()
+
   const isOrioleDb = useIsOrioleDb()
+  const isOrioleDbInAws = useIsOrioleDbInAws()
+  const isOrioleDBInAwsNew = isOrioleDb && !isOrioleDbInAws
 
   const isFreePlan = organization?.plan.id === 'free'
-  const isPaidAndNotAwsNew = !isFreePlan && !(isOrioleDb && !isOrioleDbInAws)
+
+  const isPaidAndNotAwsNew = !isFreePlan && !isOrioleDBInAwsNew
 
   const { mutate: pauseProject, isLoading: isPausing } = useProjectPauseMutation({
     onSuccess: (res, variables) => {
