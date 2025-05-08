@@ -110,10 +110,8 @@ To start API locally, run:
     }
   }
 
-  // Navigate to sign in and wait for network idle
   await page.goto('./sign-in', { waitUntil: 'networkidle' })
 
-  // Wait for the form to be ready
   await page.waitForLoadState('domcontentloaded')
   await page.waitForLoadState('networkidle')
 
@@ -124,7 +122,6 @@ To start API locally, run:
   expect(auth.password).toBeDefined()
   expect(auth.projectRef).toBeDefined()
 
-  // Wait for form elements with increased timeout
   const emailInput = page.getByLabel('Email')
   const passwordInput = page.getByLabel('Password')
   const signInButton = page.getByRole('button', { name: 'Sign In' })
@@ -133,14 +130,12 @@ To start API locally, run:
   await passwordInput.waitFor({ state: 'visible', timeout: 15000 })
   await signInButton.waitFor({ state: 'visible', timeout: 15000 })
 
-  // Fill in the form with retries
   await emailInput.fill(auth.email ?? '')
-  await page.waitForTimeout(1000) // Small delay between actions
+  await page.waitForTimeout(1000)
   await passwordInput.fill(auth.password ?? '')
-  await page.waitForTimeout(1000) // Small delay between actions
+  await page.waitForTimeout(1000)
   await signInButton.click()
 
-  // Wait for navigation with increased timeout
   await page.waitForURL('./projects', { timeout: 60000 })
   await page.context().storageState({ path: STORAGE_STATE_PATH })
 })
