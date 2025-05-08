@@ -1,4 +1,6 @@
-import { Github } from 'lucide-react'
+import { ExternalLink, Github } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { ReactNode } from 'react'
 
 import { APIKeysData } from 'data/api-keys/api-keys-query'
 import {
@@ -11,10 +13,45 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  cn,
 } from 'ui'
 import { SecretAPIKeyInput } from './APIKeyRow'
 import { CreateNewAPIKeysButton } from './CreateNewAPIKeysButton'
 import { useApiKeysVisibility } from './hooks/useApiKeysVisibility'
+
+// Reusable container component for all the banners
+interface BannerContainerProps {
+  children: ReactNode
+  withIllustration?: boolean
+  className?: string
+}
+
+const BannerContainer = ({
+  children,
+  withIllustration = false,
+  className,
+}: BannerContainerProps) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        type: 'spring',
+        stiffness: 500,
+        damping: 30,
+        mass: 1,
+      }}
+      className={cn(
+        'pb-36 pt-10 relative w-full flex flex-col xl:flex-row border xl:py-10 px-10 rounded-md overflow-hidden',
+        withIllustration && 'bg-background-alternative',
+        className
+      )}
+    >
+      {children}
+      {withIllustration && <ApiKeysIllustrationWithOverlay />}
+    </motion.div>
+  )
+}
 
 // Mock API Keys for demo
 const mockApiKeys = [
@@ -96,7 +133,7 @@ export const ApiKeysIllustrationWithOverlay = () => {
         z-[3] pointer-events-none xl:max-w-[500px]"
       />
 
-      <div className="absolute scale-100 left-10 -bottom-14 w-[720px] xl:w-[500px] xl:left-auto xl:-right-[200px] 2xl:-right-16 xl:top-3 xl:scale-75">
+      <div className="absolute scale-100 left-10 -bottom-14 w-[720px] xl:w-[500px] xl:left-auto xl:-right-[200px] 2xl:-right-16 xl:top-[21px] xl:scale-75">
         <ApiKeysTableIllustration />
       </div>
     </>
@@ -108,7 +145,7 @@ export const ApiKeysIllustrationWithOverlay = () => {
  */
 export const ApiKeysComingSoonBanner = () => {
   return (
-    <div className="pb-36 pt-10 relative w-full flex flex-col xl:flex-row border xl:py-10 px-10 rounded-md bg-background-alternative overflow-hidden">
+    <BannerContainer withIllustration>
       <div className="flex flex-col gap-0 z-[2]">
         <p className="text-sm text-foreground">New API keys are coming soon</p>
         <p className="text-sm text-foreground-lighter lg:max-w-sm 2xl:max-w-none">
@@ -120,9 +157,7 @@ export const ApiKeysComingSoonBanner = () => {
           </Button>
         </div>
       </div>
-
-      <ApiKeysIllustrationWithOverlay />
-    </div>
+    </BannerContainer>
   )
 }
 
@@ -135,7 +170,7 @@ export const ApiKeysCreateCallout = () => {
   if (!canInitApiKeys) return null
 
   return (
-    <div className="pb-36 pt-10 relative w-full flex flex-col xl:flex-row border xl:py-10 px-10 rounded-md bg-background-alternative overflow-hidden mb-8">
+    <BannerContainer withIllustration>
       <div className="flex flex-col gap-0 z-[2]">
         <p className="text-sm text-foreground">Create your first API key</p>
         <p className="text-sm text-foreground-lighter lg:max-w-sm 2xl:max-w-none">
@@ -145,8 +180,37 @@ export const ApiKeysCreateCallout = () => {
           <CreateNewAPIKeysButton />
         </div>
       </div>
+    </BannerContainer>
+  )
+}
 
-      <ApiKeysIllustrationWithOverlay />
-    </div>
+/**
+ * Feedback banner for users who have API keys and the feature is rolled out to them
+ */
+export const ApiKeysFeedbackBanner = () => {
+  const { hasApiKeys, isInRollout } = useApiKeysVisibility()
+
+  // Don't show anything if not in rollout or if keys don't exist
+  if (!isInRollout || !hasApiKeys) {
+    return null
+  }
+
+  return (
+    <BannerContainer>
+      <div className="flex flex-col gap-0 z-[2]">
+        <p className="text-sm text-foreground">These are the new API keys</p>
+        <p className="text-sm text-foreground-lighter">
+          We've updated our API keys to better support your application needs. Have feedback?{' '}
+          <a
+            href="https://github.com/supabase/supabase/discussions"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 text-brand"
+          >
+            Join the discussion on GitHub <ExternalLink size={14} strokeWidth={1.5} />
+          </a>
+        </p>
+      </div>
+    </BannerContainer>
   )
 }

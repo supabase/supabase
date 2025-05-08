@@ -1,56 +1,25 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-
-import { LegacyAPIKeys } from 'components/interfaces/APIKeys/LegacyAPIKeys'
-import { PublishableAPIKeys } from 'components/interfaces/APIKeys/PublishableAPIKeys'
-import { SecretAPIKeys } from 'components/interfaces/APIKeys/SecretAPIKeys'
-import {
-  ApiKeysComingSoonBanner,
-  ApiKeysCreateCallout,
-} from 'components/interfaces/APIKeys/ApiKeysIllustrations'
-import { useApiKeysVisibility } from 'components/interfaces/APIKeys/hooks/useApiKeysVisibility'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import ApiKeysLayout from 'components/layouts/project/[ref]/settings/APIKeysLayout'
-import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import type { NextPageWithLayout } from 'types'
-import { Separator, cn } from 'ui'
 
-const ApiKeysSettings: NextPageWithLayout = () => {
-  const { ref: projectRef } = useParams()
-  const [apiKeysView] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.API_KEYS_VIEW(projectRef ?? ''),
-    undefined
-  )
+export default function ApiKeysLegacyPage() {
+  const router = useRouter()
+  const { ref } = useParams()
 
-  const { isInRollout, shouldDisableUI } = useApiKeysVisibility()
+  // For backward compatibility, check if there's a view query parameter
+  const view = router.query.view as string
 
-  return (
-    <>
-      {!isInRollout && <ApiKeysComingSoonBanner />}
+  // Get the view from local storage if no query parameter
+  const [storedView] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.API_KEYS_VIEW(ref ?? ''), 'new-keys')
 
-      <ApiKeysCreateCallout />
+  // Determine which page to redirect to
+  const targetView = view || storedView || 'new-keys'
 
-      <div className={cn(shouldDisableUI && 'opacity-50 pointer-events-none')}>
-        {apiKeysView !== 'legacy-keys' ? (
-          <>
-            <PublishableAPIKeys />
-            <Separator />
-            <SecretAPIKeys />
-          </>
-        ) : (
-          <LegacyAPIKeys />
-        )}
-      </div>
-    </>
-  )
+  useEffect(() => {
+    // Redirect to the appropriate page
+    router.replace(`/project/${ref}/settings/api-keys/${targetView}`)
+  }, [])
+
+  return null
 }
-
-ApiKeysSettings.getLayout = (page) => (
-  <DefaultLayout>
-    <SettingsLayout>
-      <ApiKeysLayout>{page}</ApiKeysLayout>
-    </SettingsLayout>
-  </DefaultLayout>
-)
-
-export default ApiKeysSettings

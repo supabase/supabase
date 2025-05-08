@@ -168,7 +168,7 @@ export function SecretAPIKeyInput({
         </AnimatePresence>
       </div>
       {isSecret && (
-        <AnimatePresence>
+        <AnimatePresence initial={false}>
           {!show && (
             <motion.div
               initial={{ opacity: 0, scale: 1, width: 0 }}
