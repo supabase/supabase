@@ -14,8 +14,8 @@ on:
       - 'packages/pg-meta/**/*'
       - 'apps/studio/**'
       - 'tests/studio-tests/**'
-      - 'pnpm-lock.yaml'
       - 'e2e/studio/**'
+      - 'pnpm-lock.yaml'
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
@@ -46,7 +46,14 @@ jobs:
           version: latest
       - name: Install dependencies
         run: pnpm i
+      - name: Cache Studio build
+        uses: actions/cache@v4
+        id: studio-cache
+        with:
+          path: apps/studio/.next
+          key: studio-build-${{ hashFiles('apps/studio/**', 'packages/pg-meta/**', 'packages/ai-commands/**', 'packages/common/**', 'packages/config/**', 'packages/icons/**', 'packages/shared-data/**', 'packages/ui/**', 'packages/ui-patterns/**', 'packages/api-types/**', 'pnpm-lock.yaml') }}
       - name: Build Studio
+        if: steps.studio-cache.outputs.cache-hit != 'true'
         run: pnpm --filter studio build
       - name: Start Studio server
         run: pnpm --filter studio start &
