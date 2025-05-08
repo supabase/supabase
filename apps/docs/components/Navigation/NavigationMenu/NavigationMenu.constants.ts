@@ -2159,7 +2159,17 @@ export const platform: NavMenuConstant = {
         },
         {
           name: 'Multi-factor Authentication',
-          url: '/guides/platform/multi-factor-authentication',
+          url: undefined,
+          items: [
+            {
+              name: 'Enable MFA',
+              url: '/guides/platform/multi-factor-authentication',
+            },
+            {
+              name: 'Require MFA for organization members',
+              url: '/guides/platform/org-mfa-enforcement',
+            },
+          ],
         },
         {
           name: 'Transfer Project',
