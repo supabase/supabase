@@ -1857,7 +1857,7 @@ importers:
         version: 0.5.10(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@20.12.11)(typescript@5.5.2)))
       autoprefixer:
         specifier: ^10.4.14
-        version: 10.4.16(postcss@8.4.38)
+        version: 10.4.16(postcss@8.5.3)
       class-variance-authority:
         specifier: ^0.6.1
         version: 0.6.1
@@ -9501,6 +9501,7 @@ packages:
     resolution: {integrity: sha512-t0q23FIpvHDTtnORW+bDJziGsal5uh9RJTJ1fyH8drd4lICOoXhJ5pLMUZ5C0VQei6dNmwTzzoTRgMkO9JgHEQ==}
     peerDependencies:
       eslint: '>= 5'
+    bundledDependencies: []
 
   eslint-plugin-import@2.29.1:
     resolution: {integrity: sha512-BbPC0cuExzhiMo4Ff1BTVwHpjjv28C5R+btTOGaCRC7UEz801up0JadwkeSk5Ued6TG34uaczuVuH6qyy5YUxw==}
