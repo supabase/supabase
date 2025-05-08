@@ -35,6 +35,7 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
     defaultChartStyle: 'line',
     showMaxValue: false,
     showGrid: true,
+    syncId: 'database-reports',
     YAxisProps: { width: 55, tickFormatter: (value: any) => formatBytes(value, 0) },
     attributes: [
       {
@@ -77,6 +78,7 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
   {
     id: 'cpu-usage',
     label: 'CPU usage',
+    syncId: 'database-reports',
     format: '%',
     valuePrecision: 2,
     hide: false,
@@ -131,6 +133,7 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
   {
     id: 'disk-iops',
     label: 'Disk IOps',
+    syncId: 'database-reports',
     hide: false,
     showTooltip: true,
     showLegend: true,
@@ -178,7 +181,7 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
   // },
   // {
   //   id: 'disk-space-usage',
-  //   label: 'Disk Space Usage',
+  //   label: 'Disk Usage',
   //   valuePrecision: 1,
   //   hide: false,
   //   showTooltip: true,
@@ -198,7 +201,7 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
   //     {
   //       attribute: 'disk_space_available',
   //       provider: 'infra-monitoring',
-  //       label: 'disk_space_available',
+  //       label: 'Available',
   //       tooltip: 'Available disk space',
   //     },
   //   ],
@@ -227,6 +230,7 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
   {
     id: 'client-connections',
     label: 'Database client connections',
+    syncId: 'database-reports',
     valuePrecision: 0,
     hide: false,
     showTooltip: false,
@@ -248,6 +252,7 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
   {
     id: 'pgbouncer-connections',
     label: 'Pooler client connections',
+    syncId: 'database-reports',
     valuePrecision: 0,
     hide: false,
     showTooltip: false,
@@ -269,6 +274,7 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
   {
     id: 'supavisor-connections-active',
     label: 'Supavisor client connections',
+    syncId: 'database-reports',
     valuePrecision: 0,
     hide: isFreePlan,
     showTooltip: false,
@@ -290,6 +296,7 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
   {
     id: 'network-traffic',
     label: 'Network Traffic',
+    syncId: 'database-reports',
     valuePrecision: 1,
     showTooltip: true,
     showLegend: true,

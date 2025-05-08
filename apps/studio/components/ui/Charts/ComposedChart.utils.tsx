@@ -33,6 +33,7 @@ interface TooltipProps {
   valuePrecision?: number
   showMaxValue?: boolean
   showTotal?: boolean
+  isActiveHoveredChart?: boolean
 }
 
 const isMaxAttribute = (attributes?: MultiAttribute[]) => attributes?.find((a) => a.isMaxValue)
@@ -57,6 +58,7 @@ const CustomTooltip = ({
   isPercentage,
   valuePrecision,
   showTotal,
+  isActiveHoveredChart,
 }: TooltipProps) => {
   if (active && payload && payload.length) {
     const timestamp = payload[0].payload.timestamp
@@ -124,7 +126,12 @@ const CustomTooltip = ({
     }
 
     return (
-      <div className="grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg px-2.5 py-1.5 text-xs shadow-xl">
+      <div
+        className={cn(
+          'grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg px-2.5 py-1.5 text-xs shadow-xl transition-opacity opacity-100',
+          !isActiveHoveredChart && 'opacity-0'
+        )}
+      >
         <p className="font-medium">{dayjs(timestamp).format(DateTimeFormats.FULL_SECONDS)}</p>
         <div className="grid gap-0">
           {payload.reverse().map((entry: any, index: number) => (

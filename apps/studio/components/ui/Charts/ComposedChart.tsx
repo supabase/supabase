@@ -32,7 +32,7 @@ import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
 import { formatBytes } from 'lib/helpers'
 
-export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
+export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   attributes: MultiAttribute[]
   yAxisKey: string
   xAxisKey: string
@@ -54,6 +54,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   updateDateRange: any
   hideYAxis?: boolean
   hideHighlightedValue?: boolean
+  syncId?: string
 }
 
 export default function ComposedChart({
@@ -88,13 +89,14 @@ export default function ComposedChart({
   updateDateRange,
   hideYAxis,
   hideHighlightedValue,
-}: BarChartProps) {
+  syncId,
+}: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
   const [_activePayload, setActivePayload] = useState<any>(null)
   const [_showMaxValue, setShowMaxValue] = useState(showMaxValue)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
   const [hoveredLabel, setHoveredLabel] = useState<string | null>(null)
-
+  const [isActiveHoveredChart, setIsActiveHoveredChart] = useState(false)
   const isDarkMode = resolvedTheme?.includes('dark')
 
   // Update chart colors when theme changes
@@ -246,7 +248,9 @@ export default function ComposedChart({
       <Container className="relative z-10">
         <RechartComposedChart
           data={data}
+          syncId={syncId}
           onMouseMove={(e: any) => {
+            setIsActiveHoveredChart(true)
             if (e.activeTooltipIndex !== focusDataIndex) {
               setFocusDataIndex(e.activeTooltipIndex)
               setActivePayload(e.activePayload)
@@ -266,6 +270,7 @@ export default function ComposedChart({
           }}
           onMouseUp={chartHighlight?.handleMouseUp}
           onMouseLeave={(e) => {
+            setIsActiveHoveredChart(false)
             setFocusDataIndex(null)
             setActivePayload(null)
           }}
@@ -301,6 +306,7 @@ export default function ComposedChart({
                   attributes={attributes}
                   valuePrecision={valuePrecision}
                   showTotal={showTotal}
+                  isActiveHoveredChart={isActiveHoveredChart}
                 />
               ) : null
             }
@@ -341,6 +347,8 @@ export default function ComposedChart({
                   name={
                     attributes?.find((a) => a.attribute === attribute.name)?.label || attribute.name
                   }
+                  // Show dot for the first attribute when a point is focused
+                  dot={false}
                 />
               ))}
           {/* Max value, if available */}
