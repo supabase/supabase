@@ -559,7 +559,7 @@ select
     'WARN' as level,
     'EXTERNAL' as facing,
     array['PERFORMANCE'] as categories,
-    'Detects cases where two ore more identical indexes exist.' as description,
+    'Detects cases where two or more identical indexes exist.' as description,
     format(
         'Table \`%s.%s\` has identical indexes %s. Drop all except one of them',
         n.nspname,
