@@ -90,13 +90,6 @@ To start API locally, run:
   console.log(`\n ✅ API is running at ${apiUrl}`)
 
   /**
-   * TODO:
-   * Check if user is running hosted or selfhosted
-   * If user is running wrong studio for tests, stop and show error
-   * Not sure how to check this. - Jordi
-   */
-
-  /**
    * Only run authentication if the environment requires it
    */
   if (!ENVS_WITH_AUTH.includes(ENV)) {
@@ -110,10 +103,40 @@ To start API locally, run:
     }
   }
 
-  await page.goto('./sign-in', { waitUntil: 'networkidle' })
+  // Navigate to sign in with full URL
+  const signInUrl = new URL('./sign-in', studioUrl).toString()
+  console.log(`\n 🔑 Navigating to sign in page: ${signInUrl}`)
 
+  await page.goto(signInUrl, { waitUntil: 'networkidle' })
   await page.waitForLoadState('domcontentloaded')
   await page.waitForLoadState('networkidle')
+
+  // Check if we're still on the sign-in page
+  const currentUrl = page.url()
+  console.log(`\n 📍 Current URL: ${currentUrl}`)
+
+  if (!currentUrl.includes('/sign-in')) {
+    console.log('\n ⚠️ Redirected away from sign-in page. Checking if already authenticated...')
+
+    // Check if we're already on the projects page
+    if (currentUrl.includes('/projects')) {
+      console.log('\n ✅ Already authenticated, proceeding with tests')
+      await page.context().storageState({ path: STORAGE_STATE_PATH })
+      return
+    }
+
+    // If we're redirected somewhere else, try to navigate back to sign-in
+    console.log('\n 🔄 Attempting to navigate back to sign-in page')
+    await page.goto(signInUrl, { waitUntil: 'networkidle' })
+    await page.waitForLoadState('domcontentloaded')
+    await page.waitForLoadState('networkidle')
+
+    // Check URL again after second attempt
+    const secondAttemptUrl = page.url()
+    if (!secondAttemptUrl.includes('/sign-in')) {
+      throw new Error(`Failed to reach sign-in page. Current URL: ${secondAttemptUrl}`)
+    }
+  }
 
   const auth = AUTH_ENV[ENV]
 
@@ -122,9 +145,16 @@ To start API locally, run:
   expect(auth.password).toBeDefined()
   expect(auth.projectRef).toBeDefined()
 
+  // Wait for form elements with increased timeout
   const emailInput = page.getByLabel('Email')
   const passwordInput = page.getByLabel('Password')
   const signInButton = page.getByRole('button', { name: 'Sign In' })
+
+  // Debug element states
+  console.log('\n 🔍 Checking form elements:')
+  console.log(`Email input exists: ${(await emailInput.count()) > 0}`)
+  console.log(`Password input exists: ${(await passwordInput.count()) > 0}`)
+  console.log(`Sign in button exists: ${(await signInButton.count()) > 0}`)
 
   await emailInput.waitFor({ state: 'visible', timeout: 15000 })
   await passwordInput.waitFor({ state: 'visible', timeout: 15000 })
