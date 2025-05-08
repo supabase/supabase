@@ -78,7 +78,12 @@ export const PolicyTableRow = ({
             policies.length === 0 ? '' : 'border-b'
           )}
         >
-          <div className="w-1.5 h-1.5 bg-warning-600 rounded-full" />
+          <div
+            className={cn(
+              'w-1.5 h-1.5 rounded-full',
+              rlsLint.level === 'ERROR' ? 'bg-warning-600' : 'bg-selection'
+            )}
+          />
           <span className={cn('font-bold', rlsLint.level === 'ERROR' ? 'text-warning-600' : '')}>
             {rlsLint.level === 'ERROR' ? 'Warning' : 'Note'}:
           </span>{' '}

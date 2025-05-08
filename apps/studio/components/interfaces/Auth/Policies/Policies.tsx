@@ -1,4 +1,5 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
+import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty } from 'lodash'
 import { HelpCircle } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -16,6 +17,7 @@ import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import InformationBox from 'components/ui/InformationBox'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
+import { lintKeys } from 'data/lint/keys'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
@@ -38,6 +40,7 @@ const Policies = ({
 }: PoliciesProps) => {
   const router = useRouter()
   const { ref } = useParams()
+  const queryClient = useQueryClient()
   const { project } = useProjectContext()
 
   const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<{
@@ -57,8 +60,9 @@ const Policies = ({
     },
   })
   const { mutate: deleteDatabasePolicy } = useDatabasePolicyDeleteMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success('Successfully deleted policy!')
+      await queryClient.invalidateQueries(lintKeys.lint(ref))
     },
     onSettled: () => {
       closeConfirmModal()
