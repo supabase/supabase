@@ -119,9 +119,10 @@ export async function generateReferenceStaticParams() {
 }
 
 export async function generateReferenceMetadata(
-  { params: { slug } }: { params: { slug: Array<string> } },
+  props: { params: Promise<{ slug: Array<string> }> },
   resolvingParent: ResolvingMetadata
 ): Promise<Metadata> {
+  const { slug } = await props.params
   const { alternates: parentAlternates, openGraph: parentOg } = await resolvingParent
 
   const parsedPath = parseReferencePath(slug)
