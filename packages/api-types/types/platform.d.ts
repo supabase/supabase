@@ -4869,10 +4869,8 @@ export interface components {
     DatabaseDetailResponse: {
       /** @enum {string} */
       cloud_provider: 'AWS' | 'AWS_K8S' | 'FLY'
-      /** @default null */
-      connection_string_read_only?: string | null
-      /** @default null */
-      connectionString?: string | null
+      connection_string_read_only: string
+      connectionString: string
       db_host: string
       db_name: string
       db_port: number
@@ -6351,7 +6349,7 @@ export interface components {
       work_mem?: string
     }
     /** @enum {string} */
-    PostgresEngine: '15' | '17' | '17-oriole'
+    PostgresEngine: '15' | '17-oriole'
     PostgresExtension: {
       comment: string | null
       default_version: string
@@ -6779,8 +6777,7 @@ export interface components {
     }
     ProjectDetailResponse: {
       cloud_provider: string
-      /** @default null */
-      connectionString?: string | null
+      connectionString: string
       db_host: string
       dbVersion?: string
       id: number
