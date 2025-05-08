@@ -83,6 +83,20 @@ npm install supabase --save-dev
 
 ## Updating the Supabase CLI
 
+Before updating the CLI, stop any Supabase containers running locally and delete their data volumes before proceeding with the upgrade. This ensures that Supabase managed services can apply new migrations on a clean state of the local database.
+
+<Admonition type="tip" label="Backup and stop running containers">
+
+Remember to save any local schema and data changes before stopping because the `--no-backup` flag will delete them.
+
+```sh
+supabase db diff -f my_schema
+supabase db dump --local --data-only > supabase/seed.sql
+supabase stop --no-backup
+```
+
+</Admonition>
+
 When a new [version](https://github.com/supabase/cli/releases) is released, you can update the CLI using the same methods.
 
 <Tabs
@@ -133,20 +147,6 @@ npm update supabase --save-dev
 
 </TabPanel>
 </Tabs>
-
-If you have any Supabase containers running locally, stop them and delete their data volumes before proceeding with the upgrade. This ensures that Supabase managed services can apply new migrations on a clean state of the local database.
-
-<Admonition type="tip" label="Backup and stop running containers">
-
-Remember to save any local schema and data changes before stopping because the `--no-backup` flag will delete them.
-
-```sh
-supabase db diff -f my_schema
-supabase db dump --local --data-only > supabase/seed.sql
-supabase stop --no-backup
-```
-
-</Admonition>
 
 ## Running Supabase locally
 
