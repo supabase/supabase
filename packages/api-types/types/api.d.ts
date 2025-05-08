@@ -1728,7 +1728,7 @@ export interface components {
        * @description Postgres engine version. If not provided, the latest version will be used.
        * @enum {string}
        */
-      postgres_engine?: '15' | '17-oriole'
+      postgres_engine?: '15' | '17' | '17-oriole'
       region?: string
       /**
        * @description Release channel. If not provided, GA will be used.
@@ -1880,6 +1880,16 @@ export interface components {
       updated_at?: number
       verify_jwt?: boolean
       version: number
+    }
+    FunctionDeployBody: {
+      file?: string[]
+      metadata: {
+        entrypoint_path: string
+        import_map_path?: string
+        name?: string
+        static_patterns?: string[]
+        verify_jwt?: boolean
+      }
     }
     FunctionResponse: {
       created_at: number
@@ -2206,7 +2216,7 @@ export interface components {
       target_upgrade_versions: {
         app_version: string
         /** @enum {string} */
-        postgres_version: '15' | '17-oriole'
+        postgres_version: '15' | '17' | '17-oriole'
         /** @enum {string} */
         release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       }[]
@@ -2781,6 +2791,7 @@ export interface components {
       db_pass: string
       /** @enum {string} */
       desired_instance_size?:
+        | 'pico'
         | 'micro'
         | 'small'
         | 'medium'
@@ -3058,6 +3069,11 @@ export interface components {
       owner: string
       public: boolean
       updated_at: string
+    }
+    V1UpdateFunctionBody: {
+      body?: string
+      name?: string
+      verify_jwt?: boolean
     }
     V1UpdatePostgrestConfigBody: {
       db_extra_search_path?: string
@@ -5435,7 +5451,12 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody?: never
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1UpdateFunctionBody']
+        'application/vnd.denoland.eszip': components['schemas']['V1UpdateFunctionBody']
+      }
+    }
     responses: {
       200: {
         headers: {
@@ -5509,7 +5530,11 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody?: never
+    requestBody: {
+      content: {
+        'multipart/form-data': components['schemas']['FunctionDeployBody']
+      }
+    }
     responses: {
       201: {
         headers: {
@@ -5537,7 +5562,7 @@ export interface operations {
   'v1-get-services-health': {
     parameters: {
       query: {
-        services: string
+        services: ('auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage')[]
         timeout_ms?: number
       }
       header?: never

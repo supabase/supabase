@@ -4657,13 +4657,16 @@ export interface components {
       sink_name: string
     }
     CreateReplicationSinkPipelineBody: {
+      /** @description Pipeline config */
       pipeline_config: {
         config: {
           max_fill_secs: number
           max_size: number
         }
       }
+      /** @description Publication name */
       publication_name: string
+      /** @description Sink config */
       sink_config: {
         big_query: {
           /** @description BigQuery dataset id */
@@ -4678,6 +4681,7 @@ export interface components {
       }
       /** @description Sink name */
       sink_name: string
+      /** @description Source id */
       source_id: number
     }
     CreateSchemaBody: {
@@ -4685,7 +4689,9 @@ export interface components {
       owner: string
     }
     CreateSinkPipelineResponse: {
+      /** @description Pipeline id */
       pipeline_id: number
+      /** @description Sink id */
       sink_id: number
     }
     CreateSinkResponse: {
@@ -4720,7 +4726,9 @@ export interface components {
       value: string
     }
     CreateTenantSourceResponse: {
+      /** @description Source id */
       source_id: number
+      /** @description Tenant id */
       tenant_id: string
     }
     CreateTriggerBody: {
@@ -4861,8 +4869,10 @@ export interface components {
     DatabaseDetailResponse: {
       /** @enum {string} */
       cloud_provider: 'AWS' | 'AWS_K8S' | 'FLY'
-      connection_string_read_only: string
-      connectionString: string
+      /** @default null */
+      connection_string_read_only?: string | null
+      /** @default null */
+      connectionString?: string | null
       db_host: string
       db_name: string
       db_port: number
@@ -6341,7 +6351,7 @@ export interface components {
       work_mem?: string
     }
     /** @enum {string} */
-    PostgresEngine: '15' | '17-oriole'
+    PostgresEngine: '15' | '17' | '17-oriole'
     PostgresExtension: {
       comment: string | null
       default_version: string
@@ -6769,7 +6779,8 @@ export interface components {
     }
     ProjectDetailResponse: {
       cloud_provider: string
-      connectionString: string
+      /** @default null */
+      connectionString?: string | null
       db_host: string
       dbVersion?: string
       id: number
@@ -7947,13 +7958,16 @@ export interface components {
       sink_name: string
     }
     UpdateReplicationSinkPipelineBody: {
+      /** @description Pipeline config */
       pipeline_config: {
         config: {
           max_fill_secs: number
           max_size: number
         }
       }
+      /** @description Publication name */
       publication_name: string
+      /** @description Sink config */
       sink_config: {
         big_query: {
           /** @description BigQuery dataset id */
@@ -7968,6 +7982,7 @@ export interface components {
       }
       /** @description Sink name */
       sink_name: string
+      /** @description Source id */
       source_id: number
     }
     UpdateSchemaBody: {
@@ -11858,7 +11873,9 @@ export interface operations {
     parameters: {
       query?: never
       header?: never
-      path?: never
+      path: {
+        fly_organization_id: string
+      }
       cookie?: never
     }
     requestBody?: never
@@ -15783,7 +15800,7 @@ export interface operations {
   ContentController_deleteContents: {
     parameters: {
       query: {
-        ids: string
+        ids: string[]
       }
       header?: never
       path: {
@@ -15916,7 +15933,7 @@ export interface operations {
   ContentFoldersController_DeleteFolder: {
     parameters: {
       query: {
-        ids: string
+        ids: string[]
       }
       header?: never
       path?: never
@@ -16554,7 +16571,7 @@ export interface operations {
   ProjectAdvisorNotificationsController_deleteNotificationExceptions: {
     parameters: {
       query: {
-        ids: string
+        ids: string[]
       }
       header?: never
       path: {
@@ -17632,7 +17649,7 @@ export interface operations {
       path: {
         /** @description Pipeline id */
         pipeline_id: number
-        /** @description Project ref */
+        /** @description Project reference */
         ref: string
         /** @description Sink id */
         sink_id: number
