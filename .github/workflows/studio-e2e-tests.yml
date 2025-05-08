@@ -6,6 +6,7 @@ on:
       - 'packages/pg-meta/**/*'
       - 'apps/studio/**'
       - 'tests/studio-tests/**'
+      - 'e2e/**'
       - 'pnpm-lock.yaml'
   pull_request:
     branches: [master]
@@ -14,6 +15,7 @@ on:
       - 'apps/studio/**'
       - 'tests/studio-tests/**'
       - 'pnpm-lock.yaml'
+      - 'e2e/**'
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
