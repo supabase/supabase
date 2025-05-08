@@ -7,7 +7,7 @@ import { privilegeKeys } from './keys'
 
 export type ColumnPrivilegesVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export type ColumnPrivilege = components['schemas']['PostgresColumnPrivileges']

@@ -9,7 +9,7 @@ export type UpdateColumnBody = components['schemas']['UpdateColumnBody']
 
 export type DatabaseColumnUpdateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: string
   payload: components['schemas']['UpdateColumnBody']
 }

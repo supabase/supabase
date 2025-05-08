@@ -7,7 +7,7 @@ import { databaseIndexesKeys } from './keys'
 
 export type DatabaseIndexDeleteVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   name: string
 }
 
