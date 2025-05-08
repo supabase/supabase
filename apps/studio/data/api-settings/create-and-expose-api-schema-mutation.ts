@@ -9,7 +9,7 @@ import type { ResponseError } from 'types'
 
 export type CreateAndExposeAPISchemaVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   existingPostgrestConfig: {
     db_pool: any
     max_rows: number

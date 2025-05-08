@@ -10,7 +10,7 @@ export type Filter = 'verified' | 'unverified' | 'anonymous'
 
 export type UsersVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   page?: number
   keywords?: string
   filter?: Filter

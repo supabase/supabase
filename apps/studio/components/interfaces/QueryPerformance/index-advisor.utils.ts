@@ -40,7 +40,7 @@ export function calculateImprovement(
 
 interface CreateIndexParams {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   indexStatements: string[]
   onSuccess?: () => void
   onError?: (error: any) => void

@@ -5,6 +5,7 @@ import { uuidv4 } from 'lib/helpers'
 import createClient from 'openapi-fetch'
 import { ResponseError } from 'types'
 import type { paths } from './api' // generated from openapi-typescript
+import { IS_PLATFORM } from 'common'
 
 const DEFAULT_HEADERS = {
   Accept: 'application/json',
@@ -26,6 +27,13 @@ const client = createClient<paths>({
   },
 })
 
+export function isValidConnString(connString?: string | null) {
+  // If there is no `connectionString` on platform, pg-meta will necessarily fail to connect to the target database.
+  // This only applies if IS_PLATFORM is true; otherwise (test/local-dev), pg-meta won't need this parameter
+  // and will connect to the locally running DB_URL instead.
+  return IS_PLATFORM ? Boolean(connString) : true
+}
+
 export async function constructHeaders(headersInit?: HeadersInit | undefined) {
   const requestId = uuidv4()
   const headers = new Headers(headersInit)
@@ -40,6 +48,24 @@ export async function constructHeaders(headersInit?: HeadersInit | undefined) {
   return headers
 }
 
+function pgMetaGuard(request: Request) {
+  // Only check for /platform/pg-meta/ endpoints
+  if (request.url.includes('/platform/pg-meta/')) {
+    // If there is no valid `x-connection-encrypted`, pg-meta will necesseraly fail to connect to the target database
+    // in such case, we save the hops and throw a 421 response instead
+    if (!isValidConnString(request.headers.get('x-connection-encrypted'))) {
+      // TODO: Maybe here add a sentry warning to monitor how often this happen
+      // Simulate a 421 response by throwing an error
+      throw {
+        code: 421,
+        message: 'x-connection-encrypted header is required for /platform/pg-meta/ requests',
+        requestId: request.headers.get('X-Request-Id'),
+      }
+    }
+  }
+  return request
+}
+
 // Middleware
 client.use(
   {
@@ -47,8 +73,7 @@ client.use(
     async onRequest({ request }) {
       const headers = await constructHeaders()
       headers.forEach((value, key) => request.headers.set(key, value))
-
-      return request
+      return pgMetaGuard(request)
     },
   },
   {

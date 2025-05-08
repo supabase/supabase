@@ -7,7 +7,7 @@ import { databasePublicationsKeys } from './keys'
 
 export type DatabasePublicationCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   name: string
   tables?: string[]
   publish_insert?: boolean
