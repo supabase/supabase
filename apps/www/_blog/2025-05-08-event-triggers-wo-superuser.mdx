@@ -100,17 +100,17 @@ NOTICE:  the event trigger is executed for privileged_role
 
 ## Future in Postgres core
 
-We would also like to allow regular user event triggers in Postgres core. To this end, we’ve submitted [some patches](https://www.postgresql.org/message-id/flat/CAGRrpzbtYDkg7_xwfzrqByYgCJQbbL38tADyuN%2B6tAkbA-Pnkg%40mail.gmail.com) which are generating discussion.
+We would also like to allow regular user event triggers in Postgres core. To this end, we’ve submitted [some patches](https://www.postgresql.org/message-id/flat/CAGRrpzbtYDkg7_xwfzrqByYgCJQbbL38tADyuN%2B6tAkbA-Pnkg%40mail.gmail.com) which are already generating fruitful discussion.
 
 Note that Postgres core user event triggers will likely be more restricted than the supautils version.
 
 ## Try it out
 
-User event triggers are now available on the Supabase platform, for new projects created on the Central EU (`eu-central-1` ) region. We’ll be progressively rolling the feature out to other regions as we gather feedback.
+User event triggers are now available on the Supabase platform, for new projects created on the Central EU (`eu-central-1` ) region. We’ll progressively roll the feature out to other regions as we gather feedback.
 
 You can also git clone the [supautils](https://github.com/supabase/supautils/) repo and `make install` it in your own deployment.
 
-A special shout out to the [Zero Sync](https://zero.rocicorp.dev) guys, which kept pushing us to release this feature.
+Finally, we want to give a special shout out to the [Zero Sync](https://zero.rocicorp.dev) guys, which kept pushing us to release this feature.
 
 [^1]: As a last step, we change the owner of the event trigger to the privileged role so it be altered or dropped by end users.
 
