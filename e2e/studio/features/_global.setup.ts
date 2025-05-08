@@ -103,11 +103,8 @@ To start API locally, run:
     console.log(`\n 🔑 Skipping authentication for ${ENV}`)
     return
   } else {
-    if (
-      !process.env.STAGING_EMAIL ||
-      !process.env.STAGING_PASSWORD ||
-      !process.env.STAGING_PROJECT_REF
-    ) {
+    const env = AUTH_ENV[ENV]
+    if (!env.email || !env.password || !env.projectRef) {
       console.error(`Missing environment variables. Check README.md for more information.`)
       throw new Error('Missing environment variables')
     }
