@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@ai-sdk/amazon-bedrock": "^2.2.8",
+    "@ai-sdk/react": "^1.2.12",
     "@dagrejs/dagre": "^1.0.4",
     "@deno/eszip": "0.83.0",
     "@dnd-kit/core": "^6.1.0",

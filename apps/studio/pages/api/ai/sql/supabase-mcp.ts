@@ -5,10 +5,10 @@ import { API_URL } from 'lib/constants'
 
 export async function createSupabaseMCPClient({
   accessToken,
-  projectRef,
+  projectId,
 }: {
   accessToken: string
-  projectRef: string
+  projectId: string
 }) {
   // Create an in-memory transport pair
   const clientTransport = new StreamTransport()
@@ -23,13 +23,14 @@ export async function createSupabaseMCPClient({
       accessToken,
       apiUrl,
     },
+    projectId,
     readOnly: true,
   })
   await server.connect(serverTransport)
 
   // Create the MCP client and connect to its transport
   const client = await createMCPClient({
-    name: 'Studio AI Assistant', // Give a more specific name
+    name: 'supabase-studio',
     transport: clientTransport,
   })
 

@@ -54,8 +54,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(401).json({ error: 'Authorization token is required' })
   }
 
-  let mcpTools: Record<string, Tool<any, any>> = {}
-  let wrappedExecuteSqlTool: Tool<any, any> | undefined = undefined
+  let mcpTools: Record<string, Tool<any, unknown>> = {}
+  let wrappedExecuteSqlTool: Tool<any, unknown> | undefined = undefined
   let schemasResult: any[] = []
 
   try {
@@ -63,10 +63,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     if (aiOptInLevel !== 'disabled') {
       const mcpClient = await createSupabaseMCPClient({
         accessToken,
-        projectRef,
+        projectId: projectRef,
       })
 
-      let availableMcpTools = await mcpClient.tools()
+      const availableMcpTools = (await mcpClient.tools()) as Record<string, Tool<any, unknown>>
       const disallowedTools = ['execute_sql', 'apply_migration', 'get_logs']
       const privacyMessage =
         'Fetching data requires a higher privacy level. Please enable this in your org settings'
@@ -89,10 +89,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       } else if (aiOptInLevel === 'schema_and_data') {
         mcpTools = availableMcpTools
 
-        const originalExecuteSqlTool = mcpTools.execute_sql as Tool<any, any> | undefined
+        const originalExecuteSqlTool = mcpTools.execute_sql
 
         if (originalExecuteSqlTool) {
-          wrappedExecuteSqlTool = tool({
+          wrappedExecuteSqlTool = tool<any, unknown>({
             description: originalExecuteSqlTool.description,
             parameters: originalExecuteSqlTool.parameters,
             execute: async (args, context) => {
@@ -102,8 +102,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
               const originalResult = await originalExecuteSqlTool.execute(args, context)
               const manualToolCallId = `manual_${crypto.randomUUID()}`
 
-              if (originalResult && typeof originalResult === 'object') {
-                ;(originalResult as any).manualToolCallId = manualToolCallId
+              if (originalResult && isObject(originalResult)) {
+                originalResult.manualToolCallId = manualToolCallId
               } else {
                 console.warn('execute_sql result is not an object, cannot add manualToolCallId')
                 return {
@@ -333,7 +333,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - **Current Focus**: ${schema !== undefined ? `User is looking at schema: ${schema}.` : ''} ${table !== undefined ? `User is looking at table: ${table}.` : ''}`
     }
 
-    const result = await streamText({
+    const result = streamText({
       model: bedrock('us.anthropic.claude-3-7-sonnet-20250219-v1:0'),
       maxSteps: 10,
       system: systemPrompt.trim(),
@@ -346,4 +346,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     console.error('Error in handlePost:', error)
     return res.status(500).json({ message: error.message })
   }
+}
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
 }

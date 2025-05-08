@@ -1,4 +1,4 @@
-import { Message as VercelMessage, MessagePart } from '@ai-sdk/react'
+import { Message as VercelMessage } from '@ai-sdk/react'
 import { User } from 'lucide-react'
 import { createContext, PropsWithChildren, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -101,7 +101,7 @@ export const Message = function Message({
 
           <div className="flex-1 min-w-0 space-y-4">
             {shouldUsePartsRendering ? (
-              parts.map((part: MessagePart, index: number) => {
+              parts.map((part, index) => {
                 switch (part.type) {
                   case 'text':
                     return (
@@ -172,7 +172,6 @@ export const Message = function Message({
                         return null
                     }
                   }
-                  case 'tool-result':
                   case 'reasoning':
                   case 'source':
                   case 'file':
