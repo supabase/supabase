@@ -53,6 +53,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   onChartStyleChange?: (style: string) => void
   updateDateRange: any
   hideYAxis?: boolean
+  hideHighlightedValue?: boolean
 }
 
 export default function ComposedChart({
@@ -86,6 +87,7 @@ export default function ComposedChart({
   onChartStyleChange,
   updateDateRange,
   hideYAxis,
+  hideHighlightedValue,
 }: BarChartProps) {
   const { resolvedTheme } = useTheme()
   const [_activePayload, setActivePayload] = useState<any>(null)
@@ -181,7 +183,14 @@ export default function ComposedChart({
   const stackedAttributes = chartData.filter((att) => !att.name.includes('max'))
   const isPercentage = format === '%'
   const isRamChart = chartData?.some((att: any) => att.name.toLowerCase().includes('ram_'))
-  const isDiskChart = chartData?.some((att: any) => att.name.toLowerCase().includes('disk_space_'))
+  const isDiskSpaceChart = chartData?.some((att: any) =>
+    att.name.toLowerCase().includes('disk_space_')
+  )
+  const isDBSizeChart = chartData?.some((att: any) =>
+    att.name.toLowerCase().includes('pg_database_size')
+  )
+  const isNetworkChart = chartData?.some((att: any) => att.name.toLowerCase().includes('network_'))
+  const shouldFormatBytes = isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
   //*
   // Set the y-axis domain
   // to the highest value in the chart data for percentage charts
@@ -213,8 +222,15 @@ export default function ComposedChart({
         customDateFormat={customDateFormat}
         highlightedValue={
           typeof resolvedHighlightedValue === 'number'
-            ? isRamChart || isDiskChart
-              ? formatBytes(resolvedHighlightedValue, valuePrecision)
+            ? shouldFormatBytes
+              ? formatBytes(
+                  isDBSizeChart
+                    ? resolvedHighlightedValue * 1024 * 1024
+                    : isNetworkChart
+                      ? Math.abs(resolvedHighlightedValue)
+                      : resolvedHighlightedValue,
+                  valuePrecision
+                )
               : numberFormatter(resolvedHighlightedValue, valuePrecision)
             : resolvedHighlightedValue
         }
@@ -225,6 +241,7 @@ export default function ComposedChart({
         onChartStyleChange={onChartStyleChange}
         showMaxValue={_showMaxValue}
         setShowMaxValue={maxAttribute ? setShowMaxValue : undefined}
+        hideHighlightedValue={hideHighlightedValue}
       />
       <Container className="relative z-10">
         <RechartComposedChart
@@ -263,7 +280,7 @@ export default function ComposedChart({
             hide={hideYAxis}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
-            domain={isPercentage && !showMaxValue ? yDomain : undefined}
+            domain={isPercentage && !showMaxValue ? yDomain : ['auto', 'auto']}
             key={yAxisKey}
           />
           <XAxis
@@ -293,7 +310,7 @@ export default function ComposedChart({
                 <Bar
                   key={attribute.name}
                   dataKey={attribute.name}
-                  stackId="1"
+                  stackId={attributes?.find((a) => a.attribute === attribute.name)?.stackId ?? '1'}
                   fill={attribute.color}
                   fillOpacity={hoveredLabel && hoveredLabel !== attribute.name ? 0.25 : 1}
                   radius={0.75}
@@ -303,12 +320,12 @@ export default function ComposedChart({
                   }
                 />
               ))
-            : stackedAttributes.map((attribute) => (
+            : stackedAttributes.map((attribute, i) => (
                 <Area
                   key={attribute.name}
                   type="step"
                   dataKey={attribute.name}
-                  stackId="1"
+                  stackId={attributes?.find((a) => a.attribute === attribute.name)?.stackId ?? '1'}
                   fill={attribute.color}
                   strokeOpacity={hoveredLabel && hoveredLabel !== attribute.name ? 0.4 : 1}
                   stroke={attribute.color}

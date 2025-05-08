@@ -16296,6 +16296,8 @@ export interface operations {
           | 'physical_replication_lag_physical_replica_lag_seconds'
           | 'pg_stat_database_num_backends'
           | 'supavisor_connections_active'
+          | 'network_receive_bytes'
+          | 'network_transmit_bytes'
           | 'pgbouncer_pools_client_active_connections'
         databaseIdentifier?: string
         endDate: string

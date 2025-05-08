@@ -24,6 +24,7 @@ export type MultiAttribute = {
   provider: Provider
   label?: string
   color?: string
+  stackId?: string
   format?: 'percent' | 'number'
   description?: string
   docsLink?: string
@@ -32,6 +33,7 @@ export type MultiAttribute = {
   omitFromTotal?: boolean
   tooltip?: string
   customValue?: number
+  id?: string
 }
 
 interface ComposedChartHandlerProps {
@@ -125,6 +127,7 @@ const ComposedChartHandler = ({
   updateDateRange,
   valuePrecision,
   isVisible = true,
+  id,
   ...otherProps
 }: PropsWithChildren<ComposedChartHandlerProps>) => {
   const router = useRouter()
@@ -248,16 +251,12 @@ const ComposedChartHandler = ({
     <Panel
       noMargin
       noHideOverflow
-      className={cn('relative py-2 w-full', className)}
+      className={cn('relative py-2 w-full scroll-mt-16', className)}
       wrapWithLoading={false}
+      id={id ?? label.toLowerCase().replaceAll(' ', '-')}
     >
       <Panel.Content className="flex flex-col gap-4">
-        <div
-          className="absolute right-6 z-50 flex justify-between scroll-mt-10"
-          id={label.toLowerCase().replaceAll(' ', '-')}
-        >
-          {children}
-        </div>
+        <div className="absolute right-6 z-50 flex justify-between scroll-mt-16">{children}</div>
         <ComposedChart
           attributes={attributes}
           data={combinedData as DataPoint[]}

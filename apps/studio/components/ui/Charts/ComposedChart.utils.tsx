@@ -65,7 +65,15 @@ const CustomTooltip = ({
       maxValueAttribute && payload?.find((p: any) => p.dataKey === maxValueAttribute.attribute)
     const maxValue = maxValueData?.value
     const isRamChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
-    const isDiskChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_space_'))
+    const isDiskSpaceChart = payload?.some((p: any) =>
+      p.dataKey.toLowerCase().includes('disk_space_')
+    )
+    const isDBSizeChart = payload?.some((p: any) =>
+      p.dataKey.toLowerCase().includes('pg_database_size')
+    )
+    const isNetworkChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('network_'))
+    const shouldFormatBytes = isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
+
     const total =
       showTotal &&
       calculateTotalChartAggregate(
@@ -94,8 +102,15 @@ const CustomTooltip = ({
             {attribute?.label || entry.name}
           </span>
           <span className="ml-3.5 flex items-end gap-1">
-            {isRamChart || isDiskChart
-              ? formatBytes(entry.value, valuePrecision)
+            {shouldFormatBytes
+              ? formatBytes(
+                  isDBSizeChart
+                    ? entry.value * 1024 * 1024
+                    : isNetworkChart
+                      ? Math.abs(entry.value)
+                      : entry.value,
+                  valuePrecision
+                )
               : numberFormatter(entry.value, valuePrecision)}
             {isPercentage ? '%' : ''}
 
@@ -120,8 +135,11 @@ const CustomTooltip = ({
               <span className="flex-grow text-foreground-lighter">Total</span>
               <div className="flex items-end gap-1">
                 <span className="text-base">
-                  {isRamChart || isDiskChart
-                    ? formatBytes(total as number, 1)
+                  {shouldFormatBytes
+                    ? formatBytes(
+                        isDBSizeChart ? (total as number) * 1024 * 1024 : (total as number),
+                        1
+                      )
                     : numberFormatter(total as number)}
                   {isPercentage ? '%' : ''}
                 </span>
