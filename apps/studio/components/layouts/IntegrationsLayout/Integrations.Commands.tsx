@@ -23,7 +23,6 @@ export function useIntegrationsGotoCommands(options?: CommandOptions) {
       ),
     }
   })
-  console.log(INTEGRATIONS)
 
   useRegisterCommands(
     COMMAND_MENU_SECTIONS.INTEGRATIONS,
