@@ -1,10 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 import { useParams } from 'common'
-import { ClientLibrary, ExampleProject } from 'components/interfaces/Home'
-import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
-import { SecurityStatus } from 'components/interfaces/Home/SecurityStatus'
 import ServiceStatus from 'components/interfaces/Home/ServiceStatus'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState/ProjectPausedState'
@@ -28,11 +25,12 @@ import {
   TooltipTrigger,
 } from 'ui'
 import AdvisorWidget from 'components/interfaces/Home/AdvisorWidget'
-import { GettingStarted } from 'components/interfaces/Home/GettingStarted'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { Database, Zap, GitFork } from 'lucide-react'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ClientLibrary, ExampleProject } from 'components/interfaces/Home'
+import { EXAMPLE_PROJECTS, CLIENT_LIBRARIES } from 'components/interfaces/Home/Home.constants'
 
 const Home: NextPageWithLayout = () => {
   const organization = useSelectedOrganization()
@@ -40,7 +38,6 @@ const Home: NextPageWithLayout = () => {
   const isOrioleDb = useIsOrioleDb()
   const snap = useAppStateSnapshot()
   const { enableBranching } = useParams()
-  const [showGettingStarted, setShowGettingStarted] = useState(true)
 
   const hasShownEnableBranchingModalRef = useRef(false)
   useEffect(() => {
@@ -72,8 +69,8 @@ const Home: NextPageWithLayout = () => {
   const replicasCount = replicasData?.length ?? 0
 
   return (
-    <div className="w-full space-y-12 md:space-y-16">
-      <div className="bg-surface-100/75 border-b border-muted py-16">
+    <div className="w-full">
+      <div className="border-b border-muted py-16">
         <div className="mx-auto max-w-7xl">
           <div className=" flex items-center justify-between w-full">
             <div className="flex flex-col md:flex-row md:items-center gap-3 w-full">
@@ -107,32 +104,41 @@ const Home: NextPageWithLayout = () => {
                 <div className="flex items-center gap-x-6">
                   <div>
                     <div className="flex items-center gap-1.5 text-foreground-light text-sm mb-1">
-                      <Database size={14} strokeWidth={1.5} />
-                      Table{tablesCount !== 1 ? 's' : ''}
+                      Tables
                     </div>
-                    <span className="text-2xl font-mono tabular-nums">
-                      {isLoadingTables ? '...' : tablesCount}
+                    <span className="text-2xl tabular-nums">
+                      {isLoadingTables ? (
+                        <ShimmeringLoader className="w-full h-[30px] w-6 p-0" />
+                      ) : (
+                        tablesCount
+                      )}
                     </span>
                   </div>
 
                   <div>
                     <div className="flex items-center gap-1.5 text-foreground-light text-sm mb-1">
-                      <Zap size={14} strokeWidth={1.5} />
-                      Function{functionsCount !== 1 ? 's' : ''}
+                      Functions
                     </div>
-                    <span className="text-2xl font-mono tabular-nums">
-                      {isLoadingFunctions ? '...' : functionsCount}
+                    <span className="text-2xl tabular-nums">
+                      {isLoadingFunctions ? (
+                        <ShimmeringLoader className="w-full h-[30px] w-6 p-0" />
+                      ) : (
+                        functionsCount
+                      )}
                     </span>
                   </div>
 
                   {IS_PLATFORM && (
                     <div>
                       <div className="flex items-center gap-1.5 text-foreground-light text-sm mb-1">
-                        <GitFork size={14} strokeWidth={1.5} />
-                        Replica{replicasCount !== 1 ? 's' : ''}
+                        Replicas
                       </div>
-                      <span className="text-2xl font-mono tabular-nums">
-                        {isLoadingReplicas ? '...' : replicasCount}
+                      <span className="text-2xl tabular-nums">
+                        {isLoadingReplicas ? (
+                          <ShimmeringLoader className="w-full h-[30px] w-6 p-0" />
+                        ) : (
+                          replicasCount
+                        )}
                       </span>
                     </div>
                   )}
@@ -147,32 +153,62 @@ const Home: NextPageWithLayout = () => {
           </div>
           <ProjectUpgradeFailedBanner />
           {project?.status === PROJECT_STATUS.INACTIVE && <ProjectPausedState />}
+        </div>
+      </div>
+      <div className="py-16 border-b border-muted">
+        <div className="mx-auto max-w-7xl space-y-16">
+          {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && <ProjectUsageSection />}
 
-          {project?.ref && project?.status !== PROJECT_STATUS.INACTIVE && showGettingStarted && (
-            <div className="mt-16 -mb-48">
-              <GettingStarted
-                projectRef={project.ref}
-                onRemove={() => setShowGettingStarted(false)}
-              />
-            </div>
+          {project?.status !== PROJECT_STATUS.INACTIVE && (
+            <>{project?.ref && <AdvisorWidget projectRef={project.ref} />}</>
           )}
         </div>
       </div>
-      {showGettingStarted && <div className="h-16" />}
-
-      <div className="mx-auto max-w-7xl">
-        {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && <ProjectUsageSection />}
-      </div>
-
-      {project?.status !== PROJECT_STATUS.INACTIVE && (
-        <>
-          {project?.ref && (
-            <div className="mx-auto max-w-7xl pb-32">
-              <AdvisorWidget projectRef={project.ref} />
-            </div>
+      <div className="bg-surface-100/5 py-16">
+        <div className="mx-auto max-w-7xl space-y-16">
+          {project?.status !== PROJECT_STATUS.INACTIVE && (
+            <>
+              <div className="space-y-8">
+                <h2 className="text-lg">Client libraries</h2>
+                <div className="grid grid-cols-2 gap-x-8 gap-y-8 md:gap-12 mb-12 md:grid-cols-3">
+                  {CLIENT_LIBRARIES.map((library) => (
+                    <ClientLibrary key={library.language} {...library} />
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-8">
+                <h4 className="text-lg">Example projects</h4>
+                <div className="flex justify-center">
+                  <Tabs_Shadcn_ defaultValue="app">
+                    <TabsList_Shadcn_ className="flex gap-4 mb-8">
+                      <TabsTrigger_Shadcn_ value="app">App Frameworks</TabsTrigger_Shadcn_>
+                      <TabsTrigger_Shadcn_ value="mobile">Mobile Framework</TabsTrigger_Shadcn_>
+                    </TabsList_Shadcn_>
+                    <TabsContent_Shadcn_ value="app">
+                      <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
+                        {EXAMPLE_PROJECTS.filter((project) => project.type === 'app')
+                          .sort((a, b) => a.title.localeCompare(b.title))
+                          .map((project) => (
+                            <ExampleProject key={project.url} {...project} />
+                          ))}
+                      </div>
+                    </TabsContent_Shadcn_>
+                    <TabsContent_Shadcn_ value="mobile">
+                      <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
+                        {EXAMPLE_PROJECTS.filter((project) => project.type === 'mobile')
+                          .sort((a, b) => a.title.localeCompare(b.title))
+                          .map((project) => (
+                            <ExampleProject key={project.url} {...project} />
+                          ))}
+                      </div>
+                    </TabsContent_Shadcn_>
+                  </Tabs_Shadcn_>
+                </div>
+              </div>
+            </>
           )}
-        </>
-      )}
+        </div>
+      </div>
     </div>
   )
 }

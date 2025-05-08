@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 
 import { useProjectLintsQuery, Lint } from 'data/lint/lint-query'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
+import { EntityTypeIcon, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import {
   QueryPerformanceSort,
   useQueryPerformanceQuery,
@@ -30,40 +31,18 @@ import {
   AiIconAnimation,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { formatBytes } from 'lib/helpers'
-import ReactMarkdown from 'react-markdown'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 
 interface AdvisorWidgetProps {
   projectRef: string
 }
 
-// Define type for slowest queries based on usage
 interface SlowQuery {
   rolname: string
   avg_time: number
   calls: number
   query: string
-  // Add other potential fields if known, otherwise keep minimal
 }
-
-// Define DataPoint component locally
-const DataPoint = ({
-  icon,
-  label,
-  value,
-  valueClassName,
-}: {
-  icon: React.ReactNode
-  label: string
-  value: string | number
-  valueClassName?: string
-}) => (
-  <div className="flex items-center gap-2">
-    {icon}
-    <span className="text-sm text-foreground-light">{label}:</span>
-    <span className={cn('text-sm font-medium', valueClassName)}>{value}</span>
-  </div>
-)
 
 const AdvisorWidget = ({ projectRef }: AdvisorWidgetProps) => {
   const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery({ projectRef })
@@ -72,6 +51,7 @@ const AdvisorWidget = ({ projectRef }: AdvisorWidgetProps) => {
       preset: 'slowestExecutionTime',
     }
   )
+  const snap = useAiAssistantStateSnapshot()
 
   const securityLints = useMemo(
     () => (lints ?? []).filter((lint: Lint) => lint.categories.includes('SECURITY')),
@@ -109,38 +89,22 @@ const AdvisorWidget = ({ projectRef }: AdvisorWidgetProps) => {
   let titleContent: React.ReactNode
 
   if (totalIssues === 0) {
-    titleContent = <h2 className="text-brand text-xl">Your project is looking healthy</h2>
+    titleContent = <h2 className="text-xl">No issues available</h2>
   } else {
-    const numberWords = [
-      'No',
-      'One',
-      'Two',
-      'Three',
-      'Four',
-      'Five',
-      'Six',
-      'Seven',
-      'Eight',
-      'Nine',
-      'Ten',
-    ]
-    const issuesText = totalIssues === 1 ? 'item' : 'items'
+    const issuesText = totalIssues === 1 ? 'issue' : 'issues'
     const numberDisplay = totalIssues.toString()
 
     let attentionClassName = ''
-    let badgeVariant: 'destructive' | 'warning' | 'default' = 'default'
     if (hasErrors) {
       attentionClassName = 'text-destructive'
-      badgeVariant = 'destructive'
     } else if (hasWarnings) {
       attentionClassName = 'text-warning'
-      badgeVariant = 'warning'
     }
 
     titleContent = (
       <h2 className="text-xl">
         {numberDisplay} {issuesText} need
-        {totalIssues === 1 ? 's' : ''} your <span className={attentionClassName}>attention</span>
+        {totalIssues === 1 ? 's' : ''} <span className={attentionClassName}>attention</span>
       </h2>
     )
   }
@@ -150,8 +114,7 @@ const AdvisorWidget = ({ projectRef }: AdvisorWidgetProps) => {
     lints: Lint[],
     errorCount: number,
     warningCount: number,
-    isLoading: boolean,
-    link: string
+    isLoading: boolean
   ) => {
     const topIssues = lints
       .filter((lint) => lint.level === LINTER_LEVELS.ERROR || lint.level === LINTER_LEVELS.WARN)
@@ -159,172 +122,180 @@ const AdvisorWidget = ({ projectRef }: AdvisorWidgetProps) => {
       .slice(0, 5)
 
     return (
-      <div className="p-4">
+      <div className="h-full">
         {!isLoading && (errorCount > 0 || warningCount > 0) && (
-          <div>
-            <ul>
-              {topIssues.map((lint) => (
-                <li
-                  key={lint.cache_key}
-                  className="text-sm py-3 first:pt-0 truncate w-full border-b my-0 last:border-b-0"
-                >
+          <ul>
+            {topIssues.map((lint) => (
+              <li
+                key={lint.cache_key}
+                className="text-sm px-4 py-3 w-full border-b my-0 last:border-b-0 group"
+              >
+                <div className="flex items-center justify-between w-full">
                   <Link
                     href={`/project/${projectRef}/advisors/${title.toLowerCase()}?id=${lint.cache_key}`}
-                    className="flex items-center gap-2 text-foreground-light hover:text-foreground transition truncate w-full"
+                    className="flex items-center gap-2 text-foreground-light hover:text-foreground transition truncate flex-1 min-w-0"
                   >
-                    <AlertTriangle
-                      size={16}
-                      strokeWidth={1.5}
-                      className={cn(
-                        'shrink-0',
-                        lint.level === LINTER_LEVELS.ERROR ? 'text-destructive' : 'text-warning'
-                      )}
-                    />
-                    <ReactMarkdown className="truncate w-full max-w-full">
+                    <EntityTypeIcon type={lint.metadata?.type} />
+                    <div className="flex-1 truncate min-w-0">
                       {lint.detail ? lint.detail : lint.title}
-                    </ReactMarkdown>
+                    </div>
                   </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+                  <Button
+                    type="text"
+                    className="px-1 opacity-0 group-hover:opacity-100"
+                    icon={<AiIconAnimation className="w-5 h-5" />}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      e.preventDefault()
+                      snap.newChat({
+                        name: 'Summarize lint',
+                        open: true,
+                        initialInput: `Summarize the issue and suggest fixes for the following lint item:
+Title: ${lintInfoMap.find((item) => item.name === lint.name)?.title ?? lint.title}
+Entity: ${(lint.metadata && (lint.metadata.entity || (lint.metadata.schema && lint.metadata.name && `${lint.metadata.schema}.${lint.metadata.name}`))) ?? 'N/A'}
+Schema: ${lint.metadata?.schema ?? 'N/A'}
+Issue Details: ${lint.detail ? lint.detail.replace(/\`/g, '`') : 'N/A'}
+Description: ${lint.description ? lint.description.replace(/\`/g, '`') : 'N/A'}`,
+                      })
+                    }}
+                  />
+                </div>
+              </li>
+            ))}
+          </ul>
         )}
         {!isLoading && errorCount === 0 && warningCount === 0 && (
-          <div className="p-4 flex items-center space-x-4 border rounded-md">
-            <Shield size={20} strokeWidth={1.5} />
-            <p className="text-sm text-foreground-light">No {title.toLowerCase()} issues found.</p>
+          <div className="flex-1 flex flex-col h-full items-center justify-center gap-2">
+            <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
+            <p className="text-sm text-foreground-light">No {title.toLowerCase()} issues found</p>
           </div>
         )}
       </div>
     )
   }
 
-  const renderQueriesTabContent = () => (
-    <div>
-      {isLoadingSlowestQueries ? (
-        <div className="space-y-2">
-          <ShimmeringLoader />
-          <ShimmeringLoader className="w-3/4" />
-          <ShimmeringLoader className="w-1/2" />
-          <ShimmeringLoader className="w-3/4" />
-          <ShimmeringLoader className="w-1/2" />
-        </div>
-      ) : top5SlowestQueries.length === 0 ? (
-        <div className="p-4 flex items-center space-x-4 border rounded-md">
-          <Activity strokeWidth={1.5} size={20} />
-          <p className="text-sm text-foreground-light">
-            No slow queries found in the selected period.
-          </p>
-        </div>
-      ) : (
-        // Removed size="tiny" prop from Table
-        <Table className="text-xs font-mono max-w-full">
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-foreground-lighter truncate py-2 h-auto">Query</TableHead>
-              <TableHead className="text-foreground-lighter truncate py-2 h-auto">
-                Avg time
-              </TableHead>
-              <TableHead className="text-foreground-lighter truncate py-2 h-auto">Calls</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {/* Added explicit types for map parameters */}
-            {top5SlowestQueries.map((query: SlowQuery, i: number) => (
-              <TableRow key={i}>
-                <TableCell className="font-mono truncate max-w-xs py-2">{query.query}</TableCell>
-
-                <TableCell className="font-mono truncate max-w-xs py-2">
-                  {typeof query.avg_time === 'number' ? `${query.avg_time.toFixed(2)}ms` : 'N/A'}
-                </TableCell>
-                <TableCell className="font-mono truncate max-w-xs py-2">{query.calls}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-    </div>
-  )
-
   return (
     <div>
       {isLoadingLints ? (
-        <h2 className="text-brand text-xl animate-pulse">Checking project health...</h2>
+        <ShimmeringLoader className="w-96" />
       ) : (
-        <div className="flex justify-between items-center mb-8">
-          {titleContent}
-          {totalIssues > 0 && (
-            <Button type="primary" icon={<AiIconAnimation />} size="tiny">
-              Debug with Assistant
-            </Button>
-          )}
-        </div>
+        <div className="flex justify-between items-center mb-8">{titleContent}</div>
       )}
-      {totalIssues > 0 ? (
-        <Tabs defaultValue="security" className="mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <Tabs defaultValue="security">
-                <CardHeader className="py-0 px-4 flex flex-row items-center justify-between">
-                  <TabsList className="flex justify-start rounded-none gap-4 border-b-0 !mt-0 pt-0">
-                    <TabsTrigger
-                      value="security"
-                      className="flex items-center gap-2 text-xs py-3 border-b-[1px] font-mono uppercase"
-                    >
-                      Security{' '}
-                      {securityErrorCount + securityWarningCount > 0 && (
-                        <div className="rounded bg-warning text-warning-100 px-1">
-                          {securityErrorCount + securityWarningCount}
-                        </div>
-                      )}
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="performance"
-                      className="flex items-center gap-2 text-xs py-3 border-b-[1px] font-mono uppercase"
-                    >
-                      Performance{' '}
-                      {performanceErrorCount + performanceWarningCount > 0 && (
-                        <div className="rounded bg-warning text-warning-100 px-1">
-                          {performanceErrorCount + performanceWarningCount}
-                        </div>
-                      )}
-                    </TabsTrigger>
-                  </TabsList>
-                </CardHeader>
-                <CardContent className="!p-0 mt-0">
-                  <TabsContent value="security" className="p-0 mt-0">
-                    {renderLintTabContent(
-                      'Security',
-                      securityLints,
-                      securityErrorCount,
-                      securityWarningCount,
-                      isLoadingLints,
-                      `/project/${projectRef}/advisors/security`
+      <Tabs defaultValue="security" className="mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card className="h-80">
+            <Tabs defaultValue="security" className="h-full flex flex-col">
+              <CardHeader className="py-0 px-4 flex flex-row items-center justify-between flex-0">
+                <TabsList className="flex justify-start rounded-none gap-4 border-b-0 !mt-0 pt-0">
+                  <TabsTrigger
+                    value="security"
+                    className="flex items-center gap-2 text-xs py-3 border-b-[1px] font-mono uppercase"
+                  >
+                    Security{' '}
+                    {securityErrorCount + securityWarningCount > 0 && (
+                      <div className="rounded bg-warning text-warning-100 px-1">
+                        {securityErrorCount + securityWarningCount}
+                      </div>
                     )}
-                  </TabsContent>
-                  <TabsContent value="performance" className="p-0 mt-0">
-                    {renderLintTabContent(
-                      'Performance',
-                      performanceLints,
-                      performanceErrorCount,
-                      performanceWarningCount,
-                      isLoadingLints,
-                      `/project/${projectRef}/advisors/performance`
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="performance"
+                    className="flex items-center gap-2 text-xs py-3 border-b-[1px] font-mono uppercase"
+                  >
+                    Performance{' '}
+                    {performanceErrorCount + performanceWarningCount > 0 && (
+                      <div className="rounded bg-warning text-warning-100 px-1">
+                        {performanceErrorCount + performanceWarningCount}
+                      </div>
                     )}
-                  </TabsContent>
-                </CardContent>
-              </Tabs>
-            </Card>
-
-            <Card>
-              <CardHeader className="py-3 px-4">
-                <CardTitle>Slow Queries</CardTitle>
+                  </TabsTrigger>
+                </TabsList>
               </CardHeader>
-              <CardContent className="!p-0">{renderQueriesTabContent()}</CardContent>
-            </Card>
-          </div>
-        </Tabs>
-      ) : null}
+              <CardContent className="!p-0 mt-0 flex-1 overflow-y-auto">
+                <TabsContent value="security" className="p-0 mt-0 h-full">
+                  {renderLintTabContent(
+                    'Security',
+                    securityLints,
+                    securityErrorCount,
+                    securityWarningCount,
+                    isLoadingLints
+                  )}
+                </TabsContent>
+                <TabsContent value="performance" className="p-0 mt-0 h-full">
+                  {renderLintTabContent(
+                    'Performance',
+                    performanceLints,
+                    performanceErrorCount,
+                    performanceWarningCount,
+                    isLoadingLints
+                  )}
+                </TabsContent>
+              </CardContent>
+            </Tabs>
+          </Card>
+
+          <Card>
+            <CardHeader className="py-3 px-4">
+              <CardTitle>Slow Queries</CardTitle>
+            </CardHeader>
+            <CardContent className="!p-0">
+              <div>
+                {isLoadingSlowestQueries ? (
+                  <div className="space-y-2">
+                    <ShimmeringLoader />
+                    <ShimmeringLoader className="w-3/4" />
+                    <ShimmeringLoader className="w-1/2" />
+                    <ShimmeringLoader className="w-3/4" />
+                    <ShimmeringLoader className="w-1/2" />
+                  </div>
+                ) : top5SlowestQueries.length === 0 ? (
+                  <div className="p-4 flex items-center space-x-4 border rounded-md">
+                    <Activity strokeWidth={1.5} size={20} />
+                    <p className="text-sm text-foreground-light">
+                      No slow queries found in the selected period.
+                    </p>
+                  </div>
+                ) : (
+                  <Table className="text-xs font-mono max-w-full">
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-foreground-lighter truncate py-2 h-auto">
+                          Query
+                        </TableHead>
+                        <TableHead className="text-foreground-lighter truncate py-2 h-auto">
+                          Avg time
+                        </TableHead>
+                        <TableHead className="text-foreground-lighter truncate py-2 h-auto">
+                          Calls
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {/* Added explicit types for map parameters */}
+                      {top5SlowestQueries.map((query: SlowQuery, i: number) => (
+                        <TableRow key={i}>
+                          <TableCell className="font-mono truncate max-w-xs py-2">
+                            {query.query}
+                          </TableCell>
+
+                          <TableCell className="font-mono truncate max-w-xs py-2">
+                            {typeof query.avg_time === 'number'
+                              ? `${query.avg_time.toFixed(2)}ms`
+                              : 'N/A'}
+                          </TableCell>
+                          <TableCell className="font-mono truncate max-w-xs py-2">
+                            {query.calls}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </Tabs>
     </div>
   )
 }

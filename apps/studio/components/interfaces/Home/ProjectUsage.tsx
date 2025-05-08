@@ -54,7 +54,7 @@ const CHART_INTERVALS: ChartIntervals[] = [
   },
 ]
 
-const ProjectUsage = ({ totalRequests }: { totalRequests: number }) => {
+const ProjectUsage = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
 
@@ -110,7 +110,11 @@ const ProjectUsage = ({ totalRequests }: { totalRequests: number }) => {
     <div className="space-y-8">
       <div className="flex flex-row items-center justify-between gap-x-2">
         <h2 className="text-xl">
-          {totalRequests} requests in the {selectedInterval.label}
+          {sumBy(charts, 'total_rest_requests') +
+            sumBy(charts, 'total_realtime_requests') +
+            sumBy(charts, 'total_storage_requests') +
+            sumBy(charts, 'total_auth_requests')}{' '}
+          requests in the {selectedInterval.label.toLowerCase()}
         </h2>
         <div className="flex flex-row items-center gap-x-4">
           <DropdownMenu>
