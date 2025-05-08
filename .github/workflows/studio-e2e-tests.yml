@@ -52,14 +52,22 @@ jobs:
           version: latest
       - name: Install dependencies
         run: pnpm i
-      - name: Cache Studio build
+      - name: Cache Next.js build
         uses: actions/cache@v4
-        id: studio-cache
+        id: nextjs-cache
         with:
-          path: apps/studio/.next
-          key: studio-build-${{ github.event.pull_request.number || github.ref_name }}-${{ hashFiles('apps/studio/**', 'packages/pg-meta/**', 'packages/ai-commands/**', 'packages/common/**', 'packages/config/**', 'packages/icons/**', 'packages/shared-data/**', 'packages/ui/**', 'packages/ui-patterns/**', 'packages/api-types/**', 'pnpm-lock.yaml') }}
+          path: |
+            apps/studio/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ github.event.pull_request.number || github.ref_name }}-${{ hashFiles('apps/studio/**', 'packages/pg-meta/**', 'packages/ai-commands/**', 'packages/common/**', 'packages/config/**', 'packages/icons/**', 'packages/shared-data/**', 'packages/ui/**', 'packages/ui-patterns/**', 'packages/api-types/**', 'pnpm-lock.yaml') }}
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}
       - name: Build Studio
-        if: steps.studio-cache.outputs.cache-hit != 'true'
+        if: steps.nextjs-cache.outputs.cache-hit != 'true'
         run: pnpm --filter studio build
       - name: Start Studio server
         run: pnpm --filter studio start &
@@ -67,6 +75,7 @@ jobs:
         run: |
           timeout 60 bash -c 'until curl -s http://localhost:3000 > /dev/null; do sleep 1; done'
       - name: Install Playwright Browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: pnpm -C e2e/studio exec playwright install --with-deps
       - name: Run Playwright tests
         run: pnpm e2e:ci
