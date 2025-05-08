@@ -136,3 +136,5 @@ gcloud.json
 
 # CLI version file
 .temp/cli-latest
+
+.pnpm-store/*
