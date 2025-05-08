@@ -182,7 +182,7 @@ Description: ${lint.description ? lint.description.replace(/\`/g, '`') : 'N/A'}`
         <div className="flex justify-between items-center mb-8">{titleContent}</div>
       )}
       <Tabs defaultValue="security" className="mt-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card className="h-80">
             <Tabs defaultValue="security" className="h-full flex flex-col">
               <CardHeader className="py-0 px-4 flex flex-row items-center justify-between flex-0">
