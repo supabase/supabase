@@ -14,7 +14,9 @@
     "extract-design-tokens": "node internals/tokens/extract-design-tokens.js",
     "generate-styles": "pnpm run extract-design-tokens && pnpm run transform-tokens && pnpm run cleanse-css-for-tailwind && pnpm run generate-demo-tailwind-classes",
     "clean": "rimraf node_modules",
-    "test": "vitest"
+    "test": "vitest",
+    "test:ci": "vitest --run --coverage",
+    "test:report": "open coverage/lcov-report/index.html"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
@@ -88,6 +90,7 @@
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-dom": "catalog:",
     "@types/react-syntax-highlighter": "^15.5.6",
+    "@vitest/coverage-v8": "^3.0.9",
     "common": "workspace:*",
     "config": "workspace:*",
     "glob": "^8.1.0",

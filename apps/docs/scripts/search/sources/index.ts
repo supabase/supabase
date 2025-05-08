@@ -56,7 +56,7 @@ export async function fetchJsLibReferenceSource() {
   return new ClientLibReferenceLoader(
     'js-lib',
     '/reference/javascript',
-    { title: 'JavaScript Reference' },
+    { title: 'JavaScript Reference', language: 'JavaScript' },
     'spec/supabase_js_v2.yml',
     'spec/common-client-libs-sections.json'
   ).load()
@@ -66,7 +66,7 @@ export async function fetchDartLibReferenceSource() {
   return new ClientLibReferenceLoader(
     'dart-lib',
     '/reference/dart',
-    { title: 'Dart Reference' },
+    { title: 'Dart Reference', language: 'Dart' },
     'spec/supabase_dart_v2.yml',
     'spec/common-client-libs-sections.json'
   ).load()
@@ -76,7 +76,7 @@ export async function fetchPythonLibReferenceSource() {
   return new ClientLibReferenceLoader(
     'python-lib',
     '/reference/python',
-    { title: 'Python Reference' },
+    { title: 'Python Reference', language: 'Python' },
     'spec/supabase_py_v2.yml',
     'spec/common-client-libs-sections.json'
   ).load()
@@ -86,7 +86,7 @@ export async function fetchCSharpLibReferenceSource() {
   return new ClientLibReferenceLoader(
     'csharp-lib',
     '/reference/csharp',
-    { title: 'C# Reference' },
+    { title: 'C# Reference', language: 'C#' },
     'spec/supabase_csharp_v0.yml',
     'spec/common-client-libs-sections.json'
   ).load()
@@ -96,7 +96,7 @@ export async function fetchSwiftLibReferenceSource() {
   return new ClientLibReferenceLoader(
     'swift-lib',
     '/reference/swift',
-    { title: 'Swift Reference' },
+    { title: 'Swift Reference', language: 'Swift' },
     'spec/supabase_swift_v2.yml',
     'spec/common-client-libs-sections.json'
   ).load()
@@ -106,7 +106,7 @@ export async function fetchKtLibReferenceSource() {
   return new ClientLibReferenceLoader(
     'kt-lib',
     '/reference/kotlin',
-    { title: 'Kotlin Reference' },
+    { title: 'Kotlin Reference', language: 'Kotlin' },
     'spec/supabase_kt_v1.yml',
     'spec/common-client-libs-sections.json'
   ).load()
@@ -116,7 +116,7 @@ export async function fetchCliLibReferenceSource() {
   return new CliReferenceLoader(
     'cli',
     '/reference/cli',
-    { title: 'CLI Reference' },
+    { title: 'CLI Reference', platform: 'cli' },
     'spec/cli_v1_commands.yaml',
     'spec/common-cli-sections.json'
   ).load()

@@ -102,6 +102,7 @@ export type Database = {
       }
       meetups: {
         Row: {
+          city: string | null
           country: string | null
           created_at: string
           display_info: string | null
@@ -111,9 +112,11 @@ export type Database = {
           launch_week: string
           link: string | null
           start_at: string | null
+          timezone: string | null
           title: string | null
         }
         Insert: {
+          city?: string | null
           country?: string | null
           created_at?: string
           display_info?: string | null
@@ -123,9 +126,11 @@ export type Database = {
           launch_week: string
           link?: string | null
           start_at?: string | null
+          timezone?: string | null
           title?: string | null
         }
         Update: {
+          city?: string | null
           country?: string | null
           created_at?: string
           display_info?: string | null
@@ -135,6 +140,7 @@ export type Database = {
           launch_week?: string
           link?: string | null
           start_at?: string | null
+          timezone?: string | null
           title?: string | null
         }
         Relationships: [
@@ -434,6 +440,14 @@ export type Database = {
           description: string
         }[]
       }
+      get_full_content_url: {
+        Args: {
+          type: string
+          path: string
+          slug: string
+        }
+        Returns: string
+      }
       get_last_revalidation_for_tags: {
         Args: {
           tags: string[]
@@ -491,6 +505,23 @@ export type Database = {
         }
         Returns: string[]
       }
+      match_embedding: {
+        Args: {
+          embedding: string
+          match_threshold?: number
+          max_results?: number
+        }
+        Returns: {
+          content: string | null
+          embedding: string | null
+          heading: string | null
+          id: number
+          page_id: number
+          rag_ignore: boolean | null
+          slug: string | null
+          token_count: number | null
+        }[]
+      }
       match_page_sections_v2: {
         Args: {
           embedding: string
@@ -506,6 +537,23 @@ export type Database = {
           rag_ignore: boolean | null
           slug: string | null
           token_count: number | null
+        }[]
+      }
+      search_content: {
+        Args: {
+          embedding: string
+          include_full_content?: boolean
+          match_threshold?: number
+          max_result?: number
+        }
+        Returns: {
+          id: number
+          page_title: string
+          type: string
+          href: string
+          content: string
+          metadata: Json
+          subsections: Json[]
         }[]
       }
       update_last_changed_checksum: {

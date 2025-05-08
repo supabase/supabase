@@ -8,7 +8,7 @@ import { databaseExtensionsKeys } from './keys'
 
 export type DatabaseExtensionEnableVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   schema: string
   name: string
   version: string

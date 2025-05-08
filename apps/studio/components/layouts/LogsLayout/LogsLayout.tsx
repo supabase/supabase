@@ -6,9 +6,9 @@ import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { withAuth } from 'hooks/misc/withAuth'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { LogsSidebarMenuV2 } from './LogsSidebarMenuV2'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 interface LogsLayoutProps {
   title?: string

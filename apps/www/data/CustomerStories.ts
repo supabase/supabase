@@ -20,6 +20,17 @@ export type CustomerStoryType = {
 export const data: CustomerStoryType[] = [
   {
     type: 'Customer Story',
+    title: 'Euka used Supabase to unlock faster growth',
+    description:
+      'Supabase helped Euka accelerate development, simplify AI feature rollout, and scale creator marketing faster than ever.',
+    organization: 'Euka',
+    imgUrl: 'images/customers/logos/euka.png',
+    logo: '/images/customers/logos/euka.png',
+    logo_inverse: '/images/customers/logos/light/euka.png',
+    url: '/customers/euka',
+  },
+  {
+    type: 'Customer Story',
     title: "Bree's Migration to Supabase from Fauna",
     description:
       'Discover how Bree found 10X performance gains, greater developer velocity, and a better foundation for AI when switching to Supabase.',

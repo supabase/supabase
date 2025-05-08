@@ -6,6 +6,7 @@ import { useParams } from 'common'
 import { useContentQuery } from 'data/content/content-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { Metric, METRIC_CATEGORIES, METRICS } from 'lib/constants/metrics'
 import { Dashboards } from 'types'
@@ -39,6 +40,7 @@ interface MetricOptionsProps {
 
 export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsProps) => {
   const { ref: projectRef } = useParams()
+  const selectedOrganization = useSelectedOrganization()
   const supportSQLBlocks = useFlag('reportsV2')
   const [search, setSearch] = useState('')
 
@@ -142,6 +144,10 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
                             })
                             sendEvent({
                               action: 'custom_report_add_sql_block_clicked',
+                              groups: {
+                                project: projectRef ?? 'Unknown',
+                                organization: selectedOrganization?.slug ?? 'Unknown',
+                              },
                             })
                           }
                         }}
