@@ -13,7 +13,7 @@ dotenv.config({
   override: true,
 })
 
-const ENVS_WITH_AUTH: Env[] = ['staging', 'production', 'dev-hosted']
+const ENVS_WITH_AUTH: Env[] = ['staging', 'production', 'dev-hosted', 'ci']
 
 const AUTH_ENV = {
   'dev-hosted': {
@@ -30,6 +30,11 @@ const AUTH_ENV = {
     email: process.env.PRODUCTION_EMAIL,
     password: process.env.PRODUCTION_PASSWORD,
     projectRef: process.env.PRODUCTION_PROJECT_REF,
+  },
+  ci: {
+    email: process.env.STAGING_EMAIL,
+    password: process.env.STAGING_PASSWORD,
+    projectRef: process.env.STAGING_PROJECT_REF,
   },
 } as const
 
