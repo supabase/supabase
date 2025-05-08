@@ -6,7 +6,10 @@ import type { components } from 'data/api'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 
-export type CreateColumnBody = components['schemas']['CreateColumnBody']
+export type CreateColumnBody = Omit<components['schemas']['CreateColumnBody'], 'tableId'> & {
+  schema: string
+  table: string
+}
 
 export type DatabaseColumnCreateVariables = {
   projectRef: string
@@ -23,7 +26,8 @@ export async function createDatabaseColumn({
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
   const { sql } = pgMeta.columns.create({
-    table_id: payload.tableId,
+    schema: payload.schema,
+    table: payload.table,
     name: payload.name,
     type: payload.type,
     default_value: payload.defaultValue,

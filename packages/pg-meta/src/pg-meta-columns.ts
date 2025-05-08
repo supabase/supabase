@@ -83,13 +83,7 @@ where
   }
 }
 
-type ColumnIdentifier =
-  | Pick<PGColumn, 'id'>
-  | {
-      schema: string
-      table: string
-      name: string
-    }
+type ColumnIdentifier = Pick<PGColumn, 'id'> | Pick<PGColumn, 'name' | 'schema' | 'table'>
 
 function getIdentifierWhereClause(identifier: ColumnIdentifier) {
   if ('id' in identifier && identifier.id) {
@@ -112,7 +106,8 @@ function retrieve(identifier: ColumnIdentifier): {
 }
 
 function create({
-  table_id,
+  schema,
+  table,
   name,
   type,
   default_value,
@@ -125,7 +120,8 @@ function create({
   comment,
   check,
 }: {
-  table_id: number
+  schema: string
+  table: string
   name: string
   type: string
   default_value?: any
@@ -138,56 +134,56 @@ function create({
   comment?: string
   check?: string
 }): { sql: string } {
-  // Any literal containing quotes should be added as arg
-  const clauses = ['ADD COLUMN %I', '%s']
-  const args = [literal(name), literal(type)]
-
+  let defaultValueClause = ''
   if (is_identity) {
     if (default_value !== undefined) {
       throw new Error('Columns cannot both be identity and have a default value')
     }
-    clauses.push(`GENERATED ${identity_generation} AS IDENTITY`)
-  } else if (default_value !== undefined) {
-    if (default_value_format === 'literal' && typeof default_value === 'string') {
-      clauses.push('DEFAULT %L')
+
+    defaultValueClause = `GENERATED ${identity_generation} AS IDENTITY`
+  } else {
+    if (default_value === undefined) {
+      // skip
+    } else if (default_value_format === 'expression') {
+      defaultValueClause = `DEFAULT ${default_value}`
     } else {
-      clauses.push('DEFAULT %s')
+      defaultValueClause = `DEFAULT ${literal(default_value)}`
     }
-    args.push(literal(default_value))
   }
 
-  if (is_nullable === false) clauses.push('NOT NULL')
-  if (is_primary_key) clauses.push('PRIMARY KEY')
-  if (is_unique) clauses.push('UNIQUE')
-  if (check) {
-    clauses.push('CHECK (%s)')
-    args.push(literal(check))
+  let isNullableClause = ''
+  if (is_nullable !== undefined) {
+    isNullableClause = is_nullable ? 'NULL' : 'NOT NULL'
   }
+  const isPrimaryKeyClause = is_primary_key ? 'PRIMARY KEY' : ''
+  const isUniqueClause = is_unique ? 'UNIQUE' : ''
+  const checkSql = check === undefined ? '' : `CHECK (${check})`
+  const commentSql =
+    comment === undefined
+      ? ''
+      : `COMMENT ON COLUMN ${ident(schema)}.${ident(table)}.${ident(name)} IS ${literal(comment)}`
 
   const sql = `
-DO $$
-DECLARE
-  v_schema name;
-  v_table name;
-BEGIN
-  SELECT n.nspname, c.relname INTO v_schema, v_table
-  FROM pg_class c 
-  JOIN pg_namespace n ON n.oid = c.relnamespace
-  WHERE c.oid = ${literal(table_id)};
-
-  IF v_schema IS NULL THEN
-    RAISE EXCEPTION 'Table with id % not found', ${literal(table_id)};
-  END IF;
-
-  execute(format(
-    'ALTER TABLE %I.%I ${clauses.join(' ')}',
-    v_schema, v_table, ${args.join(', ')}
-  ));
-  
-  ${comment ? `execute(format('COMMENT ON COLUMN %I.%I.%I IS %L', v_schema, v_table, ${literal(name)}, quote_ident(${literal(comment)})));` : ''}
-END $$;`
+BEGIN;
+  ALTER TABLE ${ident(schema)}.${ident(table)} ADD COLUMN ${ident(name)} ${typeIdent(type)}
+    ${defaultValueClause}
+    ${isNullableClause}
+    ${isPrimaryKeyClause}
+    ${isUniqueClause}
+    ${checkSql};
+  ${commentSql};
+COMMIT;`
 
   return { sql }
+}
+
+// TODO: make this more robust - use type_id or type_schema + type_name instead of just type.
+const typeIdent = (type: string) => {
+  return type.endsWith('[]')
+    ? `${ident(type.slice(0, -2))}[]`
+    : type.includes('.')
+      ? type
+      : ident(type)
 }
 
 function update(

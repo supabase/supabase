@@ -178,18 +178,10 @@ withTestDatabase('retrieve, create, update, delete column', async ({ executeQuer
   // Create test table using pure SQL
   await executeQuery('CREATE TABLE t ()')
 
-  // Get table ID
-  const tableId = Number(
-    (
-      await executeQuery(
-        "SELECT oid FROM pg_class WHERE relname = 't' AND relnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'public')"
-      )
-    )[0].oid
-  )
-
   // Create column
   const { sql: createColumnSql } = await pgMeta.columns.create({
-    table_id: tableId,
+    schema: 'public',
+    table: 't',
     name: 'c',
     type: 'int2',
     default_value: 42,
@@ -337,18 +329,10 @@ withTestDatabase('primary key column', async ({ executeQuery }) => {
   // Create test table using pure SQL
   await executeQuery('CREATE TABLE t ()')
 
-  // Get table ID
-  const tableId = Number(
-    (
-      await executeQuery(
-        "SELECT oid FROM pg_class WHERE relname = 't' AND relnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'public')"
-      )
-    )[0].oid
-  )
-
   // Create column with primary key
   const { sql: createColumnSql } = await pgMeta.columns.create({
-    table_id: tableId,
+    schema: 'public',
+    table: 't',
     name: 'c',
     type: 'int2',
     is_primary_key: true,
@@ -378,18 +362,10 @@ withTestDatabase('unique column', async ({ executeQuery }) => {
   // Create test table using pure SQL
   await executeQuery('CREATE TABLE t ()')
 
-  // Get table ID
-  const tableId = Number(
-    (
-      await executeQuery(
-        "SELECT oid FROM pg_class WHERE relname = 't' AND relnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'public')"
-      )
-    )[0].oid
-  )
-
   // Create column with unique constraint
   const { sql: createColumnSql } = await pgMeta.columns.create({
-    table_id: tableId,
+    schema: 'public',
+    table: 't',
     name: 'c',
     type: 'int2',
     is_unique: true,
@@ -420,18 +396,10 @@ withTestDatabase('array column', async ({ executeQuery }) => {
   // Create test table using pure SQL
   await executeQuery('CREATE TABLE t ()')
 
-  // Get table ID
-  const tableId = Number(
-    (
-      await executeQuery(
-        "SELECT oid FROM pg_class WHERE relname = 't' AND relnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'public')"
-      )
-    )[0].oid
-  )
-
   // Create array column
   const { sql: createColumnSql } = await pgMeta.columns.create({
-    table_id: tableId,
+    schema: 'public',
+    table: 't',
     name: 'c',
     type: 'int2[]',
   })
@@ -479,18 +447,10 @@ withTestDatabase('column with default value', async ({ executeQuery }) => {
   // Create test table using pure SQL
   await executeQuery('CREATE TABLE t ()')
 
-  // Get table ID
-  const tableId = Number(
-    (
-      await executeQuery(
-        "SELECT oid FROM pg_class WHERE relname = 't' AND relnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'public')"
-      )
-    )[0].oid
-  )
-
   // Create column with default value
   const { sql: createColumnSql } = await pgMeta.columns.create({
-    table_id: tableId,
+    schema: 'public',
+    table: 't',
     name: 'c',
     type: 'timestamptz',
     default_value: 'NOW()',
@@ -540,18 +500,10 @@ withTestDatabase('column with escaped quote', async ({ executeQuery }) => {
   // Create test table using pure SQL
   await executeQuery('CREATE TABLE t ()')
 
-  // Get table ID
-  const tableId = Number(
-    (
-      await executeQuery(
-        "SELECT oid FROM pg_class WHERE relname = 't' AND relnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'public')"
-      )
-    )[0].oid
-  )
-
   // Create column with default value
   const { sql: createColumnSql } = await pgMeta.columns.create({
-    table_id: tableId,
+    schema: 'public',
+    table: 't',
     name: 'c',
     type: 'text',
     default_value: `quote's`,
@@ -602,18 +554,10 @@ withTestDatabase('alter column to type with uppercase', async ({ executeQuery })
   await executeQuery('CREATE TABLE t ()')
   await executeQuery('CREATE TYPE "T" AS ENUM ()')
 
-  // Get table ID
-  const tableId = Number(
-    (
-      await executeQuery(
-        "SELECT oid FROM pg_class WHERE relname = 't' AND relnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'public')"
-      )
-    )[0].oid
-  )
-
   // Create and then update column
   const { sql: createSql } = await pgMeta.columns.create({
-    table_id: tableId,
+    schema: 'public',
+    table: 't',
     name: 'c',
     type: 'text',
     is_unique: false,
@@ -675,18 +619,10 @@ withTestDatabase('enums are populated in enum array columns', async ({ executeQu
   await executeQuery(`CREATE TYPE test_enum AS ENUM ('a')`)
   await executeQuery('CREATE TABLE t ()')
 
-  // Get table ID
-  const tableId = Number(
-    (
-      await executeQuery(
-        "SELECT oid FROM pg_class WHERE relname = 't' AND relnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'public')"
-      )
-    )[0].oid
-  )
-
   // Create column
   const { sql: createSql } = await pgMeta.columns.create({
-    table_id: tableId,
+    schema: 'public',
+    table: 't',
     name: 'c',
     type: '_test_enum',
   })
@@ -879,18 +815,10 @@ withTestDatabase('column with fully-qualified type', async ({ executeQuery }) =>
     create type s.my_type as enum ();
   `)
 
-  // Get table ID using pure SQL
-  const tableId = Number(
-    (
-      await executeQuery(
-        "SELECT oid FROM pg_class WHERE relname = 't' AND relnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'public')"
-      )
-    )[0].oid
-  )
-
   // Create column with fully-qualified type
   const { sql: createColumnSql } = await pgMeta.columns.create({
-    table_id: tableId,
+    schema: 'public',
+    table: 't',
     name: 'c',
     type: 's.my_type',
   })

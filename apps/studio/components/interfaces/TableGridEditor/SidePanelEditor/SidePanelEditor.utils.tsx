@@ -246,8 +246,8 @@ export const createColumn = async ({
         await dropConstraint(
           projectRef,
           connectionString,
-          selectedTable.schema,
-          selectedTable.name,
+          payload.schema,
+          payload.table,
           primaryKey.name
         )
       }
@@ -256,8 +256,8 @@ export const createColumn = async ({
       await addPrimaryKey(
         projectRef,
         connectionString,
-        selectedTable.schema,
-        selectedTable.name,
+        payload.schema,
+        payload.table,
         primaryKeyColumns
       )
     }
@@ -267,7 +267,7 @@ export const createColumn = async ({
       await addForeignKey({
         projectRef,
         connectionString,
-        table: { schema: selectedTable.schema, name: selectedTable.name },
+        table: { schema: payload.schema, name: payload.table },
         foreignKeys: foreignKeyRelations,
       })
     }
@@ -496,7 +496,7 @@ export const createTable = async ({
 
     for (const column of columns) {
       // We create all columns without primary keys first
-      const columnPayload = generateCreateColumnPayload(table.id, {
+      const columnPayload = generateCreateColumnPayload(table, {
         ...column,
         isPrimaryKey: false,
       })
@@ -699,7 +699,7 @@ export const updateTable = async ({
       toast.loading(`Adding column ${column.name} to ${updatedTable.name}`, { id: toastId })
       // Ensure that columns do not created as primary key first, cause the primary key will
       // be added later on further down in the code
-      const columnPayload = generateCreateColumnPayload(updatedTable.id, {
+      const columnPayload = generateCreateColumnPayload(updatedTable, {
         ...column,
         isPrimaryKey: false,
       })
