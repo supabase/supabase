@@ -1,5 +1,4 @@
 export const getAuthReportAttributes = (isFreePlan: boolean) => [
-  // User Authentication Metrics
   {
     id: 'signups-by-provider',
     label: 'Sign Ups',
@@ -37,8 +36,8 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
     ],
   },
   {
-    id: 'auth-sessions',
-    label: 'Sessions',
+    id: 'sign-ins',
+    label: 'Sign Ins',
     valuePrecision: 0,
     hide: false,
     showTooltip: true,
@@ -72,43 +71,6 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
       { attribute: 'ZoomSessions', provider: 'mock', label: 'Zoom', enabled: false },
     ],
   },
-  // {
-  //   id: 'account-deletions',
-  //   label: 'Account Deletions',
-  //   valuePrecision: 0,
-  //   hide: false,
-  //   showTooltip: false,
-  //   showLegend: false,
-  //   showMaxValue: false,
-  //   hideChartType: false,
-  //   defaultChartStyle: 'bar',
-  //   titleTooltip: 'The number of users who have deleted their account.',
-  //   attributes: [
-  //     {
-  //       attribute: 'EmailChurn',
-  //       provider: 'mock',
-  //       label: 'Account deletions',
-  //       enabled: true,
-  //     },
-  //   ],
-  // },
-  // {
-  //   id: 'churn-rate',
-  //   label: 'Churn Rate',
-  //   valuePrecision: 1,
-  //   hide: false,
-  //   showTooltip: true,
-  //   showLegend: true,
-  //   showMaxValue: false,
-  //   hideChartType: false,
-  //   defaultChartStyle: 'bar',
-  //   format: '%',
-  //   titleTooltip: 'The percentage of users who have deleted their account.',
-  //   attributes: [{ attribute: 'ChurnRate', provider: 'mock', label: 'Churn Rate', enabled: true }],
-  // },
-
-  // Authentication Flows
-  // Password Reset Activity
   {
     id: 'password-reset',
     label: 'Password Resets',
@@ -125,141 +87,14 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
       { attribute: 'PasswordResetCompleted', provider: 'mock', label: 'Completed Resets' },
     ],
   },
-
-  // Error Analysis and Security
-  // Authentication Errors
-  // {
-  //   id: 'auth-errors',
-  //   label: 'Auth Errors',
-  //   valuePrecision: 0,
-  //   hide: false,
-  //   showTooltip: true,
-  //   showLegend: true,
-  //   showMaxValue: false,
-  //   hideChartType: false,
-  //   defaultChartStyle: 'bar',
-  //   titleTooltip: 'The total number of auth errors.',
-  //   attributes: [
-  //     {
-  //       attribute: 'Status403',
-  //       provider: 'mock',
-  //       label: '403 Forbidden',
-  //       color: {
-  //         light: '#FFB74D', // Orange 300
-  //         dark: '#FFCC80', // Orange 200
-  //       },
-  //     },
-  //     {
-  //       attribute: 'Status422',
-  //       provider: 'mock',
-  //       label: '422 Unprocessable Entity',
-  //       color: {
-  //         light: '#FF9800', // Orange 500
-  //         dark: '#FFB74D', // Orange 300
-  //       },
-  //     },
-  //     {
-  //       attribute: 'Status429',
-  //       provider: 'mock',
-  //       label: '429 Too Many Requests',
-  //       color: {
-  //         light: '#E65100', // Orange 900
-  //         dark: '#F57C00', // Orange 700
-  //       },
-  //     },
-  //     {
-  //       attribute: 'Status500',
-  //       provider: 'mock',
-  //       label: '500 Internal Server Error',
-  //       color: {
-  //         light: '#B71C1C', // Red 900
-  //         dark: '#D32F2F', // Red 700
-  //       },
-  //     },
-  //   ],
-  // },
-
-  // API Latency
-  // {
-  //   id: 'sign-up-latency',
-  //   label: 'Auth API Latency - Sign Up (ms)',
-  //   valuePrecision: 0,
-  //   hide: false,
-  //   showTooltip: false,
-  //   showLegend: false,
-  //   showMaxValue: false,
-  //   hideChartType: false,
-  //   defaultChartStyle: 'bar',
-  //   titleTooltip: 'The average latency of sign up requests in milliseconds.',
-  //   attributes: [{ attribute: 'SignUpLatency', provider: 'mock', label: 'Sign Up' }],
-  // },
-  // {
-  //   id: 'sign-in-latency',
-  //   label: 'Auth API Latency - Sign In (ms)',
-  //   valuePrecision: 0,
-  //   hide: false,
-  //   showTooltip: false,
-  //   showLegend: false,
-  //   showMaxValue: false,
-  //   hideChartType: false,
-  //   defaultChartStyle: 'bar',
-  //   titleTooltip: 'The average latency of sign in requests in milliseconds.',
-  //   attributes: [{ attribute: 'SignInLatency', provider: 'mock', label: 'Sign In' }],
-  // },
-  // {
-  //   id: 'token-refresh-latency',
-  //   label: 'Auth API Latency - Token Refresh (ms)',
-  //   valuePrecision: 0,
-  //   hide: false,
-  //   showTooltip: false,
-  //   showLegend: false,
-  //   showMaxValue: false,
-  //   hideChartType: false,
-  //   defaultChartStyle: 'bar',
-  //   titleTooltip: 'The average latency of token refresh requests in milliseconds.',
-  //   attributes: [{ attribute: 'TokenRefreshLatency', provider: 'mock', label: 'Token Refresh' }],
-  // },
-  // // Rate Limiting
-  // {
-  //   id: 'rate-limiting',
-  //   label: 'Rate Limiting Events',
-  //   valuePrecision: 0,
-  //   hide: false,
-  //   showTooltip: true,
-  //   showLegend: true,
-  //   showMaxValue: false,
-  //   hideChartType: false,
-  //   defaultChartStyle: 'bar',
-  //   titleTooltip: 'The total number of rate limiting events.',
-  //   attributes: [
-  //     { attribute: 'IPRateLimited', provider: 'mock', label: 'IP Address Rate Limited' },
-  //     { attribute: 'UserRateLimited', provider: 'mock', label: 'User Account Rate Limited' },
-  //     {
-  //       attribute: 'BruteForceAttempts',
-  //       provider: 'mock',
-  //       label: 'Potential Brute Force Attempts',
-  //     },
-  //   ],
-  // },
-  // // Token Usage
-  // {
-  //   id: 'token-usage',
-  //   label: 'Token Activity',
-  //   valuePrecision: 0,
-  //   hide: false,
-  //   showTooltip: true,
-  //   showLegend: true,
-  //   showMaxValue: false,
-  //   hideChartType: false,
-  //   defaultChartStyle: 'bar',
-  //   titleTooltip: 'The total number of token activity.',
-  //   attributes: [
-  //     { attribute: 'TokenIssuance', provider: 'mock', label: 'Tokens Issued' },
-  //     { attribute: 'TokenRefresh', provider: 'mock', label: 'Token Refreshes' },
-  //     { attribute: 'TokenRevocation', provider: 'mock', label: 'Token Revocations' },
-  //   ],
-  // },
 ]
+
+/**
+ * ================================================
+ * Mock data below
+ * TODO: Remove once we have real data
+ * ================================================
+ * */
 
 // Time points for all mock data
 const DEFAULT_TIME_POINTS = [
@@ -728,180 +563,6 @@ export const getMfaAdoptionMockData = (metric: string) => {
   }
 }
 
-// Error Analysis and Security charts
-export const getErrorSecurityChartAttributes = () => [
-  // Authentication Errors
-  {
-    id: 'auth-errors',
-    label: 'Auth Error Status Codes',
-    valuePrecision: 0,
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'bar',
-    titleTooltip: 'The total number of auth errors.',
-    attributes: [
-      {
-        attribute: 'Status403',
-        provider: 'mock',
-        label: '403 Forbidden',
-        color: {
-          light: '#FFB74D', // Orange 300
-          dark: '#FFCC80', // Orange 200
-        },
-      },
-      {
-        attribute: 'Status422',
-        provider: 'mock',
-        label: '422 Unprocessable Entity',
-        color: {
-          light: '#FF9800', // Orange 500
-          dark: '#FFB74D', // Orange 300
-        },
-      },
-      {
-        attribute: 'Status429',
-        provider: 'mock',
-        label: '429 Too Many Requests',
-        color: {
-          light: '#E65100', // Orange 900
-          dark: '#F57C00', // Orange 700
-        },
-      },
-      {
-        attribute: 'Status500',
-        provider: 'mock',
-        label: '500 Internal Server Error',
-        color: {
-          light: '#B71C1C', // Red 900
-          dark: '#D32F2F', // Red 700
-        },
-      },
-    ],
-  },
-  // Error Rate by Provider
-  {
-    id: 'provider-errors',
-    label: 'Error Rate by Provider (%)',
-    valuePrecision: 1,
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'bar',
-    attributes: [
-      { attribute: 'EmailErrorRate', provider: 'mock', label: 'Email' },
-      { attribute: 'GoogleErrorRate', provider: 'mock', label: 'Google' },
-      { attribute: 'GitHubErrorRate', provider: 'mock', label: 'GitHub' },
-      { attribute: 'FacebookErrorRate', provider: 'mock', label: 'Facebook' },
-    ],
-  },
-  // Rate Limiting
-  // {
-  //   id: 'rate-limiting',
-  //   label: 'Rate Limiting Events',
-  //   valuePrecision: 0,
-  //   hide: false,
-  //   showTooltip: true,
-  //   showLegend: true,
-  //   showMaxValue: false,
-  //   hideChartType: false,
-  //   defaultChartStyle: 'bar',
-  //   attributes: [
-  //     { attribute: 'IPRateLimited', provider: 'mock', label: 'IP Address Rate Limited' },
-  //     { attribute: 'UserRateLimited', provider: 'mock', label: 'User Account Rate Limited' },
-  //     {
-  //       attribute: 'BruteForceAttempts',
-  //       provider: 'mock',
-  //       label: 'Potential Brute Force Attempts',
-  //     },
-  //   ],
-  // },
-  // API Latency
-  {
-    id: 'sign-in-latency',
-    label: 'Sign In Latency',
-    valuePrecision: 0,
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'bar',
-    titleTooltip: 'The average latency of sign in requests in milliseconds.',
-    attributes: [{ attribute: 'SignInLatency', provider: 'mock', label: 'Sign In', enabled: true }],
-  },
-  {
-    id: 'sign-up-latency',
-    label: 'Sign Up Latency',
-    valuePrecision: 0,
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'bar',
-    titleTooltip: 'The average latency of sign up requests in milliseconds.',
-    attributes: [{ attribute: 'SignUpLatency', provider: 'mock', label: 'Sign Up', enabled: true }],
-  },
-  {
-    id: 'token-refresh-latency',
-    label: 'Token Refresh Latency',
-    valuePrecision: 0,
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'bar',
-    titleTooltip: 'The average latency of token refresh requests in milliseconds.',
-    attributes: [
-      { attribute: 'TokenRefreshLatency', provider: 'mock', label: 'Token Refresh', enabled: true },
-    ],
-  },
-  // Security Events
-  {
-    id: 'security-events',
-    label: 'Security Events',
-    valuePrecision: 0,
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'bar',
-    attributes: [
-      { attribute: 'SuspiciousLogins', provider: 'mock', label: 'Suspicious Login Attempts' },
-      { attribute: 'NewDeviceLogins', provider: 'mock', label: 'New Device Logins' },
-      {
-        attribute: 'PasswordBreachDetections',
-        provider: 'mock',
-        label: 'Password Breach Detections',
-      },
-    ],
-  },
-  // Token Usage
-  {
-    id: 'token-usage',
-    label: 'Token Activity',
-    valuePrecision: 0,
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'bar',
-    attributes: [
-      { attribute: 'TokenIssuance', provider: 'mock', label: 'Tokens Issued' },
-      { attribute: 'TokenRefresh', provider: 'mock', label: 'Token Refreshes' },
-      { attribute: 'TokenRevocation', provider: 'mock', label: 'Token Revocations' },
-    ],
-  },
-]
-
 // Mock data generators for error and security charts
 export const getAuthErrorsMockData = (errorType: string) => {
   const length = DEFAULT_TIME_POINTS.length
@@ -1097,81 +758,6 @@ export const getTokenUsageMockData = (metricType: string) => {
     total,
   }
 }
-
-// Conversion Metrics charts
-export const getConversionMetricsChartAttributes = () => [
-  // Auth Conversion Funnel
-  {
-    id: 'auth-funnel',
-    label: 'Auth Conversion Funnel',
-    valuePrecision: 0,
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'bar',
-    attributes: [
-      { attribute: 'PageVisits', provider: 'mock', label: 'Page Visits' },
-      { attribute: 'SignupStarts', provider: 'mock', label: 'Sign-up Starts' },
-      { attribute: 'SignupCompletes', provider: 'mock', label: 'Sign-up Completes' },
-      { attribute: 'FirstLogins', provider: 'mock', label: 'First Logins' },
-    ],
-  },
-  // Conversion Rates
-  {
-    id: 'conversion-rates',
-    label: 'Conversion Rates (%)',
-    valuePrecision: 1,
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'bar',
-    attributes: [
-      { attribute: 'VisitToSignupRate', provider: 'mock', label: 'Visit to Sign-up' },
-      { attribute: 'SignupCompletionRate', provider: 'mock', label: 'Sign-up Completion' },
-      { attribute: 'RetentionRate', provider: 'mock', label: 'User Retention' },
-    ],
-  },
-  // Onboarding Completion
-  {
-    id: 'onboarding-completion',
-    label: 'Onboarding Completion',
-    valuePrecision: 0,
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'bar',
-    attributes: [
-      { attribute: 'OnboardingStarts', provider: 'mock', label: 'Onboarding Starts' },
-      { attribute: 'ProfileCompletions', provider: 'mock', label: 'Profile Completions' },
-      { attribute: 'VerificationCompletions', provider: 'mock', label: 'Verification Completions' },
-    ],
-  },
-  // Onboarding Time
-  {
-    id: 'onboarding-time',
-    label: 'Avg. Time to Complete (minutes)',
-    valuePrecision: 1,
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'bar',
-    attributes: [
-      {
-        attribute: 'TimeToCompleteOnboarding',
-        provider: 'mock',
-        label: 'Onboarding Completion Time',
-      },
-    ],
-  },
-]
 
 // Mock data generators for conversion metrics
 export const getAuthFunnelMockData = (stage: string) => {
