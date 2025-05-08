@@ -55,7 +55,8 @@ interface Params {
   slug: string
 }
 
-const PythonClientDocs = async ({ params }: { params: Params }) => {
+const PythonClientDocs = async (props: { params: Promise<Params> }) => {
+  const params = await props.params
   const { meta, ...data } = await getContent(params)
 
   const options = {
