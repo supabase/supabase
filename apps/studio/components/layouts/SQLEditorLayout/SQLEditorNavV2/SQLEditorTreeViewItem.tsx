@@ -159,8 +159,9 @@ export const SQLEditorTreeViewItem = ({
       <ContextMenu_Shadcn_ modal={false}>
         <ContextMenuTrigger_Shadcn_ asChild>
           <TreeViewItem
-            className={className}
             level={level}
+            className={className}
+            data-testid={`snippet-${element.id}`}
             isExpanded={isExpanded}
             isBranch={isBranch}
             isSelected={isSelected}

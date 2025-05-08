@@ -16,6 +16,6 @@ setup('Authenticate', async ({ page }) => {
 
   await page.pause()
 
-  await page.waitForURL('./projects')
+  await page.waitForURL('./organizations')
   await page.context().storageState({ path: authFile })
 })
