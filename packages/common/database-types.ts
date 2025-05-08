@@ -552,6 +552,7 @@ export type Database = {
           type: string
           href: string
           content: string
+          metadata: Json
           subsections: Json[]
         }[]
       }

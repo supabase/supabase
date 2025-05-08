@@ -70,6 +70,61 @@ type Subsection {
   content: String
 }
 
+"""
+A reference document containing a description of a Supabase CLI command
+"""
+type CLICommandReference implements SearchResult {
+  """The title of the document"""
+  title: String
+
+  """The URL of the document"""
+  href: String
+
+  """The content of the reference document, as text"""
+  content: String
+}
+
+"""
+A reference document containing a description of a function from a Supabase client library
+"""
+type ClientLibraryFunctionReference implements SearchResult {
+  """The title of the document"""
+  title: String
+
+  """The URL of the document"""
+  href: String
+
+  """The content of the reference document, as text"""
+  content: String
+
+  """The programming language for which the function is written"""
+  language: Language!
+
+  """The name of the function or method"""
+  methodName: String
+}
+
+enum Language {
+  JAVASCRIPT
+  SWIFT
+  DART
+  CSHARP
+  KOTLIN
+  PYTHON
+}
+
+"""A document describing how to troubleshoot an issue when using Supabase"""
+type TroubleshootingGuide implements SearchResult {
+  """The title of the troubleshooting guide"""
+  title: String
+
+  """The URL of the troubleshooting guide"""
+  href: String
+
+  """The full content of the troubleshooting guide"""
+  content: String
+}
+
 type RootQueryType {
   """Get the GraphQL schema for this endpoint"""
   schema: String!
