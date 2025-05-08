@@ -13,6 +13,8 @@ dotenv.config({
   override: true,
 })
 
+const IS_PLATFORM = process.env.IS_PLATFORM
+
 const ENVS_WITH_AUTH: Env[] = ['staging', 'production', 'dev-hosted', 'ci']
 
 const AUTH_ENV = {
@@ -46,6 +48,7 @@ setup('Global Setup', async ({ page }) => {
     - Studio URL: ${getStudioUrl()}
     - API URL: ${getApiUrl()}
     - Auth: ${envHasAuth ? 'enabled' : 'disabled'}
+    - Is Platform: ${IS_PLATFORM}
     `)
 
   /**

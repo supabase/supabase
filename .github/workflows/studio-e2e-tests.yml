@@ -70,13 +70,9 @@ jobs:
             ${{ runner.os }}-playwright-v1-
       - name: Build Studio
         if: steps.nextjs-cache.outputs.cache-hit != 'true'
-        run: |
-          echo "IS_PLATFORM in build step: $IS_PLATFORM"
-          pnpm --filter studio build
+        run: pnpm --filter studio build
       - name: Start Studio server
-        run: |
-          echo "IS_PLATFORM in start step: $IS_PLATFORM"
-          pnpm --filter studio start &
+        run: pnpm --filter studio start
       - name: Wait for Studio server
         run: |
           timeout 60 bash -c 'until curl -s http://localhost:3000 > /dev/null; do sleep 1; done'
