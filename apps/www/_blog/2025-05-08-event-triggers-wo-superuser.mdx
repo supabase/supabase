@@ -110,6 +110,8 @@ User event triggers are now available on the Supabase platform, for new projects
 
 You can also git clone the [supautils](https://github.com/supabase/supautils/) repo and `make install` it in your own deployment.
 
+A special shout out to the [Zero Sync](https://zero.rocicorp.dev) guys, which kept pushing us to release this feature.
+
 [^1]: As a last step, we change the owner of the event trigger to the privileged role so it be altered or dropped by end users.
 
 [^2]: This is not true if you mark the event trigger function as SECURITY DEFINER, then it will run with the privileges of the function owner. But this is not a usual practice on event triggers, as they usually want to preserve the context of the current user.
