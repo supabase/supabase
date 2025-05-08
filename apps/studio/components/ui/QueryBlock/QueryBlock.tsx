@@ -194,8 +194,6 @@ export const QueryBlock = ({
   const handleExecute = () => {
     if (!sql || isLoading) return
 
-    console.log('Handle execute')
-
     if (readOnlyError) {
       return setShowWarning('hasWriteOperation')
     }
