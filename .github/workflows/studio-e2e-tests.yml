@@ -44,10 +44,17 @@ jobs:
           version: latest
       - name: Install dependencies
         run: pnpm i
+      - name: Build Studio
+        run: pnpm --filter studio build
+      - name: Start Studio server
+        run: pnpm --filter studio start &
+      - name: Wait for Studio server
+        run: |
+          timeout 60 bash -c 'until curl -s http://localhost:3000 > /dev/null; do sleep 1; done'
       - name: Install Playwright Browsers
         run: pnpm -C tests/studio-tests exec playwright install --with-deps
       - name: Run Playwright tests
-        run: pnpm test:e2e:studio-local
+        run: pnpm e2e:ci
         # mark the action as succeeded even if the tests failed. This is temporarily until we make the tests more stable.
         # continue-on-error: true
       - uses: actions/upload-artifact@v4

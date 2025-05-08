@@ -18,7 +18,7 @@ export const ENV_URLS: Record<Env, string> = {
   selfhosted: 'http://localhost:54323/',
   'dev-hosted': 'http://localhost:8082/',
   'dev-selfhosted': 'http://localhost:8082/',
-  ci: process.env.BASE_URL || '', // Set in CI
+  ci: process.env.BASE_URL || 'http://localhost:3000/', // Set in CI
 }
 
 export const API_URLS: Record<Env, string> = {
