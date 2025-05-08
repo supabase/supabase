@@ -45,7 +45,7 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
     showMaxValue: false,
     hideChartType: false,
     defaultChartStyle: 'bar',
-    titleTooltip: 'The total number of auth sessions by provider.',
+    titleTooltip: 'The total number of sign ins by provider.',
     attributes: [
       { attribute: 'EmailSessions', provider: 'mock', label: 'Email', enabled: true },
       { attribute: 'PhoneSessions', provider: 'mock', label: 'Phone', enabled: false },
