@@ -1,12 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronRight, Clipboard, Download, Edit, Move, Trash2 } from 'lucide-react'
-import { observer } from 'mobx-react-lite'
 import { Item, Menu, Separator, Submenu } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
 
 import { useParams } from 'common'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItemWithColumn } from '../Storage.types'
 import { downloadFile } from './StorageExplorer.utils'
@@ -18,14 +17,15 @@ interface ItemContextMenuProps {
 
 const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
   const { ref: projectRef, bucketId } = useParams()
-  const storageExplorerStore = useStorageStore()
+  const snap = useStorageExplorerStateSnapshot()
+  const { setSelectedFileCustomExpiry } = snap
+
   const {
     selectedBucket,
     setSelectedItemsToDelete,
     setSelectedItemToRename,
     setSelectedItemsToMove,
-    setSelectedFileCustomExpiry,
-  } = storageExplorerStore
+  } = useStorageExplorerStateSnapshot()
   const { onCopyUrl } = useCopyUrl()
   const isPublic = selectedBucket.public
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
@@ -107,4 +107,4 @@ const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
   )
 }
 
-export default observer(ItemContextMenu)
+export default ItemContextMenu

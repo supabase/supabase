@@ -179,9 +179,12 @@ export const PricingTableRowDesktop = (props: any) => {
                           )}
                           {typeof planValue === 'string' ? planValue : planValue[0]}
                         </span>
-                        {typeof planValue !== 'string' && (
-                          <span className="text-lighter leading-4">{planValue[1]}</span>
-                        )}
+                        {Array.isArray(planValue) &&
+                          planValue.slice(1).map((val, idx) => (
+                            <span key={`planval_${i}_${idx}`} className="text-lighter leading-4">
+                              {val}
+                            </span>
+                          ))}
                       </div>
                     )}
                   </td>
@@ -246,9 +249,12 @@ export const PricingTableRowMobile = (props: any) => {
                         ? feat.plans[plan]
                         : feat.plans[plan][0]}
                     </span>
-                    {typeof feat.plans[plan] !== 'string' && (
-                      <span className="text-lighter leading-5">{feat.plans[plan][1]}</span>
-                    )}
+                    {Array.isArray(feat.plans[plan]) &&
+                      feat.plans[plan].slice(1).map((val, idx) => (
+                        <span key={`planval_mobile_${i}_${idx}`} className="text-lighter leading-5">
+                          {val}
+                        </span>
+                      ))}
                   </span>
                 )}
               </td>
