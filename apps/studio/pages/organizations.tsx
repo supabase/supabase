@@ -9,6 +9,7 @@ import { ScaffoldContainerLegacy, ScaffoldTitle } from 'components/layouts/Scaff
 import { ActionCard } from 'components/ui/ActionCard'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { withAuth } from 'hooks/misc/withAuth'
 import { NextPageWithLayout } from 'types'
 import { Skeleton } from 'ui'
 
@@ -71,4 +72,4 @@ OrganizationsPage.getLayout = (page) => (
   </AppLayout>
 )
 
-export default OrganizationsPage
+export default withAuth(OrganizationsPage)
