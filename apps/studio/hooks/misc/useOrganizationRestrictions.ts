@@ -5,6 +5,7 @@ import { RESTRICTION_MESSAGES } from 'components/interfaces/Organization/restric
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useProfile } from 'lib/profile'
 
 export type WarningBannerProps = {
   type: 'danger' | 'warning' | 'note'
@@ -14,10 +15,11 @@ export type WarningBannerProps = {
 }
 
 export function useOrganizationRestrictions() {
+  const { profile } = useProfile()
   const org = useSelectedOrganization()
   const isNewLayout = useIsNewLayoutEnabled()
 
-  const { data: overdueInvoices } = useOverdueInvoicesQuery()
+  const { data: overdueInvoices } = useOverdueInvoicesQuery({ enabled: profile !== undefined })
   const { data: organizations } = useOrganizationsQuery()
 
   const warnings: WarningBannerProps[] = []

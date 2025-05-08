@@ -23,6 +23,7 @@ import type { Organization, ResponseError } from 'types'
 import { Button, cn } from 'ui'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
+import { useProfile } from 'lib/profile'
 
 export interface ProjectListProps {
   rewriteHref?: (projectRef: string) => string
@@ -41,6 +42,7 @@ const ProjectList = ({
   filterToSlug,
 }: ProjectListProps) => {
   const { slug } = useParams()
+  const { profile } = useProfile()
   const { data: organizations, isLoading, isSuccess } = useOrganizationsQuery()
   const {
     data: allProjects,
@@ -55,7 +57,7 @@ const ProjectList = ({
     error: permissionsError,
   } = usePermissionsQuery()
   const { data: resourceWarnings } = useResourceWarningsQuery()
-  const { data: allOverdueInvoices } = useOverdueInvoicesQuery()
+  const { data: allOverdueInvoices } = useOverdueInvoicesQuery({ enabled: profile !== undefined })
   const projectsByOrg = groupBy(allProjects, 'organization_id')
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
 
