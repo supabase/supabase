@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { constructHeaders } from 'data/fetchers'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { constructHeaders, fetchHandler } from 'data/fetchers'
+import { BASE_PATH } from 'lib/constants'
 import { ResponseError } from 'types'
 import { aiKeys } from './keys'
 
@@ -10,7 +10,10 @@ import { aiKeys } from './keys'
 
 export async function checkOpenAIKey(signal?: AbortSignal) {
   const headers = await constructHeaders()
-  const response = await fetch(`${BASE_PATH}/api/ai/sql/check-api-key`, { headers, signal })
+  const response = await fetchHandler(`${BASE_PATH}/api/ai/sql/check-api-key`, {
+    headers,
+    signal,
+  })
   let body: any
 
   try {
@@ -34,5 +37,5 @@ export const useCheckOpenAIKeyQuery = <TData = ResourceData>({
   useQuery<ResourceData, ResourceError, TData>(
     aiKeys.apiKey(),
     ({ signal }) => checkOpenAIKey(signal),
-    { enabled: !IS_PLATFORM && enabled, ...options }
+    { enabled: enabled, ...options } // !IS_PLATFORM &&
   )

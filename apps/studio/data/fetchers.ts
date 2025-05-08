@@ -10,7 +10,7 @@ import type { paths } from './api' // generated from openapi-typescript
 
 const DEFAULT_HEADERS = { Accept: 'application/json' }
 
-const fetchHandler: typeof fetch = async (input, init) => {
+export const fetchHandler: typeof fetch = async (input, init) => {
   try {
     return await fetch(input, init)
   } catch (err: any) {

@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { ResponseData } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionDetails.types'
-import { constructHeaders } from 'data/fetchers'
+import { constructHeaders, fetchHandler } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
 import { ResponseError } from 'types'
 
@@ -21,7 +21,7 @@ export type EdgeFunctionTestVariables = {
 export async function testEdgeFunction({ url, method, body, headers }: EdgeFunctionTestVariables) {
   const defaultHeaders = await constructHeaders()
 
-  const response = await fetch(`${BASE_PATH}/api/edge-functions/test`, {
+  const response = await fetchHandler(`${BASE_PATH}/api/edge-functions/test`, {
     method: 'POST',
     headers: { ...defaultHeaders, 'Content-Type': 'application/json' },
     body: JSON.stringify({ url, method, body, headers }),
