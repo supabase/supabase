@@ -30,6 +30,11 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
 
+    env:
+      CI_EMAIL: ${{ secrets.CI_EMAIL }}
+      CI_PASSWORD: ${{ secrets.CI_PASSWORD }}
+      CI_PROJECT_REF: ${{ secrets.CI_PROJECT_REF }}
+
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -51,7 +56,7 @@ jobs:
         id: studio-cache
         with:
           path: apps/studio/.next
-          key: studio-build-${{ hashFiles('apps/studio/**', 'packages/pg-meta/**', 'packages/ai-commands/**', 'packages/common/**', 'packages/config/**', 'packages/icons/**', 'packages/shared-data/**', 'packages/ui/**', 'packages/ui-patterns/**', 'packages/api-types/**', 'pnpm-lock.yaml') }}
+          key: studio-build-${{ github.event.pull_request.number || github.ref_name }}-${{ hashFiles('apps/studio/**', 'packages/pg-meta/**', 'packages/ai-commands/**', 'packages/common/**', 'packages/config/**', 'packages/icons/**', 'packages/shared-data/**', 'packages/ui/**', 'packages/ui-patterns/**', 'packages/api-types/**', 'pnpm-lock.yaml') }}
       - name: Build Studio
         if: steps.studio-cache.outputs.cache-hit != 'true'
         run: pnpm --filter studio build

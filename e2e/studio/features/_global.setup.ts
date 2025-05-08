@@ -32,9 +32,9 @@ const AUTH_ENV = {
     projectRef: process.env.PRODUCTION_PROJECT_REF,
   },
   ci: {
-    email: process.env.STAGING_EMAIL,
-    password: process.env.STAGING_PASSWORD,
-    projectRef: process.env.STAGING_PROJECT_REF,
+    email: process.env.CI_EMAIL,
+    password: process.env.CI_PASSWORD,
+    projectRef: process.env.CI_PROJECT_REF,
   },
 } as const
 
