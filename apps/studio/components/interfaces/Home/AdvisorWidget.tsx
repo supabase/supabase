@@ -27,6 +27,7 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
+  AiIconAnimation,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { formatBytes } from 'lib/helpers'
@@ -68,7 +69,6 @@ const AdvisorWidget = ({ projectRef }: AdvisorWidgetProps) => {
   const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery({ projectRef })
   const { data: slowestQueriesData, isLoading: isLoadingSlowestQueries } = useQueryPerformanceQuery(
     {
-      projectRef: projectRef as any,
       preset: 'slowestExecutionTime',
     }
   )
@@ -100,6 +100,50 @@ const AdvisorWidget = ({ projectRef }: AdvisorWidgetProps) => {
     () => ((slowestQueriesData ?? []) as SlowQuery[]).slice(0, 5),
     [slowestQueriesData]
   )
+
+  const totalIssues =
+    securityErrorCount + securityWarningCount + performanceErrorCount + performanceWarningCount
+  const hasErrors = securityErrorCount > 0 || performanceErrorCount > 0
+  const hasWarnings = securityWarningCount > 0 || performanceWarningCount > 0
+
+  let titleContent: React.ReactNode
+
+  if (totalIssues === 0) {
+    titleContent = <h2 className="text-brand text-xl">Your project is looking healthy</h2>
+  } else {
+    const numberWords = [
+      'No',
+      'One',
+      'Two',
+      'Three',
+      'Four',
+      'Five',
+      'Six',
+      'Seven',
+      'Eight',
+      'Nine',
+      'Ten',
+    ]
+    const issuesText = totalIssues === 1 ? 'item' : 'items'
+    const numberDisplay = totalIssues.toString()
+
+    let attentionClassName = ''
+    let badgeVariant: 'destructive' | 'warning' | 'default' = 'default'
+    if (hasErrors) {
+      attentionClassName = 'text-destructive'
+      badgeVariant = 'destructive'
+    } else if (hasWarnings) {
+      attentionClassName = 'text-warning'
+      badgeVariant = 'warning'
+    }
+
+    titleContent = (
+      <h2 className="text-xl">
+        {numberDisplay} {issuesText} need
+        {totalIssues === 1 ? 's' : ''} your <span className={attentionClassName}>attention</span>
+      </h2>
+    )
+  }
 
   const renderLintTabContent = (
     title: string,
@@ -203,67 +247,85 @@ const AdvisorWidget = ({ projectRef }: AdvisorWidgetProps) => {
   )
 
   return (
-    <Card>
-      <Tabs defaultValue="security">
-        <CardHeader className="py-3 px-4 flex flex-row items-center py-0 justify-between">
-          <TabsList className="flex justify-start rounded-none gap-4 border-b-0 !mt-0 pt-0">
-            <TabsTrigger
-              value="security"
-              className="flex items-center gap-2 text-xs py-3 border-b-[1px] font-mono uppercase"
-            >
-              Security{' '}
-              {securityErrorCount + securityWarningCount > 0 && (
-                <div className="rounded bg-warning text-warning-100 px-1">
-                  {securityErrorCount + securityWarningCount}
-                </div>
-              )}
-            </TabsTrigger>
-            <TabsTrigger
-              value="performance"
-              className="flex items-center gap-2 text-xs py-3 border-b-[1px] font-mono uppercase"
-            >
-              Performance{' '}
-              {performanceErrorCount + performanceWarningCount > 0 && (
-                <div className="rounded bg-warning text-warning-100 px-1">
-                  {performanceErrorCount + performanceWarningCount}
-                </div>
-              )}
-            </TabsTrigger>
-            <TabsTrigger
-              value="queries"
-              className="flex items-center gap-2 text-xs py-3 border-b-[1px] font-mono uppercase"
-            >
-              Slow Queries
-            </TabsTrigger>
-          </TabsList>
-        </CardHeader>
-        <CardContent className="!p-0">
-          <TabsContent value="security" className="p-0 mt-0">
-            {renderLintTabContent(
-              'Security',
-              securityLints,
-              securityErrorCount,
-              securityWarningCount,
-              isLoadingLints,
-              `/project/${projectRef}/advisors/security`
-            )}
-          </TabsContent>
-          <TabsContent value="performance" className="p-0 mt-0">
-            {renderLintTabContent(
-              'Performance',
-              performanceLints,
-              performanceErrorCount,
-              performanceWarningCount,
-              isLoadingLints,
-              `/project/${projectRef}/advisors/performance`
-            )}
-          </TabsContent>
-          <TabsContent value="queries" className="p-0 mt-0">
-            {renderQueriesTabContent()}
-          </TabsContent>
-        </CardContent>
-      </Tabs>
-    </Card>
+    <div>
+      {isLoadingLints ? (
+        <h2 className="text-brand text-xl animate-pulse">Checking project health...</h2>
+      ) : (
+        <div className="flex justify-between items-center mb-8">
+          {titleContent}
+          {totalIssues > 0 && (
+            <Button type="primary" icon={<AiIconAnimation />} size="tiny">
+              Debug with Assistant
+            </Button>
+          )}
+        </div>
+      )}
+      {totalIssues > 0 ? (
+        <Tabs defaultValue="security" className="mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <Tabs defaultValue="security">
+                <CardHeader className="py-0 px-4 flex flex-row items-center justify-between">
+                  <TabsList className="flex justify-start rounded-none gap-4 border-b-0 !mt-0 pt-0">
+                    <TabsTrigger
+                      value="security"
+                      className="flex items-center gap-2 text-xs py-3 border-b-[1px] font-mono uppercase"
+                    >
+                      Security{' '}
+                      {securityErrorCount + securityWarningCount > 0 && (
+                        <div className="rounded bg-warning text-warning-100 px-1">
+                          {securityErrorCount + securityWarningCount}
+                        </div>
+                      )}
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="performance"
+                      className="flex items-center gap-2 text-xs py-3 border-b-[1px] font-mono uppercase"
+                    >
+                      Performance{' '}
+                      {performanceErrorCount + performanceWarningCount > 0 && (
+                        <div className="rounded bg-warning text-warning-100 px-1">
+                          {performanceErrorCount + performanceWarningCount}
+                        </div>
+                      )}
+                    </TabsTrigger>
+                  </TabsList>
+                </CardHeader>
+                <CardContent className="!p-0 mt-0">
+                  <TabsContent value="security" className="p-0 mt-0">
+                    {renderLintTabContent(
+                      'Security',
+                      securityLints,
+                      securityErrorCount,
+                      securityWarningCount,
+                      isLoadingLints,
+                      `/project/${projectRef}/advisors/security`
+                    )}
+                  </TabsContent>
+                  <TabsContent value="performance" className="p-0 mt-0">
+                    {renderLintTabContent(
+                      'Performance',
+                      performanceLints,
+                      performanceErrorCount,
+                      performanceWarningCount,
+                      isLoadingLints,
+                      `/project/${projectRef}/advisors/performance`
+                    )}
+                  </TabsContent>
+                </CardContent>
+              </Tabs>
+            </Card>
+
+            <Card>
+              <CardHeader className="py-3 px-4">
+                <CardTitle>Slow Queries</CardTitle>
+              </CardHeader>
+              <CardContent className="!p-0">{renderQueriesTabContent()}</CardContent>
+            </Card>
+          </div>
+        </Tabs>
+      ) : null}
+    </div>
   )
 }
 

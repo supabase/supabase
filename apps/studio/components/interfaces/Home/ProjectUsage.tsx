@@ -54,7 +54,7 @@ const CHART_INTERVALS: ChartIntervals[] = [
   },
 ]
 
-const ProjectUsage = () => {
+const ProjectUsage = ({ totalRequests }: { totalRequests: number }) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
 
@@ -89,6 +89,8 @@ const ProjectUsage = () => {
     endDateLocal.toISOString(),
     5
   )
+  console.log('charts:', charts)
+  console.log('data:', data)
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
 
   const handleBarClick = (
@@ -105,39 +107,44 @@ const ProjectUsage = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-row items-center gap-x-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button type="default" iconRight={<ChevronDown size={14} />}>
-              <span>{selectedInterval.label}</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="start" className="w-40">
-            <DropdownMenuRadioGroup
-              value={interval}
-              onValueChange={(interval) =>
-                setInterval(interval as ProjectLogStatsVariables['interval'])
-              }
-            >
-              {CHART_INTERVALS.map((i) => (
-                <DropdownMenuRadioItem
-                  key={i.key}
-                  value={i.key}
-                  disabled={!i.availableIn?.includes(plan?.id || 'free')}
-                >
-                  {i.label}
-                </DropdownMenuRadioItem>
-              ))}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <span className="text-xs text-foreground-light">
-          Statistics for {selectedInterval.label.toLowerCase()}
-        </span>
+    <div className="space-y-8">
+      <div className="flex flex-row items-center justify-between gap-x-2">
+        <h2 className="text-xl">
+          {totalRequests} requests in the {selectedInterval.label}
+        </h2>
+        <div className="flex flex-row items-center gap-x-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="default" iconRight={<ChevronDown size={14} />}>
+                <span>{selectedInterval.label}</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="bottom" align="start" className="w-40">
+              <DropdownMenuRadioGroup
+                value={interval}
+                onValueChange={(interval) =>
+                  setInterval(interval as ProjectLogStatsVariables['interval'])
+                }
+              >
+                {CHART_INTERVALS.map((i) => (
+                  <DropdownMenuRadioItem
+                    key={i.key}
+                    value={i.key}
+                    disabled={!i.availableIn?.includes(plan?.id || 'free')}
+                  >
+                    {i.label}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <span className="text-xs text-foreground-light">
+            Statistics for {selectedInterval.label.toLowerCase()}
+          </span>
+        </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-4">
-        <Panel>
+        <Panel className="mb-0 md:mb-0">
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
@@ -163,7 +170,7 @@ const ProjectUsage = () => {
           </Panel.Content>
         </Panel>
         {authEnabled && (
-          <Panel>
+          <Panel className="mb-0 md:mb-0">
             <Panel.Content className="space-y-4">
               <PanelHeader
                 icon={
@@ -189,7 +196,7 @@ const ProjectUsage = () => {
           </Panel>
         )}
         {storageEnabled && (
-          <Panel>
+          <Panel className="mb-0 md:mb-0">
             <Panel.Content className="space-y-4">
               <PanelHeader
                 icon={
@@ -215,7 +222,7 @@ const ProjectUsage = () => {
             </Panel.Content>
           </Panel>
         )}
-        <Panel>
+        <Panel className="mb-0 md:mb-0">
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={

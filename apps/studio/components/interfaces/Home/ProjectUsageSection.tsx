@@ -47,7 +47,7 @@ const ProjectUsageSection = () => {
       {isLoading || isLogsStatsLoading ? (
         <ProjectUsageLoadingState />
       ) : hasProjectData && !isNewProject ? (
-        <ProjectUsage />
+        <ProjectUsage totalRequests={usage?.result[0]?.count} />
       ) : (
         <NewProjectPanel />
       )}

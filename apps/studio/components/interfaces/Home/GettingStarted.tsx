@@ -20,25 +20,21 @@ import { BASE_PATH } from 'lib/constants'
 
 interface GettingStartedProps {
   projectRef: string
+  onRemove: () => void
 }
 
-export const GettingStarted = ({ projectRef }: GettingStartedProps) => {
-  const [show, setShow] = useState(true)
+export const GettingStarted = ({ projectRef, onRemove }: GettingStartedProps) => {
   const { resolvedTheme } = useTheme()
 
-  if (!show) {
-    return null
-  }
-
   return (
-    <Card className="mb-6">
+    <Card>
       <CardHeader className="py-3 px-4 flex flex-row items-center justify-between">
         <CardTitle className="text-foreground-light">Getting Started</CardTitle>
         <Button
           type="text"
           icon={<X size={16} strokeWidth={1.5} />}
           className="w-7 h-7 !mt-0"
-          onClick={() => setShow(false)}
+          onClick={onRemove}
         ></Button>
       </CardHeader>
       <CardContent className="p-0">
