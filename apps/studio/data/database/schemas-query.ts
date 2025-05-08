@@ -7,7 +7,7 @@ import { databaseKeys } from './keys'
 
 export type SchemasVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export type Schema = z.infer<typeof pgMeta.schemas.zod>

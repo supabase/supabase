@@ -11,7 +11,7 @@ import { tableKeys } from './keys'
 
 export type TableDeleteVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: number
   schema: string
   cascade?: boolean

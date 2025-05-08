@@ -7,7 +7,7 @@ import { databasePoliciesKeys } from './keys'
 
 export type DatabasePolicyUpdateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: number
   payload: {
     name?: string
