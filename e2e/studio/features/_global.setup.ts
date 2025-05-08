@@ -110,7 +110,7 @@ To start API locally, run:
     }
   }
 
-  await page.goto('./sign-in')
+  await page.goto('./dashboard/sign-in')
 
   const auth = AUTH_ENV[ENV]
 
@@ -123,9 +123,9 @@ To start API locally, run:
   await expect(page.getByLabel('Password')).toBeVisible()
   await expect(page.getByRole('button', { name: 'Sign In' })).toBeVisible()
 
-  await page.getByLabel('Email').fill(auth.email ?? '', { force: true })
-  await page.getByLabel('Password').fill(auth.password ?? '', { force: true })
-  await page.getByRole('button', { name: 'Sign In' }).click({ force: true })
+  await page.getByLabel('Email').fill(auth.email ?? '')
+  await page.getByLabel('Password').fill(auth.password ?? '')
+  await page.getByRole('button', { name: 'Sign In' }).click()
 
   await page.waitForURL('./projects')
   await page.context().storageState({ path: STORAGE_STATE_PATH })
