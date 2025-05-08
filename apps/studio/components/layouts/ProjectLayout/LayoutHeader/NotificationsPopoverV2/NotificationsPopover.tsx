@@ -27,7 +27,7 @@ import {
 import NotificationRow from './NotificationRow'
 import { NotificationsFilter } from './NotificationsFilter'
 
-const NotificationsPopoverV2 = () => {
+export const NotificationsPopoverV2 = () => {
   const [open, setOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'inbox' | 'archived'>('inbox')
 
@@ -278,5 +278,3 @@ const NotificationsPopoverV2 = () => {
     </Popover_Shadcn_>
   )
 }
-
-export default NotificationsPopoverV2

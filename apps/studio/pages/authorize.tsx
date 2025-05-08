@@ -52,7 +52,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const { mutate: declineRequest } = useApiAuthorizationDeclineMutation({
     onSuccess: () => {
       toast.success('Declined API authorization request')
-      router.push('/projects')
+      router.push('/organizations')
     },
   })
 

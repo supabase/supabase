@@ -154,7 +154,7 @@ const nextConfig = {
             },
             {
               source: '/',
-              destination: '/projects',
+              destination: '/org',
               permanent: false,
             },
             {
@@ -462,6 +462,11 @@ const nextConfig = {
         source: '/org/:slug/invoices',
         destination: '/org/:slug/billing#invoices',
         permanent: true,
+      },
+      {
+        source: '/projects',
+        destination: '/organizations',
+        permanent: false,
       },
 
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length

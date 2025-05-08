@@ -1,22 +1,12 @@
 import { Filter, Search } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 
-import { IS_PLATFORM, useParams } from 'common'
-import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useParams } from 'common'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { PROJECT_STATUS } from 'lib/constants'
-import { EMPTY_ARR } from 'lib/void'
 import {
   Button,
   Checkbox_Shadcn_,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
   Input,
   Label_Shadcn_,
   PopoverContent_Shadcn_,
@@ -25,7 +15,6 @@ import {
 } from 'ui'
 
 interface HomePageActionsProps {
-  organizations?: { name: string; slug: string }[]
   search: string
   filterStatus: string[]
   setSearch: (value: string) => void
@@ -33,57 +22,19 @@ interface HomePageActionsProps {
 }
 
 const HomePageActions = ({
-  organizations = EMPTY_ARR,
   search,
   filterStatus,
   setSearch,
   setFilterStatus,
 }: HomePageActionsProps) => {
-  const newLayoutPreview = useIsNewLayoutEnabled()
-
-  const router = useRouter()
   const { slug } = useParams()
-
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
-  const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
-  const { isSuccess: orgsLoaded } = useOrganizationsQuery()
 
   return (
     <div className="flex flex-col gap-2 md:gap-3 md:flex-row">
-      {newLayoutPreview ? (
-        projectCreationEnabled ? (
-          <Link href={`/new/${slug}`}>
-            <Button type="primary">New project</Button>
-          </Link>
-        ) : null
-      ) : (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button type="primary">
-              <span>New project</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="start">
-            <>
-              <DropdownMenuLabel>Choose organization</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {organizations
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .map((x) => (
-                  <DropdownMenuItem key={x.slug} onClick={() => router.push(`/new/${x.slug}`)}>
-                    {x.name}
-                  </DropdownMenuItem>
-                ))}
-            </>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
-
-      {IS_PLATFORM && organizationCreationEnabled && orgsLoaded && !newLayoutPreview && (
-        <Button type="default" asChild>
-          <Link href="/new" className="flex items-center gap-2">
-            New organization
-          </Link>
+      {projectCreationEnabled && (
+        <Button asChild type="primary">
+          <Link href={`/new/${slug}`}>New project</Link>
         </Button>
       )}
 

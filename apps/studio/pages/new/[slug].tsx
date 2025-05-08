@@ -11,7 +11,7 @@ import { z } from 'zod'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { components } from 'api-types'
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
@@ -46,6 +46,7 @@ import {
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -139,6 +140,11 @@ const Wizard: NextPageWithLayout = () => {
   const { slug, projectName } = useParams()
   const currentOrg = useSelectedOrganization()
   const isFreePlan = currentOrg?.plan?.id === 'free'
+
+  const [lastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -557,7 +563,10 @@ const Wizard: NextPageWithLayout = () => {
                 <Button
                   type="default"
                   disabled={isCreatingNewProject || isSuccessNewProject}
-                  onClick={() => router.push('/projects')}
+                  onClick={() => {
+                    if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
+                    else router.push('/organizations')
+                  }}
                 >
                   Cancel
                 </Button>
@@ -993,16 +1002,7 @@ const instanceLabel = (instance: string | undefined): string => {
 }
 
 const PageLayout = withAuth(({ children }: PropsWithChildren) => {
-  const { slug } = useParams()
-
-  const { data: organizations } = useOrganizationsQuery()
-  const currentOrg = organizations?.find((o) => o.slug === slug)
-
-  return (
-    <WizardLayoutWithoutAuth organization={currentOrg} project={null}>
-      {children}
-    </WizardLayoutWithoutAuth>
-  )
+  return <WizardLayoutWithoutAuth>{children}</WizardLayoutWithoutAuth>
 })
 
 Wizard.getLayout = (page) => (

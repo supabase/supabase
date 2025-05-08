@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   ScaffoldContainer,
   ScaffoldContainerLegacy,
@@ -29,8 +28,6 @@ import SizeAndCounts from './SizeAndCounts'
 import TotalUsage from './TotalUsage'
 
 const Usage = () => {
-  const newLayoutPreview = useIsNewLayoutEnabled()
-
   const { slug, projectRef } = useParams()
   const [dateRange, setDateRange] = useState<any>()
   const [selectedProjectRef, setSelectedProjectRef] = useState<string>()
@@ -119,11 +116,9 @@ const Usage = () => {
 
   return (
     <>
-      {newLayoutPreview && (
-        <ScaffoldContainerLegacy>
-          <ScaffoldTitle>Usage</ScaffoldTitle>
-        </ScaffoldContainerLegacy>
-      )}
+      <ScaffoldContainerLegacy>
+        <ScaffoldTitle>Usage</ScaffoldTitle>
+      </ScaffoldContainerLegacy>
       <div className="sticky top-0 border-b bg-studio z-[1] overflow-hidden ">
         <ScaffoldContainer className="">
           <div className="py-4 flex items-center space-x-4">

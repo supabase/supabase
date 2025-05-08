@@ -3,8 +3,7 @@ import { getAccessToken, gotrueClient, type User } from 'common'
 export const auth = gotrueClient
 export { getAccessToken }
 
-// [Joshen] We can flip this to /organizations once the new nav layout is permanent
-export const DEFAULT_FALLBACK_PATH = '/projects'
+export const DEFAULT_FALLBACK_PATH = '/organizations'
 
 export const validateReturnTo = (
   returnTo: string,

@@ -4,11 +4,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
-import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { withAuth } from 'hooks/misc/withAuth'
 import { IS_PLATFORM } from 'lib/constants'
-import { LOCAL_STORAGE_KEYS } from 'common'
 import { useAppStateSnapshot } from 'state/app-state'
 import { cn, NavMenu, NavMenuItem } from 'ui'
 import {
@@ -25,7 +24,6 @@ export interface AccountLayoutProps {
 const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps>) => {
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
-  const newLayoutPreview = useIsNewLayoutEnabled()
 
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
@@ -66,36 +64,32 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
         <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
         <meta name="description" content="Supabase Studio" />
       </Head>
-      <div className={cn(newLayoutPreview ? 'flex flex-col h-screen w-screen' : '')}>
-        {newLayoutPreview && (
-          <>
-            <ScaffoldContainerLegacy>
-              <Link
-                href={backToDashboardURL}
-                className="flex text-xs flex-row gap-2 items-center text-foreground-lighter focus-visible:text-foreground hover:text-foreground"
+      <div className={cn('flex flex-col h-screen w-screen')}>
+        <ScaffoldContainerLegacy>
+          <Link
+            href={backToDashboardURL}
+            className="flex text-xs flex-row gap-2 items-center text-foreground-lighter focus-visible:text-foreground hover:text-foreground"
+          >
+            <ArrowLeft strokeWidth={1.5} size={14} />
+            Back to dashboard
+          </Link>
+          <ScaffoldTitle>Account settings</ScaffoldTitle>
+        </ScaffoldContainerLegacy>
+        <div className="border-b">
+          <NavMenu
+            className={cn(PADDING_CLASSES, MAX_WIDTH_CLASSES, 'border-none')}
+            aria-label="Organization menu navigation"
+          >
+            {accountLinks.map((item, i) => (
+              <NavMenuItem
+                key={`${item.key}-${i}`}
+                active={(item.key === currentPath || item.keys?.includes(currentPath)) ?? false}
               >
-                <ArrowLeft strokeWidth={1.5} size={14} />
-                Back to dashboard
-              </Link>
-              <ScaffoldTitle>Account settings</ScaffoldTitle>
-            </ScaffoldContainerLegacy>
-            <div className="border-b">
-              <NavMenu
-                className={cn(PADDING_CLASSES, MAX_WIDTH_CLASSES, 'border-none')}
-                aria-label="Organization menu navigation"
-              >
-                {accountLinks.map((item, i) => (
-                  <NavMenuItem
-                    key={`${item.key}-${i}`}
-                    active={(item.key === currentPath || item.keys?.includes(currentPath)) ?? false}
-                  >
-                    <Link href={item.href}>{item.label}</Link>
-                  </NavMenuItem>
-                ))}
-              </NavMenu>
-            </div>
-          </>
-        )}
+                <Link href={item.href}>{item.label}</Link>
+              </NavMenuItem>
+            ))}
+          </NavMenu>
+        </div>
         {children}
       </div>
     </>
