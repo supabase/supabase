@@ -28,7 +28,7 @@ In this blog post, we’ll explain how we do this in the `supautils` extension. 
 
 The core of `supautils` is the “privileged role”, which is a role that serves as proxy to superuser. It provides a safe subset of superuser capabilities and it’s accessible to end users.
 
-When the privileged role does a CREATE EVENT TRIGGER, we intercept the statement with an Utility Hook (`ProcessUtility_hook`). Here we elevate the role to a superuser, continuing the usual flow and allowing the creation on PostgreSQL core [1].
+When the privileged role does a CREATE EVENT TRIGGER, we intercept the statement with an Utility Hook (`ProcessUtility_hook`). Here we elevate the role to a superuser, continuing the usual flow and allowing the creation on PostgreSQL core [^1].
 
 Creating an event trigger like this is not safe though, as it would allow privilege escalation.
 
@@ -37,7 +37,7 @@ Creating an event trigger like this is not safe though, as it would allow privil
 Here a problem arises, once an event trigger is created:
 
 - It targets every role.
-- It runs using the target role privileges [2].
+- It runs using the target role privileges [^2].
 
 This means that a malicious user can create an event trigger like:
 
@@ -67,7 +67,7 @@ The Function Manager hook (`fmgr_hook`) allows us to intercept and modify functi
 
 We can intercept the event trigger function and replace it with a “noop”. PostgreSQL doesn’t provide a noop function, but we can use the existing `version()` function to achieve the same effect.
 
-Besides superusers, we also want to skip user event triggers for “reserved roles” [3]. These are used for managed services (like `pgbouncer`).
+Besides superusers, we also want to skip user event triggers for “reserved roles” [^3]. These are used for managed services (like `pgbouncer`).
 
 ## User Event Triggers
 
@@ -101,8 +101,7 @@ NOTICE:  the event trigger is executed for privileged_role
 ## Future in PostgreSQL core
 
 We would also like to allow regular user event triggers in PostgreSQL core. To this end, we’ve submitted some patches which are already generating discussion.
-
-https://www.postgresql.org/message-id/flat/CAGRrpzbtYDkg7_xwfzrqByYgCJQbbL38tADyuN%2B6tAkbA-Pnkg%40mail.gmail.com
+See [this mailing list thread](https://www.postgresql.org/message-id/flat/CAGRrpzbtYDkg7_xwfzrqByYgCJQbbL38tADyuN%2B6tAkbA-Pnkg%40mail.gmail.com).
 
 Note that PostgreSQL core user event triggers will likely be more restricted than the supautils version.
 
@@ -112,8 +111,8 @@ User event triggers are now available on the Supabase platform, for new projects
 
 You can also git clone the [supautils](https://github.com/supabase/supautils/) repo and `make install` it in your own deployment.
 
-[1]: As a last step we also change the owner of the event trigger to the privileged role so it can later be altered or dropped by end users.
+[^1]: As a last step we also change the owner of the event trigger to the privileged role so it can later be altered or dropped by end users.
 
-[2]: This is not true if you mark the event trigger function as SECURITY DEFINER, then it will run with the privileges of the function owner. But this is not a usual practice on event triggers, as they usually want to preserve the context of the current user.
+[^2]: This is not true if you mark the event trigger function as SECURITY DEFINER, then it will run with the privileges of the function owner. But this is not a usual practice on event triggers, as they usually want to preserve the context of the current user.
 
-[3]: These are configurable. You can read more about reserved roles [here](https://supabase.com/blog/roles-postgres-hooks).
+[^3]: These are configurable. You can read more about reserved roles [here](https://supabase.com/blog/roles-postgres-hooks).
