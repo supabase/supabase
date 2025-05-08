@@ -294,7 +294,7 @@ export const ForeignKeySelector = ({
                   <code className="text-xs">
                     {fk.schema}.{fk.table}
                   </code>
-                  to reference to
+                  {' '}to reference to
                 </label>
                 <div className="grid grid-cols-10 gap-y-2">
                   <div className="col-span-5 text-xs text-foreground-lighter">
