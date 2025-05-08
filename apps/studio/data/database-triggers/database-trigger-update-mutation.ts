@@ -8,7 +8,7 @@ import { databaseTriggerKeys } from './keys'
 export type DatabaseTriggerUpdateVariables = {
   id: number
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   payload: any
 }
 

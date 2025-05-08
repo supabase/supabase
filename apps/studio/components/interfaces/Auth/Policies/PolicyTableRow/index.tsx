@@ -1,11 +1,13 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { noop } from 'lodash'
+import { Info } from 'lucide-react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { Info } from 'lucide-react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import PolicyRow from './PolicyRow'
 import PolicyTableRowHeader from './PolicyTableRowHeader'
 
@@ -28,7 +30,7 @@ export interface PolicyTableRowProps {
   onSelectDeletePolicy: (policy: PostgresPolicy) => void
 }
 
-const PolicyTableRow = ({
+export const PolicyTableRow = ({
   table,
   isLocked,
   onSelectToggleRLS = noop,
@@ -37,7 +39,7 @@ const PolicyTableRow = ({
   onSelectDeletePolicy = noop,
 }: PolicyTableRowProps) => {
   const { project } = useProjectContext()
-  const { data } = useDatabasePoliciesQuery({
+  const { data, error, isLoading, isError, isSuccess } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -80,22 +82,36 @@ const PolicyTableRow = ({
           </Tooltip>
         </div>
       )}
-      {policies.length === 0 && (
-        <div className="px-6 py-4 flex flex-col gap-y-3">
-          <p className="text-foreground-lighter text-sm">No policies created yet</p>
+      {isLoading && (
+        <div className="px-6 py-4">
+          <ShimmeringLoader />
         </div>
       )}
-      {policies?.map((policy) => (
-        <PolicyRow
-          key={policy.id}
-          isLocked={isLocked}
-          policy={policy}
-          onSelectEditPolicy={onSelectEditPolicy}
-          onSelectDeletePolicy={onSelectDeletePolicy}
+      {isError && (
+        <AlertError
+          className="border-0 rounded-none"
+          error={error}
+          subject="Failed to retrieve policies"
         />
-      ))}
+      )}
+      {isSuccess && (
+        <>
+          {policies.length === 0 && (
+            <div className="px-6 py-4 flex flex-col gap-y-3">
+              <p className="text-foreground-lighter text-sm">No policies created yet</p>
+            </div>
+          )}
+          {policies?.map((policy) => (
+            <PolicyRow
+              key={policy.id}
+              isLocked={isLocked}
+              policy={policy}
+              onSelectEditPolicy={onSelectEditPolicy}
+              onSelectDeletePolicy={onSelectDeletePolicy}
+            />
+          ))}
+        </>
+      )}
     </Panel>
   )
 }
-
-export default PolicyTableRow

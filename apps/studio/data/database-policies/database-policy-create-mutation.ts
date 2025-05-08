@@ -10,7 +10,7 @@ type CreatePolicyBody = components['schemas']['CreatePolicyBody']
 
 export type DatabasePolicyCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   payload: CreatePolicyBody
 }
 

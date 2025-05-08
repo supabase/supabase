@@ -18,7 +18,7 @@ select
 export type ReplicationLagVariables = {
   id: string
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getReplicationLag(

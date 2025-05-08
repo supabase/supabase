@@ -19,18 +19,18 @@ export async function apiAuthenticate(
   res: NextApiResponse
 ): Promise<SupaResponse<User>> {
   if (!req) {
-    return { error: new Error('Request is not available') } as unknown as SupaResponse<User>
+    return { error: new Error('Request is not available') }
   }
 
   if (!res) {
-    return { error: new Error('Response is not available') } as unknown as SupaResponse<User>
+    return { error: new Error('Response is not available') }
   }
 
   const { slug: orgSlug, ref: projectRef } = req.query
   try {
     const user = await fetchUser(req, res)
     if (!user) {
-      return { error: new Error('The user does not exist') } as unknown as SupaResponse<User>
+      return { error: new Error('The user does not exist') }
     }
 
     if (orgSlug || projectRef) await checkMemberPermission(req, user)
@@ -38,7 +38,7 @@ export async function apiAuthenticate(
     return user
   } catch (error: any) {
     console.error('Error at apiAuthenticate', error)
-    return { error: { message: error.message ?? 'unknown' } } as unknown as SupaResponse<User>
+    return { error: { name: 'Error', message: error.message ?? 'unknown' } }
   }
 }
 

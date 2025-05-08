@@ -120,7 +120,8 @@ const genGuideMeta =
   <Params,>(
     generate: (params: Params) => OrPromise<{ meta: GuideFrontmatter; pathname: `/${string}` }>
   ) =>
-  async ({ params }: { params: Params }, parent: ResolvingMetadata): Promise<Metadata> => {
+  async (props: { params: Promise<Params> }, parent: ResolvingMetadata): Promise<Metadata> => {
+    const params = await props.params
     const [parentAlternates, parentOg, { meta, pathname }] = await Promise.all([
       pluckPromise(parent, 'alternates'),
       pluckPromise(parent, 'openGraph'),

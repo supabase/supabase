@@ -12,7 +12,7 @@ import { databaseTriggerKeys } from './keys'
 
 export type DatabaseTriggerUpdateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   originalTrigger: any
   updatedTrigger: any
 }
