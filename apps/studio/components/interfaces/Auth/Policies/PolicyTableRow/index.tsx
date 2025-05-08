@@ -58,7 +58,6 @@ export const PolicyTableRow = ({
       lint.metadata?.schema === table.schema &&
       (lint.name === 'rls_enabled_no_policy' || lint.name.includes('rls_disabled'))
   )
-  console.log(table.name, { rlsLint })
 
   return (
     <Panel
