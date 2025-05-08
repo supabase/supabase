@@ -1,7 +1,7 @@
 import { ExternalLink, Github } from 'lucide-react'
-import { motion } from 'framer-motion'
-import { ReactNode } from 'react'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { FeatureBanner } from 'components/ui/FeatureBanner'
 import { APIKeysData } from 'data/api-keys/api-keys-query'
 import {
   Button,
@@ -13,45 +13,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  cn,
 } from 'ui'
 import { SecretAPIKeyInput } from './APIKeyRow'
 import { CreateNewAPIKeysButton } from './CreateNewAPIKeysButton'
 import { useApiKeysVisibility } from './hooks/useApiKeysVisibility'
-
-// Reusable container component for all the banners
-interface BannerContainerProps {
-  children: ReactNode
-  withIllustration?: boolean
-  className?: string
-}
-
-const BannerContainer = ({
-  children,
-  withIllustration = false,
-  className,
-}: BannerContainerProps) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        type: 'spring',
-        stiffness: 500,
-        damping: 30,
-        mass: 1,
-      }}
-      className={cn(
-        'pb-36 pt-10 relative w-full flex flex-col xl:flex-row border xl:py-10 px-10 rounded-md overflow-hidden',
-        withIllustration && 'bg-background-alternative',
-        className
-      )}
-    >
-      {children}
-      {withIllustration && <ApiKeysIllustrationWithOverlay />}
-    </motion.div>
-  )
-}
 
 // Mock API Keys for demo
 const mockApiKeys = [
@@ -145,7 +110,7 @@ export const ApiKeysIllustrationWithOverlay = () => {
  */
 export const ApiKeysComingSoonBanner = () => {
   return (
-    <BannerContainer withIllustration>
+    <FeatureBanner illustration={<ApiKeysIllustrationWithOverlay />} bgAlt>
       <div className="flex flex-col gap-0 z-[2]">
         <p className="text-sm text-foreground">New API keys are coming soon</p>
         <p className="text-sm text-foreground-lighter lg:max-w-sm 2xl:max-w-none">
@@ -157,7 +122,7 @@ export const ApiKeysComingSoonBanner = () => {
           </Button>
         </div>
       </div>
-    </BannerContainer>
+    </FeatureBanner>
   )
 }
 
@@ -170,17 +135,17 @@ export const ApiKeysCreateCallout = () => {
   if (!canInitApiKeys) return null
 
   return (
-    <BannerContainer withIllustration>
+    <FeatureBanner illustration={<ApiKeysIllustrationWithOverlay />} bgAlt>
       <div className="flex flex-col gap-0 z-[2]">
-        <p className="text-sm text-foreground">Create your first API key</p>
+        <p className="text-sm text-foreground">Create your new API keys</p>
         <p className="text-sm text-foreground-lighter lg:max-w-sm 2xl:max-w-none">
-          Generate new API keys to use with your application or for server-side authentication.
+          Generate new API keys to use with your application.
         </p>
         <div className="mt-4">
           <CreateNewAPIKeysButton />
         </div>
       </div>
-    </BannerContainer>
+    </FeatureBanner>
   )
 }
 
@@ -196,9 +161,14 @@ export const ApiKeysFeedbackBanner = () => {
   }
 
   return (
-    <BannerContainer>
+    <FeatureBanner
+      storageKey={LOCAL_STORAGE_KEYS.API_KEYS_FEEDBACK_DISMISSED}
+      className="!p-6"
+      illustration={<ApiKeysIllustrationWithOverlay />}
+      dismissable
+    >
       <div className="flex flex-col gap-0 z-[2]">
-        <p className="text-sm text-foreground">These are the new API keys</p>
+        <p className="text-sm text-foreground">Your new API keys are here</p>
         <p className="text-sm text-foreground-lighter">
           We've updated our API keys to better support your application needs. Have feedback?{' '}
           <a
@@ -211,6 +181,6 @@ export const ApiKeysFeedbackBanner = () => {
           </a>
         </p>
       </div>
-    </BannerContainer>
+    </FeatureBanner>
   )
 }
