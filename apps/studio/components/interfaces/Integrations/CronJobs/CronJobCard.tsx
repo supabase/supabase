@@ -5,7 +5,7 @@ import { useState } from 'react'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
+import { CronJob } from 'data/database-cron-jobs/database-cron-job-query'
 import { useCronJobRunQuery } from 'data/database-cron-jobs/database-cron-jobs-run-query'
 import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'

@@ -62,7 +62,7 @@ export const useCronJobRunsInfiniteQuery = <TData = DatabaseCronJobData>(
   }: UseInfiniteQueryOptions<DatabaseCronJobData, DatabaseCronJobError, TData> = {}
 ) =>
   useInfiniteQuery<DatabaseCronJobData, DatabaseCronJobError, TData>(
-    databaseCronJobsKeys.runsInfinite(projectRef, jobId, { status }),
+    databaseCronJobsKeys.runsInfinite(projectRef, jobId),
     ({ pageParam }) => {
       return getDatabaseCronJobRuns({
         projectRef,

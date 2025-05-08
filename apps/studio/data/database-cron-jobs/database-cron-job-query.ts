@@ -3,9 +3,10 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { ResponseError } from 'types'
 import { databaseCronJobsKeys } from './keys'
 
-export type DatabaseCronJobsVariables = {
+interface DatabaseCronJobVariables {
   projectRef?: string
   connectionString?: string
+  jobName: string
 }
 
 export type CronJob = {
@@ -20,37 +21,43 @@ export type CronJob = {
   jobname: string
 }
 
-const cronJobSqlQuery = `select * from cron.job order by jobid;`
+const cronJobByNameQuery = (jobName: string) => `
+  select * from cron.job 
+  where jobname = '${jobName}'
+  limit 1;
+`
 
-export async function getDatabaseCronJobs({
+export async function getDatabaseCronJob({
   projectRef,
   connectionString,
-}: DatabaseCronJobsVariables) {
+  jobName,
+}: DatabaseCronJobVariables) {
   if (!projectRef) throw new Error('Project ref is required')
 
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: cronJobSqlQuery,
+    sql: cronJobByNameQuery(jobName),
   })
-  return result
+  return result[0] as CronJob | undefined
 }
 
-export type DatabaseCronJobData = CronJob[]
+export type DatabaseCronJobData = CronJob | undefined
 export type DatabaseCronJobError = ResponseError
 
-export const useCronJobsQuery = <TData = DatabaseCronJobData>(
-  { projectRef, connectionString }: DatabaseCronJobsVariables,
+export function useCronJobQuery<TData = DatabaseCronJobData>(
+  { projectRef, connectionString, jobName }: DatabaseCronJobVariables,
   {
     enabled = true,
     ...options
   }: UseQueryOptions<DatabaseCronJobData, DatabaseCronJobError, TData> = {}
-) =>
-  useQuery<DatabaseCronJobData, DatabaseCronJobError, TData>(
-    databaseCronJobsKeys.list(projectRef),
-    () => getDatabaseCronJobs({ projectRef, connectionString }),
+) {
+  return useQuery<DatabaseCronJobData, DatabaseCronJobError, TData>(
+    databaseCronJobsKeys.detail(projectRef, jobName),
+    () => getDatabaseCronJob({ projectRef, connectionString, jobName }),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )
+}
