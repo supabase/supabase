@@ -146,7 +146,7 @@ function Input({
       <div
         className={cn(
           InputVariants({ size: 'tiny' }),
-          'flex-1 grow gap-0 font-mono rounded-full max-w-60 overflow-hidden',
+          'flex-1 grow gap-0 font-mono rounded-full',
           show ? 'ring-1 ring-foreground-lighter ring-opacity-50' : 'ring-0 ring-opacity-0',
           'transition-all'
         )}
@@ -161,7 +161,6 @@ function Input({
               duration: 0.12,
               y: { type: 'spring', stiffness: 2450, damping: 55 },
             }}
-            className="truncate"
           >
             {show ? data?.api_key : apiKey?.api_key}
           </motion.span>
