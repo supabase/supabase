@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { constructHeaders, fetchHandler } from 'data/fetchers'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { ResponseError } from 'types'
 import { aiKeys } from './keys'
 
@@ -37,5 +37,5 @@ export const useCheckOpenAIKeyQuery = <TData = ResourceData>({
   useQuery<ResourceData, ResourceError, TData>(
     aiKeys.apiKey(),
     ({ signal }) => checkOpenAIKey(signal),
-    { enabled: enabled, ...options } // !IS_PLATFORM &&
+    { enabled: !IS_PLATFORM && enabled, ...options }
   )
