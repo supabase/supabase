@@ -9,7 +9,7 @@ import { databaseTriggerKeys } from './keys'
 export type DatabaseTriggerDeleteVariables = {
   id: number
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 type DeleteDatabaseTriggerResponse = PostgresTrigger & { error?: any }

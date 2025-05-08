@@ -7,7 +7,7 @@ import { databasePoliciesKeys } from './keys'
 
 export type DatabasePolicyDeleteVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: number
 }
 

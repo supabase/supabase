@@ -7,7 +7,7 @@ import { databaseCronJobsKeys } from './keys'
 
 export type DatabaseCronJobCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   query: string
 }
 
