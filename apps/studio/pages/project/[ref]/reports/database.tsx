@@ -316,16 +316,16 @@ const DatabaseUsage = () => {
             return (
               <div>
                 <div className="col-span-4 inline-grid grid-cols-12 gap-12 w-full mt-5">
-                  <div className="grid gap-2 col-span-2">
+                  <div className="grid gap-2 col-span-4 xl:col-span-2">
                     <h5 className="text-sm">Space used</h5>
                     <span className="text-lg">{formatBytes(databaseSizeBytes, 2, 'GB')}</span>
                   </div>
-                  <div className="grid gap-2 col-span-2">
+                  <div className="grid gap-2 col-span-4 xl:col-span-3">
                     <h5 className="text-sm">Provisioned disk size</h5>
                     <span className="text-lg">{currentDiskSize} GB</span>
                   </div>
 
-                  <div className="col-span-8 text-right">
+                  <div className="col-span-full lg:col-span-4 xl:col-span-7 lg:text-right">
                     {project?.cloud_provider === 'AWS' ? (
                       <Button asChild type="default">
                         <Link href={`/project/${ref}/settings/compute-and-disk`}>
