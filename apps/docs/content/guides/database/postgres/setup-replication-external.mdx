@@ -1,8 +1,18 @@
 ---
-title: 'Replicate to another Postgres database using Logical Replication'
+title: 'Replicate from Supabase to another Postgres database using Logical Replication'
 description: 'Example to setup logical replication using publish-subscribe to a Postgres database outside of Supabase'
 footerHelpType: 'postgres'
 ---
+
+For most use cases, our managed [Read Replica](/docs/content/guides/platform/read-replicas.mdx) service will be more than enough for your [replication](/docs/content/guides/database/replication.mdx) needs.
+
+When you need a more manual replication setup, setting up logical replication is the way to go. Before we dive in, let's cover some points about logical replication.
+
+Logical replication works by creating [publications](https://www.postgresql.org/docs/current/sql-createpublication.html), that use [replication slots](https://www.postgresql.org/docs/current/warm-standby.html#STREAMING-REPLICATION-SLOTS), to send data from your database to any [subscriptions](https://www.postgresql.org/docs/current/logical-replication-subscription.html) against your publication.
+
+Supabase Realtime uses [replication](/docs/docs/ref/realtime/realtime.mdx) in this way. Being able to configure your own replication can be vital for some, but it can also have some side effects that impact on your database performance.
+
+## Replication from Supabase to PostgreSQL
 
 For this example, you will need:
 
@@ -60,3 +70,16 @@ ALTER PUBLICATION example_pub ADD TABLE example_table;
 ```sql
 select * from pg_stat_replication;
 ```
+
+## Replication from Supabase to Data Warehouses using ETL tools
+
+For this example, you will need:
+- A Supabase project
+- An ETL tool, such as: [Estuary](https://supabase.com/partners/integrations/estuary), 
+A destination data-source (such as [Airbyte](https://airbyte.com/), [Materialize](https://materialize.com/) or [Estuary](https://estuary.dev/))
+
+ETL stands for `Extract`, `Transform` and `Load` and they do exactly that. Using the logical replication functionality of PostgreSQL, these tools extract changes from your database, transform them (if necessary) to suit your needs or to support the destination and then load the data to your configured destination.
+
+The steps are similar to the section above but you should check the specific documentation for the tool/service that you are using.
+
+
