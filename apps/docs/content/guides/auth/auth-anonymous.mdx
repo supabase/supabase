@@ -269,6 +269,7 @@ using ( true );
 <Admonition type="note" label="Use restrictive policies">
 
 RLS policies are permissive by default, which means that they are combined using an "OR" operator when multiple policies are applied. It is important to construct restrictive policies to ensure that the checks for an anonymous user are always enforced when combined with other policies.
+Be aware that a single 'restrictive' RLS policy alone will fail unless combined with another policy that returns true, ensuring the combined condition is met.
 
 </Admonition>
 
