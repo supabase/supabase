@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef } from 'react'
 import { useLatest } from 'react-use'
 import { useUser } from './auth'
 import { hasConsented } from './consent-state'
-import { LOCAL_STORAGE_KEYS } from './constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
@@ -21,6 +21,9 @@ const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 
 // Reexports GoogleTagManager with the right API key set
 export const TelemetryTagManager = (props: Partial<GTMParams>) => {
+  if (!IS_PLATFORM || !process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID) {
+    return
+  }
   return <GTMComponent gtmId={process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID} {...props} />
 }
 
