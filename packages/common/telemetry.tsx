@@ -3,7 +3,7 @@
 import { components } from 'api-types'
 import { useRouter } from 'next/compat/router'
 import { usePathname } from 'next/navigation'
-import { useCallback, useEffect, useRef } from 'react'
+import { ComponentPropsWithoutRef, useCallback, useEffect, useRef } from 'react'
 import { useLatest } from 'react-use'
 import { useUser } from './auth'
 import { hasConsented } from './consent-state'
@@ -15,12 +15,13 @@ import { useTelemetryCookie } from './hooks'
 import { TelemetryEvent } from './telemetry-constants'
 import { getSharedTelemetryData } from './telemetry-utils'
 import { GoogleTagManager as GTMComponent } from '@next/third-parties/google'
-import { GTMParams } from '@next/third-parties/dist/types/google'
 
 const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 
+type TelemetryTagManagerProps = Partial<ComponentPropsWithoutRef<typeof GTMComponent>>
+
 // Reexports GoogleTagManager with the right API key set
-export const TelemetryTagManager = (props: Partial<GTMParams>) => {
+export const TelemetryTagManager = (props: TelemetryTagManagerProps) => {
   if (!IS_PLATFORM || !process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID) {
     return
   }
