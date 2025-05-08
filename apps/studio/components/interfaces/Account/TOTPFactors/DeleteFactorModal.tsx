@@ -49,6 +49,9 @@ const DeleteFactorModal = ({
           <>
             <li>Adding another authenticator app as a factor prior to deleting</li>
             <li>Ensure that your account does not need multi-factor authentication</li>
+            <li>
+              You will lose access to any organization that enforces multi-factor authentication
+            </li>
           </>
         ) : (
           <>
