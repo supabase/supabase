@@ -14,13 +14,19 @@ import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useTelemetryCookie } from './hooks'
 import { TelemetryEvent } from './telemetry-constants'
 import { getSharedTelemetryData } from './telemetry-utils'
+import { GoogleTagManager as GTMComponent } from '@next/third-parties/google'
+import { GTMParams } from '@next/third-parties/dist/types/google'
 
 const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
+
+// Reexports GoogleTagManager with the right API key set
+export const TelemetryTagManager = (props: Partial<GTMParams>) => {
+  return <GTMComponent gtmId={process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID} {...props} />
+}
 
 //---
 // PAGE TELEMETRY
 //---
-
 export function handlePageTelemetry(
   API_URL: string,
   pathname?: string,
