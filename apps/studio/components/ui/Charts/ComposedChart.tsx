@@ -32,9 +32,9 @@ import {
   CustomTooltip,
   formatBytes,
 } from './ComposedChart.utils'
-import { MultiAttribute } from './ComposedChartHandler'
-import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
+import NoDataPlaceholder from './NoDataPlaceholder'
+import { MultiAttribute } from './ComposedChartHandler'
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   attributes: MultiAttribute[]
@@ -56,6 +56,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   chartStyle?: string
   onChartStyleChange?: (style: string) => void
   updateDateRange: any
+  titleTooltip?: string
 }
 
 export default function ComposedChart({
@@ -88,6 +89,7 @@ export default function ComposedChart({
   chartStyle,
   onChartStyleChange,
   updateDateRange,
+  titleTooltip,
 }: BarChartProps) {
   const { resolvedTheme } = useTheme()
   const [_activePayload, setActivePayload] = useState<any>(null)
@@ -137,13 +139,45 @@ export default function ComposedChart({
     color: '#3ECF8E',
   }
 
+  const chartData =
+    data && !!data[0]
+      ? Object.entries(data[0])
+          ?.map(([key, value]) => ({
+            name: key,
+            value: value,
+          }))
+          .filter(
+            (att) =>
+              att.name !== 'timestamp' &&
+              att.name !== 'period_start' &&
+              att.name !== maxAttribute?.attribute &&
+              attributes.some((attr) => attr.attribute === att.name && attr.enabled !== false)
+          )
+          .map((att, index) => {
+            const attribute = attributes.find((attr) => attr.attribute === att.name)
+            return {
+              ...att,
+              color: attribute?.color
+                ? resolvedTheme?.includes('dark')
+                  ? attribute.color.dark
+                  : attribute.color.light
+                : STACKED_CHART_COLORS[index % STACKED_CHART_COLORS.length],
+            }
+          })
+      : []
+
   const lastDataPoint = !!data[data.length - 1]
     ? Object.entries(data[data.length - 1])
         .map(([key, value]) => ({
           dataKey: key,
           value: value as number,
         }))
-        .filter((entry) => entry.dataKey !== 'timestamp')
+        .filter(
+          (entry) =>
+            entry.dataKey !== 'timestamp' &&
+            entry.dataKey !== 'period_start' &&
+            attributes.some((attr) => attr.attribute === entry.dataKey && attr.enabled !== false)
+        )
     : undefined
 
   const resolvedHighlightedLabel = getHeaderLabel()
@@ -166,17 +200,6 @@ export default function ComposedChart({
     chartHighlight?.coordinates.left &&
     chartHighlight?.coordinates.right &&
     chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
-
-  const chartData =
-    data && !!data[0]
-      ? Object.entries(data[0])
-          ?.map(([key, value], index) => ({
-            name: key,
-            value: value,
-            color: STACKED_CHART_COLORS[index - (1 % STACKED_CHART_COLORS.length)],
-          }))
-          .filter((att) => att.name !== 'timestamp' && att.name !== maxAttribute?.attribute)
-      : []
 
   const stackedAttributes = chartData.filter((att) => !att.name.includes('max'))
   const isPercentage = format === '%'
@@ -225,6 +248,7 @@ export default function ComposedChart({
         onChartStyleChange={onChartStyleChange}
         showMaxValue={_showMaxValue}
         setShowMaxValue={maxAttribute ? setShowMaxValue : undefined}
+        titleTooltip={titleTooltip}
       />
       <Container className="relative z-10">
         <RechartComposedChart
