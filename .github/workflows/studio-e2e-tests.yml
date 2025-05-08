@@ -34,6 +34,7 @@ jobs:
       CI_EMAIL: ${{ secrets.CI_EMAIL }}
       CI_PASSWORD: ${{ secrets.CI_PASSWORD }}
       CI_PROJECT_REF: ${{ secrets.CI_PROJECT_REF }}
+      IS_PLATFORM: true
 
     steps:
       - uses: actions/checkout@v4
@@ -75,5 +76,5 @@ jobs:
         if: always()
         with:
           name: playwright-report
-          path: tests/studio-tests/playwright-report/
+          path: e2e/studio/playwright-report/
           retention-days: 7

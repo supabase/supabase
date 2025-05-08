@@ -110,7 +110,7 @@ To start API locally, run:
     }
   }
 
-  await page.goto('./dashboard/sign-in')
+  await page.goto('./sign-in')
 
   const auth = AUTH_ENV[ENV]
 
