@@ -31,7 +31,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { ErrorInfo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
-import { FeatureFlagProvider, ThemeProvider, useThemeSandbox } from 'common'
+import { FeatureFlagProvider, TelemetryTagManager, ThemeProvider, useThemeSandbox } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 import { RouteValidationWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
@@ -151,6 +151,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
           </Hydrate>
         </NuqsAdapter>
       </QueryClientProvider>
+      <TelemetryTagManager />
     </ErrorBoundary>
   )
 }
