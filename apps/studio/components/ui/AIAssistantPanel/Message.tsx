@@ -122,7 +122,7 @@ export const Message = function Message({
                   case 'tool-invocation': {
                     const { toolCallId, toolName, args } = part.toolInvocation
                     switch (toolName) {
-                      case 'displayQuery': {
+                      case 'display_query': {
                         if (args.manualToolCallId) {
                           return (
                             <DisplayBlockRenderer
@@ -153,7 +153,7 @@ export const Message = function Message({
                           )
                         }
                       }
-                      case 'displayEdgeFunction': {
+                      case 'display_edge_function': {
                         return (
                           <div
                             key={`${id}-tool-${toolCallId}`}

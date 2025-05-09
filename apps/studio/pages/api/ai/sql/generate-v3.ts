@@ -83,67 +83,100 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   let schemasResult: any[] = []
 
   try {
-    // Fetch MCP client and tools only if opt-in level is not 'disabled'
-    if (aiOptInLevel !== 'disabled') {
-      const mcpClient = await createSupabaseMCPClient({
-        accessToken,
-        projectId: projectRef,
-      })
+    const privacyMessage =
+      'Fetching data requires a higher privacy level. Please enable this in your org settings'
 
-      const availableMcpTools = (await mcpClient.tools()) as Record<string, Tool<any, unknown>>
-      const disallowedTools = ['execute_sql', 'apply_migration', 'get_logs']
-      const privacyMessage =
-        'Fetching data requires a higher privacy level. Please enable this in your org settings'
+    // Helper function to create a tool that returns privacy message
+    const createPrivacyMessageTool = (toolInstance: Tool<any, any>) => ({
+      ...toolInstance,
+      execute: async (_args: any, _context: any) => ({ status: privacyMessage }),
+    })
 
-      if (aiOptInLevel === 'schema') {
-        mcpTools = Object.fromEntries(
-          Object.entries(availableMcpTools).map(([key, toolInstance]) => {
-            if (disallowedTools.includes(key)) {
-              return [
-                key,
-                {
-                  ...toolInstance,
-                  execute: async (_args: any, _context: any) => ({ status: privacyMessage }),
-                },
-              ]
-            }
-            return [key, toolInstance]
-          })
-        )
-      } else if (aiOptInLevel === 'schema_and_data') {
-        mcpTools = availableMcpTools
+    // Fetch MCP client and tools
+    const mcpClient = await createSupabaseMCPClient({
+      accessToken,
+      projectId: projectRef,
+    })
 
-        const originalExecuteSqlTool = mcpTools.execute_sql
+    let availableMcpTools = await mcpClient.tools()
 
-        if (originalExecuteSqlTool) {
-          wrappedExecuteSqlTool = tool<any, unknown>({
-            description: originalExecuteSqlTool.description,
-            parameters: originalExecuteSqlTool.parameters,
-            execute: async (args, context) => {
-              if (!originalExecuteSqlTool.execute) {
-                throw new Error('Original execute_sql tool has no execute function.')
-              }
-              const originalResult = await originalExecuteSqlTool.execute(args, context)
-              const manualToolCallId = `manual_${crypto.randomUUID()}`
+    let allAllowedTools = [
+      'list_tables',
+      'list_extensions',
+      'list_edge_functions',
+      'list_branches',
+      'get_project',
+      'execute_sql',
+      'get_logs',
+    ]
 
-              if (originalResult && isObject(originalResult)) {
-                originalResult.manualToolCallId = manualToolCallId
-              } else {
-                console.warn('execute_sql result is not an object, cannot add manualToolCallId')
-                return {
-                  error: 'Internal error: Unexpected tool result format',
-                  manualToolCallId: manualToolCallId,
-                }
-              }
+    // Filter out tools that should never be available across any permission level
+    availableMcpTools = Object.fromEntries(
+      Object.entries(availableMcpTools).filter(([key]) => allAllowedTools.includes(key))
+    )
 
-              return originalResult
-            },
-          })
-        } else {
-          console.warn('execute_sql tool not found in mcpTools.')
+    // Build allowed tools based on permission level
+    let allowedTools: string[] = []
+
+    // For schema and above permission levels
+    if (aiOptInLevel === 'schema' || aiOptInLevel === 'schema_and_data') {
+      allowedTools = [
+        'list_tables',
+        'list_extensions',
+        'list_edge_functions',
+        'list_branches',
+        'get_project',
+      ]
+    }
+
+    // For schema_and_data permission level, add data access tools
+    if (aiOptInLevel === 'schema_and_data') {
+      allowedTools = [...allowedTools, 'execute_sql', 'get_logs']
+    }
+
+    // Process tools based on permission level
+    mcpTools = Object.fromEntries(
+      Object.entries(availableMcpTools).map(([key, toolInstance]) => {
+        if (allowedTools.includes(key)) {
+          return [key, toolInstance]
         }
-      }
+        return [key, createPrivacyMessageTool(toolInstance)]
+      })
+    )
 
+    // Wrap execute_sql only if it's allowed and exists
+    const originalExecuteSqlTool = mcpTools.execute_sql as Tool<any, any> | undefined
+    if (originalExecuteSqlTool && allowedTools.includes('execute_sql')) {
+      wrappedExecuteSqlTool = tool({
+        ...originalExecuteSqlTool,
+        execute: async (args, context) => {
+          if (!originalExecuteSqlTool.execute) {
+            throw new Error('Original execute_sql tool has no execute function.')
+          }
+          const originalResult = await originalExecuteSqlTool.execute(args, context)
+          const manualToolCallId = `manual_${crypto.randomUUID()}`
+
+          if (originalResult && typeof originalResult === 'object') {
+            ;(originalResult as any).manualToolCallId = manualToolCallId
+          } else {
+            console.warn('execute_sql result is not an object, cannot add manualToolCallId')
+            return {
+              error: 'Internal error: Unexpected tool result format',
+              manualToolCallId: manualToolCallId,
+            }
+          }
+
+          return originalResult
+        },
+      })
+    } else {
+      console.warn(
+        'execute_sql tool not found in mcpTools or not allowed at this permission level.'
+      )
+    }
+
+    // Only fetch schemas if not disabled
+    if (aiOptInLevel !== 'disabled') {
       const { result: fetchedSchemas } = await executeSql(
         {
           projectRef,
@@ -160,7 +193,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       schemasResult = fetchedSchemas
     }
 
-    const displayQuery = tool({
+    const display_query = tool({
       description:
         'Displays SQL query results (table or chart) or renders SQL for write/DDL operations. Use this for all query display needs. Optionally references a previous execute_sql call via manualToolCallId for displaying SELECT results.',
       parameters: z.object({
@@ -193,7 +226,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       },
     })
 
-    const displayEdgeFunction = tool({
+    const display_edge_function = tool({
       description: 'Renders the code for a Supabase Edge Function for the user to deploy manually.',
       parameters: z.object({
         name: z
@@ -209,8 +242,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     const allTools = {
       ...mcpTools,
       ...(wrappedExecuteSqlTool && { execute_sql: wrappedExecuteSqlTool }),
-      displayQuery,
-      displayEdgeFunction,
+      display_query,
+      display_edge_function,
     }
 
     let systemPrompt = `
@@ -223,40 +256,35 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     if (aiOptInLevel === 'schema_and_data') {
       systemPrompt += `
           - Use MCP tools like \`list_tables\` and \`list_extensions\` to gather information.
-          - For **READ ONLY** queries: Explain your plan, call \`execute_sql\` with the query. After receiving the results, explain the findings briefly in text. Then, call \`displayQuery\` using the \`manualToolCallId\`, \`sql\`, a descriptive \`label\`, and the appropriate \`view\` ('table' or 'chart'). **Choose 'chart'** if the data is suitable for visualization (e.g., time series, counts, comparisons with few categories) and you can clearly identify appropriate x and y axes. **Otherwise, default to 'table'** for detailed data, complex results, or if a clear chart type isn't obvious. Ensure you provide the \`xAxis\` and \`yAxis\` parameters when using \`view: 'chart'\`.`
+          - For **READ ONLY** queries: Explain your plan, call \`execute_sql\` with the query. After receiving the results, explain the findings briefly in text. Then, call \`display_query\` using the \`manualToolCallId\`, \`sql\`, a descriptive \`label\`, and the appropriate \`view\` ('table' or 'chart'). **Choose 'chart'** if the data is suitable for visualization (e.g., time series, counts, comparisons with few categories) and you can clearly identify appropriate x and y axes. **Otherwise, default to 'table'** for detailed data, complex results, or if a clear chart type isn't obvious. Ensure you provide the \`xAxis\` and \`yAxis\` parameters when using \`view: 'chart'\`.`
     } else if (aiOptInLevel === 'schema') {
       systemPrompt += `
           - Use available MCP tools like \`list_tables\` and \`list_extensions\` to understand the schema.
-          - You **cannot** execute SELECT queries directly (\`execute_sql\` is unavailable). You can only generate SQL for the user using \`displayQuery\`. Provide the \`sql\` and \`label\`.
-          - You **cannot** directly apply migrations (\`apply_migration\` is unavailable). Generate DDL using \`displayQuery\` with the \`sql\` and \`label\`.
+          - You **cannot** execute SELECT queries directly (\`execute_sql\` is unavailable). You can only generate SQL for the user using \`display_query\`. Provide the \`sql\` and \`label\`.
+          - You **cannot** directly apply migrations. Generate DDL using \`display_query\` with the \`sql\` and \`label\`.
           - You **cannot** view logs (\`get_logs\` is unavailable).`
     } else {
       systemPrompt += `
           - Schema metadata access is disabled. You cannot view table structures or use MCP tools.
-          - Generate SQL using \`displayQuery\` based on the user's request and general Postgres/Supabase knowledge. Provide the \`sql\` and \`label\`.
+          - Generate SQL using \`display_query\` based on the user's request and general Postgres/Supabase knowledge. Provide the \`sql\` and \`label\`.
           - Avoid generating Edge Functions as you lack schema context.`
     }
 
     systemPrompt += `
-          - For **ALL WRITE/DDL** queries (INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, etc.): Explain your plan and the purpose of the SQL. Call \`displayQuery\` with the \`sql\` and a descriptive \`label\`. **If the query might return data suitable for visualization (e.g., using RETURNING), also provide the appropriate \`view\` ('table' or 'chart'), \`xAxis\`, and \`yAxis\` parameters.** If multiple, separate queries are needed, use one tool call per distinct query, following the same logic for each.
-          - For **Edge Functions**: Explain your plan and the function's purpose, then use the \`displayEdgeFunction\` tool with the name and Typescript code to propose it to the user.`
-
-    if (aiOptInLevel === 'schema_and_data') {
-      systemPrompt += `
-      - **DO NOT** use \`apply_migration\` or \`deploy_edge_function\` directly.`
-    }
+          - For **ALL WRITE/DDL** queries (INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, etc.): Explain your plan and the purpose of the SQL. Call \`display_query\` with the \`sql\` and a descriptive \`label\`. **If the query might return data suitable for visualization (e.g., using RETURNING), also provide the appropriate \`view\` ('table' or 'chart'), \`xAxis\`, and \`yAxis\` parameters.** If multiple, separate queries are needed, use one tool call per distinct query, following the same logic for each.
+          - For **Edge Functions**: Explain your plan and the function's purpose, then use the \`display_edge_function\` tool with the name and Typescript code to propose it to the user.`
 
     systemPrompt += `
-      - **UI Rendering & Explanation**: The frontend uses the \`displayQuery\` and \`displayEdgeFunction\` tools to show generated content or data to the user. Your text responses should clearly explain *what* you are doing, *why*, and briefly summarize the outcome (e.g., "I found 5 matching users", "I've generated the SQL to create the table"). **Do not** include the full SQL results, complete SQL code blocks, or entire Edge Function code in your text response; use the appropriate rendering tools for that purpose.
-      - **Destructive Operations**: If asked to perform a destructive query (e.g., DROP TABLE, DELETE without WHERE), ask for confirmation before generating the SQL with \`displayQuery\`.`
+      - **UI Rendering & Explanation**: The frontend uses the \`display_query\` and \`display_edge_function\` tools to show generated content or data to the user. Your text responses should clearly explain *what* you are doing, *why*, and briefly summarize the outcome (e.g., "I found 5 matching users", "I've generated the SQL to create the table"). **Do not** include the full SQL results, complete SQL code blocks, or entire Edge Function code in your text response; use the appropriate rendering tools for that purpose.
+      - **Destructive Operations**: If asked to perform a destructive query (e.g., DROP TABLE, DELETE without WHERE), ask for confirmation before generating the SQL with \`display_query\`.`
 
     if (aiOptInLevel === 'schema_and_data') {
       systemPrompt += `
 
       # Debugging SQL:
       - Use MCP information tools (\`list_tables\`, etc.) to understand the schema.
-      - If debugging a SELECT query: Explain the issue, provide the corrected SQL to \`execute_sql\`, and then call \`displayQuery\` with the \`manualToolCallId\`, \`sql\`, \`label\`, and appropriate \`view\`, \`xAxis\`, \`yAxis\` for the new results.
-      - If debugging a WRITE/DDL query: Explain the issue and provide the corrected SQL using \`displayQuery\` with \`sql\` and \`label\`. Include \`view\`, \`xAxis\`, \`yAxis\` if the corrected query might return visualizable data.
+      - If debugging a SELECT query: Explain the issue, provide the corrected SQL to \`execute_sql\`, and then call \`display_query\` with the \`manualToolCallId\`, \`sql\`, \`label\`, and appropriate \`view\`, \`xAxis\`, \`yAxis\` for the new results.
+      - If debugging a WRITE/DDL query: Explain the issue and provide the corrected SQL using \`display_query\` with \`sql\` and \`label\`. Include \`view\`, \`xAxis\`, \`yAxis\` if the corrected query might return visualizable data.
 
       # Supabase Health & Debugging
       - **General Status**: If the user asks about the general status or health of their project, use tools like \`get_logs\` (check recent errors/activity for relevant services like 'postgres', 'api', 'auth'), \`list_tables\`, \`list_extensions\` to provide a summary overview.
@@ -266,7 +294,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       # Debugging SQL:
       - Use available MCP tools (\`list_tables\`, etc.) to understand the schema.
-      - If debugging a query (SELECT, WRITE, DDL): Explain the issue and provide the corrected SQL using \`displayQuery\` with \`sql\` and \`label\`. Include \`view\`, \`xAxis\`, \`yAxis\` if the corrected query might return visualizable data, even though you cannot execute it.
+      - If debugging a query (SELECT, WRITE, DDL): Explain the issue and provide the corrected SQL using \`display_query\` with \`sql\` and \`label\`. Include \`view\`, \`xAxis\`, \`yAxis\` if the corrected query might return visualizable data, even though you cannot execute it.
 
       # Supabase Health & Debugging
       - You cannot access logs. Ask the user to check logs if necessary.`
@@ -284,7 +312,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           - Feel free to suggest corrections for suspected typos in user input.
 
       # Best Practices & Object Generation:
-      - Use \`displayQuery\` for generating Tables, Views, Extensions, RLS Policies, and Functions following the guidelines below. Explain the generated SQL's purpose clearly in your text response.
+      - Use \`display_query\` for generating Tables, Views, Extensions, RLS Policies, and Functions following the guidelines below. Explain the generated SQL's purpose clearly in your text response.
       - **Auth Schema**: The \`auth.users\` table stores user authentication data. Create a \`public.profiles\` table linked to \`auth.users\` (via user_id referencing auth.users.id) for user-specific public data. Do not create a new 'users' table. Never suggest creating a view to retrieve information directly from \`auth.users\`.
       - **Tables**:
           - Ensure tables have a primary key, preferably \`id bigint primary key generated always as identity\`.
@@ -317,7 +345,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           - Use \`create or replace function\` when possible.
 
       # Edge Functions
-      - Use the \`displayEdgeFunction\` tool to generate complete, high-quality Edge Functions in TypeScript for the Deno runtime.
+      - Use the \`display_edge_function\` tool to generate complete, high-quality Edge Functions in TypeScript for the Deno runtime.
       - **Dependencies**:
           - Prefer Web APIs (\`fetch\`, \`WebSocket\`) and Deno standard libraries.
           - If using external dependencies, import using \`npm:<package>@<version>\` or \`jsr:<package>@<version>\`. Specify versions.
