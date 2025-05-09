@@ -1,15 +1,11 @@
 import Link from 'next/link'
-import { AlertTriangle, Shield, Activity, Clock } from 'lucide-react'
+import { Shield, Activity } from 'lucide-react'
 import { useMemo } from 'react'
 
 import { useProjectLintsQuery, Lint } from 'data/lint/lint-query'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import { EntityTypeIcon, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
-import {
-  QueryPerformanceSort,
-  useQueryPerformanceQuery,
-} from 'components/interfaces/Reports/Reports.queries'
-import { QUERY_PERFORMANCE_REPORT_TYPES } from 'components/interfaces/QueryPerformance/QueryPerformance.constants'
+import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
 import {
   cn,
   Tabs_Shadcn_ as Tabs,
@@ -75,7 +71,6 @@ const AdvisorWidget = ({ projectRef }: AdvisorWidgetProps) => {
     (lint: Lint) => lint.level === LINTER_LEVELS.WARN
   ).length
 
-  // Type assertion for the data structure
   const top5SlowestQueries = useMemo(
     () => ((slowestQueriesData ?? []) as SlowQuery[]).slice(0, 5),
     [slowestQueriesData]
@@ -123,6 +118,13 @@ const AdvisorWidget = ({ projectRef }: AdvisorWidgetProps) => {
 
     return (
       <div className="h-full">
+        {isLoading && (
+          <div className="flex flex-col p-4 gap-2">
+            <ShimmeringLoader />
+            <ShimmeringLoader className="w-3/4" />
+            <ShimmeringLoader className="w-1/2" />
+          </div>
+        )}
         {!isLoading && (errorCount > 0 || warningCount > 0) && (
           <ul>
             {topIssues.map((lint) => (
@@ -177,7 +179,7 @@ Description: ${lint.description ? lint.description.replace(/\`/g, '`') : 'N/A'}`
   return (
     <div>
       {isLoadingLints ? (
-        <ShimmeringLoader className="w-96" />
+        <ShimmeringLoader className="w-96 mb-6" />
       ) : (
         <div className="flex justify-between items-center mb-6">{titleContent}</div>
       )}
@@ -240,7 +242,7 @@ Description: ${lint.description ? lint.description.replace(/\`/g, '`') : 'N/A'}`
             </CardHeader>
             <CardContent className="!p-0 flex-1 overflow-y-auto">
               {isLoadingSlowestQueries ? (
-                <div className="space-y-2">
+                <div className="space-y-2 p-4">
                   <ShimmeringLoader />
                   <ShimmeringLoader className="w-3/4" />
                   <ShimmeringLoader className="w-1/2" />
