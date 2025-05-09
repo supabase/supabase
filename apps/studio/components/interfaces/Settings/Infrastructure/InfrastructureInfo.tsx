@@ -218,7 +218,7 @@ const InfrastructureInfo = () => {
                           <p>
                             {projectUpgradeEligibilityData?.potential_breaking_changes?.includes(
                               'pg17_upgrade_unsupported_extensions'
-                            ) &&
+                            ) ? 'These extensions are not supported in newer versions of Supabase Postgres.' :
                               'You can add them back after the upgrade is done. Check the docs for which ones might need to be removed.'}
                           </p>
 
