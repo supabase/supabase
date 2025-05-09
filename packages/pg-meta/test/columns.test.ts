@@ -431,6 +431,7 @@ describe('array column', async () => {
     const { sql } = pgMeta.columns.create({
       ...id,
       type: c.type,
+      default_value: null,
     })
     await db.executeQuery(sql)
 
