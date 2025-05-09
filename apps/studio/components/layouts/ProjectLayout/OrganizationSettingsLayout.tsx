@@ -9,11 +9,13 @@ import { NavMenu, NavMenuItem } from 'ui'
 import { ScaffoldContainerLegacy, ScaffoldTitle } from '../Scaffold'
 
 function OrganizationSettingsLayout({ children }: PropsWithChildren) {
-  const newLayoutPreview = useIsNewLayoutEnabled()
-  const newSecurityPage = useFlag('newEnforceOrgMFA')
   const { slug } = useParams()
-  const fullCurrentPath = useCurrentPath()
+
+  const newLayoutPreview = useIsNewLayoutEnabled()
+  const newSecurityPage = useFlag('showOrganizationSecuritySettings')
+
   // Get the path without any hash values
+  const fullCurrentPath = useCurrentPath()
   const [currentPath] = fullCurrentPath.split('#')
 
   // hide these settings in the new layout
