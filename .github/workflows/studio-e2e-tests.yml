@@ -55,16 +55,22 @@ jobs:
       - name: Install Vercel CLI
         run: pnpm add --global vercel@latest
 
+      - name: Create Vercel Local Config in Temp Directory
+        run: |
+          mkdir -p ${{ runner.temp }}/vercel_config
+          echo '{ "projectId": "${{ secrets.VERCEL_STUDIO_HOSTED_PROJECT_ID }}", "orgId": "${{ secrets.VERCEL_ORG_ID }}" }' > ${{ runner.temp }}/vercel_config/vercel.json
+          echo "Created Vercel config at ${{ runner.temp }}/vercel_config/vercel.json"
+
       - name: Pull Vercel Environment Information (Preview)
-        run: vercel pull --yes --environment=preview --cwd ./apps/studio --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=preview --cwd ./apps/studio --local-config ${{ runner.temp }}/vercel_config/vercel.json --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Build Project Artifacts for Vercel
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --cwd ./apps/studio --local-config ${{ runner.temp }}/vercel_config/vercel.json --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy Project to Vercel and Get URL
         id: deploy_vercel
         run: |
-          DEPLOY_URL=$(vercel deploy --prebuilt --cwd ./apps/studio --token=${{ secrets.VERCEL_TOKEN }})
+          DEPLOY_URL=$(vercel deploy --prebuilt --cwd ./apps/studio --local-config ${{ runner.temp }}/vercel_config/vercel.json --token=${{ secrets.VERCEL_TOKEN }})
           echo "Vercel Preview URL: $DEPLOY_URL"
           echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_OUTPUT
 
@@ -85,11 +91,7 @@ jobs:
       - name: Run Playwright tests
         env:
           BASE_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}
-
-          CI_EMAIL: ${{ secrets.CI_EMAIL }}
-          CI_PASSWORD: ${{ secrets.CI_PASSWORD }}
-          CI_PROJECT_REF: ${{ secrets.CI_PROJECT_REF }}
-
+          IS_PLATFORM: true
         run: pnpm e2e:ci
 
       - uses: actions/upload-artifact@v4
