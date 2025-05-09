@@ -11,7 +11,6 @@ import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,
-  Button,
   Card,
   CardContent,
   CardHeader,
@@ -31,7 +30,7 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 interface SlowQuery {
   rolname: string
-  avg_time: number
+  mean_time: number
   calls: number
   query: string
 }
@@ -112,7 +111,6 @@ export const AdvisorWidget = () => {
     const topIssues = lints
       .filter((lint) => lint.level === LINTER_LEVELS.ERROR || lint.level === LINTER_LEVELS.WARN)
       .sort((a, b) => (a.level === LINTER_LEVELS.ERROR ? -1 : 1))
-      .slice(0, 5)
 
     return (
       <div className="h-full">
@@ -125,43 +123,49 @@ export const AdvisorWidget = () => {
         )}
         {!isLoading && (errorCount > 0 || warningCount > 0) && (
           <ul>
-            {topIssues.map((lint) => (
-              <li
-                key={lint.cache_key}
-                className="text-sm px-4 py-3 w-full border-b my-0 last:border-b-0 group"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <Link
-                    href={`/project/${projectRef}/advisors/${title.toLowerCase()}?id=${lint.cache_key}`}
-                    className="flex items-center gap-2 text-foreground-light hover:text-foreground transition truncate flex-1 min-w-0"
-                  >
-                    <EntityTypeIcon type={lint.metadata?.type} />
-                    <div className="flex-1 truncate min-w-0">
-                      {lint.detail ? lint.detail : lint.title}
-                    </div>
-                  </Link>
-                  <Button
-                    type="text"
-                    className="px-1 opacity-0 group-hover:opacity-100"
-                    icon={<AiIconAnimation className="w-5 h-5" />}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      e.preventDefault()
-                      snap.newChat({
-                        name: 'Summarize lint',
-                        open: true,
-                        initialInput: `Summarize the issue and suggest fixes for the following lint item:
-Title: ${lintInfoMap.find((item) => item.name === lint.name)?.title ?? lint.title}
-Entity: ${(lint.metadata && (lint.metadata.entity || (lint.metadata.schema && lint.metadata.name && `${lint.metadata.schema}.${lint.metadata.name}`))) ?? 'N/A'}
-Schema: ${lint.metadata?.schema ?? 'N/A'}
-Issue Details: ${lint.detail ? lint.detail.replace(/\`/g, '`') : 'N/A'}
-Description: ${lint.description ? lint.description.replace(/\`/g, '`') : 'N/A'}`,
-                      })
-                    }}
-                  />
-                </div>
-              </li>
-            ))}
+            {topIssues.map((lint) => {
+              const lintText = lint.detail ? lint.detail : lint.title
+              return (
+                <li
+                  key={lint.cache_key}
+                  className="text-sm w-full border-b my-0 last:border-b-0 group px-4 "
+                >
+                  <div className="flex items-center justify-between w-full group">
+                    <Link
+                      href={`/project/${projectRef}/advisors/${title.toLowerCase()}?id=${lint.cache_key}&preset=${lint.level}`}
+                      className="flex items-center gap-2 transition truncate flex-1 min-w-0 py-3"
+                    >
+                      <EntityTypeIcon type={lint.metadata?.type} />
+                      <p className="flex-1 font-mono text-xs leading-6 text-xs text-foreground-light group-hover:text-foreground truncate">
+                        {lintText.replace(/\\`/g, '`')}
+                      </p>
+                    </Link>
+                    <ButtonTooltip
+                      type="text"
+                      className="px-1 opacity-0 group-hover:opacity-100 w-7"
+                      icon={<AiIconAnimation className="w-5 h-5" />}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        e.preventDefault()
+                        snap.newChat({
+                          name: 'Summarize lint',
+                          open: true,
+                          initialInput: `Summarize the issue and suggest fixes for the following lint item:
+  Title: ${lintInfoMap.find((item) => item.name === lint.name)?.title ?? lint.title}
+  Entity: ${(lint.metadata && (lint.metadata.entity || (lint.metadata.schema && lint.metadata.name && `${lint.metadata.schema}.${lint.metadata.name}`))) ?? 'N/A'}
+  Schema: ${lint.metadata?.schema ?? 'N/A'}
+  Issue Details: ${lint.detail ? lint.detail.replace(/\`/g, '`') : 'N/A'}
+  Description: ${lint.description ? lint.description.replace(/\`/g, '`') : 'N/A'}`,
+                        })
+                      }}
+                      tooltip={{
+                        content: { side: 'bottom', text: 'What is this issue?' },
+                      }}
+                    />
+                  </div>
+                </li>
+              )
+            })}
           </ul>
         )}
         {!isLoading && errorCount === 0 && warningCount === 0 && (
@@ -308,8 +312,8 @@ Description: ${lint.description ? lint.description.replace(/\`/g, '`') : 'N/A'}`
                       </TableCell>
 
                       <TableCell className="font-mono truncate max-w-xs py-2">
-                        {typeof query.avg_time === 'number'
-                          ? `${query.avg_time.toFixed(2)}ms`
+                        {typeof query.mean_time === 'number'
+                          ? `${(query.mean_time / 1000).toFixed(2)}s`
                           : 'N/A'}
                       </TableCell>
                       <TableCell className="font-mono truncate max-w-xs py-2">
