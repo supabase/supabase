@@ -10,7 +10,7 @@ import { tableRowKeys } from './keys'
 
 export type TableRowCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   table: { id: number; name: string; schema?: string }
   payload: any
   enumArrayColumns: string[]

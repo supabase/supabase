@@ -10,7 +10,7 @@ export const getMaxConnectionsSql = () => {
 
 export type MaxConnectionsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   table?: string
   schema?: string
 }
