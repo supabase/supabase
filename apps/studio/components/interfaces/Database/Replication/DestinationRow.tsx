@@ -122,6 +122,8 @@ const DestinationRow = ({
 
     try {
       await stopPipeline({ projectRef, pipelineId: pipeline.id })
+      // deleting the sink also deletes the pipeline because of cascade delete
+      // so we don't need to call deletePipeline explicitly
       await deleteSink({ projectRef, sinkId })
     } catch (error) {
       toast.error('Failed to delete destination')
