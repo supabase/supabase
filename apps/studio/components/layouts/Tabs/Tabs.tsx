@@ -11,7 +11,9 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { InlineLinkClassName } from 'components/ui/InlineLink'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   editorEntityTypes,
@@ -21,7 +23,17 @@ import {
   useTabsStore,
   type Tab,
 } from 'state/tabs'
-import { cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import {
+  Badge,
+  Button,
+  cn,
+  HoverCard,
+  HoverCardContent_Shadcn_,
+  HoverCardTrigger_Shadcn_,
+  Tabs_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+} from 'ui'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { CollapseButton } from './CollapseButton'
 import { SortableTab } from './SortableTab'
@@ -40,6 +52,11 @@ export const EditorTabs = () => {
         distance: 1, // Start with a very small distance
       },
     })
+  )
+
+  const [tabsInterfaceAcknowledge, setTabsInterfaceAcknowledge] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.TABS_INTERFACE_ACKNOWLEDGED,
+    false
   )
 
   const openTabs = tabs.openTabs
@@ -166,7 +183,56 @@ export const EditorTabs = () => {
           </AnimatePresence>
           <div className="grow h-full border-b pr-6" />
         </TabsList_Shadcn_>
+
+        {/* [Joshen] To inform users during default opt in phase, can remove once default*/}
+        {!tabsInterfaceAcknowledge && (
+          <HoverCard openDelay={150}>
+            <HoverCardTrigger_Shadcn_ asChild>
+              <div
+                className={cn(
+                  'flex items-center justify-center px-2 h-10 shrink-0',
+                  'border-b border-b-default gap-x-2'
+                )}
+              >
+                <Badge variant="brand" className="rounded">
+                  <span>NEW</span>
+                </Badge>
+              </div>
+            </HoverCardTrigger_Shadcn_>
+            <HoverCardContent_Shadcn_ className="p-3 w-72">
+              <div className="flex flex-col gap-y-1">
+                <p className="text-sm">Tabs Interface for Editors</p>
+                <p className="text-xs text-foreground-light">
+                  The Table and SQL Editors now feature tabs for improved navigation and
+                  organization! Check out our{' '}
+                  <span
+                    className={cn(InlineLinkClassName, 'cursor-pointer')}
+                    onClick={() => {
+                      appSnap.setSelectedFeaturePreview(
+                        editor === 'table'
+                          ? LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS
+                          : LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS
+                      )
+                      appSnap.setShowFeaturePreviewModal(true)
+                    }}
+                  >
+                    feature previews
+                  </span>{' '}
+                  for more information.
+                </p>
+              </div>
+              <Button
+                type="default"
+                className="mt-2"
+                onClick={() => setTabsInterfaceAcknowledge(true)}
+              >
+                Dismiss
+              </Button>
+            </HoverCardContent_Shadcn_>
+          </HoverCard>
+        )}
       </Tabs_Shadcn_>
+
       <DragOverlay dropAnimation={null}>
         {tabs.activeTab ? <TabPreview tab={tabs.activeTab} /> : null}
       </DragOverlay>

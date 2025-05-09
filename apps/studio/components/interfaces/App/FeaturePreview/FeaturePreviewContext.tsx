@@ -76,12 +76,18 @@ export const useFeaturePreviewContext = () => useContext(FeaturePreviewContext)
 export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}>) => {
   const { hasLoaded } = useContext(FeatureFlagContext)
   const enableNewLayoutPreview = useFlag('newLayoutPreview')
+  const enableSQLEditorTabs = useFlag('featurePreviewSqlEditorTabs')
+  const enableTableEditorTabs = useFlag('featurePreviewTabsTableEditor')
 
   // [Joshen] Similar logic to feature flagging previews, we can use flags to default opt in previews
   const isDefaultOptIn = (feature: (typeof FEATURE_PREVIEWS)[number]) => {
     switch (feature.key) {
       case LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW:
         return enableNewLayoutPreview
+      case LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS:
+        return enableSQLEditorTabs
+      case LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS:
+        return enableTableEditorTabs
       default:
         return false
     }
