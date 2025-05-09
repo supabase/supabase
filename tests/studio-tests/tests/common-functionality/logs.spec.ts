@@ -12,7 +12,7 @@ test.describe('Logs', async () => {
     test.describe(`${logPage.label} logs page`, () => {
       test('can navigate to logs page', async ({ page, ref }) => {
         await page.goto(`./project/${ref}`)
-        await page.locator('a', { hasText: 'Logs' }).click({ timeout: 10000 })
+        await page.locator(`[href*="/dashboard/project/${ref}/logs"]`).click()
         await expect(page.getByRole('heading', { name: 'Logs & Analytics' })).toBeVisible()
 
         // Click anywhere on the screen to close the sidebar
