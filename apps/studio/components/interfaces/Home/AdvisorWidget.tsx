@@ -234,64 +234,62 @@ Description: ${lint.description ? lint.description.replace(/\`/g, '`') : 'N/A'}`
             </Tabs>
           </Card>
 
-          <Card>
+          <Card className="h-80 flex flex-col">
             <CardHeader className="py-3 px-4">
               <CardTitle>Slow Queries</CardTitle>
             </CardHeader>
-            <CardContent className="!p-0">
-              <div>
-                {isLoadingSlowestQueries ? (
-                  <div className="space-y-2">
-                    <ShimmeringLoader />
-                    <ShimmeringLoader className="w-3/4" />
-                    <ShimmeringLoader className="w-1/2" />
-                    <ShimmeringLoader className="w-3/4" />
-                    <ShimmeringLoader className="w-1/2" />
-                  </div>
-                ) : top5SlowestQueries.length === 0 ? (
-                  <div className="p-4 flex items-center space-x-4 border rounded-md">
-                    <Activity strokeWidth={1.5} size={20} />
-                    <p className="text-sm text-foreground-light">
-                      No slow queries found in the selected period.
-                    </p>
-                  </div>
-                ) : (
-                  <Table className="text-xs font-mono max-w-full">
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="text-foreground-lighter truncate py-2 h-auto">
-                          Query
-                        </TableHead>
-                        <TableHead className="text-foreground-lighter truncate py-2 h-auto">
-                          Avg time
-                        </TableHead>
-                        <TableHead className="text-foreground-lighter truncate py-2 h-auto">
-                          Calls
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {/* Added explicit types for map parameters */}
-                      {top5SlowestQueries.map((query: SlowQuery, i: number) => (
-                        <TableRow key={i}>
-                          <TableCell className="font-mono truncate max-w-xs py-2">
-                            {query.query}
-                          </TableCell>
+            <CardContent className="!p-0 flex-1 overflow-y-auto">
+              {isLoadingSlowestQueries ? (
+                <div className="space-y-2">
+                  <ShimmeringLoader />
+                  <ShimmeringLoader className="w-3/4" />
+                  <ShimmeringLoader className="w-1/2" />
+                  <ShimmeringLoader className="w-3/4" />
+                  <ShimmeringLoader className="w-1/2" />
+                </div>
+              ) : top5SlowestQueries.length === 0 ? (
+                <div className="flex-1 flex flex-col h-full items-center justify-center gap-2">
+                  <Activity strokeWidth={1.5} size={20} className="text-foreground-muted" />
+                  <p className="text-sm text-foreground-light">
+                    No slow queries found in the selected period
+                  </p>
+                </div>
+              ) : (
+                <Table className="text-xs font-mono max-w-full">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-foreground-lighter truncate py-2 h-auto">
+                        Query
+                      </TableHead>
+                      <TableHead className="text-foreground-lighter truncate py-2 h-auto">
+                        Avg time
+                      </TableHead>
+                      <TableHead className="text-foreground-lighter truncate py-2 h-auto">
+                        Calls
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {/* Added explicit types for map parameters */}
+                    {top5SlowestQueries.map((query: SlowQuery, i: number) => (
+                      <TableRow key={i}>
+                        <TableCell className="font-mono truncate max-w-xs py-2">
+                          {query.query}
+                        </TableCell>
 
-                          <TableCell className="font-mono truncate max-w-xs py-2">
-                            {typeof query.avg_time === 'number'
-                              ? `${query.avg_time.toFixed(2)}ms`
-                              : 'N/A'}
-                          </TableCell>
-                          <TableCell className="font-mono truncate max-w-xs py-2">
-                            {query.calls}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
-              </div>
+                        <TableCell className="font-mono truncate max-w-xs py-2">
+                          {typeof query.avg_time === 'number'
+                            ? `${query.avg_time.toFixed(2)}ms`
+                            : 'N/A'}
+                        </TableCell>
+                        <TableCell className="font-mono truncate max-w-xs py-2">
+                          {query.calls}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
         </div>
