@@ -35,6 +35,8 @@ jobs:
       CI_PASSWORD: ${{ secrets.CI_PASSWORD }}
       CI_PROJECT_REF: ${{ secrets.CI_PROJECT_REF }}
       IS_PLATFORM: true
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
     steps:
       - uses: actions/checkout@v4
@@ -47,18 +49,25 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
-      - uses: supabase/setup-cli@v1
-        with:
-          version: latest
       - name: Install dependencies
         run: pnpm i
-      - name: Cache Next.js build
-        uses: actions/cache@v4
-        id: nextjs-cache
-        with:
-          path: |
-            apps/studio/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ github.event.pull_request.number || github.ref_name }}-${{ hashFiles('apps/studio/**', 'packages/pg-meta/**', 'packages/ai-commands/**', 'packages/common/**', 'packages/config/**', 'packages/icons/**', 'packages/shared-data/**', 'packages/ui/**', 'packages/ui-patterns/**', 'packages/api-types/**', 'pnpm-lock.yaml') }}
+
+      - name: Install Vercel CLI
+        run: pnpm add --global vercel@latest
+
+      - name: Pull Vercel Environment Information (Preview)
+        run: vercel pull --yes --environment=preview --cwd ./apps/studio --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts for Vercel
+        run: vercel build --cwd ./apps/studio --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project to Vercel and Get URL
+        id: deploy_vercel
+        run: |
+          DEPLOY_URL=$(vercel deploy --prebuilt --cwd ./apps/studio --token=${{ secrets.VERCEL_TOKEN }})
+          echo "Vercel Preview URL: $DEPLOY_URL"
+          echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_OUTPUT
+
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         id: playwright-cache
@@ -68,21 +77,21 @@ jobs:
           key: ${{ runner.os }}-playwright-v1-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-playwright-v1-
-      - name: Build Studio
-        if: steps.nextjs-cache.outputs.cache-hit != 'true'
-        run: pnpm --filter studio build
-      - name: Start Studio server
-        run: pnpm --filter studio start
-      - name: Wait for Studio server
-        run: |
-          timeout 60 bash -c 'until curl -s http://localhost:3000 > /dev/null; do sleep 1; done'
+
       - name: Install Playwright Browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: pnpm -C e2e/studio exec playwright install --with-deps
+
       - name: Run Playwright tests
+        env:
+          BASE_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}
+
+          CI_EMAIL: ${{ secrets.CI_EMAIL }}
+          CI_PASSWORD: ${{ secrets.CI_PASSWORD }}
+          CI_PROJECT_REF: ${{ secrets.CI_PROJECT_REF }}
+
         run: pnpm e2e:ci
-        # mark the action as succeeded even if the tests failed. This is temporarily until we make the tests more stable.
-        # continue-on-error: true
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
