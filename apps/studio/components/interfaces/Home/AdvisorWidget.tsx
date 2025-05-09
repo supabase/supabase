@@ -179,7 +179,7 @@ Description: ${lint.description ? lint.description.replace(/\`/g, '`') : 'N/A'}`
       {isLoadingLints ? (
         <ShimmeringLoader className="w-96" />
       ) : (
-        <div className="flex justify-between items-center mb-8">{titleContent}</div>
+        <div className="flex justify-between items-center mb-6">{titleContent}</div>
       )}
       <Tabs defaultValue="security" className="mt-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
