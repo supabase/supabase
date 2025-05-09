@@ -100,6 +100,7 @@ const TeamSettings = () => {
     <>
       <ScaffoldContainerLegacy>
         {newLayoutPreview && <ScaffoldTitle>Team</ScaffoldTitle>}
+
         <ScaffoldFilterAndContent>
           <ScaffoldActionsContainer className="w-full flex-col md:flex-row gap-2 justify-between">
             <Input
