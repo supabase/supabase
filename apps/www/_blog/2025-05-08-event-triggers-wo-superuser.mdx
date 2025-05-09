@@ -16,9 +16,9 @@ tags:
 date: '2025-05-08'
 ---
 
-Event triggers in Postgres are powerful, but only SUPERUSERS can create them. In cloud environments, giving SUPERUSER access to end users isn't an option.
+Event triggers in Postgres are powerful, but only a superuser can create them. In cloud environments, granting superuser access to end users isn't an option.
 
-But thanks to Postgres extensibility, we can allow regular users to create event triggers, in a safe way.
+But thanks to Postgres' extensibility, we can allow end users to create event triggers, without superuser access, in a safe way.
 
 In this blog post, we’ll explain how we do this in the supautils extension, using a combination of the Utility Hook and the Function Manager Hook.
 
@@ -28,7 +28,9 @@ In this blog post, we’ll explain how we do this in the supautils extension, us
 
 The core of supautils is the “privileged role”, which is a role that serves as proxy to superuser. It provides a safe subset of superuser capabilities and it’s accessible to end users.
 
-When the privileged role does a `CREATE EVENT TRIGGER`, we intercept the statement with an Utility Hook (`ProcessUtility_hook`). Here we elevate the role to a superuser, continuing the usual flow and allowing the creation on Postgres core [^1].
+When the privileged role does a `create event trigger`, we intercept the statement with a Utility Hook (`ProcessUtility_hook`).
+Here we elevate the role to a superuser, continuing the usual flow and allowing the creation on Postgres core. As a last step, we downgrade to the privileged role and make
+it the event trigger owner [^1].
 
 Creating an event trigger like this is not safe though, as it would allow privilege escalation.
 
@@ -47,7 +49,7 @@ create or replace function become_super()
     language plpgsql as
 $$
 begin
-    alter role malicious superuser;
+    alter role malicious SUPERUSER;
 end;
 $$;
 
@@ -55,7 +57,7 @@ create event trigger malicious_event_trigger on ddl_command_end
 execute procedure become_super();
 ```
 
-And once a SUPERUSER trips on the malicious event trigger, it will fire with its privileges. Making the malicious user a SUPERUSER.
+And once a superuser trips on the malicious event trigger, it will fire with its privileges. Making the malicious user a superuser.
 
 ## Skipping Event Triggers
 
@@ -112,8 +114,8 @@ You can also git clone the [supautils](https://github.com/supabase/supautils/) r
 
 Finally, we want to give a special shout out to the [Zero Sync](https://zero.rocicorp.dev) guys, which kept pushing us to release this feature.
 
-[^1]: As a last step, we change the owner of the event trigger to the privileged role so it be altered or dropped by end users.
+[^1]: This is so the event trigger can be altered or dropped by end users.
 
-[^2]: This is not true if you mark the event trigger function as SECURITY DEFINER, then it will run with the privileges of the function owner. But this is not a usual practice on event triggers, as they usually want to preserve the context of the current user.
+[^2]: This is not true if you mark the event trigger function as `security definer`, then it will run with the privileges of the function owner. But this is not a usual practice on event triggers, as they usually want to preserve the context of the current user.
 
 [^3]: These are configurable. You can read more about reserved roles [here](https://supabase.com/blog/roles-postgres-hooks).
