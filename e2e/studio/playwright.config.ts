@@ -11,7 +11,7 @@ export default defineConfig({
   retries: IS_CI ? 2 : 0,
   workers: IS_CI ? 1 : undefined,
   use: {
-    baseURL: ENV_URLS[ENV],
+    baseURL: ENV_URLS[ENV] + '/dashboard',
     screenshot: 'off',
     video: 'off',
     headless: IS_CI,
