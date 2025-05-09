@@ -12,6 +12,8 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
   const { slug } = useParams()
 
   const newLayoutPreview = useIsNewLayoutEnabled()
+
+  // [Joshen] RE Organization Settings - need to figure out how to enforce MFA across users before this goes live
   const newSecurityPage = useFlag('showOrganizationSecuritySettings')
 
   // Get the path without any hash values
