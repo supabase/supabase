@@ -1,40 +1,41 @@
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { toast } from 'sonner'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
 
-import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
-import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useOrganizationMfaQuery } from 'data/organizations/organization-mfa-query'
-import { useOrganizationMfaToggleMutation } from 'data/organizations/organization-mfa-mutation'
-import { useProfile } from 'lib/profile'
 import { useParams } from 'common'
+import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
+import { InlineLink } from 'components/ui/InlineLink'
+import NoPermission from 'components/ui/NoPermission'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
+import { useOrganizationMfaToggleMutation } from 'data/organizations/organization-mfa-mutation'
+import { useOrganizationMfaQuery } from 'data/organizations/organization-mfa-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useProfile } from 'lib/profile'
 import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Button,
   Card,
   CardContent,
   CardFooter,
   Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   Switch,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
   WarningIcon,
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
 } from 'ui'
-import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import AlertError from 'components/ui/AlertError'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const schema = z.object({
   enforceMfa: z.boolean(),
@@ -60,10 +61,11 @@ const SecuritySettings = () => {
 
   const { mutate: toggleMfa, isLoading: isUpdatingMfa } = useOrganizationMfaToggleMutation({
     onError: (error) => {
+      toast.error(`Failed to update MFA enforcement: ${error.message}`)
       if (mfaConfig !== undefined) form.reset({ enforceMfa: mfaConfig })
     },
     onSuccess: (data) => {
-      toast.success('Successfully updated MFA settings')
+      toast.success('Successfully updated organization MFA settings')
     },
   })
 
@@ -78,7 +80,7 @@ const SecuritySettings = () => {
     if (mfaConfig !== undefined) {
       form.reset({ enforceMfa: mfaConfig })
     }
-  }, [mfaConfig, form.reset])
+  }, [mfaConfig, form])
 
   const hasMFAEnabled =
     members?.find((member) => member.primary_email == profile?.primary_email)?.mfa_enabled || false
@@ -137,7 +139,7 @@ const SecuritySettings = () => {
         </Card>
       )}
 
-      {isSuccessMfa && (
+      {isSuccessMfa && isPaidPlan && (
         <Form_Shadcn_ {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <Card>
@@ -167,13 +169,16 @@ const SecuritySettings = () => {
                               />
                             </div>
                           </TooltipTrigger>
-                          {(!isPaidPlan || !canUpdateMfaConfig || !hasMFAEnabled) && (
+                          {(!canUpdateMfaConfig || !hasMFAEnabled) && (
                             <TooltipContent side="bottom">
-                              {!isPaidPlan
-                                ? 'Upgrade to Pro or above to enable MFA enforcement'
-                                : !canUpdateMfaConfig
-                                  ? "You don't have permission to update MFA settings"
-                                  : 'Enable MFA on your own account first'}
+                              {!canUpdateMfaConfig ? (
+                                "You don't have permission to update MFA settings"
+                              ) : (
+                                <>
+                                  <InlineLink href="/account/security">Enable MFA</InlineLink> on
+                                  your own account first
+                                </>
+                              )}
                             </TooltipContent>
                           )}
                         </Tooltip>
@@ -183,33 +188,29 @@ const SecuritySettings = () => {
                 />
               </CardContent>
               <CardFooter className="justify-end space-x-2">
-                {isPaidPlan && (
-                  <>
-                    {form.formState.isDirty && (
-                      <Button
-                        type="default"
-                        disabled={isLoadingMfa || isUpdatingMfa}
-                        onClick={() => form.reset({ enforceMfa: isPaidPlan ? mfaConfig : false })}
-                      >
-                        Cancel
-                      </Button>
-                    )}
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      disabled={
-                        !isPaidPlan ||
-                        !canUpdateMfaConfig ||
-                        isUpdatingMfa ||
-                        isLoadingMfa ||
-                        !form.formState.isDirty
-                      }
-                      loading={isUpdatingMfa}
-                    >
-                      Save changes
-                    </Button>
-                  </>
+                {form.formState.isDirty && (
+                  <Button
+                    type="default"
+                    disabled={isLoadingMfa || isUpdatingMfa}
+                    onClick={() => form.reset({ enforceMfa: isPaidPlan ? mfaConfig : false })}
+                  >
+                    Cancel
+                  </Button>
                 )}
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  disabled={
+                    !isPaidPlan ||
+                    !canUpdateMfaConfig ||
+                    isUpdatingMfa ||
+                    isLoadingMfa ||
+                    !form.formState.isDirty
+                  }
+                  loading={isUpdatingMfa}
+                >
+                  Save changes
+                </Button>
               </CardFooter>
             </Card>
           </form>
