@@ -84,7 +84,7 @@ jobs:
 
       - name: Run Playwright tests
         env:
-          BASE_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}
+          BASE_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}/dashboard
           IS_PLATFORM: true
         run: pnpm e2e:ci
 
