@@ -105,14 +105,7 @@ const CustomTooltip = ({
           </span>
           <span className="ml-3.5 flex items-end gap-1">
             {shouldFormatBytes
-              ? formatBytes(
-                  isDBSizeChart
-                    ? entry.value * 1024 * 1024
-                    : isNetworkChart
-                      ? Math.abs(entry.value)
-                      : entry.value,
-                  valuePrecision
-                )
+              ? formatBytes(isNetworkChart ? Math.abs(entry.value) : entry.value, valuePrecision)
               : numberFormatter(entry.value, valuePrecision)}
             {isPercentage ? '%' : ''}
 

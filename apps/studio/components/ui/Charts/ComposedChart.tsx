@@ -226,11 +226,7 @@ export default function ComposedChart({
           typeof resolvedHighlightedValue === 'number'
             ? shouldFormatBytes
               ? formatBytes(
-                  isDBSizeChart
-                    ? resolvedHighlightedValue * 1024 * 1024
-                    : isNetworkChart
-                      ? Math.abs(resolvedHighlightedValue)
-                      : resolvedHighlightedValue,
+                  isNetworkChart ? Math.abs(resolvedHighlightedValue) : resolvedHighlightedValue,
                   valuePrecision
                 )
               : numberFormatter(resolvedHighlightedValue, valuePrecision)

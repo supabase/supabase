@@ -16275,6 +16275,7 @@ export interface operations {
           | 'cpu_usage_busy_idle'
           | 'max_cpu_usage'
           | 'avg_cpu_usage'
+          | 'pg_database_size'
           | 'disk_io_budget'
           | 'disk_io_consumption'
           | 'disk_iops_read'
