@@ -173,13 +173,6 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
     YAxisProps: { width: 40, tickFormatter: (value: any) => `${numberFormatter(value, 2)}%` },
     defaultChartStyle: 'line',
     attributes: [
-      // {
-      //   attribute: 'disk_io_budget',
-      //   provider: 'infra-monitoring',
-      //   label: 'IO Budget',
-      //   isMaxValue: true,
-      //   tooltip: 'The maximum number of IO operations per second that the database can handle.',
-      // },
       {
         attribute: 'disk_io_consumption',
         provider: 'infra-monitoring',
@@ -243,54 +236,6 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
       },
     ],
   },
-  // {
-  //   id: 'disk-space-usage',
-  //   label: 'Disk Usage',
-  //   valuePrecision: 1,
-  //   hide: false,
-  //   showTooltip: true,
-  //   showLegend: true,
-  //   showMaxValue: false,
-  //   showGrid: true,
-  //   YAxisProps: { width: 55, tickFormatter: (value: any) => formatBytes(value, 1) },
-  //   hideChartType: false,
-  //   defaultChartStyle: 'line',
-  //   attributes: [
-  //     {
-  //       attribute: 'disk_space_used',
-  //       provider: 'infra-monitoring',
-  //       label: 'Used',
-  //       tooltip: 'Used disk space',
-  //     },
-  //     {
-  //       attribute: 'disk_space_available',
-  //       provider: 'infra-monitoring',
-  //       label: 'Available',
-  //       tooltip: 'Available disk space',
-  //     },
-  //   ],
-  // },
-  // {
-  //   id: 'disk_space_total',
-  //   label: 'Disk Space Total',
-  //   valuePrecision: 0,
-  //   hide: false,
-  //   showTooltip: false,
-  //   showLegend: false,
-  //   showMaxValue: false,
-  //   showGrid: true,
-  //   YAxisProps: { width: 30 },
-  //   hideChartType: false,
-  //   defaultChartStyle: 'line',
-  //   attributes: [
-  //     {
-  //       attribute: 'disk_space_total',
-  //       provider: 'infra-monitoring',
-  //       label: 'disk_space_total',
-  //       tooltip: 'pg_database_size',
-  //     },
-  //   ],
-  // },
   {
     id: 'client-connections',
     label: 'Database client connections',
