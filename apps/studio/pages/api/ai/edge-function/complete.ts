@@ -269,7 +269,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - First look at the list of provided schemas if database interaction is needed.
       - Use \`getSchema\` to understand the data model you're working with if the edge function needs to interact with user data.
       - Check both the public and auth schemas to understand the authentication setup if relevant.
-      - The available database schema names are: \${schemas}
+      - The available database schema names are: ${schemas}
 
       # Response Format:
       - Your response MUST be ONLY the modified TypeScript/JavaScript text intended to replace the user's selection.

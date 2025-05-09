@@ -20,7 +20,7 @@ import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { isError } from 'data/utils/error-check'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -96,9 +96,10 @@ export const SQLEditor = () => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
-  const isOptedInToAI = useOrgOptedIntoAi()
+  const aiOptInLevel = useOrgAiOptInLevel()
   const [selectedSchemas] = useSchemasForAi(project?.ref!)
-  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
+  const includeSchemaMetadata =
+    aiOptInLevel === 'schema' || aiOptInLevel === 'schema_and_data' || !IS_PLATFORM
   const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   const {
