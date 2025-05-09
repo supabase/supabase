@@ -4,12 +4,13 @@ import { PropsWithChildren } from 'react'
 import { useParams } from 'common'
 import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
+import { useFlag } from 'hooks/ui/useFlag'
 import { NavMenu, NavMenuItem } from 'ui'
 import { ScaffoldContainerLegacy, ScaffoldTitle } from '../Scaffold'
 
 function OrganizationSettingsLayout({ children }: PropsWithChildren) {
   const newLayoutPreview = useIsNewLayoutEnabled()
-
+  const newSecurityPage = useFlag('newEnforceOrgMFA')
   const { slug } = useParams()
   const fullCurrentPath = useCurrentPath()
   // Get the path without any hash values
@@ -39,7 +40,7 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
       label: 'General',
       href: `/org/${slug}/general`,
     },
-    {
+    newSecurityPage && {
       label: 'Security',
       href: `/org/${slug}/security`,
     },
