@@ -56,6 +56,7 @@ const Home: NextPageWithLayout = () => {
   const { data: tablesData, isLoading: isLoadingTables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    schema: 'public',
   })
   const { data: functionsData, isLoading: isLoadingFunctions } = useEdgeFunctionsQuery({
     projectRef: project?.ref,
