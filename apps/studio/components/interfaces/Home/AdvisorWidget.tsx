@@ -306,19 +306,15 @@ export const AdvisorWidget = () => {
                 <TableBody>
                   {/* Added explicit types for map parameters */}
                   {top5SlowestQueries.map((query: SlowQuery, i: number) => (
-                    <TableRow key={i}>
-                      <TableCell className="font-mono truncate max-w-xs py-2">
-                        {query.query}
-                      </TableCell>
+                    <TableRow key={i} className="py-2">
+                      <TableCell className="font-mono truncate max-w-xs">{query.query}</TableCell>
 
-                      <TableCell className="font-mono truncate max-w-xs py-2">
+                      <TableCell className="font-mono truncate max-w-xs">
                         {typeof query.mean_time === 'number'
                           ? `${(query.mean_time / 1000).toFixed(2)}s`
                           : 'N/A'}
                       </TableCell>
-                      <TableCell className="font-mono truncate max-w-xs py-2">
-                        {query.calls}
-                      </TableCell>
+                      <TableCell className="font-mono truncate max-w-xs">{query.calls}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
