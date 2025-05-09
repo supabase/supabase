@@ -1,4 +1,4 @@
-import { test, beforeAll, afterAll, expect } from 'vitest'
+import { test, beforeAll, afterAll, expect, describe } from 'vitest'
 import pgMeta from '../src/index'
 import { createTestDatabase, cleanupRoot } from './db/utils'
 
@@ -443,109 +443,109 @@ withTestDatabase('array column', async ({ executeQuery }) => {
   )
 })
 
-withTestDatabase('column with default value', async ({ executeQuery }) => {
-  // Create test table using pure SQL
-  await executeQuery('CREATE TABLE t ()')
+describe('column with default value', async () => {
+  const db = await createTestDatabase()
+  await db.executeQuery('CREATE TABLE t ()')
 
-  // Create column with default value
-  const { sql: createColumnSql } = await pgMeta.columns.create({
-    schema: 'public',
-    table: 't',
-    name: 'c',
-    type: 'timestamptz',
-    default_value: 'NOW()',
-    default_value_format: 'expression',
+  afterAll(async () => {
+    await db.cleanup()
   })
-  await executeQuery(createColumnSql)
 
-  // Retrieve and verify the created column
-  const { sql: retrieveSql, zod: retrieveZod } = await pgMeta.columns.retrieve({
-    schema: 'public',
-    table: 't',
-    name: 'c',
-  })
-  const column = retrieveZod.parse((await executeQuery(retrieveSql))[0])
-
-  expect(column).toMatchInlineSnapshot(
+  test.concurrent.for([
+    // numerical types
+    { type: 'int2', value: 0, etype: 'smallint', evalue: '0' },
+    { type: 'int4', value: 1, etype: 'integer', evalue: '1' },
+    { type: 'int8', value: -1, etype: 'bigint', evalue: `'-1'::integer` },
+    { type: 'float4', value: 0.1, etype: 'real', evalue: '0.1' },
+    { type: 'float8', value: -0.1, etype: 'double precision', evalue: `'-0.1'::numeric` },
+    { type: 'numeric', value: 1e2, etype: 'numeric', evalue: '100' },
+    // json types
     {
-      id: expect.stringMatching(/^\d+\.1$/),
-      table_id: expect.any(Number),
+      type: 'json',
+      value: { a: 0, b: '1', c: true },
+      etype: 'json',
+      evalue: `'{\"a\": 0, \"b\": \"1\", \"c\": true}'::jsonb`,
     },
-    `
+    // json array must be stringified, otherwise it will be converted to pg array literal
+    { type: 'jsonb', value: JSON.stringify([null]), etype: 'jsonb', evalue: `'[null]'::jsonb` },
+    // text types
+    { type: 'text', value: `quote's`, etype: 'text', evalue: `'quote''s'::text` },
+    { type: 'varchar', value: '\n', etype: 'character varying', evalue: `'\n'::character varying` },
+    // datetime types
     {
-      "check": null,
-      "comment": null,
-      "data_type": "timestamp with time zone",
-      "default_value": "now()",
-      "enums": [],
-      "format": "timestamptz",
-      "id": StringMatching /\\^\\\\d\\+\\\\\\.1\\$/,
-      "identity_generation": null,
-      "is_generated": false,
-      "is_identity": false,
-      "is_nullable": true,
-      "is_unique": false,
-      "is_updatable": true,
-      "name": "c",
-      "ordinal_position": 1,
-      "schema": "public",
-      "table": "t",
-      "table_id": Any<Number>,
-    }
-  `
-  )
-})
-
-withTestDatabase('column with escaped quote', async ({ executeQuery }) => {
-  // Create test table using pure SQL
-  await executeQuery('CREATE TABLE t ()')
-
-  // Create column with default value
-  const { sql: createColumnSql } = await pgMeta.columns.create({
-    schema: 'public',
-    table: 't',
-    name: 'c',
-    type: 'text',
-    default_value: `quote's`,
-  })
-  await executeQuery(createColumnSql)
-
-  // Retrieve and verify the created column
-  const { sql: retrieveSql, zod: retrieveZod } = await pgMeta.columns.retrieve({
-    schema: 'public',
-    table: 't',
-    name: 'c',
-  })
-  const column = retrieveZod.parse((await executeQuery(retrieveSql))[0])
-
-  expect(column).toMatchInlineSnapshot(
-    {
-      id: expect.stringMatching(/^\d+\.1$/),
-      table_id: expect.any(Number),
+      type: 'timestamp',
+      value: `now() - INTERVAL '1 day'`,
+      etype: 'timestamp without time zone',
+      evalue: `(now() - '1 day'::interval)`,
+      exp: true,
     },
-    `
     {
-      "check": null,
-      "comment": null,
-      "data_type": "text",
-      "default_value": "'quote''s'::text",
-      "enums": [],
-      "format": "text",
-      "id": StringMatching /\\^\\\\d\\+\\\\\\.1\\$/,
-      "identity_generation": null,
-      "is_generated": false,
-      "is_identity": false,
-      "is_nullable": true,
-      "is_unique": false,
-      "is_updatable": true,
-      "name": "c",
-      "ordinal_position": 1,
-      "schema": "public",
-      "table": "t",
-      "table_id": Any<Number>,
-    }
-  `
-  )
+      type: 'timestamptz',
+      value: 'NOW()',
+      etype: 'timestamp with time zone',
+      evalue: 'now()',
+      exp: true,
+    },
+    { type: 'date', value: '2025-05-09', etype: 'date', evalue: `'2025-05-09'::date` },
+    {
+      type: 'time',
+      value: '11:22:33',
+      etype: 'time without time zone',
+      evalue: `'11:22:33'::time without time zone`,
+    },
+    {
+      type: 'timetz',
+      value: '11:22:33+0800',
+      etype: 'time with time zone',
+      evalue: `'11:22:33+08'::time with time zone`,
+    },
+    // other types
+    {
+      type: 'uuid',
+      value: 'gen_random_uuid()',
+      etype: 'uuid',
+      evalue: 'gen_random_uuid()',
+      exp: true,
+    },
+    { type: 'bool', value: true, etype: 'boolean', evalue: 'true' },
+    // https://www.postgresql.org/docs/current/datatype-binary.html#DATATYPE-BINARY-BYTEA-ESCAPE-FORMAT
+    { type: 'bytea', value: `\\000`, etype: 'bytea', evalue: `'\\x00'::bytea` },
+  ])('$type -> $value', async (c, { expect, task }) => {
+    const id = { schema: 'public', table: 't', name: `c${task.id}` }
+
+    // Create column with default value
+    const { sql } = pgMeta.columns.create({
+      ...id,
+      type: c.type,
+      default_value: c.value,
+      default_value_format: c.exp ? 'expression' : 'literal',
+    })
+    await db.executeQuery(sql)
+
+    // Retrieve and verify the created column
+    const expected = pgMeta.columns.retrieve(id)
+    const result = await db.executeQuery(expected.sql)
+    const column = expected.zod.parse(result[0])
+
+    expect(column).toStrictEqual({
+      ...id,
+      data_type: c.etype,
+      default_value: c.evalue,
+      format: c.type,
+      id: expect.stringMatching(/^\d+\.\d+$/),
+      ordinal_position: expect.any(Number),
+      table_id: expect.any(Number),
+      check: null,
+      comment: null,
+      enums: [],
+      identity_generation: null,
+      is_generated: false,
+      is_identity: false,
+      is_nullable: true,
+      is_unique: false,
+      is_updatable: true,
+    })
+  })
 })
 
 // https://github.com/supabase/supabase/issues/3553
