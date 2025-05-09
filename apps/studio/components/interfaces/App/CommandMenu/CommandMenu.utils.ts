@@ -7,4 +7,5 @@ export const COMMAND_MENU_SECTIONS = {
   SQL: 'SQL Editor',
   DATABASE: 'Database',
   INTEGRATIONS: 'Integrations',
+  REALTIME: 'Realtime',
 } as const
