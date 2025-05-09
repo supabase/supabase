@@ -91,6 +91,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-report
-          path: e2e/studio/playwright-report/
+          name: playwright-artifacts
+          path: |
+            e2e/studio/playwright-report/
+            e2e/studio/test-results/
           retention-days: 7

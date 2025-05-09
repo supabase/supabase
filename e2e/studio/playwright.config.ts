@@ -13,7 +13,7 @@ export default defineConfig({
   use: {
     baseURL: ENV_URLS[ENV],
     screenshot: 'off',
-    video: 'off',
+    video: 'retain-on-failure',
     headless: IS_CI,
   },
   projects: [
