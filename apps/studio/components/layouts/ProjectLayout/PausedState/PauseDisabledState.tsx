@@ -180,7 +180,7 @@ export const PauseDisabledState = () => {
             rel="noreferrer"
             href="https://supabase.com/docs/guides/platform/migrating-within-supabase/dashboard-restore"
           >
-            Restore backup to a new Supabase Project guide
+            Restore backup to a new Supabase project guide
           </a>
         </Button>
         <Button asChild type="default" icon={<ExternalLink />}>
