@@ -1,19 +1,28 @@
 import * as Sentry from '@sentry/nextjs'
+import createClient from 'openapi-fetch'
+
+import { IS_PLATFORM } from 'common'
 import { API_URL } from 'lib/constants'
 import { getAccessToken } from 'lib/gotrue'
 import { uuidv4 } from 'lib/helpers'
-import createClient from 'openapi-fetch'
 import { ResponseError } from 'types'
 import type { paths } from './api' // generated from openapi-typescript
-import { IS_PLATFORM } from 'common'
 
-const DEFAULT_HEADERS = {
-  Accept: 'application/json',
+const DEFAULT_HEADERS = { Accept: 'application/json' }
+
+export const fetchHandler: typeof fetch = async (input, init) => {
+  try {
+    return await fetch(input, init)
+  } catch (err: any) {
+    if (err instanceof TypeError && err.message === 'Failed to fetch') {
+      throw new Error('Unable to reach the server. Please check your network or try again later.')
+    }
+    throw err
+  }
 }
 
-// This file will eventually replace what we currently have in lib/fetchWrapper, but will be currently unused until we get to that refactor
-
 const client = createClient<paths>({
+  fetch: fetchHandler,
   // [Joshen] Just FYI, the replace is temporary until we update env vars API_URL to remove /platform or /v1 - should just be the base URL
   baseUrl: API_URL?.replace('/platform', ''),
   referrerPolicy: 'no-referrer-when-downgrade',
