@@ -23,6 +23,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
+  cn,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
@@ -41,6 +42,7 @@ const Home: NextPageWithLayout = () => {
   const { enableBranching } = useParams()
 
   const hasShownEnableBranchingModalRef = useRef(false)
+  const isPaused = project?.status === PROJECT_STATUS.INACTIVE
   const isNewProject = dayjs(project?.inserted_at).isAfter(dayjs().subtract(2, 'day'))
 
   useEffect(() => {
@@ -74,8 +76,8 @@ const Home: NextPageWithLayout = () => {
 
   return (
     <div className="w-full">
-      <div className="border-b border-muted py-16 px-8">
-        <div className="mx-auto max-w-7xl">
+      <div className={cn('py-16 px-8', !isPaused && 'border-b border-muted ')}>
+        <div className="mx-auto max-w-7xl flex flex-col gap-y-4">
           <div className="flex flex-col md:flex-row md:items-center gap-6 justify-between w-full">
             <div className="flex flex-col md:flex-row md:items-center gap-3 w-full">
               <h1 className="text-3xl">{projectName}</h1>
@@ -112,7 +114,7 @@ const Home: NextPageWithLayout = () => {
                     </div>
                     <span className="text-2xl tabular-nums">
                       {isLoadingTables ? (
-                        <ShimmeringLoader className="w-full h-[30px] w-6 p-0" />
+                        <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
                       ) : (
                         tablesCount
                       )}
@@ -125,7 +127,7 @@ const Home: NextPageWithLayout = () => {
                     </div>
                     <span className="text-2xl tabular-nums">
                       {isLoadingFunctions ? (
-                        <ShimmeringLoader className="w-full h-[30px] w-6 p-0" />
+                        <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
                       ) : (
                         functionsCount
                       )}
@@ -139,7 +141,7 @@ const Home: NextPageWithLayout = () => {
                       </div>
                       <span className="text-2xl tabular-nums">
                         {isLoadingReplicas ? (
-                          <ShimmeringLoader className="w-full h-[30px] w-6 p-0" />
+                          <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
                         ) : (
                           replicasCount
                         )}
@@ -149,69 +151,75 @@ const Home: NextPageWithLayout = () => {
                 </div>
               )}
               {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && (
-                <div className="ml-6 pl-6 border-l">
+                <div className="ml-6 border-l flex items-center w-[145px] justify-end">
                   <ServiceStatus />
                 </div>
               )}
             </div>
           </div>
           <ProjectUpgradeFailedBanner />
-          {project?.status === PROJECT_STATUS.INACTIVE && <ProjectPausedState />}
+          {isPaused && <ProjectPausedState />}
         </div>
       </div>
-      <div className="py-16 border-b border-muted px-8">
-        <div className="mx-auto max-w-7xl space-y-16">
-          {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && (
-            <>{isNewProject ? <NewProjectPanel /> : <ProjectUsageSection />}</>
-          )}
-          {!isNewProject && project?.status !== PROJECT_STATUS.INACTIVE && <AdvisorWidget />}
-        </div>
-      </div>
-      <div className="bg-surface-100/5 py-16">
-        <div className="mx-auto max-w-7xl space-y-16">
-          {project?.status !== PROJECT_STATUS.INACTIVE && (
-            <>
-              <div className="space-y-8">
-                <h2 className="text-lg">Client libraries</h2>
-                <div className="grid grid-cols-2 gap-x-8 gap-y-8 md:gap-12 mb-12 md:grid-cols-3">
-                  {CLIENT_LIBRARIES.map((library) => (
-                    <ClientLibrary key={library.language} {...library} />
-                  ))}
-                </div>
-              </div>
-              <div className="space-y-8">
-                <h4 className="text-lg">Example projects</h4>
-                <div className="flex justify-center">
-                  <Tabs_Shadcn_ defaultValue="app">
-                    <TabsList_Shadcn_ className="flex gap-4 mb-8">
-                      <TabsTrigger_Shadcn_ value="app">App Frameworks</TabsTrigger_Shadcn_>
-                      <TabsTrigger_Shadcn_ value="mobile">Mobile Framework</TabsTrigger_Shadcn_>
-                    </TabsList_Shadcn_>
-                    <TabsContent_Shadcn_ value="app">
-                      <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
-                        {EXAMPLE_PROJECTS.filter((project) => project.type === 'app')
-                          .sort((a, b) => a.title.localeCompare(b.title))
-                          .map((project) => (
-                            <ExampleProject key={project.url} {...project} />
-                          ))}
-                      </div>
-                    </TabsContent_Shadcn_>
-                    <TabsContent_Shadcn_ value="mobile">
-                      <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
-                        {EXAMPLE_PROJECTS.filter((project) => project.type === 'mobile')
-                          .sort((a, b) => a.title.localeCompare(b.title))
-                          .map((project) => (
-                            <ExampleProject key={project.url} {...project} />
-                          ))}
-                      </div>
-                    </TabsContent_Shadcn_>
-                  </Tabs_Shadcn_>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
+
+      {!isPaused && (
+        <>
+          <div className="py-16 border-b border-muted px-8">
+            <div className="mx-auto max-w-7xl space-y-16">
+              {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && (
+                <>{isNewProject ? <NewProjectPanel /> : <ProjectUsageSection />}</>
+              )}
+              {!isNewProject && project?.status !== PROJECT_STATUS.INACTIVE && <AdvisorWidget />}
+            </div>
+          </div>
+
+          <div className="bg-surface-100/5 py-16">
+            <div className="mx-auto max-w-7xl space-y-16">
+              {project?.status !== PROJECT_STATUS.INACTIVE && (
+                <>
+                  <div className="space-y-8">
+                    <h2 className="text-lg">Client libraries</h2>
+                    <div className="grid grid-cols-2 gap-x-8 gap-y-8 md:gap-12 mb-12 md:grid-cols-3">
+                      {CLIENT_LIBRARIES.map((library) => (
+                        <ClientLibrary key={library.language} {...library} />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-8">
+                    <h4 className="text-lg">Example projects</h4>
+                    <div className="flex justify-center">
+                      <Tabs_Shadcn_ defaultValue="app">
+                        <TabsList_Shadcn_ className="flex gap-4 mb-8">
+                          <TabsTrigger_Shadcn_ value="app">App Frameworks</TabsTrigger_Shadcn_>
+                          <TabsTrigger_Shadcn_ value="mobile">Mobile Framework</TabsTrigger_Shadcn_>
+                        </TabsList_Shadcn_>
+                        <TabsContent_Shadcn_ value="app">
+                          <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
+                            {EXAMPLE_PROJECTS.filter((project) => project.type === 'app')
+                              .sort((a, b) => a.title.localeCompare(b.title))
+                              .map((project) => (
+                                <ExampleProject key={project.url} {...project} />
+                              ))}
+                          </div>
+                        </TabsContent_Shadcn_>
+                        <TabsContent_Shadcn_ value="mobile">
+                          <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
+                            {EXAMPLE_PROJECTS.filter((project) => project.type === 'mobile')
+                              .sort((a, b) => a.title.localeCompare(b.title))
+                              .map((project) => (
+                                <ExampleProject key={project.url} {...project} />
+                              ))}
+                          </div>
+                        </TabsContent_Shadcn_>
+                      </Tabs_Shadcn_>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }
