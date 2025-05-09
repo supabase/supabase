@@ -106,8 +106,7 @@ To start API locally, run:
     }
   }
 
-  // Navigate to sign in with full URL
-  const signInUrl = new URL('./sign-in', studioUrl).toString()
+  const signInUrl = `${studioUrl}/sign-in`
   console.log(`\n 🔑 Navigating to sign in page: ${signInUrl}`)
 
   await page.goto(signInUrl, { waitUntil: 'networkidle' })
@@ -169,6 +168,8 @@ To start API locally, run:
   await page.waitForTimeout(1000)
   await signInButton.click()
 
-  await page.waitForURL('./projects', { timeout: 60000 })
+  const projectsPageUrl = `${studioUrl}/projects`
+  console.log(`\n ⏳ Waiting for navigation to projects page: ${projectsPageUrl}`)
+  await page.waitForURL(projectsPageUrl, { timeout: 60000 })
   await page.context().storageState({ path: STORAGE_STATE_PATH })
 })
