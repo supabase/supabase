@@ -392,55 +392,72 @@ withTestDatabase('unique column', async ({ executeQuery }) => {
   `)
 })
 
-withTestDatabase('array column', async ({ executeQuery }) => {
-  // Create test table using pure SQL
-  await executeQuery('CREATE TABLE t ()')
+describe('array column', async () => {
+  const db = await createTestDatabase()
+  await db.executeQuery('CREATE TABLE t ()')
 
-  // Create array column
-  const { sql: createColumnSql } = await pgMeta.columns.create({
-    schema: 'public',
-    table: 't',
-    name: 'c',
-    type: 'int2[]',
+  afterAll(async () => {
+    await db.cleanup()
   })
-  await executeQuery(createColumnSql)
 
-  // Retrieve and verify the created column
-  const { sql: retrieveSql, zod: retrieveZod } = await pgMeta.columns.retrieve({
-    schema: 'public',
-    table: 't',
-    name: 'c',
-  })
-  const column = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+  test.concurrent.for([
+    // numerical types
+    { type: 'int2[]', etype: '_int2' },
+    { type: 'int4[]', etype: '_int4' },
+    { type: 'int8[]', etype: '_int8' },
+    { type: 'float4[]', etype: '_float4' },
+    { type: 'float8[]', etype: '_float8' },
+    { type: 'numeric[]', etype: '_numeric' },
+    // json types
+    { type: 'json[]', etype: '_json' },
+    { type: 'jsonb[]', etype: '_jsonb' },
+    // text types
+    { type: 'text[]', etype: '_text' },
+    { type: 'varchar[]', etype: '_varchar' },
+    // datetime types
+    { type: 'timestamp[]', etype: '_timestamp' },
+    { type: 'timestamptz[]', etype: '_timestamptz' },
+    { type: 'date[]', etype: '_date' },
+    { type: 'time[]', etype: '_time' },
+    { type: 'timetz[]', etype: '_timetz' },
+    // other types
+    { type: 'uuid[]', etype: '_uuid' },
+    { type: 'bool[]', etype: '_bool' },
+    { type: 'bytea[]', etype: '_bytea' },
+  ])('$type -> $etype', async (c, { expect, task }) => {
+    const id = { schema: 'public', table: 't', name: `c${task.id}` }
 
-  expect(column).toMatchInlineSnapshot(
-    {
-      id: expect.stringMatching(/^\d+\.1$/),
+    // Create column with default value
+    const { sql } = pgMeta.columns.create({
+      ...id,
+      type: c.type,
+    })
+    await db.executeQuery(sql)
+
+    // Retrieve and verify the created column
+    const expected = pgMeta.columns.retrieve(id)
+    const result = await db.executeQuery(expected.sql)
+    const column = expected.zod.parse(result[0])
+
+    expect(column).toStrictEqual({
+      ...id,
+      data_type: 'ARRAY',
+      default_value: null,
+      format: c.etype,
+      id: expect.stringMatching(/^\d+\.\d+$/),
+      ordinal_position: expect.any(Number),
       table_id: expect.any(Number),
-    },
-    `
-    {
-      "check": null,
-      "comment": null,
-      "data_type": "ARRAY",
-      "default_value": null,
-      "enums": [],
-      "format": "_int2",
-      "id": StringMatching /\\^\\\\d\\+\\\\\\.1\\$/,
-      "identity_generation": null,
-      "is_generated": false,
-      "is_identity": false,
-      "is_nullable": true,
-      "is_unique": false,
-      "is_updatable": true,
-      "name": "c",
-      "ordinal_position": 1,
-      "schema": "public",
-      "table": "t",
-      "table_id": Any<Number>,
-    }
-  `
-  )
+      check: null,
+      comment: null,
+      enums: [],
+      identity_generation: null,
+      is_generated: false,
+      is_identity: false,
+      is_nullable: true,
+      is_unique: false,
+      is_updatable: true,
+    })
+  })
 })
 
 describe('column with default value', async () => {
