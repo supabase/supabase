@@ -59,12 +59,10 @@ jobs:
         run: vercel pull --yes --environment=preview --cwd ./apps/studio --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Build Project Artifacts for Vercel
-        working-directory: ./apps/studio
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy Project to Vercel and Get URL
         id: deploy_vercel
-        working-directory: ./apps/studio
         run: |
           DEPLOY_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
           echo "Vercel Preview URL: $DEPLOY_URL"
