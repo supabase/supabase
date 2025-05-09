@@ -10,13 +10,13 @@ import { NewTab } from 'components/layouts/Tabs/NewTab'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
-import { editorEntityTypes, getTabsStore } from 'state/tabs'
+import { editorEntityTypes, useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  const tabStore = getTabsStore(projectRef)
+  const tabStore = useTabsStateSnapshot()
   const appSnap = useAppStateSnapshot()
   const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
 

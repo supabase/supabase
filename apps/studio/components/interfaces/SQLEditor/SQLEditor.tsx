@@ -36,7 +36,7 @@ import {
   useGetImpersonatedRoleState,
 } from 'state/role-impersonation-state'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { createTabId, getTabsStore, updateTab } from 'state/tabs'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   Button,
   DropdownMenu,
@@ -52,7 +52,6 @@ import {
   TooltipTrigger,
   cn,
 } from 'ui'
-import { useSnapshot } from 'valtio'
 import { useIsSQLEditorTabsEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
@@ -90,8 +89,7 @@ export const SQLEditor = () => {
   const org = useSelectedOrganization()
 
   const queryClient = useQueryClient()
-  const store = getTabsStore(ref)
-  const tabs = useSnapshot(store)
+  const tabs = useTabsStateSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
@@ -222,7 +220,7 @@ export const SQLEditor = () => {
         snapV2.renameSnippet({ id, name })
         if (isSQLEditorTabsEnabled && ref) {
           const tabId = createTabId('sql', { id })
-          updateTab(ref, tabId, { label: name })
+          tabs.updateTab(tabId, { label: name })
         }
       } catch (error) {
         // [Joshen] No error handler required as this happens in the background and not necessary to ping the user
@@ -529,7 +527,7 @@ export const SQLEditor = () => {
     return () => {
       if (ref) {
         const tabId = createTabId('sql', { id })
-        updateTab(ref, tabId, { scrollTop: scrollTopRef.current })
+        tabs.updateTab(tabId, { scrollTop: scrollTopRef.current })
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

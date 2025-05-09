@@ -13,7 +13,7 @@ import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { createTabId, updateTab } from 'state/tabs'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
 import { useIsSQLEditorTabsEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
@@ -35,6 +35,7 @@ const RenameQueryModal = ({
   const organization = useSelectedOrganization()
 
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const tabsSnap = useTabsStateSnapshot()
   const { data: subscription } = useOrgSubscriptionQuery(
     { orgSlug: organization?.slug },
     { enabled: visible }
@@ -111,7 +112,7 @@ const RenameQueryModal = ({
 
       if (isSQLEditorTabsEnabled && ref) {
         const tabId = createTabId('sql', { id })
-        updateTab(ref, tabId, { label: nameInput })
+        tabsSnap.updateTab(tabId, { label: nameInput })
       }
 
       toast.success('Successfully renamed snippet!')

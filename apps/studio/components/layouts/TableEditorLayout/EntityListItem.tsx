@@ -3,7 +3,6 @@ import { Clipboard, Copy, Download, Edit, Lock, MoreHorizontal, Trash, Unlock } 
 import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
-import { useSnapshot } from 'valtio'
 
 import { IS_PLATFORM } from 'common'
 import {
@@ -28,7 +27,7 @@ import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { copyToClipboard } from 'lib/helpers'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { createTabId, getTabsStore, makeTabPermanent } from 'state/tabs'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   cn,
   DropdownMenu,
@@ -66,10 +65,9 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   // For tabs preview flag logic
   const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
   const tabId = createTabId(entity.type, { id: entity.id })
-  const tabStore = getTabsStore(projectRef)
-  const isPreview = isTableEditorTabsEnabled ? tabStore.previewTabId === tabId : false
+  const tabs = useTabsStateSnapshot()
+  const isPreview = isTableEditorTabsEnabled ? tabs.previewTabId === tabId : false
 
-  const tabs = useSnapshot(tabStore)
   const isOpened = Object.values(tabs.tabsMap).some((tab) => tab.metadata?.tableId === entity.id)
   const isActive = Number(id) === entity.id
   const canEdit = isActive && !isLocked
@@ -233,7 +231,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       onDoubleClick={(e) => {
         e.preventDefault()
         const tabId = createTabId(entity.type, { id: entity.id })
-        makeTabPermanent(projectRef, tabId)
+        tabs.makeTabPermanent(tabId)
       }}
     >
       <>

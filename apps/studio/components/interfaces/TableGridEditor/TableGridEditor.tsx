@@ -21,7 +21,7 @@ import { useUrlState } from 'hooks/ui/useUrlState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { useAppStateSnapshot } from 'state/app-state'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
-import { createTabId, handleTabClose, makeActiveTabPermanent, useTabsStore } from 'state/tabs'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { Button } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { useIsTableEditorTabsEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
@@ -44,7 +44,7 @@ export const TableGridEditor = ({
   const appSnap = useAppStateSnapshot()
   const { ref: projectRef, id } = useParams()
 
-  const tabs = useTabsStore(projectRef)
+  const tabs = useTabsStateSnapshot()
   const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
   const { selectedSchema } = useQuerySchemaState()
 
@@ -83,7 +83,7 @@ export const TableGridEditor = ({
     if (isTableEditorTabsEnabled && selectedTable) {
       // Close tab
       const tabId = createTabId(selectedTable.entity_type, { id: selectedTable.id })
-      handleTabClose({ ref: projectRef, id: tabId, router, editor, onClearDashboardHistory })
+      tabs.handleTabClose({ id: tabId, router, editor, onClearDashboardHistory })
     } else {
       const tables = await getTables(selectedSchema)
       if (tables.length > 0) {
@@ -122,8 +122,7 @@ export const TableGridEditor = ({
                 className="mt-2"
                 onClick={() => {
                   if (tabId) {
-                    handleTabClose({
-                      ref: projectRef,
+                    tabs.handleTabClose({
                       id: tabId,
                       router,
                       editor,
@@ -156,7 +155,7 @@ export const TableGridEditor = ({
 
   return (
     // When any click happens in a table tab, the tab becomes permanent
-    <div className="h-full" onClick={() => makeActiveTabPermanent(project?.ref)}>
+    <div className="h-full" onClick={() => tabs.makeActiveTabPermanent()}>
       <TableEditorTableStateContextProvider
         key={`table-editor-table-${selectedTable.id}`}
         projectRef={projectRef}

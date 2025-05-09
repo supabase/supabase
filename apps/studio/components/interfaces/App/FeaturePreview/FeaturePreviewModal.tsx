@@ -2,13 +2,11 @@ import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { removeTabsByEditor } from 'state/tabs'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
 
@@ -47,13 +45,6 @@ const FeaturePreviewModal = () => {
       properties: { feature: selectedFeatureKey },
       groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
-
-    if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS) {
-      removeTabsByEditor(ref as string | undefined, 'table')
-    }
-    if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS) {
-      removeTabsByEditor(ref as string | undefined, 'sql')
-    }
   }
 
   function handleCloseFeaturePreviewModal() {

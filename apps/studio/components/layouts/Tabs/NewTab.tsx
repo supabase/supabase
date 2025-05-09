@@ -15,7 +15,7 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { getTabsStore } from 'state/tabs'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   Button,
   cn,
@@ -42,7 +42,7 @@ export function NewTab() {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { project } = useProjectContext()
   const org = useSelectedOrganization()
-
+  const tabs = useTabsStateSnapshot()
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
@@ -92,16 +92,14 @@ export function NewTab() {
       snapV2.addSnippet({ projectRef: ref, snippet })
       snapV2.addNeedsSaving(snippet.id)
 
-      const store = getTabsStore(ref)
-      const tabId = `sql-${snippet.id}`
-      store.openTabs = [...store.openTabs, tabId]
-      store.tabsMap[tabId] = {
+      const tabId = createTabId('sql', { id: snippet.id })
+
+      tabs.addTab({
         id: tabId,
         type: 'sql',
         label: name,
         metadata: { sqlId: snippet.id },
-      }
-      store.activeTab = tabId
+      })
 
       router.push(`/project/${ref}/sql/${snippet.id}`)
     } catch (error: any) {
