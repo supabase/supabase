@@ -7,12 +7,13 @@ import { executeSql } from 'data/sql/execute-sql-query'
 /**
  * Gets the required extensions for index advisor
  * @param extensions Array of database extensions
- * @returns Object containing hypopg and index_advisor extensions if they exist
+ * @returns Object containing hypopg, index_advisor, and test_extension extensions if they exist
  */
 export function getIndexAdvisorExtensions(extensions: DatabaseExtension[] = []) {
   const hypopg = extensions.find((ext) => ext.name === 'hypopg')
   const indexAdvisor = extensions.find((ext) => ext.name === 'index_advisor')
-  return { hypopg, indexAdvisor }
+  const test_extension = extensions.find((ext) => ext.name === 'test_extension')
+  return { hypopg, indexAdvisor, test_extension }
 }
 
 /**
