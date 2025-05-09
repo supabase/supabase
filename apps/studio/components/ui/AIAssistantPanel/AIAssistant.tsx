@@ -285,8 +285,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   </TooltipTrigger>
                   <TooltipContent className="w-80">
                     The Assistant is in Alpha and your prompts might be rate limited.{' '}
-                    {aiOptInLevel === 'schema_and_data' &&
-                      'Schema and query data are being shared to improve Assistant responses.'}
+                    {aiOptInLevel === 'schema_and_log_and_data' &&
+                      'Schema, logs, and query data are being shared to improve Assistant responses.'}
+                    {aiOptInLevel === 'schema_and_log' &&
+                      'Schema and logs are being shared to improve Assistant responses.'}
                     {aiOptInLevel === 'schema' &&
                       'Only schema metadata is being shared to improve Assistant responses.'}
                     {aiOptInLevel === 'disabled' &&
@@ -327,36 +329,38 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 </div>
               </div>
             </div>
-            {IS_PLATFORM && aiOptInLevel !== 'schema_and_data' && selectedOrganization && (
-              <Admonition
-                type="default"
-                title={
-                  aiOptInLevel === 'disabled'
-                    ? 'Project metadata is not shared'
-                    : 'Limited metadata is shared'
-                }
-                description={
-                  hasHipaaAddon
-                    ? 'Your organization has the HIPAA addon and will not send any project metadata with your prompts.'
-                    : aiOptInLevel === 'disabled'
-                      ? 'The Assistant can provide better answers if you opt-in to share schema metadata.'
-                      : aiOptInLevel === 'schema'
-                        ? 'Sharing query data in addition to schema can further improve responses. Update AI settings to enable this.'
-                        : ''
-                }
-                className="border-0 border-b rounded-none bg-background"
-              >
-                {!hasHipaaAddon && (
-                  <Button
-                    type="default"
-                    className="w-fit mt-4"
-                    onClick={() => setIsConfirmOptInModalOpen(true)}
-                  >
-                    Update AI settings
-                  </Button>
-                )}
-              </Admonition>
-            )}
+            {IS_PLATFORM &&
+              (aiOptInLevel === 'disabled' || aiOptInLevel === 'schema') &&
+              selectedOrganization && (
+                <Admonition
+                  type="default"
+                  title={
+                    aiOptInLevel === 'disabled'
+                      ? 'Project metadata is not shared'
+                      : 'Limited metadata is shared'
+                  }
+                  description={
+                    hasHipaaAddon
+                      ? 'Your organization has the HIPAA addon and will not send any project metadata with your prompts.'
+                      : aiOptInLevel === 'disabled'
+                        ? 'The Assistant can provide better answers if you opt-in to share schema metadata.'
+                        : aiOptInLevel === 'schema'
+                          ? 'Sharing query data in addition to schema can further improve responses. Update AI settings to enable this.'
+                          : ''
+                  }
+                  className="border-0 border-b rounded-none bg-background"
+                >
+                  {!hasHipaaAddon && (
+                    <Button
+                      type="default"
+                      className="w-fit mt-4"
+                      onClick={() => setIsConfirmOptInModalOpen(true)}
+                    >
+                      Update AI settings
+                    </Button>
+                  )}
+                </Admonition>
+              )}
           </div>
           {!hasMessages && (
             <div className="h-48 flex-0 m-8">

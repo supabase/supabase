@@ -15,7 +15,7 @@ import { OPT_IN_TAGS } from 'lib/constants'
 
 // Shared schema definition
 export const AIOptInSchema = z.object({
-  aiOptInLevel: z.enum(['disabled', 'schema', 'schema_and_data'], {
+  aiOptInLevel: z.enum(['disabled', 'schema', 'schema_and_log', 'schema_and_log_and_data'], {
     required_error: 'AI Opt-in level selection is required',
   }),
 })
@@ -51,14 +51,29 @@ export const useAIOptInForm = (onSuccessCallback?: () => void) => {
 
     const existingOptInTags = selectedOrganization?.opt_in_tags ?? []
     let updatedOptInTags = existingOptInTags.filter(
-      (tag: string) => tag !== OPT_IN_TAGS.AI_SQL && tag !== (OPT_IN_TAGS.AI_DATA ?? 'AI_DATA')
+      (tag: string) =>
+        tag !== OPT_IN_TAGS.AI_SQL &&
+        tag !== (OPT_IN_TAGS.AI_DATA ?? 'AI_DATA') &&
+        tag !== (OPT_IN_TAGS.AI_LOG ?? 'AI_LOG')
     )
-    if (values.aiOptInLevel === 'schema' || values.aiOptInLevel === 'schema_and_data') {
+
+    if (
+      values.aiOptInLevel === 'schema' ||
+      values.aiOptInLevel === 'schema_and_log' ||
+      values.aiOptInLevel === 'schema_and_log_and_data'
+    ) {
       updatedOptInTags.push(OPT_IN_TAGS.AI_SQL)
     }
-    if (values.aiOptInLevel === 'schema_and_data') {
-      updatedOptInTags.push(OPT_IN_TAGS.AI_DATA ?? 'AI_DATA')
+    if (
+      values.aiOptInLevel === 'schema_and_log' ||
+      values.aiOptInLevel === 'schema_and_log_and_data'
+    ) {
+      updatedOptInTags.push(OPT_IN_TAGS.AI_LOG)
     }
+    if (values.aiOptInLevel === 'schema_and_log_and_data') {
+      updatedOptInTags.push(OPT_IN_TAGS.AI_DATA)
+    }
+
     updatedOptInTags = [...new Set(updatedOptInTags)]
 
     updateOrganization(

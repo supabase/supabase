@@ -119,7 +119,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     let allowedTools: string[] = []
 
     // For schema and above permission levels
-    if (aiOptInLevel === 'schema' || aiOptInLevel === 'schema_and_data') {
+    if (
+      aiOptInLevel === 'schema' ||
+      aiOptInLevel === 'schema_and_log' ||
+      aiOptInLevel === 'schema_and_log_and_data'
+    ) {
       allowedTools = [
         'list_tables',
         'list_extensions',
@@ -129,9 +133,14 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       ]
     }
 
-    // For schema_and_data permission level, add data access tools
-    if (aiOptInLevel === 'schema_and_data') {
-      allowedTools = [...allowedTools, 'execute_sql', 'get_logs']
+    // For schema_and_log permission level, add log access tools
+    if (aiOptInLevel === 'schema_and_log' || aiOptInLevel === 'schema_and_log_and_data') {
+      allowedTools = [...allowedTools, 'get_logs']
+    }
+
+    // For schema_and_log_and_data permission level, add data access tools
+    if (aiOptInLevel === 'schema_and_log_and_data') {
+      allowedTools = [...allowedTools, 'execute_sql']
     }
 
     // Process tools based on permission level
@@ -253,16 +262,15 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       # Core Principles:
       - **Tool Usage Strategy**:`
 
-    if (aiOptInLevel === 'schema_and_data') {
+    if (aiOptInLevel === 'schema_and_log_and_data') {
       systemPrompt += `
           - Use MCP tools like \`list_tables\` and \`list_extensions\` to gather information.
           - For **READ ONLY** queries: Explain your plan, call \`execute_sql\` with the query. After receiving the results, explain the findings briefly in text. Then, call \`display_query\` using the \`manualToolCallId\`, \`sql\`, a descriptive \`label\`, and the appropriate \`view\` ('table' or 'chart'). **Choose 'chart'** if the data is suitable for visualization (e.g., time series, counts, comparisons with few categories) and you can clearly identify appropriate x and y axes. **Otherwise, default to 'table'** for detailed data, complex results, or if a clear chart type isn't obvious. Ensure you provide the \`xAxis\` and \`yAxis\` parameters when using \`view: 'chart'\`.`
-    } else if (aiOptInLevel === 'schema') {
+    } else if (aiOptInLevel === 'schema' || aiOptInLevel === 'schema_and_log') {
       systemPrompt += `
           - Use available MCP tools like \`list_tables\` and \`list_extensions\` to understand the schema.
           - You **cannot** execute SELECT queries directly (\`execute_sql\` is unavailable). You can only generate SQL for the user using \`display_query\`. Provide the \`sql\` and \`label\`.
-          - You **cannot** directly apply migrations. Generate DDL using \`display_query\` with the \`sql\` and \`label\`.
-          - You **cannot** view logs (\`get_logs\` is unavailable).`
+          - You **cannot** directly apply migrations. Generate DDL using \`display_query\` with the \`sql\` and \`label\`.`
     } else {
       systemPrompt += `
           - Schema metadata access is disabled. You cannot view table structures or use MCP tools.
@@ -278,7 +286,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - **UI Rendering & Explanation**: The frontend uses the \`display_query\` and \`display_edge_function\` tools to show generated content or data to the user. Your text responses should clearly explain *what* you are doing, *why*, and briefly summarize the outcome (e.g., "I found 5 matching users", "I've generated the SQL to create the table"). **Do not** include the full SQL results, complete SQL code blocks, or entire Edge Function code in your text response; use the appropriate rendering tools for that purpose.
       - **Destructive Operations**: If asked to perform a destructive query (e.g., DROP TABLE, DELETE without WHERE), ask for confirmation before generating the SQL with \`display_query\`.`
 
-    if (aiOptInLevel === 'schema_and_data') {
+    if (aiOptInLevel === 'schema_and_log' || aiOptInLevel === 'schema_and_log_and_data') {
       systemPrompt += `
 
       # Debugging SQL:

@@ -103,7 +103,10 @@ const NewFunctionPage = () => {
   const project = useSelectedProject()
   const aiOptInLevel = useOrgAiOptInLevel()
   const includeSchemaMetadata =
-    aiOptInLevel === 'schema' || aiOptInLevel === 'schema_and_data' || !IS_PLATFORM
+    aiOptInLevel === 'schema' ||
+    aiOptInLevel === 'schema_and_log' ||
+    aiOptInLevel === 'schema_and_log_and_data' ||
+    !IS_PLATFORM
   const snap = useAiAssistantStateSnapshot()
   const edgeFunctionCreate = useFlag('edgeFunctionCreate')
   const { mutate: sendEvent } = useSendEventMutation()

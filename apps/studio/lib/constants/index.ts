@@ -100,6 +100,7 @@ export const LOCAL_STORAGE_KEYS = {
 export const OPT_IN_TAGS = {
   AI_SQL: 'AI_SQL_GENERATOR_OPT_IN',
   AI_DATA: 'AI_DATA_GENERATOR_OPT_IN',
+  AI_LOG: 'AI_LOG_GENERATOR_OPT_IN',
 }
 
 export const GB = 1024 * 1024 * 1024

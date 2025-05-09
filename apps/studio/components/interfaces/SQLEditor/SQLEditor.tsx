@@ -99,7 +99,10 @@ export const SQLEditor = () => {
   const aiOptInLevel = useOrgAiOptInLevel()
   const [selectedSchemas] = useSchemasForAi(project?.ref!)
   const includeSchemaMetadata =
-    aiOptInLevel === 'schema' || aiOptInLevel === 'schema_and_data' || !IS_PLATFORM
+    aiOptInLevel === 'schema' ||
+    aiOptInLevel === 'schema_and_log' ||
+    aiOptInLevel === 'schema_and_log_and_data' ||
+    !IS_PLATFORM
   const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   const {

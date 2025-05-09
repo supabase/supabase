@@ -107,7 +107,7 @@ export const Message = function Message({
                     return (
                       <ReactMarkdown
                         key={`${id}-part-${index}`}
-                        className="prose prose-sm [&_ol>li]:pl-4 [&_ol>li]:my-0 [&_li>p]:mt-0 space-y-5 [&>*>code]:text-xs [&>*>*>code]:text-xs [&_li]:space-y-4"
+                        className="prose prose-sm [&_h3]:text-base [&_ol>li]:pl-4 [&_ol>li]:my-0 [&_li>p]:mt-0 space-y-5 [&>*>code]:text-xs [&>*>*>code]:text-xs [&_li]:space-y-4"
                         remarkPlugins={[remarkGfm]}
                         components={{
                           ...baseMarkdownComponents,
@@ -182,7 +182,7 @@ export const Message = function Message({
               })
             ) : hasTextContent ? (
               <ReactMarkdown
-                className="prose prose-sm [&_ol>li]:pl-4 [&_ol>li]:my-0 space-y-5 flex-1 [&>*>code]:text-xs [&>*>*>code]:text-xs min-w-0 [&_li]:space-y-4"
+                className="prose prose-sm [&_>h3]:text-base [&_ol>li]:pl-4 [&_ol>li]:my-0 space-y-5 flex-1 [&>*>code]:text-xs [&>*>*>code]:text-xs min-w-0 [&_li]:space-y-4"
                 remarkPlugins={[remarkGfm]}
                 components={allMarkdownComponents}
               >

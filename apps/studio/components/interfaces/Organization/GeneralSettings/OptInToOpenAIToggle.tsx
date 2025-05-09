@@ -26,38 +26,28 @@ export default function OptInToOpenAIToggle({ className }: OptInToOpenAITogglePr
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader padding="small" className="border-b">
-          <DialogTitle>Where does my data go?</DialogTitle>
+          <DialogTitle>What do we do with your data?</DialogTitle>
         </DialogHeader>
         <DialogSection className="space-y-4 text-sm text-foreground-light" padding="small">
           <p>
-            Supabase AI is a chatbot support tool powered by OpenAI. Supabase will share the query
-            you submit and information about the databases you manage through Supabase with OpenAI,
-            L.L.C. and its affiliates in order to provide the Supabase AI tool.
+            Supabase AI is a support tool powered by Amazon Bedrock ("Bedrock"). By default, no
+            information is shared with Bedrock unless you explicitly provide consent.
           </p>
+
           <p>
-            OpenAI will only access information about the structure of your databases, such as table
-            names, column and row headings. OpenAI will not access the contents of the database
-            itself.
+            To improve our services, and only with your permission, we may share customer-generated
+            prompts, database schema, database data, and project logs with Bedrock. This information
+            is used solely to generate responses to your queries and is not retained or used to
+            train their models.
           </p>
+
           <p>
-            OpenAI uses this information to generate responses to your query, and does not retain or
-            use the information to train its algorithms or otherwise improve its products and
-            services.
+            If you are a HIPAA Covered Entity, please note that Bedrock is HIPPA eligible and
+            Supabase has a Business Associate Agreement in place covering this use.
           </p>
+
           <p>
-            If you have your own individual account on Supabase, we will use any personal
-            information collected through [Supabase AI] to provide you with the [Supabase AI] tool.
-            If you are in the UK, EEA or Switzerland, the processing of this personal information is
-            necessary for the performance of a contract between you and us.
-          </p>
-          <p>
-            Supabase collects information about the queries you submit through Supabase AI and the
-            responses you receive to assess the performance of the Supabase AI tool and improve our
-            services. If you are in the UK, EEA or Switzerland, the processing is necessary for our
-            legitimate interests, namely informing our product development and improvement.
-          </p>
-          <p>
-            For more information about how we use personal information, please see our{' '}
+            For more detailed information about how we collect and use your data, see our{' '}
             <Link
               href="https://supabase.com/privacy"
               target="_blank"

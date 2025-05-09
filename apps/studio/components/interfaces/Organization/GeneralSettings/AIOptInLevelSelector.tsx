@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import { Control } from 'react-hook-form'
-import { cn, FormField_Shadcn_, RadioGroupCard, RadioGroupCardItem } from 'ui'
+import { cn, FormField_Shadcn_, RadioGroup_Shadcn_, RadioGroupItem_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import OptInToOpenAIToggle from './OptInToOpenAIToggle'
 import { AIOptInFormValues } from 'hooks/forms/useAIOptInForm'
@@ -24,52 +24,47 @@ export const AIOptInLevelSelector = ({
         control={control as any}
         name="aiOptInLevel"
         render={({ field }) => (
-          <RadioGroupCard
+          <RadioGroup_Shadcn_
             value={field.value}
             onValueChange={field.onChange}
             disabled={disabled}
-            className="grid md:grid-cols-3 gap-2"
+            className="space-y-2 mb-6"
           >
-            <RadioGroupCardItem
-              className={cn(layout !== 'flex-row-reverse' && 'w-full')}
-              key="disabled"
-              value="disabled"
-              label={
-                <span className="flex flex-col gap-1">
-                  <span className="text-foreground">Disabled</span>
-                  <span className="text-foreground-light text-xs">
-                    No data is sent to OpenAI, responses will be generic.
-                  </span>
-                </span>
-              }
-            />
-            <RadioGroupCardItem
-              className={cn(layout !== 'flex-row-reverse' && 'w-full')}
-              key="schema"
-              value="schema"
-              label={
-                <span className="flex flex-col gap-1">
-                  <span className="text-foreground">Schema Only</span>
-                  <span className="text-foreground-light text-xs">
-                    Send only your database schema to OpenAI for better responses.
-                  </span>
-                </span>
-              }
-            />
-            <RadioGroupCardItem
-              className={cn(layout !== 'flex-row-reverse' && 'w-full')}
-              key="schema_and_data"
-              value="schema_and_data"
-              label={
-                <span className="flex flex-col gap-1">
-                  <span className="text-foreground">Schema & Data</span>
-                  <span className="text-foreground-light text-xs">
-                    Send schema and SQL query data for the best AI responses.
-                  </span>
-                </span>
-              }
-            />
-          </RadioGroupCard>
+            {[
+              {
+                value: 'disabled',
+                title: 'Disabled',
+                description: 'No data is sent to OpenAI, responses will be generic.',
+              },
+              {
+                value: 'schema',
+                title: 'Schema Only',
+                description: 'Send only your database schema to OpenAI for better responses.',
+              },
+              {
+                value: 'schema_and_log',
+                title: 'Schema & Logs',
+                description: 'Send schema and logging data for improved AI responses.',
+              },
+              {
+                value: 'schema_and_log_and_data',
+                title: 'Schema, Logs & Data',
+                description: 'Send schema, logs, and query data for the best AI responses.',
+              },
+            ].map((item) => (
+              <div key={item.value} className="flex items-start space-x-3">
+                <RadioGroupItem_Shadcn_
+                  value={item.value}
+                  id={`ai-opt-in-${item.value}`}
+                  className="mt-0.5"
+                />
+                <label htmlFor={`ai-opt-in-${item.value}`} className="cursor-pointer flex flex-col">
+                  <span className="text-sm font-medium text-foreground">{item.title}</span>
+                  <span className="text-sm text-foreground-light">{item.description}</span>
+                </label>
+              </div>
+            ))}
+          </RadioGroup_Shadcn_>
         )}
       />
     </div>
@@ -79,7 +74,7 @@ export const AIOptInLevelSelector = ({
     <FormItemLayout
       label={label}
       description={
-        <p className="my-4">
+        <p className="my-4 max-w-xl">
           By opting into sending anonymous data, Supabase AI can improve the answers it shows you.
           This is an organization-wide setting. Select the level of data you are comfortable
           sharing. <OptInToOpenAIToggle />.
