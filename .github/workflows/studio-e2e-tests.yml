@@ -36,7 +36,7 @@ jobs:
       CI_PROJECT_REF: ${{ secrets.CI_PROJECT_REF }}
       IS_PLATFORM: true
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_STUDIO_HOSTED_PROJECT_ID }}
 
     steps:
       - uses: actions/checkout@v4
