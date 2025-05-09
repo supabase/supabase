@@ -1,14 +1,21 @@
+import dayjs from 'dayjs'
 import { useEffect, useRef } from 'react'
 
 import { useParams } from 'common'
-import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
-import ServiceStatus from 'components/interfaces/Home/ServiceStatus'
+import { ClientLibrary, ExampleProject, NewProjectPanel } from 'components/interfaces/Home'
+import { AdvisorWidget } from 'components/interfaces/Home/AdvisorWidget'
+import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
+import { ProjectUsageSection } from 'components/interfaces/Home/ProjectUsageSection'
+import { ServiceStatus } from 'components/interfaces/Home/ServiceStatus'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import { InlineLink } from 'components/ui/InlineLink'
 import { ProjectUpgradeFailedBanner } from 'components/ui/ProjectUpgradeFailedBanner'
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDb, useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
@@ -24,13 +31,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import AdvisorWidget from 'components/interfaces/Home/AdvisorWidget'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { ClientLibrary, ExampleProject } from 'components/interfaces/Home'
-import { EXAMPLE_PROJECTS, CLIENT_LIBRARIES } from 'components/interfaces/Home/Home.constants'
 
 const Home: NextPageWithLayout = () => {
   const organization = useSelectedOrganization()
@@ -40,6 +41,8 @@ const Home: NextPageWithLayout = () => {
   const { enableBranching } = useParams()
 
   const hasShownEnableBranchingModalRef = useRef(false)
+  const isNewProject = dayjs(project?.inserted_at).isAfter(dayjs().subtract(2, 'day'))
+
   useEffect(() => {
     if (enableBranching && !hasShownEnableBranchingModalRef.current) {
       hasShownEnableBranchingModalRef.current = true
@@ -67,7 +70,7 @@ const Home: NextPageWithLayout = () => {
 
   const tablesCount = tablesData?.length ?? 0
   const functionsCount = functionsData?.length ?? 0
-  const replicasCount = replicasData?.length ?? 0
+  const replicasCount = (replicasData?.length ?? 1) - 1
 
   return (
     <div className="w-full">
@@ -158,11 +161,10 @@ const Home: NextPageWithLayout = () => {
       </div>
       <div className="py-16 border-b border-muted px-8">
         <div className="mx-auto max-w-7xl space-y-16">
-          {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && <ProjectUsageSection />}
-
-          {project?.status !== PROJECT_STATUS.INACTIVE && (
-            <>{project?.ref && <AdvisorWidget projectRef={project.ref} />}</>
+          {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && (
+            <>{isNewProject ? <NewProjectPanel /> : <ProjectUsageSection />}</>
           )}
+          {!isNewProject && project?.status !== PROJECT_STATUS.INACTIVE && <AdvisorWidget />}
         </div>
       </div>
       <div className="bg-surface-100/5 py-16">
