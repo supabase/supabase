@@ -61,16 +61,16 @@ export const SecretAPIKeys = () => {
       />
       <Card className={cn('w-full overflow-hidden', !empty && 'bg-surface-100')}>
         <CardContent className="p-0">
-          <Table className="p-5">
+          <Table className="p-5 table-fixed">
             <TableHeader>
               <TableRow className={cn('bg-200', empty && 'hidden')}>
                 <TableHead
                   key=""
-                  className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 overflow-hidden"
+                  className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 overflow-hidden w-[200px]"
                 >
                   Name
                 </TableHead>
-                <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 pr-0">
+                <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 pr-0 w-full">
                   API Key
                 </TableHead>
                 <TableHead

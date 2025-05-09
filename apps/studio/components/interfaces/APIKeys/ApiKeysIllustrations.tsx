@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { SecretAPIKeyInput } from './APIKeyRow'
+import { ApiKeyPill } from './ApiKeyPill'
 import { CreateNewAPIKeysButton } from './CreateNewAPIKeysButton'
 import { useApiKeysVisibility } from './hooks/useApiKeysVisibility'
 
@@ -71,7 +71,7 @@ export const ApiKeysTableIllustration = () => {
                 <TableCell className="py-2 w-[180px]">{apiKey.description}</TableCell>
                 <TableCell className="py-2">
                   <div className="flex flex-row gap-2">
-                    <SecretAPIKeyInput apiKey={apiKey} />
+                    <ApiKeyPill apiKey={apiKey} />
                   </div>
                 </TableCell>
                 <TableCell />
@@ -164,7 +164,6 @@ export const ApiKeysFeedbackBanner = () => {
     <FeatureBanner
       storageKey={LOCAL_STORAGE_KEYS.API_KEYS_FEEDBACK_DISMISSED}
       className="!p-6"
-      illustration={<ApiKeysIllustrationWithOverlay />}
       dismissable
     >
       <div className="flex flex-col gap-0 z-[2]">
