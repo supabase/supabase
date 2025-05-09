@@ -75,7 +75,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
       connectionString: project?.connectionString,
       query: selectedRow?.['query'],
     },
-    { enabled: isAdvisorAvailable }
+    { enabled: isIndexAdvisorEnabled }
   )
 
   const {
