@@ -84,13 +84,14 @@ export const generateColumnFieldFromPostgresColumn = (
 }
 
 export const generateCreateColumnPayload = (
-  tableId: number,
+  table: PostgresTable,
   field: ColumnField
 ): CreateColumnPayload => {
   const isIdentity = field.format.includes('int') ? field.isIdentity : false
-  const defaultValue = field.defaultValue as any
+  const defaultValue = field.defaultValue
   const payload: CreateColumnPayload = {
-    tableId,
+    schema: table.schema,
+    table: table.name,
     isIdentity,
     name: field.name.trim(),
     comment: field.comment?.trim(),
@@ -106,9 +107,7 @@ export const generateCreateColumnPayload = (
     ...(!isIdentity &&
       defaultValue && {
         defaultValueFormat:
-          isNull(defaultValue) || isSQLExpression(defaultValue)
-            ? 'expression'
-            : ('literal' as 'expression' | 'literal'),
+          isNull(defaultValue) || isSQLExpression(defaultValue) ? 'expression' : 'literal',
       }),
   }
   return payload
