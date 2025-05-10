@@ -124,10 +124,100 @@ export const createApiQueryString = (params: Record<string, any>): string => {
 function buildWhereClause(search: SearchParamsType): string {
   const conditions: string[] = []
 
-  // Process all filters dynamically
+  // Extract and handle level filter specially
+  const levelFilter = search.level || []
+  let levelCondition = ''
+
+  if (levelFilter.length > 0) {
+    const sourceLevelConditions = []
+
+    // Edge logs level conditions
+    if (levelFilter.includes('success')) {
+      sourceLevelConditions.push(
+        "(log_type = 'edge' AND edge_logs_response.status_code BETWEEN 200 AND 299)"
+      )
+    }
+    if (levelFilter.includes('warning')) {
+      sourceLevelConditions.push(
+        "(log_type = 'edge' AND edge_logs_response.status_code BETWEEN 400 AND 499)"
+      )
+    }
+    if (levelFilter.includes('error')) {
+      sourceLevelConditions.push("(log_type = 'edge' AND edge_logs_response.status_code >= 500)")
+    }
+
+    // Postgres logs level conditions
+    if (levelFilter.includes('success')) {
+      sourceLevelConditions.push("(log_type = 'postgres' AND pgl_parsed.error_severity = 'LOG')")
+    }
+    if (levelFilter.includes('warning')) {
+      sourceLevelConditions.push(
+        "(log_type = 'postgres' AND pgl_parsed.error_severity = 'WARNING')"
+      )
+    }
+    if (levelFilter.includes('error')) {
+      sourceLevelConditions.push("(log_type = 'postgres' AND pgl_parsed.error_severity = 'ERROR')")
+    }
+
+    // Function logs level conditions
+    if (levelFilter.includes('success')) {
+      sourceLevelConditions.push(
+        "(log_type = 'edge function' AND fel_response.status_code BETWEEN 200 AND 299)"
+      )
+    }
+    if (levelFilter.includes('warning')) {
+      sourceLevelConditions.push(
+        "(log_type = 'edge function' AND fel_response.status_code BETWEEN 400 AND 499)"
+      )
+    }
+    if (levelFilter.includes('error')) {
+      sourceLevelConditions.push("(log_type = 'edge function' AND fel_response.status_code >= 500)")
+    }
+
+    // Auth logs level conditions
+    if (levelFilter.includes('success')) {
+      sourceLevelConditions.push(
+        "(log_type = 'auth' AND el_in_al_response.status_code BETWEEN 200 AND 299)"
+      )
+    }
+    if (levelFilter.includes('warning')) {
+      sourceLevelConditions.push(
+        "(log_type = 'auth' AND el_in_al_response.status_code BETWEEN 400 AND 499)"
+      )
+    }
+    if (levelFilter.includes('error')) {
+      sourceLevelConditions.push("(log_type = 'auth' AND el_in_al_response.status_code >= 500)")
+    }
+
+    // Supavisor logs level conditions
+    if (levelFilter.includes('success')) {
+      sourceLevelConditions.push(
+        "(log_type = 'supavisor' AND LOWER(svl_metadata.level) NOT IN ('error', 'warn', 'warning'))"
+      )
+    }
+    if (levelFilter.includes('warning')) {
+      sourceLevelConditions.push(
+        "(log_type = 'supavisor' AND (LOWER(svl_metadata.level) = 'warn' OR LOWER(svl_metadata.level) = 'warning'))"
+      )
+    }
+    if (levelFilter.includes('error')) {
+      sourceLevelConditions.push("(log_type = 'supavisor' AND LOWER(svl_metadata.level) = 'error')")
+    }
+
+    if (sourceLevelConditions.length > 0) {
+      levelCondition = `(${sourceLevelConditions.join(' OR ')})`
+      conditions.push(levelCondition)
+    }
+  }
+
+  // Process all other filters dynamically
   Object.entries(search).forEach(([key, value]) => {
-    // Skip pagination/control parameters and date (handled separately via API params)
-    if (['sort', 'start', 'size', 'uuid', 'cursor', 'direction', 'live', 'date'].includes(key)) {
+    // Skip pagination/control parameters, date, and level (handled separately)
+    if (
+      ['sort', 'start', 'size', 'uuid', 'cursor', 'direction', 'live', 'date', 'level'].includes(
+        key
+      )
+    ) {
       return
     }
 
@@ -165,11 +255,6 @@ export const useChartData = (search: SearchParamsType, projectRef: string) => {
           dateEnd = now.toISOString()
           const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
           dateStart = oneHourAgo.toISOString()
-
-          console.log('Using default date range for chart (last hour):', {
-            dateStart,
-            dateEnd,
-          })
         }
 
         // SQL query to get aggregated log counts by minute
@@ -280,8 +365,10 @@ ORDER BY minute ASC
         )
 
         if (error) {
-          console.error('API returned error for chart data:', error)
-          throw error
+          // Return default empty chart data rather than throwing
+          return {
+            chartData: [],
+          }
         }
 
         // Create a Map of the API results
@@ -333,24 +420,25 @@ ORDER BY minute ASC
           // Always push a data point for this minute
           chartData.push({
             timestamp: roundedMinute, // Use the minute timestamp
-            success: minuteData.success,
-            warning: minuteData.warning,
-            error: minuteData.error,
+            success: minuteData.success || 0,
+            warning: minuteData.warning || 0,
+            error: minuteData.error || 0,
           })
         }
-
-        console.log(`Created ${chartData.length} minute buckets (${apiResultMap.size} with data)`)
 
         return {
           chartData,
         }
       } catch (error) {
-        console.error('Error fetching chart data:', error)
-        throw error
+        // Return default empty chart data instead of throwing
+        return {
+          chartData: [],
+        }
       }
     },
     // Keep chart data fresh for 5 minutes
     staleTime: 1000 * 60 * 5,
+    retry: 1, // Only retry once to avoid excessive API calls
   })
 }
 
@@ -381,8 +469,170 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
         const direction = pageParam?.direction
         const isPagination = pageParam !== undefined
 
-        // Build the unified logs SQL query
-        const whereClause = buildWhereClause(search)
+        // Get standard filters
+        const baseConditions: string[] = []
+        Object.entries(search).forEach(([key, value]) => {
+          // Skip pagination/control parameters, date and level (handled separately)
+          if (
+            [
+              'sort',
+              'start',
+              'size',
+              'uuid',
+              'cursor',
+              'direction',
+              'live',
+              'date',
+              'level',
+            ].includes(key)
+          ) {
+            return
+          }
+
+          // Handle array filters (IN clause)
+          if (Array.isArray(value) && value.length > 0) {
+            baseConditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(',')})`)
+            return
+          }
+
+          // Handle scalar values
+          if (value !== null && value !== undefined) {
+            baseConditions.push(`${key} = '${value}'`)
+          }
+        })
+
+        // Get level filter if exists
+        const levelFilter = search.level || []
+        const hasLevelFilter = levelFilter.length > 0
+
+        // Create source-specific where clauses with level filters
+        let edgeWhere = ''
+        let postgresWhere = ''
+        let functionWhere = ''
+        let authWhere = 'where al_metadata.request_id is not null'
+        let supavisorWhere = ''
+
+        // Edge logs level filter
+        if (hasLevelFilter) {
+          const edgeLevelConditions = []
+          if (levelFilter.includes('success'))
+            edgeLevelConditions.push('edge_logs_response.status_code BETWEEN 200 AND 299')
+          if (levelFilter.includes('warning'))
+            edgeLevelConditions.push('edge_logs_response.status_code BETWEEN 400 AND 499')
+          if (levelFilter.includes('error'))
+            edgeLevelConditions.push('edge_logs_response.status_code >= 500')
+
+          if (edgeLevelConditions.length > 0) {
+            if (baseConditions.length > 0) {
+              edgeWhere = `WHERE (${edgeLevelConditions.join(' OR ')}) AND ${baseConditions.join(' AND ')}`
+            } else {
+              edgeWhere = `WHERE (${edgeLevelConditions.join(' OR ')})`
+            }
+          } else if (baseConditions.length > 0) {
+            edgeWhere = `WHERE ${baseConditions.join(' AND ')}`
+          }
+        } else if (baseConditions.length > 0) {
+          edgeWhere = `WHERE ${baseConditions.join(' AND ')}`
+        }
+
+        // Postgres logs level filter
+        if (hasLevelFilter) {
+          const postgresLevelConditions = []
+          if (levelFilter.includes('success'))
+            postgresLevelConditions.push("pgl_parsed.error_severity = 'LOG'")
+          if (levelFilter.includes('warning'))
+            postgresLevelConditions.push("pgl_parsed.error_severity = 'WARNING'")
+          if (levelFilter.includes('error'))
+            postgresLevelConditions.push("pgl_parsed.error_severity = 'ERROR'")
+
+          if (postgresLevelConditions.length > 0) {
+            if (baseConditions.length > 0) {
+              postgresWhere = `WHERE (${postgresLevelConditions.join(' OR ')}) AND ${baseConditions.join(' AND ')}`
+            } else {
+              postgresWhere = `WHERE (${postgresLevelConditions.join(' OR ')})`
+            }
+          } else if (baseConditions.length > 0) {
+            postgresWhere = `WHERE ${baseConditions.join(' AND ')}`
+          }
+        } else if (baseConditions.length > 0) {
+          postgresWhere = `WHERE ${baseConditions.join(' AND ')}`
+        }
+
+        // Function logs level filter
+        if (hasLevelFilter) {
+          const functionLevelConditions = []
+          if (levelFilter.includes('success'))
+            functionLevelConditions.push('fel_response.status_code BETWEEN 200 AND 299')
+          if (levelFilter.includes('warning'))
+            functionLevelConditions.push('fel_response.status_code BETWEEN 400 AND 499')
+          if (levelFilter.includes('error'))
+            functionLevelConditions.push('fel_response.status_code >= 500')
+
+          if (functionLevelConditions.length > 0) {
+            if (baseConditions.length > 0) {
+              functionWhere = `WHERE (${functionLevelConditions.join(' OR ')}) AND ${baseConditions.join(' AND ')}`
+            } else {
+              functionWhere = `WHERE (${functionLevelConditions.join(' OR ')})`
+            }
+          } else if (baseConditions.length > 0) {
+            functionWhere = `WHERE ${baseConditions.join(' AND ')}`
+          }
+        } else if (baseConditions.length > 0) {
+          functionWhere = `WHERE ${baseConditions.join(' AND ')}`
+        }
+
+        // Auth logs level filter (already has a WHERE clause)
+        if (hasLevelFilter) {
+          const authLevelConditions = []
+          if (levelFilter.includes('success'))
+            authLevelConditions.push('el_in_al_response.status_code BETWEEN 200 AND 299')
+          if (levelFilter.includes('warning'))
+            authLevelConditions.push('el_in_al_response.status_code BETWEEN 400 AND 499')
+          if (levelFilter.includes('error'))
+            authLevelConditions.push('el_in_al_response.status_code >= 500')
+
+          if (authLevelConditions.length > 0) {
+            authWhere = `where al_metadata.request_id is not null AND (${authLevelConditions.join(' OR ')})`
+            if (baseConditions.length > 0) {
+              authWhere += ` AND ${baseConditions.join(' AND ')}`
+            }
+          } else if (baseConditions.length > 0) {
+            authWhere = `where al_metadata.request_id is not null AND ${baseConditions.join(' AND ')}`
+          } else {
+            authWhere = `where al_metadata.request_id is not null`
+          }
+        } else if (baseConditions.length > 0) {
+          authWhere = `where al_metadata.request_id is not null AND ${baseConditions.join(' AND ')}`
+        } else {
+          authWhere = `where al_metadata.request_id is not null`
+        }
+
+        // Supavisor logs level filter
+        if (hasLevelFilter) {
+          const supavisorLevelConditions = []
+          if (levelFilter.includes('success'))
+            supavisorLevelConditions.push(
+              "LOWER(svl_metadata.level) NOT IN ('error', 'warn', 'warning')"
+            )
+          if (levelFilter.includes('warning'))
+            supavisorLevelConditions.push(
+              "(LOWER(svl_metadata.level) = 'warn' OR LOWER(svl_metadata.level) = 'warning')"
+            )
+          if (levelFilter.includes('error'))
+            supavisorLevelConditions.push("LOWER(svl_metadata.level) = 'error'")
+
+          if (supavisorLevelConditions.length > 0) {
+            if (baseConditions.length > 0) {
+              supavisorWhere = `WHERE (${supavisorLevelConditions.join(' OR ')}) AND ${baseConditions.join(' AND ')}`
+            } else {
+              supavisorWhere = `WHERE (${supavisorLevelConditions.join(' OR ')})`
+            }
+          } else if (baseConditions.length > 0) {
+            supavisorWhere = `WHERE ${baseConditions.join(' AND ')}`
+          }
+        } else if (baseConditions.length > 0) {
+          supavisorWhere = `WHERE ${baseConditions.join(' AND ')}`
+        }
 
         // The actual SQL query template with your UNION ALL statements - without timestamp conditions
         let sql = `
@@ -392,9 +642,9 @@ select
   'edge' as log_type,
   CAST(edge_logs_response.status_code AS STRING) as status,
   CASE
-    WHEN CAST(edge_logs_response.status_code AS INT64) BETWEEN 200 AND 299 THEN 'success'
-    WHEN CAST(edge_logs_response.status_code AS INT64) BETWEEN 400 AND 499 THEN 'warning'
-    WHEN CAST(edge_logs_response.status_code AS INT64) >= 500 THEN 'error'
+    WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
+    WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+    WHEN edge_logs_response.status_code >= 500 THEN 'error'
     ELSE 'success'
   END as level,
   edge_logs_request.path as path,
@@ -412,6 +662,7 @@ left join unnest(edge_logs_request.sb) as sb
 left join unnest(sb.jwt) as jwt
 left join unnest(jwt.authorization) as auth
 left join unnest(auth.payload) as authorization_payload
+${edgeWhere}
 
 union all
 
@@ -436,6 +687,7 @@ select
 from postgres_logs as pgl
 cross join unnest(pgl.metadata) as pgl_metadata
 cross join unnest(pgl_metadata.parsed) as pgl_parsed
+${postgresWhere}
 
 union all 
 
@@ -443,11 +695,11 @@ select
   id, 
   fel.timestamp as timestamp,
   'edge function' as log_type,
-  CAST(fel_response.status_code as STRING) as status,
+  CAST(fel_response.status_code AS STRING) as status,
   CASE
-    WHEN CAST(fel_response.status_code AS INT64) BETWEEN 200 AND 299 THEN 'success'
-    WHEN CAST(fel_response.status_code AS INT64) BETWEEN 400 AND 499 THEN 'warning'
-    WHEN CAST(fel_response.status_code AS INT64) >= 500 THEN 'error'
+    WHEN fel_response.status_code BETWEEN 200 AND 299 THEN 'success'
+    WHEN fel_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+    WHEN fel_response.status_code >= 500 THEN 'error'
     ELSE 'success'
   END as level,
   fel_request.url as path,
@@ -475,6 +727,7 @@ left join (
   WHERE fl_metadata.execution_id IS NOT NULL
   GROUP BY fl_metadata.execution_id
 ) as function_logs_agg on fel_metadata.execution_id = function_logs_agg.execution_id
+${functionWhere}
 
 union all
 
@@ -482,11 +735,11 @@ select
   al.id as id, 
   el_in_al.timestamp as timestamp, 
   'auth' as log_type,
-  CAST(el_in_al_response.status_code as STRING) as status,
+  CAST(el_in_al_response.status_code AS STRING) as status,
   CASE
-    WHEN CAST(el_in_al_response.status_code AS INT64) BETWEEN 200 AND 299 THEN 'success'
-    WHEN CAST(el_in_al_response.status_code AS INT64) BETWEEN 400 AND 499 THEN 'warning'
-    WHEN CAST(el_in_al_response.status_code AS INT64) >= 500 THEN 'error'
+    WHEN el_in_al_response.status_code BETWEEN 200 AND 299 THEN 'success'
+    WHEN el_in_al_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+    WHEN el_in_al_response.status_code >= 500 THEN 'error'
     ELSE 'success'
   END as level,
   el_in_al_request.path as path,
@@ -510,7 +763,7 @@ left join (
     left join unnest(auth.payload) as authorization_payload
 )
 on al_metadata.request_id = el_in_al_response_headers.cf_ray
-where al_metadata.request_id is not null
+${authWhere}
 
 union all
 
@@ -533,15 +786,8 @@ select
   null as log_count,
 from supavisor_logs as svl
 cross join unnest(metadata) as svl_metadata
-
-
+${supavisorWhere}
 `
-
-        // Apply any additional search criteria to the query
-        if (whereClause) {
-          // Add it as a surrounding WHERE clause for the whole union
-          sql = `SELECT * FROM (${sql}) AS combined_logs ${whereClause}`
-        }
 
         // Add ordering and limit
         sql += `\nORDER BY timestamp DESC, id DESC`
@@ -560,11 +806,6 @@ cross join unnest(metadata) as svl_metadata
           isoTimestampEnd = now.toISOString()
           const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
           isoTimestampStart = oneHourAgo.toISOString()
-
-          console.log('Using default date range for logs (last hour):', {
-            isoTimestampStart,
-            isoTimestampEnd,
-          })
         }
 
         // Use get function from data/fetchers for logs
@@ -590,14 +831,11 @@ cross join unnest(metadata) as svl_metadata
         )
 
         if (error) {
-          console.error('API returned error:', error)
           throw error
         }
 
         // Process the results
         const resultData = data?.result || []
-
-        console.log(`Received ${resultData.length} records from API`)
 
         // Define specific level types
         type LogLevel = 'success' | 'warning' | 'error'
@@ -613,8 +851,6 @@ cross join unnest(metadata) as svl_metadata
 
           // Use the level directly from SQL rather than determining it in TypeScript
           const level = row.level as LogLevel
-
-          console.log(row.log_count)
 
           return {
             id: uniqueId,
@@ -666,7 +902,6 @@ cross join unnest(metadata) as svl_metadata
 
         return response
       } catch (error) {
-        console.error('Error fetching unified logs:', error)
         throw error
       }
     },
