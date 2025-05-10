@@ -14,13 +14,13 @@ import {
   QUERY_PERFORMANCE_PRESET_MAP,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from '../QueryPerformance.constants'
-import { useIsIndexAdvisorAvailable } from './useIsIndexAdvisorAvailable'
+import { useIndexAdvisorStatus } from './useIsIndexAdvisorStatus'
 
 export function useIndexInvalidation() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
-  const isAdvisorAvailable = useIsIndexAdvisorAvailable()
+  const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
   const [{ preset: urlPreset, search: searchQuery, order, sort }] = useQueryStates({
     sort: parseAsString,
@@ -38,7 +38,7 @@ export function useIndexInvalidation() {
     orderBy,
     preset,
     roles: typeof roles === 'string' ? [roles] : roles,
-    runIndexAdvisor: isAdvisorAvailable,
+    runIndexAdvisor: isIndexAdvisorEnabled,
   })
 
   return useCallback(() => {

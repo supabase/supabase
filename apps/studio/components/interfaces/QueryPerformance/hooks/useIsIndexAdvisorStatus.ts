@@ -3,10 +3,12 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { getIndexAdvisorExtensions } from 'components/interfaces/QueryPerformance/index-advisor.utils'
 
 /**
- * Hook to check if index advisor functionality is available
- * @returns boolean indicating if index advisor is available
+ * Hook to get both index advisor availability and enabled status
+ *
+ * available if the index_advisor and hypopg extensions are available
+ * enabled if the index_advisor and hypopg extensions are installed (their versions are not null)
  */
-export function useIsIndexAdvisorAvailable(): boolean {
+export function useIndexAdvisorStatus() {
   const { project } = useProjectContext()
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -14,5 +16,14 @@ export function useIsIndexAdvisorAvailable(): boolean {
   })
 
   const { hypopg, indexAdvisor } = getIndexAdvisorExtensions(extensions ?? [])
-  return hypopg?.installed_version !== null && indexAdvisor?.installed_version !== null
+
+  const isIndexAdvisorAvailable = !!hypopg && !!indexAdvisor
+
+  const isIndexAdvisorEnabled =
+    !!hypopg &&
+    !!indexAdvisor &&
+    hypopg.installed_version !== null &&
+    indexAdvisor.installed_version !== null
+
+  return { isIndexAdvisorAvailable, isIndexAdvisorEnabled }
 }

@@ -1,9 +1,8 @@
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
 
-import { useParams } from 'common'
 import { EnableIndexAdvisorButton } from 'components/interfaces/QueryPerformance/EnableIndexAdvisorButton'
-import { useIsIndexAdvisorAvailable } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorAvailable'
+import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
 import {
   QUERY_PERFORMANCE_PRESET_MAP,
@@ -22,11 +21,12 @@ import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
-  const isAdvisorAvailable = useIsIndexAdvisorAvailable()
+  const { project } = useProjectContext()
+  const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
   const [{ preset: urlPreset, search: searchQuery, order, sort }] = useQueryStates({
     sort: parseAsString,
@@ -36,7 +36,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   })
 
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
-  const hooks = queriesFactory(config.queries, projectRef ?? 'default')
+  const hooks = queriesFactory(config.queries, project?.ref ?? 'default')
   const queryHitRate = hooks.queryHitRate()
 
   const preset = QUERY_PERFORMANCE_PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES]
@@ -48,7 +48,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     orderBy,
     preset,
     roles: typeof roles === 'string' ? [roles] : roles,
-    runIndexAdvisor: isAdvisorAvailable,
+    runIndexAdvisor: isIndexAdvisorEnabled,
   })
 
   return (
