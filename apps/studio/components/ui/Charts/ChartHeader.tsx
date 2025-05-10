@@ -9,6 +9,7 @@ export interface ChartHeaderProps {
   displayDateInUtc?: boolean
   highlightedLabel?: number | string | any | null
   highlightedValue?: number | string | any | null
+  hideHighlightedValue?: boolean
   hideChartType?: boolean
   chartStyle?: string
   onChartStyleChange?: (style: string) => void
@@ -20,6 +21,7 @@ const ChartHeader = ({
   format,
   highlightedValue,
   highlightedLabel,
+  hideHighlightedValue = false,
   title,
   minimalHeader = false,
   hideChartType = false,
@@ -52,7 +54,7 @@ const ChartHeader = ({
       <div className="flex flex-row items-center gap-x-4" style={{ minHeight: '1.8rem' }}>
         {title && chartTitle}
         <div className="flex flex-row items-baseline gap-x-2">
-          {highlightedValue !== undefined && highlighted}
+          {highlightedValue !== undefined && !hideHighlightedValue && highlighted}
           {label}
         </div>
       </div>
@@ -63,7 +65,7 @@ const ChartHeader = ({
     <div className="flex-grow flex justify-between items-start min-h-16">
       <div className="flex flex-col">
         {title && chartTitle}
-        {highlightedValue !== undefined && highlighted}
+        {highlightedValue !== undefined && !hideHighlightedValue && highlighted}
         {label}
       </div>
       <div className="flex items-center gap-2">

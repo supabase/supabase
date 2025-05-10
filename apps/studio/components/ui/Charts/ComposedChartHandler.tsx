@@ -17,13 +17,14 @@ import { useChartHighlight } from './useChartHighlight'
 import type { ChartData } from './Charts.types'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 
-type Provider = 'infra-monitoring' | 'daily-stats'
+type Provider = 'infra-monitoring' | 'daily-stats' | 'custom'
 
 export type MultiAttribute = {
   attribute: string
   provider: Provider
   label?: string
   color?: string
+  stackId?: string
   format?: 'percent' | 'number'
   description?: string
   docsLink?: string
@@ -31,6 +32,8 @@ export type MultiAttribute = {
   type?: 'line' | 'area-bar'
   omitFromTotal?: boolean
   tooltip?: string
+  customValue?: number
+  id?: string
 }
 
 interface ComposedChartHandlerProps {
@@ -124,6 +127,8 @@ const ComposedChartHandler = ({
   updateDateRange,
   valuePrecision,
   isVisible = true,
+  id,
+  ...otherProps
 }: PropsWithChildren<ComposedChartHandlerProps>) => {
   const router = useRouter()
   const { ref } = router.query
@@ -170,6 +175,12 @@ const ComposedChartHandler = ({
       .map((timestamp) => {
         const point: any = { timestamp }
         attributes.forEach((attr, index) => {
+          // Handle custom value attributes (like disk size)
+          if (attr.customValue !== undefined) {
+            point[attr.attribute] = attr.customValue
+            return
+          }
+
           const queryData = attributeQueries[index].data?.data
           const matchingPoint = queryData?.find((p: any) => p.period_start === timestamp)
           point[attr.attribute] = matchingPoint?.[attr.attribute] ?? 0
@@ -240,19 +251,14 @@ const ComposedChartHandler = ({
     <Panel
       noMargin
       noHideOverflow
-      className={cn('relative py-2 w-full', className)}
+      className={cn('relative py-2 w-full scroll-mt-16', className)}
       wrapWithLoading={false}
+      id={id ?? label.toLowerCase().replaceAll(' ', '-')}
     >
       <Panel.Content className="flex flex-col gap-4">
-        <div
-          className="absolute right-6 z-50 flex justify-between scroll-mt-10"
-          id={label.toLowerCase().replaceAll(' ', '-')}
-        >
-          {children}
-        </div>
+        <div className="absolute right-6 z-50 flex justify-between scroll-mt-16">{children}</div>
         <ComposedChart
           attributes={attributes}
-          YAxisProps={{ width: 1 }}
           data={combinedData as DataPoint[]}
           format={format}
           xAxisKey="period_start"
@@ -270,6 +276,7 @@ const ComposedChartHandler = ({
           updateDateRange={updateDateRange}
           valuePrecision={valuePrecision}
           hideChartType={hideChartType}
+          {...otherProps}
         />
       </Panel.Content>
     </Panel>

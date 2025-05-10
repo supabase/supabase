@@ -16400,9 +16400,9 @@ export interface operations {
           | 'cpu_usage_busy_irqs'
           | 'cpu_usage_busy_other'
           | 'cpu_usage_busy_idle'
-          | 'client_connections_pgbouncer'
           | 'max_cpu_usage'
           | 'avg_cpu_usage'
+          | 'pg_database_size'
           | 'disk_io_budget'
           | 'disk_io_consumption'
           | 'disk_iops_read'
@@ -16416,9 +16416,12 @@ export interface operations {
           | 'ram_usage_cache_and_buffers'
           | 'ram_usage_swap'
           | 'swap_usage'
+          | 'client_connections_pgbouncer'
           | 'physical_replication_lag_physical_replica_lag_seconds'
           | 'pg_stat_database_num_backends'
           | 'supavisor_connections_active'
+          | 'network_receive_bytes'
+          | 'network_transmit_bytes'
           | 'pgbouncer_pools_client_active_connections'
         databaseIdentifier?: string
         endDate: string

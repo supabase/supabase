@@ -1,3 +1,6 @@
+import { numberFormatter } from 'components/ui/Charts/Charts.utils'
+import { formatBytes } from 'lib/helpers'
+
 export const getReportAttributes = (isFreePlan: boolean) => [
   { id: 'ram_usage', label: 'Memory usage', hide: false },
   { id: 'avg_cpu_usage', label: 'Average CPU usage', hide: false },
@@ -30,7 +33,10 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
     showLegend: true,
     hideChartType: false,
     defaultChartStyle: 'line',
-    showMaxValue: false,
+    showMaxValue: true,
+    showGrid: true,
+    syncId: 'database-reports',
+    YAxisProps: { width: 55, tickFormatter: (value: any) => formatBytes(value, 0) },
     attributes: [
       {
         attribute: 'ram_usage_used',
@@ -60,17 +66,27 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
         tooltip:
           'Memory swapped to disk when RAM is full. An instance has 1GB of SWAP. High swap with high disk I/O signals memory stress.',
       },
+      {
+        attribute: 'ram_usage_total',
+        provider: 'infra-monitoring',
+        label: 'Max',
+        isMaxValue: true,
+        tooltip: 'Total memory capacity provisioned for this database instance.',
+      },
     ],
   },
   {
     id: 'cpu-usage',
     label: 'CPU usage',
+    syncId: 'database-reports',
     format: '%',
     valuePrecision: 2,
     hide: false,
     showTooltip: true,
     showLegend: true,
     showMaxValue: false,
+    showGrid: true,
+    YAxisProps: { width: 40, tickFormatter: (value: any) => `${numberFormatter(value, 2)}%` },
     hideChartType: false,
     defaultChartStyle: 'line',
     attributes: [
@@ -117,10 +133,13 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
   {
     id: 'disk-iops',
     label: 'Disk IOps',
+    syncId: 'database-reports',
     hide: false,
     showTooltip: true,
     showLegend: true,
     hideChartType: false,
+    showGrid: true,
+    YAxisProps: { width: 30, tickFormatter: (value: any) => numberFormatter(value, 2) },
     defaultChartStyle: 'line',
     attributes: [
       {
@@ -140,13 +159,94 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
     ],
   },
   {
+    id: 'disk-io-usage',
+    label: 'Disk IO Usage',
+    syncId: 'database-reports',
+    hide: false,
+    showTooltip: true,
+    format: '%',
+    valuePrecision: 2,
+    showLegend: false,
+    showMaxValue: false,
+    hideChartType: false,
+    showGrid: true,
+    YAxisProps: { width: 40, tickFormatter: (value: any) => `${numberFormatter(value, 2)}%` },
+    defaultChartStyle: 'line',
+    attributes: [
+      {
+        attribute: 'disk_io_consumption',
+        provider: 'infra-monitoring',
+        label: 'IO Consumption',
+        tooltip:
+          'The actual number of IO operations per second that the database is currently using.',
+      },
+    ],
+  },
+  {
+    id: 'db-size',
+    label: 'Database Size',
+    valuePrecision: 2,
+    hide: false,
+    showTooltip: false,
+    showLegend: false,
+    showMaxValue: false,
+    showGrid: true,
+    YAxisProps: { width: 65, tickFormatter: (value: any) => formatBytes(value, 1) },
+    hideChartType: false,
+    defaultChartStyle: 'line',
+    attributes: [
+      {
+        attribute: 'pg_database_size',
+        provider: 'infra-monitoring',
+        label: 'pg_database_size',
+        tooltip: 'pg_database_size',
+      },
+    ],
+  },
+  {
+    id: 'network-traffic',
+    label: 'Network Traffic',
+    syncId: 'database-reports',
+    valuePrecision: 1,
+    showTooltip: true,
+    showLegend: true,
+    showMaxValue: false,
+    showGrid: true,
+    YAxisProps: { width: 55, tickFormatter: (value: any) => formatBytes(value, 1) },
+    hideChartType: false,
+    defaultChartStyle: 'line',
+    hideHighlightedValue: true,
+    showTotal: false,
+    attributes: [
+      {
+        attribute: 'network_transmit_bytes',
+        provider: 'infra-monitoring',
+        label: 'Transmit',
+        tooltip:
+          'Data sent from your database to clients. High values may indicate large query results or numerous outgoing connections.',
+        stackId: '2',
+      },
+      {
+        attribute: 'network_receive_bytes',
+        provider: 'infra-monitoring',
+        label: 'Receive',
+        tooltip:
+          'Data received by your database from clients. High values may indicate frequent queries, large data inserts, or many incoming connections.',
+        stackId: '1',
+      },
+    ],
+  },
+  {
     id: 'client-connections',
     label: 'Database client connections',
+    syncId: 'database-reports',
     valuePrecision: 0,
     hide: false,
     showTooltip: false,
     showLegend: false,
     showMaxValue: false,
+    showGrid: true,
+    YAxisProps: { width: 20 },
     hideChartType: false,
     defaultChartStyle: 'line',
     attributes: [
@@ -161,11 +261,14 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
   {
     id: 'pgbouncer-connections',
     label: 'Pooler client connections',
+    syncId: 'database-reports',
     valuePrecision: 0,
     hide: false,
     showTooltip: false,
     showLegend: false,
     showMaxValue: false,
+    showGrid: true,
+    YAxisProps: { width: 30 },
     hideChartType: false,
     defaultChartStyle: 'line',
     attributes: [
@@ -180,11 +283,14 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
   {
     id: 'supavisor-connections-active',
     label: 'Supavisor client connections',
+    syncId: 'database-reports',
     valuePrecision: 0,
     hide: isFreePlan,
     showTooltip: false,
     showLegend: false,
     showMaxValue: false,
+    showGrid: true,
+    YAxisProps: { width: 30 },
     hideChartType: false,
     defaultChartStyle: 'line',
     attributes: [
