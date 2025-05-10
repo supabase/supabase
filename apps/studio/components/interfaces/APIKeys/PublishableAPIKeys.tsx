@@ -8,7 +8,6 @@ import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPe
 import { Link } from 'lucide-react'
 import { useMemo } from 'react'
 import { cn, EyeOffIcon, Input_Shadcn_, Skeleton, WarningIcon } from 'ui'
-import QuickKeyCopyWrapper from './QuickKeyCopy'
 // to add in later with follow up PR
 // import CreatePublishableAPIKeyDialog from './CreatePublishableAPIKeyDialog'
 // to add in later with follow up PR
@@ -75,8 +74,6 @@ export const PublishableAPIKeys = () => {
         </div>
 
         {/* <CreatePublishableAPIKeyModal /> */}
-
-        <QuickKeyCopyWrapper />
       </div>
     </div>
   )
