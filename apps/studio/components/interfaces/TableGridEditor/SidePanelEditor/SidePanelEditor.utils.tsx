@@ -286,6 +286,7 @@ export const updateColumn = async ({
   projectRef,
   connectionString,
   id,
+  originalName,
   payload,
   selectedTable,
   primaryKey,
@@ -297,6 +298,7 @@ export const updateColumn = async ({
   projectRef: string
   connectionString?: string | null
   id: string
+  originalName: string
   payload: UpdateColumnPayload
   selectedTable: PostgresTable
   primaryKey?: Constraint
@@ -307,7 +309,7 @@ export const updateColumn = async ({
 }) => {
   try {
     const { isPrimaryKey, ...formattedPayload } = payload
-    const column = await updateDatabaseColumn({
+    await updateDatabaseColumn({
       projectRef,
       connectionString,
       id,
@@ -322,22 +324,23 @@ export const updateColumn = async ({
         await dropConstraint(
           projectRef,
           connectionString,
-          column.schema,
-          column.table,
+          selectedTable.schema,
+          selectedTable.name,
           primaryKey.name
         )
       }
 
+      const columnName = formattedPayload.name ?? originalName
       const primaryKeyColumns = isPrimaryKey
-        ? existingPrimaryKeys.concat([column.name])
-        : existingPrimaryKeys.filter((x) => x !== column.name)
+        ? existingPrimaryKeys.concat([columnName])
+        : existingPrimaryKeys.filter((x) => x !== columnName)
 
       if (primaryKeyColumns.length) {
         await addPrimaryKey(
           projectRef,
           connectionString,
-          column.schema,
-          column.table,
+          selectedTable.schema,
+          selectedTable.name,
           primaryKeyColumns
         )
       }
@@ -348,13 +351,13 @@ export const updateColumn = async ({
       await updateForeignKeys({
         projectRef,
         connectionString,
-        table: { schema: column.schema, name: column.table },
+        table: { schema: selectedTable.schema, name: selectedTable.name },
         foreignKeys: foreignKeyRelations,
         existingForeignKeyRelations,
       })
     }
 
-    if (!skipSuccessMessage) toast.success(`Successfully updated column "${column.name}"`)
+    if (!skipSuccessMessage) toast.success(`Successfully updated column "${originalName}"`)
   } catch (error: any) {
     return { error }
   }
@@ -723,6 +726,7 @@ export const updateTable = async ({
             projectRef: projectRef,
             connectionString: connectionString,
             id: column.id,
+            originalName: column.name,
             payload: columnPayload,
             selectedTable: updatedTable,
             skipPKCreation: true,

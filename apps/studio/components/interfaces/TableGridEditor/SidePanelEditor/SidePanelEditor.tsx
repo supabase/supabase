@@ -247,6 +247,7 @@ const SidePanelEditor = ({
           projectRef: project?.ref!,
           connectionString: project?.connectionString,
           id: columnId as string,
+          originalName: selectedColumnToEdit ? selectedColumnToEdit.name : '',
           payload: payload as UpdateColumnPayload,
           selectedTable,
           primaryKey,

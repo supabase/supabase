@@ -1,9 +1,10 @@
+import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseKeys } from 'data/database/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
-import { del, handleError } from 'data/fetchers'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import { tableRowKeys } from 'data/table-rows/keys'
 import { viewKeys } from 'data/views/keys'
@@ -26,18 +27,16 @@ export async function deleteDatabaseColumn({
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  const { data, error } = await del('/platform/pg-meta/{ref}/columns', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      // cascade is expected to be a string 'true' or 'false'
-      query: { id, cascade },
-    },
-    headers,
+  const { sql } = pgMeta.columns.remove(id, { cascade })
+
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['column', 'delete', id],
   })
 
-  if (error) handleError(error)
-  return data
+  return result
 }
 
 type DatabaseColumnDeleteData = Awaited<ReturnType<typeof deleteDatabaseColumn>>
