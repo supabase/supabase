@@ -25,9 +25,9 @@ export function getStatusColor(value?: number | string): Record<'text' | 'bg' | 
     case '5':
     case 'error':
       return {
-        text: 'text-red-500',
-        bg: 'bg-destructive-300 dark:bg-destructive-200/50',
-        border: 'border-destructive-400/50 dark:border-destructive-400/50',
+        text: 'text-destructive',
+        bg: 'bg-destructive-300 dark:bg-destructive-300/50',
+        border: 'border border-destructive-400/50 dark:border-destructive-400/50',
       }
     default:
       return {
