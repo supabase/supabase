@@ -4,18 +4,16 @@
 	import type { SubmitFunction } from '@sveltejs/kit';
     import Avatar from './Avatar.svelte'
 
-	export let data
-	export let form
+	let { data, form } = $props()
 
-	let { session, supabase, profile } = data
-	$: ({ session, supabase, profile } = data)
+	let { session, supabase, profile } = $derived(data)
 
 	let profileForm: HTMLFormElement
-	let loading = false
+	let loading = $state(false)
 	let fullName: string = profile?.full_name ?? ''
 	let username: string = profile?.username ?? ''
 	let website: string = profile?.website ?? ''
-	let avatarUrl: string = profile?.avatar_url ?? ''
+	let avatarUrl: string = $state(profile?.avatar_url ?? '')
 
 	const handleSubmit: SubmitFunction = () => {
 		loading = true
