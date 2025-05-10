@@ -1,4 +1,4 @@
-import { ExternalLink, Github } from 'lucide-react'
+import { ExternalLink, Github, Mail } from 'lucide-react'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { FeatureBanner } from 'components/ui/FeatureBanner'
@@ -7,6 +7,7 @@ import {
   Button,
   Card,
   CardContent,
+  Separator,
   Table,
   TableBody,
   TableCell,
@@ -163,20 +164,34 @@ export const ApiKeysFeedbackBanner = () => {
   return (
     <FeatureBanner
       storageKey={LOCAL_STORAGE_KEYS.API_KEYS_FEEDBACK_DISMISSED}
-      className="!p-6"
+      className="!p-0 flex flex-col gap-0"
       dismissable
     >
-      <div className="flex flex-col gap-0 z-[2]">
+      <div className="p-5">
         <p className="text-sm text-foreground">Your new API keys are here</p>
         <p className="text-sm text-foreground-lighter">
-          We've updated our API keys to better support your application needs. Have feedback?{' '}
+          We've updated our API keys to better support your application needs.{' '}
           <a
-            href="https://github.com/supabase/supabase/discussions"
+            href="https://github.com/orgs/supabase/discussions/29260"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1 text-brand"
+            className="inline-flex items-center gap-1 text-foreground"
           >
             Join the discussion on GitHub <ExternalLink size={14} strokeWidth={1.5} />
+          </a>
+        </p>
+      </div>
+
+      <Separator className="w-full" />
+
+      <div className="px-5 py-2 bg-surface-200/30">
+        <p className="text-sm text-foreground-lighter">
+          Having trouble with the new API keys?{' '}
+          <a
+            href="/support/new?category=Problem&subject=Help%20with%20API%20keys&message=I'm%20experiencing%20problems%20with%20the%20new%20API%20keys%20feature.%20Please%20describe%20your%20specific%20issue%20here."
+            className="inline-flex items-center gap-1 text-foreground"
+          >
+            Contact support
           </a>
         </p>
       </div>

@@ -64,12 +64,12 @@ export const FeatureBanner = ({
       }}
       {...props}
       className={cn(
-        'pb-36 pt-10 relative w-full flex flex-col xl:flex-row border xl:py-10 px-10 rounded-md overflow-hidden',
+        'pb-36 pt-10 relative w-full border xl:py-10 px-10 rounded-md overflow-hidden',
         bgAlt && 'bg-background-alternative',
         className
       )}
     >
-      <div className="z-[2]">{children}</div>
+      {children}
       {illustration}
       {dismissable && storageKey && (
         <div className={cn('absolute top-3 right-3', dismissClassName)}>

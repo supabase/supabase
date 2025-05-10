@@ -56,7 +56,7 @@ export const SecretAPIKeys = () => {
     <div>
       <FormHeader
         title="Secret keys"
-        description="These API keys allow privileged access to your project's APIs. Use in servers, functions, workers or other backend components of your application. Keep secret and never publish."
+        description="These API keys allow privileged access to your project's APIs. Use in servers, functions, workers or other backend components of your application."
         actions={<CreateSecretAPIKeyDialog />}
       />
       <Card className={cn('w-full overflow-hidden', !empty && 'bg-surface-100')}>
