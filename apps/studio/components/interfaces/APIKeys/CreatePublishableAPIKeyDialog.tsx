@@ -1,5 +1,6 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
+import * as z from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
   Button,
@@ -16,22 +17,29 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import * as z from 'zod'
 
-import { useParams } from 'common'
 import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
-import { Plus } from 'lucide-react'
+import { useParams } from 'next/navigation'
 
-const FORM_ID = 'create-secret-api-key'
+const FORM_ID = 'create-publishable-api-key'
 const SCHEMA = z.object({
   description: z.string(),
 })
 
-const CreateSecretAPIKeyModal = () => {
+export interface CreatePublishableAPIKeyDialogProps {
+  projectRef: string
+}
+
+function CreatePublishableAPIKeyDialog() {
+  const params = useParams()
+  const projectRef = params?.ref as string
+
   const [visible, setVisible] = useState(false)
-  const { ref: projectRef } = useParams()
 
   const onClose = (value: boolean) => {
     setVisible(value)
@@ -50,7 +58,7 @@ const CreateSecretAPIKeyModal = () => {
     createAPIKey(
       {
         projectRef,
-        type: 'secret',
+        type: 'publishable',
         description: values.description.trim(),
       },
       {
@@ -64,17 +72,17 @@ const CreateSecretAPIKeyModal = () => {
   return (
     <Dialog open={visible} onOpenChange={onClose}>
       <DialogTrigger asChild>
-        <Button type="default" className="mt-2" icon={<Plus />}>
-          Add new Secret key
+        <Button type="default" className="pointer-events-auto">
+          Create new
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create new secret API key</DialogTitle>
+          <DialogTitle>Create new publishable API key</DialogTitle>
           <DialogDescription>
-            Secret API keys are used to authorize requests to your project from servers, functions,
-            workers or other backend components of your application. Keep them secret, don't publish
-            them online and don't check them in source code.
+            Publishable API keys are used to authorize requests to your project from the web, mobile
+            or desktop apps, CLIs or other public components of your application. They are safe to
+            be published online and embedded in code.
           </DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
@@ -105,7 +113,7 @@ const CreateSecretAPIKeyModal = () => {
         </DialogSection>
         <DialogFooter>
           <Button form={FORM_ID} htmlType="submit" loading={isCreatingAPIKey}>
-            Create API key
+            Create Publishable API key
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -113,4 +121,4 @@ const CreateSecretAPIKeyModal = () => {
   )
 }
 
-export default CreateSecretAPIKeyModal
+export default CreatePublishableAPIKeyDialog

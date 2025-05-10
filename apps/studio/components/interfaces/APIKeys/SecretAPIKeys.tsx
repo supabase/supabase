@@ -15,7 +15,7 @@ import {
   TableRow,
 } from 'ui/src/components/shadcn/ui/table'
 import { APIKeyRow } from './APIKeyRow'
-import CreateSecretAPIKeyModal from './CreateSecretAPIKeyModal'
+import CreateSecretAPIKeyDialog from './CreateSecretAPIKeyDialog'
 
 export const SecretAPIKeys = () => {
   const { ref: projectRef } = useParams()
@@ -56,21 +56,21 @@ export const SecretAPIKeys = () => {
     <div>
       <FormHeader
         title="Secret keys"
-        description="These API keys allow privileged access to your project's APIs. Use in servers, functions, workers or other backend components of your application. Keep secret and never publish."
-        actions={<CreateSecretAPIKeyModal />}
+        description="These API keys allow privileged access to your project's APIs. Use in servers, functions, workers or other backend components of your application."
+        actions={<CreateSecretAPIKeyDialog />}
       />
       <Card className={cn('w-full overflow-hidden', !empty && 'bg-surface-100')}>
         <CardContent className="p-0">
-          <Table className="p-5">
+          <Table className="p-5 table-fixed">
             <TableHeader>
               <TableRow className={cn('bg-200', empty && 'hidden')}>
                 <TableHead
                   key=""
-                  className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 overflow-hidden"
+                  className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 overflow-hidden w-[200px]"
                 >
                   Name
                 </TableHead>
-                <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 pr-0">
+                <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 pr-0 w-full">
                   API Key
                 </TableHead>
                 <TableHead
