@@ -4,7 +4,7 @@ import type { SearchParamsType } from './search-params'
 import { ARRAY_DELIMITER, SORT_DELIMITER } from 'components/interfaces/DataTableDemo/lib/delimiters'
 import { z } from 'zod'
 import { useParams } from 'common'
-import { get, handleError } from 'data/fetchers'
+import { get, handleError, post } from 'data/fetchers'
 import { ColumnSchema } from './schema'
 import dayjs from 'dayjs'
 import { useQuery } from '@tanstack/react-query'
@@ -269,14 +269,18 @@ ORDER BY minute ASC
 `
 
         // Use the get function from data/fetchers for chart data
-        const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-          params: {
-            path: { ref: projectRef },
-            query: {
+        const { data, error } = await post(
+          // @ts-expect-error
+          `/platform/projects/{ref}/analytics/endpoints/logs.all`,
+          {
+            body: {
               sql,
             },
-          },
-        })
+            params: {
+              path: { ref: projectRef },
+            },
+          }
+        )
 
         if (error) {
           console.error('API returned error for chart data:', error)
@@ -556,23 +560,28 @@ cross join unnest(metadata) as svl_metadata
           ? new Date(search.date[0]).toISOString()
           : undefined
 
-        // Use the get function from data/fetchers
-        const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-          params: {
-            path: { ref: projectRef },
-            query: {
+        // Use get function from data/fetchers for logs
+        const { data, error } = await post(
+          // @ts-expect-error
+          `/platform/projects/{ref}/analytics/endpoints/logs.all`,
+          {
+            body: {
               sql,
-              // Use pagination parameters instead of embedding in SQL
-              iso_timestamp_start: isoTimestampStart,
-              iso_timestamp_end: isPagination
-                ? isoTimestampEnd
-                : search.date?.[1]
-                  ? new Date(search.date[1]).toISOString()
-                  : new Date().toISOString(),
-              project: projectRef,
             },
-          },
-        })
+            params: {
+              path: { ref: projectRef },
+              query: {
+                iso_timestamp_start: isoTimestampStart,
+                iso_timestamp_end: isPagination
+                  ? isoTimestampEnd
+                  : search.date?.[1]
+                    ? new Date(search.date[1]).toISOString()
+                    : new Date().toISOString(),
+                project: projectRef,
+              },
+            },
+          }
+        )
 
         if (error) {
           console.error('API returned error:', error)
@@ -644,6 +653,7 @@ cross join unnest(metadata) as svl_metadata
               logTypeCounts: calculateLogTypeCounts(result),
             },
           },
+
           nextCursor: hasMore ? nextCursor : null,
           prevCursor,
         }
