@@ -137,7 +137,7 @@ const ProjectUsage = () => {
         </span>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-4">
-        <Panel>
+        <Panel className="mb-0 md:mb-0">
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
@@ -163,7 +163,7 @@ const ProjectUsage = () => {
           </Panel.Content>
         </Panel>
         {authEnabled && (
-          <Panel>
+          <Panel className="mb-0 md:mb-0">
             <Panel.Content className="space-y-4">
               <PanelHeader
                 icon={
@@ -189,7 +189,7 @@ const ProjectUsage = () => {
           </Panel>
         )}
         {storageEnabled && (
-          <Panel>
+          <Panel className="mb-0 md:mb-0">
             <Panel.Content className="space-y-4">
               <PanelHeader
                 icon={
@@ -215,7 +215,7 @@ const ProjectUsage = () => {
             </Panel.Content>
           </Panel>
         )}
-        <Panel>
+        <Panel className="mb-0 md:mb-0">
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
