@@ -298,7 +298,7 @@ export function Client() {
               <TimelineChart
                 data={chartData ?? []}
                 className="-mb-2"
-                columnId={'date'}
+                columnId={chartData?.[0]?.date ? 'date' : 'timestamp'}
                 chartConfig={chartConfig}
               />
             </DataTableHeaderLayout>

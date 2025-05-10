@@ -183,7 +183,6 @@ WITH unified_logs AS (
   FROM edge_logs as el
   CROSS JOIN UNNEST(metadata) as edge_logs_metadata
   CROSS JOIN UNNEST(edge_logs_metadata.response) as edge_logs_response
-  WHERE el.timestamp >= '${dateStart}' AND el.timestamp <= '${dateEnd}'
 
   UNION ALL
 
@@ -195,7 +194,6 @@ WITH unified_logs AS (
   FROM postgres_logs as pgl
   CROSS JOIN UNNEST(pgl.metadata) as pgl_metadata
   CROSS JOIN UNNEST(pgl_metadata.parsed) as pgl_parsed
-  WHERE pgl.timestamp >= '${dateStart}' AND pgl.timestamp <= '${dateEnd}'
 
   UNION ALL 
 
@@ -205,7 +203,6 @@ WITH unified_logs AS (
     'function events' as log_type,
     'undefined' as status
   FROM function_logs as fl
-  WHERE fl.timestamp >= '${dateStart}' AND fl.timestamp <= '${dateEnd}'
 
   UNION ALL
 
@@ -217,7 +214,6 @@ WITH unified_logs AS (
   FROM function_edge_logs as fel
   CROSS JOIN UNNEST(metadata) as fel_metadata
   CROSS JOIN UNNEST(fel_metadata.response) as fel_response
-  WHERE fel.timestamp >= '${dateStart}' AND fel.timestamp <= '${dateEnd}'
 
   UNION ALL
 
@@ -235,8 +231,7 @@ WITH unified_logs AS (
     CROSS JOIN UNNEST(el_in_al_response.headers) as el_in_al_response_headers 
   )
   ON al_metadata.request_id = el_in_al_response_headers.cf_ray
-  WHERE el_in_al.timestamp >= '${dateStart}' AND el_in_al.timestamp <= '${dateEnd}'
-  AND al_metadata.request_id is not null
+  WHERE al_metadata.request_id is not null
 
   UNION ALL
 
@@ -246,7 +241,6 @@ WITH unified_logs AS (
     'supavisor' as log_type,
     'undefined' as status
   FROM supavisor_logs as svl
-  WHERE svl.timestamp >= '${dateStart}' AND svl.timestamp <= '${dateEnd}'
 
   UNION ALL
 
@@ -256,7 +250,6 @@ WITH unified_logs AS (
     'postgres upgrade' as log_type,
     'undefined' as status
   FROM pg_upgrade_logs as pgul
-  WHERE pgul.timestamp >= '${dateStart}' AND pgul.timestamp <= '${dateEnd}'
 )
 SELECT
   TIMESTAMP_TRUNC(timestamp, MINUTE) as minute,
@@ -270,7 +263,6 @@ ORDER BY minute ASC
 
         // Use the get function from data/fetchers for chart data
         const { data, error } = await post(
-          // @ts-expect-error
           `/platform/projects/{ref}/analytics/endpoints/logs.all`,
           {
             body: {
@@ -278,6 +270,11 @@ ORDER BY minute ASC
             },
             params: {
               path: { ref: projectRef },
+              query: {
+                iso_timestamp_start: dateStart,
+                iso_timestamp_end: dateEnd,
+                project: projectRef,
+              },
             },
           }
         )
@@ -550,19 +547,28 @@ cross join unnest(metadata) as svl_metadata
         sql += `\nORDER BY timestamp DESC, id DESC`
         sql += `\nLIMIT 50`
 
-        // Convert cursor microseconds to ISO string if needed
-        const isoTimestampEnd = cursorValue
-          ? new Date(Number(cursorValue) / 1000).toISOString()
-          : undefined
+        // Extract date range from search or use default (last hour)
+        let isoTimestampStart: string
+        let isoTimestampEnd: string
 
-        // Extract date range from search
-        const isoTimestampStart = search.date?.[0]
-          ? new Date(search.date[0]).toISOString()
-          : undefined
+        if (search.date && search.date.length === 2) {
+          isoTimestampStart = new Date(search.date[0]).toISOString()
+          isoTimestampEnd = new Date(search.date[1]).toISOString()
+        } else {
+          // Default to last hour
+          const now = new Date()
+          isoTimestampEnd = now.toISOString()
+          const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
+          isoTimestampStart = oneHourAgo.toISOString()
+
+          console.log('Using default date range for logs (last hour):', {
+            isoTimestampStart,
+            isoTimestampEnd,
+          })
+        }
 
         // Use get function from data/fetchers for logs
         const { data, error } = await post(
-          // @ts-expect-error
           `/platform/projects/{ref}/analytics/endpoints/logs.all`,
           {
             body: {
@@ -571,12 +577,12 @@ cross join unnest(metadata) as svl_metadata
             params: {
               path: { ref: projectRef },
               query: {
-                iso_timestamp_start: isoTimestampStart,
-                iso_timestamp_end: isPagination
-                  ? isoTimestampEnd
-                  : search.date?.[1]
-                    ? new Date(search.date[1]).toISOString()
-                    : new Date().toISOString(),
+                iso_timestamp_start: isPagination
+                  ? cursorValue
+                    ? new Date(Number(cursorValue) / 1000).toISOString()
+                    : isoTimestampEnd
+                  : isoTimestampStart,
+                iso_timestamp_end: isPagination ? isoTimestampEnd : isoTimestampEnd,
                 project: projectRef,
               },
             },
