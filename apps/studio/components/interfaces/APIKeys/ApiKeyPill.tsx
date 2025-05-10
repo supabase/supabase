@@ -4,13 +4,15 @@ import { Eye } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
 import CopyButton from 'components/ui/CopyButton'
 import { useAPIKeyIdQuery } from 'data/api-keys/[id]/api-key-id-query'
 import { APIKeysData } from 'data/api-keys/api-keys-query'
 import { apiKeysKeys } from 'data/api-keys/keys'
-import { Button, cn } from 'ui'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export function ApiKeyPill({
   apiKey,
@@ -20,10 +22,17 @@ export function ApiKeyPill({
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
 
+  // State that controls whether to show the full API key
   const [show, setShowState] = useState(false)
 
   const isSecret = apiKey.type === 'secret'
 
+  // Permission check for revealing/copying secret API keys
+  const { can: canManageSecretKeys, isLoading: isLoadingPermission } =
+    useAsyncCheckProjectPermissions(PermissionAction.READ, 'service_api_keys')
+
+  // This query only runs when show=true (enabled: show)
+  // It fetches the fully revealed API key when needed
   const {
     data,
     isLoading: isLoadingApiKey,
@@ -33,20 +42,22 @@ export function ApiKeyPill({
     {
       projectRef,
       id: apiKey.id as string,
-      reveal: true,
+      reveal: true, // Request the unmasked key
     },
     {
-      enabled: show,
-      staleTime: 0, // Data is considered stale immediately
-      cacheTime: 0, // Cache is cleared immediately after query becomes stale
+      enabled: show, // Only run query when show is true
+      staleTime: 0, // Always consider data stale
+      cacheTime: 0, // Don't cache the key data
     }
   )
 
-  // Auto-hide timer for the API key
+  // Auto-hide timer for the API key (security feature)
   useEffect(() => {
     if (show && data?.api_key) {
+      // Auto-hide the key after 10 seconds
       const timer = setTimeout(() => {
         setShowState(false)
+        // Clear the cached key from memory
         queryClient.removeQueries({
           queryKey: apiKeysKeys.single(projectRef, apiKey.id as string),
           exact: true,
@@ -55,18 +66,23 @@ export function ApiKeyPill({
 
       return () => clearTimeout(timer)
     }
-  }, [show, data?.api_key, projectRef, queryClient])
+  }, [show, data?.api_key, projectRef, queryClient, apiKey.id])
 
   async function onSubmitShow() {
+    // Don't reveal key if not allowed or loading
+    if (isSecret && !canManageSecretKeys) return
+    if (isLoadingPermission) return
+
+    // This will enable the API key query to fetch and reveal the key
     setShowState(true)
   }
 
   async function onCopy() {
-    // if ID already exists from a reveal action, return that
+    // If key is already revealed, use that value
     if (data?.api_key) return data?.api_key
 
     try {
-      // fetch ID and then destroy query immediately
+      // Fetch full key and immediately clear from cache after copying
       const result = await refetchApiKey()
       queryClient.removeQueries({
         queryKey: apiKeysKeys.single(projectRef, apiKey.id as string),
@@ -82,9 +98,13 @@ export function ApiKeyPill({
       console.error('Failed to fetch API key:', error)
     }
 
-    // Fallback to the masked version
+    // Fallback to the masked version if fetch fails
     return apiKey.api_key
   }
+
+  // States for disabling buttons/showing tooltips
+  const isRestricted = isSecret && !canManageSecretKeys
+  const isLoading = isLoadingPermission
 
   return (
     <>
@@ -117,6 +137,8 @@ export function ApiKeyPill({
           </motion.span>
         </div>
       </AnimatePresence>
+
+      {/* Reveal button - only shown for secret keys and when not already revealed */}
       {isSecret && (
         <AnimatePresence initial={false}>
           {!show && (
@@ -127,17 +149,47 @@ export function ApiKeyPill({
               transition={{ duration: 0.12 }}
               style={{ overflow: 'hidden' }}
             >
-              <Button
-                type="outline"
-                className="rounded-full px-2"
-                icon={<Eye strokeWidth={2} />}
-                onClick={onSubmitShow}
-              />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="outline"
+                    className="rounded-full px-2 pointer-events-auto cursor-default"
+                    icon={<Eye strokeWidth={2} />}
+                    onClick={onSubmitShow}
+                    disabled={isRestricted}
+                  />
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  {isRestricted
+                    ? 'You need additional permissions to reveal secret API keys'
+                    : isLoadingPermission
+                      ? 'Loading permissions...'
+                      : 'Reveal API key'}
+                </TooltipContent>
+              </Tooltip>
             </motion.div>
           )}
         </AnimatePresence>
       )}
-      <CopyButton type="default" asyncText={onCopy} iconOnly className="rounded-full px-2" />
+
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <CopyButton
+            type="default"
+            asyncText={onCopy}
+            iconOnly
+            className="rounded-full px-2 pointer-events-auto cursor-default"
+            disabled={isRestricted || isLoadingPermission}
+          />
+        </TooltipTrigger>
+        <TooltipContent side="bottom">
+          {isRestricted
+            ? 'You need additional permissions to copy secret API keys'
+            : isLoadingPermission
+              ? 'Loading permissions...'
+              : 'Copy API key'}
+        </TooltipContent>
+      </Tooltip>
     </>
   )
 }
