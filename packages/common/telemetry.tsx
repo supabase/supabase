@@ -3,24 +3,34 @@
 import { components } from 'api-types'
 import { useRouter } from 'next/compat/router'
 import { usePathname } from 'next/navigation'
-import { useCallback, useEffect, useRef } from 'react'
+import { ComponentPropsWithoutRef, useCallback, useEffect, useRef } from 'react'
 import { useLatest } from 'react-use'
 import { useUser } from './auth'
 import { hasConsented } from './consent-state'
-import { LOCAL_STORAGE_KEYS } from './constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useTelemetryCookie } from './hooks'
 import { TelemetryEvent } from './telemetry-constants'
 import { getSharedTelemetryData } from './telemetry-utils'
+import { GoogleTagManager as GTMComponent } from '@next/third-parties/google'
 
 const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
+
+type TelemetryTagManagerProps = Partial<ComponentPropsWithoutRef<typeof GTMComponent>>
+
+// Reexports GoogleTagManager with the right API key set
+export const TelemetryTagManager = (props: TelemetryTagManagerProps) => {
+  if (!IS_PLATFORM || !process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID) {
+    return
+  }
+  return <GTMComponent gtmId={process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID} {...props} />
+}
 
 //---
 // PAGE TELEMETRY
 //---
-
 export function handlePageTelemetry(
   API_URL: string,
   pathname?: string,
