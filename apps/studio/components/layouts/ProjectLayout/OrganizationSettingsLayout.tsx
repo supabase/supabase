@@ -4,15 +4,20 @@ import { PropsWithChildren } from 'react'
 import { useParams } from 'common'
 import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
+import { useFlag } from 'hooks/ui/useFlag'
 import { NavMenu, NavMenuItem } from 'ui'
 import { ScaffoldContainerLegacy, ScaffoldTitle } from '../Scaffold'
 
 function OrganizationSettingsLayout({ children }: PropsWithChildren) {
+  const { slug } = useParams()
+
   const newLayoutPreview = useIsNewLayoutEnabled()
 
-  const { slug } = useParams()
-  const fullCurrentPath = useCurrentPath()
+  // [Joshen] RE Organization Settings - need to figure out how to enforce MFA across users before this goes live
+  const newSecurityPage = useFlag('showOrganizationSecuritySettings')
+
   // Get the path without any hash values
+  const fullCurrentPath = useCurrentPath()
   const [currentPath] = fullCurrentPath.split('#')
 
   // hide these settings in the new layout
@@ -38,6 +43,10 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
     {
       label: 'General',
       href: `/org/${slug}/general`,
+    },
+    newSecurityPage && {
+      label: 'Security',
+      href: `/org/${slug}/security`,
     },
     !newLayoutPreview && {
       label: 'Team',

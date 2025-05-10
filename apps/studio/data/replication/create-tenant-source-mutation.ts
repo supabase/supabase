@@ -5,14 +5,14 @@ import type { ResponseError } from 'types'
 import { replicationKeys } from './keys'
 import { handleError, post } from 'data/fetchers'
 
-export type CreateSourceParams = {
+export type CreateTenantSourceParams = {
   projectRef: string
 }
 
-async function createSource({ projectRef }: CreateSourceParams, signal?: AbortSignal) {
+async function createTenantSource({ projectRef }: CreateTenantSourceParams, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await post('/platform/replication/{ref}/sources', {
+  const { data, error } = await post('/platform/replication/{ref}/tenants-sources', {
     params: { path: { ref: projectRef } },
     signal,
   })
@@ -23,20 +23,20 @@ async function createSource({ projectRef }: CreateSourceParams, signal?: AbortSi
   return data
 }
 
-type CreateSourceData = Awaited<ReturnType<typeof createSource>>
+type CreateTenantSourceData = Awaited<ReturnType<typeof createTenantSource>>
 
-export const useCreateSourceMutation = ({
+export const useCreateTenantSourceMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<CreateSourceData, ResponseError, CreateSourceParams>,
+  UseMutationOptions<CreateTenantSourceData, ResponseError, CreateTenantSourceParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CreateSourceData, ResponseError, CreateSourceParams>(
-    (vars) => createSource(vars),
+  return useMutation<CreateTenantSourceData, ResponseError, CreateTenantSourceParams>(
+    (vars) => createTenantSource(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
@@ -45,7 +45,7 @@ export const useCreateSourceMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to create source: ${data.message}`)
+          toast.error(`Failed to create tenant or source: ${data.message}`)
         } else {
           onError(data, variables, context)
         }
