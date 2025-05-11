@@ -141,23 +141,23 @@ export const getUnifiedLogsQuery = (search: SearchParamsType): string => {
 WITH unified_logs AS (
 
     select 
-    id,
-    el.timestamp as timestamp,
-    'edge' as log_type,
-    CAST(edge_logs_response.status_code AS STRING) as status,
-    CASE
-        WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
-        WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-        WHEN edge_logs_response.status_code >= 500 THEN 'error'
-        ELSE 'success'
-    END as level,
-    edge_logs_request.path as path,
-    edge_logs_request.host as host,
-    null as event_message,
-    edge_logs_request.method as method,
-    authorization_payload.role as api_role,
-    COALESCE(sb.auth_user, null) as auth_user,
-    null as log_count,
+      id,
+      el.timestamp as timestamp,
+      'edge' as log_type,
+      CAST(edge_logs_response.status_code AS STRING) as status,
+      CASE
+          WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
+          WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+          WHEN edge_logs_response.status_code >= 500 THEN 'error'
+          ELSE 'success'
+      END as level,
+      edge_logs_request.path as path,
+      edge_logs_request.host as host,
+      null as event_message,
+      edge_logs_request.method as method,
+      authorization_payload.role as api_role,
+      COALESCE(sb.auth_user, null) as auth_user,
+      null as log_count
     from edge_logs as el
     cross join unnest(metadata) as edge_logs_metadata
     cross join unnest(edge_logs_metadata.request) as edge_logs_request
@@ -171,23 +171,23 @@ WITH unified_logs AS (
     union all
 
     select 
-    id,
-    pgl.timestamp as timestamp,
-    'postgres' as log_type,
-    pgl_parsed.sql_state_code as status,
-    CASE
-        WHEN pgl_parsed.error_severity = 'LOG' THEN 'success'
-        WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
-        WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
-        ELSE null
-    END as level,
-    null as path,
-    null as host,
-    event_message as event_message,
-    null as method,
-    'api_role' as api_role,
-    null as auth_user,
-    null as log_count,
+      id,
+      pgl.timestamp as timestamp,
+      'postgres' as log_type,
+      pgl_parsed.sql_state_code as status,
+      CASE
+          WHEN pgl_parsed.error_severity = 'LOG' THEN 'success'
+          WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
+          WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
+          ELSE null
+      END as level,
+      null as path,
+      null as host,
+      event_message as event_message,
+      null as method,
+      'api_role' as api_role,
+      null as auth_user,
+      null as log_count
     from postgres_logs as pgl
     cross join unnest(pgl.metadata) as pgl_metadata
     cross join unnest(pgl_metadata.parsed) as pgl_parsed
@@ -196,23 +196,23 @@ WITH unified_logs AS (
     union all 
 
     select 
-    id, 
-    fel.timestamp as timestamp,
-    'edge function' as log_type,
-    CAST(fel_response.status_code AS STRING) as status,
-    CASE
-        WHEN fel_response.status_code BETWEEN 200 AND 299 THEN 'success'
-        WHEN fel_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-        WHEN fel_response.status_code >= 500 THEN 'error'
-        ELSE 'success'
-    END as level,
-    fel_request.url as path,
-    fel_request.host as host,
-    COALESCE(function_logs_agg.last_event_message, '') as event_message,
-    fel_request.method as method,
-    authorization_payload.role as api_role,
-    COALESCE(sb.auth_user, null) as auth_user,
-    function_logs_agg.function_log_count as log_count
+      id, 
+      fel.timestamp as timestamp,
+      'edge function' as log_type,
+      CAST(fel_response.status_code AS STRING) as status,
+      CASE
+          WHEN fel_response.status_code BETWEEN 200 AND 299 THEN 'success'
+          WHEN fel_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+          WHEN fel_response.status_code >= 500 THEN 'error'
+          ELSE 'success'
+      END as level,
+      fel_request.url as path,
+      fel_request.host as host,
+      COALESCE(function_logs_agg.last_event_message, '') as event_message,
+      fel_request.method as method,
+      authorization_payload.role as api_role,
+      COALESCE(sb.auth_user, null) as auth_user,
+      function_logs_agg.function_log_count as log_count
     from function_edge_logs as fel
     cross join unnest(metadata) as fel_metadata
     cross join unnest(fel_metadata.response) as fel_response
@@ -236,23 +236,23 @@ WITH unified_logs AS (
     union all
 
     select
-    al.id as id, 
-    el_in_al.timestamp as timestamp, 
-    'auth' as log_type,
-    CAST(el_in_al_response.status_code AS STRING) as status,
-    CASE
-        WHEN el_in_al_response.status_code BETWEEN 200 AND 299 THEN 'success'
-        WHEN el_in_al_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-        WHEN el_in_al_response.status_code >= 500 THEN 'error'
-        ELSE 'success'
-    END as level,
-    el_in_al_request.path as path,
-    el_in_al_request.host as host,
-    null as event_message,
-    el_in_al_request.method as method,
-    authorization_payload.role as api_role,
-    COALESCE(sb.auth_user, null) as auth_user,
-    null as log_count,
+      al.id as id, 
+      el_in_al.timestamp as timestamp, 
+      'auth' as log_type,
+      CAST(el_in_al_response.status_code AS STRING) as status,
+      CASE
+          WHEN el_in_al_response.status_code BETWEEN 200 AND 299 THEN 'success'
+          WHEN el_in_al_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+          WHEN el_in_al_response.status_code >= 500 THEN 'error'
+          ELSE 'success'
+      END as level,
+      el_in_al_request.path as path,
+      el_in_al_request.host as host,
+      null as event_message,
+      el_in_al_request.method as method,
+      authorization_payload.role as api_role,
+      COALESCE(sb.auth_user, null) as auth_user,
+      null as log_count
     from auth_logs as al
     cross join unnest(metadata) as al_metadata 
     left join (
@@ -272,22 +272,22 @@ WITH unified_logs AS (
     union all
 
     select 
-        id, 
-        svl.timestamp as timestamp, 
-        'supavisor' as log_type,
-        'undefined' as status,
-        CASE
-            WHEN LOWER(svl_metadata.level) = 'error' THEN 'error'
-            WHEN LOWER(svl_metadata.level) = 'warn' OR LOWER(svl_metadata.level) = 'warning' THEN 'warning'
-            ELSE 'success'
-        END as level,
-        null as path,
-        null as host,
-        null as event_message,
-        null as method,
-        'api_role' as api_role,
-        null as auth_user,
-        null as log_count,
+      id, 
+      svl.timestamp as timestamp, 
+      'supavisor' as log_type,
+      'undefined' as status,
+      CASE
+          WHEN LOWER(svl_metadata.level) = 'error' THEN 'error'
+          WHEN LOWER(svl_metadata.level) = 'warn' OR LOWER(svl_metadata.level) = 'warning' THEN 'warning'
+          ELSE 'success'
+      END as level,
+      null as path,
+      null as host,
+      null as event_message,
+      null as method,
+      'api_role' as api_role,
+      null as auth_user,
+      null as log_count
     from supavisor_logs as svl
     cross join unnest(metadata) as svl_metadata
     ${supavisorWhere}
@@ -307,6 +307,9 @@ SELECT
     auth_user,
     log_count
 FROM unified_logs
+
+WHERE 
+  level = "error"
 `
 
   return sql
