@@ -10,7 +10,7 @@ export function DataTableColumnStatusCode({
   value?: number | string
   level?: string
 }) {
-  console.log('level', level, level === 'warning' ? value : 'no warning')
+  // console.log('level', level, level === 'warning' ? value : 'no warning')
   const colors = getStatusColor(level)
   if (!value) {
     return <Minus className="h-4 w-4 text-muted-foreground/50" />

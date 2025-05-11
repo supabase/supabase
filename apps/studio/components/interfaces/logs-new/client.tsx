@@ -89,16 +89,13 @@ export function Client() {
     projectRef ?? ''
   )
 
-  console.log('>>> [Client] chartDataResult:', chartDataResult)
-
   useResetFocus()
 
   const [topBarHeight, setTopBarHeight] = React.useState(0)
 
-  const flatData = React.useMemo(
-    () => data?.pages?.flatMap((page) => page.data ?? []) ?? [],
-    [data?.pages]
-  )
+  const flatData = React.useMemo(() => {
+    return data?.pages?.flatMap((page) => page.data ?? []) ?? []
+  }, [data?.pages])
 
   const liveMode = useLiveMode(flatData)
 
@@ -113,6 +110,14 @@ export function Client() {
   const totalFetched = flatData?.length
 
   const { sort, start, size, uuid, cursor, direction, live, ...filter } = search
+
+  // Create a filtered version of the chart config based on selected levels
+  const filteredChartConfig = React.useMemo(() => {
+    const levelFilter = search.level || ['success', 'warning', 'error']
+    return Object.fromEntries(
+      Object.entries(chartConfig).filter(([key]) => levelFilter.includes(key))
+    ) as ChartConfig
+  }, [search.level])
 
   const defaultColumnFilters = Object.entries(filter)
     .map(([key, value]) => ({
@@ -171,12 +176,6 @@ export function Client() {
     })
   }, [facets])
 
-  // --- DEBUG: Check props before passing to DataTableInfinite ---
-  // console.log('>>> [Client] flatData length:', flatData?.length)
-  // console.log('>>> [Client] filterDBRowCount:', filterDBRowCount)
-  // console.log('>>> [Client] data object:', data) // Log the raw react-query data
-  // --- END DEBUG ---
-
   const getRowClassName = <TData extends { date: Date; level: string; timestamp: number }>(
     row: Row<TData>
   ) => {
@@ -211,6 +210,11 @@ export function Client() {
     getFacetedUniqueValues: getFacetedUniqueValues(facets),
     getFacetedMinMaxValues: getFacetedMinMaxValues(facets),
     filterFns: { inDateRange, arrSome },
+    // Here, manually override the filter function for the level column
+    // to prevent client-side filtering since it's already filtered on the server
+    columnFilterFns: {
+      level: () => true, // Always return true to pass all level values
+    },
     debugAll: process.env.NEXT_PUBLIC_TABLE_DEBUG === 'true',
     meta: { getRowClassName },
   })
@@ -235,6 +239,11 @@ export function Client() {
       },
       {} as Record<string, unknown>
     )
+
+    // Debug column filters
+    if (columnFilters.length > 0) {
+      console.log('Setting search from column filters:', columnFilters, '->', search)
+    }
 
     setSearch(search)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -298,8 +307,8 @@ export function Client() {
               <TimelineChart
                 data={chartData ?? []}
                 className="-mb-2"
-                columnId={chartData?.[0]?.date ? 'date' : 'timestamp'}
-                chartConfig={chartConfig}
+                columnId="timestamp"
+                chartConfig={filteredChartConfig}
               />
             </DataTableHeaderLayout>
             <DataTableInfinite

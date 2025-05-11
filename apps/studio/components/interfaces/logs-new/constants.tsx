@@ -93,22 +93,23 @@ export const filterFields = [
       return <span className="font-mono">{props.value}</span>
     },
   },
-  {
-    label: 'Regions',
-    value: 'regions',
-    type: 'checkbox',
-    options: REGIONS.map((region) => ({ label: region, value: region })),
-    component: (props: Option) => {
-      return <span className="font-mono">{props.value}</span>
-    },
-  },
-  {
-    label: 'Latency',
-    value: 'latency',
-    type: 'slider',
-    min: 0,
-    max: 5000,
-  },
+  // {
+  //   label: 'Regions',
+  //   value: 'regions',
+  //   type: 'checkbox',
+  //   options: REGIONS.map((region) => ({ label: region, value: region })),
+  //   component: (props: Option) => {
+  //     return <span className="font-mono">{props.value}</span>
+  //   },
+  // },
+  // Commenting out latency field as it's not in the schema
+  // {
+  //   label: 'Latency',
+  //   value: 'latency',
+  //   type: 'slider',
+  //   min: 0,
+  //   max: 5000,
+  // },
 ] satisfies DataTableFilterField<ColumnSchema>[]
 
 export const sheetFields = [
@@ -175,45 +176,48 @@ export const sheetFields = [
     type: 'input',
     skeletonClassName: 'w-56',
   },
-  {
-    id: 'regions',
-    label: 'Regions',
-    type: 'checkbox',
-    skeletonClassName: 'w-12',
-    component: (props) => <DataTableColumnRegion value={props.regions[0]} reverse showFlag />,
-  },
-  {
-    id: 'latency',
-    label: 'Latency',
-    type: 'slider',
-    component: (props) => (
-      <>
-        {formatMilliseconds(props.latency)}
-        <span className="text-muted-foreground">ms</span>
-      </>
-    ),
-    skeletonClassName: 'w-16',
-  },
-  {
-    id: 'headers',
-    label: 'Headers',
-    type: 'readonly',
-    component: (props) => (
-      // REMINDER: negative margin to make it look like the header is on the same level of the tab triggers
-      <KVTabs data={props.headers} className="-mt-[22px]" />
-    ),
-    className: 'flex-col items-start w-full gap-1',
-  },
-  {
-    id: 'message',
-    label: 'Message',
-    type: 'readonly',
-    condition: (props) => props.message !== undefined,
-    component: (props) => (
-      <CopyToClipboardContainer variant="destructive">
-        {JSON.stringify(props.message, null, 2)}
-      </CopyToClipboardContainer>
-    ),
-    className: 'flex-col items-start w-full gap-1',
-  },
+  // {
+  //   id: 'regions',
+  //   label: 'Regions',
+  //   type: 'checkbox',
+  //   skeletonClassName: 'w-12',
+  //   component: (props) => <DataTableColumnRegion value={props.regions[0]} reverse showFlag />,
+  // },
+  // Commenting out latency field as it's not in the schema
+  // {
+  //   id: 'latency',
+  //   label: 'Latency',
+  //   type: 'slider',
+  //   component: (props) => (
+  //     <>
+  //       {formatMilliseconds(props.latency)}
+  //       <span className="text-muted-foreground">ms</span>
+  //     </>
+  //   ),
+  //   skeletonClassName: 'w-16',
+  // },
+  // Commenting out headers field as it's not in the schema
+  // {
+  //   id: 'headers',
+  //   label: 'Headers',
+  //   type: 'readonly',
+  //   component: (props) => (
+  //     // REMINDER: negative margin to make it look like the header is on the same level of the tab triggers
+  //     <KVTabs data={props.headers} className="-mt-[22px]" />
+  //   ),
+  //   className: 'flex-col items-start w-full gap-1',
+  // },
+  // Commenting out message field as it's not in the schema
+  // {
+  //   id: 'message',
+  //   label: 'Message',
+  //   type: 'readonly',
+  //   condition: (props) => props.message !== undefined,
+  //   component: (props) => (
+  //     <CopyToClipboardContainer variant="destructive">
+  //       {JSON.stringify(props.message, null, 2)}
+  //     </CopyToClipboardContainer>
+  //   ),
+  //   className: 'flex-col items-start w-full gap-1',
+  // },
 ] satisfies SheetField<ColumnSchema, LogsMeta>[]

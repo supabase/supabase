@@ -40,7 +40,7 @@ export const columns: ColumnDef<ColumnSchema>[] = [
     },
     enableHiding: false,
     enableResizing: false,
-    // filterFn: 'arrSome',
+    filterFn: (row, columnId, filterValue) => true,
     size: 48,
     minSize: 48,
     maxSize: 48,
