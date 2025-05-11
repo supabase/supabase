@@ -21,7 +21,7 @@ import { SheetTimingPhases } from 'components/interfaces/DataTableDemo/infinite/
 
 // custom imports
 import type { LogsMeta } from './query-options'
-import { type ColumnSchema } from './schema'
+import { type ColumnSchema, LOG_TYPES } from './schema'
 
 // instead of filterFields, maybe just 'fields' with a filterDisabled prop?
 // that way, we could have 'message' or 'headers' field with label and value as well as type!
@@ -51,6 +51,23 @@ export const filterFields = [
             <div className={cn('h-2.5 w-2.5 rounded-[2px]', getLevelColor(value).bg)} />
             <span className="text-xs text-muted-foreground/70">{getLevelLabel(value)}</span>
           </div>
+        </div>
+      )
+    },
+  },
+  {
+    label: 'Log Type',
+    value: 'log_type',
+    type: 'checkbox',
+    defaultOpen: true,
+    options: LOG_TYPES.map((type) => ({ label: type, value: type })),
+    component: (props: Option) => {
+      return (
+        <div className="flex w-full items-center justify-between gap-2 font-mono">
+          <span className="capitalize text-foreground/70 group-hover:text-accent-foreground">
+            {props.label}
+          </span>
+          <span className="text-xs text-muted-foreground/70">{props.value}</span>
         </div>
       )
     },
