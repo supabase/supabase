@@ -63,13 +63,11 @@ function pgMetaGuard(request: Request) {
     // If there is no valid `x-connection-encrypted`, pg-meta will necesseraly fail to connect to the target database
     // in such case, we save the hops and throw a 421 response instead
     if (!isValidConnString(request.headers.get('x-connection-encrypted'))) {
-      // TODO: Maybe here add a sentry warning to monitor how often this happen
-      // Simulate a 421 response by throwing an error
-      throw {
-        code: 421,
-        message: 'x-connection-encrypted header is required for /platform/pg-meta/ requests',
-        requestId: request.headers.get('X-Request-Id'),
-      }
+      throw new ResponseError(
+        'x-connection-encrypted header is required for /platform/pg-meta/ requests',
+        400,
+        request.headers.get('X-Request-Id') ?? undefined
+      )
     }
   }
   return request
