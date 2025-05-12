@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ARRAY_DELIMITER, SORT_DELIMITER } from 'components/interfaces/DataTableDemo/lib/delimiters'
 import { post } from 'data/fetchers'
 import dayjs from 'dayjs'
-import { getLogsChartQuery, getLogsChartQuery2, getUnifiedLogsQuery } from './logs.queries'
+import { getLogsChartQuery, getUnifiedLogsQuery } from './logs.queries'
 import type { BaseChartSchema, FacetMetadataSchema } from './schema'
 import { ColumnSchema } from './schema'
 import type { SearchParamsType } from './search-params'
@@ -162,7 +162,7 @@ export const useChartData = (search: SearchParamsType, projectRef: string) => {
         }
 
         // Get SQL query from utility function (with dynamic bucketing)
-        const sql = getLogsChartQuery2(search)
+        const sql = getLogsChartQuery(search)
 
         // Use the get function from data/fetchers for chart data
         const { data, error } = await post(

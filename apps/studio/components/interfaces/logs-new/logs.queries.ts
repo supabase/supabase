@@ -412,7 +412,7 @@ ${finalWhere}
  * Enhanced logs chart query with dynamic bucketing based on time range
  * Incorporates dynamic bucketing from the older implementation
  */
-export const getLogsChartQuery2 = (search: SearchParamsType | Record<string, any>): string => {
+export const getLogsChartQuery = (search: SearchParamsType | Record<string, any>): string => {
   // Use the buildQueryConditions helper
   const { finalWhere } = buildQueryConditions(search as SearchParamsType)
 
@@ -576,110 +576,6 @@ SELECT
   COUNTIF(level = 'success') as success,
   COUNTIF(level = 'warning') as warning,
   COUNTIF(level = 'error') as error
-FROM unified_logs
-${finalWhere}
-GROUP BY time_bucket
-ORDER BY time_bucket ASC
-`
-}
-
-/**
- * Chart data query for logs time series with dynamic bucketing
- * Adapted from the older implementation to use dynamic bucketing
- */
-export const getLogsChartQuery = (search?: Record<string, any>): string => {
-  // Determine appropriate bucketing level based on time range
-  const truncationLevel = calculateChartBucketing(search || {})
-
-  // Build where clause if search params are provided
-  const { finalWhere } =
-    search && Object.keys(search).length > 0
-      ? buildQueryConditions(search as SearchParamsType)
-      : { finalWhere: '' }
-
-  return `
-WITH unified_logs AS (
-  -- edge logs
-  SELECT
-    el.timestamp,
-    'edge' as log_type,
-    CAST(edge_logs_response.status_code AS STRING) as status
-  FROM edge_logs as el
-  CROSS JOIN UNNEST(metadata) as edge_logs_metadata
-  CROSS JOIN UNNEST(edge_logs_metadata.response) as edge_logs_response
-
-  UNION ALL
-
-  -- postgres logs
-  SELECT
-    pgl.timestamp,
-    'postgres' as log_type,
-    pgl_parsed.sql_state_code as status
-  FROM postgres_logs as pgl
-  CROSS JOIN UNNEST(pgl.metadata) as pgl_metadata
-  CROSS JOIN UNNEST(pgl_metadata.parsed) as pgl_parsed
-
-  UNION ALL 
-
-  -- function event logs
-  SELECT
-    fl.timestamp,
-    'function events' as log_type,
-    'undefined' as status
-  FROM function_logs as fl
-
-  UNION ALL
-
-  -- function edge logs
-  SELECT
-    fel.timestamp,
-    'edge function' as log_type,
-    CAST(fel_response.status_code as STRING) as status
-  FROM function_edge_logs as fel
-  CROSS JOIN UNNEST(metadata) as fel_metadata
-  CROSS JOIN UNNEST(fel_metadata.response) as fel_response
-
-  UNION ALL
-
-  -- auth logs
-  SELECT
-    el_in_al.timestamp,
-    'auth' as log_type,
-    CAST(el_in_al_response.status_code as STRING) as status
-  FROM auth_logs as al
-  CROSS JOIN UNNEST(metadata) as al_metadata 
-  LEFT JOIN (
-    edge_logs as el_in_al
-    CROSS JOIN UNNEST(metadata) as el_in_al_metadata 
-    CROSS JOIN UNNEST(el_in_al_metadata.response) as el_in_al_response 
-    CROSS JOIN UNNEST(el_in_al_response.headers) as el_in_al_response_headers 
-  )
-  ON al_metadata.request_id = el_in_al_response_headers.cf_ray
-  WHERE al_metadata.request_id is not null
-
-  UNION ALL
-
-  -- supavisor logs
-  SELECT
-    svl.timestamp,
-    'supavisor' as log_type,
-    'undefined' as status
-  FROM supavisor_logs as svl
-
-  UNION ALL
-
-  -- pg_upgrade logs
-  SELECT
-    pgul.timestamp,
-    'postgres upgrade' as log_type,
-    'undefined' as status
-  FROM pg_upgrade_logs as pgul
-)
-SELECT
-  TIMESTAMP_TRUNC(timestamp, ${truncationLevel}) as time_bucket,
-  COUNTIF(REGEXP_CONTAINS(status, '^2|^3') OR status = 'undefined') as success,
-  COUNTIF(REGEXP_CONTAINS(status, '^4')) as warning,
-  COUNTIF(REGEXP_CONTAINS(status, '^5')) as error
 FROM unified_logs
 ${finalWhere}
 GROUP BY time_bucket
