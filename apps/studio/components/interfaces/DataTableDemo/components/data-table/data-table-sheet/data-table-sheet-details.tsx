@@ -86,85 +86,88 @@ export function DataTableSheetDetails({
   }, [selectedRowKey, onNext, onPrev])
 
   return (
-    <Sheet
-      open={!!selectedRowKey}
-      onOpenChange={() => {
-        // REMINDER: focus back to the row that was selected
-        // We need to manually focus back due to missing Trigger component
-        const el = selectedRowKey ? document.getElementById(selectedRowKey) : null
-        table.resetRowSelection()
+    // <Sheet
+    //   open={!!selectedRowKey}
+    //   onOpenChange={() => {
+    //     // REMINDER: focus back to the row that was selected
+    //     // We need to manually focus back due to missing Trigger component
+    //     const el = selectedRowKey ? document.getElementById(selectedRowKey) : null
+    //     table.resetRowSelection()
 
-        // REMINDER: when navigating between tabs in the sheet and exit the sheet, the tab gets lost
-        // We need a minimal delay to allow the sheet to close before focusing back to the row
-        setTimeout(() => el?.focus(), 0)
-      }}
-    >
-      <SheetContent
-        // onCloseAutoFocus={(e) => e.preventDefault()}
-        className="overflow-y-auto p-0 sm:max-w-md"
-        hideClose
-      >
-        <SheetHeader className="sticky top-0 z-10 border-b bg-background p-4">
-          <div className="flex items-center justify-between gap-2">
-            <SheetTitle className={cn(titleClassName, 'truncate text-left')}>
-              {isLoading && !selectedRowKey ? <Skeleton className="h-7 w-36" /> : title}
-            </SheetTitle>
-            <div className="flex h-7 items-center gap-1">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-7 w-7"
-                      disabled={!prevId}
-                      onClick={onPrev}
-                    >
-                      <ChevronUp className="h-5 w-5" />
-                      <span className="sr-only">Previous</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>
-                      Navigate <Kbd variant="outline">↑</Kbd>
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-7 w-7"
-                      disabled={!nextId}
-                      onClick={onNext}
-                    >
-                      <ChevronDown className="h-5 w-5" />
-                      <span className="sr-only">Next</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>
-                      Navigate <Kbd variant="outline">↓</Kbd>
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <Separator orientation="vertical" className="mx-1" />
-              <SheetClose autoFocus={true} asChild>
-                <Button size="icon" variant="ghost" className="h-7 w-7">
-                  <X className="h-5 w-5" />
-                  <span className="sr-only">Close</span>
+    //     // REMINDER: when navigating between tabs in the sheet and exit the sheet, the tab gets lost
+    //     // We need a minimal delay to allow the sheet to close before focusing back to the row
+    //     setTimeout(() => el?.focus(), 0)
+    //   }}
+    // >
+    // <SheetContent
+    //   // onCloseAutoFocus={(e) => e.preventDefault()}
+    //   className="overflow-y-auto p-0 sm:max-w-md"
+    //   hideClose
+    // >
+    // <SheetHeader className="sticky top-0 z-10 border-b bg-background p-4">
+    <div className="relative bg-background">
+      <div className="flex items-center justify-between gap-2">
+        <h5 className={cn(titleClassName, 'truncate text-left')}>
+          {isLoading && !selectedRowKey ? <Skeleton className="h-7 w-36" /> : title}
+        </h5>
+        <div className="flex h-7 items-center gap-1">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="tiny"
+                  variant="ghost"
+                  className="h-7 w-7"
+                  disabled={!prevId}
+                  onClick={onPrev}
+                >
+                  <ChevronUp className="h-5 w-5" />
+                  <span className="sr-only">Previous</span>
                 </Button>
-              </SheetClose>
-            </div>
-          </div>
-        </SheetHeader>
-        <SheetDescription className="sr-only">Selected row details</SheetDescription>
-        <div className="p-4">{children}</div>
-      </SheetContent>
-    </Sheet>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  Navigate <Kbd variant="outline">↑</Kbd>
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="tiny"
+                  variant="ghost"
+                  className="h-7 w-7"
+                  disabled={!nextId}
+                  onClick={onNext}
+                >
+                  <ChevronDown className="h-5 w-5" />
+                  <span className="sr-only">Next</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  Navigate <Kbd variant="outline">↓</Kbd>
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <Separator orientation="vertical" className="mx-1" />
+          {/* <SheetClose autoFocus={true} asChild> */}
+          <Button
+            size="tiny"
+            variant="ghost"
+            className="h-7 w-7"
+            onClick={() => table.resetRowSelection()}
+          >
+            <X className="h-5 w-5" />
+            <span className="sr-only">Close</span>
+          </Button>
+          {/* </SheetClose> */}
+        </div>
+      </div>
+      <div className="p-4">{children}</div>
+    </div>
   )
 }

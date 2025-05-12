@@ -41,10 +41,20 @@ export function DataTableSideBarLayout({
 
   return (
     <div
-      className={cn('flex h-full min-h-screen w-full flex-col sm:flex-row', className)}
+      className={cn(
+        'flex flex-row w-full h-full',
+        // 'min-h-screen w-full flex-col sm:flex-row',
+        className
+      )}
       style={
         {
-          '--top-bar-height': `${topBarHeight}px`,
+          '--top-bar-height': `${
+            // topBarHeight is the height of the chart and search bar
+            topBarHeight +
+            // 64px is the height of the top bar
+            64
+            //
+          }px`,
           ...columnSizeVars,
         } as React.CSSProperties
       }

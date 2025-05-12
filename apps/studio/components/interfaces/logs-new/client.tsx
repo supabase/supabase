@@ -29,15 +29,25 @@ import {
   getLevelRowClassName,
 } from 'components/interfaces/DataTableDemo/lib/request/level'
 import { arrSome, inDateRange } from 'components/interfaces/DataTableDemo/lib/table/filterfns'
-import { ChartConfig, cn } from 'ui'
+import { ChartConfig, cn, Separator } from 'ui'
 import { DataTableFilterCommand } from 'components/interfaces/DataTableDemo/components/data-table/data-table-filter-command'
-import { DataTableProvider } from 'components/interfaces/DataTableDemo/components/data-table/data-table-provider'
+import {
+  DataTableProvider,
+  useDataTable,
+} from 'components/interfaces/DataTableDemo/components/data-table/data-table-provider'
 import { DataTableSheetDetails } from 'components/interfaces/DataTableDemo/components/data-table/data-table-sheet/data-table-sheet-details'
 import { DataTableToolbar } from 'components/interfaces/DataTableDemo/components/data-table/data-table-toolbar'
 import { useLocalStorage } from 'components/interfaces/DataTableDemo/hooks/use-local-storage'
 import { LiveButton } from 'components/interfaces/DataTableDemo/infinite/_components/live-button'
 import { RefreshButton } from 'components/interfaces/DataTableDemo/infinite/_components/refresh-button'
 import { Percentile } from 'components/interfaces/DataTableDemo/lib/request/percentile'
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from 'ui/src/components/shadcn/ui/resizable'
+import { Button } from 'ui'
+import { X } from 'lucide-react'
 
 // components pulled out and modified
 import { FilterSideBar } from '../data-table/filter-side-bar'
@@ -79,6 +89,7 @@ const chartConfig = {
     color: 'hsl(var(--destructive-default))',
   },
 } satisfies ChartConfig
+
 export function Client() {
   const [search, setSearch] = useQueryStates(searchParamsParser)
   const { ref: projectRef } = useParams()
@@ -134,12 +145,6 @@ export function Client() {
   const defaultColumnSorting = sort ? [sort] : []
   const defaultColumnVisibility = {
     uuid: false,
-    // Remove timing fields since they don't exist in schema anymore
-    // 'timing.dns': false,
-    // 'timing.connection': false,
-    // 'timing.tls': false,
-    // 'timing.ttfb': false,
-    // 'timing.transfer': false,
   }
   const defaultRowSelection = search.uuid ? { [search.uuid]: true } : {}
 
@@ -168,11 +173,11 @@ export function Client() {
         }
       })
 
-      if (field.type === 'slider') {
+      if (field.type === ('slider' as any)) {
         return {
-          ...field,
-          min: facetsField.min ?? field.min,
-          max: facetsField.max ?? field.max,
+          ...(field as any),
+          min: facetsField.min ?? (field as any).min,
+          max: facetsField.max ?? (field as any).max,
           options,
         }
       }
@@ -229,6 +234,8 @@ export function Client() {
     const selectedRowKey = Object.keys(rowSelection)?.[0]
     return table.getCoreRowModel().flatRows.find((row) => row.id === selectedRowKey)
   }, [rowSelection, table, isLoading, isFetching, flatData])
+
+  const selectedRowKey = Object.keys(rowSelection)?.[0]
 
   React.useEffect(() => {
     if (DEBUG_FILTER_PROCESSING) console.log('========== FILTER CHANGE DETECTED ==========')
@@ -316,13 +323,7 @@ export function Client() {
       >
         <DataTableSideBarLayout topBarHeight={topBarHeight}>
           <FilterSideBar />
-          <div
-            className={cn(
-              'flex max-w-full flex-1 flex-col border-border sm:border-l',
-              // Chrome issue
-              'group-data-[expanded=true]/controls:sm:max-w-[calc(100vw_-_208px)] group-data-[expanded=true]/controls:md:max-w-[calc(100vw_-_288px)]'
-            )}
-          >
+          <div className="flex max-w-full flex-1 flex-col border-border sm:border-l overflow-hidden">
             <DataTableHeaderLayout setTopBarHeight={setTopBarHeight}>
               <DataTableFilterCommand searchParamsParser={searchParamsParser} />
               <DataTableToolbar
@@ -333,9 +334,6 @@ export function Client() {
                   ) : null,
                 ]}
               />
-              {/* <div className="px-4 text-xs text-muted-foreground mb-1">
-                Last hour of logs {search.date ? '(custom time range)' : '(default)'}
-              </div> */}
               <TimelineChart
                 data={chartData ?? []}
                 className="-mb-2"
@@ -343,43 +341,62 @@ export function Client() {
                 chartConfig={filteredChartConfig}
               />
             </DataTableHeaderLayout>
-            <DataTableInfinite
-              columns={columns}
-              totalRows={totalDBRowCount}
-              filterRows={filterDBRowCount}
-              totalRowsFetched={totalFetched}
-              isFetching={isFetching}
-              isLoading={isLoading}
-              fetchNextPage={fetchNextPage}
-              hasNextPage={hasNextPage}
-              renderLiveRow={(props) => {
-                if (!liveMode.timestamp) return null
-                if (props?.row.original.uuid !== liveMode?.row?.uuid) return null
-                return <LiveRow />
-              }}
-              setColumnOrder={setColumnOrder}
-              setColumnVisibility={setColumnVisibility}
-            />
+            <Separator />
+            {/* Use ResizablePanelGroup for the log list and details */}
+            <div className="flex flex-1 overflow-hidden">
+              <ResizablePanelGroup direction="horizontal" className="w-full">
+                <ResizablePanel defaultSize={selectedRowKey ? 60 : 100} minSize={30}>
+                  <div className="h-full overflow-auto">
+                    <DataTableInfinite
+                      columns={columns}
+                      totalRows={totalDBRowCount}
+                      filterRows={filterDBRowCount}
+                      totalRowsFetched={totalFetched}
+                      isFetching={isFetching}
+                      isLoading={isLoading}
+                      fetchNextPage={fetchNextPage}
+                      hasNextPage={hasNextPage}
+                      renderLiveRow={(props) => {
+                        if (!liveMode.timestamp) return null
+                        if (props?.row.original.uuid !== liveMode?.row?.uuid) return null
+                        return <LiveRow />
+                      }}
+                      setColumnOrder={setColumnOrder}
+                      setColumnVisibility={setColumnVisibility}
+                    />
+                  </div>
+                </ResizablePanel>
+
+                {selectedRowKey && (
+                  <>
+                    <ResizableHandle withHandle />
+                    <ResizablePanel defaultSize={25} minSize={25}>
+                      <div className="h-full overflow-auto">
+                        <DataTableSheetDetails
+                          title={selectedRow?.original?.pathname}
+                          titleClassName="font-mono"
+                        >
+                          <MemoizedDataTableSheetContent
+                            table={table}
+                            data={selectedRow?.original}
+                            filterFields={filterFields}
+                            fields={sheetFields}
+                            metadata={{
+                              totalRows: totalDBRowCount ?? 0,
+                              filterRows: filterDBRowCount ?? 0,
+                              totalRowsFetched: totalFetched ?? 0,
+                              currentPercentiles: metadata?.currentPercentiles ?? ({} as any),
+                              ...metadata,
+                            }}
+                          />
+                        </DataTableSheetDetails>
+                      </div>
+                    </ResizablePanel>
+                  </>
+                )}
+              </ResizablePanelGroup>
+            </div>
           </div>
-          <DataTableSheetDetails title={selectedRow?.original?.pathname} titleClassName="font-mono">
-            <MemoizedDataTableSheetContent
-              table={table}
-              data={selectedRow?.original}
-              filterFields={filterFields}
-              fields={sheetFields}
-              // TODO: check if we should memoize this
-              // REMINDER: this is used to pass additional data like the `InfiniteQueryMeta`
-              metadata={{
-                totalRows: totalDBRowCount ?? 0,
-                filterRows: filterDBRowCount ?? 0,
-                totalRowsFetched: totalFetched ?? 0,
-                currentPercentiles:
-                  metadata?.currentPercentiles ?? ({} as Record<Percentile, number>),
-                // REMINDER: includes `currentPercentiles`
-                ...metadata,
-              }}
-            />
-          </DataTableSheetDetails>
         </DataTableSideBarLayout>
       </DataTableProvider>
     </>
@@ -427,13 +444,13 @@ export function useLiveMode<TData extends { date: Date }>(data: TData[]) {
 }
 
 export function getFacetedUniqueValues<TData>(facets?: Record<string, FacetMetadataSchema>) {
-  return (_: TTable<TData>, columnId: string): Map<string, number> => {
+  return (table: TTable<TData>, columnId: string) => {
     return new Map(facets?.[columnId]?.rows?.map(({ value, total }) => [value, total]) || [])
   }
 }
 
 export function getFacetedMinMaxValues<TData>(facets?: Record<string, FacetMetadataSchema>) {
-  return (_: TTable<TData>, columnId: string): [number, number] | undefined => {
+  return (table: TTable<TData>, columnId: string) => {
     const min = facets?.[columnId]?.min
     const max = facets?.[columnId]?.max
     if (typeof min === 'number' && typeof max === 'number') return [min, max]

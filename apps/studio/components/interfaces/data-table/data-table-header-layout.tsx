@@ -27,7 +27,7 @@ export const DataTableHeaderLayout = forwardRef<
   return (
     <div
       ref={topBarRef}
-      className={cn('flex flex-col gap-4 bg-background p-2', 'sticky top-0 z-10 pb-4')}
+      className={cn('flex flex-col gap-4 bg-background p-2', 'top-0 z-10 pb-4')}
       {...props}
     />
   )

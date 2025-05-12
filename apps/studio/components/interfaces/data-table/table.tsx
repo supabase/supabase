@@ -21,7 +21,7 @@ const Table = React.forwardRef<HTMLTableElement, React.ComponentPropsWithRef<typ
       className={cn('', className)}
       containerProps={{
         className:
-          'table-fixed w-max caption-bottom text-sm max-h-[calc(100vh_-_var(--top-bar-height))]',
+          'table-fixed min-w-max caption-bottom text-sm max-h-[calc(100vh_-_var(--top-bar-height))]',
         ...props.containerProps,
       }}
       // REMINDER: we are not scrolling the table, but the container
@@ -100,7 +100,10 @@ const TableCell = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ShadcnTableCell
     ref={ref}
-    className={cn('text-[0.8rem] !py-1 p-2 [&>[role=checkbox]]:translate-y-[2px]', className)}
+    className={cn(
+      'text-[0.8rem] !py-1 p-2 [&>[role=checkbox]]:translate-y-[2px] truncate',
+      className
+    )}
     {...props}
   />
 ))
