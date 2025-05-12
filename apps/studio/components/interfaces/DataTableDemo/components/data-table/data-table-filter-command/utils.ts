@@ -208,20 +208,30 @@ export function columnFiltersParser<TData>({
 }) {
   return {
     parse: (inputValue: string) => {
-      const values = inputValue
-        .trim()
-        .split(' ')
-        .reduce(
-          (prev, curr) => {
-            const [name, value] = curr.split(':')
-            if (!value || !name) return prev
-            prev[name] = value
-            return prev
-          },
-          {} as Record<string, string>
-        )
+      // Use regex to properly extract field:value pairs
+      // This properly handles spaces within values
+      const filterPairs: Record<string, string> = {}
 
-      const searchParams = Object.entries(values).reduce(
+      // This regex properly extracts field:value pairs where:
+      // 1. Values can contain spaces (both normal spaces and URL-encoded + characters)
+      // 2. It finds word characters followed by a colon as the field name
+      // 3. It then captures everything (including spaces and + characters) until
+      //    it finds another field:value pattern or the end of string
+      // This solves the issue with values like "edge function" or "edge+function" in URLs
+      const regex = /(\w+):([^]*?)(?=\s+\w+:|$)/g
+      let match
+
+      console.log('DataTableFilterCommand parsing input:', inputValue)
+
+      while ((match = regex.exec(inputValue)) !== null) {
+        const [_, fieldName, fieldValue] = match
+        if (fieldName && fieldValue) {
+          filterPairs[fieldName] = fieldValue.trim()
+          console.log(`Parsed filter pair: ${fieldName} = ${fieldValue.trim()}`)
+        }
+      }
+
+      const searchParams = Object.entries(filterPairs).reduce(
         (prev, [key, value]) => {
           const parser = searchParamsParser[key]
           if (!parser) return prev
