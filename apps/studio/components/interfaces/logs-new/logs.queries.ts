@@ -3,6 +3,40 @@
  */
 
 import { SearchParamsType } from './search-params'
+import { BASE_CONDITIONS_EXCLUDED_PARAMS, EXCLUDED_QUERY_PARAMS } from './constants/query-params'
+
+/**
+ * Builds query conditions from search parameters and returns WHERE clause
+ * @param search SearchParamsType object containing query parameters
+ * @returns Object with whereConditions array and formatted WHERE clause
+ */
+export const buildQueryConditions = (search: SearchParamsType) => {
+  const whereConditions: string[] = []
+
+  // Process all search parameters for filtering
+  Object.entries(search).forEach(([key, value]) => {
+    // Skip pagination/control parameters
+    if (EXCLUDED_QUERY_PARAMS.includes(key as any)) {
+      return
+    }
+
+    // Handle array filters (IN clause)
+    if (Array.isArray(value) && value.length > 0) {
+      whereConditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(',')})`)
+      return
+    }
+
+    // Handle scalar values
+    if (value !== null && value !== undefined) {
+      whereConditions.push(`${key} = '${value}'`)
+    }
+  })
+
+  // Create final WHERE clause
+  const finalWhere = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
+
+  return { whereConditions, finalWhere }
+}
 
 /**
  * Builds level-specific condition for different log types
@@ -99,22 +133,16 @@ export const buildBaseConditions = (search: SearchParamsType): string[] => {
 
   Object.entries(search).forEach(([key, value]) => {
     // Skip pagination/control parameters, date and level (handled separately)
-    if (
-      ['sort', 'start', 'size', 'uuid', 'cursor', 'direction', 'live', 'date', 'level'].includes(
-        key
-      )
-    ) {
+    if (BASE_CONDITIONS_EXCLUDED_PARAMS.includes(key as any)) {
       return
     }
 
     // Handle array filters (IN clause)
     if (Array.isArray(value) && value.length > 0) {
-      baseConditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(',')})`)
-      return
+      baseConditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(', ')})`)
     }
-
     // Handle scalar values
-    if (value !== null && value !== undefined) {
+    else if (value !== null && value !== undefined) {
       baseConditions.push(`${key} = '${value}'`)
     }
   })
@@ -126,15 +154,8 @@ export const buildBaseConditions = (search: SearchParamsType): string[] => {
  * Unified logs SQL query
  */
 export const getUnifiedLogsQuery = (search: SearchParamsType): string => {
-  const baseConditions = buildBaseConditions(search)
-  const levelFilter = search.level || []
-
-  // Create source-specific where clauses with level filters
-  const edgeWhere = createFilterWhereClause('edge', levelFilter, baseConditions)
-  const postgresWhere = createFilterWhereClause('postgres', levelFilter, baseConditions)
-  const functionWhere = createFilterWhereClause('edge function', levelFilter, baseConditions)
-  const authWhere = createFilterWhereClause('auth', levelFilter, baseConditions)
-  const supavisorWhere = createFilterWhereClause('supavisor', levelFilter, baseConditions)
+  // Use the buildQueryConditions helper
+  const { finalWhere } = buildQueryConditions(search)
 
   // The unified SQL query with UNION ALL statements
   const sql = `
@@ -166,7 +187,6 @@ WITH unified_logs AS (
     left join unnest(sb.jwt) as jwt
     left join unnest(jwt.authorization) as auth
     left join unnest(auth.payload) as authorization_payload
-    ${edgeWhere}
 
     union all
 
@@ -191,7 +211,6 @@ WITH unified_logs AS (
     from postgres_logs as pgl
     cross join unnest(pgl.metadata) as pgl_metadata
     cross join unnest(pgl_metadata.parsed) as pgl_parsed
-    ${postgresWhere}
 
     union all 
 
@@ -231,7 +250,6 @@ WITH unified_logs AS (
     WHERE fl_metadata.execution_id IS NOT NULL
     GROUP BY fl_metadata.execution_id
     ) as function_logs_agg on fel_metadata.execution_id = function_logs_agg.execution_id
-    ${functionWhere}
 
     union all
 
@@ -267,7 +285,7 @@ WITH unified_logs AS (
         left join unnest(auth.payload) as authorization_payload
     )
     on al_metadata.request_id = el_in_al_response_headers.cf_ray
-    ${authWhere}
+    WHERE al_metadata.request_id is not null
 
     union all
 
@@ -290,7 +308,6 @@ WITH unified_logs AS (
       null as log_count
     from supavisor_logs as svl
     cross join unnest(metadata) as svl_metadata
-    ${supavisorWhere}
 )
 
 SELECT
@@ -307,24 +324,15 @@ SELECT
     auth_user,
     log_count
 FROM unified_logs
-
-WHERE 
-  level = "error"
+${finalWhere}
 `
 
   return sql
 }
 
 export const getLogsChartQuery2 = (search: SearchParamsType): string => {
-  const baseConditions = buildBaseConditions(search)
-  const levelFilter = search.level || []
-
-  // Create source-specific where clauses with level filters
-  const edgeWhere = createFilterWhereClause('edge', levelFilter, baseConditions)
-  const postgresWhere = createFilterWhereClause('postgres', levelFilter, baseConditions)
-  const functionWhere = createFilterWhereClause('edge function', levelFilter, baseConditions)
-  const authWhere = createFilterWhereClause('auth', levelFilter, baseConditions)
-  const supavisorWhere = createFilterWhereClause('supavisor', levelFilter, baseConditions)
+  // Use the buildQueryConditions helper
+  const { finalWhere } = buildQueryConditions(search)
 
   return `
 WITH unified_logs AS (
@@ -346,7 +354,7 @@ WITH unified_logs AS (
     edge_logs_request.method as method,
     authorization_payload.role as api_role,
     COALESCE(sb.auth_user, null) as auth_user,
-    null as log_count,
+    null as log_count
     from edge_logs as el
     cross join unnest(metadata) as edge_logs_metadata
     cross join unnest(edge_logs_metadata.request) as edge_logs_request
@@ -355,7 +363,6 @@ WITH unified_logs AS (
     left join unnest(sb.jwt) as jwt
     left join unnest(jwt.authorization) as auth
     left join unnest(auth.payload) as authorization_payload
-    ${edgeWhere}
 
     union all
 
@@ -376,11 +383,10 @@ WITH unified_logs AS (
     null as method,
     'api_role' as api_role,
     null as auth_user,
-    null as log_count,
+    null as log_count
     from postgres_logs as pgl
     cross join unnest(pgl.metadata) as pgl_metadata
     cross join unnest(pgl_metadata.parsed) as pgl_parsed
-    ${postgresWhere}
 
     union all 
 
@@ -420,7 +426,6 @@ WITH unified_logs AS (
     WHERE fl_metadata.execution_id IS NOT NULL
     GROUP BY fl_metadata.execution_id
     ) as function_logs_agg on fel_metadata.execution_id = function_logs_agg.execution_id
-    ${functionWhere}
 
     union all
 
@@ -441,7 +446,7 @@ WITH unified_logs AS (
     el_in_al_request.method as method,
     authorization_payload.role as api_role,
     COALESCE(sb.auth_user, null) as auth_user,
-    null as log_count,
+    null as log_count
     from auth_logs as al
     cross join unnest(metadata) as al_metadata 
     left join (
@@ -456,7 +461,7 @@ WITH unified_logs AS (
         left join unnest(auth.payload) as authorization_payload
     )
     on al_metadata.request_id = el_in_al_response_headers.cf_ray
-    ${authWhere}
+    WHERE al_metadata.request_id is not null
 
     union all
 
@@ -476,10 +481,9 @@ WITH unified_logs AS (
         null as method,
         'api_role' as api_role,
         null as auth_user,
-        null as log_count,
+        null as log_count
     from supavisor_logs as svl
     cross join unnest(metadata) as svl_metadata
-    ${supavisorWhere}
 )
 
 SELECT
@@ -488,10 +492,12 @@ SELECT
   COUNTIF(level = 'warning') as warning,
   COUNTIF(level = 'error') as error
 FROM unified_logs
+${finalWhere}
 GROUP BY minute
 ORDER BY minute ASC
 `
 }
+
 /**
  * Chart data query for logs time series
  */

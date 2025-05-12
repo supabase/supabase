@@ -235,10 +235,18 @@ export const useChartData = (search: SearchParamsType, projectRef: string) => {
           }
 
           // Only include the levels that were requested in the filter (or all if no filter)
-          const levelFilter = search.level || ['success', 'warning', 'error']
-          if (levelFilter.includes('success')) dataPoint.success = minuteData.success
-          if (levelFilter.includes('warning')) dataPoint.warning = minuteData.warning
-          if (levelFilter.includes('error')) dataPoint.error = minuteData.error
+          const levelFilter = search.level
+          // If no level filter is specified or it's empty, include all levels
+          if (!levelFilter || levelFilter.length === 0) {
+            dataPoint.success = minuteData.success
+            dataPoint.warning = minuteData.warning
+            dataPoint.error = minuteData.error
+          } else {
+            // Otherwise only include the selected levels
+            if (levelFilter.includes('success')) dataPoint.success = minuteData.success
+            if (levelFilter.includes('warning')) dataPoint.warning = minuteData.warning
+            if (levelFilter.includes('error')) dataPoint.error = minuteData.error
+          }
 
           // Always push a data point for this minute
           chartData.push(dataPoint)
