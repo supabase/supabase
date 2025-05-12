@@ -229,16 +229,10 @@ export const calculateChartBucketing = (search: SearchParamsType | Record<string
 }
 
 /**
- * Unified logs SQL query
+ * Edge logs query fragment
  */
-export const getUnifiedLogsQuery = (search: SearchParamsType): string => {
-  // Use the buildQueryConditions helper
-  const { finalWhere } = buildQueryConditions(search)
-
-  // The unified SQL query with UNION ALL statements
-  const sql = `
-WITH unified_logs AS (
-
+export const getEdgeLogsQuery = () => {
+  return `
     select 
       id,
       el.timestamp as timestamp,
@@ -265,9 +259,14 @@ WITH unified_logs AS (
     left join unnest(sb.jwt) as jwt
     left join unnest(jwt.authorization) as auth
     left join unnest(auth.payload) as authorization_payload
+  `
+}
 
-    union all
-
+/**
+ * Postgres logs query fragment
+ */
+export const getPostgresLogsQuery = () => {
+  return `
     select 
       id,
       pgl.timestamp as timestamp,
@@ -289,9 +288,14 @@ WITH unified_logs AS (
     from postgres_logs as pgl
     cross join unnest(pgl.metadata) as pgl_metadata
     cross join unnest(pgl_metadata.parsed) as pgl_parsed
+  `
+}
 
-    union all 
-
+/**
+ * Edge function logs query fragment
+ */
+export const getEdgeFunctionLogsQuery = () => {
+  return `
     select 
       id, 
       fel.timestamp as timestamp,
@@ -328,9 +332,14 @@ WITH unified_logs AS (
     WHERE fl_metadata.execution_id IS NOT NULL
     GROUP BY fl_metadata.execution_id
     ) as function_logs_agg on fel_metadata.execution_id = function_logs_agg.execution_id
+  `
+}
 
-    union all
-
+/**
+ * Auth logs query fragment
+ */
+export const getAuthLogsQuery = () => {
+  return `
     select
       al.id as id, 
       el_in_al.timestamp as timestamp, 
@@ -364,9 +373,14 @@ WITH unified_logs AS (
     )
     on al_metadata.request_id = el_in_al_response_headers.cf_ray
     WHERE al_metadata.request_id is not null
+  `
+}
 
-    union all
-
+/**
+ * Supavisor logs query fragment
+ */
+export const getSupavisorLogsQuery = () => {
+  return `
     select 
       id, 
       svl.timestamp as timestamp, 
@@ -386,8 +400,38 @@ WITH unified_logs AS (
       null as log_count
     from supavisor_logs as svl
     cross join unnest(metadata) as svl_metadata
-)
+  `
+}
 
+/**
+ * Combine all log sources to create the unified logs CTE
+ */
+export const getUnifiedLogsCTE = () => {
+  return `
+WITH unified_logs AS (
+    ${getEdgeLogsQuery()}
+    union all
+    ${getPostgresLogsQuery()}
+    union all 
+    ${getEdgeFunctionLogsQuery()}
+    union all
+    ${getAuthLogsQuery()}
+    union all
+    ${getSupavisorLogsQuery()}
+)
+  `
+}
+
+/**
+ * Unified logs SQL query
+ */
+export const getUnifiedLogsQuery = (search: SearchParamsType): string => {
+  // Use the buildQueryConditions helper
+  const { finalWhere } = buildQueryConditions(search)
+
+  // The unified SQL query with UNION ALL statements
+  const sql = `
+${getUnifiedLogsCTE()}
 SELECT
     id,
     timestamp,
@@ -409,6 +453,25 @@ ${finalWhere}
 }
 
 /**
+ * Get a count query for the total logs within the timeframe
+ */
+export const getLogsCountQuery = (search: SearchParamsType): string => {
+  // Use the buildQueryConditions helper
+  const { finalWhere } = buildQueryConditions(search)
+
+  // Create a count query using the same unified logs CTE
+  const sql = `
+${getUnifiedLogsCTE()}
+SELECT
+    COUNT(*) as total_count
+FROM unified_logs
+${finalWhere}
+`
+
+  return sql
+}
+
+/**
  * Enhanced logs chart query with dynamic bucketing based on time range
  * Incorporates dynamic bucketing from the older implementation
  */
@@ -420,157 +483,7 @@ export const getLogsChartQuery = (search: SearchParamsType | Record<string, any>
   const truncationLevel = calculateChartBucketing(search)
 
   return `
-WITH unified_logs AS (
-
-    select 
-    id,
-    el.timestamp as timestamp,
-    'edge' as log_type,
-    CAST(edge_logs_response.status_code AS STRING) as status,
-    CASE
-        WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
-        WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-        WHEN edge_logs_response.status_code >= 500 THEN 'error'
-        ELSE 'success'
-    END as level,
-    edge_logs_request.path as path,
-    edge_logs_request.host as host,
-    null as event_message,
-    edge_logs_request.method as method,
-    authorization_payload.role as api_role,
-    COALESCE(sb.auth_user, null) as auth_user,
-    null as log_count
-    from edge_logs as el
-    cross join unnest(metadata) as edge_logs_metadata
-    cross join unnest(edge_logs_metadata.request) as edge_logs_request
-    cross join unnest(edge_logs_metadata.response) as edge_logs_response
-    left join unnest(edge_logs_request.sb) as sb
-    left join unnest(sb.jwt) as jwt
-    left join unnest(jwt.authorization) as auth
-    left join unnest(auth.payload) as authorization_payload
-
-    union all
-
-    select 
-    id,
-    pgl.timestamp as timestamp,
-    'postgres' as log_type,
-    pgl_parsed.sql_state_code as status,
-    CASE
-        WHEN pgl_parsed.error_severity = 'LOG' THEN 'success'
-        WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
-        WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
-        ELSE null
-    END as level,
-    null as path,
-    null as host,
-    event_message as event_message,
-    null as method,
-    'api_role' as api_role,
-    null as auth_user,
-    null as log_count
-    from postgres_logs as pgl
-    cross join unnest(pgl.metadata) as pgl_metadata
-    cross join unnest(pgl_metadata.parsed) as pgl_parsed
-
-    union all 
-
-    select 
-    id, 
-    fel.timestamp as timestamp,
-    'edge function' as log_type,
-    CAST(fel_response.status_code AS STRING) as status,
-    CASE
-        WHEN fel_response.status_code BETWEEN 200 AND 299 THEN 'success'
-        WHEN fel_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-        WHEN fel_response.status_code >= 500 THEN 'error'
-        ELSE 'success'
-    END as level,
-    fel_request.url as path,
-    fel_request.host as host,
-    COALESCE(function_logs_agg.last_event_message, '') as event_message,
-    fel_request.method as method,
-    authorization_payload.role as api_role,
-    COALESCE(sb.auth_user, null) as auth_user,
-    function_logs_agg.function_log_count as log_count
-    from function_edge_logs as fel
-    cross join unnest(metadata) as fel_metadata
-    cross join unnest(fel_metadata.response) as fel_response
-    cross join unnest(fel_metadata.request) as fel_request
-    left join unnest(fel_request.sb) as sb
-    left join unnest(sb.jwt) as jwt
-    left join unnest(jwt.authorization) as auth
-    left join unnest(auth.payload) as authorization_payload
-    left join (
-    SELECT
-        fl_metadata.execution_id,
-        COUNT(fl.id) as function_log_count,
-        ANY_VALUE(fl.event_message) as last_event_message
-    FROM function_logs as fl
-    CROSS JOIN UNNEST(fl.metadata) as fl_metadata
-    WHERE fl_metadata.execution_id IS NOT NULL
-    GROUP BY fl_metadata.execution_id
-    ) as function_logs_agg on fel_metadata.execution_id = function_logs_agg.execution_id
-
-    union all
-
-    select
-    al.id as id, 
-    el_in_al.timestamp as timestamp, 
-    'auth' as log_type,
-    CAST(el_in_al_response.status_code AS STRING) as status,
-    CASE
-        WHEN el_in_al_response.status_code BETWEEN 200 AND 299 THEN 'success'
-        WHEN el_in_al_response.status_code BETWEEN 400 AND 499 THEN 'warning'
-        WHEN el_in_al_response.status_code >= 500 THEN 'error'
-        ELSE 'success'
-    END as level,
-    el_in_al_request.path as path,
-    el_in_al_request.host as host,
-    null as event_message,
-    el_in_al_request.method as method,
-    authorization_payload.role as api_role,
-    COALESCE(sb.auth_user, null) as auth_user,
-    null as log_count
-    from auth_logs as al
-    cross join unnest(metadata) as al_metadata 
-    left join (
-    edge_logs as el_in_al
-        cross join unnest (metadata) as el_in_al_metadata 
-        cross join unnest (el_in_al_metadata.response) as el_in_al_response 
-        cross join unnest (el_in_al_response.headers) as el_in_al_response_headers 
-        cross join unnest (el_in_al_metadata.request) as el_in_al_request
-        left join unnest(el_in_al_request.sb) as sb
-        left join unnest(sb.jwt) as jwt
-        left join unnest(jwt.authorization) as auth
-        left join unnest(auth.payload) as authorization_payload
-    )
-    on al_metadata.request_id = el_in_al_response_headers.cf_ray
-    WHERE al_metadata.request_id is not null
-
-    union all
-
-    select 
-        id, 
-        svl.timestamp as timestamp, 
-        'supavisor' as log_type,
-        'undefined' as status,
-        CASE
-            WHEN LOWER(svl_metadata.level) = 'error' THEN 'error'
-            WHEN LOWER(svl_metadata.level) = 'warn' OR LOWER(svl_metadata.level) = 'warning' THEN 'warning'
-            ELSE 'success'
-        END as level,
-        null as path,
-        null as host,
-        null as event_message,
-        null as method,
-        'api_role' as api_role,
-        null as auth_user,
-        null as log_count
-    from supavisor_logs as svl
-    cross join unnest(metadata) as svl_metadata
-)
-
+${getUnifiedLogsCTE()}
 SELECT
   TIMESTAMP_TRUNC(timestamp, ${truncationLevel}) as time_bucket,
   COUNTIF(level = 'success') as success,
