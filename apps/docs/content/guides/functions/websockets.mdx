@@ -85,7 +85,7 @@ wss.emit("connection", ws, req);
 
 server.listen(8080);
 
-```
+````
 
 </TabPanel>
 </Tabs>
@@ -168,7 +168,7 @@ return new Response("User is not authenticated", { status: 403 });
 
 });
 
-```
+````
 
 </TabPanel>
 <TabPanel id="protocol" label="Using custom protocol">
@@ -218,7 +218,7 @@ return new Response("User is not authenticated", { status: 403 });
 
 });
 
-```
+````
 
 </TabPanel>
 </Tabs>
@@ -236,6 +236,6 @@ To prevent that, you can update the `supabase/config.toml` with the following se
 ```toml
 [edge_runtime]
 policy = "per_worker"
-```
+````
 
 When running with `per_worker` policy, Function won't auto-reload on edits. You will need to manually restart it by running `supabase functions serve`.
