@@ -9,7 +9,7 @@ Make sure new features, bug fixes or refactors do not break existing functionali
 ## Set up
 
 ```bash
-cp .env.example .env.local
+cp .env.local.example .env.local
 ```
 
 Edit the `.env.local` file with your credentials.
