@@ -20,7 +20,7 @@ interface DocPageProps {
   }>
 }
 
-async function getDocFromParams({ params }: DocPageProps) {
+async function getDocFromParams({ params }: { params: { slug: string[] } }) {
   const slug = params.slug?.join('/') || ''
   const doc = allDocs.find((doc) => doc.slugAsParams === slug)
 
@@ -32,7 +32,7 @@ async function getDocFromParams({ params }: DocPageProps) {
 }
 
 export async function generateMetadata(props: DocPageProps): Promise<Metadata> {
-  const params = await props.params;
+  const params = await props.params
   const doc = await getDocFromParams({ params })
 
   if (!doc) {
@@ -66,14 +66,14 @@ export async function generateMetadata(props: DocPageProps): Promise<Metadata> {
   }
 }
 
-export async function generateStaticParams(): Promise<DocPageProps['params'][]> {
+export async function generateStaticParams(): Promise<{ slug: string[] }[]> {
   return allDocs.map((doc) => ({
     slug: doc.slugAsParams.split('/'),
   }))
 }
 
 export default async function DocPage(props: DocPageProps) {
-  const params = await props.params;
+  const params = await props.params
   const doc = await getDocFromParams({ params })
 
   if (!doc) {
