@@ -7,7 +7,14 @@
       <language>en</language>
       <lastBuildDate>Fri, 04 Apr 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
-      <item>
+<item>
+  <guid>https://supabase.com/blog/event-triggers-wo-superuser</guid>
+  <title>PostgreSQL Event Triggers without superuser access</title>
+  <link>https://supabase.com/blog/event-triggers-wo-superuser</link>
+  <description>Using Postgres Hooks to allow regular users to create event triggers</description>
+  <pubDate>Thu, 08 May 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/launch-week-14-top-10</guid>
   <title>Top 10 Launches of Launch Week 14</title>
   <link>https://supabase.com/blog/launch-week-14-top-10</link>

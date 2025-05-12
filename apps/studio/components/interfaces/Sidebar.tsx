@@ -501,7 +501,8 @@ const OrganizationLinks = () => {
                   ? router.pathname.includes('/general') ||
                     router.pathname.includes('/apps') ||
                     router.pathname.includes('/audit') ||
-                    router.pathname.includes('/documents')
+                    router.pathname.includes('/documents') ||
+                    router.pathname.includes('/security')
                   : activeRoute === item.key
             }
             route={{
