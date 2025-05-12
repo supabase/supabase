@@ -105,7 +105,7 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0
       next:
-        specifier: 15.3.1
+        specifier: 'catalog:'
         version: 15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
       next-contentlayer2:
         specifier: 0.4.6
@@ -358,7 +358,7 @@ importers:
         specifier: ^1.0.0
         version: 1.0.1
       next:
-        specifier: 15.3.1
+        specifier: 'catalog:'
         version: 15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
       next-mdx-remote:
         specifier: ^4.4.1
@@ -749,7 +749,7 @@ importers:
         specifier: 0.52.2
         version: 0.52.2
       next:
-        specifier: ~15.3.0
+        specifier: 'catalog:'
         version: 15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
       next-themes:
         specifier: ^0.3.0
@@ -1098,7 +1098,7 @@ importers:
         specifier: '*'
         version: 0.436.0(react@18.3.1)
       next:
-        specifier: 15.3.1
+        specifier: 'catalog:'
         version: 15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
       next-contentlayer2:
         specifier: 0.4.6
@@ -1336,7 +1336,7 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0
       next:
-        specifier: 15.3.1
+        specifier: 'catalog:'
         version: 15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.72.0)
       next-contentlayer2:
         specifier: 0.5.3
