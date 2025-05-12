@@ -29,7 +29,7 @@ npm run e2e:dev-selfhosted
 With Playwright UI:
 
 ```bash
-npm run test:e2e:dev-selfhosted -- --ui
+npm run e2e:dev-selfhosted -- --ui
 ```
 
 ---
