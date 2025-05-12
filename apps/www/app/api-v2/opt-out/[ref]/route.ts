@@ -28,7 +28,7 @@ async function verifyCaptcha(token: string): Promise<boolean> {
 }
 
 export async function POST(req: NextRequest, props: { params: Promise<{ ref: string }> }) {
-  const params = await props.params;
+  const params = await props.params
   const ref = params.ref
   const { reason, email, captchaToken } = await req.json()
 
