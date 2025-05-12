@@ -4,6 +4,10 @@
 
 import { SearchParamsType } from './search-params'
 import { BASE_CONDITIONS_EXCLUDED_PARAMS, EXCLUDED_QUERY_PARAMS } from './constants/query-params'
+import dayjs from 'dayjs'
+
+// Types for plan IDs - import actual type if available
+type PlanId = 'free' | 'pro' | 'team' | 'enterprise'
 
 /**
  * Builds query conditions from search parameters and returns WHERE clause
@@ -148,6 +152,80 @@ export const buildBaseConditions = (search: SearchParamsType): string[] => {
   })
 
   return baseConditions
+}
+
+/**
+ * Determine if we should show the user an upgrade prompt while browsing logs
+ * Ported from the older implementation (apps/studio/components/interfaces/Settings/Logs/Logs.utils.ts)
+ */
+export const maybeShowUpgradePrompt = (from: string | null | undefined, planId?: PlanId) => {
+  const day = Math.abs(dayjs().diff(dayjs(from), 'day'))
+
+  return (
+    (day > 1 && planId === 'free') ||
+    (day > 7 && planId === 'pro') ||
+    (day > 28 && planId === 'team') ||
+    (day > 90 && planId === 'enterprise')
+  )
+}
+
+/**
+ * Calculates how much the chart start datetime should be offset given the current datetime filter params
+ * and determines the appropriate bucketing level (minute, hour, day)
+ * Ported from the older implementation (apps/studio/components/interfaces/Settings/Logs/Logs.utils.ts)
+ */
+export const calculateChartBucketing = (search: SearchParamsType | Record<string, any>): string => {
+  // Extract start and end times from the date array if available
+  const dateRange = search.date || []
+
+  // Handle timestamps that could be in various formats
+  const convertToMillis = (timestamp: any) => {
+    if (!timestamp) return null
+    // If timestamp is a Date object
+    if (timestamp instanceof Date) return timestamp.getTime()
+
+    // If timestamp is a string that needs parsing
+    if (typeof timestamp === 'string') return dayjs(timestamp).valueOf()
+
+    // If timestamp is already a number (unix timestamp)
+    // Check if microseconds (16 digits) and convert to milliseconds
+    if (typeof timestamp === 'number') {
+      const str = timestamp.toString()
+      if (str.length >= 16) return Math.floor(timestamp / 1000)
+      return timestamp
+    }
+
+    return null
+  }
+
+  let startMillis = convertToMillis(dateRange[0])
+  let endMillis = convertToMillis(dateRange[1])
+
+  // Default values if not set
+  if (!startMillis) startMillis = dayjs().subtract(1, 'hour').valueOf()
+  if (!endMillis) endMillis = dayjs().valueOf()
+
+  const startTime = dayjs(startMillis)
+  const endTime = dayjs(endMillis)
+
+  let truncationLevel = 'MINUTE'
+
+  const minuteDiff = endTime.diff(startTime, 'minute')
+  const hourDiff = endTime.diff(startTime, 'hour')
+  const dayDiff = endTime.diff(startTime, 'day')
+
+  console.log(`Time difference: ${minuteDiff} minutes, ${hourDiff} hours, ${dayDiff} days`)
+
+  // Adjust bucketing based on time range
+  if (dayDiff >= 2) {
+    truncationLevel = 'DAY'
+  } else if (hourDiff >= 12) {
+    truncationLevel = 'HOUR'
+  } else {
+    truncationLevel = 'MINUTE'
+  }
+
+  return truncationLevel
 }
 
 /**
@@ -330,9 +408,16 @@ ${finalWhere}
   return sql
 }
 
-export const getLogsChartQuery2 = (search: SearchParamsType): string => {
+/**
+ * Enhanced logs chart query with dynamic bucketing based on time range
+ * Incorporates dynamic bucketing from the older implementation
+ */
+export const getLogsChartQuery2 = (search: SearchParamsType | Record<string, any>): string => {
   // Use the buildQueryConditions helper
-  const { finalWhere } = buildQueryConditions(search)
+  const { finalWhere } = buildQueryConditions(search as SearchParamsType)
+
+  // Determine appropriate bucketing level based on time range
+  const truncationLevel = calculateChartBucketing(search)
 
   return `
 WITH unified_logs AS (
@@ -487,21 +572,31 @@ WITH unified_logs AS (
 )
 
 SELECT
-  TIMESTAMP_TRUNC(timestamp, MINUTE) as minute,
+  TIMESTAMP_TRUNC(timestamp, ${truncationLevel}) as time_bucket,
   COUNTIF(level = 'success') as success,
   COUNTIF(level = 'warning') as warning,
   COUNTIF(level = 'error') as error
 FROM unified_logs
 ${finalWhere}
-GROUP BY minute
-ORDER BY minute ASC
+GROUP BY time_bucket
+ORDER BY time_bucket ASC
 `
 }
 
 /**
- * Chart data query for logs time series
+ * Chart data query for logs time series with dynamic bucketing
+ * Adapted from the older implementation to use dynamic bucketing
  */
-export const getLogsChartQuery = (): string => {
+export const getLogsChartQuery = (search?: Record<string, any>): string => {
+  // Determine appropriate bucketing level based on time range
+  const truncationLevel = calculateChartBucketing(search || {})
+
+  // Build where clause if search params are provided
+  const { finalWhere } =
+    search && Object.keys(search).length > 0
+      ? buildQueryConditions(search as SearchParamsType)
+      : { finalWhere: '' }
+
   return `
 WITH unified_logs AS (
   -- edge logs
@@ -581,12 +676,13 @@ WITH unified_logs AS (
   FROM pg_upgrade_logs as pgul
 )
 SELECT
-  TIMESTAMP_TRUNC(timestamp, MINUTE) as minute,
+  TIMESTAMP_TRUNC(timestamp, ${truncationLevel}) as time_bucket,
   COUNTIF(REGEXP_CONTAINS(status, '^2|^3') OR status = 'undefined') as success,
   COUNTIF(REGEXP_CONTAINS(status, '^4')) as warning,
   COUNTIF(REGEXP_CONTAINS(status, '^5')) as error
 FROM unified_logs
-GROUP BY minute
-ORDER BY minute ASC
+${finalWhere}
+GROUP BY time_bucket
+ORDER BY time_bucket ASC
 `
 }

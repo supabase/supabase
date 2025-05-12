@@ -145,19 +145,23 @@ export const useChartData = (search: SearchParamsType, projectRef: string) => {
         // Use a default date range (last hour) if no date range is selected
         let dateStart: string
         let dateEnd: string
+        let startTime: Date
+        let endTime: Date
 
         if (search.date && search.date.length === 2) {
-          dateStart = new Date(search.date[0]).toISOString()
-          dateEnd = new Date(search.date[1]).toISOString()
+          startTime = new Date(search.date[0])
+          endTime = new Date(search.date[1])
+          dateStart = startTime.toISOString()
+          dateEnd = endTime.toISOString()
         } else {
           // Default to last hour
-          const now = new Date()
-          dateEnd = now.toISOString()
-          const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
-          dateStart = oneHourAgo.toISOString()
+          endTime = new Date()
+          startTime = new Date(endTime.getTime() - 60 * 60 * 1000)
+          dateStart = startTime.toISOString()
+          dateEnd = endTime.toISOString()
         }
 
-        // Get SQL query from utility function
+        // Get SQL query from utility function (with dynamic bucketing)
         const sql = getLogsChartQuery2(search)
 
         // Use the get function from data/fetchers for chart data
@@ -183,74 +187,96 @@ export const useChartData = (search: SearchParamsType, projectRef: string) => {
           throw error
         }
 
-        // Create a Map of the API results
-        const apiResultMap = new Map()
+        // Process API results directly without additional bucketing
+        const chartData: Array<{
+          timestamp: number
+          success: number
+          warning: number
+          error: number
+        }> = []
+
+        // Create a map to store data points by their timestamp
+        const dataByTimestamp = new Map<
+          number,
+          {
+            timestamp: number
+            success: number
+            warning: number
+            error: number
+          }
+        >()
 
         // Only process API results if we have them
         if (data?.result) {
           data.result.forEach((row: any) => {
             // The API returns timestamps in microseconds (needs to be converted to milliseconds for JS Date)
-            const microseconds = Number(row.minute)
+            const microseconds = Number(row.time_bucket)
             const milliseconds = Math.floor(microseconds / 1000)
 
-            // Round to nearest minute (60000ms = 1 minute)
-            const roundedToMinute = Math.floor(milliseconds / 60000) * 60000
-
-            // Add to existing data for this minute if it exists
-            const existing = apiResultMap.get(roundedToMinute)
-            if (existing) {
-              apiResultMap.set(roundedToMinute, {
-                success: existing.success + (Number(row.success) || 0),
-                warning: existing.warning + (Number(row.warning) || 0),
-                error: existing.error + (Number(row.error) || 0),
-              })
-            } else {
-              // Store using minute-aligned milliseconds for proper matching
-              apiResultMap.set(roundedToMinute, {
-                success: Number(row.success) || 0,
-                warning: Number(row.warning) || 0,
-                error: Number(row.error) || 0,
-              })
+            // Create chart data point
+            const dataPoint = {
+              timestamp: milliseconds, // Convert to milliseconds for the chart
+              success: Number(row.success) || 0,
+              warning: Number(row.warning) || 0,
+              error: Number(row.error) || 0,
             }
+
+            // Filter levels if needed
+            const levelFilter = search.level
+            if (levelFilter && levelFilter.length > 0) {
+              // Reset levels not in the filter
+              if (!levelFilter.includes('success')) dataPoint.success = 0
+              if (!levelFilter.includes('warning')) dataPoint.warning = 0
+              if (!levelFilter.includes('error')) dataPoint.error = 0
+            }
+
+            dataByTimestamp.set(milliseconds, dataPoint)
           })
         }
 
-        // ALWAYS create a complete set of minute buckets for the entire hour
-        const startTime = new Date(dateStart).getTime()
-        const endTime = new Date(dateEnd).getTime()
-        const minuteMs = 60 * 1000
-        const chartData = []
+        // Determine bucket size based on the truncation level in the SQL query
+        // We need to fill in missing data points
+        const startTimeMs = startTime.getTime()
+        const endTimeMs = endTime.getTime()
 
-        // Generate all minute buckets for the hour (approximately 60 buckets)
-        for (let minute = startTime; minute <= endTime; minute += minuteMs) {
-          // Round current bucket to minute boundary
-          const roundedMinute = Math.floor(minute / minuteMs) * minuteMs
+        // Calculate appropriate bucket size from the time range
+        const timeRangeHours = (endTimeMs - startTimeMs) / (1000 * 60 * 60)
 
-          // Get data for this minute if it exists, otherwise use zeros
-          const minuteData = apiResultMap.get(roundedMinute) || { success: 0, warning: 0, error: 0 }
+        let bucketSizeMs: number
+        if (timeRangeHours > 72) {
+          // Day-level bucketing (for ranges > 3 days)
+          bucketSizeMs = 24 * 60 * 60 * 1000
+        } else if (timeRangeHours > 12) {
+          // Hour-level bucketing (for ranges > 12 hours)
+          bucketSizeMs = 60 * 60 * 1000
+        } else {
+          // Minute-level bucketing (for shorter ranges)
+          bucketSizeMs = 60 * 1000
+        }
 
-          // Create a data point with only the filtered levels
-          const dataPoint: any = {
-            timestamp: roundedMinute, // Use the minute timestamp
+        // Fill in any missing buckets
+        for (let t = startTimeMs; t <= endTimeMs; t += bucketSizeMs) {
+          // Round to the nearest bucket boundary
+          const bucketTime = Math.floor(t / bucketSizeMs) * bucketSizeMs
+
+          if (!dataByTimestamp.has(bucketTime)) {
+            // Create empty data point for this bucket
+            dataByTimestamp.set(bucketTime, {
+              timestamp: bucketTime,
+              success: 0,
+              warning: 0,
+              error: 0,
+            })
           }
+        }
 
-          // Only include the levels that were requested in the filter (or all if no filter)
-          const levelFilter = search.level
-          // If no level filter is specified or it's empty, include all levels
-          if (!levelFilter || levelFilter.length === 0) {
-            dataPoint.success = minuteData.success
-            dataPoint.warning = minuteData.warning
-            dataPoint.error = minuteData.error
-          } else {
-            // Otherwise only include the selected levels
-            if (levelFilter.includes('success')) dataPoint.success = minuteData.success
-            if (levelFilter.includes('warning')) dataPoint.warning = minuteData.warning
-            if (levelFilter.includes('error')) dataPoint.error = minuteData.error
-          }
-
-          // Always push a data point for this minute
+        // Convert map to array
+        for (const dataPoint of dataByTimestamp.values()) {
           chartData.push(dataPoint)
         }
+
+        // Sort by timestamp
+        chartData.sort((a, b) => a.timestamp - b.timestamp)
 
         return {
           chartData,
