@@ -217,15 +217,15 @@ export function Client() {
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(facets),
-    getFacetedMinMaxValues: getFacetedMinMaxValues(facets),
+    getFacetedUniqueValues: getTTableFacetedUniqueValues(),
+    getFacetedMinMaxValues: getTTableFacetedMinMaxValues(),
     filterFns: { inDateRange, arrSome },
     // Here, manually override the filter function for the level column
     // to prevent client-side filtering since it's already filtered on the server
     columnFilterFns: {
       level: () => true, // Always return true to pass all level values
     },
-    debugAll: process.env.NEXT_PUBLIC_TABLE_DEBUG === 'true',
+    // debugAll: process.env.NEXT_PUBLIC_TABLE_DEBUG === 'true',
     meta: { getRowClassName },
   })
 

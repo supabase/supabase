@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ARRAY_DELIMITER, SORT_DELIMITER } from 'components/interfaces/DataTableDemo/lib/delimiters'
 import { post } from 'data/fetchers'
 import dayjs from 'dayjs'
-import { getLogsChartQuery, getUnifiedLogsQuery } from './logs.queries'
+import { getLogsChartQuery, getLogsCountQuery, getUnifiedLogsQuery } from './logs.queries'
 import type { BaseChartSchema, FacetMetadataSchema } from './schema'
 import { ColumnSchema } from './schema'
 import type { SearchParamsType } from './search-params'
@@ -329,13 +329,6 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
         const direction = pageParam?.direction
         const isPagination = pageParam !== undefined
 
-        // Get the unified SQL query from utility function
-        let sql = getUnifiedLogsQuery(search)
-
-        // Add ordering and limit
-        sql += `\nORDER BY timestamp DESC, id DESC`
-        sql += `\nLIMIT 50`
-
         // Extract date range from search or use default (last hour)
         let isoTimestampStart: string
         let isoTimestampEnd: string
@@ -351,7 +344,88 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
           isoTimestampStart = oneHourAgo.toISOString()
         }
 
-        // Use get function from data/fetchers for logs
+        // Get the unified SQL query for logs data from utility function
+        let logsSql = getUnifiedLogsQuery(search)
+
+        // Add ordering and limit
+        logsSql += `\nORDER BY timestamp DESC, id DESC`
+        logsSql += `\nLIMIT 50`
+
+        // Get SQL query for counts from utility function
+        const countsSql = getLogsCountQuery(search)
+
+        // First, fetch the counts data
+        const { data: countsData, error: countsError } = await post(
+          `/platform/projects/{ref}/analytics/endpoints/logs.all`,
+          {
+            body: {
+              sql: countsSql,
+            },
+            params: {
+              path: { ref: projectRef },
+              query: {
+                iso_timestamp_start: isoTimestampStart,
+                iso_timestamp_end: isoTimestampEnd,
+                project: projectRef,
+              },
+            },
+          }
+        )
+
+        if (countsError) {
+          console.error('API returned error for counts data:', countsError)
+          throw countsError
+        }
+
+        // Process count results into facets structure
+        const facets: Record<string, FacetMetadataSchema> = {}
+        const countsByDimension: Record<string, Map<string, number>> = {}
+        let totalCount = 0
+
+        // Group by dimension
+        if (countsData?.result) {
+          countsData.result.forEach((row: any) => {
+            const dimension = row.dimension
+            const value = row.value
+            const count = Number(row.count || 0)
+
+            // Set total count if this is the total dimension
+            if (dimension === 'total' && value === 'all') {
+              totalCount = count
+            }
+
+            // Initialize dimension map if not exists
+            if (!countsByDimension[dimension]) {
+              countsByDimension[dimension] = new Map()
+            }
+
+            // Add count to the dimension map
+            countsByDimension[dimension].set(value, count)
+          })
+        }
+
+        // Convert dimension maps to facets structure
+        Object.entries(countsByDimension).forEach(([dimension, countsMap]) => {
+          // Skip the 'total' dimension as it's not a facet
+          if (dimension === 'total') return
+
+          const dimensionTotal = Array.from(countsMap.values()).reduce(
+            (sum, count) => sum + count,
+            0
+          )
+
+          facets[dimension] = {
+            min: undefined,
+            max: undefined,
+            total: dimensionTotal,
+            rows: Array.from(countsMap.entries()).map(([value, count]) => ({
+              value,
+              total: count,
+            })),
+          }
+        })
+
+        // Now, fetch the logs data with pagination
         const timestampStart = isPagination
           ? cursorValue
             ? new Date(Number(cursorValue) / 1000).toISOString()
@@ -362,11 +436,11 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
           `Query params: isPagination=${isPagination}, cursorValue=${cursorValue}, iso_timestamp_start=${timestampStart}, iso_timestamp_end=${isoTimestampEnd}`
         )
 
-        const { data, error } = await post(
+        const { data: logsData, error: logsError } = await post(
           `/platform/projects/{ref}/analytics/endpoints/logs.all`,
           {
             body: {
-              sql,
+              sql: logsSql,
             },
             params: {
               path: { ref: projectRef },
@@ -379,13 +453,13 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
           }
         )
 
-        if (error) {
-          console.error('API returned error:', error)
-          throw error
+        if (logsError) {
+          console.error('API returned error for logs data:', logsError)
+          throw logsError
         }
 
-        // Process the results
-        const resultData = data?.result || []
+        // Process the logs results
+        const resultData = logsData?.result || []
 
         console.log(`Received ${resultData.length} records from API`)
 
@@ -447,11 +521,11 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
         const response = {
           data: result,
           meta: {
-            // We'll rely on the client.tsx to use chartDataResult.totalCount instead
-            totalRowCount: 10000, // Keep using the hardcoded value for now
+            // Use the total count from our counts query
+            totalRowCount: totalCount,
             filterRowCount: result.length,
             chartData: buildChartData(result),
-            facets: {},
+            facets, // Use the facets from the counts query
             metadata: {
               currentPercentiles: {},
               logTypeCounts: calculateLogTypeCounts(result),
@@ -489,7 +563,7 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
-    refetchInterval: false,
+    refetchInterval: 0,
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 1000 * 60 * 10, // 10 minutes (formerly cacheTime)
   }

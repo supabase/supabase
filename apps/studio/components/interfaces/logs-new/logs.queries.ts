@@ -2,9 +2,9 @@
  * Reusable SQL queries for logs
  */
 
-import { SearchParamsType } from './search-params'
-import { BASE_CONDITIONS_EXCLUDED_PARAMS, EXCLUDED_QUERY_PARAMS } from './constants/query-params'
 import dayjs from 'dayjs'
+import { BASE_CONDITIONS_EXCLUDED_PARAMS, EXCLUDED_QUERY_PARAMS } from './constants/query-params'
+import { SearchParamsType } from './search-params'
 
 // Types for plan IDs - import actual type if available
 type PlanId = 'free' | 'pro' | 'team' | 'enterprise'
@@ -454,6 +454,7 @@ ${finalWhere}
 
 /**
  * Get a count query for the total logs within the timeframe
+ * Also returns facets for all filter dimensions
  */
 export const getLogsCountQuery = (search: SearchParamsType): string => {
   // Use the buildQueryConditions helper
@@ -462,10 +463,35 @@ export const getLogsCountQuery = (search: SearchParamsType): string => {
   // Create a count query using the same unified logs CTE
   const sql = `
 ${getUnifiedLogsCTE()}
-SELECT
-    COUNT(*) as total_count
+-- Get total count
+SELECT 'total' as dimension, 'all' as value, COUNT(*) as count
 FROM unified_logs
 ${finalWhere}
+
+UNION ALL
+
+-- Get counts by level
+SELECT 'level' as dimension, level as value, COUNT(*) as count
+FROM unified_logs
+${finalWhere}
+GROUP BY level
+
+UNION ALL
+
+-- Get counts by log_type
+SELECT 'log_type' as dimension, log_type as value, COUNT(*) as count
+FROM unified_logs
+${finalWhere}
+GROUP BY log_type
+
+UNION ALL
+
+-- Get counts by method
+SELECT 'method' as dimension, method as value, COUNT(*) as count
+FROM unified_logs
+${finalWhere}
+WHERE method IS NOT NULL
+GROUP BY method
 `
 
   return sql
