@@ -1,4 +1,5 @@
 import pgMeta from '@supabase/pg-meta'
+import { ident } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -32,7 +33,7 @@ export async function enableDatabaseExtension({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: createSchema ? `create schema if not exists ${schema}; ${sql}` : sql,
+    sql: createSchema ? `create schema if not exists ${ident(schema)}; ${sql}` : sql,
     queryKey: ['extension', 'create'],
   })
 
