@@ -32,6 +32,7 @@ export async function grantColumnPrivileges({
     projectRef,
     connectionString,
     sql,
+    queryKey: ['column-privileges', 'grant'],
   })
 
   return result

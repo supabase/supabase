@@ -26,6 +26,7 @@ export async function getColumnPrivileges(
       projectRef,
       connectionString,
       sql,
+      queryKey: ['column-privileges', 'list'],
     },
     signal
   )

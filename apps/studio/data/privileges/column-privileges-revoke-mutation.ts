@@ -31,6 +31,7 @@ export async function revokeColumnPrivileges({
     projectRef,
     connectionString,
     sql,
+    queryKey: ['column-privileges', 'revoke'],
   })
 
   return result
