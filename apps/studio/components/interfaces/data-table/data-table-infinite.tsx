@@ -148,17 +148,30 @@ export function DataTableInfinite<TData, TValue, TMeta>({
             <TableRow className="hover:bg-transparent data-[state=selected]:bg-transparent">
               <TableCell colSpan={columns.length} className="text-center">
                 {hasNextPage || isFetching || isLoading ? (
-                  <Button
-                    disabled={isFetching || isLoading}
-                    onClick={() => fetchNextPage()}
-                    size="small"
-                    type="outline"
-                    icon={
-                      isFetching ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : null
-                    }
-                  >
-                    Load More
-                  </Button>
+                  <div className="flex flex-col items-center gap-2">
+                    <Button
+                      disabled={isFetching || isLoading}
+                      onClick={() => fetchNextPage()}
+                      size="small"
+                      type="outline"
+                      icon={
+                        isFetching ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : null
+                      }
+                    >
+                      Load More
+                    </Button>
+                    <p className="text-xs text-foreground-lighter">
+                      Showing{' '}
+                      <span className="font-mono font-medium">
+                        {formatCompactNumber(totalRowsFetched)}
+                      </span>{' '}
+                      of{' '}
+                      <span className="font-mono font-medium">
+                        {formatCompactNumber(totalRows)}
+                      </span>{' '}
+                      rows
+                    </p>
+                  </div>
                 ) : (
                   <p className="text-sm text-foreground-lighter py-4">
                     No more data to load (

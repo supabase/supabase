@@ -104,7 +104,9 @@ export function Client() {
 
   // REMINDER: meta data is always the same for all pages as filters do not change(!)
   const lastPage = data?.pages?.[data?.pages.length - 1]
-  const totalDBRowCount = lastPage?.meta?.totalRowCount
+  // Use the totalCount from chartDataResult which gives us the actual count of logs in the time period
+  // instead of the hardcoded 10000 value
+  const totalDBRowCount = chartDataResult?.totalCount || lastPage?.meta?.totalRowCount
   const filterDBRowCount = lastPage?.meta?.filterRowCount
   const metadata = lastPage?.meta?.metadata
   // Use chart data from the separate query if available, fallback to the default
@@ -331,9 +333,9 @@ export function Client() {
                   ) : null,
                 ]}
               />
-              <div className="px-4 text-xs text-muted-foreground mb-1">
+              {/* <div className="px-4 text-xs text-muted-foreground mb-1">
                 Last hour of logs {search.date ? '(custom time range)' : '(default)'}
-              </div>
+              </div> */}
               <TimelineChart
                 data={chartData ?? []}
                 className="-mb-2"

@@ -488,7 +488,8 @@ SELECT
   TIMESTAMP_TRUNC(timestamp, ${truncationLevel}) as time_bucket,
   COUNTIF(level = 'success') as success,
   COUNTIF(level = 'warning') as warning,
-  COUNTIF(level = 'error') as error
+  COUNTIF(level = 'error') as error,
+  COUNT(*) as total_per_bucket
 FROM unified_logs
 ${finalWhere}
 GROUP BY time_bucket

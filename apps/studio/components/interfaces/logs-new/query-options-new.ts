@@ -206,12 +206,19 @@ export const useChartData = (search: SearchParamsType, projectRef: string) => {
           }
         >()
 
+        // Track the total count from the query results
+        // this uses the total_per_bucket field that was added to the chart query
+        let totalCount = 0
+
         // Only process API results if we have them
         if (data?.result) {
           data.result.forEach((row: any) => {
             // The API returns timestamps in microseconds (needs to be converted to milliseconds for JS Date)
             const microseconds = Number(row.time_bucket)
             const milliseconds = Math.floor(microseconds / 1000)
+
+            // Add to total count - this comes directly from the query
+            totalCount += Number(row.total_per_bucket || 0)
 
             // Create chart data point
             const dataPoint = {
@@ -278,8 +285,12 @@ export const useChartData = (search: SearchParamsType, projectRef: string) => {
         // Sort by timestamp
         chartData.sort((a, b) => a.timestamp - b.timestamp)
 
+        // Add debugging info for totalCount
+        console.log(`Total count from chart query: ${totalCount}`)
+
         return {
           chartData,
+          totalCount,
         }
       } catch (error) {
         console.error('Error fetching chart data:', error)
@@ -436,8 +447,9 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
         const response = {
           data: result,
           meta: {
-            totalRowCount: 10000, // A large number to show total potential logs
-            filterRowCount: hasMore ? result.length + 1000 : result.length,
+            // We'll rely on the client.tsx to use chartDataResult.totalCount instead
+            totalRowCount: 10000, // Keep using the hardcoded value for now
+            filterRowCount: result.length,
             chartData: buildChartData(result),
             facets: {},
             metadata: {
