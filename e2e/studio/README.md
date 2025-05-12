@@ -23,7 +23,7 @@ Check the `package.json` for the available commands and environments.
 #### Example:
 
 ```bash
-npm run test:e2e:dev-selfhosted
+npm run e2e:dev-selfhosted
 ```
 
 With Playwright UI:
