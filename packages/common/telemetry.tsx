@@ -28,8 +28,9 @@ export const TelemetryTagManager = (props: TelemetryTagManagerProps) => {
     if (isGTMEnabled) {
       // set „denied" as default for both ad and analytics storage, as well as ad_user_data and ad_personalization,
       sendGTMEvent({
-        event: 'consent',
-        default: {
+        0: 'consent',
+        1: 'default',
+        2: {
           ad_user_data: 'denied',
           ad_personalization: 'denied',
           ad_storage: 'denied',
