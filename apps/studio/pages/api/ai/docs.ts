@@ -1,5 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import { ApplicationError, UserError, clippy } from 'ai-commands/edge'
+import { getAuthUser } from 'lib/gotrue'
 import { NextRequest } from 'next/server'
 import OpenAI from 'openai'
 
@@ -37,6 +38,16 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string
 const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
 
 export default async function handler(req: NextRequest) {
+  const { user, error } = await getAuthUser(
+    req.headers.get('Authorization')?.replace('Bearer ', '') ?? ''
+  )
+  if (error || !user) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
   if (!openAiKey) {
     return new Response(
       JSON.stringify({

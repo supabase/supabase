@@ -1,6 +1,7 @@
 import { StreamingTextResponse } from 'ai'
 import { chatRlsPolicy } from 'ai-commands/edge'
 import { DatabasePoliciesData } from 'data/database-policies/database-policies-query'
+import { getAuthUser } from 'lib/gotrue'
 import { NextRequest } from 'next/server'
 import OpenAI from 'openai'
 
@@ -36,6 +37,16 @@ export const config = {
 const openAiKey = process.env.OPENAI_API_KEY
 
 export default async function handler(req: NextRequest) {
+  const { user, error } = await getAuthUser(
+    req.headers.get('Authorization')?.replace('Bearer ', '') ?? ''
+  )
+  if (error || !user) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
   if (!openAiKey) {
     return new Response(
       JSON.stringify({
