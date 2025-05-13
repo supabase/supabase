@@ -38,6 +38,7 @@ jobs:
       NEXT_PUBLIC_API_URL: https://api.supabase.green
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_STUDIO_HOSTED_PROJECT_ID }}
+      NEXT_PUBLIC_HCAPTCHA_SITE_KEY: 10000000-ffff-ffff-ffff-000000000001
 
     steps:
       - uses: actions/checkout@v4
@@ -76,7 +77,6 @@ jobs:
       - name: Run Playwright tests
         env:
           BASE_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}/dashboard
-          IS_PLATFORM: true
         run: pnpm e2e:ci
 
       - uses: actions/upload-artifact@v4
