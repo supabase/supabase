@@ -57,11 +57,13 @@ import { DataTableSideBarLayout } from '../data-table/data-table-side-bar-layout
 // specific imports
 import { MemoizedDataTableSheetContent } from './components/data-table-sheet-content'
 import type { FacetMetadataSchema, TimelineChartSchema } from './schema'
-import { columns } from './columns'
+import { columns, logEventBus } from './columns'
 import { searchParamsParser } from './search-params'
 import { dataOptions, useChartData } from './query-options-new'
 import { filterFields as defaultFilterFields, sheetFields } from './constants'
 import { useParams } from 'common'
+import { TraceDetailTab } from './components/trace-detail-tab'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from 'ui/src/components/shadcn/ui/tabs'
 
 // Debug mode flag - set to true to enable detailed logs
 const DEBUG_FILTER_PROCESSING = false
@@ -93,6 +95,7 @@ const chartConfig = {
 export function Client() {
   const [search, setSearch] = useQueryStates(searchParamsParser)
   const { ref: projectRef } = useParams()
+  const [activeTab, setActiveTab] = React.useState('details')
 
   const { data, isFetching, isLoading, fetchNextPage, hasNextPage, fetchPreviousPage, refetch } =
     useInfiniteQuery(dataOptions(search, projectRef ?? ''))
@@ -305,6 +308,20 @@ export function Client() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowSelection, selectedRow, isLoading, isFetching])
 
+  // Set up event listener for trace tab selection
+  React.useEffect(() => {
+    const unsubscribe = logEventBus.on('selectTraceTab', (rowId) => {
+      // Select the row
+      setRowSelection({ [rowId]: true })
+      // Set the active tab to trace
+      setActiveTab('trace')
+    })
+
+    return () => {
+      unsubscribe()
+    }
+  }, [setRowSelection])
+
   return (
     <>
       <DataTableProvider
@@ -376,19 +393,51 @@ export function Client() {
                           title={selectedRow?.original?.pathname}
                           titleClassName="font-mono"
                         >
-                          <MemoizedDataTableSheetContent
-                            table={table}
-                            data={selectedRow?.original}
-                            filterFields={filterFields}
-                            fields={sheetFields}
-                            metadata={{
-                              totalRows: totalDBRowCount ?? 0,
-                              filterRows: filterDBRowCount ?? 0,
-                              totalRowsFetched: totalFetched ?? 0,
-                              currentPercentiles: metadata?.currentPercentiles ?? ({} as any),
-                              ...metadata,
-                            }}
-                          />
+                          <Tabs
+                            defaultValue="details"
+                            value={activeTab}
+                            onValueChange={setActiveTab}
+                            className="w-full h-full flex flex-col pt-4"
+                          >
+                            <TabsList className="mb-2 flex gap-3 px-5">
+                              <TabsTrigger value="details">Log Details</TabsTrigger>
+                              <TabsTrigger value="trace">Trace</TabsTrigger>
+                            </TabsList>
+
+                            <TabsContent
+                              value="details"
+                              className="flex-grow overflow-auto data-[state=active]:flex-grow px-5"
+                            >
+                              <MemoizedDataTableSheetContent
+                                table={table}
+                                data={selectedRow?.original}
+                                filterFields={filterFields}
+                                fields={sheetFields}
+                                metadata={{
+                                  totalRows: totalDBRowCount ?? 0,
+                                  filterRows: filterDBRowCount ?? 0,
+                                  totalRowsFetched: totalFetched ?? 0,
+                                  currentPercentiles: metadata?.currentPercentiles ?? ({} as any),
+                                  ...metadata,
+                                }}
+                              />
+                            </TabsContent>
+
+                            <TabsContent
+                              value="trace"
+                              className="flex-grow overflow-auto data-[state=active]:flex-grow h-full mt-0 px-5"
+                            >
+                              {selectedRow?.original?.has_trace ? (
+                                <TraceDetailTab id={selectedRow?.original?.id} />
+                              ) : (
+                                <div className="flex flex-col gap-2">
+                                  <p className="text-sm text-muted-foreground">
+                                    No trace found for this log
+                                  </p>
+                                </div>
+                              )}
+                            </TabsContent>
+                          </Tabs>
                         </DataTableSheetDetails>
                       </div>
                     </ResizablePanel>

@@ -59,6 +59,7 @@ export const columnSchema = z.object({
   event_message: z.string().optional(),
   log_count: z.number().optional(), // used to count function logs for a given execution_id
   // percentile: z.number().optional(),
+  has_trace: z.boolean().optional(),
 })
 // .merge(timingSchema)
 
@@ -124,6 +125,7 @@ export const columnFilterSchema = z.object({
     .transform((val) => val.split(RANGE_DELIMITER).map(Number))
     .pipe(z.coerce.date().array())
     .optional(),
+  has_trace: z.boolean().optional(),
 })
 
 export type ColumnFilterSchema = z.infer<typeof columnFilterSchema>

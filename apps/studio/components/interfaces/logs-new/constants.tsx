@@ -22,6 +22,7 @@ import { SheetTimingPhases } from 'components/interfaces/DataTableDemo/infinite/
 // custom imports
 import type { LogsMeta } from './query-options'
 import { type ColumnSchema, LOG_TYPES } from './schema'
+import { TraceButton } from './components/trace-button'
 
 // instead of filterFields, maybe just 'fields' with a filterDisabled prop?
 // that way, we could have 'message' or 'headers' field with label and value as well as type!
@@ -160,6 +161,14 @@ export const sheetFields = [
       )
     },
     skeletonClassName: 'w-36',
+  },
+  {
+    id: 'has_trace',
+    label: 'Trace',
+    type: 'readonly',
+    condition: (props) => Boolean(props.has_trace),
+    component: (props) => <TraceButton has_trace={Boolean(props.has_trace)} id={props.id} />,
+    className: 'flex-row items-end justify-end w-full',
   },
   {
     id: 'status',

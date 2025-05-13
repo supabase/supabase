@@ -22,13 +22,31 @@ import {
 } from 'components/interfaces/DataTableDemo/lib/request/timing'
 import { cn } from 'ui'
 import { HoverCardPortal } from '@radix-ui/react-hover-card'
-import type { ColumnDef } from '@tanstack/react-table'
-import { Minus } from 'lucide-react'
+import type { ColumnDef, FilterFn } from '@tanstack/react-table'
+import { Bolt, Minus, Pyramid, Zap } from 'lucide-react'
 import { HoverCardTimestamp } from 'components/interfaces/DataTableDemo/infinite/_components/hover-card-timestamp'
 
 // custom imports
 import type { ColumnSchema } from './schema'
 import { LogTypeIcon } from './LogTypeIcon'
+
+// Event broadcaster for selecting the trace tab
+// This will be used to communicate between the columns and the client component
+export const logEventBus = {
+  listeners: new Map<string, Set<(...args: any[]) => void>>(),
+
+  on(event: 'selectTraceTab', callback: (rowId: string) => void) {
+    if (!this.listeners.has(event)) {
+      this.listeners.set(event, new Set())
+    }
+    this.listeners.get(event)?.add(callback)
+    return () => this.listeners.get(event)?.delete(callback)
+  },
+
+  emit(event: 'selectTraceTab', rowId: string) {
+    this.listeners.get(event)?.forEach((callback) => callback(rowId))
+  },
+}
 
 export const columns: ColumnDef<ColumnSchema>[] = [
   {
@@ -57,7 +75,7 @@ export const columns: ColumnDef<ColumnSchema>[] = [
       const date = new Date(row.getValue<ColumnSchema['date']>('date'))
       return <HoverCardTimestamp date={date} />
     },
-    filterFn: 'inDateRange',
+    filterFn: (row, columnId, filterValue) => true,
     enableResizing: false,
     size: 190,
     minSize: 190,
@@ -108,13 +126,28 @@ export const columns: ColumnDef<ColumnSchema>[] = [
     cell: ({ row }) => {
       const logType = row.getValue<ColumnSchema['log_type']>('log_type')
       return (
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 text-right">
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 text-right flex items-center gap-1">
+          {row.original.has_trace && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Bolt
+                  className="text-foreground/30 cursor-pointer hover:text-foreground/70"
+                  size={12}
+                  onClick={(e) => {
+                    e.stopPropagation() // Prevent row selection
+                    logEventBus.emit('selectTraceTab', row.original.uuid)
+                  }}
+                />
+              </TooltipTrigger>
+              <TooltipContent>View trace details</TooltipContent>
+            </Tooltip>
+          )}
           <LogTypeIcon type={logType} size={16} className="text-foreground/70" />
         </div>
       )
     },
     enableHiding: false,
-    filterFn: 'arrSome',
+    filterFn: (row, columnId, filterValue) => true,
     size: 48,
     minSize: 48,
     maxSize: 48,
@@ -157,7 +190,7 @@ export const columns: ColumnDef<ColumnSchema>[] = [
         />
       )
     },
-    filterFn: 'arrSome',
+    filterFn: (row, columnId, filterValue) => true,
     enableResizing: false,
     size: 60,
     minSize: 60,

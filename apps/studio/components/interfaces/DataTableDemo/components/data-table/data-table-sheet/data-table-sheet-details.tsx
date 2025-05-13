@@ -105,8 +105,8 @@ export function DataTableSheetDetails({
     //   hideClose
     // >
     // <SheetHeader className="sticky top-0 z-10 border-b bg-background p-4">
-    <div className="relative bg-background">
-      <div className="flex items-center justify-between gap-2">
+    <div className="relative bg-sidebar">
+      <div className="flex items-center justify-between gap-2 px-5 py-1">
         <h5 className={cn(titleClassName, 'truncate text-left')}>
           {isLoading && !selectedRowKey ? <Skeleton className="h-7 w-36" /> : title}
         </h5>
@@ -116,12 +116,12 @@ export function DataTableSheetDetails({
               <TooltipTrigger asChild>
                 <Button
                   size="tiny"
-                  variant="ghost"
-                  className="h-7 w-7"
+                  type="text"
                   disabled={!prevId}
                   onClick={onPrev}
+                  className="px-0"
+                  icon={<ChevronUp />}
                 >
-                  <ChevronUp className="h-5 w-5" />
                   <span className="sr-only">Previous</span>
                 </Button>
               </TooltipTrigger>
@@ -137,12 +137,12 @@ export function DataTableSheetDetails({
               <TooltipTrigger asChild>
                 <Button
                   size="tiny"
-                  variant="ghost"
-                  className="h-7 w-7"
+                  type="text"
                   disabled={!nextId}
                   onClick={onNext}
+                  className="px-0"
+                  icon={<ChevronDown />}
                 >
-                  <ChevronDown className="h-5 w-5" />
                   <span className="sr-only">Next</span>
                 </Button>
               </TooltipTrigger>
@@ -157,17 +157,18 @@ export function DataTableSheetDetails({
           {/* <SheetClose autoFocus={true} asChild> */}
           <Button
             size="tiny"
-            variant="ghost"
-            className="h-7 w-7"
+            type="text"
             onClick={() => table.resetRowSelection()}
+            className="px-0"
+            icon={<X />}
           >
-            <X className="h-5 w-5" />
             <span className="sr-only">Close</span>
           </Button>
           {/* </SheetClose> */}
         </div>
       </div>
-      <div className="p-4">{children}</div>
+      <Separator />
+      {children}
     </div>
   )
 }
