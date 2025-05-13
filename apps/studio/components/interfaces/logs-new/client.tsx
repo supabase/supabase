@@ -319,7 +319,7 @@ export function Client() {
         enableColumnOrdering={true}
         isLoading={isFetching || isLoading}
         getFacetedUniqueValues={getFacetedUniqueValues(facets)}
-        getFacetedMinMaxValues={getFacetedMinMaxValues(facets)}
+        // getFacetedMinMaxValues={getFacetedMinMaxValues(facets)}
       >
         <DataTableSideBarLayout topBarHeight={topBarHeight}>
           <FilterSideBar />
