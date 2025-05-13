@@ -159,8 +159,8 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
     ],
   },
   {
-    id: 'disk-io-usage',
-    label: 'Disk IO Usage',
+    id: 'disk-io-consumption',
+    label: 'Disk IO Consumption',
     syncId: 'database-reports',
     hide: false,
     showTooltip: true,
@@ -179,6 +179,37 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
         label: 'IO Consumption',
         tooltip:
           'The actual number of IO operations per second that the database is currently using.',
+      },
+    ],
+  },
+  {
+    id: 'disk-io-usage',
+    label: 'Disk IO Usage',
+    syncId: 'database-reports',
+    hide: false,
+    showTooltip: true,
+    format: '%',
+    valuePrecision: 5,
+    showLegend: false,
+    showMaxValue: false,
+    hideChartType: false,
+    showGrid: true,
+    YAxisProps: { width: 60, tickFormatter: (value: any) => `${numberFormatter(value, 5)}%` },
+    defaultChartStyle: 'line',
+    attributes: [
+      {
+        attribute: 'disk_io_usage',
+        provider: 'infra-monitoring',
+        label: 'IO Usage',
+        tooltip:
+          'The actual number of IO operations per second that the database is currently using.',
+      },
+    ],
+    referenceLines: [
+      {
+        value: 0.9,
+        label: '90%',
+        color: 'red',
       },
     ],
   },

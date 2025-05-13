@@ -141,6 +141,19 @@ const DatabaseUsage = () => {
         })
       )
     })
+    if (isReportsV2) {
+      REPORT_ATTRIBUTES_V2.forEach((attr) => {
+        queryClient.invalidateQueries(
+          analyticsKeys.infraMonitoring(ref, {
+            attribute: attr?.id,
+            startDate: period_start.date,
+            endDate: period_start.end,
+            interval,
+            databaseIdentifier: state.selectedDatabaseId,
+          })
+        )
+      })
+    }
     if (isReplicaSelected) {
       queryClient.invalidateQueries(
         analyticsKeys.infraMonitoring(ref, {

@@ -3281,6 +3281,40 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/replication/{ref}/sinks-pipelines': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Creates a replication sink and pipeline. */
+    post: operations['ReplicationSinksPipelinesController_createSinkPipeline']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/sinks-pipelines/{sink_id}/{pipeline_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Updates a replication sink and pipeline */
+    post: operations['ReplicationSinksPipelinesController_updateSinkPipeline']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/replication/{ref}/sinks/{sink_id}': {
     parameters: {
       query?: never
@@ -3364,6 +3398,23 @@ export interface paths {
     get: operations['ReplicationSourcesController_getTables']
     put?: never
     post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/tenants-sources': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Creates a replication tenant and source. */
+    post: operations['ReplicationTenantsSourcesController_createTenantSource']
     delete?: never
     options?: never
     head?: never
@@ -4605,9 +4656,43 @@ export interface components {
       /** @description Sink name */
       sink_name: string
     }
+    CreateReplicationSinkPipelineBody: {
+      /** @description Pipeline config */
+      pipeline_config: {
+        config: {
+          max_fill_secs: number
+          max_size: number
+        }
+      }
+      /** @description Publication name */
+      publication_name: string
+      /** @description Sink config */
+      sink_config: {
+        big_query: {
+          /** @description BigQuery dataset id */
+          dataset_id: string
+          /** @description Max staleness in minutes */
+          max_staleness_mins: number
+          /** @description BigQuery project id */
+          project_id: string
+          /** @description BigQuery service account key */
+          service_account_key: string
+        }
+      }
+      /** @description Sink name */
+      sink_name: string
+      /** @description Source id */
+      source_id: number
+    }
     CreateSchemaBody: {
       name: string
       owner: string
+    }
+    CreateSinkPipelineResponse: {
+      /** @description Pipeline id */
+      pipeline_id: number
+      /** @description Sink id */
+      sink_id: number
     }
     CreateSinkResponse: {
       id: number
@@ -4639,6 +4724,12 @@ export interface components {
       country?: string
       type: string
       value: string
+    }
+    CreateTenantSourceResponse: {
+      /** @description Source id */
+      source_id: number
+      /** @description Tenant id */
+      tenant_id: string
     }
     CreateTriggerBody: {
       /** @enum {string} */
@@ -5474,6 +5565,7 @@ export interface components {
       EXTERNAL_TWITTER_CLIENT_ID: string
       EXTERNAL_TWITTER_ENABLED: boolean
       EXTERNAL_TWITTER_SECRET: string
+      EXTERNAL_WEB3_SOLANA_ENABLED: boolean
       EXTERNAL_WORKOS_CLIENT_ID: string
       EXTERNAL_WORKOS_ENABLED: boolean
       EXTERNAL_WORKOS_SECRET: string
@@ -6934,9 +7026,13 @@ export interface components {
     ReplicationSinkResponse: {
       config: {
         big_query: {
+          /** @description BigQuery dataset id */
           dataset_id: string
+          /** @description Max staleness in minutes */
           max_staleness_mins: number
+          /** @description BigQuery project id */
           project_id: string
+          /** @description BigQuery service account key */
           service_account_key: string
         }
       }
@@ -6948,9 +7044,13 @@ export interface components {
       sinks: {
         config: {
           big_query: {
+            /** @description BigQuery dataset id */
             dataset_id: string
+            /** @description Max staleness in minutes */
             max_staleness_mins: number
+            /** @description BigQuery project id */
             project_id: string
+            /** @description BigQuery service account key */
             service_account_key: string
           }
         }
@@ -7857,6 +7957,34 @@ export interface components {
       service_account_key: string
       /** @description Sink name */
       sink_name: string
+    }
+    UpdateReplicationSinkPipelineBody: {
+      /** @description Pipeline config */
+      pipeline_config: {
+        config: {
+          max_fill_secs: number
+          max_size: number
+        }
+      }
+      /** @description Publication name */
+      publication_name: string
+      /** @description Sink config */
+      sink_config: {
+        big_query: {
+          /** @description BigQuery dataset id */
+          dataset_id: string
+          /** @description Max staleness in minutes */
+          max_staleness_mins: number
+          /** @description BigQuery project id */
+          project_id: string
+          /** @description BigQuery service account key */
+          service_account_key: string
+        }
+      }
+      /** @description Sink name */
+      sink_name: string
+      /** @description Source id */
+      source_id: number
     }
     UpdateSchemaBody: {
       name?: string
@@ -16275,13 +16403,14 @@ export interface operations {
           | 'cpu_usage_busy_idle'
           | 'max_cpu_usage'
           | 'avg_cpu_usage'
-          | 'pg_database_size'
           | 'disk_io_budget'
           | 'disk_io_consumption'
+          | 'disk_io_usage'
           | 'disk_iops_read'
           | 'disk_iops_write'
           | 'disk_bytes_read'
           | 'disk_bytes_written'
+          | 'pg_database_size'
           | 'ram_usage'
           | 'ram_usage_total'
           | 'ram_usage_used'
@@ -17478,6 +17607,87 @@ export interface operations {
       }
     }
   }
+  ReplicationSinksPipelinesController_createSinkPipeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateReplicationSinkPipelineBody']
+      }
+    }
+    responses: {
+      /** @description Returns the created replication sink and pipeline ids. */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateSinkPipelineResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Returned when the API fails to create the replication sink or pipeline. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationSinksPipelinesController_updateSinkPipeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Pipeline id */
+        pipeline_id: number
+        /** @description Project reference */
+        ref: string
+        /** @description Sink id */
+        sink_id: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateReplicationSinkPipelineBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Returned when the API fails to update the replication sink or pipeline */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   ReplicationSinksController_getSink: {
     parameters: {
       query?: never
@@ -17813,6 +18023,42 @@ export interface operations {
         content?: never
       }
       /** @description Returned when the API fails to get source tables. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationTenantsSourcesController_createTenantSource: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Returns the created replication tenant and source ids. */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateTenantSourceResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Returned when the API fails to create the replication tenant or source. */
       500: {
         headers: {
           [name: string]: unknown
