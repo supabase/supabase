@@ -2,6 +2,7 @@ export const organizationKeys = {
   list: () => ['organizations'] as const,
   detail: (slug?: string) => ['organizations', slug] as const,
   members: (slug?: string) => ['organizations', slug, 'members'] as const,
+  mfa: (slug?: string) => ['organizations', slug, 'mfa'] as const,
   paymentMethods: (slug: string | undefined) => ['organizations', slug, 'payment-methods'] as const,
   roles: (slug: string | undefined) => ['organizations', slug, 'roles'] as const,
   freeProjectLimitCheck: (slug: string | undefined) =>
