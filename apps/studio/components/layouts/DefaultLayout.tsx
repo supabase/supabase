@@ -3,9 +3,7 @@ import { PropsWithChildren } from 'react'
 import { useParams } from 'common'
 import { AppBannerWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
-import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Sidebar } from 'components/interfaces/Sidebar'
-import { useShowLayoutHeader } from 'hooks/misc/useShowLayoutHeader'
 import { useRouter } from 'next/router'
 import { SidebarProvider } from 'ui'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader'
@@ -27,9 +25,6 @@ export interface DefaultLayoutProps {
  * - First level side navigation bar (e.g For navigating to Table Editor, SQL Editor, Database page, etc)
  */
 const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayoutProps>) => {
-  const newLayoutPreview = useIsNewLayoutEnabled()
-  const showLayoutHeader = useShowLayoutHeader()
-
   const { ref } = useParams()
   const router = useRouter()
   const showProductMenu = !!ref && router.pathname !== '/project/[ref]'
@@ -43,9 +38,7 @@ const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayou
             <AppBannerWrapper />
             <div className="flex-shrink-0">
               <MobileNavigationBar />
-              {newLayoutPreview || showLayoutHeader ? (
-                <LayoutHeader showProductMenu={showProductMenu} headerTitle={headerTitle} />
-              ) : null}
+              <LayoutHeader showProductMenu={showProductMenu} headerTitle={headerTitle} />
             </div>
             {/* Main Content Area */}
             <div className="flex flex-1 w-full overflow-y-hidden">
