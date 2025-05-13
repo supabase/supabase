@@ -34,7 +34,7 @@ jobs:
       CI_EMAIL: ${{ secrets.CI_EMAIL }}
       CI_PASSWORD: ${{ secrets.CI_PASSWORD }}
       CI_PROJECT_REF: ${{ secrets.CI_PROJECT_REF }}
-      IS_PLATFORM: true
+      NEXT_PUBLIC_IS_PLATFORM: true
 
     steps:
       - uses: actions/checkout@v4
@@ -51,7 +51,7 @@ jobs:
         run: pnpm i
 
       - name: Build Studio
-        run: IS_PLATFORM=true pnpm --filter studio build
+        run: NEXT_PUBLIC_IS_PLATFORM=true pnpm --filter studio build
 
       - name: Start Studio in background
         run: pnpm --filter studio start &
