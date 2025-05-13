@@ -79,7 +79,7 @@ const ChartHeader = ({
                 onClick={() => onChartStyleChange(chartStyle === 'bar' ? 'line' : 'bar')}
               />
             </TooltipTrigger>
-            <TooltipContent side="left" align="center">
+            <TooltipContent side="top" align="center">
               View as {chartStyle === 'bar' ? 'line chart' : 'bar chart'}
             </TooltipContent>
           </Tooltip>
@@ -92,13 +92,13 @@ const ChartHeader = ({
                 className="px-1.5"
                 icon={
                   <GitCommitHorizontalIcon
-                    className={showMaxValue ? 'text-foreground' : 'text-foreground-lighter'}
+                    className={showMaxValue ? 'text-foreground-light' : 'text-foreground-lighter'}
                   />
                 }
                 onClick={() => setShowMaxValue(!showMaxValue)}
               />
             </TooltipTrigger>
-            <TooltipContent side="left" align="center">
+            <TooltipContent side="top" align="center">
               {showMaxValue ? 'Hide' : 'Show'} limit
             </TooltipContent>
           </Tooltip>
