@@ -83,7 +83,7 @@ export const fetchAllTableRows = async ({
   progressCallback,
 }: {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   table: SupaTable
   filters?: Filter[]
   sorts?: Sort[]
@@ -167,7 +167,7 @@ export type TableRows = { rows: SupaRow[] }
 export type TableRowsVariables = Omit<GetTableRowsArgs, 'table'> & {
   queryClient: QueryClient
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   tableId?: number
 }
 

@@ -299,6 +299,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                       <PostgresVersionSelector
                         field={field}
                         form={form}
+                        type="unpause"
                         label="Select the version of Postgres to restore to"
                         layout="vertical"
                         dbRegion={region?.displayName ?? ''}

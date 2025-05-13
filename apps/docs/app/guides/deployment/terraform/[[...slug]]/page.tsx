@@ -42,7 +42,8 @@ interface Params {
   slug?: string[]
 }
 
-const TerraformDocs = async ({ params }: { params: Params }) => {
+const TerraformDocs = async (props: { params: Promise<Params> }) => {
+  const params = await props.params
   const { meta, ...data } = await getContent(params)
 
   const options = {

@@ -49,19 +49,22 @@ const nextConfig = {
     })
     return config
   },
-  transpilePackages: ['ui', 'ui-patterns', 'common', 'dayjs', 'shared-data', 'api-types', 'icons'],
-  experimental: {
-    outputFileTracingIncludes: {
-      '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
-      '/guides/**/*': [
-        './content/guides/**/*',
-        './content/troubleshooting/**/*',
-        './examples/**/*',
-      ],
-      '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
-    },
-    serverComponentsExternalPackages: ['libpg-query', 'twoslash'],
+  transpilePackages: [
+    'ui',
+    'ui-patterns',
+    'common',
+    'dayjs',
+    'shared-data',
+    'api-types',
+    'icons',
+    'next-mdx-remote',
+  ],
+  outputFileTracingIncludes: {
+    '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
+    '/guides/**/*': ['./content/guides/**/*', './content/troubleshooting/**/*', './examples/**/*'],
+    '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
   },
+  serverExternalPackages: ['libpg-query', 'twoslash'],
   async headers() {
     return [
       {

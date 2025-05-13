@@ -208,7 +208,8 @@ interface Params {
   slug?: string[]
 }
 
-const WrappersDocs = async ({ params }: { params: Params }) => {
+const WrappersDocs = async (props: { params: Promise<Params> }) => {
+  const params = await props.params
   const { isExternal, meta, ...data } = await getContent(params)
 
   const options = isExternal
@@ -271,6 +272,7 @@ const getContent = async (params: Params) => {
     editLink = `${org}/${repo}/blob/${tag}/${docsDir}/${remoteFile}`
 
     const response = await fetch(`https://raw.githubusercontent.com/${repoPath}`, {
+      cache: 'force-cache',
       next: { tags: [REVALIDATION_TAGS.WRAPPERS] },
     })
     const rawContent = await response.text()

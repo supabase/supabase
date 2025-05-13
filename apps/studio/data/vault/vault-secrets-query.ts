@@ -15,7 +15,7 @@ export const getVaultSecretsSql = () => {
 
 export type VaultSecretsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getVaultSecrets(

@@ -79,7 +79,8 @@ async function getAiPromptImpl(prompt: string) {
 }
 export const getAiPrompt = cache(getAiPromptImpl)
 
-export async function generateAiPromptMetadata({ params: { slug } }: { params: { slug: string } }) {
+export async function generateAiPromptMetadata(props: { params: Promise<{ slug: string }> }) {
+  const { slug } = await props.params
   const prompt = await getAiPrompt(slug)
 
   return {

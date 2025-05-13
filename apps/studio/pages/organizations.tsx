@@ -12,6 +12,7 @@ import NoSearchResults from 'components/ui/NoSearchResults'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { withAuth } from 'hooks/misc/withAuth'
 import { NextPageWithLayout } from 'types'
 import { Button, Skeleton } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -100,4 +101,4 @@ OrganizationsPage.getLayout = (page) => (
   </AppLayout>
 )
 
-export default OrganizationsPage
+export default withAuth(OrganizationsPage)

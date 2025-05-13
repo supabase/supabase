@@ -8,7 +8,7 @@ import { vaultSecretsKeys } from './keys'
 
 export type VaultSecretUpdateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: string
 } & Partial<VaultSecret>
 

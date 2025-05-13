@@ -10,7 +10,7 @@ export type ColumnPrivilegesGrant = components['schemas']['GrantColumnPrivileges
 
 export type ColumnPrivilegesGrantVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   grants: ColumnPrivilegesGrant
 }
 
