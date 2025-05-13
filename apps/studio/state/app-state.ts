@@ -121,6 +121,19 @@ export const appState = proxy({
     appState.docsLanguage = value
   },
 
+  isOptedInTelemetry: false,
+  setIsOptedInTelemetry: (value: boolean | null) => {
+    appState.isOptedInTelemetry = value === null ? false : value
+    if (typeof window !== 'undefined' && value !== null) {
+      localStorage.setItem(COMMON_LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
+    }
+  },
+
+  isMfaEnforced: false,
+  setIsMfaEnforced: (value: boolean) => {
+    appState.isMfaEnforced = value
+  },
+
   showEnableBranchingModal: false,
   setShowEnableBranchingModal: (value: boolean) => {
     appState.showEnableBranchingModal = value

@@ -1,12 +1,13 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
+import { fetchHandler } from 'data/fetchers'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { miscKeys } from './keys'
 
 export async function getUserIPAddress() {
   try {
-    const data = await fetch(`${BASE_PATH}/api/get-ip-address`).then((res) => res.json())
+    const data = await fetchHandler(`${BASE_PATH}/api/get-ip-address`).then((res) => res.json())
     return data.ipAddress
   } catch (error) {
     throw error
