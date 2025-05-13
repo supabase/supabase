@@ -3,30 +3,28 @@ import Link from 'next/link'
 import { ReactNode, useMemo } from 'react'
 
 import { useParams } from 'common'
-import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import Connect from 'components/interfaces/Connect/Connect'
+import { Connect } from 'components/interfaces/Connect/Connect'
 import { LocalDropdown } from 'components/interfaces/LocalDropdown'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
-import AssistantButton from 'components/layouts/AppLayout/AssistantButton'
-import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
-import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
-import InlineEditorButton from 'components/layouts/AppLayout/InlineEditorButton'
-import OrganizationDropdown from 'components/layouts/AppLayout/OrganizationDropdown'
-import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
+import { AssistantButton } from 'components/layouts/AppLayout/AssistantButton'
+import { BranchDropdown } from 'components/layouts/AppLayout/BranchDropdown'
+import { EnableBranchingButton } from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
+import { InlineEditorButton } from 'components/layouts/AppLayout/InlineEditorButton'
+import { OrganizationDropdown } from 'components/layouts/AppLayout/OrganizationDropdown'
+import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useShowLayoutHeader } from 'hooks/misc/useShowLayoutHeader'
 import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, cn } from 'ui'
-import BreadcrumbsView from './BreadcrumbsView'
+import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
-import HelpPopover from './HelpPopover'
+import { HelpPopover } from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
-import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
+import { NotificationsPopoverV2 } from './NotificationsPopoverV2/NotificationsPopover'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -59,9 +57,6 @@ const LayoutHeader = ({
   headerTitle,
   showProductMenu,
 }: LayoutHeaderProps) => {
-  const newLayoutPreview = useIsNewLayoutEnabled()
-
-  const showLayoutHeader = useShowLayoutHeader()
   const { ref: projectRef, slug } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
@@ -108,75 +103,17 @@ const LayoutHeader = ({
       >
         <div className="flex items-center text-sm">
           <HomeIcon />
-          <>
-            <div className="flex items-center md:pl-2">
-              {showOrgSelection &&
-              // hides org dropdown for old layout
-              (newLayoutPreview || showLayoutHeader) &&
-              IS_PLATFORM ? (
-                <>
-                  <LayoutHeaderDivider className="hidden md:block" />
-                  <OrganizationDropdown />
-                </>
-              ) : null}
-              <AnimatePresence>
-                {projectRef && (
-                  <motion.div
-                    className="flex items-center"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{
-                      duration: 0.15,
-                      ease: 'easeOut',
-                    }}
-                  >
-                    <LayoutHeaderDivider />
-                    <ProjectDropdown />
-
-                    {exceedingLimits && (
-                      <div className="ml-2">
-                        <Link href={`/org/${selectedOrganization?.slug}/usage`}>
-                          <Badge variant="destructive" className="whitespace-nowrap">
-                            Exceeding usage limits
-                          </Badge>
-                        </Link>
-                      </div>
-                    )}
-
-                    {selectedProject && isBranchingEnabled && (
-                      <>
-                        <LayoutHeaderDivider />
-                        <BranchDropdown />
-                      </>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              <AnimatePresence>
-                {headerTitle && (
-                  <motion.div
-                    className="flex items-center"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{
-                      duration: 0.15,
-                      ease: 'easeOut',
-                    }}
-                  >
-                    <LayoutHeaderDivider />
-                    <span className="text-foreground">{headerTitle}</span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
+          <div className="flex items-center md:pl-2">
+            {showOrgSelection && IS_PLATFORM ? (
+              <>
+                <LayoutHeaderDivider className="hidden md:block" />
+                <OrganizationDropdown />
+              </>
+            ) : null}
             <AnimatePresence>
               {projectRef && (
                 <motion.div
-                  className="ml-3 items-center gap-x-3 flex"
+                  className="flex items-center"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
@@ -185,12 +122,65 @@ const LayoutHeader = ({
                     ease: 'easeOut',
                   }}
                 >
-                  {<Connect />}
-                  {!isBranchingEnabled && IS_PLATFORM && <EnableBranchingButton />}
+                  <LayoutHeaderDivider />
+                  <ProjectDropdown />
+
+                  {exceedingLimits && (
+                    <div className="ml-2">
+                      <Link href={`/org/${selectedOrganization?.slug}/usage`}>
+                        <Badge variant="destructive" className="whitespace-nowrap">
+                          Exceeding usage limits
+                        </Badge>
+                      </Link>
+                    </div>
+                  )}
+
+                  {selectedProject && isBranchingEnabled && (
+                    <>
+                      <LayoutHeaderDivider />
+                      <BranchDropdown />
+                    </>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
-          </>
+
+            <AnimatePresence>
+              {headerTitle && (
+                <motion.div
+                  className="flex items-center"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{
+                    duration: 0.15,
+                    ease: 'easeOut',
+                  }}
+                >
+                  <LayoutHeaderDivider />
+                  <span className="text-foreground">{headerTitle}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          <AnimatePresence>
+            {projectRef && (
+              <motion.div
+                className="ml-3 items-center gap-x-3 flex"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{
+                  duration: 0.15,
+                  ease: 'easeOut',
+                }}
+              >
+                {<Connect />}
+                {!isBranchingEnabled && IS_PLATFORM && <EnableBranchingButton />}
+              </motion.div>
+            )}
+          </AnimatePresence>
           <BreadcrumbsView defaultValue={breadcrumbs} />
         </div>
         <div className="flex items-center gap-x-2">
