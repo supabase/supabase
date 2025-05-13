@@ -3,6 +3,7 @@ import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
+import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { useParams } from 'common'
 import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
 import {
@@ -18,7 +19,6 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
 
@@ -70,7 +70,7 @@ const StatusIcon = ({
   return <AlertIcon />
 }
 
-const ServiceStatus = () => {
+export const ServiceStatus = () => {
   const { ref } = useParams()
   const project = useSelectedProject()
   const [open, setOpen] = useState(false)
@@ -248,7 +248,7 @@ const ServiceStatus = () => {
           {isBranch ? 'Preview Branch' : 'Project'} Status
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
+      <PopoverContent_Shadcn_ portal className="p-0 w-56" side="bottom" align="center">
         {services.map((service) => (
           <Link
             href={`/project/${ref}${service.logsUrl}`}
@@ -295,5 +295,3 @@ const ServiceStatus = () => {
     </Popover_Shadcn_>
   )
 }
-
-export default ServiceStatus
