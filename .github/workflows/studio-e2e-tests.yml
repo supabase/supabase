@@ -35,6 +35,7 @@ jobs:
       CI_PASSWORD: ${{ secrets.CI_PASSWORD }}
       CI_PROJECT_REF: ${{ secrets.CI_PROJECT_REF }}
       NEXT_PUBLIC_IS_PLATFORM: true
+      NEXT_PUBLIC_API_URL: https://api.supabase.green
 
     steps:
       - uses: actions/checkout@v4
@@ -51,7 +52,7 @@ jobs:
         run: pnpm i
 
       - name: Build Studio
-        run: NEXT_PUBLIC_IS_PLATFORM=true pnpm --filter studio build
+        run: pnpm --filter studio build
 
       - name: Start Studio in background
         run: pnpm --filter studio start &
