@@ -157,9 +157,7 @@ async function functionDetails(
   return fullDescription + parameters + examples
 }
 
-function mdxToHtml(markdownUnescaped: string): string {
-  const markdown = markdownUnescaped.replace(/(?<!\\)\{/g, '\\{').replace(/(?<!\\)\}/g, '\\}')
-
+function mdxToHtml(markdown: string): string {
   const mdast = fromMarkdown(markdown, {
     extensions: [mdxjs()],
     mdastExtensions: [mdxFromMarkdown()],
