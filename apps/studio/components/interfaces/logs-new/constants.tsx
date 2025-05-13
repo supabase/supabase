@@ -170,6 +170,13 @@ export const sheetFields = [
     component: (props) => <TraceButton has_trace={Boolean(props.has_trace)} id={props.id} />,
     className: 'flex-row items-end justify-end w-full',
   },
+  // {
+  //   id: 'logs',
+  //   label: 'Logs',
+  //   type: 'readonly',
+  //   component: (props) => <pre className="text-xs p-2">{JSON.stringify(props.logs, null, 2)}</pre>,
+  //   skeletonClassName: 'w-full',
+  // },
   {
     id: 'status',
     label: 'Status',

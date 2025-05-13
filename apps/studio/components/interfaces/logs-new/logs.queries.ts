@@ -250,7 +250,8 @@ export const getEdgeLogsQuery = () => {
       edge_logs_request.method as method,
       authorization_payload.role as api_role,
       COALESCE(sb.auth_user, null) as auth_user,
-      null as log_count
+      null as log_count,
+      null as logs
     from edge_logs as el
     cross join unnest(metadata) as edge_logs_metadata
     cross join unnest(edge_logs_metadata.request) as edge_logs_request
@@ -284,7 +285,8 @@ export const getPostgresLogsQuery = () => {
       null as method,
       'api_role' as api_role,
       null as auth_user,
-      null as log_count
+      null as log_count,
+      null as logs
     from postgres_logs as pgl
     cross join unnest(pgl.metadata) as pgl_metadata
     cross join unnest(pgl_metadata.parsed) as pgl_parsed
@@ -313,7 +315,8 @@ export const getEdgeFunctionLogsQuery = () => {
       fel_request.method as method,
       authorization_payload.role as api_role,
       COALESCE(sb.auth_user, null) as auth_user,
-      function_logs_agg.function_log_count as log_count
+      function_logs_agg.function_log_count as log_count,
+      function_logs_agg.logs as logs
     from function_edge_logs as fel
     cross join unnest(metadata) as fel_metadata
     cross join unnest(fel_metadata.response) as fel_response
@@ -326,7 +329,8 @@ export const getEdgeFunctionLogsQuery = () => {
     SELECT
         fl_metadata.execution_id,
         COUNT(fl.id) as function_log_count,
-        ANY_VALUE(fl.event_message) as last_event_message
+        ANY_VALUE(fl.event_message) as last_event_message,
+        ARRAY_AGG(STRUCT(fl.id, fl.timestamp, fl.event_message, fl_metadata.level, fl_metadata.event_type)) as logs
     FROM function_logs as fl
     CROSS JOIN UNNEST(fl.metadata) as fl_metadata
     WHERE fl_metadata.execution_id IS NOT NULL
@@ -357,7 +361,8 @@ export const getAuthLogsQuery = () => {
       el_in_al_request.method as method,
       authorization_payload.role as api_role,
       COALESCE(sb.auth_user, null) as auth_user,
-      null as log_count
+      null as log_count,
+      null as logs
     from auth_logs as al
     cross join unnest(metadata) as al_metadata 
     left join (
@@ -397,7 +402,8 @@ export const getSupavisorLogsQuery = () => {
       null as method,
       'api_role' as api_role,
       null as auth_user,
-      null as log_count
+      null as log_count,
+      null as logs
     from supavisor_logs as svl
     cross join unnest(metadata) as svl_metadata
   `
@@ -444,7 +450,8 @@ SELECT
     method,
     api_role,
     auth_user,
-    log_count
+    log_count,
+    logs
 FROM unified_logs
 ${finalWhere}
 `

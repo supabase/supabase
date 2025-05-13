@@ -64,6 +64,7 @@ import { filterFields as defaultFilterFields, sheetFields } from './constants'
 import { useParams } from 'common'
 import { TraceDetailTab } from './components/trace-detail-tab'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'ui/src/components/shadcn/ui/tabs'
+import { FunctionLogsTab } from './components/function-logs-tab'
 
 // Debug mode flag - set to true to enable detailed logs
 const DEBUG_FILTER_PROCESSING = false
@@ -360,92 +361,133 @@ export function Client() {
             </DataTableHeaderLayout>
             <Separator />
             {/* Use ResizablePanelGroup for the log list and details */}
-            <div className="flex flex-1 overflow-hidden">
-              <ResizablePanelGroup direction="horizontal" className="w-full">
-                <ResizablePanel defaultSize={selectedRowKey ? 60 : 100} minSize={30}>
-                  <div className="h-full overflow-auto">
-                    <DataTableInfinite
-                      columns={columns}
-                      totalRows={totalDBRowCount}
-                      filterRows={filterDBRowCount}
-                      totalRowsFetched={totalFetched}
-                      isFetching={isFetching}
-                      isLoading={isLoading}
-                      fetchNextPage={fetchNextPage}
-                      hasNextPage={hasNextPage}
-                      renderLiveRow={(props) => {
-                        if (!liveMode.timestamp) return null
-                        if (props?.row.original.uuid !== liveMode?.row?.uuid) return null
-                        return <LiveRow />
-                      }}
-                      setColumnOrder={setColumnOrder}
-                      setColumnVisibility={setColumnVisibility}
-                    />
-                  </div>
-                </ResizablePanel>
+            {/* <div className="flex flex-1 overflow-hidden"> */}
+            <ResizablePanelGroup direction="horizontal" className="w-full h-full">
+              <ResizablePanel
+                defaultSize={selectedRowKey ? 60 : 100}
+                minSize={30}
+                className="h-full"
+              >
+                <ResizablePanelGroup key="main-logs" direction="vertical" className="h-full">
+                  <ResizablePanel defaultSize={100} minSize={30}>
+                    <div className="h-full overflow-auto">
+                      <DataTableInfinite
+                        columns={columns}
+                        totalRows={totalDBRowCount}
+                        filterRows={filterDBRowCount}
+                        totalRowsFetched={totalFetched}
+                        isFetching={isFetching}
+                        isLoading={isLoading}
+                        fetchNextPage={fetchNextPage}
+                        hasNextPage={hasNextPage}
+                        renderLiveRow={(props) => {
+                          if (!liveMode.timestamp) return null
+                          if (props?.row.original.uuid !== liveMode?.row?.uuid) return null
+                          return <LiveRow />
+                        }}
+                        setColumnOrder={setColumnOrder}
+                        setColumnVisibility={setColumnVisibility}
+                      />
+                    </div>
+                  </ResizablePanel>
+                  {/* <ResizableHandle withHandle />
+                  <ResizablePanel defaultSize={20} minSize={20} className="bg">
+                    hello world
+                    <pre className="text-xs p-2">
+                      {JSON.stringify(selectedRow?.original, null, 2)}
+                    </pre>
+                  </ResizablePanel> */}
+                  {selectedRow?.original?.logs && selectedRow?.original?.logs?.length > 0 && (
+                    <>
+                      <ResizableHandle withHandle />
+                      <ResizablePanel defaultSize={20} minSize={20}>
+                        <div className="h-full flex flex-col overflow-hidden">
+                          <div className="px-5 py-3 border-b border-border flex justify-between items-center">
+                            <h3 className="text-sm font-medium">
+                              Function Logs (
+                              {selectedRow?.original?.logs &&
+                              Array.isArray(selectedRow?.original?.logs)
+                                ? selectedRow?.original?.logs?.length
+                                : 0}
+                              )
+                            </h3>
+                          </div>
+                          <div className="flex-grow overflow-auto">
+                            <FunctionLogsTab logs={selectedRow?.original?.logs} />
+                          </div>
+                        </div>
+                      </ResizablePanel>
+                    </>
+                  )}
+                </ResizablePanelGroup>
+              </ResizablePanel>
 
-                {selectedRowKey && (
-                  <>
-                    <ResizableHandle withHandle />
-                    <ResizablePanel defaultSize={25} minSize={25}>
-                      <div className="h-full overflow-auto">
-                        <DataTableSheetDetails
-                          title={selectedRow?.original?.pathname}
-                          titleClassName="font-mono"
-                        >
-                          <Tabs
-                            defaultValue="details"
-                            value={activeTab}
-                            onValueChange={setActiveTab}
-                            className="w-full h-full flex flex-col pt-4"
+              {selectedRowKey && (
+                <>
+                  <ResizableHandle withHandle />
+                  <ResizablePanel defaultSize={25} minSize={25}>
+                    <ResizablePanelGroup direction="vertical">
+                      <ResizablePanel defaultSize={100} minSize={30}>
+                        <div className="h-full overflow-auto">
+                          <DataTableSheetDetails
+                            title={selectedRow?.original?.pathname}
+                            titleClassName="font-mono"
                           >
-                            <TabsList className="mb-2 flex gap-3 px-5">
-                              <TabsTrigger value="details">Log Details</TabsTrigger>
-                              <TabsTrigger value="trace">Trace</TabsTrigger>
-                            </TabsList>
-
-                            <TabsContent
-                              value="details"
-                              className="flex-grow overflow-auto data-[state=active]:flex-grow px-5"
+                            <Tabs
+                              defaultValue="details"
+                              value={activeTab}
+                              onValueChange={setActiveTab}
+                              className="w-full h-full flex flex-col pt-4"
                             >
-                              <MemoizedDataTableSheetContent
-                                table={table}
-                                data={selectedRow?.original}
-                                filterFields={filterFields}
-                                fields={sheetFields}
-                                metadata={{
-                                  totalRows: totalDBRowCount ?? 0,
-                                  filterRows: filterDBRowCount ?? 0,
-                                  totalRowsFetched: totalFetched ?? 0,
-                                  currentPercentiles: metadata?.currentPercentiles ?? ({} as any),
-                                  ...metadata,
-                                }}
-                              />
-                            </TabsContent>
+                              <TabsList className="mb-2 flex gap-3 px-5">
+                                <TabsTrigger value="details">Log Details</TabsTrigger>
+                                <TabsTrigger value="trace">Trace</TabsTrigger>
+                              </TabsList>
 
-                            <TabsContent
-                              value="trace"
-                              className="flex-grow overflow-auto data-[state=active]:flex-grow h-full mt-0 px-5"
-                            >
-                              {selectedRow?.original?.has_trace ? (
-                                <TraceDetailTab id={selectedRow?.original?.id} />
-                              ) : (
-                                <div className="flex flex-col gap-2">
-                                  <p className="text-sm text-muted-foreground">
-                                    No trace found for this log
-                                  </p>
-                                </div>
-                              )}
-                            </TabsContent>
-                          </Tabs>
-                        </DataTableSheetDetails>
-                      </div>
-                    </ResizablePanel>
-                  </>
-                )}
-              </ResizablePanelGroup>
-            </div>
+                              <TabsContent
+                                value="details"
+                                className="flex-grow overflow-auto data-[state=active]:flex-grow px-5"
+                              >
+                                <MemoizedDataTableSheetContent
+                                  table={table}
+                                  data={selectedRow?.original}
+                                  filterFields={filterFields}
+                                  fields={sheetFields}
+                                  metadata={{
+                                    totalRows: totalDBRowCount ?? 0,
+                                    filterRows: filterDBRowCount ?? 0,
+                                    totalRowsFetched: totalFetched ?? 0,
+                                    currentPercentiles: metadata?.currentPercentiles ?? ({} as any),
+                                    ...metadata,
+                                  }}
+                                />
+                              </TabsContent>
+
+                              <TabsContent
+                                value="trace"
+                                className="flex-grow overflow-auto data-[state=active]:flex-grow h-full mt-0 px-5"
+                              >
+                                {selectedRow?.original?.has_trace ? (
+                                  <TraceDetailTab id={selectedRow?.original?.id} />
+                                ) : (
+                                  <div className="flex flex-col gap-2">
+                                    <p className="text-sm text-muted-foreground">
+                                      No trace found for this log
+                                    </p>
+                                  </div>
+                                )}
+                              </TabsContent>
+                            </Tabs>
+                          </DataTableSheetDetails>
+                        </div>
+                      </ResizablePanel>
+                    </ResizablePanelGroup>
+                  </ResizablePanel>
+                </>
+              )}
+            </ResizablePanelGroup>
           </div>
+          {/* </div> */}
         </DataTableSideBarLayout>
       </DataTableProvider>
     </>

@@ -6,9 +6,11 @@ import { color } from 'framer-motion'
 export function DataTableColumnStatusCode({
   value,
   level,
+  className,
 }: {
   value?: number | string
   level?: string
+  className?: string
 }) {
   // console.log('level', level, level === 'warning' ? value : 'no warning')
   const colors = getStatusColor(level)
@@ -17,7 +19,7 @@ export function DataTableColumnStatusCode({
   }
 
   return (
-    <div className="flex items-center relative">
+    <div className={cn('flex items-center relative', className)}>
       <div
         className={cn(
           'px-1 py-[0.03rem] rounded-md',
