@@ -36,6 +36,8 @@ jobs:
       CI_PROJECT_REF: ${{ secrets.CI_PROJECT_REF }}
       NEXT_PUBLIC_IS_PLATFORM: true
       NEXT_PUBLIC_API_URL: https://api.supabase.green
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_STUDIO_HOSTED_PROJECT_ID }}
 
     steps:
       - uses: actions/checkout@v4
@@ -48,35 +50,32 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
+
       - name: Install dependencies
         run: pnpm i
 
-      - name: Build Studio
-        run: pnpm --filter studio build
+      - name: Install Vercel CLI
+        run: pnpm add --global vercel@latest
 
-      - name: Start Studio in background
-        run: pnpm --filter studio start &
-        env:
-          PORT: 3000
+      - name: Pull Vercel Environment Information (Preview)
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Wait for Studio to be ready
+      - name: Build Project Artifacts for Vercel
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project to Vercel and Get URL
+        id: deploy_vercel
         run: |
-          timeout=60
-          while ! curl -s http://localhost:3000 > /dev/null; do
-            sleep 1
-            timeout=$((timeout-1))
-            if [ $timeout -le 0 ]; then
-              echo "Studio failed to start"
-              exit 1
-            fi
-          done
+          DEPLOY_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "Vercel Preview URL: $DEPLOY_URL"
+          echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_OUTPUT
 
       - name: Install Playwright Browsers
         run: pnpm -C e2e/studio exec playwright install --with-deps
 
       - name: Run Playwright tests
         env:
-          BASE_URL: http://localhost:3000
+          BASE_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}/dashboard
           IS_PLATFORM: true
         run: pnpm e2e:ci
 
