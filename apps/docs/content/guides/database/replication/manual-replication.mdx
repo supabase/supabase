@@ -1,0 +1,100 @@
+---
+title: Manual Replication
+subtitle: Set up your own replication pipeline for more control
+---
+
+Postgres comes with built-in support for replication. If `pg_replicate` doesn't provide a destination that you need, or if you need more control over the replication process, you can set up your own replication pipeline using Postgres primitives.
+
+## Replication and publications
+
+Replication is done through _publications_. A [publication](https://www.postgresql.org/docs/current/logical-replication-publication.html) is a set of changes. You can choose which tables and change events to include in a publication.
+
+Once a publication is created, it can be listened to by a subscriber. Subscriptions are handled using Postgres [replication slots](https://www.postgresql.org/docs/current/logical-replication-subscription.html). The exact connection parameters for the replication slot depend on your downstream subscriber. See your subscriber documentation for more details.
+
+## Managing publications
+
+- [Managing publications in the dashboard](#managing-publications-in-the-dashboard)
+- [Managing publications using SQL](#managing-publications-using-sql)
+
+## Managing publications in the dashboard
+
+1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+2. Click on **Publications** in the sidebar.
+3. Control which database events are sent by toggling **Insert**, **Update**, and **Delete**.
+4. Control which tables broadcast changes by selecting **Source** and toggling each table.
+
+<video width="99%" muted playsInline controls={true}>
+  <source
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-realtime.mp4"
+    type="video/mp4"
+  />
+</video>
+
+## Managing publications using SQL
+
+### Create a publication
+
+Create a publication that includes changes to all tables:
+
+```sql
+create publication publication_name
+for all tables;
+```
+
+### Create a publication to listen to individual tables
+
+```sql
+create publication publication_name
+for table table_one, table_two;
+```
+
+### Add tables to an existing publication
+
+```sql
+alter publication publication_name
+add table table_name;
+```
+
+### Create a publication that only listens to `insert` events
+
+```sql
+create publication publication_name
+for all tables
+with (publish = 'insert');
+```
+
+### Create a publication that only listens to `update` events
+
+```sql
+create publication publication_name
+for all tables
+with (publish = 'update');
+```
+
+### Create a publication that only listens to `delete` events
+
+```sql
+create publication publication_name
+for all tables
+with (publish = 'delete');
+```
+
+### Remove a publication
+
+```sql
+drop publication if exists publication_name;
+```
+
+### Recreate a publication
+
+Recreate a publication in a transaction to make sure the operation succeeds:
+
+```sql
+begin;
+  -- remove the realtime publication
+  drop publication if exists publication_name;
+
+  -- re-create the publication but don't enable it for any tables
+  create publication publication_name;
+commit;
+```
