@@ -66,7 +66,7 @@ const ProjectList = ({
     isSuccessProjects &&
     orgProjects.filter((project) => filterStatus.includes(project.status)).length === 0
 
-  if (isLoadingProjects) {
+  if (isLoadingProjects || !organization) {
     return (
       <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
         <ShimmeringCard />
@@ -106,7 +106,7 @@ const ProjectList = ({
     )
   }
 
-  return !!organization ? (
+  return (
     <OrganizationProjects
       key={organization.slug}
       organization={organization}
@@ -122,8 +122,6 @@ const ProjectList = ({
       search={search}
       filterStatus={filterStatus}
     />
-  ) : (
-    <NoProjectsState slug={slug ?? ''} />
   )
 }
 
