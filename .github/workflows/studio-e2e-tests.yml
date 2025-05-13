@@ -52,6 +52,8 @@ jobs:
 
       - name: Build Studio
         run: pnpm --filter studio build
+        env:
+          IS_PLATFORM: true
 
       - name: Start Studio in background
         run: pnpm --filter studio start &
