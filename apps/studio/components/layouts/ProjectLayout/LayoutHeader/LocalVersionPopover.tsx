@@ -81,7 +81,7 @@ export const LocalVersionPopover = () => {
                 </TabsContent_Shadcn_>
                 <TabsContent_Shadcn_ className="mt-2 text-xs" value="windows">
                   <SimpleCodeBlock parentClassName="bg-selection rounded !px-2">
-                    scoop upgrade supabase
+                    scoop update supabase
                   </SimpleCodeBlock>
                 </TabsContent_Shadcn_>
                 <TabsContent_Shadcn_ className="mt-2 text-xs" value="linux">

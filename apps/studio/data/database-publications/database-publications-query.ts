@@ -5,7 +5,7 @@ import { databasePublicationsKeys } from './keys'
 
 export type DatabasePublicationsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getDatabasePublications(

@@ -1,3 +1,4 @@
+import { fetchHandler } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
 import { useCallback, useEffect, useState } from 'react'
 import { Button } from 'ui'
@@ -9,7 +10,7 @@ const CLOCK_SKEW_CHECK_INTERVAL = 30 * 60 * 1000
 
 const isClockSkewed = async () => {
   try {
-    const response = await fetch(`${BASE_PATH}/api/get-utc-time`)
+    const response = await fetchHandler(`${BASE_PATH}/api/get-utc-time`)
     const data = await response.json()
     // The received time is in UTC timezone, add Z at the end to make JS understand that
     const serverTime = new Date(data.utcTime).getTime()
