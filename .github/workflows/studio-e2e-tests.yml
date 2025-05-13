@@ -75,7 +75,7 @@ jobs:
 
       - name: Run Playwright tests
         env:
-          BASE_URL: http://localhost:3000/dashboard
+          BASE_URL: http://localhost:3000
           IS_PLATFORM: true
         run: pnpm e2e:ci
 
