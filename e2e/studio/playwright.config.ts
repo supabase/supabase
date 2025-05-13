@@ -15,6 +15,7 @@ export default defineConfig({
     screenshot: 'off',
     video: 'retain-on-failure',
     headless: IS_CI,
+    trace: 'retain-on-failure',
   },
   projects: [
     {
@@ -33,5 +34,9 @@ export default defineConfig({
       },
     },
   ],
-  reporter: [['list'], ['html', { open: 'never' }]],
+  reporter: [
+    ['list'],
+    ['html', { open: 'never' }],
+    ['json', { outputFile: 'test-results/test-results.json' }],
+  ],
 })
