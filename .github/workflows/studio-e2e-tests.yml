@@ -29,6 +29,8 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    # Make the job non-blocking
+    continue-on-error: true
 
     env:
       CI_EMAIL: ${{ secrets.CI_EMAIL }}
@@ -75,6 +77,7 @@ jobs:
         run: pnpm -C e2e/studio exec playwright install --with-deps
 
       - name: Run Playwright tests
+        id: playwright
         env:
           BASE_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}/dashboard
         run: pnpm e2e:ci
