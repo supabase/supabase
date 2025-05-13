@@ -16,11 +16,7 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
   // [Joshen] RE Organization Settings - need to figure out how to enforce MFA across users before this goes live
   const newSecurityPage = useFlag('showOrganizationSecuritySettings')
 
-  // hide these settings in the new layout
-  // when path equals `/org/${slug}/team`
-  // or `/org/${slug}/integrations`
-  // or `/org/${slug}/usage`
-  // make the function
+  // Hide these settings in the new layout on the following paths
   const isHidden = (path: string) => {
     return (
       path === `/org/${slug}/team` ||
