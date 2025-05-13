@@ -51,12 +51,10 @@ jobs:
         run: pnpm i
 
       - name: Build Studio
-        run: pnpm --filter studio build
-        env:
-          IS_PLATFORM: true
+        run: IS_PLATFORM=true pnpm --filter studio build
 
       - name: Start Studio in background
-        run: pnpm --filter studio start &
+        run: pnpm --filter studio start
         env:
           PORT: 3000
 
