@@ -1,5 +1,4 @@
-import { TeamSettings } from 'components/interfaces/Organization'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import { TeamSettings } from 'components/interfaces/Organization/TeamSettings/TeamSettings'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
@@ -12,11 +11,7 @@ const OrgTeamSettings: NextPageWithLayout = () => {
   const { isLoading: isLoadingPermissions } = usePermissionsQuery()
   const selectedOrganization = useSelectedOrganization()
 
-  return (
-    <>
-      {selectedOrganization === undefined && isLoadingPermissions ? <Loading /> : <TeamSettings />}
-    </>
-  )
+  return selectedOrganization === undefined && isLoadingPermissions ? <Loading /> : <TeamSettings />
 }
 
 OrgTeamSettings.getLayout = (page) => (
@@ -26,4 +21,5 @@ OrgTeamSettings.getLayout = (page) => (
     </OrganizationLayout>
   </DefaultLayout>
 )
+
 export default OrgTeamSettings
