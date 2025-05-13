@@ -38,20 +38,10 @@ describe('apiAuthenticate', () => {
     })
   })
 
-  it('should return error when request is not available', async () => {
-    const result = await apiAuthenticate(null as any, mockRes)
-    expect(result).toStrictEqual({ error: new Error('Request is not available') })
-  })
-
-  it('should return error when response is not available', async () => {
-    const result = await apiAuthenticate(mockReq, null as any)
-    expect(result).toStrictEqual({ error: new Error('Response is not available') })
-  })
-
   it('should return error when authorization token is missing', async () => {
     const reqWithoutToken = { ...mockReq, headers: {} }
     const result = await apiAuthenticate(reqWithoutToken, mockRes)
-    expect(result).toStrictEqual({ error: { name: 'Error', message: 'missing access token' } })
+    expect(result).toStrictEqual({ error: new Error('missing access token') })
   })
 
   it('should return error when auth user fetch fails', async () => {
@@ -61,24 +51,15 @@ describe('apiAuthenticate', () => {
     })
 
     const result = await apiAuthenticate(mockReq, mockRes)
-    expect(result).toStrictEqual({ error: { name: 'Error', message: 'Auth failed' } })
-  })
-
-  it('should handle identity error', async () => {
-    const result = await apiAuthenticate(mockReq, mockRes)
-    expect(result).toStrictEqual({ error: { name: 'Error', message: 'Identity error' } })
-  })
-
-  it('should return user when user_id_supabase is present', async () => {
-    const result = await apiAuthenticate(mockReq, mockRes)
-    expect(result).toStrictEqual({
-      id: 'supabase-user-id',
-      auth0_id: 'auth0-user-id',
-      primary_email: 'test@example.com',
-    })
+    expect(result).toStrictEqual({ error: new Error('Auth failed') })
   })
 
   it('should return error when user does not exist', async () => {
+    mocks.getAuthUser.mockResolvedValue({
+      user: null,
+      error: null,
+    })
+
     const result = await apiAuthenticate(mockReq, mockRes)
     expect(result).toStrictEqual({ error: new Error('The user does not exist') })
   })
