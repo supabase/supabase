@@ -6,6 +6,7 @@ import { cn, WarningIcon } from 'ui'
 import Panel from 'components/ui/Panel'
 import ComposedChart from './ComposedChart'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
 import { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
 import { useInfraMonitoringQueries } from 'data/analytics/infra-monitoring-queries'
@@ -17,7 +18,7 @@ import { useChartHighlight } from './useChartHighlight'
 import type { ChartData } from './Charts.types'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 
-type Provider = 'infra-monitoring' | 'daily-stats' | 'custom'
+type Provider = 'infra-monitoring' | 'daily-stats' | 'reference-line'
 
 export type MultiAttribute = {
   attribute: string
@@ -165,15 +166,23 @@ const ComposedChartHandler = ({
     const timestamps = new Set<string>()
     attributeQueries.forEach((query: any) => {
       query.data?.data?.forEach((point: any) => {
-        timestamps.add(point.period_start)
+        if (point?.period_start) {
+          timestamps.add(point.period_start)
+        }
       })
     })
+
+    const referenceLineQueries = attributeQueries.filter(
+      (_, index) => attributes[index].provider === 'reference-line'
+    )
 
     // Combine data points for each timestamp
     const combined = Array.from(timestamps)
       .sort()
       .map((timestamp) => {
         const point: any = { timestamp }
+
+        // Add regular attributes
         attributes.forEach((attr, index) => {
           // Handle custom value attributes (like disk size)
           if (attr.customValue !== undefined) {
@@ -181,10 +190,21 @@ const ComposedChartHandler = ({
             return
           }
 
+          // Skip reference line attributes here, we'll add them below
+          if (attr.provider === 'reference-line') return
+
           const queryData = attributeQueries[index].data?.data
           const matchingPoint = queryData?.find((p: any) => p.period_start === timestamp)
           point[attr.attribute] = matchingPoint?.[attr.attribute] ?? 0
         })
+
+        // Add reference line values for each timestamp
+        referenceLineQueries.forEach((query: any) => {
+          const attr = query.data.attribute
+          const value = query.data.total
+          point[attr] = value
+        })
+
         return point as DataPoint
       })
 
@@ -283,6 +303,28 @@ const ComposedChartHandler = ({
   )
 }
 
+// Helper function to get connection limits based on compute size
+const getConnectionLimits = (computeSize: string = 'medium') => {
+  const connectionLimits = {
+    nano: { direct: 60, pooler: 200 },
+    micro: { direct: 60, pooler: 200 },
+    small: { direct: 90, pooler: 400 },
+    medium: { direct: 120, pooler: 600 },
+    large: { direct: 160, pooler: 800 },
+    xl: { direct: 240, pooler: 1000 },
+    '2xl': { direct: 380, pooler: 1500 },
+    '4xl': { direct: 480, pooler: 3000 },
+    '8xl': { direct: 490, pooler: 6000 },
+    '12xl': { direct: 500, pooler: 9000 },
+    '16xl': { direct: 500, pooler: 12000 },
+  }
+
+  return (
+    connectionLimits[computeSize.toLowerCase() as keyof typeof connectionLimits] ||
+    connectionLimits.medium
+  )
+}
+
 const useAttributeQueries = (
   attributes: MultiAttribute[],
   ref: string | string[] | undefined,
@@ -293,12 +335,16 @@ const useAttributeQueries = (
   data: ChartData | undefined,
   isVisible: boolean
 ) => {
+  const { project } = useProjectContext()
+  const computeSize = project?.infra_compute_size
+
   const infraAttributes = attributes
     .filter((attr) => attr.provider === 'infra-monitoring')
     .map((attr) => attr.attribute as InfraMonitoringAttribute)
   const dailyStatsAttributes = attributes
     .filter((attr) => attr.provider === 'daily-stats')
     .map((attr) => attr.attribute as ProjectDailyStatsAttribute)
+  const referenceLines = attributes.filter((attr) => attr.provider === 'reference-line')
 
   const infraQueries = useInfraMonitoringQueries(
     infraAttributes,
@@ -321,7 +367,28 @@ const useAttributeQueries = (
     isVisible
   )
 
-  return [...infraQueries, ...dailyStatsQueries]
+  const referenceLineQueries = referenceLines.map((line) => {
+    let value = 0
+    if (line.attribute === 'pg_database_max_connections') {
+      value = getConnectionLimits(computeSize).direct
+    } else if (line.attribute === 'pg_pooler_max_connections') {
+      value = getConnectionLimits(computeSize).pooler
+    }
+
+    return {
+      data: {
+        data: [], // Will be populated in combinedData
+        attribute: line.attribute,
+        total: value,
+        maximum: value,
+        totalGrouped: { [line.attribute]: value },
+      },
+      isLoading: false,
+      isError: false,
+    }
+  })
+
+  return [...infraQueries, ...dailyStatsQueries, ...referenceLineQueries]
 }
 
 export default function LazyComposedChartHandler(props: ComposedChartHandlerProps) {

@@ -80,7 +80,7 @@ const DatabaseUsage = () => {
 
   const { data: databaseSizeData } = useDatabaseSizeQuery({
     projectRef: project?.ref,
-    connectionString: project?.connectionString,
+    connectionString: project?.connectionString || undefined,
   })
   const databaseSizeBytes = databaseSizeData ?? 0
   const currentDiskSize = project?.volumeSizeGb ?? 0
@@ -142,16 +142,18 @@ const DatabaseUsage = () => {
       )
     })
     if (isReportsV2) {
-      REPORT_ATTRIBUTES_V2.forEach((attr) => {
-        queryClient.invalidateQueries(
-          analyticsKeys.infraMonitoring(ref, {
-            attribute: attr?.id,
-            startDate: period_start.date,
-            endDate: period_start.end,
-            interval,
-            databaseIdentifier: state.selectedDatabaseId,
-          })
-        )
+      REPORT_ATTRIBUTES_V2.forEach((chart: any) => {
+        chart.attributes.forEach((attr: any) => {
+          queryClient.invalidateQueries(
+            analyticsKeys.infraMonitoring(ref, {
+              attribute: attr.attribute,
+              startDate: period_start.date,
+              endDate: period_start.end,
+              interval,
+              databaseIdentifier: state.selectedDatabaseId,
+            })
+          )
+        })
       })
     }
     if (isReplicaSelected) {
@@ -268,16 +270,21 @@ const DatabaseUsage = () => {
         {isReportsV2 ? (
           <div className="grid grid-cols-1 gap-4">
             {dateRange &&
-              REPORT_ATTRIBUTES_V2.filter((attr) => !attr.hide).map((attr) => (
+              REPORT_ATTRIBUTES_V2.filter((chart) => !chart.hide).map((chart) => (
                 <ComposedChartHandler
-                  key={attr.id}
-                  {...attr}
-                  attributes={attr.attributes as MultiAttribute[]}
+                  key={chart.id}
+                  {...chart}
+                  attributes={chart.attributes as MultiAttribute[]}
                   interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
-                  defaultChartStyle={attr.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+                  defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+                  showMaxValue={
+                    chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
+                      ? true
+                      : chart.showMaxValue
+                  }
                 />
               ))}
           </div>
