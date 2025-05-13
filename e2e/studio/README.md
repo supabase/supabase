@@ -37,7 +37,7 @@ npm run e2e:dev-selfhosted -- --ui
 ## Tips for development
 
 - Read [Playwright Best Practices](https://playwright.dev/docs/best-practices)
-- Use `npm run test:e2e -- --ui` to get the playwright UI.
+- Use `npm run e2e -- --ui` to get the playwright UI.
 - Add the tests in `examples/examples.ts` to Cursor as context.
 - Add messages to expect statements to make them easier to debug.
 
@@ -58,7 +58,7 @@ import { test } from '../utils/test'
 - Use the PWDEBUG environment variable to debug the tests.
 
 ```bash
-PWDEBUG=1 npm run test:e2e:dev-selfhosted -- --ui
+PWDEBUG=1 npm run e2e:dev-selfhosted -- --ui
 ```
 
 ---
