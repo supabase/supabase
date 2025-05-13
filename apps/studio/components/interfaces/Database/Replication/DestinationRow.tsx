@@ -12,7 +12,6 @@ import { toast } from 'sonner'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import { useDeleteSinkMutation } from 'data/replication/delete-sink-mutation'
-import { useDeletePipelineMutation } from 'data/replication/delete-pipeline-mutation'
 import DeleteDestination from './DeleteDestination'
 import DestinationPanel from './DestinationPanel'
 
@@ -110,11 +109,6 @@ const DestinationRow = ({
     setRefetchInterval(5000)
   }
   const { mutateAsync: deleteSink } = useDeleteSinkMutation({})
-  const { mutateAsync: deletePipeline } = useDeletePipelineMutation({
-    onSuccess: (_res: any) => {
-      toast.success('Successfully deleted destination')
-    },
-  })
 
   const onDeleteClick = async () => {
     if (!projectRef) {
@@ -128,7 +122,8 @@ const DestinationRow = ({
 
     try {
       await stopPipeline({ projectRef, pipelineId: pipeline.id })
-      await deletePipeline({ projectRef, pipelineId: pipeline.id })
+      // deleting the sink also deletes the pipeline because of cascade delete
+      // so we don't need to call deletePipeline explicitly
       await deleteSink({ projectRef, sinkId })
     } catch (error) {
       toast.error('Failed to delete destination')

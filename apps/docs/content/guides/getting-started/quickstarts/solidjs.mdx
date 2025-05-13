@@ -87,27 +87,27 @@ hideToc: true
 
 
       ```jsx name=src/App.jsx
-        import { createClient } from "@supabase/supabase-js";
-        import { createResource, For } from "solid-js";
+      import { createClient } from "@supabase/supabase-js";
+      import { createResource, For } from "solid-js";
 
-        const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>');
+      const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>');
 
-        async function getInstruments() {
-          const { data } = await supabase.from("instruments").select();
-          return data;
-        }
+      async function getInstruments() {
+        const { data } = await supabase.from("instruments").select();
+        return data;
+      }
 
-        function App() {
-          const [instruments] = createResource(getInstruments);
+      function App() {
+        const [instruments] = createResource(getInstruments);
 
-          return (
-            <ul>
-              <For each={instruments()}>{(instrument) => <li>{instrument.name}</li>}</For>
-            </ul>
-          );
-        }
+        return (
+          <ul>
+            <For each={instruments()}>{(instrument) => <li>{instrument.name}</li>}</For>
+          </ul>
+        );
+      }
 
-        export default App;
+      export default App;
       ```
 
     </StepHikeCompact.Code>
