@@ -191,7 +191,9 @@ const Home: NextPageWithLayout = () => {
                       <Tabs_Shadcn_ defaultValue="app" className="w-full">
                         <TabsList_Shadcn_ className="flex gap-4 mb-8">
                           <TabsTrigger_Shadcn_ value="app">App Frameworks</TabsTrigger_Shadcn_>
-                          <TabsTrigger_Shadcn_ value="mobile">Mobile Framework</TabsTrigger_Shadcn_>
+                          <TabsTrigger_Shadcn_ value="mobile">
+                            Mobile Frameworks
+                          </TabsTrigger_Shadcn_>
                         </TabsList_Shadcn_>
                         <TabsContent_Shadcn_ value="app">
                           <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
