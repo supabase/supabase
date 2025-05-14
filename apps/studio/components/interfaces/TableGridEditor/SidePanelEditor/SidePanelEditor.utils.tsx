@@ -24,6 +24,7 @@ import { createTable as createTableMutation } from 'data/tables/table-create-mut
 import { deleteTable as deleteTableMutation } from 'data/tables/table-delete-mutation'
 import { updateTable as updateTableMutation } from 'data/tables/table-update-mutation'
 import { getTables } from 'data/tables/tables-query'
+import { getTable } from 'data/tables/table-retrieve-query'
 import { timeout, tryParseJson } from 'lib/helpers'
 import {
   generateCreateColumnPayload,
@@ -474,13 +475,14 @@ export const createTable = async ({
     payload: payload,
   })
 
-  const allTables = await queryClient.fetchQuery({
-    queryKey: tableKeys.list(projectRef, payload.schema),
+  const table = await queryClient.fetchQuery({
+    queryKey: tableKeys.retrieve(projectRef, payload.name, payload.schema),
     queryFn: ({ signal }) =>
-      getTables({ projectRef, connectionString, schema: payload.schema }, signal),
+      getTable(
+        { projectRef, connectionString, name: payload.name, schema: payload.schema },
+        signal
+      ),
   })
-
-  const table = find(allTables, { schema: payload.schema, name: payload.name })!
 
   // If we face any errors during this process after the actual table creation
   // We'll delete the table as a way to clean up and not leave behind bits that
