@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test'
 import { test } from '../utils/test'
-
+import { toUrl } from '../utils/to-url'
 const LOGS_PAGES = [
   { label: 'API Gateway', route: 'edge-logs' },
   { label: 'Postgres', route: 'postgres-logs' },
@@ -46,7 +46,7 @@ test.describe('Logs', () => {
       /**
        * Navigates to Logs
        */
-      await page.goto(`./project/${ref}/`)
+      await page.goto(toUrl(`/project/${ref}/`))
       await page.locator('a', { hasText: 'Logs' }).click({ timeout: 10000 })
       await page.click('body')
 
