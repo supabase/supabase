@@ -1,6 +1,6 @@
+import { getIndexAdvisorExtensions } from 'components/interfaces/QueryPerformance/index-advisor.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { getIndexAdvisorExtensions } from 'components/interfaces/QueryPerformance/index-advisor.utils'
 
 /**
  * Hook to get both index advisor availability and enabled status
@@ -20,8 +20,7 @@ export function useIndexAdvisorStatus() {
   const isIndexAdvisorAvailable = !!hypopg && !!indexAdvisor
 
   const isIndexAdvisorEnabled =
-    !!hypopg &&
-    !!indexAdvisor &&
+    isIndexAdvisorAvailable &&
     hypopg.installed_version !== null &&
     indexAdvisor.installed_version !== null
 

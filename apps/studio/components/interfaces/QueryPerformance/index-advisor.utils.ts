@@ -12,8 +12,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 export function getIndexAdvisorExtensions(extensions: DatabaseExtension[] = []) {
   const hypopg = extensions.find((ext) => ext.name === 'hypopg')
   const indexAdvisor = extensions.find((ext) => ext.name === 'index_advisor')
-  const test_extension = extensions.find((ext) => ext.name === 'test_extension')
-  return { hypopg, indexAdvisor, test_extension }
+  return { hypopg, indexAdvisor }
 }
 
 /**

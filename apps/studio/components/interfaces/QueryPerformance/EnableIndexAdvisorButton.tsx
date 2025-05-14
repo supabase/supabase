@@ -27,7 +27,7 @@ import { getIndexAdvisorExtensions } from './index-advisor.utils'
 export const EnableIndexAdvisorButton = () => {
   const { project } = useProjectContext()
 
-  const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
+  const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
@@ -73,7 +73,7 @@ export const EnableIndexAdvisorButton = () => {
   }
 
   // if index_advisor is already enabled or not available to install, show nothing
-  if (isIndexAdvisorEnabled || !isIndexAdvisorAvailable) return null
+  if (isIndexAdvisorEnabled) return null
 
   return (
     <AlertDialog open={isDialogOpen} onOpenChange={() => setIsDialogOpen(!isDialogOpen)}>
