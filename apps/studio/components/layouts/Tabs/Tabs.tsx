@@ -11,7 +11,9 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { TabsUpdateTooltip } from 'components/interfaces/App/FeaturePreview/TableEditorTabs'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useAppStateSnapshot } from 'state/app-state'
 import { editorEntityTypes, useTabsStateSnapshot, type Tab } from 'state/tabs'
 import { cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
@@ -33,6 +35,11 @@ export const EditorTabs = () => {
         distance: 1, // Start with a very small distance
       },
     })
+  )
+
+  const [tabsInterfaceAcknowledge, setTabsInterfaceAcknowledge] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.TABS_INTERFACE_ACKNOWLEDGED,
+    false
   )
 
   const openTabs = tabs.openTabs
@@ -159,7 +166,10 @@ export const EditorTabs = () => {
           </AnimatePresence>
           <div className="grow h-full border-b pr-6" />
         </TabsList_Shadcn_>
+
+        <TabsUpdateTooltip />
       </Tabs_Shadcn_>
+
       <DragOverlay dropAnimation={null}>
         {tabs.activeTab ? <TabPreview tab={tabs.activeTab} /> : null}
       </DragOverlay>

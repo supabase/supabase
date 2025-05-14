@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { TabsUpdateCallout } from 'components/interfaces/App/FeaturePreview/TableEditorTabs'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -34,15 +35,18 @@ export function NewTab() {
   const router = useRouter()
   const { ref } = useParams()
   const editor = useEditorType()
-  const snap = useTableEditorStateSnapshot()
   const { profile } = useProfile()
+  const org = useSelectedOrganization()
+  const { project } = useProjectContext()
+
+  const snap = useTableEditorStateSnapshot()
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const tabs = useTabsStateSnapshot()
+
   const [templates] = partition(SQL_TEMPLATES, { type: 'template' })
   const [quickstarts] = partition(SQL_TEMPLATES, { type: 'quickstart' })
+
   const { mutate: sendEvent } = useSendEventMutation()
-  const snapV2 = useSqlEditorV2StateSnapshot()
-  const { project } = useProjectContext()
-  const org = useSelectedOrganization()
-  const tabs = useTabsStateSnapshot()
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
@@ -110,6 +114,7 @@ export function NewTab() {
   return (
     <div className="bg-surface-100 h-full overflow-y-auto py-12">
       <div className="mx-auto max-w-2xl flex flex-col gap-10 px-10">
+        <TabsUpdateCallout />
         <div className="grid grid-cols-2 gap-4">
           {actions.map((item, i) => (
             <ActionCard key={`action-card-${i}`} {...item} />
