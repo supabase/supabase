@@ -136,3 +136,6 @@ gcloud.json
 
 # CLI version file
 .temp/cli-latest
+
+# Sentry CLI config
+**/.sentryclirc
