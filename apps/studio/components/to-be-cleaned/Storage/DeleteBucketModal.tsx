@@ -52,7 +52,7 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
             deletePolicy({
               projectRef: project?.ref,
               connectionString: project?.connectionString,
-              id: policy.id,
+              originalPolicy: policy,
             })
           )
         )

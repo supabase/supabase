@@ -314,65 +314,70 @@ const SidePanelEditor = ({
 
   const updateTableRealtime = async (table: PostgresTable, enabled: boolean) => {
     if (!project) return console.error('Project is required')
-    let realtimePublication = (publications ?? []).find((pub) => pub.name === 'supabase_realtime')
-    const publicTables = await queryClient.fetchQuery({
-      queryKey: tableKeys.list(project.ref, 'public', includeColumns),
-      queryFn: ({ signal }) =>
-        getTables(
-          { projectRef: project.ref, connectionString: project.connectionString, schema: 'public' },
-          signal
-        ),
-    })
+    const realtimePublication = publications?.find((pub) => pub.name === 'supabase_realtime')
 
     try {
       if (realtimePublication === undefined) {
-        realtimePublication = await createPublication({
+        const realtimeTables = enabled ? [`${table.schema}.${table.name}`] : []
+        await createPublication({
           projectRef: project.ref,
-          connectionString: project?.connectionString,
+          connectionString: project.connectionString,
           name: 'supabase_realtime',
           publish_insert: true,
           publish_update: true,
           publish_delete: true,
+          tables: realtimeTables,
         })
+        return
       }
-      const { id, tables: publicationTables } = realtimePublication
-      if (publicationTables === null) {
+      if (realtimePublication.tables === null) {
         // UI doesn't have support for toggling realtime for ALL tables
         // Switch it to individual tables via an array of strings
         // Refer to PublicationStore for more information about this
+        const publicTables = await queryClient.fetchQuery({
+          queryKey: tableKeys.list(project.ref, 'public', includeColumns),
+          queryFn: ({ signal }) =>
+            getTables(
+              {
+                projectRef: project.ref,
+                connectionString: project.connectionString,
+                schema: 'public',
+              },
+              signal
+            ),
+        })
+        // TODO: support tables in non-public schemas
         const realtimeTables = enabled
-          ? publicTables.map((t: any) => `${t.schema}.${t.name}`)
-          : publicTables
-              .filter((t: any) => t.id !== table.id)
-              .map((t: any) => `${t.schema}.${t.name}`)
+          ? publicTables.map((t) => `${t.schema}.${t.name}`)
+          : publicTables.filter((t) => t.id !== table.id).map((t) => `${t.schema}.${t.name}`)
         await updatePublication({
-          id,
+          id: realtimePublication.id,
           projectRef: project.ref,
-          connectionString: project?.connectionString,
+          connectionString: project.connectionString,
           tables: realtimeTables,
         })
-      } else {
-        const isAlreadyEnabled = publicationTables.some((x: any) => x.id == table.id)
-        const realtimeTables =
-          isAlreadyEnabled && !enabled
-            ? // Toggle realtime off
-              publicationTables
-                .filter((t: any) => t.id !== table.id)
-                .map((t: any) => `${t.schema}.${t.name}`)
-            : !isAlreadyEnabled && enabled
-              ? // Toggle realtime on
-                [`${table.schema}.${table.name}`].concat(
-                  publicationTables.map((t: any) => `${t.schema}.${t.name}`)
-                )
-              : null
-        if (realtimeTables === null) return
-        await updatePublication({
-          id,
-          projectRef: project.ref,
-          connectionString: project?.connectionString,
-          tables: realtimeTables,
-        })
+        return
       }
+      const isAlreadyEnabled = realtimePublication.tables.some((x) => x.id == table.id)
+      const realtimeTables =
+        isAlreadyEnabled && !enabled
+          ? // Toggle realtime off
+            realtimePublication.tables
+              .filter((t) => t.id !== table.id)
+              .map((t) => `${t.schema}.${t.name}`)
+          : !isAlreadyEnabled && enabled
+            ? // Toggle realtime on
+              realtimePublication.tables
+                .map((t) => `${t.schema}.${t.name}`)
+                .concat([`${table.schema}.${table.name}`])
+            : null
+      if (realtimeTables === null) return
+      await updatePublication({
+        id: realtimePublication.id,
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        tables: realtimeTables,
+      })
     } catch (error: any) {
       toast.error(`Failed to update realtime for ${table.name}: ${error.message}`)
     }

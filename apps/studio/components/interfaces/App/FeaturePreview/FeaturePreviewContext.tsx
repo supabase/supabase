@@ -1,26 +1,17 @@
 import { noop } from 'lodash'
-import { FeatureFlagContext } from 'common'
+import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
+
+import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
 import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
 import { EMPTY_OBJ } from 'lib/void'
-import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 import { APISidePanelPreview } from './APISidePanelPreview'
 import { CLSPreview } from './CLSPreview'
 import { InlineEditorPreview } from './InlineEditorPreview'
-import { LayoutUpdatePreview } from './LayoutUpdatePreview'
 import { SqlEditorTabsPreview } from './SqlEditorTabs'
 import { TableEditorTabsPreview } from './TableEditorTabs'
-import { LOCAL_STORAGE_KEYS } from 'common'
 
 export const FEATURE_PREVIEWS = [
-  {
-    key: LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW,
-    name: 'Layout Update for Organizations',
-    content: <LayoutUpdatePreview />,
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/33670',
-    isNew: false,
-    isPlatformOnly: true,
-  },
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
     name: 'Directly edit database entities',
@@ -33,6 +24,7 @@ export const FEATURE_PREVIEWS = [
     key: LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS,
     name: 'Table Editor Tabs',
     content: <TableEditorTabsPreview />,
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/35636',
     isNew: true,
     isPlatformOnly: false,
   },
@@ -40,6 +32,7 @@ export const FEATURE_PREVIEWS = [
     key: LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS,
     name: 'SQL Editor Tabs',
     content: <SqlEditorTabsPreview />,
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/35636',
     isNew: true,
     isPlatformOnly: true,
   },
@@ -75,13 +68,15 @@ export const useFeaturePreviewContext = () => useContext(FeaturePreviewContext)
 
 export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}>) => {
   const { hasLoaded } = useContext(FeatureFlagContext)
-  const enableNewLayoutPreview = useFlag('newLayoutPreview')
+  const enableTabsInterface = useFlag('tabsInterface')
 
   // [Joshen] Similar logic to feature flagging previews, we can use flags to default opt in previews
   const isDefaultOptIn = (feature: (typeof FEATURE_PREVIEWS)[number]) => {
     switch (feature.key) {
-      case LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW:
-        return enableNewLayoutPreview
+      case LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS:
+        return enableTabsInterface
+      case LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS:
+        return enableTabsInterface
       default:
         return false
     }
@@ -148,10 +143,4 @@ export const useIsSQLEditorTabsEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   if (!IS_PLATFORM) return false
   return flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
-}
-
-export const useIsNewLayoutEnabled = (): boolean => {
-  const { flags } = useFeaturePreviewContext()
-  if (!IS_PLATFORM) return false
-  return flags[LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW]
 }
