@@ -32,9 +32,6 @@ export async function updateDatabaseColumn({
   originalColumn,
   payload,
 }: DatabaseColumnUpdateVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
   const { sql } = pgMeta.columns.update(originalColumn, {
     name: payload.name,
     type: payload.type,

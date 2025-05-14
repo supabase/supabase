@@ -24,9 +24,6 @@ export async function deleteDatabaseColumn({
   column,
   cascade = false,
 }: DatabaseColumnDeleteVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
   const { sql } = pgMeta.columns.remove(column, { cascade })
 
   const { result } = await executeSql({
