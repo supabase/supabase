@@ -83,7 +83,7 @@ const Home: NextPageWithLayout = () => {
               <h1 className="text-3xl">{projectName}</h1>
               {isOrioleDb && (
                 <Tooltip>
-                  <TooltipTrigger>
+                  <TooltipTrigger asChild>
                     <Badge variant="warning">OrioleDB</Badge>
                   </TooltipTrigger>
                   <TooltipContent side="bottom" align="start" className="max-w-80 text-center">
