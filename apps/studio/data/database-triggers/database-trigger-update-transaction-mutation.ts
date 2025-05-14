@@ -42,7 +42,7 @@ export async function updateDatabaseTrigger({
   updatedTrigger,
 }: DatabaseTriggerUpdateVariables) {
   const sql = getDatabaseTriggerUpdateSQL({ originalTrigger, updatedTrigger })
-  await executeSql({ projectRef, connectionString, sql })
+  await executeSql({ projectRef, connectionString, sql, queryKey: ['trigger', 'update'] })
   return updatedTrigger
 }
 
