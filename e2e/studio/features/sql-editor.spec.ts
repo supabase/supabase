@@ -1,10 +1,11 @@
 import { expect } from '@playwright/test'
 import { test } from '../utils/test'
 import { toUrl } from '../utils/to-url'
+import { getProjectRef } from '../env.config'
 
 test.describe('SQL Editor', () => {
   test('should check if SQL editor can run simple commands', async ({ page }) => {
-    await page.goto(toUrl('/project/default/sql/1'))
+    await page.goto(toUrl(`/project/${getProjectRef()}/sql/1`))
 
     // fill up sql
     await page.getByText('select * from (select version').click()
