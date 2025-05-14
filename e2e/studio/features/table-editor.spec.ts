@@ -1,5 +1,6 @@
 import { expect, Page } from '@playwright/test'
 import { test } from '../utils/test'
+import { toUrl } from '../utils/to-url'
 
 const getSelectors = (tableName: string) => ({
   newTableBtn: (page) => page.getByRole('button', { name: 'New table', exact: true }),
@@ -92,7 +93,7 @@ test.describe('Table Editor', () => {
 
   test.beforeEach(async ({ browser, ref }) => {
     page = await browser.newPage()
-    await page.goto(`/project/${ref}`)
+    await page.goto(toUrl(`/project/${ref}`))
     await page.locator('a', { hasText: 'Table Editor' }).click({ timeout: 10000 })
     // Click anywhere on the screen to close the sidebar
     await page.click('body')
