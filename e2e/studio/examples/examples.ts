@@ -16,7 +16,7 @@ import { test } from '../utils/test'
  * * Test that is skipped in self-hosted environment
  */
 test('Loads the page 1', async ({ page }) => {
-  if (isEnv('self-hosted')) return
+  if (isEnv('selfhosted')) return
 
   await page.goto('https://www.supabase.com')
   await expect(
