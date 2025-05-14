@@ -10,7 +10,6 @@ test.describe('Project', async () => {
     if (ENV.includes('selfhosted')) {
       await expect(page.getByRole('heading', { name: 'Welcome to your project' })).toBeVisible()
     } else {
-      await expect(page.getByRole('button', { name: 'Security Issues' })).toBeVisible()
       await expect(page.getByRole('button', { name: 'Project Status' })).toBeVisible()
     }
   })

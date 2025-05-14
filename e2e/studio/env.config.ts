@@ -36,7 +36,7 @@ export const PROJECT_REFS: Record<Env, string> = {
   'dev-hosted': process.env.DEV_HOSTED_PROJECT_REF,
   selfhosted: 'default',
   'dev-selfhosted': 'default',
-  ci: process.env.PREVIEW_PROJECT_REF,
+  ci: process.env.CI_PROJECT_REF,
 }
 
 export const STORAGE_STATE_PATH = path.join(__dirname, './playwright/.auth/user.json')
