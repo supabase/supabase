@@ -27,7 +27,7 @@ export const API_URLS: Record<Env, string> = {
   selfhosted: 'http://localhost:54323/api',
   'dev-hosted': 'http://localhost:8080/api',
   'dev-selfhosted': 'http://localhost:8082/api',
-  ci: process.env.API_BASE_URL,
+  ci: 'https://api.supabase.green',
 }
 
 export const PROJECT_REFS: Record<Env, string> = {
