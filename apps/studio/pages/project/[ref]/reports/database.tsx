@@ -96,7 +96,7 @@ const DatabaseUsage = () => {
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
   const REPORT_ATTRIBUTES = getReportAttributes(isFreePlan)
-  const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(isFreePlan).map((attr) => {
+  const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(orgPlan, project).map((attr) => {
     if (attr.id === 'ram-usage') {
       return {
         ...attr,

@@ -3,7 +3,7 @@
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { DateTimeFormats } from './Charts.constants'
+import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
 import { numberFormatter } from './Charts.utils'
 import { MultiAttribute } from './ComposedChartHandler'
 import { formatBytes } from 'lib/helpers'
@@ -18,9 +18,17 @@ const CustomIcon = ({ color }: CustomIconProps) => (
   </svg>
 )
 
-const MaxConnectionsIcon = () => (
+const MaxConnectionsIcon = ({ color }: { color?: string }) => (
   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <line x1="2" y1="6" x2="12" y2="6" stroke="#3ECF8E" strokeWidth="2" strokeDasharray="2 2" />
+    <line
+      x1="2"
+      y1="6"
+      x2="12"
+      y2="6"
+      stroke={color ?? CHART_COLORS.REFERENCE_LINE}
+      strokeWidth="2"
+      strokeDasharray="2 2"
+    />
   </svg>
 )
 
@@ -83,14 +91,8 @@ const CustomTooltip = ({
         maxValueAttribute?.attribute ? [maxValueAttribute.attribute] : []
       )
 
-    const getIcon = (name: string, color: string) => {
-      switch (name.toLowerCase().includes('max')) {
-        case false:
-          return <CustomIcon color={color} />
-        default:
-          return <MaxConnectionsIcon />
-      }
-    }
+    const getIcon = (color: string, isMax: boolean) =>
+      isMax ? <MaxConnectionsIcon /> : <CustomIcon color={color} />
 
     const LabelItem = ({ entry }: { entry: any }) => {
       const attribute = attributes?.find((a: MultiAttribute) => a.attribute === entry.name)
@@ -99,7 +101,7 @@ const CustomTooltip = ({
 
       return (
         <div key={entry.name} className="flex items-center w-full">
-          {getIcon(entry.name, entry.color)}
+          {getIcon(entry.color, isMax)}
           <span className="text-foreground-lighter ml-1 flex-grow">
             {attribute?.label || entry.name}
           </span>

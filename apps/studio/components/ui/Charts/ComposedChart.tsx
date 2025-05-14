@@ -138,7 +138,7 @@ export default function ComposedChart({
   const maxAttribute = attributes.find((a) => a.isMaxValue)
   const maxAttributeData = {
     name: maxAttribute?.attribute,
-    color: '#3ECF8E',
+    color: CHART_COLORS.REFERENCE_LINE,
   }
 
   const lastDataPoint = !!data[data.length - 1]
@@ -353,7 +353,7 @@ export default function ComposedChart({
               key={maxAttribute.attribute}
               type="stepAfter"
               dataKey={maxAttribute.attribute}
-              stroke="#3ECF8E"
+              stroke={CHART_COLORS.REFERENCE_LINE}
               strokeWidth={2}
               strokeDasharray="3 3"
               dot={false}

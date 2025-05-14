@@ -6,7 +6,6 @@ import { cn, WarningIcon } from 'ui'
 import Panel from 'components/ui/Panel'
 import ComposedChart from './ComposedChart'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
 import { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
 import { useInfraMonitoringQueries } from 'data/analytics/infra-monitoring-queries'
@@ -304,28 +303,6 @@ const ComposedChartHandler = ({
   )
 }
 
-// Helper function to get connection limits based on compute size
-const getConnectionLimits = (computeSize: string = 'medium') => {
-  const connectionLimits = {
-    nano: { direct: 60, pooler: 200 },
-    micro: { direct: 60, pooler: 200 },
-    small: { direct: 90, pooler: 400 },
-    medium: { direct: 120, pooler: 600 },
-    large: { direct: 160, pooler: 800 },
-    xl: { direct: 240, pooler: 1000 },
-    '2xl': { direct: 380, pooler: 1500 },
-    '4xl': { direct: 480, pooler: 3000 },
-    '8xl': { direct: 490, pooler: 6000 },
-    '12xl': { direct: 500, pooler: 9000 },
-    '16xl': { direct: 500, pooler: 12000 },
-  }
-
-  return (
-    connectionLimits[computeSize.toLowerCase() as keyof typeof connectionLimits] ||
-    connectionLimits.medium
-  )
-}
-
 const useAttributeQueries = (
   attributes: MultiAttribute[],
   ref: string | string[] | undefined,
@@ -336,9 +313,6 @@ const useAttributeQueries = (
   data: ChartData | undefined,
   isVisible: boolean
 ) => {
-  const { project } = useProjectContext()
-  const computeSize = project?.infra_compute_size
-
   const infraAttributes = attributes
     .filter((attr) => attr.provider === 'infra-monitoring')
     .map((attr) => attr.attribute as InfraMonitoringAttribute)
@@ -369,14 +343,7 @@ const useAttributeQueries = (
   )
 
   const referenceLineQueries = referenceLines.map((line) => {
-    let value = 0
-    if (line.attribute === 'pg_database_max_connections') {
-      value = getConnectionLimits(computeSize).direct
-    } else if (line.attribute === 'pg_pooler_max_connections') {
-      value = getConnectionLimits(computeSize).pooler
-    } else if (line.value) {
-      value = line.value
-    }
+    let value = line.value || 0
 
     return {
       data: {

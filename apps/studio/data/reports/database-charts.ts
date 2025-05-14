@@ -1,6 +1,28 @@
 import { numberFormatter } from 'components/ui/Charts/Charts.utils'
 import { formatBytes } from 'lib/helpers'
 
+// Helper function to get connection limits based on compute size
+export const getConnectionLimits = (computeSize: string = 'medium') => {
+  const connectionLimits = {
+    nano: { direct: 60, pooler: 200 },
+    micro: { direct: 60, pooler: 200 },
+    small: { direct: 90, pooler: 400 },
+    medium: { direct: 120, pooler: 600 },
+    large: { direct: 160, pooler: 800 },
+    xl: { direct: 240, pooler: 1000 },
+    '2xl': { direct: 380, pooler: 1500 },
+    '4xl': { direct: 480, pooler: 3000 },
+    '8xl': { direct: 490, pooler: 6000 },
+    '12xl': { direct: 500, pooler: 9000 },
+    '16xl': { direct: 500, pooler: 12000 },
+  }
+
+  return (
+    connectionLimits[computeSize?.toLowerCase() as keyof typeof connectionLimits] ||
+    connectionLimits.medium
+  )
+}
+
 export const getReportAttributes = (isFreePlan: boolean) => [
   { id: 'ram_usage', label: 'Memory usage', hide: false },
   { id: 'avg_cpu_usage', label: 'Average CPU usage', hide: false },
@@ -24,304 +46,320 @@ export const getReportAttributes = (isFreePlan: boolean) => [
   },
 ]
 
-export const getReportAttributesV2 = (isFreePlan: boolean) => [
-  {
-    id: 'ram-usage',
-    label: 'Memory usage',
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    hideChartType: false,
-    defaultChartStyle: 'line',
-    showMaxValue: true,
-    showGrid: true,
-    syncId: 'database-reports',
-    YAxisProps: { width: 60, tickFormatter: (value: any) => formatBytes(value, 0) },
-    attributes: [
-      {
-        attribute: 'ram_usage_used',
-        provider: 'infra-monitoring',
-        label: 'Used',
-        tooltip:
-          'Total RAM currently in use by the system and applications. High usage may indicate memory pressure.',
-      },
-      {
-        attribute: 'ram_usage_cache_and_buffers',
-        provider: 'infra-monitoring',
-        label: 'Cache + buffers',
-        tooltip:
-          'RAM used for caching and buffering disk operations. Higher values improve read performance.',
-      },
-      {
-        attribute: 'ram_usage_free',
-        provider: 'infra-monitoring',
-        label: 'Free',
-        tooltip:
-          'Available unused RAM. A small amount is always reserved. High unused RAM present with erratic Used RAM may indicate unoptimized queries disrupting cache.',
-      },
-      {
-        attribute: 'ram_usage_swap',
-        provider: 'infra-monitoring',
-        label: 'Swap',
-        tooltip:
-          'Memory swapped to disk when RAM is full. An instance has 1GB of SWAP. High swap with high disk I/O signals memory stress.',
-      },
-      {
-        attribute: 'ram_usage_total',
-        provider: 'infra-monitoring',
-        label: 'Max',
-        isMaxValue: true,
-        tooltip: 'Total memory capacity provisioned for this database instance.',
-      },
-    ],
-  },
-  {
-    id: 'cpu-usage',
-    label: 'CPU usage',
-    syncId: 'database-reports',
-    format: '%',
-    valuePrecision: 2,
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: false,
-    showGrid: true,
-    YAxisProps: { width: 35, tickFormatter: (value: any) => `${numberFormatter(value, 2)}%` },
-    hideChartType: false,
-    defaultChartStyle: 'line',
-    attributes: [
-      {
-        attribute: 'cpu_usage_busy_system',
-        provider: 'infra-monitoring',
-        label: 'System',
-        format: '%',
-        tooltip:
-          'CPU time spent on kernel operations (e.g., process scheduling, memory management). High values may indicate system overhead.',
-      },
-      {
-        attribute: 'cpu_usage_busy_user',
-        provider: 'infra-monitoring',
-        label: 'User',
-        format: '%',
-        tooltip:
-          'CPU time used by database queries and user-space processes. High values may suggest CPU-intensive queries.',
-      },
-      {
-        attribute: 'cpu_usage_busy_iowait',
-        provider: 'infra-monitoring',
-        label: 'IOwait',
-        format: '%',
-        tooltip:
-          'CPU time waiting for disk or network I/O. High values may indicate disk bottlenecks.',
-      },
-      {
-        attribute: 'cpu_usage_busy_irqs',
-        provider: 'infra-monitoring',
-        label: 'IRQs',
-        format: '%',
-        tooltip: 'CPU time handling hardware interrupt requests (IRQ)',
-      },
-      {
-        attribute: 'cpu_usage_busy_other',
-        provider: 'infra-monitoring',
-        label: 'Other',
-        format: '%',
-        tooltip: 'CPU time spent on other tasks (e.g., background processes, software interrupts).',
-      },
-      {
-        attribute: 'cpu_usage_max',
-        provider: 'reference-line',
-        label: 'Max',
-        value: 100,
-        tooltip: 'Max CPU usage',
-        isMaxValue: true,
-      },
-    ],
-  },
-  {
-    id: 'disk-iops',
-    label: 'Disk IOps',
-    syncId: 'database-reports',
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    hideChartType: false,
-    showGrid: true,
-    YAxisProps: { width: 30, tickFormatter: (value: any) => numberFormatter(value, 2) },
-    defaultChartStyle: 'line',
-    attributes: [
-      {
-        attribute: 'disk_iops_write',
-        provider: 'infra-monitoring',
-        label: 'IOps write/s',
-        tooltip:
-          'Number of write operations per second. High values indicate frequent data writes, logging, or transaction activity.',
-      },
-      {
-        attribute: 'disk_iops_read',
-        provider: 'infra-monitoring',
-        label: 'IOps read/s',
-        tooltip:
-          'Number of read operations per second. High values suggest frequent disk reads due to queries or poor caching.',
-      },
-    ],
-  },
-  {
-    id: 'disk-io-usage',
-    label: 'Disk IO Usage',
-    syncId: 'database-reports',
-    hide: false,
-    showTooltip: true,
-    format: '%',
-    valuePrecision: 6,
-    showLegend: false,
-    showMaxValue: false,
-    hideChartType: false,
-    showGrid: true,
-    YAxisProps: { width: 70, tickFormatter: (value: any) => `${numberFormatter(value, 6)}%` },
-    defaultChartStyle: 'line',
-    attributes: [
-      {
-        attribute: 'disk_io_usage',
-        provider: 'infra-monitoring',
-        label: 'IO Usage',
-        tooltip:
-          'The actual number of IO operations per second that the database is currently using.',
-      },
-    ],
-  },
-  {
-    id: 'db-size',
-    label: 'Database Size',
-    valuePrecision: 2,
-    hide: false,
-    showTooltip: false,
-    showLegend: false,
-    showMaxValue: false,
-    showGrid: true,
-    YAxisProps: { width: 65, tickFormatter: (value: any) => formatBytes(value, 1) },
-    hideChartType: false,
-    defaultChartStyle: 'line',
-    attributes: [
-      {
-        attribute: 'pg_database_size',
-        provider: 'infra-monitoring',
-        label: 'pg_database_size',
-        tooltip: 'pg_database_size',
-      },
-    ],
-  },
-  {
-    id: 'network-traffic',
-    label: 'Network Traffic',
-    syncId: 'database-reports',
-    valuePrecision: 1,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: false,
-    showGrid: true,
-    YAxisProps: { width: 55, tickFormatter: (value: any) => formatBytes(value, 1) },
-    hideChartType: false,
-    defaultChartStyle: 'line',
-    hideHighlightedValue: true,
-    showTotal: false,
-    attributes: [
-      {
-        attribute: 'network_transmit_bytes',
-        provider: 'infra-monitoring',
-        label: 'Transmit',
-        tooltip:
-          'Data sent from your database to clients. High values may indicate large query results or numerous outgoing connections.',
-        stackId: '2',
-      },
-      {
-        attribute: 'network_receive_bytes',
-        provider: 'infra-monitoring',
-        label: 'Receive',
-        tooltip:
-          'Data received by your database from clients. High values may indicate frequent queries, large data inserts, or many incoming connections.',
-        stackId: '1',
-      },
-    ],
-  },
-  {
-    id: 'client-connections',
-    label: 'Database client connections',
-    syncId: 'database-reports',
-    valuePrecision: 0,
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: true,
-    showGrid: true,
-    YAxisProps: { width: 20 },
-    hideChartType: false,
-    defaultChartStyle: 'line',
-    attributes: [
-      {
-        attribute: 'pg_stat_database_num_backends',
-        provider: 'infra-monitoring',
-        label: 'active connections',
-        tooltip: 'Active connections',
-      },
-      {
-        attribute: 'pg_database_max_connections',
-        provider: 'reference-line',
-        label: 'Max connections',
-        tooltip: 'Max available connections for your current compute size',
-        isMaxValue: true,
-      },
-    ],
-  },
-  {
-    id: 'pgbouncer-connections',
-    label: 'Pooler client connections',
-    syncId: 'database-reports',
-    valuePrecision: 0,
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: true,
-    showGrid: true,
-    YAxisProps: { width: 30 },
-    hideChartType: false,
-    defaultChartStyle: 'line',
-    attributes: [
-      {
-        attribute: 'client_connections_pgbouncer',
-        provider: 'infra-monitoring',
-        label: 'pgbouncer',
-        tooltip: 'PgBouncer connections',
-      },
-      {
-        attribute: 'pg_pooler_max_connections',
-        provider: 'reference-line',
-        label: 'Max pooler connections',
-        tooltip: 'Maximum allowed pooler connections for your current compute size',
-        isMaxValue: true,
-      },
-    ],
-  },
-  {
-    id: 'supavisor-connections-active',
-    label: 'Supavisor client connections',
-    syncId: 'database-reports',
-    valuePrecision: 0,
-    hide: isFreePlan,
-    showTooltip: false,
-    showLegend: false,
-    showMaxValue: false,
-    showGrid: true,
-    YAxisProps: { width: 30 },
-    hideChartType: false,
-    defaultChartStyle: 'line',
-    attributes: [
-      {
-        attribute: 'supavisor_connections_active',
-        provider: 'infra-monitoring',
-        label: 'supavisor',
-        tooltip: 'Supavisor connections',
-      },
-    ],
-  },
-]
+export const getReportAttributesV2 = (orgPlan: any, project: any) => {
+  const isFreePlan = orgPlan?.id === 'free'
+  const computeSize = project?.infra_compute_size || 'medium'
+
+  return [
+    {
+      id: 'ram-usage',
+      label: 'Memory usage',
+      hide: false,
+      showTooltip: true,
+      showLegend: true,
+      hideChartType: false,
+      defaultChartStyle: 'line',
+      showMaxValue: true,
+      showGrid: true,
+      syncId: 'database-reports',
+      YAxisProps: { width: 60, tickFormatter: (value: any) => formatBytes(value, 0) },
+      attributes: [
+        {
+          attribute: 'ram_usage_used',
+          provider: 'infra-monitoring',
+          label: 'Used',
+          tooltip:
+            'Total RAM currently in use by the system and applications. High usage may indicate memory pressure.',
+        },
+        {
+          attribute: 'ram_usage_cache_and_buffers',
+          provider: 'infra-monitoring',
+          label: 'Cache + buffers',
+          tooltip:
+            'RAM used for caching and buffering disk operations. Higher values improve read performance.',
+        },
+        {
+          attribute: 'ram_usage_free',
+          provider: 'infra-monitoring',
+          label: 'Free',
+          tooltip:
+            'Available unused RAM. A small amount is always reserved. High unused RAM present with erratic Used RAM may indicate unoptimized queries disrupting cache.',
+        },
+        {
+          attribute: 'ram_usage_swap',
+          provider: 'infra-monitoring',
+          label: 'Swap',
+          tooltip:
+            'Memory swapped to disk when RAM is full. An instance has 1GB of SWAP. High swap with high disk I/O signals memory stress.',
+        },
+        {
+          attribute: 'ram_usage_total',
+          provider: 'infra-monitoring',
+          label: 'Max',
+          isMaxValue: true,
+          tooltip: 'Total RAM',
+        },
+      ],
+    },
+    {
+      id: 'cpu-usage',
+      label: 'CPU usage',
+      syncId: 'database-reports',
+      format: '%',
+      valuePrecision: 2,
+      hide: false,
+      showTooltip: true,
+      showLegend: true,
+      showMaxValue: false,
+      showGrid: true,
+      YAxisProps: { width: 45, tickFormatter: (value: any) => `${numberFormatter(value, 2)}%` },
+      hideChartType: false,
+      defaultChartStyle: 'line',
+      attributes: [
+        {
+          attribute: 'cpu_usage_busy_system',
+          provider: 'infra-monitoring',
+          label: 'System',
+          format: '%',
+          tooltip:
+            'CPU time spent on kernel operations (e.g., process scheduling, memory management). High values may indicate system overhead.',
+        },
+        {
+          attribute: 'cpu_usage_busy_user',
+          provider: 'infra-monitoring',
+          label: 'User',
+          format: '%',
+          tooltip:
+            'CPU time used by database queries and user-space processes. High values may suggest CPU-intensive queries.',
+        },
+        {
+          attribute: 'cpu_usage_busy_iowait',
+          provider: 'infra-monitoring',
+          label: 'IOwait',
+          format: '%',
+          tooltip:
+            'CPU time waiting for disk or network I/O. High values may indicate disk bottlenecks.',
+        },
+        {
+          attribute: 'cpu_usage_busy_irqs',
+          provider: 'infra-monitoring',
+          label: 'IRQs',
+          format: '%',
+          tooltip: 'CPU time handling hardware interrupt requests (IRQ)',
+        },
+        {
+          attribute: 'cpu_usage_busy_other',
+          provider: 'infra-monitoring',
+          label: 'Other',
+          format: '%',
+          tooltip:
+            'CPU time spent on other tasks (e.g., background processes, software interrupts).',
+        },
+        {
+          attribute: 'cpu_usage_max',
+          provider: 'reference-line',
+          label: 'Max',
+          value: 100,
+          tooltip: 'Max CPU usage',
+          isMaxValue: true,
+        },
+      ],
+    },
+    {
+      id: 'disk-iops',
+      label: 'Disk IOps',
+      syncId: 'database-reports',
+      hide: false,
+      showTooltip: true,
+      showLegend: true,
+      hideChartType: false,
+      showGrid: true,
+      YAxisProps: { width: 35, tickFormatter: (value: any) => numberFormatter(value, 2) },
+      defaultChartStyle: 'line',
+      attributes: [
+        {
+          attribute: 'disk_iops_write',
+          provider: 'infra-monitoring',
+          label: 'IOps write/s',
+          tooltip:
+            'Number of write operations per second. High values indicate frequent data writes, logging, or transaction activity.',
+        },
+        {
+          attribute: 'disk_iops_read',
+          provider: 'infra-monitoring',
+          label: 'IOps read/s',
+          tooltip:
+            'Number of read operations per second. High values suggest frequent disk reads due to queries or poor caching.',
+        },
+      ],
+    },
+    {
+      id: 'disk-io-usage',
+      label: 'Disk IO Usage',
+      syncId: 'database-reports',
+      hide: false,
+      showTooltip: true,
+      format: '%',
+      valuePrecision: 6,
+      showLegend: false,
+      showMaxValue: false,
+      hideChartType: false,
+      showGrid: true,
+      YAxisProps: { width: 70, tickFormatter: (value: any) => `${numberFormatter(value, 6)}%` },
+      defaultChartStyle: 'line',
+      attributes: [
+        {
+          attribute: 'disk_io_usage',
+          provider: 'infra-monitoring',
+          label: 'IO Usage',
+          tooltip:
+            'The actual number of IO operations per second that the database is currently using.',
+        },
+      ],
+    },
+    {
+      id: 'db-size',
+      label: 'Database Size',
+      valuePrecision: 2,
+      hide: false,
+      showTooltip: true,
+      showLegend: true,
+      showMaxValue: true,
+      showGrid: true,
+      YAxisProps: { width: 65, tickFormatter: (value: any) => formatBytes(value, 1) },
+      hideChartType: false,
+      defaultChartStyle: 'line',
+      attributes: [
+        {
+          attribute: 'pg_database_size',
+          provider: 'infra-monitoring',
+          label: 'Database',
+          tooltip: 'Total space on disk used by your database (tables, indexes, data, ...).',
+        },
+        {
+          attribute: 'pg_database_size_max',
+          provider: 'reference-line',
+          label: 'Disk size',
+          value: project?.volumeSizeGb * 1024 * 1024 * 1024,
+          tooltip: 'Disk Size refers to the total space your project occupies on disk',
+          isMaxValue: true,
+        },
+      ],
+    },
+    {
+      id: 'network-traffic',
+      label: 'Network Traffic',
+      syncId: 'database-reports',
+      valuePrecision: 1,
+      showTooltip: true,
+      showLegend: true,
+      showMaxValue: false,
+      showGrid: true,
+      YAxisProps: { width: 55, tickFormatter: (value: any) => formatBytes(value, 1) },
+      hideChartType: false,
+      defaultChartStyle: 'line',
+      hideHighlightedValue: true,
+      showTotal: false,
+      attributes: [
+        {
+          attribute: 'network_transmit_bytes',
+          provider: 'infra-monitoring',
+          label: 'Transmit',
+          tooltip:
+            'Data sent from your database to clients. High values may indicate large query results or numerous outgoing connections.',
+          stackId: '2',
+        },
+        {
+          attribute: 'network_receive_bytes',
+          provider: 'infra-monitoring',
+          label: 'Receive',
+          tooltip:
+            'Data received by your database from clients. High values may indicate frequent queries, large data inserts, or many incoming connections.',
+          stackId: '1',
+        },
+      ],
+    },
+    {
+      id: 'client-connections',
+      label: 'Database client connections',
+      syncId: 'database-reports',
+      valuePrecision: 0,
+      hide: false,
+      showTooltip: true,
+      showLegend: true,
+      showMaxValue: true,
+      showGrid: true,
+      YAxisProps: { width: 20 },
+      hideChartType: false,
+      defaultChartStyle: 'line',
+      attributes: [
+        {
+          attribute: 'pg_stat_database_num_backends',
+          provider: 'infra-monitoring',
+          label: 'Active connections',
+          // tooltip: 'Active connections',
+        },
+        {
+          attribute: 'pg_database_max_connections',
+          provider: 'reference-line',
+          label: 'Max connections',
+          value: getConnectionLimits(computeSize).direct,
+          tooltip: 'Max available connections for your current compute size',
+          isMaxValue: true,
+        },
+      ],
+    },
+    {
+      id: 'pgbouncer-connections',
+      label: 'Pooler client connections',
+      syncId: 'database-reports',
+      valuePrecision: 0,
+      hide: false,
+      showTooltip: true,
+      showLegend: true,
+      showMaxValue: true,
+      showGrid: true,
+      YAxisProps: { width: 30 },
+      hideChartType: false,
+      defaultChartStyle: 'line',
+      attributes: [
+        {
+          attribute: 'client_connections_pgbouncer',
+          provider: 'infra-monitoring',
+          label: 'pgbouncer',
+          tooltip: 'PgBouncer connections',
+        },
+        {
+          attribute: 'pg_pooler_max_connections',
+          provider: 'reference-line',
+          label: 'Max pooler connections',
+          value: getConnectionLimits(computeSize).pooler,
+          tooltip: 'Maximum allowed pooler connections for your current compute size',
+          isMaxValue: true,
+        },
+      ],
+    },
+    {
+      id: 'supavisor-connections-active',
+      label: 'Supavisor client connections',
+      syncId: 'database-reports',
+      valuePrecision: 0,
+      hide: isFreePlan,
+      showTooltip: false,
+      showLegend: false,
+      showMaxValue: false,
+      showGrid: true,
+      YAxisProps: { width: 30 },
+      hideChartType: false,
+      defaultChartStyle: 'line',
+      attributes: [
+        {
+          attribute: 'supavisor_connections_active',
+          provider: 'infra-monitoring',
+          label: 'supavisor',
+          tooltip: 'Supavisor connections',
+        },
+      ],
+    },
+  ]
+}
