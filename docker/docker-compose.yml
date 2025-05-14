@@ -162,7 +162,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v12.2.10
+    image: postgrest/postgrest:v12.2.11
     restart: unless-stopped
     depends_on:
       db:
@@ -231,7 +231,7 @@ services:
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.22.3
+    image: supabase/storage-api:v1.22.7
     restart: unless-stopped
     volumes:
       - ./volumes/storage:/var/lib/storage:z

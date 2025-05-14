@@ -1,6 +1,10 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { organizationKeys } from 'data/organizations/keys'
 import { useMfaUnenrollMutation } from 'data/profile/mfa-unenroll-mutation'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface DeleteFactorModalProps {
@@ -16,8 +20,17 @@ const DeleteFactorModal = ({
   lastFactorToBeDeleted,
   onClose,
 }: DeleteFactorModalProps) => {
+  const queryClient = useQueryClient()
+  const [lastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
+
   const { mutate: unenroll, isLoading } = useMfaUnenrollMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
+      if (lastVisitedOrganization) {
+        await queryClient.invalidateQueries(organizationKeys.members(lastVisitedOrganization))
+      }
       toast.success(`Successfully deleted factor`)
       onClose()
     },
@@ -49,6 +62,9 @@ const DeleteFactorModal = ({
           <>
             <li>Adding another authenticator app as a factor prior to deleting</li>
             <li>Ensure that your account does not need multi-factor authentication</li>
+            <li>
+              You will lose access to any organization that enforces multi-factor authentication
+            </li>
           </>
         ) : (
           <>

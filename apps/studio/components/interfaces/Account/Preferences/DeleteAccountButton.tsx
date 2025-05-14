@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -27,6 +26,7 @@ import {
   Input_Shadcn_,
   Separator,
 } from 'ui'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 const setDeletionRequestFlag = () => {
   const expiryDate = new Date()

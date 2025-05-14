@@ -4,6 +4,7 @@ import { useAdvisorsGoToCommands } from './AdvisorsLayout/Advisors.Commands'
 import { useAuthGotoCommands } from './AuthLayout/Auth.Commands'
 import { useDatabaseGotoCommands } from './DatabaseLayout/Database.Commands'
 import { useFunctionsGotoCommands } from './EdgeFunctionsLayout/EdgeFunctions.Commands'
+import { useIntegrationsGotoCommands } from './IntegrationsLayout/Integrations.Commands'
 import { useLogsGotoCommands } from './LogsLayout/Logs.Commands'
 import { useProjectSettingsGotoCommands } from './ProjectSettingsLayout/ProjectSettings.Commands'
 import { useReportsGotoCommands } from './ReportsLayout/Reports.Commands'
@@ -25,4 +26,5 @@ export function useLayoutNavCommands() {
   useReportsGotoCommands({ enabled: isLoggedIn })
   useApiDocsGotoCommands({ enabled: isLoggedIn })
   useProjectSettingsGotoCommands({ enabled: isLoggedIn })
+  useIntegrationsGotoCommands({ enabled: isLoggedIn })
 }

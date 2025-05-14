@@ -11,7 +11,7 @@ export type CreateTableBody = components['schemas']['CreateTableBody']
 
 export type TableCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   // the schema is required field
   payload: CreateTableBody & { schema: string }
 }
