@@ -35,6 +35,7 @@ export type MultiAttribute = {
   tooltip?: string
   customValue?: number
   id?: string
+  value?: number
 }
 
 interface ComposedChartHandlerProps {
@@ -373,6 +374,8 @@ const useAttributeQueries = (
       value = getConnectionLimits(computeSize).direct
     } else if (line.attribute === 'pg_pooler_max_connections') {
       value = getConnectionLimits(computeSize).pooler
+    } else if (line.value) {
+      value = line.value
     }
 
     return {

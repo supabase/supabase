@@ -36,7 +36,7 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
     showMaxValue: true,
     showGrid: true,
     syncId: 'database-reports',
-    YAxisProps: { width: 55, tickFormatter: (value: any) => formatBytes(value, 0) },
+    YAxisProps: { width: 60, tickFormatter: (value: any) => formatBytes(value, 0) },
     attributes: [
       {
         attribute: 'ram_usage_used',
@@ -86,7 +86,7 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
     showLegend: true,
     showMaxValue: false,
     showGrid: true,
-    YAxisProps: { width: 40, tickFormatter: (value: any) => `${numberFormatter(value, 2)}%` },
+    YAxisProps: { width: 35, tickFormatter: (value: any) => `${numberFormatter(value, 2)}%` },
     hideChartType: false,
     defaultChartStyle: 'line',
     attributes: [
@@ -127,6 +127,14 @@ export const getReportAttributesV2 = (isFreePlan: boolean) => [
         label: 'Other',
         format: '%',
         tooltip: 'CPU time spent on other tasks (e.g., background processes, software interrupts).',
+      },
+      {
+        attribute: 'cpu_usage_max',
+        provider: 'reference-line',
+        label: 'Max',
+        value: 100,
+        tooltip: 'Max CPU usage',
+        isMaxValue: true,
       },
     ],
   },
