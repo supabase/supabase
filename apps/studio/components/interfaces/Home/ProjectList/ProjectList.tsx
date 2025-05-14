@@ -19,6 +19,7 @@ import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
 
 export interface ProjectListProps {
+  forOrganization?: Organization
   rewriteHref?: (projectRef: string) => string
   search?: string
   filterStatus?: string[]
@@ -27,12 +28,13 @@ export interface ProjectListProps {
 
 const ProjectList = ({
   search = '',
+  forOrganization,
   rewriteHref,
   filterStatus,
   resetFilterStatus,
 }: ProjectListProps) => {
   const { slug } = useParams()
-  const organization = useSelectedOrganization()
+  const organization = useSelectedOrganization() ?? forOrganization
 
   const {
     data: allProjects = [],
@@ -48,7 +50,9 @@ const ProjectList = ({
   } = usePermissionsQuery()
   const { data: resourceWarnings } = useResourceWarningsQuery()
 
-  const orgProjects = allProjects.filter((x) => x.organization_slug === slug)
+  const orgProjects = allProjects.filter(
+    (x) => x.organization_slug === slug || x.organization_slug === organization?.slug
+  )
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
 
   const hasFilterStatusApplied = filterStatus !== undefined && filterStatus.length !== 2
