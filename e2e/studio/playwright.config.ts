@@ -19,18 +19,18 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'Global Setup',
-      testMatch: /global\.setup\.ts/,
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
     },
     {
       name: 'Features',
       testDir: './features',
       testMatch: /.*\.spec\.ts/,
-      dependencies: ['Global Setup'],
+      dependencies: ['setup'],
       use: {
         browserName: 'chromium',
         screenshot: 'off',
-        ...(isEnvWithAuth() ? { storageState: STORAGE_STATE_PATH } : {}),
+        storageState: STORAGE_STATE_PATH,
       },
     },
   ],

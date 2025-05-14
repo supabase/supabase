@@ -163,15 +163,10 @@ To start API locally, run:
   await signInButton.waitFor({ state: 'visible', timeout: 15000 })
 
   await emailInput.fill(auth.email ?? '')
-  await page.waitForTimeout(1000)
   await passwordInput.fill(auth.password ?? '')
-  await page.waitForTimeout(1000)
   await signInButton.click()
 
-  const projectsPageUrl = `${studioUrl}/project/${auth.projectRef}`
-  console.log(`\n ⏳ Waiting for navigation to projects page: ${projectsPageUrl}`)
-
-  await page.goto(projectsPageUrl)
+  await page.waitForURL('**/organizations')
 
   await page.context().storageState({ path: STORAGE_STATE_PATH })
 })

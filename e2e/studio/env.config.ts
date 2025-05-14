@@ -39,7 +39,7 @@ export const PROJECT_REFS: Record<Env, string> = {
   ci: process.env.PREVIEW_PROJECT_REF,
 }
 
-export const STORAGE_STATE_PATH = path.resolve(__dirname, 'playwright/.auth/user.json')
+export const STORAGE_STATE_PATH = path.join(__dirname, './playwright/.auth/user.json')
 
 export const getStudioUrl = (env?: Env): string => {
   return env ? ENV_URLS[env] : ENV_URLS[ENV]
