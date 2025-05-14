@@ -46,3 +46,10 @@ export const useIsOrioleDbInAws = () => {
     project?.dbVersion?.endsWith('orioledb') && project?.cloud_provider === PROVIDERS.AWS.id
   return isOrioleDbInAws
 }
+
+export const useIsOrioleDbInAwsRevamped = () => {
+  const project = useSelectedProject()
+  const isOrioleDbInAws =
+    project?.dbVersion?.endsWith('orioledb') && project?.cloud_provider === PROVIDERS.AWS_NEW.id
+  return isOrioleDbInAws
+}
