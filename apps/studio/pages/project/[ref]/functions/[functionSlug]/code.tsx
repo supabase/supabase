@@ -1,11 +1,10 @@
 import { common, dirname, relative } from '@std/path/posix'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AlertCircle, CornerDownLeft, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { LogoLoader } from 'ui'
 import { useParams } from 'common'
 import { DeployEdgeFunctionWarningModal } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -20,8 +19,8 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { LogoLoader } from 'ui'
 
 const CodePage = () => {
   const router = useRouter()
@@ -29,7 +28,6 @@ const CodePage = () => {
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
-  const edgeFunctionCreate = useFlag('edgeFunctionCreate')
   const { mutate: sendEvent } = useSendEventMutation()
   const org = useSelectedOrganization()
   const [showDeployWarning, setShowDeployWarning] = useState(false)
@@ -148,13 +146,6 @@ const CodePage = () => {
     })
     onUpdate()
   }
-
-  // TODO (Saxon): Remove this once the flag is fully launched
-  useEffect(() => {
-    if (edgeFunctionCreate !== undefined && !edgeFunctionCreate) {
-      router.push(`/project/${ref}/functions`)
-    }
-  }, [edgeFunctionCreate])
 
   useEffect(() => {
     // Set files from API response when available
