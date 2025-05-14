@@ -102,7 +102,7 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                 }}
               >
                 <Link
-                  href={`/project/${ref}/integrations/cron/jobs/${encodeURIComponent(job.jobname)}`}
+                  href={`/project/${ref}/integrations/cron/jobs/${encodeURIComponent(job.jobid)}?child-label=${encodeURIComponent(job.jobname || `Job #${job.jobid}`)}`}
                 >
                   History
                 </Link>
