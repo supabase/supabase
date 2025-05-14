@@ -54,7 +54,8 @@ const pageMap = [
 
 type Params = { slug: string }
 
-const ActionDocs = async ({ params }: { params: Params }) => {
+const ActionDocs = async (props: { params: Promise<Params> }) => {
+  const params = await props.params
   const { meta, ...data } = await getContent(params)
 
   const options = {

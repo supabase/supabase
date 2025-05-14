@@ -97,7 +97,8 @@ export const pluckObjectFields = (model: any, fields: any[]) => {
  */
 export const tryParseInt = (str: string) => {
   try {
-    return parseInt(str, 10)
+    const int = parseInt(str, 10)
+    return isNaN(int) ? undefined : int
   } catch (error) {
     return undefined
   }

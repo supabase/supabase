@@ -18,7 +18,7 @@ select pid, query, query_start from pg_stat_activity where state = 'active' and 
 
 export type OngoingQueriesVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getOngoingQueries(

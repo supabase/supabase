@@ -9,7 +9,8 @@ export const dynamicParams = false
 
 type Params = { slug?: string[] }
 
-const DeploymentGuidePage = async ({ params }: { params: Params }) => {
+const DeploymentGuidePage = async (props: { params: Promise<Params> }) => {
+  const params = await props.params
   const slug = ['deployment', ...(params.slug ?? [])]
   const data = await getGuidesMarkdown(slug)
 
