@@ -34,7 +34,7 @@ const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.ComponentPropsWithRef<typeof ShadcnTableHeader>
 >(({ className, ...props }, ref) => (
-  <ShadcnTableHeader ref={ref} className={cn('sticky top-0 z-20', className)} {...props} />
+  <ShadcnTableHeader ref={ref} className={cn('sticky top-0', className)} {...props} />
 ))
 TableHeader.displayName = 'TableHeader'
 

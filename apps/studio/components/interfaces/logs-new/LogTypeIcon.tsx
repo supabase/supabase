@@ -1,19 +1,9 @@
 'use client'
 
-import {
-  Database,
-  Key,
-  Box,
-  Server,
-  LayoutList,
-  AlertTriangle,
-  HardDrive,
-  Files,
-  Globe,
-} from 'lucide-react'
+import { Auth, EdgeFunctions, Storage } from 'icons'
+import { BookHeart, Box, Cpu, Database, Globe } from 'lucide-react'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { type LOG_TYPES } from './schema'
-import { cn, TooltipContent, TooltipTrigger, Tooltip } from 'ui'
-import { Auth, EdgeFunctions } from 'icons'
 
 interface LogTypeIconProps {
   type: (typeof LOG_TYPES)[number]
@@ -30,6 +20,7 @@ export const LogTypeIcon = ({
 }: LogTypeIconProps) => {
   const iconMap = {
     edge: () => <Globe size={size} strokeWidth={strokeWidth} className={className} />,
+    postgrest: () => <BookHeart size={size} strokeWidth={strokeWidth} className={className} />,
     auth: () => <Auth size={size} strokeWidth={strokeWidth} className={className} />,
     'edge function': () => (
       <EdgeFunctions size={size} strokeWidth={strokeWidth} className={className} />
@@ -38,11 +29,10 @@ export const LogTypeIcon = ({
     'function events': () => (
       <EdgeFunctions size={size} strokeWidth={strokeWidth} className={className} />
     ),
-    supavisor: () => <Server size={size} strokeWidth={strokeWidth} className={className} />,
-    'postgres upgrade': () => (
-      <HardDrive size={size} strokeWidth={strokeWidth} className={className} />
-    ),
-    storage: () => <Files size={size} strokeWidth={strokeWidth} className={className} />,
+    supavisor: () => <Cpu size={size} strokeWidth={strokeWidth} className={className} />,
+    'postgres upgrade': () => <Cpu size={size} strokeWidth={strokeWidth} className={className} />,
+    storage: () => <Storage size={size} strokeWidth={strokeWidth} className={className} />,
+    // cron: () => <Clock size={size} strokeWidth={strokeWidth} className={className} />,
   }
 
   const IconComponent =

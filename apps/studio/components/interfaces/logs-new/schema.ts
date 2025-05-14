@@ -32,6 +32,7 @@ const stringToBoolean = z
 
 export const LOG_TYPES = [
   'edge',
+  'postgrest',
   'auth',
   'edge function',
   'postgres',
@@ -61,6 +62,7 @@ export const columnSchema = z.object({
   // percentile: z.number().optional(),
   has_trace: z.boolean().optional(),
   logs: z.array(z.any()).optional(), // array of function logs
+  auth_user: z.string().optional(),
 })
 // .merge(timingSchema)
 
@@ -127,7 +129,7 @@ export const columnFilterSchema = z.object({
     .pipe(z.coerce.date().array())
     .optional(),
   has_trace: z.boolean().optional(),
-  logs: z.array(z.any()).optional(), // array of function logs
+  auth_user: z.string().optional(),
 })
 
 export type ColumnFilterSchema = z.infer<typeof columnFilterSchema>

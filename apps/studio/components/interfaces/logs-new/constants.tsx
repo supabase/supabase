@@ -18,6 +18,7 @@ import { cn } from 'ui'
 import { format } from 'date-fns'
 import { PopoverPercentile } from 'components/interfaces/DataTableDemo/infinite/_components/popover-percentile'
 import { SheetTimingPhases } from 'components/interfaces/DataTableDemo/infinite/_components/sheet-timing-phases'
+import { User } from 'lucide-react'
 
 // custom imports
 import type { LogsMeta } from './query-options'
@@ -81,6 +82,11 @@ export const filterFields = [
   {
     label: 'Pathname',
     value: 'pathname',
+    type: 'input',
+  },
+  {
+    label: 'Auth User',
+    value: 'auth_user',
     type: 'input',
   },
   {
@@ -169,6 +175,19 @@ export const sheetFields = [
     condition: (props) => Boolean(props.has_trace),
     component: (props) => <TraceButton has_trace={Boolean(props.has_trace)} id={props.id} />,
     className: 'flex-row items-end justify-end w-full',
+  },
+  {
+    id: 'auth_user',
+    label: 'Auth User',
+    type: 'readonly',
+    condition: (props) => Boolean(props.auth_user),
+    component: (props) => (
+      <div className="flex items-center gap-2">
+        <User size={14} className="text-foreground-lighter" />
+        <span className="font-mono">{props.auth_user}</span>
+      </div>
+    ),
+    skeletonClassName: 'w-56',
   },
   // {
   //   id: 'logs',

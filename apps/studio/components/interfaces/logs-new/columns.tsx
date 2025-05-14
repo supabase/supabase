@@ -23,12 +23,13 @@ import {
 import { cn } from 'ui'
 import { HoverCardPortal } from '@radix-ui/react-hover-card'
 import type { ColumnDef, FilterFn } from '@tanstack/react-table'
-import { Bolt, Minus, Pyramid, Zap } from 'lucide-react'
+import { Bolt, Minus, Pyramid, User, Zap } from 'lucide-react'
 import { HoverCardTimestamp } from 'components/interfaces/DataTableDemo/infinite/_components/hover-card-timestamp'
 
 // custom imports
 import type { ColumnSchema } from './schema'
 import { LogTypeIcon } from './LogTypeIcon'
+import { AuthUserHoverCard } from './components/auth-user-hover-card'
 
 // Event broadcaster for selecting the trace tab
 // This will be used to communicate between the columns and the client component
@@ -184,10 +185,17 @@ export const columns: ColumnDef<ColumnSchema>[] = [
     cell: ({ row }) => {
       const value = row.getValue<ColumnSchema['status']>('status')
       return (
-        <DataTableColumnStatusCode
-          value={value}
-          level={row.getValue<ColumnSchema['level']>('level')}
-        />
+        <div className="flex items-center gap-1">
+          {row.original.auth_user && (
+            <div>
+              <AuthUserHoverCard authUser={row.original.auth_user} />
+            </div>
+          )}
+          <DataTableColumnStatusCode
+            value={value}
+            level={row.getValue<ColumnSchema['level']>('level')}
+          />
+        </div>
       )
     },
     filterFn: (row, columnId, filterValue) => true,

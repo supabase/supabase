@@ -230,6 +230,8 @@ export const calculateChartBucketing = (search: SearchParamsType | Record<string
 
 /**
  * Edge logs query fragment
+ *
+ * excludes `/rest/` in the path
  */
 export const getEdgeLogsQuery = () => {
   return `
@@ -260,6 +262,48 @@ export const getEdgeLogsQuery = () => {
     left join unnest(sb.jwt) as jwt
     left join unnest(jwt.authorization) as auth
     left join unnest(auth.payload) as authorization_payload
+
+    -- ONLY include logs where the path does not include /rest/
+    WHERE edge_logs_request.path NOT LIKE '%/rest/%'
+    
+  `
+}
+
+// Postgrest logs
+
+// WHERE pathname includes `/rest/`
+export const getPostgrestLogsQuery = () => {
+  return `
+    select 
+      id,
+      el.timestamp as timestamp,
+      'postgrest' as log_type,
+      CAST(edge_logs_response.status_code AS STRING) as status,
+      CASE
+          WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
+          WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+          WHEN edge_logs_response.status_code >= 500 THEN 'error'
+          ELSE 'success'
+      END as level,
+      edge_logs_request.path as path,
+      edge_logs_request.host as host,
+      null as event_message,
+      edge_logs_request.method as method,
+      authorization_payload.role as api_role,
+      COALESCE(sb.auth_user, null) as auth_user,
+      null as log_count,
+      null as logs
+    from edge_logs as el
+    cross join unnest(metadata) as edge_logs_metadata
+    cross join unnest(edge_logs_metadata.request) as edge_logs_request
+    cross join unnest(edge_logs_metadata.response) as edge_logs_response
+    left join unnest(edge_logs_request.sb) as sb
+    left join unnest(sb.jwt) as jwt
+    left join unnest(jwt.authorization) as auth
+    left join unnest(auth.payload) as authorization_payload
+
+    -- ONLY include logs where the path includes /rest/
+    WHERE edge_logs_request.path LIKE '%/rest/%'
   `
 }
 
@@ -416,6 +460,8 @@ export const getUnifiedLogsCTE = () => {
   return `
 WITH unified_logs AS (
     ${getEdgeLogsQuery()}
+    union all
+    ${getPostgrestLogsQuery()}
     union all
     ${getPostgresLogsQuery()}
     union all 

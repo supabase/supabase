@@ -32,7 +32,7 @@ export const FunctionLogsTab: React.FC<FunctionLogsTabProps> = ({ logs = [] }) =
           // Map the log level to our standard levels
 
           return (
-            <div key={log.id} className="py-2 border-b border-border last:border-0">
+            <div key={log.id} className="py-1 border-b border-border last:border-0">
               <div className="flex items-start gap-5">
                 <div className="flex flex-row items-center gap-5">
                   <HoverCardTimestamp date={date} className="min-w-20 ml-14" />
@@ -42,7 +42,7 @@ export const FunctionLogsTab: React.FC<FunctionLogsTabProps> = ({ logs = [] }) =
                     level={log.level}
                     className="min-w-20"
                   />
-                  <span className="text-foreground">{log.event_type || 'Log'}</span>
+                  {/* <span className="text-foreground">{log.event_type || 'Log'}</span> */}
                 </div>
                 <div className="mt-1 whitespace-pre-wrap break-all pl-2 text-[0.8rem]">
                   {log.event_message}
