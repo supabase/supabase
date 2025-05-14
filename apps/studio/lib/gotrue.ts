@@ -1,4 +1,5 @@
-import { getAccessToken, gotrueClient, type User } from 'common'
+import { getAccessToken, type User } from 'common/auth'
+import { gotrueClient } from 'common/gotrue'
 
 export const auth = gotrueClient
 export { getAccessToken }
