@@ -188,7 +188,7 @@ const Home: NextPageWithLayout = () => {
                   <div className="space-y-8">
                     <h4 className="text-lg">Example projects</h4>
                     <div className="flex justify-center">
-                      <Tabs_Shadcn_ defaultValue="app">
+                      <Tabs_Shadcn_ defaultValue="app" className="w-full">
                         <TabsList_Shadcn_ className="flex gap-4 mb-8">
                           <TabsTrigger_Shadcn_ value="app">App Frameworks</TabsTrigger_Shadcn_>
                           <TabsTrigger_Shadcn_ value="mobile">Mobile Framework</TabsTrigger_Shadcn_>
