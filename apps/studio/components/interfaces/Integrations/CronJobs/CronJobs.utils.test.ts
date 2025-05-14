@@ -76,7 +76,7 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it.only("should return a HTTP request config when there's a query parameter or hash in the URL (also handles edge function)", () => {
+  it("should return a HTTP request config when there's a query parameter or hash in the URL (also handles edge function)", () => {
     const command = `select net.http_post( url:='https://random_project_ref.supabase.co/functions/v1/_?first=1#second=2', headers:=jsonb_build_object('Authorization', 'Bearer something'), timeout_milliseconds:=5000 )`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
       endpoint: 'https://random_project_ref.supabase.co/functions/v1/_?first=1#second=2',
