@@ -22,9 +22,6 @@ export async function createDatabaseColumn({
   connectionString,
   payload,
 }: DatabaseColumnCreateVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
   const { sql } = pgMeta.columns.create({
     schema: payload.schema,
     table: payload.table,
