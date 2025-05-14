@@ -230,7 +230,7 @@ export const createColumn = async ({
   try {
     // Once pg-meta supports composite keys, we can remove this logic
     const { isPrimaryKey, ...formattedPayload } = payload
-    const column = await createDatabaseColumn({
+    await createDatabaseColumn({
       projectRef: projectRef,
       connectionString: connectionString,
       payload: formattedPayload,
@@ -246,18 +246,18 @@ export const createColumn = async ({
         await dropConstraint(
           projectRef,
           connectionString,
-          column.schema,
-          column.table,
+          payload.schema,
+          payload.table,
           primaryKey.name
         )
       }
 
-      const primaryKeyColumns = existingPrimaryKeys.concat([column.name])
+      const primaryKeyColumns = existingPrimaryKeys.concat([formattedPayload.name])
       await addPrimaryKey(
         projectRef,
         connectionString,
-        column.schema,
-        column.table,
+        payload.schema,
+        payload.table,
         primaryKeyColumns
       )
     }
@@ -267,13 +267,13 @@ export const createColumn = async ({
       await addForeignKey({
         projectRef,
         connectionString,
-        table: { schema: column.schema, name: column.table },
+        table: { schema: payload.schema, name: payload.table },
         foreignKeys: foreignKeyRelations,
       })
     }
 
     if (!skipSuccessMessage) {
-      toast.success(`Successfully created column "${column.name}"`, { id: toastId })
+      toast.success(`Successfully created column "${formattedPayload.name}"`, { id: toastId })
     }
     return { error: undefined }
   } catch (error: any) {
@@ -496,7 +496,7 @@ export const createTable = async ({
 
     for (const column of columns) {
       // We create all columns without primary keys first
-      const columnPayload = generateCreateColumnPayload(table.id, {
+      const columnPayload = generateCreateColumnPayload(table, {
         ...column,
         isPrimaryKey: false,
       })
@@ -699,7 +699,7 @@ export const updateTable = async ({
       toast.loading(`Adding column ${column.name} to ${updatedTable.name}`, { id: toastId })
       // Ensure that columns do not created as primary key first, cause the primary key will
       // be added later on further down in the code
-      const columnPayload = generateCreateColumnPayload(updatedTable.id, {
+      const columnPayload = generateCreateColumnPayload(updatedTable, {
         ...column,
         isPrimaryKey: false,
       })
