@@ -53,7 +53,7 @@ const FormSchema = z.object({
   activation: z.string(),
   enabled_mode: z.string(),
   orientation: z.string(),
-  function_name: z.string(),
+  function_name: z.string().min(1, 'Please select a database function for your trigger to call'),
   function_schema: z.string(),
   events: z.array(z.string()).min(1, 'Please select at least one event'),
 
@@ -413,6 +413,17 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
                         </Button>
                       </div>
                     )}
+
+                    {/* [Joshen] Just for form to handle errors for function_name, since this parameter is handled outside of a form component */}
+                    <FormField_Shadcn_
+                      name="function_name"
+                      control={form.control}
+                      render={() => (
+                        <FormItemLayout layout="vertical">
+                          <FormControl_Shadcn_ />
+                        </FormItemLayout>
+                      )}
+                    />
                   </div>
                 </>
               )}
