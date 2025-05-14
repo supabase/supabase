@@ -1,15 +1,18 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-
-import { handleError, patch } from 'data/fetchers'
+import pgMeta from '@supabase/pg-meta'
 import type { ResponseError } from 'types'
 import { databaseTriggerKeys } from './keys'
+import { executeSql } from 'data/sql/execute-sql-query'
 
 export type DatabaseTriggerUpdateVariables = {
   id: number
   projectRef: string
   connectionString?: string | null
-  payload: any
+  payload: {
+    name?: string
+    enabled_mode?: 'ORIGIN' | 'REPLICA' | 'ALWAYS' | 'DISABLED'
+  }
 }
 
 export async function updateDatabaseTrigger({
@@ -18,21 +21,16 @@ export async function updateDatabaseTrigger({
   connectionString,
   payload,
 }: DatabaseTriggerUpdateVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
+  const { sql } = pgMeta.triggers.update({ id }, payload)
 
-  const { data, error } = await patch('/platform/pg-meta/{ref}/triggers', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      query: { id },
-    },
-    body: payload,
-    headers,
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['trigger', 'update'],
   })
 
-  if (error) handleError(error)
-  return data
+  return result
 }
 
 type DatabaseTriggerUpdateData = Awaited<ReturnType<typeof updateDatabaseTrigger>>
