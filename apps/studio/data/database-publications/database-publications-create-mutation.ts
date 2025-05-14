@@ -27,9 +27,6 @@ export async function createDatabasePublication({
   publish_delete = false,
   publish_truncate = false,
 }: DatabasePublicationCreateVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
   const { sql } = pgMeta.publications.create({
     name,
     tables,
