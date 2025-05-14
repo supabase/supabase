@@ -664,6 +664,8 @@ export const updateTable = async ({
   existingForeignKeyRelations: ForeignKeyConstraint[]
   primaryKey?: Constraint
 }) => {
+  const queryClient = getQueryClient()
+
   // Prepare a check to see if primary keys to the tables were updated or not
   const primaryKeyColumns = columns
     .filter((column) => column.isPrimaryKey)
@@ -683,13 +685,26 @@ export const updateTable = async ({
   }
 
   // Update the table
-  const updatedTable = await updateTableMutation({
+  await updateTableMutation({
     projectRef,
     connectionString,
     id: table.id,
     name: table.name,
     schema: table.schema,
     payload,
+  })
+
+  const updatedTable = await queryClient.fetchQuery({
+    queryKey: tableKeys.retrieve(
+      projectRef,
+      payload.name ?? table.name,
+      payload.schema ?? table.schema
+    ),
+    queryFn: ({ signal }) =>
+      getTable(
+        { projectRef, connectionString, name: payload.name, schema: payload.schema },
+        signal
+      ),
   })
 
   const originalColumns = table.columns ?? []
@@ -770,8 +785,6 @@ export const updateTable = async ({
     foreignKeys: foreignKeyRelations,
     existingForeignKeyRelations,
   })
-
-  const queryClient = getQueryClient()
 
   await Promise.all([
     queryClient.invalidateQueries(tableEditorKeys.tableEditor(projectRef, table.id)),
