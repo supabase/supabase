@@ -13,19 +13,19 @@ interface DeleteTriggerProps {
 
 export const DeleteTrigger = ({ trigger, visible, setVisible }: DeleteTriggerProps) => {
   const { project } = useProjectContext()
-  const { id, name, schema } = trigger ?? {}
+  const { name, schema, table } = trigger ?? {}
 
   const { mutate: deleteDatabaseTrigger, isLoading } = useDatabaseTriggerDeleteMutation()
 
   async function handleDelete() {
     if (!project) return console.error('Project is required')
-    if (!id) return console.error('Trigger ID is required')
+    if (!(name && schema && table)) return console.error('Trigger ID is required')
 
     deleteDatabaseTrigger(
       {
         projectRef: project.ref,
         connectionString: project.connectionString,
-        id,
+        id: { name, schema, table },
       },
       {
         onSuccess: () => {

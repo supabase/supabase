@@ -6,7 +6,7 @@ import { databaseTriggerKeys } from './keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 
 export type DatabaseTriggerUpdateVariables = {
-  id: number
+  id: { name: string; schema: string; table: string }
   projectRef: string
   connectionString?: string | null
   payload: {
@@ -21,7 +21,7 @@ export async function updateDatabaseTrigger({
   connectionString,
   payload,
 }: DatabaseTriggerUpdateVariables) {
-  const { sql } = pgMeta.triggers.update({ id }, payload)
+  const { sql } = pgMeta.triggers.update(id, payload)
 
   const { result } = await executeSql({
     projectRef,

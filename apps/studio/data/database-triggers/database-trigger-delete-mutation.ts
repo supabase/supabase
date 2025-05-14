@@ -2,13 +2,12 @@ import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import pgMeta from '@supabase/pg-meta'
-import { del, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { databaseTriggerKeys } from './keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 
 export type DatabaseTriggerDeleteVariables = {
-  id: number
+  id: { name: string; schema: string; table: string }
   projectRef: string
   connectionString?: string | null
 }
@@ -20,7 +19,7 @@ export async function deleteDatabaseTrigger({
   projectRef,
   connectionString,
 }: DatabaseTriggerDeleteVariables) {
-  const { sql } = pgMeta.triggers.remove({ id })
+  const { sql } = pgMeta.triggers.remove(id)
 
   const { result } = await executeSql({
     projectRef,

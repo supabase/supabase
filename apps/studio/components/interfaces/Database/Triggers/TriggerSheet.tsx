@@ -133,7 +133,11 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
       updateDatabaseTrigger({
         projectRef: project?.ref,
         connectionString: project?.connectionString,
-        id: selectedTrigger.id,
+        id: {
+          name: selectedTrigger.name,
+          schema: selectedTrigger.schema,
+          table: selectedTrigger.table,
+        },
         payload: { name: payload.name, enabled_mode: payload.enabled_mode },
       })
     } else {
