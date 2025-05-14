@@ -131,16 +131,16 @@ const CustomTooltip = ({
             <LabelItem key={`${entry.name}-${index}`} entry={entry} />
           ))}
           {active && showTotal && (
-            <div className="flex md:flex-col gap-1 md:gap-0 text-foreground font-semibold">
+            <div className="flex md:flex-col gap-1 md:gap-0 text-foreground mt-1">
               <span className="flex-grow text-foreground-lighter">Total</span>
               <div className="flex items-end gap-1">
                 <span className="text-base">
                   {shouldFormatBytes
                     ? formatBytes(
                         isDBSizeChart ? (total as number) * 1024 * 1024 : (total as number),
-                        1
+                        valuePrecision
                       )
-                    : numberFormatter(total as number)}
+                    : numberFormatter(total as number, valuePrecision)}
                   {isPercentage ? '%' : ''}
                 </span>
                 {maxValueAttribute &&

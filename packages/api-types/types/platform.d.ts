@@ -16413,6 +16413,7 @@ export interface operations {
           | 'pg_database_size'
           | 'ram_usage'
           | 'ram_usage_total'
+          | 'ram_usage_available'
           | 'ram_usage_used'
           | 'ram_usage_free'
           | 'ram_usage_cache_and_buffers'
