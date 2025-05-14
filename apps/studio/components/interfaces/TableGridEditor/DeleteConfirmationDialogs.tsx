@@ -150,8 +150,9 @@ const DeleteConfirmationDialogs = ({
     deleteTable({
       projectRef: project?.ref!,
       connectionString: project?.connectionString,
-      schema: selectedTableToDelete.schema,
       id: selectedTableToDelete.id,
+      name: selectedTableToDelete.name,
+      schema: selectedTableToDelete.schema,
       cascade: isDeleteWithCascade,
     })
   }

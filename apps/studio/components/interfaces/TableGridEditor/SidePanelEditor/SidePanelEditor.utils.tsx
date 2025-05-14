@@ -433,6 +433,7 @@ export const duplicateTable = async (
       projectRef,
       connectionString,
       id: duplicatedTable?.id!,
+      name: duplicatedTable?.name!,
       schema: duplicatedTable?.schema!,
       payload: { rls_enabled: isRLSEnabled },
     })
@@ -467,11 +468,19 @@ export const createTable = async ({
   const queryClient = getQueryClient()
 
   // Create the table first. Error may be thrown.
-  const table = await createTableMutation({
+  await createTableMutation({
     projectRef: projectRef,
     connectionString: connectionString,
     payload: payload,
   })
+
+  const allTables = await queryClient.fetchQuery({
+    queryKey: tableKeys.list(projectRef, payload.schema),
+    queryFn: ({ signal }) =>
+      getTables({ projectRef, connectionString, schema: payload.schema }, signal),
+  })
+
+  const table = find(allTables, { schema: payload.schema, name: payload.name })!
 
   // If we face any errors during this process after the actual table creation
   // We'll delete the table as a way to clean up and not leave behind bits that
@@ -484,6 +493,7 @@ export const createTable = async ({
         projectRef,
         connectionString,
         id: table.id,
+        name: table.name,
         schema: table.schema,
         payload: { rls_enabled: isRLSEnabled },
       })
@@ -624,6 +634,7 @@ export const createTable = async ({
       projectRef,
       connectionString,
       id: table.id,
+      name: table.name,
       schema: table.schema,
     })
     throw error
@@ -674,6 +685,7 @@ export const updateTable = async ({
     projectRef,
     connectionString,
     id: table.id,
+    name: table.name,
     schema: table.schema,
     payload,
   })
