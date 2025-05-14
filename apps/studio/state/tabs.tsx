@@ -435,3 +435,37 @@ export function createTabId<T extends TabType>(type: T, params: CreateTabIdParam
       return ''
   }
 }
+
+// Remove from local storage when feature flag is disabled
+export function removeTabsByEditor(ref: string, editor: 'table' | 'sql') {
+  // Recent items
+  const recentItems = getSavedRecentItems(ref)
+  const filteredRecentItems = recentItems.filter((item) =>
+    editor === 'sql' ? item.type !== 'sql' : item.type === 'sql'
+  )
+  localStorage.setItem(
+    getRecentItemsStorageKey(ref),
+    JSON.stringify({ items: filteredRecentItems })
+  )
+
+  // Tabs
+  const tabs = getSavedTabs(ref)
+  const filteredTabsMap = Object.fromEntries(
+    Object.entries(tabs.tabsMap).filter(([, tab]) =>
+      editor === 'sql' ? tab.type !== 'sql' : tab.type === 'sql'
+    )
+  )
+
+  const filteredOpenTabs = tabs.openTabs.filter((tabId) => filteredTabsMap[tabId])
+  localStorage.setItem(
+    getTabsStorageKey(ref),
+    JSON.stringify({
+      activeTab: filteredOpenTabs.includes(tabs.activeTab ?? '')
+        ? tabs.activeTab
+        : filteredOpenTabs[0] ?? null,
+      openTabs: filteredOpenTabs,
+      tabsMap: filteredTabsMap,
+      previewTabId: tabs.previewTabId,
+    })
+  )
+}
