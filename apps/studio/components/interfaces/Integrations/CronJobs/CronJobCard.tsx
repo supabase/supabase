@@ -22,6 +22,9 @@ import {
   DropdownMenuTrigger,
   Label_Shadcn_,
   Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -52,6 +55,17 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: toggleDatabaseCronJob, isLoading } = useDatabaseCronJobToggleMutation()
+
+  const onEdit = () => {
+    sendEvent({
+      action: 'cron_job_update_clicked',
+      groups: {
+        project: selectedProject?.ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
+    })
+    onEditCronJob(job)
+  }
 
   return (
     <>
@@ -112,20 +126,21 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                   <Button type="default" icon={<MoreVertical />} className="px-1.5" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-36">
-                  <DropdownMenuItem
-                    onClick={() => {
-                      sendEvent({
-                        action: 'cron_job_update_clicked',
-                        groups: {
-                          project: selectedProject?.ref ?? 'Unknown',
-                          organization: org?.slug ?? 'Unknown',
-                        },
-                      })
-                      onEditCronJob(job)
-                    }}
-                  >
-                    Edit cron job
-                  </DropdownMenuItem>
+                  {job.jobname ? (
+                    <DropdownMenuItem onClick={onEdit}>Edit cron job</DropdownMenuItem>
+                  ) : (
+                    <Tooltip>
+                      <TooltipTrigger className="w-full">
+                        <DropdownMenuItem onClick={onEdit} disabled>
+                          Edit cron job
+                        </DropdownMenuItem>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        This cron job doesn’t have a name and can’t be edited. Create a new one and
+                        delete this job.
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={() => {
