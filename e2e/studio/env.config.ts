@@ -15,10 +15,10 @@ export const ENV_WITH_AUTH: Env[] = ['production', 'staging', 'dev-hosted']
 export const ENV_URLS: Record<Env, string> = {
   production: 'https://supabase.com',
   staging: 'https://supabase.green',
-  selfhosted: 'http://localhost:54323/',
-  'dev-hosted': 'http://localhost:8082/',
-  'dev-selfhosted': 'http://localhost:8082/',
-  ci: process.env.BASE_URL || 'http://localhost:3000/dashboard', // Set in CI
+  selfhosted: 'http://localhost:54323',
+  'dev-hosted': 'http://localhost:8082',
+  'dev-selfhosted': 'http://localhost:8082',
+  ci: process.env.BASE_URL,
 }
 
 export const API_URLS: Record<Env, string> = {
@@ -27,7 +27,7 @@ export const API_URLS: Record<Env, string> = {
   selfhosted: 'http://localhost:54323/api',
   'dev-hosted': 'http://localhost:8080/api',
   'dev-selfhosted': 'http://localhost:8082/api',
-  ci: process.env.API_BASE_URL || 'https://api.supabase.green',
+  ci: process.env.API_BASE_URL,
 }
 
 export const PROJECT_REFS: Record<Env, string> = {
