@@ -11,7 +11,7 @@ import type { ResponseError } from 'types'
 
 export type DatabaseColumnDeleteVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: string
   cascade?: boolean
   table?: { id: number; schema: string; name: string }

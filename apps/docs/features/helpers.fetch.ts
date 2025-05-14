@@ -29,11 +29,8 @@ function fetchWithNextOptions({
   return (info: RequestInfo) => fetch(info, { next, cache })
 }
 
-const fetchRevalidatePerDay_TEMP_TESTING = fetchWithNextOptions({
+const fetchRevalidatePerDay = fetchWithNextOptions({
   next: { revalidate: ONE_DAY_IN_SECONDS },
 })
-// [Charis 2024-12-28]
-// Temporarily disabling revalidation as a hotfix for Vercel NFT problem
-const fetchRevalidatePerDay = fetch
 
-export { fetchWithNextOptions, fetchRevalidatePerDay, fetchRevalidatePerDay_TEMP_TESTING }
+export { fetchWithNextOptions, fetchRevalidatePerDay }

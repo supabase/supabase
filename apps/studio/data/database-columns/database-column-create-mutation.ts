@@ -9,7 +9,7 @@ export type CreateColumnBody = components['schemas']['CreateColumnBody']
 
 export type DatabaseColumnCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   payload: CreateColumnBody
 }
 

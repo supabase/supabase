@@ -5,7 +5,7 @@ import { databaseCronJobsKeys } from './keys'
 
 export type DatabaseCronJobsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getDatabaseCronTimezone({

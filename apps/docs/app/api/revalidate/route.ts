@@ -19,7 +19,7 @@ const requestBodySchema = z.object({
 export const POST = handleError(_handleRevalidateRequest)
 
 export async function _handleRevalidateRequest(request: NextRequest) {
-  const requestHeaders = headers()
+  const requestHeaders = await headers()
   const authorization = requestHeaders.get('Authorization')
   if (!authorization) {
     return new Response('Missing Authorization header', { status: 401 })
