@@ -85,7 +85,22 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
       }
     }
 
-    if (url.includes(`${projectRef}.supabase.`) && url.includes('/functions/v1/')) {
+    // If there's a search param or hash in the edge function URL, let it be handled by the HTTP Request case.
+    // Otherwise, the params/hash may be lost during editing of the cron job.
+    let searchParams = ''
+    let urlHash = ''
+    try {
+      const urlObject = new URL(url)
+      searchParams = urlObject.search
+      urlHash = urlObject.hash
+    } catch {}
+
+    if (
+      url.includes(`${projectRef}.supabase.`) &&
+      url.includes('/functions/v1/') &&
+      searchParams.length === 0 &&
+      urlHash.length === 0
+    ) {
       return {
         type: 'edge_function',
         method: method === 'http_get' ? 'GET' : 'POST',
