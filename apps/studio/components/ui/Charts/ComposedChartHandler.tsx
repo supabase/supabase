@@ -35,6 +35,7 @@ export type MultiAttribute = {
   customValue?: number
   id?: string
   value?: number
+  isReferenceLine?: boolean
 }
 
 interface ComposedChartHandlerProps {

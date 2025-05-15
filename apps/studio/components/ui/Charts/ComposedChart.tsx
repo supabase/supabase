@@ -10,9 +10,11 @@ import {
   Line,
   ComposedChart as RechartComposedChart,
   ReferenceArea,
+  ReferenceLine,
   Tooltip,
   XAxis,
   YAxis,
+  Label,
 } from 'recharts'
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
@@ -171,6 +173,10 @@ export default function ComposedChart({
     chartHighlight?.coordinates.right &&
     chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
 
+  const referenceLines = attributes.filter((attribute) => attribute.provider === 'reference-line')
+
+  console.log(referenceLines)
+
   const chartData =
     data && !!data[0]
       ? Object.entries(data[0])
@@ -179,7 +185,12 @@ export default function ComposedChart({
             value: value,
             color: STACKED_CHART_COLORS[index - (1 % STACKED_CHART_COLORS.length)],
           }))
-          .filter((att) => att.name !== 'timestamp' && att.name !== maxAttribute?.attribute)
+          .filter(
+            (att) =>
+              att.name !== 'timestamp' &&
+              att.name !== maxAttribute?.attribute &&
+              !referenceLines.map((a) => a.attribute).includes(att.name)
+          )
       : []
 
   const stackedAttributes = chartData.filter((att) => !att.name.includes('max'))
@@ -360,6 +371,27 @@ export default function ComposedChart({
               name={maxAttribute.label}
             />
           )}
+          {referenceLines
+            .filter((line) => line.isReferenceLine)
+            .map((line) => (
+              <ReferenceLine
+                key={line.attribute}
+                y={line.value}
+                stroke={CHART_COLORS.RED_2}
+                strokeWidth={1}
+                opacity={0.5}
+                className="!text-brand"
+                strokeDasharray="3 3"
+              >
+                <Label
+                  value={line.label}
+                  position="insideTopRight"
+                  fill={CHART_COLORS.REFERENCE_LINE_TEXT}
+                  className="text-xs"
+                  style={{ fill: CHART_COLORS.REFERENCE_LINE_TEXT }}
+                />
+              </ReferenceLine>
+            ))}
           {/* Selection highlight */}
           {showHighlightActions && (
             <ReferenceArea
