@@ -213,6 +213,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
     {
       id: 'db-size',
       label: 'Database Size',
+      syncId: 'database-reports',
       valuePrecision: 2,
       hide: false,
       showTooltip: true,
@@ -230,7 +231,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
           tooltip: 'Total space on disk used by your database (tables, indexes, data, ...).',
         },
         {
-          attribute: 'pg_database_size_max',
+          attribute: 'max_pg_database_size',
           provider: 'reference-line',
           label: 'Disk size',
           value: (project?.volumeSizeGb || getRecommendedDbSize(computeSize)) * 1024 * 1024 * 1024,

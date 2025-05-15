@@ -151,6 +151,7 @@ export default function ComposedChart({
         }))
         .filter((entry) => entry.dataKey !== 'timestamp')
     : undefined
+  const referenceLines = attributes.filter((attribute) => attribute?.provider === 'reference-line')
 
   const resolvedHighlightedLabel = getHeaderLabel()
   const resolvedHighlightedValue =
@@ -158,13 +159,13 @@ export default function ComposedChart({
       ? showTotal
         ? calculateTotalChartAggregate(
             _activePayload,
-            maxAttribute?.attribute ? [maxAttribute?.attribute] : []
+            maxAttribute?.attribute ? referenceLines.map((a) => a.attribute) : []
           )
         : data[focusDataIndex]?.[yAxisKey]
       : showTotal && lastDataPoint
         ? calculateTotalChartAggregate(
             lastDataPoint,
-            maxAttribute?.attribute ? [maxAttribute?.attribute] : []
+            maxAttribute?.attribute ? referenceLines.map((a) => a.attribute) : []
           )
         : highlightedValue
 
@@ -172,8 +173,6 @@ export default function ComposedChart({
     chartHighlight?.coordinates.left &&
     chartHighlight?.coordinates.right &&
     chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
-
-  const referenceLines = attributes.filter((attribute) => attribute?.provider === 'reference-line')
 
   const chartData =
     data && !!data[0]
