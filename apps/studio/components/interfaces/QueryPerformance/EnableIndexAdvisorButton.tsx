@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useIsIndexAdvisorAvailable } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorAvailable'
+import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
@@ -26,7 +26,9 @@ import { getIndexAdvisorExtensions } from './index-advisor.utils'
 
 export const EnableIndexAdvisorButton = () => {
   const { project } = useProjectContext()
-  const isAdvisorAvailable = useIsIndexAdvisorAvailable()
+
+  const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
+
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   const { data: extensions } = useDatabaseExtensionsQuery({
@@ -70,7 +72,8 @@ export const EnableIndexAdvisorButton = () => {
     }
   }
 
-  if (isAdvisorAvailable) return null
+  // if index_advisor is already enabled or not available to install, show nothing
+  if (!isIndexAdvisorAvailable || isIndexAdvisorEnabled) return null
 
   return (
     <AlertDialog open={isDialogOpen} onOpenChange={() => setIsDialogOpen(!isDialogOpen)}>
