@@ -245,11 +245,11 @@ export const getNextRun = (schedule: string, lastRun?: string) => {
       return undefined
     }
   } else {
-    // [Joshen] Only going to attempt to parse if the schedule is as simple as "n seconds", "n minutes", or "n days"
+    // [Joshen] Only going to attempt to parse if the schedule is as simple as "n second" or "n seconds"
     // Returned undefined otherwise - we can revisit this perhaps if we get feedback about this
-    const [value, unit] = schedule.split(' ')
+    const [value, unit] = schedule.toLocaleLowerCase().split(' ')
     if (
-      ['seconds', 'minutes', 'days'].includes(unit) &&
+      ['second', 'seconds'].includes(unit) &&
       !Number.isNaN(Number(value)) &&
       lastRun !== undefined
     ) {
