@@ -30,7 +30,7 @@ export async function updateTable({
 }: TableUpdateVariables) {
   const { sql } = pgMeta.tables.update({ id, name, schema }, payload)
 
-  const { result } = await executeSql({
+  const { result } = await executeSql<void>({
     projectRef,
     connectionString,
     sql,
