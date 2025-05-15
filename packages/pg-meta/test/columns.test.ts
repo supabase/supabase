@@ -226,7 +226,7 @@ withTestDatabase('retrieve, create, update, delete column', async ({ executeQuer
   )
 
   // Update column
-  const { sql: updateSql } = await pgMeta.columns.update(column!.id, {
+  const { sql: updateSql } = await pgMeta.columns.update(column!, {
     name: 'c1',
     type: 'int4',
     drop_default: true,
@@ -274,7 +274,7 @@ withTestDatabase('retrieve, create, update, delete column', async ({ executeQuer
   )
 
   // Remove column
-  const { sql: removeSql } = await pgMeta.columns.remove(column!.id)
+  const { sql: removeSql } = await pgMeta.columns.remove(column!)
   await executeQuery(removeSql)
 
   // Verify column was removed
@@ -591,7 +591,7 @@ withTestDatabase('alter column to type with uppercase', async ({ executeQuery })
   const column = retrieveZod.parse((await executeQuery(retrieveSql))[0])
 
   // Update column
-  const { sql: updateSql } = await pgMeta.columns.update(column!.id, { type: 'T' })
+  const { sql: updateSql } = await pgMeta.columns.update(column!, { type: 'T' })
   await executeQuery(updateSql)
 
   // Verify updated column
@@ -704,7 +704,7 @@ withTestDatabase('drop with cascade', async ({ executeQuery }) => {
   const column = retrieveZod.parse((await executeQuery(retrieveSql))[0])
 
   // Remove column with cascade
-  const { sql: removeSql } = await pgMeta.columns.remove(column!.id, { cascade: true })
+  const { sql: removeSql } = await pgMeta.columns.remove(column!, { cascade: true })
   await executeQuery(removeSql)
 
   // Verify original column was removed
@@ -811,7 +811,7 @@ withTestDatabase('dropping column checks', async ({ executeQuery }) => {
   const column = retrieveZod.parse((await executeQuery(retrieveSql))[0])
 
   // Update column to remove check
-  const { sql: updateSql } = await pgMeta.columns.update(column!.id, { check: null })
+  const { sql: updateSql } = await pgMeta.columns.update(column!, { check: null })
   await executeQuery(updateSql)
 
   // Verify updated column
