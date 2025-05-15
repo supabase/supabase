@@ -69,6 +69,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       method,
       headers: requestHeaders,
       body: finalBody,
+      redirect: 'manual', // don't follow the redirect and return response as is
     })
 
     // Handle non-JSON responses
