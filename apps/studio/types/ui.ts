@@ -17,7 +17,7 @@ interface NotificationMetadata {
 }
 
 export interface ChartIntervals {
-  key: 'minutely' | 'hourly' | 'daily' | '5min' | '15min' | '1hr' | '1day' | '7day'
+  key: 'minutely' | 'hourly' | 'daily' | '5min' | '15min' | '1hr' | '1day' | '7day' | '3hr'
   label: string
   startValue: number
   startUnit: 'minute' | 'hour' | 'day'
