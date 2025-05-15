@@ -19,7 +19,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   try {
-    console.log('post', req.body)
     const { url, method, body: requestBody, headers: customHeaders } = req.body
 
     const regexValidEdgeFunctionURL = new RegExp(
