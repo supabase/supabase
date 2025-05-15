@@ -1,3 +1,4 @@
+import { isValidEdgeFunctionURL } from 'lib/api/edgeFunctions'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -21,13 +22,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { url, method, body: requestBody, headers: customHeaders } = req.body
 
-    const regexValidEdgeFunctionURL = new RegExp(
-      'https://[a-z]*.supabase.(red|co)/functions/v[0-9]{1}/S*',
-      'g'
-    )
-    const validEdgeFunctionURL = regexValidEdgeFunctionURL.test(url)
+    const validEdgeFnUrl = isValidEdgeFunctionURL(url)
 
-    if (!validEdgeFunctionURL) {
+    if (!validEdgeFnUrl) {
       return res.status(400).json({
         status: 400,
         error: { message: 'Provided URL is not a valid Supabase edge function URL' },
