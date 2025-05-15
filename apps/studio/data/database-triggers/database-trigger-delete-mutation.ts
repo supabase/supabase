@@ -7,25 +7,28 @@ import { databaseTriggerKeys } from './keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 
 export type DatabaseTriggerDeleteVariables = {
-  id: { name: string; schema: string; table: string }
+  trigger: {
+    id: number
+    name: string
+    schema: string
+    table: string
+  }
   projectRef: string
   connectionString?: string | null
 }
 
-type DeleteDatabaseTriggerResponse = PostgresTrigger & { error?: any }
-
 export async function deleteDatabaseTrigger({
-  id,
+  trigger,
   projectRef,
   connectionString,
 }: DatabaseTriggerDeleteVariables) {
-  const { sql } = pgMeta.triggers.remove(id)
+  const { sql } = pgMeta.triggers.remove(trigger)
 
   const { result } = await executeSql({
     projectRef,
     connectionString,
     sql,
-    queryKey: ['trigger', 'delete'],
+    queryKey: ['trigger', 'delete', trigger.id],
   })
 
   return result

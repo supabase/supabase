@@ -6,7 +6,7 @@ import { quoteLiteral } from 'lib/pg-format'
 import type { ResponseError } from 'types'
 import { databaseTriggerKeys } from './keys'
 import { PostgresTrigger } from '@supabase/postgres-meta'
-import { PGTriggerCreate, PGTriggerUpdate } from '@supabase/pg-meta/src/pg-meta-triggers'
+import { PGTrigger, PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
 
 // [Joshen] Writing this query within FE as the PATCH endpoint from pg-meta only supports updating
 // trigger name and enabled mode. So we'll delete and create the trigger, within a single transaction
@@ -16,7 +16,7 @@ export type DatabaseTriggerUpdateVariables = {
   projectRef: string
   connectionString?: string | null
   originalTrigger: PostgresTrigger
-  updatedTrigger: PGTriggerCreate & { enabled_mode: PGTriggerUpdate['enabled_mode'] }
+  updatedTrigger: PGTriggerCreate & Pick<PGTrigger, 'enabled_mode'>
 }
 
 export function getDatabaseTriggerUpdateSQL({
@@ -42,7 +42,12 @@ export async function updateDatabaseTrigger({
   updatedTrigger,
 }: DatabaseTriggerUpdateVariables) {
   const sql = getDatabaseTriggerUpdateSQL({ originalTrigger, updatedTrigger })
-  await executeSql({ projectRef, connectionString, sql, queryKey: ['trigger', 'update'] })
+  await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['trigger', 'update', originalTrigger.id],
+  })
   return updatedTrigger
 }
 

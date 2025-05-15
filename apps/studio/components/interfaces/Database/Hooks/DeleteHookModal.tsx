@@ -12,7 +12,7 @@ interface DeleteHookModalProps {
 }
 
 const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProps) => {
-  const { name, schema, table } = selectedHook ?? {}
+  const { name, schema } = selectedHook ?? {}
 
   const { project } = useProjectContext()
   const { mutate: deleteDatabaseTrigger, isLoading: isDeleting } = useDatabaseTriggerDeleteMutation(
@@ -28,12 +28,12 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
     if (!project) {
       return console.error('Project ref is required')
     }
-    if (!(name && schema && table)) {
+    if (!selectedHook) {
       return toast.error('Unable find selected hook')
     }
 
     deleteDatabaseTrigger({
-      id: { name, schema, table },
+      trigger: selectedHook,
       projectRef: project.ref,
       connectionString: project.connectionString,
     })

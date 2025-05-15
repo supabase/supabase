@@ -148,6 +148,7 @@ export function update(
   params: PGTriggerUpdate
 ): {
   sql: string
+  zod: z.ZodType<void>
 } {
   const qualifiedTableName = `${ident(id.schema)}.${ident(id.table)}`
 
@@ -178,6 +179,7 @@ export function update(
 
   return {
     sql,
+    zod: z.void(),
   }
 }
 

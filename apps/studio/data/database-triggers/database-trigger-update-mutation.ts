@@ -4,30 +4,33 @@ import pgMeta from '@supabase/pg-meta'
 import type { ResponseError } from 'types'
 import { databaseTriggerKeys } from './keys'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { PGTriggerUpdate } from '@supabase/pg-meta/src/pg-meta-triggers'
 
 export type DatabaseTriggerUpdateVariables = {
-  id: { name: string; schema: string; table: string }
+  originalTrigger: {
+    id: number
+    name: string
+    schema: string
+    table: string
+  }
   projectRef: string
   connectionString?: string | null
-  payload: {
-    name?: string
-    enabled_mode?: 'ORIGIN' | 'REPLICA' | 'ALWAYS' | 'DISABLED'
-  }
+  payload: PGTriggerUpdate
 }
 
 export async function updateDatabaseTrigger({
-  id,
+  originalTrigger,
   projectRef,
   connectionString,
   payload,
 }: DatabaseTriggerUpdateVariables) {
-  const { sql } = pgMeta.triggers.update(id, payload)
+  const { sql } = pgMeta.triggers.update(originalTrigger, payload)
 
   const { result } = await executeSql({
     projectRef,
     connectionString,
     sql,
-    queryKey: ['trigger', 'update'],
+    queryKey: ['trigger', 'update', originalTrigger.id],
   })
 
   return result
