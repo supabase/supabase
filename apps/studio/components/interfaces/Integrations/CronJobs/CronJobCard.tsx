@@ -78,10 +78,10 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
             <span
               className={cn(
                 'text-base',
-                job.jobname === null ? 'text-foreground-lighter' : 'text-foreground'
+                job.jobname ? 'text-foreground' : 'text-foreground-lighter'
               )}
             >
-              {job.jobname ?? 'No name provided'}
+              {job.jobname || 'No name provided'}
             </span>
             <div className="flex items-center gap-x-2">
               {isLoading ? (
