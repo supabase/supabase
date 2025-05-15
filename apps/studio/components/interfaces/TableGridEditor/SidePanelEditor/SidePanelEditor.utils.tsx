@@ -22,7 +22,10 @@ import { tableRowKeys } from 'data/table-rows/keys'
 import { tableKeys } from 'data/tables/keys'
 import { createTable as createTableMutation } from 'data/tables/table-create-mutation'
 import { deleteTable as deleteTableMutation } from 'data/tables/table-delete-mutation'
-import { updateTable as updateTableMutation } from 'data/tables/table-update-mutation'
+import {
+  UpdateTableBody,
+  updateTable as updateTableMutation,
+} from 'data/tables/table-update-mutation'
 import { getTables } from 'data/tables/tables-query'
 import { getTable } from 'data/tables/table-retrieve-query'
 import { timeout, tryParseJson } from 'lib/helpers'
@@ -658,7 +661,7 @@ export const updateTable = async ({
   connectionString?: string | null
   toastId: string | number
   table: PostgresTable
-  payload: any
+  payload: UpdateTableBody
   columns: ColumnField[]
   foreignKeyRelations: ForeignKey[]
   existingForeignKeyRelations: ForeignKeyConstraint[]
@@ -702,7 +705,12 @@ export const updateTable = async ({
     ),
     queryFn: ({ signal }) =>
       getTable(
-        { projectRef, connectionString, name: payload.name, schema: payload.schema },
+        {
+          projectRef,
+          connectionString,
+          name: payload.name ?? table.name,
+          schema: payload.schema ?? table.schema,
+        },
         signal
       ),
   })

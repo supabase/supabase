@@ -118,14 +118,12 @@ function retrieve(identifier: TableIdentifier): {
   }
 }
 
-type TableRemoveParams = { cascade: boolean }
-
 function remove(
   table: Pick<PGTable, 'name' | 'schema'>,
-  params?: TableRemoveParams
+  { cascade = false } = {}
 ): { sql: string } {
   const sql = `DROP TABLE ${ident(table.schema)}.${ident(table.name)} ${
-    params?.cascade ? 'CASCADE' : 'RESTRICT'
+    cascade ? 'CASCADE' : 'RESTRICT'
   };`
   return { sql }
 }
