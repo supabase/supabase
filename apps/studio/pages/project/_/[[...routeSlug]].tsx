@@ -3,14 +3,15 @@ import { AlertTriangleIcon, Boxes } from 'lucide-react'
 import { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Fragment, useMemo } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'common'
 import { ProjectList } from 'components/interfaces/Home/ProjectList'
+import HomePageActions from 'components/interfaces/HomePageActions'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { withAuth } from 'hooks/misc/withAuth'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
@@ -38,6 +39,12 @@ const Header = () => {
 const GenericProjectPage: NextPage = () => {
   const router = useRouter()
   const { routeSlug, ...queryParams } = router.query
+
+  const [search, setSearch] = useState('')
+  const [filterStatus, setFilterStatus] = useState<string[]>([
+    PROJECT_STATUS.ACTIVE_HEALTHY,
+    PROJECT_STATUS.INACTIVE,
+  ])
 
   const [lastVisitedOrgSlug] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
@@ -80,9 +87,16 @@ const GenericProjectPage: NextPage = () => {
       <div className="flex flex-col mx-auto w-full max-w-5xl">
         <h1 className="mt-8 text-2xl">Select a project to continue</h1>
         <div
-          className="flex-grow py-6 space-y-8 overflow-y-auto"
+          className="flex-grow flex flex-col py-6 gap-y-8 overflow-y-auto"
           style={{ maxHeight: 'calc(100vh - 49px - 64px)' }}
         >
+          <HomePageActions
+            hideNewProject
+            search={search}
+            setSearch={setSearch}
+            filterStatus={filterStatus}
+            setFilterStatus={setFilterStatus}
+          />
           {isLoadingOrganizations ? (
             <OrganizationLoadingState />
           ) : isErrorOrganizations ? (
@@ -97,6 +111,8 @@ const GenericProjectPage: NextPage = () => {
                     <Badge variant="default">Recently visited</Badge>
                   </h2>
                   <ProjectList
+                    search={search}
+                    filterStatus={filterStatus}
                     organization={lastVisitedOrganization}
                     rewriteHref={urlRewriterFactory(routeSlug)}
                   />
@@ -109,6 +125,8 @@ const GenericProjectPage: NextPage = () => {
                     {organization.name}
                   </h2>
                   <ProjectList
+                    search={search}
+                    filterStatus={filterStatus}
                     organization={organization}
                     rewriteHref={urlRewriterFactory(routeSlug)}
                   />
