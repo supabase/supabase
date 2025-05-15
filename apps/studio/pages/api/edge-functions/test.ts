@@ -22,7 +22,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     const { url, method, body: requestBody, headers: customHeaders } = req.body
 
     const regexValidEdgeFunctionURL = new RegExp(
-      'https://[a-z]*.supabase.(red|co)/functions/v[0-9]{1}/S*',
+      '^https://[a-z]*.supabase.(red|co)/functions/v[0-9]{1}/\S*$',
       'g'
     )
     const validEdgeFunctionURL = regexValidEdgeFunctionURL.test(url)
