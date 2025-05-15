@@ -19,7 +19,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   try {
+    console.log('post', req.body)
     const { url, method, body: requestBody, headers: customHeaders } = req.body
+
+    const regexValidEdgeFunctionURL = new RegExp(
+      'https://[a-z]*.supabase.(red|co)/functions/v[0-9]{1}/S*',
+      'g'
+    )
+    const validEdgeFunctionURL = regexValidEdgeFunctionURL.test(url)
+
+    if (!validEdgeFunctionURL) {
+      return res.status(400).json({
+        status: 400,
+        error: { message: 'Provided URL is not a valid Supabase edge function URL' },
+      })
+    }
 
     // Remove any undefined or null values from custom headers
     const sanitizedCustomHeaders = Object.entries(customHeaders || {}).reduce(
