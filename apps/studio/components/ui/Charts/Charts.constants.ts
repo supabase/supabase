@@ -10,7 +10,7 @@ export const CHART_COLORS = {
   RED_1: 'hsl(var(--destructive-default))',
   RED_2: 'hsl(var(--destructive-500))',
   REFERENCE_LINE: 'hsl(var(--foreground-muted))',
-  REFERENCE_LINE_TEXT: 'hsl(var(--foreground-lighter))',
+  REFERENCE_LINE_TEXT: 'hsl(var(--foreground-muted))',
 }
 
 const LIGHT_STACKED_CHART_COLORS = [

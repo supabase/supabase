@@ -248,7 +248,7 @@ export const getReportAttributesV2 = (orgPlan: any, project: any) => {
           attribute: 'pg_database_size_percent',
           provider: 'reference-line',
           isReferenceLine: true,
-          label: '90%',
+          label: '90% - Disk resize threshold',
           value: project?.volumeSizeGb * 1024 * 1024 * 1024 * 0.9, // 90% of the disk size will trigger a disk resize
         },
       ],
