@@ -6,7 +6,6 @@ import {
   wrapWithRoleImpersonation,
 } from './role-impersonation'
 
-// Test data builders
 const createBaseUser = (overrides = {}) => ({
   id: 'user123',
   email: 'test@example.com',
