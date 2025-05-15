@@ -64,7 +64,7 @@ function pgMetaGuard(request: Request) {
     // in such case, we save the hops and throw a 421 response instead
     if (!isValidConnString(request.headers.get('x-connection-encrypted'))) {
       throw new ResponseError(
-        'x-connection-encrypted header is required for /platform/pg-meta/ requests',
+        'API Error: happened while trying to acquire connection to the database',
         400,
         request.headers.get('X-Request-Id') ?? undefined
       )
