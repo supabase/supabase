@@ -1,15 +1,17 @@
+import { partition } from 'lodash'
 import { AlertTriangleIcon, Boxes } from 'lucide-react'
 import { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Fragment } from 'react'
+import { Fragment, useMemo } from 'react'
 
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'common'
 import { ProjectList } from 'components/interfaces/Home/ProjectList'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 const Header = () => {
@@ -37,8 +39,13 @@ const GenericProjectPage: NextPage = () => {
   const router = useRouter()
   const { routeSlug, ...queryParams } = router.query
 
+  const [lastVisitedOrgSlug] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
+
   const {
-    data: organizations,
+    data: organizations = [],
     isLoading: isLoadingOrganizations,
     isError: isErrorOrganizations,
   } = useOrganizationsQuery({
@@ -62,6 +69,11 @@ const GenericProjectPage: NextPage = () => {
     }
   }
 
+  const [[lastVisitedOrganization], otherOrganizations] = useMemo(
+    () => partition(organizations, (org) => org.slug === lastVisitedOrgSlug),
+    [lastVisitedOrgSlug, organizations]
+  )
+
   return (
     <>
       <Header />
@@ -76,19 +88,33 @@ const GenericProjectPage: NextPage = () => {
           ) : isErrorOrganizations ? (
             <OrganizationErrorState />
           ) : (
-            organizations.map((organization) => (
-              <Fragment key={organization.id}>
-                <h2 className="flex items-center gap-2">
-                  <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                  {organization.name}
-                </h2>
-                <ProjectList
-                  forOrganization={organization}
-                  rewriteHref={urlRewriterFactory(routeSlug)}
-                  search=""
-                />
-              </Fragment>
-            ))
+            <>
+              {!!lastVisitedOrganization && (
+                <>
+                  <h2 className="flex items-center gap-2">
+                    <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                    {lastVisitedOrganization.name}
+                    <Badge variant="default">Recently visited</Badge>
+                  </h2>
+                  <ProjectList
+                    organization={lastVisitedOrganization}
+                    rewriteHref={urlRewriterFactory(routeSlug)}
+                  />
+                </>
+              )}
+              {otherOrganizations.map((organization) => (
+                <Fragment key={organization.id}>
+                  <h2 className="flex items-center gap-2">
+                    <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                    {organization.name}
+                  </h2>
+                  <ProjectList
+                    organization={organization}
+                    rewriteHref={urlRewriterFactory(routeSlug)}
+                  />
+                </Fragment>
+              ))}
+            </>
           )}
         </div>
       </div>
