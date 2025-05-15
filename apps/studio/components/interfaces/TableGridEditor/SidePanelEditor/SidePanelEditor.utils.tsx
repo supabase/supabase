@@ -716,7 +716,7 @@ export const updateTable = async ({
       ),
   })
 
-  const originalColumns = table.columns ?? []
+  const originalColumns = updatedTable.columns ?? []
   const columnIds = columns.map((column) => column.id)
 
   // Delete any removed columns
