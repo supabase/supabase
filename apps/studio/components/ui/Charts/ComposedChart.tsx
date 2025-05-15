@@ -57,6 +57,7 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   hideYAxis?: boolean
   hideHighlightedValue?: boolean
   syncId?: string
+  docsUrl?: string
 }
 
 export default function ComposedChart({
@@ -92,6 +93,7 @@ export default function ComposedChart({
   hideYAxis,
   hideHighlightedValue,
   syncId,
+  docsUrl,
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
   const [_activePayload, setActivePayload] = useState<any>(null)
@@ -248,6 +250,7 @@ export default function ComposedChart({
         showMaxValue={_showMaxValue}
         setShowMaxValue={maxAttribute ? setShowMaxValue : undefined}
         hideHighlightedValue={hideHighlightedValue}
+        docsUrl={docsUrl}
       />
       <Container className="relative z-10">
         <RechartComposedChart

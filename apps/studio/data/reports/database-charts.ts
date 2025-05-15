@@ -160,6 +160,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       showMaxValue: true,
       YAxisProps: { width: 35, tickFormatter: (value: any) => numberFormatter(value, 2) },
       defaultChartStyle: 'line',
+      docsUrl: 'https://supabase.com/docs/guides/platform/compute-and-disk#compute-size',
       attributes: [
         {
           attribute: 'disk_iops_write',
@@ -223,6 +224,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       YAxisProps: { width: 65, tickFormatter: (value: any) => formatBytes(value, 1) },
       hideChartType: false,
       defaultChartStyle: 'line',
+      docsUrl: 'https://supabase.com/docs/guides/platform/database-size',
       attributes: [
         {
           attribute: 'pg_database_size',
@@ -238,7 +240,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
           tooltip: 'Disk Size refers to the total space your project occupies on disk',
           isMaxValue: true,
         },
-        isFreePlan &&
+        !isFreePlan &&
           (isSpendCapEnabled
             ? {
                 attribute: 'pg_database_size_percent_paid_spendCap',
@@ -312,6 +314,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       YAxisProps: { width: 30 },
       hideChartType: false,
       defaultChartStyle: 'line',
+      docsUrl: 'https://supabase.com/docs/guides/platform/compute-and-disk#limits-and-constraints',
       attributes: [
         {
           attribute: 'pg_stat_database_num_backends',
@@ -341,6 +344,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       YAxisProps: { width: 30 },
       hideChartType: false,
       defaultChartStyle: 'line',
+      docsUrl: 'https://supabase.com/docs/guides/platform/compute-and-disk#limits-and-constraints',
       attributes: [
         {
           attribute: 'client_connections_pgbouncer',

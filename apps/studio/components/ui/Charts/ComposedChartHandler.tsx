@@ -62,6 +62,7 @@ interface ComposedChartHandlerProps {
   updateDateRange: UpdateDateRange
   valuePrecision?: number
   isVisible?: boolean
+  docsUrl?: string
 }
 
 /**
