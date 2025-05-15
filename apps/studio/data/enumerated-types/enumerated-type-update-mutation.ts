@@ -1,10 +1,11 @@
+import { ident, literal } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
-import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import type { ResponseError } from 'types'
 import { enumeratedTypesKeys } from './keys'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type EnumeratedTypeUpdateVariables = {
   projectRef: string
@@ -25,7 +26,9 @@ export async function updateEnumeratedType({
 }: EnumeratedTypeUpdateVariables) {
   const statements: string[] = []
   if (name.original !== name.updated) {
-    statements.push(`alter type "${schema}"."${name.original}" rename to "${name.updated}";`)
+    statements.push(
+      `alter type ${ident(schema)}.${ident(name.original)} rename to ${ident(name.updated)}`
+    )
   }
   if (values.length > 0) {
     values.forEach((x, idx) => {
@@ -34,27 +37,27 @@ export async function updateEnumeratedType({
           // Consider if any new enums were added before any existing enums
           const firstExistingEnumValue = values.find((x) => !x.isNew)
           statements.push(
-            `alter type "${schema}"."${name.updated}" add value '${x.updated}' before '${firstExistingEnumValue?.original}';`
+            `alter type ${ident(schema)}.${ident(name.updated)} add value ${literal(x.updated)} before ${literal(firstExistingEnumValue?.original)}`
           )
         } else {
           statements.push(
-            `alter type "${schema}"."${name.updated}" add value '${x.updated}' after '${
-              values[idx - 1].updated
-            }';`
+            `alter type ${ident(schema)}.${ident(name.updated)} add value ${literal(x.updated)} after ${literal(values[idx - 1].updated)}`
           )
         }
       } else if (x.original !== x.updated) {
         statements.push(
-          `alter type "${schema}"."${name.updated}" rename value '${x.original}' to '${x.updated}';`
+          `alter type ${ident(schema)}.${ident(name.updated)} rename value ${literal(x.original)} to ${literal(x.updated)}`
         )
       }
     })
   }
   if (description !== undefined) {
-    statements.push(`comment on type "${schema}"."${name.updated}" is '${description}';`)
+    statements.push(
+      `comment on type ${ident(schema)}.${ident(name.updated)} is ${literal(description)}`
+    )
   }
 
-  const sql = wrapWithTransaction(statements.join(' '))
+  const sql = applyAndTrackMigrations(statements.join(';\n'), `update_type_${name}`)
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
 }

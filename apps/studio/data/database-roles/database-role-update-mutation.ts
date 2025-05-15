@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { invalidateRolesQuery } from './database-roles-query'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 type UpdateRoleBody = Parameters<typeof pgMeta.roles.update>[1]
 
@@ -21,13 +22,15 @@ export async function updateDatabaseRole({
   id,
   payload,
 }: DatabaseRoleUpdateVariables) {
-  const sql = pgMeta.roles.update({ id }, payload).sql
+  const { sql } = pgMeta.roles.update({ id }, payload)
+
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: applyAndTrackMigrations(sql, `update_role_${id}`),
     queryKey: ['roles', 'update'],
   })
+
   return result
 }
 

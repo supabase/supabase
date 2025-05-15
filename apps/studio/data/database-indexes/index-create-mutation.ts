@@ -1,9 +1,11 @@
+import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databaseIndexesKeys } from './keys'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type DatabaseIndexCreateVariables = {
   projectRef: string
@@ -21,19 +23,13 @@ export async function createDatabaseIndex({
   connectionString,
   payload,
 }: DatabaseIndexCreateVariables) {
-  const { schema, entity, type, columns } = payload
-
-  const sql = `
-  CREATE INDEX ON "${schema}"."${entity}" USING ${type} (${columns
-    .map((column) => `"${column}"`)
-    .join(', ')});
-  `.trim()
+  const { sql } = pgMeta.indexes.create(payload)
 
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
-    queryKey: ['indexes', schema],
+    sql: applyAndTrackMigrations(sql, `create_index_${payload.entity}`),
+    queryKey: ['indexes', 'create'],
   })
 
   return result

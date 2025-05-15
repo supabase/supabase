@@ -1,9 +1,11 @@
+import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databaseIndexesKeys } from './keys'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type DatabaseIndexDeleteVariables = {
   projectRef: string
@@ -16,12 +18,12 @@ export async function deleteDatabaseIndex({
   connectionString,
   name,
 }: DatabaseIndexDeleteVariables) {
-  const sql = `drop index if exists "${name}"`
+  const { sql } = pgMeta.indexes.remove(name)
 
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: applyAndTrackMigrations(sql, `delete_index_${name}`),
     queryKey: ['indexes'],
   })
 

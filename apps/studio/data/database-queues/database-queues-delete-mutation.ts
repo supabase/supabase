@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databaseQueuesKeys } from './keys'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type DatabaseQueueDeleteVariables = {
   projectRef: string
@@ -16,10 +17,12 @@ export async function deleteDatabaseQueue({
   connectionString,
   queueName,
 }: DatabaseQueueDeleteVariables) {
+  const sql = `select * from pgmq.drop_queue('${queueName}')`
+
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `select * from pgmq.drop_queue('${queueName}');`,
+    sql: applyAndTrackMigrations(sql, `delete_queue_${queueName}`),
     queryKey: databaseQueuesKeys.delete(queueName),
   })
 

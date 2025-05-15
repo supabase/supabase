@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databaseExtensionsKeys } from './keys'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type DatabaseExtensionEnableVariables = {
   projectRef: string
@@ -26,14 +27,15 @@ export async function enableDatabaseExtension({
   cascade = false,
   createSchema = false,
 }: DatabaseExtensionEnableVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
   const { sql } = pgMeta.extensions.create({ schema, name, version, cascade })
+
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: createSchema ? `create schema if not exists ${ident(schema)}; ${sql}` : sql,
+    sql: applyAndTrackMigrations(
+      createSchema ? `create schema if not exists ${ident(schema)}; ${sql}` : sql,
+      `enable_extension_${name}`
+    ),
     queryKey: ['extension', 'create'],
   })
 

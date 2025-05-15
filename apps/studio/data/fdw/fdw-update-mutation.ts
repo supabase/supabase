@@ -5,13 +5,13 @@ import type { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wr
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { foreignTableKeys } from 'data/foreign-tables/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { vaultSecretsKeys } from 'data/vault/keys'
 import type { ResponseError } from 'types'
 import { getCreateFDWSql } from './fdw-create-mutation'
 import { getDeleteFDWSql } from './fdw-delete-mutation'
 import { FDW } from './fdws-query'
 import { fdwKeys } from './keys'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type FDWUpdateVariables = {
   projectRef?: string
@@ -50,7 +50,10 @@ export async function updateFDW({
   formState,
   tables,
 }: FDWUpdateVariables) {
-  const sql = wrapWithTransaction(getUpdateFDWSql({ wrapper, wrapperMeta, formState, tables }))
+  const sql = applyAndTrackMigrations(
+    getUpdateFDWSql({ wrapper, wrapperMeta, formState, tables }),
+    `update_fdw_${wrapperMeta.name}`
+  )
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
 }

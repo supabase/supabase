@@ -1,4 +1,4 @@
-import { literal } from './pg-format'
+import { ident, literal } from './pg-format'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
 import { INDEXES_SQL } from './sql/indexes'
@@ -94,8 +94,29 @@ function retrieve({ id }: { id: number }): { sql: string; zod: typeof pgIndexOpt
   }
 }
 
+type IndexCreateParams = {
+  schema: string
+  entity: string
+  type: string
+  columns: string[]
+}
+
+function create({ schema, entity, type, columns }: IndexCreateParams): { sql: string } {
+  const sql = `CREATE INDEX ON ${ident(schema)}.${ident(entity)} USING ${type} (${columns
+    .map((column) => ident(column))
+    .join(', ')})`.trim()
+  return { sql }
+}
+
+function remove(name: string): { sql: string } {
+  const sql = `drop index if exists ${ident(name)}`
+  return { sql }
+}
+
 export default {
   list,
   retrieve,
+  create,
+  remove,
   zod: pgIndexZod,
 }

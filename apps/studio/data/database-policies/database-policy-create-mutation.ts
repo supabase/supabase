@@ -6,6 +6,7 @@ import type { components } from 'data/api'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databasePoliciesKeys } from './keys'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 type CreatePolicyBody = components['schemas']['CreatePolicyBody']
 
@@ -20,14 +21,12 @@ export async function createDatabasePolicy({
   connectionString,
   payload,
 }: DatabasePolicyCreateVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
   const { sql } = pgMeta.policies.create(payload)
+
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: applyAndTrackMigrations(sql, `create_policy_${payload.name}`),
     queryKey: ['policy', 'create'],
   })
 
