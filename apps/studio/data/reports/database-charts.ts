@@ -276,7 +276,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       showLegend: true,
       showMaxValue: false,
       showGrid: true,
-      YAxisProps: { width: 55, tickFormatter: (value: any) => formatBytes(value, 1) },
+      YAxisProps: { width: 65, tickFormatter: (value: any) => formatBytes(value, 1) },
       hideChartType: false,
       defaultChartStyle: 'line',
       hideHighlightedValue: true,
@@ -310,7 +310,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       showLegend: true,
       showMaxValue: true,
       showGrid: true,
-      YAxisProps: { width: 20 },
+      YAxisProps: { width: 30 },
       hideChartType: false,
       defaultChartStyle: 'line',
       attributes: [
@@ -318,7 +318,6 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
           attribute: 'pg_stat_database_num_backends',
           provider: 'infra-monitoring',
           label: 'Active connections',
-          // tooltip: 'Active connections',
         },
         {
           attribute: 'pg_database_max_connections',
