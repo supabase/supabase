@@ -11,7 +11,7 @@ import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
 import { useContentIdQuery } from 'data/content/content-id-query'
 import { useAppStateSnapshot } from 'state/app-state'
 import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { addTab, createTabId } from 'state/tabs'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
 const SqlEditor: NextPageWithLayout = () => {
@@ -20,6 +20,7 @@ const SqlEditor: NextPageWithLayout = () => {
 
   const appSnap = useAppStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const tabs = useTabsStateSnapshot()
 
   const allSnippets = useSnippets(ref!)
 
@@ -65,7 +66,7 @@ const SqlEditor: NextPageWithLayout = () => {
       const tabId = createTabId('sql', { id })
       const snippet = allSnippets.find((x) => x.id === id)
 
-      addTab(ref, {
+      tabs.addTab({
         id: tabId,
         type: 'sql',
         label: snippet?.name || 'Untitled Query',
