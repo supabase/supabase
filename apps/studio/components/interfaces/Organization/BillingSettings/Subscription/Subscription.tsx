@@ -14,7 +14,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Alert, Button } from 'ui'
+import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 import { Restriction } from '../Restriction'
@@ -92,53 +92,51 @@ const Subscription = () => {
                     </ProjectUpdateDisabledTooltip>
                     {!canChangeTier &&
                       (projectUpdateDisabled ? (
-                        <Alert
+                        <Admonition
                           className="mt-2"
-                          withIcon
-                          variant="info"
+                          type="default"
                           title={`Unable to update plan from ${planName}`}
                         >
                           We have temporarily disabled project and subscription changes - our
                           engineers are working on a fix.
-                        </Alert>
+                        </Admonition>
                       ) : (
-                        <Alert
-                          withIcon
+                        <Admonition
                           className="mt-2"
-                          variant="info"
+                          type="default"
                           title={`Unable to update plan from ${planName}`}
-                          actions={[
-                            <div key="contact-support">
-                              <Button asChild type="default">
-                                <Link
-                                  href={`/support/new?category=sales&subject=Change%20plan%20away%20from%20${planName}`}
-                                >
-                                  Contact support
-                                </Link>
-                              </Button>
-                            </div>,
-                          ]}
                         >
-                          Please contact us if you'd like to change your plan.
-                        </Alert>
+                          <p className="mb-2">
+                            Please contact us if you'd like to change your plan.
+                          </p>
+                          <div key="contact-support">
+                            <Button asChild type="default">
+                              <Link
+                                href={`/support/new?category=sales&subject=Change%20plan%20away%20from%20${planName}`}
+                              >
+                                Contact support
+                              </Link>
+                            </Button>
+                          </div>
+                        </Admonition>
                       ))}
+                    {!subscription?.usage_billing_enabled && (
+                      <Admonition
+                        className="mt-2"
+                        type="default"
+                        title="This organization is limited by the included usage"
+                      >
+                        <div className="[&>p]:!leading-normal prose text-sm">
+                          Projects may become unresponsive when this organization exceeds its{' '}
+                          <Link href={`/org/${slug}/usage`}>included usage quota</Link>. To scale
+                          seamlessly,{' '}
+                          {currentPlan?.id === 'free'
+                            ? 'upgrade to a paid plan.'
+                            : 'you can disable Spend Cap under the Cost Control settings.'}
+                        </div>
+                      </Admonition>
+                    )}
                   </div>
-
-                  {!subscription?.usage_billing_enabled && (
-                    <Admonition
-                      type="default"
-                      title="This organization is limited by the included usage"
-                    >
-                      <div className="[&>p]:!leading-normal prose text-sm">
-                        Projects may become unresponsive when this organization exceeds its{' '}
-                        <Link href={`/org/${slug}/usage`}>included usage quota</Link>. To scale
-                        seamlessly,{' '}
-                        {currentPlan?.id === 'free'
-                          ? 'upgrade to a paid plan.'
-                          : 'you can disable Spend Cap under the Cost Control settings.'}
-                      </div>
-                    </Admonition>
-                  )}
                 </div>
               )}
             </>
