@@ -1,3 +1,4 @@
+import { isValidEdgeFunctionURL } from 'lib/api/edgeFunctions'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -20,6 +21,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { url, method, body: requestBody, headers: customHeaders } = req.body
+
+    const validEdgeFnUrl = isValidEdgeFunctionURL(url)
+
+    if (!validEdgeFnUrl) {
+      return res.status(400).json({
+        status: 400,
+        error: { message: 'Provided URL is not a valid Supabase edge function URL' },
+      })
+    }
 
     // Remove any undefined or null values from custom headers
     const sanitizedCustomHeaders = Object.entries(customHeaders || {}).reduce(
