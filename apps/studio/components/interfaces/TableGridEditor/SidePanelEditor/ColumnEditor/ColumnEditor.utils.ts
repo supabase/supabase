@@ -127,7 +127,7 @@ export const generateUpdateColumnPayload = (
   const type = field.isArray ? `${field.format}[]` : field.format
   const comment = ((field.comment?.length ?? '') === 0 ? '' : field.comment)?.trim()
 
-  const check = field.check?.trim()
+  const check = field.check?.trim() ? field.check?.trim() : undefined
 
   const payload: Partial<UpdateColumnPayload> = {}
   // [Joshen] Trimming on the original name as well so we don't rename columns that already
