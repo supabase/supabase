@@ -2,6 +2,7 @@ import { openai } from '@ai-sdk/openai'
 import pgMeta from '@supabase/pg-meta'
 import { streamText } from 'ai'
 import { executeSql } from 'data/sql/execute-sql-query'
+import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getTools } from '../sql/tools'
 
@@ -9,7 +10,7 @@ export const maxDuration = 30
 const openAiKey = process.env.OPENAI_API_KEY
 const pgMetaSchemasList = pgMeta.schemas.list()
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!openAiKey) {
     return new Response(
       JSON.stringify({
@@ -150,3 +151,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     })
   }
 }
+
+const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
+  apiWrapper(req, res, handler, { withAuth: true })
+
+export default wrapper

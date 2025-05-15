@@ -406,7 +406,7 @@ function createStorageExplorerState({
         )
 
         // Add items to column
-        const formattedItems = formatFolderItems(data)
+        const formattedItems = formatFolderItems(data, prefix)
         state.columns = state.columns.map((col, idx) => {
           if (idx === index) {
             return {
@@ -475,7 +475,8 @@ function createStorageExplorerState({
       )
 
       const formattedFolders = foldersItems.map((folderItems, idx) => {
-        const formattedItems = formatFolderItems(folderItems)
+        const prefix = paths.slice(0, idx).join('/')
+        const formattedItems = formatFolderItems(folderItems, prefix)
         return {
           id: null,
           status: STORAGE_ROW_STATUS.READY,
