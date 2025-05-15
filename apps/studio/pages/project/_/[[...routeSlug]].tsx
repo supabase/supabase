@@ -1,10 +1,16 @@
+import { AlertTriangleIcon, Boxes } from 'lucide-react'
 import { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { Fragment } from 'react'
 
+import { IS_PLATFORM } from 'common'
 import { ProjectList } from 'components/interfaces/Home/ProjectList'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 const Header = () => {
   return (
@@ -30,6 +36,14 @@ const Header = () => {
 const GenericProjectPage: NextPage = () => {
   const router = useRouter()
   const { routeSlug, ...queryParams } = router.query
+
+  const {
+    data: organizations,
+    isLoading: isLoadingOrganizations,
+    isError: isErrorOrganizations,
+  } = useOrganizationsQuery({
+    enabled: IS_PLATFORM,
+  })
 
   const query = Object.keys(queryParams).length
     ? `?${new URLSearchParams(queryParams as Record<string, string>)}`
@@ -57,10 +71,48 @@ const GenericProjectPage: NextPage = () => {
           className="flex-grow py-6 space-y-8 overflow-y-auto"
           style={{ maxHeight: 'calc(100vh - 49px - 64px)' }}
         >
-          <ProjectList rewriteHref={urlRewriterFactory(routeSlug)} search="" />
+          {isLoadingOrganizations ? (
+            <OrganizationLoadingState />
+          ) : isErrorOrganizations ? (
+            <OrganizationErrorState />
+          ) : (
+            organizations.map((organization) => (
+              <Fragment key={organization.id}>
+                <h2 className="flex items-center gap-2">
+                  <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                  {organization.name}
+                </h2>
+                <ProjectList
+                  forOrganization={organization}
+                  rewriteHref={urlRewriterFactory(routeSlug)}
+                  search=""
+                />
+              </Fragment>
+            ))
+          )}
         </div>
       </div>
     </>
+  )
+}
+
+function OrganizationLoadingState() {
+  return (
+    <>
+      <ShimmeringLoader className="w-3/4" />
+      <ShimmeringLoader className="w-1/2" />
+      <ShimmeringLoader className="w-1/4" />
+    </>
+  )
+}
+
+function OrganizationErrorState() {
+  return (
+    <Alert_Shadcn_ variant="warning">
+      <AlertTriangleIcon />
+      <AlertTitle_Shadcn_>Failed to load your Supabase organizations</AlertTitle_Shadcn_>
+      <AlertDescription_Shadcn_>Try refreshing the page</AlertDescription_Shadcn_>
+    </Alert_Shadcn_>
   )
 }
 

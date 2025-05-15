@@ -25,7 +25,7 @@ import { getTables } from 'data/tables/tables-query'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { createTabId, updateTab } from 'state/tabs'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import type { Dictionary } from 'types'
 import { SonnerProgress } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -69,6 +69,7 @@ const SidePanelEditor = ({
 }: SidePanelEditorProps) => {
   const { ref } = useParams()
   const snap = useTableEditorStateSnapshot()
+  const tabsSnap = useTabsStateSnapshot()
   const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
 
@@ -246,7 +247,7 @@ const SidePanelEditor = ({
       : await updateColumn({
           projectRef: project?.ref!,
           connectionString: project?.connectionString,
-          id: columnId as string,
+          originalColumn: selectedColumnToEdit as PostgresColumn,
           payload: payload as UpdateColumnPayload,
           selectedTable,
           primaryKey,
@@ -494,7 +495,7 @@ const SidePanelEditor = ({
           if (isTableEditorTabsEnabled && ref && payload.name) {
             // [Joshen] Only table entities can be updated via the dashboard
             const tabId = createTabId(ENTITY_TYPE.TABLE, { id: selectedTable.id })
-            updateTab(ref, tabId, { label: payload.name })
+            tabsSnap.updateTab(tabId, { label: payload.name })
           }
           toast.success(`Successfully updated ${table.name}!`, { id: toastId })
         }
