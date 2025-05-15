@@ -183,10 +183,10 @@ export const cronPattern =
   /^(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)(\s+(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)){4}$/
 
 // detect seconds like "10 seconds" or normal cron syntax like "*/5 * * * *"
-export const secondsPattern = /^\d+\s+seconds$/
+export const secondsPattern = /^\d+\s+seconds*$/
 
 export function isSecondsFormat(schedule: string): boolean {
-  return secondsPattern.test(schedule.trim())
+  return secondsPattern.test(schedule.trim().toLocaleLowerCase())
 }
 
 export function getScheduleMessage(scheduleString: string) {

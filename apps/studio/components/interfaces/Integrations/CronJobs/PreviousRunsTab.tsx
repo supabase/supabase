@@ -225,7 +225,9 @@ export const PreviousRunsTab = () => {
               <p className="text-xs text-foreground-light">
                 {currentJobState?.schedule ? (
                   <>
-                    <span className="font-mono text-lg">{currentJobState.schedule}</span>
+                    <span className="font-mono text-lg">
+                      {currentJobState.schedule.toLocaleLowerCase()}
+                    </span>
                     <p>
                       {isSecondsFormat(currentJobState.schedule)
                         ? ''
