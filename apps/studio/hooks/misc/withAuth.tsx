@@ -1,10 +1,10 @@
 import { useRouter } from 'next/router'
-import { ComponentType, useEffect } from 'react'
+import { ComponentType, useCallback, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useAuthenticatorAssuranceLevelQuery } from 'data/profile/mfa-authenticator-assurance-level-query'
-import { useAuth } from 'lib/auth'
+import { useAuth, useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import { NextPageWithLayout, isNextPageWithLayout } from 'types'
 
@@ -46,26 +46,67 @@ export function withAuth<T>(
       },
     })
 
+    const signOut = useSignOut()
+
     const isLoggedIn = Boolean(session)
     const isFinishedLoading = !isLoading && !isAALLoading
+    const timeoutIdRef = useRef<NodeJS.Timeout | null>(null)
+
+    const redirectToSignIn = useCallback(() => {
+      let pathname = location.pathname
+      if (process.env.NEXT_PUBLIC_BASE_PATH) {
+        pathname = pathname.replace(process.env.NEXT_PUBLIC_BASE_PATH, '')
+      }
+
+      if (pathname === '/sign-in') {
+        // If the user is already on the sign in page, we don't need to redirect them
+        return
+      }
+
+      const searchParams = new URLSearchParams(location.search)
+      searchParams.set('returnTo', pathname)
+
+      // Sign out before redirecting to sign in page incase the user is stuck in a loading state
+      signOut().finally(() => {
+        router.push(`/sign-in?${searchParams.toString()}`)
+      })
+    }, [router, signOut])
 
     useEffect(() => {
-      const isCorrectLevel = options.useHighestAAL
-        ? aalData?.currentLevel === aalData?.nextLevel
-        : true
-
-      if (isFinishedLoading && (!isLoggedIn || !isCorrectLevel)) {
-        const searchParams = new URLSearchParams(location.search)
-        let pathname = location.pathname
-        if (process.env.NEXT_PUBLIC_BASE_PATH) {
-          pathname = pathname.replace(process.env.NEXT_PUBLIC_BASE_PATH, '')
+      if (!isFinishedLoading) {
+        timeoutIdRef.current = setTimeout(() => {
+          redirectToSignIn()
+        }, 10000) // 10 seconds timeout
+      } else {
+        if (timeoutIdRef.current) {
+          clearTimeout(timeoutIdRef.current)
+          timeoutIdRef.current = null
         }
-
-        searchParams.set('returnTo', pathname)
-
-        router.push(`/sign-in?${searchParams.toString()}`)
       }
-    }, [session, isLoading, router, aalData, isFinishedLoading, isLoggedIn])
+
+      return () => {
+        if (timeoutIdRef.current) {
+          clearTimeout(timeoutIdRef.current)
+        }
+      }
+    }, [isFinishedLoading, router, redirectToSignIn])
+
+    const isCorrectLevel = options.useHighestAAL
+      ? aalData?.currentLevel === aalData?.nextLevel
+      : true
+
+    const shouldRedirect = isFinishedLoading && (!isLoggedIn || !isCorrectLevel)
+
+    useEffect(() => {
+      if (shouldRedirect) {
+        // Clear the timeout if it's still active and we are redirecting
+        if (timeoutIdRef.current) {
+          clearTimeout(timeoutIdRef.current)
+          timeoutIdRef.current = null
+        }
+        redirectToSignIn()
+      }
+    }, [redirectToSignIn, shouldRedirect])
 
     const InnerComponent = WrappedComponent as any
 
