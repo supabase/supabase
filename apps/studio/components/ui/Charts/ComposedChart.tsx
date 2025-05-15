@@ -375,11 +375,9 @@ export default function ComposedChart({
               <ReferenceLine
                 key={line.attribute}
                 y={line.value}
-                strokeWidth={2}
-                isFront
-                opacity={0.5}
-                strokeDasharray={line.strokeDasharray ?? '3 3'}
+                strokeWidth={1}
                 {...line}
+                strokeDasharray={line.strokeDasharray ?? '3 3'}
                 label={undefined}
               >
                 <Label

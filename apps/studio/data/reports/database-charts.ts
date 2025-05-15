@@ -238,7 +238,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
           tooltip: 'Disk Size refers to the total space your project occupies on disk',
           isMaxValue: true,
         },
-        !isFreePlan &&
+        isFreePlan &&
           (isSpendCapEnabled
             ? {
                 attribute: 'pg_database_size_percent_paid_spendCap',
@@ -256,8 +256,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
                 provider: 'reference-line',
                 isReferenceLine: true,
                 label: '90% - Disk resize threshold',
-                opacity: 0.5,
-                className: '[&_line]:!stroke-brand',
+                className: '[&_line]:!stroke-yellow-800',
                 value:
                   (project?.volumeSizeGb || getRecommendedDbSize(computeSize)) *
                   1024 *
