@@ -37,6 +37,8 @@ import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 
 import type { NextPageWithLayout } from 'types'
+import { useOrganizationQuery } from '../../../../data/organizations/organization-query'
+import { useSelectedOrganization } from '../../../../hooks/misc/useSelectedOrganization'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -59,6 +61,9 @@ const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { project } = useProjectContext()
   const isReportsV2 = useFlag('reportsDatabaseV2')
+  const org = useSelectedOrganization()
+  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
+  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
   const state = useDatabaseSelectorStateSnapshot()
   const defaultStart = dayjs().subtract(1, 'day').toISOString()
@@ -92,28 +97,8 @@ const DatabaseUsage = () => {
     },
   })
 
-  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
-  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
-
   const REPORT_ATTRIBUTES = getReportAttributes(isFreePlan)
-  const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(orgPlan, project).map((attr) => {
-    if (attr.id === 'ram-usage') {
-      return {
-        ...attr,
-        attributes: attr.attributes.map((attribute) => {
-          if (attribute.attribute === 'ram_disk_size') {
-            return {
-              ...attribute,
-              customValue: currentDiskSize * 1024 * 1024 * 1024, // Convert GB to bytes
-            }
-          }
-          return attribute
-        }),
-      }
-    }
-
-    return attr
-  })
+  const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(org!, project!)
 
   const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
     onSuccess: (_, variables) => {

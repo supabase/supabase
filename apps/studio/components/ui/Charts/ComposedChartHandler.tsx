@@ -36,6 +36,8 @@ export type MultiAttribute = {
   id?: string
   value?: number
   isReferenceLine?: boolean
+  strokeDasharray?: string
+  className?: string
 }
 
 interface ComposedChartHandlerProps {
@@ -185,6 +187,7 @@ const ComposedChartHandler = ({
 
         // Add regular attributes
         attributes.forEach((attr, index) => {
+          if (!attr) return
           // Handle custom value attributes (like disk size)
           if (attr.customValue !== undefined) {
             point[attr.attribute] = attr.customValue
@@ -194,7 +197,7 @@ const ComposedChartHandler = ({
           // Skip reference line attributes here, we'll add them below
           if (attr.provider === 'reference-line') return
 
-          const queryData = attributeQueries[index].data?.data
+          const queryData = attributeQueries[index]?.data?.data
           const matchingPoint = queryData?.find((p: any) => p.period_start === timestamp)
           point[attr.attribute] = matchingPoint?.[attr.attribute] ?? 0
         })
@@ -315,12 +318,12 @@ const useAttributeQueries = (
   isVisible: boolean
 ) => {
   const infraAttributes = attributes
-    .filter((attr) => attr.provider === 'infra-monitoring')
+    .filter((attr) => attr?.provider === 'infra-monitoring')
     .map((attr) => attr.attribute as InfraMonitoringAttribute)
   const dailyStatsAttributes = attributes
-    .filter((attr) => attr.provider === 'daily-stats')
+    .filter((attr) => attr?.provider === 'daily-stats')
     .map((attr) => attr.attribute as ProjectDailyStatsAttribute)
-  const referenceLines = attributes.filter((attr) => attr.provider === 'reference-line')
+  const referenceLines = attributes.filter((attr) => attr?.provider === 'reference-line')
 
   const infraQueries = useInfraMonitoringQueries(
     infraAttributes,

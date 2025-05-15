@@ -173,9 +173,7 @@ export default function ComposedChart({
     chartHighlight?.coordinates.right &&
     chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
 
-  const referenceLines = attributes.filter((attribute) => attribute.provider === 'reference-line')
-
-  console.log(referenceLines)
+  const referenceLines = attributes.filter((attribute) => attribute?.provider === 'reference-line')
 
   const chartData =
     data && !!data[0]
@@ -323,13 +321,14 @@ export default function ComposedChart({
                 <Bar
                   key={attribute.name}
                   dataKey={attribute.name}
-                  stackId={attributes?.find((a) => a.attribute === attribute.name)?.stackId ?? '1'}
+                  stackId={attributes?.find((a) => a.attribute === attribute?.name)?.stackId ?? '1'}
                   fill={attribute.color}
-                  fillOpacity={hoveredLabel && hoveredLabel !== attribute.name ? 0.25 : 1}
+                  fillOpacity={hoveredLabel && hoveredLabel !== attribute?.name ? 0.25 : 1}
                   radius={0.75}
-                  opacity={hoveredLabel && hoveredLabel !== attribute.name ? 0.5 : 1}
+                  opacity={hoveredLabel && hoveredLabel !== attribute?.name ? 0.5 : 1}
                   name={
-                    attributes?.find((a) => a.attribute === attribute.name)?.label || attribute.name
+                    attributes?.find((a) => a.attribute === attribute?.name)?.label ||
+                    attribute?.name
                   }
                 />
               ))
@@ -366,7 +365,7 @@ export default function ComposedChart({
               dataKey={maxAttribute.attribute}
               stroke={CHART_COLORS.REFERENCE_LINE}
               strokeWidth={2}
-              strokeDasharray="3 3"
+              strokeDasharray={maxAttribute.strokeDasharray ?? '3 3'}
               dot={false}
               name={maxAttribute.label}
             />
@@ -377,11 +376,12 @@ export default function ComposedChart({
               <ReferenceLine
                 key={line.attribute}
                 y={line.value}
-                stroke={CHART_COLORS.RED_2}
-                strokeWidth={1}
+                strokeWidth={2}
+                isFront
                 opacity={0.5}
-                className="!text-brand"
-                strokeDasharray="3 3"
+                strokeDasharray={line.strokeDasharray ?? '3 3'}
+                {...line}
+                label={undefined}
               >
                 <Label
                   value={line.label}
