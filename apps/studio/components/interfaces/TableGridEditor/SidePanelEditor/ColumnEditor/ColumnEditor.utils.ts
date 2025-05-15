@@ -1,4 +1,4 @@
-import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresColumn } from '@supabase/postgres-meta'
 import { isEqual, isNull } from 'lodash'
 import type { Dictionary } from 'types'
 
@@ -11,6 +11,7 @@ import {
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from '../SidePanelEditor.types'
+import type { RetrievedTableColumn, RetrieveTableResult } from 'data/tables/table-retrieve-query'
 
 const isSQLExpression = (input: string) => {
   if (['CURRENT_DATE'].includes(input)) return true
@@ -54,7 +55,7 @@ export const generateColumnField = (field: any = {}): ColumnField => {
 
 export const generateColumnFieldFromPostgresColumn = (
   column: PostgresColumn,
-  table: PostgresTable,
+  table: RetrieveTableResult,
   foreignKeys: ForeignKeyConstraint[]
 ): ColumnField => {
   const { primary_keys } = table
@@ -84,7 +85,7 @@ export const generateColumnFieldFromPostgresColumn = (
 }
 
 export const generateCreateColumnPayload = (
-  table: PostgresTable,
+  table: RetrieveTableResult,
   field: ColumnField
 ): CreateColumnPayload => {
   const isIdentity = field.format.includes('int') ? field.isIdentity : false
@@ -114,8 +115,8 @@ export const generateCreateColumnPayload = (
 }
 
 export const generateUpdateColumnPayload = (
-  originalColumn: PostgresColumn,
-  table: PostgresTable,
+  originalColumn: RetrievedTableColumn,
+  table: RetrieveTableResult,
   field: ColumnField
 ): Partial<UpdateColumnPayload> => {
   const primaryKeyColumns = table.primary_keys.map((key) => key.name)
@@ -206,7 +207,7 @@ export const getForeignKeyUIState = (
 
 export const getColumnForeignKey = (
   column: PostgresColumn,
-  table: PostgresTable,
+  table: RetrieveTableResult,
   foreignKeys: ForeignKeyConstraint[]
 ) => {
   const { relationships } = table

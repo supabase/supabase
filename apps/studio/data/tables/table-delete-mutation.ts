@@ -28,7 +28,7 @@ export async function deleteTable({
 }: TableDeleteVariables) {
   const { sql } = pgMeta.tables.remove({ name, schema }, { cascade })
 
-  const { result } = await executeSql({
+  const { result } = await executeSql<void>({
     projectRef,
     connectionString,
     sql,

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { coalesceRowsToArray, exceptionIdentifierNotFound, filterByList } from './helpers'
+import { coalesceRowsToArray, filterByList } from './helpers'
 import { TABLES_SQL } from './sql/tables'
 import { COLUMNS_SQL } from './sql/columns'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
@@ -107,14 +107,14 @@ function list<T extends boolean | undefined = true>(
 
 function retrieve(identifier: TableIdentifier): {
   sql: string
-  zod: z.ZodType<PGTable | undefined>
+  zod: z.ZodType<TableWithColumns>
 } {
   let whereClause = getIdentifierWhereClause(identifier)
 
   const sql = `${generateEnrichedTablesSql({ includeColumns: true })} where ${whereClause};`
   return {
     sql,
-    zod: pgTableZod.optional(),
+    zod: pgTableZod,
   }
 }
 

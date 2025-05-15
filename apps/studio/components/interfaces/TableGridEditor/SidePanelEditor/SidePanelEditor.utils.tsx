@@ -1,4 +1,4 @@
-import type { PostgresColumn, PostgresPrimaryKey, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresPrimaryKey } from '@supabase/postgres-meta'
 import { chunk, find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
@@ -27,7 +27,11 @@ import {
   updateTable as updateTableMutation,
 } from 'data/tables/table-update-mutation'
 import { getTables } from 'data/tables/tables-query'
-import { getTable } from 'data/tables/table-retrieve-query'
+import {
+  getTable,
+  RetrievedTableColumn,
+  RetrieveTableResult,
+} from 'data/tables/table-retrieve-query'
 import { timeout, tryParseJson } from 'lib/helpers'
 import {
   generateCreateColumnPayload,
@@ -224,7 +228,7 @@ export const createColumn = async ({
   projectRef: string
   connectionString?: string | null
   payload: CreateColumnPayload
-  selectedTable: PostgresTable
+  selectedTable: RetrieveTableResult
   primaryKey?: Constraint
   foreignKeyRelations?: ForeignKey[]
   skipSuccessMessage?: boolean
@@ -300,9 +304,9 @@ export const updateColumn = async ({
 }: {
   projectRef: string
   connectionString?: string | null
-  originalColumn: PostgresColumn
+  originalColumn: RetrievedTableColumn
   payload: UpdateColumnPayload
-  selectedTable: PostgresTable
+  selectedTable: RetrieveTableResult
   primaryKey?: Constraint
   foreignKeyRelations?: ForeignKey[]
   existingForeignKeyRelations?: ForeignKeyConstraint[]
@@ -370,7 +374,7 @@ export const duplicateTable = async (
   connectionString: string | undefined | null,
   payload: { name: string; comment?: string },
   metadata: {
-    duplicateTable: PostgresTable
+    duplicateTable: RetrieveTableResult
     isRLSEnabled: boolean
     isDuplicateRows: boolean
     foreignKeyRelations: ForeignKey[]
@@ -661,7 +665,7 @@ export const updateTable = async ({
   projectRef: string
   connectionString?: string | null
   toastId: string | number
-  table: PostgresTable
+  table: RetrieveTableResult
   payload: UpdateTableBody
   columns: ColumnField[]
   foreignKeyRelations: ForeignKey[]
@@ -821,7 +825,7 @@ export const insertRowsViaSpreadsheet = async (
   projectRef: string,
   connectionString: string | undefined | null,
   file: any,
-  table: PostgresTable,
+  table: RetrieveTableResult,
   selectedHeaders: string[],
   onProgressUpdate: (progress: number) => void
 ) => {
@@ -882,7 +886,7 @@ export const insertRowsViaSpreadsheet = async (
 export const insertTableRows = async (
   projectRef: string,
   connectionString: string | undefined | null,
-  table: PostgresTable,
+  table: RetrieveTableResult,
   rows: any,
   selectedHeaders: string[],
   onProgressUpdate: (progress: number) => void

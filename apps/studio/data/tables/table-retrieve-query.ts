@@ -1,5 +1,4 @@
 import pgMeta from '@supabase/pg-meta'
-import { PostgresTable } from '@supabase/postgres-meta'
 import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
 
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -17,7 +16,7 @@ export async function getTable(
   { projectRef, connectionString, name, schema }: TablesVariables,
   signal?: AbortSignal
 ) {
-  const { sql } = pgMeta.tables.retrieve({ name, schema })
+  const { sql, zod } = pgMeta.tables.retrieve({ name, schema })
 
   const { result } = await executeSql(
     {
@@ -28,18 +27,21 @@ export async function getTable(
     },
     signal
   )
-
-  return result[0] as PostgresTable
+  return zod.parse(result[0])
 }
 
-export type TablesData = Awaited<ReturnType<typeof getTable>>
-export type TablesError = ResponseError
+export type RetrieveTableResult = Awaited<ReturnType<typeof getTable>>
+export type RetrieveTableError = ResponseError
+export type RetrievedTableColumn = NonNullable<RetrieveTableResult['columns']>[number]
 
-export const useTablesQuery = <TData = TablesData>(
+export const useTablesQuery = <TData = RetrieveTableResult>(
   { projectRef, connectionString, name, schema }: TablesVariables,
-  { enabled = true, ...options }: UseQueryOptions<TablesData, TablesError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseQueryOptions<RetrieveTableResult, RetrieveTableError, TData> = {}
 ) => {
-  return useQuery<TablesData, TablesError, TData>(
+  return useQuery<RetrieveTableResult, RetrieveTableError, TData>(
     tableKeys.retrieve(projectRef, name, schema),
     ({ signal }) => getTable({ projectRef, connectionString, name, schema }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }

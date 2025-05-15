@@ -19,7 +19,7 @@ export type TableCreateVariables = {
 export async function createTable({ projectRef, connectionString, payload }: TableCreateVariables) {
   const { sql } = pgMeta.tables.create(payload)
 
-  const { result } = await executeSql({
+  const { result } = await executeSql<void>({
     projectRef,
     connectionString,
     sql,
