@@ -50,6 +50,7 @@ import {
 import SpreadsheetImport from './SpreadsheetImport/SpreadsheetImport'
 import TableEditor from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
+import { RetrieveTableResult } from 'data/tables/table-retrieve-query'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -58,7 +59,7 @@ export interface SidePanelEditorProps {
 
   // Because the panel is shared between grid editor and database pages
   // Both require different responses upon success of these events
-  onTableCreated?: (table: PostgresTable) => void
+  onTableCreated?: (table: RetrieveTableResult) => void
 }
 
 const SidePanelEditor = ({
@@ -229,7 +230,7 @@ const SidePanelEditor = ({
     resolve: any
   ) => {
     const selectedColumnToEdit = snap.sidePanel?.type === 'column' && snap.sidePanel.column
-    const { columnId, primaryKey, foreignKeyRelations, existingForeignKeyRelations } = configuration
+    const { primaryKey, foreignKeyRelations, existingForeignKeyRelations } = configuration
 
     if (!project || selectedTable === undefined) {
       return console.error('no project or table selected')
@@ -313,7 +314,7 @@ const SidePanelEditor = ({
     })
   }
 
-  const updateTableRealtime = async (table: PostgresTable, enabled: boolean) => {
+  const updateTableRealtime = async (table: RetrieveTableResult, enabled: boolean) => {
     if (!project) return console.error('Project is required')
     const realtimePublication = publications?.find((pub) => pub.name === 'supabase_realtime')
 

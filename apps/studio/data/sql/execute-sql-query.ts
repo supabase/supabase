@@ -113,7 +113,7 @@ export async function executeSql<T = any>(
   return { result: data as T }
 }
 
-export type ExecuteSqlData = Awaited<ReturnType<typeof executeSql>>
+export type ExecuteSqlData = Awaited<ReturnType<typeof executeSql<any[]>>>
 export type ExecuteSqlError = ResponseError
 
 /**
