@@ -29,6 +29,7 @@ export const SqlRunButton = ({
       disabled={isDisabled}
       type="primary"
       size="tiny"
+      data-testid="sql-run-button"
       iconRight={
         isExecuting ? (
           <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
