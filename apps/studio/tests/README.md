@@ -60,6 +60,7 @@ test('mock is working', async () => {
 To render a component that uses Nuqs with some predefined query parameters, you can use `customRender` with the `nuqs` prop.
 
 ```ts
+
 customRender(<MyComponent />, {
   nuqs: {
     searchParams: {
