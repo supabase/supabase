@@ -213,7 +213,7 @@ function update(
     identity_generation?: 'BY DEFAULT' | 'ALWAYS'
     is_nullable?: boolean
     is_unique?: boolean
-    comment?: string
+    comment?: string | null
     check?: string | null
   }
 ): { sql: string } {

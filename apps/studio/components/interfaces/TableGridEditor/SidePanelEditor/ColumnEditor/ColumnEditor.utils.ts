@@ -125,9 +125,8 @@ export const generateUpdateColumnPayload = (
   // Only append the properties which are getting updated
   const name = field.name.trim()
   const type = field.isArray ? `${field.format}[]` : field.format
-  const comment = ((field.comment?.length ?? '') === 0 ? '' : field.comment)?.trim()
-
-  const check = field.check?.trim() ? field.check?.trim() : undefined
+  const comment = field.comment?.trim()
+  const check = field.check?.trim()
 
   const payload: Partial<UpdateColumnPayload> = {}
   // [Joshen] Trimming on the original name as well so we don't rename columns that already
@@ -136,10 +135,10 @@ export const generateUpdateColumnPayload = (
     payload.name = name
   }
   if (!isEqual(originalColumn.comment?.trim(), comment)) {
-    payload.comment = comment as string | undefined
+    payload.comment = comment || null
   }
   if (!isEqual(originalColumn.check?.trim(), check)) {
-    payload.check = check
+    payload.check = check || null
   }
 
   if (!isEqual(originalColumn.format, type)) {
@@ -149,9 +148,7 @@ export const generateUpdateColumnPayload = (
     const defaultValue = field.defaultValue
     payload.defaultValue = defaultValue as unknown as Record<string, never> | undefined
     payload.defaultValueFormat =
-      isNull(defaultValue) || isSQLExpression(defaultValue)
-        ? 'expression'
-        : ('literal' as 'expression' | 'literal')
+      isNull(defaultValue) || isSQLExpression(defaultValue) ? 'expression' : 'literal'
   }
   if (!isEqual(originalColumn.is_identity, field.isIdentity)) {
     payload.isIdentity = field.isIdentity
