@@ -22,6 +22,7 @@ export type StateSnippetFolder = {
 // [Joshen] API codegen is somehow missing the content property
 export interface SnippetWithContent extends Snippet {
   content?: SqlSnippets.Content
+  isNotSavedInDatabaseYet?: boolean
 }
 
 export type StateSnippet = {
@@ -304,6 +305,8 @@ async function upsertSnippet(
       ])
     }
 
+    let snippet = sqlEditorState.snippets[id]?.snippet
+    if (snippet?.content) snippet.isNotSavedInDatabaseYet = false
     sqlEditorState.savingStates[id] = 'IDLE'
   } catch (error) {
     sqlEditorState.savingStates[id] = 'UPDATING_FAILED'
