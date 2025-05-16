@@ -631,6 +631,7 @@ export const auth = {
           ],
         },
         { name: 'Anonymous Sign-Ins', url: '/guides/auth/auth-anonymous' },
+        { name: 'Web3 (Sign in with Solana)', url: '/guides/auth/auth-web3' },
         { name: 'Mobile Deep Linking', url: '/guides/auth/native-mobile-deep-linking' },
         {
           name: 'Identity Linking',
