@@ -26,7 +26,7 @@ function isDevGraphiQL(request: Request) {
   const referrer = request.headers.get('Referer')
   return (
     IS_DEV &&
-    origin.startsWith('http://localhost') &&
+    origin?.startsWith('http://localhost') &&
     referrer === `${origin}${BASE_PATH ?? ''}/graphiql`
   )
 }
