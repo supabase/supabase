@@ -23,6 +23,7 @@ const SqlEditor: NextPageWithLayout = () => {
   const tabs = useTabsStateSnapshot()
 
   const allSnippets = useSnippets(ref!)
+  const snippet = allSnippets.find((x) => x.id === id)
 
   // [Refactor] There's an unnecessary request getting triggered when we start typing while on /new
   // the URL ID gets updated and we attempt to fetch content for a snippet that's not been created yet
@@ -32,7 +33,9 @@ const SqlEditor: NextPageWithLayout = () => {
       // [Joshen] May need to investigate separately, but occasionally addSnippet doesnt exist in
       // the snapV2 valtio store for some reason hence why the added typeof check here
       retry: false,
-      enabled: Boolean(id !== 'new' && typeof snapV2.addSnippet === 'function'),
+      enabled: Boolean(
+        id !== 'new' && typeof snapV2.addSnippet === 'function' && !snippet?.isNotSavedInDatabaseYet
+      ),
     }
   )
 
