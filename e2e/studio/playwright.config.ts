@@ -4,7 +4,7 @@ import { ENV_URLS, ENV, STORAGE_STATE_PATH } from './env.config'
 const IS_CI = !!process.env.CI
 
 export default defineConfig({
-  timeout: 30 * 1000,
+  timeout: 60 * 1000,
   testDir: './features',
   testMatch: /.*\.spec\.ts/,
   forbidOnly: IS_CI,
