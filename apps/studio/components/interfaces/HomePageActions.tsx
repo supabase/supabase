@@ -17,6 +17,7 @@ import {
 interface HomePageActionsProps {
   search: string
   filterStatus: string[]
+  hideNewProject?: boolean
   setSearch: (value: string) => void
   setFilterStatus: (value: string[]) => void
 }
@@ -24,6 +25,7 @@ interface HomePageActionsProps {
 const HomePageActions = ({
   search,
   filterStatus,
+  hideNewProject = false,
   setSearch,
   setFilterStatus,
 }: HomePageActionsProps) => {
@@ -32,7 +34,7 @@ const HomePageActions = ({
 
   return (
     <div className="flex flex-col gap-2 md:gap-3 md:flex-row">
-      {projectCreationEnabled && (
+      {projectCreationEnabled && !hideNewProject && (
         <Button asChild type="primary">
           <Link href={`/new/${slug}`}>New project</Link>
         </Button>
