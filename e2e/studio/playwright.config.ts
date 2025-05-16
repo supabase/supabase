@@ -1,5 +1,5 @@
 import { defineConfig } from '@playwright/test'
-import { ENV_URLS, ENV, STORAGE_STATE_PATH, isEnvWithAuth } from './env.config'
+import { ENV_URLS, ENV, STORAGE_STATE_PATH } from './env.config'
 
 const IS_CI = !!process.env.CI
 
@@ -8,8 +8,7 @@ export default defineConfig({
   testDir: './features',
   testMatch: /.*\.spec\.ts/,
   forbidOnly: IS_CI,
-  retries: IS_CI ? 2 : 0,
-  workers: IS_CI ? 1 : undefined,
+  retries: 0,
   use: {
     baseURL: ENV_URLS[ENV],
     screenshot: 'off',
