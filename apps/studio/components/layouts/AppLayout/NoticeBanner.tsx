@@ -23,7 +23,7 @@ export const NoticeBanner = () => {
     <div className="flex items-center justify-center gap-x-4 bg py-0.5 border transition text-foreground border-default">
       <WarningIcon className="w-4 h-4" />
       <p className="text-sm">
-        Scheduled maintenance: May 16, 2025, 22:00-23:00 UTC (brief Dashboard/API downtime)
+        Brief Dashboard outage: May 16, 2025, 22:00–23:00 UTC (no impact to your apps)
       </p>
       <div className="flex items-center gap-x-1">
         <Button asChild type="link" iconRight={<ExternalLink size={14} />}>
