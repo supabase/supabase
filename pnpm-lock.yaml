@@ -467,8 +467,8 @@ importers:
         specifier: 4.5.0
         version: 4.5.0(encoding@0.1.13)(graphql-sock@1.0.1(graphql@16.10.0))(graphql@16.10.0)
       '@supabase/supa-mdx-lint':
-        specifier: 0.2.6-alpha
-        version: 0.2.6-alpha
+        specifier: 0.2.9-alpha
+        version: 0.2.9-alpha
       '@types/common-tags':
         specifier: ^1.8.4
         version: 1.8.4
@@ -6730,8 +6730,19 @@ packages:
     engines: {node: '>=10'}
     os: [darwin]
 
+  '@supabase/supa-mdx-lint-darwin@0.2.9-alpha':
+    resolution: {integrity: sha512-o2Yy7VdfGvzgy9jwDUt90u0ZWms9OECyC/BG+elZN3ShSsIUrK/Z/OMZVYrGnbGLfoFmYPcAuawIsqGvhc/iCg==}
+    engines: {node: '>=10'}
+    os: [darwin]
+
   '@supabase/supa-mdx-lint-linux-arm64@0.2.6-alpha':
     resolution: {integrity: sha512-y51H1VW4VIpsFB/ui8GEU1h15tPp9fL8p2NMDltNEUrjSYpH7hzbj+surxy/FA0JdXllpqNV+7UvDm/FIz/Klg==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [linux, freebsd]
+
+  '@supabase/supa-mdx-lint-linux-arm64@0.2.9-alpha':
+    resolution: {integrity: sha512-62spvawezXAr3u0tTVi+NfQEMXL6WG3+fZHh5y6ftIRb74m3AIBfnstltf4zf3PQ2U4mxIBbFK6FV5hXF8pRcA==}
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [linux, freebsd]
@@ -6742,8 +6753,20 @@ packages:
     cpu: [arm]
     os: [linux, freebsd]
 
+  '@supabase/supa-mdx-lint-linux-arm@0.2.9-alpha':
+    resolution: {integrity: sha512-AhrT5bYc/N46Dmn/4pgTYAQE2aPhVA5+XKAWYVFAxPjEw9x64Cf9Y4oGwt9i4gFrhxEBckNVuH7a8UWfg6legw==}
+    engines: {node: '>=10'}
+    cpu: [arm]
+    os: [linux, freebsd]
+
   '@supabase/supa-mdx-lint-linux-i686@0.2.6-alpha':
     resolution: {integrity: sha512-Vjcn3hGNsw4V9x6RpI9S75byeqlkHbkVNPtKihm4hof9hgaMoxEA+/EPX7f0L/1rnPR39dkV1rbBojoV/XBd6w==}
+    engines: {node: '>=10'}
+    cpu: [x86, ia32]
+    os: [linux, freebsd]
+
+  '@supabase/supa-mdx-lint-linux-i686@0.2.9-alpha':
+    resolution: {integrity: sha512-WGZksF2EFZqK5EJBQj7myvlZvKuw56DVxg+TWe8dvgPJFsy60NooUJJX/0Gij8i10bSGnP9hcrIUUinSBFrnKA==}
     engines: {node: '>=10'}
     cpu: [x86, ia32]
     os: [linux, freebsd]
@@ -6754,8 +6777,20 @@ packages:
     cpu: [x64]
     os: [linux, freebsd]
 
+  '@supabase/supa-mdx-lint-linux-x64@0.2.9-alpha':
+    resolution: {integrity: sha512-jN8G4D7T5zxq8/5sfriMO6PSxXmXTZxQKwUS2cX/+PV24Biln3STzdszxwA4ix6D3rrSaYc+AZ/rVkmZGLL9qg==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [linux, freebsd]
+
   '@supabase/supa-mdx-lint-win32-i686@0.2.6-alpha':
     resolution: {integrity: sha512-htjCjhElGSt9LTrtFHtN+iCsVHa4fZmVBBQPsO6Tqsubis00voFInKXkQGDsMkT9swOyEBCAaYe7XK3FEnYEXA==}
+    engines: {node: '>=10'}
+    cpu: [x86, ia32]
+    os: [win32]
+
+  '@supabase/supa-mdx-lint-win32-i686@0.2.9-alpha':
+    resolution: {integrity: sha512-uZ7orThD7stUGuenpNGCMUuIpmpJ6p7+D99aCWBqF9YfJX3jFX212Jaj3k0qxDaUFmMzX6MEbjHT+57ix1/0YA==}
     engines: {node: '>=10'}
     cpu: [x86, ia32]
     os: [win32]
@@ -6766,8 +6801,18 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@supabase/supa-mdx-lint-win32-x64@0.2.9-alpha':
+    resolution: {integrity: sha512-RWaywt2IzYUDXbAvqhwxN8Q7sAQMKCpZY8wVd5mBpmMBDtPp7FTYIjZV0erSYB+huUp9rc/hmN7HgI6GEZdviw==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [win32]
+
   '@supabase/supa-mdx-lint@0.2.6-alpha':
     resolution: {integrity: sha512-rfp+xsnTaQ/UB5LNNZEh6w00JxxkZMoZnjjIgb/TBvqr/E1DbWyLHSyWwMD8sBoC+LX8q20ym75GRAXhvxIONA==}
+    hasBin: true
+
+  '@supabase/supa-mdx-lint@0.2.9-alpha':
+    resolution: {integrity: sha512-+zQQkqjau6Mw1pRrqma5amniRNjp54oNq1S+8A/UcvwEuq2xBZk44qD8VYG79GaM6sX1LE1kTmeelC2MK5hMNA==}
     hasBin: true
 
   '@supabase/supabase-js@2.49.3':
@@ -21608,22 +21653,43 @@ snapshots:
   '@supabase/supa-mdx-lint-darwin@0.2.6-alpha':
     optional: true
 
+  '@supabase/supa-mdx-lint-darwin@0.2.9-alpha':
+    optional: true
+
   '@supabase/supa-mdx-lint-linux-arm64@0.2.6-alpha':
+    optional: true
+
+  '@supabase/supa-mdx-lint-linux-arm64@0.2.9-alpha':
     optional: true
 
   '@supabase/supa-mdx-lint-linux-arm@0.2.6-alpha':
     optional: true
 
+  '@supabase/supa-mdx-lint-linux-arm@0.2.9-alpha':
+    optional: true
+
   '@supabase/supa-mdx-lint-linux-i686@0.2.6-alpha':
+    optional: true
+
+  '@supabase/supa-mdx-lint-linux-i686@0.2.9-alpha':
     optional: true
 
   '@supabase/supa-mdx-lint-linux-x64@0.2.6-alpha':
     optional: true
 
+  '@supabase/supa-mdx-lint-linux-x64@0.2.9-alpha':
+    optional: true
+
   '@supabase/supa-mdx-lint-win32-i686@0.2.6-alpha':
     optional: true
 
+  '@supabase/supa-mdx-lint-win32-i686@0.2.9-alpha':
+    optional: true
+
   '@supabase/supa-mdx-lint-win32-x64@0.2.6-alpha':
+    optional: true
+
+  '@supabase/supa-mdx-lint-win32-x64@0.2.9-alpha':
     optional: true
 
   '@supabase/supa-mdx-lint@0.2.6-alpha':
@@ -21635,6 +21701,17 @@ snapshots:
       '@supabase/supa-mdx-lint-linux-x64': 0.2.6-alpha
       '@supabase/supa-mdx-lint-win32-i686': 0.2.6-alpha
       '@supabase/supa-mdx-lint-win32-x64': 0.2.6-alpha
+      node-pty: 1.0.0
+
+  '@supabase/supa-mdx-lint@0.2.9-alpha':
+    optionalDependencies:
+      '@supabase/supa-mdx-lint-darwin': 0.2.9-alpha
+      '@supabase/supa-mdx-lint-linux-arm': 0.2.9-alpha
+      '@supabase/supa-mdx-lint-linux-arm64': 0.2.9-alpha
+      '@supabase/supa-mdx-lint-linux-i686': 0.2.9-alpha
+      '@supabase/supa-mdx-lint-linux-x64': 0.2.9-alpha
+      '@supabase/supa-mdx-lint-win32-i686': 0.2.9-alpha
+      '@supabase/supa-mdx-lint-win32-x64': 0.2.9-alpha
       node-pty: 1.0.0
 
   '@supabase/supabase-js@2.49.3':
