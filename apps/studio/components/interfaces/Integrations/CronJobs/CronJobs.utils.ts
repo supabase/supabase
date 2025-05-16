@@ -85,7 +85,22 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
       }
     }
 
-    if (url.includes(`${projectRef}.supabase.`) && url.includes('/functions/v1/')) {
+    // If there's a search param or hash in the edge function URL, let it be handled by the HTTP Request case.
+    // Otherwise, the params/hash may be lost during editing of the cron job.
+    let searchParams = ''
+    let urlHash = ''
+    try {
+      const urlObject = new URL(url)
+      searchParams = urlObject.search
+      urlHash = urlObject.hash
+    } catch {}
+
+    if (
+      url.includes(`${projectRef}.supabase.`) &&
+      url.includes('/functions/v1/') &&
+      searchParams.length === 0 &&
+      urlHash.length === 0
+    ) {
       return {
         type: 'edge_function',
         method: method === 'http_get' ? 'GET' : 'POST',
@@ -168,10 +183,10 @@ export const cronPattern =
   /^(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)(\s+(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)){4}$/
 
 // detect seconds like "10 seconds" or normal cron syntax like "*/5 * * * *"
-export const secondsPattern = /^\d+\s+seconds$/
+export const secondsPattern = /^\d+\s+seconds*$/
 
 export function isSecondsFormat(schedule: string): boolean {
-  return secondsPattern.test(schedule.trim())
+  return secondsPattern.test(schedule.trim().toLocaleLowerCase())
 }
 
 export function getScheduleMessage(scheduleString: string) {
@@ -230,11 +245,11 @@ export const getNextRun = (schedule: string, lastRun?: string) => {
       return undefined
     }
   } else {
-    // [Joshen] Only going to attempt to parse if the schedule is as simple as "n seconds", "n minutes", or "n days"
+    // [Joshen] Only going to attempt to parse if the schedule is as simple as "n second" or "n seconds"
     // Returned undefined otherwise - we can revisit this perhaps if we get feedback about this
-    const [value, unit] = schedule.split(' ')
+    const [value, unit] = schedule.toLocaleLowerCase().split(' ')
     if (
-      ['seconds', 'minutes', 'days'].includes(unit) &&
+      ['second', 'seconds'].includes(unit) &&
       !Number.isNaN(Number(value)) &&
       lastRun !== undefined
     ) {
