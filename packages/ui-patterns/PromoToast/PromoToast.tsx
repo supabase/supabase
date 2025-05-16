@@ -1,11 +1,11 @@
 'use client'
 
 // import Image from 'next/image'
+import { hasConsented, LOCAL_STORAGE_KEYS } from 'common'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { cn } from 'ui/src/lib/utils/cn'
 import { Button } from 'ui/src/components/Button/Button'
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { cn } from 'ui/src/lib/utils/cn'
 // import { useTheme } from 'next-themes'
 import announcement from '../Banners/data.json'
 import './styles.css'
@@ -16,8 +16,7 @@ const PromoToast = () => {
 
   useEffect(() => {
     const shouldHide =
-      !localStorage?.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT) ||
-      localStorage?.getItem(LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST) === 'true'
+      !hasConsented() || localStorage?.getItem(LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST) === 'true'
 
     if (!shouldHide) {
       setVisible(true)

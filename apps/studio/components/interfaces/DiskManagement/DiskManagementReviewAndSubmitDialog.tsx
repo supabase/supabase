@@ -116,7 +116,9 @@ const TableDataRow = ({
           free={upgradeIncluded}
         />
       ) : (
-        <span className="text-xs font-mono">{formatCurrency(beforePrice)}</span>
+        <span className="text-xs font-mono" translate="no">
+          {formatCurrency(beforePrice)}
+        </span>
       )}
     </TableCell>
   </TableRow>

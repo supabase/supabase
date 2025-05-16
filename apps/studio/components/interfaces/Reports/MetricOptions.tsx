@@ -6,7 +6,7 @@ import { useParams } from 'common'
 import { useContentQuery } from 'data/content/content-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Metric, METRIC_CATEGORIES, METRICS } from 'lib/constants/metrics'
 import { Dashboards } from 'types'
 import {
@@ -39,7 +39,7 @@ interface MetricOptionsProps {
 
 export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsProps) => {
   const { ref: projectRef } = useParams()
-  const supportSQLBlocks = useFlag('reportsV2')
+  const selectedOrganization = useSelectedOrganization()
   const [search, setSearch] = useState('')
 
   const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
@@ -96,66 +96,68 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
           </DropdownMenuSub>
         )
       })}
-      {supportSQLBlocks && (
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger className="space-x-2">
-            <SQL_ICON
-              size={14}
-              strokeWidth={1.5}
-              className="fill-foreground-light w-5 h-4 shrink-0 grow-0 -ml-0.5"
-            />
-            <p>SQL Snippets</p>
-          </DropdownMenuSubTrigger>
-          <DropdownMenuPortal>
-            <DropdownMenuSubContent className="p-0">
-              <Command_Shadcn_ shouldFilter={false}>
-                <CommandInput_Shadcn_
-                  autoFocus
-                  placeholder="Search snippets..."
-                  value={search}
-                  onValueChange={setSearch}
-                />
-                <CommandList_Shadcn_>
-                  {isLoading ? (
-                    <div className="flex flex-col p-1 gap-y-1">
-                      <ShimmeringLoader />
-                      <ShimmeringLoader className="w-3/4" />
-                    </div>
-                  ) : (
-                    <CommandEmpty_Shadcn_>No snippets found</CommandEmpty_Shadcn_>
-                  )}
-                  <CommandGroup_Shadcn_>
-                    {snippets?.map((snippet) => (
-                      <CommandItem_Shadcn_
-                        key={snippet.id}
-                        value={snippet.id}
-                        className="cursor-pointer"
-                        onSelect={() => {
-                          if (!config?.layout.find((x) => x.id === snippet.id)) {
-                            handleChartSelection({
-                              metric: {
-                                id: snippet.id,
-                                key: `snippet_${snippet.id}`,
-                                label: snippet.name,
-                              },
-                              isAddingChart: true,
-                            })
-                            sendEvent({
-                              action: 'custom_report_add_sql_block_clicked',
-                            })
-                          }
-                        }}
-                      >
-                        {snippet.name}
-                      </CommandItem_Shadcn_>
-                    ))}
-                  </CommandGroup_Shadcn_>
-                </CommandList_Shadcn_>
-              </Command_Shadcn_>
-            </DropdownMenuSubContent>
-          </DropdownMenuPortal>
-        </DropdownMenuSub>
-      )}
+      <DropdownMenuSub>
+        <DropdownMenuSubTrigger className="space-x-2">
+          <SQL_ICON
+            size={14}
+            strokeWidth={1.5}
+            className="fill-foreground-light w-5 h-4 shrink-0 grow-0 -ml-0.5"
+          />
+          <p>SQL Snippets</p>
+        </DropdownMenuSubTrigger>
+        <DropdownMenuPortal>
+          <DropdownMenuSubContent className="p-0">
+            <Command_Shadcn_ shouldFilter={false}>
+              <CommandInput_Shadcn_
+                autoFocus
+                placeholder="Search snippets..."
+                value={search}
+                onValueChange={setSearch}
+              />
+              <CommandList_Shadcn_>
+                {isLoading ? (
+                  <div className="flex flex-col p-1 gap-y-1">
+                    <ShimmeringLoader />
+                    <ShimmeringLoader className="w-3/4" />
+                  </div>
+                ) : (
+                  <CommandEmpty_Shadcn_>No snippets found</CommandEmpty_Shadcn_>
+                )}
+                <CommandGroup_Shadcn_>
+                  {snippets?.map((snippet) => (
+                    <CommandItem_Shadcn_
+                      key={snippet.id}
+                      value={snippet.id}
+                      className="cursor-pointer"
+                      onSelect={() => {
+                        if (!config?.layout.find((x) => x.id === snippet.id)) {
+                          handleChartSelection({
+                            metric: {
+                              id: snippet.id,
+                              key: `snippet_${snippet.id}`,
+                              label: snippet.name,
+                            },
+                            isAddingChart: true,
+                          })
+                          sendEvent({
+                            action: 'custom_report_add_sql_block_clicked',
+                            groups: {
+                              project: projectRef ?? 'Unknown',
+                              organization: selectedOrganization?.slug ?? 'Unknown',
+                            },
+                          })
+                        }
+                      }}
+                    >
+                      {snippet.name}
+                    </CommandItem_Shadcn_>
+                  ))}
+                </CommandGroup_Shadcn_>
+              </CommandList_Shadcn_>
+            </Command_Shadcn_>
+          </DropdownMenuSubContent>
+        </DropdownMenuPortal>
+      </DropdownMenuSub>
     </>
   )
 }

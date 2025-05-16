@@ -1,7 +1,7 @@
 import { bedrock } from '@ai-sdk/amazon-bedrock'
-import { streamText } from 'ai'
+import { streamText, tool } from 'ai'
+import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { tool } from 'ai'
 import { z } from 'zod'
 
 const awsAccessKeyId = process.env.AWS_ACCESS_KEY_ID
@@ -46,7 +46,7 @@ const getTools = () => {
   }
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!awsAccessKeyId) {
     return res.status(400).json({
       error: 'No AWS_ACCESS_KEY_ID set. Create this environment variable to use AI features.',
@@ -63,6 +63,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
+
+const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
+  apiWrapper(req, res, handler, { withAuth: true })
+
+export default wrapper
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { messages } = req.body

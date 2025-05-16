@@ -3,6 +3,7 @@ import { bedrock } from '@ai-sdk/amazon-bedrock'
 import pgMeta from '@supabase/pg-meta'
 import { streamText } from 'ai'
 import { executeSql } from 'data/sql/execute-sql-query'
+import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getTools } from '../sql/tools'
 
@@ -10,7 +11,7 @@ export const maxDuration = 30
 const awsAccessKeyId = process.env.AWS_ACCESS_KEY_ID
 const pgMetaSchemasList = pgMeta.schemas.list()
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!awsAccessKeyId) {
     return new Response(
       JSON.stringify({
@@ -35,6 +36,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       )
   }
 }
+
+const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
+  apiWrapper(req, res, handler, { withAuth: true })
+
+export default wrapper
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   try {

@@ -1,10 +1,8 @@
-import Panel from 'components/ui/Panel'
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Admonition } from 'ui-patterns'
-import DeleteOrganizationButton from './DeleteOrganizationButton'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
-import { Card, CardContent } from 'ui'
+import { DeleteOrganizationButton } from './DeleteOrganizationButton'
 
 const OrganizationDeletePanel = () => {
   const selectedOrganization = useSelectedOrganization()

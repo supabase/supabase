@@ -1,12 +1,14 @@
 import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock'
 import { fromNodeProviderChain } from '@aws-sdk/credential-providers'
 import pgMeta from '@supabase/pg-meta'
-import { streamText, tool, type Tool } from 'ai'
 import crypto from 'crypto'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
+
+import { streamText, tool, type Tool } from 'ai'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import apiWrapper from 'lib/api/apiWrapper'
 import { createSupabaseMCPClient } from './supabase-mcp'
 
 export const maxDuration = 30
@@ -29,7 +31,7 @@ async function hasAwsCredentials() {
 
 const hasCredentials = await hasAwsCredentials()
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
 
   if (!process.env.AWS_REGION) {
@@ -53,6 +55,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
+
+const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
+  apiWrapper(req, res, handler, { withAuth: true })
+
+export default wrapper
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { messages, projectRef, connectionString, aiOptInLevel, schema, table } = req.body as {

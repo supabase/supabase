@@ -167,9 +167,14 @@ export const QueryBlock = ({
     onSuccess: (data) => {
       onResults?.(data.result)
       setQueryResult(data.result)
+
+      setReadOnlyError(false)
+      setQueryError(undefined)
     },
     onError: (error) => {
-      if (error?.message.includes('permission denied')) {
+      const permissionDenied = error.message.includes('permission denied')
+      const notOwner = error.message.includes('must be owner')
+      if (permissionDenied || notOwner) {
         setReadOnlyError(true)
         if (showRunButtonIfNotReadOnly) setShowWarning('hasWriteOperation')
       } else {

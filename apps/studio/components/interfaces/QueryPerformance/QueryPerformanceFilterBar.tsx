@@ -2,14 +2,13 @@ import { ArrowDown, ArrowUp, RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import {
   Button,
   DropdownMenu,
@@ -35,6 +34,7 @@ export const QueryPerformanceFilterBar = ({
     LOCAL_STORAGE_KEYS.QUERY_PERF_SHOW_BOTTOM_SECTION,
     true
   )
+
   const defaultSearchQueryValue = router.query.search ? String(router.query.search) : ''
   const defaultFilterRoles = router.query.roles ? (router.query.roles as string[]) : []
   const defaultSortByValue = router.query.sort
@@ -48,7 +48,7 @@ export const QueryPerformanceFilterBar = ({
   })
   // [Joshen] This is for the old UI, can deprecated after
   const [sortByValue, setSortByValue] = useState<QueryPerformanceSort>(
-    defaultSortByValue ?? { column: 'prop_total_time', order: 'desc' }
+    defaultSortByValue ?? { column: 'total_time', order: 'desc' }
   )
 
   const { isLoading, isRefetching } = queryPerformanceQuery
@@ -84,8 +84,8 @@ export const QueryPerformanceFilterBar = ({
   }
 
   const onSortChange = (order: 'asc' | 'desc') => {
-    setSortByValue({ column: 'prop_total_time', order })
-    router.push({ ...router, query: { ...router.query, sort: 'prop_total_time', order } })
+    setSortByValue({ column: 'total_time', order })
+    router.push({ ...router, query: { ...router.query, sort: 'total_time', order } })
   }
 
   return (
@@ -101,9 +101,11 @@ export const QueryPerformanceFilterBar = ({
             activeOptions={isLoadingRoles ? [] : filters.roles}
             onSaveFilters={onFilterRolesChange}
           />
+
           <TextSearchPopover name="Query" value={searchInputVal} onSaveText={onSearchQueryChange} />
 
           <div className="border-r border-strong h-6" />
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button icon={sortByValue?.order === 'desc' ? <ArrowDown /> : <ArrowUp />}>

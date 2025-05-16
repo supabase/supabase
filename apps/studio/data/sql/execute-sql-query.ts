@@ -12,7 +12,7 @@ import { sqlKeys } from './keys'
 
 export type ExecuteSqlVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   sql: string
   queryKey?: QueryKey
   handleError?: (error: ResponseError) => { result: any }

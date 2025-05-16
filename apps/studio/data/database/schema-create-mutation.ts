@@ -9,7 +9,7 @@ import { invalidateSchemasQuery } from './schemas-query'
 export type SchemaCreateVariables = {
   name: string
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function createSchema({ name, projectRef, connectionString }: SchemaCreateVariables) {

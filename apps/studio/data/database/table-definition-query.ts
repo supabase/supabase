@@ -35,7 +35,7 @@ const getTableDefinitionSql = ({ id }: GetTableDefinitionArgs) => {
 
 export type TableDefinitionVariables = GetTableDefinitionArgs & {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getTableDefinition(
