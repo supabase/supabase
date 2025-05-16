@@ -5565,6 +5565,7 @@ export interface components {
       EXTERNAL_TWITTER_CLIENT_ID: string
       EXTERNAL_TWITTER_ENABLED: boolean
       EXTERNAL_TWITTER_SECRET: string
+      EXTERNAL_WEB3_SOLANA_ENABLED: boolean
       EXTERNAL_WORKOS_CLIENT_ID: string
       EXTERNAL_WORKOS_ENABLED: boolean
       EXTERNAL_WORKOS_SECRET: string
@@ -16400,25 +16401,30 @@ export interface operations {
           | 'cpu_usage_busy_irqs'
           | 'cpu_usage_busy_other'
           | 'cpu_usage_busy_idle'
-          | 'client_connections_pgbouncer'
           | 'max_cpu_usage'
           | 'avg_cpu_usage'
           | 'disk_io_budget'
           | 'disk_io_consumption'
+          | 'disk_io_usage'
           | 'disk_iops_read'
           | 'disk_iops_write'
           | 'disk_bytes_read'
           | 'disk_bytes_written'
+          | 'pg_database_size'
           | 'ram_usage'
           | 'ram_usage_total'
+          | 'ram_usage_available'
           | 'ram_usage_used'
           | 'ram_usage_free'
           | 'ram_usage_cache_and_buffers'
           | 'ram_usage_swap'
           | 'swap_usage'
+          | 'client_connections_pgbouncer'
           | 'physical_replication_lag_physical_replica_lag_seconds'
           | 'pg_stat_database_num_backends'
           | 'supavisor_connections_active'
+          | 'network_receive_bytes'
+          | 'network_transmit_bytes'
           | 'pgbouncer_pools_client_active_connections'
         databaseIdentifier?: string
         endDate: string
