@@ -689,8 +689,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/config
       configcat-js:
-        specifier: ^7.0.0
-        version: 7.0.1
+        specifier: ^9.5.1
+        version: 9.5.1
       cron-parser:
         specifier: ^4.9.0
         version: 4.9.0
@@ -8579,11 +8579,11 @@ packages:
   confbox@0.2.1:
     resolution: {integrity: sha512-hkT3yDPFbs95mNCy1+7qNKC6Pro+/ibzYxtM2iqEigpf0sVw+bg4Zh9/snjsBcf990vfIsg5+1U7VyiyBb3etg==}
 
-  configcat-common@7.0.1:
-    resolution: {integrity: sha512-9SxX4/6NzK1l+2iDWLyr/0tsli/eKzSJhBIepptF+GPy/7CprnA0coQz8fF8Gx1IF3wBZsJg0vRaC3LtNa0vRg==}
+  configcat-common@9.3.1:
+    resolution: {integrity: sha512-yVkIbluksD/kZfVyKjLIOpwLrq3/ZRM7Lwrsz89JmbpQ6VtbnelrTQynSPElTtKjrPRZx56v3IZYk3nWTnnM6A==}
 
-  configcat-js@7.0.1:
-    resolution: {integrity: sha512-Tf/YoN0f3mz4NjlJCL04Y4gOvTw1jyAZMNDir2vzF30IUGcvS1GVLCPLbbgnnLAyZgFRx7Sl0iylt17D1DC9uQ==}
+  configcat-js@9.5.1:
+    resolution: {integrity: sha512-M7ZPMtS+wCJLsFwcMkXa/ka+r/uEbN5MYS1FEnnlM2cohvpR2vpvvSMe0fuhc83HDgXJari08LyRXay0k0S80g==}
 
   consola@3.4.2:
     resolution: {integrity: sha512-5IKcdX0nnYavi6G7TtOhwkYzyjfJlatbjMjuLSfE2kYT5pMDOilZ4OvMhi637CcDICTmz3wARPoyhqyX1Y+XvA==}
@@ -24247,14 +24247,14 @@ snapshots:
 
   confbox@0.2.1: {}
 
-  configcat-common@7.0.1:
+  configcat-common@9.3.1:
     dependencies:
       tslib: 2.8.1
 
-  configcat-js@7.0.1:
+  configcat-js@9.5.1:
     dependencies:
-      configcat-common: 7.0.1
-      tslib: 2.6.2
+      configcat-common: 9.3.1
+      tslib: 2.8.1
 
   consola@3.4.2: {}
 
