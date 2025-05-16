@@ -32,14 +32,10 @@ export const EditorBaseLayout = ({ children, title, product, ...props }: Explore
   const tableEditorTabsEnabled = editor === 'table' && isTableEditorTabsEnabled
   const sqlEditorTabsEnabled = editor === 'sql' && isSQLEditorTabsEnabled
 
-  const openTabs =
-    editor === 'sql'
-      ? tabs.openTabs.filter((x) => x.startsWith('sql'))
-      : tabs.openTabs.filter((x) => !x.startsWith('sql'))
+  const hasNoOpenTabs =
+    editor === 'table' ? tabs.openTabs.filter((x) => !x.startsWith('sql')).length === 0 : false
   const hideTabs =
-    pathname === `/project/${ref}/editor` ||
-    pathname === `/project/${ref}/sql` ||
-    openTabs.length === 0
+    pathname === `/project/${ref}/editor` || pathname === `/project/${ref}/sql` || hasNoOpenTabs
 
   return (
     <ProjectLayoutWithAuth resizableSidebar title={title} product={product} {...props}>

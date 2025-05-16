@@ -134,6 +134,17 @@ export const TableGridEditor = ({
                   >
                     Close tab
                   </Button>
+                ) : tabs.openTabs.length > 0 ? (
+                  <Button
+                    asChild
+                    type="default"
+                    className="mt-2"
+                    onClick={() => appSnap.setDashboardHistory(projectRef, 'editor', undefined)}
+                  >
+                    <Link href={`/project/${projectRef}/editor/${tabs.openTabs[0].split('-')[1]}`}>
+                      Close tab
+                    </Link>
+                  </Button>
                 ) : (
                   <Button
                     asChild
