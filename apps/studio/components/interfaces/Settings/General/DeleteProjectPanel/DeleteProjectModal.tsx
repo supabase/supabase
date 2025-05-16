@@ -3,12 +3,14 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
 import { useProjectDeleteMutation } from 'data/projects/project-delete-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Input } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
@@ -17,6 +19,11 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
   const router = useRouter()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
+
+  const [lastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
 
   const projectRef = project?.ref
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
@@ -43,7 +50,9 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
       }
 
       toast.success(`Successfully deleted ${project?.name}`)
-      router.push(`/projects`)
+
+      if (lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
+      else router.push('/organizations')
     },
   })
   const { mutateAsync: sendExitSurvey, isLoading: isSending } = useSendDowngradeFeedbackMutation()
