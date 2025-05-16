@@ -1,15 +1,18 @@
+import { partition } from 'lodash'
 import { AlertTriangleIcon, Boxes } from 'lucide-react'
 import { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Fragment } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'common'
 import { ProjectList } from 'components/interfaces/Home/ProjectList'
+import HomePageActions from 'components/interfaces/HomePageActions'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { withAuth } from 'hooks/misc/withAuth'
-import { BASE_PATH } from 'lib/constants'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
+import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 const Header = () => {
@@ -37,8 +40,19 @@ const GenericProjectPage: NextPage = () => {
   const router = useRouter()
   const { routeSlug, ...queryParams } = router.query
 
+  const [search, setSearch] = useState('')
+  const [filterStatus, setFilterStatus] = useState<string[]>([
+    PROJECT_STATUS.ACTIVE_HEALTHY,
+    PROJECT_STATUS.INACTIVE,
+  ])
+
+  const [lastVisitedOrgSlug] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
+
   const {
-    data: organizations,
+    data: organizations = [],
     isLoading: isLoadingOrganizations,
     isError: isErrorOrganizations,
   } = useOrganizationsQuery({
@@ -62,34 +76,66 @@ const GenericProjectPage: NextPage = () => {
     }
   }
 
+  const [[lastVisitedOrganization], otherOrganizations] = useMemo(
+    () => partition(organizations, (org) => org.slug === lastVisitedOrgSlug),
+    [lastVisitedOrgSlug, organizations]
+  )
+
   return (
     <>
       <Header />
-      <div className="flex flex-col mx-auto w-full max-w-5xl">
-        <h1 className="mt-8 text-2xl">Select a project to continue</h1>
+      <div className="flex flex-col mx-auto w-full">
+        <h1 className="mt-8 text-2xl max-w-5xl mx-auto w-full">Select a project to continue</h1>
         <div
-          className="flex-grow py-6 space-y-8 overflow-y-auto"
+          className="flex-grow py-6 overflow-y-auto"
           style={{ maxHeight: 'calc(100vh - 49px - 64px)' }}
         >
-          {isLoadingOrganizations ? (
-            <OrganizationLoadingState />
-          ) : isErrorOrganizations ? (
-            <OrganizationErrorState />
-          ) : (
-            organizations.map((organization) => (
-              <Fragment key={organization.id}>
-                <h2 className="flex items-center gap-2">
-                  <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                  {organization.name}
-                </h2>
-                <ProjectList
-                  forOrganization={organization}
-                  rewriteHref={urlRewriterFactory(routeSlug)}
-                  search=""
-                />
-              </Fragment>
-            ))
-          )}
+          <div className="w-full max-w-5xl mx-auto flex flex-col gap-y-8">
+            <HomePageActions
+              hideNewProject
+              search={search}
+              setSearch={setSearch}
+              filterStatus={filterStatus}
+              setFilterStatus={setFilterStatus}
+            />
+            {isLoadingOrganizations ? (
+              <OrganizationLoadingState />
+            ) : isErrorOrganizations ? (
+              <OrganizationErrorState />
+            ) : (
+              <>
+                {!!lastVisitedOrganization && (
+                  <>
+                    <h2 className="flex items-center gap-2">
+                      <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                      {lastVisitedOrganization.name}
+                      <Badge variant="default">Recently visited</Badge>
+                    </h2>
+                    <ProjectList
+                      search={search}
+                      filterStatus={filterStatus}
+                      organization={lastVisitedOrganization}
+                      rewriteHref={urlRewriterFactory(routeSlug)}
+                    />
+                  </>
+                )}
+                {otherOrganizations.map((organization) => (
+                  <Fragment key={organization.id}>
+                    <h2 className="flex items-center gap-2">
+                      <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                      {organization.name}
+                    </h2>
+                    <ProjectList
+                      search={search}
+                      filterStatus={filterStatus}
+                      organization={organization}
+                      rewriteHref={urlRewriterFactory(routeSlug)}
+                    />
+                  </Fragment>
+                ))}
+              </>
+            )}
+          </div>
         </div>
       </div>
     </>
