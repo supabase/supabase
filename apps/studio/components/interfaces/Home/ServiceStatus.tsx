@@ -65,8 +65,8 @@ const StatusIcon = ({
   if (projectStatus === 'UNHEALTHY') return <AlertIcon />
   if (projectStatus === 'COMING_UP') return <LoaderIcon />
   if (projectStatus === 'ACTIVE_HEALTHY') return <CheckIcon />
-  if (isProjectNew) return <LoaderIcon />
   if (isSuccess) return <CheckIcon />
+  if (isProjectNew) return <LoaderIcon />
   return <AlertIcon />
 }
 
@@ -193,6 +193,11 @@ export const ServiceStatus = () => {
             docsUrl: 'https://supabase.com/docs/guides/functions/troubleshooting',
             isLoading,
             isSuccess: edgeFunctionsStatus?.healthy,
+            status: edgeFunctionsStatus?.healthy
+              ? 'ACTIVE_HEALTHY'
+              : isLoading
+                ? 'COMING_UP'
+                : ('UNHEALTHY' as ProjectServiceStatus),
             logsUrl: '/logs/edge-functions-logs',
           },
         ]
@@ -234,7 +239,7 @@ export const ServiceStatus = () => {
         <Button
           type="default"
           icon={
-            isLoadingChecks || isProjectNew ? (
+            isLoadingChecks || (!allServicesOperational && isProjectNew) ? (
               <LoaderIcon />
             ) : (
               <div
