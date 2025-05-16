@@ -30,7 +30,8 @@ permissions:
 
 jobs:
   test:
-    if: github.event_name == 'repository_dispatch' && github.event.client_payload.project == 'studio'
+    if: github.event_name == 'repository_dispatch'
+
     timeout-minutes: 60
     runs-on: ubuntu-latest
     # Make the job non-blocking
@@ -50,6 +51,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.client_payload.git.sha }}
+
+      - name: Debug - Log Vercel Webhook Payload
+        run: |
+          echo "Full client payload:"
+          echo '${{ toJSON(github.event.client_payload) }}'
+          echo "Project ID: ${{ github.event.client_payload.project }}"
+          echo "Deployment URL: ${{ github.event.client_payload.url }}"
+          echo "Git SHA: ${{ github.event.client_payload.git.sha }}"
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
