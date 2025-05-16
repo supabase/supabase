@@ -33,7 +33,7 @@ export const OrganizationInvite = () => {
   const { mutate: joinOrganization, isLoading: isJoining } =
     useOrganizationAcceptInvitationMutation({
       onSuccess: () => {
-        router.push('/projects')
+        router.push('/organizations')
       },
       onError: (error) => {
         toast.error(`Failed to join organization: ${error.message}`)

@@ -18,7 +18,6 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
-import { useFlag } from 'hooks/ui/useFlag'
 import {
   Button,
   Popover_Shadcn_,
@@ -43,7 +42,6 @@ const EdgeFunctionDetailsLayout = ({
   const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const edgeFunctionCreate = useFlag('edgeFunctionCreate')
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { isLoading, can: canReadFunctions } = useAsyncCheckProjectPermissions(
     PermissionAction.FUNCTIONS_READ,
@@ -86,14 +84,10 @@ const EdgeFunctionDetailsLayout = ({
           label: 'Logs',
           href: `/project/${ref}/functions/${functionSlug}/logs`,
         },
-        ...(edgeFunctionCreate
-          ? [
-              {
-                label: 'Code',
-                href: `/project/${ref}/functions/${functionSlug}/code`,
-              },
-            ]
-          : []),
+        {
+          label: 'Code',
+          href: `/project/${ref}/functions/${functionSlug}/code`,
+        },
         {
           label: 'Details',
           href: `/project/${ref}/functions/${functionSlug}/details`,
@@ -194,7 +188,7 @@ const EdgeFunctionDetailsLayout = ({
                 </div>
               </PopoverContent_Shadcn_>
             </Popover_Shadcn_>
-            {edgeFunctionCreate && !!functionSlug && (
+            {!!functionSlug && (
               <Button
                 type="default"
                 icon={<Send />}

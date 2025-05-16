@@ -78,7 +78,7 @@ from records r;
 export type EntityDefinitionsVariables = {
   limit?: number
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   schemas: string[]
 }
 

@@ -4,7 +4,6 @@ import 'react-contexify/dist/ReactContexify.css'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { ChevronRight, ChevronsDown, ChevronsUp, Clipboard, Eye, FolderPlus } from 'lucide-react'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
@@ -20,7 +19,6 @@ interface ColumnContextMenuProps {
 
 const ColumnContextMenu = ({ id = '' }: ColumnContextMenuProps) => {
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
-  const storageExplorerStore = useStorageStore()
   const {
     columns,
     selectedItems,
@@ -28,7 +26,7 @@ const ColumnContextMenu = ({ id = '' }: ColumnContextMenuProps) => {
     setSortBy,
     setSortByOrder,
     addNewFolderPlaceholder,
-  } = storageExplorerStore
+  } = useStorageExplorerStateSnapshot()
 
   const snap = useStorageExplorerStateSnapshot()
 
