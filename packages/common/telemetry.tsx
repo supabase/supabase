@@ -3,24 +3,100 @@
 import { components } from 'api-types'
 import { useRouter } from 'next/compat/router'
 import { usePathname } from 'next/navigation'
-import { useCallback, useEffect, useRef } from 'react'
+import { ComponentPropsWithoutRef, useCallback, useEffect, useRef } from 'react'
 import { useLatest } from 'react-use'
 import { useUser } from './auth'
 import { hasConsented } from './consent-state'
-import { LOCAL_STORAGE_KEYS } from './constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useTelemetryCookie } from './hooks'
 import { TelemetryEvent } from './telemetry-constants'
 import { getSharedTelemetryData } from './telemetry-utils'
+import Script from 'next/script'
 
 const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
+
+// type TelemetryTagManagerProps = Partial<ComponentPropsWithoutRef<typeof GTMComponent>>
+
+// Reexports GoogleTagManager with the right API key set
+export const TelemetryTagManager = () => {
+  const isGTMEnabled = Boolean(IS_PLATFORM && process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID)
+
+  // useEffect(() => {
+  //   if (isGTMEnabled) {
+  //     // set „denied" as default for both ad and analytics storage, as well as ad_user_data and ad_personalization,
+  //     sendGTMEvent({
+  //       0: 'consent',
+  //       1: 'default',
+  //       2: {
+  //         ad_user_data: 'denied',
+  //         ad_personalization: 'denied',
+  //         ad_storage: 'denied',
+  //         analytics_storage: 'denied',
+  //         wait_for_update: 2000, // milliseconds to wait for update
+  //       },
+  //     })
+  //   }
+  // }, [isGTMEnabled])
+
+  if (!isGTMEnabled) {
+    return
+  }
+
+  return (
+    <>
+      <Script
+        id="consent"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+
+            gtag("consent", "default", {
+                ad_user_data: "denied",
+                ad_personalization: "denied",
+                ad_storage: "denied",
+                analytics_storage: "denied",
+                wait_for_update: 2000 // milliseconds to wait for update
+            });
+            `,
+        }}
+      />
+      <Script
+        id="google-tag-manager"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            // Google Tag Manager
+            (function(w, d, s, l, i) {
+              w[l] = w[l] || [];
+              w[l].push({
+                'gtm.start': new Date().getTime(),
+                event: 'gtm.js'
+              });
+              var f = d.getElementsByTagName(s)[0],
+                  j = d.createElement(s),
+                  dl = l != 'dataLayer' ? '&l=' + l : '';
+              j.async = true;
+              j.src =
+                'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+              f.parentNode.insertBefore(j, f);
+            })(window, document, 'script', 'dataLayer', '${process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID}'); D
+            `,
+        }}
+      />
+    </>
+  )
+}
 
 //---
 // PAGE TELEMETRY
 //---
-
 export function handlePageTelemetry(
   API_URL: string,
   pathname?: string,
