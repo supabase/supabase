@@ -124,17 +124,17 @@ export const ServiceStatus = () => {
     error?: string
     docsUrl?: string
     isLoading: boolean
-    isSuccess?: boolean
+    isSuccess: boolean
+    status: ProjectServiceStatus
     logsUrl: string
-    status?: ProjectServiceStatus
   }[] = [
     {
       name: 'Database',
       error: undefined,
       docsUrl: undefined,
       isLoading: isLoading,
-      isSuccess: dbStatus?.healthy,
-      status: dbStatus?.status,
+      isSuccess: !!dbStatus?.healthy,
+      status: dbStatus?.status ?? 'UNHEALTHY',
       logsUrl: '/logs/postgres-logs',
     },
     {
@@ -142,8 +142,8 @@ export const ServiceStatus = () => {
       error: restStatus?.error,
       docsUrl: undefined,
       isLoading,
-      isSuccess: restStatus?.healthy,
-      status: restStatus?.status,
+      isSuccess: !!restStatus?.healthy,
+      status: restStatus?.status ?? 'UNHEALTHY',
       logsUrl: '/logs/postgrest-logs',
     },
     ...(authEnabled
@@ -153,8 +153,8 @@ export const ServiceStatus = () => {
             error: authStatus?.error,
             docsUrl: undefined,
             isLoading,
-            isSuccess: authStatus?.healthy,
-            status: authStatus?.status,
+            isSuccess: !!authStatus?.healthy,
+            status: authStatus?.status ?? 'UNHEALTHY',
             logsUrl: '/logs/auth-logs',
           },
         ]
@@ -166,8 +166,8 @@ export const ServiceStatus = () => {
             error: realtimeStatus?.error,
             docsUrl: undefined,
             isLoading,
-            isSuccess: realtimeStatus?.healthy,
-            status: realtimeStatus?.status,
+            isSuccess: !!realtimeStatus?.healthy,
+            status: realtimeStatus?.status ?? 'UNHEALTHY',
             logsUrl: '/logs/realtime-logs',
           },
         ]
@@ -179,8 +179,8 @@ export const ServiceStatus = () => {
             error: storageStatus?.error,
             docsUrl: undefined,
             isLoading,
-            isSuccess: storageStatus?.healthy,
-            status: storageStatus?.status,
+            isSuccess: !!storageStatus?.healthy,
+            status: storageStatus?.status ?? 'UNHEALTHY',
             logsUrl: '/logs/storage-logs',
           },
         ]
@@ -192,7 +192,7 @@ export const ServiceStatus = () => {
             error: undefined,
             docsUrl: 'https://supabase.com/docs/guides/functions/troubleshooting',
             isLoading,
-            isSuccess: edgeFunctionsStatus?.healthy,
+            isSuccess: !!edgeFunctionsStatus?.healthy,
             status: edgeFunctionsStatus?.healthy
               ? 'ACTIVE_HEALTHY'
               : isLoading
