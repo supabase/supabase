@@ -1,0 +1,63 @@
+---
+title: Flame Graph
+description: A flame graph visualizes a distributed request trace and represents each service call that occurred during the request's execution path with a timed, color-coded, horizontal bar.
+fragment: true
+---
+
+<ComponentPreview name="flame-graph" peekCode wide />
+
+## Usage
+
+This component is used to display a flame graph.
+
+It requires that the `data` prop is an array of objects with the following shape:
+
+```ts
+export type FlameGraphDataItem = {
+  id: string
+  name: string
+  start_value: number
+  end_value: number
+  parent_id?: string
+  [key: string]: any
+}
+```
+
+## Gotchas
+
+### Flame Graph data violations
+
+There are 3 ways in which the data might be violated - 1. The items might be `too short`, `too long` or there might be `overlap`.
+
+The parent's start and end value should always sum up to the combination of the child's start and end time.
+However, if the children's end_value is before the parent's end_value it would result in being `too short`.
+However, if the children's end_value is greater the parent's end_value it would result in being `too long`.
+However, if there is an overlap between the item's start_value and end_value, it would result in an `overlap`.
+
+<ComponentPreview
+  name="flame-graph-data-violations"
+  className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
+/>
+
+### What happens when there are >1 or no "root processes".
+
+We will give an error.
+
+<ComponentPreview
+  name="flame-graph-no-root"
+  className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
+/>
+
+<ComponentPreview
+  name="flame-graph-multiple-root"
+  className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
+/>
+
+### What happens when there are processes without any valid parent_id
+
+We would filter the data out, with a console.warn message.
+
+<ComponentPreview
+  name="flame-graph-orphan-children"
+  className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
+/>
