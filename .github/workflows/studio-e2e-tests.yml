@@ -30,8 +30,6 @@ permissions:
 
 jobs:
   test:
-    if: github.event_name == 'repository_dispatch'
-
     timeout-minutes: 60
     runs-on: ubuntu-latest
     # Make the job non-blocking
@@ -50,15 +48,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.client_payload.git.sha }}
+          ref: ${{ github.event.client_payload.git.sha || github.sha }}
 
-      - name: Debug - Log Vercel Webhook Payload
+      - name: Debug - Log Event Information
         run: |
-          echo "Full client payload:"
-          echo '${{ toJSON(github.event.client_payload) }}'
-          echo "Project ID: ${{ github.event.client_payload.project }}"
-          echo "Deployment URL: ${{ github.event.client_payload.url }}"
-          echo "Git SHA: ${{ github.event.client_payload.git.sha }}"
+          echo "Event name: ${{ github.event_name }}"
+          if [ "${{ github.event_name }}" == "repository_dispatch" ]; then
+            echo "Full client payload:"
+            echo '${{ toJSON(github.event.client_payload) }}'
+            echo "Project ID: ${{ github.event.client_payload.project }}"
+            echo "Deployment URL: ${{ github.event.client_payload.url }}"
+            echo "Git SHA: ${{ github.event.client_payload.git.sha }}"
+          fi
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
@@ -80,7 +81,7 @@ jobs:
       - name: Run Playwright tests
         id: playwright
         env:
-          BASE_URL: ${{ github.event.client_payload.url }}/dashboard
+          BASE_URL: ${{ github.event.client_payload.url || 'https://supabase.com/dashboard' }}/dashboard
         run: pnpm e2e:ci
 
       - uses: actions/upload-artifact@v4
