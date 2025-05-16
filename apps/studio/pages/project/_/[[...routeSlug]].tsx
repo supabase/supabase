@@ -84,56 +84,58 @@ const GenericProjectPage: NextPage = () => {
   return (
     <>
       <Header />
-      <div className="flex flex-col mx-auto w-full max-w-5xl">
-        <h1 className="mt-8 text-2xl">Select a project to continue</h1>
+      <div className="flex flex-col mx-auto w-full">
+        <h1 className="mt-8 text-2xl max-w-5xl mx-auto w-full">Select a project to continue</h1>
         <div
-          className="flex-grow flex flex-col py-6 gap-y-8 overflow-y-auto"
+          className="flex-grow py-6 overflow-y-auto"
           style={{ maxHeight: 'calc(100vh - 49px - 64px)' }}
         >
-          <HomePageActions
-            hideNewProject
-            search={search}
-            setSearch={setSearch}
-            filterStatus={filterStatus}
-            setFilterStatus={setFilterStatus}
-          />
-          {isLoadingOrganizations ? (
-            <OrganizationLoadingState />
-          ) : isErrorOrganizations ? (
-            <OrganizationErrorState />
-          ) : (
-            <>
-              {!!lastVisitedOrganization && (
-                <>
-                  <h2 className="flex items-center gap-2">
-                    <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                    {lastVisitedOrganization.name}
-                    <Badge variant="default">Recently visited</Badge>
-                  </h2>
-                  <ProjectList
-                    search={search}
-                    filterStatus={filterStatus}
-                    organization={lastVisitedOrganization}
-                    rewriteHref={urlRewriterFactory(routeSlug)}
-                  />
-                </>
-              )}
-              {otherOrganizations.map((organization) => (
-                <Fragment key={organization.id}>
-                  <h2 className="flex items-center gap-2">
-                    <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                    {organization.name}
-                  </h2>
-                  <ProjectList
-                    search={search}
-                    filterStatus={filterStatus}
-                    organization={organization}
-                    rewriteHref={urlRewriterFactory(routeSlug)}
-                  />
-                </Fragment>
-              ))}
-            </>
-          )}
+          <div className="w-full max-w-5xl mx-auto flex flex-col gap-y-8">
+            <HomePageActions
+              hideNewProject
+              search={search}
+              setSearch={setSearch}
+              filterStatus={filterStatus}
+              setFilterStatus={setFilterStatus}
+            />
+            {isLoadingOrganizations ? (
+              <OrganizationLoadingState />
+            ) : isErrorOrganizations ? (
+              <OrganizationErrorState />
+            ) : (
+              <>
+                {!!lastVisitedOrganization && (
+                  <>
+                    <h2 className="flex items-center gap-2">
+                      <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                      {lastVisitedOrganization.name}
+                      <Badge variant="default">Recently visited</Badge>
+                    </h2>
+                    <ProjectList
+                      search={search}
+                      filterStatus={filterStatus}
+                      organization={lastVisitedOrganization}
+                      rewriteHref={urlRewriterFactory(routeSlug)}
+                    />
+                  </>
+                )}
+                {otherOrganizations.map((organization) => (
+                  <Fragment key={organization.id}>
+                    <h2 className="flex items-center gap-2">
+                      <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                      {organization.name}
+                    </h2>
+                    <ProjectList
+                      search={search}
+                      filterStatus={filterStatus}
+                      organization={organization}
+                      rewriteHref={urlRewriterFactory(routeSlug)}
+                    />
+                  </Fragment>
+                ))}
+              </>
+            )}
+          </div>
         </div>
       </div>
     </>
