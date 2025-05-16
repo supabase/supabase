@@ -25,15 +25,15 @@ const SERVICE_STATUS_THRESHOLD = 5 // minutes
 const StatusMessage = ({
   status,
   isLoading,
-  isSuccess,
+  isHealthy,
   isProjectNew,
 }: {
   isLoading: boolean
-  isSuccess: boolean
+  isHealthy: boolean
   isProjectNew: boolean
   status?: ProjectServiceStatus
 }) => {
-  if (isSuccess) return 'Healthy'
+  if (isHealthy) return 'Healthy'
   if (isLoading) return 'Checking status'
   if (status === 'UNHEALTHY') return 'Unhealthy'
   if (status === 'COMING_UP') return 'Coming up...'
@@ -52,16 +52,16 @@ const CheckIcon = () => <CheckCircle2 {...iconProps} className="text-brand" />
 
 const StatusIcon = ({
   isLoading,
-  isSuccess,
+  isHealthy,
   isProjectNew,
   projectStatus,
 }: {
   isLoading: boolean
-  isSuccess: boolean
+  isHealthy: boolean
   isProjectNew: boolean
   projectStatus?: ProjectServiceStatus
 }) => {
-  if (isSuccess) return <CheckIcon />
+  if (isHealthy) return <CheckIcon />
   if (isLoading) return <LoaderIcon />
   if (projectStatus === 'UNHEALTHY') return <AlertIcon />
   if (projectStatus === 'COMING_UP') return <LoaderIcon />
@@ -124,7 +124,7 @@ export const ServiceStatus = () => {
     error?: string
     docsUrl?: string
     isLoading: boolean
-    isSuccess: boolean
+    isHealthy: boolean
     status: ProjectServiceStatus
     logsUrl: string
   }[] = [
@@ -133,7 +133,7 @@ export const ServiceStatus = () => {
       error: undefined,
       docsUrl: undefined,
       isLoading: isLoading,
-      isSuccess: !!dbStatus?.healthy,
+      isHealthy: !!dbStatus?.healthy,
       status: dbStatus?.status ?? 'UNHEALTHY',
       logsUrl: '/logs/postgres-logs',
     },
@@ -142,7 +142,7 @@ export const ServiceStatus = () => {
       error: restStatus?.error,
       docsUrl: undefined,
       isLoading,
-      isSuccess: !!restStatus?.healthy,
+      isHealthy: !!restStatus?.healthy,
       status: restStatus?.status ?? 'UNHEALTHY',
       logsUrl: '/logs/postgrest-logs',
     },
@@ -153,7 +153,7 @@ export const ServiceStatus = () => {
             error: authStatus?.error,
             docsUrl: undefined,
             isLoading,
-            isSuccess: !!authStatus?.healthy,
+            isHealthy: !!authStatus?.healthy,
             status: authStatus?.status ?? 'UNHEALTHY',
             logsUrl: '/logs/auth-logs',
           },
@@ -166,7 +166,7 @@ export const ServiceStatus = () => {
             error: realtimeStatus?.error,
             docsUrl: undefined,
             isLoading,
-            isSuccess: !!realtimeStatus?.healthy,
+            isHealthy: !!realtimeStatus?.healthy,
             status: realtimeStatus?.status ?? 'UNHEALTHY',
             logsUrl: '/logs/realtime-logs',
           },
@@ -179,7 +179,7 @@ export const ServiceStatus = () => {
             error: storageStatus?.error,
             docsUrl: undefined,
             isLoading,
-            isSuccess: !!storageStatus?.healthy,
+            isHealthy: !!storageStatus?.healthy,
             status: storageStatus?.status ?? 'UNHEALTHY',
             logsUrl: '/logs/storage-logs',
           },
@@ -192,7 +192,7 @@ export const ServiceStatus = () => {
             error: undefined,
             docsUrl: 'https://supabase.com/docs/guides/functions/troubleshooting',
             isLoading,
-            isSuccess: !!edgeFunctionsStatus?.healthy,
+            isHealthy: !!edgeFunctionsStatus?.healthy,
             status: edgeFunctionsStatus?.healthy
               ? 'ACTIVE_HEALTHY'
               : isLoading
@@ -205,7 +205,7 @@ export const ServiceStatus = () => {
   ]
 
   const isLoadingChecks = services.some((service) => service.isLoading)
-  const allServicesOperational = services.every((service) => service.isSuccess)
+  const allServicesOperational = services.every((service) => service.isHealthy)
 
   // If the project is less than 5 minutes old, and status is not operational, then it's likely the service is still starting up
   const isProjectNew =
@@ -263,7 +263,7 @@ export const ServiceStatus = () => {
             <div className="flex gap-x-2">
               <StatusIcon
                 isLoading={service.isLoading}
-                isSuccess={!!service.isSuccess}
+                isHealthy={!!service.isHealthy}
                 isProjectNew={isProjectNew}
                 projectStatus={service.status}
               />
@@ -272,7 +272,7 @@ export const ServiceStatus = () => {
                 <p className="text-foreground-light flex items-center gap-1">
                   <StatusMessage
                     isLoading={service.isLoading}
-                    isSuccess={!!service.isSuccess}
+                    isHealthy={!!service.isHealthy}
                     isProjectNew={isProjectNew}
                     status={service.status}
                   />
