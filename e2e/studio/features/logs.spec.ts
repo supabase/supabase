@@ -46,31 +46,11 @@ test.describe('Logs', () => {
       /**
        * Navigates to Logs
        */
-      await page.goto(toUrl(`/project/${ref}/`))
-      await page.locator('a', { hasText: 'Logs' }).click({ timeout: 10000 })
-      await page.click('body')
-
-      // can take a sec or two for the page to load and redirect to the last logs page
-      // wait for 2 secs
-      await page.waitForTimeout(2000)
+      await page.goto(toUrl(`/project/${ref}/logs/${logPage.route}`))
 
       await expect(page.getByRole('heading', { name: 'Logs & Analytics' }), {
         message: 'Logs & Analytics heading should be visible',
       }).toBeVisible()
-
-      /**
-       * Navigates to the specific log page
-       */
-      await page
-        .getByRole('link', { name: logPage.label, exact: true })
-        .click()
-        .catch((e) => {
-          console.log('🔴 Error clicking', logPage, e)
-          throw e
-        })
-
-      // Wait for logs to be loaded
-      await page.waitForResponse((response) => response.url().includes(`logs.all`))
 
       /**
        * Shows the logs table
