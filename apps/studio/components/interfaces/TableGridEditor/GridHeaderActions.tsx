@@ -177,7 +177,8 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
     updateTable({
       projectRef: project?.ref!,
       connectionString: project?.connectionString,
-      id: payload.id,
+      id: table.id,
+      name: table.name,
       schema: table.schema,
       payload: payload,
     })

@@ -1,4 +1,4 @@
-import type { PostgresColumn, PostgresPrimaryKey, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresPrimaryKey } from '@supabase/postgres-meta'
 import { chunk, find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
@@ -22,8 +22,16 @@ import { tableRowKeys } from 'data/table-rows/keys'
 import { tableKeys } from 'data/tables/keys'
 import { createTable as createTableMutation } from 'data/tables/table-create-mutation'
 import { deleteTable as deleteTableMutation } from 'data/tables/table-delete-mutation'
-import { updateTable as updateTableMutation } from 'data/tables/table-update-mutation'
+import {
+  UpdateTableBody,
+  updateTable as updateTableMutation,
+} from 'data/tables/table-update-mutation'
 import { getTables } from 'data/tables/tables-query'
+import {
+  getTable,
+  RetrievedTableColumn,
+  RetrieveTableResult,
+} from 'data/tables/table-retrieve-query'
 import { timeout, tryParseJson } from 'lib/helpers'
 import {
   generateCreateColumnPayload,
@@ -220,7 +228,7 @@ export const createColumn = async ({
   projectRef: string
   connectionString?: string | null
   payload: CreateColumnPayload
-  selectedTable: PostgresTable
+  selectedTable: RetrieveTableResult
   primaryKey?: Constraint
   foreignKeyRelations?: ForeignKey[]
   skipSuccessMessage?: boolean
@@ -296,9 +304,9 @@ export const updateColumn = async ({
 }: {
   projectRef: string
   connectionString?: string | null
-  originalColumn: PostgresColumn
+  originalColumn: RetrievedTableColumn
   payload: UpdateColumnPayload
-  selectedTable: PostgresTable
+  selectedTable: RetrieveTableResult
   primaryKey?: Constraint
   foreignKeyRelations?: ForeignKey[]
   existingForeignKeyRelations?: ForeignKeyConstraint[]
@@ -366,7 +374,7 @@ export const duplicateTable = async (
   connectionString: string | undefined | null,
   payload: { name: string; comment?: string },
   metadata: {
-    duplicateTable: PostgresTable
+    duplicateTable: RetrieveTableResult
     isRLSEnabled: boolean
     isDuplicateRows: boolean
     foreignKeyRelations: ForeignKey[]
@@ -434,6 +442,7 @@ export const duplicateTable = async (
       projectRef,
       connectionString,
       id: duplicatedTable?.id!,
+      name: duplicatedTable?.name!,
       schema: duplicatedTable?.schema!,
       payload: { rls_enabled: isRLSEnabled },
     })
@@ -468,10 +477,19 @@ export const createTable = async ({
   const queryClient = getQueryClient()
 
   // Create the table first. Error may be thrown.
-  const table = await createTableMutation({
+  await createTableMutation({
     projectRef: projectRef,
     connectionString: connectionString,
     payload: payload,
+  })
+
+  const table = await queryClient.fetchQuery({
+    queryKey: tableKeys.retrieve(projectRef, payload.name, payload.schema),
+    queryFn: ({ signal }) =>
+      getTable(
+        { projectRef, connectionString, name: payload.name, schema: payload.schema },
+        signal
+      ),
   })
 
   // If we face any errors during this process after the actual table creation
@@ -485,6 +503,7 @@ export const createTable = async ({
         projectRef,
         connectionString,
         id: table.id,
+        name: table.name,
         schema: table.schema,
         payload: { rls_enabled: isRLSEnabled },
       })
@@ -625,6 +644,7 @@ export const createTable = async ({
       projectRef,
       connectionString,
       id: table.id,
+      name: table.name,
       schema: table.schema,
     })
     throw error
@@ -645,13 +665,15 @@ export const updateTable = async ({
   projectRef: string
   connectionString?: string | null
   toastId: string | number
-  table: PostgresTable
-  payload: any
+  table: RetrieveTableResult
+  payload: UpdateTableBody
   columns: ColumnField[]
   foreignKeyRelations: ForeignKey[]
   existingForeignKeyRelations: ForeignKeyConstraint[]
   primaryKey?: Constraint
 }) => {
+  const queryClient = getQueryClient()
+
   // Prepare a check to see if primary keys to the tables were updated or not
   const primaryKeyColumns = columns
     .filter((column) => column.isPrimaryKey)
@@ -671,15 +693,34 @@ export const updateTable = async ({
   }
 
   // Update the table
-  const updatedTable = await updateTableMutation({
+  await updateTableMutation({
     projectRef,
     connectionString,
     id: table.id,
+    name: table.name,
     schema: table.schema,
     payload,
   })
 
-  const originalColumns = table.columns ?? []
+  const updatedTable = await queryClient.fetchQuery({
+    queryKey: tableKeys.retrieve(
+      projectRef,
+      payload.name ?? table.name,
+      payload.schema ?? table.schema
+    ),
+    queryFn: ({ signal }) =>
+      getTable(
+        {
+          projectRef,
+          connectionString,
+          name: payload.name ?? table.name,
+          schema: payload.schema ?? table.schema,
+        },
+        signal
+      ),
+  })
+
+  const originalColumns = updatedTable.columns ?? []
   const columnIds = columns.map((column) => column.id)
 
   // Delete any removed columns
@@ -758,8 +799,6 @@ export const updateTable = async ({
     existingForeignKeyRelations,
   })
 
-  const queryClient = getQueryClient()
-
   await Promise.all([
     queryClient.invalidateQueries(tableEditorKeys.tableEditor(projectRef, table.id)),
     queryClient.invalidateQueries(databaseKeys.foreignKeyConstraints(projectRef, table.schema)),
@@ -786,7 +825,7 @@ export const insertRowsViaSpreadsheet = async (
   projectRef: string,
   connectionString: string | undefined | null,
   file: any,
-  table: PostgresTable,
+  table: RetrieveTableResult,
   selectedHeaders: string[],
   onProgressUpdate: (progress: number) => void
 ) => {
@@ -847,7 +886,7 @@ export const insertRowsViaSpreadsheet = async (
 export const insertTableRows = async (
   projectRef: string,
   connectionString: string | undefined | null,
-  table: PostgresTable,
+  table: RetrieveTableResult,
   rows: any,
   selectedHeaders: string[],
   onProgressUpdate: (progress: number) => void
