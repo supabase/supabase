@@ -1,8 +1,5 @@
 name: Studio E2E Tests
 on:
-  repository_dispatch:
-    types:
-      - 'vercel.deployment.success'
   push:
     branches: [master]
     paths:
@@ -30,10 +27,6 @@ permissions:
 
 jobs:
   test:
-    if: |
-      github.event_name == 'push' || 
-      github.event_name == 'pull_request' || 
-      (github.event_name == 'repository_dispatch' && github.event.client_payload.project == 'studio')
     timeout-minutes: 60
     runs-on: ubuntu-latest
     # Make the job non-blocking
@@ -51,25 +44,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.client_payload.git.sha || github.sha }}
-
-      - name: Debug - Log Event Information
-        run: |
-          echo "Event name: ${{ github.event_name }}"
-          if [ "${{ github.event_name }}" == "repository_dispatch" ]; then
-            echo "Full client payload:"
-            echo '${{ toJSON(github.event.client_payload) }}'
-            echo "Project ID: ${{ github.event.client_payload.project }}"
-            echo "Deployment URL: ${{ github.event.client_payload.url }}"
-            echo "Git SHA: ${{ github.event.client_payload.git.sha }}"
-          fi
-
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
           run_install: false
-
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -79,13 +57,29 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
+      - name: Install Vercel CLI
+        run: pnpm add --global vercel@latest
+
+      - name: Pull Vercel Environment Information (Preview)
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts for Vercel
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project to Vercel and Get URL
+        id: deploy_vercel
+        run: |
+          DEPLOY_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "Vercel Preview URL: $DEPLOY_URL"
+          echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_OUTPUT
+
       - name: Install Playwright Browsers
         run: pnpm -C e2e/studio exec playwright install --with-deps
 
       - name: Run Playwright tests
         id: playwright
         env:
-          BASE_URL: ${{ github.event.client_payload.url || 'https://supabase.com/dashboard' }}/dashboard
+          BASE_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}/dashboard
         run: pnpm e2e:ci
 
       - uses: actions/upload-artifact@v4
