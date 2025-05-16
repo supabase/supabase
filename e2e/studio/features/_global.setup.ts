@@ -152,9 +152,11 @@ To start API locally, run:
   const passwordInput = page.getByLabel('Password')
   const signInButton = page.getByRole('button', { name: 'Sign In' })
 
-  // click opt out on telemetry
+  // if found click opt out on telemetry
   const optOutButton = page.getByRole('button', { name: 'Opt out' })
-  await optOutButton.click()
+  if ((await optOutButton.count()) > 0) {
+    await optOutButton.click()
+  }
 
   // Debug element states
   console.log('\n 🔍 Checking form elements:')
