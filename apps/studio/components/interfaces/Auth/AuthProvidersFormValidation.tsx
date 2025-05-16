@@ -1389,13 +1389,13 @@ const PROVIDER_SAML = {
 const PROVIDER_WEB3 = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
-  title: 'Web3 (Solana)',
-  link: 'TBD',
+  title: 'Web3 Wallet (Solana)',
+  link: 'https://supabase.com/docs/guides/auth/auth-web3',
   properties: {
     EXTERNAL_WEB3_SOLANA_ENABLED: {
       title: 'Enable Sign in with Solana',
       description:
-        'Allow Solana wallet holders to sign in to your project via the Sign in with Solana (SIWS, EIP-4361) standard. Set up [attack protection](../auth/protection) to counter abuse.',
+        'Allow Solana wallet holders to sign in to your project via the Sign in with Solana (SIWS, EIP-4361) standard. Set up [attack protection](../auth/protection) and adjust [rate limits](../auth/rate-limits) to counter abuse.',
       type: 'boolean',
     },
   },
