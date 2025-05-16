@@ -694,7 +694,7 @@ val supabaseClient = createSupabaseClient(
     supabaseUrl = "SUPABASE_URL",
     supabaseKey = "SUPABASE_KEY"
 ) {
-    install(GoTrue)
+    install(Auth)
     install(ComposeAuth) {
         nativeGoogleLogin("WEB_GOOGLE_CLIENT_ID") //Use the Web Client ID, not the Android one!
     }
