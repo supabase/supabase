@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { invalidateRolesQuery } from './database-roles-query'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 type CreateRoleBody = Parameters<typeof pgMeta.roles.create>[0]
 
@@ -19,13 +20,15 @@ export async function createDatabaseRole({
   connectionString,
   payload,
 }: DatabaseRoleCreateVariables) {
-  const sql = pgMeta.roles.create(payload).sql
+  const { sql } = pgMeta.roles.create(payload)
+
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: applyAndTrackMigrations(sql, `create_role_${payload.name}`),
     queryKey: ['roles', 'create'],
   })
+
   return result
 }
 

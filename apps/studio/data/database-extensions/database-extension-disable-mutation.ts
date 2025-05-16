@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databaseExtensionsKeys } from './keys'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type DatabaseExtensionDisableVariables = {
   projectRef: string
@@ -19,14 +20,12 @@ export async function disableDatabaseExtension({
   id,
   cascade,
 }: DatabaseExtensionDisableVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
   const { sql } = pgMeta.extensions.remove(id, { cascade })
+
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: applyAndTrackMigrations(sql, `disable_extension_${id}`),
     queryKey: ['extension', 'delete', id],
   })
 

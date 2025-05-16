@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databasePoliciesKeys } from './keys'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type DatabasePolicyDeleteVariables = {
   projectRef: string
@@ -22,14 +23,12 @@ export async function deleteDatabasePolicy({
   connectionString,
   originalPolicy,
 }: DatabasePolicyDeleteVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
   const { sql } = pgMeta.policies.remove(originalPolicy)
+
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: applyAndTrackMigrations(sql, `delete_policy_${originalPolicy.name}`),
     queryKey: ['policy', 'delete', originalPolicy.id],
   })
 

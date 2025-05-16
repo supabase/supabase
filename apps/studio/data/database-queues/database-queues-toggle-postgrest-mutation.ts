@@ -6,6 +6,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databaseQueuesKeys } from './keys'
 import { databaseKeys } from 'data/database/keys'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type DatabaseQueueExposePostgrestVariables = {
   projectRef: string
@@ -227,7 +228,7 @@ export async function toggleQueuesExposurePostgrest({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: applyAndTrackMigrations(sql, `${enable ? 'expose' : 'hide'}_queue`),
     queryKey: ['toggle-queues-exposure'],
   })
 

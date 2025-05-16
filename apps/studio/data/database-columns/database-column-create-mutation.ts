@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import type { components } from 'data/api'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type CreateColumnBody = Omit<components['schemas']['CreateColumnBody'], 'tableId'> & {
   schema: string
@@ -41,7 +42,7 @@ export async function createDatabaseColumn({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: applyAndTrackMigrations(sql, `create_column_${payload.name}`),
     queryKey: ['column', 'create'],
   })
 

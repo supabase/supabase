@@ -1,25 +1,33 @@
+import { literal } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databaseCronJobsKeys } from './keys'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type DatabaseCronJobCreateVariables = {
   projectRef: string
   connectionString?: string | null
-  query: string
+  name: string
+  schedule: string
+  command: string
 }
 
 export async function createDatabaseCronJob({
   projectRef,
   connectionString,
-  query,
+  name,
+  schedule,
+  command,
 }: DatabaseCronJobCreateVariables) {
+  const sql = `select cron.schedule(${literal(name)}, ${literal(schedule)}, $$${command}$$)`
+
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: query,
+    sql: applyAndTrackMigrations(sql, `create_cron_${name}`),
     queryKey: databaseCronJobsKeys.create(),
   })
 

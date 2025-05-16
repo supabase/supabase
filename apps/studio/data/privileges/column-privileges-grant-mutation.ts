@@ -5,6 +5,7 @@ import type { ResponseError } from 'types'
 import { privilegeKeys } from './keys'
 import pgMeta from '@supabase/pg-meta'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type ColumnPrivilegesGrant = components['schemas']['GrantColumnPrivilegesBody']
 
@@ -31,7 +32,7 @@ export async function grantColumnPrivileges({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: applyAndTrackMigrations(sql, `grant_column_privilege`),
     queryKey: ['column-privileges', 'grant'],
   })
 

@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databasePublicationsKeys } from './keys'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type DatabasePublicationUpdateVariables = {
   projectRef: string
@@ -38,7 +39,7 @@ export async function updateDatabasePublication({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: applyAndTrackMigrations(sql, `update_publication_${id}`),
     queryKey: ['publication', 'update', id],
   })
 
