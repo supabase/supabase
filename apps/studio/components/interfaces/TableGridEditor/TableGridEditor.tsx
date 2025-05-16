@@ -19,6 +19,7 @@ import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import Link from 'next/link'
 import { useAppStateSnapshot } from 'state/app-state'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
@@ -117,22 +118,33 @@ export const TableGridEditor = ({
             description="This table doesn't exist in your database"
           >
             {isTableEditorTabsEnabled && (
-              <Button
-                type="default"
-                className="mt-2"
-                onClick={() => {
-                  if (tabId) {
-                    tabs.handleTabClose({
-                      id: tabId,
-                      router,
-                      editor,
-                      onClearDashboardHistory,
-                    })
-                  }
-                }}
-              >
-                Close tab
-              </Button>
+              <>
+                {!!tabId ? (
+                  <Button
+                    type="default"
+                    className="mt-2"
+                    onClick={() => {
+                      tabs.handleTabClose({
+                        id: tabId,
+                        router,
+                        editor,
+                        onClearDashboardHistory,
+                      })
+                    }}
+                  >
+                    Close tab
+                  </Button>
+                ) : (
+                  <Button
+                    asChild
+                    type="default"
+                    className="mt-2"
+                    onClick={() => appSnap.setDashboardHistory(projectRef, 'editor', undefined)}
+                  >
+                    <Link href={`/project/${projectRef}/editor`}>Head back</Link>
+                  </Button>
+                )}
+              </>
             )}
           </Admonition>
         </div>
