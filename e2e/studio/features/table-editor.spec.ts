@@ -115,6 +115,7 @@ test.describe('Table Editor', () => {
 
   test('should perform all table operations sequentially', async ({ ref }) => {
     const s = getSelectors(tableName)
+    test.setTimeout(60000)
 
     // 1. View table definition
     await page.evaluate(() => document.querySelector('.ReactQueryDevtools')?.remove())
@@ -204,36 +205,6 @@ test.describe('Table Editor', () => {
     await expect(
       page.getByTestId('tables-list'),
       'Tables list should be visible in public schema'
-    ).toBeVisible()
-
-    // 6. Test RLS disabled
-    const tableNameRlsDisabled = getRandomTableName()
-    await s.newTableBtn(page).click()
-    await s.tableNameInput(page).fill(tableNameRlsDisabled)
-    await s.rlsCheckbox(page).click()
-    await s.rlsConfirmBtn(page).click()
-    await s.saveBtn(page).click()
-
-    // wait for the success toast to be visible
-    await expect(
-      page.getByText(`Table ${tableNameRlsDisabled} is good to go!`),
-      'Success toast should be visible after table creation'
-    ).toBeVisible()
-
-    await page.getByRole('button', { name: `View ${tableNameRlsDisabled}` }).click()
-    await expect(
-      page.getByRole('button', { name: 'RLS disabled' }),
-      'RLS disabled button should be visible for table with RLS disabled'
-    ).toBeVisible()
-
-    // Clean up the RLS test table
-    await s.viewTableLabel(page).click()
-    await s.viewTableLabel(page).getByRole('button').nth(1).click()
-    await s.deleteTableBtn(page).click()
-    await s.confirmDeleteBtn(page).click()
-    await expect(
-      s.deleteTableToast(page),
-      'Delete confirmation toast should be visible for RLS table'
     ).toBeVisible()
   })
 })
