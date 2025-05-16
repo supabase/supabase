@@ -34,7 +34,7 @@ export default defineConfig({
     reporters: [['default']],
     coverage: {
       reporter: ['lcov'],
-      exclude: ['**/*.test.ts', '**/*.test.tsx'],
+      exclude: ['**/*.test.ts', '**/*.test.tsx', 'lib/common/fetch/**'],
       include: ['lib/**/*.ts'],
     },
   },
