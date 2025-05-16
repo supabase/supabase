@@ -61,6 +61,10 @@ export const LOCAL_STORAGE_KEYS = {
   LAST_VISITED_LOGS_PAGE: 'supabase-last-visited-logs-page',
   LAST_VISITED_ORGANIZATION: 'last-visited-organization',
 
+  // user impersonation selector previous searches
+  USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES: (ref: string) =>
+    `user-impersonation-selector-previous-searches-${ref}`,
+
   /**
    * COMMON
    */
