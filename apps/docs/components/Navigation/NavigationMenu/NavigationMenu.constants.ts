@@ -917,8 +917,18 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/configuration',
         },
         {
-          name: 'Managing database replication',
+          name: 'Database replication',
           url: '/guides/database/replication',
+          items: [
+            {
+              name: 'pg_replicate',
+              url: '/guides/database/replication/pg_replicate',
+            },
+            {
+              name: 'Manual replication',
+              url: '/guides/database/replication/manual-replication',
+            },
+          ],
         },
         {
           name: 'Query optimization',
