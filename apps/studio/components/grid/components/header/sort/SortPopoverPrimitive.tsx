@@ -18,7 +18,6 @@ export interface SortPopoverPrimitiveProps {
   buttonText?: string
   sorts: Sort[]
   onApplySorts: (sorts: Sort[]) => void
-  portal?: boolean
 }
 
 /**
@@ -34,7 +33,6 @@ export const SortPopoverPrimitive = ({
   buttonText,
   sorts,
   onApplySorts,
-  portal = true,
 }: SortPopoverPrimitiveProps) => {
   const [open, setOpen] = useState(false)
   const snap = useTableEditorTableStateSnapshot()
@@ -228,7 +226,7 @@ export const SortPopoverPrimitive = ({
           {displayButtonText}
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start" portal={portal}>
+      <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start">
         {content}
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
