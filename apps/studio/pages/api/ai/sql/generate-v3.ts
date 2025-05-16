@@ -1,24 +1,51 @@
-import { openai } from '@ai-sdk/openai'
+import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock'
+import { fromNodeProviderChain } from '@aws-sdk/credential-providers'
 import pgMeta from '@supabase/pg-meta'
-import { streamText } from 'ai'
+import crypto from 'crypto'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { z } from 'zod'
 
+import { streamText, tool, type Tool } from 'ai'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import apiWrapper from 'lib/api/apiWrapper'
-import { getTools } from './tools'
+import { createSupabaseMCPClient } from './supabase-mcp'
 
 export const maxDuration = 30
-const openAiKey = process.env.OPENAI_API_KEY
 const pgMetaSchemasList = pgMeta.schemas.list()
 
+const credentialProvider = fromNodeProviderChain()
+
+const bedrock = createAmazonBedrock({
+  credentialProvider,
+})
+
+async function hasAwsCredentials() {
+  try {
+    const credentials = await credentialProvider()
+    return !!credentials
+  } catch (error) {
+    return false
+  }
+}
+
+const hasCredentials = await hasAwsCredentials()
+
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (!openAiKey) {
+  const { method } = req
+
+  if (!process.env.AWS_REGION) {
     return res.status(500).json({
-      error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
+      error: 'AWS_REGION is not set',
     })
   }
 
-  const { method } = req
+  if (!hasCredentials) {
+    return res.status(500).json({
+      error:
+        'AWS credentials are not configured. Set up a local profile or add environment variables.',
+    })
+  }
 
   switch (method) {
     case 'POST':
@@ -35,7 +62,14 @@ const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
 export default wrapper
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
-  const { messages, projectRef, connectionString, includeSchemaMetadata, schema, table } = req.body
+  const { messages, projectRef, connectionString, aiOptInLevel, schema, table } = req.body as {
+    messages: any[] // Use stronger types if available
+    projectRef: string
+    connectionString?: string
+    aiOptInLevel: AiOptInLevel
+    schema?: string
+    table?: string
+  }
 
   if (!projectRef) {
     return res.status(400).json({
@@ -45,128 +79,342 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   const cookie = req.headers.cookie
   const authorization = req.headers.authorization
+  const accessToken = authorization?.replace('Bearer ', '')
+
+  if (!accessToken) {
+    return res.status(401).json({ error: 'Authorization token is required' })
+  }
+
+  let mcpTools: Record<string, Tool<any, unknown>> = {}
+  let wrappedExecuteSqlTool: Tool<any, unknown> | undefined = undefined
+  let schemasResult: any[] = []
 
   try {
-    const { result: schemas } = includeSchemaMetadata
-      ? await executeSql(
-          {
-            projectRef,
-            connectionString,
-            sql: pgMetaSchemasList.sql,
-          },
-          undefined,
-          {
-            'Content-Type': 'application/json',
-            ...(cookie && { cookie }),
-            ...(authorization && { Authorization: authorization }),
-          }
-        )
-      : { result: [] }
+    const privacyMessage =
+      'Fetching data requires a higher privacy level. Please enable this in your org settings'
 
-    const result = await streamText({
-      model: openai('gpt-4o-mini'),
-      maxSteps: 5,
-      system: `
-        You are a Supabase Postgres expert who can do the following things.
-  
-        # You generate and debug SQL
-        The generated SQL (must be valid SQL), and must adhere to the following:
-        - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
-        - Always use semicolons
-        - Output as markdown
-        - Always include code snippets if available
-        - If a code snippet is SQL, the first line of the snippet should always be -- props: {"id": "id", "title": "Query title", "runQuery": "false", "isChart": "true", "xAxis": "columnOrAlias", "yAxis": "columnOrAlias"}
-        - Only include one line of comment props per markdown snippet, even if the snippet has multiple queries
-        - Only set chart to true if the query makes sense as a chart. xAxis and yAxis need to be columns or aliases returned by the query.
-        - Set the id to a random uuidv4 value
-        - Only set runQuery to true if the query has no risk of writing data and is not a debugging request. Set it to false if there are any values that need to be replaced with real data.
-        - Explain what the snippet does in a sentence or two before showing it
-        - Use vector(384) data type for any embedding/vector related query
-        - When debugging, retrieve sql schema details to ensure sql is correct
-        - In Supabase, the auth schema already has a users table which is used to store users. It is common practice to create a profiles table in the public schema that links to auth.users to store user information instead. You don't need to create a new users table.
-        - Never suggest creating a view to retrieve information from the users table of the auth schema. This is against our best practices.
-  
-        When generating tables, do the following:
-        - Ensure that all tables always have a primary key
-        - Ensure that all tables have RLS enabled. Inform the user that they will need to create RLS policies before being able to read or write to the table over Supabase APIs.
-        - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
-        - Prefer creating foreign key references in the create statement
-        - Prefer 'text' over 'varchar'
-        - Prefer 'timestamp with time zone' over 'date'
-        - If a foreign key is created, include a statement to create a database index on the columns involved in the foreign key. This is a best practice as it is common to use foreign key columns in join conditions when querying the database, hence the index will improve the performance of those joins and reduce database resource consumption.
-        - If the table is a foreign table, create it in a new schema called private. If the private schema doesnt exist, create it. 
-          - Explain to the user that we create it outside of the public schema as it can present a security risk as foreign tables views cannot be configured to respect RLS policies. Provide this link for users to view more details about the security risk: https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0017_foreign_table_in_api
-  
-        When generating views, do the following:
-        - All views should include 'with (security_invoker=on)' clause in the SQL statement for creating views (only views though - do not do this for tables)
-        - Place the 'with (security_invoker=on)' immediately after the CREATE VIEW statement, before AS
-        - If the view is a materialized view, create it in a new schema called private. If the private schema doesnt exist, create it. 
-          - Explain to the user that we create it outside of the public schema as it can present a security risk as materialized views cannot be configured to respect RLS policies of the underlying tables they are built upon, nor can they be secured with RLS directly. Provide this link for users to view more details about the security risk: https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0016_materialized_view_in_api
-  
-        When installing database extensions, do the following:
-        - Never install extensions in the public schema
-        - Extensions should be installed in the extensions schema, or a dedicated schema
-  
-        Feel free to suggest corrections for suspected typos.
-  
-        # You write row level security policies.
-  
-        Your purpose is to generate a policy with the constraints given by the user.
-        - First, use getSchemaTables to retrieve more information about a schema or schemas that will contain policies, usually the public schema.
-        - Then retrieve existing RLS policies and guidelines on how to write policies using the getRlsKnowledge tool .
-        - Then write new policies or update existing policies based on the prompt
-        - When asked to suggest policies, either alter existing policies or add new ones to the public schema.
-        - When writing policies that use a function from the auth schema, ensure that the calls are wrapped with parentheses e.g select auth.uid() should be written as (select auth.uid()) instead
-  
-        # You write database functions
-        Your purpose is to generate a database function with the constraints given by the user. The output may also include a database trigger
-        if the function returns a type of trigger. When generating functions, do the following:
-        - If the function returns a trigger type, ensure that it uses security definer, otherwise default to security invoker. Include this in the create functions SQL statement.
-        - Ensure to set the search_path configuration parameter as '', include this in the create functions SQL statement.
-        - Default to create or replace whenever possible for updating an existing function, otherwise use the alter function statement
-        Please make sure that all queries are valid Postgres SQL queries
-  
-        # You write edge functions
-        Your purpose is to generate entire edge functions with the constraints given by the user.
-        - First, always use the getEdgeFunctionKnowledge tool to get knowledge about how to write edge functions for Supabase
-        - When writing edge functions, always ensure that they are written in TypeScript and Deno JavaScript runtime.
-        - When writing edge functions, write complete code so the user doesn't need to replace any placeholders.
-        - When writing edge functions, always ensure that they are written in a way that is compatible with the database schema.
-        - When suggesting edge functions, follow the guidelines in getEdgeFunctionKnowledge tool. Always create personalised edge functions based on the database schema
-        - When outputting edge functions, always include a props comment in the first line of the code block:
-          -- props: {"name": "function-name", "title": "Human readable title"}
-        - The function name in the props must be URL-friendly (use hyphens instead of spaces or underscores)
-        - Always wrap the edge function code in a markdown code block with the language set to 'edge'
-        - The props comment must be the first line inside the code block, followed by the actual function code
-  
-        # You convert sql to supabase-js client code
-        Use the convertSqlToSupabaseJs tool to convert select sql to supabase-js client code. Only provide js code snippets if explicitly asked. If conversion isn't supported, build a postgres function instead and suggest using supabase-js to call it via  "const { data, error } = await supabase.rpc('echo', { say: '👋'})"
-  
-        # For all your abilities, follow these instructions:
-        - First look at the list of provided schemas and if needed, get more information about a schema. You will almost always need to retrieve information about the public schema before answering a question.
-        - If the question is about users or involves creating a users table, also retrieve the auth schema.
-        - If it a query is a destructive query e.g. table drop, ask for confirmation before writing the query. The user will still have to run the query once you create it
-    
-  
-        Here are the existing database schema names you can retrieve: ${schemas}
-  
-        ${schema !== undefined && includeSchemaMetadata ? `The user is currently looking at the ${schema} schema.` : ''}
-        ${table !== undefined && includeSchemaMetadata ? `The user is currently looking at the ${table} table.` : ''}
-        `,
-      messages,
-      tools: getTools({
-        projectRef,
-        connectionString,
-        cookie,
-        authorization,
-        includeSchemaMetadata,
-      }),
+    // Helper function to create a tool that returns privacy message
+    const createPrivacyMessageTool = (toolInstance: Tool<any, any>) => ({
+      ...toolInstance,
+      execute: async (_args: any, _context: any) => ({ status: privacyMessage }),
     })
 
-    // write the data stream to the response
-    // Note: this is sent as a single response, not a stream
+    // Fetch MCP client and tools
+    const mcpClient = await createSupabaseMCPClient({
+      accessToken,
+      projectId: projectRef,
+    })
+
+    let availableMcpTools = await mcpClient.tools()
+
+    let allAllowedTools = [
+      'list_tables',
+      'list_extensions',
+      'list_edge_functions',
+      'list_branches',
+      'get_project',
+      'execute_sql',
+      'get_logs',
+    ]
+
+    // Filter out tools that should never be available across any permission level
+    availableMcpTools = Object.fromEntries(
+      Object.entries(availableMcpTools).filter(([key]) => allAllowedTools.includes(key))
+    )
+
+    // Build allowed tools based on permission level
+    let allowedTools: string[] = []
+
+    // For schema and above permission levels
+    if (
+      aiOptInLevel === 'schema' ||
+      aiOptInLevel === 'schema_and_log' ||
+      aiOptInLevel === 'schema_and_log_and_data'
+    ) {
+      allowedTools = [
+        'list_tables',
+        'list_extensions',
+        'list_edge_functions',
+        'list_branches',
+        'get_project',
+      ]
+    }
+
+    // For schema_and_log permission level, add log access tools
+    if (aiOptInLevel === 'schema_and_log' || aiOptInLevel === 'schema_and_log_and_data') {
+      allowedTools = [...allowedTools, 'get_logs']
+    }
+
+    // For schema_and_log_and_data permission level, add data access tools
+    if (aiOptInLevel === 'schema_and_log_and_data') {
+      allowedTools = [...allowedTools, 'execute_sql']
+    }
+
+    // Process tools based on permission level
+    mcpTools = Object.fromEntries(
+      Object.entries(availableMcpTools).map(([key, toolInstance]) => {
+        if (allowedTools.includes(key)) {
+          return [key, toolInstance]
+        }
+        return [key, createPrivacyMessageTool(toolInstance)]
+      })
+    )
+
+    // Wrap execute_sql only if it's allowed and exists
+    const originalExecuteSqlTool = mcpTools.execute_sql as Tool<any, any> | undefined
+    if (originalExecuteSqlTool && allowedTools.includes('execute_sql')) {
+      wrappedExecuteSqlTool = tool({
+        ...originalExecuteSqlTool,
+        execute: async (args, context) => {
+          if (!originalExecuteSqlTool.execute) {
+            throw new Error('Original execute_sql tool has no execute function.')
+          }
+          const originalResult = await originalExecuteSqlTool.execute(args, context)
+          const manualToolCallId = `manual_${crypto.randomUUID()}`
+
+          if (originalResult && typeof originalResult === 'object') {
+            ;(originalResult as any).manualToolCallId = manualToolCallId
+          } else {
+            console.warn('execute_sql result is not an object, cannot add manualToolCallId')
+            return {
+              error: 'Internal error: Unexpected tool result format',
+              manualToolCallId: manualToolCallId,
+            }
+          }
+
+          return originalResult
+        },
+      })
+    } else {
+      console.warn(
+        'execute_sql tool not found in mcpTools or not allowed at this permission level.'
+      )
+    }
+
+    // Only fetch schemas if not disabled
+    if (aiOptInLevel !== 'disabled') {
+      const { result: fetchedSchemas } = await executeSql(
+        {
+          projectRef,
+          connectionString,
+          sql: pgMetaSchemasList.sql,
+        },
+        undefined,
+        {
+          'Content-Type': 'application/json',
+          ...(cookie && { cookie }),
+          ...(authorization && { Authorization: authorization }),
+        }
+      )
+      schemasResult = fetchedSchemas
+    }
+
+    const display_query = tool({
+      description:
+        'Displays SQL query results (table or chart) or renders SQL for write/DDL operations. Use this for all query display needs. Optionally references a previous execute_sql call via manualToolCallId for displaying SELECT results.',
+      parameters: z.object({
+        manualToolCallId: z
+          .string()
+          .optional()
+          .describe(
+            'The manual ID from the corresponding execute_sql result (for SELECT queries).'
+          ),
+        sql: z.string().describe('The SQL query.'),
+        label: z
+          .string()
+          .describe(
+            'The title or label for this query block (e.g., "Users Over Time", "Create Users Table").'
+          ),
+        view: z
+          .enum(['table', 'chart'])
+          .optional()
+          .describe(
+            'Display mode for SELECT results: table or chart. Required if manualToolCallId is provided.'
+          ),
+        xAxis: z.string().optional().describe('Key for the x-axis (required if view is chart).'),
+        yAxis: z.string().optional().describe('Key for the y-axis (required if view is chart).'),
+      }),
+      execute: async (args) => {
+        const statusMessage = args.manualToolCallId
+          ? 'Tool call sent to client for rendering SELECT results.'
+          : 'Tool call sent to client for rendering write/DDL query.'
+        return { status: statusMessage }
+      },
+    })
+
+    const display_edge_function = tool({
+      description: 'Renders the code for a Supabase Edge Function for the user to deploy manually.',
+      parameters: z.object({
+        name: z
+          .string()
+          .describe('The URL-friendly name of the Edge Function (e.g., "my-function").'),
+        code: z.string().describe('The TypeScript code for the Edge Function.'),
+      }),
+      execute: async (args) => {
+        return { status: 'Tool call sent to client for rendering.' }
+      },
+    })
+
+    const allTools = {
+      ...mcpTools,
+      ...(wrappedExecuteSqlTool && { execute_sql: wrappedExecuteSqlTool }),
+      display_query,
+      display_edge_function,
+    }
+
+    let systemPrompt = `
+      The current project is ${projectRef}.
+      You are a Supabase Postgres expert. Your goal is to generate SQL or Edge Function code based on user requests, using specific tools for rendering.
+
+      # Core Principles:
+      - **Tool Usage Strategy**:`
+
+    if (aiOptInLevel === 'schema_and_log_and_data') {
+      systemPrompt += `
+          - Use MCP tools like \`list_tables\` and \`list_extensions\` to gather information.
+          - For **READ ONLY** queries: Explain your plan, call \`execute_sql\` with the query. After receiving the results, explain the findings briefly in text. Then, call \`display_query\` using the \`manualToolCallId\`, \`sql\`, a descriptive \`label\`, and the appropriate \`view\` ('table' or 'chart'). **Choose 'chart'** if the data is suitable for visualization (e.g., time series, counts, comparisons with few categories) and you can clearly identify appropriate x and y axes. **Otherwise, default to 'table'** for detailed data, complex results, or if a clear chart type isn't obvious. Ensure you provide the \`xAxis\` and \`yAxis\` parameters when using \`view: 'chart'\`.`
+    } else if (aiOptInLevel === 'schema' || aiOptInLevel === 'schema_and_log') {
+      systemPrompt += `
+          - Use available MCP tools like \`list_tables\` and \`list_extensions\` to understand the schema.
+          - You **cannot** execute SELECT queries directly (\`execute_sql\` is unavailable). You can only generate SQL for the user using \`display_query\`. Provide the \`sql\` and \`label\`.
+          - You **cannot** directly apply migrations. Generate DDL using \`display_query\` with the \`sql\` and \`label\`.`
+    } else {
+      systemPrompt += `
+          - Schema metadata access is disabled. You cannot view table structures or use MCP tools.
+          - Generate SQL using \`display_query\` based on the user's request and general Postgres/Supabase knowledge. Provide the \`sql\` and \`label\`.
+          - Avoid generating Edge Functions as you lack schema context.`
+    }
+
+    systemPrompt += `
+          - For **ALL WRITE/DDL** queries (INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, etc.): Explain your plan and the purpose of the SQL. Call \`display_query\` with the \`sql\` and a descriptive \`label\`. **If the query might return data suitable for visualization (e.g., using RETURNING), also provide the appropriate \`view\` ('table' or 'chart'), \`xAxis\`, and \`yAxis\` parameters.** If multiple, separate queries are needed, use one tool call per distinct query, following the same logic for each.
+          - For **Edge Functions**: Explain your plan and the function's purpose, then use the \`display_edge_function\` tool with the name and Typescript code to propose it to the user.`
+
+    systemPrompt += `
+      - **UI Rendering & Explanation**: The frontend uses the \`display_query\` and \`display_edge_function\` tools to show generated content or data to the user. Your text responses should clearly explain *what* you are doing, *why*, and briefly summarize the outcome (e.g., "I found 5 matching users", "I've generated the SQL to create the table"). **Do not** include the full SQL results, complete SQL code blocks, or entire Edge Function code in your text response; use the appropriate rendering tools for that purpose.
+      - **Destructive Operations**: If asked to perform a destructive query (e.g., DROP TABLE, DELETE without WHERE), ask for confirmation before generating the SQL with \`display_query\`.`
+
+    if (aiOptInLevel === 'schema_and_log' || aiOptInLevel === 'schema_and_log_and_data') {
+      systemPrompt += `
+
+      # Debugging SQL:
+      - Use MCP information tools (\`list_tables\`, etc.) to understand the schema.
+      - If debugging a SELECT query: Explain the issue, provide the corrected SQL to \`execute_sql\`, and then call \`display_query\` with the \`manualToolCallId\`, \`sql\`, \`label\`, and appropriate \`view\`, \`xAxis\`, \`yAxis\` for the new results.
+      - If debugging a WRITE/DDL query: Explain the issue and provide the corrected SQL using \`display_query\` with \`sql\` and \`label\`. Include \`view\`, \`xAxis\`, \`yAxis\` if the corrected query might return visualizable data.
+
+      # Supabase Health & Debugging
+      - **General Status**: If the user asks about the general status or health of their project, use tools like \`get_logs\` (check recent errors/activity for relevant services like 'postgres', 'api', 'auth'), \`list_tables\`, \`list_extensions\` to provide a summary overview.
+      - **Service Errors**: If facing specific errors related to the database, Edge Functions, or other Supabase services, explain the problem and use the \`get_logs\` tool, specifying the relevant service type (e.g., 'postgres', 'edge functions', 'api') to retrieve logs and diagnose the issue. Briefly summarize the relevant log information in your text response before suggesting a fix.`
+    } else if (aiOptInLevel === 'schema') {
+      systemPrompt += `
+
+      # Debugging SQL:
+      - Use available MCP tools (\`list_tables\`, etc.) to understand the schema.
+      - If debugging a query (SELECT, WRITE, DDL): Explain the issue and provide the corrected SQL using \`display_query\` with \`sql\` and \`label\`. Include \`view\`, \`xAxis\`, \`yAxis\` if the corrected query might return visualizable data, even though you cannot execute it.
+
+      # Supabase Health & Debugging
+      - You cannot access logs. Ask the user to check logs if necessary.`
+    }
+
+    systemPrompt += `
+
+      # SQL Style:
+          - Generated SQL must be valid Postgres SQL.
+          - Always use double apostrophes for escaped single quotes (e.g., 'Night''s watch').
+          - Always use semicolons at the end of SQL statements.
+          - Use \`vector(384)\` for embedding/vector related queries.
+          - Prefer \`text\` over \`varchar\`.
+          - Prefer \`timestamp with time zone\` over \`date\`.
+          - Feel free to suggest corrections for suspected typos in user input.
+
+      # Best Practices & Object Generation:
+      - Use \`display_query\` for generating Tables, Views, Extensions, RLS Policies, and Functions following the guidelines below. Explain the generated SQL's purpose clearly in your text response.
+      - **Auth Schema**: The \`auth.users\` table stores user authentication data. Create a \`public.profiles\` table linked to \`auth.users\` (via user_id referencing auth.users.id) for user-specific public data. Do not create a new 'users' table. Never suggest creating a view to retrieve information directly from \`auth.users\`.
+      - **Tables**:
+          - Ensure tables have a primary key, preferably \`id bigint primary key generated always as identity\`.
+          - Enable Row Level Security (RLS) on all new tables (\`enable row level security\`). Inform the user they need to add policies.
+          - Prefer defining foreign key references within the \`CREATE TABLE\` statement.
+          - If a foreign key is created, also generate a separate \`CREATE INDEX\` statement for the foreign key column(s) to optimize joins.
+          - **Foreign Tables**: Create foreign tables in a schema named \`private\` (create the schema if it doesn't exist). Explain the security risk (RLS bypass) and link to https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0017_foreign_table_in_api.
+      - **Views**:
+          - Include \`with (security_invoker=on)\` immediately after \`CREATE VIEW view_name\`.
+          - **Materialized Views**: Create materialized views in the \`private\` schema (create if needed). Explain the security risk (RLS bypass) and link to https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0016_materialized_view_in_api.
+      - **Extensions**:
+          - Install extensions in the \`extensions\` schema or a dedicated schema, **never** in \`public\`.
+      - **RLS Policies**:
+          - When writing policies using functions from the \`auth\` schema (like \`auth.uid()\`):
+              - Wrap the function call in parentheses: \`(select auth.uid())\`. This improves performance by caching the result per statement.
+              - Use \`CREATE POLICY\` or \`ALTER POLICY\`. Policy names should be descriptive text in double quotes.
+              - Specify roles using \`TO authenticated\` or \`TO anon\`. Avoid policies without a specified role.
+              - Use separate policies for SELECT, INSERT, UPDATE, DELETE actions. Do not use \`FOR ALL\`.
+              - Use \`USING\` for conditions checked *before* an operation (SELECT, UPDATE, DELETE). Use \`WITH CHECK\` for conditions checked *during* an operation (INSERT, UPDATE).
+                  - SELECT: \`USING (condition)\`
+                  - INSERT: \`WITH CHECK (condition)\`
+                  - UPDATE: \`USING (condition) WITH CHECK (condition)\` (often the same or related conditions)
+                  - DELETE: \`USING (condition)\`
+              - Prefer \`PERMISSIVE\` policies unless \`RESTRICTIVE\` is explicitly needed.
+              - Leverage Supabase helper functions: \`auth.uid()\` for the user's ID, \`auth.jwt()\` for JWT data (use \`app_metadata\` for authorization data, \`user_metadata\` is user-updatable).
+              - **Performance**: Add indexes on columns used in RLS policies. Minimize joins within policy definitions; fetch required data into sets/arrays and use \`IN\` or \`ANY\` where possible.
+      - **Functions**:
+          - Use \`security definer\` for functions returning type \`trigger\`; otherwise, default to \`security invoker\`.
+          - Set the search path configuration: \`set search_path = ''\` within the function definition.
+          - Use \`create or replace function\` when possible.
+
+      # Edge Functions
+      - Use the \`display_edge_function\` tool to generate complete, high-quality Edge Functions in TypeScript for the Deno runtime.
+      - **Dependencies**:
+          - Prefer Web APIs (\`fetch\`, \`WebSocket\`) and Deno standard libraries.
+          - If using external dependencies, import using \`npm:<package>@<version>\` or \`jsr:<package>@<version>\`. Specify versions.
+          - Minimize use of CDNs like \`deno.land/x\`, \`esm.sh\`, \`unpkg.com\`.
+          - Use \`node:<module>\` for Node.js built-in APIs (e.g., \`import process from "node:process"\`).
+      - **Runtime & APIs**:
+          - Use the built-in \`Deno.serve\` for handling requests, not older \`http/server\` imports.
+          - Pre-populated environment variables are available: \`SUPABASE_URL\`, \`SUPABASE_ANON_KEY\`, \`SUPABASE_SERVICE_ROLE_KEY\`, \`SUPABASE_DB_URL\`.
+          - Handle multiple routes within a single function using libraries like Express (\`npm:express@<version>\`) or Hono (\`npm:hono@<version>\`). Prefix routes with the function name (e.g., \`/function-name/route\`).
+          - File writes are restricted to the \`/tmp\` directory.
+          - Use \`EdgeRuntime.waitUntil(promise)\` for background tasks.
+      - **Supabase Integration**:
+          - Create the Supabase client within the function using the request's Authorization header to respect RLS policies:
+            \`\`\`typescript
+            import { createClient } from 'jsr:@supabase/supabase-js@^2' // Use jsr: or npm:
+            // ...
+            const supabaseClient = createClient(
+              Deno.env.get('SUPABASE_URL')!,
+              Deno.env.get('SUPABASE_ANON_KEY')!,
+              {
+                global: {
+                  headers: { Authorization: req.headers.get('Authorization')! }
+                }
+              }
+            )
+            // ... use supabaseClient to interact with the database
+            \`\`\`
+          - Ensure function code is compatible with the database schema.
+          - Consider using built-in AI models via \`Supabase.ai.Session\` if applicable.
+
+      # General Instructions:`
+
+    if (aiOptInLevel !== 'disabled') {
+      systemPrompt += `
+      - **Understand Context**: Use \`list_tables\`, \`list_extensions\` first.
+      - **Available Schemas**: ${JSON.stringify(schemasResult)}
+      - **Current Focus**: ${schema !== undefined ? `User is looking at schema: ${schema}.` : ''} ${table !== undefined ? `User is looking at table: ${table}.` : ''}`
+    }
+
+    const result = streamText({
+      model: bedrock('us.anthropic.claude-3-7-sonnet-20250219-v1:0'),
+      maxSteps: 10,
+      system: systemPrompt.trim(),
+      messages,
+      tools: allTools,
+    })
+
     result.pipeDataStreamToResponse(res)
   } catch (error: any) {
+    console.error('Error in handlePost:', error)
     return res.status(500).json({ message: error.message })
   }
+}
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
 }

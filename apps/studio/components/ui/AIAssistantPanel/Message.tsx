@@ -1,3 +1,4 @@
+import { Message as VercelMessage } from '@ai-sdk/react'
 import { User } from 'lucide-react'
 import { createContext, PropsWithChildren, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -6,6 +7,9 @@ import remarkGfm from 'remark-gfm'
 
 import { AiIconAnimation, cn, markdownComponents, WarningIcon } from 'ui'
 import { Heading3, InlineCode, Link, ListItem, MarkdownPre, OrderedList } from './MessageMarkdown'
+import { QueryBlock } from '../QueryBlock/QueryBlock'
+import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
+import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 
 interface MessageContextType {
   isLoading: boolean
@@ -21,10 +25,9 @@ const baseMarkdownComponents: Partial<Components> = {
   a: Link,
 }
 
-interface MessageProps {
+interface MessageProps extends Omit<VercelMessage, 'id'> {
   id: string
-  role: 'function' | 'system' | 'user' | 'assistant' | 'data' | 'tool'
-  content?: string
+  message: VercelMessage
   isLoading: boolean
   readOnly?: boolean
   action?: React.ReactNode
@@ -42,15 +45,13 @@ interface MessageProps {
 
 export const Message = function Message({
   id,
-  role,
-  content,
+  message,
   isLoading,
   readOnly,
   action = null,
   variant = 'default',
   onResults,
 }: PropsWithChildren<MessageProps>) {
-  const isUser = role === 'user'
   const allMarkdownComponents: Partial<Components> = useMemo(
     () => ({
       ...markdownComponents,
@@ -61,10 +62,20 @@ export const Message = function Message({
         </MarkdownPre>
       ),
     }),
-    []
+    [id, onResults]
   )
 
-  if (!content) return null
+  if (!message) {
+    console.error(`Message component received undefined message prop for id: ${id}`)
+    return null
+  }
+
+  const { role, content, parts } = message
+  const isUser = role === 'user'
+
+  const shouldUsePartsRendering = parts && parts.length > 0
+
+  const hasTextContent = content && content.trim().length > 0
 
   return (
     <MessageContext.Provider value={{ isLoading, readOnly }}>
@@ -87,13 +98,100 @@ export const Message = function Message({
           ) : (
             <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
           )}
-          <ReactMarkdown
-            className="space-y-5 flex-1 [&>*>code]:text-xs [&>*>*>code]:text-xs min-w-0 [&_li]:space-y-4"
-            remarkPlugins={[remarkGfm]}
-            components={allMarkdownComponents}
-          >
-            {content}
-          </ReactMarkdown>
+
+          <div className="flex-1 min-w-0 space-y-4">
+            {shouldUsePartsRendering ? (
+              parts.map((part, index) => {
+                switch (part.type) {
+                  case 'text':
+                    return (
+                      <ReactMarkdown
+                        key={`${id}-part-${index}`}
+                        className="prose prose-sm [&_h3]:text-base [&_ol>li]:pl-4 [&_ol>li]:my-0 [&_li>p]:mt-0 space-y-5 [&>*>code]:text-xs [&>*>*>code]:text-xs [&_li]:space-y-4"
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          ...baseMarkdownComponents,
+                          ...markdownComponents,
+                          pre: 'pre',
+                        }}
+                      >
+                        {part.text}
+                      </ReactMarkdown>
+                    )
+
+                  case 'tool-invocation': {
+                    const { toolCallId, toolName, args } = part.toolInvocation
+                    switch (toolName) {
+                      case 'display_query': {
+                        if (args.manualToolCallId) {
+                          return (
+                            <DisplayBlockRenderer
+                              key={`${id}-tool-${toolCallId}`}
+                              messageId={id}
+                              manualId={args.manualToolCallId}
+                              initialArgs={args}
+                              messageParts={parts}
+                              isLoading={isLoading}
+                              onResults={onResults}
+                            />
+                          )
+                        } else {
+                          return (
+                            <div
+                              key={`${id}-tool-${toolCallId}`}
+                              className="w-auto overflow-x-hidden"
+                            >
+                              <QueryBlock
+                                label={args.label || 'SQL Snippet'}
+                                sql={args.sql}
+                                showSql={true}
+                                isChart={false}
+                                showRunButtonIfNotReadOnly={true}
+                                isLoading={false}
+                              />
+                            </div>
+                          )
+                        }
+                      }
+                      case 'display_edge_function': {
+                        return (
+                          <div
+                            key={`${id}-tool-${toolCallId}`}
+                            className="w-auto -ml-[36px] overflow-x-hidden"
+                          >
+                            <EdgeFunctionBlock
+                              label={args.name || 'Edge Function'}
+                              code={args.code}
+                              functionName={args.name || 'my-function'}
+                              showCode={!readOnly}
+                            />
+                          </div>
+                        )
+                      }
+                      default:
+                        return null
+                    }
+                  }
+                  case 'reasoning':
+                  case 'source':
+                  case 'file':
+                    return null
+                  default:
+                    return null
+                }
+              })
+            ) : hasTextContent ? (
+              <ReactMarkdown
+                className="prose prose-sm [&_>h3]:text-base [&_ol>li]:pl-4 [&_ol>li]:my-0 space-y-5 flex-1 [&>*>code]:text-xs [&>*>*>code]:text-xs min-w-0 [&_li]:space-y-4"
+                remarkPlugins={[remarkGfm]}
+                components={allMarkdownComponents}
+              >
+                {content}
+              </ReactMarkdown>
+            ) : (
+              <span className="text-foreground-lighter italic">Assistant is thinking...</span>
+            )}
+          </div>
         </div>
       </div>
     </MessageContext.Provider>
