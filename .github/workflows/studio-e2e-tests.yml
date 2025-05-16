@@ -30,7 +30,7 @@ permissions:
 
 jobs:
   test:
-    if: github.event_name == 'repository_dispatch' && client_payload.project == 'studio'
+    if: github.event_name == 'repository_dispatch' && github.event.client_payload.project == 'studio'
     timeout-minutes: 60
     runs-on: ubuntu-latest
     # Make the job non-blocking
