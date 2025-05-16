@@ -7,6 +7,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "test": "vitest",
+    "test:coverage": "vitest --run --coverage",
     "clean": "rimraf node_modules",
     "typecheck": "tsc --noEmit"
   },
@@ -15,6 +16,7 @@
     "@monaco-editor/react": "^4.6.0",
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",
+    "@vitest/coverage-v8": "^3.0.9",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
     "cmdk": "^1.0.0",
