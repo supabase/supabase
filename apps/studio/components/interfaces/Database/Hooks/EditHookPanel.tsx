@@ -14,11 +14,12 @@ import {
 } from 'data/edge-functions/edge-functions-query'
 import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { isValidHttpUrl, tryParseJson, uuidv4 } from 'lib/helpers'
+import { isValidHttpUrl, uuidv4 } from 'lib/helpers'
 import { Button, Checkbox, Form, Input, Listbox, Radio, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import HTTPRequestFields from './HTTPRequestFields'
 import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
+import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
 
 export interface EditHookPanelProps {
   visible: boolean
@@ -231,15 +232,13 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       return value
     })
 
-    const payload: any = {
+    const payload: PGTriggerCreate = {
       events,
       activation: 'AFTER',
       orientation: 'ROW',
-      enabled_mode: 'ORIGIN',
       name: values.name,
       table: selectedTable.name,
       schema: selectedTable.schema,
-      table_id: values.table_id,
       function_name: 'http_request',
       function_schema: 'supabase_functions',
       function_args: [
@@ -262,7 +261,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
         projectRef: project?.ref,
         connectionString: project?.connectionString,
         originalTrigger: selectedHook,
-        updatedTrigger: payload,
+        updatedTrigger: { ...payload, enabled_mode: 'ORIGIN' },
       })
     }
   }
