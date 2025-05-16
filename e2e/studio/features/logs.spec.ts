@@ -82,9 +82,9 @@ test.describe('Logs', () => {
       await expect(tabPanel, {
         message: 'Log selection should be visible',
       }).toContainText('Random event message: uuid-1')
-      await expect(tabPanel.getByTestId('log-selection-timestamp'), {
-        message: 'Log selection timestamp should be visible',
-      }).toContainText('15 Apr 18:53:20')
+      await expect(tabPanel.getByTestId('log-selection-id'), {
+        message: 'Log selection ID should be visible',
+      }).toContainText('uuid-1')
     })
   }
 })
