@@ -4160,13 +4160,12 @@ export interface operations {
       }
     }
     responses: {
-      /** @description [Alpha] Create a new signing key for the project in standby status */
       201: {
         headers: {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['CreateSigningKeyBody']
+          'application/json': components['schemas']['SigningKeyResponse']
         }
       }
       403: {
