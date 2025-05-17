@@ -29,15 +29,29 @@ Self hosted Edge functions are in beta. There will be breaking changes to APIs /
 
 ## How to run locally
 
-```bash
-./run.sh start --main-service /path/to/supabase/functions -p 9000
+Place you functions in `<directory_containing_docker-compose.yml>/volumes/functions/` then, edit the `docker-compose.yml` file. In the functions section add
 ```
-
-using Docker:
-
-```bash
-docker build -t edge-runtime .
-docker run -it --rm -p 9000:9000 -v /path/to/supabase/functions:/usr/services supabase/edge-runtime start --main-service /usr/services
+ports:
+  - 9000:9000
+```
+and edit the command to start your function 
+```
+command:
+  - start
+  - --main-service
+  - /home/deno/functions/<function-name>
+```
+or to start all functions
+```
+command:
+  - start
+  - --main-service
+  - /home/deno/functions
+```
+finally restart supabase
+```
+docker compose down
+docker compose up -d
 ```
 
 ## How to update to a newer Deno version
