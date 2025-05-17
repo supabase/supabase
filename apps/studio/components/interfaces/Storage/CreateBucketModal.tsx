@@ -60,7 +60,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
 
     if (values.name && !/^[a-z0-9.-]+$/.test(values.name)) {
       errors.name =
-        'The name of the bucket must only container lowercase letters, numbers, dots, and hyphens'
+        'The name of the bucket must only contain lowercase letters, numbers, dots, and hyphens'
     }
 
     if (values.name && values.name.endsWith(' ')) {
