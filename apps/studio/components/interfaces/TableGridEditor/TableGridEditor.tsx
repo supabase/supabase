@@ -6,7 +6,6 @@ import { useCallback } from 'react'
 import { useParams } from 'common'
 import { SupabaseGrid } from 'components/grid/SupabaseGrid'
 import { useLoadTableEditorStateFromLocalStorageIntoUrl } from 'components/grid/SupabaseGrid.utils'
-import { useEditorType } from 'components/layouts/editors/EditorsLayout.hooks'
 import {
   Entity,
   isMaterializedView,
@@ -19,6 +18,7 @@ import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import Link from 'next/link'
 import { useAppStateSnapshot } from 'state/app-state'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
@@ -39,7 +39,6 @@ export const TableGridEditor = ({
   selectedTable,
 }: TableGridEditorProps) => {
   const router = useRouter()
-  const editor = useEditorType()
   const project = useSelectedProject()
   const appSnap = useAppStateSnapshot()
   const { ref: projectRef, id } = useParams()
@@ -66,9 +65,7 @@ export const TableGridEditor = ({
   })
 
   const onClearDashboardHistory = () => {
-    if (projectRef && editor) {
-      appSnap.setDashboardHistory(projectRef, editor === 'table' ? 'editor' : editor, undefined)
-    }
+    if (projectRef) appSnap.setDashboardHistory(projectRef, 'editor', undefined)
   }
 
   const onTableCreated = useCallback(
@@ -83,7 +80,7 @@ export const TableGridEditor = ({
     if (isTableEditorTabsEnabled && selectedTable) {
       // Close tab
       const tabId = createTabId(selectedTable.entity_type, { id: selectedTable.id })
-      tabs.handleTabClose({ id: tabId, router, editor, onClearDashboardHistory })
+      tabs.handleTabClose({ id: tabId, router, editor: 'table', onClearDashboardHistory })
     } else {
       const tables = await getTables(selectedSchema)
       if (tables.length > 0) {
@@ -117,22 +114,44 @@ export const TableGridEditor = ({
             description="This table doesn't exist in your database"
           >
             {isTableEditorTabsEnabled && (
-              <Button
-                type="default"
-                className="mt-2"
-                onClick={() => {
-                  if (tabId) {
-                    tabs.handleTabClose({
-                      id: tabId,
-                      router,
-                      editor,
-                      onClearDashboardHistory,
-                    })
-                  }
-                }}
-              >
-                Close tab
-              </Button>
+              <>
+                {!!tabId ? (
+                  <Button
+                    type="default"
+                    className="mt-2"
+                    onClick={() => {
+                      tabs.handleTabClose({
+                        id: tabId,
+                        router,
+                        editor: 'table',
+                        onClearDashboardHistory,
+                      })
+                    }}
+                  >
+                    Close tab
+                  </Button>
+                ) : tabs.openTabs.length > 0 ? (
+                  <Button
+                    asChild
+                    type="default"
+                    className="mt-2"
+                    onClick={() => appSnap.setDashboardHistory(projectRef, 'editor', undefined)}
+                  >
+                    <Link href={`/project/${projectRef}/editor/${tabs.openTabs[0].split('-')[1]}`}>
+                      Close tab
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button
+                    asChild
+                    type="default"
+                    className="mt-2"
+                    onClick={() => appSnap.setDashboardHistory(projectRef, 'editor', undefined)}
+                  >
+                    <Link href={`/project/${projectRef}/editor`}>Head back</Link>
+                  </Button>
+                )}
+              </>
             )}
           </Admonition>
         </div>
