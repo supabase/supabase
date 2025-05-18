@@ -151,7 +151,7 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
 
       if (isEditing) {
         form.reset(selectedTrigger)
-      } else {
+      } else if (tables.length > 0) {
         form.reset({
           ...defaultValues,
           tableId: tables[0].id.toString(),
@@ -168,7 +168,11 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent size="lg" className="flex flex-col gap-0">
           <SheetHeader>
-            <SheetTitle>Create a new database trigger</SheetTitle>
+            <SheetTitle>
+              {isEditing
+                ? `Edit database trigger: ${selectedTrigger.name}`
+                : 'Create a new database trigger'}
+            </SheetTitle>
           </SheetHeader>
 
           <Form_Shadcn_ {...form}>
