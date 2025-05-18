@@ -1,3 +1,5 @@
+import type { components } from 'data/api'
+
 export type VercelFramework =
   | (
       | 'blitzjs'
@@ -137,6 +139,8 @@ export type Imetadata = {
       preview: boolean
     }
     supabaseDirectory?: string
+    supabaseChangesOnly?: boolean
+    branchLimit?: number
   }
   link?: VercelGitLink
   name: string
@@ -151,11 +155,9 @@ export type IntegrationProjectConnection = {
   supabase_project_ref: string
   foreign_project_id: string
   organization_integration_id: string
+  env_sync_targets?: string[]
+  public_env_var_prefix?: string
   metadata: Imetadata
-}
-
-export type IntegrationsVariables = {
-  orgSlug?: string
 }
 
 export type IntegrationProjectConnectionPayload = {
@@ -171,7 +173,6 @@ export type userDetails = {
   primary_email: string
 }
 type addedBy = userDetails
-type updatedBy = userDetails
 
 export type IntegrationName = 'Vercel' | 'GitHub' // | 'Netlify'
 export type VercelAccountType = 'Team' | 'Personal'
@@ -249,10 +250,23 @@ export type IntegrationConnectionsCreateVariables = {
     metadata: any
   }
   orgSlug: string | undefined
+  new?: {
+    installation_id: number
+    project_ref: string
+    repository_id: number
+  }
 }
+
+export type GitHubConnectionCreateVariables = {
+  organizationId: number
+  connection: components['schemas']['CreateGitHubConnectionsBody']
+}
+
+export type EnvironmentTargets = 'production' | 'preview' | 'development'
 
 export type UpdateConnectionPayload = {
   id: string
   organizationIntegrationId: string
-  metadata: Imetadata
+  envSyncTargets: EnvironmentTargets[]
+  publicEnvVarPrefix?: string
 }

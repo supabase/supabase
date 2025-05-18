@@ -1,12 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import BasicHooksConfig from 'components/interfaces/Auth/Hooks/BasicHooksConfig'
-import EnterpriseHooksConfig from 'components/interfaces/Auth/Hooks/EnterpriseHooksConfig'
-import { AuthLayout } from 'components/layouts'
-import { FormsContainer } from 'components/ui/Forms'
+import { HooksListing } from 'components/interfaces/Auth/Hooks/HooksListing'
+import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
-import { NextPageWithLayout } from 'types'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import type { NextPageWithLayout } from 'types'
 
 const Hooks: NextPageWithLayout = () => {
   const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
@@ -14,20 +15,26 @@ const Hooks: NextPageWithLayout = () => {
 
   if (isPermissionsLoaded && !canReadAuthSettings) {
     return <NoPermission isFullPage resourceText="access your project's auth hooks" />
-  } else {
-    return (
-      <FormsContainer>
-        <div className="flex flex-col gap-8">
-          <BasicHooksConfig />
-          <EnterpriseHooksConfig />
-        </div>
-      </FormsContainer>
-    )
   }
+
+  return (
+    <ScaffoldContainer>
+      <HooksListing />
+    </ScaffoldContainer>
+  )
 }
 
-Hooks.getLayout = (page) => {
-  return <AuthLayout>{page}</AuthLayout>
-}
+Hooks.getLayout = (page) => (
+  <DefaultLayout>
+    <AuthLayout>
+      <PageLayout
+        title="Auth Hooks"
+        subtitle="Use Postgres functions or HTTP endpoints to customize the behavior of Supabase Auth to meet your needs"
+      >
+        {page}
+      </PageLayout>
+    </AuthLayout>
+  </DefaultLayout>
+)
 
 export default Hooks

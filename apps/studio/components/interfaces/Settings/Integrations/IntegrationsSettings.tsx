@@ -1,18 +1,18 @@
 import Link from 'next/link'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, IconAlertCircle } from 'ui'
 
 import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelVercelProjectLinker'
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
-import { useProjectByRef, useSelectedProject } from 'hooks'
+import { useProjectByRef, useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
 import GitHubSection from './GithubIntegration/GithubSection'
 import VercelSection from './VercelIntegration/VercelSection'
 
 export const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
     <img
-      className="border rounded-lg shadow w-48 mt-6 border-body"
+      className="border rounded-lg shadow w-full sm:w-48 mt-6 border-body"
       src={`${BASE_PATH}/img/integrations/covers/${title}-cover.png`}
       alt={`${title} cover`}
     />
@@ -29,7 +29,7 @@ const IntegrationSettings = () => {
       {isBranch && (
         <ScaffoldContainer>
           <Alert_Shadcn_ variant="default" className="mt-6">
-            <IconAlertCircle strokeWidth={2} />
+            <WarningIcon />
             <AlertTitle_Shadcn_>
               You are currently on a preview branch of your project
             </AlertTitle_Shadcn_>

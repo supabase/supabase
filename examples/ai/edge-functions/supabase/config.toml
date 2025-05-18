@@ -1,0 +1,52 @@
+# A string used to distinguish different Supabase projects on the same host. Defaults to the
+# working directory name when running `supabase init`.
+project_id = "ai-in-edge-functions"
+
+[api]
+enabled = true
+# Port to use for the API URL.
+port = 54321
+# Schemas to expose in your API. Tables, views and stored procedures in this schema will get API
+# endpoints. `public` is always included.
+schemas = ["public", "graphql_public"]
+# Extra schemas to add to the search_path of every request. `public` is always included.
+extra_search_path = ["public", "extensions"]
+# The maximum number of rows returns from a view, table, or stored procedure. Limits payload size
+# for accidental or malicious requests.
+max_rows = 1000
+
+[db]
+# Port to use for the local database URL.
+port = 54322
+# Port used by db diff command to initialize the shadow database.
+shadow_port = 54320
+# The database major version to use. This has to be the same as your remote database's. Run `SHOW
+# server_version;` on the remote database to check.
+major_version = 15
+
+[db.seed]
+# If enabled, seeds the database after migrations during a db reset.
+enabled = true
+# Specifies an ordered list of seed files to load during db reset.
+# Supports glob patterns relative to supabase directory, ie. './seeds/*.sql'
+sql_paths = ['./seed.sql']
+
+[functions.generate-embedding]
+enabled = true
+# verify_jwt = true
+# import_map = "./functions/generate-embedding/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+# entrypoint = "./functions/generate-embedding/index.ts"
+
+[functions.search]
+enabled = true
+# verify_jwt = true
+# import_map = "./functions/search/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+# entrypoint = "./functions/search/index.ts"
+
+# Experimental features may be deprecated any time
+[experimental.webhooks]
+enabled = true

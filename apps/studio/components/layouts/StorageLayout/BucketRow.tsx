@@ -1,7 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import clsx from 'clsx'
 import { noop } from 'lodash'
+import { ChevronDown, Edit2, Trash, XCircle } from 'lucide-react'
 import Link from 'next/link'
+
+import type { Bucket } from 'data/storage/buckets-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Badge,
   Button,
@@ -10,15 +13,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconChevronDown,
-  IconEdit2,
-  IconLoader,
-  IconTrash,
-  IconXCircle,
+  cn,
 } from 'ui'
-
-import { Bucket } from 'data/storage/buckets-query'
-import { useCheckPermissions } from 'hooks'
 
 export interface BucketRowProps {
   bucket: Bucket
@@ -37,12 +33,12 @@ const BucketRow = ({
   onSelectDeleteBucket = noop,
   onSelectEditBucket = noop,
 }: BucketRowProps) => {
-  const canUpdateBuckets = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canUpdateBuckets = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   return (
     <div
       key={bucket.id}
-      className={clsx(
+      className={cn(
         'group flex items-center justify-between rounded-md',
         isSelected && 'text-foreground bg-surface-100'
       )}
@@ -50,7 +46,7 @@ const BucketRow = ({
       {/* Even though we trim whitespaces from bucket names, there may be some existing buckets with trailing whitespaces. */}
       <Link
         href={`/project/${projectRef}/storage/buckets/${encodeURIComponent(bucket.id)}`}
-        className="py-1 px-3 w-full"
+        className={cn('py-1 px-3', isSelected ? 'w-[88%]' : 'w-full')}
       >
         <div className="flex items-center justify-between space-x-2 truncate w-full">
           <p
@@ -61,25 +57,13 @@ const BucketRow = ({
           >
             {bucket.name}
           </p>
-          {bucket.public && <Badge color="yellow">Public</Badge>}
+          {bucket.public && <Badge variant="warning">Public</Badge>}
         </div>
       </Link>
-      {/* [JOSHEN TODO] need to change this */}
-      {false ? (
-        <IconLoader className="animate-spin" size={16} strokeWidth={2} />
-      ) : canUpdateBuckets && isSelected ? (
+      {canUpdateBuckets && isSelected ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              asChild
-              type="text"
-              icon={
-                <IconChevronDown size="tiny" strokeWidth={2} className="text-foreground-light" />
-              }
-              className="mr-1 p-0.5"
-            >
-              <span></span>
-            </Button>
+            <Button type="text" icon={<ChevronDown />} className="mr-1 p-0.5" />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="start">
             <DropdownMenuItem
@@ -87,16 +71,16 @@ const BucketRow = ({
               className="space-x-2"
               onClick={() => onSelectEditBucket()}
             >
-              <IconEdit2 size="tiny" />
+              <Edit2 size={14} />
               <p>Edit bucket</p>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              key="delete-bucket"
+              key="empty-bucket"
               className="space-x-2"
               onClick={() => onSelectEmptyBucket()}
             >
-              <IconXCircle size="tiny" />
+              <XCircle size={14} />
               <p>Empty bucket</p>
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -104,7 +88,7 @@ const BucketRow = ({
               className="space-x-2"
               onClick={() => onSelectDeleteBucket()}
             >
-              <IconTrash size="tiny" />
+              <Trash size={14} />
               <p>Delete bucket</p>
             </DropdownMenuItem>
           </DropdownMenuContent>

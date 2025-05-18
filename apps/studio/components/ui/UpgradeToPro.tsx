@@ -1,35 +1,36 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { ReactNode } from 'react'
-import { Button } from 'ui'
 
-import { useCheckPermissions, useFlag } from 'hooks'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
+import { Button, cn } from 'ui'
+import { ButtonTooltip } from './ButtonTooltip'
 
 interface UpgradeToProProps {
   icon?: ReactNode
   primaryText: string
-  projectRef: string
-  organizationSlug: string
   secondaryText: string
-  addon?: 'pitr' | 'customDomain' | 'computeInstance'
+  addon?: 'pitr' | 'customDomain'
   buttonText?: string
+  source?: string
   disabled?: boolean
 }
 
 const UpgradeToPro = ({
   icon,
   primaryText,
-  projectRef,
-  organizationSlug,
   secondaryText,
   addon,
   buttonText,
+  source = 'upgrade',
   disabled = false,
 }: UpgradeToProProps) => {
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organizationSlug })
-  const plan = subscription?.plan?.id
+  const project = useSelectedProject()
+  const organization = useSelectedOrganization()
+  const plan = organization?.plan?.id
 
   const canUpdateSubscription = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
@@ -39,67 +40,54 @@ const UpgradeToPro = ({
 
   return (
     <div
-      className={[
+      className={cn(
         'block w-full rounded border border-opacity-20 py-4 px-6',
-        'border-overlay bg-surface-200',
-      ].join(' ')}
+        'border-overlay bg-surface-200'
+      )}
     >
-      <div className="flex space-x-3">
+      <div className="flex gap-x-3">
         {icon && <div className="mt-1">{icon}</div>}
-        <div className="flex w-full items-center justify-between space-x-32">
+        <div className="flex flex-col md:flex-row w-full md:items-center justify-between gap-4 md:gap-x-8 xl:gap-x-32">
           <div className="space-y-1">
             <p className="text-sm">{primaryText}</p>
             <div>
               <p className="text-sm text-foreground-light">{secondaryText}</p>
             </div>
           </div>
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger asChild>
-              <Button
-                type="primary"
-                disabled={!canUpdateSubscription || projectUpdateDisabled || disabled}
-                asChild
+          {!canUpdateSubscription || projectUpdateDisabled ? (
+            <ButtonTooltip
+              disabled
+              type="primary"
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: projectUpdateDisabled
+                    ? 'Subscription changes are currently disabled, our engineers are working on a fix'
+                    : !canUpdateSubscription
+                      ? 'You need additional permissions to amend subscriptions'
+                      : undefined,
+                },
+              }}
+            >
+              Reset database password
+            </ButtonTooltip>
+          ) : (
+            <Button
+              asChild
+              type="primary"
+              disabled={!canUpdateSubscription || projectUpdateDisabled || disabled}
+            >
+              <Link
+                href={
+                  plan === 'free'
+                    ? `/org/${organization?.slug ?? '_'}/billing?panel=subscriptionPlan&source=${source}`
+                    : `/project/${project?.ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
+                }
               >
-                <Link
-                  href={
-                    plan === 'free'
-                      ? `/org/${organizationSlug}/billing?panel=subscriptionPlan`
-                      : `/project/${projectRef}/settings/addons?panel=${addon}`
-                  }
-                >
-                  {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable Addon')}
-                </Link>
-              </Button>
-            </Tooltip.Trigger>
-            {!canUpdateSubscription ||
-              (projectUpdateDisabled && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'border border-background text-center', //border
-                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        {projectUpdateDisabled ? (
-                          <>
-                            Subscription changes are currently disabled.
-                            <br />
-                            Our engineers are working on a fix.
-                          </>
-                        ) : !canUpdateSubscription ? (
-                          'You need additional permissions to amend subscriptions'
-                        ) : (
-                          ''
-                        )}
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              ))}
-          </Tooltip.Root>
+                {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable add on')}
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
     </div>

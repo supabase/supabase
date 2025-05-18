@@ -1,13 +1,13 @@
-import { UseQueryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCallback } from 'react'
+import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
+import { PostgresView } from '@supabase/postgres-meta'
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { viewKeys } from './keys'
 
 export type ViewsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   schema?: string
 }
 
@@ -33,7 +33,7 @@ export async function getViews(
   })
 
   if (error) handleError(error)
-  return data
+  return data as PostgresView[]
 }
 
 export type ViewsData = Awaited<ReturnType<typeof getViews>>
@@ -48,20 +48,9 @@ export const useViewsQuery = <TData = ViewsData>(
     ({ signal }) => getViews({ projectRef, connectionString, schema }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
+      // We're using a staleTime of 0 here because the only way to create a
+      // view is via SQL, which we don't know about
       staleTime: 0,
       ...options,
     }
   )
-
-export const useViewsPrefetch = ({ projectRef, connectionString, schema }: ViewsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(
-        schema ? viewKeys.listBySchema(projectRef, schema) : viewKeys.list(projectRef),
-        ({ signal }) => getViews({ projectRef, connectionString, schema }, signal)
-      )
-    }
-  }, [projectRef, schema])
-}

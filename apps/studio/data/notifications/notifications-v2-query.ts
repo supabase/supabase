@@ -1,8 +1,8 @@
 import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 
-import { components } from 'data/api'
-import { ResponseError } from 'types'
+import type { components } from 'data/api'
+import type { ResponseError } from 'types'
 import { notificationKeys } from './keys'
 
 const NOTIFICATIONS_PAGE_LIMIT = 10
@@ -39,21 +39,21 @@ export async function getNotifications(options: NotificationVariables, signal?: 
   const { status, filters, page = 0, limit = NOTIFICATIONS_PAGE_LIMIT } = options
   const { data, error } = await get('/platform/notifications', {
     params: {
-      // @ts-ignore
       query: {
         offset: page * limit,
         limit,
-        ...(status !== undefined ? { status } : { status: ['new', 'seen'] }),
-        ...(filters.priority.length > 0 ? { priority: filters.priority } : {}),
-        ...(filters.organizations.length > 0 ? { org_slug: filters.organizations } : {}),
-        ...(filters.projects.length > 0 ? { project_ref: filters.projects } : {}),
+        // [Alaister]: 'as any' is needed because the API types don't reflect an array of strings
+        ...(status !== undefined ? { status } : { status: ['new', 'seen'].join(',') as any }),
+        ...(filters.priority.length > 0 ? { priority: filters.priority.join(',') as any } : {}),
+        ...(filters.organizations.length > 0 ? { org_slug: filters.organizations.join(',') } : {}),
+        ...(filters.projects.length > 0 ? { project_ref: filters.projects.join(',') } : {}),
       },
     },
     headers: { Version: '2' },
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
 
   return data
 }
@@ -76,7 +76,7 @@ export const useNotificationsV2Query = <TData = NotificationsData>(
       enabled: enabled,
       getNextPageParam(lastPage, pages) {
         const page = pages.length
-        if (lastPage.length < limit) return undefined
+        if ((lastPage ?? []).length < limit) return undefined
         return page
       },
       ...options,

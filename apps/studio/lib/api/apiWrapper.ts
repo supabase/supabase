@@ -1,6 +1,5 @@
-import { withSentry } from '@sentry/nextjs'
 import { isResponseOk } from 'lib/common/fetch'
-import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 import { IS_PLATFORM } from '../constants'
 import { apiAuthenticate } from './apiAuthenticate'
 
@@ -30,9 +29,7 @@ export default async function apiWrapper(
       }
     }
 
-    const func = withSentry(handler as any)
-    // @ts-ignore
-    return await func(req, res)
+    return handler(req, res)
   } catch (error) {
     return res.status(500).json({ error })
   }

@@ -1,6 +1,6 @@
-import { Content, Paragraph, Parent } from 'mdast'
-import { MdxJsxFlowElement } from 'mdast-util-mdx'
-import { Node } from 'unist'
+import type { Content, Paragraph, Root } from 'mdast'
+import type { MdxJsxFlowElement } from 'mdast-util-mdx'
+import type { Node } from 'unist'
 import { visit } from 'unist-util-visit'
 
 /**
@@ -9,8 +9,8 @@ import { visit } from 'unist-util-visit'
  * https://facelessuser.github.io/pymdown-extensions/extensions/tabbed/
  */
 const remarkPyMdownTabs = function () {
-  return function transformer(root: Parent) {
-    visit(root, 'paragraph', (node: Paragraph, nodeIndex: number, parent: Parent) => {
+  return function transformer(root: Root) {
+    visit(root, 'paragraph', (node: Paragraph, nodeIndex: number, parent: Root) => {
       for (let i = 0; i < node.children.length; i++) {
         const child = node.children[i]
         if (child.type !== 'text') {
@@ -110,6 +110,8 @@ const remarkPyMdownTabs = function () {
         return nodeIndex + nodesAdded
       }
     })
+
+    return root
   }
 }
 
@@ -122,7 +124,7 @@ const remarkPyMdownTabs = function () {
  *
  * Splices the discovered siblings out of the original parent and returns them.
  */
-function extractLinkedSiblings(parent: Parent, node: Node, index: number, indentAmount = 4) {
+function extractLinkedSiblings(parent: Root, node: Node, index: number, indentAmount = 4) {
   const { column } = node.position.start
 
   let nextSibling: Content

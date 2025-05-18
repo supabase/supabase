@@ -1,5 +1,5 @@
-import * as React from 'react'
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { Maximize2 } from 'lucide-react'
+import { ChangeEvent, InputHTMLAttributes, SyntheticEvent, useEffect, useRef } from 'react'
 import {
   CalculatedColumn,
   RenderCellProps,
@@ -7,11 +7,12 @@ import {
   RenderHeaderCellProps,
   useRowSelection,
 } from 'react-data-grid'
-import { Button, IconMaximize2 } from 'ui'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { SELECT_COLUMN_KEY } from '../../constants'
-import { useTrackedState } from '../../store'
-import { SupaRow } from '../../types'
+import type { SupaRow } from '../../types'
 
 export const SelectColumn: CalculatedColumn<any, any> = {
   key: SELECT_COLUMN_KEY,
@@ -85,12 +86,12 @@ export const SelectColumn: CalculatedColumn<any, any> = {
   draggable: false,
 }
 
-function stopPropagation(event: React.SyntheticEvent) {
+function stopPropagation(event: SyntheticEvent) {
   event.stopPropagation()
 }
 
 type SharedInputProps = Pick<
-  React.InputHTMLAttributes<HTMLInputElement>,
+  InputHTMLAttributes<HTMLInputElement>,
   'disabled' | 'tabIndex' | 'onClick' | 'aria-label' | 'aria-labelledby'
 >
 
@@ -110,17 +111,16 @@ function SelectCellFormatter({
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
 }: SelectCellFormatterProps) {
-  const state = useTrackedState()
-  const { onEditRow } = state
+  const snap = useTableEditorStateSnapshot()
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleChange(e: ChangeEvent<HTMLInputElement>) {
     onChange(e.target.checked, (e.nativeEvent as MouseEvent).shiftKey)
   }
 
-  function onEditClick(e: React.MouseEvent) {
+  function onEditClick(e: any) {
     e.stopPropagation()
-    if (onEditRow && row) {
-      onEditRow(row)
+    if (row) {
+      snap.onEditRow(row)
     }
   }
 
@@ -137,32 +137,20 @@ function SelectCellFormatter({
         onChange={handleChange}
         onClick={onClick}
       />
-      {onEditRow && row && (
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger asChild>
-            <Button
-              type="text"
-              size="tiny"
-              className="rdg-row__select-column__edit-action"
-              icon={<IconMaximize2 size="tiny" strokeWidth={1.5} className="text-foreground" />}
-              onClick={onEditClick}
-              style={{ padding: '3px' }}
-            />
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background',
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">Expand row</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+      {row && (
+        <ButtonTooltip
+          type="text"
+          size="tiny"
+          className="px-1 rdg-row__select-column__edit-action"
+          icon={<Maximize2 />}
+          onClick={onEditClick}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: 'Expand row',
+            },
+          }}
+        />
       )}
     </div>
   )
@@ -182,13 +170,26 @@ function SelectCellHeader({
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
 }: SelectCellHeaderProps) {
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+  const snap = useTableEditorTableStateSnapshot()
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // indeterminate state === some rows are selected but not all
+  const isIndeterminate = snap.selectedRows.size > 0 && !snap.allRowsSelected
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.indeterminate = isIndeterminate
+    }
+  }, [isIndeterminate])
+
+  function handleChange(e: ChangeEvent<HTMLInputElement>) {
     onChange(e.target.checked, (e.nativeEvent as MouseEvent).shiftKey)
   }
 
   return (
     <div className="sb-grid-select-cell__header">
       <input
+        ref={inputRef}
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
         tabIndex={tabIndex}

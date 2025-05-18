@@ -1,4 +1,4 @@
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { DEFAULT_QUERY_PARAMS } from './Reports.constants'
 
 export enum Presets {
@@ -20,7 +20,12 @@ export type BaseQueries<Keys extends string> = Record<Keys, ReportQuery>
 
 export interface ReportQuery {
   queryType: ReportQueryType
-  sql: (filters: ReportFilterItem[], where?: string, orderBy?: string) => string
+  sql: (
+    filters: ReportFilterItem[],
+    where?: string,
+    orderBy?: string,
+    runIndexAdvisor?: boolean
+  ) => string
 }
 
 export type ReportQueryType = 'db' | 'logs'

@@ -1,13 +1,13 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { organizationKeys } from 'data/organizations/keys'
 import { permissionKeys } from 'data/permissions/keys'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { profileKeys } from './keys'
-import { Profile } from './types'
+import type { Profile } from './types'
 
 export type ProfileResponse = Profile
 

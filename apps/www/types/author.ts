@@ -4,6 +4,7 @@ type Author = {
   position: string
   author_url: string
   author_image_url: string
+  company?: string
 }
 
 export default Author

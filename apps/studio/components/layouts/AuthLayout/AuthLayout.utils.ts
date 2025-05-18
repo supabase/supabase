@@ -1,10 +1,7 @@
-import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
+import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import { IS_PLATFORM } from 'lib/constants'
 
-export const generateAuthMenu = (
-  ref: string,
-  options: { columnLevelPrivileges?: boolean } = {}
-): ProductMenuGroup[] => {
+export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
   return [
     {
       title: 'Manage',
@@ -19,23 +16,19 @@ export const generateAuthMenu = (
           url: `/project/${ref}/auth/policies`,
           items: [],
         },
-        ...(options?.columnLevelPrivileges
-          ? [
-              {
-                name: 'Column Privileges',
-                key: 'column-privileges',
-                url: `/project/${ref}/auth/column-privileges`,
-                items: [],
-                label: 'ALPHA',
-              },
-            ]
-          : []),
         ...(IS_PLATFORM
           ? [
               {
-                name: 'Providers',
-                key: 'providers',
+                name: 'Sign In / Providers',
+                key: 'sign-in-up',
+                pages: ['providers', 'third-party'],
                 url: `/project/${ref}/auth/providers`,
+                items: [],
+              },
+              {
+                name: 'Sessions',
+                key: 'sessions',
+                url: `/project/${ref}/auth/sessions`,
                 items: [],
               },
               {
@@ -45,9 +38,16 @@ export const generateAuthMenu = (
                 items: [],
               },
               {
-                name: 'Email Templates',
-                key: 'templates',
+                name: 'Emails',
+                key: 'emails',
+                pages: ['templates', 'smtp'],
                 url: `/project/${ref}/auth/templates`,
+                items: [],
+              },
+              {
+                name: 'Multi-Factor',
+                key: 'mfa',
+                url: `/project/${ref}/auth/mfa`,
                 items: [],
               },
               {
@@ -57,11 +57,23 @@ export const generateAuthMenu = (
                 items: [],
               },
               {
-                name: 'Hooks',
+                name: 'Attack Protection',
+                key: 'protection',
+                url: `/project/${ref}/auth/protection`,
+                items: [],
+              },
+              {
+                name: 'Auth Hooks',
                 key: 'hooks',
                 url: `/project/${ref}/auth/hooks`,
                 items: [],
                 label: 'BETA',
+              },
+              {
+                name: 'Advanced',
+                key: 'advanced',
+                url: `/project/${ref}/auth/advanced`,
+                items: [],
               },
             ]
           : []),

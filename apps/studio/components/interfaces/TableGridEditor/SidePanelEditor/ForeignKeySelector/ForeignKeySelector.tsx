@@ -1,32 +1,29 @@
-import { PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { sortBy } from 'lodash'
-import { Table } from 'lucide-react'
+import { ArrowRight, Database, HelpCircle, Table, X } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  IconArrowRight,
-  IconDatabase,
-  IconExternalLink,
-  IconHelpCircle,
-  IconX,
   Listbox,
   SidePanel,
 } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { DocsButton } from 'components/ui/DocsButton'
 import InformationBox from 'components/ui/InformationBox'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { uuidv4 } from 'lib/helpers'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import ActionBar from '../ActionBar'
 import { NUMERICAL_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
+import type { ColumnField } from '../SidePanelEditor.types'
 import { FOREIGN_KEY_CASCADE_OPTIONS } from './ForeignKeySelector.constants'
-import { ForeignKey } from './ForeignKeySelector.types'
+import type { ForeignKey } from './ForeignKeySelector.types'
 import { generateCascadeActionDescription } from './ForeignKeySelector.utils'
 
 const EMPTY_STATE: ForeignKey = {
@@ -40,7 +37,12 @@ const EMPTY_STATE: ForeignKey = {
 
 interface ForeignKeySelectorProps {
   visible: boolean
-  table: { id: number; name: string; columns: any[] }
+  table: {
+    id: number
+    name: string
+    columns: { id: string; name: string; format: string; isNewColumn: boolean }[]
+  }
+  column?: ColumnField // For ColumnEditor, to prefill when adding a new foreign key
   foreignKey?: ForeignKey
   onClose: () => void
   onSaveRelation: (fk: ForeignKey) => void
@@ -49,12 +51,13 @@ interface ForeignKeySelectorProps {
 export const ForeignKeySelector = ({
   visible,
   table,
+  column,
   foreignKey,
   onClose,
   onSaveRelation,
 }: ForeignKeySelectorProps) => {
   const { project } = useProjectContext()
-  const snap = useTableEditorStateSnapshot()
+  const { selectedSchema } = useQuerySchemaState()
 
   const [fk, setFk] = useState(EMPTY_STATE)
   const [errors, setErrors] = useState<{ columns?: string; types?: any[]; typeNotice?: any[] }>({})
@@ -83,17 +86,8 @@ export const ForeignKeySelector = ({
 
   const updateSelectedTable = (tableId: number) => {
     setErrors({})
-    if (!tableId) {
-      return setFk({
-        ...EMPTY_STATE,
-        id: fk.id,
-        name: fk.name,
-        schema: fk.schema,
-        columns: [{ source: '', target: '' }],
-      })
-    }
     const table = (tables ?? []).find((x) => x.id === tableId)
-    if (table)
+    if (table) {
       setFk({
         ...EMPTY_STATE,
         id: fk.id,
@@ -101,8 +95,12 @@ export const ForeignKeySelector = ({
         tableId: table.id,
         schema: table.schema,
         table: table.name,
-        columns: [{ source: '', target: '' }],
+        columns:
+          column !== undefined
+            ? [{ source: column.name, target: '' }]
+            : [{ source: '', target: '' }],
       })
+    }
   }
 
   const addColumn = () => {
@@ -160,7 +158,7 @@ export const ForeignKeySelector = ({
     fk.columns.forEach((column) => {
       const { source, target, sourceType: sType, targetType: tType } = column
       const sourceColumn = table.columns.find((col) => col.name === source)
-      const sourceType = sType ?? sourceColumn?.format
+      const sourceType = sType ?? sourceColumn?.format ?? ''
       const targetType =
         tType ?? selectedTable?.columns?.find((col) => col.name === target)?.format ?? ''
 
@@ -225,7 +223,7 @@ export const ForeignKeySelector = ({
       <SidePanel.Content>
         <div className="py-6 space-y-6">
           <InformationBox
-            icon={<IconHelpCircle size="large" strokeWidth={1.5} />}
+            icon={<HelpCircle size={20} strokeWidth={1.5} />}
             title="What are foreign keys?"
             description={`Foreign keys help maintain referential integrity of your data by ensuring that no
                 one can insert rows into the table that do not have a matching entry to another
@@ -246,7 +244,8 @@ export const ForeignKeySelector = ({
                   key={schema.id}
                   value={schema.name}
                   label={schema.name}
-                  addOnBefore={() => <IconDatabase size={16} strokeWidth={1.5} />}
+                  className="min-w-96"
+                  addOnBefore={() => <Database size={16} strokeWidth={1.5} />}
                 >
                   <div className="flex items-center gap-2">
                     {/* For aria searching to target the schema name instead of schema */}
@@ -264,7 +263,7 @@ export const ForeignKeySelector = ({
             value={selectedTable?.id ?? 1}
             onChange={(value: string) => updateSelectedTable(Number(value))}
           >
-            <Listbox.Option key="empty" value={1} label="---">
+            <Listbox.Option key="empty" className="min-w-96" value={1} label="---">
               ---
             </Listbox.Option>
             {sortBy(tables, ['schema']).map((table) => {
@@ -273,6 +272,7 @@ export const ForeignKeySelector = ({
                   key={table.id}
                   value={table.id}
                   label={table.name}
+                  className="min-w-96"
                   addOnBefore={() => <Table size={16} strokeWidth={1.5} />}
                 >
                   <div className="flex items-center gap-2">
@@ -293,13 +293,12 @@ export const ForeignKeySelector = ({
                   Select columns from{' '}
                   <code className="text-xs">
                     {fk.schema}.{fk.table}
-                  </code>
+                  </code>{' '}
                   to reference to
                 </label>
                 <div className="grid grid-cols-10 gap-y-2">
                   <div className="col-span-5 text-xs text-foreground-lighter">
-                    {snap.selectedSchemaName}.
-                    {table.name.length > 0 ? table.name : '[unnamed table]'}
+                    {selectedSchema}.{table.name.length > 0 ? table.name : '[unnamed table]'}
                   </div>
                   <div className="col-span-4 text-xs text-foreground-lighter text-right">
                     {fk.schema}.{fk.table}
@@ -312,7 +311,7 @@ export const ForeignKeySelector = ({
                     </Alert_Shadcn_>
                   )}
                   {fk.columns.map((_, idx) => (
-                    <Fragment key={`${uuidv4}`}>
+                    <Fragment key={`${uuidv4()}`}>
                       <div className="col-span-4">
                         <Listbox
                           id="column"
@@ -342,7 +341,7 @@ export const ForeignKeySelector = ({
                         </Listbox>
                       </div>
                       <div className="col-span-1 flex justify-center items-center">
-                        <IconArrowRight />
+                        <ArrowRight />
                       </div>
                       <div className="col-span-4">
                         <Listbox
@@ -372,7 +371,7 @@ export const ForeignKeySelector = ({
                         <Button
                           type="default"
                           className="px-1"
-                          icon={<IconX />}
+                          icon={<X />}
                           disabled={fk.columns.length === 1}
                           onClick={() => onRemoveColumn(idx)}
                         />
@@ -420,7 +419,7 @@ export const ForeignKeySelector = ({
                             <li key={`type-error-${idx}`}>
                               <div className="flex items-center gap-x-1">
                                 <code className="text-xs">{fk.columns[idx]?.source}</code>{' '}
-                                <IconArrowRight /> {x.targetType}
+                                <ArrowRight /> {x.targetType}
                               </div>
                             </li>
                           )
@@ -434,7 +433,7 @@ export const ForeignKeySelector = ({
               <SidePanel.Separator />
 
               <InformationBox
-                icon={<IconHelpCircle size="large" strokeWidth={1.5} />}
+                icon={<HelpCircle size="20" strokeWidth={1.5} />}
                 title="Which action is most appropriate?"
                 description={
                   <>
@@ -500,15 +499,7 @@ export const ForeignKeySelector = ({
                 label="Action if referenced row is removed"
                 // @ts-ignore
                 labelOptional={
-                  <Button asChild type="default" icon={<IconExternalLink />}>
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://supabase.com/docs/guides/database/postgres/cascade-deletes"
-                    >
-                      Documentation
-                    </a>
-                  </Button>
+                  <DocsButton href="https://supabase.com/docs/guides/database/postgres/cascade-deletes" />
                 }
                 descriptionText={
                   <>

@@ -1,30 +1,42 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
+'use client'
+
+import { useConsentState } from 'common'
 import Link from 'next/link'
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { PropsWithChildren, useState } from 'react'
 import { Modal, Toggle } from 'ui'
 
-import { useConsentValue } from '../ConsentToast'
+interface PrivacySettingsProps {
+  className?: string
+}
 
 export const PrivacySettings = ({
   children,
   ...props
-}: PropsWithChildren<{ className?: string }>) => {
+}: PropsWithChildren<PrivacySettingsProps>) => {
   const [isOpen, setIsOpen] = useState(false)
-  const { hasAccepted, handleConsent } = useConsentValue(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-  const [telemetryValue, setTelemetryValue] = useState(hasAccepted)
+  const { categories, updateServices } = useConsentState()
 
-  // Every time the modal opens, sync state with localStorage
-  useEffect(() => {
-    setTelemetryValue(localStorage?.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT) === 'true')
-  }, [isOpen])
+  const [serviceConsentMap, setServiceConsentMap] = useState(() => new Map<string, boolean>())
+
+  function handleServicesChange(services: { id: string; status: boolean }[]) {
+    let newServiceConsentMap = new Map(serviceConsentMap)
+    services.forEach((service) => {
+      newServiceConsentMap.set(service.id, service.status)
+    })
+    setServiceConsentMap(newServiceConsentMap)
+  }
 
   const handleConfirmPreferences = () => {
-    handleConsent && handleConsent(telemetryValue ? 'true' : 'false')
+    const services = Array.from(serviceConsentMap.entries()).map(([id, status]) => ({
+      serviceId: id,
+      status,
+    }))
+    updateServices(services)
+
     setIsOpen(false)
   }
 
   const handleCancel = () => {
-    setTelemetryValue(hasAccepted)
     setIsOpen(false)
   }
 
@@ -51,48 +63,76 @@ export const PrivacySettings = ({
         className="max-w-[calc(100vw-4rem)]"
         size="medium"
       >
-        <div className="pt-6 pb-3 space-y-4">
-          <Modal.Content>
-            <Toggle
-              checked={true}
-              disabled
-              onChange={() => null}
-              label="Strictly necessary cookies"
-              descriptionText={
-                <>
-                  These cookies are necessary for Supabase to function.{' '}
-                  <Link
-                    href="https://supabase.com/privacy#8-cookies-and-similar-technologies-used-on-our-european-services"
-                    className="underline"
-                  >
-                    Learn more
-                  </Link>
-                </>
-              }
-            />
-          </Modal.Content>
-          <Modal.Separator />
-          <Modal.Content>
-            <Toggle
-              checked={telemetryValue}
-              onChange={() => setTelemetryValue((prev) => !prev)}
-              label="Telemetry"
-              descriptionText={
-                <>
-                  By opting in to sending telemetry data, Supabase can improve the overall user
-                  experience.{' '}
-                  <Link
-                    href="https://supabase.com/privacy#cookieless-analytics"
-                    className="underline"
-                  >
-                    Learn more
-                  </Link>
-                </>
-              }
-            />
-          </Modal.Content>
+        <div className="pt-3 divide-y divide-border">
+          {categories
+            ?.toReversed()
+            .map((category) => (
+              <Category
+                key={category.slug}
+                category={category}
+                handleServicesChange={handleServicesChange}
+              />
+            ))}
         </div>
       </Modal>
     </>
+  )
+}
+
+function Category({
+  category,
+  handleServicesChange,
+}: {
+  category: {
+    slug: string
+    label: string
+    description: string
+    isEssential: boolean
+    services: readonly {
+      id: string
+      consent: {
+        status: boolean
+      }
+    }[]
+  }
+  handleServicesChange: (services: { id: string; status: boolean }[]) => void
+}) {
+  const [isChecked, setIsChecked] = useState(() =>
+    category.services.every((service) => service.consent.status)
+  )
+
+  function handleChange() {
+    setIsChecked(!isChecked)
+
+    handleServicesChange(
+      category.services.map((service) => ({
+        id: service.id,
+        status: !isChecked,
+      }))
+    )
+  }
+
+  return (
+    <Modal.Content key={category.slug}>
+      <Toggle
+        checked={isChecked}
+        defaultChecked={isChecked}
+        disabled={category.isEssential}
+        onChange={handleChange}
+        label={category.label}
+        descriptionText={
+          <>
+            {category.description}
+            <br />
+            <Link
+              href="https://supabase.com/privacy#8-cookies-and-similar-technologies-used-on-our-european-services"
+              className="underline"
+            >
+              Learn more
+            </Link>
+          </>
+        }
+      />
+    </Modal.Content>
   )
 }

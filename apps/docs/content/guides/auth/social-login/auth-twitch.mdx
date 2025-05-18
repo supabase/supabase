@@ -28,7 +28,7 @@ Setting up Twitch logins for your application consists of 3 parts:
 
 ## Find your callback URL
 
-<SocialProviderSetup provider="Twitch" />
+<$Partial path="social_provider_setup.mdx" variables={{ "provider": "Twitch" }} />
 
 ## Create a Twitch application
 
@@ -41,7 +41,7 @@ Setting up Twitch logins for your application consists of 3 parts:
 - Enter the name of your application.
 - Type or paste your `OAuth Redirect URL` (the callback URL from the previous step.)
 - Select a category for your app.
-- Check the Captcha box and click `Create`.
+- Check the CAPTCHA box and click `Create`.
 
 ## Retrieve your Twitch OAuth client ID and client secret
 
@@ -57,7 +57,7 @@ Setting up Twitch logins for your application consists of 3 parts:
 
 ## Add your Twitch credentials into your Supabase project
 
-<SocialProviderSettingsSupabase provider="Twitch" />
+<$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "Twitch" }} />
 
 ## Add login code to your client app
 
@@ -70,13 +70,35 @@ Setting up Twitch logins for your application consists of 3 parts:
 >
 <TabPanel id="js" label="JavaScript">
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `twitch` as the `provider`:
+<$Partial path="create_client_snippet.mdx" />
+
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `twitch` as the `provider`:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('<your-project-url>', '<your-anon-key>')
+
+// ---cut---
 async function signInWithTwitch() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'twitch',
   })
+}
+```
+
+</TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) with `twitch` as the `provider`:
+
+```dart
+Future<void> signInWithTwitch() async {
+  await supabase.auth.signInWithOAuth(
+    OAuthProvider.twitch,
+    redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+    authScreenLaunchMode:
+        kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
+  );
 }
 ```
 
@@ -94,6 +116,8 @@ suspend fun signInWithTwitch() {
 </TabPanel>
 </Tabs>
 
+<$Partial path="oauth_pkce_flow.mdx" />
+
 <Tabs
   scrollable
   size="small"
@@ -106,15 +130,30 @@ suspend fun signInWithTwitch() {
 When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('<your-project-url>', '<your-anon-key>')
+
+// ---cut---
 async function signOut() {
   const { error } = await supabase.auth.signOut()
 }
 ```
 
 </TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```dart
+Future<void> signOut() async {
+  await supabase.auth.signOut();
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```kotlin
 suspend fun signOut() {
@@ -127,7 +166,7 @@ suspend fun signOut() {
 
 ## Resources
 
-- [Supabase Account - Free Plan OK](https://supabase.com)
+- [Supabase - Get started for free](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [Twitch Account](https://twitch.tv)
 - [Twitch Developer Console](https://dev.twitch.tv/console)

@@ -1,37 +1,33 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import clsx from 'clsx'
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { Collapsible, Form, IconChevronRight, Input, Toggle } from 'ui'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 
-import NoProjectsOnPaidOrgInfo from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
+import { useParams } from 'common'
+import { NoProjectsOnPaidOrgInfo } from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
-import {
-  FormActions,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { OPT_IN_TAGS } from 'lib/constants'
+import { Form, Input, Toggle } from 'ui'
+import OptInToOpenAIToggle from './OptInToOpenAIToggle'
 import OrganizationDeletePanel from './OrganizationDeletePanel'
 
 const GeneralSettings = () => {
-  const queryClient = useQueryClient()
-  const { ui } = useStore()
   const { slug } = useParams()
-  const [open, setOpen] = useState(false)
+  const queryClient = useQueryClient()
   const selectedOrganization = useSelectedOrganization()
-  const { name, opt_in_tags } = selectedOrganization ?? {}
+  const { name } = selectedOrganization ?? {}
 
   const formId = 'org-general-settings'
-  const isOptedIntoAi = opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL)
+  const isOptedIntoAi = useOrgOptedIntoAi()
   const initialValues = { name: name ?? '', isOptedIntoAi }
 
   const organizationDeletionEnabled = useIsFeatureEnabled('organizations:delete')
@@ -42,10 +38,7 @@ const GeneralSettings = () => {
 
   const onUpdateOrganization = async (values: any, { resetForm }: any) => {
     if (!canUpdateOrganization) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'You do not have the required permissions to update this organization',
-      })
+      return toast.error('You do not have the required permissions to update this organization')
     }
 
     if (!slug) return console.error('Slug is required')
@@ -64,7 +57,7 @@ const GeneralSettings = () => {
         onSuccess: () => {
           resetForm({ values, initialValues: values })
           invalidateOrganizationsQuery(queryClient)
-          ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
+          toast.success('Successfully saved settings')
         },
       }
     )
@@ -89,7 +82,7 @@ const GeneralSettings = () => {
           return (
             <FormPanel
               footer={
-                <div className="flex py-4 px-8">
+                <div className="flex p-4 md:px-8">
                   <FormActions
                     form={formId}
                     isSubmitting={isUpdating}
@@ -127,69 +120,10 @@ const GeneralSettings = () => {
                       disabled={!canUpdateOrganization}
                       size="small"
                       label="Opt-in to sending anonymous data to OpenAI"
-                      descriptionText="By opting into sending anonymous data, Supabase AI can improve the answers it shows you"
+                      descriptionText="By opting into sending anonymous data, Supabase AI can improve the answers it shows you. This is an organization-wide setting."
                     />
-                    <Collapsible open={open} onOpenChange={setOpen}>
-                      <Collapsible.Trigger asChild>
-                        <div className="flex items-center space-x-2 ml-16 cursor-pointer">
-                          <IconChevronRight
-                            strokeWidth={2}
-                            size={16}
-                            className={clsx('transition-all', open ? 'rotate-90' : '')}
-                          />
-                          <p className="text-sm text-foreground-light underline">
-                            Important information regarding opting in
-                          </p>
-                        </div>
-                      </Collapsible.Trigger>
-                      <Collapsible.Content>
-                        <div className="space-y-2 py-4 ml-16 text-sm text-foreground-light">
-                          <p>
-                            Supabase AI is a chatbot support tool powered by OpenAI. Supabase will
-                            share the query you submit and information about the databases you
-                            manage through Supabase with OpenAI, L.L.C. and its affiliates in order
-                            to provide the Supabase AI tool.
-                          </p>
-                          <p>
-                            OpenAI will only access information about the structure of your
-                            databases, such as table names, column and row headings. OpenAI will not
-                            access the contents of the database itself.
-                          </p>
-                          <p>
-                            OpenAI uses this information to generate responses to your query, and
-                            does not retain or use the information to train its algorithms or
-                            otherwise improve its products and services.
-                          </p>
-                          <p>
-                            If you have your own individual account on Supabase, we will use any
-                            personal information collected through [Supabase AI] to provide you with
-                            the [Supabase AI] tool. If you are in the UK, EEA or Switzerland, the
-                            processing of this personal information is necessary for the performance
-                            of a contract between you and us.
-                          </p>
-                          <p>
-                            Supabase collects information about the queries you submit through
-                            Supabase AI and the responses you receive to assess the performance of
-                            the Supabase AI tool and improve our services. If you are in the UK, EEA
-                            or Switzerland, the processing is necessary for our legitimate
-                            interests, namely informing our product development and improvement.
-                          </p>
-                          <p>
-                            For more information about how we use personal information, please see
-                            our{' '}
-                            <Link
-                              href="https://supabase.com/privacy"
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-brand border-b border-brand"
-                            >
-                              privacy policy
-                            </Link>
-                            .
-                          </p>
-                        </div>
-                      </Collapsible.Content>
-                    </Collapsible>
+
+                    <OptInToOpenAIToggle className="ml-16" />
                   </div>
                 </FormSectionContent>
               </FormSection>
@@ -203,4 +137,4 @@ const GeneralSettings = () => {
   )
 }
 
-export default observer(GeneralSettings)
+export default GeneralSettings

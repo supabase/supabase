@@ -1,7 +1,5 @@
 ---
-id: 'sessions'
-title: 'User Sessions'
-description: 'Control and manage user sessions.'
+title: 'User sessions'
 ---
 
 Supabase Auth provides fine-grained control over your user's sessions.
@@ -30,37 +28,20 @@ A session terminates, depending on configuration, when:
 
 Every access token contains a `session_id` claim, a UUID, uniquely identifying the session of the user. You can correlate this ID with the primary key of the `auth.sessions` table.
 
-## Sign out and scopes
+## Initiating a session
 
-Supabase Auth allows you to specify three different scopes for when a user invokes the [sign out API](/docs/reference/javascript/auth-signout) in your application:
+A session is initiated when a user signs in. The session is stored in the `auth.sessions` table, and your app should receive the access and refresh tokens.
 
-- `global` (default) when all sessions active for the user are terminated.
-- `local` which only terminates the current session for the user but keep sessions on other devices or browsers active.
-- `others` to terminate all but the current session for the user.
+There are two flows for initiating a session and receiving the tokens:
 
-You can invoke these by providing the `scope` option:
-
-```typescript
-// defaults to the global scope
-await supabase.auth.signOut()
-
-// sign out from the current session only
-await supabase.auth.signOut({ scope: 'local' })
-```
-
-Upon sign out, all refresh tokens and potentially other database objects related to the affected sessions are destroyed and the client library removes the session stored in the browser.
-
-<Admonition type="caution">
-
-Access tokens of revoked sessions remain valid until their expiry time, encoded in the `exp` claim. The user won't be immediately logged out and will only be logged out when the access token expires.
-
-</Admonition>
+- [Implicit flow](/docs/guides/auth/sessions/implicit-flow)
+- [PKCE flow](/docs/guides/auth/sessions/pkce-flow)
 
 ## Limiting session lifetime and number of allowed sessions per user
 
 <Admonition type="note">
 
-This feature is only available on Pro plans and up.
+This feature is only available on Pro Plans and up.
 
 </Admonition>
 
@@ -80,7 +61,7 @@ To make sure that sessions expire after a period of inactivity, you can set a po
 
 You can also enforce only one active session per user per device or browser. When this is enabled, the session from the most recent sign in will remain active, while the rest are terminated. Enable this via the _Single session per user_ option in the [Auth settings](/dashboard/project/_/settings/auth).
 
-Sessions are not proactively destroyed when you change these settings, but rather the check is enforced whenever a session is refreshed next. This can confuse developers because the actual duration of a session is the configured timeout plus the JWT expiration time. For single session per user, the effect will only be noticed at intervals of the JWT expiration time. Please make sure you adjust this setting depending on your needs. We do not recommend going below 5 minutes for the JWT expiration time.
+Sessions are not proactively destroyed when you change these settings, but rather the check is enforced whenever a session is refreshed next. This can confuse developers because the actual duration of a session is the configured timeout plus the JWT expiration time. For single session per user, the effect will only be noticed at intervals of the JWT expiration time. Make sure you adjust this setting depending on your needs. We do not recommend going below 5 minutes for the JWT expiration time.
 
 Otherwise sessions are progressively deleted from the database 24 hours after they expire, which prevents you from causing a high load on your project by accident and allows you some freedom to undo changes without adversely affecting all users.
 
@@ -126,11 +107,11 @@ This approach has some tradeoffs compared to using a JWT-based approach:
 - A failing authentication server can cause a chain of failures across other systems and APIs, paralyzing the whole application system.
 - All requests that require authentication has to be routed through the authentication, which adds an additional latency overhead to all requests.
 
-Supabase Auth prefers a JWT-based approach using access and refresh tokens are because the session information is encoded in a short-lived token -- the access token -- which can be transferred across APIs and systems without relying on the availability or performance of a central server. An application can thus tolerate transient failures or performance issues a lot better. By trying to refresh the access token ahead of time, your application can safely continue to function even with larger outages.
+Supabase Auth prefers a JWT-based approach using access and refresh tokens because session information is encoded within the short-lived access token, enabling transfer across APIs and systems without dependence on a central server's availability or performance. This approach enhances an application's tolerance to transient failures or performance issues. Furthermore, proactively refreshing the access token allows the application to function reliably even during significant outages.
 
 It's better for cost optimization and scaling as well, as the authentication system's servers and database only handle traffic for this use case.
 
-### How do I make sure that an access token (JWT) cannot be used after a user clicks sign out?
+### How to ensure an access token (JWT) cannot be used after a user signs out
 
 Most applications rarely need such strong guarantees. Consider adjusting the JWT expiry time to an acceptable value. If this is still necessary, you should try to use this validation logic only for the most sensitive actions within your application.
 
@@ -138,7 +119,7 @@ When a user signs out, the sessions affected by the logout are removed from the 
 
 Note that sessions are not proactively terminated when their maximum lifetime (time-box) or inactivity timeout are reached. These sessions are cleaned up progressively 24 hours after reaching that status. This allows you to tweak the values or roll back changes without causing unintended user friction.
 
-### Can I use HTTP-Only cookies to store the access and refresh tokens?
+### Using HTTP-only cookies to store access and refresh tokens
 
 This is possible, but only for apps that use the traditional server-only web app approach where all of the application logic is implemented on the server and it returns rendered HTML only.
 
@@ -149,9 +130,15 @@ Because of this, the Supabase JavaScript libraries provide only limited support.
 ```typescript
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+const supabase = createClient('SUPABASE_URL', 'SUPABASE_ANON_KEY', {
   auth: {
-    storage: customStorageObject,
+    storage: {
+      getItem: () => {
+        return Promise.resolve('FETCHED_COOKIE')
+      },
+      setItem: () => {},
+      removeItem: () => {},
+    },
   },
 })
 ```

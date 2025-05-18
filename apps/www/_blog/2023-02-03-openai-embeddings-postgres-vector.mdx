@@ -170,7 +170,7 @@ import { Configuration, OpenAIApi } from 'openai'
 import { supabaseClient } from './lib/supabase'
 
 async function generateEmbeddings() {
-  const configuration = new Configuration({ apiKey: '<YOUR_OPENAI_KEY>' })
+  const configuration = new Configuration({ apiKey: '<YOUR_OPENAI_API_KEY>' })
   const openAi = new OpenAIApi(configuration)
 
   const documents = await getDocuments() // Your custom function to load docs
@@ -203,7 +203,7 @@ Finally, let's create an [Edge Function](https://supabase.com/docs/guides/functi
 ```tsx
 import { serve } from 'https://deno.land/std@0.170.0/http/server.ts'
 import 'https://deno.land/x/xhr@0.2.1/mod.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.5.0'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { Configuration, OpenAIApi } from 'https://esm.sh/openai@3.1.0'
 import { supabaseClient } from './lib/supabase'
 
@@ -224,7 +224,7 @@ serve(async (req) => {
   // OpenAI recommends replacing newlines with spaces for best results
   const input = query.replace(/\n/g, ' ')
 
-  const configuration = new Configuration({ apiKey: '<YOUR_OPENAI_KEY>' })
+  const configuration = new Configuration({ apiKey: '<YOUR_OPENAI_API_KEY>' })
   const openai = new OpenAIApi(configuration)
 
   // Generate a one-time embedding for the query itself
@@ -264,7 +264,7 @@ Here's another Edge Function that expands upon the simple example above:
 ```tsx
 import { serve } from 'https://deno.land/std@0.170.0/http/server.ts'
 import 'https://deno.land/x/xhr@0.2.1/mod.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.5.0'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 import GPT3Tokenizer from 'https://esm.sh/gpt3-tokenizer@1.1.5'
 import { Configuration, OpenAIApi } from 'https://esm.sh/openai@3.1.0'
 import { oneLine, stripIndent } from 'https://esm.sh/common-tags@1.8.2'
@@ -287,7 +287,7 @@ serve(async (req) => {
   // OpenAI recommends replacing newlines with spaces for best results
   const input = query.replace(/\n/g, ' ')
 
-  const configuration = new Configuration({ apiKey: '<YOUR_OPENAI_KEY>' })
+  const configuration = new Configuration({ apiKey: '<YOUR_OPENAI_API_KEY>' })
   const openai = new OpenAIApi(configuration)
 
   // Generate a one-time embedding for the query itself

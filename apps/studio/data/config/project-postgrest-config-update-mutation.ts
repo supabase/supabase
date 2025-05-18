@@ -1,32 +1,42 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { patch } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { ResponseError } from 'types'
+import { components } from 'api-types'
+import { handleError, patch } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { configKeys } from './keys'
 
 export type ProjectPostgrestConfigUpdateVariables = {
   projectRef: string
   dbSchema: string
-  maxRows: string
+  maxRows: number
   dbExtraSearchPath: string
+  dbPool: number | null
 }
+
+type UpdatePostgrestConfigResponse = components['schemas']['UpdatePostgrestConfigBody']
 
 export async function updateProjectPostgrestConfig({
   projectRef,
   dbSchema,
   maxRows,
   dbExtraSearchPath,
+  dbPool,
 }: ProjectPostgrestConfigUpdateVariables) {
-  const response = await patch(`${API_URL}/projects/${projectRef}/config/postgrest`, {
+  const payload: UpdatePostgrestConfigResponse = {
     db_schema: dbSchema,
     max_rows: maxRows,
     db_extra_search_path: dbExtraSearchPath,
+  }
+  if (dbPool) payload.db_pool = dbPool
+
+  const { data, error } = await patch('/platform/projects/{ref}/config/postgrest', {
+    params: { path: { ref: projectRef } },
+    body: payload,
   })
 
-  if (response.error) throw response.error
-  return response
+  if (error) handleError(error)
+  return data
 }
 
 type ProjectPostgrestConfigUpdateData = Awaited<ReturnType<typeof updateProjectPostgrestConfig>>

@@ -1,6 +1,23 @@
-import { PRODUCT_NAMES } from 'shared-data/products'
+import { PRODUCT_MODULES_NAMES, PRODUCT_NAMES } from 'shared-data/products'
 
-export default [
+type ProductsArrayItem = PRODUCT_NAMES | PRODUCT_MODULES_NAMES
+
+export type Example = {
+  type: string
+  tags: string[]
+  products: ProductsArrayItem[]
+  title: string
+  description: string
+  author?: string
+  author_url?: string
+  author_img?: string
+  repo_name?: string
+  repo_url?: string
+  vercel_deploy_url?: string
+  demo_url?: string
+}
+
+const Examples: Example[] = [
   {
     type: 'example',
     tags: ['Next.js', 'Stripe', 'Vercel'],
@@ -36,7 +53,7 @@ export default [
   {
     type: 'example',
     tags: ['Next.js', 'OpenAI', 'Vercel'],
-    products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.AUTHENTICATION, PRODUCT_NAMES.VECTOR],
+    products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.AUTHENTICATION, PRODUCT_MODULES_NAMES.VECTOR],
     title: 'AI Chatbot',
     description:
       'An open-source AI chatbot app template built with Next.js, the Vercel AI SDK, OpenAI, and Supabase.',
@@ -52,7 +69,7 @@ export default [
   {
     type: 'example',
     tags: ['LangChain', 'Next.js'],
-    products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.VECTOR],
+    products: [PRODUCT_NAMES.DATABASE, PRODUCT_MODULES_NAMES.VECTOR],
     title: 'LangChain + Next.js Starter',
     description:
       'Starter template and example use-cases for LangChain projects in Next.js, including chat, agents, and retrieval.',
@@ -185,66 +202,6 @@ export default [
   },
   {
     type: 'example',
-    tags: ['Javascript'],
-    products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.AUTHENTICATION],
-    title: 'Vanilla-js Auth app',
-    description:
-      'How to sign up and login using supabase and supabase-js using HTML and JavaScript only',
-    author: 'supabase',
-    author_url: 'https://github.com/supabase',
-    author_img: 'https://avatars.githubusercontent.com/u/54469796',
-    repo_name: 'javascript-auth',
-    repo_url: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/auth/javascript-auth',
-    vercel_deploy_url: '',
-    demo_url: 'https://auth-vanilla-js.vercel.app/',
-  },
-  {
-    type: 'example',
-    tags: ['React'],
-    products: [PRODUCT_NAMES.DATABASE],
-    title: 'React Native todo list app',
-    description: 'React Native Todo List example with Expo',
-    author: 'supabase',
-    author_url: 'https://github.com/supabase',
-    author_img: 'https://avatars.githubusercontent.com/u/54469796',
-    repo_name: 'expo-todo-list',
-    repo_url:
-      'https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/react-native-ts-todo-list',
-    vercel_deploy_url: '',
-    demo_url: '',
-  },
-  {
-    type: 'example',
-    tags: ['Next.js'],
-    products: [PRODUCT_NAMES.DATABASE],
-    title: 'Next.js todo list app',
-    description: 'Next.js todo list example',
-    author: 'supabase',
-    author_url: 'https://github.com/supabase',
-    author_img: 'https://avatars.githubusercontent.com/u/54469796',
-    repo_name: 'nextjs-todo-list',
-    repo_url:
-      'https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/nextjs-todo-list',
-    vercel_deploy_url: '',
-    demo_url: 'https://supabase-nextjs-todo-list.vercel.app/',
-  },
-  {
-    type: 'example',
-    tags: ['React'],
-    products: [PRODUCT_NAMES.DATABASE],
-    title: 'React todo list app',
-    description: 'React todo List example',
-    author: 'supabase',
-    author_url: 'https://github.com/supabase',
-    author_img: 'https://avatars.githubusercontent.com/u/54469796',
-    repo_name: 'react-todo-list',
-    repo_url:
-      'https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/react-todo-list',
-    vercel_deploy_url: '',
-    demo_url: '',
-  },
-  {
-    type: 'example',
     tags: ['Svelte'],
     products: [PRODUCT_NAMES.DATABASE],
     title: 'Svelte todo list app',
@@ -288,4 +245,64 @@ export default [
     vercel_deploy_url: '',
     demo_url: '',
   },
+  {
+    type: 'example',
+    tags: ['Resend'],
+    products: [PRODUCT_NAMES.FUNCTIONS],
+    title: 'Sending Emails',
+    description: 'Send emails in Edge Functions with Resend.',
+    repo_url: 'https://supabase.com/docs/guides/functions/examples/send-emails',
+  },
+  {
+    type: 'example',
+    tags: ['OpenAI'],
+    products: [PRODUCT_NAMES.FUNCTIONS],
+    title: 'Generating OpenAI GPT3 completions',
+    description: 'Using OpenAI in Edge Functions.',
+    repo_url: 'https://supabase.com/docs/guides/ai/examples/openai',
+  },
+  // {
+  //   type: 'example',
+  //   tags: ['Supabase'],
+  //   products: [PRODUCT_NAMES.FUNCTIONS],
+  //   title: 'With supabase-js',
+  //   description: 'Use the Supabase client inside your Edge Function.',
+  //   repo_url: 'https://supabase.com/docs/guides/functions/auth',
+  // },
+  {
+    type: 'example',
+    tags: ['Stripe'],
+    products: [PRODUCT_NAMES.FUNCTIONS],
+    title: 'Stripe Webhooks',
+    description: 'Handling signed Stripe Webhooks with Edge Functions.',
+    repo_url: 'https://supabase.com/docs/guides/functions/examples/stripe-webhooks',
+  },
+  {
+    type: 'example',
+    tags: ['Postgres'],
+    products: [PRODUCT_NAMES.FUNCTIONS],
+    title: 'Connecting directly to Postgres',
+    description: 'Connecting to Postgres from Edge Functions.',
+    repo_url: 'https://supabase.com/docs/guides/functions/connect-to-postgres',
+  },
+  {
+    type: 'example',
+    tags: ['Huggingface'],
+    products: [PRODUCT_NAMES.FUNCTIONS],
+    title: 'Huggingface Image Captioning',
+    description:
+      'Use the Hugging Face Inference API to make calls to 100,000+ Machine Learning models from Supabase Edge Functions.',
+    repo_url: 'https://supabase.com/docs/guides/functions/auth',
+  },
+  {
+    type: 'example',
+    tags: ['Supabase'],
+    products: [PRODUCT_NAMES.FUNCTIONS],
+    title: 'Upload files to Storage',
+    description: 'Process multipart/form-data.',
+    repo_url:
+      'https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/file-upload-storage',
+  },
 ]
+
+export default Examples

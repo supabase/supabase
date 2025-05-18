@@ -1,9 +1,9 @@
-import Divider from 'components/ui/Divider'
 import { BASE_PATH } from 'lib/constants'
 import { useTheme } from 'next-themes'
 import Head from 'next/head'
 import Image from 'next/legacy/image'
-import { PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
+import { Separator } from 'ui'
 
 export interface APIAuthorizationLayoutProps {}
 
@@ -36,8 +36,8 @@ const APIAuthorizationLayout = ({ children }: PropsWithChildren<APIAuthorization
             </div>
           </div>
         </div>
-        <Divider light />
-        <div className="flex flex-col justify-center flex-grow mx-auto w-[90vw] max-w-[600px] h-full space-y-4">
+        <Separator />
+        <div className="flex flex-col justify-center flex-grow mx-auto w-[90vw] max-w-[600px] space-y-4">
           {children}
         </div>
       </main>

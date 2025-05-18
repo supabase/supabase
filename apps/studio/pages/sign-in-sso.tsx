@@ -1,6 +1,6 @@
 import SignInSSOForm from 'components/interfaces/SignIn/SignInSSOForm'
-import { SignInLayout } from 'components/layouts'
-import { NextPageWithLayout } from 'types'
+import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
+import type { NextPageWithLayout } from 'types'
 
 const SignInSSOPage: NextPageWithLayout = () => {
   return (

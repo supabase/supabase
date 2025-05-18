@@ -1,31 +1,23 @@
-import { useMonaco } from '@monaco-editor/react'
-import { useTheme } from 'next-themes'
-import { PropsWithChildren, useEffect } from 'react'
+import { PropsWithChildren } from 'react'
 
+import { ClockSkewBanner } from 'components/layouts/AppLayout/ClockSkewBanner'
 import IncidentBanner from 'components/layouts/AppLayout/IncidentBanner'
 import { NoticeBanner } from 'components/layouts/AppLayout/NoticeBanner'
-import { getTheme } from 'components/ui/CodeEditor'
-import { useFlag } from 'hooks'
+import { useFlag } from 'hooks/ui/useFlag'
+import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
 
 const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
-  const monaco = useMonaco()
-  const { resolvedTheme } = useTheme()
-
   const ongoingIncident = useFlag('ongoingIncident')
   const showNoticeBanner = useFlag('showNoticeBanner')
-
-  useEffect(() => {
-    if (monaco && resolvedTheme) {
-      const mode: any = getTheme(resolvedTheme)
-      monaco.editor.defineTheme('supabase', mode)
-    }
-  }, [resolvedTheme, monaco])
+  const clockSkewBanner = useFlag('clockSkewBanner')
 
   return (
-    <div className="min-h-full flex flex-col">
-      <div className="flex-none">
+    <div className="flex flex-col">
+      <div className="flex-shrink-0">
         {ongoingIncident && <IncidentBanner />}
         {showNoticeBanner && <NoticeBanner />}
+        <OrganizationResourceBanner />
+        {clockSkewBanner && <ClockSkewBanner />}
       </div>
       {children}
     </div>

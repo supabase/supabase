@@ -1,14 +1,27 @@
 import ServiceList from 'components/interfaces/Settings/API/ServiceList'
-import { SettingsLayout } from 'components/layouts'
-import { NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
+import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
+import type { NextPageWithLayout } from 'types'
 
 const ApiSettings: NextPageWithLayout = () => {
   return (
-    <div className="flex flex-col gap-8 px-5 py-6 mx-auto 1xl:px-28 lg:px-16 xl:px-24 2xl:px-32">
-      <ServiceList />
-    </div>
+    <>
+      <ScaffoldContainer id="billing-page-top">
+        <ScaffoldHeader>
+          <ScaffoldTitle>API Settings</ScaffoldTitle>
+        </ScaffoldHeader>
+      </ScaffoldContainer>
+      <ScaffoldContainer bottomPadding>
+        <ServiceList />
+      </ScaffoldContainer>
+    </>
   )
 }
 
-ApiSettings.getLayout = (page) => <SettingsLayout title="API Settings">{page}</SettingsLayout>
+ApiSettings.getLayout = (page) => (
+  <DefaultLayout>
+    <SettingsLayout title="API Settings">{page}</SettingsLayout>
+  </DefaultLayout>
+)
 export default ApiSettings

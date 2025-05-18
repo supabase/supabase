@@ -4,16 +4,16 @@ import ExampleProject from 'components/interfaces/Home/ExampleProject'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
-import { Badge, Button, IconArrowRight, IconLoader } from 'ui'
 
 import { useParams } from 'common'
 import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
 import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedProject } from 'hooks'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import Connect from 'components/interfaces/Home/Connect/Connect'
+import { ArrowRight, Loader2 } from 'lucide-react'
+import { Badge, Button } from 'ui'
 
 const BuildingState = () => {
   const { ref } = useParams()
@@ -49,14 +49,14 @@ const BuildingState = () => {
   if (project === undefined) return null
 
   return (
-    <div className="mx-auto my-16 w-full max-w-7xl items-center justify-center">
-      <div className="mx-6 flex flex-col space-y-16">
-        <div className=" flex flex-col gap-4">
-          <div className="flex items-center space-x-3">
+    <div className="mx-auto my-8 md:my-16 w-full md:max-w-7xl items-center justify-center">
+      <div className="px-4 md:px-6 flex flex-col space-y-16">
+        <div className="w-full flex flex-col gap-4">
+          <div className="w-full flex flex-col md:flex-row items-start md:items-center gap-3">
             <h1 className="text-3xl text-foreground">{project?.name}</h1>
-            <Badge color="brand">
+            <Badge variant="default" className="bg-surface-100 bg-opacity-100">
               <div className="flex items-center gap-2">
-                <IconLoader className="animate-spin" size={12} />
+                <Loader2 className="animate-spin" size={12} />
                 <span>
                   {project.status === PROJECT_STATUS.UNKNOWN
                     ? 'Initiating project set up'
@@ -74,8 +74,8 @@ const BuildingState = () => {
           </div>
         </div>
         <div>
-          <div className=" grid grid-cols-12 gap-12">
-            <div className="col-span-12 space-y-12 lg:col-span-4">
+          <div className="w-full grid grid-cols-12 gap-12">
+            <div className="w-full col-span-12 space-y-12 lg:col-span-4">
               <div>
                 <h4 className="text-base text-foreground">While you wait</h4>
 
@@ -133,9 +133,9 @@ const BuildingState = () => {
         <div className="mx-auto my-16 w-full max-w-7xl space-y-16">
           <div className="space-y-8">
             <div className="mx-6">
-              <h5>Client libraries</h5>
+              <h4 className="text-lg">Client libraries</h4>
             </div>
-            <div className="mx-6 mb-12 grid gap-12 md:grid-cols-3">
+            <div className="grid grid-cols-2 gap-x-8 gap-y-8 md:gap-12 mx-6 mb-12 md:grid-cols-3">
               {CLIENT_LIBRARIES.map((library) => (
                 <ClientLibrary key={library.language} {...library} />
               ))}
@@ -145,7 +145,7 @@ const BuildingState = () => {
             <div className="mx-6">
               <h5>Example projects</h5>
             </div>
-            <div className="mx-6 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="mx-6 grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
               {EXAMPLE_PROJECTS.map((project) => (
                 <ExampleProject key={project.url} {...project} />
               ))}
@@ -162,7 +162,7 @@ const ChecklistItem = ({ description }: any) => {
   return (
     <li className="my-3 flex flex-wrap space-x-3">
       <div className="mt-0.5">
-        <IconArrowRight className="text-foreground-lighter" size="tiny" />
+        <ArrowRight className="text-foreground-lighter" size={14} />
       </div>
       <div className="flex-1">{description}</div>
     </li>

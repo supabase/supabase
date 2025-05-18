@@ -37,6 +37,7 @@ on storage.objects
 for all using (
   bucket_id = 'avatars' 
   and auth.role() = 'authenticated'
+  and (storage.foldername(name))[1] = 'authenticated'
 );`,
     detail_title: 'Allow any authenticated user access to a folder',
     detail_text:
@@ -53,7 +54,7 @@ on storage.objects for all
 using (
   bucket_id = 'avatars' 
   and name = 'folder/only_uid.jpg' 
-  and auth.uid() = 'd8c7bce9-cfeb-497b-bd61-e66ce2cbdaa2'
+  and (select auth.uid()) = 'd8c7bce9-cfeb-497b-bd61-e66ce2cbdaa2'
 );`,
     detail_title: 'Allow a specific user access to a file',
     detail_text:

@@ -1,62 +1,78 @@
-import { observer } from 'mobx-react-lite'
-import { NextPageWithLayout } from 'types'
-import { ReportsLayout } from 'components/layouts'
+import { useState } from 'react'
+
+import ReportHeader from 'components/interfaces/Reports/ReportHeader'
+import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import {
-  PRESET_CONFIG,
+  createFilteredDatePickerHelpers,
   REPORTS_DATEPICKER_HELPERS,
 } from 'components/interfaces/Reports/Reports.constants'
-import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import {
   CacheHitRateChartRenderer,
   TopCacheMissesRenderer,
 } from 'components/interfaces/Reports/renderers/StorageRenderers'
-import { useEffect, useMemo } from 'react'
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
-import { DatePickerToFrom, LogsEndpointParams } from 'components/interfaces/Settings/Logs'
-import { useParams } from 'common'
+import {
+  DatePickerValue,
+  LogsDatePicker,
+} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmerLine from 'components/ui/ShimmerLine'
-import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import DatePickers from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks'
+import { useStorageReport } from 'data/reports/storage-report-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { RefreshCw } from 'lucide-react'
+import type { NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 export const StorageReport: NextPageWithLayout = () => {
-  const { ref: projectRef } = useParams()
-  const organization = useSelectedOrganization()
   const report = useStorageReport()
+  const organization = useSelectedOrganization()
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const plan = subscription?.plan
+  const { isLoading, refresh } = report
 
-  const handleDatepickerChange = ({ from, to }: DatePickerToFrom) => {
+  const plan = organization?.plan
+
+  const defaultHelper =
+    REPORTS_DATEPICKER_HELPERS.find((h) => h.default) || REPORTS_DATEPICKER_HELPERS[0]
+
+  const [selectedRange, setSelectedRange] = useState<DatePickerValue>({
+    to: defaultHelper.calcTo(),
+    from: defaultHelper.calcFrom(),
+    isHelper: true,
+    text: defaultHelper.text,
+  })
+
+  const datepickerHelpers = createFilteredDatePickerHelpers(plan?.id || 'free')
+
+  const handleDatepickerChange = (vals: DatePickerValue) => {
     report.mergeParams({
-      iso_timestamp_start: from || '',
-      iso_timestamp_end: to || '',
+      iso_timestamp_start: vals.from || '',
+      iso_timestamp_end: vals.to || '',
     })
+    setSelectedRange(vals)
   }
-
-  const datepickerHelpers = useMemo(
-    () =>
-      REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
-        ...helper,
-        disabled: (index > 0 && plan?.id === 'free') || (index > 1 && plan?.id !== 'pro'),
-      })),
-    []
-  )
 
   return (
     <ReportPadding>
-      <ReportHeader title="Storage" isLoading={report.isLoading} onRefresh={report.refresh} />
+      <ReportHeader title="Storage" />
       <div className="w-full flex flex-col gap-1">
-        <div>
-          <DatePickers
-            onChange={handleDatepickerChange}
-            to={report.params.cacheHitRate.iso_timestamp_end || ''}
-            from={report.params.cacheHitRate.iso_timestamp_start || ''}
+        <div className="flex gap-2 items-center">
+          <ButtonTooltip
+            type="default"
+            disabled={isLoading}
+            icon={<RefreshCw className={isLoading ? 'animate-spin' : ''} />}
+            className="w-7"
+            tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+            onClick={() => refresh()}
+          />
+
+          <LogsDatePicker
+            onSubmit={handleDatepickerChange}
+            value={selectedRange}
             helpers={datepickerHelpers}
           />
         </div>
+
         <div className="h-2 w-full">
           <ShimmerLine active={report.isLoading} />
         </div>
@@ -76,51 +92,10 @@ export const StorageReport: NextPageWithLayout = () => {
   )
 }
 
-// hook to fetch data
-const useStorageReport = () => {
-  const { ref: projectRef } = useParams()
+StorageReport.getLayout = (page) => (
+  <DefaultLayout>
+    <ReportsLayout>{page}</ReportsLayout>
+  </DefaultLayout>
+)
 
-  const queryHooks = queriesFactory<keyof typeof PRESET_CONFIG.storage.queries>(
-    PRESET_CONFIG.storage.queries,
-    projectRef ?? 'default'
-  )
-  const cacheHitRate = queryHooks.cacheHitRate()
-  const topCacheMisses = queryHooks.topCacheMisses()
-  const activeHooks = [cacheHitRate, topCacheMisses]
-
-  const handleRefresh = async () => {
-    activeHooks.forEach((hook) => hook.runQuery())
-  }
-  const handleSetParams = (params: Partial<LogsEndpointParams>) => {
-    activeHooks.forEach((hook) => {
-      hook.setParams?.((prev: LogsEndpointParams) => ({ ...prev, ...params }))
-    })
-  }
-  useEffect(() => {
-    if (cacheHitRate.changeQuery) {
-      cacheHitRate.changeQuery(PRESET_CONFIG.storage.queries.cacheHitRate.sql([]))
-    }
-
-    if (topCacheMisses.changeQuery) {
-      topCacheMisses.changeQuery(PRESET_CONFIG.storage.queries.topCacheMisses.sql([]))
-    }
-  }, [])
-  const isLoading = activeHooks.some((hook) => hook.isLoading)
-  return {
-    data: {
-      cacheHitRate: cacheHitRate.logData,
-      topCacheMisses: topCacheMisses.logData,
-    },
-    params: {
-      cacheHitRate: cacheHitRate.params,
-      topCacheMisses: topCacheMisses.params,
-    },
-    mergeParams: handleSetParams,
-    isLoading,
-    refresh: handleRefresh,
-  }
-}
-
-StorageReport.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
-
-export default observer(StorageReport)
+export default StorageReport

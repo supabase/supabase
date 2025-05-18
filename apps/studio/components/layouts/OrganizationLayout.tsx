@@ -1,93 +1,44 @@
-import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
+import { ExternalLink } from 'lucide-react'
+import { type PropsWithChildren } from 'react'
 
-import { useParams } from 'common'
-import { useFlag, useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
-import { NavMenu, NavMenuItem } from 'ui'
-import { AccountLayout } from './'
-import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
-import SettingsLayout from './SettingsLayout/SettingsLayout'
-import Link from 'next/link'
+import PartnerIcon from 'components/ui/PartnerIcon'
+import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
+import { useVercelRedirectQuery } from 'data/integrations/vercel-redirect-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { withAuth } from 'hooks/misc/withAuth'
+import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
 
-const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
+const OrganizationLayoutContent = ({ children }: PropsWithChildren<{}>) => {
   const selectedOrganization = useSelectedOrganization()
-  const router = useRouter()
-  const { slug } = useParams()
-  const id = router.asPath.split('/').at(-1)?.split('?')[0]?.split('#')[0]
-
-  const invoicesEnabled = useIsFeatureEnabled('billing:invoices')
-
-  const navLayoutV2 = useFlag('navigationLayoutV2')
-
-  if (navLayoutV2) {
-    return <SettingsLayout>{children}</SettingsLayout>
-  }
-
-  const navMenuItems = [
-    {
-      label: 'General',
-      href: `/org/${slug}/general`,
-    },
-    {
-      label: 'Team',
-      href: `/org/${slug}/team`,
-    },
-    {
-      label: 'Integrations',
-      href: `/org/${slug}/integrations`,
-    },
-    {
-      label: 'Billing',
-      href: `/org/${slug}/billing`,
-    },
-    {
-      label: 'Usage',
-      href: `/org/${slug}/usage`,
-    },
-    {
-      label: 'Invoices',
-      href: `/org/${slug}/invoices`,
-      hidden: !invoicesEnabled,
-    },
-    {
-      label: 'OAuth Apps',
-      href: `/org/${slug}/apps`,
-    },
-    {
-      label: 'Audit Logs',
-      href: `/org/${slug}/audit`,
-    },
-    {
-      label: 'Legal Documents',
-      href: `/org/${slug}/documents`,
-    },
-  ]
-
-  const filteredNavMenuItems = navMenuItems.filter((item) => !item.hidden)
+  const { data, isSuccess } = useVercelRedirectQuery({
+    installationId: selectedOrganization?.partner_id,
+  })
 
   return (
-    <AccountLayout
-      title={selectedOrganization?.name ?? 'Supabase'}
-      breadcrumbs={[{ key: `org-settings`, label: 'Settings' }]}
-    >
-      <ScaffoldHeader>
-        <ScaffoldContainer id="billing-page-top">
-          <ScaffoldTitle>{selectedOrganization?.name ?? 'Organization'} settings</ScaffoldTitle>
-        </ScaffoldContainer>
-        <ScaffoldContainer>
-          <NavMenu className="border-none" aria-label="Organization menu navigation">
-            {filteredNavMenuItems.map((item) => (
-              <NavMenuItem key={item.label} active={item.href === router.asPath}>
-                <Link href={item.href}>{item.label}</Link>
-              </NavMenuItem>
-            ))}
-          </NavMenu>
-        </ScaffoldContainer>
-      </ScaffoldHeader>
-      <ScaffoldDivider />
-      {children}
-    </AccountLayout>
+    <div className={cn('w-full flex flex-col overflow-hidden')}>
+      {selectedOrganization && selectedOrganization?.managed_by !== 'supabase' && (
+        <Alert_Shadcn_
+          variant="default"
+          className="flex items-center gap-4 border-t-0 border-x-0 rounded-none"
+        >
+          <PartnerIcon organization={selectedOrganization} showTooltip={false} size="medium" />
+          <AlertTitle_Shadcn_ className="flex-1">
+            This organization is managed by {PARTNER_TO_NAME[selectedOrganization.managed_by]}.
+          </AlertTitle_Shadcn_>
+          <Button asChild type="default" iconRight={<ExternalLink />} disabled={!isSuccess}>
+            <a href={data?.url} target="_blank" rel="noopener noreferrer">
+              Manage
+            </a>
+          </Button>
+        </Alert_Shadcn_>
+      )}
+      <main className="h-full w-full overflow-y-auto">{children}</main>
+    </div>
   )
 }
 
-export default OrganizationLayout
+const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
+  return <OrganizationLayoutContent>{children}</OrganizationLayoutContent>
+}
+
+export default withAuth(OrganizationLayout)

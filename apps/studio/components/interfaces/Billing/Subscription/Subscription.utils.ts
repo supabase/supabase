@@ -1,5 +1,5 @@
+import type { OrgSubscription, ProjectSelectedAddon } from 'data/subscriptions/types'
 import { IS_PLATFORM } from 'lib/constants'
-import { OrgSubscription, ProjectSelectedAddon } from 'data/subscriptions/types'
 
 export const getAddons = (selectedAddons: ProjectSelectedAddon[]) => {
   const computeInstance = selectedAddons.find((addon) => addon.type === 'compute_instance')
@@ -16,4 +16,19 @@ export const subscriptionHasHipaaAddon = (subscription?: OrgSubscription): boole
   return (subscription?.addons ?? []).some(
     (addon) => addon.supabase_prod_id === 'addon_security_hipaa'
   )
+}
+
+export const billingPartnerLabel = (billingPartner?: string) => {
+  if (!billingPartner) return billingPartner
+
+  switch (billingPartner) {
+    case 'fly':
+      return 'Fly.io'
+    case 'aws':
+      return 'AWS'
+    case 'vercel_marketplace':
+      return 'Vercel'
+    default:
+      return billingPartner
+  }
 }

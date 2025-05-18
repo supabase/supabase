@@ -1,8 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { del } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { del, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
+import { BranchesData } from './branches-query'
 import { branchKeys } from './keys'
 
 export type BranchDeleteVariables = {
@@ -15,7 +16,7 @@ export async function deleteBranch({ id }: Pick<BranchDeleteVariables, 'id'>) {
     params: { path: { branch_id: id } },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -35,7 +36,18 @@ export const useBranchDeleteMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(branchKeys.list(projectRef))
+        setTimeout(() => {
+          queryClient.invalidateQueries(branchKeys.list(projectRef))
+        }, 5000)
+
+        const branches: BranchesData | undefined = queryClient.getQueryData(
+          branchKeys.list(projectRef)
+        )
+        if (branches) {
+          const updatedBranches = branches.filter((branch) => branch.id !== variables.id)
+          queryClient.setQueryData(branchKeys.list(projectRef), updatedBranches)
+        }
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

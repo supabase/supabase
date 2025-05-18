@@ -1,8 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { storageKeys } from './keys'
 
 export type BucketEmptyVariables = {
@@ -18,7 +18,7 @@ export async function emptyBucket({ projectRef, id }: BucketEmptyVariables) {
     params: { path: { id, ref: projectRef } },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

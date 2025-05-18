@@ -3,6 +3,7 @@ id: 'remix'
 title: 'Supabase Auth with Remix'
 description: 'Authentication helpers for loaders and actions in Remix.'
 sidebar_label: 'Remix'
+sitemapPriority: 0.5
 ---
 
 <Admonition type="caution">
@@ -10,6 +11,20 @@ sidebar_label: 'Remix'
 We generally recommend using the new `@supabase/ssr` package instead of `auth-helpers`. `@supabase/ssr` takes the core concepts of the Auth Helpers package and makes them available to any server framework. Check out the [migration doc](/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers) to learn more.
 
 </Admonition>
+
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light border-b mt-8 pb-2"
+  >
+
+  <AccordionItem
+        header="See legacy docs"
+        id="legacy-docs"
+      >
 
 This submodule provides convenience helpers for implementing user authentication in Remix applications.
 
@@ -22,7 +37,11 @@ This submodule provides convenience helpers for implementing user authentication
   ></iframe>
 </div>
 
-> For a complete implementation example, check out [this free egghead course](https://egghead.io/courses/build-a-realtime-chat-app-with-remix-and-supabase-d36e2618) or [this GitHub repo](https://github.com/supabase/auth-helpers/tree/main/examples/remix).
+<Admonition type="tip">
+
+For a complete implementation example, check out [this free egghead course](https://egghead.io/courses/build-a-realtime-chat-app-with-remix-and-supabase-d36e2618) or [this GitHub repo](https://github.com/supabase/auth-helpers/tree/main/examples/remix).
+
+</Admonition>
 
 ## Install the Remix helper library
 
@@ -93,9 +112,9 @@ import { redirect } from '@remix-run/node'
 import { createServerClient } from '@supabase/auth-helpers-remix'
 
 import type { Database } from 'db_types'
-import type { LoaderArgs } from '@remix-run/node'
+import type { LoaderFunctionArgs } from '@remix-run/node'
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const response = new Response()
   const url = new URL(request.url)
   const code = url.searchParams.get('code')
@@ -165,7 +184,11 @@ export const loader = async ({ request }) => {
 }
 ```
 
-> Supabase will set cookie headers to manage the user's auth session, therefore, the `response.headers` must be returned from the `Loader` function.
+<Admonition type="tip">
+
+Supabase will set cookie headers to manage the user's auth session, therefore, the `response.headers` must be returned from the `Loader` function.
+
+</Admonition>
 
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
@@ -174,9 +197,9 @@ export const loader = async ({ request }) => {
 import { json } from '@remix-run/node' // change this import to whatever runtime you are using
 import { createServerClient } from '@supabase/auth-helpers-remix'
 
-import type { LoaderArgs } from '@remix-run/node' // change this import to whatever runtime you are using
+import type { LoaderFunctionArgs } from '@remix-run/node' // change this import to whatever runtime you are using
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const response = new Response()
   const supabaseClient = createServerClient(
     process.env.SUPABASE_URL!,
@@ -195,7 +218,11 @@ export const loader = async ({ request }: LoaderArgs) => {
 }
 ```
 
-> Supabase will set cookie headers to manage the user's auth session, therefore, the `response.headers` must be returned from the `Loader` function.
+<Admonition type="tip">
+
+Supabase will set cookie headers to manage the user's auth session, therefore, the `response.headers` must be returned from the `Loader` function.
+
+</Admonition>
 
 </TabPanel>
 </Tabs>
@@ -237,7 +264,11 @@ export const action = async ({ request }) => {
 }
 ```
 
-> Supabase will set cookie headers to manage the user's auth session, therefore, the `response.headers` must be returned from the `Action` function.
+<Admonition type="tip">
+
+Supabase will set cookie headers to manage the user's auth session, therefore, the `response.headers` must be returned from the `Action` function.
+
+</Admonition>
 
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
@@ -246,9 +277,9 @@ export const action = async ({ request }) => {
 import { json } from '@remix-run/node' // change this import to whatever runtime you are using
 import { createServerClient } from '@supabase/auth-helpers-remix'
 
-import type { ActionArgs } from '@remix-run/node' // change this import to whatever runtime you are using
+import type { ActionFunctionArgs } from '@remix-run/node' // change this import to whatever runtime you are using
 
-export const action = async ({ request }: ActionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const response = new Response()
 
   const supabaseClient = createServerClient(
@@ -268,7 +299,11 @@ export const action = async ({ request }: ActionArgs) => {
 }
 ```
 
-> Supabase will set cookie headers to manage the user's auth session, therefore, the `response.headers` must be returned from the `Action` function.
+<Admonition type="tip">
+
+Supabase will set cookie headers to manage the user's auth session, therefore, the `response.headers` must be returned from the `Action` function.
+
+</Admonition>
 
 </TabPanel>
 </Tabs>
@@ -285,7 +320,7 @@ const {
 
 The session contains a user property. This is the user metadata saved, unencoded, to the local storage medium. It's unverified and can be tampered by the user, so don't use it for authorization or sensitive purposes.
 
-<GetSessionWarning />
+<$Partial path="get_session_warning.mdx" />
 
 ```jsx
 const user = session?.user
@@ -327,7 +362,11 @@ export const loader = () => {
 }
 ```
 
-> These may not be stored in `process.env` for environments other than Node.
+<Admonition type="tip">
+
+These may not be stored in `process.env` for environments other than Node.
+
+</Admonition>
 
 Next, we call the `useLoaderData` hook in our component to get the `env` object.
 
@@ -351,7 +390,7 @@ And then we can share this instance across our application with Outlet Context.
 <TabPanel id="ts" label="TypeScript">
 
 ```tsx app/root.tsx
-export const loader = ({}: LoaderArgs) => {
+export const loader = ({}: LoaderFunctionArgs) => {
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
@@ -361,7 +400,11 @@ export const loader = ({}: LoaderArgs) => {
 }
 ```
 
-> These may not be stored in `process.env` for environments other than Node.
+<Admonition type="tip">
+
+These may not be stored in `process.env` for environments other than Node.
+
+</Admonition>
 
 Next, we call the `useLoaderData` hook in our component to get the `env` object.
 
@@ -441,7 +484,7 @@ export const loader = async ({ request }) => {
 <TabPanel id="ts" label="TypeScript">
 
 ```tsx app/root.tsx
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
@@ -544,7 +587,11 @@ useEffect(() => {
 
 </Tabs>
 
-> Check out [this repo](https://github.com/supabase/auth-helpers/tree/main/examples/remix) for full implementation example
+<Admonition type="tip">
+
+Check out [this repo](https://github.com/supabase/auth-helpers/tree/main/examples/remix) for full implementation example
+
+</Admonition>
 
 ### Authentication
 
@@ -566,7 +613,7 @@ export default function Login() {
 
   const handleEmailLogin = async () => {
     await supabase.auth.signInWithPassword({
-      email: 'jon@supabase.com',
+      email: 'valid.email@supabase.io',
       password: 'password',
     })
   }
@@ -604,7 +651,7 @@ export default function Login() {
 
   const handleEmailLogin = async () => {
     await supabase.auth.signInWithPassword({
-      email: 'jon@supabase.com',
+      email: 'valid.email@supabase.io',
       password: 'password',
     })
   }
@@ -707,9 +754,9 @@ import type { Database } from 'db_types'
 
 type Post = Database['public']['Tables']['posts']['Row']
 
-import type { LoaderArgs } from '@remix-run/node'
+import type { LoaderFunctionArgs } from '@remix-run/node'
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const response = new Response()
   const supabase = createServerClient<Database>(
     process.env.SUPABASE_URL!,
@@ -757,7 +804,11 @@ export default function Index() {
 
 </Tabs>
 
-> Ensure you have [enabled replication](https://supabase.com/dashboard/project/_/database/replication) on the table you are subscribing to.
+<Admonition type="tip">
+
+Ensure you have [enabled replication](https://supabase.com/dashboard/project/_/database/publications) on the table you are subscribing to.
+
+</Admonition>
 
 ## Migration guide
 
@@ -775,10 +826,14 @@ For authentication methods that have a `redirectTo` or `emailRedirectTo`, this m
 
 ```jsx
 supabaseClient.auth.signUp({
-  email: 'jon@example.com',
+  email: 'valid.email@supabase.io',
   password: 'sup3rs3cur3',
   options: {
     emailRedirectTo: 'http://localhost:3000/auth/callback',
   },
 })
 ```
+
+</AccordionItem>
+
+</Accordion>

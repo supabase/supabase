@@ -1,6 +1,5 @@
-import { useTheme } from 'next-themes'
 import { BASE_PATH } from 'lib/constants'
-import { observer } from 'mobx-react-lite'
+import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
@@ -27,7 +26,7 @@ const ForgotPasswordLayout = ({
         <nav className="relative flex items-center justify-between sm:h-10">
           <div className="flex flex-shrink-0 flex-grow items-center lg:flex-grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
-              <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/projects'}>
+              <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/organizations'}>
                 <Image
                   src={
                     resolvedTheme?.includes('dark')
@@ -60,4 +59,4 @@ const ForgotPasswordLayout = ({
   )
 }
 
-export default observer(ForgotPasswordLayout)
+export default ForgotPasswordLayout

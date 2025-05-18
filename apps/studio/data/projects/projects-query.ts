@@ -1,11 +1,12 @@
 import { QueryClient, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { useCallback, useRef } from 'react'
 
-import { components } from 'data/api'
-import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
+import { useProfile } from 'lib/profile'
+import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
-import { Project } from './project-detail-query'
+import type { Project } from './project-detail-query'
 
 export type ProjectsVariables = {
   ref?: string
@@ -16,8 +17,8 @@ export type ProjectInfo = components['schemas']['ProjectInfo']
 export async function getProjects(signal?: AbortSignal) {
   const { data, error } = await get('/platform/projects', { signal })
 
-  if (error) throw error
-  return data
+  if (error) handleError(error)
+  return data as ProjectInfo[]
 }
 
 export type ProjectsData = Awaited<ReturnType<typeof getProjects>>
@@ -27,10 +28,15 @@ export const useProjectsQuery = <TData = ProjectsData>({
   enabled = true,
   ...options
 }: UseQueryOptions<ProjectsData, ProjectsError, TData> = {}) => {
+  const { profile } = useProfile()
   return useQuery<ProjectsData, ProjectsError, TData>(
     projectKeys.list(),
     ({ signal }) => getProjects(signal),
-    { enabled, ...options }
+    {
+      enabled: enabled && profile !== undefined,
+      staleTime: 30 * 60 * 1000, // 30 minutes
+      ...options,
+    }
   )
 }
 

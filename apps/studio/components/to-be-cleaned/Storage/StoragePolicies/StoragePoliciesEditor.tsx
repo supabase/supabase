@@ -8,8 +8,8 @@ import { deriveAllowedClientLibraryMethods } from '../Storage.utils'
 
 const PolicyDefinition = ({ definition = '', onUpdatePolicyDefinition = () => {} }) => {
   return (
-    <div className="flex space-x-12">
-      <div className="flex w-1/3 flex-col space-y-2">
+    <div className="flex flex-col md:flex-row gap-4 md:gap-12">
+      <div className="flex md:w-1/3 flex-col space-y-2">
         <label className="text-base text-foreground-light" htmlFor="policy-name">
           Policy definition
         </label>
@@ -17,7 +17,7 @@ const PolicyDefinition = ({ definition = '', onUpdatePolicyDefinition = () => {}
           Provide a SQL conditional expression that returns a boolean.
         </p>
       </div>
-      <div className="h-56 w-2/3">
+      <div className="h-56 md:w-2/3">
         <SqlEditor defaultValue={definition} onInputChange={onUpdatePolicyDefinition} />
       </div>
     </div>
@@ -27,8 +27,8 @@ const PolicyDefinition = ({ definition = '', onUpdatePolicyDefinition = () => {}
 const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = () => {} }: any) => {
   const allowedClientLibraryMethods = deriveAllowedClientLibraryMethods(allowedOperations)
   return (
-    <div className="flex justify-between space-x-12">
-      <div className="flex w-1/3 flex-col space-y-2">
+    <div className="flex flex-col md:flex-row justify-between gap-4 md:gap-12">
+      <div className="flex md:w-1/3 flex-col space-y-2">
         <label className="text-base text-foreground-light" htmlFor="allowed-operation">
           Allowed operation
         </label>
@@ -45,8 +45,8 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
           .
         </p>
       </div>
-      <div className="w-2/3">
-        <div className="flex items-center space-x-8">
+      <div className="md:w-2/3">
+        <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
           <Checkbox
             label="SELECT"
             onChange={() => onToggleOperation('SELECT')}
@@ -71,7 +71,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
         <div className="flex w-5/6 flex-wrap">
           {Object.keys(STORAGE_CLIENT_LIBRARY_MAPPINGS).map((method) => (
             <div key={method} className="mr-2 mt-2 font-mono">
-              <Badge color={allowedClientLibraryMethods.includes(method) ? 'green' : 'gray'}>
+              <Badge variant={allowedClientLibraryMethods.includes(method) ? 'brand' : 'default'}>
                 {method}
               </Badge>
             </div>
@@ -108,8 +108,8 @@ const StoragePoliciesEditor = ({
   const selectedRoles = policyFormFields.roles
 
   return (
-    <div>
-      <div className="mb-8 space-y-8 py-6">
+    <>
+      <div className="space-y-4 py-4">
         <Modal.Content>
           <PolicyName
             name={policyFormFields.name}
@@ -137,7 +137,7 @@ const StoragePoliciesEditor = ({
         </Modal.Content>
       </div>
       <PolicyEditorFooter onViewTemplates={onViewTemplates} onReviewPolicy={onReviewPolicy} />
-    </div>
+    </>
   )
 }
 

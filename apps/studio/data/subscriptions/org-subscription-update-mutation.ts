@@ -1,11 +1,12 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { put } from 'data/fetchers'
-import { toast } from 'react-hot-toast'
-import { ResponseError } from 'types/base'
-import { subscriptionKeys } from './keys'
-import { usageKeys } from 'data/usage/keys'
-import { SubscriptionTier } from './types'
+import { handleError, put } from 'data/fetchers'
 import { invoicesKeys } from 'data/invoices/keys'
+import { usageKeys } from 'data/usage/keys'
+import { toast } from 'sonner'
+import type { ResponseError } from 'types/base'
+import { subscriptionKeys } from './keys'
+import type { SubscriptionTier } from './types'
+import { organizationKeys } from 'data/organizations/keys'
 
 export type OrgSubscriptionUpdateVariables = {
   slug: string
@@ -32,10 +33,7 @@ export async function updateOrgSubscription({
     params: { path: { slug } },
   })
 
-  if (error) {
-    throw error
-  }
-
+  if (error) handleError(error)
   return data
 }
 
@@ -66,6 +64,8 @@ export const useOrgSubscriptionUpdateMutation = ({
           queryClient.invalidateQueries(subscriptionKeys.orgPlans(slug)),
           queryClient.invalidateQueries(usageKeys.orgUsage(slug)),
           queryClient.invalidateQueries(invoicesKeys.orgUpcomingPreview(slug)),
+          queryClient.invalidateQueries(organizationKeys.detail(slug)),
+          queryClient.invalidateQueries(organizationKeys.list()),
         ])
 
         await onSuccess?.(data, variables, context)

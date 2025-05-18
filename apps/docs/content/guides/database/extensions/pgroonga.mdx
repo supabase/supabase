@@ -5,7 +5,7 @@ description: 'Full Text Search for multiple languages in PostgreSQL'
 tocVideo: 'Mmmv9g_MiBA'
 ---
 
-`PGroonga` is a PostgreSQL extension adding a full text search indexing method based on [Groonga](https://groonga.org). While native PostgreSQL supports full text indexing, it is limited to alphabet and digit based languages. `PGroonga` offers a wider range of character support making it viable for a superset of languages supported by PostgreSQL including Japanese, Chinese, etc.
+`PGroonga` is a Postgres extension adding a full text search indexing method based on [Groonga](https://groonga.org). While native Postgres supports full text indexing, it is limited to alphabet and digit based languages. `PGroonga` offers a wider range of character support making it viable for a superset of languages supported by Postgres including Japanese, Chinese, etc.
 
 ## Enable the extension
 
@@ -20,7 +20,7 @@ tocVideo: 'Mmmv9g_MiBA'
 
 1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
-3. Search for "pgroonga" and enable the extension.
+3. Search for `pgroonga` and enable the extension.
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
@@ -34,7 +34,7 @@ create extension pgroonga with schema extensions;
 drop extension if exists pgroonga;
 ```
 
-Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
+Even though the SQL code is `create extension`, this is the equivalent of enabling the extension.
 To disable an extension you can call `drop extension`.
 
 </TabPanel>
@@ -71,7 +71,7 @@ values
   ('There is groonga command.');
 ```
 
-The PostgreSQL query planner is smart enough to know that, for extremely small tables, it's faster to scan the whole table rather than loading an index. To force the index to be used, we can disable sequential scans:
+The Postgres query planner is smart enough to know that, for extremely small tables, it's faster to scan the whole table rather than loading an index. To force the index to be used, we can disable sequential scans:
 
 {/* prettier-ignore */}
 ```sql
@@ -92,7 +92,7 @@ Index Scan using ix_memos_content on memos  (cost=0.00..1.11 rows=1 width=36)
 (2 rows)
 ```
 
-The pgroonga index is used to retrieve the result set:
+The `pgroonga` index is used to retrieve the result set:
 
 ```markdown
 | id  | content                                                                  |
@@ -102,7 +102,7 @@ The pgroonga index is used to retrieve the result set:
 
 ## Full text search
 
-The `&@~` operator performs full text search. It returns any matching results. Unlike `LIKE` operator, pgroonga can search any text that contains the keyword case insensitive.
+The `&@~` operator performs full text search. It returns any matching results. Unlike `LIKE` operator, `pgroonga` can search any text that contains the keyword case insensitive.
 
 Take the following example:
 

@@ -1,32 +1,43 @@
-import { useIsLoggedIn, useIsUserLoading } from 'common'
+'use client'
+
+import type {
+  Branch,
+  Org,
+  Project,
+  Variable,
+} from '~/components/ProjectConfigVariables/ProjectConfigVariables.utils'
+import type { ProjectApiData } from '~/lib/fetch/projectApi'
+
+import { Copy, Check } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { withErrorBoundary } from 'react-error-boundary'
-import { Button_Shadcn_ as Button, Input_Shadcn_ as Input, cn, IconCopy, IconCheck } from 'ui'
 import { proxy, useSnapshot } from 'valtio'
 
-import { useCopy } from '~/hooks/useCopy'
-import { useBranchesQuery } from '~/lib/fetch/branches'
-import { useOrganizationsQuery } from '~/lib/fetch/organizations'
-import { useProjectApiQuery } from '~/lib/fetch/projectApi'
-import { useProjectsQuery } from '~/lib/fetch/projects'
-import { LOCAL_STORAGE_KEYS, retrieve, storeOrRemoveNull } from '~/lib/storage'
-import { useOnLogout } from '~/lib/userAuth'
+import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsUserLoading } from 'common'
+import { Button_Shadcn_ as Button, Input_Shadcn_ as Input, cn } from 'ui'
 
-import { ComboBox, ComboBoxOption } from './ProjectConfigVariables.ComboBox'
 import {
-  type Branch,
-  type Org,
-  type Project,
-  type Variable,
+  ComboBox,
+  ComboBoxOption,
+} from '~/components/ProjectConfigVariables/ProjectConfigVariables.ComboBox'
+import {
   fromBranchValue,
   fromOrgProjectValue,
   prettyFormatVariable,
   toBranchValue,
   toDisplayNameOrgProject,
   toOrgProjectValue,
-} from './ProjectConfigVariables.utils'
+} from '~/components/ProjectConfigVariables/ProjectConfigVariables.utils'
+import { useCopy } from '~/hooks/useCopy'
+import { useBranchesQuery } from '~/lib/fetch/branches'
+import { useOrganizationsQuery } from '~/lib/fetch/organizations'
+import { type SupavisorConfigData, useSupavisorConfigQuery } from '~/lib/fetch/pooler'
+import { useProjectApiQuery } from '~/lib/fetch/projectApi'
+import { isProjectPaused, type ProjectsData, useProjectsQuery } from '~/lib/fetch/projects'
+import { retrieve, storeOrRemoveNull } from '~/lib/storage'
+import { useOnLogout } from '~/lib/userAuth'
 
 type ProjectOrgDataState =
   | 'userLoading'
@@ -49,6 +60,7 @@ type VariableDataState =
   | 'userLoading'
   | 'loggedOut'
   | 'loggedIn.noSelectedProject'
+  | 'loggedIn.selectedProject.projectPaused'
   | 'loggedIn.selectedProject.dataPending'
   | 'loggedIn.selectedProject.dataError'
   | 'loggedIn.selectedProject.dataSuccess'
@@ -58,10 +70,9 @@ const projectsStore = proxy({
   selectedProject: null as Project | null,
   setSelectedOrgProject: (org: Org | null, project: Project | null) => {
     projectsStore.selectedOrg = org
-    storeOrRemoveNull('local', LOCAL_STORAGE_KEYS.SAVED_ORG, org?.id)
+    storeOrRemoveNull('local', LOCAL_STORAGE_KEYS.SAVED_ORG, org?.id.toString())
 
     projectsStore.selectedProject = project
-    // @ts-ignore -- problem in OpenAPI spec -- project has ref property
     storeOrRemoveNull('local', LOCAL_STORAGE_KEYS.SAVED_PROJECT, project?.ref)
   },
   selectedBranch: null as Branch | null,
@@ -114,7 +125,6 @@ function OrgProjectSelector() {
         : projects.map((project) => {
             const organization = organizations.find((org) => org.id === project.organization_id)
             return {
-              // @ts-ignore -- problem in OpenAPI spec -- project has ref property
               id: project.ref,
               value: toOrgProjectValue(organization, project),
               displayName: toDisplayNameOrgProject(organization, project),
@@ -131,9 +141,7 @@ function OrgProjectSelector() {
       let storedOrg: Org
       let storedProject: Project
       if (storedMaybeOrgId && storedMaybeProjectRef) {
-        // @ts-ignore -- problem in OpenAPI spec -- org id is returned as number, not string
         storedOrg = organizations.find((org) => org.id === Number(storedMaybeOrgId))
-        // @ts-ignore -- problem in OpenAPI spec -- project has ref property
         storedProject = projects.find((project) => project.ref === storedMaybeProjectRef)
       }
 
@@ -165,7 +173,6 @@ function OrgProjectSelector() {
         if (!orgId || !projectRef) return
 
         const org = organizations.find((org) => org.id === orgId)
-        // @ts-ignore -- problem in OpenAPI spec -- project has ref property
         const project = projects.find((project) => project.ref === projectRef)
 
         if (org && project && project.organization_id === org.id) {
@@ -182,20 +189,19 @@ function BranchSelector() {
 
   const { selectedProject, selectedBranch, setSelectedBranch } = useSnapshot(projectsStore)
 
-  // @ts-ignore -- problem in OpenAPI spec -- project has is_branch_enabled property
+  const projectPaused = isProjectPaused(selectedProject)
   const hasBranches = selectedProject?.is_branch_enabled ?? false
 
   const { data, isPending, isError } = useBranchesQuery(
-    // @ts-ignore -- problem in OpenAPI spec -- project has ref property
     { projectRef: selectedProject?.ref },
-    { enabled: isLoggedIn && hasBranches }
+    { enabled: isLoggedIn && !projectPaused && hasBranches }
   )
 
   const stateSummary: BranchesDataState = userLoading
     ? 'userLoading'
     : !isLoggedIn
       ? 'loggedOut'
-      : !hasBranches
+      : !hasBranches || projectPaused
         ? 'loggedIn.noBranches'
         : isPending
           ? 'loggedIn.branches.dataPending'
@@ -262,22 +268,47 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   const isLoggedIn = useIsLoggedIn()
 
   const { selectedProject, selectedBranch } = useSnapshot(projectsStore)
-
-  // @ts-ignore -- problem in OpenAPI spec -- project has is_branch-enabled property
+  const projectPaused = isProjectPaused(selectedProject)
   const hasBranches = selectedProject?.is_branch_enabled ?? false
-  // @ts-ignore -- problem in OpenAPI spec -- project has ref property
   const ref = hasBranches ? selectedBranch?.project_ref : selectedProject?.ref
+
+  const needsApiQuery = variable === 'anonKey' || variable === 'url'
+  const needsSupavisorQuery = variable === 'sessionPooler'
 
   const {
     data: apiData,
-    isPending,
-    isError,
+    isPending: isApiPending,
+    isError: isApiError,
   } = useProjectApiQuery(
     {
       projectRef: ref,
     },
-    { enabled: isLoggedIn && !!ref }
+    { enabled: isLoggedIn && !!ref && !projectPaused && needsApiQuery }
   )
+
+  const {
+    data: supavisorConfig,
+    isPending: isSupavisorPending,
+    isError: isSupavisorError,
+  } = useSupavisorConfigQuery(
+    {
+      projectRef: ref,
+    },
+    { enabled: isLoggedIn && !!ref && !projectPaused && needsSupavisorQuery }
+  )
+
+  function isInvalidApiData(apiData: ProjectApiData) {
+    switch (variable) {
+      case 'url':
+        return !apiData.app_config?.endpoint
+      case 'anonKey':
+        return !apiData.service_api_keys?.some((key) => key.tags === 'anon')
+    }
+  }
+
+  function isInvalidSupavisorData(supavisorData: SupavisorConfigData) {
+    return supavisorData.length === 0
+  }
 
   const stateSummary: VariableDataState = isUserLoading
     ? 'userLoading'
@@ -285,23 +316,29 @@ function VariableView({ variable, className }: { variable: Variable; className?:
       ? 'loggedOut'
       : !ref
         ? 'loggedIn.noSelectedProject'
-        : isPending
-          ? 'loggedIn.selectedProject.dataPending'
-          : isError
-            ? 'loggedIn.selectedProject.dataError'
-            : 'loggedIn.selectedProject.dataSuccess'
+        : projectPaused
+          ? 'loggedIn.selectedProject.projectPaused'
+          : (needsApiQuery ? isApiPending : isSupavisorPending)
+            ? 'loggedIn.selectedProject.dataPending'
+            : (
+                  needsApiQuery
+                    ? isApiError || isInvalidApiData(apiData)
+                    : isSupavisorError || isInvalidSupavisorData(supavisorConfig)
+                )
+              ? 'loggedIn.selectedProject.dataError'
+              : 'loggedIn.selectedProject.dataSuccess'
 
   let variableValue: string = null
   if (stateSummary === 'loggedIn.selectedProject.dataSuccess') {
     switch (variable) {
       case 'url':
-        variableValue = `${apiData.autoApiService.protocol || 'https'}://${
-          apiData.autoApiService.endpoint
-        }`
+        variableValue = `https://${apiData.app_config!.endpoint}`
         break
       case 'anonKey':
-        variableValue = apiData.autoApiService.defaultApiKey
+        variableValue = apiData.service_api_keys!.find((key) => key.tags === 'anon')!.api_key
         break
+      case 'sessionPooler':
+        variableValue = supavisorConfig[0].connection_string
     }
   }
 
@@ -318,9 +355,11 @@ function VariableView({ variable, className }: { variable: Variable; className?:
             stateSummary === 'userLoading' ||
             stateSummary === 'loggedIn.selectedProject.dataPending'
               ? 'Loading...'
-              : stateSummary === 'loggedIn.selectedProject.dataSuccess'
-                ? variableValue
-                : `YOUR ${prettyFormatVariable[variable].toUpperCase()}`
+              : stateSummary === 'loggedIn.selectedProject.projectPaused'
+                ? 'PROJECT PAUSED'
+                : stateSummary === 'loggedIn.selectedProject.dataSuccess'
+                  ? variableValue
+                  : `YOUR ${prettyFormatVariable[variable].toUpperCase()}`
           }
         />
         <CopyToClipboard text={variableValue ?? ''}>
@@ -331,7 +370,7 @@ function VariableView({ variable, className }: { variable: Variable; className?:
             onClick={handleCopy}
             aria-label="Copy"
           >
-            {copied ? <IconCheck /> : <IconCopy />}
+            {copied ? <Check /> : <Copy />}
           </Button>
         </CopyToClipboard>
       </div>

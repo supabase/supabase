@@ -1,16 +1,17 @@
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { components } from 'data/api'
+import type { components } from 'data/api'
 import { handleError, post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { tableKeys } from './keys'
 
 export type CreateTableBody = components['schemas']['CreateTableBody']
 
 export type TableCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   // the schema is required field
   payload: CreateTableBody & { schema: string }
 }
@@ -29,7 +30,10 @@ export async function createTable({ projectRef, connectionString, payload }: Tab
   })
 
   if (error) handleError(error)
-  return data
+
+  // [Alaister] we have to manually cast the data to PostgresTable
+  // because the API types are slightly wrong
+  return data as PostgresTable
 }
 
 type TableCreateData = Awaited<ReturnType<typeof createTable>>
@@ -50,7 +54,10 @@ export const useTableCreateMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef, payload } = variables
 
-        await queryClient.invalidateQueries(tableKeys.list(projectRef, payload.schema))
+        await Promise.all([
+          queryClient.invalidateQueries(tableKeys.list(projectRef, payload.schema, true)),
+          queryClient.invalidateQueries(tableKeys.list(projectRef, payload.schema, false)),
+        ])
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

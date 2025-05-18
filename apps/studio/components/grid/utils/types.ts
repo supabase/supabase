@@ -1,4 +1,4 @@
-import { SupaColumn } from '../types'
+import type { SupaColumn } from '../types'
 
 const NUMERICAL_TYPES = [
   'smallint',
@@ -67,6 +67,11 @@ export function isBoolColumn(type: string) {
 const ENUM_TYPES = ['user-defined']
 export function isEnumColumn(type: string) {
   return ENUM_TYPES.indexOf(type.toLowerCase()) > -1
+}
+
+const BINARY_TYPES = ['bytea']
+export function isBinaryColumn(type: string) {
+  return BINARY_TYPES.indexOf(type.toLowerCase()) > -1
 }
 
 export function isForeignKeyColumn(columnDef: SupaColumn) {

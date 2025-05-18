@@ -1,9 +1,9 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
-import { find, isEqual, isNull } from 'lodash'
-import { Dictionary } from 'types'
+import { isEqual, isNull } from 'lodash'
+import type { Dictionary } from 'types'
 
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { uuidv4 } from 'lib/helpers'
 import {
   ColumnField,
@@ -84,16 +84,17 @@ export const generateColumnFieldFromPostgresColumn = (
 }
 
 export const generateCreateColumnPayload = (
-  tableId: number,
+  table: PostgresTable,
   field: ColumnField
 ): CreateColumnPayload => {
   const isIdentity = field.format.includes('int') ? field.isIdentity : false
-  const defaultValue = field.defaultValue as any
+  const defaultValue = field.defaultValue
   const payload: CreateColumnPayload = {
-    tableId,
+    schema: table.schema,
+    table: table.name,
     isIdentity,
-    name: field.name,
-    comment: field.comment,
+    name: field.name.trim(),
+    comment: field.comment?.trim(),
     type: field.isArray ? `${field.format}[]` : field.format,
     check: field.check?.trim() || undefined,
     isUnique: field.isUnique,
@@ -106,9 +107,7 @@ export const generateCreateColumnPayload = (
     ...(!isIdentity &&
       defaultValue && {
         defaultValueFormat:
-          isNull(defaultValue) || isSQLExpression(defaultValue)
-            ? 'expression'
-            : ('literal' as 'expression' | 'literal'),
+          isNull(defaultValue) || isSQLExpression(defaultValue) ? 'expression' : 'literal',
       }),
   }
   return payload
@@ -123,18 +122,23 @@ export const generateUpdateColumnPayload = (
   const isOriginallyPrimaryKey = primaryKeyColumns.includes(originalColumn.name)
 
   // Only append the properties which are getting updated
+  const name = field.name.trim()
   const type = field.isArray ? `${field.format}[]` : field.format
-  const comment = (field.comment?.length ?? '') === 0 ? null : field.comment
+  const comment = ((field.comment?.length ?? '') === 0 ? '' : field.comment)?.trim()
+
+  const check = field.check?.trim()
 
   const payload: Partial<UpdateColumnPayload> = {}
-  if (!isEqual(originalColumn.name, field.name)) {
-    payload.name = field.name
+  // [Joshen] Trimming on the original name as well so we don't rename columns that already
+  // contain whitespaces (and accidentally bringing user apps down)
+  if (!isEqual(originalColumn.name.trim(), name)) {
+    payload.name = name
   }
-  if (!isEqual(originalColumn.comment, comment)) {
+  if (!isEqual(originalColumn.comment?.trim(), comment)) {
     payload.comment = comment as string | undefined
   }
-  if (!isEqual(originalColumn.check?.trim(), field.check?.trim())) {
-    payload.check = field.check?.trim()
+  if (!isEqual(originalColumn.check?.trim(), check)) {
+    payload.check = check
   }
 
   if (!isEqual(originalColumn.format, type)) {
@@ -206,7 +210,8 @@ export const getColumnForeignKey = (
   foreignKeys: ForeignKeyConstraint[]
 ) => {
   const { relationships } = table
-  const foreignKey = find(relationships, (relationship) => {
+
+  const foreignKey = relationships.find((relationship) => {
     return (
       relationship.source_schema === column.schema &&
       relationship.source_table_name === column.table &&
@@ -242,5 +247,52 @@ export const getForeignKeyCascadeAction = (action?: string) => {
       return 'Set NULL'
     default:
       return undefined
+  }
+}
+
+export const getPlaceholderText = (format?: string, columnFieldName?: string) => {
+  const columnName = columnFieldName || 'column_name'
+
+  switch (format) {
+    case 'int2':
+    case 'int4':
+    case 'int8':
+    case 'numeric':
+      return `"${columnName}" > 0`
+
+    case 'float4':
+    case 'float8':
+      return `"${columnName}" > 0.0`
+
+    case 'text':
+    case 'varchar':
+      return `length("${columnName}") <= 50`
+
+    case 'json':
+    case 'jsonb':
+      return `jsonb_typeof("${columnName}"->'active') = 'boolean'`
+
+    case 'bool':
+      return `"${columnName}" in (true, false)`
+
+    case 'date':
+      return `"${columnName}" > '2024-01-01'`
+
+    case 'time':
+      return `"${columnName}" between '09:00:00' and '12:00:00'`
+
+    case 'timetz':
+      return `"${columnName}" at time zone 'UTC' between '09:00:00+00' and '17:00:00+00'`
+
+    case 'uuid':
+      return `"${columnName}" '00000000-0000-0000-0000-000000000000'`
+
+    case 'timestamp':
+      return `"${columnName}" > '2023-01-01 00:00' and "${columnName}" < '2025-01-01 00:00'`
+    case 'timestamptz':
+      return `"${columnName}" > '2023-01-01 00:00:00+00' and "${columnName}" < '2025-01-01 00:00:00+00'`
+
+    default:
+      return `length("${columnName}") < 500`
   }
 }

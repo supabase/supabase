@@ -2,15 +2,16 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import { useTheme } from 'next-themes'
-import { observer } from 'mobx-react-lite'
 import { useCallback, useEffect, useState } from 'react'
 
 import { NewOrgForm } from 'components/interfaces/Organization'
-import { WizardLayout } from 'components/layouts'
-import { useSetupIntent } from 'data/stripe/setup-intent-mutation'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import WizardLayout from 'components/layouts/WizardLayout'
+import { SetupIntentResponse, useSetupIntent } from 'data/stripe/setup-intent-mutation'
 import { STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -20,7 +21,7 @@ const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 const Wizard: NextPageWithLayout = () => {
   const { resolvedTheme } = useTheme()
 
-  const [intent, setIntent] = useState<any>()
+  const [intent, setIntent] = useState<SetupIntentResponse>()
   const captchaLoaded = useIsHCaptchaLoaded()
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
@@ -43,7 +44,7 @@ const Wizard: NextPageWithLayout = () => {
   const options = {
     clientSecret: intent ? intent.client_secret : '',
     appearance: { theme: resolvedTheme?.includes('dark') ? 'night' : 'flat', labels: 'floating' },
-  } as any
+  } as const
 
   const loadPaymentForm = async () => {
     if (captchaRef && captchaLoaded) {
@@ -105,9 +106,11 @@ const Wizard: NextPageWithLayout = () => {
 }
 
 Wizard.getLayout = (page) => (
-  <WizardLayout organization={null} project={null}>
-    {page}
-  </WizardLayout>
+  <AppLayout>
+    <DefaultLayout headerTitle="New organization">
+      <WizardLayout>{page}</WizardLayout>
+    </DefaultLayout>
+  </AppLayout>
 )
 
-export default observer(Wizard)
+export default Wizard

@@ -1,74 +1,92 @@
-import { CloudProvider, PROVIDERS } from 'lib/constants'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-import { Listbox } from 'ui'
+import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
+import { PROVIDERS } from 'lib/constants'
+import type { CloudProvider } from 'shared-data'
+import {
+  SelectContent_Shadcn_,
+  SelectGroup_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  Select_Shadcn_,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { getAvailableRegions } from './ProjectCreation.utils'
 
 interface RegionSelectorProps {
   cloudProvider: CloudProvider
-  selectedRegion: string
-  onSelectRegion: (value: string) => void
+  field: ControllerRenderProps<any, 'dbRegion'>
+  form: UseFormReturn<any>
+  layout?: 'vertical' | 'horizontal'
 }
+
+// [Joshen] Let's use a library to maintain the flag SVGs in the future
+// I tried using https://flagpack.xyz/docs/development/react/ but couldn't get it to render
+// ^ can try again next time
 
 export const RegionSelector = ({
   cloudProvider,
-  selectedRegion,
-  onSelectRegion,
+  field,
+  layout = 'horizontal',
 }: RegionSelectorProps) => {
   const router = useRouter()
-  const availableRegions = getAvailableRegions(PROVIDERS[cloudProvider].id)
-  const {
-    data: region,
-    isSuccess,
-    isError,
-  } = useDefaultRegionQuery(
-    { cloudProvider },
-    { refetchOnMount: false, refetchOnWindowFocus: false, refetchInterval: false }
-  )
 
-  useEffect(() => {
-    // only pick a region if one hasn't already been selected
-    if (isSuccess && region && !selectedRegion) {
-      onSelectRegion(region)
-    } else if (isError && !selectedRegion) {
-      // if an error happened, and the user haven't selected a region, just select the default one for him
-      onSelectRegion(PROVIDERS[cloudProvider].default_region)
-    }
-  }, [cloudProvider, isError, isSuccess, region, selectedRegion])
+  const showNonProdFields =
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+
+  const availableRegions = getAvailableRegions(PROVIDERS[cloudProvider].id)
+  const regionsArray = Object.entries(availableRegions)
+
+  const { isLoading: isLoadingDefaultRegion } = useDefaultRegionQuery({
+    cloudProvider,
+  })
 
   return (
-    <Listbox
-      layout="horizontal"
+    <FormItemLayout
+      layout={layout}
       label="Region"
-      type="select"
-      value={selectedRegion}
-      onChange={(value) => onSelectRegion(value)}
-      descriptionText="Select the region closest to your users for the best performance."
+      description={
+        <>
+          <p>Select the region closest to your users for the best performance.</p>
+          {showNonProdFields && (
+            <p className="text-warning">
+              Note: Only US (NV), Frankfurt and SG are supported for local/staging projects
+            </p>
+          )}
+        </>
+      }
     >
-      <Listbox.Option disabled key="empty" label="---" value="">
-        <span className="text-foreground">Select a region for your project</span>
-      </Listbox.Option>
-      {Object.keys(availableRegions).map((option: string, i) => {
-        const label = Object.values(availableRegions)[i] as string
-        return (
-          <Listbox.Option
-            key={option}
-            label={label}
-            value={label}
-            addOnBefore={() => (
-              <img
-                alt="region icon"
-                className="w-5 rounded-sm"
-                src={`${router.basePath}/img/regions/${Object.keys(availableRegions)[i]}.svg`}
-              />
-            )}
-          >
-            <span className="text-foreground">{label}</span>
-          </Listbox.Option>
-        )
-      })}
-    </Listbox>
+      <Select_Shadcn_
+        value={field.value}
+        onValueChange={field.onChange}
+        disabled={isLoadingDefaultRegion}
+      >
+        <SelectTrigger_Shadcn_>
+          <SelectValue_Shadcn_ placeholder="Select a region for your project.." />
+        </SelectTrigger_Shadcn_>
+        <SelectContent_Shadcn_>
+          <SelectGroup_Shadcn_>
+            {regionsArray.map(([key, value]) => {
+              const label = value.displayName as string
+              return (
+                <SelectItem_Shadcn_ key={key} value={label}>
+                  <div className="flex items-center gap-3">
+                    <img
+                      alt="region icon"
+                      className="w-5 rounded-sm"
+                      src={`${router.basePath}/img/regions/${key}.svg`}
+                    />
+                    <span className="text-foreground">{label}</span>
+                  </div>
+                </SelectItem_Shadcn_>
+              )
+            })}
+          </SelectGroup_Shadcn_>
+        </SelectContent_Shadcn_>
+      </Select_Shadcn_>
+    </FormItemLayout>
   )
 }

@@ -1,46 +1,42 @@
-import { PropsWithChildren, ReactNode } from 'react'
-import { Loading, cn } from 'ui'
+import { Megaphone } from 'lucide-react'
+import { forwardRef, PropsWithChildren, ReactNode } from 'react'
+
+import { Badge, Button, cn, Loading } from 'ui'
 
 interface PanelProps {
-  bodyClassName?: string
   className?: string
   footer?: JSX.Element | false
-  hideHeaderStyling?: boolean
   loading?: boolean
   noMargin?: boolean
   title?: ReactNode | false
   wrapWithLoading?: boolean
   noHideOverflow?: boolean
-  headerClasses?: string
+  titleClasses?: string
 }
 
 function Panel(props: PropsWithChildren<PanelProps>) {
   const content = (
     <div
       className={cn(
-        'rounded-md border border-overlay shadow-sm',
+        'bg-surface-100',
+        'rounded-md border shadow-sm',
         props.noHideOverflow ? '' : 'overflow-hidden',
-        props.noMargin ? '' : 'mb-8',
+        props.noMargin ? '' : 'mb-4 md:mb-8',
         props.className
       )}
     >
       {props.title && (
         <div
           className={cn(
-            props.hideHeaderStyling ? 'bg-surface-100 border-b border-overlay' : 'bg-surface-100',
-            props.headerClasses
+            'bg-surface-100 border-b border-default flex items-center px-4 md:px-6 py-4',
+            props.titleClasses
           )}
         >
-          <div className="flex items-center px-6 py-4">{props.title}</div>
+          {props.title}
         </div>
       )}
-      <div className={cn('bg-surface-100', props.bodyClassName)}>{props.children}</div>
-
-      {props.footer && (
-        <div className="bg-surface-100 border-t border-overlay">
-          <div className="flex h-12 items-center px-6">{props.footer}</div>
-        </div>
-      )}
+      {props.children}
+      {props.footer && <Footer>{props.footer}</Footer>}
     </div>
   )
 
@@ -52,8 +48,101 @@ function Panel(props: PropsWithChildren<PanelProps>) {
 }
 
 function Content({ children, className }: { children: ReactNode; className?: string | false }) {
-  return <div className={cn('px-6 py-4', className)}>{children}</div>
+  return <div className={cn('px-4 md:px-6 py-4', className)}>{children}</div>
 }
 
+function Footer({ children }: { children: ReactNode; className?: string }) {
+  return (
+    <div className="bg-surface-100 border-t border-default">
+      <div className="flex h-12 items-center px-4 md:px-6">{children}</div>
+    </div>
+  )
+}
+
+const PanelNotice = forwardRef<
+  HTMLDivElement,
+  {
+    className?: string | false
+    title?: string
+    description?: string
+    href?: string
+    buttonText?: string
+    layout?: 'horizontal' | 'vertical'
+    badgeLabel?: string
+  }
+>(
+  (
+    {
+      className,
+      title,
+      description,
+      href,
+      buttonText,
+      layout = 'horizontal',
+      badgeLabel,
+      ...props
+    },
+    ref
+  ) => {
+    return (
+      <div
+        ref={ref}
+        {...props}
+        className={cn(
+          'relative px-4 md:px-6 py-5 bg-studio flex flex-col lg:flex-row lg:justify-between gap-6 overflow-hidden lg:items-center',
+          layout === 'vertical' && '!flex-col !items-start gap-y-2',
+          className
+        )}
+      >
+        <div
+          className="absolute inset-0 -mt-[5px]"
+          style={{
+            backgroundImage: `
+                linear-gradient(to right, hsl(var(--background-200)/1) 0%, hsl(var(--background-200)/1) 30%, hsl(var(--background-200)/0) 100%),
+                linear-gradient(to right, hsl(var(--border-default)/0.33) 1px, transparent 1px),
+                linear-gradient(to bottom, hsl(var(--border-default)/0.33) 1px, transparent 1px)
+              `,
+            backgroundSize: '100% 100%, 15px 15px, 15px 15px',
+            backgroundPosition: '0 0, 0 0, 0 0',
+          }}
+        />
+        <div className="relative flex flex-col gap-y-2">
+          <div className="flex flex-row items-center -space-x-px">
+            <Badge
+              variant={'default'}
+              className="rounded-r-none pr-2 flex-shrink-0 gap-1.5 border-dashed bg-opacity-0 bg-surface-400 text-foreground-lighter"
+            >
+              <Megaphone size={16} strokeWidth={1.2} />
+              <span className="text-foreground-lighter">{badgeLabel ?? 'Upcoming change'}</span>
+            </Badge>
+            <Badge
+              variant="default"
+              className="rounded-l-none flex-shrink-0 gap-1.5 bg-opacity-0 bg-surface-400 text-foreground-lighter border-l-0"
+            >
+              <span className="text-foreground text-xs">{title}</span>
+            </Badge>
+          </div>
+          {description && (
+            <div className="text-foreground-light text-sm flex flex-col gap-0">
+              <div className="prose text-xs max-w-none [&_p]:mt-2 [&_p]:mb-0">{description}</div>
+            </div>
+          )}
+        </div>
+        {href && (
+          <Button size="tiny" type="default" className="text-xs" asChild>
+            <a href={href} target="_blank" rel="noreferrer noopener">
+              {buttonText ?? 'Read the accouncement'}
+            </a>
+          </Button>
+        )}
+      </div>
+    )
+  }
+)
+
+PanelNotice.displayName = 'PanelNotice'
+
 Panel.Content = Content
+Panel.Footer = Footer
+Panel.Notice = PanelNotice
 export default Panel

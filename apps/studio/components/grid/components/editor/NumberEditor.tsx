@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { RenderEditCellProps } from 'react-data-grid'
+import type { RenderEditCellProps } from 'react-data-grid'
 
 function autoFocusAndSelect(input: HTMLInputElement | null) {
   input?.focus()
@@ -16,7 +15,7 @@ export function NumberEditor<TRow, TSummaryRow = unknown>({
 
   function onChange(event: React.ChangeEvent<HTMLInputElement>) {
     const _value = event.target.value
-    if (_value == '') onRowChange({ ...row, [column.key]: null })
+    if (_value === '') onRowChange({ ...row, [column.key]: null })
     else onRowChange({ ...row, [column.key]: _value })
   }
 

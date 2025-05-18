@@ -2,7 +2,7 @@ import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query
 import { useCallback } from 'react'
 
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { resourceKeys } from './keys'
 
 export type ResourceVariables = {

@@ -1,4 +1,4 @@
-import clsx from 'clsx'
+import { cn } from 'ui'
 
 interface SparkBarProps {
   value: number
@@ -16,7 +16,7 @@ interface SparkBarProps {
 const SparkBar = ({
   max = 100,
   value = 0,
-  barClass = '',
+  barClass = 'bg-foreground',
   bgClass = '',
   type = 'vertical',
   borderClass = '',
@@ -35,7 +35,7 @@ const SparkBar = ({
         {hasLabels && (
           <div className="flex align-baseline justify-between pb-1 space-x-8">
             <p
-              className={clsx(
+              className={cn(
                 'text-foreground text-sm truncate capitalize-sentence',
                 labelTop.length > 0 && 'max-w-[75%]',
                 labelBottomClass
@@ -43,12 +43,12 @@ const SparkBar = ({
             >
               {labelBottom}
             </p>
-            <p className={clsx('text-foreground-light text-sm', labelTopClass)}>{labelTop}</p>
+            <p className={cn('text-foreground-light text-sm', labelTopClass)}>{labelTop}</p>
           </div>
         )}
         <div
           className={`relative rounded h-1 overflow-hidden w-full border p-0 ${
-            bgClass ? bgClass : 'bg-overlay-hover'
+            bgClass ? bgClass : 'bg-surface-400'
           } ${borderClass ? borderClass : 'border-none'}`}
         >
           <div

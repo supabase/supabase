@@ -1,4 +1,6 @@
-import { Session } from '@supabase/supabase-js'
+'use client'
+
+import type { Session } from '@supabase/supabase-js'
 import {
   createContext,
   PropsWithChildren,
@@ -8,7 +10,10 @@ import {
   useMemo,
   useState,
 } from 'react'
-import { gotrueClient } from './gotrue'
+import { gotrueClient, type User } from './gotrue'
+import { clearLocalStorage } from './constants/local-storage'
+
+export type { User }
 
 const DEFAULT_SESSION: any = {
   access_token: undefined,
@@ -109,4 +114,43 @@ export const useIsLoggedIn = () => {
   const user = useUser()
 
   return user !== null
+}
+
+export const signOut = async () => await gotrueClient.signOut()
+
+export const logOut = async () => {
+  await signOut()
+  clearLocalStorage()
+}
+
+let currentSession: Session | null = null
+
+gotrueClient.onAuthStateChange((event, session) => {
+  currentSession = session
+})
+
+/**
+ * Grabs the currently available access token, or calls getSession.
+ */
+export async function getAccessToken() {
+  // ignore if server-side
+  if (typeof window === 'undefined') return undefined
+
+  const aboutToExpire = currentSession?.expires_at
+    ? currentSession.expires_at - Math.ceil(Date.now() / 1000) < 30
+    : false
+
+  if (!currentSession || aboutToExpire) {
+    const {
+      data: { session },
+      error,
+    } = await gotrueClient.getSession()
+    if (error) {
+      throw error
+    }
+
+    return session?.access_token
+  }
+
+  return currentSession.access_token
 }

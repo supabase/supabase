@@ -1,21 +1,22 @@
 import { Transition } from '@headlessui/react'
 import { get, noop, sum } from 'lodash'
+import { Upload } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useContextMenu } from 'react-contexify'
-import { Checkbox, IconUpload } from 'ui'
 
 import InfiniteList from 'components/ui/InfiniteList'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import { Checkbox, cn } from 'ui'
 import {
   CONTEXT_MENU_KEYS,
   STORAGE_ROW_STATUS,
   STORAGE_ROW_TYPES,
   STORAGE_VIEWS,
 } from '../Storage.constants'
-import { StorageColumn } from '../Storage.types'
+import type { StorageColumn, StorageItem, StorageItemWithColumn } from '../Storage.types'
 import FileExplorerRow from './FileExplorerRow'
 
 const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) => {
@@ -38,10 +39,10 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) =>
       >
         {!folderIsEmpty && (
           <div
-            className="w-3/4 h-32 border-2 border-dashed border-gray-400 rounded-md flex flex-col items-center justify-center p-6 pointer-events-none"
+            className="w-3/4 h-32 border-2 border-dashed border-muted rounded-md flex flex-col items-center justify-center p-6 pointer-events-none"
             style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
           >
-            <IconUpload className="text-white pointer-events-none" size={20} strokeWidth={2} />
+            <Upload className="text-white pointer-events-none" size={20} strokeWidth={2} />
             <p className="text-center text-sm  text-white mt-2 pointer-events-none">
               Drop your files to upload to this folder
             </p>
@@ -54,34 +55,28 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) =>
 
 export interface FileExplorerColumnProps {
   index: number
-  view: string
   column: StorageColumn
   fullWidth?: boolean
-  openedFolders?: any[]
-  selectedItems: any[]
-  selectedFilePreview: any
+  openedFolders?: StorageItem[]
+  selectedItems: StorageItemWithColumn[]
   itemSearchString: string
   onFilesUpload: (event: any, index: number) => void
   onSelectAllItemsInColumn: (index: number) => void
   onSelectColumnEmptySpace: (index: number) => void
   onColumnLoadMore: (index: number, column: StorageColumn) => void
-  onCopyUrl: (name: string, url: string) => void
 }
 
 const FileExplorerColumn = ({
   index = 0,
-  view = STORAGE_VIEWS.COLUMNS,
   column,
   fullWidth = false,
   openedFolders = [],
   selectedItems = [],
-  selectedFilePreview = {},
   itemSearchString,
   onFilesUpload = noop,
   onSelectAllItemsInColumn = noop,
   onSelectColumnEmptySpace = noop,
   onColumnLoadMore = noop,
-  onCopyUrl = noop,
 }: FileExplorerColumnProps) => {
   const [isDraggedOver, setIsDraggedOver] = useState(false)
   const fileExplorerColumnRef = useRef<any>(null)
@@ -105,7 +100,7 @@ const FileExplorerColumn = ({
     (item) => item.type === STORAGE_ROW_TYPES.FILE
   )
 
-  const columnItems = column.items
+  const columnItems = column.items.map((item, index) => ({ ...item, columnIndex: index }))
   const columnItemsSize = sum(columnItems.map((item) => get(item, ['metadata', 'size'], 0)))
 
   const isEmpty =
@@ -147,11 +142,11 @@ const FileExplorerColumn = ({
   return (
     <div
       ref={fileExplorerColumnRef}
-      className={`
-        ${fullWidth ? 'w-full' : 'w-64 border-r border-overlay'}
-        ${view === STORAGE_VIEWS.COLUMNS ? '' : ''}
-        hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto
-      `}
+      className={cn(
+        fullWidth ? 'w-full' : 'w-64 border-r border-overlay',
+        snap.view === STORAGE_VIEWS.LIST && 'h-full',
+        'hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto'
+      )}
       onContextMenu={displayMenu}
       onDragOver={onDragOver}
       onDrop={onDrop}
@@ -162,11 +157,13 @@ const FileExplorerColumn = ({
       }}
     >
       {/* Checkbox selection for select all */}
-      {view === STORAGE_VIEWS.COLUMNS && (
+      {snap.view === STORAGE_VIEWS.COLUMNS && (
         <div
-          className={`sticky top-0 z-10 mb-0 flex items-center bg-table-header-light px-2.5 [[data-theme*=dark]_&]:bg-table-header-dark ${
-            haveSelectedItems ? 'h-10 py-3 opacity-100' : 'h-0 py-0 opacity-0'
-          } transition-all duration-200`}
+          className={cn(
+            'sticky top-0 z-10 mb-0 flex items-center bg-table-header-light px-2.5 [[data-theme*=dark]_&]:bg-table-header-dark',
+            haveSelectedItems ? 'h-10 py-3 opacity-100' : 'h-0 py-0 opacity-0',
+            'transition-all duration-200'
+          )}
           onClick={(event) => event.stopPropagation()}
         >
           {columnFiles.length > 0 ? (
@@ -181,14 +178,8 @@ const FileExplorerColumn = ({
       )}
 
       {/* List Interface Header */}
-      {view === STORAGE_VIEWS.LIST && (
-        <div
-          className="
-          sticky top-0
-          z-10 flex min-w-min items-center border-b border-overlay bg-surface-100 px-2.5
-          py-2
-        "
-        >
+      {snap.view === STORAGE_VIEWS.LIST && (
+        <div className="sticky top-0 py-2 z-10 flex min-w-min items-center border-b border-overlay bg-surface-100 px-2.5">
           <div className="flex w-[40%] min-w-[250px] items-center">
             <SelectAllCheckbox />
             <p className="text-sm">Name</p>
@@ -218,12 +209,10 @@ const FileExplorerColumn = ({
       <InfiniteList
         items={columnItems}
         itemProps={{
-          view,
+          view: snap.view,
           columnIndex: index,
           selectedItems,
           openedFolders,
-          selectedFilePreview,
-          onCopyUrl,
         }}
         ItemComponent={FileExplorerRow}
         getItemSize={(index) => (index !== 0 && index === columnItems.length ? 85 : 37)}
@@ -270,13 +259,8 @@ const FileExplorerColumn = ({
       />
 
       {/* List interface footer */}
-      {view === STORAGE_VIEWS.LIST && (
-        <div
-          className="
-          sticky bottom-0
-          z-10 flex min-w-min items-center bg-panel-footer-light px-2.5 py-2 [[data-theme*=dark]_&]:bg-panel-footer-dark
-        "
-        >
+      {snap.view === STORAGE_VIEWS.LIST && (
+        <div className="shrink-0 rounded-b-md z-10 flex min-w-min items-center bg-panel-footer-light px-2.5 py-2 [[data-theme*=dark]_&]:bg-panel-footer-dark w-full">
           <p className="text-sm">
             {formatBytes(columnItemsSize)} for {columnItems.length} items
           </p>

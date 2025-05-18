@@ -1,13 +1,13 @@
 import dayjs from 'dayjs'
 import { ALL_TIMEZONES } from './PITR.constants'
-import { Time } from './PITR.types'
-import { ProjectSelectedAddon } from 'data/subscriptions/types'
+import type { Time } from './PITR.types'
+import type { ProjectSelectedAddon } from 'data/subscriptions/types'
 
 export const getPITRRetentionDuration = (addons: ProjectSelectedAddon[]) => {
   const pitrAddon = addons.find((addon) => addon.type === 'pitr')
   if (!pitrAddon) return 0
 
-  return pitrAddon.variant.meta?.backup_duration_days ?? 0
+  return (pitrAddon.variant.meta as any)?.backup_duration_days ?? 0
 }
 
 export const getDatesBetweenRange = (startDate: dayjs.Dayjs, endDate: dayjs.Dayjs) => {

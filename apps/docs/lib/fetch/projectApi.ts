@@ -1,4 +1,4 @@
-import { ResponseError } from '~/types/fetch'
+import type { ResponseError } from '~/types/fetch'
 import { get } from './fetchWrappers'
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
@@ -15,7 +15,7 @@ async function getProjectApi({ projectRef }: ProjectApiVariables, signal?: Abort
     throw Error('projectRef is required')
   }
 
-  const { data, error } = await get('/platform/props/project/{ref}/api', {
+  const { data, error } = await get('/platform/projects/{ref}/settings', {
     params: {
       path: { ref: projectRef },
     },
@@ -26,7 +26,7 @@ async function getProjectApi({ projectRef }: ProjectApiVariables, signal?: Abort
   return data
 }
 
-type ProjectApiData = Awaited<ReturnType<typeof getProjectApi>>
+export type ProjectApiData = Awaited<ReturnType<typeof getProjectApi>>
 type ProjectApiError = ResponseError
 
 export function useProjectApiQuery<TData = ProjectApiData>(

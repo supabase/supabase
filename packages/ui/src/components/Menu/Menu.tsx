@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import styleHandler from '../../lib/theme/styleHandler'
 import { cn } from '../../lib/utils/cn'
@@ -95,7 +97,7 @@ export function Item({
 interface GroupProps {
   children?: React.ReactNode
   icon?: React.ReactNode
-  title: string
+  title: React.ReactNode
 }
 
 export function Group({ children, icon, title }: GroupProps) {

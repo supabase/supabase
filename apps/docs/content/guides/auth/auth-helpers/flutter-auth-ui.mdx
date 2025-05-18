@@ -2,22 +2,20 @@
 id: 'flutter-auth-ui'
 title: 'Flutter Auth UI'
 description: 'Prebuilt, customizable Flutter widgets for authenticating users.'
+sitemapPriority: 0.5
 ---
 
 Flutter Auth UI is a Flutter package containing pre-built widgets for authenticating users.
 It is unstyled and can match your brand and aesthetic.
 
-<image src="https://raw.githubusercontent.com/supabase-community/flutter-auth-ui/main/assets/supabase_auth_ui.png" />
+![Flutter Auth UI](https://raw.githubusercontent.com/supabase-community/flutter-auth-ui/main/screenshots/supabase_auth_ui.png)
 
 ## Add Flutter Auth UI
 
 Add the latest version of the package [supabase-auth-ui](https://pub.dev/packages/supabase_auth_ui) to pubspec.yaml:
 
-```yaml
-dependencies:
-  flutter:
-    sdk: flutter
-  supabase_auth_ui: ^0.1.0+2
+```bash
+flutter pub add supabase_auth_ui
 ```
 
 ### Initialize the Flutter Auth package
@@ -38,9 +36,9 @@ void main() async {
 
 ### Email Auth
 
-Use a SupaEmailAuth widget to create an email and password signin and signup form. It also contains a button to toggle to display a forgot password form.
+Use a `SupaEmailAuth` widget to create an email and password signin and signup form. It also contains a button to toggle to display a forgot password form.
 
-You can pass metadataFields to add additional fields to the form to pass as metadata to Supabase.
+You can pass `metadataFields` to add additional fields to the form to pass as metadata to Supabase.
 
 ```dart
 SupaEmailAuth(
@@ -65,7 +63,7 @@ SupaEmailAuth(
 
 ### Magic link Auth
 
-Use SupaMagicAuth widget to create a magic link signIn form.
+Use `SupaMagicAuth` widget to create a magic link signIn form.
 
 ```dart
 SupaMagicAuth(
@@ -77,7 +75,7 @@ SupaMagicAuth(
 
 ### Reset password
 
-Use SupaResetPassword to create a password reset form.
+Use `SupaResetPassword` to create a password reset form.
 
 ```dart
 SupaResetPassword(
@@ -89,31 +87,31 @@ SupaResetPassword(
 
 ### Phone Auth
 
-Use SupaPhoneAuth to create a phone authentication form.
+Use `SupaPhoneAuth` to create a phone authentication form.
 
 ```dart
 SupaPhoneAuth(
-    authAction: SupaAuthAction.signUp,
-    onSuccess: (AuthResponse response) {},
-  ),
+  authAction: SupaAuthAction.signUp,
+  onSuccess: (AuthResponse response) {},
+),
 ```
 
 ### Social Auth
 
 The package supports login with [official social providers](../../auth#providers).
 
-Use SupaSocialsAuth to create list of social login buttons.
+Use `SupaSocialsAuth` to create list of social login buttons.
 
 ```dart
 SupaSocialsAuth(
   socialProviders: [
-  SocialProviders.apple,
-  SocialProviders.google,
+    OAuthProvider.apple,
+    OAuthProvider.google,
   ],
   colored: true,
   redirectUrl: kIsWeb
-  ? null
-  : 'io.mydomain.myapp://callback',
+    ? null
+    : 'io.mydomain.myapp://callback',
   onSuccess: (Session response) {},
   onError: (error) {},
 )

@@ -1,8 +1,9 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
-import { AuditLog } from 'data/organizations/organization-audit-logs-query'
-import { ResponseError } from 'types'
+import { get, handleError } from 'data/fetchers'
+import type { AuditLog } from 'data/organizations/organization-audit-logs-query'
+import { IS_PLATFORM } from 'lib/constants'
+import type { ResponseError } from 'types'
 import { profileKeys } from './keys'
 
 export type ProfileAuditLogsVariables = {
@@ -24,7 +25,7 @@ export async function getProfileAuditLogs(
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data as unknown as ProfileAuditLogsData
 }
 
@@ -43,6 +44,7 @@ export const useProfileAuditLogsQuery = <TData = ProfileAuditLogsData>(
     profileKeys.auditLogs({ date_start: iso_timestamp_start, date_end: iso_timestamp_end }),
     ({ signal }) => getProfileAuditLogs(vars, signal),
     {
+      enabled: IS_PLATFORM && options.enabled,
       ...options,
     }
   )

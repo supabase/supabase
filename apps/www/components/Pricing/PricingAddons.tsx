@@ -1,9 +1,10 @@
-import React, { FC } from 'react'
-import Image from 'next/image'
-import { useRouter } from 'next/router'
+import { ArrowUpRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { Button, IconArrowUpRight, cn } from 'ui'
+import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { FC } from 'react'
+import { Button, cn } from 'ui'
 import CostControlAnimation from './CostControlAnimation'
 
 const addons = [
@@ -13,9 +14,9 @@ const addons = [
     price: 'Available on Pro Plan',
     heroImg: <CostControlAnimation className="relative w-full h-full lg:max-w-md" />,
     description:
-      'The Pro plan has a spend cap enabled by default to keep costs under control. If you want to scale beyond the plans included quota, simply switch off the spend cap to pay for additional resources.',
+      "The Pro Plan has a spend cap enabled by default to keep costs under control. If you want to scale beyond the plan's included quota, simply switch off the spend cap to pay for additional resources.",
     ctaText: 'Learn about Cost Control',
-    ctaLink: 'https://supabase.com/docs/guides/platform/spend-cap',
+    ctaLink: 'https://supabase.com/docs/guides/platform/cost-control#spend-cap',
     ctaTarget: '_blank',
   },
   {
@@ -36,7 +37,7 @@ const addons = [
     heroImg: 'pitr-on',
     icon: 'pitr-upgrade',
     price: 'Starts from $100/month',
-    description: 'Roll back to any specific point in time up to seconds in granularity.',
+    description: 'Roll back to any specific point in time, down to the second.',
     ctaText: 'Documentation',
     ctaLink: 'https://supabase.com/docs/guides/platform/backups',
     ctaTarget: '_blank',
@@ -49,7 +50,7 @@ const PricingAddons: FC = () => {
       <div className="text-center">
         <h2 className="text-foreground text-3xl">Fine-tune your project</h2>
         <p className="text-foreground-light mt-4 mb-8 lg:mb-16 text-lg">
-          Go beyond your plan limits and level up your Supabase experience
+          Go beyond your Plan limits and level up your Supabase experience
         </p>
       </div>
       <div className="grid lg:grid-cols-2 gap-4 mb-16 mx-auto max-w-6xl">
@@ -82,7 +83,9 @@ const AddonCard = ({ addon }: any) => {
 
       <div className="p-4 gap-4 flex flex-col justify-center">
         <div className="flex flex-col gap-2">
-          <p className="text-[13px] text-foreground-lighter">{addon.price}</p>
+          <p className="text-[13px] text-foreground-lighter" translate="no">
+            {addon.price}
+          </p>
           <div className="flex items-center gap-2">
             <h3 className="text-foreground text-2xl">{addon.name}</h3>
           </div>
@@ -95,7 +98,7 @@ const AddonCard = ({ addon }: any) => {
             asChild
             size="tiny"
             type="default"
-            iconRight={<IconArrowUpRight className="w-4 h-4" />}
+            iconRight={<ArrowUpRight className="w-4 h-4" />}
           >
             <Link href={addon.ctaLink} target={addon.ctaTarget}>
               {addon.ctaText}
@@ -125,7 +128,9 @@ const AddonCard = ({ addon }: any) => {
       </div>
       <div className="p-4 lg:pl-0 lg:-ml-2 xl:ml-0 gap-4 col-span-2">
         <div className="flex flex-col gap-2">
-          <p className="text-[13px] text-foreground-lighter">{addon.price}</p>
+          <p className="text-[13px] text-foreground-lighter" translate="no">
+            {addon.price}
+          </p>
           <div className="flex items-center gap-2">
             <Image
               src={`${basePath}/images/pricing/${addon.icon}${
@@ -141,7 +146,7 @@ const AddonCard = ({ addon }: any) => {
         </div>
       </div>
       <div className="absolute right-0 flex justify-end p-4">
-        <IconArrowUpRight className="w-5 h-5 text-foreground-lighter group-hover:text-foreground transition-colors" />
+        <ArrowUpRight className="w-5 h-5 text-foreground-lighter group-hover:text-foreground transition-colors" />
       </div>
     </>
   )

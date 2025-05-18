@@ -1,10 +1,10 @@
 import { noop } from 'lodash'
-import { Button, IconChevronRight } from 'ui'
+import { Button } from 'ui'
 
-import { Branch } from 'data/branches/branches-query'
-import { GitHubPullRequest } from 'data/integrations/integrations-github-pull-requests-query'
+import type { Branch } from 'data/branches/branches-query'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { PreviewBranchesEmptyState } from './EmptyStates'
+import { ChevronRight } from 'lucide-react'
 
 const MAX_BRANCHES_OVERVIEW = 10
 
@@ -14,7 +14,6 @@ interface OverviewProps {
   repo: string
   mainBranch: Branch
   previewBranches: Branch[]
-  pullRequests: GitHubPullRequest[]
   onViewAllBranches: () => void
   onSelectCreateBranch: () => void
   onSelectDeleteBranch: (branch: Branch) => void
@@ -27,7 +26,6 @@ const Overview = ({
   repo,
   mainBranch,
   previewBranches,
-  pullRequests,
   onViewAllBranches,
   onSelectCreateBranch,
   onSelectDeleteBranch,
@@ -47,11 +45,7 @@ const Overview = ({
         footer={
           isSuccess && (
             <div className="flex items-center justify-center">
-              <Button
-                type="text"
-                iconRight={<IconChevronRight />}
-                onClick={() => onViewAllBranches()}
-              >
+              <Button type="text" iconRight={<ChevronRight />} onClick={() => onViewAllBranches()}>
                 View all branches
               </Button>
             </div>
@@ -64,15 +58,11 @@ const Overview = ({
         )}
         {isSuccess &&
           previewBranches.slice(0, MAX_BRANCHES_OVERVIEW).map((branch) => {
-            const pullRequest = pullRequests?.find(
-              (pr) => pr.branch === branch.git_branch && pr.repo === repo
-            )
             return (
               <BranchRow
                 key={branch.id}
                 repo={repo}
                 branch={branch}
-                pullRequest={pullRequest}
                 generateCreatePullRequestURL={generateCreatePullRequestURL}
                 onSelectDeleteBranch={() => onSelectDeleteBranch(branch)}
               />

@@ -1,21 +1,24 @@
-import { QueryClient, QueryKey, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryKey, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { post, handleError as handleErrorFetchers } from 'data/fetchers'
+import { handleError as handleErrorFetchers, post } from 'data/fetchers'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { MB, PROJECT_STATUS } from 'lib/constants'
 import {
   ROLE_IMPERSONATION_NO_RESULTS,
   ROLE_IMPERSONATION_SQL_LINE_COUNT,
 } from 'lib/role-impersonation'
+import type { ResponseError } from 'types'
 import { sqlKeys } from './keys'
-
-export type Error = { code: number; message: string; requestId: string }
 
 export type ExecuteSqlVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   sql: string
   queryKey?: QueryKey
-  handleError?: (error: { code: number; message: string; requestId: string }) => any
+  handleError?: (error: ResponseError) => { result: any }
   isRoleImpersonationEnabled?: boolean
+  autoLimit?: number
+  contextualInvalidation?: boolean
 }
 
 export async function executeSql(
@@ -35,11 +38,18 @@ export async function executeSql(
     | 'handleError'
     | 'isRoleImpersonationEnabled'
   >,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
 ): Promise<{ result: any }> {
   if (!projectRef) throw new Error('projectRef is required')
 
-  let headers = new Headers()
+  const sqlSize = new Blob([sql]).size
+  // [Joshen] I think the limit is around 1MB from testing, but its not exactly 1MB it seems
+  if (sqlSize > 0.98 * MB) {
+    throw new Error('Query is too large to be run via the SQL Editor')
+  }
+
+  let headers = new Headers(headersInit)
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
   let { data, error } = await post('/platform/pg-meta/{ref}/query', {
@@ -47,11 +57,15 @@ export async function executeSql(
     params: {
       header: { 'x-connection-encrypted': connectionString ?? '' },
       path: { ref: projectRef },
-      // @ts-ignore: This is just a client side thing to identify queries better
-      query: { key: queryKey?.filter((seg) => typeof seg === 'string').join('-') ?? '' },
+      // @ts-expect-error: This is just a client side thing to identify queries better
+      query: {
+        key:
+          queryKey?.filter((seg) => typeof seg === 'string' || typeof seg === 'number').join('-') ??
+          '',
+      },
     },
     body: { query: sql },
-    headers: Object.fromEntries(headers),
+    headers,
   })
 
   if (error) {
@@ -85,7 +99,7 @@ export async function executeSql(
     }
 
     if (handleError !== undefined) return handleError(error as any)
-    else handleErrorFetchers(error as any)
+    else handleErrorFetchers(error)
   }
 
   if (
@@ -100,8 +114,11 @@ export async function executeSql(
 }
 
 export type ExecuteSqlData = Awaited<ReturnType<typeof executeSql>>
-export type ExecuteSqlError = unknown
+export type ExecuteSqlError = ResponseError
 
+/**
+ * @deprecated Use the regular useQuery with a function that calls executeSql() instead
+ */
 export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
   {
     projectRef,
@@ -112,22 +129,17 @@ export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
     isRoleImpersonationEnabled,
   }: ExecuteSqlVariables,
   { enabled = true, ...options }: UseQueryOptions<ExecuteSqlData, ExecuteSqlError, TData> = {}
-) =>
-  useQuery<ExecuteSqlData, ExecuteSqlError, TData>(
+) => {
+  const project = useSelectedProject()
+  const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+
+  return useQuery<ExecuteSqlData, ExecuteSqlError, TData>(
     sqlKeys.query(projectRef, queryKey ?? [btoa(sql)]),
     ({ signal }) =>
       executeSql(
         { projectRef, connectionString, sql, queryKey, handleError, isRoleImpersonationEnabled },
         signal
       ),
-    { enabled: enabled && typeof projectRef !== 'undefined', staleTime: 0, ...options }
-  )
-
-export const prefetchExecuteSql = (
-  client: QueryClient,
-  { projectRef, connectionString, sql, queryKey, handleError }: ExecuteSqlVariables
-) => {
-  return client.prefetchQuery(sqlKeys.query(projectRef, queryKey ?? [btoa(sql)]), ({ signal }) =>
-    executeSql({ projectRef, connectionString, sql, queryKey, handleError }, signal)
+    { enabled: enabled && typeof projectRef !== 'undefined' && isActive, staleTime: 0, ...options }
   )
 }

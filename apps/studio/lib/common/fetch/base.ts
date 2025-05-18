@@ -1,7 +1,8 @@
 import { getAccessToken } from 'lib/gotrue'
 import { isUndefined } from 'lodash'
-import { SupaResponse } from 'types/base'
+import type { SupaResponse } from 'types/base'
 
+/* @deprecated Use handleError from data/fetchers instead */
 export function handleError<T>(e: any, requestId: string): SupaResponse<T> {
   const message = e?.message ? `An error has occurred: ${e.message}` : 'An error has occurred'
   const error = { code: 500, message, requestId }

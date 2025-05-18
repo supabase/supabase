@@ -1,6 +1,6 @@
+import type { RenderEditCellProps } from 'react-data-grid'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Select } from 'ui'
-import { RenderEditCellProps } from 'react-data-grid'
-import { useTrackedState } from 'components/grid/store'
 
 interface Props<TRow, TSummaryRow = unknown> extends RenderEditCellProps<TRow, TSummaryRow> {
   isNullable?: boolean
@@ -13,8 +13,8 @@ export const BooleanEditor = <TRow, TSummaryRow = unknown>({
   onRowChange,
   onClose,
 }: Props<TRow, TSummaryRow>) => {
-  const state = useTrackedState()
-  const gridColumn = state.gridColumns.find((x) => x.name == column.key)
+  const snap = useTableEditorTableStateSnapshot()
+  const gridColumn = snap.gridColumns.find((x) => x.name == column.key)
   const value = row[column.key as keyof TRow] as unknown as string
 
   const onBlur = () => onClose(false)

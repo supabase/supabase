@@ -1,19 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
-import { Button, IconAlertCircle, IconSearch, Input, Modal, Toggle } from 'ui'
+import { toast } from 'sonner'
+import { Button, Input, Toggle } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
 import InformationBox from 'components/ui/InformationBox'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import PublicationSkeleton from './PublicationSkeleton'
-import toast from 'react-hot-toast'
+import { Search, AlertCircle } from 'lucide-react'
 
 interface PublicationEvent {
   event: string
@@ -38,7 +38,6 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
       setToggleListenEventValue(null)
     },
   })
-  console.log(data)
 
   const canUpdatePublications = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -82,8 +81,8 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Input
-              size="small"
-              icon={<IconSearch size="tiny" />}
+              size="tiny"
+              icon={<Search size="14" />}
               placeholder={'Filter'}
               value={filterString}
               onChange={(e) => setFilterString(e.target.value)}
@@ -92,23 +91,19 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
           {isPermissionsLoaded && !canUpdatePublications && (
             <div className="w-[500px]">
               <InformationBox
-                icon={<IconAlertCircle className="text-foreground-light" strokeWidth={2} />}
-                title="You need additional permissions to update database replications"
+                icon={<AlertCircle className="text-foreground-light" strokeWidth={2} />}
+                title="You need additional permissions to update database publications"
               />
             </div>
           )}
         </div>
       </div>
 
-      <div className="overflow-hidden rounded">
+      <div className="w-full overflow-hidden overflow-x-auto">
         <Table
           head={[
-            <Table.th key="header.name" style={{ width: '25%' }}>
-              Name
-            </Table.th>,
-            <Table.th key="header.id" className="hidden lg:table-cell" style={{ width: '25%' }}>
-              System ID
-            </Table.th>,
+            <Table.th key="header.name">Name</Table.th>,
+            <Table.th key="header.id">System ID</Table.th>,
             <Table.th key="header.insert">Insert</Table.th>,
             <Table.th key="header.update">Update</Table.th>,
             <Table.th key="header.delete">Delete</Table.th>,
@@ -122,12 +117,8 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
               ? Array.from({ length: 5 }).map((_, i) => <PublicationSkeleton key={i} index={i} />)
               : publications.map((x) => (
                   <Table.tr className="border-t" key={x.name}>
-                    <Table.td className="px-4 py-3" style={{ width: '25%' }}>
-                      {x.name}
-                    </Table.td>
-                    <Table.td className="hidden lg:table-cell" style={{ width: '25%' }}>
-                      {x.id}
-                    </Table.td>
+                    <Table.td className="px-4 py-3">{x.name}</Table.td>
+                    <Table.td>{x.id}</Table.td>
                     {publicationEvents.map((event) => (
                       <Table.td key={event.key}>
                         <Toggle
@@ -163,36 +154,34 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
                 ))
           }
         />
-
-        {!isLoading && publications.length === 0 && (
-          <NoSearchResults
-            searchString={filterString}
-            onResetFilter={() => setFilterString('')}
-            className="rounded-t-none border-t-0"
-          />
-        )}
       </div>
+
+      {!isLoading && publications.length === 0 && (
+        <NoSearchResults
+          searchString={filterString}
+          onResetFilter={() => setFilterString('')}
+          className="rounded-t-none border-t-0"
+        />
+      )}
 
       <ConfirmationModal
         visible={toggleListenEventValue !== null}
-        header={`Confirm to toggle sending ${toggleListenEventValue?.event.event.toLowerCase()} events`}
-        buttonLabel="Confirm"
-        buttonLoadingLabel="Updating"
-        onSelectCancel={() => setToggleListenEventValue(null)}
-        onSelectConfirm={() => {
+        title={`Confirm to toggle sending ${toggleListenEventValue?.event.event.toLowerCase()} events`}
+        confirmLabel="Confirm"
+        confirmLabelLoading="Updating"
+        onCancel={() => setToggleListenEventValue(null)}
+        onConfirm={() => {
           toggleListenEvent()
         }}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            Are you sure you want to {toggleListenEventValue?.currentStatus ? 'stop' : 'start'}{' '}
-            sending {toggleListenEventValue?.event.event.toLowerCase()} events for{' '}
-            {toggleListenEventValue?.publication.name}?
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          Are you sure you want to {toggleListenEventValue?.currentStatus ? 'stop' : 'start'}{' '}
+          sending {toggleListenEventValue?.event.event.toLowerCase()} events for{' '}
+          {toggleListenEventValue?.publication.name}?
+        </p>
       </ConfirmationModal>
     </>
   )
 }
 
-export default observer(PublicationsList)
+export default PublicationsList

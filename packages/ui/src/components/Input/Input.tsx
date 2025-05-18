@@ -1,5 +1,8 @@
+'use client'
+
 import React, { useEffect, useState } from 'react'
 
+import { Copy } from 'lucide-react'
 import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
 import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
 import InputIconContainer from '../../lib/Layout/InputIconContainer'
@@ -8,7 +11,6 @@ import styleHandler from '../../lib/theme/styleHandler'
 import { cn } from '../../lib/utils/cn'
 import { Button } from '../Button'
 import { useFormContext } from '../Form/FormContext'
-import { IconCopy } from '../Icon/icons/IconCopy'
 
 export interface Props
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'onCopy'> {
@@ -34,6 +36,9 @@ export interface Props
   validation?: (x: any) => void
 }
 
+/**
+ * @deprecated Use ./Input_shadcn_ instead or ./ui-patterns/data-inputs/input
+ */
 function Input({
   autoComplete,
   autoFocus,
@@ -155,6 +160,7 @@ function Input({
     >
       <div className={__styles.container}>
         <input
+          data-size={size}
           autoComplete={autoComplete}
           autoFocus={autoFocus}
           defaultValue={defaultValue}
@@ -171,12 +177,12 @@ function Input({
           className={cn(inputClasses)}
           {...props}
         />
-        {icon && <InputIconContainer icon={icon} className={iconContainerClassName} />}
+        {icon && <InputIconContainer size={size} icon={icon} className={iconContainerClassName} />}
         {copy || error || actions ? (
           <div className={__styles.actions_container}>
             {error && <InputErrorIcon size={size} />}
             {copy && !(reveal && hidden) ? (
-              <Button size="tiny" type="default" icon={<IconCopy />} onClick={() => _onCopy(value)}>
+              <Button size="tiny" type="default" icon={<Copy />} onClick={() => _onCopy(value)}>
                 {copyLabel}
               </Button>
             ) : null}
@@ -193,6 +199,9 @@ function Input({
   )
 }
 
+/**
+ * @deprecated Use ./TextArea_Shadcn_ instead
+ */
 export interface TextAreaProps
   extends Omit<React.InputHTMLAttributes<HTMLTextAreaElement>, 'size' | 'onCopy'> {
   textAreaClassName?: string
@@ -341,12 +350,7 @@ function TextArea({
             <div className={__styles['textarea_actions_container_items']}>
               {error && <InputErrorIcon size={size} />}
               {copy && (
-                <Button
-                  size="tiny"
-                  type="default"
-                  onClick={() => _onCopy(value)}
-                  icon={<IconCopy />}
-                >
+                <Button size="tiny" type="default" onClick={() => _onCopy(value)} icon={<Copy />}>
                   {copyLabel}
                 </Button>
               )}

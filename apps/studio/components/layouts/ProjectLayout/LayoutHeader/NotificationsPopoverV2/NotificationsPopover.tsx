@@ -1,20 +1,8 @@
-import clsx from 'clsx'
+import { ArchiveIcon, InboxIcon } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
-import {
-  Button,
-  IconArchive,
-  IconInbox,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-  Tabs_Shadcn_,
-} from 'ui'
+import { toast } from 'sonner'
 
 import AlertError from 'components/ui/AlertError'
-import { CriticalIcon, WarningIcon } from 'components/ui/Icons'
 import InfiniteList from 'components/ui/InfiniteList'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useNotificationsArchiveAllMutation } from 'data/notifications/notifications-v2-archive-all-mutation'
@@ -24,10 +12,22 @@ import { useNotificationsV2UpdateMutation } from 'data/notifications/notificatio
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useNotificationsStateSnapshot } from 'state/notifications'
+import {
+  Button,
+  CriticalIcon,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
+  WarningIcon,
+  cn,
+} from 'ui'
 import NotificationRow from './NotificationRow'
 import { NotificationsFilter } from './NotificationsFilter'
 
-const NotificationsPopoverV2 = () => {
+export const NotificationsPopoverV2 = () => {
   const [open, setOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'inbox' | 'archived'>('inbox')
 
@@ -41,8 +41,8 @@ const NotificationsPopoverV2 = () => {
   // so opting to simplify and implement it here for now
   const rowHeights = useRef<{ [key: number]: number }>({})
 
-  const { data: projects } = useProjectsQuery()
-  const { data: organizations } = useOrganizationsQuery()
+  const { data: projects } = useProjectsQuery({ enabled: open })
+  const { data: organizations } = useOrganizationsQuery({ enabled: open })
   const {
     data,
     error,
@@ -52,19 +52,22 @@ const NotificationsPopoverV2 = () => {
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
-  } = useNotificationsV2Query({
-    status:
-      activeTab === 'archived'
-        ? 'archived'
-        : snap.filterStatuses.includes('unread')
-          ? 'new'
-          : undefined,
-    filters: {
-      priority: snap.filterPriorities,
-      organizations: snap.filterOrganizations,
-      projects: snap.filterProjects,
+  } = useNotificationsV2Query(
+    {
+      status:
+        activeTab === 'archived'
+          ? 'archived'
+          : snap.filterStatuses.includes('unread')
+            ? 'new'
+            : undefined,
+      filters: {
+        priority: snap.filterPriorities,
+        organizations: snap.filterOrganizations,
+        projects: snap.filterProjects,
+      },
     },
-  })
+    { enabled: open }
+  )
   const { data: summary } = useNotificationsSummaryQuery()
   const { mutate: updateNotifications } = useNotificationsV2UpdateMutation()
   const { mutate: archiveAllNotifications, isLoading: isArchiving } =
@@ -95,7 +98,7 @@ const NotificationsPopoverV2 = () => {
       <PopoverTrigger_Shadcn_ asChild>
         <Button
           type={hasNewNotifications ? 'outline' : 'text'}
-          className={clsx(
+          className={cn(
             'h-[26px]',
             // !hasCritical || !hasWarning || !hasNewNotifications ? 'w-[26px]' : '',
             'group',
@@ -108,12 +111,12 @@ const NotificationsPopoverV2 = () => {
           )}
           icon={
             hasCritical ? (
-              <CriticalIcon className="!w-3.5 !h-3.5 transition-all -mr-3.5 group-hover:-mr-1 z-10" />
+              <CriticalIcon className="relative !w-3.5 !h-3.5 transition-all -mr-3.5 group-hover:-mr-1 z-10" />
             ) : hasWarning ? (
-              <WarningIcon className="!w-3.5 !h-3.5 transition-all -mr-3.5 group-hover:-mr-1 z-10" />
+              <WarningIcon className="relative !w-3.5 !h-3.5 transition-all -mr-3.5 group-hover:-mr-1 z-10" />
             ) : hasNewNotifications ? (
               <div
-                className={clsx(
+                className={cn(
                   'transition-all -mr-3 group-hover:-mr-1',
                   'z-10 h-4 flex items-center justify-center rounded-full bg-black dark:bg-white',
                   (summary?.unread_count ?? 0) > 9 ? 'px-0.5 w-auto' : 'w-4'
@@ -124,7 +127,7 @@ const NotificationsPopoverV2 = () => {
             ) : null
           }
           iconRight={
-            <IconInbox
+            <InboxIcon
               size={18}
               strokeWidth={1.5}
               className="transition group-hover:text-foreground text-foreground-light"
@@ -132,7 +135,11 @@ const NotificationsPopoverV2 = () => {
           }
         />
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-[450px] overflow-hidden" side="bottom" align="end">
+      <PopoverContent_Shadcn_
+        className="p-0 w-screen md:w-[450px] overflow-hidden"
+        side="bottom"
+        align="end"
+      >
         <div className="px-4">
           <p className="pt-4 pb-1 text-sm">Notifications</p>
           <div className="flex items-center">
@@ -155,10 +162,10 @@ const NotificationsPopoverV2 = () => {
                   >
                     Inbox
                     <div
-                      className={clsx([
+                      className={cn(
                         'flex items-center justify-center text-xs rounded-full bg-surface-300 h-4',
-                        (summary?.unread_count ?? 0) > 9 ? 'px-0.5 w-auto' : 'w-4',
-                      ])}
+                        (summary?.unread_count ?? 0) > 9 ? 'px-0.5 w-auto' : 'w-4'
+                      )}
                     >
                       {summary?.unread_count}
                     </div>
@@ -206,7 +213,10 @@ const NotificationsPopoverV2 = () => {
                       }
                     },
                     getProject: (ref: string) => projects?.find((project) => project.ref === ref)!,
-                    getOrganization: (id: number) => organizations?.find((org) => org.id === id)!,
+                    getOrganizationById: (id: number) =>
+                      organizations?.find((org) => org.id === id)!,
+                    getOrganizationBySlug: (slug: string) =>
+                      organizations?.find((org) => org.slug === slug)!,
                     onUpdateNotificationStatus: (id: string, status: 'archived' | 'seen') => {
                       updateNotifications({ ids: [id], status })
                     },
@@ -223,7 +233,7 @@ const NotificationsPopoverV2 = () => {
                 />
               ) : (
                 <div className="flex flex-col gap-y-4 items-center flex-grow justify-center">
-                  <IconInbox size={32} className="text-foreground-light" />
+                  <InboxIcon size={32} className="text-foreground-light" />
                   <div className="flex flex-col gap-y-1">
                     <p className="text-foreground-light text-sm mx-auto text-center">
                       {activeTab === 'archived'
@@ -257,7 +267,7 @@ const NotificationsPopoverV2 = () => {
               disabled={isArchiving}
               loading={isArchiving}
               type="text"
-              icon={<IconArchive />}
+              icon={<ArchiveIcon />}
               onClick={() => archiveAllNotifications()}
             >
               Archive all
@@ -268,5 +278,3 @@ const NotificationsPopoverV2 = () => {
     </Popover_Shadcn_>
   )
 }
-
-export default NotificationsPopoverV2

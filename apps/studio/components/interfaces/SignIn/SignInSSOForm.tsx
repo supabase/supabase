@@ -1,28 +1,29 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
+import * as Sentry from '@sentry/nextjs'
 import { useQueryClient } from '@tanstack/react-query'
-import { useStore } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
-import { auth, buildPathWithParams } from 'lib/gotrue'
 import { useRef, useState } from 'react'
-import { Button, Form, Input } from 'ui'
+import { toast } from 'sonner'
 import { object, string } from 'yup'
 
-const signInSchema = object({
-  email: string().email('Must be a valid email').required('Email is required'),
-})
+import { useLastSignIn } from 'hooks/misc/useLastSignIn'
+import { BASE_PATH } from 'lib/constants'
+import { auth, buildPathWithParams } from 'lib/gotrue'
+import { Button, Form, Input } from 'ui'
+
+const WHITELIST_ERRORS = ['No SSO provider assigned for this domain']
 
 const SignInSSOForm = () => {
-  const { ui } = useStore()
   const queryClient = useQueryClient()
-
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [_, setLastSignInUsed] = useLastSignIn()
+
+  const signInSchema = object({
+    email: string().email('Must be a valid email').required('Email is required'),
+  })
 
   const onSignIn = async ({ email }: { email: string }) => {
-    const toastId = ui.setNotification({
-      category: 'loading',
-      message: `Signing in...`,
-    })
+    const toastId = toast.loading('Signing in...')
 
     let token = captchaToken
     if (!token) {
@@ -36,7 +37,7 @@ const SignInSSOForm = () => {
         process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
           ? location.origin
           : process.env.NEXT_PUBLIC_SITE_URL
-      }${BASE_PATH}/sign-in-mfa`
+      }${BASE_PATH}/sign-in-mfa?method=sso`
     )
 
     const { data, error } = await auth.signInWithSSO({
@@ -49,7 +50,7 @@ const SignInSSOForm = () => {
 
     if (!error) {
       await queryClient.resetQueries()
-
+      setLastSignInUsed('sso')
       if (data) {
         // redirect to SSO identity provider page
         window.location.href = data.url
@@ -57,12 +58,11 @@ const SignInSSOForm = () => {
     } else {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
+      toast.error(`Failed to sign in: ${error.message}`, { id: toastId })
 
-      ui.setNotification({
-        id: toastId,
-        category: 'error',
-        message: error.message,
-      })
+      if (!WHITELIST_ERRORS.includes(error.message)) {
+        Sentry.captureMessage('[CRITICAL] Failed to sign in via SSO: ' + error.message)
+      }
     }
   }
 

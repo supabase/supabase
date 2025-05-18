@@ -1,18 +1,19 @@
 import { has } from 'lodash'
-import { useState, useEffect, useRef } from 'react'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { STORAGE_ROW_TYPES } from '../Storage.constants'
+import { useEffect, useRef, useState } from 'react'
+
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
+import { StorageItem } from '../Storage.types'
 import { RowIcon } from './FileExplorerRow'
 
 export interface FileExplorerRowEditingProps {
-  item: any
-  view: string
+  item: StorageItem
+  view: STORAGE_VIEWS
   columnIndex: number
 }
 
 const FileExplorerRowEditing = ({ item, view, columnIndex }: FileExplorerRowEditingProps) => {
-  const storageExplorerStore = useStorageStore()
-  const { renameFile, renameFolder, addNewFolder } = storageExplorerStore
+  const { renameFile, renameFolder, addNewFolder } = useStorageExplorerStateSnapshot()
 
   const inputRef = useRef<any>(null)
   const [itemName, setItemName] = useState(item.name)

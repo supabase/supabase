@@ -1,16 +1,17 @@
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import SVG from 'react-inlinesvg'
-import { Button, IconActivity, IconArchive, IconCode, IconExternalLink, IconKey } from 'ui'
 
+import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
-import { useIsFeatureEnabled } from 'hooks'
+import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { Auth, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
+import { Button } from 'ui'
 import APIKeys from './APIKeys'
 import GetStartedHero from './GetStartedHero'
 
 const NewProjectPanel = () => {
-  const router = useRouter()
-  const { ref } = router.query
+  const { ref } = useParams()
 
   const {
     projectAuthAll: authEnabled,
@@ -21,7 +22,7 @@ const NewProjectPanel = () => {
   return (
     <div className="grid grid-cols-12 gap-4 lg:gap-20">
       <div className="col-span-12">
-        <div className="flex flex-col space-y-20">
+        <div className="flex flex-col space-y-12 md:space-y-20">
           <div className="flex h-full flex-col justify-between">
             <div className="space-y-2">
               <h3 className="text-xl text-foreground">Welcome to your new project</h3>
@@ -45,37 +46,13 @@ const NewProjectPanel = () => {
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <Button
-                  asChild
-                  type="default"
-                  icon={
-                    <SVG
-                      src={`${router.basePath}/img/table-editor.svg`}
-                      style={{ width: `${14}px`, height: `${14}px` }}
-                      preProcessor={(code) =>
-                        code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
-                      }
-                    />
-                  }
-                >
-                  <Link href={`/project/${ref}/editor`}>Table Editor</Link>
+                <Button asChild type="default" icon={<TableEditor strokeWidth={1.5} />}>
+                  <EditorIndexPageLink projectRef={ref}>Table Editor</EditorIndexPageLink>
                 </Button>
-                <Button
-                  asChild
-                  type="default"
-                  icon={
-                    <SVG
-                      src={`${router.basePath}/img/sql-editor.svg`}
-                      style={{ width: `${14}px`, height: `${14}px` }}
-                      preProcessor={(code) =>
-                        code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
-                      }
-                    />
-                  }
-                >
-                  <Link href={`/project/${ref}/sql/new`}>SQL editor</Link>
+                <Button asChild type="default" icon={<SqlEditor strokeWidth={1.5} />}>
+                  <Link href={`/project/${ref}/sql/new`}>SQL Editor</Link>
                 </Button>
-                <Button asChild type="default" icon={<IconExternalLink size={14} />}>
+                <Button asChild type="default" icon={<ExternalLink />}>
                   <Link
                     href="https://supabase.com/docs/guides/database"
                     target="_blank"
@@ -105,7 +82,7 @@ const NewProjectPanel = () => {
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
                       <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                        <IconKey strokeWidth={2} size={16} />
+                        <Auth size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Authentication</h5>
                     </div>
@@ -121,7 +98,7 @@ const NewProjectPanel = () => {
 
                       <Button
                         className="translate-y-[1px]"
-                        icon={<IconExternalLink size={14} />}
+                        icon={<ExternalLink />}
                         type="default"
                         asChild
                       >
@@ -141,7 +118,7 @@ const NewProjectPanel = () => {
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
                       <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                        <IconArchive strokeWidth={2} size={16} />
+                        <Storage size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Storage</h5>
                     </div>
@@ -157,7 +134,7 @@ const NewProjectPanel = () => {
 
                       <Button
                         className="translate-y-[1px]"
-                        icon={<IconExternalLink size={14} />}
+                        icon={<ExternalLink />}
                         type="default"
                         asChild
                       >
@@ -177,7 +154,7 @@ const NewProjectPanel = () => {
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-3">
                       <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                        <IconCode strokeWidth={2} size={16} />
+                        <EdgeFunctions size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Edge Functions</h5>
                     </div>
@@ -193,7 +170,7 @@ const NewProjectPanel = () => {
                       </Button>
                       <Button
                         className="translate-y-[1px]"
-                        icon={<IconExternalLink size={14} />}
+                        icon={<ExternalLink />}
                         type="default"
                         asChild
                       >
@@ -212,7 +189,7 @@ const NewProjectPanel = () => {
                   <Panel.Content className="flex flex-col space-y-4 md:px-3">
                     <div className="flex items-center space-x-4">
                       <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
-                        <IconActivity strokeWidth={2} size={16} />
+                        <Realtime size={16} strokeWidth={1.5} />
                       </div>
                       <h5>Realtime</h5>
                     </div>
@@ -222,9 +199,12 @@ const NewProjectPanel = () => {
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
+                      <Button type="default" asChild>
+                        <Link href={`/project/${ref}/realtime/inspector`}>Explore Realtime</Link>
+                      </Button>
                       <Button
                         className="translate-y-[1px]"
-                        icon={<IconExternalLink size={14} />}
+                        icon={<ExternalLink />}
                         type="default"
                         asChild
                       >
@@ -265,12 +245,7 @@ const NewProjectPanel = () => {
             <Button asChild type="default">
               <Link href={`/project/${ref}/settings/api`}>View API settings</Link>
             </Button>
-            <Button
-              asChild
-              className="translate-y-[1px]"
-              type="default"
-              icon={<IconExternalLink />}
-            >
+            <Button asChild className="translate-y-[1px]" type="default" icon={<ExternalLink />}>
               <Link
                 href="https://supabase.com/docs/guides/database/api"
                 target="_blank"

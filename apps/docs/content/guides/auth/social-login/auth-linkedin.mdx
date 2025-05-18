@@ -8,12 +8,6 @@ To enable LinkedIn Auth for your project, you need to set up a LinkedIn OAuth ap
 
 ## Overview
 
-<Admonition type="caution">
-
-We will be replacing the existing _LinkedIn_ provider with a new _LinkedIn (OIDC)_ provider. Developers with LinkedIn OAuth Applications created prior to 1st August 2023 should create a new OAuth application and migrate their credentials from the _LinkedIn_ provider to the _LinkedIn (OIDC)_ provider. Alternatively, you can also add the newly released `Sign In with LinkedIn using OpenID Connect` to your existing OAuth application. [Read this section](/docs/guides/auth/social-login/auth-linkedin#linkedin-open-id-connect-oidc) to find out more.
-
-</Admonition>
-
 Setting up LinkedIn logins for your application consists of 3 parts:
 
 - Create and configure a LinkedIn Project and App on the [LinkedIn Developer Dashboard](https://www.linkedin.com/developers/apps).
@@ -29,7 +23,7 @@ Setting up LinkedIn logins for your application consists of 3 parts:
 
 ## Find your callback URL
 
-<SocialProviderSetup provider="LinkedIn" />
+<$Partial path="social_provider_setup.mdx" variables={{ "provider": "LinkedIn" }} />
 
 ## Create a LinkedIn OAuth app
 
@@ -50,7 +44,7 @@ Ensure that the appropriate scopes have been added under OAuth 2.0 Scopes at the
 
 ## Enter your LinkedIn (OIDC) credentials into your Supabase project
 
-<SocialProviderSettingsSupabase provider="LinkedIn (OIDC)" />
+<$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "LinkedIn (OIDC)" }} />
 
 ## Add login code to your client app
 
@@ -63,13 +57,35 @@ Ensure that the appropriate scopes have been added under OAuth 2.0 Scopes at the
 >
 <TabPanel id="js" label="JavaScript">
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `linkedin_oidc` as the `provider`:
+<$Partial path="create_client_snippet.mdx" />
+
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `linkedin_oidc` as the `provider`:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('<your-project-url>', '<your-anon-key>')
+
+// ---cut---
 async function signInWithLinkedIn() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'linkedin_oidc',
   })
+}
+```
+
+</TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs in, call [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth) with `linkedin_oidc` as the `provider`:
+
+```dart
+Future<void> signInWithLinkedIn() async {
+  await supabase.auth.signInWithOAuth(
+    OAuthProvider.linkedinOidc,
+    redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+    authScreenLaunchMode:
+        kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
+  );
 }
 ```
 
@@ -87,6 +103,8 @@ suspend fun signInWithKaLinkedIn() {
 </TabPanel>
 </Tabs>
 
+<$Partial path="oauth_pkce_flow.mdx" />
+
 <Tabs
   scrollable
   size="small"
@@ -99,15 +117,30 @@ suspend fun signInWithKaLinkedIn() {
 When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('<your-project-url>', '<your-anon-key>')
+
+// ---cut---
 async function signOut() {
   const { error } = await supabase.auth.signOut()
 }
 ```
 
 </TabPanel>
+<TabPanel id="flutter" label="Flutter">
+
+When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```dart
+Future<void> signOut() async {
+  await supabase.auth.signOut();
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```kotlin
 suspend fun signOut() {
@@ -135,6 +168,6 @@ Do reach out to support if you have any concerns around this change.
 
 ## Resources
 
-- [Supabase Account - Free Plan OK](https://supabase.com)
+- [Supabase - Get started for free](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [LinkedIn Developer Dashboard](https://api.LinkedIn.com/apps)

@@ -1,3 +1,1 @@
-import Loading from './Loading'
-
-export default Loading
+export { LogoLoader as Loading } from 'ui'

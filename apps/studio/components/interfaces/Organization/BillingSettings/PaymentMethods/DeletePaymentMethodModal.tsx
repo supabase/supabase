@@ -1,8 +1,10 @@
 import { useParams } from 'common'
+import { toast } from 'sonner'
+import { Button, Modal } from 'ui'
+
 import { useOrganizationPaymentMethodDeleteMutation } from 'data/organizations/organization-payment-method-delete-mutation'
-import { OrganizationPaymentMethod } from 'data/organizations/organization-payment-methods-query'
-import { useStore } from 'hooks'
-import { Alert, Button, Modal } from 'ui'
+import type { OrganizationPaymentMethod } from 'data/organizations/organization-payment-methods-query'
+import { Admonition } from 'ui-patterns'
 
 export interface DeletePaymentMethodModalProps {
   selectedPaymentMethod?: OrganizationPaymentMethod
@@ -13,18 +15,14 @@ const DeletePaymentMethodModal = ({
   selectedPaymentMethod,
   onClose,
 }: DeletePaymentMethodModalProps) => {
-  const { ui } = useStore()
   const { slug } = useParams()
 
   const { mutate: deletePayment, isLoading: isDeleting } =
     useOrganizationPaymentMethodDeleteMutation({
       onSuccess: () => {
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully removed payment method ending with ${
-            selectedPaymentMethod!.card.last4
-          }`,
-        })
+        toast.success(
+          `Successfully removed payment method ending with ${selectedPaymentMethod?.card?.last4}`
+        )
         onClose()
       },
     })
@@ -39,7 +37,7 @@ const DeletePaymentMethodModal = ({
     <Modal
       visible={selectedPaymentMethod !== undefined}
       size="medium"
-      header={`Confirm to delete payment method ending with ${selectedPaymentMethod?.card.last4}`}
+      header={`Confirm to delete payment method ending with ${selectedPaymentMethod?.card?.last4}`}
       onCancel={() => onClose()}
       customFooter={
         <div className="flex items-center gap-2">
@@ -57,13 +55,13 @@ const DeletePaymentMethodModal = ({
         </div>
       }
     >
-      <div className="py-4">
-        <Modal.Content>
-          <Alert withIcon variant="info" title="This will permanently delete your payment method.">
-            <p>You can re-add the payment method any time.</p>
-          </Alert>
-        </Modal.Content>
-      </div>
+      <Modal.Content>
+        <Admonition
+          type="default"
+          title="This will permanently delete your payment method."
+          description="You can re-add the payment method any time."
+        />
+      </Modal.Content>
     </Modal>
   )
 }

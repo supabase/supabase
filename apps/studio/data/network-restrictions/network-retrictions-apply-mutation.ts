@@ -1,8 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { networkRestrictionKeys } from './keys'
 
 export type NetworkRestrictionsApplyVariables = {
@@ -23,7 +23,7 @@ export async function applyNetworkRestrictions({
     body: { dbAllowedCidrs, dbAllowedCidrsV6 },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

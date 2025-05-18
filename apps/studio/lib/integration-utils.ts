@@ -1,27 +1,20 @@
-import { Integration } from 'data/integrations/integrations.types'
-import { SupaResponse } from 'types'
+import { fetchHandler } from 'data/fetchers'
+import type { Integration } from 'data/integrations/integrations.types'
+import { ResponseError, type SupaResponse } from 'types'
 import { isResponseOk } from './common/fetch'
 
 async function fetchGitHub<T = any>(url: string, responseJson = true): Promise<SupaResponse<T>> {
-  const response = await fetch(url)
+  const response = await fetchHandler(url)
   if (!response.ok) {
     return {
-      error: {
-        code: response.status,
-        message: response.statusText,
-        requestId: '',
-      },
+      error: new ResponseError(response.statusText, response.status),
     }
   }
   try {
     return (responseJson ? await response.json() : await response.text()) as T
   } catch (error: any) {
     return {
-      error: {
-        message: error.message,
-        code: 500,
-        requestId: '',
-      },
+      error: new ResponseError(error.message, 500),
     }
   }
 }

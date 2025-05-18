@@ -1,6 +1,7 @@
-import React from 'react'
+import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import { IconChevronRight, cn } from 'ui'
+import React from 'react'
+import { cn } from 'ui'
 
 const MenuItem = React.forwardRef<
   React.ElementRef<'a'>,
@@ -39,7 +40,7 @@ const MenuItem = React.forwardRef<
         {children ?? (
           <>
             {icon && (
-              <div className="shrink-0 bg-surface-200 min-w-10 w-10 h-10 flex items-center justify-center rounded-lg">
+              <div className="shrink-0 border bg-surface-200 min-w-10 w-10 h-10 flex items-center justify-center rounded-lg">
                 <svg
                   className="h-5 w-5 group-hover/menu-item:text-foreground group-focus-visible/menu-item:text-foreground"
                   xmlns="http://www.w3.org/2000/svg"
@@ -68,14 +69,14 @@ const MenuItem = React.forwardRef<
                   {title}
                 </p>
                 {hasChevron && (
-                  <IconChevronRight
+                  <ChevronRight
                     strokeWidth={2}
-                    className="w-3 text-foreground transition-all will-change-transform -translate-x-1 opacity-0 group-hover/menu-item:translate-x-0 group-hover/menu-item:opacity-100"
+                    className="w-3 h-3 text-foreground transition-all will-change-transform -translate-x-1 opacity-0 group-hover/menu-item:translate-x-0 group-hover/menu-item:opacity-100"
                   />
                 )}
               </div>
               {description && (
-                <p className="line-clamp-1 -mb-1 leading-relaxed text-foreground-lighter group-hover/menu-item:text-foreground-light group-focus-visible/menu-item:text-foreground-light">
+                <p className="line-clamp-2 leading-snug text-foreground-lighter group-hover/menu-item:text-foreground-light group-focus-visible/menu-item:text-foreground-light text-xs">
                   {description}
                 </p>
               )}

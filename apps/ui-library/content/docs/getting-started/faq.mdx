@@ -1,0 +1,94 @@
+---
+title: FAQ
+description: Frequently asked questions
+---
+
+ <Accordion openBehaviour="single" collapsible>
+  <AccordionItem value="how">
+    <AccordionTrigger>How does it work? </AccordionTrigger>
+    <AccordionContent>
+      You run a command in a new or existing project that looks something like this:
+      ```bash
+      npx shadcn@latest add http://supabase.com/ui/r/password-based-auth-nextjs.json
+      ```
+        This will add all of the files to your project and install the dependencies.
+      After you've run the command, you can start using the components. In the case of Auth, you should be up and running with user sign in/sign up with just this one command.
+    </AccordionContent>
+  </AccordionItem>
+    <AccordionItem value="overwrite">
+      <AccordionTrigger>Will it overwrite existing files?</AccordionTrigger>
+      <AccordionContent>
+        No. If you run a command in an existing project, it will <u>not</u> overwrite your existing
+        files. If there conflicting files, you will be asked what you want to do (leave them or
+        overwrite them). If you run it in a new project, it will just add the new files to your project.
+      </AccordionContent>
+    </AccordionItem>
+    <AccordionItem value="existing-project">
+      <AccordionTrigger>I've already started a project, what should I do?</AccordionTrigger>
+      <AccordionContent>
+        You can still use these components, even if you've already started your project! The commands
+        won't overwrite your existing files, but you should still be careful with the changes to makes
+        sure you understand what's been added. You should commit your changes into Git before running
+        these commands so you'll be able to see a clean diff of the changes.
+      </AccordionContent>
+    </AccordionItem>
+    <AccordionItem value="shadcn">
+      <AccordionTrigger>I've already installed shadcn/ui, what should I do?</AccordionTrigger>
+      <AccordionContent>
+        You're off to a great start! You can now run an add command to add the desired component to your
+        project.
+      </AccordionContent>
+    </AccordionItem>
+    <AccordionItem value="quickstart">
+      <AccordionTrigger>
+        I already started with `npx create-next-app -e with-supabase` what should I do now?
+      </AccordionTrigger>
+      <AccordionContent>
+        Our Next.js quickstart is a great starting point for building a full app with Supabase and
+        Next.js. If you've already started with this template, you can just add the components in this library to your project.
+      </AccordionContent>
+    </AccordionItem>
+    <AccordionItem value="quickstart-needed">
+      <AccordionTrigger>
+        Do I need to install one of the framework quickstarts before using this library?
+      </AccordionTrigger>
+      <AccordionContent>
+        No. You don't need to start with one of our framework quickstarts.
+
+        If you already have an existing project, you can just add the components in this library to your project. If you're starting from scratch, you should use one of the shadcn/ui setup guides for your framework of choice via the [Quickstart](/ui/docs/getting-started/quickstart) page.
+      </AccordionContent>
+    </AccordionItem>
+    <AccordionItem value="ai-builder">
+      <AccordionTrigger>I used an AI builder to build an app, what should I do?</AccordionTrigger>
+      <AccordionContent>
+        If your app is already built, you can use any of the commands to drop components into your
+        project. Your app likely already has a Supabase client set up, so you can just continue using
+        that if it's working well for you.
+      </AccordionContent>
+    </AccordionItem>
+    <AccordionItem value="react-only">
+      <AccordionTrigger>Why is this library React-only?</AccordionTrigger>
+      <AccordionContent>
+        Several reasons.
+
+        First, we use React ourselves and know the ecosystem really well. That makes this ui library easy for us to build and maintain.
+
+        Second, this library is really just stitching together a bunch of existing shadcn/ui and internal components into Supabase-specific workflows. It's not technically a brand new, from the ground up ui library—it's using an established tool in shadcn/ui.
+
+        Last, it's a way for us to better distribute components that we already had out there in different places (our docs and guides, different framework quickstarts, etc)
+
+        TL;DR:  shadcn/ui + our internal React experience make this easy to do well. Doing it for other ecosystems would be much more challenging.
+      </AccordionContent>
+    </AccordionItem>
+    <AccordionItem value="other-frameworks">
+      <AccordionTrigger>Any plans for other, non-React frameworks?</AccordionTrigger>
+      <AccordionContent>
+        Not at the moment, but we're not ruling it out.
+
+        Our expertise is predominantly in React—that's the ecosystem in which we think we can provide the highest quality tools for our users. But we've heard from lots of people in the Vue and Svelte communities in particular, and agree something like this would be really beneficial for them.
+
+        This isn't a situation like "we will never do it", but instead more of a "we don't want to reinvent the wheel". If the right opportunity comes up for supporting Vue, Svelte, etc like this, we're very open to supporting it.
+      </AccordionContent>
+    </AccordionItem>
+
+</Accordion>

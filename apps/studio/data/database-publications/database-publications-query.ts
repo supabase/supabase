@@ -1,11 +1,11 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { databasePublicationsKeys } from './keys'
 
 export type DatabasePublicationsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getDatabasePublications(
@@ -30,7 +30,7 @@ export async function getDatabasePublications(
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

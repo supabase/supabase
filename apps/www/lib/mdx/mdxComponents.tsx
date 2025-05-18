@@ -1,46 +1,30 @@
-import 'react-medium-image-zoom/dist/styles.css'
-
 import { PropsWithChildren } from 'react'
-import Image from 'next/image'
-import { ThemeImage } from 'ui-patterns/ThemeImage'
 
-import Avatar from '~/components/Avatar'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import { CH } from '@code-hike/mdx/components'
-import ImageGrid from '~/components/ImageGrid'
-import Quote from '~/components/Quote'
-import Chart from '~/components/Charts/PGCharts'
-import InlineCodeTag from '~/components/InlineCode'
+import { ArrowUpRight, Triangle } from 'lucide-react'
 import {
-  Admonition,
   Badge,
   cn,
   Collapsible_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
   CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
   Heading,
-  IconArrowUpRight,
-  IconTriangle,
+  Image,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { type ImageProps } from 'ui/src/components/Image/Image'
+import Avatar from '~/components/Avatar'
+import Chart from '~/components/Charts/PGCharts'
+import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import ImageFadeStack from '~/components/ImageFadeStack'
-import ZoomableImg from '~/components/ZoomableImg/ZoomableImg'
+import ImageGrid from '~/components/ImageGrid'
+import InlineCodeTag from '~/components/InlineCode'
+import Quote from '~/components/Quote'
 
 // import all components used in blog articles here
 // to do: move this into a helper/utils, it is used elsewhere
 
 const ignoreClass = 'ignore-on-export'
-
-const getCaptionAlign = (align?: 'left' | 'center' | 'right') => {
-  switch (align) {
-    case 'left':
-      return 'text-left'
-    case 'right':
-      return 'text-right'
-    case 'center':
-    default:
-      return 'text-center'
-  }
-}
 
 const LinkComponent = (props: PropsWithChildren<HTMLAnchorElement>) => (
   <a
@@ -49,13 +33,20 @@ const LinkComponent = (props: PropsWithChildren<HTMLAnchorElement>) => (
     className={cn('inline relative [&_p]:inline', props.target === '_blank' && 'mr-4')}
   >
     {props.children}{' '}
-    {props.target === '_blank' && <IconArrowUpRight className="absolute -right-3.5 w-3 top-0" />}
+    {props.target === '_blank' && <ArrowUpRight className="absolute -right-3.5 w-3 top-0" />}
   </a>
 )
 
-const BlogCollapsible = ({ title, ...props }: { title: string }) => {
+const BlogCollapsible = ({
+  title,
+  containerClassName,
+  ...props
+}: {
+  title: string
+  containerClassName?: string
+}) => {
   return (
-    <Collapsible_Shadcn_>
+    <Collapsible_Shadcn_ className={containerClassName}>
       <CollapsibleTrigger_Shadcn_
         className="
         data-[state=open]:text
@@ -68,7 +59,7 @@ const BlogCollapsible = ({ title, ...props }: { title: string }) => {
         [&>svg]:data-[state='open']:text
         "
       >
-        <IconTriangle size={10} />
+        <Triangle size={10} />
         <span>{title}</span>
       </CollapsibleTrigger_Shadcn_>
       <CollapsibleContent_Shadcn_ {...props} />
@@ -104,41 +95,35 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     img: (props: any) => {
       if (props.className !== ignoreClass) {
         return (
-          <span className={['next-image--dynamic-fill'].join(' ')}>
-            <Image
-              {...props}
-              className={[type === 'blog' ? 'm-0 object-cover rounded-md border' : ''].join(' ')}
-              fill
-              loading="lazy"
-            />
-          </span>
+          <Image
+            fill
+            className={cn(
+              'm-0 object-cover',
+              type === 'blog' ? 'rounded-md border' : '',
+              props.wide && 'wide',
+              props.className
+            )}
+            {...props}
+          />
         )
       }
       return <img {...props} />
     },
-    Img: ({ zoomable = true, className, ...props }: any) => (
-      <figure className={cn('m-0', className)}>
-        <ZoomableImg zoomable={zoomable}>
-          <span
-            className={[
-              'next-image--dynamic-fill',
-              type === 'blog' ? 'rounded-md border' : '',
-              props.wide && 'wide',
-            ].join(' ')}
-          >
-            <ThemeImage fill className="m-0 object-cover" {...props} />
-          </span>
-        </ZoomableImg>
-        {props.caption && (
-          <figcaption className={[getCaptionAlign(props.captionAlign)].join(' ')}>
-            {props.caption}
-          </figcaption>
-        )}
-      </figure>
+    Img: ({ zoomable = true, className, ...props }: ImageProps & { wide?: boolean }) => (
+      <Image
+        fill
+        containerClassName={cn(props.wide && 'wide')}
+        className={cn('m-0 object-cover', type === 'blog' ? 'rounded-md border' : '', className)}
+        zoomable={zoomable}
+        {...props}
+      />
     ),
     Link: LinkComponent,
     code: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
     BlogCollapsible: (props: any) => <BlogCollapsible {...props} />,
+    Subtitle: (props: any) => (
+      <p className={cn('-mt-6 text-foreground-lighter text-lg', props.className)} {...props} />
+    ),
     Admonition,
   }
 

@@ -1,5 +1,10 @@
-import clsx from 'clsx'
 import { useParams } from 'common'
+import { ChevronDown } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import { Alert, Button, Collapsible, Form, Input, Listbox, Modal, Toggle, cn } from 'ui'
+
 import { StorageSizeUnits } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.constants'
 import {
   convertFromBytes,
@@ -7,22 +12,8 @@ import {
 } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketUpdateMutation } from 'data/storage/bucket-update-mutation'
-import { useStore } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import {
-  Alert,
-  Button,
-  Collapsible,
-  Form,
-  IconChevronDown,
-  Input,
-  Listbox,
-  Modal,
-  Toggle,
-} from 'ui'
-import { StorageBucket } from './Storage.types'
+import type { StorageBucket } from './Storage.types'
 
 export interface EditBucketModalProps {
   visible: boolean
@@ -31,19 +22,18 @@ export interface EditBucketModalProps {
 }
 
 const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => {
-  const { ui } = useStore()
   const { ref } = useParams()
 
   const { mutate: updateBucket, isLoading: isUpdating } = useBucketUpdateMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated bucket "${bucket?.name}"`,
-      })
+      toast.success(`Successfully updated bucket "${bucket?.name}"`)
       onClose()
     },
   })
-  const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
+  const { data } = useProjectStorageConfigQuery(
+    { projectRef: ref },
+    { enabled: IS_PLATFORM && visible }
+  )
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
@@ -115,7 +105,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
           }, [visible])
 
           return (
-            <div className="space-y-4 py-4">
+            <>
               <Modal.Content>
                 <Input
                   disabled
@@ -165,10 +155,10 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                 <Collapsible.Trigger asChild>
                   <div className="w-full cursor-pointer py-3 px-5 flex items-center justify-between border-t border-default">
                     <p className="text-sm">Additional configuration</p>
-                    <IconChevronDown
+                    <ChevronDown
                       size={18}
                       strokeWidth={2}
-                      className={clsx('text-foreground-light', showConfiguration && 'rotate-180')}
+                      className={cn('text-foreground-light', showConfiguration && 'rotate-180')}
                     />
                   </div>
                 </Collapsible.Trigger>
@@ -217,16 +207,16 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                             </Listbox>
                           </div>
                           {IS_PLATFORM && (
-                            <div className="col-span-12">
+                            <div className="col-span-12 mt-2">
                               <p className="text-foreground-light text-sm">
-                                Note: The{' '}
+                                Note: Individual bucket upload will still be capped at the{' '}
                                 <Link
                                   href={`/project/${ref}/settings/storage`}
-                                  className="text-brand opacity-80 hover:opacity-100 transition"
+                                  className="font-bold underline"
                                 >
                                   global upload limit
                                 </Link>{' '}
-                                takes precedence over this value ({formattedGlobalUploadLimit})
+                                of {formattedGlobalUploadLimit}
                               </p>
                             </div>
                           )}
@@ -245,23 +235,16 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                   </div>
                 </Collapsible.Content>
               </Collapsible>
-              <div className="w-full border-t border-default !mt-0" />
-              <Modal.Content>
-                <div className="flex items-center space-x-2 justify-end">
-                  <Button type="default" disabled={isUpdating} onClick={() => onClose()}>
-                    Cancel
-                  </Button>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={isUpdating}
-                    disabled={isUpdating}
-                  >
-                    Save
-                  </Button>
-                </div>
+              <Modal.Separator />
+              <Modal.Content className="flex items-center space-x-2 justify-end">
+                <Button type="default" disabled={isUpdating} onClick={() => onClose()}>
+                  Cancel
+                </Button>
+                <Button type="primary" htmlType="submit" loading={isUpdating} disabled={isUpdating}>
+                  Save
+                </Button>
               </Modal.Content>
-            </div>
+            </>
           )
         }}
       </Form>

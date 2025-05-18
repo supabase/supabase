@@ -4,7 +4,7 @@ title: 'Working With Arrays'
 description: 'How to use arrays in PostgreSQL and the Supabase API.'
 ---
 
-PostgreSQL supports flexible [array types](https://www.postgresql.org/docs/12/arrays.html). These arrays are also supported in the Supabase Dashboard and in the JavaScript API.
+Postgres supports flexible [array types](https://www.postgresql.org/docs/12/arrays.html). These arrays are also supported in the Supabase Dashboard and in the JavaScript API.
 
 ## Create a table with an array column
 
@@ -73,6 +73,47 @@ const { data, error } = await supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Insert a record from the Swift client:
+
+```swift
+struct ArrayTest: Encodable {
+  let id: Int
+  let textarray: [String]
+}
+
+try await supabase
+  .from("arraytest")
+  .insert(
+    [
+      ArrayTest(
+        id: 2,
+        textarray: ["one", "two", "three", "four"]
+      )
+    ]
+  )
+  .execute()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+Insert a record from the Python client:
+
+```python
+supabase.from_('arraytest').insert(
+  [
+    {
+      id: 2,
+      textarray: ["one", "two", "three", "four"]
+    }
+  ]
+)
+.execute()
+```
+
+</TabPanel>
 </Tabs>
 
 ## View the results
@@ -91,9 +132,11 @@ const { data, error } = await supabase
 
 You should see:
 
+```
 | id  | textarray               |
 | --- | ----------------------- |
 | 1   | ["Harry","Larry","Moe"] |
+```
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
@@ -104,16 +147,18 @@ select * from arraytest;
 
 You should see:
 
+```
 | id  | textarray               |
 | --- | ----------------------- |
 | 1   | ["Harry","Larry","Moe"] |
+```
 
 </TabPanel>
 </Tabs>
 
 ## Query array data
 
-PostgreSQL uses 1-based indexing (e.g., `textarray[1]` is the first item in the array).
+Postgres uses 1-based indexing (e.g., `textarray[1]` is the first item in the array).
 
 <Tabs
   scrollable
@@ -132,9 +177,11 @@ SELECT textarray[1], array_length(textarray, 1) FROM arraytest;
 
 returns:
 
+```
 | textarray | array_length |
 | --------- | ------------ |
 | Harry     | 3            |
+```
 
 </TabPanel>
 <TabPanel id="js" label="JavaScript">
@@ -148,11 +195,35 @@ console.log(JSON.stringify(data, null, 2))
 
 returns:
 
-```js
-;[
+```json
+[
   {
-    textarray: ['Harry', 'Larry', 'Moe'],
-  },
+    "textarray": ["Harry", "Larry", "Moe"]
+  }
+]
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+This returns the entire array field:
+
+```swift
+struct Response: Decodable {
+  let textarray: [String]
+}
+
+let response: [Response] = try await supabase.from("arraytest").select("textarray").execute().value
+dump(response)
+```
+
+returns:
+
+```
+[
+  Response(
+    textarray: ["Harry", "Larry", "Moe"],
+  )
 ]
 ```
 
@@ -162,5 +233,5 @@ returns:
 ## Resources
 
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
-- [Supabase Account - Free Plan OK](https://supabase.com)
-- [PostgreSQL Arrays](https://www.postgresql.org/docs/15/arrays.html)
+- [Supabase - Get started for free](https://supabase.com)
+- [Postgres Arrays](https://www.postgresql.org/docs/15/arrays.html)

@@ -8,34 +8,8 @@ hideToc: true
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Set up a Supabase project">
 
-    Head over to [database.new](https://database.new) and create a new Supabase project.
-
-    When your project is up and running, navigate to the [Table Editor](https://supabase.com/dashboard/project/_/editor), create a new table and insert some data.
-
-    Alternatively, you can run the following snippet in your project's [SQL Editor](https://supabase.com/dashboard/project/_/sql/new). This will create a `notes` table with some sample data.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-     ```sql SQL_EDITOR
-      -- Create the table
-      create table notes (
-        id serial primary key,
-        title text
-      );
-
-      -- Insert some sample data
-      insert into notes (title)
-      values
-        ('Today I created a Supabase project.'),
-        ('I added some data and queried it from Next.js.'),
-        ('It was awesome!');
-      ````
-
-    </StepHikeCompact.Code>
+    <$Partial path="quickstart_db_setup.mdx" />
 
   </StepHikeCompact.Step>
 
@@ -52,7 +26,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash
       npx create-next-app -e with-supabase
       ```
 
@@ -72,10 +46,14 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```text .env.local
+      <$CodeTabs>
+
+        ```text name=.env.local
         NEXT_PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
         NEXT_PUBLIC_SUPABASE_ANON_KEY=<SUBSTITUTE_SUPABASE_ANON_KEY>
-      ```
+        ```
+
+      </$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -84,24 +62,60 @@ hideToc: true
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Query Supabase data from Next.js">
 
-    Create a new file at `app/notes/page.tsx` and populate with the following.
+    Create a new file at `app/instruments/page.tsx` and populate with the following.
 
-    This will select all the rows from the `notes` table in Supabase and render them on the page.
+    This will select all the rows from the `instruments` table in Supabase and render them on the page.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```ts app/notes/page.tsx
-        import { createClient } from '@/utils/supabase/server';
+    <$CodeTabs>
 
-        export default async function Notes() {
-          const supabase = createClient();
-          const { data: notes } = await supabase.from("notes").select();
+      ```ts name=app/instruments/page.tsx
+      import { createClient } from '@/utils/supabase/server';
 
-          return <pre>{JSON.stringify(notes, null, 2)}</pre>
-        }
+      export default async function Instruments() {
+        const supabase = await createClient();
+        const { data: instruments } = await supabase.from("instruments").select();
+
+        return <pre>{JSON.stringify(instruments, null, 2)}</pre>
+      }
       ```
+
+      ```ts name=utils/supabase/server.ts
+      import { createServerClient } from '@supabase/ssr'
+      import { cookies } from 'next/headers'
+
+      export async function createClient() {
+        const cookieStore = await cookies()
+
+        return createServerClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          {
+            cookies: {
+              getAll() {
+                return cookieStore.getAll()
+              },
+              setAll(cookiesToSet) {
+                try {
+                  cookiesToSet.forEach(({ name, value, options }) =>
+                    cookieStore.set(name, value, options)
+                  )
+                } catch {
+                  // The `setAll` method was called from a Server Component.
+                  // This can be ignored if you have middleware refreshing
+                  // user sessions.
+                }
+              },
+            },
+          }
+        )
+      }
+      ```
+
+    </$CodeTabs>
 
     </StepHikeCompact.Code>
 
@@ -110,7 +124,7 @@ hideToc: true
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Start the app">
 
-    Run the development server, go to http://localhost:3000/notes in a browser and you should see the list of notes.
+    Run the development server, go to http://localhost:3000/instruments in a browser and you should see the list of instruments.
 
     </StepHikeCompact.Details>
 
@@ -125,3 +139,9 @@ hideToc: true
   </StepHikeCompact.Step>
 
 </StepHikeCompact>
+
+## Next steps
+
+- Set up [Auth](/docs/guides/auth) for your app
+- [Insert more data](/docs/guides/database/import-data) into your database
+- Upload and serve static files using [Storage](/docs/guides/storage)

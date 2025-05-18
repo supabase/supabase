@@ -1,16 +1,9 @@
-import AuthProvidersForm from './AuthProvidersForm/AuthProvidersForm'
-import EmailTemplates from './EmailTemplates/EmailTemplates'
-import SmtpForm from './SmtpForm/SmtpForm'
-import BasicAuthSettingsForm from './BasicAuthSettingsForm/BasicAuthSettingsForm'
-import AdvancedAuthSettingsForm from './AdvancedAuthSettingsForm/AdvancedAuthSettingsForm'
-
-import Users from './Users'
-
-export {
-  Users,
-  AuthProvidersForm,
-  EmailTemplates,
-  SmtpForm,
-  BasicAuthSettingsForm,
-  AdvancedAuthSettingsForm,
-}
+export { AdvancedAuthSettingsForm } from './AdvancedAuthSettingsForm'
+export { AuthProvidersForm } from './AuthProvidersForm/AuthProvidersForm'
+export { default as BasicAuthSettingsForm } from './BasicAuthSettingsForm/BasicAuthSettingsForm'
+export { default as EmailTemplates } from './EmailTemplates/EmailTemplates'
+export { default as MfaAuthSettingsForm } from './MfaAuthSettingsForm/MfaAuthSettingsForm'
+export { default as ProtectionAuthSettingsForm } from './ProtectionAuthSettingsForm/ProtectionAuthSettingsForm'
+export { default as SessionsAuthSettingsForm } from './SessionsAuthSettingsForm/SessionsAuthSettingsForm'
+export { default as SmtpForm } from './SmtpForm/SmtpForm'
+export { ThirdPartyAuthForm } from './ThirdPartyAuthForm'

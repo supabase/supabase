@@ -1,4 +1,4 @@
-import { GoTrueClient, navigatorLock } from '@supabase/gotrue-js'
+import { AuthClient, navigatorLock, User } from '@supabase/auth-js'
 
 export const STORAGE_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || 'supabase.dashboard.auth.token'
 export const AUTH_DEBUG_KEY =
@@ -20,6 +20,10 @@ const persistedDebug =
 const shouldEnableNavigatorLock =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' &&
   !(globalThis?.localStorage?.getItem(AUTH_NAVIGATOR_LOCK_DISABLED_KEY) === 'true')
+
+const shouldDetectSessionInUrl = process.env.NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL
+  ? process.env.NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL === 'true'
+  : true
 
 const navigatorLockEnabled = !!(shouldEnableNavigatorLock && globalThis?.navigator?.locks)
 
@@ -100,10 +104,12 @@ const logIndexedDB = (message: string, ...args: any[]) => {
   })()
 }
 
-export const gotrueClient = new GoTrueClient({
+export const gotrueClient = new AuthClient({
   url: process.env.NEXT_PUBLIC_GOTRUE_URL,
   storageKey: STORAGE_KEY,
-  detectSessionInUrl: true,
+  detectSessionInUrl: shouldDetectSessionInUrl,
   debug: debug ? (persistedDebug ? logIndexedDB : true) : false,
   lock: navigatorLockEnabled ? navigatorLock : undefined,
 })
+
+export type { User }

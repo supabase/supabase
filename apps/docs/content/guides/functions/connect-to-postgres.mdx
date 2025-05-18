@@ -14,9 +14,9 @@ You can also use other Postgres clients like [Deno Postgres](https://deno.land/x
 The `supabase-js` client is a great option for connecting to your Supabase database since it handles authorization with Row Level Security, and it automatically formats your response as JSON.
 
 ```ts index.ts
-import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 
-Deno.serve(async (_req) => {
+Deno.serve(async (req) => {
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -89,6 +89,39 @@ Deno.serve(async (_req) => {
   }
 })
 ```
+
+## Using Drizzle
+
+You can use Drizzle together with [Postgres.js](https://github.com/porsager/postgres). Both can be loaded directly from npm:
+
+```json supabase/functions/import_map.json
+{
+  "imports": {
+    "drizzle-orm": "npm:drizzle-orm@0.29.1",
+    "drizzle-orm/": "npm:/drizzle-orm@0.29.1/",
+    "postgres": "npm:postgres@3.4.3"
+  }
+}
+```
+
+```ts supabase/functions/drizzle/index.ts
+import { drizzle } from 'drizzle-orm/postgres-js'
+import postgres from 'postgres'
+import { countries } from '../_shared/schema.ts'
+
+const connectionString = Deno.env.get('SUPABASE_DB_URL')!
+
+Deno.serve(async (_req) => {
+  // Disable prefetch as it is not supported for "Transaction" pool mode
+  const client = postgres(connectionString, { prepare: false })
+  const db = drizzle(client)
+  const allCountries = await db.select().from(countries)
+
+  return Response.json(allCountries)
+})
+```
+
+You can find the full example on [GitHub](https://github.com/thorwebdev/edgy-drizzle).
 
 ## SSL connections
 
