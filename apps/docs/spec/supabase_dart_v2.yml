@@ -1934,7 +1934,7 @@ functions:
       Limits the result with the specified count.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
@@ -1960,7 +1960,7 @@ functions:
       Orders the result with the specified column.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
@@ -1986,7 +1986,7 @@ functions:
       Limits the result to rows within the specified range, inclusive.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
@@ -2002,7 +2002,7 @@ functions:
       Retrieves only one row from the result. Result must be one row (e.g. using limit), otherwise this will result in an error.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
@@ -2175,7 +2175,7 @@ functions:
         ```
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
@@ -2256,7 +2256,7 @@ functions:
         ```
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
@@ -2266,7 +2266,7 @@ functions:
             .not('name', 'eq', 'Paris');
           ```
       - id: with-update
-        name: With `update()`
+        name: With update()
         code: |
           ```dart
           final data = await supabase
@@ -2275,7 +2275,7 @@ functions:
             .not('name', 'eq', 'Paris');
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With delete()
         code: |
           ```dart
           final data = await supabase
@@ -2284,7 +2284,7 @@ functions:
             .not('name', 'eq', 'Paris');
           ```
       - id: with-rpc
-        name: With `rpc()`
+        name: With rpc()
         code: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
@@ -2299,7 +2299,7 @@ functions:
       Finds all rows whose columns match the specified `query` object.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -2337,7 +2337,7 @@ functions:
       Match only rows where `column` is equal to `value`.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -2376,7 +2376,7 @@ functions:
       Finds all rows whose value on the stated `column` doesn't match the specified `value`.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -2419,7 +2419,7 @@ functions:
       Finds all rows whose value on the stated `column` is greater than the specified `value`.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -2458,7 +2458,7 @@ functions:
       Finds all rows whose value on the stated `column` is greater than or equal to the specified `value`.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -2501,7 +2501,7 @@ functions:
       Finds all rows whose value on the stated `column` is less than the specified `value`.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -2540,7 +2540,7 @@ functions:
       Finds all rows whose value on the stated `column` is less than or equal to the specified `value`.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -2583,7 +2583,7 @@ functions:
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case sensitive).
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -2622,7 +2622,7 @@ functions:
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case insensitive).
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -2705,7 +2705,7 @@ functions:
       Finds all rows whose value on the stated `column` is found on the specified `values`.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -2984,7 +2984,7 @@ functions:
       Only relevant for range columns. Match only rows where every element in `column` is less than any element in `range`.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -3032,7 +3032,7 @@ functions:
       Only relevant for range columns. Match only rows where every element in `column` is greater than any element in `range`.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -3080,7 +3080,7 @@ functions:
       Only relevant for range columns. Match only rows where every element in `column` is either contained in `range` or greater than any element in `range`.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -3128,7 +3128,7 @@ functions:
       Only relevant for range columns. Match only rows where every element in `column` is either contained in `range` or less than any element in `range`.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -3176,7 +3176,7 @@ functions:
       Only relevant for range columns. Match only rows where `column` is mutually exclusive to `range` and there can be no element between the two ranges.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -3379,7 +3379,7 @@ functions:
         ```
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
@@ -3389,7 +3389,7 @@ functions:
             .filter('name', 'in', '("Paris","Tokyo")');
           ```
       - id: with-update
-        name: With `update()`
+        name: With update()
         code: |
           ```dart
           final data = await supabase
@@ -3398,7 +3398,7 @@ functions:
             .filter('name', 'in', '("Paris","Tokyo")');
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With delete()
         code: |
           ```dart
           final data = await supabase
@@ -3407,7 +3407,7 @@ functions:
             .filter('name', 'in', '("Paris","Tokyo")');
           ```
       - id: with-rpc
-        name: With `rpc()`
+        name: With rpc()
         code: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
