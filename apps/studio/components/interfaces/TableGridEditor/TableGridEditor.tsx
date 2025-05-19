@@ -6,7 +6,6 @@ import { useCallback } from 'react'
 import { useParams } from 'common'
 import { SupabaseGrid } from 'components/grid/SupabaseGrid'
 import { useLoadTableEditorStateFromLocalStorageIntoUrl } from 'components/grid/SupabaseGrid.utils'
-import { useEditorType } from 'components/layouts/editors/EditorsLayout.hooks'
 import {
   Entity,
   isMaterializedView,
@@ -40,7 +39,6 @@ export const TableGridEditor = ({
   selectedTable,
 }: TableGridEditorProps) => {
   const router = useRouter()
-  const editor = useEditorType()
   const project = useSelectedProject()
   const appSnap = useAppStateSnapshot()
   const { ref: projectRef, id } = useParams()
@@ -68,9 +66,7 @@ export const TableGridEditor = ({
   })
 
   const onClearDashboardHistory = () => {
-    if (projectRef && editor) {
-      appSnap.setDashboardHistory(projectRef, editor === 'table' ? 'editor' : editor, undefined)
-    }
+    if (projectRef) appSnap.setDashboardHistory(projectRef, 'editor', undefined)
   }
 
   const onTableCreated = useCallback(
@@ -85,7 +81,7 @@ export const TableGridEditor = ({
     if (isTableEditorTabsEnabled && selectedTable) {
       // Close tab
       const tabId = createTabId(selectedTable.entity_type, { id: selectedTable.id })
-      tabs.handleTabClose({ id: tabId, router, editor, onClearDashboardHistory })
+      tabs.handleTabClose({ id: tabId, router, editor: 'table', onClearDashboardHistory })
     } else {
       const tables = await getTables(selectedSchema)
       if (tables.length > 0) {
@@ -128,21 +124,21 @@ export const TableGridEditor = ({
                       tabs.handleTabClose({
                         id: tabId,
                         router,
-                        editor,
+                        editor: 'table',
                         onClearDashboardHistory,
                       })
                     }}
                   >
                     Close tab
                   </Button>
-                ) : openTabs.length > 0 ? (
+                ) : tabs.openTabs.length > 0 ? (
                   <Button
                     asChild
                     type="default"
                     className="mt-2"
                     onClick={() => appSnap.setDashboardHistory(projectRef, 'editor', undefined)}
                   >
-                    <Link href={`/project/${projectRef}/editor/${openTabs[0].split('-')[1]}`}>
+                    <Link href={`/project/${projectRef}/editor/${tabs.openTabs[0].split('-')[1]}`}>
                       Close tab
                     </Link>
                   </Button>
