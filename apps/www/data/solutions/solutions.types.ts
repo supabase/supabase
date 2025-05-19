@@ -52,32 +52,22 @@ export interface Highlight {
 }
 
 export interface Feature {
+  id?: string
   icon?: IconType
   heading: string | JSX.Element
   subheading: string | JSX.Element
   img?: JSX.Element
 }
 
-export interface WhySection {
+export interface FeaturesSection {
   id: string
-  label: string
+  label?: string
   heading: JSX.Element
+  subheading?: string
   features: Feature[]
-}
-
-interface FeaturesSection {
-  id: string
-  heading: JSX.Element
-  subheading: string
-  features: {
-    [key: string]: {
-      id: string
-      icon?: IconType
-      heading: JSX.Element
-      subheading: JSX.Element
-      img?: JSX.Element
-    }
-  }
+  // {
+  //   [key: string]: Feature
+  // }
 }
 
 export interface Testimonials {
@@ -94,7 +84,7 @@ export interface Testimonials {
 interface CTASection {
   id: string
   label: string
-  heading: JSX.Element
+  heading: JSX.Element | string
   subheading: string
   cta: {
     label: string
@@ -107,7 +97,7 @@ export interface AIData {
   metadata: Metadata
   heroSection: HeroSection
   quotes: Quotes
-  why: WhySection
+  why: FeaturesSection
   features: FeaturesSection
   testimonials: Testimonials
   'cta-section': CTASection

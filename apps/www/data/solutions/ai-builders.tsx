@@ -181,8 +181,8 @@ const data: AIData = {
     ),
     subheading:
       'Build a delightful application building experience backed seamlessly by a powerful application backend.',
-    features: {
-      'mgmt-api': {
+    features: [
+      {
         id: 'mgmt-api',
         icon: Timer,
         heading: (
@@ -225,7 +225,7 @@ const data: AIData = {
           />
         ),
       },
-      postgres: {
+      {
         id: 'postgres',
         icon: Timer,
         heading: (
@@ -455,7 +455,7 @@ const data: AIData = {
           </svg>
         ),
       },
-      branching: {
+      {
         id: 'branching',
         icon: Timer,
         heading: (
@@ -507,7 +507,7 @@ const data: AIData = {
           </>
         ),
       },
-      pricing: {
+      {
         id: 'pricing',
         icon: Timer,
         heading: (
@@ -551,7 +551,7 @@ const data: AIData = {
           </>
         ),
       },
-    },
+    ],
   },
   testimonials: {
     id: 'testimonials',
