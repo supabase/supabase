@@ -334,7 +334,7 @@ BEGIN
   IF v_conname IS NOT NULL THEN
     EXECUTE format('ALTER TABLE ${ident(old.schema)}.${ident(
       old.table
-    )} DROP CONSTRAINT %s', v_conname);
+    )} DROP CONSTRAINT %I', v_conname);
   END IF;
 
   ${
