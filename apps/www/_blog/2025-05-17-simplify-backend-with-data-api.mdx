@@ -45,7 +45,8 @@ Supabase automatically generates client libraries based on your schema. For exam
 ```tsx
 const { data, error } = await supabase
   .from('orders')
-  .select(`
+  .select(
+    `
     id,
     created_at,
     total,
@@ -54,7 +55,8 @@ const { data, error } = await supabase
       name,
       price
     )
-  `)
+  `
+  )
   .eq('customer_id', customerId)
 ```
 
@@ -94,7 +96,7 @@ Here’s the TypeScript example of calling a Database Function using auto-genera
 
 ```tsx
 const { data, error } = await supabase.rpc('calculate_customer_discount', {
-  customer_id: 'uuid-of-customer'
+  customer_id: 'uuid-of-customer',
 })
 ```
 
@@ -122,19 +124,16 @@ const customerId = 'uuid-of-customer' // Replace with actual customer ID
 const projectRef = 'your-project-ref' // e.g. abcdefg.supabase.co
 const functionName = 'send-discount'
 
-const response = await fetch(
-  `https://${projectRef}.functions.supabase.co/${functionName}`,
-  {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer your-access-token`, // From Supabase Auth
-    },
-    body: JSON.stringify({
-      customer_id: customerId,
-    }),
-  }
-)
+const response = await fetch(`https://${projectRef}.functions.supabase.co/${functionName}`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer your-access-token`, // From Supabase Auth
+  },
+  body: JSON.stringify({
+    customer_id: customerId,
+  }),
+})
 ```
 
 Edge Functions give you full flexibility to write this logic with access to Supabase Auth, your database, and any external APIs.
@@ -160,7 +159,7 @@ This enables a radically simplified architecture:
 
 Everything is powered by your schema. Add a table, get an API. Change a column, the API reflects it. Need to restrict access? Just define a row-level security (RLS) policy.
 
-For teams moving from hand-built APIs, this can reduce both technical debt and cloud spend. Customers routinely report that Supabase’s managed API layer simplifies onboarding for new developers and cuts build times. [Quilia reduced development time by 75%](https://supabase.com/customers/quilia) with the Supabase Data API. 
+For teams moving from hand-built APIs, this can reduce both technical debt and cloud spend. Customers routinely report that Supabase’s managed API layer simplifies onboarding for new developers and cuts build times. [Quilia reduced development time by 75%](https://supabase.com/customers/quilia) with the Supabase Data API.
 
 In practice, Supabase becomes a unified data plane: the single, secure interface for your application logic, internal services, and even external integrations.
 
