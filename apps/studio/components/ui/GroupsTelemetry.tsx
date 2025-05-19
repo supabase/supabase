@@ -10,7 +10,7 @@ import { usePrevious } from 'hooks/deprecated'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 
-export const getAnonId = async (id: string) => {
+const getAnonId = async (id: string) => {
   const encoder = new TextEncoder()
   const data = encoder.encode(id)
   const hashBuffer = await crypto.subtle.digest('SHA-256', data)

@@ -1,10 +1,9 @@
 import * as Sentry from '@sentry/nextjs'
-import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useUser } from 'common'
+import { useIsLoggedIn, useUser } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 import { toast } from 'sonner'
 
-import { getAnonId } from 'components/ui/GroupsTelemetry'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
@@ -42,15 +41,12 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
       sendEvent({ action: 'sign_up', properties: { category: 'conversion' } })
 
       if (user) {
-        const hashedId =
-          localStorage.getItem(LOCAL_STORAGE_KEYS.SENTRY_USER_ID) ?? (await getAnonId(user?.id))
-
         // Send an event to GTM, will do nothing if GTM is not enabled
         const thisWindow = window as any
         thisWindow.dataLayer = thisWindow.dataLayer || []
         thisWindow.dataLayer.push({
           event: 'sign_up',
-          user_id: hashedId,
+          email: user.email,
         })
       }
     },
