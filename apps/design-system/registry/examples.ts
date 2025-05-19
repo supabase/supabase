@@ -1228,11 +1228,6 @@ export const examples: Registry = [
     files: ['example/logs-bar-chart.tsx'],
   },
   {
-    name: 'horizontal-waterfall-chart',
-    type: 'components:example',
-    files: ['example/horizontal-waterfall-chart.tsx'],
-  },
-  {
     name: 'flame-graph',
     type: 'components:example',
     files: ['example/flame-graph.tsx'],

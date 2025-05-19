@@ -136,8 +136,6 @@ The Design System used in Supabase Studio.
     - A flame chart visualizes a distributed request trace and represents each service call that occurred during the request's execution path with a timed, color-coded, horizontal bar.
 - [Form Item Layout](https://supabase-design-system.vercel.app/design-system/docs/fragments/form-item-layout)
     - A helper component that provides a layout for form items.
-- [Horizontal Waterfall Chart](https://supabase-design-system.vercel.app/design-system/docs/fragments/horizontal-waterfall-chart)
-    - A waterfall chart to visualize request/traces timeline.
 - [Info Tooltip](https://supabase-design-system.vercel.app/design-system/docs/fragments/info-tooltip)
     - InfoTooltip provides a tooltip with an information icon.
 - [Inner Side Menu](https://supabase-design-system.vercel.app/design-system/docs/fragments/inner-side-menu)
