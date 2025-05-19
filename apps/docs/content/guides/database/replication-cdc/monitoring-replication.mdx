@@ -30,3 +30,11 @@ The state can be checked using the `pg_replication_slots` table:
 ```sql
 select slot_name, active, state from pg_replication_slots;
 ```
+
+# WAL size
+
+The WAL size can be checked using the `pg_stat_replication` table:
+```sql
+select * from pg_ls_waldir();
+```
+
