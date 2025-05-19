@@ -3,7 +3,8 @@
 import { components } from 'api-types'
 import { useRouter } from 'next/compat/router'
 import { usePathname } from 'next/navigation'
-import { ComponentPropsWithoutRef, useCallback, useEffect, useRef } from 'react'
+import Script from 'next/script'
+import { useCallback, useEffect, useRef } from 'react'
 import { useLatest } from 'react-use'
 import { useUser } from './auth'
 import { hasConsented } from './consent-state'
@@ -14,7 +15,6 @@ import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useTelemetryCookie } from './hooks'
 import { TelemetryEvent } from './telemetry-constants'
 import { getSharedTelemetryData } from './telemetry-utils'
-import Script from 'next/script'
 
 const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 
@@ -23,23 +23,6 @@ const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 // Reexports GoogleTagManager with the right API key set
 export const TelemetryTagManager = () => {
   const isGTMEnabled = Boolean(IS_PLATFORM && process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID)
-
-  // useEffect(() => {
-  //   if (isGTMEnabled) {
-  //     // set „denied" as default for both ad and analytics storage, as well as ad_user_data and ad_personalization,
-  //     sendGTMEvent({
-  //       0: 'consent',
-  //       1: 'default',
-  //       2: {
-  //         ad_user_data: 'denied',
-  //         ad_personalization: 'denied',
-  //         ad_storage: 'denied',
-  //         analytics_storage: 'denied',
-  //         wait_for_update: 2000, // milliseconds to wait for update
-  //       },
-  //     })
-  //   }
-  // }, [isGTMEnabled])
 
   if (!isGTMEnabled) {
     return
