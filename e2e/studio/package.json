@@ -1,0 +1,24 @@
+{
+  "name": "e2e-studio",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "e2e": "playwright test",
+    "e2e:staging": "TEST_ENV=staging playwright test",
+    "e2e:prod": "TEST_ENV=production playwright test",
+    "e2e:ci": "TEST_ENV=ci playwright test",
+    "e2e:selfhosted": "TEST_ENV=selfhosted playwright test",
+    "e2e:dev-selfhosted": "TEST_ENV=dev-selfhosted playwright test",
+    "e2e:dev-hosted": "TEST_ENV=dev-hosted playwright test",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "@playwright/test": "^1.52.0"
+  }
+}

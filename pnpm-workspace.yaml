@@ -2,6 +2,7 @@ packages:
   - 'apps/*'
   - 'packages/*'
   - 'tests/*'
+  - 'e2e/*'
 
 catalog:
   '@types/node': ^20.0.0
