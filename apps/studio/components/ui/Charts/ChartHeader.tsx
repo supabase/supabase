@@ -1,5 +1,5 @@
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { Activity, BarChartIcon, GitCommitHorizontalIcon } from 'lucide-react'
+import { Activity, BarChartIcon, GitCommitHorizontalIcon, InfoIcon } from 'lucide-react'
 
 export interface ChartHeaderProps {
   title?: string
@@ -14,6 +14,7 @@ export interface ChartHeaderProps {
   onChartStyleChange?: (style: string) => void
   showMaxValue?: boolean
   setShowMaxValue?: (value: boolean) => void
+  titleTooltip?: string
 }
 
 const ChartHeader = ({
@@ -27,10 +28,24 @@ const ChartHeader = ({
   onChartStyleChange,
   showMaxValue = false,
   setShowMaxValue,
+  titleTooltip,
 }: ChartHeaderProps) => {
   const chartTitle = (
-    <h3 className={'text-foreground-lighter ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
-      {title}
+    <h3
+      className={
+        'text-foreground-lighter flex gap-2 flex-wrap items-center' +
+        (minimalHeader ? 'text-xs' : 'text-sm')
+      }
+    >
+      {title}{' '}
+      {titleTooltip && (
+        <Tooltip>
+          <TooltipTrigger>
+            <InfoIcon className="w-3 h-3" />
+          </TooltipTrigger>
+          <TooltipContent>{titleTooltip}</TooltipContent>
+        </Tooltip>
+      )}
     </h3>
   )
 
@@ -61,7 +76,7 @@ const ChartHeader = ({
 
   return (
     <div className="flex-grow flex justify-between items-start min-h-16">
-      <div className="flex flex-col">
+      <div className="flex flex-col min-h-20">
         {title && chartTitle}
         {highlightedValue !== undefined && highlighted}
         {label}
