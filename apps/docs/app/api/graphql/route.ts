@@ -10,7 +10,7 @@ import { createQueryDepthLimiter } from './validators'
 
 export const runtime = 'edge'
 
-const MAX_DEPTH = 9
+const MAX_DEPTH = 5
 
 const validationRules = [
   ...specifiedRules,
