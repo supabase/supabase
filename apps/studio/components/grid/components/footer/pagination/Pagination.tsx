@@ -55,7 +55,7 @@ const Pagination = () => {
     setValue(String(page))
   }, [page])
 
-  const { data, isLoading, isSuccess, isError, isFetching } = useTableRowsCountQuery(
+  const { data, isLoading, isSuccess, isError, isFetching, error } = useTableRowsCountQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -132,6 +132,16 @@ const Pagination = () => {
       snap.setEnforceExactCount(rowsCountEstimate !== null && rowsCountEstimate <= THRESHOLD_COUNT)
     }
   }, [id])
+
+  useEffect(() => {
+    // If the count query encountered a timeout error with exact count
+    // turn off the exact count to rely on approximate
+    if (isError && snap.enforceExactCount && error.code === 408) {
+      snap.setEnforceExactCount(false)
+      // TODO: Maybe also add a sentry error with the table details so we can fix
+      // the logic that decide whether an exact count should be performed or not
+    }
+  }, [isError])
 
   return (
     <div className="flex items-center gap-x-4">
