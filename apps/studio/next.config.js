@@ -49,8 +49,11 @@ const GITHUB_USER_CONTENT_URL = 'https://raw.githubusercontent.com'
 const GITHUB_USER_AVATAR_URL = 'https://avatars.githubusercontent.com'
 const GOOGLE_USER_AVATAR_URL = 'https://lh3.googleusercontent.com'
 const GOOGLE_TAG_MANAGER_URL = 'https://www.googletagmanager.com'
+// IMG src for GTM, used only for testing purposes in preview mode
 const GOOGLE_TAG_MANAGER_IMG_URL =
   'https://www.googletagmanager.com https://ssl.gstatic.com https://www.gstatic.com'
+// Stape is used for GTM servers
+const STAPE_URL = 'https://*.stape.io'
 const VERCEL_LIVE_URL = 'https://vercel.live'
 const SENTRY_URL =
   'https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io'
@@ -83,7 +86,7 @@ const csp = [
         `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
         `img-src 'self' blob: data: ${IMG_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${VERCEL_URL};`,
         `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `font-src 'self' ${FONT_SRC_URLS} ${VERCEL_LIVE_URL};`,
+        `font-src 'self' ${FONT_SRC_URLS} ${VERCEL_LIVE_URL} ${STAPE_URL};`,
         `worker-src 'self' blob: data:;`,
       ]
     : [
@@ -92,7 +95,7 @@ const csp = [
         `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
         `img-src 'self' blob: data: ${IMG_SRC_URLS} ;`,
         `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `font-src 'self' ${FONT_SRC_URLS} ${VERCEL_LIVE_URL};`,
+        `font-src 'self' ${FONT_SRC_URLS} ${VERCEL_LIVE_URL} ${STAPE_URL};`,
         `worker-src 'self' blob: data:;`,
       ]),
   `object-src 'none';`,
