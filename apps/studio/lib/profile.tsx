@@ -90,6 +90,18 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
         signOut().then(() => router.push('/sign-in'))
       }
     },
+    // To test the GTM event, we can use this onSuccess callback. Remove before merging to master.
+    onSuccess: () => {
+      if (user) {
+        // Send an event to GTM, will do nothing if GTM is not enabled
+        const thisWindow = window as any
+        thisWindow.dataLayer = thisWindow.dataLayer || []
+        thisWindow.dataLayer.push({
+          event: 'sign_up',
+          email: user.email,
+        })
+      }
+    },
   })
 
   const { isInitialLoading: isLoadingPermissions } = usePermissionsQuery({ enabled: isLoggedIn })
