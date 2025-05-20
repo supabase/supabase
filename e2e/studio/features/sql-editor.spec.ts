@@ -25,6 +25,7 @@ test.describe('SQL Editor', () => {
     await expect(page.getByText('Running...')).not.toBeVisible()
 
     // remove stuff from the editor
+    await editor.click()
     await page.keyboard.press('ControlOrMeta+KeyA')
     await page.keyboard.press('Backspace')
 
