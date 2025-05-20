@@ -138,8 +138,6 @@ const Pagination = () => {
     // turn off the exact count to rely on approximate
     if (isError && snap.enforceExactCount && error.code === 408) {
       snap.setEnforceExactCount(false)
-      // TODO: Maybe also add a sentry error with the table details so we can fix
-      // the logic that decide whether an exact count should be performed or not
     }
   }, [isError])
 
