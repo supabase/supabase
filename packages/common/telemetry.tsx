@@ -19,8 +19,6 @@ import { getSharedTelemetryData } from './telemetry-utils'
 
 const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 
-// type TelemetryTagManagerProps = Partial<ComponentPropsWithoutRef<typeof GTMComponent>>
-
 // Reexports GoogleTagManager with the right API key set
 export const TelemetryTagManager = () => {
   const isGTMEnabled = Boolean(IS_PLATFORM && process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID)
