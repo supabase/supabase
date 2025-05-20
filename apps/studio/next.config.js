@@ -50,7 +50,7 @@ const GITHUB_USER_AVATAR_URL = 'https://avatars.githubusercontent.com'
 const GOOGLE_USER_AVATAR_URL = 'https://lh3.googleusercontent.com'
 const GOOGLE_TAG_MANAGER_URL = 'https://www.googletagmanager.com'
 const GOOGLE_TAG_MANAGER_IMG_URL =
-  'https://googletagmanager.com https://ssl.gstatic.com https://www.gstatic.com'
+  'https://www.googletagmanager.com https://ssl.gstatic.com https://www.gstatic.com'
 const VERCEL_LIVE_URL = 'https://vercel.live'
 const SENTRY_URL =
   'https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io'
