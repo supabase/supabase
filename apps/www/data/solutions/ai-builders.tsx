@@ -133,18 +133,21 @@ const data: AIData = {
     ),
     features: [
       {
+        id: 'get-to-market-faster',
         icon: Timer,
         heading: 'Get to market faster',
         subheading:
           'Supabase is easy to use and set up. Use your existing Postgres knowledge and skills. Build with your favorite frameworks and tools.',
       },
       {
+        id: 'the-tools-you-need-at-a-great-price',
         icon: CubeIcon,
         heading: 'The tools you need at a great price',
         subheading:
           'Supabase offers a fully integrated suite of tools including authentication, storage, edge functions, real-time subscriptions, and vector search. Use one or all.',
       },
       {
+        id: 'scalable-and-dependable',
         icon: (props: any) => (
           <svg
             width="23"

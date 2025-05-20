@@ -1,17 +1,10 @@
-import { AIData } from './solutions.types'
 import { cn, Image } from 'ui'
 import {
   FileText,
   LayoutGrid,
   Scale,
   Timer,
-  Database,
-  Shield,
   Lock,
-  Activity,
-  HardDrive,
-  Terminal,
-  Box,
   ShieldCheck,
   Cpu,
   Sparkle,
@@ -19,9 +12,6 @@ import {
   Command,
   Code,
   ArrowRight,
-  Key,
-  Globe,
-  KeyRound,
   Users,
   UserX,
   FolderLock,
@@ -30,7 +20,15 @@ import {
   ClipboardCheck,
   ShieldAlert,
   HeartPulse,
+  Check,
 } from 'lucide-react'
+import AuthVisual from '../../components/Products/AuthVisual'
+import FunctionsVisual from '../../components/Products/FunctionsVisual'
+import StorageVisual from '../../components/Products/StorageVisual'
+import RealtimeVisual from '../../components/Products/RealtimeVisual'
+import VectorVisual from '../../components/Products/VectorVisual'
+import MainProducts from '../MainProducts'
+import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 
 const data = {
   metadata: {
@@ -128,155 +126,177 @@ const data = {
   },
   platform: {
     id: 'postgres-platform',
-    title: 'Supabase is the Postgres platform you control',
+    title: (
+      <>
+        Supabase is the Postgres platform <span className="text-foreground">you control</span>
+      </>
+    ),
     subheading: "Supabase includes everything you've come to expect from Neon, and so much more.",
     features: [
       {
         id: 'database',
         title: 'Database',
-        icon: Database,
-        description: (
+        isDatabase: true,
+        icon: MainProducts[PRODUCT_SHORTNAMES.DATABASE].icon,
+        subheading: (
           <>
-            A fully managed <span className="text-foreground font-medium">Postgres database</span>.
-            No forks, no serverless gimmicks.
+            A fully managed Postgres database.
+            <br /> No forks, no serverless gimmicks.
           </>
         ),
-        className: 'col-span-2',
-        imageClassName: 'h-[240px]',
-        layout: 'table',
-        image: {
-          dark: '/images/product/database/dashboard-dark.png',
-          light: '/images/product/database/dashboard-light.png',
-        },
+        className: 'col-span-2 flex-col md:flex-row',
+        image: (
+          <Image
+            src={{
+              dark: '/images/solutions/neon/database-visual-dark.svg',
+              light: '/images/solutions/neon/database-visual-light.svg',
+            }}
+            alt="Database"
+            width={100}
+            height={100}
+            quality={100}
+            containerClassName="md:mt-8"
+          />
+        ),
+        highlights: (
+          <ul className="hidden md:flex flex-col gap-1 text-sm">
+            <li>
+              <Check className="inline text-foreground-light h-4 w-4" /> 100% portable
+            </li>
+            <li>
+              <Check className="inline text-foreground-light h-4 w-4" /> Built-in Auth with RLS
+            </li>
+            <li>
+              <Check className="inline text-foreground-light h-4 w-4" /> Easy to extend
+            </li>
+          </ul>
+        ),
       },
       {
         id: 'authentication',
         title: 'Authentication',
-        icon: Shield,
-        description: (
+        icon: MainProducts[PRODUCT_SHORTNAMES.AUTHENTICATION].icon,
+        subheading: (
           <>
-            Secure authentication with{' '}
-            <span className="text-foreground font-medium">email/password, magic links, OAuth</span>{' '}
-            (Google, GitHub, Twitter, etc.),{' '}
-            <span className="text-foreground font-medium">SAML, SSO</span>, and phone/SMS OTP.
+            Secure authentication with email/password, magic links, OAuth (Google, GitHub, Twitter,
+            etc.), SAML, SSO, and phone/SMS OTP.
           </>
         ),
-        className: '',
-        imageClassName: 'h-[200px]',
-        layout: 'auth',
-        image: {
-          dark: '/images/product/auth/auth-modal-dark.png',
-          light: '/images/product/auth/auth-modal-light.png',
-        },
+        className: '!border-t-0',
+        image: <AuthVisual className="hidden sm:block" />,
       },
       {
-        id: 'access-control',
+        id: 'rbac',
         title: 'Role-Based Access Control',
-        icon: Lock,
-        description: (
-          <>
-            Secure your data <span className="text-foreground font-medium">properly</span>.
-          </>
+        icon: '',
+        subheading: <>Secure your data properly.</>,
+        className: '!border-l-0',
+        image: (
+          <Image
+            src={{
+              dark: '/images/solutions/neon/rbac-dark.svg',
+              light: '/images/solutions/neon/rbac-light.svg',
+            }}
+            alt="Role Based Access Control diagram"
+            width={100}
+            height={100}
+            quality={100}
+            containerClassName="md:mb-4"
+          />
         ),
-        className: '',
-        imageClassName: 'h-[200px]',
-        layout: 'policies',
-        image: {
-          dark: '/images/product/auth/policies-dark.png',
-          light: '/images/product/auth/policies-light.png',
-        },
       },
       {
         id: 'realtime',
         title: 'Realtime',
-        icon: Activity,
-        description: (
+        icon: MainProducts[PRODUCT_SHORTNAMES.REALTIME].icon,
+        subheading: (
           <>
-            <span className="text-foreground font-medium">Postgres replication</span> enables live
-            sync functionality for collaborative applications.
+            Postgres replication enables{' '}
+            <span className="text-foreground">live sync functionality</span> for collaborative
+            applications.
           </>
         ),
         className: '',
-        imageClassName: 'h-[200px]',
-        layout: 'realtime',
-        image: {
-          dark: '/images/product/realtime/realtime-dark.png',
-          light: '/images/product/realtime/realtime-light.png',
-        },
+        image: <RealtimeVisual className="hidden sm:block" />,
       },
       {
         id: 'storage',
         title: 'Storage',
-        icon: HardDrive,
-        description: (
+        icon: MainProducts[PRODUCT_SHORTNAMES.STORAGE].icon,
+        subheading: (
           <>
-            <span className="text-foreground font-medium">
-              Scalable S3-compatible object storage
-            </span>{' '}
-            for managing files, images, and videos.
+            <span className="text-foreground">Scalable S3-compatible</span> object storage for
+            managing files, images, and videos.
           </>
         ),
         className: '',
-        imageClassName: 'h-[200px]',
-        layout: 'storage',
-        image: {
-          dark: '/images/product/storage/storage-dark.png',
-          light: '/images/product/storage/storage-light.png',
-        },
+        image: (
+          <Image
+            src={{
+              dark: '/images/solutions/neon/storage-dark.svg',
+              light: '/images/solutions/neon/storage-light.svg',
+            }}
+            alt="Storage"
+            width={100}
+            height={100}
+            quality={100}
+            containerClassName="md:mb-4"
+          />
+        ),
       },
       {
         id: 'edge-functions',
         title: 'Edge Functions',
-        icon: Terminal,
-        description: (
-          <>
-            <span className="text-foreground font-medium">Serverless functions</span> powered by
-            Deno, deployed globally for low-latency execution.
-          </>
+        icon: MainProducts[PRODUCT_SHORTNAMES.FUNCTIONS].icon,
+        subheading: (
+          <>Serverless functions powered by Deno, deployed globally for low-latency execution.</>
         ),
-        className: '',
-        imageClassName: 'h-[180px]',
-        layout: 'functions',
-        image: {
-          dark: '/images/product/functions/functions-log-dark.png',
-          light: '/images/product/functions/functions-log-light.png',
-        },
+        className: '!border-l-0',
+        image: <FunctionsVisual className="hidden sm:block" />,
       },
       {
         id: 'vectors',
         title: 'Vectors',
-        icon: Box,
-        description: (
+        icon: 'M4.13477 12.8129C4.13477 14.1481 4.43245 15.4138 4.96506 16.5471M12.925 4.02271C11.5644 4.02271 10.276 4.33184 9.12614 4.88371M21.7152 12.8129C21.7152 11.4644 21.4115 10.1867 20.8688 9.0447M12.925 21.6032C14.2829 21.6032 15.5689 21.2952 16.717 20.7454M16.717 20.7454C17.2587 21.5257 18.1612 22.0366 19.1831 22.0366C20.84 22.0366 22.1831 20.6935 22.1831 19.0366C22.1831 17.3798 20.84 16.0366 19.1831 16.0366C17.5263 16.0366 16.1831 17.3798 16.1831 19.0366C16.1831 19.6716 16.3804 20.2605 16.717 20.7454ZM4.96506 16.5471C4.16552 17.086 3.63965 17.9999 3.63965 19.0366C3.63965 20.6935 4.98279 22.0366 6.63965 22.0366C8.2965 22.0366 9.63965 20.6935 9.63965 19.0366C9.63965 17.3798 8.2965 16.0366 6.63965 16.0366C6.01951 16.0366 5.44333 16.2248 4.96506 16.5471ZM9.12614 4.88371C8.58687 4.08666 7.67444 3.56274 6.63965 3.56274C4.98279 3.56274 3.63965 4.90589 3.63965 6.56274C3.63965 8.2196 4.98279 9.56274 6.63965 9.56274C8.2965 9.56274 9.63965 8.2196 9.63965 6.56274C9.63965 5.94069 9.45032 5.36285 9.12614 4.88371ZM20.8688 9.0447C21.6621 8.50486 22.1831 7.59464 22.1831 6.56274C22.1831 4.90589 20.84 3.56274 19.1831 3.56274C17.5263 3.56274 16.1831 4.90589 16.1831 6.56274C16.1831 8.2196 17.5263 9.56274 19.1831 9.56274C19.8081 9.56274 20.3884 9.37165 20.8688 9.0447Z',
+        subheading: (
           <>
-            <span className="text-foreground font-medium">pgvector extension</span> for AI/ML
-            applications, enabling fast semantic search and embedding storage.
+            pgvector extension for AI/ML applications, enabling fast semantic search and embedding
+            storage.
           </>
         ),
         className: '',
-        imageClassName: 'h-[180px]',
-        layout: 'vectors',
-        image: {
-          dark: '/images/product/vector/vector-search-dark.png',
-          light: '/images/product/vector/vector-search-light.png',
-        },
+        image: (
+          <Image
+            src={{
+              dark: '/images/solutions/neon/vectors-dark.svg',
+              light: '/images/solutions/neon/vectors-light.svg',
+            }}
+            alt="Vector embeddings"
+            width={100}
+            height={100}
+            quality={100}
+          />
+        ),
       },
       {
         id: 'row-level-security',
         title: 'Row Level Security',
-        icon: ShieldCheck,
-        description: (
-          <>
-            <span className="text-foreground font-medium">Granular access control</span> policies to
-            secure data at the row level.
-          </>
-        ),
+        icon: '',
+        subheading: <>Granular access control policies to secure data at the row level.</>,
         className: '',
-        imageClassName: 'h-[180px]',
-        layout: 'rls',
-        image: {
-          dark: '/images/product/auth/rls-dark.png',
-          light: '/images/product/auth/rls-light.png',
-        },
+        image: (
+          <Image
+            src={{
+              dark: '/images/solutions/neon/rls-dark.svg',
+              light: '/images/solutions/neon/rls-light.svg',
+            }}
+            alt="Row Level Security"
+            width={100}
+            height={100}
+            quality={100}
+            containerClassName="md:mb-8"
+          />
+        ),
       },
     ],
   },
