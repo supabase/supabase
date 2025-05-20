@@ -8,7 +8,13 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
-export type UpdateColumnBody = components['schemas']['UpdateColumnBody']
+export type UpdateColumnBody = Omit<
+  components['schemas']['UpdateColumnBody'],
+  'check' | 'comment'
+> & {
+  check?: string | null
+  comment?: string | null
+}
 
 export type DatabaseColumnUpdateVariables = {
   projectRef: string
@@ -24,7 +30,7 @@ export type DatabaseColumnUpdateVariables = {
     | 'is_identity'
     | 'is_unique'
   >
-  payload: components['schemas']['UpdateColumnBody']
+  payload: UpdateColumnBody
 }
 
 export async function updateDatabaseColumn({

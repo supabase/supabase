@@ -51,6 +51,7 @@ export const LOCAL_STORAGE_KEYS = {
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
   // Notice banner keys
   FLY_POSTGRES_DEPRECATION_WARNING: 'fly-postgres-deprecation-warning-dismissed',
+  MIDDLEWARE_OUTAGE_BANNER: 'middleware-outage-banner-2025-05-16',
   AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
 
   // api keys view switcher for new and legacy api keys

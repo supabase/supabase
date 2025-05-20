@@ -1,7 +1,6 @@
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
 
-import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
@@ -19,7 +18,7 @@ import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
 
 export interface ProjectListProps {
-  forOrganization?: Organization
+  organization?: Organization
   rewriteHref?: (projectRef: string) => string
   search?: string
   filterStatus?: string[]
@@ -28,13 +27,13 @@ export interface ProjectListProps {
 
 const ProjectList = ({
   search = '',
-  forOrganization,
+  organization: organization_,
   rewriteHref,
   filterStatus,
   resetFilterStatus,
 }: ProjectListProps) => {
-  const { slug } = useParams()
-  const organization = useSelectedOrganization() ?? forOrganization
+  const selectedOrganization = useSelectedOrganization()
+  const organization = organization_ ?? selectedOrganization
 
   const {
     data: allProjects = [],
@@ -50,9 +49,7 @@ const ProjectList = ({
   } = usePermissionsQuery()
   const { data: resourceWarnings } = useResourceWarningsQuery()
 
-  const orgProjects = allProjects.filter(
-    (x) => x.organization_slug === slug || x.organization_slug === organization?.slug
-  )
+  const orgProjects = allProjects.filter((x) => x.organization_slug === organization?.slug)
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
 
   const hasFilterStatusApplied = filterStatus !== undefined && filterStatus.length !== 2
