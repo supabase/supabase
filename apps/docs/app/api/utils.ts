@@ -18,6 +18,10 @@ export class ApiError<Details extends ObjectOrNever = never> extends Error {
     return true
   }
 
+  isUserError() {
+    return false
+  }
+
   statusCode() {
     return 500
   }
@@ -30,6 +34,10 @@ export class InvalidRequestError<Details extends ObjectOrNever = never> extends 
 
   isPrivate() {
     return false
+  }
+
+  isUserError() {
+    return true
   }
 
   statusCode() {
