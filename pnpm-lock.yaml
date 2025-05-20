@@ -29639,7 +29639,7 @@ snapshots:
     dependencies:
       mobx: 6.11.0
       react: 18.3.1
-      use-sync-external-store: 1.4.0(react@18.3.1)
+      use-sync-external-store: 1.5.0(react@18.3.1)
     optionalDependencies:
       react-dom: 18.3.1(react@18.3.1)
 
