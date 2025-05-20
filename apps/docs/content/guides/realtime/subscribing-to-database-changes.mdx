@@ -36,6 +36,7 @@ Let's create a function that we can call any time a record is created, updated, 
 ```sql
 create or replace function public.your_table_changes()
 returns trigger
+security definer
 language plpgsql
 as $$
 begin

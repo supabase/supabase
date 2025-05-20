@@ -1,4 +1,4 @@
-import type { PostgresPrimaryKey, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresColumn, PostgresPrimaryKey, PostgresTable } from '@supabase/postgres-meta'
 import { chunk, find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
@@ -230,7 +230,7 @@ export const createColumn = async ({
   try {
     // Once pg-meta supports composite keys, we can remove this logic
     const { isPrimaryKey, ...formattedPayload } = payload
-    const column = await createDatabaseColumn({
+    await createDatabaseColumn({
       projectRef: projectRef,
       connectionString: connectionString,
       payload: formattedPayload,
@@ -246,18 +246,18 @@ export const createColumn = async ({
         await dropConstraint(
           projectRef,
           connectionString,
-          column.schema,
-          column.table,
+          payload.schema,
+          payload.table,
           primaryKey.name
         )
       }
 
-      const primaryKeyColumns = existingPrimaryKeys.concat([column.name])
+      const primaryKeyColumns = existingPrimaryKeys.concat([formattedPayload.name])
       await addPrimaryKey(
         projectRef,
         connectionString,
-        column.schema,
-        column.table,
+        payload.schema,
+        payload.table,
         primaryKeyColumns
       )
     }
@@ -267,13 +267,13 @@ export const createColumn = async ({
       await addForeignKey({
         projectRef,
         connectionString,
-        table: { schema: column.schema, name: column.table },
+        table: { schema: payload.schema, name: payload.table },
         foreignKeys: foreignKeyRelations,
       })
     }
 
     if (!skipSuccessMessage) {
-      toast.success(`Successfully created column "${column.name}"`, { id: toastId })
+      toast.success(`Successfully created column "${formattedPayload.name}"`, { id: toastId })
     }
     return { error: undefined }
   } catch (error: any) {
@@ -285,7 +285,7 @@ export const createColumn = async ({
 export const updateColumn = async ({
   projectRef,
   connectionString,
-  id,
+  originalColumn,
   payload,
   selectedTable,
   primaryKey,
@@ -296,7 +296,7 @@ export const updateColumn = async ({
 }: {
   projectRef: string
   connectionString?: string | null
-  id: string
+  originalColumn: PostgresColumn
   payload: UpdateColumnPayload
   selectedTable: PostgresTable
   primaryKey?: Constraint
@@ -307,10 +307,10 @@ export const updateColumn = async ({
 }) => {
   try {
     const { isPrimaryKey, ...formattedPayload } = payload
-    const column = await updateDatabaseColumn({
+    await updateDatabaseColumn({
       projectRef,
       connectionString,
-      id,
+      originalColumn,
       payload: formattedPayload,
     })
 
@@ -322,22 +322,23 @@ export const updateColumn = async ({
         await dropConstraint(
           projectRef,
           connectionString,
-          column.schema,
-          column.table,
+          originalColumn.schema,
+          originalColumn.table,
           primaryKey.name
         )
       }
 
+      const columnName = formattedPayload.name ?? originalColumn.name
       const primaryKeyColumns = isPrimaryKey
-        ? existingPrimaryKeys.concat([column.name])
-        : existingPrimaryKeys.filter((x) => x !== column.name)
+        ? existingPrimaryKeys.concat([columnName])
+        : existingPrimaryKeys.filter((x) => x !== columnName)
 
       if (primaryKeyColumns.length) {
         await addPrimaryKey(
           projectRef,
           connectionString,
-          column.schema,
-          column.table,
+          originalColumn.schema,
+          originalColumn.table,
           primaryKeyColumns
         )
       }
@@ -348,13 +349,13 @@ export const updateColumn = async ({
       await updateForeignKeys({
         projectRef,
         connectionString,
-        table: { schema: column.schema, name: column.table },
+        table: { schema: originalColumn.schema, name: originalColumn.table },
         foreignKeys: foreignKeyRelations,
         existingForeignKeyRelations,
       })
     }
 
-    if (!skipSuccessMessage) toast.success(`Successfully updated column "${column.name}"`)
+    if (!skipSuccessMessage) toast.success(`Successfully updated column "${originalColumn.name}"`)
   } catch (error: any) {
     return { error }
   }
@@ -496,7 +497,7 @@ export const createTable = async ({
 
     for (const column of columns) {
       // We create all columns without primary keys first
-      const columnPayload = generateCreateColumnPayload(table.id, {
+      const columnPayload = generateCreateColumnPayload(table, {
         ...column,
         isPrimaryKey: false,
       })
@@ -688,7 +689,7 @@ export const updateTable = async ({
     await deleteDatabaseColumn({
       projectRef,
       connectionString,
-      id: column.id,
+      column,
     })
   }
 
@@ -699,7 +700,7 @@ export const updateTable = async ({
       toast.loading(`Adding column ${column.name} to ${updatedTable.name}`, { id: toastId })
       // Ensure that columns do not created as primary key first, cause the primary key will
       // be added later on further down in the code
-      const columnPayload = generateCreateColumnPayload(updatedTable.id, {
+      const columnPayload = generateCreateColumnPayload(updatedTable, {
         ...column,
         isPrimaryKey: false,
       })
@@ -722,7 +723,7 @@ export const updateTable = async ({
           const res = await updateColumn({
             projectRef: projectRef,
             connectionString: connectionString,
-            id: column.id,
+            originalColumn: originalColumn,
             payload: columnPayload,
             selectedTable: updatedTable,
             skipPKCreation: true,

@@ -6,11 +6,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useAppStateSnapshot } from 'state/app-state'
 
-interface EnableBranchingButtonProps {
-  isNewNav?: boolean
-}
-
-const EnableBranchingButton = ({ isNewNav = false }: EnableBranchingButtonProps) => {
+export const EnableBranchingButton = () => {
   const snap = useAppStateSnapshot()
   const project = useSelectedProject()
 
@@ -42,5 +38,3 @@ const EnableBranchingButton = ({ isNewNav = false }: EnableBranchingButtonProps)
     </ButtonTooltip>
   )
 }
-
-export default EnableBranchingButton

@@ -2446,20 +2446,6 @@ functions:
           final res = await supabase.functions.invoke('hello', body: {'foo': 'baa'});
           final data = res.data;
           ```
-      - id: specifying-response-type
-        name: Specifying response type.
-        description: |
-          By default, `invoke()` will parse the response as JSON. You can parse the response in the following formats: `json`, `blob`, `text`, and `arrayBuffer`.
-        isSpotlight: true
-        code: |
-          ```dart
-          final res = await supabase.functions.invoke(
-            'hello',
-            body: {'foo': 'baa'},
-            responseType: ResponseType.text,
-          );
-          final data = res.data;
-          ```
       - id: parsing-custom-headers
         name: Parsing custom headers.
         description: |
