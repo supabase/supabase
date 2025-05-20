@@ -23,8 +23,6 @@ const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 export const TelemetryTagManager = () => {
   const isGTMEnabled = Boolean(IS_PLATFORM && process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID)
 
-  console.log('isGTMEnabled', isGTMEnabled)
-
   if (!isGTMEnabled) {
     return
   }
