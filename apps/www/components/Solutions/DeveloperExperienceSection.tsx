@@ -5,16 +5,16 @@ import { Badge } from 'ui'
 import { Check, X } from 'lucide-react'
 
 interface Feature {
-  id: string
+  id?: string
   title: string
-  description: string
-  icon: React.ElementType
-  supabaseFeature: boolean
-  neonFeature: boolean
-  image: {
-    dark: string
-    light: string
-  }
+  subheading: string | React.ReactNode
+  highlights?: string | React.ReactNode
+  url?: string
+  icon?: string
+  image?: any
+  className?: string
+  onClick?: any
+  alignLeft?: boolean
 }
 
 interface Props {
@@ -33,7 +33,7 @@ const DeveloperExperienceSection = ({ id, title, subheading, features, className
         <p className="text-foreground-light text-base md:text-lg">{subheading}</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 divide-x divide-y border border-default overflow-hidden">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 divide-x divide-y border rounded-md border-default overflow-hidden">
         {features.map((feature) => (
           <FeatureCard key={feature.id} feature={feature} />
         ))}
@@ -43,27 +43,59 @@ const DeveloperExperienceSection = ({ id, title, subheading, features, className
 }
 
 const FeatureCard = ({ feature }: { feature: Feature }) => {
-  const Icon = feature.icon
+  const { alignLeft = true } = feature
 
   return (
-    <div className="bg-transparent text-foreground-lighter">
-      <div className="p-6 flex flex-col gap-3 h-auto">
+    <div
+      className={cn(
+        'relative overflow-hidden',
+        'flex-1 flex flex-row sm:flex-col',
+        'gap-4 items-start sm:items-center lg:items-start justify-between',
+        'bg-default w-full h-full min-h-[360px]',
+        'text-foreground-lighter [&_strong]:!font-normal [&_strong]:!text-foreground',
+        feature.className
+      )}
+    >
+      <div
+        className={cn(
+          'relative z-10',
+          'p-4 sm:p-6',
+          'w-full',
+          'mx-auto gap-2 sm:gap-4',
+          'flex flex-col items-start sm:items-center',
+          'text-left sm:text-center',
+          alignLeft && 'lg:mx-0 lg:items-start lg:text-left'
+        )}
+      >
         <div className="flex items-center gap-2">
-          {Icon && <Icon className="w-4 h-4" strokeWidth={1.5} />}
-          <h3 className="text-sm">{feature.title}</h3>
+          {feature.icon && (
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 25 25"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d={feature.icon}
+                stroke="currentColor"
+                strokeMiterlimit="10"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                strokeWidth="1.5"
+              />
+            </svg>
+          )}
+          <h3 className="">{feature.title}</h3>
         </div>
-        <p className="text-base">{feature.description}</p>
+        <div className="flex-1 flex flex-col justify-between gap-2">
+          <p className="text-sm [&_strong]:!text-foreground">{feature.subheading}</p>
+          {feature.highlights && (
+            <span className="hidden lg:block text-foreground">{feature.highlights}</span>
+          )}
+        </div>
       </div>
-
-      <div className="relative overflow-hidden w-full h-48">
-        <Image
-          src={feature.image}
-          alt={feature.title}
-          layout="fill"
-          objectFit="cover"
-          className="object-top"
-        />
-      </div>
+      {feature.image && feature.image}
     </div>
   )
 }

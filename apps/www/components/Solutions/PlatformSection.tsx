@@ -18,7 +18,7 @@ interface Feature {
 
 interface Props {
   id?: string
-  title: string
+  title: string | React.ReactNode
   subheading: string
   features?: Feature[]
   className?: string
@@ -27,12 +27,12 @@ interface Props {
 const PlatformSection = ({ title, subheading, features, id, className }: Props) => {
   return (
     <SectionContainer id={id} className={cn('flex flex-col gap-12 py-16 md:py-24', className)}>
-      <div className="text-foreground-light flex flex-col gap-4 max-w-lg">
-        <h2 className="text-2xl md:text-3xl text-foreground-light font-normal">{title}</h2>
+      <div className="flex flex-col gap-4 max-w-lg">
+        <h2 className="text-2xl md:text-3xl text-foreground-lighter font-normal">{title}</h2>
         <p className="text-foreground-lighter text-base md:text-lg">{subheading}</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 divide-x divide-y border border-default overflow-hidden">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 divide-x divide-y rounded-md border border-default overflow-hidden">
         {features?.map((feature) => <FeatureCard key={feature.id} feature={feature} />)}
       </div>
     </SectionContainer>
