@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import { type DocumentNode, graphql, GraphQLError, parse, specifiedRules, validate } from 'graphql'
 import { createComplexityLimitRule } from 'graphql-validation-complexity'
 import { NextResponse } from 'next/server'
@@ -93,10 +94,16 @@ export async function POST(request: Request): Promise<NextResponse> {
     console.error(error)
 
     if (error instanceof ApiError) {
+      if (!error.isUserError()) {
+        Sentry.captureException(error)
+      }
+
       return NextResponse.json({
         errors: [{ message: error.isPrivate() ? 'Internal Server Error' : error.message }],
       })
     } else {
+      Sentry.captureException(error)
+
       return NextResponse.json({
         errors: [{ message: 'Internal Server Error' }],
       })

@@ -45,6 +45,7 @@
     "@octokit/plugin-paginate-graphql": "^4.0.0",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-collapsible": "^1.0.3",
+    "@sentry/nextjs": "^9.15.0",
     "@supabase/supabase-js": "catalog:",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tanstack/react-query": "^5.13.4",
