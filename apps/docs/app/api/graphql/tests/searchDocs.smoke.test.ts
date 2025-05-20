@@ -9,6 +9,13 @@ describe('prod smoke test: graphql: searchDocs', () => {
     const query = `
         query SearchDocsQuery($query: String!) {
           searchDocs(query: $query) {
+            edges {
+              node {
+                title
+                href
+                content
+              }
+            }
             nodes {
               title
               href
@@ -27,13 +34,19 @@ describe('prod smoke test: graphql: searchDocs', () => {
     expect(errors).toBeUndefined()
 
     const {
-      searchDocs: { nodes },
+      searchDocs: { edges, nodes },
     } = data
     expect(Array.isArray(nodes)).toBe(true)
     expect(nodes.length).toBeGreaterThan(0)
     expect(nodes[0]).toHaveProperty('title')
     expect(nodes[0]).toHaveProperty('href')
     expect(nodes[0]).toHaveProperty('content')
+
+    expect(Array.isArray(edges)).toBe(true)
+    expect(edges.length).toBeGreaterThan(0)
+    expect(edges[0].node).toHaveProperty('title')
+    expect(edges[0].node).toHaveProperty('href')
+    expect(edges[0].node).toHaveProperty('content')
   })
 
   it('searchDocs query includes guides', async () => {
