@@ -2474,6 +2474,10 @@ export const integrations: NavMenuConstant = {
               name: 'OAuth scopes',
               url: '/guides/integrations/build-a-supabase-integration/oauth-scopes',
             },
+            {
+              name: 'Platform as a Service',
+              url: '/guides/integrations/build-a-supabase-integration/platform-as-a-service',
+            },
           ],
         },
       ],
