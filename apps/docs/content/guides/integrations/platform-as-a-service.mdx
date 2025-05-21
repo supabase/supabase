@@ -1,19 +1,24 @@
 ---
 id: 'platform-as-a-service'
-title: 'PaaS Best Practices'
-description: 'Build your own tools on top of Supabase.'
-subtitle: 'Build your own tools on top of Supabase.'
+title: 'Supabase Platform-as-a-Service'
+description: 'Use Supabase as a Platform for your own business and tools.'
+subtitle: 'Use Supabase as a platform for your own business and tools.'
 ---
 
 
-Supabase is a [Platform as a Service](https://en.wikipedia.org/wiki/Platform_as_a_service) that can be managed programmatically, making it perfect as a backend for AI Tools and Agents.
+Supabase is a [Platform as a Service](https://en.wikipedia.org/wiki/Platform_as_a_service) that can be managed programmatically. You can use it to offer services to your own users. Supabase is commonly used as a platform for AI Tools, agents, and vibe-coding companies.
 
-You can use Supabase as a provider to offer services to your own users. This document will guide you on best practices when using Supabase as a PaaS.
+This document will guide you on best practices when using Supabase as a PaaS.
 
-![Platform as a Service](./build-a-supabase-integration/paas-intro.png)
+![Platform as a Service](/docs/img/integrations/paas-intro.png)
 
 
-## Getting started: launch a project
+## Getting started
+
+All features of Supabase can be managed through the [Management API](/docs/reference/api/introduction) or the [MCP Server](/docs/guides/getting-started/mcp).
+
+
+### Launching projects
 
 - Launch an new project
 - [Docs: Create a project](https://api.supabase.com/api/v1#tag/projects/POST/v1/projects)
@@ -38,7 +43,7 @@ Supabase is a _stateful_ service: we store data. If anything breaks in productio
 
 Because of this, it's important that you adopt a development workflow on behalf of your users:
 
-![Change flow](./build-a-supabase-integration/change-flow.png)
+![Change flow](/docs/img/integrations/change-flow.png)
 
 After launching a Project, it's important that all changes happen on a Branch. This is because branches can be treated like ephemeral servers: if anything goes wrong you can either roll back to a checkpoint or destroy the branch and create a new one from production.
 
@@ -75,11 +80,23 @@ After launching a Project, it's important that all changes happen on a Branch. T
 
 - TODO
 
-![Revert](./build-a-supabase-integration/revert.png)
+![Revert](/docs/img/integrations/revert.png)
 
 
 ## Disaster Recovery
 
 - Rollbacks can cause data loss. Only use in in `PROD` when absolutely necessary
 
-![Rollback](./build-a-supabase-integration/rollback.png)
+![Rollback](/docs/img/integrations/rollback.png)
+
+
+Supabase creates continuous backups of production branches. To rollback you can use the [Restore API](https://api.supabase.com/api/v1#tag/database/POST/v1/projects/{ref}/database/backups/restore-pitr):
+
+```sh
+curl https://api.supabase.com/v1/projects/database/backups/restore-pitr \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "recovery_time_target_unix": 1
+}'
+```
