@@ -32,7 +32,7 @@ const PlatformSection = ({ title, subheading, features, id, className }: Props) 
         <p className="text-foreground-lighter text-base md:text-lg">{subheading}</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 divide-x divide-y rounded-md border border-default overflow-hidden">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 sm:divide-x divide-y rounded-md border border-default overflow-hidden">
         {features?.map((feature) => <FeatureCard key={feature.id} feature={feature} />)}
       </div>
     </SectionContainer>
@@ -46,8 +46,8 @@ const FeatureCard = ({ feature }: { feature: Feature }) => {
     <div
       className={cn(
         'relative overflow-hidden',
-        'flex-1 flex flex-row sm:flex-col',
-        'gap-4 items-start sm:items-center lg:items-start justify-between',
+        'flex-1 flex flex-col',
+        'items-start sm:items-center lg:items-start justify-between',
         'bg-default w-full h-full min-h-[400px]',
         'text-foreground-lighter [&_strong]:!font-normal [&_strong]:!text-foreground',
         feature.className
@@ -56,16 +56,16 @@ const FeatureCard = ({ feature }: { feature: Feature }) => {
       <div
         className={cn(
           'relative z-10',
-          'p-4 sm:p-6',
+          'p-4 sm:p-6 2xl:p-8',
           'w-full',
           'mx-auto gap-2 sm:gap-4',
           'flex flex-col items-start sm:items-center',
           'text-left sm:text-center',
-          feature.isDatabase && 'md:h-full',
+          feature.isDatabase && 'lg:h-full',
           alignLeft && !feature.isDatabase && 'lg:mx-0 lg:items-start lg:text-left',
           alignLeft &&
             feature.isDatabase &&
-            'ml-0 md:justify-start md:max-w-[250px] md:text-left md:items-start'
+            'ml-0 md:justify-start md:text-left md:items-start lg:max-w-[47%]'
         )}
       >
         <div className="flex items-center gap-2">

@@ -16,6 +16,7 @@ const DataAPIsVisual: React.FC<Props> = ({ className }) => (
           className="relative h-full !aspect-[330/430] -right-10 -left-10 items-end pb-2 z-10 flex pause animate-[marquee-reverse_30000ms_linear_both_infinite] motion-safe:group-hover:run will-change-transform"
         >
           <Image
+            draggable={false}
             src="/images/index/products/data-apis-lines-dark.svg"
             alt="Supabase restful DataAPIs"
             fill
@@ -24,6 +25,7 @@ const DataAPIsVisual: React.FC<Props> = ({ className }) => (
             className="hidden dark:block !h-full !aspect-[330/430]"
           />
           <Image
+            draggable={false}
             src="/images/index/products/data-apis-lines-light.svg"
             alt="Supabase restful DataAPIs"
             fill
@@ -34,6 +36,7 @@ const DataAPIsVisual: React.FC<Props> = ({ className }) => (
         </div>
       ))}
       <Image
+        draggable={false}
         src="/images/index/products/data-apis-dark.svg"
         alt="Supabase restful DataAPIs"
         fill
@@ -42,6 +45,7 @@ const DataAPIsVisual: React.FC<Props> = ({ className }) => (
         className="hidden dark:block absolute h-full aspect-[330/430] inset-0 z-10 object-contain xl:object-cover 2xl:object-contain object-center bottom-0"
       />
       <Image
+        draggable={false}
         src="/images/index/products/data-apis-light.svg"
         alt="Supabase restful DataAPIs"
         fill

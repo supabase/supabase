@@ -33,7 +33,19 @@ const DeveloperExperienceSection = ({ id, title, subheading, features, className
         <p className="text-foreground-light text-base md:text-lg">{subheading}</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 divide-x divide-y border rounded-md border-default overflow-hidden">
+      <div
+        className="
+          grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0
+          rounded-md border-default overflow-hidden
+          sm:divide-x divide-y border
+          [&>div:nth-child(2n+1)]:sm:!border-l-0
+          [&>div:nth-child(2)]:sm:!border-t-0
+          [&>div:nth-child(3)]:lg:!border-t-0
+          [&>div:nth-child(3n)]:lg:!border-l
+          [&>div:nth-child(4n)]:lg:!border-l-0
+          [&>div:nth-child(3n-1)]:lg:!border-l
+        "
+      >
         {features.map((feature) => (
           <FeatureCard key={feature.id} feature={feature} />
         ))}
@@ -59,7 +71,7 @@ const FeatureCard = ({ feature }: { feature: Feature }) => {
       <div
         className={cn(
           'relative z-10',
-          'p-4 sm:p-6',
+          'p-4 sm:p-6 2xl:p-8',
           'w-full',
           'mx-auto gap-2 sm:gap-4',
           'flex flex-col items-start sm:items-center',

@@ -65,12 +65,7 @@ const Neon: NextPage = () => {
           subheading={content.resultsSection.subheading}
           highlights={content.resultsSection.highlights}
         />
-        <FeatureGrid
-          id={content.featureGrid.id}
-          title={content.featureGrid.title}
-          subheading={content.featureGrid.subheading}
-          features={content.featureGrid.features}
-        />
+        <FeatureGrid id={content.featureGrid.id} features={content.featureGrid.features} />
         <Security
           id={content.securitySection.id}
           label={content.securitySection.label}
