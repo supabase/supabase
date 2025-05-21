@@ -6,7 +6,7 @@ keywords = ["migration", "users"] # any strings (topics are automatically added 
 
 You can migrate all tables in the auth schema—including users and their hashed passwords—from one Supabase project to another. This means users do not need to reset or recreate their passwords after migration.
 
-## Important: JWT Secret and Token Validity
+## Important: JWT secret and Token Validity
 
 Each project is provisioned with a unique JWT secret used to sign and verify auth tokens. This has two key implications:
 
@@ -18,7 +18,7 @@ You can configure a custom JWT secret in the new project by going to:
 
 Note: Updating the JWT secret will regenerate your anon and service_role API keys in the new project.
 
-## How to Migrate Auth Data
+## How to migrate Auth Data
 
 We don’t currently provide a one-size-fits-all script for migrating only the auth schema, but the process is covered in our general migration guide. You can use either:
 
