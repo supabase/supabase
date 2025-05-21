@@ -59,7 +59,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             'Content-Type': 'application/json',
             ...(authorization && { Authorization: authorization }),
           },
-          IS_PLATFORM ? queryPgMetaSelfHosted : undefined
+          IS_PLATFORM ? undefined : queryPgMetaSelfHosted
         )
       : { result: [] }
 

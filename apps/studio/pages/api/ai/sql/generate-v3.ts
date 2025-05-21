@@ -62,7 +62,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
             ...(cookie && { cookie }),
             ...(authorization && { Authorization: authorization }),
           },
-          IS_PLATFORM ? queryPgMetaSelfHosted : undefined
+          IS_PLATFORM ? undefined : queryPgMetaSelfHosted
         )
       : { result: [] }
 

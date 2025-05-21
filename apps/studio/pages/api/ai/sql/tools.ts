@@ -46,7 +46,7 @@ export const getTools = ({
                 },
                 undefined,
                 headers,
-                IS_PLATFORM ? queryPgMetaSelfHosted : undefined
+                IS_PLATFORM ? undefined : queryPgMetaSelfHosted
               )
             : { result: [] }
 
