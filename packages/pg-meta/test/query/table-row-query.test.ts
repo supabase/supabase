@@ -75,7 +75,7 @@ describe('Table Row Query', () => {
 
       // Verify SQL generation with snapshot
       expect(sql).toMatchInlineSnapshot(`
-        "with _base_query as (select * from public.test_enum_array order by test_enum_array.id asc nulls first limit 10 offset 0)
+        "with _base_query as (select * from public.test_enum_array order by test_enum_array.id asc nulls last limit 10 offset 0)
           select id,case
                 when octet_length(name::text) > 10240 
                 then left(name::text, 10240) || '...'
@@ -141,7 +141,7 @@ describe('Table Row Query', () => {
       })
 
       expect(filtersStatusSQL).toMatchInlineSnapshot(`
-        "with _base_query as (select * from public.test_enum_array where status = 'active' order by test_enum_array.id asc nulls first limit 10 offset 0)
+        "with _base_query as (select * from public.test_enum_array where status = 'active' order by test_enum_array.id asc nulls last limit 10 offset 0)
           select id,case
                 when octet_length(name::text) > 10240 
                 then left(name::text, 10240) || '...'
@@ -180,7 +180,7 @@ describe('Table Row Query', () => {
       })
 
       expect(filtersHistorySQL).toMatchInlineSnapshot(`
-        "with _base_query as (select * from public.test_enum_array where history = ARRAY['active']::status_type[] order by test_enum_array.id asc nulls first limit 10 offset 0)
+        "with _base_query as (select * from public.test_enum_array where history = ARRAY['active']::status_type[] order by test_enum_array.id asc nulls last limit 10 offset 0)
           select id,case
                 when octet_length(name::text) > 10240 
                 then left(name::text, 10240) || '...'
@@ -226,7 +226,7 @@ describe('Table Row Query', () => {
         limit: 10,
       })
       expect(sql).toMatchInlineSnapshot(`
-        "with _base_query as (select * from public.test_array_table order by test_array_table.id asc nulls first limit 10 offset 0)
+        "with _base_query as (select * from public.test_array_table order by test_array_table.id asc nulls last limit 10 offset 0)
           select id,case
                 when octet_length(name::text) > 10240 
                 then left(name::text, 10240) || '...'
@@ -305,7 +305,7 @@ describe('Table Row Query', () => {
       // Verify SQL generation with snapshot
       expect(sql).toMatchInlineSnapshot(
         `
-        "with _base_query as (select * from public.test_sql_gen order by test_sql_gen.id asc nulls first limit 10 offset 0)
+        "with _base_query as (select * from public.test_sql_gen order by test_sql_gen.id asc nulls last limit 10 offset 0)
           select id,case
                 when octet_length(name::text) > 10240 
                 then left(name::text, 10240) || '...'
@@ -366,7 +366,7 @@ describe('Table Row Query', () => {
 
         // Verify the SQL contains the array truncation logic
         expect(sql).toMatchInlineSnapshot(`
-          "with _base_query as (select * from public.test_large_array_table order by test_large_array_table.id asc nulls first limit 10 offset 0)
+          "with _base_query as (select * from public.test_large_array_table order by test_large_array_table.id asc nulls last limit 10 offset 0)
             select id,case
                   when octet_length(name::text) > 2048 
                   then left(name::text, 2048) || '...'
@@ -593,7 +593,7 @@ describe('Table Row Query', () => {
 
         // Verify the SQL contains the array truncation logic
         expect(sql).toMatchInlineSnapshot(`
-          "with _base_query as (select * from public.test_large_array_table order by test_large_array_table.id asc nulls first limit 10 offset 0)
+          "with _base_query as (select * from public.test_large_array_table order by test_large_array_table.id asc nulls last limit 10 offset 0)
             select id,case
                   when octet_length(name::text) > 2048 
                   then left(name::text, 2048) || '...'
@@ -956,7 +956,7 @@ describe('Table Row Query', () => {
 
       // Verify the SQL contains the array truncation logic
       expect(sql).toMatchInlineSnapshot(`
-        "with _base_query as (select * from public.test_large_array_table order by test_large_array_table.id asc nulls first limit 10 offset 0)
+        "with _base_query as (select * from public.test_large_array_table order by test_large_array_table.id asc nulls last limit 10 offset 0)
           select id,case
                 when octet_length(name::text) > 256 
                 then left(name::text, 256) || '...'
@@ -1042,7 +1042,7 @@ describe('Table Row Query', () => {
       // Verify SQL generation with snapshot
       expect(sql).toMatchInlineSnapshot(
         `
-        "with _base_query as (select * from public.test_sql_filter where name ~~ 'Test%' and category = 'A' order by test_sql_filter.id asc nulls first limit 10 offset 0)
+        "with _base_query as (select * from public.test_sql_filter where name ~~ 'Test%' and category = 'A' order by test_sql_filter.id asc nulls last limit 10 offset 0)
           select id,case
                 when octet_length(name::text) > 10240 
                 then left(name::text, 10240) || '...'
@@ -1167,7 +1167,7 @@ describe('Table Row Query', () => {
       // Verify SQL generation with snapshot
       expect(sql).toMatchInlineSnapshot(
         `
-        "with _base_query as (select * from public."test sql spaces" order by "test sql spaces".id asc nulls first limit 10 offset 0)
+        "with _base_query as (select * from public."test sql spaces" order by "test sql spaces".id asc nulls last limit 10 offset 0)
           select id,case
                 when octet_length("user name"::text) > 10240 
                 then left("user name"::text, 10240) || '...'
@@ -1228,7 +1228,7 @@ describe('Table Row Query', () => {
       // Verify SQL generation with snapshot
       expect(sql).toMatchInlineSnapshot(
         `
-        "with _base_query as (select * from public.test_large_text order by test_large_text.id asc nulls first limit 10 offset 0)
+        "with _base_query as (select * from public.test_large_text order by test_large_text.id asc nulls last limit 10 offset 0)
           select id,case
                 when octet_length(small_text::text) > 10240 
                 then left(small_text::text, 10240) || '...'
@@ -1289,7 +1289,7 @@ describe('Table Row Query', () => {
 
       expect(sql1).toMatchInlineSnapshot(
         `
-        "with _base_query as (select * from public.test_pagination order by test_pagination.id asc nulls first limit 5 offset 0)
+        "with _base_query as (select * from public.test_pagination order by test_pagination.id asc nulls last limit 5 offset 0)
           select id,case
                 when octet_length(name::text) > 10240 
                 then left(name::text, 10240) || '...'
@@ -1317,7 +1317,7 @@ describe('Table Row Query', () => {
       // Verify SQL generation for page 2
       expect(sql2).toMatchInlineSnapshot(
         `
-        "with _base_query as (select * from public.test_pagination order by test_pagination.id asc nulls first limit 5 offset 5)
+        "with _base_query as (select * from public.test_pagination order by test_pagination.id asc nulls last limit 5 offset 5)
           select id,case
                 when octet_length(name::text) > 10240 
                 then left(name::text, 10240) || '...'
@@ -1374,7 +1374,7 @@ describe('Table Row Query', () => {
       // Verify SQL generation with snapshot
       expect(sql).toMatchInlineSnapshot(
         `
-        "with _base_query as (select * from public.test_sql_view order by test_sql_view.id asc nulls first limit 10 offset 0)
+        "with _base_query as (select * from public.test_sql_view order by test_sql_view.id asc nulls last limit 10 offset 0)
           select id,case
                 when octet_length(name::text) > 10240 
                 then left(name::text, 10240) || '...'
@@ -1427,7 +1427,7 @@ describe('Table Row Query', () => {
       // Verify SQL generation with snapshot
       expect(sql).toMatchInlineSnapshot(
         `
-        "with _base_query as (select * from public.test_sql_mv order by test_sql_mv.id asc nulls first limit 10 offset 0)
+        "with _base_query as (select * from public.test_sql_mv order by test_sql_mv.id asc nulls last limit 10 offset 0)
           select id,case
                 when octet_length(name::text) > 10240 
                 then left(name::text, 10240) || '...'
@@ -1494,7 +1494,7 @@ describe('Table Row Query', () => {
       // Verify SQL generation with snapshot
       expect(sql).toMatchInlineSnapshot(
         `
-        "with _base_query as (select * from public.test_sql_foreign order by test_sql_foreign.id asc nulls first limit 10 offset 0)
+        "with _base_query as (select * from public.test_sql_foreign order by test_sql_foreign.id asc nulls last limit 10 offset 0)
           select id,case
                 when octet_length(name::text) > 10240 
                 then left(name::text, 10240) || '...'
