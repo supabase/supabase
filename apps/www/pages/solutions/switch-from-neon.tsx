@@ -26,6 +26,8 @@ const Neon: NextPage = () => {
           description: content.metadata.metaDescription,
           url: `https://supabase.com/neon`,
         }}
+        noindex={true}
+        nofollow={true}
       />
       <Layout className="overflow-visible">
         <ProductHeader {...content.heroSection} />

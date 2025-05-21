@@ -62,13 +62,7 @@ const RealtimeLogs: FC<Props> = ({ isActive, isInView, className }) => {
 
   return (
     <div className={cn('absolute inset-0 bottom-8 overflow-hidden', className)}>
-      <div
-        className="absolute z-20 pointer-events-none inset-0 top-auto h-32"
-        style={{
-          background:
-            'linear-gradient(to top, hsl(var(--background-surface-75)) 0%, transparent 100%)',
-        }}
-      />
+      <div className="visual-overlay absolute z-20 pointer-events-none inset-0 top-auto h-32 bg-[linear-gradient(to_top,hsl(var(--background-surface-75))_0%,transparent_100%)]" />
       <motion.ul
         layout
         transition={{

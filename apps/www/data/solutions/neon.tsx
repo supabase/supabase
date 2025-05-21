@@ -1,17 +1,11 @@
 import { cn, Image } from 'ui'
+import { CubeIcon } from '@heroicons/react/outline'
 import {
-  FileText,
-  LayoutGrid,
-  Scale,
+  ArrowRight,
+  ArrowUpRight,
   Timer,
   Lock,
   ShieldCheck,
-  Cpu,
-  Sparkle,
-  Zap,
-  Command,
-  Code,
-  ArrowRight,
   Users,
   UserX,
   FolderLock,
@@ -22,18 +16,18 @@ import {
   HeartPulse,
   Check,
 } from 'lucide-react'
-import AuthVisual from '../../components/Products/AuthVisual'
-import FunctionsVisual from '../../components/Products/FunctionsVisual'
-import RealtimeVisual from '../../components/Products/RealtimeVisual'
-import MainProducts from '../MainProducts'
+import AuthVisual from '~/components/Products/AuthVisual'
+import FunctionsVisual from '~/components/Products/FunctionsVisual'
+import RealtimeVisual from '~/components/Products/RealtimeVisual'
+import RealtimeLogs from '~/components/Products/Functions/RealtimeLogs'
+import DataAPIsVisual from '~/components/Products/DataAPIsVisual'
+
+import MainProducts from '~/data/MainProducts'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-import RealtimeLogs from '../../components/Products/Functions/RealtimeLogs'
-import DataAPIsVisual from '../../components/Products/DataAPIsVisual'
-import { CubeIcon } from '@heroicons/react/outline'
 
 const data = {
   metadata: {
-    metaTitle: 'Supabase for Neon Users',
+    metaTitle: 'Switch from Neon to Supabase',
     metaDescription:
       'The complete Postgres development platform Neon users prefer. Supabase is a composable stack for modern applications: Postgres Database, built-in Auth, Real-time sync, Edge Functions, Storage, and a powerful developer experience.',
   },
@@ -44,7 +38,7 @@ const data = {
       '[&_h1]:text-xl [&_h1]:md:!text-2xl [&_h1]:lg:!text-4xl [&_h1]:2xl:!text-5xl',
       '[&_.image-container]:flex [&_.image-container]:items-center'
     ),
-    h1: 'The complete Postgres development platform Neon users prefer',
+    h1: 'Neon users switch to Supabase for a complete Postgres experience',
     subheader: [
       <>
         Supabase is a composable stack for modern applications: Postgres Database, built-in Auth,
@@ -211,7 +205,7 @@ const data = {
         title: 'Role-Based Access Control',
         icon: '',
         subheading: <>Secure your data properly.</>,
-        className: '!border-l-0',
+        className: '!border-l-0 !min-h-[200px] sm:!min-h-[400px]',
         image: (
           <Image
             draggable={false}
@@ -223,7 +217,7 @@ const data = {
             width={100}
             height={100}
             quality={100}
-            containerClassName="md:mb-4"
+            containerClassName="md:mb-4 -mb-8 -mt-12 sm:mt-0"
           />
         ),
       },
@@ -277,7 +271,7 @@ const data = {
           <>Serverless functions powered by Deno, deployed globally for low-latency execution.</>
         ),
         className: '!border-l-0 sm:!border-l lg:!border-l-0',
-        image: <FunctionsVisual className="hidden sm:block" />,
+        image: <FunctionsVisual className="" />,
       },
       {
         id: 'vectors',
@@ -321,7 +315,7 @@ const data = {
             width={100}
             height={100}
             quality={100}
-            containerClassName="md:mb-8"
+            containerClassName="-mt-8 sm:mt-0 mb-8"
           />
         ),
       },
@@ -350,7 +344,8 @@ const data = {
               dark: '/images/solutions/neon/ai-assistant-dark.svg',
               light: '/images/solutions/neon/ai-assistant-light.svg',
             }}
-            alt="Vector embeddings"
+            alt="AI Assistant chat example"
+            className="invert dark:invert-0"
             width={100}
             height={100}
             quality={100}
@@ -383,7 +378,7 @@ const data = {
         icon: 'M4.13477 12.8129C4.13477 14.1481 4.43245 15.4138 4.96506 16.5471M12.925 4.02271C11.5644 4.02271 10.276 4.33184 9.12614 4.88371M21.7152 12.8129C21.7152 11.4644 21.4115 10.1867 20.8688 9.0447M12.925 21.6032C14.2829 21.6032 15.5689 21.2952 16.717 20.7454M16.717 20.7454C17.2587 21.5257 18.1612 22.0366 19.1831 22.0366C20.84 22.0366 22.1831 20.6935 22.1831 19.0366C22.1831 17.3798 20.84 16.0366 19.1831 16.0366C17.5263 16.0366 16.1831 17.3798 16.1831 19.0366C16.1831 19.6716 16.3804 20.2605 16.717 20.7454ZM4.96506 16.5471C4.16552 17.086 3.63965 17.9999 3.63965 19.0366C3.63965 20.6935 4.98279 22.0366 6.63965 22.0366C8.2965 22.0366 9.63965 20.6935 9.63965 19.0366C9.63965 17.3798 8.2965 16.0366 6.63965 16.0366C6.01951 16.0366 5.44333 16.2248 4.96506 16.5471ZM9.12614 4.88371C8.58687 4.08666 7.67444 3.56274 6.63965 3.56274C4.98279 3.56274 3.63965 4.90589 3.63965 6.56274C3.63965 8.2196 4.98279 9.56274 6.63965 9.56274C8.2965 9.56274 9.63965 8.2196 9.63965 6.56274C9.63965 5.94069 9.45032 5.36285 9.12614 4.88371ZM20.8688 9.0447C21.6621 8.50486 22.1831 7.59464 22.1831 6.56274C22.1831 4.90589 20.84 3.56274 19.1831 3.56274C17.5263 3.56274 16.1831 4.90589 16.1831 6.56274C16.1831 8.2196 17.5263 9.56274 19.1831 9.56274C19.8081 9.56274 20.3884 9.37165 20.8688 9.0447Z',
         subheading:
           "Learn SQL when you're ready. In the meantime, Supabase generates automatic APIs to make coding a lot easier.",
-        image: <DataAPIsVisual className="mt-8 md:mt-16" />,
+        image: <DataAPIsVisual className="mt-4 md:mt-16" />,
       },
       {
         id: 'foreign-data-wrappers',
@@ -434,7 +429,7 @@ const data = {
             <div
               className="
                 absolute pointer-events-none
-                w-full h-full max-h-[400px] lg:max-h-none
+                w-full h-full
                 inset-0 top-auto
                 bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]
               "
@@ -459,9 +454,12 @@ const data = {
         icon: 'M11.1404 7.66537C11.1404 5.18146 13.1541 3.16785 15.638 3.16785H17.3775C19.8614 3.16785 21.875 5.18146 21.875 7.66537V17.3776C21.875 19.8615 19.8614 21.8751 17.3775 21.8751H15.638C13.1541 21.8751 11.1404 19.8615 11.1404 17.3776V7.66537Z M3.125 14.7821C3.125 13.4015 4.24419 12.2823 5.62477 12.2823C7.00536 12.2823 8.12454 13.4015 8.12454 14.7821V19.3754C8.12454 20.7559 7.00536 21.8751 5.62477 21.8751C4.24419 21.8751 3.125 20.7559 3.125 19.3754V14.7821Z M3.125 5.58522C3.125 4.20463 4.24419 3.08545 5.62477 3.08545C7.00536 3.08545 8.12454 4.20463 8.12454 5.58522V6.95164C8.12454 8.33223 7.00536 9.45142 5.62477 9.45142C4.24419 9.45142 3.125 8.33223 3.125 6.95164V5.58522Z',
         subheading:
           'Built-in logs, query performance tools, and security insights for easy debugging.',
-
         image: (
-          <RealtimeLogs isActive={false} isInView={true} className="h-3/5 bottom-0 top-auto" />
+          <RealtimeLogs
+            isActive={false}
+            isInView={true}
+            className="h-3/5 bottom-0 top-auto [&_.visual-overlay]:!bg-[linear-gradient(to_top,hsl(var(--background-default))_0%,transparent_100%)]"
+          />
         ),
       },
     ],
@@ -488,7 +486,6 @@ const data = {
       },
     ],
   },
-
   featureGrid: {
     id: 'database-features',
     features: [
@@ -627,7 +624,9 @@ const data = {
     ),
     primaryCta: {
       label: 'Open migration guide',
-      url: 'https://supabase.com/dashboard',
+      url: 'https://supabase.com/docs/guides/platform/migrating-to-supabase/neon',
+      target: '_blank',
+      icon: <ArrowUpRight className="w-4 h-4 text-current" />,
     },
   },
 }

@@ -61,9 +61,9 @@ const FeatureCard = ({ feature }: { feature: Feature }) => {
     <div
       className={cn(
         'relative overflow-hidden',
-        'flex-1 flex flex-row sm:flex-col',
-        'gap-4 items-start sm:items-center lg:items-start justify-between',
-        'bg-default w-full h-full min-h-[360px]',
+        'flex-1 flex flex-col',
+        'items-start justify-between',
+        'bg-default w-full h-full min-h-[330px] sm:min-h-[360px]',
         'text-foreground-lighter [&_strong]:!font-normal [&_strong]:!text-foreground',
         feature.className
       )}
@@ -71,11 +71,11 @@ const FeatureCard = ({ feature }: { feature: Feature }) => {
       <div
         className={cn(
           'relative z-10',
-          'p-4 sm:p-6 2xl:p-8',
+          'p-4 md:p-6 2xl:p-8',
           'w-full',
           'mx-auto gap-2 sm:gap-4',
-          'flex flex-col items-start sm:items-center',
-          'text-left sm:text-center',
+          'flex flex-col items-start',
+          'text-left',
           alignLeft && 'lg:mx-0 lg:items-start lg:text-left'
         )}
       >

@@ -48,7 +48,7 @@ const FeatureCard = ({ feature }: { feature: Feature }) => {
         'relative overflow-hidden',
         'flex-1 flex flex-col',
         'items-start sm:items-center lg:items-start justify-between',
-        'bg-default w-full h-full min-h-[400px]',
+        'bg-default w-full h-full min-h-[350px] sm:min-h-[400px]',
         'text-foreground-lighter [&_strong]:!font-normal [&_strong]:!text-foreground',
         feature.className
       )}

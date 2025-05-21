@@ -10,6 +10,8 @@ interface Props {
   primaryCta: {
     label: string
     url: string
+    target?: string
+    icon?: React.ReactNode
   }
   secondaryCta?: {
     label: string
@@ -33,8 +35,10 @@ const CtaSection = ({ id, title, subtitle, primaryCta, secondaryCta, className }
           <h2 className="text-foreground-light text-2xl lg:text-3xl leading-tight">{title}</h2>
           {subtitle && <p className="text-foreground-light text-lg">{subtitle}</p>}
           <div className="flex flex-wrap gap-3 pt-4">
-            <Button asChild size="medium">
-              <Link href={primaryCta.url}>{primaryCta.label}</Link>
+            <Button asChild size="medium" icon={primaryCta.icon}>
+              <Link href={primaryCta.url} target={primaryCta.target}>
+                {primaryCta.label}
+              </Link>
             </Button>
             {secondaryCta && (
               <Button asChild size="medium" type="default">
