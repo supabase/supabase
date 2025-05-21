@@ -139,7 +139,7 @@ const Pagination = () => {
     if (isError && snap.enforceExactCount && error.code === 408) {
       snap.setEnforceExactCount(false)
     }
-  }, [isError])
+  }, [isError, snap.enforceExactCount, error.code])
 
   return (
     <div className="flex items-center gap-x-4">
