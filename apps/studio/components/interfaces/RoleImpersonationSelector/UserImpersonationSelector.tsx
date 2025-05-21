@@ -76,7 +76,7 @@ const UserImpersonationSelector = () => {
 
   async function impersonateUser(user: User) {
     setIsImpersonateLoading(true)
-    setPreviousSearches([...previousSearches, user])
+    setPreviousSearches((prev) => (prev.some((u) => u.id === user.id) ? prev : [...prev, user]))
 
     if (customAccessTokenHookDetails?.type === 'https') {
       toast.info(
@@ -333,7 +333,7 @@ const UserImpersonationSelector = () => {
                   </div>
                 ))}
               {previousSearches.length > 0 && (
-                <div className="border-t mt-4">
+                <div className="border-t">
                   {previousSearches.length > 0 ? (
                     <>
                       <Collapsible_Shadcn_ className="mt-2 relative">
@@ -363,10 +363,7 @@ const UserImpersonationSelector = () => {
                           <ul className="grid gap-2 ">
                             {previousSearches.map((search) => (
                               <li key={search.id}>
-                                <UserRow
-                                  user={search}
-                                  onClick={() => selectPreviousSearch(search)}
-                                />
+                                <UserRow user={search} onClick={impersonateUser} />
                               </li>
                             ))}
                           </ul>
