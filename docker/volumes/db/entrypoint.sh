@@ -1,26 +1,23 @@
 #!/usr/bin/env bash
 set -Eeo pipefail
 
-# Source the Docker entrypoint script
 source /usr/local/bin/docker-entrypoint.sh
 
 sync_password() {
-	# Start a temporary server to run the roles SQL file
+	# PGPASSWORD is required for psql when authentication is required for 'local' connections via pg_hba.conf and is otherwise harmless
+	# e.g. when '--auth=md5' or '--auth-local=md5' is used in POSTGRES_INITDB_ARGS
 	export PGPASSWORD="${PGPASSWORD:-$POSTGRES_PASSWORD}"
 	docker_temp_server_start "$@"
 
-	# First alter the supabase_admin password as postgres superuser
-	echo "Setting supabase_admin password..."
-	psql -U supabase_admin -d postgres <<-'EOSQL'
+	# alter the supabase_admin password
+	docker_process_sql <<-'EOSQL'
 		\set pgpass `echo "$POSTGRES_PASSWORD"`
 		ALTER USER supabase_admin WITH PASSWORD :'pgpass';
 	EOSQL
 
-	# Now execute the roles SQL file using docker_process_sql as supabase_admin
-	echo "Updating roles..."
+	# execute the roles SQL file using docker_process_sql
 	docker_process_sql -f /docker-entrypoint-initdb.d/init-scripts/99-roles.sql
 
-	# Stop the temporary server
 	docker_temp_server_stop
 	unset PGPASSWORD
 }
@@ -74,7 +71,7 @@ _main() {
 			EOM
 		fi
 
-		# sync_password "$@"
+		sync_password "$@"
 	fi
 
 	exec "$@"
