@@ -3,9 +3,10 @@ import pgMeta from '@supabase/pg-meta'
 import { streamText } from 'ai'
 import { NextApiRequest, NextApiResponse } from 'next'
 
+import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
 import apiWrapper from 'lib/api/apiWrapper'
-import { fetchPgMetaSelfHosted } from 'lib/self-hosted'
+import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 import { getTools } from './tools'
 
 export const maxDuration = 30
@@ -61,7 +62,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
             ...(cookie && { cookie }),
             ...(authorization && { Authorization: authorization }),
           },
-          fetchPgMetaSelfHosted
+          IS_PLATFORM ? queryPgMetaSelfHosted : undefined
         )
       : { result: [] }
 

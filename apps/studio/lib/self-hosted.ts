@@ -3,7 +3,7 @@ import { post } from 'lib/common/fetch'
 import { PG_META_URL } from 'lib/constants'
 import type { ResponseError } from 'types'
 
-export async function fetchPgMetaSelfHosted(sql: string, headersInit?: { [prop: string]: any }) {
+export async function queryPgMetaSelfHosted(sql: string, headersInit?: { [prop: string]: any }) {
   const headers = constructHeaders(headersInit ?? {})
   const response = await post(`${PG_META_URL}/query`, { query: sql }, { headers })
 
