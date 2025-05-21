@@ -963,8 +963,7 @@ export const database: NavMenuConstant = {
       name: 'Logical Replication and CDC',
       url: undefined,
       items: [
-        { name: 'Overview', url: '/guides/database/replication-cdc/overview',},
-        { name: 'Logical Replication', url: '/guides/database/replication-cdc/logical-replication' },
+        { name: 'Overview', url: '/guides/database/replication-cdc/logical-replication',},
         { name: 'Setting up replication', url: '/guides/database/replication-cdc/setting-up-replication' },
         { name: 'Monitoring replication', url: '/guides/database/replication-cdc/monitoring-replication' },
         { name: 'FAQ', url: '/guides/database/replication/faq' },

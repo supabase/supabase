@@ -23,6 +23,10 @@ When setting up logical replication, three key components are involved:
 - `replication slot` - A slot used for replicating the data from a single publication. The slot, when created, will specify the output format of the changes
 - `subscription` - A subscription is created from an external system (i.e. another Postgres database) and must specify the name of the `publication`. If you do not specify a replication slot, one is automatically created
 
+## LSN
+
+LSN is a Log Sequence Number that is used to identify the position of a WAL file in the WAL directory. It is often used to determine the progress of replication in subscribers and calculate the lag of a replication slot.
+
 ## Logical replication output format
 
 Logical replication is typically output in 2 forms, `pgoutput` and `wal2json`. The output method is how Postgres sends changes to any active replication slot.

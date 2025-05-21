@@ -39,16 +39,3 @@ Some of the more important options to be aware of are:
 - `wal_keep_size`
 - `max_wal_senders`
 
-# How to check the status of replication?
-
-Postgres has some system tables that allow you to monitor the status of replication:
-
-## Primary
-
-- `select * from pg_stat_replication;` - Shows the `lag` of active replicas to indicate how far behind they are from the primary database
-- `select * from pg_replication_slots;` - Shows the last confirmed data that was sent and consumed on the slot
-
-## Replica
-
-- `select * from pg_subscription_rel;` - Shows the status of any subscriptions on a replica
-
