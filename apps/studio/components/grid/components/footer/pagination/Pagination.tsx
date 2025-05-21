@@ -136,10 +136,10 @@ const Pagination = () => {
   useEffect(() => {
     // If the count query encountered a timeout error with exact count
     // turn off the exact count to rely on approximate
-    if (isError && snap.enforceExactCount && error.code === 408) {
+    if (isError && snap.enforceExactCount && error?.code === 408) {
       snap.setEnforceExactCount(false)
     }
-  }, [isError, snap.enforceExactCount, error.code])
+  }, [isError, snap.enforceExactCount, error?.code])
 
   return (
     <div className="flex items-center gap-x-4">
