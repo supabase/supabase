@@ -18,6 +18,8 @@ import {
   CollapsibleTrigger_Shadcn_,
   Input,
   Switch,
+  ScrollArea,
+  cn,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
@@ -76,7 +78,14 @@ const UserImpersonationSelector = () => {
 
   async function impersonateUser(user: User) {
     setIsImpersonateLoading(true)
-    setPreviousSearches((prev) => (prev.some((u) => u.id === user.id) ? prev : [...prev, user]))
+    setPreviousSearches((prev) => {
+      // Remove if already present
+      const filtered = prev.filter((u) => u.id !== user.id)
+      // Add new user to the end
+      const updated = [...filtered, user]
+      // Keep only the last 6
+      return updated.slice(-6)
+    })
 
     if (customAccessTokenHookDetails?.type === 'https') {
       toast.info(
@@ -359,14 +368,17 @@ const UserImpersonationSelector = () => {
                           >
                             <span className="flex items-center">Clear</span>
                           </Button>
-
-                          <ul className="grid gap-2 ">
-                            {previousSearches.map((search) => (
-                              <li key={search.id}>
-                                <UserRow user={search} onClick={impersonateUser} />
-                              </li>
-                            ))}
-                          </ul>
+                          <ScrollArea
+                            className={cn(previousSearches.length > 3 ? 'h-36' : 'h-auto')}
+                          >
+                            <ul className="grid gap-2 ">
+                              {previousSearches.map((search) => (
+                                <li key={search.id}>
+                                  <UserRow user={search} onClick={impersonateUser} />
+                                </li>
+                              ))}
+                            </ul>
+                          </ScrollArea>
                         </CollapsibleContent_Shadcn_>
                       </Collapsible_Shadcn_>
                     </>
