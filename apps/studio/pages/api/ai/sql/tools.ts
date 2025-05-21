@@ -7,6 +7,7 @@ import { getDatabaseFunctions } from 'data/database-functions/database-functions
 import { getDatabasePolicies } from 'data/database-policies/database-policies-query'
 import { getEntityDefinitionsSql } from 'data/database/entity-definitions-query'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { fetchPgMetaSelfHosted } from 'lib/self-hosted'
 
 export const getTools = ({
   projectRef,
@@ -43,7 +44,8 @@ export const getTools = ({
                   sql: getEntityDefinitionsSql({ schemas }),
                 },
                 undefined,
-                headers
+                headers,
+                fetchPgMetaSelfHosted
               )
             : { result: [] }
 

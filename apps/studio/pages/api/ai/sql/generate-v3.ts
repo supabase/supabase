@@ -5,6 +5,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import apiWrapper from 'lib/api/apiWrapper'
+import { fetchPgMetaSelfHosted } from 'lib/self-hosted'
 import { getTools } from './tools'
 
 export const maxDuration = 30
@@ -59,7 +60,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
             'Content-Type': 'application/json',
             ...(cookie && { cookie }),
             ...(authorization && { Authorization: authorization }),
-          }
+          },
+          fetchPgMetaSelfHosted
         )
       : { result: [] }
 

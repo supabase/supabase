@@ -3,6 +3,7 @@ import pgMeta from '@supabase/pg-meta'
 import { streamText } from 'ai'
 import { executeSql } from 'data/sql/execute-sql-query'
 import apiWrapper from 'lib/api/apiWrapper'
+import { fetchPgMetaSelfHosted } from 'lib/self-hosted'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getTools } from '../sql/tools'
 
@@ -56,7 +57,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           {
             'Content-Type': 'application/json',
             ...(authorization && { Authorization: authorization }),
-          }
+          },
+          fetchPgMetaSelfHosted
         )
       : { result: [] }
 
