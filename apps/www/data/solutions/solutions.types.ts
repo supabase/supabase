@@ -1,8 +1,8 @@
 import { LucideIcon } from 'lucide-react'
 import type { ComponentType, SVGProps } from 'react'
 
-type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>
-type IconType = LucideIcon | HeroIcon
+export type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>
+export type IconType = LucideIcon | HeroIcon
 
 interface Metadata {
   metaTitle: string
@@ -53,7 +53,8 @@ export interface Highlight {
 
 export interface Feature {
   id?: string
-  icon?: IconType
+  icon?: IconType | string
+  iconNoStroke?: boolean
   heading: string | JSX.Element
   subheading: string | JSX.Element
   img?: JSX.Element

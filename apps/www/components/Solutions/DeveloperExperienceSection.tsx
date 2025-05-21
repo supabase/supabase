@@ -6,7 +6,7 @@ import { Check, X } from 'lucide-react'
 
 interface Feature {
   id?: string
-  title: string
+  title: string | React.ReactNode
   subheading: string | React.ReactNode
   highlights?: string | React.ReactNode
   url?: string
@@ -19,7 +19,7 @@ interface Feature {
 
 interface Props {
   id: string
-  title: string
+  title: string | React.ReactNode
   subheading: string
   features: Feature[]
   className?: string
@@ -29,7 +29,7 @@ const DeveloperExperienceSection = ({ id, title, subheading, features, className
   return (
     <SectionContainer id={id} className={cn('flex flex-col gap-12 py-16 md:py-24', className)}>
       <div className="flex flex-col gap-4 max-w-lg">
-        <h2 className="text-2xl md:text-3xl font-normal text-foreground">{title}</h2>
+        <h2 className="text-2xl md:text-3xl font-normal text-foreground-lighter">{title}</h2>
         <p className="text-foreground-light text-base md:text-lg">{subheading}</p>
       </div>
 

@@ -29,6 +29,7 @@ import MainProducts from '../MainProducts'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 import RealtimeLogs from '../../components/Products/Functions/RealtimeLogs'
 import DataAPIsVisual from '../../components/Products/DataAPIsVisual'
+import { CubeIcon } from '@heroicons/react/outline'
 
 const data = {
   metadata: {
@@ -77,19 +78,30 @@ const data = {
   },
   quote: {
     id: 'quote',
+    className: '[&_q]:md:max-w-2xl',
     text: 'We wanted a backend that could accelerate our development while maintaining security and scalability. Supabase stood out due to its automation, integrations, and ecosystem.',
     author: 'Raunak Kathuria',
     role: 'VP of Engineering, Deriv',
-    logo: (
+    avater: (
       <Image
         draggable={false}
-        src="/images/solutions/neon/deriv-logo.png"
+        src="/images/customers/logos/deriv.png"
         alt="Deriv logo"
+        className="dark:invert"
         width={100}
         height={28}
       />
     ),
-    avatar: '/images/solutions/neon/raunak-avatar.png',
+    logo: (
+      <Image
+        draggable={false}
+        src="/images/solutions/neon/raunak-kathuria.jpg"
+        alt="Raunak Kathuria"
+        className="w-10 h-10 rounded-full overflow-hidden"
+        width={100}
+        height={28}
+      />
+    ),
   },
   why: {
     id: 'why-supabase',
@@ -111,21 +123,22 @@ const data = {
       },
       {
         id: 'platform',
-        icon: LayoutGrid,
+        icon: CubeIcon,
         heading: 'Everything your application stack needs',
         subheading:
           'Auth, storage, edge functions, vectors, and realtime are available out of the box. Use one or all.',
       },
       {
         id: 'scalability',
-        icon: Scale,
+        icon: 'M13.2689 14.9229C14.04 16.494 15.6379 17.4892 17.3881 17.4893H22.0892C22.4726 17.4893 22.7843 17.8003 22.7845 18.1836C22.7845 18.5671 22.4728 18.8789 22.0892 18.8789H20.1664C20.1564 21.0605 18.171 22.4853 16.0052 22.4854C14.044 22.4854 12.4009 21.1292 11.9603 19.3037L11.9213 19.126L11.9086 18.9854C11.9116 18.6624 12.1408 18.3748 12.4701 18.3105C12.7994 18.2463 13.1203 18.4265 13.2445 18.7246L13.2845 18.8594L13.3412 19.0947C13.6746 20.251 14.742 21.0967 16.0052 21.0967C17.6551 21.0966 18.7655 20.0649 18.7758 18.8789H17.3881C15.108 18.8788 13.0263 17.5811 12.0218 15.5342L13.2689 14.9229ZM18.7767 15.6787V11.4639C18.7766 8.09738 16.0476 5.36816 12.681 5.36816H11.7269C11.7032 5.36816 11.6797 5.36364 11.6566 5.36133H7.15564C6.5783 5.36133 6.05835 5.69927 5.82068 6.21777L5.77673 6.32422L4.26404 10.4443C4.03486 11.0686 4.21563 11.7696 4.71814 12.2051L5.75622 13.1045L5.93298 13.2754C6.32193 13.694 6.54138 14.2468 6.54138 14.8242V16.4775L6.5531 16.7227C6.67574 17.9298 7.69544 18.8721 8.93493 18.8721C9.2213 18.8721 9.45986 18.6685 9.51501 18.3984L9.52771 18.2793V10.9121C9.52772 9.33737 10.1566 7.82755 11.2748 6.71875L11.3842 6.63086C11.6543 6.45411 12.0199 6.48475 12.2562 6.72266C12.5263 6.995 12.5247 7.43503 12.2523 7.70508L12.097 7.86816C11.3396 8.69814 10.9164 9.78304 10.9164 10.9121V18.2793L10.9056 18.4814C10.8044 19.4807 9.96094 20.2607 8.93493 20.2607C6.91113 20.2607 5.25814 18.6714 5.15661 16.6729L5.15173 16.4775V14.8242C5.15173 14.5993 5.06693 14.3838 4.9154 14.2207L4.84607 14.1543L3.80798 13.2549C2.86934 12.4414 2.53223 11.1318 2.96033 9.96582L4.47302 5.84473L4.55798 5.63867C5.02039 4.62971 6.03224 3.97266 7.15564 3.97266H11.8246V3.97949H12.681C16.8146 3.97949 20.1662 7.33032 20.1664 11.4639V15.6787C20.1664 16.0622 19.8546 16.373 19.4711 16.373C19.0877 16.3728 18.7767 16.0621 18.7767 15.6787ZM12.3392 14.6055C12.6835 14.4365 13.1 14.5785 13.2689 14.9229L12.0218 15.5342C11.8532 15.1901 11.9953 14.7745 12.3392 14.6055Z M14.4779 10.7135C14.4779 11.1278 14.8137 11.4635 15.2279 11.4635C15.6421 11.4635 15.9779 11.1278 15.9779 10.7135C15.9779 10.2993 15.6421 9.96354 15.2279 9.96354C14.8137 9.96354 14.4779 10.2993 14.4779 10.7135Z',
+        iconNoStroke: true,
         heading: 'Scalable, dependable, Postgres-native',
         subheading:
           'Supabase runs on standard Postgres with full SQL, ACID guarantees, PITR, and high availability. Designed for reliable, stateful agent workloads.',
       },
       {
         id: 'migration',
-        icon: FileText,
+        icon: ArrowRight,
         heading: 'Migrate from Neon with ease',
         subheading: 'Supabase is Postgres. Moving from Neon is a breeze.',
       },
@@ -316,7 +329,12 @@ const data = {
   },
   developerExperience: {
     id: 'developer-experience',
-    title: 'Developers can build faster with Supabase',
+    className: '[&_h2]:!max-w-sm',
+    title: (
+      <>
+        Developers can build <span className="text-foreground">faster</span> with Supabase
+      </>
+    ),
     subheading: 'Features that help developers move quickly and focus.',
     features: [
       {

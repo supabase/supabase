@@ -9,9 +9,7 @@ const ProductHeader = dynamic(() => import('~/components/Sections/ProductHeader2
 const SingleQuote = dynamic(() => import('~/components/Enterprise/SingleQuote'))
 const FeaturesSection = dynamic(() => import('~/components/Solutions/FeaturesSection'))
 const PlatformSection = dynamic(() => import('~/components/Solutions/PlatformSection'))
-const DeveloperExperienceSection = dynamic(
-  () => import('~/components/Solutions/DeveloperExperienceSection')
-)
+const DXSection = dynamic(() => import('~/components/Solutions/DeveloperExperienceSection'))
 const ResultsSection = dynamic(() => import('~/components/Solutions/ResultsSection'))
 const FeatureGrid = dynamic(() => import('~/components/Solutions/FeatureGrid'))
 const Security = dynamic(() => import('~/components/Enterprise/Security'))
@@ -32,13 +30,13 @@ const Neon: NextPage = () => {
       <Layout className="overflow-visible">
         <ProductHeader {...content.heroSection} />
         <SingleQuote
-          id={content.quote.id}
           quote={{
             text: content.quote.text,
             author: content.quote.author,
             role: content.quote.role,
             logo: content.quote.logo,
           }}
+          {...content.quote}
         />
         <FeaturesSection
           id={content.why.id}
@@ -53,11 +51,12 @@ const Neon: NextPage = () => {
           subheading={content.platform.subheading}
           features={content.platform.features}
         />
-        <DeveloperExperienceSection
+        <DXSection
           id={content.developerExperience.id}
           title={content.developerExperience.title}
           subheading={content.developerExperience.subheading}
           features={content.developerExperience.features}
+          className={content.developerExperience.className}
         />
         <ResultsSection
           id={content.resultsSection.id}

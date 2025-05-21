@@ -39,10 +39,31 @@ const FeatureItem: FC<FeatureItemProps> = ({ feature }) => {
   const iconHeight = `h-${iconSize}`
 
   return (
-    <li className="flex flex-col gap-2 text-sm">
-      {Icon && (
-        <Icon className={cn('stroke-1 mb-2 text-foreground-lighter', iconWidth, iconHeight)} />
-      )}
+    <li className="flex flex-col gap-2 text-sm text-foreground-lighter">
+      {Icon &&
+        (typeof Icon === 'string' ? (
+          <svg
+            width="25"
+            height="25"
+            viewBox="0 0 25 25"
+            fill={feature.iconNoStroke ? 'currentColor' : 'none'}
+            className="w-7 h-7 mb-2"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d={Icon}
+              fillRule="evenodd"
+              clipRule="evenodd"
+              stroke={feature.iconNoStroke ? 'none' : 'currentColor'}
+              strokeMiterlimit="10"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              strokeWidth="1"
+            />
+          </svg>
+        ) : (
+          <Icon className={cn('stroke-1 mb-2 text-current', iconWidth, iconHeight)} />
+        ))}
       <div className="w-full h-px overflow-hidden flex items-start bg-border-muted">
         <span className={cn('h-full bg-foreground-lighter', iconWidth)} />
       </div>

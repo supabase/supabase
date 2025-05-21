@@ -5,7 +5,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 interface Feature {
   id: string
   title: string
-  description: string
+  description: string | React.ReactNode
   icon: string
   iconNoStroke?: boolean
   className?: string
