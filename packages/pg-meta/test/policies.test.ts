@@ -22,7 +22,7 @@ const withTestDatabase = (
 }
 
 withTestDatabase('list policies', async ({ executeQuery }) => {
-  const { sql, zod } = await pgMeta.policies.list()
+  const { sql, zod } = pgMeta.policies.list()
   const res = zod.parse(await executeQuery(sql))
   const policy = res.find(({ name }) => name === 'categories_update_policy')
 
@@ -48,7 +48,7 @@ withTestDatabase('list policies', async ({ executeQuery }) => {
 })
 
 withTestDatabase('list policies with included schemas', async ({ executeQuery }) => {
-  const { sql, zod } = await pgMeta.policies.list({
+  const { sql, zod } = pgMeta.policies.list({
     includedSchemas: ['public'],
   })
   const res = zod.parse(await executeQuery(sql))
@@ -61,7 +61,7 @@ withTestDatabase('list policies with included schemas', async ({ executeQuery })
 
 withTestDatabase('retrieve, create, update, delete policies', async ({ executeQuery }) => {
   // Create policy
-  const { sql: createSql } = await pgMeta.policies.create({
+  const { sql: createSql } = pgMeta.policies.create({
     name: 'test_policy',
     schema: 'public',
     table: 'memes',
@@ -70,7 +70,7 @@ withTestDatabase('retrieve, create, update, delete policies', async ({ executeQu
   await executeQuery(createSql)
 
   // List to get the created policy
-  const { sql: listSql, zod: listZod } = await pgMeta.policies.list()
+  const { sql: listSql, zod: listZod } = pgMeta.policies.list()
   const policies = listZod.parse(await executeQuery(listSql))
   const createdPolicy = policies.find((p) => p.name === 'test_policy')
 
@@ -95,19 +95,16 @@ withTestDatabase('retrieve, create, update, delete policies', async ({ executeQu
   )
 
   // Update policy
-  const { sql: updateSql } = await pgMeta.policies.update(
-    { id: createdPolicy!.id },
-    {
-      name: 'updated_policy',
-      definition: "current_setting('my.username') IN (name)",
-      check: "current_setting('my.username') IN (name)",
-      roles: ['postgres'],
-    }
-  )
+  const { sql: updateSql } = pgMeta.policies.update(createdPolicy!, {
+    name: 'updated_policy',
+    definition: "current_setting('my.username') IN (name)",
+    check: "current_setting('my.username') IN (name)",
+    roles: ['postgres'],
+  })
   await executeQuery(updateSql)
 
   // Retrieve updated policy
-  const { sql: retrieveSql, zod: retrieveZod } = await pgMeta.policies.retrieve({
+  const { sql: retrieveSql, zod: retrieveZod } = pgMeta.policies.retrieve({
     id: createdPolicy!.id,
   })
   const updatedPolicy = retrieveZod.parse((await executeQuery(retrieveSql))[0])
@@ -133,11 +130,11 @@ withTestDatabase('retrieve, create, update, delete policies', async ({ executeQu
   )
 
   // Remove policy
-  const { sql: removeSql } = await pgMeta.policies.remove({ id: updatedPolicy!.id })
+  const { sql: removeSql } = pgMeta.policies.remove(updatedPolicy!)
   await executeQuery(removeSql)
 
   // Verify policy is removed
-  const { sql: verifyRemoveSql } = await pgMeta.policies.retrieve({
+  const { sql: verifyRemoveSql } = pgMeta.policies.retrieve({
     id: updatedPolicy!.id,
   })
   const result = await executeQuery(verifyRemoveSql)

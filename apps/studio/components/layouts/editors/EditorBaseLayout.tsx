@@ -6,6 +6,7 @@ import {
   useIsSQLEditorTabsEnabled,
   useIsTableEditorTabsEnabled,
 } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useTabsStateSnapshot } from 'state/tabs'
 import { cn } from 'ui'
 import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
 import { CollapseButton } from '../Tabs/CollapseButton'
@@ -23,16 +24,21 @@ export const EditorBaseLayout = ({ children, title, product, ...props }: Explore
   const { ref } = useParams()
   const pathname = usePathname()
   const editor = useEditorType()
+  const tabs = useTabsStateSnapshot()
 
   const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
   const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   const tableEditorTabsEnabled = editor === 'table' && isTableEditorTabsEnabled
   const sqlEditorTabsEnabled = editor === 'sql' && isSQLEditorTabsEnabled
-  const hideTabs = pathname === `/project/${ref}/editor` || pathname === `/project/${ref}/sql`
+
+  const hasNoOpenTabs =
+    editor === 'table' ? tabs.openTabs.filter((x) => !x.startsWith('sql')).length === 0 : false
+  const hideTabs =
+    pathname === `/project/${ref}/editor` || pathname === `/project/${ref}/sql` || hasNoOpenTabs
 
   return (
-    <ProjectLayoutWithAuth resizableSidebar={true} title={title} product={product} {...props}>
+    <ProjectLayoutWithAuth resizableSidebar title={title} product={product} {...props}>
       <div className="flex flex-col h-full">
         {tableEditorTabsEnabled || sqlEditorTabsEnabled ? (
           <div

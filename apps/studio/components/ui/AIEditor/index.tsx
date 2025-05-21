@@ -18,7 +18,7 @@ interface AIEditorProps {
   aiEndpoint?: string
   aiMetadata?: {
     projectRef?: string
-    connectionString?: string
+    connectionString?: string | null
     includeSchemaMetadata?: boolean
   }
   initialPrompt?: string

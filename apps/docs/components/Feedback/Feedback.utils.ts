@@ -30,6 +30,8 @@ const getLinearTeam = (pathname: string) => {
       return 'Dev Workflows'
     case 'integrations':
       return 'API'
+    case 'security':
+      return 'Security'
     case 'platform':
     case 'monitoring-troubleshooting':
       return 'Infra'

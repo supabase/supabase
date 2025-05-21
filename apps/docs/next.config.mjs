@@ -1,11 +1,10 @@
 // @ts-check
+import configureBundleAnalyzer from '@next/bundle-analyzer'
 import nextMdx from '@next/mdx'
+import { withSentryConfig } from '@sentry/nextjs'
+import withYaml from 'next-plugin-yaml'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
-
-import configureBundleAnalyzer from '@next/bundle-analyzer'
-import withYaml from 'next-plugin-yaml'
-
 import remotePatterns from './lib/remotePatterns.js'
 
 const withBundleAnalyzer = configureBundleAnalyzer({
@@ -22,7 +21,6 @@ const withMDX = nextMdx({
 })
 
 /** @type {import('next').NextConfig} nextConfig */
-
 const nextConfig = {
   assetPrefix: getAssetPrefix(),
   // Append the default value with md extensions
@@ -49,19 +47,22 @@ const nextConfig = {
     })
     return config
   },
-  transpilePackages: ['ui', 'ui-patterns', 'common', 'dayjs', 'shared-data', 'api-types', 'icons'],
-  experimental: {
-    outputFileTracingIncludes: {
-      '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
-      '/guides/**/*': [
-        './content/guides/**/*',
-        './content/troubleshooting/**/*',
-        './examples/**/*',
-      ],
-      '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
-    },
-    serverComponentsExternalPackages: ['libpg-query', 'twoslash'],
+  transpilePackages: [
+    'ui',
+    'ui-patterns',
+    'common',
+    'dayjs',
+    'shared-data',
+    'api-types',
+    'icons',
+    'next-mdx-remote',
+  ],
+  outputFileTracingIncludes: {
+    '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
+    '/guides/**/*': ['./content/guides/**/*', './content/troubleshooting/**/*', './examples/**/*'],
+    '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
   },
+  serverExternalPackages: ['libpg-query', 'twoslash'],
   async headers() {
     return [
       {
@@ -170,7 +171,31 @@ const configExport = () => {
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
 
-export default configExport
+export default withSentryConfig(configExport, {
+  // For all available options, see:
+  // https://www.npmjs.com/package/@sentry/webpack-plugin#options
+
+  org: 'supabase',
+  project: 'docs',
+
+  // Only print logs for uploading source maps in CI
+  silent: !process.env.CI,
+
+  // For all available options, see:
+  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+
+  // Upload a larger set of source maps for prettier stack traces (increases build time)
+  widenClientFileUpload: true,
+
+  // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
+  // This can increase your server load as well as your hosting bill.
+  // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
+  // side errors will fail.
+  // tunnelRoute: "/monitoring",
+
+  // Automatically tree-shake Sentry logger statements to reduce bundle size
+  disableLogger: true,
+})
 
 function getAssetPrefix() {
   // If not force enabled, but not production env, disable CDN

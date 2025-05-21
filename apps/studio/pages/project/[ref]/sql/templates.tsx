@@ -8,12 +8,13 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
-import { addTab, createTabId } from 'state/tabs'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
 const SqlTemplates: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams<{ ref: string }>()
+  const tabs = useTabsStateSnapshot()
 
   const isSqlEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
@@ -23,7 +24,7 @@ const SqlTemplates: NextPageWithLayout = () => {
 
       const tabId = createTabId('sql', { id: 'templates' })
 
-      addTab(ref, {
+      tabs.addTab({
         id: tabId,
         type: 'sql',
         label: 'Templates',

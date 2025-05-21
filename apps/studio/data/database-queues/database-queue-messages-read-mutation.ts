@@ -7,7 +7,7 @@ import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueMessageReadVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   queryName: string
   duration: number
   messageId: number

@@ -8,7 +8,7 @@ import { tableKeys } from 'data/tables/keys'
 
 export type DatabaseQueueCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   name: string
   type: 'basic' | 'partitioned' | 'unlogged'
   enableRls: boolean

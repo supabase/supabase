@@ -15,6 +15,7 @@ export const LOCAL_STORAGE_KEYS = {
   UI_SQL_EDITOR_TABS: 'supabase-ui-sql-editor-tabs',
   UI_NEW_LAYOUT_PREVIEW: 'supabase-ui-new-layout-preview',
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
+  TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
   STORAGE_PREFERENCE: (ref: string) => `storage-explorer-${ref}`,
@@ -50,6 +51,7 @@ export const LOCAL_STORAGE_KEYS = {
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
   // Notice banner keys
   FLY_POSTGRES_DEPRECATION_WARNING: 'fly-postgres-deprecation-warning-dismissed',
+  MIDDLEWARE_OUTAGE_BANNER: 'middleware-outage-banner-2025-05-16',
   AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
 
   // api keys view switcher for new and legacy api keys

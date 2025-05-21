@@ -55,7 +55,9 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
   try {
     mdx = await readFile(fullPath, 'utf-8')
   } catch {
-    console.error('Error reading Markdown at path: %s', fullPath)
+    // Not using console.error because this includes pages that are genuine
+    // 404s and clutters up the logs
+    console.log('Error reading Markdown at path: %s', fullPath)
     notFound()
   }
 
@@ -120,7 +122,8 @@ const genGuideMeta =
   <Params,>(
     generate: (params: Params) => OrPromise<{ meta: GuideFrontmatter; pathname: `/${string}` }>
   ) =>
-  async ({ params }: { params: Params }, parent: ResolvingMetadata): Promise<Metadata> => {
+  async (props: { params: Promise<Params> }, parent: ResolvingMetadata): Promise<Metadata> => {
+    const params = await props.params
     const [parentAlternates, parentOg, { meta, pathname }] = await Promise.all([
       pluckPromise(parent, 'alternates'),
       pluckPromise(parent, 'openGraph'),
@@ -164,4 +167,4 @@ function removeRedundantH1(content: string) {
   return content
 }
 
-export { getGuidesMarkdown, genGuidesStaticParams, genGuideMeta, removeRedundantH1 }
+export { genGuideMeta, genGuidesStaticParams, getGuidesMarkdown, removeRedundantH1 }
