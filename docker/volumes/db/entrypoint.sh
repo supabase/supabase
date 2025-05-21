@@ -4,6 +4,27 @@ set -Eeo pipefail
 # Source the Docker entrypoint script
 source /usr/local/bin/docker-entrypoint.sh
 
+sync_password() {
+	# Start a temporary server to run the roles SQL file
+	export PGPASSWORD="${PGPASSWORD:-$POSTGRES_PASSWORD}"
+	docker_temp_server_start "$@"
+
+	# First alter the supabase_admin password as postgres superuser
+	echo "Setting supabase_admin password..."
+	psql -U supabase_admin -d postgres <<-'EOSQL'
+		\set pgpass `echo "$POSTGRES_PASSWORD"`
+		ALTER USER supabase_admin WITH PASSWORD :'pgpass';
+	EOSQL
+
+	# Now execute the roles SQL file using docker_process_sql as supabase_admin
+	echo "Updating roles..."
+	docker_process_sql -f /docker-entrypoint-initdb.d/init-scripts/99-roles.sql
+
+	# Stop the temporary server
+	docker_temp_server_stop
+	unset PGPASSWORD
+}
+
 _main() {
 	# if first arg looks like a flag, assume we want to run postgres server
 	if [ "${1:0:1}" = '-' ]; then
@@ -53,24 +74,7 @@ _main() {
 			EOM
 		fi
 
-		# Start a temporary server to run the roles SQL file
-		export PGPASSWORD="${PGPASSWORD:-$POSTGRES_PASSWORD}"
-		docker_temp_server_start "$@"
-
-		# First alter the supabase_admin password as postgres superuser
-		echo "Setting supabase_admin password..."
-		docker_process_sql <<-'EOSQL'
-      \set pgpass `echo "$POSTGRES_PASSWORD"`
-			ALTER USER supabase_admin WITH PASSWORD :'pgpass';
-		EOSQL
-
-		# Now execute the roles SQL file using docker_process_sql as supabase_admin
-		echo "Updating roles..."
-		docker_process_sql -f /docker-entrypoint-initdb.d/init-scripts/99-roles.sql
-
-		# Stop the temporary server
-		docker_temp_server_stop
-		unset PGPASSWORD
+		# sync_password "$@"
 	fi
 
 	exec "$@"
