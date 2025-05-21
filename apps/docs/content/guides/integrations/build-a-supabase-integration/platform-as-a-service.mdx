@@ -1,0 +1,85 @@
+---
+id: ''
+title: 'PaaS Best Practices'
+description: 'Build your own platform on top of Supabase.'
+subtitle: 'Build your own platform on top of Supabase.'
+---
+
+
+Supabase is a [Platform as a Service](https://en.wikipedia.org/wiki/Platform_as_a_service) that can be managed programmatically, making it perfect as a backend for AI Tools and Agents.
+
+You can use Supabase as a provider to offer services to your own users. This document will guide you on best practices when using Supabase as a PaaS.
+
+![Platform as a Service](./paas-intro.png)
+
+
+## Getting started: launch a project
+
+- Launch an new project
+- [Docs: Create a project](https://api.supabase.com/api/v1#tag/projects/POST/v1/projects)
+
+```sh
+curl https://api.supabase.com/v1/projects \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "db_pass": "",
+  "name": "",
+  "organization_id": "",
+  "region": "us-east-1",
+  "desired_instance_size": "pico",
+  "template_url": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
+}'
+```
+
+## Development workflow
+
+Supabase is a _stateful_ service: we store data. If anything breaks in production, you can't simply "roll back" to a point in time because doing so might cause your users to lose any data that their production enviroment recieved since the last checkpoint.
+
+Because of this, it's important that you adopt a development workflow on behalf of your users:
+
+![Change flow](./change-flow.png)
+
+After launching a Project, it's important that all changes happen on a Branch. This is because branches can be treated like ephemeral servers: if anything goes wrong you can either roll back to a checkpoint or destroy the branch and create a new one from production.
+
+### Creating a development environment
+
+- Create a branch
+- [Docs: Create a branch](https://api.supabase.com/api/v1#tag/environments/POST/v1/projects/{ref}/branches)
+
+
+### Make a change
+
+- TODO
+
+### Merge the branch
+
+- TODO
+- https://api.supabase.com/api/v1#tag/environments/POST/v1/branches/{branch_id}/merge
+
+### Delete the branch
+
+- TODO
+- https://api.supabase.com/api/v1#tag/environments/DELETE/v1/branches/{branch_id}
+
+
+## Making changes
+
+- Database
+- Auth (config)
+- Edge Functions
+
+
+
+### Reverting changes
+
+- TODO
+
+![Revert](./revert.png)
+
+
+## Disaster Recovery
+
+- Rollbacks can cause data loss. Only use in in `PROD` when absolutely necessary
+
+![Rollback](./rollback.png)
