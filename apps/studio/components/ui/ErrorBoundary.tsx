@@ -2,6 +2,7 @@ import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary'
 import * as Sentry from '@sentry/nextjs'
 import { Button } from 'ui'
 import { AlertTriangle } from 'lucide-react'
+import { ErrorInfo } from 'react'
 
 interface ErrorFallbackProps {
   error: Error
@@ -47,7 +48,6 @@ const ErrorFallback = ({
 
 interface ErrorBoundaryProps {
   children: React.ReactNode
-  fallback?: React.ComponentType<ErrorFallbackProps>
   message?: string
   actions?: {
     label: string
@@ -59,13 +59,12 @@ interface ErrorBoundaryProps {
 
 export const ErrorBoundary = ({
   children,
-  fallback,
   message,
   actions,
   sentryContext,
   onReset,
 }: ErrorBoundaryProps) => {
-  const handleError = (error: Error, info: { componentStack: string }) => {
+  const handleError = (error: Error, info: ErrorInfo) => {
     Sentry.withScope((scope) => {
       scope.setExtra('componentStack', info.componentStack)
       if (sentryContext) {
