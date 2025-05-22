@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import React, { FC } from 'react'
 import { cn } from 'ui'
 
@@ -15,6 +16,7 @@ type Quote = {
   logo?: string | JSX.Element
   role: string
   avatar?: string | JSX.Element
+  link?: string
 }
 
 const SingleQuote: FC<Props> = ({ id: sectionId, quote, className }) => {
@@ -28,7 +30,11 @@ const SingleQuote: FC<Props> = ({ id: sectionId, quote, className }) => {
         {quote.logo && <figure className="text-foreground-lighter mb-4">{quote.logo}</figure>}
         <span className="text-foreground">{quote.author}</span>
         <span className="text-foreground-lighter font-mono text-sm">{quote.role}</span>
-        {quote.avatar && <figure className="text-foreground-lighter mt-4">{quote.avatar}</figure>}
+        {quote.avatar && (
+          <Link href={quote.link ?? '#'}>
+            <figure className="text-foreground-muted mt-4">{quote.avatar}</figure>
+          </Link>
+        )}
       </div>
     </SectionContainer>
   )

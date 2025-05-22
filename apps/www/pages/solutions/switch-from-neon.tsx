@@ -37,6 +37,8 @@ const Neon: NextPage = () => {
             author: content.quote.author,
             role: content.quote.role,
             logo: content.quote.logo,
+            link: content.quote.link,
+            avatar: content.quote.avatar,
           }}
           {...content.quote}
         />

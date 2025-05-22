@@ -52,9 +52,10 @@ const data = {
     ],
     ctas: [
       {
-        label: 'Start your project',
-        href: 'https://supabase.com/dashboard',
+        label: 'Start your migration',
+        href: 'https://supabase.com/docs/guides/platform/migrating-to-supabase/neon',
         type: 'primary' as any,
+        icon: <ArrowUpRight className="w-4 h-4 text-current" />,
       },
     ],
     image: (
@@ -67,7 +68,7 @@ const data = {
         alt="Neon to Supabase illustration"
         width={1000}
         height={1000}
-        className="max-w-[430px] max-h-[300px] m-auto"
+        className="max-w-[500px] max-h-[400px] m-auto"
       />
     ),
   },
@@ -77,23 +78,24 @@ const data = {
     text: 'We wanted a backend that could accelerate our development while maintaining security and scalability. Supabase stood out due to its automation, integrations, and ecosystem.',
     author: 'Raunak Kathuria',
     role: 'VP of Engineering, Deriv',
-    avater: (
+    avatar: (
       <Image
         draggable={false}
         src="/images/customers/logos/deriv.png"
         alt="Deriv logo"
-        className="dark:invert"
-        width={100}
+        className="dark:invert object-contain opacity-50 hover:!opacity-60 max-w-20 max-h-10 !w-10 !h-10"
+        width={28}
         height={28}
       />
     ),
+    link: '/customers/deriv',
     logo: (
       <Image
         draggable={false}
         src="/images/solutions/neon/raunak-kathuria.jpg"
         alt="Raunak Kathuria"
         className="w-10 h-10 rounded-full overflow-hidden"
-        width={100}
+        width={28}
         height={28}
       />
     ),
@@ -161,18 +163,48 @@ const data = {
         ),
         className: 'lg:col-span-2 flex-col lg:flex-row',
         image: (
-          <Image
-            draggable={false}
-            src={{
-              dark: '/images/solutions/neon/database-visual-dark.svg',
-              light: '/images/solutions/neon/database-visual-light.svg',
-            }}
-            alt="Database"
-            width={100}
-            height={100}
-            quality={100}
-            containerClassName="lg:mt-8"
-          />
+          <div className="relative w-full max-w-xl pt-8">
+            <div className="w-full h-full rounded-tl-lg overflow-hidden border-t border-l bg-surface-75">
+              <table className="min-w-full m-0">
+                <thead className="p-0">
+                  <tr className="border-b">
+                    <th className="py-2 px-4 text-left text-xs font-mono font-normal tracking-widest text-[#A0A0A0]">
+                      NAME
+                    </th>
+                    <th className="py-2 px-4 text-left text-xs font-mono font-normal tracking-widest text-[#A0A0A0]">
+                      PUBLICATION
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-surface-100">
+                  {[
+                    { name: 'Jon Meyers', pub: 'All', active: false },
+                    { name: 'Chris Martin', pub: 'All', active: true },
+                    { name: 'Amy Quek', pub: 'No', active: false },
+                    { name: 'Riccardo Bussetti', pub: 'No', active: false },
+                    { name: 'Beng Eu', pub: 'All', active: false },
+                    { name: 'Tyler Hillery', pub: 'All', active: false },
+                  ].map((row) => (
+                    <tr
+                      key={row.name}
+                      className="group/row hover:bg-selection hover:text-foreground transition-colors cursor-pointer"
+                    >
+                      <td className="py-2 px-4 whitespace-nowrap">{row.name}</td>
+                      <td className="py-2 px-4 whitespace-nowrap">{row.pub}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div
+              className="
+                absolute pointer-events-none
+                w-full h-full
+                inset-0 top-auto
+                bg-[linear-gradient(to_bottom,transparent_0%,hsl(var(--background-default))_100%)]
+              "
+            />
+          </div>
         ),
         highlights: (
           <ul className="hidden lg:flex flex-col gap-1 text-sm">
@@ -199,7 +231,7 @@ const data = {
           </>
         ),
         className: '!border-l-0 sm:!border-l sm:!border-t-0',
-        image: <AuthVisual className="xl:!-bottom-10" />,
+        image: <AuthVisual className="2xl:!-bottom-20" />,
       },
       {
         id: 'rbac',
@@ -571,7 +603,7 @@ const data = {
             mission-critical applications.
           </>
         ),
-        icon: 'M16.3046 3.24514C15.3004 2.91279 14.2268 2.73291 13.1111 2.73291C7.50197 2.73291 2.95486 7.28002 2.95486 12.8892C2.95486 18.4983 7.50197 23.0454 13.1111 23.0454C18.7203 23.0454 23.2674 18.4983 23.2674 12.8892C23.2674 10.5703 22.4902 8.4329 21.1822 6.72328L12.2253 15.5572L10.2303 13.5622M13.2175 6.31682C9.54013 6.31682 6.55899 9.29795 6.55899 12.9754C6.55899 16.6528 9.54013 19.6339 13.2175 19.6339C16.895 19.6339 19.8761 16.6528 19.8761 12.9754C19.8761 11.1095 19.4615 9.83483 18.7507 8.77557',
+        icon: 'M16.3046 3.24514C15.3004 2.91279 14.2268 2.73291 13.1111 2.73291C7.50197 2.73291 2.95486 7.28002 2.95486 12.8892C2.95486 18.4983 7.50197 23.0454 13.1111 23.0454C18.7203 23.0454 23.2674 18.4983 23.2674 12.8892C23.2674 10.5703 22.4902 8.4329 21.1822 6.72328L12.2253 15.5572L10.2303 13.5622M13.2175 6.31682C9.54013 6.31682 6.55899 9.29795 6.55899 12.4809C6.55899 16.1583 9.54013 19.1395 13.2175 19.1395C16.895 19.1395 19.8761 16.1583 19.8761 12.4809C19.8761 11.1095 19.4615 9.83483 18.7507 8.77557',
       },
       {
         id: 'pitr',
