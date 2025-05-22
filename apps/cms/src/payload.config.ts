@@ -1,11 +1,11 @@
-// storage-adapter-import-placeholder
 import { postgresAdapter } from '@payloadcms/db-postgres'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
-
 import sharp from 'sharp'
+import { plugins } from './plugins'
+import { defaultLexical } from '@/fields/defaultLexical'
+import { getServerSideURL } from './utilities/getURL'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
@@ -13,10 +13,6 @@ import { Posts } from './collections/Posts'
 import { Authors } from './collections/Authors'
 import { Categories } from './collections/Categories'
 import { Tags } from './collections/Tags'
-
-import { plugins } from './plugins'
-import { defaultLexical } from '@/fields/defaultLexical'
-import { getServerSideURL } from './utilities/getURL'
 import { Pages } from './collections/Pages'
 
 const filename = fileURLToPath(import.meta.url)
@@ -53,7 +49,6 @@ export default buildConfig({
   },
   collections: [Posts, Users, Media, Authors, Categories, Tags, Pages],
   editor: defaultLexical,
-  // editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
@@ -66,5 +61,5 @@ export default buildConfig({
     schemaName: 'cms-payload',
   }),
   sharp,
-  plugins: [...plugins],
+  plugins
 })
