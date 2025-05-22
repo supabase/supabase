@@ -27,9 +27,7 @@ export const DeleteUserModal = ({
   const { mutate: deleteUser, isLoading: isDeleting } = useUserDeleteMutation({
     onSuccess: () => {
       const userLabel = selectedUser?.email ?? selectedUser?.phone ?? 'user'
-      toast.success(
-        `Successfully ${softDelete ? 'soft deleted' : 'deleted'} ${userLabel}`
-      )
+      toast.success(`Successfully ${softDelete ? 'soft deleted' : 'deleted'} ${userLabel}`)
       onDeleteSuccess?.()
     },
   })

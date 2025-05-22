@@ -12,11 +12,7 @@ export type UserDeleteVariables = {
   softDelete?: boolean
 }
 
-export async function deleteUser({
-  projectRef,
-  userId,
-  softDelete = false,
-}: UserDeleteVariables) {
+export async function deleteUser({ projectRef, userId, softDelete = false }: UserDeleteVariables) {
   const { data, error } = await del('/platform/auth/{ref}/users/{id}', {
     params: {
       path: { ref: projectRef, id: userId },
