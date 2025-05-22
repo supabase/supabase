@@ -29,7 +29,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
           )}
           <hr className="my-7" aria-hidden />
           <div className="grid gap-10 @3xl/troubleshooting-entry-layout:grid-cols-[1fr,250px]">
-            <div>
+            <div className="min-w-0">
               <MDXRemoteBase source={entry.content} />
             </div>
             <aside aria-labelledby="heading--metadata" className="not-prose mt-5">
@@ -94,7 +94,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                   <hr className="my-6" aria-hidden />
                 </>
               )}
-              <Feedback className="px-0" />
+              <Feedback className="px-0 mb-6 lg:mb-8" />
             </aside>
           </div>
         </article>

@@ -4,7 +4,6 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 import { toast } from 'sonner'
 
-import { TelemetryActions } from 'common/telemetry-constants'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
@@ -12,6 +11,7 @@ import type { Profile } from 'data/profile/types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import type { ResponseError } from 'types'
 import { useSignOut } from './auth'
+import { getGitHubProfileImgUrl } from './github'
 
 export type ProfileContextType = {
   profile: Profile | undefined
@@ -37,11 +37,22 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: createProfile, isLoading: isCreatingProfile } = useProfileCreateMutation({
     onSuccess: () => {
-      sendEvent({ action: TelemetryActions.SIGN_UP, properties: { category: 'conversion' } })
+      sendEvent({ action: 'sign_up', properties: { category: 'conversion' } })
     },
     onError: (error) => {
-      Sentry.captureMessage('Failed to create users profile: ' + error.message)
-      toast.error('Failed to create your profile. Please refresh to try again.')
+      if (error.code === 409) {
+        // [Joshen] There's currently an assumption that createProfile is getting triggered
+        // multiple times unnecessarily, although the tracing the code i can't see why this might
+        // be happening unless GET profile is somehow returning `User's profile not found` incorrectly
+        // Adding a Sentry capture + toast in hopes to catch this while developing on local / staging
+        Sentry.captureMessage('Profile already exists: ' + error.message)
+        if (process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod') {
+          toast.error('[DEV] createProfile called despite profile already exists: ' + error.message)
+        }
+      } else {
+        Sentry.captureMessage('Failed to create users profile: ' + error.message)
+        toast.error('Failed to create your profile. Please refresh to try again.')
+      }
     },
   })
 
@@ -74,10 +85,12 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
 
   const value = useMemo(() => {
     const isLoading = isLoadingProfile || isCreatingProfile || isLoadingPermissions
+    const isGHUser = !!profile && 'auth0_id' in profile && profile?.auth0_id.startsWith('github')
+    const profileImageUrl = isGHUser ? getGitHubProfileImgUrl(profile.username) : undefined
 
     return {
       error,
-      profile,
+      profile: !!profile ? { ...profile, profileImageUrl } : undefined,
       isLoading,
       isError,
       isSuccess,

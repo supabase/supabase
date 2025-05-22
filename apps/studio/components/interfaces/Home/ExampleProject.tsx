@@ -3,7 +3,6 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
@@ -29,7 +28,7 @@ const ExampleProject = ({ framework, title, description, url }: ExampleProjectPr
       rel="noreferrer"
       onClick={() =>
         sendEvent({
-          action: TelemetryActions.EXAMPLE_PROJECT_CARD_CLICKED,
+          action: 'example_project_card_clicked',
           properties: { cardTitle: title },
           groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
         })

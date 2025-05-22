@@ -5,6 +5,7 @@ import '../styles/index.css'
 import {
   AuthProvider,
   FeatureFlagProvider,
+  IS_PLATFORM,
   PageTelemetry,
   ThemeProvider,
   useThemeSandbox,
@@ -13,9 +14,9 @@ import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { SonnerToaster, themes } from 'ui'
+import { SonnerToaster, themes, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
-import { useConsent } from 'ui-patterns/ConsentToast'
+import { useConsentToast } from 'ui-patterns/consent'
 
 import MetaFaviconsPagesRouter, {
   DEFAULT_FAVICON_ROUTE,
@@ -27,7 +28,7 @@ import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
-  const { hasAcceptedConsent } = useConsent()
+  const { hasAcceptedConsent } = useConsentToast()
 
   useThemeSandbox()
 
@@ -84,19 +85,25 @@ export default function App({ Component, pageProps }: AppProps) {
       />
 
       <AuthProvider>
-        <FeatureFlagProvider API_URL={API_URL}>
+        <FeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM}>
           <ThemeProvider
             themes={themes.map((theme) => theme.value)}
             enableSystem
             disableTransitionOnChange
             forcedTheme={forceDarkMode ? 'dark' : undefined}
           >
-            <CommandProvider>
-              <SonnerToaster position="top-right" />
-              <Component {...pageProps} />
-              <WwwCommandMenu />
-              <PageTelemetry API_URL={API_URL} hasAcceptedConsent={hasAcceptedConsent} />
-            </CommandProvider>
+            <TooltipProvider delayDuration={0}>
+              <CommandProvider>
+                <SonnerToaster position="top-right" />
+                <Component {...pageProps} />
+                <WwwCommandMenu />
+                <PageTelemetry
+                  API_URL={API_URL}
+                  hasAcceptedConsent={hasAcceptedConsent}
+                  enabled={IS_PLATFORM}
+                />
+              </CommandProvider>
+            </TooltipProvider>
           </ThemeProvider>
         </FeatureFlagProvider>
       </AuthProvider>

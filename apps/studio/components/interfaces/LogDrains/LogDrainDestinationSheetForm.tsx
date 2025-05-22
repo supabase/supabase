@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ExternalLink, TrashIcon } from 'lucide-react'
+import { TrashIcon } from 'lucide-react'
 import { ReactNode, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -7,7 +7,7 @@ import { z } from 'zod'
 
 import { useParams } from 'common'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-import { useFlag } from 'hooks/ui/useFlag'
+
 import {
   Button,
   Form_Shadcn_,
@@ -136,13 +136,15 @@ export function LogDrainDestinationSheetForm({
   onSubmit: (values: z.infer<typeof formSchema>) => void
   mode: 'create' | 'update'
 }) {
-  const lokiLogDrainsEnabled = useFlag('lokilogdrains')
+  // NOTE(kamil): This used to be `any` for a long long time, but after moving to Zod,
+  // it produces a correct union type of all possible configs. Unfortunately, this type was not designed correctly
+  // and it does not include `type` inside the config itself, so it's not trivial to create `discriminatedUnion`
+  // out of it, therefore for an ease of use now, we bail to `any` until the better time come.
+  const defaultConfig = (defaultValues?.config || {}) as any
   const CREATE_DEFAULT_HEADERS = {
     'Content-Type': 'application/json',
   }
-
-  const DEFAULT_HEADERS =
-    mode === 'create' ? CREATE_DEFAULT_HEADERS : defaultValues?.config?.headers || {}
+  const DEFAULT_HEADERS = mode === 'create' ? CREATE_DEFAULT_HEADERS : defaultConfig?.headers || {}
 
   const { ref } = useParams()
   const { data: logDrains } = useLogDrainsQuery({
@@ -158,14 +160,14 @@ export function LogDrainDestinationSheetForm({
       name: defaultValues?.name || '',
       description: defaultValues?.description || '',
       type: defaultType,
-      http: defaultValues?.config?.http || 'http2',
-      gzip: mode === 'create' ? true : defaultValues?.config?.gzip || false,
+      http: defaultConfig?.http || 'http2',
+      gzip: mode === 'create' ? true : defaultConfig?.gzip || false,
       headers: DEFAULT_HEADERS,
-      url: defaultValues?.config?.url || '',
-      api_key: defaultValues?.config?.api_key || '',
-      region: defaultValues?.config?.region || '',
-      username: defaultValues?.config?.username || '',
-      password: defaultValues?.config?.password || '',
+      url: defaultConfig?.url || '',
+      api_key: defaultConfig?.api_key || '',
+      region: defaultConfig?.region || '',
+      username: defaultConfig?.username || '',
+      password: defaultConfig?.password || '',
     },
   })
 
@@ -281,18 +283,16 @@ export function LogDrainDestinationSheetForm({
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
                       </SelectTrigger_Shadcn_>
                       <SelectContent_Shadcn_>
-                        {LOG_DRAIN_TYPES.map((type) =>
-                          type.value === 'loki' && !lokiLogDrainsEnabled ? null : (
-                            <SelectItem_Shadcn_
-                              value={type.value}
-                              key={type.value}
-                              id={type.value}
-                              className="text-left"
-                            >
-                              {type.name}
-                            </SelectItem_Shadcn_>
-                          )
-                        )}
+                        {LOG_DRAIN_TYPES.map((type) => (
+                          <SelectItem_Shadcn_
+                            value={type.value}
+                            key={type.value}
+                            id={type.value}
+                            className="text-left"
+                          >
+                            {type.name}
+                          </SelectItem_Shadcn_>
+                        ))}
                       </SelectContent_Shadcn_>
                     </Select_Shadcn_>
                   </FormItemLayout>
@@ -539,9 +539,11 @@ export function LogDrainDestinationSheetForm({
               }
             >
               <ul className="text-right text-foreground-light">
-                <li className="text-brand-link text-base">$60 per drain per month</li>
-                <li>$0.20 per million events</li>
-                <li>$0.09 per GB egress</li>
+                <li className="text-brand-link text-base" translate="no">
+                  $60 per drain per month
+                </li>
+                <li translate="no">+ $0.20 per million events</li>
+                <li translate="no">+ $0.09 per GB egress</li>
               </ul>
             </FormItemLayout>
           </SheetSection>

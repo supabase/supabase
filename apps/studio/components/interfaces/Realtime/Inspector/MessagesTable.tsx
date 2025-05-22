@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { DocsButton } from 'components/ui/DocsButton'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -182,7 +181,7 @@ const MessagesTable = ({
                       selectedCellIdx={undefined}
                       onClick={() => {
                         sendEvent({
-                          action: TelemetryActions.REALTIME_INSPECTOR_MESSAGE_CLICKED,
+                          action: 'realtime_inspector_message_clicked',
                           groups: {
                             project: ref ?? 'Unknown',
                             organization: org?.slug ?? 'Unknown',

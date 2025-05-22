@@ -74,6 +74,8 @@ const ColumnType = ({
   const isAvailableType = value ? availableTypes.includes(value) : true
   const recommendation = RECOMMENDED_ALTERNATIVE_DATA_TYPE[value]
 
+  const unsupportedDataTypeText = `This column's data type cannot be changed via the Table Editor as it is not supported yet. You can do so through the SQL Editor instead.`
+
   const getOptionByName = (name: string) => {
     // handle built in types
     const pgOption = POSTGRES_DATA_TYPE_OPTIONS.find((option) => option.name === name)
@@ -124,17 +126,12 @@ const ColumnType = ({
             size="small"
             icon={inferIcon(POSTGRES_DATA_TYPE_OPTIONS.find((x) => x.name === value)?.type ?? '')}
             value={value}
-            descriptionText={
-              showLabel
-                ? 'Custom non-native psql data types currently cannot be changed to a different data type via Supabase Studio'
-                : ''
-            }
+            descriptionText={showLabel ? unsupportedDataTypeText : undefined}
           />
         </TooltipTrigger>
         {!showLabel && (
           <TooltipContent side="bottom" className="w-80">
-            Custom non-native psql data types currently cannot be changed to a different data type
-            via Supabase Studio
+            {unsupportedDataTypeText}
           </TooltipContent>
         )}
       </Tooltip>

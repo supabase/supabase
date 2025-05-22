@@ -11,8 +11,8 @@ code = "42501"
 message = "permission denied for table http_request_queue"
 ---
 
-If you're currently blocked by the above error, please run the following in your Supabase SQL editor:
+If you're currently blocked by the above error, run the following in your Supabase SQL editor:
 
 - Check `select * from net.http_request_queue` and make sure it's empty.
 - Try `drop extension pg_net; create extension pg_net schema extensions;`
-- If that doesn't work (e.g. because some objects depend on it), then please [contact support](https://supabase.com/support).
+- If that doesn't work (e.g. because some objects depend on it), then [contact support](https://supabase.com/support).

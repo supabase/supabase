@@ -97,7 +97,8 @@ export const pluckObjectFields = (model: any, fields: any[]) => {
  */
 export const tryParseInt = (str: string) => {
   try {
-    return parseInt(str, 10)
+    const int = parseInt(str, 10)
+    return isNaN(int) ? undefined : int
   } catch (error) {
     return undefined
   }
@@ -292,7 +293,7 @@ const currencyFormatterSmallValues = Intl.NumberFormat('en-US', {
 export const formatCurrency = (amount: number | undefined | null): string | null => {
   if (amount === undefined || amount === null) {
     return null
-  } else if (amount < 0.01) {
+  } else if (amount > 0 && amount < 0.01) {
     return currencyFormatterSmallValues.format(amount)
   } else {
     return currencyFormatterDefault.format(amount)

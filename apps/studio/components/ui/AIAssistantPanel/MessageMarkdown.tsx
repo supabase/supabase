@@ -1,16 +1,27 @@
 import { useRouter } from 'next/router'
-import { DragEvent, memo, ReactNode, useContext, useEffect, useMemo, useRef } from 'react'
+import {
+  DragEvent,
+  memo,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { Dashboards } from 'types'
 import { Badge, cn, CodeBlock, CodeBlockLang } from 'ui'
 import { DebouncedComponent } from '../DebouncedComponent'
+import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { QueryBlock } from '../QueryBlock/QueryBlock'
 import { AssistantSnippetProps } from './AIAssistant.types'
 import { identifyQueryType } from './AIAssistant.utils'
@@ -61,7 +72,9 @@ const MemoizedQueryBlock = memo(
     isLoading,
     isDraggable,
     runQuery,
+    results,
     onRunQuery,
+    onResults,
     onDragStart,
     onUpdateChartConfig,
   }: {
@@ -73,7 +86,9 @@ const MemoizedQueryBlock = memo(
     isLoading: boolean
     isDraggable: boolean
     runQuery: boolean
+    results?: any[]
     onRunQuery: (queryType: 'select' | 'mutation') => void
+    onResults: (results: any[]) => void
     onDragStart: (e: DragEvent<Element>) => void
     onUpdateChartConfig?: ({
       chart,
@@ -84,7 +99,7 @@ const MemoizedQueryBlock = memo(
     }) => void
   }) => (
     <DebouncedComponent
-      delay={500}
+      delay={isLoading ? 500 : 0}
       value={sql}
       fallback={
         <div className="bg-surface-100 border-overlay rounded border shadow-sm px-3 py-2 text-xs">
@@ -94,6 +109,7 @@ const MemoizedQueryBlock = memo(
     >
       <QueryBlock
         lockColumns
+        showRunButtonIfNotReadOnly
         label={title}
         sql={sql}
         chartConfig={{
@@ -118,7 +134,9 @@ const MemoizedQueryBlock = memo(
         isLoading={isLoading}
         draggable={isDraggable}
         runQuery={runQuery}
+        results={results}
         onRunQuery={onRunQuery}
+        onResults={onResults}
         onDragStart={onDragStart}
         onUpdateChartConfig={onUpdateChartConfig}
       />
@@ -127,12 +145,30 @@ const MemoizedQueryBlock = memo(
 )
 MemoizedQueryBlock.displayName = 'MemoizedQueryBlock'
 
-export const MarkdownPre = ({ children }: { children: any }) => {
+export const MarkdownPre = ({
+  children,
+  id,
+  onResults,
+}: {
+  children: any
+  id: string
+  onResults: ({
+    messageId,
+    resultId,
+    results,
+  }: {
+    messageId: string
+    resultId?: string
+    results: any[]
+  }) => void
+}) => {
   const router = useRouter()
   const { profile } = useProfile()
   const { isLoading, readOnly } = useContext(MessageContext)
   const { mutate: sendEvent } = useSendEventMutation()
-  const supportSQLBlocks = useFlag('reportsV2')
+  const snap = useAiAssistantStateSnapshot()
+  const project = useSelectedProject()
+  const org = useSelectedOrganization()
 
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
@@ -149,21 +185,29 @@ export const MarkdownPre = ({ children }: { children: any }) => {
   })
 
   const language = children[0].props.className?.replace('language-', '') || 'sql'
-  const rawSql = language === 'sql' ? children[0].props.children : undefined
-  const formatted = (rawSql || [''])[0]
-  const propsMatch = formatted.match(/--\s*props:\s*(\{[^}]+\})/)
+  const rawContent = children[0].props.children[0]
+  const propsMatch = rawContent.match(/(?:--|\/\/)\s*props:\s*(\{[^}]+\})/)
 
-  const snippetProps: AssistantSnippetProps = useMemo(
-    () => (propsMatch ? JSON.parse(propsMatch[1]) : {}),
-    [propsMatch]
-  )
+  const snippetProps: AssistantSnippetProps = useMemo(() => {
+    try {
+      if (propsMatch) {
+        return JSON.parse(propsMatch[1])
+      }
+    } catch {}
+    return {}
+  }, [propsMatch])
+
   const { xAxis, yAxis } = snippetProps
-  const title = snippetProps.title || 'SQL Query'
+  const snippetId = snippetProps.id
+  const title = snippetProps.title || (language === 'edge' ? 'Edge Function' : 'SQL Query')
   const isChart = snippetProps.isChart === 'true'
   const runQuery = snippetProps.runQuery === 'true'
-  const sql = formatted?.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
-  const isDraggableToReports =
-    supportSQLBlocks && canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
+  const results = snap.getCachedSQLResults({ messageId: id, snippetId })
+
+  // Strip props from the content for both SQL and edge functions
+  const cleanContent = rawContent.replace(/(?:--|\/\/)\s*props:\s*\{[^}]+\}/, '').trim()
+
+  const isDraggableToReports = canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
 
   useEffect(() => {
     chartConfig.current = {
@@ -175,43 +219,61 @@ export const MarkdownPre = ({ children }: { children: any }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snippetProps])
 
+  const onResultsReturned = useCallback(
+    (results: any[]) => {
+      onResults({ messageId: id, resultId: snippetProps.id, results })
+    },
+    [onResults, snippetProps.id]
+  )
+
   const onRunQuery = async (queryType: 'select' | 'mutation') => {
     sendEvent({
-      action: TelemetryActions.ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED,
+      action: 'assistant_suggestion_run_query_clicked',
       properties: {
         queryType,
-        ...(queryType === 'mutation' ? { category: identifyQueryType(sql) ?? 'unknown' } : {}),
+        ...(queryType === 'mutation'
+          ? { category: identifyQueryType(cleanContent) ?? 'unknown' }
+          : {}),
+      },
+      groups: {
+        project: project?.ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
       },
     })
   }
 
   return (
     <div className="w-auto -ml-[36px] overflow-x-hidden">
-      {language === 'sql' ? (
+      {language === 'edge' ? (
+        <EdgeFunctionBlock
+          label={title}
+          code={cleanContent}
+          functionName={snippetProps.name || 'my-function'}
+          showCode={!readOnly}
+        />
+      ) : language === 'sql' ? (
         readOnly ? (
-          <CollapsibleCodeBlock
-            value={children[0].props.children[0]}
-            language="sql"
-            hideLineNumbers
-          />
+          <CollapsibleCodeBlock value={cleanContent} language="sql" hideLineNumbers />
         ) : (
           <MemoizedQueryBlock
-            sql={sql}
+            sql={cleanContent}
             title={title}
             xAxis={xAxis}
             yAxis={yAxis}
             isChart={isChart}
             isLoading={isLoading}
             isDraggable={isDraggableToReports}
-            runQuery={runQuery}
+            runQuery={!results && runQuery}
+            results={results}
             onRunQuery={onRunQuery}
+            onResults={onResultsReturned}
             onUpdateChartConfig={({ chartConfig: config }) => {
               chartConfig.current = { ...chartConfig.current, ...config }
             }}
             onDragStart={(e: DragEvent<Element>) => {
               e.dataTransfer.setData(
                 'application/json',
-                JSON.stringify({ label: title, sql, config: chartConfig.current })
+                JSON.stringify({ label: title, sql: cleanContent, config: chartConfig.current })
               )
             }}
           />
@@ -219,7 +281,7 @@ export const MarkdownPre = ({ children }: { children: any }) => {
       ) : (
         <CodeBlock
           hideLineNumbers
-          value={children[0].props.children[0]}
+          value={cleanContent}
           language={language as CodeBlockLang}
           className={cn(
             'max-h-96 max-w-none block border rounded !bg-transparent !py-3 !px-3.5 prose dark:prose-dark text-foreground',

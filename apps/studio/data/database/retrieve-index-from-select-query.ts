@@ -6,7 +6,7 @@ import { databaseKeys } from './keys'
 
 export type GetInvolvedIndexesFromSelectQueryVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   query: string
 }
 
@@ -17,6 +17,7 @@ export type GetInvolvedIndexesFromSelectQueryResponse = {
 }
 
 // [Joshen] This is experimental - hence why i'm chucking a create or replace query like this here
+// [Alaister] Based on: https://github.com/supabase/index_advisor/blob/ddb9b4ed17692ef8dbf049fad806426a851a3079/index_advisor--0.2.0.sql
 
 export async function getInvolvedIndexesInSelectQuery({
   projectRef,
@@ -29,56 +30,90 @@ export async function getInvolvedIndexesInSelectQuery({
     const { result } = await executeSql({
       projectRef,
       connectionString,
-      sql: `
-CREATE OR REPLACE FUNCTION pg_temp.explain_query(query TEXT) RETURNS JSONB AS $$
-DECLARE
-    explain_result JSONB;
-    prepared_statement_name TEXT := 'query_to_explain';
-    n_args INT;
-BEGIN
-    -- Disallow multiple statements
-    IF query ILIKE '%;%' THEN
-        RAISE EXCEPTION 'Query must not contain a semicolon';
-    END IF;
+      queryKey: ['involved-indexes-explain-query'],
+      sql: /* sql */ `
+        create or replace function pg_temp.explain_query(query text) returns jsonb
+        language plpgsql
+        as $$
+        declare
+            explain_result jsonb;
+            prepared_statement_name text := 'query_to_explain';
+            explain_plan_statement text;
+            n_args int;
+        begin
+            -- Remove comment lines (its common that they contain semicolons)
+            query := trim(
+                regexp_replace(
+                    regexp_replace(
+                        regexp_replace(query,'\\/\\*.+\\*\\/', '', 'g'),
+                    '--[^\\r\\n]*', ' ', 'g'),
+                '\\s+', ' ', 'g')
+            );
+      
+            -- Remove trailing semicolon
+            query := regexp_replace(query, ';\\s*$', '');
 
-    -- Construct the parameterized query
-    EXECUTE 'PREPARE ' || prepared_statement_name || ' AS ' || query;
+            -- Disallow multiple statements
+            if query ilike '%;%' then
+                raise exception 'Query must not contain a semicolon';
+            end if;
+        
+            -- Hack to support PostgREST because the prepared statement for args incorrectly defaults to text
+            query := replace(query, 'WITH pgrst_payload AS (SELECT $1 AS json_data)', 
+                                    'WITH pgrst_payload AS (SELECT $1::json AS json_data)');
+        
+            -- Create a prepared statement for the given query
+            deallocate all;
+            execute format('prepare %I as %s', prepared_statement_name, query);
+        
+            -- Detect how many arguments are present in the prepared statement
+            n_args = (
+                select
+                    coalesce(array_length(parameter_types, 1), 0)
+                from
+                    pg_prepared_statements
+                where
+                    name = prepared_statement_name
+                limit
+                    1
+            );
+        
+            -- Create a SQL statement that can be executed to collect the explain plan
+            explain_plan_statement = format(
+                'set local plan_cache_mode = force_generic_plan; explain (format json) execute %I%s',
+                prepared_statement_name,
+                case
+                    when n_args = 0 then ''
+                    else format(
+                        '(%s)', array_to_string(array_fill('null'::text, array[n_args]), ',')
+                    )
+                end
+            );
+        
+            -- Execute the explain plan statement and get the result
+            execute explain_plan_statement into explain_result;
+        
+            -- Clean up the prepared statement
+            deallocate all;
+        
+            -- Return the explain result
+            return explain_result;
+        end;
+        $$;
 
-    -- Detect how many arguments are present in the prepared statement
-    SELECT COALESCE(array_length(parameter_types, 1), 0)
-    INTO n_args
-    FROM pg_prepared_statements
-    WHERE name = prepared_statement_name
-    LIMIT 1;
-
-    -- Construct the EXECUTE statement with parameters using dynamic SQL construction
-    IF n_args > 0 THEN
-        EXECUTE 'EXPLAIN (FORMAT JSON) EXECUTE ' || prepared_statement_name || '(' || quote_literal($1) || ')' INTO explain_result;
-    ELSE
-        EXECUTE 'EXPLAIN (FORMAT JSON) EXECUTE ' || prepared_statement_name INTO explain_result;
-    END IF;
-
-    -- Deallocate the prepared statement
-    EXECUTE 'DEALLOCATE ' || prepared_statement_name;
-
-    -- Return the explain result
-    RETURN explain_result;
-END;
-$$ LANGUAGE plpgsql;
-select pg_temp.explain_query('${query}') as plans;
-`.trim(),
+        select pg_temp.explain_query('${query}') as plans;
+      `,
     })
 
-    const involvedIndexes = result[0].plans
-      .filter((plan: any) => 'Index Name' in plan['Plan'])
-      .map((plan: any) => `'${plan['Plan']['Index Name']}'`)
+    const involvedIndexes = findIndexNames(result)
 
-    if (involvedIndexes.length === 0) return []
+    if (involvedIndexes.length <= 0) return []
 
     const { result: indexResult } = await executeSql({
       projectRef,
       connectionString,
-      sql: `select schemaname as schema, tablename as table, indexname as name from pg_indexes where indexname in (${involvedIndexes.join(', ')});`,
+      queryKey: ['involved-indexes-names'],
+      sql: `select schemaname as schema, tablename as table, indexname as name from pg_indexes where indexname in (${involvedIndexes.map((name) => `'${name}'`).join(', ')});`,
     })
 
     return indexResult as GetInvolvedIndexesFromSelectQueryResponse[]
@@ -104,10 +139,11 @@ export const useGetIndexesFromSelectQuery = <TData = GetInvolvedIndexesFromSelec
   > = {}
 ) => {
   // [Joshen] Only get indexes for queries starting with these
+  const formattedQuery = (query ?? '').trim().toLowerCase()
   const isValidQueryForIndexing =
-    query !== undefined &&
-    (query.trim().toLowerCase().startsWith('select') ||
-      query.trim().toLowerCase().startsWith('with pgrst_source'))
+    formattedQuery.startsWith('select') ||
+    formattedQuery.startsWith('with pgrst_source') ||
+    formattedQuery.startsWith('with pgrst_payload')
 
   return useQuery<
     GetInvolvedIndexesFromSelectQueryData,
@@ -126,4 +162,28 @@ export const useGetIndexesFromSelectQuery = <TData = GetInvolvedIndexesFromSelec
       ...options,
     }
   )
+}
+
+// Helper functions
+
+type JsonValue = string | number | boolean | null | JsonObject | JsonArray
+type JsonObject = { [key: string]: JsonValue }
+type JsonArray = JsonValue[]
+
+function findIndexNames(obj: JsonValue): string[] {
+  const results: string[] = []
+
+  function traverse(current: JsonValue): void {
+    if (current === null || typeof current !== 'object') return
+
+    if ('Index Name' in current) {
+      results.push(current['Index Name'] as string)
+    }
+
+    Object.values(current).forEach((value) => traverse(value))
+  }
+
+  traverse(obj)
+
+  return results
 }

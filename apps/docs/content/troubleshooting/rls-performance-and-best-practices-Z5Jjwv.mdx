@@ -9,14 +9,13 @@ database_id = "bb06ff88-e0a9-41bc-b00b-9afde10468a5"
 
 ## RLS performance and best practices
 
-Although most of the time spent on thinking about RLS is to get it to handle security needs, the impact of it on performance
-of your queries can be massive.
+Although most of the time spent on thinking about RLS is to get it to handle security needs, the impact of it on performance of your queries can be massive.
 This is especially true on queries that look at every row in a table like for many select operations and updates.
 Note that queries that use limit and offset will usually have to query all rows to determine order, not just the limit amount so they are impacted too.
 
-Please see the last section for ways to measure the performance of your queries as you test RLS improvements.
+See the last section for ways to measure the performance of your queries as you test RLS improvements.
 
-### Is RLS causing my performance issue (on a single table query)?
+### Is RLS causing performance issues (on a single table query)?
 
 For very slow queries, or if using the tools at end of article, run a query with RLS enabled on the table and then with it disabled (this should only be done in a non production environment). If the results are similar then your query itself is likely the performance issue. Although, remember any join tables in RLS will also need to run their RLS unless a security definer function is used to bypass them. You can also create a service_role client to run the query bypassing RLS if in a secure environment.
 
@@ -34,8 +33,8 @@ Improvement seen over 100x on large tables.
 
 #### 2. Another method to improve performance is to wrap your RLS queries and functions in select statements.
 
-This method works well for jwt functions like auth.uid() and auth.jwt() as well as any other functions including security definer type.
-Wrapping the function in some SQL causes an initPlan to be run by the optimizer which allows it to "cache" the results versus calling the function
+This method works well for JWT functions like `auth.uid()` and `auth.jwt()` as well as any other functions including security definer type.
+Wrapping the function in some SQL causes an `initPlan` to be run by the optimizer which allows it to "cache" the results versus calling the function
 on each row.
 WARNING: You can only do this if the results of the query or function do not change based on the row data.
 For RLS like this:
@@ -108,7 +107,7 @@ Note that if the `in` list gets to be over 10K items, then extra analysis is lik
 
 #### 6. Use role in TO option or roles dropdown in the dashboard.
 
-Never just use RLS involving auth.uid() or auth.jwt() as your way to rule out 'anon' role.
+Never just use RLS involving `auth.uid()` or `auth.jwt()` as your way to rule out 'anon' role.
 Always add 'authenticated' to the approved roles instead of nothing or public.
 Although this does not improve the query performance for the signed in user it does
 eliminate 'anon' users without taxing the database to process the rest of the RLS.
@@ -134,10 +133,10 @@ Show RLS and before after for above examples.
 
 ### Tools to measure performance
 
-Postgres has tools to analyze the peformance of queries. https://www.postgresql.org/docs/current/sql-explain.html
+Postgres has tools to analyze the performance of queries. https://www.postgresql.org/docs/current/sql-explain.html
 The use of explain in detail for query analysis is beyond the scope of this discussion.
 Here we will use it mainly to get a performance metric to compare times.
-In order to do RLS testing you need to setup the user jwt claims and change the running user to `anon` or `authenticated`.
+In order to do RLS testing you need to setup the user JWT claims and change the running user to `anon` or `authenticated`.
 
 ```sql
 set session role authenticated;
@@ -161,7 +160,7 @@ In this case the execution time is the critical number we need to compare.
 
 PostgREST allows use of explain to get performance information on your queries with Supabase clients.
 
-Before using this feature you need to run the following command in the Dashboad SQL editor (should not be used in production):
+Before using this feature you need to run the following command in the Dashboard SQL editor (should not be used in production):
 
 ```sql
 alter role authenticator set pgrst.db_plan_enabled to true;
@@ -192,10 +191,11 @@ Planning Time: 0.092 ms
 Execution Time: 0.046 ms
 ```
 
-\*These two github discussions cover the history that lead to this analysis...
+\*These two GitHub discussions cover the history that lead to this analysis...
 
 [Stable functions do not seem to be honored in RLS in basic form](https://github.com/orgs/supabase/discussions/9311)
 [current_setting can lead to bad performance when used on RLS](https://github.com/PostgREST/postgrest-docs/issues/609#)
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 Thanks Steve Chavez and Wolfgang Walther in those threads.
 
 ### Added example of security definer function having select of a team table, comparing against a column in main table
@@ -225,6 +225,8 @@ $$ language plpgsql security definer;
 
 Some results:
 
+{/* supa-mdx-lint-disable Rule003Spelling */}
+
 | Policy                           | Index | Main Rs | Team Rs | on 10 teams | 100   | 500   | note               |
 | -------------------------------- | ----- | ------- | ------- | ----------- | ----- | ----- | ------------------ |
 | =ANY(user_teams())               | no    | 1M      | 1000    | >2Min       | >2Min | >2Min | TO or killed       |
@@ -233,3 +235,5 @@ Some results:
 | =ANY(ARRAY(select user_teams())) | yes   | 1M      | 1000    | 2ms         | 3     | 3     |                    |
 | in(1,2,3...100)                  | no    | 1M      | NA      | 130ms       | 142   | x     | baseline check     |
 | =ANY(ARRAY(select user_teams())) | yes   | 1M      | 10K     | x           | x     | x     | 24ms (on 1K teams) |
+
+{/* supa-mdx-lint-enable Rule003Spelling */}

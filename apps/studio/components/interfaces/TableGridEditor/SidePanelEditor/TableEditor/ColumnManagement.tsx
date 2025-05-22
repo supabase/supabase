@@ -10,7 +10,6 @@ import {
 } from 'react-beautiful-dnd'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import InformationBox from 'components/ui/InformationBox'
 import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -170,7 +169,7 @@ const ColumnManagement = ({
                     onClick={() => {
                       onSelectImportData()
                       sendEvent({
-                        action: TelemetryActions.IMPORT_DATA_BUTTON_CLICKED,
+                        action: 'import_data_button_clicked',
                         properties: { tableType: 'New Table' },
                         groups: {
                           project: projectRef ?? 'Unknown',

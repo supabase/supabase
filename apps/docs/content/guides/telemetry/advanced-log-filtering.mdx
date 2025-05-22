@@ -15,7 +15,7 @@ The log tables are queried with a subset of BigQuery SQL syntax. They all have t
 | event_message | the log's message           |
 | metadata      | information about the event |
 
-The `metadata` column is an array of JSON objects that stores important details about each recorded event. For example, in the postgres table, the `metadata.parsed.error_severity` field indicates the error level of an event. To work with its values, you need to `unnest` them using a `cross join`.
+The `metadata` column is an array of JSON objects that stores important details about each recorded event. For example, in the Postgres table, the `metadata.parsed.error_severity` field indicates the error level of an event. To work with its values, you need to `unnest` them using a `cross join`.
 
 This approach is commonly used with JSON and array columns, so it might look a bit unfamiliar if you're not used to working with these data types.
 

@@ -1,8 +1,8 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { components } from 'api-types'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { storageKeys } from './keys'
 
@@ -14,6 +14,8 @@ export type BucketCreateVariables = {
   allowed_mime_types: string[] | null
 }
 
+type CreateStorageBucketBody = components['schemas']['CreateStorageBucketBody']
+
 export async function createBucket({
   projectRef,
   id,
@@ -22,16 +24,21 @@ export async function createBucket({
   allowed_mime_types,
 }: BucketCreateVariables) {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!id) throw new Error('Bucket name is requried')
+  if (!id) throw new Error('Bucket name is required')
 
-  const response = await post(`${API_URL}/storage/${projectRef}/buckets`, {
-    id,
-    public: isPublic,
-    file_size_limit,
-    allowed_mime_types,
+  const payload: Partial<CreateStorageBucketBody> = { id, public: isPublic }
+  if (file_size_limit) payload.file_size_limit = file_size_limit
+  if (allowed_mime_types) payload.allowed_mime_types
+
+  const { data, error } = await post('/platform/storage/{ref}/buckets', {
+    params: { path: { ref: projectRef } },
+    body: payload as CreateStorageBucketBody,
   })
-  if (response.error) throw response.error
-  return response
+
+  if (error) handleError(error)
+  // @ts-expect-error API type is wrong here
+  // https://github.com/supabase/infrastructure/blob/develop/api/src/routes/platform/storage/ref/buckets/buckets.controller.ts#L55
+  return data as { name: string }
 }
 
 type BucketCreateData = Awaited<ReturnType<typeof createBucket>>

@@ -121,6 +121,9 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     Link: LinkComponent,
     code: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
     BlogCollapsible: (props: any) => <BlogCollapsible {...props} />,
+    Subtitle: (props: any) => (
+      <p className={cn('-mt-6 text-foreground-lighter text-lg', props.className)} {...props} />
+    ),
     Admonition,
   }
 

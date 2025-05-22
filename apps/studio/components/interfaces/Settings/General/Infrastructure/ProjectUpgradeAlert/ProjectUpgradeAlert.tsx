@@ -18,7 +18,6 @@ import {
 } from 'data/config/project-upgrade-eligibility-query'
 import { ReleaseChannel, useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
@@ -72,8 +71,7 @@ const ProjectUpgradeAlert = () => {
 
   const projectUpgradeDisabled = useFlag('disableProjectUpgrade')
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
-  const planId = subscription?.plan.id ?? 'free'
+  const planId = org?.plan.id ?? 'free'
 
   const { data: diskAttributes } = useDiskAttributesQuery({ projectRef: ref })
   const { includedDiskGB: includedDiskGBMeta } = PLAN_DETAILS[planId]

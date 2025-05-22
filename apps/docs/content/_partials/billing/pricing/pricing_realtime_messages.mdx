@@ -1,0 +1,9 @@
+<Price price="2.50" /> per 1 million messages. You are only charged for usage exceeding your subscription
+plan's quota.
+
+| Plan       | Quota     | Over-Usage                                    |
+| ---------- | --------- | --------------------------------------------- |
+| Free       | 2 million | -                                             |
+| Pro        | 5 million | <Price price="2.50" /> per 1 million messages |
+| Team       | 5 million | <Price price="2.50" /> per 1 million messages |
+| Enterprise | Custom    | Custom                                        |

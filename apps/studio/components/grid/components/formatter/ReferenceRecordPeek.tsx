@@ -8,6 +8,7 @@ import {
   ESTIMATED_CHARACTER_PIXEL_WIDTH,
   getColumnDefaultWidth,
 } from 'components/grid/utils/gridColumns'
+import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -72,16 +73,17 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
           <span className="text-xs text-foreground-light font-normal">{column.format}</span>
         </div>
       ),
-      renderCell: ({ column, row }) => {
-        const value = row[column.name as any]
+      renderCell: ({ column: col, row }) => {
+        const value = row[col.name as any]
+        const formattedValue = column.format === 'bytea' ? convertByteaToHex(value) : value
         return (
           <div
             className={cn(
               'flex items-center h-full w-full whitespace-pre',
-              value === null && 'text-foreground-lighter'
+              formattedValue === null && 'text-foreground-lighter'
             )}
           >
-            {value === null ? 'NULL' : value}
+            {formattedValue === null ? 'NULL' : formattedValue}
           </div>
         )
       },

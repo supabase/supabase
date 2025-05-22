@@ -1,15 +1,13 @@
+import { Menu, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Search, Menu } from 'lucide-react'
+import { useState } from 'react'
 
 import { useParams } from 'common'
+import { SidebarContent } from 'components/interfaces/Sidebar'
 import { IS_PLATFORM } from 'lib/constants'
-import { useAppStateSnapshot } from 'state/app-state'
-
-import { buttonVariants, cn, Sheet, SheetContent } from 'ui'
+import { buttonVariants, cn } from 'ui'
 import { CommandMenuTrigger } from 'ui-patterns'
-import { NavContent } from './NavigationBar'
-import { useState } from 'react'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
 export const ICON_SIZE = 20
@@ -19,14 +17,6 @@ const MobileNavigationBar = () => {
   const router = useRouter()
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const { ref: projectRef } = useParams()
-  const snap = useAppStateSnapshot()
-
-  const onCloseNavigationIconLink = (event: any) => {
-    snap.setNavigationPanelOpen(
-      false,
-      event.target.id === 'icon-link' || ['svg', 'path'].includes(event.target.localName)
-    )
-  }
 
   return (
     <div className="h-14 w-full flex flex-row md:hidden">
@@ -39,9 +29,8 @@ const MobileNavigationBar = () => {
         )}
       >
         <Link
-          href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
+          href={IS_PLATFORM ? '/organizations' : `/project/${projectRef}`}
           className="flex items-center h-[26px] w-[26px] min-w-[26px]"
-          onClick={onCloseNavigationIconLink}
         >
           <img
             alt="Supabase"
@@ -80,8 +69,8 @@ const MobileNavigationBar = () => {
           </button>
         </div>
       </nav>
-      <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <NavContent />
+      <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen} data-state="expanded">
+        <SidebarContent />
       </MobileSheetNav>
     </div>
   )

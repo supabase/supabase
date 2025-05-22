@@ -6,8 +6,10 @@ module.exports = config({
     './components/**/*.{js,ts,jsx,tsx}',
     // purge styles from grid library
     './../../packages/ui/src/**/*.{tsx,ts,js}',
-    './../../packages/ui-patterns/!(node_modules)/**/*.{tsx,ts,js}',
+    './../../packages/ui-patterns/**/*.{tsx,ts,js}',
+    '!./../../packages/ui-patterns/node_modules/**/*', // ignore node_modules rule
   ],
+  plugins: [require('@tailwindcss/container-queries')],
   theme: {
     extend: {
       fontSize: {

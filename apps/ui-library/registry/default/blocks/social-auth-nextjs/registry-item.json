@@ -1,0 +1,43 @@
+{
+  "name": "social-auth-nextjs",
+  "type": "registry:block",
+  "title": "Social Auth flow for Nextjs and Supabase",
+  "description": "Social Auth flow for Nextjs and Supabase",
+  "registryDependencies": ["button", "card"],
+  "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+  "files": [
+    {
+      "path": "registry/default/blocks/social-auth-nextjs/app/auth/login/page.tsx",
+      "type": "registry:page",
+      "target": "app/auth/login/page.tsx"
+    },
+    {
+      "path": "registry/default/blocks/social-auth-nextjs/app/auth/error/page.tsx",
+      "type": "registry:page",
+      "target": "app/auth/error/page.tsx"
+    },
+    {
+      "path": "registry/default/blocks/social-auth-nextjs/app/protected/page.tsx",
+      "type": "registry:page",
+      "target": "app/protected/page.tsx"
+    },
+    {
+      "path": "registry/default/blocks/social-auth-nextjs/app/auth/oauth/route.ts",
+      "type": "registry:page",
+      "target": "app/auth/oauth/route.ts"
+    },
+    {
+      "path": "registry/default/blocks/social-auth-nextjs/components/login-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/social-auth-nextjs/middleware.ts",
+      "type": "registry:file",
+      "target": "middleware.ts"
+    },
+    {
+      "path": "registry/default/blocks/social-auth-nextjs/components/logout-button.tsx",
+      "type": "registry:component"
+    }
+  ]
+}

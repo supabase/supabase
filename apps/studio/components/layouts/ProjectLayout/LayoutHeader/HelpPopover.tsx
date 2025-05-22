@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
 
-import { TelemetryActions } from 'common/telemetry-constants'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -17,7 +16,7 @@ import {
 } from 'ui'
 import { useProjectContext } from '../ProjectContext'
 
-const HelpPopover = () => {
+export const HelpPopover = () => {
   const router = useRouter()
   const { project } = useProjectContext()
   const org = useSelectedOrganization()
@@ -25,7 +24,7 @@ const HelpPopover = () => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   const projectRef = project?.parent_project_ref ?? router.query.ref
-  const supportUrl = `/support/new${projectRef ? `?ref=${projectRef}` : ''}`
+  const supportUrl = `/support/new${projectRef ? `?projectRef=${projectRef}` : ''}`
 
   return (
     <Popover_Shadcn_>
@@ -38,7 +37,7 @@ const HelpPopover = () => {
           tooltip={{ content: { side: 'bottom', text: 'Help' } }}
           onClick={() => {
             sendEvent({
-              action: TelemetryActions.HELP_BUTTON_CLICKED,
+              action: 'help_button_clicked',
               groups: { project: project?.ref, organization: org?.slug },
             })
           }}
@@ -145,5 +144,3 @@ const HelpPopover = () => {
     </Popover_Shadcn_>
   )
 }
-
-export default HelpPopover

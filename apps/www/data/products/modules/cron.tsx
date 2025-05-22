@@ -8,7 +8,7 @@ export default () => ({
   metaDescription:
     'Supabase Cron is a Postgres Module that uses the pg_cron database extension to manage recurring tasks. Manage your Cron Jobs using any Postgres tooling.',
   metaImage: '/images/modules/cron/og.png',
-  url: 'https://supabase.com/dashboard/project/_/integrations/cron-jobs/overview',
+  url: 'https://supabase.com/dashboard/project/_/integrations/cron/overview',
   docsUrl: '/docs/guides/cron',
   heroSection: {
     title: 'Supabase Cron',
@@ -22,7 +22,7 @@ export default () => ({
     icon: PRODUCT_MODULES['cron'].icon[24],
     cta: {
       label: 'Schedule your first Job',
-      link: 'https://supabase.com/dashboard/project/_/integrations/cron-jobs/overview',
+      link: 'https://supabase.com/dashboard/project/_/integrations/cron/overview',
     },
     secondaryCta: {
       label: 'Explore documentation',

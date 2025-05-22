@@ -5,7 +5,6 @@ import { MutableRefObject, useEffect, useRef } from 'react'
 import { cn } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { formatSql } from 'lib/formatSql'
 
 // [Joshen] Is there a way we can just have one single MonacoEditor component that's shared across the dashboard?
@@ -50,7 +49,6 @@ export const RLSCodeEditor = ({
 }: RLSCodeEditorProps) => {
   const hasValue = useRef<any>()
   const monaco = useMonaco()
-  const { project } = useProjectContext()
 
   const placeholderId = `monaco-placeholder-${id}`
   const options: editor.IStandaloneEditorConstructionOptions = {

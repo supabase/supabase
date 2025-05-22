@@ -25,7 +25,7 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
       {
         id: 'nav-project-settings-auth',
         name: 'Auth Settings',
-        route: `/project/${ref}/settings/auth`,
+        route: `/project/${ref}/auth/providers`,
         defaultHidden: true,
       },
       {
@@ -97,13 +97,13 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
       {
         id: 'nav-project-settings-network-restrictions',
         name: 'Network restrictions',
-        route: `/project/${ref}/settings/general#network-restrictions`,
+        route: `/project/${ref}/settings/database#network-restrictions`,
         defaultHidden: true,
       },
       {
         id: 'nav-project-settings-banned-ips',
         name: 'Banned IPs',
-        route: `/project/${ref}/settings/general#banned-ips`,
+        route: `/project/${ref}/settings/database#banned-ips`,
         defaultHidden: true,
       },
       {

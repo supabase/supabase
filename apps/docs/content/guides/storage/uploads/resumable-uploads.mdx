@@ -12,7 +12,7 @@ The resumable upload method is recommended when:
 - Network stability is a concern
 - You want to have progress events for your uploads
 
-Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resumable uploads. TUS stands for The Upload Server and is an open protocol for supporting resumable uploads. The protocol allows the upload process to be resumed from where it left off in case of interruptions. This method can be implemented using the [tus-js-client](https://github.com/tus/tus-js-client) library, or other client-side libraries like [Uppy-js](https://uppy.io/docs/tus/) that support the TUS protocol.
+Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resumable uploads. TUS stands for The Upload Server and is an open protocol for supporting resumable uploads. The protocol allows the upload process to be resumed from where it left off in case of interruptions. This method can be implemented using the [`tus-js-client`](https://github.com/tus/tus-js-client) library, or other client-side libraries like [Uppy](https://uppy.io/docs/tus/) that support the TUS protocol.
 
 <Tabs
   scrollable
@@ -173,7 +173,7 @@ Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resuma
     ```
 
   </TabPanel>
-  
+
   <TabPanel id="kotlin" label="Kotlin">
 
     Kotlin supports resumable uploads natively for all targets:
@@ -268,11 +268,11 @@ When two or more clients upload a file to the same path using different upload U
 
 If you provide the `x-upsert` header the last client to complete the upload will succeed instead.
 
-### UppyJS example
+### Uppy example
 
-You can check a [full example using UppyJS](https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-uppy).
+You can check a [full example using Uppy](https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-uppy).
 
-UppyJS has integrations with different frameworks:
+Uppy has integrations with different frameworks:
 
 - [React](https://uppy.io/docs/react/)
 - [Svelte](https://uppy.io/docs/svelte/)

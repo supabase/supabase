@@ -1,14 +1,14 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { Query } from 'components/grid/query/Query'
+import { Query } from '@supabase/pg-meta/src/query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { tableRowKeys } from './keys'
 
 export type TableRowTruncateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   table: { id: number; name: string; schema?: string }
 }
 

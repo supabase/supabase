@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
+import { type Database } from 'common'
 import { revalidateTag } from 'next/cache'
 import { headers } from 'next/headers'
 import { type NextRequest } from 'next/server'
 import { z } from 'zod'
-
-import { type Database } from 'common'
+import { VALID_REVALIDATION_TAGS } from '~/features/helpers.fetch'
 
 enum AuthorizationLevel {
   Unauthorized,
@@ -13,13 +13,13 @@ enum AuthorizationLevel {
 }
 
 const requestBodySchema = z.object({
-  tags: z.array(z.string()),
+  tags: z.array(z.enum(VALID_REVALIDATION_TAGS)),
 })
 
 export const POST = handleError(_handleRevalidateRequest)
 
 export async function _handleRevalidateRequest(request: NextRequest) {
-  const requestHeaders = headers()
+  const requestHeaders = await headers()
   const authorization = requestHeaders.get('Authorization')
   if (!authorization) {
     return new Response('Missing Authorization header', { status: 401 })
@@ -35,14 +35,12 @@ export async function _handleRevalidateRequest(request: NextRequest) {
   }
 
   let authorizationLevel = AuthorizationLevel.Unauthorized
-
-  const token = authorization.replace(/^Bearer\s+/, '')
+  const token = authorization.replace(/^Bearer /, '')
   if (overrideKeys.includes(token)) {
     authorizationLevel = AuthorizationLevel.Override
   } else if (basicKeys.includes(token)) {
     authorizationLevel = AuthorizationLevel.Basic
   }
-
   if (authorizationLevel === AuthorizationLevel.Unauthorized) {
     return new Response('Invalid Authorization header', { status: 401 })
   }

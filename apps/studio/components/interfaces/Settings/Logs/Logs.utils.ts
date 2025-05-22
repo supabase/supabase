@@ -164,7 +164,7 @@ limit ${limit};
     case 'postgres_logs':
       if (IS_PLATFORM === false) {
         return `
-select postgres_logs.timestamp, id, event_message, parsed.error_severity
+select postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.detail, parsed.hint
 from postgres_logs
 ${joins}
 ${where}
@@ -172,7 +172,7 @@ ${orderBy}
 limit ${limit}
   `
       }
-      return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table}
+      return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity, parsed.detail, parsed.hint from ${table}
   ${joins}
   ${where}
   ${orderBy}
@@ -204,6 +204,9 @@ limit ${limit}
   `
     case 'supavisor_logs':
       return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit ${limit}`
+
+    case 'pg_upgrade_logs':
+      return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit 100`
 
     default:
       return `select id, ${table}.timestamp, event_message from ${table}
@@ -320,9 +323,16 @@ export const genChartQuery = (
   filters: Filters
 ) => {
   const [startOffset, trunc] = calcChartStart(params)
-  const where = genWhereStatement(table, filters)
+  let where = genWhereStatement(table, filters)
   const errorCondition = getErrorCondition(table)
   const warningCondition = getWarningCondition(table)
+
+  // pg_cron logs are a subset of postgres logs
+  // to calculate the chart, we need to query postgres logs
+  if (table === LogsTableName.PG_CRON) {
+    table = LogsTableName.POSTGRES
+    where = `where (parsed.application_name = 'pg_cron' OR event_message LIKE '%cron job%')`
+  }
 
   let joins = genCrossJoinUnnests(table)
 
@@ -597,6 +607,8 @@ function getErrorCondition(table: LogsTableName): string {
       return 'response.status_code >= 500'
     case 'function_logs':
       return "metadata.level IN ('error', 'fatal')"
+    case 'pg_cron_logs':
+      return "parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')"
     default:
       return 'false'
   }

@@ -23,7 +23,7 @@ const ResetPasswordForm = () => {
 
       // logout all other sessions after changing password
       await auth.signOut({ scope: 'others' })
-      await router.push('/projects')
+      await router.push('/organizations')
     } else {
       toast.error(`Failed to save password: ${error.message}`, { id: toastId })
       if (!WHITELIST_ERRORS.some((e) => error.message.includes(e))) {

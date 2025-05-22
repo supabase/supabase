@@ -149,7 +149,15 @@ You can also override the type of an individual successful response if needed:
 <RefSubLayout.Examples>
 
 ```ts
-const { data } = await supabase.from('countries').select().returns<MyType>()
+// Partial type override allows you to only override some of the properties in your results
+const { data } = await supabase.from('countries').select().overrideTypes<Array<{ id: string }>>()
+// For a full replacement of the original return type use the `{ merge: false }` property as second argument
+const { data } = await supabase
+  .from('countries')
+  .select()
+  .overrideTypes<Array<{ id: string }>, { merge: false }>()
+// Use it with `maybeSingle` or `single`
+const { data } = await supabase.from('countries').select().single().overrideTypes<{ id: string }>()
 ```
 
 </RefSubLayout.Examples>

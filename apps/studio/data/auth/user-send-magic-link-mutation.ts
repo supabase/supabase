@@ -13,7 +13,7 @@ export type UserSendMagicLinkVariables = {
 export async function sendMagicLink({ projectRef, user }: UserSendMagicLinkVariables) {
   const { data, error } = await post('/platform/auth/{ref}/magiclink', {
     params: { path: { ref: projectRef } },
-    body: user,
+    body: { email: user.email },
   })
 
   if (error) handleError(error)

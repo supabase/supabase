@@ -18,7 +18,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-     ```sql SQL_EDITOR
+     ```sql name=SQL_EDITOR
       select * from auth.users;
       ````
 
@@ -36,7 +36,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npx create-expo-app -t expo-template-blank-typescript my-app
       ```
 
@@ -53,7 +53,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       cd my-app && npx expo install @supabase/supabase-js @react-native-async-storage/async-storage @rneui/themed react-native-url-polyfill
       ```
 
@@ -70,11 +70,11 @@ hideToc: true
     <StepHikeCompact.Code>
 
 
-      ```ts lib/supabase.ts
+      ```ts name=lib/supabase.ts
       import { AppState } from 'react-native'
       import 'react-native-url-polyfill/auto'
       import AsyncStorage from '@react-native-async-storage/async-storage'
-      import { createClient } from '@supabase/supabase-js'
+      import { createClient, processLock } from '@supabase/supabase-js'
 
       const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL
       const supabaseAnonKey = YOUR_REACT_NATIVE_SUPABASE_ANON_KEY
@@ -85,6 +85,7 @@ hideToc: true
           autoRefreshToken: true,
           persistSession: true,
           detectSessionInUrl: false,
+          lock: processLock,
         },
       })
 
@@ -115,7 +116,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```tsx components/Auth.tsx
+      ```tsx name=components/Auth.tsx
       import React, { useState } from 'react'
       import { Alert, StyleSheet, View } from 'react-native'
       import { supabase } from '../lib/supabase'
@@ -214,7 +215,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```tsx App.tsx
+      ```tsx name=App.tsx
       import 'react-native-url-polyfill/auto'
       import { useState, useEffect } from 'react'
       import { supabase } from './lib/supabase'
@@ -257,7 +258,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npm start
       ```
 

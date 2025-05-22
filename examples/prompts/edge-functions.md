@@ -1,3 +1,9 @@
+---
+# Specify the following for Cursor rules
+description: Coding rules for Supabase Edge Functions
+alwaysApply: false
+---
+
 # Writing Supabase Edge Functions
 
 You're an expert in writing TypeScript and Deno JavaScript runtime. Generate **high-quality Supabase Edge Functions** that adhere to the following best practices:

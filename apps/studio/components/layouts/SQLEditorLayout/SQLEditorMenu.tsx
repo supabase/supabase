@@ -1,16 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useDebounce } from '@uidotdev/usehooks'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { FilePlus, FolderPlus, Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useDebounce } from '@uidotdev/usehooks'
-import { useParams } from 'common'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
+import { getAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
@@ -27,22 +27,18 @@ import {
   InnerSideBarFilterSearchInput,
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
-  InnerSideMenuItem,
 } from 'ui-patterns/InnerSideMenu'
-import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
+import { SqlEditorMenuStaticLinks } from './SqlEditorMenuStaticLinks'
 import { SearchList } from './SQLEditorNavV2/SearchList'
+import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
 
-interface SQLEditorMenuProps {
-  onViewOngoingQueries: () => void
-}
-
-export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
+export const SQLEditorMenu = () => {
   const router = useRouter()
   const { profile } = useProfile()
   const project = useSelectedProject()
   const { ref } = useParams()
-
   const snapV2 = useSqlEditorV2StateSnapshot()
+
   const [search, setSearch] = useState('')
   const [showSearch, setShowSearch] = useState(false)
   const [sort, setSort] = useLocalStorage<'name' | 'inserted_at'>(
@@ -50,6 +46,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
     'inserted_at'
   )
 
+  const appState = getAppStateSnapshot()
   const debouncedSearch = useDebounce(search, 500)
 
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
@@ -156,39 +153,17 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
         </div>
 
         {showSearch ? (
-          <SearchList
-            search={debouncedSearch}
-            onSelectSnippet={() => {
-              setSearch('')
-              setShowSearch(false)
-            }}
-          />
+          <SearchList search={debouncedSearch} />
         ) : (
           <>
-            <div className="px-2">
-              <InnerSideMenuItem
-                title="Templates"
-                isActive={router.asPath === `/project/${ref}/sql/templates`}
-                href={`/project/${ref}/sql/templates`}
-              >
-                Templates
-              </InnerSideMenuItem>
-              <InnerSideMenuItem
-                title="Quickstarts"
-                isActive={router.asPath === `/project/${ref}/sql/quickstarts`}
-                href={`/project/${ref}/sql/quickstarts`}
-              >
-                Quickstarts
-              </InnerSideMenuItem>
-            </div>
-
+            <SqlEditorMenuStaticLinks />
             <SQLEditorNav sort={sort} />
           </>
         )}
       </div>
 
       <div className="p-4 border-t sticky bottom-0 bg-studio">
-        <Button block type="default" onClick={onViewOngoingQueries}>
+        <Button block type="default" onClick={() => appState.setOnGoingQueriesPanelOpen(true)}>
           View running queries
         </Button>
       </div>

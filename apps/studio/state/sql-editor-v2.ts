@@ -22,6 +22,7 @@ export type StateSnippetFolder = {
 // [Joshen] API codegen is somehow missing the content property
 export interface SnippetWithContent extends Snippet {
   content?: SqlSnippets.Content
+  isNotSavedInDatabaseYet?: boolean
 }
 
 export type StateSnippet = {
@@ -108,7 +109,6 @@ export const sqlEditorState = proxy({
     if (storedSnippet) {
       if (!storedSnippet.snippet.content) {
         storedSnippet.snippet.content = snippet.content
-        sqlEditorState.needsSaving.set(storedSnippet.snippet.id, true)
       }
     } else {
       sqlEditorState.addSnippet({ projectRef: projectRef, snippet })
@@ -179,14 +179,15 @@ export const sqlEditorState = proxy({
 
   saveFolder: ({ id, name }: { id: string; name: string }) => {
     let storeFolder = sqlEditorState.folders[id]
+    const isNewFolder = id === 'new-folder'
     const hasChanges = storeFolder.folder.name !== name
 
-    if (id === 'new-folder' && sqlEditorState.allFolderNames.includes(name)) {
+    if (isNewFolder && sqlEditorState.allFolderNames.includes(name)) {
       sqlEditorState.removeFolder(id)
-      return toast.error('This folder name already exists')
+      return toast.error('Unable to create new folder: This folder name already exists')
     } else if (hasChanges && sqlEditorState.allFolderNames.includes(name)) {
       storeFolder.status = 'idle'
-      return toast.error('This folder name already exists')
+      return toast.error('Unable to update folder: This folder name already exists')
     }
 
     const originalFolderName = storeFolder.folder.name.slice()
@@ -304,6 +305,8 @@ async function upsertSnippet(
       ])
     }
 
+    let snippet = sqlEditorState.snippets[id]?.snippet
+    if (snippet?.content) snippet.isNotSavedInDatabaseYet = false
     sqlEditorState.savingStates[id] = 'IDLE'
   } catch (error) {
     sqlEditorState.savingStates[id] = 'UPDATING_FAILED'

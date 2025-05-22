@@ -1,7 +1,5 @@
 import { Check } from 'lucide-react'
 
-import { TelemetryActions } from 'common/telemetry-constants'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PricingInformation } from 'shared-data'
@@ -19,8 +17,7 @@ export const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: Enterpri
   const orgSlug = selectedOrganization?.slug
 
   const features = pickFeatures(plan, billingPartner)
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
-  const currentPlan = subscription?.plan.name
+  const currentPlan = selectedOrganization?.plan.name
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -55,7 +52,7 @@ export const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: Enterpri
           size="tiny"
           onClick={() =>
             sendEvent({
-              action: TelemetryActions.STUDIO_PRICING_PLAN_CTA_CLICKED,
+              action: 'studio_pricing_plan_cta_clicked',
               properties: { selectedPlan: 'Enterprise', currentPlan },
               groups: { organization: orgSlug ?? 'Unknown' },
             })
@@ -92,7 +89,7 @@ export const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: Enterpri
           size="tiny"
           onClick={() =>
             sendEvent({
-              action: TelemetryActions.STUDIO_PRICING_PLAN_CTA_CLICKED,
+              action: 'studio_pricing_plan_cta_clicked',
               properties: { selectedPlan: 'Enterprise', currentPlan },
               groups: { organization: orgSlug ?? 'Unknown' },
             })

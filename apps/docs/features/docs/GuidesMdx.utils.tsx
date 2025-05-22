@@ -15,12 +15,6 @@ import { BASE_PATH } from '~/lib/constants'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
 import { newEditLink } from './GuidesMdx.template'
 
-/**
- * [TODO Charis]
- *
- * This is kind of a dumb place for this to be, clean up later as part of
- * cleaning up navigation menus.
- */
 const PUBLISHED_SECTIONS = [
   'ai',
   'api',
@@ -37,6 +31,7 @@ const PUBLISHED_SECTIONS = [
   'queues',
   'realtime',
   'resources',
+  'security',
   'self-hosting',
   'storage',
   'telemetry',
@@ -60,7 +55,9 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
   try {
     mdx = await readFile(fullPath, 'utf-8')
   } catch {
-    console.error('Error reading Markdown at path: %s', fullPath)
+    // Not using console.error because this includes pages that are genuine
+    // 404s and clutters up the logs
+    console.log('Error reading Markdown at path: %s', fullPath)
     notFound()
   }
 
@@ -89,7 +86,7 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
 const getGuidesMarkdown = cache_fullProcess_withDevCacheBust(
   getGuidesMarkdownInternal,
   GUIDES_DIRECTORY,
-  (filename: string) => JSON.stringify([{ slug: filename.replace(/\.mdx$/, '').split(sep) }])
+  (filename: string) => JSON.stringify([filename.replace(/\.mdx$/, '').split(sep)])
 )
 
 const genGuidesStaticParams = (directory?: string) => async () => {
@@ -125,7 +122,8 @@ const genGuideMeta =
   <Params,>(
     generate: (params: Params) => OrPromise<{ meta: GuideFrontmatter; pathname: `/${string}` }>
   ) =>
-  async ({ params }: { params: Params }, parent: ResolvingMetadata): Promise<Metadata> => {
+  async (props: { params: Promise<Params> }, parent: ResolvingMetadata): Promise<Metadata> => {
+    const params = await props.params
     const [parentAlternates, parentOg, { meta, pathname }] = await Promise.all([
       pluckPromise(parent, 'alternates'),
       pluckPromise(parent, 'openGraph'),
@@ -169,4 +167,4 @@ function removeRedundantH1(content: string) {
   return content
 }
 
-export { getGuidesMarkdown, genGuidesStaticParams, genGuideMeta, removeRedundantH1 }
+export { genGuideMeta, genGuidesStaticParams, getGuidesMarkdown, removeRedundantH1 }

@@ -7,13 +7,13 @@ keywords = [ "index", "hnsw", "vector", "performance", "speed" ]
 database_id = "7d755701-747f-4c3a-b8be-236c5518e4eb"
 ---
 
-> Although this guide is specifically for HSNW indexes, it can be generalized to work for any index type
+> Although this guide is specifically for HNSW indexes, it can be generalized to work for any index type
 
 > Building an index without the `CONCURRENTLY` modifier will lock the table, but it will also increase build times. For general advice about indexes, check out this [guide](https://github.com/orgs/supabase/discussions/22449).
 
 ### **To speed up queries, it is ideal to create an HSNW index on your embedded column**
 
-The general structure for creating an hsnw index follows this pattern:
+The general structure for creating an HNSW index follows this pattern:
 
 ```sql
 CREATE INDEX <custom name of index> ON <table name> USING hnsw (<vectorized column> <search type>);
@@ -46,7 +46,7 @@ sudo apt-get update
 sudo apt-get install postgresql-client
 ```
 
-Once installed, you can find your PSQL string from the [Database Settings](https://supabase.com/dashboard/project/_/settings/database), which can be executed in the terminal to create a psql session.
+Once installed, you can find your PSQL string on the dashboard by clicking [connect](https://supabase.com/dashboard/project/_?showConnect=true). Make sure if you are using the pooler connection that it is the Session pooler (port 5432).
 
 If your network can use IPv6, consider using the direct connection string instead of Supavisor. It's not mandatory, but for tasks that run a long time, it's best to reduce network complexity. To check if your network is compatible, use this cURL command to request your IPv6 address:
 
@@ -54,7 +54,7 @@ If your network can use IPv6, consider using the direct connection string instea
 curl -6 https://ifconfig.co/ip
 ```
 
-If an address is returned, you should be able to use your direct connection string found in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database):
+If an address is returned, you should use your direct connection string found on the dashboard by clicking [connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
 **3. Increase memory for index creation (optional)**
 
@@ -100,11 +100,12 @@ show statement_timeout;
 
 **6. Consider temporarily upgrading your compute size (optional)**
 
-If your task is particularly long, you can speed it up by boosting your computing power temporarily. Compute size is charged by the hour, so you can increase it for an hour or two to finish your task faster, then scale it back afterward. Here is a list of [compute add-ons](https://supabase.com/docs/guides/platform/compute-add-ons). If you want to temporarily upgrade, you can find the add-ons for your project in your [Dashboard's Add-Ons Settings.](https://supabase.green/dashboard/project/_/settings/addons)
+If your task is particularly long, you can speed it up by boosting your computing power temporarily. Compute size is charged by the hour, so you can increase it for an hour or two to finish your task faster, then scale it back afterwards. Here is a list of [compute add-ons](https://supabase.com/docs/guides/platform/compute-add-ons). If you want to temporarily upgrade, you can find the add-ons for your project in your [Dashboard's Add-ons Settings.](https://supabase.green/dashboard/project/_/settings/addons)
 
 **7. Consider increasing disk size (optional)**
 
-HSNW indexes can produce temporary files during their construction that may consume a few GBs worth of disk. Consider increasing the disk size in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database) to accommodate for short-term disk stress.
+HSNW indexes can produce temporary files during their construction that may consume a few GBs worth of disk.
+Consider increasing the disk size in the [Compute and Disk settings](https://supabase.com/dashboard/project/_/settings/compute-and-disk) to accommodate for short-term disk stress.
 
 <img
   width="947"

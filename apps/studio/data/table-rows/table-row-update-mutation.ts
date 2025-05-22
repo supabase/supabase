@@ -1,22 +1,22 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { Query } from 'components/grid/query/Query'
+import { Query } from '@supabase/pg-meta/src/query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import type { ResponseError } from 'types'
 import { tableRowKeys } from './keys'
 
 export type TableRowUpdateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   table: { id: number; name: string; schema?: string }
   configuration: { identifiers: any }
   payload: any
   enumArrayColumns: string[]
   returning?: boolean
-  impersonatedRole?: ImpersonationRole
+  roleImpersonationState?: RoleImpersonationState
 }
 
 export function getTableRowUpdateSql({
@@ -44,21 +44,18 @@ export async function updateTableRow({
   configuration,
   enumArrayColumns,
   returning,
-  impersonatedRole,
+  roleImpersonationState,
 }: TableRowUpdateVariables) {
   const sql = wrapWithRoleImpersonation(
     getTableRowUpdateSql({ table, configuration, payload, enumArrayColumns, returning }),
-    {
-      projectRef,
-      role: impersonatedRole,
-    }
+    roleImpersonationState
   )
 
   const { result } = await executeSql({
     projectRef,
     connectionString,
     sql,
-    isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+    isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     queryKey: ['table-row-update', table.id],
   })
 

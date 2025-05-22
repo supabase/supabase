@@ -11,8 +11,7 @@ import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import type { Route } from 'components/ui/ui.types'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useAppStateSnapshot } from 'state/app-state'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 interface NavigationIconButtonProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   route: Route
@@ -21,8 +20,6 @@ interface NavigationIconButtonProps extends AnchorHTMLAttributes<HTMLAnchorEleme
 
 const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonProps>(
   ({ route, isActive = false, onClick = noop, ...props }, ref) => {
-    const snap = useAppStateSnapshot()
-
     const [storedAllowNavPanel] = useLocalStorageQuery(
       LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
       true
@@ -31,10 +28,10 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
     const allowNavPanelToExpand = process.env.NEXT_PUBLIC_NODE_ENV !== 'test' && storedAllowNavPanel
 
     const iconClasses = [
-      'absolute left-0 top-0 flex rounded items-center h-10 w-10 items-center justify-center text-foreground-lighter', // Layout
+      'absolute left-0 top-0 flex rounded h-10 w-10 items-center justify-center text-foreground-lighter', // Layout
       'group-hover/item:text-foreground-light',
-      isActive && '!text-foreground',
-      'transition-colors',
+      isActive ? '!text-foreground [&_svg]:stroke-[1.5]' : '[&_svg]:stroke-[1]',
+      'transition-all',
     ]
 
     const classes = [
@@ -78,7 +75,6 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
           {route.icon}
         </span>
         <span
-          aria-hidden={snap.navigationPanelOpen || undefined}
           className={cn(
             'min-w-[128px] text-sm text-foreground-light',
             'group-hover/item:text-foreground',

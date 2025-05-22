@@ -1,43 +1,43 @@
-import Panel from 'components/ui/Panel'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { BASE_PATH, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
+
+import { DEFAULT_SIDEBAR_BEHAVIOR } from 'components/interfaces/Sidebar'
+import Panel from 'components/ui/Panel'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { BASE_PATH } from 'lib/constants'
 import {
   Label_Shadcn_,
   RadioGroup_Shadcn_,
   RadioGroupLargeItem_Shadcn_,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
   Separator,
   singleThemes,
-  Switch,
   Theme,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
-const ThemeSettings = () => {
+export const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
 
-  const [allowNavPanelToExpand, setAllowNavPanelToExpand] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
-    true
+  const [sidebarBehaviour, setSidebarBehaviour] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
+    DEFAULT_SIDEBAR_BEHAVIOR
   )
-
-  const [expandNavigationPanel, setExpandNavigationPanel] = useState(allowNavPanelToExpand)
-
   /**
    * Avoid Hydration Mismatch
    * https://github.com/pacocoursey/next-themes?tab=readme-ov-file#avoid-hydration-mismatch
    */
   // useEffect only runs on the client, so now we can safely show the UI
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  useEffect(() => setMounted(true), [])
 
-  if (!mounted) {
-    return null
-  }
+  if (!mounted) return null
 
   function SingleThemeSelection() {
     return (
@@ -52,7 +52,7 @@ const ThemeSettings = () => {
         >
           {singleThemes.map((theme: Theme) => (
             <RadioGroupLargeItem_Shadcn_
-              className="grow p-3"
+              className="p-3"
               key={theme.value}
               value={theme.value}
               label={theme.name}
@@ -65,14 +65,9 @@ const ThemeSettings = () => {
     )
   }
 
-  function handleExpandNavigationPanel() {
-    setExpandNavigationPanel(!expandNavigationPanel)
-    setAllowNavPanelToExpand(!allowNavPanelToExpand)
-  }
-
   return (
     <Panel title={<h5 key="panel-title">Appearance</h5>}>
-      <Panel.Content className="grid gap-8">
+      <Panel.Content className="grid gap-8 !py-5">
         <div className="grid grid-cols-12">
           <div className="col-span-full md:col-span-4 flex flex-col gap-5">
             <Label_Shadcn_ htmlFor="theme" className="text-light">
@@ -88,25 +83,31 @@ const ThemeSettings = () => {
             <SingleThemeSelection />
           </div>
         </div>
-
-        <Separator />
-
+      </Panel.Content>
+      <Separator />
+      <Panel.Content>
         <FormItemLayout
           isReactForm={false}
-          label="Expand Navigation menu"
+          label="Sidebar behavior"
           layout="flex-row-reverse"
-          description="Allow the Navigation panel to expand on hover"
-          className="pb-3"
+          description="Choose your preferred sidebar behavior: open, closed, or expand on hover."
         >
-          <Switch
-            size="large"
-            checked={expandNavigationPanel}
-            onCheckedChange={() => handleExpandNavigationPanel()}
-          />
+          <Select_Shadcn_
+            value={sidebarBehaviour}
+            onValueChange={setSidebarBehaviour}
+            aria-label="Select an option"
+          >
+            <SelectTrigger_Shadcn_>
+              <SelectValue_Shadcn_ placeholder="Choose an option" />
+            </SelectTrigger_Shadcn_>
+            <SelectContent_Shadcn_>
+              <SelectItem_Shadcn_ value="open">Expanded</SelectItem_Shadcn_>
+              <SelectItem_Shadcn_ value="closed">Collapsed</SelectItem_Shadcn_>
+              <SelectItem_Shadcn_ value="expandable">Expand on hover</SelectItem_Shadcn_>
+            </SelectContent_Shadcn_>
+          </Select_Shadcn_>
         </FormItemLayout>
       </Panel.Content>
     </Panel>
   )
 }
-
-export default ThemeSettings

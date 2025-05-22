@@ -108,7 +108,7 @@ const SpendCapSidePanel = () => {
           <h4>Spend cap</h4>
           <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
-              href="https://supabase.com/docs/guides/platform/spend-cap"
+              href="https://supabase.com/docs/guides/platform/cost-control#spend-cap"
               target="_blank"
               rel="noreferrer"
             >

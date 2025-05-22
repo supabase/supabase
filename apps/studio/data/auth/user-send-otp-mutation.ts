@@ -13,7 +13,7 @@ export type UserSendOTPVariables = {
 export async function sendOTP({ projectRef, user }: UserSendOTPVariables) {
   const { data, error } = await post('/platform/auth/{ref}/otp', {
     params: { path: { ref: projectRef } },
-    body: user,
+    body: { phone: user.phone },
   })
 
   if (error) handleError(error)

@@ -10,9 +10,14 @@ export interface Organization {
   opt_in_tags: string[]
   subscription_id?: string | null
   restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
-  restriction_data: Record<string, never>
+  restriction_data: Record<string, string> | null
   managed_by: 'supabase' | 'vercel-marketplace' | 'aws-marketplace'
   partner_id?: string
+  plan: {
+    id: 'free' | 'pro' | 'team' | 'enterprise'
+    name: string
+  }
+  usage_billing_enabled: boolean
 }
 
 /**
@@ -36,7 +41,7 @@ export interface ProjectBase {
  */
 export interface Project extends ProjectBase {
   // available after projects.fetchDetail
-  connectionString?: string
+  connectionString?: string | null
   dbVersion?: string
   restUrl?: string
   lastDatabaseResizeAt?: string | null

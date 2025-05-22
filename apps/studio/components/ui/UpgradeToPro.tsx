@@ -2,7 +2,6 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { ReactNode } from 'react'
 
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -14,8 +13,9 @@ interface UpgradeToProProps {
   icon?: ReactNode
   primaryText: string
   secondaryText: string
-  addon?: 'pitr' | 'customDomain' | 'computeInstance'
+  addon?: 'pitr' | 'customDomain'
   buttonText?: string
+  source?: string
   disabled?: boolean
 }
 
@@ -25,12 +25,12 @@ const UpgradeToPro = ({
   secondaryText,
   addon,
   buttonText,
+  source = 'upgrade',
   disabled = false,
 }: UpgradeToProProps) => {
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const plan = subscription?.plan?.id
+  const plan = organization?.plan?.id
 
   const canUpdateSubscription = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
@@ -80,8 +80,8 @@ const UpgradeToPro = ({
               <Link
                 href={
                   plan === 'free'
-                    ? `/org/${organization?.slug ?? '_'}/billing?panel=subscriptionPlan`
-                    : `/project/${project?.ref ?? '_'}/settings/addons?panel=${addon}`
+                    ? `/org/${organization?.slug ?? '_'}/billing?panel=subscriptionPlan&source=${source}`
+                    : `/project/${project?.ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
                 }
               >
                 {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable add on')}

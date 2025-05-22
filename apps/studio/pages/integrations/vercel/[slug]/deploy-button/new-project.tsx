@@ -5,6 +5,7 @@ import { ChangeEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
 
+import { isVercelUrl } from 'components/interfaces/Integrations/Vercel/VercelIntegration.utils'
 import { Markdown } from 'components/interfaces/Markdown'
 import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
 import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
@@ -200,7 +201,7 @@ const CreateProject = () => {
 
         snapshot.setLoading(false)
 
-        if (next) {
+        if (next && isVercelUrl(next)) {
           window.location.href = next
         }
       },

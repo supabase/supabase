@@ -8,7 +8,6 @@ import { useBackupDownloadMutation } from 'data/database/backup-download-mutatio
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useStorageArchiveCreateMutation } from 'data/storage/storage-archive-create-mutation'
 import { useStorageArchiveQuery } from 'data/storage/storage-archive-query'
-import { useFlag } from 'hooks/ui/useFlag'
 import { Database, Storage } from 'icons'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
@@ -18,6 +17,7 @@ import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
   WarningIcon,
 } from 'ui'
@@ -30,14 +30,10 @@ export const PauseDisabledState = () => {
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
 
   const dbVersion = project?.dbVersion?.replace('supabase-postgres-', '')
-  const enforceNinetyDayUnpauseExpiry = useFlag('enforceNinetyDayUnpauseExpiry')
-  const allowStorageObjectsDownload = useFlag('enableNinetyDayStorageDownload')
 
   const { data: pauseStatus } = useProjectPauseStatusQuery(
     { ref },
-    {
-      enabled: project?.status === PROJECT_STATUS.INACTIVE && enforceNinetyDayUnpauseExpiry,
-    }
+    { enabled: project?.status === PROJECT_STATUS.INACTIVE }
   )
   const latestBackup = pauseStatus?.latest_downloadable_backup_id
 
@@ -92,12 +88,6 @@ export const PauseDisabledState = () => {
         ref,
         backup: {
           id: latestBackup,
-          // [Joshen] Just FYI these params aren't required for the download backup request
-          // API types need to be updated
-          project_id: -1,
-          inserted_at: '',
-          isPhysicalBackup: false,
-          status: {},
         },
       },
       {
@@ -159,20 +149,10 @@ export const PauseDisabledState = () => {
               <Database size={16} />
               Database backup (PG: {dbVersion})
             </DropdownMenuItemTooltip>
-            <DropdownMenuItemTooltip
-              className="gap-x-2"
-              disabled={!allowStorageObjectsDownload}
-              onClick={() => onSelectDownloadStorageArchive()}
-              tooltip={{
-                content: {
-                  side: 'right',
-                  text: 'This feature is not available yet, please reach out to support for assistance',
-                },
-              }}
-            >
+            <DropdownMenuItem className="gap-x-2" onClick={() => onSelectDownloadStorageArchive()}>
               <Storage size={16} />
               Storage objects
-            </DropdownMenuItemTooltip>
+            </DropdownMenuItem>
             {/* [Joshen] Once storage object download is supported, can just use the below component */}
             {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectDownloadStorageArchive()}>
               <Storage size={16} />

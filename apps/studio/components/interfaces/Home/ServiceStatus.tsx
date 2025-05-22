@@ -3,9 +3,9 @@ import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
+import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { useParams } from 'common'
 import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
-import { usePostgresServiceStatusQuery } from 'data/service-status/postgres-service-status-query'
 import {
   ProjectServiceStatus,
   useProjectServiceStatusQuery,
@@ -19,7 +19,6 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
 
@@ -39,7 +38,7 @@ const StatusMessage = ({
   if (status === 'COMING_UP') return 'Coming up...'
   if (status === 'ACTIVE_HEALTHY') return 'Healthy'
   if (isProjectNew) return 'Coming up...'
-  if (isSuccess) return 'No issues'
+  if (isSuccess) return 'Healthy'
   return 'Unable to connect'
 }
 
@@ -71,7 +70,7 @@ const StatusIcon = ({
   return <AlertIcon />
 }
 
-const ServiceStatus = () => {
+export const ServiceStatus = () => {
   const { ref } = useParams()
   const project = useSelectedProject()
   const [open, setOpen] = useState(false)
@@ -112,24 +111,12 @@ const ServiceStatus = () => {
         refetchInterval: (data) => (!data?.healthy ? 5000 : false),
       }
     )
-  const {
-    isLoading: isLoadingPostgres,
-    isSuccess: isSuccessPostgres,
-    refetch: refetchPostgresServiceStatus,
-  } = usePostgresServiceStatusQuery(
-    {
-      projectRef: ref,
-      connectionString: project?.connectionString,
-    },
-    {
-      refetchInterval: (data) => (data === null ? 5000 : false),
-    }
-  )
 
   const authStatus = status?.find((service) => service.name === 'auth')
   const restStatus = status?.find((service) => service.name === 'rest')
   const realtimeStatus = status?.find((service) => service.name === 'realtime')
   const storageStatus = status?.find((service) => service.name === 'storage')
+  const dbStatus = status?.find((service) => service.name === 'db')
 
   // [Joshen] Need individual troubleshooting docs for each service eventually for users to self serve
   const services: {
@@ -145,8 +132,9 @@ const ServiceStatus = () => {
       name: 'Database',
       error: undefined,
       docsUrl: undefined,
-      isLoading: isLoadingPostgres,
-      isSuccess: isSuccessPostgres,
+      isLoading: isLoading,
+      isSuccess: dbStatus?.healthy,
+      status: dbStatus?.status,
       logsUrl: '/logs/postgres-logs',
     },
     {
@@ -230,7 +218,6 @@ const ServiceStatus = () => {
 
       timer = setTimeout(() => {
         refetchServiceStatus()
-        refetchPostgresServiceStatus()
         refetchEdgeFunctionServiceStatus()
       }, remainingTimeTillNextCheck * 1000)
     }
@@ -261,7 +248,7 @@ const ServiceStatus = () => {
           {isBranch ? 'Preview Branch' : 'Project'} Status
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
+      <PopoverContent_Shadcn_ portal className="p-0 w-56" side="bottom" align="center">
         {services.map((service) => (
           <Link
             href={`/project/${ref}${service.logsUrl}`}
@@ -308,5 +295,3 @@ const ServiceStatus = () => {
     </Popover_Shadcn_>
   )
 }
-
-export default ServiceStatus
