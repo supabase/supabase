@@ -13,11 +13,11 @@ Supported Web3 wallets:
 
 ## How does it work?
 
-Sign in with Web3 utilizes the [EIP 4361](https://eips.ethereum.org/EIPS/eip-4361) standard to authenticate wallet addresses off-chain. This standard was also adopted by Solana ecosystem with some minor differences from Ethereum.
+Sign in with Web3 utilizes the [EIP 4361](https://eips.ethereum.org/EIPS/eip-4361) standard to authenticate wallet addresses off-chain. This standard is adopted by the Solana ecosystem with some minor differences from Ethereum.
 
 Authentication works by asking the Web3 wallet application to sign a predefined message with the user's wallet. This message is parsed both by the Web3 wallet application and Supabase Auth to verify its validity and purpose, before creating a user account or session.
 
-The Web3 wallet application uses the information contained in the message to provide the user with a confirmation dialog whether they want to allow sign in with your project.
+The Web3 wallet application uses the information contained in the message to provide the user with a confirmation dialog, asking whether they want to allow sign in with your project.
 
 Not all Web3 wallet applications show a dedicated confirmation dialog for these sign in messages. In that case the Web3 wallet shows a traditional message signature confirmation dialog.
 
@@ -27,7 +27,7 @@ User accounts that sign in with their Web3 wallet will not have an email address
 
 Control your project's exposure by setting up [Rate Limits for Web3](/dashboard/project/_/auth/rate-limits).
 
-Many wallet applications will warn the user if the message sent for signing is not coming from the page they are currently visiting. To further prevent your Supabase project from receiving signed messages destined for other applications, you will need to register your application's URL using the [Redirect URL settings](/docs/guides/auth/redirect-urls).
+Many wallet applications will warn the user if the message sent for signing is not coming from the page they are currently visiting. To further prevent your Supabase project from receiving signed messages destined for other applications, you must register your application's URL using the [Redirect URL settings](/docs/guides/auth/redirect-urls).
 
 ## Sign in with Ethereum
 
@@ -105,7 +105,7 @@ function SignInButton() {
           onClick={() => {
             supabase.auth.signInWithWeb3({
               chain: 'solana',
-              statement: 'I accept the terms of service at https://example.com/tos',
+              statement: 'I accept the Terms of Service at https://example.com/tos',
               wallet,
             })
           }}
