@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import { type DocumentNode, graphql, GraphQLError, parse, specifiedRules, validate } from 'graphql'
 import { createComplexityLimitRule } from 'graphql-validation-complexity'
 import { NextResponse } from 'next/server'
@@ -9,7 +10,7 @@ import { createQueryDepthLimiter } from './validators'
 
 export const runtime = 'edge'
 
-const MAX_DEPTH = 9
+const MAX_DEPTH = 5
 
 const validationRules = [
   ...specifiedRules,
@@ -26,7 +27,7 @@ function isDevGraphiQL(request: Request) {
   const referrer = request.headers.get('Referer')
   return (
     IS_DEV &&
-    origin.startsWith('http://localhost') &&
+    origin?.startsWith('http://localhost') &&
     referrer === `${origin}${BASE_PATH ?? ''}/graphiql`
   )
 }
@@ -93,10 +94,16 @@ export async function POST(request: Request): Promise<NextResponse> {
     console.error(error)
 
     if (error instanceof ApiError) {
+      if (!error.isUserError()) {
+        Sentry.captureException(error)
+      }
+
       return NextResponse.json({
         errors: [{ message: error.isPrivate() ? 'Internal Server Error' : error.message }],
       })
     } else {
+      Sentry.captureException(error)
+
       return NextResponse.json({
         errors: [{ message: 'Internal Server Error' }],
       })

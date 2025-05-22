@@ -179,7 +179,9 @@ const DefaultPreviewSelectionRenderer = ({ log }: { log: PreviewLogData }) => {
 
   return (
     <div data-testid="log-selection" className={`p-2 flex flex-col`}>
-      {log?.id && <PropertyRow key={'id'} keyName={'id'} value={log.id} />}
+      {log?.id && (
+        <PropertyRow dataTestId="log-selection-id" key={'id'} keyName={'id'} value={log.id} />
+      )}
       {log?.status && <PropertyRow key={'status'} keyName={'status'} value={log.status} />}
       {log?.timestamp && (
         <PropertyRow

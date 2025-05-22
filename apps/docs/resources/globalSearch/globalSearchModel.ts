@@ -4,13 +4,13 @@ import { Result } from '~/features/helpers.fn'
 import { openAI } from '~/lib/openAi'
 import { supabase, type DatabaseCorrected } from '~/lib/supabase'
 import { GuideModel } from '../guide/guideModel'
-import { ReferenceSDKFunctionModel, SDKLanguageValues } from '../reference/referenceSDKModel'
-import { SearchResultInterface } from './globalSearchInterface'
-import { TroubleshootingModel } from '../troubleshooting/troubleshootingModel'
 import {
   DB_METADATA_TAG_PLATFORM_CLI,
   ReferenceCLICommandModel,
 } from '../reference/referenceCLIModel'
+import { ReferenceSDKFunctionModel, SDKLanguageValues } from '../reference/referenceSDKModel'
+import { TroubleshootingModel } from '../troubleshooting/troubleshootingModel'
+import { SearchResultInterface } from './globalSearchInterface'
 
 export abstract class SearchResultModel {
   static async search(
