@@ -960,6 +960,16 @@ export const database: NavMenuConstant = {
     ormQuickstarts,
     guiQuickstarts,
     {
+      name: 'Logical Replication and CDC',
+      url: undefined,
+      items: [
+        { name: 'Overview', url: '/guides/database/replication-cdc/logical-replication',},
+        { name: 'Setting up replication', url: '/guides/database/replication-cdc/setting-up-replication' },
+        { name: 'Monitoring replication', url: '/guides/database/replication-cdc/monitoring-replication' },
+        { name: 'FAQ', url: '/guides/database/replication/faq' },
+      ],
+    },
+    {
       name: 'Extensions',
       url: undefined,
       items: [
