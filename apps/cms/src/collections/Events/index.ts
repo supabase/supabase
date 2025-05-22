@@ -180,7 +180,7 @@ export const Events: CollectionConfig = {
                 {
                   name: 'href',
                   type: 'text',
-                  required: true,
+                  required: false,
                 },
                 {
                   name: 'target',

@@ -408,8 +408,8 @@ export interface Event {
   /**
    * Used on event previews to link to a custom event page
    */
-  link: {
-    href: string;
+  link?: {
+    href?: string | null;
     target?: ('_self' | '_blank') | null;
     label?: string | null;
   };
