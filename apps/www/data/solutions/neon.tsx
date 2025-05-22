@@ -15,6 +15,7 @@ import {
   ShieldAlert,
   HeartPulse,
   Check,
+  InfoIcon,
 } from 'lucide-react'
 import AuthVisual from '~/components/Products/AuthVisual'
 import FunctionsVisual from '~/components/Products/FunctionsVisual'
@@ -203,21 +204,21 @@ const data = {
       {
         id: 'rbac',
         title: 'Role-Based Access Control',
-        icon: '',
+        icon: 'M17.6874 22.888V20.3886C17.6874 17.5888 15.4178 15.3192 12.618 15.3192C9.8182 15.3192 7.54852 17.5888 7.54852 20.3886V22.888M21.5531 11.5235C21.8189 14.1669 20.9393 16.9038 18.9141 18.9289C18.5359 19.3072 18.1328 19.6455 17.7101 19.9438M20.8038 8.70448C20.3598 7.71036 19.7299 6.77911 18.9141 5.96334C15.3338 2.38299 9.52889 2.38299 5.94855 5.96334C4.17501 7.73687 3.28 10.0562 3.26352 12.3807M24.0875 13.1161L23.2046 12.2332C22.3264 11.355 20.9026 11.355 20.0244 12.2332L19.1415 13.1161M0.875198 10.9503L1.75809 11.8331C2.63629 12.7113 4.06012 12.7113 4.93832 11.8331L5.82121 10.9503M7.49904 20.4919C5.77226 19.4557 4.37848 17.8555 3.62143 15.8584M15.6799 12.1942C15.6799 13.9201 14.2808 15.3192 12.5549 15.3192C10.829 15.3192 9.42993 13.9201 9.42993 12.1942C9.42993 10.4683 10.829 9.06917 12.5549 9.06917C14.2808 9.06917 15.6799 10.4683 15.6799 12.1942Z',
         subheading: <>Secure your data properly.</>,
-        className: '!border-l-0 !min-h-[200px] sm:!min-h-[400px]',
+        className: '!border-l-0',
         image: (
           <Image
             draggable={false}
             src={{
-              dark: '/images/solutions/neon/rbac-dark.svg',
-              light: '/images/solutions/neon/rbac-light.svg',
+              dark: '/images/solutions/neon/rbac-dark.png',
+              light: '/images/solutions/neon/rbac-light.png',
             }}
             alt="Role Based Access Control diagram"
             width={100}
             height={100}
             quality={100}
-            containerClassName="md:mb-4 -mb-8 -mt-12 sm:mt-0"
+            containerClassName="md:mb-4 -mt-12 sm:mt-0"
           />
         ),
       },
@@ -252,14 +253,18 @@ const data = {
           <Image
             draggable={false}
             src={{
-              dark: '/images/solutions/neon/storage-dark.svg',
-              light: '/images/solutions/neon/storage-light.svg',
+              dark: '/images/solutions/neon/storage-dark.png',
+              light: '/images/solutions/neon/storage-light.png',
             }}
             alt="Storage"
-            width={100}
-            height={100}
+            width={1000}
+            height={1000}
             quality={100}
             containerClassName="md:mb-4"
+            className="opacity-[0.99]"
+            style={{
+              imageRendering: 'revert-layer',
+            }}
           />
         ),
       },
@@ -288,8 +293,8 @@ const data = {
           <Image
             draggable={false}
             src={{
-              dark: '/images/solutions/neon/vectors-dark.svg',
-              light: '/images/solutions/neon/vectors-light.svg',
+              dark: '/images/solutions/neon/vectors-dark.png',
+              light: '/images/solutions/neon/vectors-light.png',
             }}
             alt="Vector embeddings"
             width={100}
@@ -301,9 +306,8 @@ const data = {
       {
         id: 'row-level-security',
         title: 'Row Level Security',
-        icon: '',
+        icon: 'M20.3124 10.9373C21.1753 10.9373 21.8749 11.6369 21.8749 12.4998V12.4998C21.8749 13.3628 21.1753 14.0623 20.3124 14.0623L4.68738 14.0623C3.82443 14.0623 3.12488 13.3628 3.12488 12.4998V12.4998C3.12488 11.6369 3.82443 10.9373 4.68738 10.9373L20.3124 10.9373Z M20.3124 3.90454C21.1753 3.90454 21.8749 4.6041 21.8749 5.46704V5.46704C21.8749 6.32999 21.1753 7.02954 20.3124 7.02954L4.68738 7.02954C3.82443 7.02954 3.12488 6.32998 3.12488 5.46704V5.46704C3.12488 4.6041 3.82443 3.90454 4.68738 3.90454L20.3124 3.90454Z M20.3124 17.9701C21.1753 17.9701 21.8749 18.6696 21.8749 19.5326V19.5326C21.8749 20.3955 21.1753 21.0951 20.3124 21.0951L4.68738 21.0951C3.82443 21.0951 3.12488 20.3955 3.12488 19.5326V19.5326C3.12488 18.6696 3.82443 17.9701 4.68738 17.9701L20.3124 17.9701Z',
         subheading: <>Granular access control policies to secure data at the row level.</>,
-        className: '',
         image: (
           <Image
             draggable={false}
@@ -338,18 +342,39 @@ const data = {
         subheading:
           'A single panel that persists across the Supabase Dashboard and maintains context across AI prompts.',
         image: (
-          <Image
-            draggable={false}
-            src={{
-              dark: '/images/solutions/neon/ai-assistant-dark.svg',
-              light: '/images/solutions/neon/ai-assistant-light.svg',
-            }}
-            alt="AI Assistant chat example"
-            className="invert dark:invert-0"
-            width={100}
-            height={100}
-            quality={100}
-          />
+          <div className="w-full ml-4 md:ml-6 2xl:ml-8 max-w-[430px] rounded-tl-lg border-t border-l bg-default text-foreground">
+            <div className="flex items-center gap-3 p-2 lg:p-4 border-b">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 25 25"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="hover:rotate-12 transition-transform duration-300"
+              >
+                <path
+                  d="M11.8949 2.39344C12.5051 1.78324 13.4944 1.78324 14.1046 2.39344L22.9106 11.1994C23.5208 11.8096 23.5208 12.7989 22.9106 13.4091L14.1046 22.2151C13.4944 22.8253 12.5051 22.8253 11.8949 22.2151L3.08892 13.4091C2.47872 12.7989 2.47872 11.8096 3.08892 11.1994L11.8949 2.39344Z M16.5408 12.3043C16.5408 14.2597 14.9556 15.8449 13.0002 15.8449C11.0448 15.8449 9.45961 14.2597 9.45961 12.3043C9.45961 10.3489 11.0448 8.76371 13.0002 8.76371C14.9556 8.76371 16.5408 10.3489 16.5408 12.3043Z"
+                  stroke="hsl(var(--brand-default))"
+                  strokeMiterlimit="10"
+                  strokeLinejoin="bevel"
+                  strokeLinecap="square"
+                  strokeWidth="1.5"
+                />
+              </svg>
+              <div className="flex items-center gap-1">
+                <h3 className="text-sm font-medium">AI Assistant</h3>
+                <InfoIcon className="w-3 h-3 text-foreground-lighter" />
+              </div>
+            </div>
+            <div className="space-y-2 p-4 pr-0 2xl:py-8 xl:pl-12 xl:ml-1 text-sm text-[#808080]">
+              <p>Entity: Auth</p>
+              <p>Schema:</p>
+              <p className="text-[#808080]">
+                Issue: We have detected that you have enabled the email provider with an expiry time
+                of more than an hour. It is recommended to set this value to less th...
+              </p>
+            </div>
+          </div>
         ),
       },
       {
@@ -378,7 +403,19 @@ const data = {
         icon: 'M4.13477 12.8129C4.13477 14.1481 4.43245 15.4138 4.96506 16.5471M12.925 4.02271C11.5644 4.02271 10.276 4.33184 9.12614 4.88371M21.7152 12.8129C21.7152 11.4644 21.4115 10.1867 20.8688 9.0447M12.925 21.6032C14.2829 21.6032 15.5689 21.2952 16.717 20.7454M16.717 20.7454C17.2587 21.5257 18.1612 22.0366 19.1831 22.0366C20.84 22.0366 22.1831 20.6935 22.1831 19.0366C22.1831 17.3798 20.84 16.0366 19.1831 16.0366C17.5263 16.0366 16.1831 17.3798 16.1831 19.0366C16.1831 19.6716 16.3804 20.2605 16.717 20.7454ZM4.96506 16.5471C4.16552 17.086 3.63965 17.9999 3.63965 19.0366C3.63965 20.6935 4.98279 22.0366 6.63965 22.0366C8.2965 22.0366 9.63965 20.6935 9.63965 19.0366C9.63965 17.3798 8.2965 16.0366 6.63965 16.0366C6.01951 16.0366 5.44333 16.2248 4.96506 16.5471ZM9.12614 4.88371C8.58687 4.08666 7.67444 3.56274 6.63965 3.56274C4.98279 3.56274 3.63965 4.90589 3.63965 6.56274C3.63965 8.2196 4.98279 9.56274 6.63965 9.56274C8.2965 9.56274 9.63965 8.2196 9.63965 6.56274C9.63965 5.94069 9.45032 5.36285 9.12614 4.88371ZM20.8688 9.0447C21.6621 8.50486 22.1831 7.59464 22.1831 6.56274C22.1831 4.90589 20.84 3.56274 19.1831 3.56274C17.5263 3.56274 16.1831 4.90589 16.1831 6.56274C16.1831 8.2196 17.5263 9.56274 19.1831 9.56274C19.8081 9.56274 20.3884 9.37165 20.8688 9.0447Z',
         subheading:
           "Learn SQL when you're ready. In the meantime, Supabase generates automatic APIs to make coding a lot easier.",
-        image: <DataAPIsVisual className="mt-4 md:mt-16" />,
+        image: (
+          <Image
+            draggable={false}
+            src={{
+              dark: '/images/solutions/neon/auto-generated-apis-dark.png',
+              light: '/images/solutions/neon/auto-generated-apis-light.png',
+            }}
+            alt="Auto Generated APIs"
+            width={100}
+            height={100}
+            quality={100}
+          />
+        ),
       },
       {
         id: 'foreign-data-wrappers',
@@ -390,10 +427,10 @@ const data = {
           <Image
             draggable={false}
             src={{
-              dark: '/images/solutions/neon/foreign-data-wrappers-dark.svg',
-              light: '/images/solutions/neon/foreign-data-wrappers-light.svg',
+              dark: '/images/solutions/neon/foreign-data-wrappers-dark.png',
+              light: '/images/solutions/neon/foreign-data-wrappers-light.png',
             }}
-            alt="Vector embeddings"
+            alt="Foreign Data Wrappers"
             containerClassName="md:mb-4"
             width={100}
             height={100}
@@ -534,7 +571,7 @@ const data = {
             mission-critical applications.
           </>
         ),
-        icon: 'M16.3046 3.24514C15.3004 2.91279 14.2268 2.73291 13.1111 2.73291C7.50197 2.73291 2.95486 7.28002 2.95486 12.8892C2.95486 18.4983 7.50197 23.0454 13.1111 23.0454C18.7203 23.0454 23.2674 18.4983 23.2674 12.8892C23.2674 10.5703 22.4902 8.4329 21.1822 6.72328L12.2253 15.5572L10.2303 13.5622M13.2175 6.31682C9.54013 6.31682 6.55899 9.29795 6.55899 12.9754C6.55899 16.6528 9.54013 19.6339 13.2175 19.6339C16.895 19.6339 19.8761 16.6528 19.8761 12.9754C19.8761 11.6039 19.4615 10.3293 18.7507 9.27002',
+        icon: 'M16.3046 3.24514C15.3004 2.91279 14.2268 2.73291 13.1111 2.73291C7.50197 2.73291 2.95486 7.28002 2.95486 12.8892C2.95486 18.4983 7.50197 23.0454 13.1111 23.0454C18.7203 23.0454 23.2674 18.4983 23.2674 12.8892C23.2674 10.5703 22.4902 8.4329 21.1822 6.72328L12.2253 15.5572L10.2303 13.5622M13.2175 6.31682C9.54013 6.31682 6.55899 9.29795 6.55899 12.9754C6.55899 16.6528 9.54013 19.6339 13.2175 19.6339C16.895 19.6339 19.8761 16.6528 19.8761 12.9754C19.8761 11.1095 19.4615 9.83483 18.7507 8.77557',
       },
       {
         id: 'pitr',
