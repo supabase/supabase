@@ -158,7 +158,7 @@ const data = {
         subheading: (
           <>
             A fully managed Postgres database.
-            <br /> No forks, no serverless gimmicks.
+            <br /> No forks: 100% pure Postgres.
           </>
         ),
         className: 'lg:col-span-2 flex-col lg:flex-row',
