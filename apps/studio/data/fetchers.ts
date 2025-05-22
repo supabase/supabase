@@ -1,18 +1,28 @@
 import * as Sentry from '@sentry/nextjs'
+import createClient from 'openapi-fetch'
+
+import { IS_PLATFORM } from 'common'
 import { API_URL } from 'lib/constants'
 import { getAccessToken } from 'lib/gotrue'
 import { uuidv4 } from 'lib/helpers'
-import createClient from 'openapi-fetch'
 import { ResponseError } from 'types'
 import type { paths } from './api' // generated from openapi-typescript
 
-const DEFAULT_HEADERS = {
-  Accept: 'application/json',
+const DEFAULT_HEADERS = { Accept: 'application/json' }
+
+export const fetchHandler: typeof fetch = async (input, init) => {
+  try {
+    return await fetch(input, init)
+  } catch (err: any) {
+    if (err instanceof TypeError && err.message === 'Failed to fetch') {
+      throw new Error('Unable to reach the server. Please check your network or try again later.')
+    }
+    throw err
+  }
 }
 
-// This file will eventually replace what we currently have in lib/fetchWrapper, but will be currently unused until we get to that refactor
-
 const client = createClient<paths>({
+  fetch: fetchHandler,
   // [Joshen] Just FYI, the replace is temporary until we update env vars API_URL to remove /platform or /v1 - should just be the base URL
   baseUrl: API_URL?.replace('/platform', ''),
   referrerPolicy: 'no-referrer-when-downgrade',
@@ -25,6 +35,13 @@ const client = createClient<paths>({
     },
   },
 })
+
+export function isValidConnString(connString?: string | null) {
+  // If there is no `connectionString` on platform, pg-meta will necessarily fail to connect to the target database.
+  // This only applies if IS_PLATFORM is true; otherwise (test/local-dev), pg-meta won't need this parameter
+  // and will connect to the locally running DB_URL instead.
+  return IS_PLATFORM ? Boolean(connString) : true
+}
 
 export async function constructHeaders(headersInit?: HeadersInit | undefined) {
   const requestId = uuidv4()
@@ -40,6 +57,22 @@ export async function constructHeaders(headersInit?: HeadersInit | undefined) {
   return headers
 }
 
+function pgMetaGuard(request: Request) {
+  // Only check for /platform/pg-meta/ endpoints
+  if (request.url.includes('/platform/pg-meta/')) {
+    // If there is no valid `x-connection-encrypted`, pg-meta will necesseraly fail to connect to the target database
+    // in such case, we save the hops and throw a 421 response instead
+    if (!isValidConnString(request.headers.get('x-connection-encrypted'))) {
+      throw new ResponseError(
+        'API Error: happened while trying to acquire connection to the database',
+        400,
+        request.headers.get('X-Request-Id') ?? undefined
+      )
+    }
+  }
+  return request
+}
+
 // Middleware
 client.use(
   {
@@ -47,8 +80,7 @@ client.use(
     async onRequest({ request }) {
       const headers = await constructHeaders()
       headers.forEach((value, key) => request.headers.set(key, value))
-
-      return request
+      return pgMetaGuard(request)
     },
   },
   {

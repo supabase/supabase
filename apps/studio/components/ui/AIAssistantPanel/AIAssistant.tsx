@@ -221,9 +221,16 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     // Store the user message in the ref before appending
     lastUserMessageRef.current = payload
 
-    append(payload, {
-      headers: { Authorization: headerData.get('Authorization') ?? '' },
-    })
+    const authorizationHeader = headerData.get('Authorization')
+
+    append(
+      payload,
+      authorizationHeader
+        ? {
+            headers: { Authorization: authorizationHeader },
+          }
+        : undefined
+    )
 
     setValue('')
 

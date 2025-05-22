@@ -37,15 +37,11 @@ If you are not able to use [Clerk's Connect with Supabase page](https://dashboar
 
 <TabPanel id="ts" label="TypeScript">
 
-```typescript
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABASE_ANON_KEY', {
-  accessToken: () => {
-    return Clerk.session?.getToken()
-  },
-})
-```
+<$CodeSample
+path="/clerk/hooks/useSupabaseClient.ts"
+lines={[[6, 14]]}
+hideElidedLines={true}
+/>
 
 </TabPanel>
 
@@ -99,34 +95,23 @@ The recommended way to design RLS policies with Clerk is to use claims present i
 
 ### Example: Check user organization role
 
-```sql
-create policy "Only organization admins can insert in table"
-  on table_name
-  for insert
-  to authenticated
-  with check (
-    ((select auth.jwt()->>'org_role') = 'org:admin')
-      and
-    (organization_id = (select auth.jwt()->>'org_id'))
-  );
-```
+<$CodeSample
+path="/clerk/supabase/migrations/20250501155648_setup_database.sql"
+lines={[[10, 18]]}
+hideElidedLines={true}
+/>
 
-This RLS policy checks that the newly inserted row in the table has the user's declared organization ID (from the `org_id` session token claim) in the `organization_id` column. Additionally it ensures that they're an `org:admin`.
+This RLS policy checks that the newly inserted row in the table has the user's declared organization ID in the `organization_id` column. Additionally it ensures that they're an `org:admin`.
 
 This way only organization admins can add rows to the table, for organizations they're a member of.
 
 ### Example: Check user has passed second factor verification
 
-```sql
-create policy "Only users that have passed second factor verification can read from table"
-  on table_name
-  for select
-  as restrictive
-  to authenticated
-  using (
-    ((select auth.jwt()->'fva'->>1) != '-1')
-  );
-```
+<$CodeSample
+path="/clerk/supabase/migrations/20250501155648_setup_database.sql"
+lines={[[28, 35]]}
+hideElidedLines={true}
+/>
 
 This example uses a restrictive RLS policy checks that the [second factor verification](https://clerk.com/docs/guides/reverification) age element in the `fva` claim is not `'-1'` indicating the user has passed through second factor verification.
 

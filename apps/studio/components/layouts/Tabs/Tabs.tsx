@@ -12,15 +12,9 @@ import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
+import { TabsUpdateTooltip } from 'components/interfaces/App/FeaturePreview/TableEditorTabs'
 import { useAppStateSnapshot } from 'state/app-state'
-import {
-  editorEntityTypes,
-  handleTabClose,
-  handleTabDragEnd,
-  handleTabNavigation,
-  useTabsStore,
-  type Tab,
-} from 'state/tabs'
+import { editorEntityTypes, useTabsStateSnapshot, type Tab } from 'state/tabs'
 import { cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { CollapseButton } from './CollapseButton'
@@ -33,7 +27,7 @@ export const EditorTabs = () => {
   const appSnap = useAppStateSnapshot()
 
   const editor = useEditorType()
-  const tabs = useTabsStore(ref)
+  const tabs = useTabsStateSnapshot()
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -61,7 +55,7 @@ export const EditorTabs = () => {
     const newIndex = tabs.openTabs.indexOf(over.id.toString())
 
     if (oldIndex !== newIndex) {
-      handleTabDragEnd(ref, oldIndex, newIndex, active.id.toString(), router)
+      tabs.handleTabDragEnd(oldIndex, newIndex, active.id.toString(), router)
     }
   }
 
@@ -71,11 +65,11 @@ export const EditorTabs = () => {
         appSnap.setDashboardHistory(ref, editor === 'table' ? 'editor' : editor, undefined)
       }
     }
-    handleTabClose({ ref, id, router, editor, onClearDashboardHistory })
+    tabs.handleTabClose({ id, router, editor, onClearDashboardHistory })
   }
 
   const handleTabChange = (id: string) => {
-    handleTabNavigation(ref, id, router)
+    tabs.handleTabNavigation(id, router)
   }
 
   return (
@@ -166,7 +160,10 @@ export const EditorTabs = () => {
           </AnimatePresence>
           <div className="grow h-full border-b pr-6" />
         </TabsList_Shadcn_>
+
+        <TabsUpdateTooltip />
       </Tabs_Shadcn_>
+
       <DragOverlay dropAnimation={null}>
         {tabs.activeTab ? <TabPreview tab={tabs.activeTab} /> : null}
       </DragOverlay>

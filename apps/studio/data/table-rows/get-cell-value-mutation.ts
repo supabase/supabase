@@ -7,7 +7,7 @@ import type { ResponseError } from 'types'
 
 export type GetCellValueVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   table: { schema: string; name: string }
   column: string
   pkMatch: { [key: string]: any }

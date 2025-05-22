@@ -12,7 +12,7 @@ import { sqlKeys } from './keys'
 
 export type ExecuteSqlVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   sql: string
   queryKey?: QueryKey
   handleError?: (error: ResponseError) => { result: any }
@@ -21,7 +21,7 @@ export type ExecuteSqlVariables = {
   contextualInvalidation?: boolean
 }
 
-export async function executeSql(
+export async function executeSql<T = any>(
   {
     projectRef,
     connectionString,
@@ -40,7 +40,7 @@ export async function executeSql(
   >,
   signal?: AbortSignal,
   headersInit?: HeadersInit
-): Promise<{ result: any }> {
+): Promise<{ result: T }> {
   if (!projectRef) throw new Error('projectRef is required')
 
   const sqlSize = new Blob([sql]).size
@@ -107,13 +107,13 @@ export async function executeSql(
     Array.isArray(data) &&
     data?.[0]?.[ROLE_IMPERSONATION_NO_RESULTS] === 1
   ) {
-    return { result: [] }
+    return { result: [] as T }
   }
 
-  return { result: data }
+  return { result: data as T }
 }
 
-export type ExecuteSqlData = Awaited<ReturnType<typeof executeSql>>
+export type ExecuteSqlData = Awaited<ReturnType<typeof executeSql<any[]>>>
 export type ExecuteSqlError = ResponseError
 
 /**

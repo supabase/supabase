@@ -2,7 +2,6 @@ import { isEmpty, noop } from 'lodash'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Modal } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'

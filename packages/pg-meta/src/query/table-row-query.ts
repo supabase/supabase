@@ -131,7 +131,7 @@ export const getTableRowsSql = ({
     const defaultOrderByColumns = getDefaultOrderByColumns(table as PGTable)
     if (defaultOrderByColumns.length > 0) {
       defaultOrderByColumns.forEach((col) => {
-        queryChains = queryChains.order(table.name, col, true, true)
+        queryChains = queryChains.order(table.name, col)
       })
     }
   } else {
@@ -206,7 +206,7 @@ export const getTableRowsSql = ({
 
   const selectClause = selectExpressions.join(',')
   const finalQuery = new Query()
-  // Now, we apply our selection logic with the tables truncation  on the _base_query contructed before
+  // Now, we apply our selection logic with the tables truncation on the _base_query constructed before
   const finalQueryChain = finalQuery.from('_base_query').select(selectClause)
   return `${baseSelectQuery}
   ${finalQueryChain.toSql({ isCTE: true, isFinal: true })}`

@@ -8,6 +8,7 @@ const LOGS_PAGES = [
 ]
 
 test.describe('Logs', async () => {
+  test.describe.configure({ retries: 5 })
   for (const logPage of LOGS_PAGES) {
     test.describe(`${logPage.label} logs page`, () => {
       test('can navigate to logs page', async ({ page, ref }) => {
