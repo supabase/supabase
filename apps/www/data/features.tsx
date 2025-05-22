@@ -514,7 +514,6 @@ Popular Postgres extensions supported by Supabase include:
 - pgjwt: Allows for JSON Web Token (JWT) generation and verification
 - pg_net: Enables making HTTP requests from the database
 - pgroonga: Provides full-text search capabilities for various languages
-- timescaledb: Optimizes the database for time-series data
 
 Postgres extensions are valuable for a wide range of applications, from GIS and machine learning projects to security-focused applications and IoT systems dealing with time-series data.
 
