@@ -71,10 +71,15 @@ const CreateSecretAPIKeyDialog = () => {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create new secret API key</DialogTitle>
-          <DialogDescription>
-            Secret API keys are used to authorize requests to your project from servers, functions,
-            workers or other backend components of your application. Keep them secret, don't publish
-            them online and don't check them in source code.
+          <DialogDescription className="grid gap-y-2">
+            <p>
+              Secret API keys are used to authorize requests to your project from servers,
+              functions, workers or other backend components of your application.{' '}
+            </p>
+
+            <p>
+              Keep these keys private. Don't publish them online or commit them to source control.
+            </p>
           </DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />

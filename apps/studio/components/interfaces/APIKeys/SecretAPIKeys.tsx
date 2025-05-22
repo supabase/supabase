@@ -70,7 +70,7 @@ export const SecretAPIKeys = () => {
                 >
                   Name
                 </TableHead>
-                <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 pr-0 w-full">
+                <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 pr-0">
                   API Key
                 </TableHead>
                 <TableHead
@@ -127,9 +127,9 @@ export const SecretAPIKeys = () => {
     return (
       <TableContainer>
         <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
-          <p className="text-sm text-foreground">No secret API keys exist</p>
+          <p className="text-sm text-foreground">No secret API keys found</p>
           <p className="text-sm text-foreground-light">
-            Your project can't be accessed using secret API keys.
+            Your project is not accessible via secret keys—there are no active secret keys created.
           </p>
         </div>
       </TableContainer>

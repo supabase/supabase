@@ -40,7 +40,7 @@ export const ApiKeysMoved = () => {
       <div className="flex flex-col gap-0 z-[2]">
         <p className="text-sm text-foreground">API keys have moved</p>
         <p className="text-sm text-foreground-lighter mb-4">
-          Can now be found in the new API Keys page
+          They can now be found in the new API Keys page
         </p>
         <Link href={`/project/${projectRef}/settings/api-keys`}>
           <Button type="default">Go to API Keys</Button>

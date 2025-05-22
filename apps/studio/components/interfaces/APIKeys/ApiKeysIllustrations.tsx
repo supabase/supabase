@@ -93,9 +93,9 @@ export const ApiKeysIllustrationWithOverlay = () => {
     <>
       {/* Gradient overlay - horizontal on desktop, vertical on mobile */}
       <div
-        className="absolute inset-x-0 bottom-0 h-1/2 xl:h-full xl:inset-x-auto xl:-right-16 xl:top-3 w-full xl:w-2/3 
-        bg-gradient-to-t xl:bg-gradient-to-l 
-        from-background-alternative via-background-alternative/90 via-[5%] to-transparent 
+        className="absolute inset-x-0 bottom-0 h-1/2 xl:h-full xl:inset-x-auto xl:-right-16 xl:top-3 w-full xl:w-2/3
+        bg-gradient-to-t xl:bg-gradient-to-l
+        from-background-alternative via-background-alternative/90 via-[5%] to-transparent
         z-[3] pointer-events-none xl:max-w-[500px]"
       />
 
@@ -138,9 +138,9 @@ export const ApiKeysCreateCallout = () => {
   return (
     <FeatureBanner illustration={<ApiKeysIllustrationWithOverlay />} bgAlt>
       <div className="flex flex-col gap-0 z-[2]">
-        <p className="text-sm text-foreground">Create your new API keys</p>
+        <p className="text-sm text-foreground">Create API keys</p>
         <p className="text-sm text-foreground-lighter lg:max-w-sm 2xl:max-w-none">
-          Generate new API keys to use with your application.
+          Use keys to authenticate requests to your app
         </p>
         <div className="mt-4">
           <CreateNewAPIKeysButton />

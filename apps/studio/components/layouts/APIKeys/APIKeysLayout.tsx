@@ -1,8 +1,6 @@
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
-import { Sparkles } from 'lucide-react'
 import { PropsWithChildren } from 'react'
-import { Separator } from 'ui'
 
 import { useParams } from 'common'
 
@@ -25,10 +23,10 @@ const ApiKeysLayout = ({ children }: PropsWithChildren) => {
   return (
     <PageLayout
       title="API Keys"
-      subtitle="Configure API keys that help secure your project"
+      subtitle="Configure API keys to securely control access to your project"
       navigationItems={navigationItems}
     >
-      <ScaffoldContainer className="flex flex-col gap-0 py-8 gap-8" bottomPadding>
+      <ScaffoldContainer className="flex flex-col py-8 gap-8" bottomPadding>
         {children}
       </ScaffoldContainer>
     </PageLayout>
