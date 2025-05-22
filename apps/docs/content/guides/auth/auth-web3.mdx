@@ -25,9 +25,17 @@ Not all Web3 wallet applications show a dedicated confirmation dialog for these 
 
 User accounts that sign in with their Web3 wallet will not have an email address or phone number associated with them. This can open your project to abuse as creating a Web3 wallet account is free and easy to automate and difficult to correlate with a real person's identity.
 
-Control your project's exposure by setting up [Rate Limits for Web3](/dashboard/project/_/auth/rate-limits).
+Control your project's exposure by configuring:
+
+- [Rate Limits for Web3](/dashboard/project/_/auth/rate-limits)
+- [Enable CAPTCHA protection](/docs/guides/auth/auth-captcha)
 
 Many wallet applications will warn the user if the message sent for signing is not coming from the page they are currently visiting. To further prevent your Supabase project from receiving signed messages destined for other applications, you must register your application's URL using the [Redirect URL settings](/docs/guides/auth/redirect-urls).
+
+For example if the user is signing in to the page `https://example.com/sign-in` you should add the following configurations in the Redirect URL settings:
+
+- `https://example.com/sign-in/` (last slash is important)
+- Alternatively set up a glob pattern such ash `https://example.com/**`
 
 ## Sign in with Ethereum
 
@@ -138,3 +146,11 @@ function App() {
 </TabPanel>
 
 </Tabs>
+
+## Frequently asked questions
+
+### How to associate an email address, phone number or social login to a user signing in with Web3?
+
+Web3 wallets don't expose any identifying information about the user other than their wallet address (public key). This is why accounts that were created using Sign in with Web3 don't have any email address or phone number associated.
+
+To associate an email address, phone number or other social login with their account you can use the `supabase.auth.updateUser()` or `supabase.auth.linkIdentity()` APIs.
