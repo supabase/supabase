@@ -2,14 +2,13 @@ import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import { notFound } from 'next/navigation'
 import { isAbsolute, relative } from 'path'
 import rehypeSlug from 'rehype-slug'
-
-import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
+import { REVALIDATION_TAGS } from '~/features/helpers.fetch'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
-import { REVALIDATION_TAGS } from '~/features/helpers.fetch'
 
 export const dynamicParams = false
 
@@ -179,7 +178,7 @@ const urlTransform: UrlTransformFunction = (url) => {
 
     // If we have a mapping for this page, use the mapped path
     if (page) {
-      return 'graphql/' + page.slug + hash
+      return '/docs/guides/graphql/' + page.slug + hash
     }
 
     // If we don't have this page in our docs, link to original docs
@@ -194,4 +193,4 @@ const generateStaticParams = async () => pageMap.map(({ slug }) => ({ slug: slug
 const generateMetadata = genGuideMeta(getContent)
 
 export default PGGraphQLDocs
-export { generateStaticParams, generateMetadata }
+export { generateMetadata, generateStaticParams }
