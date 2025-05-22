@@ -14,7 +14,7 @@ export const ENV_WITH_AUTH: Env[] = ['production', 'staging', 'dev-hosted']
 
 export const ENV_URLS: Record<Env, string> = {
   production: 'https://supabase.com',
-  staging: 'https://supabase.green',
+  staging: 'https://supabase.green/dashboard',
   selfhosted: 'http://localhost:54323',
   'dev-hosted': 'http://localhost:8082',
   'dev-selfhosted': 'http://localhost:8082',
