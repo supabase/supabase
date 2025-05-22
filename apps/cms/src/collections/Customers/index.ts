@@ -1,0 +1,290 @@
+import type { CollectionConfig } from 'payload'
+
+import {
+  BlocksFeature,
+  FixedToolbarFeature,
+  HeadingFeature,
+  HorizontalRuleFeature,
+  InlineToolbarFeature,
+  lexicalEditor,
+} from '@payloadcms/richtext-lexical'
+
+import { authenticated } from '../../access/authenticated'
+import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
+import { Banner } from '../../blocks/Banner/config'
+import { Code } from '../../blocks/Code/config'
+import { MediaBlock } from '../../blocks/MediaBlock/config'
+import { generatePreviewPath } from '../../utilities/generatePreviewPath'
+// import { populateAuthors } from './hooks/populateAuthors'
+import { revalidateDelete, revalidateCustomer } from './hooks/revalidateCustomer'
+
+import {
+  MetaDescriptionField,
+  MetaImageField,
+  MetaTitleField,
+  OverviewField,
+  PreviewField,
+} from '@payloadcms/plugin-seo/fields'
+import { slugField } from '@/fields/slug'
+
+const industryOptions = [
+  { label: 'Healthcare', value: 'healthcare' },
+  { label: 'Fintech', value: 'fintech' },
+  { label: 'E-commerce', value: 'ecommerce' },
+  { label: 'Education', value: 'education' },
+  { label: 'Gaming', value: 'gaming' },
+  { label: 'Media', value: 'media' },
+  { label: 'Real Estate', value: 'real-estate' },
+  { label: 'SaaS', value: 'saas' },
+  { label: 'Social', value: 'social' },
+  { label: 'Analytics', value: 'analytics' },
+  { label: 'AI', value: 'ai' },
+  { label: 'Developer Tools', value: 'developer-tools' },
+]
+
+const companySizeOptions = [
+  { label: 'Startup', value: 'startup' },
+  { label: 'Enterprise', value: 'enterprise' },
+  { label: 'Independent Developer', value: 'indie_dev' },
+]
+
+const regionOptions = [
+  { label: 'Asia', value: 'Asia' },
+  { label: 'Europe', value: 'Europe' },
+  { label: 'North America', value: 'North America' },
+  { label: 'South America', value: 'South America' },
+  { label: 'Africa', value: 'Africa' },
+  { label: 'Oceania', value: 'Oceania' },
+]
+
+const supabaseProductOptions = [
+  { label: 'Database', value: 'database' },
+  { label: 'Auth', value: 'auth' },
+  { label: 'Storage', value: 'storage' },
+  { label: 'Realtime', value: 'realtime' },
+  { label: 'Functions', value: 'functions' },
+  { label: 'Vector', value: 'vector' },
+]
+
+export const Customers: CollectionConfig = {
+  slug: 'customers',
+  admin: {
+    useAsTitle: 'title',
+    defaultColumns: ['title', 'slug', 'updatedAt'],
+    preview: (data) => {
+      const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
+      const isDraft = data?._status === 'draft'
+      return `${baseUrl}/customers/${data?.slug}${isDraft ? '?preview=true' : ''}`
+    },
+  },
+  access: {
+    create: authenticated,
+    delete: authenticated,
+    read: authenticatedOrPublished,
+    update: authenticated,
+  },
+  defaultPopulate: {
+    title: true,
+    slug: true,
+    categories: true,
+    meta: {
+      image: true,
+      description: true,
+    },
+  },
+  fields: [
+    {
+      name: 'title',
+      type: 'text',
+      required: true,
+    },
+    ...slugField(),
+    {
+      type: 'tabs',
+      tabs: [
+        {
+          label: 'Content',
+          fields: [
+            {
+              name: 'content',
+              type: 'richText',
+              editor: lexicalEditor({
+                features: ({ rootFeatures }) => {
+                  return [
+                    ...rootFeatures,
+                    HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
+                    BlocksFeature({ blocks: [Banner, Code, MediaBlock] }),
+                    FixedToolbarFeature(),
+                    InlineToolbarFeature(),
+                    HorizontalRuleFeature(),
+                  ]
+                },
+              }),
+              label: false,
+              required: true,
+            },
+          ],
+        },
+        {
+          label: 'Meta',
+          fields: [
+            {
+              name: 'description',
+              type: 'textarea',
+            },
+            {
+              name: 'about',
+              type: 'textarea',
+              admin: {
+                description: 'Short description about the company',
+              },
+            },
+            {
+              name: 'company_url',
+              type: 'text',
+              admin: {
+                description: 'URL of the company website',
+              },
+            },
+            {
+              name: 'stats',
+              type: 'array',
+              admin: {
+                description: 'Key statistics or metrics to highlight',
+              },
+              fields: [
+                {
+                  name: 'stat',
+                  type: 'text',
+                  required: true,
+                },
+                {
+                  name: 'label',
+                  type: 'text',
+                  required: true,
+                },
+              ],
+            },
+            {
+              name: 'misc',
+              type: 'array',
+              admin: {
+                description: 'Miscellaneous information (e.g., Founded, Location)',
+              },
+              fields: [
+                {
+                  name: 'label',
+                  type: 'text',
+                  required: true,
+                },
+                {
+                  name: 'text',
+                  type: 'text',
+                  required: true,
+                },
+              ],
+            },
+            {
+              name: 'industry',
+              type: 'select',
+              hasMany: true,
+              options: industryOptions,
+              admin: {
+                description: 'Industry categories',
+              },
+            },
+            {
+              name: 'company_size',
+              type: 'select',
+              options: companySizeOptions,
+              admin: {
+                description: 'Size of the company',
+              },
+            },
+            {
+              name: 'region',
+              type: 'select',
+              options: regionOptions,
+              admin: {
+                description: 'Geographic region',
+              },
+            },
+            {
+              name: 'supabase_products',
+              type: 'select',
+              hasMany: true,
+              options: supabaseProductOptions,
+              admin: {
+                description: 'Supabase products being used',
+              },
+            },
+          ],
+        },
+        {
+          name: 'meta',
+          label: 'SEO',
+          fields: [
+            OverviewField({
+              titlePath: 'meta.title',
+              descriptionPath: 'meta.description',
+              imagePath: 'meta.image',
+            }),
+            MetaTitleField({
+              hasGenerateFn: true,
+            }),
+            MetaImageField({
+              relationTo: 'media',
+            }),
+
+            MetaDescriptionField({}),
+            PreviewField({
+              // if the `generateUrl` function is configured
+              hasGenerateFn: true,
+
+              // field paths to match the target field for data
+              titlePath: 'meta.title',
+              descriptionPath: 'meta.description',
+            }),
+          ],
+        },
+      ],
+    },
+    {
+      name: 'publishedAt',
+      type: 'date',
+      admin: {
+        date: {
+          pickerAppearance: 'dayAndTime',
+        },
+        position: 'sidebar',
+      },
+      hooks: {
+        beforeChange: [
+          ({ siblingData, value }) => {
+            if (siblingData._status === 'published' && !value) {
+              return new Date()
+            }
+            return value
+          },
+        ],
+      },
+    },
+  ],
+  timestamps: true,
+  hooks: {
+    afterChange: [revalidateCustomer],
+    // afterRead: [populateAuthors],
+    afterDelete: [revalidateDelete],
+  },
+  versions: {
+    drafts: {
+      autosave: {
+        interval: 100, // We set this interval for optimal live preview
+      },
+      schedulePublish: true,
+    },
+    maxPerDoc: 50,
+  },
+}
+
+export default Customers

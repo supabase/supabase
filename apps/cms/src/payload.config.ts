@@ -7,13 +7,15 @@ import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
 
-import { Users } from './collections/Users'
-import { Media } from './collections/Media'
-import { Posts } from './collections/Posts'
 import { Authors } from './collections/Authors'
 import { Categories } from './collections/Categories'
-import { Tags } from './collections/Tags'
+import { Customers } from './collections/Customers'
+import { Events } from './collections/Events'
+import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
+import { Posts } from './collections/Posts'
+import { Tags } from './collections/Tags'
+import { Users } from './collections/Users'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -47,7 +49,17 @@ export default buildConfig({
       ],
     },
   },
-  collections: [Posts, Users, Media, Authors, Categories, Tags, Pages],
+  collections: [
+    Authors,
+    Categories,
+    Customers,
+    Events,
+    Media,
+    Pages,
+    Posts,
+    Tags, 
+    Users
+  ],
   editor: defaultLexical,
   secret: process.env.PAYLOAD_SECRET,
   typescript: {

@@ -67,13 +67,15 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    posts: Post;
-    users: User;
-    media: Media;
     authors: Author;
     categories: Category;
-    tags: Tag;
+    customers: Customer;
+    events: Event;
+    media: Media;
     pages: Page;
+    posts: Post;
+    tags: Tag;
+    users: User;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -85,13 +87,15 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
-    posts: PostsSelect<false> | PostsSelect<true>;
-    users: UsersSelect<false> | UsersSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
-    tags: TagsSelect<false> | TagsSelect<true>;
+    customers: CustomersSelect<false> | CustomersSelect<true>;
+    events: EventsSelect<false> | EventsSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
+    posts: PostsSelect<false> | PostsSelect<true>;
+    tags: TagsSelect<false> | TagsSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -141,50 +145,18 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "posts".
+ * via the `definition` "authors".
  */
-export interface Post {
+export interface Author {
   id: number;
-  title: string;
-  slug?: string | null;
-  slugLock?: boolean | null;
-  content: {
-    root: {
-      type: string;
-      children: {
-        type: string;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  thumb?: (number | null) | Media;
-  image?: (number | null) | Media;
-  categories?: (number | Category)[] | null;
-  launchweek?: string | null;
-  readingTime?: number | null;
-  date?: string | null;
-  toc_depth?: number | null;
-  description?: string | null;
-  authors?: (number | Author)[] | null;
-  tags?: (number | Tag)[] | null;
-  meta?: {
-    title?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
-    description?: string | null;
-  };
-  publishedAt?: string | null;
+  author: string;
+  author_id?: string | null;
+  position?: string | null;
+  author_url?: string | null;
+  author_image_url?: (number | null) | Media;
+  username?: string | null;
   updatedAt: string;
   createdAt: string;
-  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -300,45 +272,159 @@ export interface Category {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "authors".
+ * via the `definition` "customers".
  */
-export interface Author {
+export interface Customer {
   id: number;
-  author: string;
-  author_id?: string | null;
-  position?: string | null;
-  author_url?: string | null;
-  author_image_url?: (number | null) | Media;
-  username?: string | null;
+  title: string;
+  slug?: string | null;
+  slugLock?: boolean | null;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  description?: string | null;
+  /**
+   * Short description about the company
+   */
+  about?: string | null;
+  /**
+   * URL of the company website
+   */
+  company_url?: string | null;
+  /**
+   * Key statistics or metrics to highlight
+   */
+  stats?:
+    | {
+        stat: string;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Miscellaneous information (e.g., Founded, Location)
+   */
+  misc?:
+    | {
+        label: string;
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Industry categories
+   */
+  industry?:
+    | (
+        | 'healthcare'
+        | 'fintech'
+        | 'ecommerce'
+        | 'education'
+        | 'gaming'
+        | 'media'
+        | 'real-estate'
+        | 'saas'
+        | 'social'
+        | 'analytics'
+        | 'ai'
+        | 'developer-tools'
+      )[]
+    | null;
+  /**
+   * Size of the company
+   */
+  company_size?: ('startup' | 'enterprise' | 'indie_dev') | null;
+  /**
+   * Geographic region
+   */
+  region?: ('Asia' | 'Europe' | 'North America' | 'South America' | 'Africa' | 'Oceania') | null;
+  /**
+   * Supabase products being used
+   */
+  supabase_products?: ('database' | 'auth' | 'storage' | 'realtime' | 'functions' | 'vector')[] | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  publishedAt?: string | null;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tags".
+ * via the `definition` "events".
  */
-export interface Tag {
+export interface Event {
   id: number;
-  name: string;
+  title: string;
+  slug?: string | null;
+  slugLock?: boolean | null;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  thumb?: (number | null) | Media;
+  image?: (number | null) | Media;
+  categories?: (number | Category)[] | null;
+  date?: string | null;
+  description?: string | null;
+  authors?: (number | Author)[] | null;
+  /**
+   * Events that are on-demand following a registration process
+   */
+  onDemand?: boolean | null;
+  /**
+   * When true, we don't build the page and require a custom link
+   */
+  disable_page_build?: boolean | null;
+  /**
+   * Used on event previews to link to a custom event page
+   */
+  link: {
+    href: string;
+    target?: ('_self' | '_blank') | null;
+    label?: string | null;
+  };
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  publishedAt?: string | null;
   updatedAt: string;
   createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
- */
-export interface User {
-  id: number;
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  password?: string | null;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -405,6 +491,63 @@ export interface Page {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  title: string;
+  slug?: string | null;
+  slugLock?: boolean | null;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  thumb?: (number | null) | Media;
+  image?: (number | null) | Media;
+  categories?: (number | Category)[] | null;
+  launchweek?: string | null;
+  readingTime?: number | null;
+  date?: string | null;
+  toc_depth?: number | null;
+  description?: string | null;
+  authors?: (number | Author)[] | null;
+  tags?: (number | Tag)[] | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  publishedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tags".
+ */
+export interface Tag {
+  id: number;
+  name: string;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -750,6 +893,23 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: number;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  password?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -921,18 +1081,6 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'posts';
-        value: number | Post;
-      } | null)
-    | ({
-        relationTo: 'users';
-        value: number | User;
-      } | null)
-    | ({
-        relationTo: 'media';
-        value: number | Media;
-      } | null)
-    | ({
         relationTo: 'authors';
         value: number | Author;
       } | null)
@@ -941,12 +1089,32 @@ export interface PayloadLockedDocument {
         value: number | Category;
       } | null)
     | ({
-        relationTo: 'tags';
-        value: number | Tag;
+        relationTo: 'customers';
+        value: number | Customer;
+      } | null)
+    | ({
+        relationTo: 'events';
+        value: number | Event;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: number | Media;
       } | null)
     | ({
         relationTo: 'pages';
         value: number | Page;
+      } | null)
+    | ({
+        relationTo: 'posts';
+        value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'tags';
+        value: number | Tag;
+      } | null)
+    | ({
+        relationTo: 'users';
+        value: number | User;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1012,23 +1180,66 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "posts_select".
+ * via the `definition` "authors_select".
  */
-export interface PostsSelect<T extends boolean = true> {
+export interface AuthorsSelect<T extends boolean = true> {
+  author?: T;
+  author_id?: T;
+  position?: T;
+  author_url?: T;
+  author_image_url?: T;
+  username?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  name?: T;
+  parent?: T;
+  breadcrumbs?:
+    | T
+    | {
+        doc?: T;
+        url?: T;
+        label?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "customers_select".
+ */
+export interface CustomersSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   slugLock?: T;
   content?: T;
-  thumb?: T;
-  image?: T;
-  categories?: T;
-  launchweek?: T;
-  readingTime?: T;
-  date?: T;
-  toc_depth?: T;
   description?: T;
-  authors?: T;
-  tags?: T;
+  about?: T;
+  company_url?: T;
+  stats?:
+    | T
+    | {
+        stat?: T;
+        label?: T;
+        id?: T;
+      };
+  misc?:
+    | T
+    | {
+        label?: T;
+        text?: T;
+        id?: T;
+      };
+  industry?: T;
+  company_size?: T;
+  region?: T;
+  supabase_products?: T;
   meta?:
     | T
     | {
@@ -1043,18 +1254,39 @@ export interface PostsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
+ * via the `definition` "events_select".
  */
-export interface UsersSelect<T extends boolean = true> {
+export interface EventsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  slugLock?: T;
+  content?: T;
+  thumb?: T;
+  image?: T;
+  categories?: T;
+  date?: T;
+  description?: T;
+  authors?: T;
+  onDemand?: T;
+  disable_page_build?: T;
+  link?:
+    | T
+    | {
+        href?: T;
+        target?: T;
+        label?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
+  publishedAt?: T;
   updatedAt?: T;
   createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1149,47 +1381,6 @@ export interface MediaSelect<T extends boolean = true> {
               filename?: T;
             };
       };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "authors_select".
- */
-export interface AuthorsSelect<T extends boolean = true> {
-  author?: T;
-  author_id?: T;
-  position?: T;
-  author_url?: T;
-  author_image_url?: T;
-  username?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categories_select".
- */
-export interface CategoriesSelect<T extends boolean = true> {
-  name?: T;
-  parent?: T;
-  breadcrumbs?:
-    | T
-    | {
-        doc?: T;
-        url?: T;
-        label?: T;
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tags_select".
- */
-export interface TagsSelect<T extends boolean = true> {
-  name?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1325,6 +1516,61 @@ export interface FormBlockSelect<T extends boolean = true> {
   introContent?: T;
   id?: T;
   blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts_select".
+ */
+export interface PostsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  slugLock?: T;
+  content?: T;
+  thumb?: T;
+  image?: T;
+  categories?: T;
+  launchweek?: T;
+  readingTime?: T;
+  date?: T;
+  toc_depth?: T;
+  description?: T;
+  authors?: T;
+  tags?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tags_select".
+ */
+export interface TagsSelect<T extends boolean = true> {
+  name?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1590,12 +1836,20 @@ export interface TaskSchedulePublish {
     locale?: string | null;
     doc?:
       | ({
-          relationTo: 'posts';
-          value: number | Post;
+          relationTo: 'customers';
+          value: number | Customer;
+        } | null)
+      | ({
+          relationTo: 'events';
+          value: number | Event;
         } | null)
       | ({
           relationTo: 'pages';
           value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
         } | null);
     global?: string | null;
     user?: (number | null) | User;

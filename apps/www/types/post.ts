@@ -1,6 +1,6 @@
 export default interface PostTypes {
-  slug?: string
   type: 'casestudy' | 'blog' | 'event'
+  slug?: string
   title: string
   name?: string
   date: string
