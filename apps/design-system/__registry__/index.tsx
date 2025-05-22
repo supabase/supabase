@@ -2227,6 +2227,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "flame-graph-colorMode-width": {
+      name: "flame-graph-colorMode-width",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/flame-graph-colorMode-width")),
+      source: "",
+      files: ["registry/default/example/flame-graph-colorMode-width.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "flame-graph-data-violations": {
       name: "flame-graph-data-violations",
       type: "components:example",

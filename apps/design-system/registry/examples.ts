@@ -1233,6 +1233,12 @@ export const examples: Registry = [
     files: ['example/flame-graph.tsx'],
   },
   {
+    name: 'flame-graph-colorMode-width',
+    type: 'components:example',
+    registryDependencies: ['flame-graph'],
+    files: ['example/flame-graph-colorMode-width.tsx'],
+  },
+  {
     name: 'flame-graph-data-violations',
     type: 'components:example',
     registryDependencies: ['flame-graph'],

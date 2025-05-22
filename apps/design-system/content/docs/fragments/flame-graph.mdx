@@ -19,9 +19,23 @@ export type FlameGraphDataItem = {
   start_value: number
   end_value: number
   parent_id?: string
+  color?: string
   [key: string]: any
 }
 ```
+
+## ColorMode
+
+There are 3 ways to color the FlameGraph. By default, the flamegraph would follow `colorMode="peaks"` in this mode, the higher the bar level, the "brighter" the chart color would be. (see example above).
+
+THe second way is to set `colorMode="width"` in this mode, the color of the graph depends on the width of the graph. The longer the bar width, the "brighter" it will be.
+
+<ComponentPreview
+  name="flame-graph-colorMode-width"
+  className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
+/>
+
+Lastly, you are able to set the color for each bar in the flameGraph, by adding the color in the data with any color of your choice, see `Flame-graph-data-violations` below as an example.
 
 ## Gotchas
 

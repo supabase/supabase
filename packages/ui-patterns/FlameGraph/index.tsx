@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef } from 'react'
 import * as echarts from 'echarts'
+import { getFlameGraphColor, isValidateData } from './utils'
 
 type EChartsOption = echarts.EChartsOption
 type EChartsType = echarts.ECharts
@@ -16,41 +17,76 @@ export type FlameGraphDataItem = {
   [key: string]: any
 }
 
-function transformDataIntoFlameGraphFormat(data: FlameGraphDataItem[]): [number, any[]] {
-  const itemsById = new Map<string, FlameGraphDataItem>()
-  const levelMap = new Map<string, number>()
-  for (const item of data) {
-    itemsById.set(item.id, item)
-  }
+function transformDataIntoFlameGraphFormat(
+  data: FlameGraphDataItem[],
+  colorMode: 'width' | 'peaks'
+): [number, any[]] {
+  const itemsById = new Map(data.map((item) => [item.id, item]))
+  const maxWidth = Math.max(...data.map((item) => item.end_value - item.start_value))
 
-  // Function to compute level for a specific item
-  const computeLevel = (id: string): number => {
-    const item = itemsById.get(id)
-    if (!item) {
-      // If the item doesn't exist, return -1
-      console.warn("Item doesn't exist", id)
-      return -1
+  const computeLevels = (data: any[]): Map<string, number> => {
+    const levelMap = new Map<string, number>()
+    const unprocessedItems = new Set(data.map((item) => item.id))
+
+    // Process items without parents first (root items)
+    data.forEach((item) => {
+      if (item.parent_id === '') {
+        levelMap.set(item.id, 0)
+        unprocessedItems.delete(item.id)
+      }
+    })
+
+    // Continue processing until all items are processed or no progress is made
+    let madeProgress = true
+    while (unprocessedItems.size > 0 && madeProgress) {
+      madeProgress = false
+
+      // Convert set to array to avoid modifying during iteration
+      Array.from(unprocessedItems).forEach((id) => {
+        const item = itemsById.get(id)
+        if (!item) {
+          console.warn("Item doesn't exist", id)
+          unprocessedItems.delete(id)
+          return
+        }
+
+        // If parent doesn't exist in our data
+        if (item.parent_id !== '' && !itemsById.has(item.parent_id)) {
+          console.warn("Parent doesn't exist", item.parent_id)
+          levelMap.set(id, -1)
+          unprocessedItems.delete(id)
+          madeProgress = true
+          return
+        }
+
+        // If we know the parent's level, we can compute this item's level
+        if (levelMap.has(item.parent_id)) {
+          const parentLevel = levelMap.get(item.parent_id) as number
+          levelMap.set(id, parentLevel + 1)
+          unprocessedItems.delete(id)
+          madeProgress = true
+        }
+      })
     }
 
-    if (item.parent_id === '') {
-      levelMap.set(id, 0)
-      return 0
+    // Handle any remaining items (could be due to circular references)
+    if (unprocessedItems.size > 0) {
+      console.warn(
+        'Circular reference or invalid hierarchy detected for items:',
+        Array.from(unprocessedItems)
+      )
+
+      // Mark remaining items with -1 to indicate they couldn't be processed
+      unprocessedItems.forEach((id) => {
+        levelMap.set(id, -1)
+      })
     }
 
-    if (![...itemsById.keys()].includes(item.parent_id)) {
-      // If the item doesn't exist, return -1
-      console.warn("Item doesn't exist", id)
-      return -1
-    }
-
-    const parentLevel = computeLevel(item.parent_id)
-    levelMap.set(id, parentLevel + 1)
-    return parentLevel + 1
+    return levelMap
   }
 
-  for (const item of data) {
-    computeLevel(item.id)
-  }
+  const levelMap: Map<string, number> = computeLevels(data)
+  const maxLevel = Math.max(...levelMap.values())
 
   const transFormedData = data
     .filter((item) => [...levelMap.keys()].includes(item.parent_id) || item.parent_id === '')
@@ -58,41 +94,31 @@ function transformDataIntoFlameGraphFormat(data: FlameGraphDataItem[]): [number,
       name: item.id,
       value: [levelMap.get(item.id), item.start_value, item.end_value, item.name],
       itemStyle: {
-        color: item.color || '#3ecf8e',
+        color: getFlameGraphColor(item, colorMode, levelMap.get(item.id) || 0, maxLevel, maxWidth),
       },
     }))
 
-  return [Math.max(...levelMap.values()), transFormedData]
+  return [maxLevel, transFormedData]
 }
 
-function isValidateData(data: FlameGraphDataItem[]): [boolean, string] {
-  // there should only be 1 FlameGraphDataItem with no parent_id
-  const rootItems = data.filter((item) => item.parent_id === '')
-
-  if (rootItems.length === 0) {
-    return [false, 'There is no root item in the data. Add at least one item with no parent_id.']
-  }
-
-  if (rootItems.length > 1) {
-    return [
-      false,
-      'There are more than 1 root item with no parent_id. Please wrap all these data in a single item with no parent_id.',
-    ]
-  }
-
-  return [true, '']
+type FlameGraphProps = {
+  data: any[]
+  title?: string
+  tooltipFormatter?: (params: any) => string
+  /**
+   * Set the colorMode for the FlameGraph.
+   * If set to 'width', the color will be based on the width of the item. (longer items results in brighter color)
+   * If set to 'peaks', the color will be based on the level of the item. (Higher level results in brighter color)
+   */
+  colorMode?: 'width' | 'peaks'
 }
 
 export const FlameGraph = ({
   data,
   title,
   tooltipFormatter,
-}: {
-  data: any[]
-  title?: string
-  hasAnimation?: boolean
-  tooltipFormatter?: (params: any) => string
-}) => {
+  colorMode = 'peaks',
+}: FlameGraphProps) => {
   const chartRef = useRef<HTMLDivElement>(null)
   const chartInstance = useRef<EChartsType | null>(null)
   const [valid, error] = isValidateData(data)
@@ -101,8 +127,8 @@ export const FlameGraph = ({
   }
 
   const [flameGraphHeight, flameGraphData] = useMemo(
-    () => transformDataIntoFlameGraphFormat(data),
-    data
+    () => transformDataIntoFlameGraphFormat(data, colorMode),
+    [data, colorMode]
   )
 
   useEffect(() => {
