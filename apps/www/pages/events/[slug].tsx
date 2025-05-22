@@ -34,6 +34,7 @@ import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-w
 
 import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import type Author from '~/types/author'
+import { getAllCMSEventSlugs } from '../../lib/cms-events'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -103,7 +104,10 @@ type Params = {
 }
 
 export async function getStaticPaths() {
-  const paths = getAllPostSlugs('_events')
+  const staticPaths = getAllPostSlugs('_events')
+  const cmsPaths = await getAllCMSEventSlugs()
+  const paths = [...staticPaths, ...cmsPaths]
+
   return {
     paths,
     fallback: false,

@@ -12,14 +12,19 @@ import { SITE_ORIGIN } from '~/lib/constants'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
+import { getAllCMSCustomers, getAllCMSCustomerSlugs } from '../../lib/cms-customers'
 
 // table of contents extractor
 const toc = require('markdown-toc')
 
 export async function getStaticPaths() {
   const paths = getAllPostSlugs('_customers')
+  const cmsSlugs = await getAllCMSCustomerSlugs()
+
+  const allPaths = [...paths, ...cmsSlugs]
+
   return {
-    paths,
+    allPaths,
     fallback: false,
   }
 }
@@ -37,7 +42,10 @@ export async function getStaticProps({ params }: any) {
     currentPostSlug: filePath,
   })
 
-  const allPosts = getSortedPosts({ directory: '_customers' })
+  const staticPosts = getSortedPosts({ directory: '_customers' })
+  const cmsCustomers = await getAllCMSCustomers()
+  const allPosts = [...staticPosts, ...cmsCustomers]
+
   const currentIndex = allPosts
     .map(function (e) {
       return e.slug

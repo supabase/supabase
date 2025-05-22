@@ -12,6 +12,7 @@ import EventsFilters from '~/components/Events/EventsFilters'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
 import type BlogPost from '~/types/post'
+import { getAllCMSEvents } from '../../lib/cms-events'
 
 interface Props {
   events: BlogPost[]
@@ -20,6 +21,7 @@ interface Props {
 }
 
 function Events({ events: allEvents, onDemandEvents, categories }: Props) {
+  console.log('events', allEvents)
   const [events, setEvents] = useState(allEvents)
   const router = useRouter()
 
@@ -154,16 +156,24 @@ export async function getStaticProps() {
     runner: '** EVENTS PAGE **',
   }) as BlogPost[]
 
-  const allEvents = [...staticEvents, ...meetupEvents]
-  const upcomingEvents = allEvents.filter((event: BlogPost) =>
+  // Get CMS blog posts
+  const cmsEventsData = await getAllCMSEvents()
+
+  const allEvents = [...staticEvents, ...meetupEvents, ...cmsEventsData].sort((a: any, b: any) => {
+    const dateA = a.date ? new Date(a.date).getTime() : new Date(a.formattedDate).getTime()
+    const dateB = b.date ? new Date(b.date).getTime() : new Date(b.formattedDate).getTime()
+    return dateB - dateA
+  })
+
+  const upcomingEvents = allEvents.filter((event: any) =>
     event.end_date ? new Date(event.end_date!) >= new Date() : new Date(event.date!) >= new Date()
   )
   const onDemandEvents = allEvents.filter(
-    (event: BlogPost) => new Date(event.date!) < new Date() && event.onDemand === true
+    (event: any) => new Date(event.date!) < new Date() && event.onDemand === true
   )
 
   const categories = upcomingEvents.reduce(
-    (acc: { [key: string]: number }, event: BlogPost) => {
+    (acc: { [key: string]: number }, event: any) => {
       // Increment the 'all' counter
       acc.all = (acc.all || 0) + 1
 
