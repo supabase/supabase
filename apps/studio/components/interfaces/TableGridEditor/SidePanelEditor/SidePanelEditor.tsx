@@ -25,7 +25,7 @@ import { getTables } from 'data/tables/tables-query'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { createTabId, updateTab } from 'state/tabs'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import type { Dictionary } from 'types'
 import { SonnerProgress } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -50,6 +50,7 @@ import {
 import SpreadsheetImport from './SpreadsheetImport/SpreadsheetImport'
 import TableEditor from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
+import { RetrieveTableResult } from 'data/tables/table-retrieve-query'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -58,7 +59,7 @@ export interface SidePanelEditorProps {
 
   // Because the panel is shared between grid editor and database pages
   // Both require different responses upon success of these events
-  onTableCreated?: (table: PostgresTable) => void
+  onTableCreated?: (table: RetrieveTableResult) => void
 }
 
 const SidePanelEditor = ({
@@ -69,6 +70,7 @@ const SidePanelEditor = ({
 }: SidePanelEditorProps) => {
   const { ref } = useParams()
   const snap = useTableEditorStateSnapshot()
+  const tabsSnap = useTabsStateSnapshot()
   const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
 
@@ -228,7 +230,7 @@ const SidePanelEditor = ({
     resolve: any
   ) => {
     const selectedColumnToEdit = snap.sidePanel?.type === 'column' && snap.sidePanel.column
-    const { columnId, primaryKey, foreignKeyRelations, existingForeignKeyRelations } = configuration
+    const { primaryKey, foreignKeyRelations, existingForeignKeyRelations } = configuration
 
     if (!project || selectedTable === undefined) {
       return console.error('no project or table selected')
@@ -246,7 +248,7 @@ const SidePanelEditor = ({
       : await updateColumn({
           projectRef: project?.ref!,
           connectionString: project?.connectionString,
-          id: columnId as string,
+          originalColumn: selectedColumnToEdit as PostgresColumn,
           payload: payload as UpdateColumnPayload,
           selectedTable,
           primaryKey,
@@ -312,7 +314,7 @@ const SidePanelEditor = ({
     })
   }
 
-  const updateTableRealtime = async (table: PostgresTable, enabled: boolean) => {
+  const updateTableRealtime = async (table: RetrieveTableResult, enabled: boolean) => {
     if (!project) return console.error('Project is required')
     const realtimePublication = publications?.find((pub) => pub.name === 'supabase_realtime')
 
@@ -494,7 +496,7 @@ const SidePanelEditor = ({
           if (isTableEditorTabsEnabled && ref && payload.name) {
             // [Joshen] Only table entities can be updated via the dashboard
             const tabId = createTabId(ENTITY_TYPE.TABLE, { id: selectedTable.id })
-            updateTab(ref, tabId, { label: payload.name })
+            tabsSnap.updateTab(tabId, { label: payload.name })
           }
           toast.success(`Successfully updated ${table.name}!`, { id: toastId })
         }

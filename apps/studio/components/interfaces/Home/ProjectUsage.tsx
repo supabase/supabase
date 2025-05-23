@@ -65,7 +65,9 @@ const ProjectUsage = () => {
 
   const { plan } = useCurrentOrgPlan()
 
-  const [interval, setInterval] = useState<ProjectLogStatsVariables['interval']>('minutely')
+  const DEFAULT_INTERVAL = plan?.id === 'free' ? 'hourly' : 'daily'
+
+  const [interval, setInterval] = useState<ProjectLogStatsVariables['interval']>(DEFAULT_INTERVAL)
 
   const { data, isLoading } = useProjectLogStatsQuery({ projectRef, interval })
 

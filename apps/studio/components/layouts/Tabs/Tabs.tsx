@@ -11,18 +11,10 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { useParams } from 'common'
 import { TabsUpdateTooltip } from 'components/interfaces/App/FeaturePreview/TableEditorTabs'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useAppStateSnapshot } from 'state/app-state'
-import {
-  editorEntityTypes,
-  handleTabClose,
-  handleTabDragEnd,
-  handleTabNavigation,
-  useTabsStore,
-  type Tab,
-} from 'state/tabs'
+import { editorEntityTypes, useTabsStateSnapshot, type Tab } from 'state/tabs'
 import { cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { CollapseButton } from './CollapseButton'
@@ -35,18 +27,13 @@ export const EditorTabs = () => {
   const appSnap = useAppStateSnapshot()
 
   const editor = useEditorType()
-  const tabs = useTabsStore(ref)
+  const tabs = useTabsStateSnapshot()
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 1, // Start with a very small distance
       },
     })
-  )
-
-  const [tabsInterfaceAcknowledge, setTabsInterfaceAcknowledge] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.TABS_INTERFACE_ACKNOWLEDGED,
-    false
   )
 
   const openTabs = tabs.openTabs
@@ -68,7 +55,7 @@ export const EditorTabs = () => {
     const newIndex = tabs.openTabs.indexOf(over.id.toString())
 
     if (oldIndex !== newIndex) {
-      handleTabDragEnd(ref, oldIndex, newIndex, active.id.toString(), router)
+      tabs.handleTabDragEnd(oldIndex, newIndex, active.id.toString(), router)
     }
   }
 
@@ -78,11 +65,11 @@ export const EditorTabs = () => {
         appSnap.setDashboardHistory(ref, editor === 'table' ? 'editor' : editor, undefined)
       }
     }
-    handleTabClose({ ref, id, router, editor, onClearDashboardHistory })
+    tabs.handleTabClose({ id, router, editor, onClearDashboardHistory })
   }
 
   const handleTabChange = (id: string) => {
-    handleTabNavigation(ref, id, router)
+    tabs.handleTabNavigation(id, router)
   }
 
   return (
