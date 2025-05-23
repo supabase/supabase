@@ -1,7 +1,7 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { constructHeaders } from 'lib/api/apiHelpers'
 import apiWrapper from 'lib/api/apiWrapper'
 import { get } from 'lib/common/fetch'
-import { constructHeaders } from 'lib/api/apiHelpers'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 

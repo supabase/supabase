@@ -113,26 +113,24 @@ const Home: NextPageWithLayout = () => {
                       Tables
                     </div>
                     <span className="text-2xl tabular-nums">
-                      {isLoadingTables ? (
-                        <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
-                      ) : (
-                        tablesCount
-                      )}
+                      {isLoadingTables ? <ShimmeringLoader className="h-8 w-6" /> : tablesCount}
                     </span>
                   </div>
 
-                  <div>
-                    <div className="flex items-center gap-1.5 text-foreground-light text-sm mb-1">
-                      Functions
+                  {IS_PLATFORM && (
+                    <div>
+                      <div className="flex items-center gap-1.5 text-foreground-light text-sm mb-1">
+                        Functions
+                      </div>
+                      <span className="text-2xl tabular-nums">
+                        {isLoadingFunctions ? (
+                          <ShimmeringLoader className="h-8 w-6" />
+                        ) : (
+                          functionsCount
+                        )}
+                      </span>
                     </div>
-                    <span className="text-2xl tabular-nums">
-                      {isLoadingFunctions ? (
-                        <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
-                      ) : (
-                        functionsCount
-                      )}
-                    </span>
-                  </div>
+                  )}
 
                   {IS_PLATFORM && (
                     <div>

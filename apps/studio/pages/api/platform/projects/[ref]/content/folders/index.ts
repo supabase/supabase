@@ -1,6 +1,7 @@
 import { paths } from 'api-types'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { query } from '../_helpers'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -23,44 +24,43 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 type GetResponseData =
   paths['/platform/projects/{ref}/content/folders']['get']['responses']['200']['content']['application/json']
 
+type GetRequestData =
+  paths['/platform/projects/{ref}/content/folders']['get']['parameters']['query']
+
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetResponseData>) => {
-  // Platform specific endpoint
-  const snippets = [
-    {
-      id: '1',
-      owner_id: 1,
-      name: 'SQL Query',
-      description: '',
-      type: 'sql' as const,
-      visibility: 'user' as const,
-      content: {
-        content_id: '1.0',
-        sql: `select * from
-  (select version()) as version,
-  (select current_setting('server_version_num')) as version_number;`,
-        schema_version: '1',
-        favorite: false,
-      },
-      inserted_at: '',
-      updated_at: '',
-      project_id: 0,
-      favorite: false,
-    },
-  ]
-  return res.status(200).json({
-    data: {
-      folders: [],
-      contents: snippets,
-    },
-  })
+  const params = req.query as GetRequestData
+
+  const folders = await query(`SELECT * FROM public.folders`, req.headers)
+
+  const snippetsData = await query(
+    `SELECT * FROM public.snippets WHERE content->>'folder_id' IS NULL`,
+    req.headers
+  )
+  const snippets = snippetsData.map((d) => d.content)
+
+  res.status(200).json({ data: { folders: folders, contents: snippets } })
 }
 
-const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Platform specific endpoint
-  return res.status(200).json({})
+type PostResponseData =
+  paths['/platform/projects/{ref}/content/folders']['post']['responses']['201']['content']['application/json']
+
+type PostRequestData =
+  paths['/platform/projects/{ref}/content/folders']['post']['requestBody']['content']['application/json']
+const handlePost = async (req: NextApiRequest, res: NextApiResponse<PostResponseData>) => {
+  const { name, parent_id } = req.body as PostRequestData
+
+  const results = await query(
+    `INSERT INTO public.folders (name, parent_id) VALUES ('${name}', ${parent_id ? `'${parent_id}'` : 'NULL'}) RETURNING *`,
+    req.headers
+  )
+
+  return res.status(200).json(results[0])
 }
 
 const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Platform specific endpoint
+  const { id } = req.query
+  const result = await query(`DELETE FROM public.folders WHERE id = ${id}`, req.headers)
+  console.log(result)
+
   return res.status(200).json({})
 }
