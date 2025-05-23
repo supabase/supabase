@@ -29,7 +29,7 @@ const SCHEMA = z.object({
   description: z.string(),
 })
 
-const CreateSecretAPIKeyModal = () => {
+const CreateSecretAPIKeyDialog = () => {
   const [visible, setVisible] = useState(false)
   const { ref: projectRef } = useParams()
 
@@ -71,10 +71,15 @@ const CreateSecretAPIKeyModal = () => {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create new secret API key</DialogTitle>
-          <DialogDescription>
-            Secret API keys are used to authorize requests to your project from servers, functions,
-            workers or other backend components of your application. Keep them secret, don't publish
-            them online and don't check them in source code.
+          <DialogDescription className="grid gap-y-2">
+            <p>
+              Secret API keys are used to authorize requests to your project from servers,
+              functions, workers or other backend components of your application.{' '}
+            </p>
+
+            <p>
+              Keep these keys private. Don't publish them online or commit them to source control.
+            </p>
           </DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
@@ -113,4 +118,4 @@ const CreateSecretAPIKeyModal = () => {
   )
 }
 
-export default CreateSecretAPIKeyModal
+export default CreateSecretAPIKeyDialog

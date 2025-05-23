@@ -31,11 +31,11 @@ const SCHEMA = z.object({
   description: z.string(),
 })
 
-export interface CreatePublishableAPIKeyModalProps {
+export interface CreatePublishableAPIKeyDialogProps {
   projectRef: string
 }
 
-function CreatePublishableAPIKeyModal() {
+function CreatePublishableAPIKeyDialog() {
   const params = useParams()
   const projectRef = params?.ref as string
 
@@ -121,4 +121,4 @@ function CreatePublishableAPIKeyModal() {
   )
 }
 
-export default CreatePublishableAPIKeyModal
+export default CreatePublishableAPIKeyDialog
