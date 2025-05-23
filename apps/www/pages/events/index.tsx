@@ -21,7 +21,7 @@ interface Props {
 }
 
 function Events({ events: allEvents, onDemandEvents, categories }: Props) {
-  console.log('events', allEvents)
+  console.log('allEvents', allEvents)
   const [events, setEvents] = useState(allEvents)
   const router = useRouter()
 

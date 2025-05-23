@@ -35,46 +35,6 @@ export async function getStaticPaths() {
   }
 }
 
-// export async function getStaticProps({ params }: any) {
-//   const filePath = `${params.slug}`
-//   const postContent = await getPostdata(filePath, '_customers')
-//   const { data, content } = matter(postContent)
-//   const mdxSource: any = await mdxSerialize(content)
-
-//   const relatedPosts = getSortedPosts({
-//     directory: '_customers',
-//     limit: 5,
-//     tags: mdxSource.scope.tags,
-//     currentPostSlug: filePath,
-//   })
-
-//   const staticPosts = getSortedPosts({ directory: '_customers' })
-//   const cmsCustomers = await getAllCMSCustomers()
-//   const allPosts = [...staticPosts, ...cmsCustomers]
-
-//   const currentIndex = allPosts
-//     .map(function (e) {
-//       return e.slug
-//     })
-//     .indexOf(filePath)
-//   const nextPost = allPosts[currentIndex + 1]
-//   const prevPost = allPosts[currentIndex - 1]
-//   const payload = {
-//     props: {
-//       prevPost: currentIndex === 0 ? null : prevPost ? prevPost : null,
-//       nextPost: currentIndex === allPosts.length ? null : nextPost ? nextPost : null,
-//       // relatedPosts,
-//       blog: {
-//         slug: `${params.slug}`,
-//         content: mdxSource,
-//         source: content,
-//         ...data,
-//         toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
-//       },
-//     },
-//   }
-//   return payload
-// }
 type StaticAuthor = {
   author: string
   author_image_url: string | null
@@ -144,7 +104,7 @@ type Post = ReturnType<typeof getSortedPosts>[number]
 type CustomerPageProps = {
   prevPost: Post | null
   nextPost: Post | null
-  relatedPosts: (Post & CustomerData)[]
+  relatedPosts: Post[]
   customer: CustomerData
 }
 

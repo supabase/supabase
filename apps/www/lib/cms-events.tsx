@@ -8,6 +8,7 @@ const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY
 type CMSEvent = {
   id: string
   title: string
+  subtitle?: string
   slug: string
   description: string
   content: {
@@ -51,6 +52,7 @@ type CMSEvent = {
 type ProcessedEvent = {
   slug: string
   title: string
+  subtitle?: string
   description: string
   date: string
   formattedDate: string
@@ -257,6 +259,7 @@ function processEventData(event: any) {
     slug: event.slug,
     source: markdownContent,
     title: event.title || 'Untitled event',
+    subtitle: event.subtitle || '',
     date: event.date || new Date().toISOString(),
     formattedDate,
     readingTime,
@@ -277,8 +280,8 @@ function processEventData(event: any) {
     toc_depth: event.toc_depth || 2,
     thumb: thumbUrl,
     image: imageUrl,
-    url: `/event/${event.slug}`,
-    path: `/event/${event.slug}`,
+    url: `/events/${event.slug}`,
+    path: `/events/${event.slug}`,
     isCMS: true,
     content: markdownContent,
     tags: event.tags || [],
@@ -337,6 +340,7 @@ export async function getAllCMSEvents({
         return {
           slug: event.slug || '',
           title: event.title || '',
+          subtitle: event.subtitle || '',
           description: event.description || '',
           date: event.date || new Date().toISOString(),
           formattedDate,
@@ -360,8 +364,8 @@ export async function getAllCMSEvents({
           toc_depth: event.toc_depth || 2,
           thumb: thumbUrl,
           image: imageUrl,
-          url: `/event/${event.slug || ''}`,
-          path: `/event/${event.slug || ''}`,
+          url: `/events/${event.slug || ''}`,
+          path: `/events/${event.slug || ''}`,
           isCMS: true,
           tags: event.tags || [],
           content: markdownContent,

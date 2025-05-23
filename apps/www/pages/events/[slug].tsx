@@ -17,7 +17,7 @@ import authors from 'lib/authors.json'
 import { isNotNullOrUndefined } from '~/lib/helpers'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
-import { getAllPostSlugs, getPostdata } from '~/lib/posts'
+import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 import advancedFormat from 'dayjs/plugin/advancedFormat'
@@ -34,7 +34,7 @@ import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-w
 
 import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import type Author from '~/types/author'
-import { getAllCMSEventSlugs } from '../../lib/cms-events'
+import { getAllCMSEvents, getAllCMSEventSlugs, getCMSEventBySlug } from '../../lib/cms-events'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -63,9 +63,9 @@ interface EventData {
   main_cta?: CTA
   description: string
   type: EventType
-  company?: CompanyType
   onDemand?: boolean
   disable_page_build?: boolean
+  company?: CompanyType
   duration?: string
   timezone?: string
   tags?: string[]
@@ -85,6 +85,9 @@ interface EventData {
 }
 
 type EventPageProps = {
+  prevPost: Post | null
+  nextPost: Post | null
+  relatedPosts: Post[]
   event: Event & EventData
 }
 
@@ -99,10 +102,6 @@ type Event = {
   content: any
 }
 
-type Params = {
-  slug: string
-}
-
 export async function getStaticPaths() {
   const staticPaths = getAllPostSlugs('_events')
   const cmsPaths = await getAllCMSEventSlugs()
@@ -114,32 +113,194 @@ export async function getStaticPaths() {
   }
 }
 
-export const getStaticProps: GetStaticProps<EventPageProps, Params> = async ({ params }) => {
-  if (params?.slug === undefined) {
-    throw new Error('Missing slug for pages/event/[slug].tsx')
+// export const getStaticProps: GetStaticProps<EventPageProps, Params> = async ({ params }) => {
+//   if (params?.slug === undefined) {
+//     throw new Error('Missing slug for pages/event/[slug].tsx')
+//   }
+
+//   const filePath = `${params.slug}`
+//   const postContent = await getPostdata(filePath, '_events')
+//   const { data, content } = matter(postContent) as unknown as MatterReturn
+
+//   if (data.disable_page_build) {
+//     return {
+//       notFound: true,
+//     }
+//   }
+
+//   const mdxSource: any = await mdxSerialize(content)
+
+//   return {
+//     props: {
+//       event: {
+//         slug: `${params.slug}`,
+//         source: content,
+//         ...data,
+//         content: mdxSource,
+//       },
+//     },
+//   }
+// }
+
+type StaticAuthor = {
+  author: string
+  author_image_url: string | null
+  author_url: string
+  position: string
+}
+
+type CMSAuthor = {
+  author: string
+  author_image_url: {
+    url: string
   }
+  author_url: string
+  position: string
+}
 
-  const filePath = `${params.slug}`
-  const postContent = await getPostdata(filePath, '_events')
-  const { data, content } = matter(postContent) as unknown as MatterReturn
+type Post = ReturnType<typeof getSortedPosts>[number]
 
-  if (data.disable_page_build) {
-    return {
-      notFound: true,
+type Params = {
+  slug: string
+}
+
+// table of contents extractor
+// const toc = require('markdown-toc')
+
+type Tag =
+  | string
+  | {
+      name: string
+      id: number
+      documentId: string
+      createdAt: string
+      updatedAt: string
+      publishedAt: string
     }
+type Category = string | { name: string }
+
+// Add a new type for processed blog data
+type ProcessedBlogData = EventData & {
+  needsSerialization?: boolean
+}
+
+export const getStaticProps: GetStaticProps<EventPageProps, Params> = async ({
+  params,
+  preview = false,
+}) => {
+  if (!params?.slug) {
+    throw new Error('Missing slug for pages/blog/[slug].tsx')
   }
 
-  const mdxSource: any = await mdxSerialize(content)
+  const slug = `${params.slug}`
+  console.log(
+    `[getStaticProps] generating for slug: '${slug}', preview mode: ${preview ? 'true' : 'false'}`
+  )
+
+  // Try static post first
+  try {
+    const postContent = await getPostdata(slug, '_events')
+    const parsedContent = matter(postContent) as unknown as MatterReturn
+    const content = parsedContent.content
+    const mdxSource = await mdxSerialize(content)
+    const blogPost = { ...parsedContent.data }
+
+    // Get all posts for navigation and related posts
+    const allStaticEvents = getSortedPosts({ directory: '_events' })
+    const allCmsEvents = await getAllCMSEvents()
+    const allPosts = [...allStaticEvents, ...allCmsEvents].sort(
+      (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    )
+    const currentIndex = allPosts.findIndex((post) => post.slug === slug)
+    const nextPost = currentIndex === allPosts.length - 1 ? null : allPosts[currentIndex + 1]
+    const prevPost = currentIndex === 0 ? null : allPosts[currentIndex - 1]
+    // const tocResult = toc(content, { maxdepth: blogPost.toc_depth ? blogPost.toc_depth : 2 })
+    // const processedContent = tocResult.content.replace(/%23/g, '')
+    const relatedPosts = getSortedPosts({
+      directory: '_blog',
+      limit: 3,
+      tags: mdxSource.scope.tags,
+      currentPostSlug: slug,
+    }) as unknown as (EventData & Post)[]
+
+    return {
+      props: {
+        prevPost,
+        nextPost,
+        relatedPosts,
+        event: {
+          ...blogPost,
+          content: mdxSource,
+          // toc: {
+          //   ...tocResult,
+          //   content: processedContent,
+          // },
+        },
+      },
+      revalidate: 60 * 10,
+    }
+  } catch (error) {
+    console.log('[getStaticProps] Static post not found, trying CMS post...')
+    // Not a static post, try CMS
+  }
+
+  // Try CMS post (handle preview/draft logic)
+  const cmsPost = await getCMSEventBySlug(slug, preview)
+
+  if (!cmsPost) {
+    // Try to fetch published version if preview mode failed
+    if (preview) {
+      const publishedPost = await getCMSEventBySlug(slug, false)
+      if (!publishedPost) {
+        return { notFound: true }
+      }
+      const mdxSource = await mdxSerialize(publishedPost.content || '')
+
+      console.log('publishedPost', publishedPost)
+      return {
+        props: {
+          prevPost: null,
+          nextPost: null,
+          relatedPosts: [],
+          event: {
+            ...publishedPost,
+            tags: publishedPost.tags || [],
+            authors: publishedPost.authors || [],
+            isCMS: true,
+            content: mdxSource,
+            // toc: publishedPost.toc,
+            image: publishedPost.image ?? undefined,
+            // thumb: publishedPost.thumb ?? undefined,
+          },
+        },
+        revalidate: 60 * 10,
+      }
+    }
+    console.log('[getStaticProps] Not in preview mode and no CMS post found, returning 404')
+    return { notFound: true }
+  }
+
+  // For CMS posts, process content
+  console.log('[getStaticProps] Processing CMS post data for render')
+  const mdxSource = await mdxSerialize(cmsPost.content || '')
 
   return {
     props: {
+      prevPost: null,
+      nextPost: null,
+      relatedPosts: [],
       event: {
-        slug: `${params.slug}`,
-        source: content,
-        ...data,
+        ...cmsPost,
+        tags: cmsPost.tags || [],
+        authors: cmsPost.authors || [],
+        isCMS: true,
         content: mdxSource,
+        // toc: cmsPost.toc,
+        // image: cmsPost.image ?? undefined,
+        // thumb: cmsPost.thumb ?? undefined,
       },
     },
+    revalidate: 60 * 10,
   }
 }
 
@@ -265,14 +426,14 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
             >
               <div className="h-full flex flex-col justify-between">
                 <div className="flex flex-col gap-2 md:gap-3 items-start mb-8">
-                  <div className="flex flex-row text-sm items-center flex-wrap">
+                  {/* <div className="flex flex-row text-sm items-center flex-wrap">
                     <Icon className="hidden sm:inline-block w-4 h-4 text-brand mr-2" />
                     <span className="uppercase text-brand font-mono">{event.type}</span>
                     <span className="mx-3 px-3 border-x">
                       {dayjs(event.date).tz(event.timezone).format(`DD MMM YYYY [at] hA z`)}
                     </span>
                     <span className="">Duration: {event.duration}</span>
-                  </div>
+                  </div> */}
 
                   <h1 className="text-foreground text-3xl md:text-4xl xl:pr-9">{event.title}</h1>
                   <p>{event.subtitle}</p>
