@@ -22,7 +22,7 @@ interface ApiKeysVisibilityState {
 export function useApiKeysVisibility(): ApiKeysVisibilityState {
   const { ref: projectRef } = useParams()
   const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'api_keys')
-  const isInRollout = useFlag('newApiKeysRollout')
+  const isInRollout = useFlag('basicApiKeys')
 
   const { data: apiKeysData, isLoading } = useAPIKeysQuery({
     projectRef,
