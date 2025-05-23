@@ -44,7 +44,11 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       showMaxValue: true,
       showGrid: true,
       syncId: 'database-reports',
-      YAxisProps: { width: 60, tickFormatter: (value: any) => formatBytes(value, 0) },
+      valuePrecision: 1,
+      YAxisProps: {
+        width: 60,
+        tickFormatter: (value: any) => formatBytes(value, 1),
+      },
       attributes: [
         {
           attribute: 'ram_usage_used',
