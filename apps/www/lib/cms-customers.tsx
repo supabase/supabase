@@ -2,12 +2,13 @@ import { generateReadingTime } from './helpers'
 const toc = require('markdown-toc')
 
 // Payload API configuration
-const PAYLOAD_URL = process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://localhost:3000'
+const PAYLOAD_URL = process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://localhost:3030'
 const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY
 
 type CMSCustomer = {
   id: string
-  title: string
+  name: string
+  title?: string
   slug: string
   description: string
   content: {
@@ -34,6 +35,9 @@ type CMSCustomer = {
   image?: {
     url: string
   }
+  logo?: {
+    url: string
+  }
   createdAt: string
   updatedAt: string
   authors?: {
@@ -50,6 +54,7 @@ type CMSCustomer = {
 
 type ProcessedCustomer = {
   slug: string
+  name: string
   title: string
   description: string
   date: string
@@ -66,6 +71,7 @@ type ProcessedCustomer = {
   toc_depth: number
   thumb: string | null
   image: string | null
+  logo: string | null
   url: string
   path: string
   isCMS: boolean
@@ -225,11 +231,6 @@ export async function getCMSCustomerBySlug(slug: string, preview = false) {
     // If we have a customer (either draft or published), process it
     const customer = data.docs[0]
 
-    // Let's log some key data to ensure it's what we expect
-    console.log(`[getCMSCustomerBySlug] customer title: ${customer.title}`)
-    console.log(`[getCMSCustomerBySlug] customer status: ${customer._status || 'published'}`)
-    console.log(`[getCMSCustomerBySlug] customer content type:`, typeof customer.content)
-
     return processCustomerData(customer)
   } catch (error) {
     console.error('Error fetching CMS customer by slug:', error)
@@ -247,6 +248,7 @@ function processCustomerData(customer: any) {
   // Extract thumb and image URLs from the nested structure
   const thumbUrl = customer.thumb?.url ? `${PAYLOAD_URL}${customer.thumb.url}` : null
   const imageUrl = customer.image?.url ? `${PAYLOAD_URL}${customer.image.url}` : null
+  const logoUrl = customer.logo?.url ? `${PAYLOAD_URL}${customer.logo.url}` : null
 
   // Generate TOC from content for CMS customers
   const tocResult = toc(markdownContent, {
@@ -256,6 +258,7 @@ function processCustomerData(customer: any) {
   return {
     slug: customer.slug,
     source: markdownContent,
+    name: customer.name || 'Customer',
     title: customer.title || 'Untitled customer',
     date: customer.date || new Date().toISOString(),
     formattedDate,
@@ -277,6 +280,7 @@ function processCustomerData(customer: any) {
     toc_depth: customer.toc_depth || 2,
     thumb: thumbUrl,
     image: imageUrl,
+    logo: logoUrl,
     url: `/customers/${customer.slug}`,
     path: `/customers/${customer.slug}`,
     isCMS: true,
@@ -333,9 +337,11 @@ export async function getAllCMSCustomers({
         // Extract thumb and image URLs from the nested structure
         const thumbUrl = `${PAYLOAD_URL}${customer.thumb?.url}`
         const imageUrl = `${PAYLOAD_URL}${customer.image?.url}`
+        const logoUrl = `${PAYLOAD_URL}${customer.logo?.url}`
 
         return {
           slug: customer.slug || '',
+          name: customer.name || '',
           title: customer.title || '',
           description: customer.description || '',
           date: customer.date || new Date().toISOString(),
@@ -360,6 +366,7 @@ export async function getAllCMSCustomers({
           toc_depth: customer.toc_depth || 2,
           thumb: thumbUrl,
           image: imageUrl,
+          logo: logoUrl,
           url: `/customers/${customer.slug || ''}`,
           path: `/customers/${customer.slug || ''}`,
           isCMS: true,

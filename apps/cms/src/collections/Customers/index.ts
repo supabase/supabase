@@ -14,8 +14,6 @@ import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { Banner } from '../../blocks/Banner/config'
 import { Code } from '../../blocks/Code/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
-import { generatePreviewPath } from '../../utilities/generatePreviewPath'
-// import { populateAuthors } from './hooks/populateAuthors'
 import { revalidateDelete, revalidateCustomer } from './hooks/revalidateCustomer'
 
 import {
@@ -69,8 +67,8 @@ const supabaseProductOptions = [
 export const Customers: CollectionConfig = {
   slug: 'customers',
   admin: {
-    useAsTitle: 'title',
-    defaultColumns: ['title', 'slug', 'updatedAt'],
+    useAsTitle: 'name',
+    defaultColumns: ['name', 'slug', 'updatedAt'],
     preview: (data) => {
       const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
       const isDraft = data?._status === 'draft'
@@ -84,6 +82,7 @@ export const Customers: CollectionConfig = {
     update: authenticated,
   },
   defaultPopulate: {
+    name: true,
     title: true,
     slug: true,
     categories: true,
@@ -94,11 +93,16 @@ export const Customers: CollectionConfig = {
   },
   fields: [
     {
-      name: 'title',
+      name: 'name',
       type: 'text',
       required: true,
     },
-    ...slugField(),
+    {
+      name: 'title',
+      type: 'text',
+      required: false,
+    },
+    ...slugField('name'),
     {
       type: 'tabs',
       tabs: [
@@ -225,12 +229,13 @@ export const Customers: CollectionConfig = {
           label: 'SEO',
           fields: [
             OverviewField({
-              titlePath: 'meta.title',
+              titlePath: 'meta.name',
               descriptionPath: 'meta.description',
               imagePath: 'meta.image',
             }),
             MetaTitleField({
               hasGenerateFn: true,
+
             }),
             MetaImageField({
               relationTo: 'media',
@@ -242,7 +247,7 @@ export const Customers: CollectionConfig = {
               hasGenerateFn: true,
 
               // field paths to match the target field for data
-              titlePath: 'meta.title',
+              titlePath: 'meta.name',
               descriptionPath: 'meta.description',
             }),
           ],
@@ -269,11 +274,19 @@ export const Customers: CollectionConfig = {
         ],
       },
     },
+    {
+      name: 'logo',
+      type: 'upload',
+      relationTo: 'media',
+      required: false,
+      admin: {
+        position: 'sidebar',
+      },
+    },
   ],
   timestamps: true,
   hooks: {
     afterChange: [revalidateCustomer],
-    // afterRead: [populateAuthors],
     afterDelete: [revalidateDelete],
   },
   versions: {

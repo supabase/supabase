@@ -12,65 +12,277 @@ import { SITE_ORIGIN } from '~/lib/constants'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
-import { getAllCMSCustomers, getAllCMSCustomerSlugs } from '../../lib/cms-customers'
+import {
+  getAllCMSCustomers,
+  getAllCMSCustomerSlugs,
+  getCMSCustomerBySlug,
+} from '../../lib/cms-customers'
+
+import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 
 // table of contents extractor
 const toc = require('markdown-toc')
 
 export async function getStaticPaths() {
-  const paths = getAllPostSlugs('_customers')
+  const staticPaths = getAllPostSlugs('_customers')
   const cmsSlugs = await getAllCMSCustomerSlugs()
 
-  const allPaths = [...paths, ...cmsSlugs]
+  const paths = [...staticPaths, ...cmsSlugs]
 
   return {
-    allPaths,
+    paths,
     fallback: false,
   }
 }
 
-export async function getStaticProps({ params }: any) {
-  const filePath = `${params.slug}`
-  const postContent = await getPostdata(filePath, '_customers')
-  const { data, content } = matter(postContent)
-  const mdxSource: any = await mdxSerialize(content)
+// export async function getStaticProps({ params }: any) {
+//   const filePath = `${params.slug}`
+//   const postContent = await getPostdata(filePath, '_customers')
+//   const { data, content } = matter(postContent)
+//   const mdxSource: any = await mdxSerialize(content)
 
-  const relatedPosts = getSortedPosts({
-    directory: '_customers',
-    limit: 5,
-    tags: mdxSource.scope.tags,
-    currentPostSlug: filePath,
-  })
+//   const relatedPosts = getSortedPosts({
+//     directory: '_customers',
+//     limit: 5,
+//     tags: mdxSource.scope.tags,
+//     currentPostSlug: filePath,
+//   })
 
-  const staticPosts = getSortedPosts({ directory: '_customers' })
-  const cmsCustomers = await getAllCMSCustomers()
-  const allPosts = [...staticPosts, ...cmsCustomers]
+//   const staticPosts = getSortedPosts({ directory: '_customers' })
+//   const cmsCustomers = await getAllCMSCustomers()
+//   const allPosts = [...staticPosts, ...cmsCustomers]
 
-  const currentIndex = allPosts
-    .map(function (e) {
-      return e.slug
-    })
-    .indexOf(filePath)
-  const nextPost = allPosts[currentIndex + 1]
-  const prevPost = allPosts[currentIndex - 1]
-  const payload = {
-    props: {
-      prevPost: currentIndex === 0 ? null : prevPost ? prevPost : null,
-      nextPost: currentIndex === allPosts.length ? null : nextPost ? nextPost : null,
-      relatedPosts,
-      blog: {
-        slug: `${params.slug}`,
-        content: mdxSource,
-        source: content,
-        ...data,
-        toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
-      },
-    },
-  }
-  return payload
+//   const currentIndex = allPosts
+//     .map(function (e) {
+//       return e.slug
+//     })
+//     .indexOf(filePath)
+//   const nextPost = allPosts[currentIndex + 1]
+//   const prevPost = allPosts[currentIndex - 1]
+//   const payload = {
+//     props: {
+//       prevPost: currentIndex === 0 ? null : prevPost ? prevPost : null,
+//       nextPost: currentIndex === allPosts.length ? null : nextPost ? nextPost : null,
+//       // relatedPosts,
+//       blog: {
+//         slug: `${params.slug}`,
+//         content: mdxSource,
+//         source: content,
+//         ...data,
+//         toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
+//       },
+//     },
+//   }
+//   return payload
+// }
+type StaticAuthor = {
+  author: string
+  author_image_url: string | null
+  author_url: string
+  position: string
 }
 
-function CaseStudyPage(props: any) {
+type CustomerData = {
+  slug: string
+  name: string
+  title?: string
+  description?: string
+  content: any
+  toc: any
+  author?: string
+  authors?: (CMSAuthor | StaticAuthor)[]
+  about?: string
+  company_url?: string
+  logo?: string
+  misc?: {
+    label: string
+    text: string
+  }[]
+  date: string
+  categories?: string[]
+  tags?:
+    | string[]
+    | Array<{
+        id: number
+        documentId: string
+        name: string
+        createdAt: string
+        updatedAt: string
+        publishedAt: string
+      }>
+  toc_depth?: number
+  video?: string
+  docs_url?: string
+  blog_url?: string
+  url?: string
+  source: string
+  image?: string
+  thumb?: string
+  youtubeHero?: string
+  launchweek?: number | string
+  meta_title?: string
+  meta_description?: string
+  isCMS?: boolean
+}
+
+type MatterReturn = {
+  data: CustomerData
+  content: string
+}
+
+type CMSAuthor = {
+  author: string
+  author_image_url: {
+    url: string
+  }
+  author_url: string
+  position: string
+}
+
+type Post = ReturnType<typeof getSortedPosts>[number]
+
+type CustomerPageProps = {
+  prevPost: Post | null
+  nextPost: Post | null
+  relatedPosts: (Post & CustomerData)[]
+  customer: CustomerData
+}
+
+type Params = {
+  slug: string
+}
+
+export const getStaticProps: GetStaticProps<CustomerPageProps, Params> = async ({
+  params,
+  preview = false,
+}) => {
+  if (!params?.slug) {
+    throw new Error('Missing slug for pages/blog/[slug].tsx')
+  }
+
+  const slug = `${params.slug}`
+  console.log(
+    `[getStaticProps] generating for slug: '${slug}', preview mode: ${preview ? 'true' : 'false'}`
+  )
+
+  // Try static post first
+  try {
+    const postContent = await getPostdata(slug, '_customers')
+    const parsedContent = matter(postContent) as unknown as MatterReturn
+    const content = parsedContent.content
+    const mdxSource = await mdxSerialize(content)
+    const blogPost = { ...parsedContent.data }
+
+    // Get all posts for navigation and related posts
+    const allStaticPosts = getSortedPosts({ directory: '_customers' })
+    const allCmsPosts = await getAllCMSCustomers()
+    const allPosts = [...allStaticPosts, ...allCmsPosts].sort(
+      (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    )
+    const currentIndex = allPosts.findIndex((post) => post.slug === slug)
+    const nextPost = currentIndex === allPosts.length - 1 ? null : allPosts[currentIndex + 1]
+    const prevPost = currentIndex === 0 ? null : allPosts[currentIndex - 1]
+    const tocResult = toc(content, { maxdepth: blogPost.toc_depth ? blogPost.toc_depth : 2 })
+    const processedContent = tocResult.content.replace(/%23/g, '')
+    const relatedPosts = getSortedPosts({
+      directory: '_blog',
+      limit: 3,
+      tags: mdxSource.scope.tags,
+      currentPostSlug: slug,
+    }) as unknown as (CustomerData & Post)[]
+
+    return {
+      props: {
+        prevPost,
+        nextPost,
+        relatedPosts,
+        customer: {
+          ...blogPost,
+          content: mdxSource,
+          toc: {
+            ...tocResult,
+            content: processedContent,
+          },
+        },
+      },
+      revalidate: 60 * 10,
+    }
+  } catch (error) {
+    console.log('[getStaticProps] Static post not found, trying CMS post...')
+    // Not a static post, try CMS
+  }
+
+  // Try CMS post (handle preview/draft logic)
+  const cmsPost = await getCMSCustomerBySlug(slug, preview)
+
+  console.log('cmsPost', cmsPost)
+
+  if (!cmsPost) {
+    console.log(
+      '[getStaticProps] No CMS post found, checking published version (if in preview mode)...'
+    )
+    // Try to fetch published version if preview mode failed
+    if (preview) {
+      console.log(
+        '[getStaticProps] In preview mode but no draft found, trying published version...'
+      )
+      const publishedPost = await getCMSCustomerBySlug(slug, false)
+      if (!publishedPost) {
+        console.log('[getStaticProps] No published version found either, returning 404')
+        return { notFound: true }
+      }
+      console.log('[getStaticProps] Found published version, using that for preview')
+      const mdxSource = await mdxSerialize(publishedPost.content || '')
+
+      console.log('publishedPost', publishedPost)
+      return {
+        props: {
+          prevPost: null,
+          nextPost: null,
+          relatedPosts: [],
+          customer: {
+            ...publishedPost,
+            tags: publishedPost.tags || [],
+            authors: publishedPost.authors || [],
+            isCMS: true,
+            content: mdxSource,
+            toc: publishedPost.toc,
+            image: publishedPost.image ?? undefined,
+            // thumb: publishedPost.thumb ?? undefined,
+          },
+        },
+        revalidate: 60 * 10,
+      }
+    }
+    console.log('[getStaticProps] Not in preview mode and no CMS post found, returning 404')
+    return { notFound: true }
+  }
+
+  // For CMS posts, process content
+  console.log('[getStaticProps] Processing CMS post data for render')
+  const mdxSource = await mdxSerialize(cmsPost.content || '')
+
+  return {
+    props: {
+      prevPost: null,
+      nextPost: null,
+      relatedPosts: [],
+      customer: {
+        ...cmsPost,
+        tags: cmsPost.tags || [],
+        authors: cmsPost.authors || [],
+        isCMS: true,
+        content: mdxSource,
+        toc: cmsPost.toc,
+        // image: cmsPost.image ?? undefined,
+        // thumb: cmsPost.thumb ?? undefined,
+      },
+    },
+    revalidate: 60 * 10,
+  }
+}
+
+function CaseStudyPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   const {
     about,
     company_url,
@@ -84,7 +296,7 @@ function CaseStudyPage(props: any) {
     name,
     slug,
     title,
-  } = props.blog
+  } = props.customer
 
   const ogImageUrl = encodeURI(
     `${process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:54321' : 'https://obuldanrptloktxcffvn.supabase.co'}/functions/v1/og-images?site=customers&customer=${slug}&title=${meta_title ?? title}`
@@ -158,15 +370,16 @@ function CaseStudyPage(props: any) {
                       <div className="space-y-8 lg:sticky lg:top-24 lg:mb-24">
                         {/* Logo */}
                         <div className="relative h-16 w-32 lg:mt-5">
-                          <Image
-                            fill
-                            src={logo}
-                            alt={`${title} logo`}
-                            priority
-                            placeholder="blur"
-                            blurDataURL="/images/blur.png"
-                            draggable={false}
-                            className="
+                          {logo && (
+                            <Image
+                              fill
+                              src={logo}
+                              alt={`${title} logo`}
+                              priority
+                              placeholder="blur"
+                              blurDataURL="/images/blur.png"
+                              draggable={false}
+                              className="
                               bg-no-repeat
                               object-left
                               object-contain
@@ -176,7 +389,8 @@ function CaseStudyPage(props: any) {
                               [[data-theme*=dark]_&]:contrast-0
                               [[data-theme*=dark]_&]:filter
                             "
-                          />
+                            />
+                          )}
                         </div>
 
                         <div className="flex flex-col space-y-2">

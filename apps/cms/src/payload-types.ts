@@ -276,7 +276,8 @@ export interface Category {
  */
 export interface Customer {
   id: number;
-  title: string;
+  name: string;
+  title?: string | null;
   slug?: string | null;
   slugLock?: boolean | null;
   content: {
@@ -363,6 +364,7 @@ export interface Customer {
     description?: string | null;
   };
   publishedAt?: string | null;
+  logo?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1215,6 +1217,7 @@ export interface CategoriesSelect<T extends boolean = true> {
  * via the `definition` "customers_select".
  */
 export interface CustomersSelect<T extends boolean = true> {
+  name?: T;
   title?: T;
   slug?: T;
   slugLock?: T;
@@ -1248,6 +1251,7 @@ export interface CustomersSelect<T extends boolean = true> {
         description?: T;
       };
   publishedAt?: T;
+  logo?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
