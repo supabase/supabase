@@ -2,6 +2,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { type Database as DatabaseGenerated } from 'common'
 
 type Database = {
+  content: DatabaseGenerated['content']
   graphql_public: DatabaseGenerated['graphql_public']
   public: {
     Tables: DatabaseGenerated['public']['Tables']
