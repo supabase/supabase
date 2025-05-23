@@ -22,8 +22,11 @@ if (!IS_DEV) {
     beforeSend(event) {
       const frames = event.exception?.values?.[0].stacktrace?.frames || []
 
-      // Drop errors originating from user apps or extensions as unactionable
-      if (frames.some((frame) => frame.filename && frame.filename.startsWith('app:///'))) {
+      // Drop errors not originating from docs app static files as unactionable
+      if (
+        frames &&
+        !frames.some((frame) => frame.filename && frame.filename.startsWith('app:///_next'))
+      ) {
         return null
       }
 
