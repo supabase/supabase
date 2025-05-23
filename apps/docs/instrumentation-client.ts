@@ -18,6 +18,17 @@ if (!IS_DEV) {
       // now.
       /(?:text content does not match)|hydration|hydrating/i,
     ],
+
+    beforeSend(event) {
+      const frames = event.exception?.values?.[0].stacktrace?.frames || []
+
+      // Drop errors originating from user apps or extensions as unactionable
+      if (frames.some((frame) => frame.filename && frame.filename.startsWith('app:///'))) {
+        return null
+      }
+
+      return event
+    },
   })
 }
 
