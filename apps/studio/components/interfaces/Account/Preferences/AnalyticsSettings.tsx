@@ -1,9 +1,9 @@
-import { Toggle } from 'ui'
+import { toast } from 'sonner'
 
 import { useConsentState } from 'common'
 import Panel from 'components/ui/Panel'
 import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
-import { toast } from 'sonner'
+import { Toggle } from 'ui'
 
 export const AnalyticsSettings = () => {
   const { hasAccepted, acceptAll, denyAll, categories } = useConsentState()
