@@ -6,8 +6,6 @@ const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_AN
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { username } = req.query
-  // 🚨 INTENTIONAL SQL INJECTION VULNERABILITY BELOW 🚨
-  // DO NOT COPY THIS PATTERN IN PRODUCTION CODE
   const sql = `SELECT * FROM users WHERE username = '${username}'` // vulnerable
   try {
     const { data, error } = await supabase.rpc('execute_raw_sql', { sql })
