@@ -156,19 +156,23 @@ export default function ComposedChart({
   const referenceLines = attributes.filter((attribute) => attribute?.provider === 'reference-line')
 
   const resolvedHighlightedLabel = getHeaderLabel()
+
+  const attributesToIgnore =
+    attributes?.filter((a) => a.omitFromTotal)?.map((a) => a.attribute) ?? []
+
+  const attributesToIgnoreFromTotal = [
+    ...attributesToIgnore,
+    ...(referenceLines?.map((a: MultiAttribute) => a.attribute) ?? []),
+    ...(maxAttribute?.attribute ? [maxAttribute?.attribute] : []),
+  ]
+
   const resolvedHighlightedValue =
     focusDataIndex !== null
       ? showTotal
-        ? calculateTotalChartAggregate(
-            _activePayload,
-            maxAttribute?.attribute ? referenceLines.map((a) => a.attribute) : []
-          )
+        ? calculateTotalChartAggregate(_activePayload, attributesToIgnoreFromTotal)
         : data[focusDataIndex]?.[yAxisKey]
       : showTotal && lastDataPoint
-        ? calculateTotalChartAggregate(
-            lastDataPoint,
-            maxAttribute?.attribute ? referenceLines.map((a) => a.attribute) : []
-          )
+        ? calculateTotalChartAggregate(lastDataPoint, attributesToIgnoreFromTotal)
         : highlightedValue
 
   const showHighlightActions =
