@@ -1828,6 +1828,8 @@ export interface components {
       mfa_totp_verify_enabled: boolean | null
       mfa_web_authn_enroll_enabled: boolean | null
       mfa_web_authn_verify_enabled: boolean | null
+      nimbus_oauth_client_id: string | null
+      nimbus_oauth_client_secret: string | null
       password_hibp_enabled: boolean | null
       password_min_length: number | null
       /** @enum {string|null} */
@@ -1959,6 +1961,7 @@ export interface components {
         | 'FUNCTIONS_FAILED'
       /** Format: date-time */
       updated_at: string
+      with_data: boolean
     }
     BranchUpdateResponse: {
       /** @enum {string} */
@@ -2981,6 +2984,8 @@ export interface components {
       mfa_totp_verify_enabled?: boolean | null
       mfa_web_authn_enroll_enabled?: boolean | null
       mfa_web_authn_verify_enabled?: boolean | null
+      nimbus_oauth_client_id?: string | null
+      nimbus_oauth_client_secret?: string | null
       password_hibp_enabled?: boolean | null
       password_min_length?: number | null
       /** @enum {string|null} */
@@ -4692,7 +4697,30 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        addon_variant: unknown
+        addon_variant:
+          | (
+              | 'ci_micro'
+              | 'ci_small'
+              | 'ci_medium'
+              | 'ci_large'
+              | 'ci_xlarge'
+              | 'ci_2xlarge'
+              | 'ci_4xlarge'
+              | 'ci_8xlarge'
+              | 'ci_12xlarge'
+              | 'ci_16xlarge'
+              | 'ci_24xlarge'
+              | 'ci_24xlarge_optimized_cpu'
+              | 'ci_24xlarge_optimized_memory'
+              | 'ci_24xlarge_high_memory'
+              | 'ci_48xlarge'
+              | 'ci_48xlarge_optimized_cpu'
+              | 'ci_48xlarge_optimized_memory'
+              | 'ci_48xlarge_high_memory'
+            )
+          | 'cd_default'
+          | ('pitr_7' | 'pitr_14' | 'pitr_28')
+          | 'ipv4_default'
         /** @description Project ref */
         ref: string
       }
