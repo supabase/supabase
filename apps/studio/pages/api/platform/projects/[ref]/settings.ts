@@ -9,7 +9,6 @@ type ProjectAppConfig = components['schemas']['ProjectSettingsResponse']['app_co
 }
 export type ProjectSettings = components['schemas']['ProjectSettingsResponse'] & {
   app_config?: ProjectAppConfig
-  cloud_provider?: string
 }
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
