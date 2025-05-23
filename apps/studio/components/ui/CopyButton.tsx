@@ -44,9 +44,9 @@ const CopyButton = ({
   return (
     <Button
       onClick={async (e) => {
-        const textToCopy = asyncText ? await asyncText() : text
+        const valueToCopy = asyncText ? asyncText() : Promise.resolve(text)
+        await copyToClipboard(valueToCopy)
         setShowCopied(true)
-        await copyToClipboard(textToCopy!)
         onClick?.(e)
       }}
       {...props}
