@@ -7,6 +7,7 @@ import { databaseKeys } from 'data/database/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import type { DatabaseFunction } from './database-functions-query'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type DatabaseFunctionUpdateVariables = {
   projectRef: string
@@ -26,7 +27,7 @@ export async function updateDatabaseFunction({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: applyAndTrackMigrations(sql, `update_function_${payload.name}`),
     queryKey: ['functions', 'update', func.id.toString()],
   })
 

@@ -6,6 +6,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 import { privilegeKeys } from './keys'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type TablePrivilegesRevoke = Parameters<
   typeof pgMeta.tablePrivileges.revoke
@@ -24,13 +25,15 @@ export async function revokeTablePrivileges({
   connectionString,
   revokes,
 }: TablePrivilegesRevokeVariables) {
-  const sql = pgMeta.tablePrivileges.revoke(revokes).sql
+  const { sql } = pgMeta.tablePrivileges.revoke(revokes)
+
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: applyAndTrackMigrations(sql, `revoke_table_privilege`),
     queryKey: ['table-privileges', 'revoke'],
   })
+
   return result
 }
 
