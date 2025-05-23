@@ -16,16 +16,26 @@ import { GlassPanel } from 'ui-patterns/GlassPanel'
 import CustomersFilters from '../components/CustomerStories/CustomersFilters'
 import { useState } from 'react'
 import { Button, cn } from 'ui'
+import { getAllCMSCustomers } from '../lib/cms-customers'
 
 export async function getStaticProps() {
-  const allPostsData: any[] = getSortedPosts({ directory: '_customers' })
-  const rss = generateRss(allPostsData)
+  const staticCustomersData: any[] = getSortedPosts({ directory: '_customers' })
+  // Get CMS customers
+  const cmsCustomersData = await getAllCMSCustomers()
+
+  const allCustomers = [...staticCustomersData, ...cmsCustomersData].sort((a: any, b: any) => {
+    const dateA = a.date ? new Date(a.date).getTime() : new Date(a.formattedDate).getTime()
+    const dateB = b.date ? new Date(b.date).getTime() : new Date(b.formattedDate).getTime()
+    return dateB - dateA
+  })
+
+  const rss = generateRss(allCustomers)
 
   // create a rss feed in public directory
   // rss feed is added via <Head> component in render return
   fs.writeFileSync('./public/customers-rss.xml', rss)
 
-  const industries = allPostsData.reduce<{ [key: string]: number }>(
+  const industries = cmsCustomersData.reduce<{ [key: string]: number }>(
     (acc, customer) => {
       // Increment the 'all' counter
       acc.all = (acc.all || 0) + 1
@@ -40,7 +50,7 @@ export async function getStaticProps() {
     { all: 0 }
   )
 
-  const products = allPostsData.reduce<{ [key: string]: number }>(
+  const products = allCustomers.reduce<{ [key: string]: number }>(
     (acc, customer) => {
       // Increment the 'all' counter
       acc.all = (acc.all || 0) + 1
@@ -57,7 +67,7 @@ export async function getStaticProps() {
 
   return {
     props: {
-      blogs: allPostsData,
+      blogs: allCustomers,
       industries,
       products,
     },
@@ -65,6 +75,7 @@ export async function getStaticProps() {
 }
 
 function CustomerStoriesPage(props: any) {
+  console.log('customers props', props)
   const { basePath } = useRouter()
   const _allCustomers = props.blogs?.map((blog: PostTypes, idx: number) => {
     return {

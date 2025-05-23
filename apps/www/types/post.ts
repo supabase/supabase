@@ -1,6 +1,6 @@
-type PostTypes = {
-  slug?: string
+export default interface PostTypes {
   type: 'casestudy' | 'blog' | 'event'
+  slug?: string
   title: string
   name?: string
   date: string
@@ -36,6 +36,5 @@ type PostTypes = {
     target?: '_blank' | '_self'
     label?: string
   } // used on event previews to link to a custom event page
+  isCMS?: boolean
 }
-
-export default PostTypes

@@ -95,4 +95,22 @@ module.exports = [
     port: '',
     pathname: '/dms/image/**',
   },
+  {
+    protocol: 'http',
+    hostname: 'localhost',
+    port: '3030',
+    pathname: '/api/**',
+  },
+  {
+    protocol: 'http',
+    hostname: 'localhost',
+    port: '3030',
+    pathname: '/api/media/**',
+  },
+  {
+    protocol: 'https',
+    hostname: 'koovxkbhviltdcwwaqvc.supabase.co',
+    port: '',
+    pathname: '**',
+  },
 ]
