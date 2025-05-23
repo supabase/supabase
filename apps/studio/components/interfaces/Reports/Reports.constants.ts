@@ -103,6 +103,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       totalRequests: {
         queryType: 'logs',
         sql: (filters) => `
+        -- reports-api-total-requests
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
           count(t.id) as count
@@ -120,6 +121,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       topRoutes: {
         queryType: 'logs',
         sql: (filters) => `
+        -- reports-api-top-routes
         select
           request.path as path,
           request.method as method,
@@ -142,6 +144,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       errorCounts: {
         queryType: 'logs',
         sql: (filters) => `
+        -- reports-api-error-counts
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
           count(t.id) as count
@@ -162,6 +165,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       topErrorRoutes: {
         queryType: 'logs',
         sql: (filters) => `
+        -- reports-api-top-error-routes
         select
           request.path as path,
           request.method as method,
@@ -186,6 +190,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       responseSpeed: {
         queryType: 'logs',
         sql: (filters) => `
+        -- reports-api-response-speed
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
           avg(response.origin_time) as avg
@@ -205,6 +210,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       topSlowRoutes: {
         queryType: 'logs',
         sql: (filters) => `
+        -- reports-api-top-slow-routes
         select
           request.path as path,
           request.method as method,
@@ -228,6 +234,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       networkTraffic: {
         queryType: 'logs',
         sql: (filters) => `
+        -- reports-api-network-traffic
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
           coalesce(
@@ -275,7 +282,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         queryType: 'logs',
         // storage report does not perform any filtering
         sql: (_filters) => `
--- cache-hit-rate
+        -- reports-storage-cache-hit-rate
 SELECT
   timestamp_trunc(timestamp, hour) as timestamp,
   countif( h.cf_cache_status in ('HIT', 'STALE', 'REVALIDATED', 'UPDATING') ) as hit_count,
@@ -294,7 +301,7 @@ order by timestamp desc
         queryType: 'logs',
         // storage report does not perform any filtering
         sql: (_filters) => `
--- top-cache-misses
+        -- reports-storage-top-cache-misses
 SELECT
   r.path as path,
   r.search as search,
@@ -320,7 +327,7 @@ limit 12
       mostFrequentlyInvoked: {
         queryType: 'db',
         sql: (_params, where, orderBy, runIndexAdvisor = false) => `
--- Most frequently called queries
+        -- reports-query-performance-most-frequently-invoked
 set search_path to public, extensions;
 
 select
@@ -366,7 +373,7 @@ select
       mostTimeConsuming: {
         queryType: 'db',
         sql: (_, where, orderBy, runIndexAdvisor = false) => `
--- Most time consuming queries
+        -- reports-query-performance-most-time-consuming
 set search_path to public, extensions;
 
 select
@@ -403,7 +410,7 @@ select
       slowestExecutionTime: {
         queryType: 'db',
         sql: (_params, where, orderBy, runIndexAdvisor = false) => `
--- Slowest queries by max execution time
+        -- reports-query-performance-slowest-execution-time
 set search_path to public, extensions;
 
 select
@@ -448,7 +455,7 @@ select
       },
       queryHitRate: {
         queryType: 'db',
-        sql: (_params) => `-- Cache and index hit rate
+        sql: (_params) => `-- reports-query-performance-cache-and-index-hit-rate
 select
     'index hit rate' as name,
     (sum(idx_blks_hit)) / nullif(sum(idx_blks_hit + idx_blks_read),0) as ratio
@@ -466,7 +473,8 @@ select
     queries: {
       largeObjects: {
         queryType: 'db',
-        sql: (_) => `SELECT 
+        sql: (_) => `-- reports-database-large-objects
+SELECT 
         SCHEMA_NAME,
         relname,
         table_size
