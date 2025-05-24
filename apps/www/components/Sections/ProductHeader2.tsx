@@ -48,17 +48,18 @@ const ProductHeader = (props: Props) => (
             {props.h1}
           </h1>
         </div>
-        <div>
-          {props.subheader &&
-            props.subheader.map((subheader, i) => {
+        {props.subheader && (
+          <div className="mb-4 md:mb-8">
+            {props.subheader.map((subheader, i) => {
               return (
                 <p className="p lg:text-lg max-w-lg lg:max-w-none" key={i}>
                   {subheader}
                 </p>
               )
             })}
-        </div>
-        <div className="flex flex-row md:flex-row md:items-center gap-2">
+          </div>
+        )}
+        <div className="flex flex-row md:flex-row md:items-center gap-2 mt-2">
           {props.ctas?.map((cta) => (
             <Button key={cta.href} size="medium" type={cta.type ?? 'default'} asChild>
               <Link href={cta.href}>{cta.label ?? 'Start for free'}</Link>

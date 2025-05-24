@@ -44,6 +44,10 @@ const footerData = [
         text: 'AI Builders',
         url: '/solutions/ai-builders',
       },
+      {
+        text: 'Switch from Neon',
+        url: '/solutions/switch-from-neon',
+      },
     ],
   },
   {
