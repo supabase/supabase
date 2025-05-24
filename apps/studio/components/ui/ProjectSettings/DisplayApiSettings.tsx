@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useParams } from 'common'
@@ -8,6 +9,7 @@ import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import { AlertCircle, Loader2 } from 'lucide-react'
 import { Input } from 'ui'
+import useLogsQuery from 'hooks/analytics/useLogsQuery'
 
 const DisplayApiSettings = ({
   legacy,
@@ -41,6 +43,34 @@ const DisplayApiSettings = ({
   const apiKeys = settings?.service_api_keys ?? []
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0
+
+  const { isLoading: isLoadingLastUsed, logData: lastUsedLogData } = useLogsQuery(projectRef, {
+    iso_timestamp_start: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+    iso_timestamp_end: new Date().toISOString(),
+    sql: "SELECT unix_millis(max(timestamp)) as timestamp, payload.role, payload.signature_prefix FROM edge_logs cross join unnest(metadata) as m cross join unnest(m.request) as request cross join unnest(request.sb) as sb cross join unnest(sb.jwt) as jwt cross join unnest(jwt.apikey) as apikey cross join unnest(apikey.payload) as payload WHERE apikey.invalid is null and payload.issuer = 'supabase' and payload.algorithm = 'HS256' and payload.role in ('anon', 'service_role') GROUP BY payload.role, payload.signature_prefix",
+  })
+
+  const lastUsedAPIKeys = useMemo(() => {
+    if (isLoadingLastUsed || apiKeys.length < 1) {
+      return {}
+    }
+
+    return apiKeys.reduce(
+      (a, i) => {
+        const entry = lastUsedLogData?.find(
+          ({ role, signature_prefix }) =>
+            i.tags.indexOf(role) >= 0 && i.api_key.split('.')[2].startsWith(signature_prefix)
+        )?.timestamp
+
+        if (entry) {
+          a[i.api_key] = new Date(entry)
+        }
+
+        return a
+      },
+      {} as { [apikey: string]: Date }
+    )
+  }, [lastUsedLogData, apiKeys])
 
   return (
     <>
@@ -132,7 +162,7 @@ const DisplayApiSettings = ({
                       ? 'JWT secret update failed, new API key may have issues'
                       : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
                         ? 'Updating JWT secret...'
-                        : x?.api_key ?? 'You need additional permissions to view API keys'
+                        : (x?.api_key ?? 'You need additional permissions to view API keys')
                 }
                 onChange={() => {}}
                 descriptionText={
@@ -143,6 +173,9 @@ const DisplayApiSettings = ({
                       (legacy ? 'Prefer using Secret API keys instead.' : '')
                 }
               />
+
+              {(!isLoadingLastUsed && lastUsedAPIKeys[x.api_key]?.toISOString()) ??
+                'Not used in the past 24 hours.'}
             </Panel.Content>
           ))
         )}
