@@ -128,6 +128,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Flame Graph',
+          href: '/docs/fragments/flame-graph',
+          items: [],
+        },
+        {
           title: 'Table of Contents (TOC)',
           href: '/docs/fragments/toc',
           items: [],
