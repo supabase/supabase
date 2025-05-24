@@ -2216,6 +2216,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "horizontal-waterfall-chart": {
+      name: "horizontal-waterfall-chart",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/horizontal-waterfall-chart")),
+      source: "",
+      files: ["registry/default/example/horizontal-waterfall-chart.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "chart-area-axes": {
       name: "chart-area-axes",
       type: "components:block",
