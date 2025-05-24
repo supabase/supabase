@@ -1,4 +1,4 @@
-import { PlanType } from 'data/subscriptions/org-subscription-query'
+import { PlanId } from 'data/subscriptions/types'
 
 // Disk Storage expands automatically when the database reaches 90% of the disk size
 export const AUTOSCALING_THRESHOLD = 0.9
@@ -52,7 +52,7 @@ interface PlanDetails {
   includedDiskGB: { gp3: number; io2: number }
 }
 
-export const PLAN_DETAILS: Record<PlanType, PlanDetails> = {
+export const PLAN_DETAILS: Record<PlanId, PlanDetails> = {
   free: { includedDiskGB: { gp3: 1, io2: 0 } },
   pro: { includedDiskGB: { gp3: 8, io2: 0 } },
   team: { includedDiskGB: { gp3: 8, io2: 0 } },

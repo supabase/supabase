@@ -10,7 +10,9 @@ import { configKeys } from './keys'
 export type ProjectSettingsVariables = { projectRef?: string }
 
 // Manually add the protocol property to the response - specifically just for the local/CLI environment
-type ProjectAppConfig = components['schemas']['ProjectAppConfigResponse'] & { protocol?: string }
+type ProjectAppConfig = components['schemas']['ProjectSettingsResponse']['app_config'] & {
+  protocol?: string
+}
 export type ProjectSettings = components['schemas']['ProjectSettingsResponse'] & {
   app_config?: ProjectAppConfig
 }

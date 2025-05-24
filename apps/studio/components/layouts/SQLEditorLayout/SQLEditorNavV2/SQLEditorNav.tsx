@@ -215,7 +215,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     () =>
       favoriteSnippets.length === 0
         ? [ROOT_NODE]
-        : formatFolderResponseForTreeView({ contents: favoriteSnippets }),
+        : formatFolderResponseForTreeView({ contents: favoriteSnippets, folders: [] }),
     [favoriteSnippets]
   )
 
@@ -264,7 +264,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     () =>
       sharedSnippets.length === 0
         ? [ROOT_NODE]
-        : formatFolderResponseForTreeView({ contents: sharedSnippets }),
+        : formatFolderResponseForTreeView({ contents: sharedSnippets, folders: [] }),
     [sharedSnippets]
   )
 

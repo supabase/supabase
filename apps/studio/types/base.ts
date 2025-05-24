@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { PlanId } from 'data/subscriptions/types'
 import jsonLogic from 'json-logic-js'
 
 export interface Organization {
@@ -14,7 +15,7 @@ export interface Organization {
   managed_by: 'supabase' | 'vercel-marketplace' | 'aws-marketplace'
   partner_id?: string
   plan: {
-    id: 'free' | 'pro' | 'team' | 'enterprise'
+    id: PlanId
     name: string
   }
   usage_billing_enabled: boolean

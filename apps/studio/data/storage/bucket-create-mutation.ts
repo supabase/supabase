@@ -36,8 +36,6 @@ export async function createBucket({
   })
 
   if (error) handleError(error)
-  // @ts-expect-error API type is wrong here
-  // https://github.com/supabase/infrastructure/blob/develop/api/src/routes/platform/storage/ref/buckets/buckets.controller.ts#L55
   return data as { name: string }
 }
 

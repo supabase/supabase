@@ -5,7 +5,7 @@ import { get, handleError } from 'data/fetchers'
 import type { Dashboards, LogSqlSnippets, SqlSnippets } from 'types'
 import { contentKeys } from './keys'
 
-export type ContentBase = components['schemas']['GetUserContentObject']
+export type ContentBase = components['schemas']['GetUserContentResponse']['data'][number]
 
 export type Content = Omit<ContentBase, 'content' | 'type'> &
   (

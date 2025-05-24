@@ -1,10 +1,10 @@
 import { useEffect } from 'react'
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 
-import { components } from 'api-types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useProjectCreationPostgresVersionsQuery } from 'data/config/project-creation-postgres-versions-query'
 import { useProjectUnpausePostgresVersionsQuery } from 'data/config/project-unpause-postgres-versions-query'
+import { PostgresEngine, ReleaseChannel } from 'data/projects/new-project.constants'
 import type { CloudProvider } from 'shared-data'
 import {
   Badge,
@@ -16,9 +16,6 @@ import {
   Select_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-
-type ReleaseChannel = components['schemas']['ReleaseChannel']
-type PostgresEngine = components['schemas']['PostgresEngine']
 
 interface PostgresVersionDetails {
   postgresEngine: PostgresEngine | undefined

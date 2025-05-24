@@ -10,7 +10,7 @@ import { lintKeys } from './keys'
 type ProjectLintRulesVariables = {
   projectRef?: string
 }
-type LintDismissalResponse = components['schemas']['ListNotificationExceptionsResponseDto']
+type LintDismissalResponse = components['schemas']['ListNotificationExceptionsResponse']
 export type LintException = LintDismissalResponse['exceptions'][0]
 
 export async function getProjectLintRules(
