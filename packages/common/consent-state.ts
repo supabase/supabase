@@ -1,7 +1,7 @@
 import type Usercentrics from '@usercentrics/cmp-browser-sdk'
 import type { BaseCategory, UserDecision } from '@usercentrics/cmp-browser-sdk'
 import { proxy, snapshot, useSnapshot } from 'valtio'
-import { LOCAL_STORAGE_KEYS } from './constants'
+import { LOCAL_STORAGE_KEYS, IS_PLATFORM } from './constants'
 
 export const consentState = proxy({
   // Usercentrics state
@@ -60,6 +60,7 @@ export const consentState = proxy({
 
 async function initUserCentrics() {
   if (process.env.NODE_ENV === 'test') return
+  if (!IS_PLATFORM) return
 
   const { default: Usercentrics } = await import('@usercentrics/cmp-browser-sdk')
 
