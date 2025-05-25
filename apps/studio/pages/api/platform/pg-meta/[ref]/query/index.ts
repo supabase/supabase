@@ -19,6 +19,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
+const executeSql = async (query: string, headers: { [prop: string]: any }) => {
+  const builtHeaders = constructHeaders(headers)
+  return await post(`${PG_META_URL}/query`, { query }, { headers: builtHeaders })
+}
+
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   const { query } = req.body
   const headers = constructHeaders(req.headers)
