@@ -2328,7 +2328,7 @@ The MCP Server works with popular AI tools like Cursor, Claude, Windsurf, Visual
 Yes, the MCP Server can perform actions like creating tables, running queries, and managing branches. Use best practices like branching and access controls to protect production data.
 `,
     icon: CloudCog,
-    products: [ADDITIONAL_PRODUCTS.STUDIO],
+    products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/1SMldLoOhbg',
     docsUrl: 'https://supabase.com/docs/guides/getting-started/mcp',
     slug: 'mcp-server',
