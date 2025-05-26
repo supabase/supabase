@@ -36,7 +36,12 @@ export const Posts: CollectionConfig = {
       url: ({ data, req }) => {
         const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
         const isDraft = data?._status === 'draft'
-        return `${baseUrl}/blog/${data?.slug}${isDraft ? '?preview=true' : ''}`
+
+        if (isDraft) {
+          return `${baseUrl}/api/preview?slug=${data?.slug}&secret=${process.env.PREVIEW_SECRET || 'preview-secret'}`
+        }
+
+        return `${baseUrl}/blog/${data?.slug}`
       },
       breakpoints: [
         {
@@ -62,7 +67,12 @@ export const Posts: CollectionConfig = {
     preview: (data) => {
       const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
       const isDraft = data?._status === 'draft'
-      return `${baseUrl}/blog/${data?.slug}${isDraft ? '?preview=true' : ''}`
+
+      if (isDraft) {
+        return `${baseUrl}/api/preview?slug=${data?.slug}&secret=${process.env.PREVIEW_SECRET || 'preview-secret'}`
+      }
+      
+      return `${baseUrl}/blog/${data?.slug}`
     },
   },
   access: {

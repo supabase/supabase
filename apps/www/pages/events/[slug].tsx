@@ -189,7 +189,7 @@ export const getStaticProps: GetStaticProps<EventPageProps, Params> = async ({
   preview = false,
 }) => {
   if (!params?.slug) {
-    throw new Error('Missing slug for pages/blog/[slug].tsx')
+    throw new Error('Missing slug for pages/events/[slug].tsx')
   }
 
   const slug = `${params.slug}`
@@ -237,7 +237,7 @@ export const getStaticProps: GetStaticProps<EventPageProps, Params> = async ({
           // },
         },
       },
-      revalidate: 60 * 10,
+      revalidate: 60 * 10, // Revalidate every 10 minutes
     }
   } catch (error) {
     console.log('[getStaticProps] Static post not found, trying CMS post...')

@@ -4,13 +4,11 @@ import { getCMSPostBySlug } from '../../lib/cms-posts'
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { slug, secret } = req.query
 
-  console.log('[Preview API] Request params:', { slug, secret })
-
-  // Check the secret (optional)
-  // You could use a site-specific secret to prevent unauthorized preview access
-  // if (secret !== process.env.PREVIEW_SECRET) {
-  //   return res.status(401).json({ message: 'Invalid token' })
-  // }
+  // Check the secret and slug parameters
+  // You should set PREVIEW_SECRET in your environment variables for security
+  if (secret && secret !== process.env.PREVIEW_SECRET) {
+    return res.status(401).json({ message: 'Invalid token' })
+  }
 
   // Check if the slug exists
   if (!slug) {
@@ -22,23 +20,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const post = await getCMSPostBySlug(String(slug), true)
 
     if (!post) {
-      console.log(`[Preview API] No post found for slug: ${slug}`)
       return res.status(404).json({ message: 'Post not found' })
     }
 
-    console.log(`[Preview API] Found post: ${post.title}, enabling preview mode`)
+    // Enable Draft Mode by setting the cookie
+    res.setDraftMode({ enable: true })
 
-    // Enable Preview Mode by setting the cookies
-    res.setPreviewData({
-      slug: post.slug,
-      isDraft: true,
-    })
-
-    // Redirect to the path from the fetched post
-    // We don't redirect to req.query.slug as that might lead to open redirect vulnerabilities
-    console.log(`[Preview API] Enabling preview mode for: /blog/${post.slug}`)
-
-    // Redirect to the blog post page with preview mode
+    // Redirect to the blog post page with draft mode enabled
     res.redirect(`/blog/${post.slug}`)
   } catch (error) {
     console.error('[Preview API] Error enabling preview:', error)

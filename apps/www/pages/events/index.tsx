@@ -193,6 +193,7 @@ export async function getStaticProps() {
       onDemandEvents,
       categories,
     },
+    revalidate: 60 * 10, // Revalidate every 10 minutes
   }
 }
 

@@ -167,7 +167,7 @@ export const Events: CollectionConfig = {
               type: 'checkbox',
               defaultValue: false,
               admin: {
-                description: 'When true, we don\'t build the page and require a custom link',
+                description: 'When true, we don\'t build the page and link directly to an external event page (requires Link to be set)',
               },
             },
             {

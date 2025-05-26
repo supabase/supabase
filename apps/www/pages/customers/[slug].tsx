@@ -165,7 +165,7 @@ export const getStaticProps: GetStaticProps<CustomerPageProps, Params> = async (
           },
         },
       },
-      revalidate: 60 * 10,
+      revalidate: 60 * 10, // Revalidate every 10 minutes
     }
   } catch (error) {
     console.log('[getStaticProps] Static post not found, trying CMS post...')

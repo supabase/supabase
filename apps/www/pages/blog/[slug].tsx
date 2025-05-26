@@ -14,6 +14,7 @@ import { useState, useMemo } from 'react'
 import { useLivePreview } from '@payloadcms/live-preview-react'
 
 import authors from 'lib/authors.json'
+import { useDraftMode } from '~/hooks/useDraftMode'
 import { generateReadingTime, isNotNullOrUndefined } from '~/lib/helpers'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
@@ -32,6 +33,7 @@ import LWXSummary from '~/components/LaunchWeek/X/LWXSummary'
 import DefaultLayout from '~/components/Layouts/Default'
 import { ChevronLeft } from 'lucide-react'
 import { LivePreview } from '~/components/Blog/LivePreview'
+import { DraftModeBanner } from '~/components/Blog/DraftModeBanner'
 
 type Post = ReturnType<typeof getSortedPosts>[number]
 
@@ -131,6 +133,7 @@ type BlogPostPageProps = {
   nextPost: Post | null
   relatedPosts: (Post & BlogData)[]
   blog: Blog & BlogData
+  isDraftMode: boolean
 }
 
 type Params = {
@@ -176,15 +179,18 @@ export async function getStaticPaths() {
 
 export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async ({
   params,
-  preview = false,
+  draftMode = false,
 }) => {
+  console.log('[getStaticProps] Called with params:', params, 'draftMode:', draftMode)
+
   if (!params?.slug) {
+    console.error('[getStaticProps] Missing slug parameter:', params)
     throw new Error('Missing slug for pages/blog/[slug].tsx')
   }
 
   const slug = `${params.slug}`
   console.log(
-    `[getStaticProps] generating for slug: '${slug}', preview mode: ${preview ? 'true' : 'false'}`
+    `[getStaticProps] generating for slug: '${slug}', draft mode: ${draftMode ? 'true' : 'false'}`
   )
 
   // Try static post first
@@ -226,32 +232,32 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
             content: processedContent,
           },
         },
+        isDraftMode: draftMode,
       },
-      revalidate: 60 * 10,
+      // revalidate: 60 * 10,
+      revalidate: 6,
     }
   } catch (error) {
     console.log('[getStaticProps] Static post not found, trying CMS post...')
     // Not a static post, try CMS
   }
 
-  // Try CMS post (handle preview/draft logic)
-  const cmsPost = await getCMSPostBySlug(slug, preview)
+  // Try CMS post (handle draft mode logic)
+  const cmsPost = await getCMSPostBySlug(slug, draftMode)
 
   if (!cmsPost) {
     console.log(
-      '[getStaticProps] No CMS post found, checking published version (if in preview mode)...'
+      '[getStaticProps] No CMS post found, checking published version (if in draft mode)...'
     )
-    // Try to fetch published version if preview mode failed
-    if (preview) {
-      console.log(
-        '[getStaticProps] In preview mode but no draft found, trying published version...'
-      )
+    // Try to fetch published version if draft mode failed
+    if (draftMode) {
+      console.log('[getStaticProps] In draft mode but no draft found, trying published version...')
       const publishedPost = await getCMSPostBySlug(slug, false)
       if (!publishedPost) {
         console.log('[getStaticProps] No published version found either, returning 404')
         return { notFound: true }
       }
-      console.log('[getStaticProps] Found published version, using that for preview')
+      console.log('[getStaticProps] Found published version, using that for draft mode')
       const mdxSource = await mdxSerialize(publishedPost.content || '')
       return {
         props: {
@@ -268,11 +274,12 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
             image: publishedPost.image ?? undefined,
             thumb: publishedPost.thumb ?? undefined,
           },
+          isDraftMode: draftMode,
         },
-        revalidate: 60 * 10,
+        revalidate: 60 * 10, // Revalidate every 10 minutes
       }
     }
-    console.log('[getStaticProps] Not in preview mode and no CMS post found, returning 404')
+    console.log('[getStaticProps] Not in draft mode and no CMS post found, returning 404')
     return { notFound: true }
   }
 
@@ -295,6 +302,7 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
         image: cmsPost.image ?? undefined,
         thumb: cmsPost.thumb ?? undefined,
       },
+      isDraftMode: draftMode,
     },
     revalidate: 60 * 10,
   }
@@ -302,7 +310,10 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
 
 function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   const router = useRouter()
-  const isPreview = router.query.preview === 'true'
+  // Use the draft mode state passed from getStaticProps
+  const isDraftMode = props.isDraftMode
+
+  console.log('isDraftMode', isDraftMode)
   const [previewData, setPreviewData] = useState<ProcessedBlogData>(props.blog)
 
   const { data: livePreviewData } = useLivePreview({
@@ -315,7 +326,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
 
   // For LivePreview, we'll use the raw content directly with ReactMarkdown
   // instead of trying to use MDXRemote which requires specific serialization
-  const isLivePreview = isPreview && (livePreviewData !== undefined || previewData !== props.blog)
+  const isLivePreview = isDraftMode && (livePreviewData !== undefined || previewData !== props.blog)
 
   // Extract raw content from data if available
   const livePreviewContent = useMemo(() => {
@@ -355,7 +366,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
 
   // Only use the live preview data for metadata
   const blogMetaData = useMemo(() => {
-    if (isPreview) {
+    if (isDraftMode) {
       // Priority 1: Use data from LivePreview hook
       if (livePreviewData) {
         return livePreviewData
@@ -369,7 +380,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
 
     // Fallback to props.blog
     return props.blog
-  }, [isPreview, livePreviewData, previewData, props.blog])
+  }, [isDraftMode, livePreviewData, previewData, props.blog])
 
   const handlePreviewUpdate = (data: any) => {
     console.log('[BlogPostPage] Received preview update:', data)
@@ -543,7 +554,8 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
           ],
         }}
       />
-      {isPreview && <LivePreview onUpdate={handlePreviewUpdate} />}
+      {isDraftMode && <DraftModeBanner />}
+      {isDraftMode && <LivePreview onUpdate={handlePreviewUpdate} />}
       <DefaultLayout className="overflow-x-hidden">
         <div
           className="

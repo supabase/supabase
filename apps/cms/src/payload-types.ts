@@ -404,7 +404,7 @@ export interface Event {
    */
   onDemand?: boolean | null;
   /**
-   * When true, we don't build the page and require a custom link
+   * When true, we don't build the page and link directly to an external event page (requires Link to be set)
    */
   disable_page_build?: boolean | null;
   /**

@@ -2,7 +2,8 @@ import { generateReadingTime } from './helpers'
 const toc = require('markdown-toc')
 
 // Payload API configuration
-const PAYLOAD_URL = process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://localhost:3000'
+const PAYLOAD_URL =
+  process.env.NEXT_PUBLIC_PAYLOAD_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030'
 const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY
 
 type CMSBlogPost = {
@@ -117,7 +118,7 @@ function convertRichTextToMarkdown(content: CMSBlogPost['content']): string {
  */
 export async function getAllCMSPostSlugs() {
   try {
-    const response = await fetch(`${PAYLOAD_URL}/api/posts?limit=100&depth=1`, {
+    const response = await fetch(`${PAYLOAD_URL}/api/posts?limit=100&depth=1&draft=true`, {
       headers: {
         'Content-Type': 'application/json',
         ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
@@ -129,11 +130,23 @@ export async function getAllCMSPostSlugs() {
     }
 
     const data = await response.json()
-    return data.docs.map((post: CMSBlogPost) => ({
-      params: {
+    console.log(
+      '[getAllCMSPostSlugs] Found posts:',
+      data.docs.map((post: any) => ({
+        id: post.id,
+        title: post.title,
         slug: post.slug,
-      },
-    }))
+        status: post._status,
+      }))
+    )
+
+    return data.docs
+      .filter((post: CMSBlogPost) => post.slug) // Filter out posts with null/undefined slugs
+      .map((post: CMSBlogPost) => ({
+        params: {
+          slug: post.slug,
+        },
+      }))
   } catch (error) {
     console.error('Error fetching CMS post slugs:', error)
     return []
@@ -175,6 +188,7 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
     console.log(
       `[getCMSPostBySlug] API responded with ${data.docs?.length || 0} posts, draft mode: ${preview}`
     )
+    console.log(`[getCMSPostBySlug] Full API response:`, JSON.stringify(data, null, 2))
 
     // In preview mode, we want to return the draft even if it's not published
     if (!data.docs.length && !preview) {
