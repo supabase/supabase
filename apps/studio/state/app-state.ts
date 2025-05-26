@@ -1,7 +1,7 @@
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
+import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS, LOCAL_STORAGE_KEYS } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 export type Template = {
   name: string
@@ -119,6 +119,19 @@ export const appState = proxy({
   },
   setDocsLanguage: (value: 'js' | 'bash') => {
     appState.docsLanguage = value
+  },
+
+  isOptedInTelemetry: false,
+  setIsOptedInTelemetry: (value: boolean | null) => {
+    appState.isOptedInTelemetry = value === null ? false : value
+    if (typeof window !== 'undefined' && value !== null) {
+      localStorage.setItem(COMMON_LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
+    }
+  },
+
+  isMfaEnforced: false,
+  setIsMfaEnforced: (value: boolean) => {
+    appState.isMfaEnforced = value
   },
 
   showEnableBranchingModal: false,

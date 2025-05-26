@@ -8,7 +8,7 @@ import { vaultSecretsKeys } from './keys'
 
 export type VaultSecretDeleteVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: string
 }
 

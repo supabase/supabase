@@ -1,7 +1,7 @@
 import { components } from 'api-types'
-import { hasConsented } from 'common'
 import { handleError, post } from 'data/fetchers'
 import { IS_PLATFORM } from './constants'
+import { LOCAL_STORAGE_KEYS, hasConsented } from 'common'
 
 type TrackFeatureFlagVariables = components['schemas']['TelemetryFeatureFlagBodyDto']
 

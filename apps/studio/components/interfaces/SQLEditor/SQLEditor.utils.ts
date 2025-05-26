@@ -68,6 +68,7 @@ export const createSqlSnippetSkeletonV2 = ({
       content_id: id ?? '',
       sql: sql ?? '',
     } as any,
+    isNotSavedInDatabaseYet: true,
   }
 }
 

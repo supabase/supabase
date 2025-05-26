@@ -3,14 +3,13 @@ import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
 import { MutableRefObject, useEffect, useRef } from 'react'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { makeActiveTabPermanent } from 'state/tabs'
+import { useTabsStateSnapshot } from 'state/tabs'
 import { cn } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { untitledSnippetTitle } from './SQLEditor.constants'
@@ -51,6 +50,7 @@ const MonacoEditor = ({
   const { ref, content } = useParams()
   const project = useSelectedProject()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const tabsSnap = useTabsStateSnapshot()
 
   const aiSnap = useAiAssistantStateSnapshot()
 
@@ -153,7 +153,7 @@ const MonacoEditor = ({
 
   function handleEditorChange(value: string | undefined) {
     // make active tab permanent
-    makeActiveTabPermanent(ref)
+    tabsSnap.makeActiveTabPermanent()
 
     const snippetCheck = snapV2.snippets[id]
 

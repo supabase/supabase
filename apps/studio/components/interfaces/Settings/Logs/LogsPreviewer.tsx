@@ -74,6 +74,18 @@ export const LogsPreviewer = ({
 
   const { search, setSearch, timestampStart, timestampEnd, setTimeRange, filters, setFilters } =
     useLogsUrlState()
+
+  useEffect(() => {
+    if (timestampStart && timestampEnd) {
+      setSelectedDatePickerValue({
+        to: timestampEnd,
+        from: timestampStart,
+        text: `${dayjs(timestampStart).format('DD MMM, HH:mm')} - ${dayjs(timestampEnd).format('DD MMM, HH:mm')}`,
+        isHelper: false,
+      })
+    }
+  }, [timestampStart, timestampEnd])
+
   const [selectedLogId, setSelectedLogId] = useSelectedLog()
   const { data: databases, isSuccess } = useReadReplicasQuery({ projectRef })
 
