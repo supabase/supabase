@@ -1,4 +1,5 @@
 import matter from 'gray-matter'
+import { useState, useMemo } from 'react'
 import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
@@ -6,21 +7,17 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
-import { Badge } from 'ui'
 import dayjs from 'dayjs'
-import { remark } from 'remark'
-import html from 'remark-html'
-import { useState, useMemo } from 'react'
+import { ChevronLeft } from 'lucide-react'
 import { useLivePreview } from '@payloadcms/live-preview-react'
+import { Badge } from 'ui'
 
 import authors from 'lib/authors.json'
-import { useDraftMode } from '~/hooks/useDraftMode'
-import { generateReadingTime, isNotNullOrUndefined } from '~/lib/helpers'
+import { isNotNullOrUndefined } from '~/lib/helpers'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 import { getAllCMSPostSlugs, getCMSPostBySlug, getAllCMSPosts } from '~/lib/cms-posts'
-import { CMS_API_URL } from '~/lib/constants'
 
 import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 import CTABanner from '~/components/CTABanner'
@@ -31,7 +28,6 @@ import LW14Summary from '~/components/LaunchWeek/14/Releases/LWSummary'
 import BlogLinks from '~/components/LaunchWeek/7/BlogLinks'
 import LWXSummary from '~/components/LaunchWeek/X/LWXSummary'
 import DefaultLayout from '~/components/Layouts/Default'
-import { ChevronLeft } from 'lucide-react'
 import { LivePreview } from '~/components/Blog/LivePreview'
 import { DraftModeBanner } from '~/components/Blog/DraftModeBanner'
 
@@ -253,12 +249,14 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
     if (draftMode) {
       console.log('[getStaticProps] In draft mode but no draft found, trying published version...')
       const publishedPost = await getCMSPostBySlug(slug, false)
+      console.log('[getStaticProps] Published post:', publishedPost)
       if (!publishedPost) {
         console.log('[getStaticProps] No published version found either, returning 404')
         return { notFound: true }
       }
       console.log('[getStaticProps] Found published version, using that for draft mode')
       const mdxSource = await mdxSerialize(publishedPost.content || '')
+      console.log('[getStaticProps] MDX source:', mdxSource)
       return {
         props: {
           prevPost: null,

@@ -14,6 +14,8 @@ import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { Banner } from '../../blocks/Banner/config'
 import { Code } from '../../blocks/Code/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
+import { Quote } from '../../blocks/Quote/config'
+import { YouTube } from '../../blocks/YouTube/config'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
 // import { populateAuthors } from './hooks/populateAuthors'
 import { revalidateDelete, revalidateEvent } from './hooks/revalidateEvent'
@@ -101,7 +103,7 @@ export const Events: CollectionConfig = {
                   return [
                     ...rootFeatures,
                     HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
-                    BlocksFeature({ blocks: [Banner, Code, MediaBlock] }),
+                    BlocksFeature({ blocks: [Banner, Code, MediaBlock, Quote, YouTube] }),
                     FixedToolbarFeature(),
                     InlineToolbarFeature(),
                     HorizontalRuleFeature(),
