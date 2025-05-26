@@ -5,29 +5,29 @@ import type { ResponseError } from 'types'
 import { replicationKeys } from './keys'
 import { handleError, post } from 'data/fetchers'
 
-export type BigQuerySinkConfig = {
+export type BigQueryDestinationConfig = {
   projectId: string
   datasetId: string
   serviceAccountKey: string
   maxStalenessMins: number
 }
 
-export type CreateSinkPipelineParams = {
+export type CreateDestinationPipelineParams = {
   projectRef: string
-  sinkName: string
-  sinkConfig: {
-    bigQuery: BigQuerySinkConfig
+  destinationName: string
+  destinationConfig: {
+    bigQuery: BigQueryDestinationConfig
   }
   sourceId: number
   publicationName: string
   pipelinConfig: { config: { maxSize: number; maxFillSecs: number } }
 }
 
-async function createSinkPipeline(
+async function createDestinationPipeline(
   {
     projectRef,
-    sinkName,
-    sinkConfig: {
+    destinationName: destinationName,
+    destinationConfig: {
       bigQuery: { projectId, datasetId, serviceAccountKey, maxStalenessMins },
     },
     pipelinConfig: {
@@ -35,16 +35,16 @@ async function createSinkPipeline(
     },
     publicationName,
     sourceId,
-  }: CreateSinkPipelineParams,
+  }: CreateDestinationPipelineParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await post('/platform/replication/{ref}/sinks-pipelines', {
+  const { data, error } = await post('/platform/replication/{ref}/destinations-pipelines', {
     params: { path: { ref: projectRef } },
     body: {
-      sink_name: sinkName,
-      sink_config: {
+      destination_name: destinationName,
+      destination_config: {
         big_query: {
           project_id: projectId,
           dataset_id: datasetId,
@@ -70,30 +70,30 @@ async function createSinkPipeline(
   return data
 }
 
-type CreateSinkPipelineData = Awaited<ReturnType<typeof createSinkPipeline>>
+type CreateDestinationPipelineData = Awaited<ReturnType<typeof createDestinationPipeline>>
 
-export const useCreateSinkPipelineMutation = ({
+export const useCreateDestinationPipelineMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<CreateSinkPipelineData, ResponseError, CreateSinkPipelineParams>,
+  UseMutationOptions<CreateDestinationPipelineData, ResponseError, CreateDestinationPipelineParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CreateSinkPipelineData, ResponseError, CreateSinkPipelineParams>(
-    (vars) => createSinkPipeline(vars),
+  return useMutation<CreateDestinationPipelineData, ResponseError, CreateDestinationPipelineParams>(
+    (vars) => createDestinationPipeline(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(replicationKeys.sinks(projectRef))
+        await queryClient.invalidateQueries(replicationKeys.destinations(projectRef))
         await queryClient.invalidateQueries(replicationKeys.pipelines(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to create sink or pipeline: ${data.message}`)
+          toast.error(`Failed to create destination or pipeline: ${data.message}`)
         } else {
           onError(data, variables, context)
         }
