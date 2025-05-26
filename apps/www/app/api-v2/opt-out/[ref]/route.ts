@@ -31,6 +31,12 @@ export async function POST(req: NextRequest, { params }: { params: { ref: string
   const ref = params.ref
   const { reason, email, captchaToken } = await req.json()
 
+  // Validate reason
+  const allowedReasons = ['phishing', 'advertisement', 'malware', 'scam', 'other']
+  if (!allowedReasons.includes(reason)) {
+    return NextResponse.json({ error: 'Bad Request: Invalid reason provided.' }, { status: 400 })
+  }
+
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
   if (!ref) {
@@ -76,12 +82,7 @@ export async function POST(req: NextRequest, { params }: { params: { ref: string
     const response = await fetch(process.env.EMAIL_REPORT_SLACK_WEBHOOK as string, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        blocks: [
-          { type: 'section', text: { type: 'plain_text', text: `New report from: ${ref}` } },
-          { type: 'section', text: { type: 'plain_text', text: reason } },
-        ],
-      }),
+      body: JSON.stringify({ text: `New report from: ${ref} \n\n ${reason}` }),
     })
 
     if (!response.ok) throw new Error('Failed to send to Slack')
