@@ -26,8 +26,8 @@ Besides being a great product, Postgres has some important open source dynamics:
 I've realized there are three tenets of open source. Developers will assess the "open sourceness" of any project by:
 
 1. **License:** is the license [OSI-approved](https://opensource.org/licenses).
-2. **Self-hosting:** how feasible is it to self-host the *entire product*.
-3. **Commercialization**: is the project commercially unencumbered and vendor neutral or (even better) is it backed by *many* commercial entities.
+2. **Self-hosting:** how feasible is it to self-host the _entire product_.
+3. **Commercialization**: is the project commercially unencumbered and vendor neutral or (even better) is it backed by _many_ commercial entities.
 
 The third tenet took me a while to grasp. Yes, Postgres won because it's a great product, but even better: it cannot be owned by any single entity. The governance and cultural resistance makes it impossible. Postgres is like the International Space Station where several large commercial entities collaborated because no single entity can own it.
 
@@ -37,15 +37,13 @@ Postgres checks the "open source" checkbox, but it's not a magic-bullet for all 
 
 In the data space there are 3 primary "data personas" and their respective tools:
 
-1. **OLTP Databases:** used by *developers* to build apps.
-2. **Telemetry:** used by *SREs* to manage infra and optimize applications.
-3. **OLAP/Warehousing**: used by *data engineers/scientists* to draw insights.
+1. **OLTP Databases:** used by _developers_ to build apps.
+2. **Telemetry:** used by _SREs_ to manage infra and optimize applications.
+3. **OLAP/Warehousing**: used by _data engineers/scientists_ to draw insights.
 
 The data lifecycle typically flows from `1 → 2 → 3`: first a developer builds an application, then they add basic telemetry (sometimes just click events in their OLTP database), and eventually their OLTP database becomes large enough that they need a data warehouse.
 
-The three personas are distinct in their way of operating and preferred tools. That said, I'm starting to see a lot of "shift-left" to the developer: as data tooling improves, observability and warehousing is increasingly the domain of the developer.
-
-This shift-left isn't an intentional action by SREs or data engineers. It's because historically the telemetry/warehousing tools would be difficult for a developer to use. Now, databases are becoming more scalable and developers/startups can cope for longer before hiring specialized help.
+The three personas are distinct in their way of operating and preferred tools. That said, the industry continues to shift left: as data tooling improves, observability and warehousing is increasingly the domain of the developer. This shift isn't an intentional action by SREs or data engineers. It's because databases are becoming more scalable and developers/startups can cope for longer before hiring specialized help.
 
 ## The Three Open Data Standards
 
@@ -68,16 +66,16 @@ The second two are interesting because they are "standards" rather than "tools".
 
 These standards start as a grass-roots movement and commercial entities are compelled to adopt them through a [disruptive technology](https://en.wikipedia.org/wiki/Disruptive_innovation) dilemma:
 
-- if they *don't* adopt the standard, they will miss out on the growing trend.
-- if they *do* adopt the standard, they lower the lock-in for their own tool/platform.
+- if they _don't_ adopt the standard, they will miss out on the growing trend.
+- if they _do_ adopt the standard, they lower the lock-in for their own tool/platform.
 
-This is a *fantastic* dynamic for the developer community, and one that we [strongly believe in](https://supabase.com/docs/guides/getting-started/architecture#everything-is-portable): *portability forces companies to compete on experience*.
+This is a _fantastic_ dynamic for the developer community, and one that we [strongly believe in](https://supabase.com/docs/guides/getting-started/architecture#everything-is-portable): _portability forces companies to compete on experience_.
 
 Diving deeper into each of these tools:
 
 ### Postgres is the open OLTP standard
 
-While Postgres is a *tool*, it has also become a *standard*. Nearly every new database offering aims for "Postgres [wire](https://www.postgresql.org/docs/current/protocol.html) compatibility". Because Postgres isn't owned by any individual commercial entity, every major cloud can offer it - or even is *forced* to offer it because it’s a standard. Hell, even Oracle cloud offers it. If you have a bad experience with any particular vendor, you can simply `pg_dump` your data and take it to another provider. Postgres uses the [PostgreSQL license](https://www.postgresql.org/about/licence/), which is functionally equivalent to MIT.
+While Postgres is a _tool_, it has also become a _standard_. Nearly every new database offering aims for "Postgres [wire](https://www.postgresql.org/docs/current/protocol.html) compatibility". Because Postgres isn't owned by any individual commercial entity, every major cloud can offer it - or even is _forced_ to offer it because it’s a standard. Hell, even Oracle cloud offers it. If you have a bad experience with any particular vendor, you can simply `pg_dump` your data and take it to another provider. Postgres uses the [PostgreSQL license](https://www.postgresql.org/about/licence/), which is functionally equivalent to MIT.
 
 ### OTel is the open telemetry standard
 
@@ -106,14 +104,14 @@ The AWS S3 team are releasing updates that will accelerate the concept of "S3 as
 
 The tooling for S3 interoperability differs slightly depending on the use-case:
 
-- For OLTP databases, where performance is paramount, there will always be a "disk" layer between S3. There is simply no way that a network disk can operate at the speed of NVMe SSDs. The key interoperability with S3 will be ZeroETL and Tiered Storage: the ability to move "cold" data easily between your operational database and S3.  Postgres offers several methods to read the data out of Iceberg, including [pg_mooncake](https://github.com/Mooncake-Labs/pg_mooncake), [pg_duckdb](https://github.com/duckdb/pg_duckdb), and [Iceberg Foreign Data Wrappers](https://github.com/supabase/wrappers/pull/462).
+- For OLTP databases, where performance is paramount, there will always be a "disk" layer between S3. There is simply no way that a network disk can operate at the speed of NVMe SSDs. The key interoperability with S3 will be ZeroETL and Tiered Storage: the ability to move "cold" data easily between your operational database and S3. Postgres offers several methods to read the data out of Iceberg, including [pg_mooncake](https://github.com/Mooncake-Labs/pg_mooncake), [pg_duckdb](https://github.com/duckdb/pg_duckdb), and [Iceberg Foreign Data Wrappers](https://github.com/supabase/wrappers/pull/462).
 - For Telemetry and Warehousing, cardinality is the key factor. As S3 becomes cheaper, businesses are storing exponentially more data in object storage, driving an architecture where storage and compute are decoupled. This has sparked demand for database offerings that serve as compute layers, connecting directly to S3. Most of these are embedded databases, like [DuckDB](https://duckdb.org/2021/10/29/duckdb-wasm.html) (OLAP), SQLite’s [cloud-backed storage](https://sqlite.org/cloudsqlite/doc/trunk/www/index.wiki), [turbopuffer](https://turbopuffer.com/) (vectors/embeddings), [SlateDB](https://slatedb.io/) (KV), and [Tonbo](https://tonbo.io/) (Arrow). These embedded databases can run within your application or be used as a standalone tool.
 
 ## Data at Supabase
 
 Supabase is now relatively well-known as a Postgres provider. We've spent 5 years building a delightful database platform for developers and that will continue to be our focus.
 
-What's unique about Supabase is that we're not *just* a Postgres provider (despite the [memes](https://itsjustpostgres.com/)). We also offer [Supabase Storage](https://supabase.com/storage), an S3-compatible object store. Where we're going is less about a database, and more about data. This includes:
+What's unique about Supabase is that we're not _just_ a Postgres provider (despite the [memes](https://itsjustpostgres.com/)). We also offer [Supabase Storage](https://supabase.com/storage), an S3-compatible object store. Where we're going is less about a database, and more about data. This includes:
 
 - Adding OTel to all of the open source tools we maintain.
 - Adding Iceberg support in Supabase Storage.
