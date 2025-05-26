@@ -22,7 +22,7 @@ type GetResponseData =
   paths['/platform/projects/{ref}/content/folders/{id}']['get']['responses']['200']['content']['application/json']
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetResponseData>) => {
-  return res.status(200).json({ data: { folders: [] } })
+  return res.status(200).json({ data: { folders: [], contents: [] } })
 }
 
 type PatchResponseData =
