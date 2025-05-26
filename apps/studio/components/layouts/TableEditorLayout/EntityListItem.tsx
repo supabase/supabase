@@ -54,6 +54,10 @@ export interface EntityListItemProps {
   isActive?: boolean
 }
 
+function isTableLikeEntityListItem(entity: { type?: string }) {
+  return entity?.type === ENTITY_TYPE.TABLE || entity?.type === ENTITY_TYPE.PARTITIONED_TABLE
+}
+
 const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   id,
   projectRef,
@@ -65,13 +69,13 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
 
-  const { refetch: getTableDefinition, data: tableDefinition } = useTableDefinitionQuery(
+  const { data: tableDefinition, isLoading: isTableDefinitionLoading } = useTableDefinitionQuery(
     {
       id: entity.id,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { enabled: false }
+    { enabled: isTableLikeEntityListItem(entity) }
   )
 
   // For tabs preview flag logic
@@ -298,28 +302,29 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                 <span>Copy name</span>
               </DropdownMenuItem>
 
-              <DropdownMenuItem
-                key="copy-schema"
-                className="space-x-2"
-                onClick={async (e) => {
-                  e.stopPropagation()
-                  toast.loading(`Fetching schema for ${entity.name}...`, { id: 'copy-schema' })
-                  try {
-                    await getTableDefinition()
+              {isTableLikeEntityListItem(entity) && (
+                <DropdownMenuItem
+                  key="copy-schema"
+                  className="space-x-2"
+                  disabled={isTableDefinitionLoading || !tableDefinition}
+                  onClick={async (e) => {
+                    e.stopPropagation()
                     if (!tableDefinition) return
-                    const formatted = formatSql(tableDefinition)
-                    await copyToClipboard(formatted)
-                    toast.success('Table schema copied to clipboard', { id: 'copy-schema' })
-                  } catch (err: any) {
-                    toast.error('Failed to copy schema: ' + (err.message || err), {
-                      id: 'copy-schema',
-                    })
-                  }
-                }}
-              >
-                <Clipboard size={12} />
-                <span>Copy table schema</span>
-              </DropdownMenuItem>
+                    try {
+                      const formatted = formatSql(tableDefinition)
+                      await copyToClipboard(formatted)
+                      toast.success('Table schema copied to clipboard', { id: 'copy-schema' })
+                    } catch (err: any) {
+                      toast.error('Failed to copy schema: ' + (err.message || err), {
+                        id: 'copy-schema',
+                      })
+                    }
+                  }}
+                >
+                  <Clipboard size={12} />
+                  <span>Copy table schema</span>
+                </DropdownMenuItem>
+              )}
 
               {entity.type === ENTITY_TYPE.TABLE && (
                 <>
