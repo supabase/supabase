@@ -127,7 +127,7 @@ export const PauseDisabledState = () => {
         and cannot be restored through the dashboard. However, your data remains intact and can be
         downloaded as a backup.
       </AlertDescription_Shadcn_>
-      <AlertDescription_Shadcn_ className="flex items-center gap-x-2 mt-3">
+      <AlertDescription_Shadcn_ className="gap-x-2 mt-3">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button type="default" icon={<Download />} iconRight={<ChevronDown />}>
@@ -164,9 +164,18 @@ export const PauseDisabledState = () => {
           <a
             target="_blank"
             rel="noreferrer"
-            href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#time-limits"
+            href="https://supabase.com/docs/guides/platform/migrating-within-supabase/dashboard-restore"
           >
-            More information
+            Restore backup to a new Supabase project guide
+          </a>
+        </Button>
+        <Button asChild type="default" icon={<ExternalLink />}>
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href="https://supabase.com/docs/guides/local-development/restoring-downloaded-backup"
+          >
+            Restore backup on your local machine guide
           </a>
         </Button>
       </AlertDescription_Shadcn_>
