@@ -26,6 +26,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Enable Draft Mode by setting the cookie
     res.setDraftMode({ enable: true })
 
+    // Set headers to prevent caching in draft mode
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+    res.setHeader('Pragma', 'no-cache')
+    res.setHeader('Expires', '0')
+
     // Redirect to the blog post page with draft mode enabled
     res.redirect(`/blog/${post.slug}`)
   } catch (error) {

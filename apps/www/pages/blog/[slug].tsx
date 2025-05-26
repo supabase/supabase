@@ -234,8 +234,8 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
         },
         isDraftMode: draftMode,
       },
-      // revalidate: 60 * 10,
-      revalidate: 6,
+      // Don't use revalidate in draft mode
+      ...(draftMode ? {} : { revalidate: 60 * 10 }),
     }
   } catch (error) {
     console.log('[getStaticProps] Static post not found, trying CMS post...')
@@ -276,7 +276,8 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
           },
           isDraftMode: draftMode,
         },
-        revalidate: 60 * 10, // Revalidate every 10 minutes
+        // Don't use revalidate in draft mode
+        ...(draftMode ? {} : { revalidate: 60 * 10 }),
       }
     }
     console.log('[getStaticProps] Not in draft mode and no CMS post found, returning 404')
@@ -304,7 +305,8 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
       },
       isDraftMode: draftMode,
     },
-    revalidate: 60 * 10,
+    // Don't use revalidate in draft mode
+    ...(draftMode ? {} : { revalidate: 60 * 10 }),
   }
 }
 
@@ -323,6 +325,11 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   })
 
   console.log('[BlogPostPage] LivePreview data from hook:', livePreviewData)
+  console.log('[BlogPostPage] Initial data:', props.blog)
+  console.log(
+    '[BlogPostPage] Server URL for live preview:',
+    process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030'
+  )
 
   // For LivePreview, we'll use the raw content directly with ReactMarkdown
   // instead of trying to use MDXRemote which requires specific serialization
@@ -392,6 +399,15 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
       console.log('[BlogPostPage] Updated previewData:', updatedData)
       return updatedData
     })
+
+    // Force a router refresh to get the latest data
+    if (isDraftMode) {
+      console.log('[BlogPostPage] Refreshing router to get latest draft data')
+      router.replace(router.asPath, undefined, {
+        shallow: false,
+        scroll: false,
+      })
+    }
   }
 
   const content = blogMetaData.content

@@ -177,6 +177,10 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
       },
       // Important: don't cache draft content
       cache: preview ? 'no-store' : 'default',
+      // Add timestamp to prevent caching in preview mode
+      ...(preview && {
+        next: { revalidate: 0 },
+      }),
     })
 
     if (!response.ok) {
