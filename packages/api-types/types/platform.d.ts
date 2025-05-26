@@ -5639,6 +5639,7 @@ export interface components {
       MAILER_TEMPLATES_MAGIC_LINK_CONTENT: string
       MAILER_TEMPLATES_REAUTHENTICATION_CONTENT: string
       MAILER_TEMPLATES_RECOVERY_CONTENT: string
+      MFA_ALLOW_LOW_AAL: boolean
       MFA_MAX_ENROLLED_FACTORS: number
       MFA_PHONE_ENROLL_ENABLED: boolean
       MFA_PHONE_MAX_FREQUENCY: number
@@ -7832,6 +7833,7 @@ export interface components {
       MAILER_TEMPLATES_MAGIC_LINK_CONTENT?: string | null
       MAILER_TEMPLATES_REAUTHENTICATION_CONTENT?: string | null
       MAILER_TEMPLATES_RECOVERY_CONTENT?: string | null
+      MFA_ALLOW_LOW_AAL?: boolean | null
       MFA_MAX_ENROLLED_FACTORS?: number | null
       MFA_PHONE_ENROLL_ENABLED?: boolean | null
       MFA_PHONE_MAX_FREQUENCY?: number | null
@@ -14303,7 +14305,7 @@ export interface operations {
   UsageApiController_getApiCounts: {
     parameters: {
       query?: {
-        interval?: 'minutely' | 'hourly' | 'daily' | '15min' | '30min' | '1hr' | '3hr' | '1day'
+        interval?: '15min' | '30min' | '1hr' | '3hr' | '1day'
       }
       header?: never
       path: {
