@@ -269,31 +269,24 @@ function addCanonicalUrl(entry) {
 }
 
 /**
- * @param {string} str
- */
-function escapeGraphQlString(str) {
-  return str
-    .replace(/\\/g, '\\\\')
-    .replace(/"/g, '\\"')
-    .replace(/\n/g, '\\n')
-    .replace(/\r/g, '\\r')
-    .replace(/\t/g, '\\t')
-}
-
-/**
  * @param {TroubleshootingEntry} entry
  */
 async function createGithubDiscussion(entry) {
   console.log(`[INFO] Creating GitHub discussion for ${entry.data.title}`)
-  const content = escapeGraphQlString(addCanonicalUrl(entry))
+  const content = addCanonicalUrl(entry)
 
   const mutation = `
-    mutation {
+    mutation CreateDiscussionMutation(
+      $repository: ID!,
+      $category: ID!,
+      $title: String!,
+      $body: String!
+    ) {
       createDiscussion(input: {
-        repositoryId: "${REPOSITORY_ID}",
-        categoryId: "${TROUBLESHOOTING_CATEGORY_ID}",
-        body: "${content}",
-        title: "${entry.data.title}"
+        repositoryId: $repository,
+        categoryId: $category,
+        body: $body,
+        title: $title
       }) {
         discussion {
           id
@@ -305,7 +298,12 @@ async function createGithubDiscussion(entry) {
 
   const {
     createDiscussion: { discussion },
-  } = await octokit().graphql(mutation)
+  } = await octokit().graphql(mutation, {
+    repository: REPOSITORY_ID,
+    category: TROUBLESHOOTING_CATEGORY_ID,
+    body: content,
+    title: entry.data.title,
+  })
   console.log(`[INFO] Created GitHub discussion for ${entry.data.title}: %s`, discussion.url)
   return discussion
 }
@@ -383,12 +381,15 @@ async function updateGithubDiscussion(entry) {
     throw error
   }
 
-  const content = escapeGraphQlString(addCanonicalUrl(entry))
+  const content = addCanonicalUrl(entry)
   const mutation = `
-    mutation {
+    mutation UpdateDiscussionMutation(
+      $discussionId: ID!,
+      $body: String!
+    ) {
       updateDiscussion(input: {
-        discussionId: "${data.github_id}",
-        body: "${content}"
+        discussionId: $discussionId,
+        body: $body
       }) {
         discussion {
           id
@@ -397,7 +398,7 @@ async function updateGithubDiscussion(entry) {
     }
     `
   try {
-    await octokit().graphql(mutation)
+    await octokit().graphql(mutation, { discussionId: data.github_id, body: content })
     console.log(`[INFO] Updated discussion content for ${entry.data.title}`)
   } catch (err) {
     console.error('[DEBUG] Failed GraphQL mutation:\n', mutation)
@@ -409,9 +410,11 @@ async function updateGithubDiscussion(entry) {
 async function rollbackGithubDiscussion(id) {
   try {
     const mutation = `
-    mutation {
+    mutation DeleteDiscussionMutation(
+      $discussionId: ID!
+    ) {
       deleteDiscussion(input: {
-        id: "${id}",
+        discussionId: $discussionId,
       }) {
         discussion {
           id
@@ -420,7 +423,7 @@ async function rollbackGithubDiscussion(id) {
     }
     `
 
-    await octokit().graphql(mutation)
+    await octokit().graphql(mutation, { discussionId: id })
     console.log(`[INFO] Rolled back discussion creation for ${id}`)
   } catch (error) {
     console.error(`[ERROR] Failed to rollback discussion creation for ${id}: %O`, error)
