@@ -16,6 +16,7 @@ export const LOCAL_STORAGE_KEYS = {
   UI_NEW_LAYOUT_PREVIEW: 'supabase-ui-new-layout-preview',
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
   TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
+  PRIVACY_NOTICE_ACKNOWLEDGED: 'privacy-notice-acknowledged',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
   STORAGE_PREFERENCE: (ref: string) => `storage-explorer-${ref}`,
