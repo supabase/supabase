@@ -18,13 +18,13 @@ export const AnalyticsSettings = () => {
   }
 
   return (
-    <Panel title={<h5 key="panel-title">Analytics</h5>}>
+    <Panel title={<h5 key="panel-title">Analytics and Marketing</h5>}>
       <Panel.Content>
         <Toggle
           checked={hasAccepted}
           onChange={onToggleOptIn}
-          label="Opt-in to send telemetry data from the dashboard"
-          descriptionText="By opting into sending telemetry data, Supabase can improve the overall dashboard user experience"
+          label="Send telemetry data from Supabase services"
+          descriptionText="By opting in to sharing telemetry data, Supabase can analyze usage patterns to enhance user experience and use it for marketing and advertising purposes"
         />
       </Panel.Content>
     </Panel>
