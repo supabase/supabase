@@ -5,33 +5,33 @@ import type { ResponseError } from 'types'
 import { replicationKeys } from './keys'
 import { handleError, post } from 'data/fetchers'
 
-export type BigQuerySinkConfig = {
+export type BigQueryDestinationConfig = {
   projectId: string
   datasetId: string
   serviceAccountKey: string
   maxStalenessMins: number
 }
 
-export type UpdateSinkPipelineParams = {
-  sinkId: number
+export type UpdateDestinationPipelineParams = {
+  destinationId: number
   pipelineId: number
   projectRef: string
-  sinkName: string
-  sinkConfig: {
-    bigQuery: BigQuerySinkConfig
+  destinationName: string
+  destinationConfig: {
+    bigQuery: BigQueryDestinationConfig
   }
   sourceId: number
   publicationName: string
   pipelinConfig: { config: { maxSize: number; maxFillSecs: number } }
 }
 
-async function updateSinkPipeline(
+async function updateDestinationPipeline(
   {
-    sinkId,
+    destinationId: destinationId,
     pipelineId,
     projectRef,
-    sinkName,
-    sinkConfig: {
+    destinationName: destinationName,
+    destinationConfig: {
       bigQuery: { projectId, datasetId, serviceAccountKey, maxStalenessMins },
     },
     pipelinConfig: {
@@ -39,18 +39,18 @@ async function updateSinkPipeline(
     },
     publicationName,
     sourceId,
-  }: UpdateSinkPipelineParams,
+  }: UpdateDestinationPipelineParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await post(
-    '/platform/replication/{ref}/sinks-pipelines/{sink_id}/{pipeline_id}',
+    '/platform/replication/{ref}/destinations-pipelines/{destination_id}/{pipeline_id}',
     {
-      params: { path: { ref: projectRef, sink_id: sinkId, pipeline_id: pipelineId } },
+      params: { path: { ref: projectRef, destination_id: destinationId, pipeline_id: pipelineId } },
       body: {
-        sink_name: sinkName,
-        sink_config: {
+        destination_name: destinationName,
+        destination_config: {
           big_query: {
             project_id: projectId,
             dataset_id: datasetId,
@@ -77,30 +77,30 @@ async function updateSinkPipeline(
   return data
 }
 
-type UpdateSinkPipelineData = Awaited<ReturnType<typeof updateSinkPipeline>>
+type UpdateDestinationPipelineData = Awaited<ReturnType<typeof updateDestinationPipeline>>
 
-export const useUpdateSinkPipelineMutation = ({
+export const useUpdateDestinationPipelineMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<UpdateSinkPipelineData, ResponseError, UpdateSinkPipelineParams>,
+  UseMutationOptions<UpdateDestinationPipelineData, ResponseError, UpdateDestinationPipelineParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UpdateSinkPipelineData, ResponseError, UpdateSinkPipelineParams>(
-    (vars) => updateSinkPipeline(vars),
+  return useMutation<UpdateDestinationPipelineData, ResponseError, UpdateDestinationPipelineParams>(
+    (vars) => updateDestinationPipeline(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(replicationKeys.sinks(projectRef))
+        await queryClient.invalidateQueries(replicationKeys.destinations(projectRef))
         await queryClient.invalidateQueries(replicationKeys.pipelines(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to update sink or pipeline: ${data.message}`)
+          toast.error(`Failed to update destination or pipeline: ${data.message}`)
         } else {
           onError(data, variables, context)
         }

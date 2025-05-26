@@ -1384,7 +1384,7 @@ export interface components {
       /** Format: date-time */
       updated_at?: string | null
     }
-    ApplyProjectAddonBodyDto: {
+    ApplyProjectAddonBody: {
       /** @enum {string} */
       addon_type:
         | 'custom_domain'
@@ -1593,8 +1593,6 @@ export interface components {
       smtp_user: string | null
       uri_allow_list: string | null
     }
-    /** @enum {string} */
-    BillingPlanId: 'free' | 'pro' | 'team' | 'enterprise'
     BranchActionBody: {
       migration_version?: string
     }
@@ -1739,7 +1737,7 @@ export interface components {
         [key: string]: string
       }
     }
-    CreateOrganizationV1Dto: {
+    CreateOrganizationV1: {
       name: string
     }
     CreateProviderBody: {
@@ -1920,9 +1918,15 @@ export interface components {
       version: number
     }
     GetProjectAvailableRestoreVersionsResponse: {
-      available_versions: components['schemas']['ProjectAvailableRestoreVersion'][]
+      available_versions: {
+        /** @enum {string} */
+        postgres_engine: '13' | '14' | '15' | '17' | '17-oriole'
+        /** @enum {string} */
+        release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
+        version: string
+      }[]
     }
-    GetProjectDbMetadataResponseDto: {
+    GetProjectDbMetadataResponse: {
       databases: ({
         name: string
         schemas: ({
@@ -1961,7 +1965,7 @@ export interface components {
       }
       updated_at?: string
     }
-    ListProjectAddonsResponseDto: {
+    ListProjectAddonsResponse: {
       available_addons: {
         name: string
         /** @enum {string} */
@@ -2125,7 +2129,7 @@ export interface components {
       /** @enum {string} */
       status: 'stored' | 'applied'
     }
-    OAuthRevokeTokenBodyDto: {
+    OAuthRevokeTokenBody: {
       /** Format: uuid */
       client_id: string
       client_secret: string
@@ -2190,13 +2194,6 @@ export interface components {
       jwt_secret?: string
       max_rows: number
     }
-    ProjectAvailableRestoreVersion: {
-      /** @enum {string} */
-      postgres_engine: '13' | '14' | '15' | '17' | '17-oriole'
-      /** @enum {string} */
-      release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
-      version: string
-    }
     ProjectUpgradeEligibilityResponse: {
       current_app_version: string
       /** @enum {string} */
@@ -2229,8 +2226,6 @@ export interface components {
       override_active_until: string
       override_enabled: boolean
     }
-    /** @enum {string} */
-    ReleaseChannel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
     RemoveNetworkBanRequest: {
       identifier?: string
       ipv4_addresses: string[]
@@ -2297,53 +2292,59 @@ export interface components {
         updated_at: string
       }[]
     }
-    SnippetContent: {
-      favorite: boolean
-      schema_version: string
-      sql: string
-    }
     SnippetList: {
       cursor?: string
-      data: components['schemas']['SnippetMeta'][]
-    }
-    SnippetMeta: {
-      description: string | null
-      id: string
-      inserted_at: string
-      name: string
-      owner: components['schemas']['SnippetUser']
-      project: components['schemas']['SnippetProject']
-      /** @enum {string} */
-      type: 'sql'
-      updated_at: string
-      updated_by: components['schemas']['SnippetUser']
-      /** @enum {string} */
-      visibility: 'user' | 'project' | 'org' | 'public'
-    }
-    SnippetProject: {
-      /** Format: int64 */
-      id: number
-      name: string
+      data: {
+        description: string | null
+        id: string
+        inserted_at: string
+        name: string
+        owner: {
+          id: number
+          username: string
+        }
+        project: {
+          id: number
+          name: string
+        }
+        /** @enum {string} */
+        type: 'sql'
+        updated_at: string
+        updated_by: {
+          id: number
+          username: string
+        }
+        /** @enum {string} */
+        visibility: 'user' | 'project' | 'org' | 'public'
+      }[]
     }
     SnippetResponse: {
-      content: components['schemas']['SnippetContent']
+      content: {
+        favorite: boolean
+        schema_version: string
+        sql: string
+      }
       description: string | null
       id: string
       inserted_at: string
       name: string
-      owner: components['schemas']['SnippetUser']
-      project: components['schemas']['SnippetProject']
+      owner: {
+        id: number
+        username: string
+      }
+      project: {
+        id: number
+        name: string
+      }
       /** @enum {string} */
       type: 'sql'
       updated_at: string
-      updated_by: components['schemas']['SnippetUser']
+      updated_by: {
+        id: number
+        username: string
+      }
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
-    }
-    SnippetUser: {
-      /** Format: int64 */
-      id: number
-      username: string
     }
     SslEnforcementRequest: {
       requestedConfig: {
@@ -2367,6 +2368,7 @@ export interface components {
       }
       fileSizeLimit: number
     }
+    StreamableFile: Record<string, never>
     SubdomainAvailabilityResponse: {
       available: boolean
     }
@@ -2769,15 +2771,17 @@ export interface components {
           }
       result?: unknown[]
     }
-    V1Backup: {
-      inserted_at: string
-      is_physical_backup: boolean
-      /** @enum {string} */
-      status: 'COMPLETED' | 'FAILED' | 'PENDING' | 'REMOVED' | 'ARCHIVED' | 'CANCELLED'
-    }
     V1BackupsResponse: {
-      backups: components['schemas']['V1Backup'][]
-      physical_backup_data: components['schemas']['V1PhysicalBackup']
+      backups: {
+        inserted_at: string
+        is_physical_backup: boolean
+        /** @enum {string} */
+        status: 'COMPLETED' | 'FAILED' | 'PENDING' | 'REMOVED' | 'ARCHIVED' | 'CANCELLED'
+      }[]
+      physical_backup_data: {
+        earliest_physical_backup_date_unix?: number
+        latest_physical_backup_date_unix?: number
+      }
       pitr_enabled: boolean
       region: string
       walg_enabled: boolean
@@ -2786,7 +2790,7 @@ export interface components {
       name?: string
       query: string
     }
-    V1CreateProjectBodyDto: {
+    V1CreateProjectBody: {
       /** @description Database password */
       db_pass: string
       /** @enum {string} */
@@ -2855,16 +2859,6 @@ export interface components {
        */
       template_url?: string
     }
-    V1DatabaseResponse: {
-      /** @description Database host */
-      host: string
-      /** @description Database engine */
-      postgres_engine: string
-      /** @description Release channel */
-      release_channel: string
-      /** @description Database version */
-      version: string
-    }
     V1ListMigrationsResponse: {
       name?: string
       version: string
@@ -2877,11 +2871,12 @@ export interface components {
       user_name: string
     }
     V1OrganizationSlugResponse: {
-      allowed_release_channels: components['schemas']['ReleaseChannel'][]
+      allowed_release_channels: ('internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview')[]
       id: string
       name: string
       opt_in_tags: 'AI_SQL_GENERATOR_OPT_IN'[]
-      plan?: components['schemas']['BillingPlanId']
+      /** @enum {string} */
+      plan?: 'free' | 'pro' | 'team' | 'enterprise'
     }
     V1PgbouncerConfigResponse: {
       connection_string?: string
@@ -2891,12 +2886,6 @@ export interface components {
       /** @enum {string} */
       pool_mode?: 'transaction' | 'session' | 'statement'
     }
-    V1PhysicalBackup: {
-      /** Format: int64 */
-      earliest_physical_backup_date_unix?: number
-      /** Format: int64 */
-      latest_physical_backup_date_unix?: number
-    }
     V1PostgrestConfigResponse: {
       db_extra_search_path: string
       /** @description If `null`, the value is automatically configured based on compute size. */
@@ -2904,7 +2893,7 @@ export interface components {
       db_schema: string
       max_rows: number
     }
-    V1ProjectAdvisorsResponseDto: {
+    V1ProjectAdvisorsResponse: {
       lints: {
         cache_key: string
         categories: ('PERFORMANCE' | 'SECURITY')[]
@@ -2958,7 +2947,6 @@ export interface components {
       }[]
     }
     V1ProjectRefResponse: {
-      /** Format: int64 */
       id: number
       name: string
       ref: string
@@ -3004,7 +2992,16 @@ export interface components {
        * @example 2023-03-29T16:32:59Z
        */
       created_at: string
-      database: components['schemas']['V1DatabaseResponse']
+      database: {
+        /** @description Database host */
+        host: string
+        /** @description Database engine */
+        postgres_engine: string
+        /** @description Release channel */
+        release_channel: string
+        /** @description Database version */
+        version: string
+      }
       /** @description Id of your project */
       id: string
       /** @description Name of your project */
@@ -3306,7 +3303,7 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      303: {
+      204: {
         headers: {
           [name: string]: unknown
         }
@@ -3323,7 +3320,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['OAuthRevokeTokenBodyDto']
+        'application/json': components['schemas']['OAuthRevokeTokenBody']
       }
     }
     responses: {
@@ -3393,7 +3390,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateOrganizationV1Dto']
+        'application/json': components['schemas']['CreateOrganizationV1']
       }
     }
     responses: {
@@ -3498,7 +3495,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['V1CreateProjectBodyDto']
+        'application/json': components['schemas']['V1CreateProjectBody']
       }
     }
     responses: {
@@ -3592,7 +3589,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1ProjectAdvisorsResponseDto']
+          'application/json': components['schemas']['V1ProjectAdvisorsResponse']
         }
       }
       403: {
@@ -3620,7 +3617,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1ProjectAdvisorsResponseDto']
+          'application/json': components['schemas']['V1ProjectAdvisorsResponse']
         }
       }
       403: {
@@ -3846,7 +3843,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ListProjectAddonsResponseDto']
+          'application/json': components['schemas']['ListProjectAddonsResponse']
         }
       }
       403: {
@@ -3876,7 +3873,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['ApplyProjectAddonBodyDto']
+        'application/json': components['schemas']['ApplyProjectAddonBody']
       }
     }
     responses: {
@@ -5079,7 +5076,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['GetProjectDbMetadataResponseDto']
+          'application/json': components['schemas']['GetProjectDbMetadataResponse']
         }
       }
       403: {
@@ -5148,9 +5145,7 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content: {
-          'application/json': Record<string, never>
-        }
+        content?: never
       }
       403: {
         headers: {
@@ -5187,9 +5182,7 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content: {
-          'application/json': Record<string, never>
-        }
+        content?: never
       }
       403: {
         headers: {
@@ -5498,7 +5491,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['StreamableFile']
+        }
       }
       403: {
         headers: {
@@ -6265,9 +6260,7 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content: {
-          'application/json': Record<string, never>
-        }
+        content?: never
       }
       403: {
         headers: {
