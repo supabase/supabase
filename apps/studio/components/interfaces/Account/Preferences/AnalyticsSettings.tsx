@@ -1,13 +1,6 @@
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Badge,
-  Button,
-  Toggle,
-} from 'ui'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge, Toggle } from 'ui'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { ExternalLink, X } from 'lucide-react'
+import { X } from 'lucide-react'
 
 import { useConsentState } from 'common'
 import Panel from 'components/ui/Panel'
@@ -32,20 +25,16 @@ export const PrivacyUpdateBanner = () => {
         Privacy Policy Update – Effective May 28, 2025
       </AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_>
-        We’ve updated our Privacy Policy to clarify how we use AI features, marketing tools,
-        cookies, and your data. By continuing to use Supabase after May 28, you agree to the new
-        terms. Questions? Contact{' '}
+        We’ve updated our{' '}
+        <a href="https://supabase.com/privacy" target="_blank" className="text hover:text-brand">
+          Privacy Policy
+        </a>{' '}
+        to clarify how we use AI features, marketing tools, cookies, and your data. By continuing to
+        use Supabase after May 28, you agree to the new terms. Questions? Contact{' '}
         <a href="mailto:privacy@supabase.com" target="_blank" className="text hover:text-brand">
           our team
         </a>
         .
-      </AlertDescription_Shadcn_>
-      <AlertDescription_Shadcn_ className="mt-4 flex items-center gap-x-2">
-        <Button asChild type="default" icon={<ExternalLink />}>
-          <a target="_blank" rel="noreferrer noopener" href="https://supabase.com/privacy">
-            View updated policy
-          </a>
-        </Button>
       </AlertDescription_Shadcn_>
       <ButtonTooltip
         type="text"
