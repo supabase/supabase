@@ -1,6 +1,6 @@
 ---
 id: 'platform-as-a-service'
-title: 'Supabase Platform-as-a-Service'
+title: 'Supabase as a Service'
 description: 'Use Supabase as a Platform for your own business and tools.'
 subtitle: 'Use Supabase as a platform for your own business and tools.'
 ---
@@ -45,35 +45,97 @@ Because of this, it's important that you adopt a development workflow on behalf 
 
 ![Change flow](/docs/img/integrations/change-flow.png)
 
-After launching a Project, it's important that all changes happen on a Branch. This is because branches can be treated like ephemeral servers: if anything goes wrong you can either roll back to a checkpoint or destroy the branch and create a new one from production.
+After launching a Project, it's important that all changes happen on a Branch. This is because branches can be treated like ephemeral servers: if anything goes wrong you can either revert the changes or destroy the branch and create a new one from production.
 
-### Creating a development environment
+### Creating a development Branch
 
 - Create a branch
 - [Docs: Create a branch](https://api.supabase.com/api/v1#tag/environments/POST/v1/projects/{ref}/branches)
+
+```
+curl https://api.supabase.com/v1/projects/branches \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "branch_name": "",
+  "git_branch": "",
+  "persistent": true,
+  "region": "",
+  "desired_instance_size": "pico",
+  "release_channel": "internal",
+  "postgres_engine": "15",
+  "secrets": {
+    "ANY_ADDITIONAL_PROPERTY": ""
+  }
+}'
+```
 
 
 ### Make a change
 
 - TODO
+- https://api.supabase.com/api/v1#tag/database/POST/v1/projects/{ref}/database/migrations
 
-### Merge the branch
+```sh
+curl https://api.supabase.com/v1/projects/database/migrations \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "query": "",
+  "name": "Create a todo table"
+}'
+```
+
+### Merge all changes
 
 - TODO
 - https://api.supabase.com/api/v1#tag/environments/POST/v1/branches/{branch_id}/merge
+
+```sh
+curl https://api.supabase.com/v1/branches/merge \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "migration_version": ""
+}'
+```
 
 ### Delete the branch
 
 - TODO
 - https://api.supabase.com/api/v1#tag/environments/DELETE/v1/branches/{branch_id}
 
+```sh
+curl https://api.supabase.com/v1/branches/ \
+  --request DELETE
+```
+
 
 ## Making changes
 
-- Database
-- Auth (config)
-- Edge Functions
 
+## Database changes
+
+Database changes are handled through migrations.
+
+
+### Edge Functions
+
+You can develop Edge Functions on a branch and then merge them into Production.
+
+![Deploy Edge Functions](/docs/img/integrations/change-functions.png)
+
+```sh
+curl https://api.supabase.com/v1/projects/functions/deploy \
+  --request POST \
+  --header 'Content-Type: multipart/form-data' \
+  --form 'file=' \
+  --form 'metadata={"entrypoint_path":"","import_map_path":"","static_patterns":[""],"verify_jwt":true,"name":""}'
+```
+
+### Configuration
+
+You can manage the configuration of all services using the Management API. This includes Auth configuration like enabling and disabling SSO Pro
 
 
 ### Reverting changes

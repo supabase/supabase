@@ -2474,7 +2474,7 @@ export const integrations: NavMenuConstant = {
           url: '/guides/integrations/build-a-supabase-integration/oauth-scopes',
         },
         {
-          name: 'Supabase Platform',
+          name: 'Supabase as a Service',
           url: '/guides/integrations/platform-as-a-service',
         },
       ],
