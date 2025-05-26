@@ -2329,7 +2329,7 @@ Yes, the MCP Server can perform actions like creating tables, running queries, a
 `,
     icon: CloudCog,
     products: [ADDITIONAL_PRODUCTS.STUDIO],
-    heroImage: 'https://www.youtube.com/watch?v=1SMldLoOhbg',
+    heroImage: 'https://www.youtube-nocookie.com/embed/1SMldLoOhbg',
     docsUrl: 'https://supabase.com/docs/guides/getting-started/mcp',
     slug: 'mcp-server',
     status: {
@@ -2402,7 +2402,7 @@ For detailed instructions and best practices, see the [Declarative Schemas docum
 `,
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: 'https://www.youtube.com/watch?v=EALkUlOKvAs',
+    heroImage: 'https://www.youtube-nocookie.com/embed/EALkUlOKvAs',
     docsUrl: 'https://supabase.com/docs/guides/local-development/declarative-database-schemas',
     slug: 'declarative-schemas',
     status: {
