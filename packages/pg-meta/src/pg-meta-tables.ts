@@ -148,7 +148,7 @@ function create({ name, schema = 'public', comment }: TableCreateParams): { sql:
     comment === undefined
       ? ''
       : `COMMENT ON TABLE ${ident(schema)}.${ident(name)} IS ${literal(comment)};`
-  const sql = `BEGIN; ${tableSql} ${commentSql} COMMIT;`
+  const sql = `${tableSql} ${commentSql}`
   return { sql }
 }
 
@@ -237,7 +237,6 @@ $$;
       : `COMMENT ON TABLE ${ident(old.schema)}.${ident(old.name)} IS ${literal(comment)};`
   // nameSql must be last, right below schemaSql
   const sql = `
-BEGIN;
   ${enableRls}
   ${forceRls}
   ${replicaSql}
@@ -245,7 +244,7 @@ BEGIN;
   ${commentSql}
   ${schemaSql}
   ${nameSql}
-COMMIT;`
+`
 
   return { sql }
 }

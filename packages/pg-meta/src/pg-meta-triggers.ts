@@ -175,7 +175,7 @@ export function update(
       : ''
 
   // updateNameSql must be last
-  const sql = `begin; ${enabledModeSql}; ${updateNameSql}; commit;`
+  const sql = `${enabledModeSql}; ${updateNameSql};`
 
   return {
     sql,
