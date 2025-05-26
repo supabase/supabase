@@ -401,7 +401,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const result = streamText({
-      model: bedrock('us.anthropic.claude-3-7-sonnet-20250219-v1:0'),
+      model: bedrock('us.anthropic.claude-sonnet-4-20250514-v1:0'),
       maxSteps: 10,
       system: systemPrompt.trim(),
       messages,
