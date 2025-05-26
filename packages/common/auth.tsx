@@ -116,10 +116,11 @@ export const useIsLoggedIn = () => {
   return user !== null
 }
 
-export const signOut = async () => await gotrueClient.signOut()
+export const signOut = async (options?: { scope?: 'global' | 'local' | 'others' }) => 
+  await gotrueClient.signOut({ scope: 'local', ...options })
 
-export const logOut = async () => {
-  await signOut()
+export const logOut = async (options?: { scope?: 'global' | 'local' | 'others' }) => {
+  await signOut(options)
   clearLocalStorage()
 }
 
@@ -131,6 +132,7 @@ gotrueClient.onAuthStateChange((event, session) => {
 
 /**
  * Grabs the currently available access token, or calls getSession.
+ * Enhanced for multi-session support with better error handling.
  */
 export async function getAccessToken() {
   // ignore if server-side
@@ -141,16 +143,33 @@ export async function getAccessToken() {
     : false
 
   if (!currentSession || aboutToExpire) {
-    const {
-      data: { session },
-      error,
-    } = await gotrueClient.getSession()
-    if (error) {
-      throw error
-    }
+    try {
+      const {
+        data: { session },
+        error,
+      } = await gotrueClient.getSession()
+      
+      if (error) {
+        // If getSession fails, try to refresh the session
+        console.warn('getSession failed, attempting refresh:', error.message)
+        try {
+          const { data: refreshData, error: refreshError } = await gotrueClient.refreshSession()
+          if (refreshError) {
+            throw refreshError
+          }
+          return refreshData.session?.access_token
+        } catch (refreshErr) {
+          throw error
+        }
+      }
 
-    return session?.access_token
+      return session?.access_token
+    } catch (err) {
+      throw err
+    }
   }
 
   return currentSession.access_token
 }
+
+export * from './session-utils'

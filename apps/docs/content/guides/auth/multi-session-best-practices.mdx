@@ -1,0 +1,314 @@
+---
+title: 'Multi-Session Best Practices'
+subtitle: 'Building reliable multi-device authentication'
+---
+
+This guide covers best practices for implementing authentication that works reliably across multiple devices and sessions.
+
+## Understanding Multi-Session Behavior
+
+When `SESSIONS_SINGLE_PER_USER` is set to `false` (the default), users can have multiple active sessions across different devices. However, there are important considerations to ensure sessions remain independent.
+
+## Common Issues and Solutions
+
+### Issue 1: Unexpected Global Logout
+
+**Problem**: Using `signOut()` without specifying scope can terminate sessions on all devices.
+
+**Solution**: Always specify the scope explicitly:
+
+```js
+// ❌ Avoid - may terminate all sessions
+await supabase.auth.signOut()
+
+// ✅ Recommended - only terminates current session
+await supabase.auth.signOut({ scope: 'local' })
+
+// ✅ When you want to sign out from all devices
+await supabase.auth.signOut({ scope: 'global' })
+```
+
+### Issue 2: Session Validation Failures
+
+**Problem**: `getSession()` may fail due to refresh token invalidation from other devices.
+
+**Solution**: Use enhanced session validation:
+
+```js
+import { validateSession, getSessionInfo } from '@supabase/auth-helpers'
+
+// Enhanced session validation with automatic recovery
+async function checkUserSession() {
+  const { session, isValid, error } = await validateSession()
+  
+  if (!isValid) {
+    console.log('Session invalid:', error?.message)
+    // Redirect to login
+    window.location.href = '/login'
+    return null
+  }
+  
+  return session
+}
+
+// Get detailed session information
+async function getDetailedSessionInfo() {
+  const info = await getSessionInfo()
+  console.log('Session ID:', info.sessionId)
+  console.log('Expires soon:', info.isExpiringSoon)
+  return info
+}
+```
+
+### Issue 3: Inconsistent Logout Behavior
+
+**Problem**: Different client libraries have different default scopes.
+
+**Solution**: Use the safe sign out utility:
+
+```js
+import { safeSignOut } from '@supabase/auth-helpers'
+
+// Safe sign out with local scope default
+await safeSignOut()
+
+// Explicit global sign out when needed
+await safeSignOut({ scope: 'global' })
+
+// Sign out without clearing local storage
+await safeSignOut({ scope: 'local', clearStorage: false })
+```
+
+## Configuration for Multi-Session Support
+
+### Required Settings (Pro Plan)
+
+```toml
+# supabase/config.toml
+[auth.sessions]
+# Enable multiple sessions per user
+SESSIONS_SINGLE_PER_USER = false
+
+# Optional: Set session timeouts (0 = never expire)
+SESSIONS_TIMEBOX = 168  # 7 days in hours
+SESSIONS_INACTIVITY_TIMEOUT = 24  # 24 hours
+
+[auth]
+# Enable refresh token rotation for security
+REFRESH_TOKEN_ROTATION_ENABLED = true
+SECURITY_REFRESH_TOKEN_REUSE_INTERVAL = 10  # seconds
+```
+
+### Client Configuration
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  {
+    auth: {
+      // Ensure sessions persist across page reloads
+      persistSession: true,
+      // Detect session changes across tabs
+      detectSessionInUrl: true,
+    }
+  }
+)
+```
+
+## Monitoring Session State
+
+### Detect Unexpected Logouts
+
+```js
+import { monitorSessionState } from '@supabase/auth-helpers'
+
+// Monitor for unexpected session termination
+const unsubscribe = monitorSessionState((event, session) => {
+  if (event === 'SIGNED_OUT' && session === null) {
+    // Handle unexpected logout
+    console.warn('User was logged out unexpectedly')
+    // Show notification or redirect
+    showNotification('You have been logged out from another device')
+  }
+})
+
+// Clean up listener when component unmounts
+return unsubscribe
+```
+
+### Session Health Checks
+
+```js
+import { isSessionExpiringSoon, getSessionInfo } from '@supabase/auth-helpers'
+
+// Check session health periodically
+setInterval(async () => {
+  const info = await getSessionInfo()
+  
+  if (info.isValid && info.isExpiringSoon) {
+    console.log('Session expiring soon, consider refreshing')
+    // Optionally refresh the session proactively
+    await supabase.auth.refreshSession()
+  }
+}, 60000) // Check every minute
+```
+
+## Testing Multi-Session Scenarios
+
+### Test Cases
+
+1. **Multi-Device Login**
+   ```js
+   // Test that each device gets unique session IDs
+   const info1 = await getSessionInfo() // Device 1
+   const info2 = await getSessionInfo() // Device 2
+   
+   console.log('Device 1 Session ID:', info1.sessionId)
+   console.log('Device 2 Session ID:', info2.sessionId)
+   
+   // Should be different
+   assert(info1.sessionId !== info2.sessionId)
+   ```
+
+2. **Local Logout Test**
+   ```js
+   // Login on both devices
+   // Sign out from device 1 with local scope
+   await safeSignOut({ scope: 'local' })
+   
+   // Verify device 2 session is still active
+   const info = await getSessionInfo()
+   assert(info.isValid === true)
+   ```
+
+3. **Session Recovery Test**
+   ```js
+   // Simulate refresh token invalidation
+   // Verify session validation can recover
+   const { session, isValid } = await validateSession()
+   
+   if (!isValid) {
+     console.log('Session recovery failed as expected')
+   }
+   ```
+
+## React Hook Example
+
+```jsx
+import { useEffect, useState } from 'react'
+import { validateSession, monitorSessionState } from '@supabase/auth-helpers'
+
+export function useMultiSessionAuth() {
+  const [session, setSession] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    // Initial session validation
+    validateSession().then(({ session, isValid, error }) => {
+      setSession(isValid ? session : null)
+      setError(error || null)
+      setIsLoading(false)
+    })
+
+    // Monitor session changes
+    const unsubscribe = monitorSessionState((event, session) => {
+      setSession(session)
+      if (event === 'SIGNED_OUT') {
+        setError(null)
+      }
+    })
+
+    return unsubscribe
+  }, [])
+
+  const signOut = async (scope = 'local') => {
+    try {
+      await safeSignOut({ scope })
+      setSession(null)
+      setError(null)
+    } catch (err) {
+      setError(err)
+    }
+  }
+
+  return {
+    session,
+    isLoading,
+    error,
+    signOut,
+    isAuthenticated: !!session
+  }
+}
+```
+
+## Troubleshooting
+
+### Common Error Messages
+
+- **"no session found"**: Usually indicates refresh token invalidation. Use `validateSession()` for automatic recovery.
+- **"refresh token not found"**: Session was terminated. User needs to log in again.
+- **"invalid refresh token"**: Token was revoked or expired. Clear local storage and redirect to login.
+
+### Debugging Session Issues
+
+```js
+import { getSessionInfo } from '@supabase/auth-helpers'
+
+async function debugSession() {
+  const info = await getSessionInfo()
+  
+  console.log('Session Debug Info:', {
+    isValid: info.isValid,
+    sessionId: info.sessionId,
+    isExpiringSoon: info.isExpiringSoon,
+    error: info.error?.message
+  })
+  
+  // Check localStorage for session data
+  const keys = Object.keys(localStorage).filter(key => 
+    key.includes('supabase')
+  )
+  console.log('Supabase localStorage keys:', keys)
+}
+```
+
+## Migration Guide
+
+### Updating Existing Code
+
+1. **Replace direct signOut calls**:
+   ```js
+   // Before
+   await supabase.auth.signOut()
+   
+   // After
+   await supabase.auth.signOut({ scope: 'local' })
+   ```
+
+2. **Add session validation**:
+   ```js
+   // Before
+   const { data: { session } } = await supabase.auth.getSession()
+   
+   // After
+   const { session, isValid } = await validateSession()
+   if (!isValid) {
+     // Handle invalid session
+   }
+   ```
+
+3. **Monitor session state**:
+   ```js
+   // Add session monitoring
+   useEffect(() => {
+     return monitorSessionState((event, session) => {
+       // Handle session changes
+     })
+   }, [])
+   ```
+
+By following these best practices, you can build robust multi-device authentication that handles session management reliably across all user devices. 

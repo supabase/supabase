@@ -29,8 +29,8 @@ export { useAuth, useIsLoggedIn, useSession, useUser } from 'common'
 export function useSignOut() {
   const queryClient = useQueryClient()
 
-  return useCallback(async () => {
-    const result = await gotrueClient.signOut()
+  return useCallback(async (options?: { scope?: 'global' | 'local' | 'others' }) => {
+    const result = await gotrueClient.signOut({ scope: 'local', ...options })
     clearLocalStorage()
     await queryClient.clear()
 
