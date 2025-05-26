@@ -20,11 +20,11 @@
 }
 
 // Apply parent bg colour while editing
-.rdg-cell.rdg-editor-container > * {
+.rdg-cell.rdg-editor-container>* {
   background-color: inherit;
 }
 
-.rdg-cell > div[draggable='true'] {
+.rdg-cell>div[draggable='true'] {
   @apply h-full;
 }
 
@@ -39,7 +39,7 @@
 .rdg {
   @apply box-border select-none overflow-x-auto overflow-y-scroll bg-dash-canvas;
   @apply border-t border-r-0 border-l-0;
-  contain: strict;
+  contain: layout style;
   -webkit-user-select: none;
   font-size: 14px;
 }
@@ -50,7 +50,7 @@
   box-sizing: inherit;
 }
 
-@supports not (contain: strict) {
+@supports not (contain: layout style) {
   .rdg {
     position: relative;
     z-index: 0;
@@ -87,19 +87,24 @@
 .rdg-header-row .rdg-cell p {
   @apply text-typography-body-light [[data-theme*=dark]_&]:text-typography-body-dark;
 }
+
 .rdg-header-row .rdg-cell .react-contextmenu-wrapper {
   @apply flex h-full items-center px-2 transition duration-100 ease-in-out;
 }
+
 .rdg-header-row .rdg-cell .react-contextmenu-wrapper:hover {
   @apply bg-surface-200;
 }
+
 .rdg-header-row .rdg-checkbox {
   @apply bg-surface-200 border-default rounded-sm border;
 }
-.rdg-header-row .rdg-checkbox-input:checked + .rdg-checkbox {
+
+.rdg-header-row .rdg-checkbox-input:checked+.rdg-checkbox {
   @apply border-default border-4 bg-green-900;
 }
-.rdg-header-row .rdg-checkbox-input:focus + .rdg-checkbox {
+
+.rdg-header-row .rdg-checkbox-input:focus+.rdg-checkbox {
   box-shadow: none;
 }
 
@@ -122,6 +127,7 @@
 .rdg-row__select-column__edit-action {
   @apply opacity-0;
 }
+
 .rdg-row:hover .rdg-row__select-column__edit-action {
   @apply opacity-100;
 }
@@ -144,6 +150,7 @@
 */
 
 .sb-grid {
+
   /* reset styles */
   [type='checkbox'] {
     webkit-appearance: none;
@@ -215,15 +222,18 @@
   min-width: 200px;
   z-index: 100;
 }
+
 .react-contexify__submenu--is-open,
-.react-contexify__submenu--is-open > .react-contexify__item__content {
+.react-contexify__submenu--is-open>.react-contexify__item__content {
   color: white;
   background-color: #4393e6;
 }
-.react-contexify__submenu--is-open > .react-contexify__submenu {
+
+.react-contexify__submenu--is-open>.react-contexify__submenu {
   pointer-events: initial;
   opacity: 1;
 }
+
 .react-contexify .react-contexify__submenu {
   position: absolute;
   /* negate padding */
@@ -231,35 +241,41 @@
   pointer-events: none;
   transition: opacity 0.275s;
 }
+
 .react-contexify__submenu-arrow {
   margin-left: auto;
   font-size: 12px;
 }
+
 .react-contexify__will-leave--disabled {
   pointer-events: none;
 }
+
 .react-contexify__item {
   cursor: pointer;
   position: relative;
 }
+
 .react-contexify__item:focus {
   outline: 0;
 }
-.react-contexify__item:not(.react-contexify__item--disabled):hover
-  > .react-contexify__item__content,
-.react-contexify__item:not(.react-contexify__item--disabled):focus
-  > .react-contexify__item__content {
+
+.react-contexify__item:not(.react-contexify__item--disabled):hover>.react-contexify__item__content,
+.react-contexify__item:not(.react-contexify__item--disabled):focus>.react-contexify__item__content {
   color: white;
   background-color: #4393e6;
 }
-.react-contexify__item:not(.react-contexify__item--disabled):hover > .react-contexify__submenu {
+
+.react-contexify__item:not(.react-contexify__item--disabled):hover>.react-contexify__submenu {
   pointer-events: initial;
   opacity: 1;
 }
+
 .react-contexify__item--disabled {
   cursor: default;
   opacity: 0.5;
 }
+
 .react-contexify__item__content {
   font-size: 13px;
   padding: 6px 12px;
@@ -512,7 +528,7 @@
   @apply flex h-5 w-5;
 }
 
-.sb-grid-status-label__no-msg > div {
+.sb-grid-status-label__no-msg>div {
   @apply m-auto h-2 w-2 rounded-full bg-green-900;
 }
 
