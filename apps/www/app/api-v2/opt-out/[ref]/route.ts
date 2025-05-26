@@ -34,10 +34,7 @@ export async function POST(req: NextRequest, { params }: { params: { ref: string
   // Validate reason
   const allowedReasons = ['phishing', 'advertisement', 'malware', 'scam', 'other']
   if (!allowedReasons.includes(reason)) {
-    return NextResponse.json(
-      { error: 'Bad Request: Invalid reason provided.' },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: 'Bad Request: Invalid reason provided.' }, { status: 400 })
   }
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
