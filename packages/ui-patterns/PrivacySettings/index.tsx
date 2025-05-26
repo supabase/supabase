@@ -1,9 +1,11 @@
 'use client'
 
-import { useConsentState } from 'common'
 import Link from 'next/link'
 import { PropsWithChildren, useState } from 'react'
+
+import { useConsentState } from 'common'
 import { Modal, Toggle } from 'ui'
+import { Admonition } from '../admonition'
 
 interface PrivacySettingsProps {
   className?: string
@@ -64,7 +66,24 @@ export const PrivacySettings = ({
         size="medium"
       >
         <div className="pt-3 divide-y divide-border">
-          {categories &&
+          {categories === null ? (
+            <Modal.Content>
+              <Admonition
+                type="warning"
+                title="Unable to Load Privacy Settings"
+                description={
+                  <>
+                    We couldn't load the privacy settings due to an ad blocker or network error.
+                    Please disable any ad blockers and try again. If the problem persists, please{' '}
+                    <Link href="https://supabase.com/dashboard/support/new" className="underline">
+                      contact support
+                    </Link>
+                    .
+                  </>
+                }
+              />
+            </Modal.Content>
+          ) : (
             [...categories]
               .reverse()
               .map((category) => (
@@ -73,7 +92,8 @@ export const PrivacySettings = ({
                   category={category}
                   handleServicesChange={handleServicesChange}
                 />
-              ))}
+              ))
+          )}
         </div>
       </Modal>
     </>
