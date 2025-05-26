@@ -3,10 +3,12 @@ import { ChevronDown, ExternalLink, User as IconUser, Loader2, Search, X } from 
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { useCustomAccessTokenHookDetails } from 'hooks/misc/useCustomAccessTokenHookDetails'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { ResponseError } from 'types'
 import {
@@ -16,6 +18,8 @@ import {
   CollapsibleTrigger_Shadcn_,
   Input,
   Switch,
+  ScrollArea,
+  cn,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
@@ -27,6 +31,14 @@ const UserImpersonationSelector = () => {
   const [aal, setAal] = useState<AuthenticatorAssuranceLevels>('aal1')
   const [externalUserId, setExternalUserId] = useState('')
   const [additionalClaims, setAdditionalClaims] = useState('')
+
+  const { id: tableId } = useParams()
+
+  const [previousSearches, setPreviousSearches] = useLocalStorage<User[]>(
+    LOCAL_STORAGE_KEYS.USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES(tableId!),
+    []
+  )
+
   const [showExternalAuth, setShowExternalAuth] = useState(false)
   const state = useRoleImpersonationStateSnapshot()
   const debouncedSearchText = useDebounce(searchText, 300)
@@ -66,6 +78,14 @@ const UserImpersonationSelector = () => {
 
   async function impersonateUser(user: User) {
     setIsImpersonateLoading(true)
+    setPreviousSearches((prev) => {
+      // Remove if already present
+      const filtered = prev.filter((u) => u.id !== user.id)
+      // Add new user to the end
+      const updated = [...filtered, user]
+      // Keep only the last 6
+      return updated.slice(-6)
+    })
 
     if (customAccessTokenHookDetails?.type === 'https') {
       toast.info(
@@ -142,6 +162,16 @@ const UserImpersonationSelector = () => {
       ? state.role.externalAuth.sub
       : undefined
 
+  // Clear all search history
+  function clearSearchHistory() {
+    setPreviousSearches([])
+  }
+
+  // Select a previous search
+  function selectPreviousSearch(prevUser: User) {
+    setSearchText(prevUser.email ?? prevUser.phone ?? prevUser.id ?? '')
+  }
+
   return (
     <div className="flex flex-col gap-1">
       <h2 className="text-foreground text-sm">
@@ -155,7 +185,7 @@ const UserImpersonationSelector = () => {
 
       {/* Check for both regular user and external auth impersonation since they use different data structures but both need to be handled for displaying impersonation UI */}
       {!impersonatingUser && !isExternalAuthImpersonating ? (
-        <div className="flex flex-col gap-2 mt-2">
+        <div className="flex flex-col gap-2 mt-2 relative">
           <Input
             className="table-editor-search border-none"
             icon={
@@ -169,7 +199,7 @@ const UserImpersonationSelector = () => {
                 <Search className="text-foreground-lighter" size={16} strokeWidth={1.5} />
               )
             }
-            placeholder="Search for a user.."
+            placeholder="Search by id, email, phone, or name..."
             onChange={(e) => setSearchText(e.target.value)}
             value={searchText}
             size="small"
@@ -283,7 +313,7 @@ const UserImpersonationSelector = () => {
               {isLoading && (
                 <div className="flex flex-col gap-2 items-center justify-center h-24">
                   <Loader2 className="animate-spin" size={24} />
-                  <span>Loading users...</span>
+                  <span className="text-foreground-light">Loading users...</span>
                 </div>
               )}
 
@@ -291,17 +321,19 @@ const UserImpersonationSelector = () => {
 
               {isSuccess &&
                 (users.length > 0 ? (
-                  <ul className="divide-y max-h-[150px] overflow-y-scroll" role="list">
-                    {users.map((user) => (
-                      <li key={user.id} role="listitem">
-                        <UserRow
-                          user={user}
-                          onClick={impersonateUser}
-                          isLoading={isImpersonateLoading}
-                        />
-                      </li>
-                    ))}
-                  </ul>
+                  <div>
+                    <ul className="divide-y max-h-[150px] overflow-y-scroll" role="list">
+                      {users.map((user) => (
+                        <li key={user.id} role="listitem">
+                          <UserRow
+                            user={user}
+                            onClick={impersonateUser}
+                            isLoading={isImpersonateLoading}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 ) : (
                   <div className="flex flex-col gap-2 items-center justify-center h-24">
                     <p className="text-foreground-light text-xs" role="status">
@@ -309,6 +341,52 @@ const UserImpersonationSelector = () => {
                     </p>
                   </div>
                 ))}
+              {previousSearches.length > 0 && (
+                <div className="border-t">
+                  {previousSearches.length > 0 ? (
+                    <>
+                      <Collapsible_Shadcn_ className="mt-2 relative">
+                        <CollapsibleTrigger_Shadcn_ className="group font-normal p-0 [&[data-state=open]>div>svg]:!-rotate-180">
+                          <div className="flex items-center gap-x-1 w-full">
+                            <p className="text-xs text-foreground-light group-hover:text-foreground transition">
+                              Recents
+                            </p>
+                            <ChevronDown
+                              className="transition-transform duration-200"
+                              strokeWidth={1.5}
+                              size={14}
+                            />
+                          </div>
+                        </CollapsibleTrigger_Shadcn_>
+
+                        <CollapsibleContent_Shadcn_ className="mt-1 flex flex-col gap-y-4">
+                          <Button
+                            size="tiny"
+                            type="text"
+                            className="absolute right-0 top-0 py-2 hover:bg-muted flex items-center text"
+                            onClick={clearSearchHistory}
+                          >
+                            <span className="flex items-center">Clear</span>
+                          </Button>
+                          <ScrollArea
+                            className={cn(previousSearches.length > 3 ? 'h-36' : 'h-auto')}
+                          >
+                            <ul className="grid gap-2 ">
+                              {previousSearches.map((search) => (
+                                <li key={search.id}>
+                                  <UserRow user={search} onClick={impersonateUser} />
+                                </li>
+                              ))}
+                            </ul>
+                          </ScrollArea>
+                        </CollapsibleContent_Shadcn_>
+                      </Collapsible_Shadcn_>
+                    </>
+                  ) : (
+                    <div className="p-4 text-center text-muted-foreground">No recent searches</div>
+                  )}
+                </div>
+              )}
             </>
           )}
         </div>
@@ -441,22 +519,36 @@ interface UserRowProps {
 
 const UserRow = ({ user, onClick, isImpersonating = false, isLoading = false }: UserRowProps) => {
   const avatarUrl = getAvatarUrl(user)
-  const displayName =
-    getDisplayName(user, user.email ?? user.phone ?? user.id ?? 'Unknown') +
-    (user.is_anonymous ? ' (anonymous)' : '')
+  const emailOrPhone = user.email || user.phone
+  const displayName = getDisplayName(user, '')
+  const isAnonymous = user.is_anonymous
+  const showDisplayName = displayName && displayName !== emailOrPhone
 
   return (
     <div className="flex items-center justify-between py-1 text-foreground">
       <div className="flex items-center gap-4">
         {avatarUrl ? (
-          <img className="rounded-full w-5 h-5" src={avatarUrl} alt={displayName} />
+          <img className="rounded-full w-5 h-5" src={avatarUrl} alt={displayName || emailOrPhone} />
         ) : (
-          <div className="rounded-full w-[21px] h-[21px] bg-surface-300 border text-muted flex items-center justify-center text-background">
+          <div className="rounded-full w-[21px] h-[21px] bg-surface-300 border flex items-center justify-center text-foreground-lighter">
             <IconUser size={12} strokeWidth={2} />
           </div>
         )}
 
-        <span className="text-sm">{displayName}</span>
+        <span className="text-sm flex items-center gap-4">
+          {emailOrPhone}
+          {showDisplayName && (
+            <>
+              <span className="text-foreground-lighter">
+                {displayName}
+                {isAnonymous ? ' (anonymous)' : ''}
+              </span>
+            </>
+          )}
+          <span className="text-foreground-light bg-surface-200 dark:bg-surface-400 rounded-md px-1 py-0.5 font-mono text-xs">
+            {user?.id?.slice(0, 8)}
+          </span>
+        </span>
       </div>
 
       <Button type="default" onClick={() => onClick(user)} disabled={isLoading} loading={isLoading}>

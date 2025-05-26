@@ -64,15 +64,16 @@ export const PrivacySettings = ({
         size="medium"
       >
         <div className="pt-3 divide-y divide-border">
-          {categories
-            ?.toReversed()
-            .map((category) => (
-              <Category
-                key={category.slug}
-                category={category}
-                handleServicesChange={handleServicesChange}
-              />
-            ))}
+          {categories &&
+            [...categories]
+              .reverse()
+              .map((category) => (
+                <Category
+                  key={category.slug}
+                  category={category}
+                  handleServicesChange={handleServicesChange}
+                />
+              ))}
         </div>
       </Modal>
     </>
