@@ -2334,7 +2334,7 @@ Yes, the MCP Server can perform actions like creating tables, running queries, a
     slug: 'mcp-server',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
-      availableOnSelfHosted: false,
+      availableOnSelfHosted: true,
     },
   },
   {
