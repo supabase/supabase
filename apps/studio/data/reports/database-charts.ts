@@ -44,7 +44,11 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       showMaxValue: true,
       showGrid: true,
       syncId: 'database-reports',
-      YAxisProps: { width: 60, tickFormatter: (value: any) => formatBytes(value, 0) },
+      valuePrecision: 2,
+      YAxisProps: {
+        width: 60,
+        tickFormatter: (value: any) => formatBytes(value, 2),
+      },
       attributes: [
         {
           attribute: 'ram_usage_used',
@@ -71,6 +75,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
           attribute: 'ram_usage_swap',
           provider: 'infra-monitoring',
           label: 'Swap',
+          omitFromTotal: false, // we can set this to true if we want to omit the swap from the total
           tooltip:
             'Memory swapped to disk when RAM is full. An instance has 1GB of SWAP. High swap with high disk I/O signals memory stress.',
         },

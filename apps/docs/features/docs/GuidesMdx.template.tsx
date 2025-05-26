@@ -104,7 +104,7 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
                   'transition-colors'
                 )}
                 target="_blank"
-                rel="noreferrer noopener"
+                rel="noreferrer noopener edit"
               >
                 Edit this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
               </a>

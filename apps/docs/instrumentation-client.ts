@@ -18,6 +18,20 @@ if (!IS_DEV) {
       // now.
       /(?:text content does not match)|hydration|hydrating/i,
     ],
+
+    beforeSend(event) {
+      const frames = event.exception?.values?.[0].stacktrace?.frames || []
+
+      // Drop errors not originating from docs app static files as unactionable
+      if (
+        frames &&
+        !frames.some((frame) => frame.filename && frame.filename.startsWith('app:///_next'))
+      ) {
+        return null
+      }
+
+      return event
+    },
   })
 }
 

@@ -84,8 +84,8 @@ export const PrivacySettings = ({
               />
             </Modal.Content>
           ) : (
-            categories
-              .toReversed()
+            [...categories]
+              .reverse()
               .map((category) => (
                 <Category
                   key={category.slug}

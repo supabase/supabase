@@ -84,12 +84,20 @@ const CustomTooltip = ({
     const isNetworkChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('network_'))
     const shouldFormatBytes = isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
 
-    const total =
-      showTotal &&
-      calculateTotalChartAggregate(
-        payload,
-        maxValueAttribute?.attribute ? [maxValueAttribute.attribute] : []
-      )
+    const attributesToIgnore =
+      attributes?.filter((a) => a.omitFromTotal)?.map((a) => a.attribute) ?? []
+    const referenceLines =
+      attributes
+        ?.filter((attribute: MultiAttribute) => attribute?.provider === 'reference-line')
+        ?.map((a: MultiAttribute) => a.attribute) ?? []
+
+    const attributesToIgnoreFromTotal = [
+      ...attributesToIgnore,
+      ...referenceLines,
+      ...(maxValueAttribute?.attribute ? [maxValueAttribute.attribute] : []),
+    ]
+
+    const total = showTotal && calculateTotalChartAggregate(payload, attributesToIgnoreFromTotal)
 
     const getIcon = (color: string, isMax: boolean) =>
       isMax ? <MaxConnectionsIcon /> : <CustomIcon color={color} />
