@@ -16,7 +16,8 @@ import {
   ProjectUpgradeTargetVersion,
   useProjectUpgradeEligibilityQuery,
 } from 'data/config/project-upgrade-eligibility-query'
-import { ReleaseChannel, useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
+import { ReleaseChannel } from 'data/projects/new-project.constants'
+import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'

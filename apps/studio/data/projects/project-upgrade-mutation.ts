@@ -1,16 +1,12 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import { components } from 'api-types'
 
-export type ReleaseChannel = components['schemas']['ReleaseChannel']
-
-export type ProjectUpgradeVariables = {
+export type ProjectUpgradeVariables = components['schemas']['UpgradeDatabaseBody'] & {
   ref: string
-  target_version: string
-  release_channel: ReleaseChannel
 }
 
 export async function upgradeProject({

@@ -27,7 +27,7 @@ export function handlePageTelemetry(
   featureFlags?: {
     [key: string]: unknown
   },
-  telemetryDataOverride?: components['schemas']['TelemetryPageBodyV2Dto']
+  telemetryDataOverride?: components['schemas']['TelemetryPageBodyV2']
 ) {
   return post(
     `${ensurePlatformSuffix(API_URL)}/telemetry/page`,
@@ -179,7 +179,7 @@ export const PageTelemetry = ({
 // EVENT TELEMETRY
 // ---
 
-type EventBody = components['schemas']['TelemetryEventBodyV2Dto']
+type EventBody = components['schemas']['TelemetryEventBodyV2']
 
 export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathname?: string) {
   const consent = hasConsented()
