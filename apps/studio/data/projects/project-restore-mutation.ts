@@ -3,14 +3,11 @@ import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import { components } from 'api-types'
-
-export type ReleaseChannel = components['schemas']['ReleaseChannel']
-export type PostgresEngine = components['schemas']['PostgresEngine']
+import { PostgresEngine, ReleaseChannel } from './new-project.constants'
 
 export type ProjectRestoreVariables = {
   ref: string
-  postgresEngine?: PostgresEngine
+  postgresEngine?: Exclude<PostgresEngine, '13' | '14'>
   releaseChannel?: ReleaseChannel
 }
 
