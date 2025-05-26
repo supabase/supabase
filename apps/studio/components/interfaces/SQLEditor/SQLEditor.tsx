@@ -17,6 +17,7 @@ import { constructHeaders, isValidConnString } from 'data/fetchers'
 import { lintKeys } from 'data/lint/keys'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { isError } from 'data/utils/error-check'
@@ -142,8 +143,14 @@ export const SQLEditor = () => {
   useAddDefinitions(id, monacoRef.current)
 
   /** React query data fetching  */
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+  // only need to check subscription settings if org is opted into AI
+  let hasHipaaAddon: boolean = false
+  if (isOptedInToAI) {
+    const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+    const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
+    hasHipaaAddon =
+      subscriptionHasHipaaAddon(subscription) && (projectSettings?.is_sensitive || false)
+  }
 
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery(
     {

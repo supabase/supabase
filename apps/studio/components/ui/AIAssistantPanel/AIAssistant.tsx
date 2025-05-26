@@ -15,6 +15,7 @@ import OptInToOpenAIToggle from 'components/interfaces/Organization/GeneralSetti
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { constructHeaders } from 'data/fetchers'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useTablesQuery } from 'data/tables/tables-query'
@@ -91,7 +92,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
   const selectedOrganization = useSelectedOrganization()
-  const { id: entityId } = useParams()
+  const { ref: ref, id: entityId } = useParams()
   const searchParams = useSearchParamsShallow()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
@@ -116,7 +117,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const snippetContent = snippet?.snippet?.content?.sql
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: project?.ref || ref })
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
 
   const { data: tables, isLoading: isLoadingTables } = useTablesQuery(
     {
@@ -131,8 +133,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const currentSchema = searchParams?.get('schema') ?? 'public'
   const currentChat = snap.activeChat?.name
 
-  const { ref } = useParams()
-  const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
 
   const handleError = useCallback((error: Error) => {
@@ -237,12 +237,18 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     if (content.includes('Help me to debug')) {
       sendEvent({
         action: 'assistant_debug_submitted',
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+        groups: {
+          project: ref ?? 'Unknown',
+          organization: selectedOrganization?.slug ?? 'Unknown',
+        },
       })
     } else {
       sendEvent({
         action: 'assistant_prompt_submitted',
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+        groups: {
+          project: ref ?? 'Unknown',
+          organization: selectedOrganization?.slug ?? 'Unknown',
+        },
       })
     }
   }
@@ -364,7 +370,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 title="Project metadata is not shared"
                 description={
                   hasHipaaAddon
-                    ? 'Your organization has the HIPAA addon and will not send any project metadata with your prompts.'
+                    ? 'Your organization has the HIPAA addon and will not send project metadata with your prompts for projects marked as HIPAA.'
                     : 'The Assistant can improve the quality of the answers if you send project metadata along with your prompts. Opt into sending anonymous data to share your schema and table definitions.'
                 }
                 className="border-0 border-b rounded-none bg-background"
