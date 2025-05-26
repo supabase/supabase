@@ -2258,7 +2258,7 @@ Supabase Queues provides the reliability of Postgres with the simplicity of Supa
   },
   {
     title: 'MCP Server',
-    subtitle: 'Connect your AI tools to Supabase using the Model Context Protocol (MCP).',
+    subtitle: 'Connect your AI tools using the official Supabase Model Context Protocol (MCP) server.',
     description: `
 The MCP Server bridges the gap between AI tools and your Supabase projects, enabling natural language commands and agent-like experiences for database management. It standardizes how Large Language Models (LLMs) communicate with platforms like Supabase, allowing AI tools such as Cursor, Claude, and Windsurf to spin up projects, design tables, query data, and manage configurations—all through a unified protocol.
 
