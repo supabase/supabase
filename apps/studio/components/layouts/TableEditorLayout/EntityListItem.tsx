@@ -54,10 +54,6 @@ export interface EntityListItemProps {
   isActive?: boolean
 }
 
-function isTableLikeEntityListItem(entity: { type?: string }) {
-  return entity?.type === ENTITY_TYPE.TABLE || entity?.type === ENTITY_TYPE.PARTITIONED_TABLE
-}
-
 const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   id,
   projectRef,
