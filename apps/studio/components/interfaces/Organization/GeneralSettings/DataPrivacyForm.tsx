@@ -4,9 +4,12 @@ import { Form_Shadcn_, Card, CardContent, CardFooter } from 'ui'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { useAIOptInForm } from 'hooks/forms/useAIOptInForm'
 import { AIOptInLevelSelector } from './AIOptInLevelSelector'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 const DataPrivacyForm = () => {
-  const { form, onSubmit, isUpdating, canUpdateOrganization, currentOptInLevel } = useAIOptInForm()
+  const { form, onSubmit, isUpdating, currentOptInLevel } = useAIOptInForm()
+  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
   useEffect(() => {
     form.reset({ aiOptInLevel: currentOptInLevel })

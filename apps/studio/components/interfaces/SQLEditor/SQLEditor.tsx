@@ -94,13 +94,8 @@ export const SQLEditor = () => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
-  const aiOptInLevel = useOrgAiOptInLevel()
+  const { includeSchemaMetadata } = useOrgAiOptInLevel()
   const [selectedSchemas] = useSchemasForAi(project?.ref!)
-  const includeSchemaMetadata =
-    aiOptInLevel === 'schema' ||
-    aiOptInLevel === 'schema_and_log' ||
-    aiOptInLevel === 'schema_and_log_and_data' ||
-    !IS_PLATFORM
   const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   const {

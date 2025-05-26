@@ -110,7 +110,7 @@ const OrganizationDetailsForm = () => {
               >
                 <Input
                   disabled
-                  className="w-96 max-w-full"
+                  className="w-64 max-w-full"
                   id="slug"
                   value={selectedOrganization?.slug ?? ''}
                 />

@@ -12,6 +12,8 @@ import {
 } from 'ui'
 import { useAIOptInForm } from 'hooks/forms/useAIOptInForm'
 import { AIOptInLevelSelector } from 'components/interfaces/Organization/GeneralSettings/AIOptInLevelSelector'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 
 interface AIOptInModalProps {
   visible: boolean
@@ -19,8 +21,8 @@ interface AIOptInModalProps {
 }
 
 export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
-  const { form, onSubmit, isUpdating, canUpdateOrganization, currentOptInLevel } =
-    useAIOptInForm(onCancel)
+  const { form, onSubmit, isUpdating, currentOptInLevel } = useAIOptInForm(onCancel)
+  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
   useEffect(() => {
     if (visible) {

@@ -95,7 +95,6 @@ export const useAIOptInForm = (onSuccessCallback?: () => void) => {
     form,
     onSubmit,
     isUpdating,
-    canUpdateOrganization,
     currentOptInLevel: getAiOptInLevel(selectedOrganization?.opt_in_tags),
   }
 }

@@ -1,4 +1,4 @@
-import { Message as VercelMessage } from '@ai-sdk/react'
+import { Message as VercelMessage } from 'ai/react'
 import { User } from 'lucide-react'
 import { createContext, PropsWithChildren, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'

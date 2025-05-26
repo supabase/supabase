@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import type { Message as MessageType } from 'ai/react'
 import { useChat } from 'ai/react'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -17,12 +16,11 @@ import { constructHeaders } from 'data/fetchers'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import { BASE_PATH, IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -97,8 +95,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const { ref: scrollContainerRef, isSticky, scrollToEnd } = useAutoScroll()
 
-  // TODO: How do we handle IS_PLATFORM here?
-  let aiOptInLevel = useOrgAiOptInLevel()
+  const { aiOptInLevel } = useOrgAiOptInLevel()
 
   // Add a ref to store the last user message
   const lastUserMessageRef = useRef<MessageType | null>(null)
@@ -175,8 +172,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     onError: handleError,
     onFinish: handleChatFinish,
   })
-
-  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
   const updateMessage = useCallback(
     ({

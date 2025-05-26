@@ -38,7 +38,6 @@ export async function updateOrganization({
 }
 
 type OrganizationUpdateData = Awaited<ReturnType<typeof updateOrganization>>
-export type { OrganizationUpdateData }
 
 export const useOrganizationUpdateMutation = ({
   onSuccess,

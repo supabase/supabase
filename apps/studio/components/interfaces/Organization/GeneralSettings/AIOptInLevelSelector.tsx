@@ -12,6 +12,29 @@ interface AIOptInLevelSelectorProps {
   layout?: 'horizontal' | 'vertical' | 'flex-row-reverse'
 }
 
+const AI_OPT_IN_LEVELS = [
+  {
+    value: 'disabled',
+    title: 'Disabled',
+    description: 'No data is sent to OpenAI, responses will be generic.',
+  },
+  {
+    value: 'schema',
+    title: 'Schema Only',
+    description: 'Send only your database schema to OpenAI for better responses.',
+  },
+  {
+    value: 'schema_and_log',
+    title: 'Schema & Logs',
+    description: 'Send schema and logging data for improved AI responses.',
+  },
+  {
+    value: 'schema_and_log_and_data',
+    title: 'Schema, Logs & Data',
+    description: 'Send schema, logs, and query data for the best AI responses.',
+  },
+]
+
 export const AIOptInLevelSelector = ({
   control,
   disabled,
@@ -19,9 +42,9 @@ export const AIOptInLevelSelector = ({
   layout = 'vertical',
 }: AIOptInLevelSelectorProps) => {
   const content = (
-    <div className="space-y-4">
+    <div>
       <FormField_Shadcn_
-        control={control as any}
+        control={control}
         name="aiOptInLevel"
         render={({ field }) => (
           <RadioGroup_Shadcn_
@@ -30,28 +53,7 @@ export const AIOptInLevelSelector = ({
             disabled={disabled}
             className="space-y-2 mb-6"
           >
-            {[
-              {
-                value: 'disabled',
-                title: 'Disabled',
-                description: 'No data is sent to OpenAI, responses will be generic.',
-              },
-              {
-                value: 'schema',
-                title: 'Schema Only',
-                description: 'Send only your database schema to OpenAI for better responses.',
-              },
-              {
-                value: 'schema_and_log',
-                title: 'Schema & Logs',
-                description: 'Send schema and logging data for improved AI responses.',
-              },
-              {
-                value: 'schema_and_log_and_data',
-                title: 'Schema, Logs & Data',
-                description: 'Send schema, logs, and query data for the best AI responses.',
-              },
-            ].map((item) => (
+            {AI_OPT_IN_LEVELS.map((item) => (
               <div key={item.value} className="flex items-start space-x-3">
                 <RadioGroupItem_Shadcn_
                   value={item.value}

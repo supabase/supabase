@@ -1,17 +1,19 @@
-import React, { useState, useMemo, DragEvent } from 'react'
+import React, { useState, useMemo, DragEvent, PropsWithChildren } from 'react'
 import { useRouter } from 'next/router'
-import { MessagePart } from '@ai-sdk/react' // Assuming this type is needed
 
 import { QueryBlock, DEFAULT_CHART_CONFIG } from '../QueryBlock/QueryBlock'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { findResultForManualId } from './Message.utils' // We'll move the helper here or import
+import { findResultForManualId } from './Message.utils'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { identifyQueryType } from './AIAssistant.utils'
+import { useParams } from 'common/hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { Message } from 'ai/react'
 
 interface DisplayBlockRendererProps {
   messageId: string
@@ -24,19 +26,19 @@ interface DisplayBlockRendererProps {
     xAxis?: string
     yAxis?: string
   }
-  messageParts: Readonly<MessagePart[]> | undefined
+  messageParts: Readonly<Message['parts']> | undefined
   isLoading: boolean
   onResults: (args: { messageId: string; resultId?: string; results: any[] }) => void
 }
 
-export const DisplayBlockRenderer: React.FC<DisplayBlockRendererProps> = ({
+export const DisplayBlockRenderer = ({
   messageId,
   manualId,
   initialArgs,
   messageParts,
   isLoading,
   onResults,
-}) => {
+}: PropsWithChildren<DisplayBlockRendererProps>) => {
   // --- Hooks ---
   const snap = useAiAssistantStateSnapshot()
   const router = useRouter()
@@ -47,6 +49,8 @@ export const DisplayBlockRenderer: React.FC<DisplayBlockRendererProps> = ({
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
+  const { ref } = useParams()
+  const org = useSelectedOrganization()
 
   const [chartConfig, setChartConfig] = useState<ChartConfig>(() => ({
     ...DEFAULT_CHART_CONFIG,
@@ -77,6 +81,10 @@ export const DisplayBlockRenderer: React.FC<DisplayBlockRendererProps> = ({
       properties: {
         queryType,
         ...(queryType === 'mutation' ? { category: identifyQueryType(sqlQuery) ?? 'unknown' } : {}),
+      },
+      groups: {
+        project: ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
       },
     })
   }

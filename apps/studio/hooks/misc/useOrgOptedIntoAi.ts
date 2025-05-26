@@ -1,6 +1,7 @@
 import { useDisallowHipaa } from 'hooks/misc/useDisallowHipaa'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { OPT_IN_TAGS } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 
 export type AiOptInLevel = 'disabled' | 'schema' | 'schema_and_log' | 'schema_and_log_and_data'
 
@@ -41,10 +42,13 @@ export function useOrgOptedIntoAi(): boolean {
 }
 
 /**
- * Determines the organization's specific AI opt-in level.
- * @returns AiOptInLevel ('disabled', 'schema', 'schema_and_log', or 'schema_and_log_and_data')
+ * Determines the organization's specific AI opt-in level and whether schema metadata should be included.
+ * @returns Object with aiOptInLevel and includeSchemaMetadata
  */
-export function useOrgAiOptInLevel(): AiOptInLevel {
+export function useOrgAiOptInLevel(): {
+  aiOptInLevel: AiOptInLevel
+  includeSchemaMetadata: boolean
+} {
   const selectedOrganization = useSelectedOrganization()
   const optInTags = selectedOrganization?.opt_in_tags
 
@@ -52,5 +56,16 @@ export function useOrgAiOptInLevel(): AiOptInLevel {
   const level = getAiOptInLevel(optInTags)
 
   const disallowHipaa = useDisallowHipaa()
-  return disallowHipaa(level !== 'disabled') ? level : 'disabled'
+  const aiOptInLevel = disallowHipaa(level !== 'disabled') ? level : 'disabled'
+
+  const includeSchemaMetadata =
+    aiOptInLevel === 'schema' ||
+    aiOptInLevel === 'schema_and_log' ||
+    aiOptInLevel === 'schema_and_log_and_data' ||
+    !IS_PLATFORM
+
+  return {
+    aiOptInLevel,
+    includeSchemaMetadata,
+  }
 }
