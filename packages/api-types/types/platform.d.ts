@@ -3175,6 +3175,93 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/replication/{ref}/destinations': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets replication destinations */
+    get: operations['ReplicationDestinationsController_getDestinations']
+    put?: never
+    /** Creates a destination */
+    post: operations['ReplicationDestinationsController_createDestination']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/destinations-pipelines': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Creates a replication destination and pipeline. */
+    post: operations['ReplicationDestinationsPipelinesController_createDestinationPipeline']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/destinations-pipelines/{destination_id}/{pipeline_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Updates a replication destination and pipeline */
+    post: operations['ReplicationDestinationsPipelinesController_updateDestinationPipeline']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/destinations/{destinaion_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Updates a destination */
+    post: operations['ReplicationDestinationsController_updateDestination']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/replication/{ref}/destinations/{destination_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets a destination by id */
+    get: operations['ReplicationDestinationsController_getDestination']
+    put?: never
+    post?: never
+    /** Deletes a destination */
+    delete: operations['ReplicationDestinationsController_deleteDestination']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/replication/{ref}/pipelines': {
     parameters: {
       query?: never
@@ -3258,77 +3345,6 @@ export interface paths {
     /** Stops a pipeline */
     post: operations['ReplicationPipelinesController_stopPipeline']
     delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/replication/{ref}/sinks': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets replication sinks */
-    get: operations['ReplicationSinksController_getSinks']
-    put?: never
-    /** Creates a sink */
-    post: operations['ReplicationSinksController_createSink']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/replication/{ref}/sinks-pipelines': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Creates a replication sink and pipeline. */
-    post: operations['ReplicationSinksPipelinesController_createSinkPipeline']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/replication/{ref}/sinks-pipelines/{sink_id}/{pipeline_id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Updates a replication sink and pipeline */
-    post: operations['ReplicationSinksPipelinesController_updateSinkPipeline']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/replication/{ref}/sinks/{sink_id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets a sink by id */
-    get: operations['ReplicationSinksController_getSink']
-    put?: never
-    /** Updates a sink */
-    post: operations['ReplicationSinksController_updateSink']
-    /** Deletes a sink */
-    delete: operations['ReplicationSinksController_deleteSink']
     options?: never
     head?: never
     patch?: never
@@ -4330,6 +4346,15 @@ export interface components {
       /** Format: uuid */
       parent_id?: string
     }
+    CreateDestinationPipelineResponse: {
+      /** @description Destination id */
+      destination_id: number
+      /** @description Pipeline id */
+      pipeline_id: number
+    }
+    CreateDestinationResponse: {
+      id: number
+    }
     CreateExtensionBody: {
       cascade: boolean
       name: string
@@ -4617,6 +4642,46 @@ export interface components {
       publish_update?: boolean
       tables?: string[] | null
     }
+    CreateReplicationDestinationBody: {
+      /** @description BigQuery dataset id */
+      dataset_id: string
+      /** @description Destination name */
+      destination_name: string
+      /** @description Max staleness in minutes */
+      max_staleness_mins: number
+      /** @description BigQuery project id */
+      project_id: string
+      /** @description BigQuery service account key */
+      service_account_key: string
+    }
+    CreateReplicationDestinationPipelineBody: {
+      /** @description Destination config */
+      destination_config: {
+        big_query: {
+          /** @description BigQuery dataset id */
+          dataset_id: string
+          /** @description Max staleness in minutes */
+          max_staleness_mins: number
+          /** @description BigQuery project id */
+          project_id: string
+          /** @description BigQuery service account key */
+          service_account_key: string
+        }
+      }
+      /** @description Destination name */
+      destination_name: string
+      /** @description Pipeline config */
+      pipeline_config: {
+        config: {
+          max_fill_secs: number
+          max_size: number
+        }
+      }
+      /** @description Publication name */
+      publication_name: string
+      /** @description Source id */
+      source_id: number
+    }
     CreateReplicationPipelineBody: {
       /** @description Pipeline config */
       config: {
@@ -4625,10 +4690,10 @@ export interface components {
           max_size: number
         }
       }
+      /** @description Destination id */
+      destination_id: number
       /** @description Publication name */
       publication_name: string
-      /** @description Sink id */
-      sink_id: number
       /** @description Source id */
       source_id: number
     }
@@ -4641,58 +4706,9 @@ export interface components {
         schema: string
       }[]
     }
-    CreateReplicationSinkBody: {
-      /** @description BigQuery dataset id */
-      dataset_id: string
-      /** @description Max staleness in minutes */
-      max_staleness_mins: number
-      /** @description BigQuery project id */
-      project_id: string
-      /** @description BigQuery service account key */
-      service_account_key: string
-      /** @description Sink name */
-      sink_name: string
-    }
-    CreateReplicationSinkPipelineBody: {
-      /** @description Pipeline config */
-      pipeline_config: {
-        config: {
-          max_fill_secs: number
-          max_size: number
-        }
-      }
-      /** @description Publication name */
-      publication_name: string
-      /** @description Sink config */
-      sink_config: {
-        big_query: {
-          /** @description BigQuery dataset id */
-          dataset_id: string
-          /** @description Max staleness in minutes */
-          max_staleness_mins: number
-          /** @description BigQuery project id */
-          project_id: string
-          /** @description BigQuery service account key */
-          service_account_key: string
-        }
-      }
-      /** @description Sink name */
-      sink_name: string
-      /** @description Source id */
-      source_id: number
-    }
     CreateSchemaBody: {
       name: string
       owner: string
-    }
-    CreateSinkPipelineResponse: {
-      /** @description Pipeline id */
-      pipeline_id: number
-      /** @description Sink id */
-      sink_id: number
-    }
-    CreateSinkResponse: {
-      id: number
     }
     CreateSourceResponse: {
       id: number
@@ -5639,7 +5655,6 @@ export interface components {
       MAILER_TEMPLATES_MAGIC_LINK_CONTENT: string
       MAILER_TEMPLATES_REAUTHENTICATION_CONTENT: string
       MAILER_TEMPLATES_RECOVERY_CONTENT: string
-      MFA_ALLOW_LOW_AAL: boolean
       MFA_MAX_ENROLLED_FACTORS: number
       MFA_PHONE_ENROLL_ENABLED: boolean
       MFA_PHONE_MAX_FREQUENCY: number
@@ -6991,54 +7006,7 @@ export interface components {
       /** @description Whether to only allow private channels */
       private_only: boolean | null
     }
-    ReplicationPipelineResponse: {
-      config: {
-        config: {
-          max_fill_secs: number
-          max_size: number
-        }
-      }
-      id: number
-      publication_name: string
-      replicator_id: number
-      sink_id: number
-      sink_name: string
-      source_id: number
-      source_name: string
-      tenant_id: string
-    }
-    ReplicationPipelinesResponse: {
-      pipelines: {
-        config: {
-          config: {
-            max_fill_secs: number
-            max_size: number
-          }
-        }
-        id: number
-        publication_name: string
-        replicator_id: number
-        sink_id: number
-        sink_name: string
-        source_id: number
-        source_name: string
-        tenant_id: string
-      }[]
-    }
-    ReplicationPipelinesStatusResponse: {
-      pipeline_id: number
-      status: string
-    }
-    ReplicationPublicationsResponse: {
-      publications: {
-        name: string
-        tables: {
-          name: string
-          schema: string
-        }[]
-      }[]
-    }
-    ReplicationSinkResponse: {
+    ReplicationDestinationResponse: {
       config: {
         big_query: {
           /** @description BigQuery dataset id */
@@ -7055,8 +7023,8 @@ export interface components {
       name: string
       tenant_id: string
     }
-    ReplicationSinksResponse: {
-      sinks: {
+    ReplicationDestinationsResponse: {
+      destinations: {
         config: {
           big_query: {
             /** @description BigQuery dataset id */
@@ -7072,6 +7040,53 @@ export interface components {
         id: number
         name: string
         tenant_id: string
+      }[]
+    }
+    ReplicationPipelineResponse: {
+      config: {
+        config: {
+          max_fill_secs: number
+          max_size: number
+        }
+      }
+      destination_id: number
+      destination_name: string
+      id: number
+      publication_name: string
+      replicator_id: number
+      source_id: number
+      source_name: string
+      tenant_id: string
+    }
+    ReplicationPipelinesResponse: {
+      pipelines: {
+        config: {
+          config: {
+            max_fill_secs: number
+            max_size: number
+          }
+        }
+        destination_id: number
+        destination_name: string
+        id: number
+        publication_name: string
+        replicator_id: number
+        source_id: number
+        source_name: string
+        tenant_id: string
+      }[]
+    }
+    ReplicationPipelinesStatusResponse: {
+      pipeline_id: number
+      status: string
+    }
+    ReplicationPublicationsResponse: {
+      publications: {
+        name: string
+        tables: {
+          name: string
+          schema: string
+        }[]
       }[]
     }
     ReplicationSourcesResponse: {
@@ -7833,7 +7848,6 @@ export interface components {
       MAILER_TEMPLATES_MAGIC_LINK_CONTENT?: string | null
       MAILER_TEMPLATES_REAUTHENTICATION_CONTENT?: string | null
       MAILER_TEMPLATES_RECOVERY_CONTENT?: string | null
-      MFA_ALLOW_LOW_AAL?: boolean | null
       MFA_MAX_ENROLLED_FACTORS?: number | null
       MFA_PHONE_ENROLL_ENABLED?: boolean | null
       MFA_PHONE_MAX_FREQUENCY?: number | null
@@ -8078,45 +8092,21 @@ export interface components {
       /** @description Whether to only allow private channels */
       private_only?: boolean
     }
-    UpdateReplicationPipelineBody: {
-      /** @description Pipeline config */
-      config?: {
-        config: {
-          max_fill_secs: number
-          max_size: number
-        }
-      }
-      /** @description Publication name */
-      publication_name?: string
-      /** @description Sink id */
-      sink_id?: number
-      /** @description Source id */
-      source_id?: number
-    }
-    UpdateReplicationSinkBody: {
+    UpdateReplicationDestinationBody: {
       /** @description BigQuery dataset id */
       dataset_id: string
+      /** @description Destination name */
+      destination_name: string
       /** @description Max staleness in minutes */
       max_staleness_mins: number
       /** @description BigQuery project id */
       project_id: string
       /** @description BigQuery service account key */
       service_account_key: string
-      /** @description Sink name */
-      sink_name: string
     }
-    UpdateReplicationSinkPipelineBody: {
-      /** @description Pipeline config */
-      pipeline_config: {
-        config: {
-          max_fill_secs: number
-          max_size: number
-        }
-      }
-      /** @description Publication name */
-      publication_name: string
-      /** @description Sink config */
-      sink_config: {
+    UpdateReplicationDestinationPipelineBody: {
+      /** @description Destination config */
+      destination_config: {
         big_query: {
           /** @description BigQuery dataset id */
           dataset_id: string
@@ -8128,10 +8118,34 @@ export interface components {
           service_account_key: string
         }
       }
-      /** @description Sink name */
-      sink_name: string
+      /** @description Destination name */
+      destination_name: string
+      /** @description Pipeline config */
+      pipeline_config: {
+        config: {
+          max_fill_secs: number
+          max_size: number
+        }
+      }
+      /** @description Publication name */
+      publication_name: string
       /** @description Source id */
       source_id: number
+    }
+    UpdateReplicationPipelineBody: {
+      /** @description Pipeline config */
+      config?: {
+        config: {
+          max_fill_secs: number
+          max_size: number
+        }
+      }
+      /** @description Destination id */
+      destination_id?: number
+      /** @description Publication name */
+      publication_name?: string
+      /** @description Source id */
+      source_id?: number
     }
     UpdateSchemaBody: {
       name?: string
@@ -17320,6 +17334,274 @@ export interface operations {
       }
     }
   }
+  ReplicationDestinationsController_getDestinations: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReplicationDestinationsResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get replication destinations */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationDestinationsController_createDestination: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateReplicationDestinationBody']
+      }
+    }
+    responses: {
+      /** @description Returns the created replication destination id. */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateDestinationResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to create destination */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationDestinationsPipelinesController_createDestinationPipeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateReplicationDestinationPipelineBody']
+      }
+    }
+    responses: {
+      /** @description Returns the created replication destination and pipeline ids. */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateDestinationPipelineResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Returned when the API fails to create the replication destination or pipeline. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationDestinationsPipelinesController_updateDestinationPipeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Destination id */
+        destination_id: number
+        /** @description Pipeline id */
+        pipeline_id: number
+        /** @description Project reference */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateReplicationDestinationPipelineBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Returned when the API fails to update the replication destination or pipeline */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationDestinationsController_updateDestination: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Destination id */
+        destination_id: number
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateReplicationDestinationBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update destination */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationDestinationsController_getDestination: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Destination id */
+        destination_id: number
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Returns the destination. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReplicationDestinationResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get destination */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationDestinationsController_deleteDestination: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Destination id */
+        destination_id: number
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to delete destination */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   ReplicationPipelinesController_getPipelines: {
     parameters: {
       query?: never
@@ -17606,274 +17888,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to stop pipeline */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ReplicationSinksController_getSinks: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ReplicationSinksResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get replication sinks */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ReplicationSinksController_createSink: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateReplicationSinkBody']
-      }
-    }
-    responses: {
-      /** @description Returns the created replication sink id. */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['CreateSinkResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to create sink */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ReplicationSinksPipelinesController_createSinkPipeline: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateReplicationSinkPipelineBody']
-      }
-    }
-    responses: {
-      /** @description Returns the created replication sink and pipeline ids. */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['CreateSinkPipelineResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Returned when the API fails to create the replication sink or pipeline. */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ReplicationSinksPipelinesController_updateSinkPipeline: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Pipeline id */
-        pipeline_id: number
-        /** @description Project reference */
-        ref: string
-        /** @description Sink id */
-        sink_id: number
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateReplicationSinkPipelineBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Returned when the API fails to update the replication sink or pipeline */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ReplicationSinksController_getSink: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-        /** @description Sink id */
-        sink_id: number
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Returns the sink. */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ReplicationSinkResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to get sink */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ReplicationSinksController_updateSink: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-        /** @description Sink id */
-        sink_id: number
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateReplicationSinkBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update sink */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  ReplicationSinksController_deleteSink: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-        /** @description Sink id */
-        sink_id: number
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to delete sink */
       500: {
         headers: {
           [name: string]: unknown
