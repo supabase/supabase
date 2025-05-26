@@ -7,13 +7,17 @@ sidebar_label: 'Introduction to logical replication'
 
 ## Concepts and terms
 
-## Write Ahead Log (WAL)
+### Write-Ahead Log (WAL)
 
-Postgres uses a system called the Write Ahead Log (WAL) to manage changes to the database. As you make changes, they are appended to the WAL (which is a series of files (also called "segments"), where the file size can be specified). Once one segment is full, Postgres will start appending to a new segment. After a period of time, a checkpoint occurs and Postgres synchronizes the WAL with your database. Once the checkpoint is complete, then the WAL files can be removed from disk and free up space.
+Postgres uses a system called the Write-Ahead Log (WAL) to manage changes to the database. As you make changes, they are appended to the WAL (which is a series of files (also called "segments"), where the file size can be specified). Once one segment is full, Postgres will start appending to a new segment. After a period of time, a checkpoint occurs and Postgres synchronizes the WAL with your database. Once the checkpoint is complete, then the WAL files can be removed from disk and free up space.
 
-## Logical replication and WAL
+### Logical replication and WAL
 
-Logical replication is a method of replication where Postgres uses the WAL files and transmit those changes to another Postgres database, or a system that supports reading WAL files. 
+Logical replication is a method of replication where Postgres uses the WAL files and transmit those changes to another Postgres database, or a system that supports reading WAL files.
+
+### LSN
+
+LSN is a Log Sequence Number that is used to identify the position of a WAL file in the WAL directory. It is often used to determine the progress of replication in subscribers and calculate the lag of a replication slot.
 
 ## Logical replication architecture
 
@@ -23,10 +27,6 @@ When setting up logical replication, three key components are involved:
 - `replication slot` - A slot used for replicating the data from a single publication. The slot, when created, will specify the output format of the changes
 - `subscription` - A subscription is created from an external system (i.e. another Postgres database) and must specify the name of the `publication`. If you do not specify a replication slot, one is automatically created
 
-## LSN
-
-LSN is a Log Sequence Number that is used to identify the position of a WAL file in the WAL directory. It is often used to determine the progress of replication in subscribers and calculate the lag of a replication slot.
-
 ## Logical replication output format
 
 Logical replication is typically output in 2 forms, `pgoutput` and `wal2json`. The output method is how Postgres sends changes to any active replication slot.
@@ -35,11 +35,11 @@ Logical replication is typically output in 2 forms, `pgoutput` and `wal2json`. T
 
 When using logical replication, Postgres is then configured to keep WAL files around for longer than it needs them. If the files are removed too quickly, then your `replication slot` will become inactive and, if the database receives a large number of changes in a short time, then the `replication slot` can become lost as it was not able to keep up.
 
-In order to mitigate this, Postgres has many options and settings that can be tweaked to manage the WAL usage effectively. Not all of these settings are user configurable as they can impact the stability of your database. For those that are, these should be considered as advanced configuration and not changed without understanding that they can cause additional disk space and resources to be used, as well as incur additional costs.
+In order to mitigate this, Postgres has many options and settings that can be [tweaked](/guides/database/custom-postgres-config) to manage the WAL usage effectively. Not all of these settings are user configurable as they can impact the stability of your database. For those that are, these should be considered as advanced configuration and not changed without understanding that they can cause additional disk space and resources to be used, as well as incur additional costs.
 
-| Setting                                                                                | Description                                       | User-facing | Default |
-| -------------------------------------------------------------------------------------- | ------------------------------------------------- | ----------- | ------- |
-| [`max_replication_slots`](https://postgresqlco.nf/doc/en/param/max_replication_slots/) | Max count of replication slots allowed            |    No         |         |
-| [`wal_keep_size`](https://postgresqlco.nf/doc/en/param/wal_keep_size/)                 | Minimum size of WAL files to keep for replication |    No        |         |
-| [`max_slot_wal_keep_size`](https://postgresqlco.nf/doc/en/param/max_slot_wal_keep_size/)                                                               | Max WAL size that can be reserved by replication slots                                                  | No            |         |
-| [`checkpoint_timeout`](https://postgresqlco.nf/doc/en/param/checkpoint_timeout/)       | Max time between WAL checkpoints                  |  No           |         |
+| Setting                                                                                  | Description                                            | User-facing | Default |
+| ---------------------------------------------------------------------------------------- | ------------------------------------------------------ | ----------- | ------- |
+| [`max_replication_slots`](https://postgresqlco.nf/doc/en/param/max_replication_slots/)   | Max count of replication slots allowed                 | No          |         |
+| [`wal_keep_size`](https://postgresqlco.nf/doc/en/param/wal_keep_size/)                   | Minimum size of WAL files to keep for replication      | No          |         |
+| [`max_slot_wal_keep_size`](https://postgresqlco.nf/doc/en/param/max_slot_wal_keep_size/) | Max WAL size that can be reserved by replication slots | No          |         |
+| [`checkpoint_timeout`](https://postgresqlco.nf/doc/en/param/checkpoint_timeout/)         | Max time between WAL checkpoints                       | No          |         |
