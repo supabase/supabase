@@ -27,7 +27,7 @@ import { Plus } from 'lucide-react'
 const FORM_ID = 'create-secret-api-key'
 const SCHEMA = z.object({
   name: z.string(),
-  description: z.string(),
+  description: z.string().trim(),
 })
 
 const CreateSecretAPIKeyDialog = () => {
@@ -54,7 +54,7 @@ const CreateSecretAPIKeyDialog = () => {
         projectRef,
         type: 'secret',
         name: values.name,
-        description: values.description.trim() || null,
+        description: values.description,
       },
       {
         onSuccess: () => {

@@ -1,6 +1,5 @@
-import { useState } from 'react'
-import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
   Button,
@@ -17,11 +16,9 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
 
 import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
 import { useParams } from 'next/navigation'
@@ -29,7 +26,7 @@ import { useParams } from 'next/navigation'
 const FORM_ID = 'create-publishable-api-key'
 const SCHEMA = z.object({
   name: z.string(),
-  description: z.string(),
+  description: z.string().trim(),
 })
 
 export interface CreatePublishableAPIKeyDialogProps {
@@ -62,7 +59,7 @@ function CreatePublishableAPIKeyDialog() {
         projectRef,
         type: 'publishable',
         name: values.name,
-        description: values.description.trim() || null,
+        description: values.description,
       },
       {
         onSuccess: () => {
