@@ -229,7 +229,7 @@ const CTANode = () => {
         </p>
         <p>
           <Button asChild type="secondary">
-            <Link href="link....">
+            <Link href="https://forms.supabase.com/pg_replicate" target="_blank" rel="noreferrer">
               <span className="flex items-center gap-x-1">
                 Request Early Access
                 <ArrowUpRight size={16} />
