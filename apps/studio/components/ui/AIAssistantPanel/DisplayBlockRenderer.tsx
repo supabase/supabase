@@ -17,14 +17,15 @@ import { Message } from 'ai/react'
 
 interface DisplayBlockRendererProps {
   messageId: string
-  manualId: string
+  toolCallId: string
+  manualId?: string
   initialArgs: {
-    // Args specific to this displayBlock invocation
     sql: string
     label?: string
     view?: 'table' | 'chart'
     xAxis?: string
     yAxis?: string
+    runQuery?: boolean
   }
   messageParts: Readonly<Message['parts']> | undefined
   isLoading: boolean
@@ -33,6 +34,7 @@ interface DisplayBlockRendererProps {
 
 export const DisplayBlockRenderer = ({
   messageId,
+  toolCallId,
   manualId,
   initialArgs,
   messageParts,
@@ -52,6 +54,8 @@ export const DisplayBlockRenderer = ({
   const { ref } = useParams()
   const org = useSelectedOrganization()
 
+  console.log('initialArgs', initialArgs)
+
   const [chartConfig, setChartConfig] = useState<ChartConfig>(() => ({
     ...DEFAULT_CHART_CONFIG,
     view: initialArgs.view === 'chart' ? 'chart' : 'table',
@@ -60,13 +64,14 @@ export const DisplayBlockRenderer = ({
   }))
 
   const isChart = initialArgs.view === 'chart'
+  const resultId = manualId || toolCallId
   const liveResultData = useMemo(
-    () => findResultForManualId(messageParts, manualId),
+    () => (manualId ? findResultForManualId(messageParts, manualId) : undefined),
     [messageParts, manualId]
   )
   const cachedResults = useMemo(
-    () => snap.getCachedSQLResults({ messageId, snippetId: manualId }),
-    [snap, messageId, manualId]
+    () => snap.getCachedSQLResults({ messageId, snippetId: resultId }),
+    [snap, messageId, resultId]
   )
   const displayData = liveResultData ?? cachedResults
   const isDraggableToReports =
@@ -117,7 +122,8 @@ export const DisplayBlockRenderer = ({
         showRunButtonIfNotReadOnly={true}
         isLoading={isLoading}
         draggable={isDraggableToReports}
-        onResults={(results) => onResults({ messageId, resultId: manualId, results })}
+        runQuery={initialArgs.runQuery === true && !displayData && !manualId}
+        onResults={(results) => onResults({ messageId, resultId, results })}
         onRunQuery={handleRunQuery}
         onUpdateChartConfig={handleUpdateChartConfig}
         onDragStart={handleDragStart}

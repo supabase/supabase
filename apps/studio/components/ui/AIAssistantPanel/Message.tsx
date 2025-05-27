@@ -25,7 +25,7 @@ const baseMarkdownComponents: Partial<Components> = {
   a: Link,
 }
 
-interface MessageProps extends Omit<VercelMessage, 'id'> {
+interface MessageProps {
   id: string
   message: VercelMessage
   isLoading: boolean
@@ -123,35 +123,19 @@ export const Message = function Message({
                     const { toolCallId, toolName, args } = part.toolInvocation
                     switch (toolName) {
                       case 'display_query': {
-                        if (args.manualToolCallId) {
-                          return (
-                            <DisplayBlockRenderer
-                              key={`${id}-tool-${toolCallId}`}
-                              messageId={id}
-                              manualId={args.manualToolCallId}
-                              initialArgs={args}
-                              messageParts={parts}
-                              isLoading={isLoading}
-                              onResults={onResults}
-                            />
-                          )
-                        } else {
-                          return (
-                            <div
-                              key={`${id}-tool-${toolCallId}`}
-                              className="w-auto overflow-x-hidden"
-                            >
-                              <QueryBlock
-                                label={args.label || 'SQL Snippet'}
-                                sql={args.sql}
-                                showSql={true}
-                                isChart={false}
-                                showRunButtonIfNotReadOnly={true}
-                                isLoading={false}
-                              />
-                            </div>
-                          )
-                        }
+                        console.log('args', args)
+                        return (
+                          <DisplayBlockRenderer
+                            key={`${id}-tool-${toolCallId}`}
+                            messageId={id}
+                            toolCallId={toolCallId}
+                            manualId={args.manualToolCallId}
+                            initialArgs={args}
+                            messageParts={parts}
+                            isLoading={isLoading}
+                            onResults={onResults}
+                          />
+                        )
                       }
                       case 'display_edge_function': {
                         return (
