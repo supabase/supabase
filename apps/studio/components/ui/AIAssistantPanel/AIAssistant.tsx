@@ -46,6 +46,7 @@ import AIOnboarding from './AIOnboarding'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
 import { useAutoScroll } from './hooks'
+import { ErrorBoundary } from '../ErrorBoundary'
 
 const MemoizedMessage = memo(
   ({
@@ -304,7 +305,24 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   }, [snap.open, isInSQLEditor, snippetContent])
 
   return (
-    <>
+    <ErrorBoundary
+      message="Something went wrong with the AI Assistant"
+      sentryContext={{
+        component: 'AIAssistant',
+        feature: 'AI Assistant Panel',
+        projectRef: project?.ref,
+        organizationSlug: selectedOrganization?.slug,
+      }}
+      actions={[
+        {
+          label: 'Clear messages and refresh',
+          onClick: () => {
+            handleClearMessages()
+            window.location.reload()
+          },
+        },
+      ]}
+    >
       <div className={cn('flex flex-col h-full', className)}>
         <div ref={scrollContainerRef} className={cn('flex-grow overflow-auto flex flex-col')}>
           <div className="z-30 sticky top-0">
@@ -639,6 +657,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
         <OptInToOpenAIToggle />
       </ConfirmationModal>
-    </>
+    </ErrorBoundary>
   )
 }
