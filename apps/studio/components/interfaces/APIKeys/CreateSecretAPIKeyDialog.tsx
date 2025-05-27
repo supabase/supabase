@@ -1,6 +1,5 @@
-import { useState } from 'react'
-import * as z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
   Button,
@@ -17,29 +16,23 @@ import {
   FormField_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
 
+import { useParams } from 'common'
 import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
-import { useParams } from 'next/navigation'
+import { Plus } from 'lucide-react'
 
-const FORM_ID = 'create-publishable-api-key'
+const FORM_ID = 'create-secret-api-key'
 const SCHEMA = z.object({
-  description: z.string(),
+  name: z.string(),
+  description: z.string().trim(),
 })
 
-export interface CreatePublishableAPIKeyModalProps {
-  projectRef: string
-}
-
-function CreatePublishableAPIKeyModal() {
-  const params = useParams()
-  const projectRef = params?.ref as string
-
+const CreateSecretAPIKeyDialog = () => {
   const [visible, setVisible] = useState(false)
+  const { ref: projectRef } = useParams()
 
   const onClose = (value: boolean) => {
     setVisible(value)
@@ -48,6 +41,7 @@ function CreatePublishableAPIKeyModal() {
   const form = useForm<z.infer<typeof SCHEMA>>({
     resolver: zodResolver(SCHEMA),
     defaultValues: {
+      name: '',
       description: '',
     },
   })
@@ -58,8 +52,9 @@ function CreatePublishableAPIKeyModal() {
     createAPIKey(
       {
         projectRef,
-        type: 'publishable',
-        description: values.description.trim(),
+        type: 'secret',
+        name: values.name,
+        description: values.description,
       },
       {
         onSuccess: () => {
@@ -72,17 +67,22 @@ function CreatePublishableAPIKeyModal() {
   return (
     <Dialog open={visible} onOpenChange={onClose}>
       <DialogTrigger asChild>
-        <Button type="default" className="pointer-events-auto">
-          Create new
+        <Button type="default" className="mt-2" icon={<Plus />}>
+          Add new Secret key
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create new publishable API key</DialogTitle>
-          <DialogDescription>
-            Publishable API keys are used to authorize requests to your project from the web, mobile
-            or desktop apps, CLIs or other public components of your application. They are safe to
-            be published online and embedded in code.
+          <DialogTitle>Create new secret API key</DialogTitle>
+          <DialogDescription className="grid gap-y-2">
+            <p>
+              Secret API keys are used to authorize requests to your project from servers,
+              functions, workers or other backend components of your application.{' '}
+            </p>
+
+            <p>
+              Keep these keys private. Don't publish them online or commit them to source control.
+            </p>
           </DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
@@ -93,6 +93,21 @@ function CreatePublishableAPIKeyModal() {
               id={FORM_ID}
               onSubmit={form.handleSubmit(onSubmit)}
             >
+              <FormField_Shadcn_
+                key="name"
+                name="name"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout
+                    label="Name"
+                    description="A short name of lowercase alphanumeric characters and underscore, must start with letter or underscore."
+                  >
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_ {...field} />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
               <FormField_Shadcn_
                 key="description"
                 name="description"
@@ -113,7 +128,7 @@ function CreatePublishableAPIKeyModal() {
         </DialogSection>
         <DialogFooter>
           <Button form={FORM_ID} htmlType="submit" loading={isCreatingAPIKey}>
-            Create Publishable API key
+            Create API key
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -121,4 +136,4 @@ function CreatePublishableAPIKeyModal() {
   )
 }
 
-export default CreatePublishableAPIKeyModal
+export default CreateSecretAPIKeyDialog
