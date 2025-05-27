@@ -387,7 +387,28 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
             // ... use supabaseClient to interact with the database
             \`\`\`
           - Ensure function code is compatible with the database schema.
-          - Consider using built-in AI models via \`Supabase.ai.Session\` if applicable.
+          - OpenAI Example:
+          \`\`\`typescript
+            import OpenAI from 'https://deno.land/x/openai@v4.24.0/mod.ts'
+            Deno.serve(async (req) => {
+              const { query } = await req.json()
+              const apiKey = Deno.env.get('OPENAI_API_KEY')
+              const openai = new OpenAI({
+                apiKey: apiKey,
+              })
+              // Documentation here: https://github.com/openai/openai-node
+              const chatCompletion = await openai.chat.completions.create({
+                messages: [{ role: 'user', content: query }],
+                // Choose model from here: https://platform.openai.com/docs/models
+                model: 'gpt-3.5-turbo',
+                stream: false,
+              })
+              const reply = chatCompletion.choices[0].message.content
+              return new Response(reply, {
+                headers: { 'Content-Type': 'text/plain' },
+              })
+            })
+          \`\`\`
 
       # General Instructions:
       - **Understand Context**: Attempt to use \`list_tables\`, \`list_extensions\` first. If they are not available or return a privacy/permission error, state this and proceed with caution, relying on the user's description and general knowledge.
