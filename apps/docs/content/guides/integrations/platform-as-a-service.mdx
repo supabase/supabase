@@ -45,46 +45,63 @@ Because of this, it's important that you adopt a development workflow on behalf 
 
 ![Change flow](/docs/img/integrations/change-flow.png)
 
-After launching a Project, it's important that all changes happen on a Branch. This is because branches can be treated like ephemeral servers: if anything goes wrong you can either revert the changes or destroy the branch and create a new one from production.
 
-### Creating a development Branch
+### Creating a `DEV` Branch
 
-- Create a branch
-- [Docs: Create a branch](https://api.supabase.com/api/v1#tag/environments/POST/v1/projects/{ref}/branches)
+https://api.supabase.com/api/v1#tag/environments/POST/v1/projects/{ref}/branches
 
-```
+
+After launching a Project, it's important that all changes happen on a branch. Branches can be treated like ephemeral servers: if anything goes wrong you can either revert the changes or destroy the branch and create a new one from production.
+
+```sh
 curl https://api.supabase.com/v1/projects/branches \
   --request POST \
   --header 'Content-Type: application/json' \
   --data '{
-  "branch_name": "",
-  "git_branch": "",
+  "branch_name": "DEV",
   "persistent": true,
   "region": "",
   "desired_instance_size": "pico",
   "release_channel": "internal",
-  "postgres_engine": "15",
-  "secrets": {
-    "ANY_ADDITIONAL_PROPERTY": ""
-  }
+  "postgres_engine": "15"
 }'
 ```
 
-
 ### Make a change
 
-- TODO
-- https://api.supabase.com/api/v1#tag/database/POST/v1/projects/{ref}/database/migrations
+https://api.supabase.com/api/v1#tag/database/POST/v1/projects/{ref}/database/migrations
+
+For this example we will create a todos table using the `POST database/migrations` endpoint.
+
+```sql
+create table todos (
+  id serial primary key,
+  task text not null
+);
+```
+
+This endpoint will automatically create a migration inside the `supabase_migrations` schema. If the schema migration fails, the changes will be rolled back.
 
 ```sh
 curl https://api.supabase.com/v1/projects/database/migrations \
   --request POST \
   --header 'Content-Type: application/json' \
   --data '{
-  "query": "",
-  "name": "Create a todo table"
+  "query": "create table todos (id serial primary key, task text not null);",
+  "name": "Create a todos table"
 }'
 ```
+
+### Add seed data
+
+<Admonition type="warning" title="Do not use production data in branches!">
+
+It's important that the data in development branches is NOT production data, especially for non-developers who don't understand the implications of working with data. Security and side-effects (e.g. emailing all production users) are two reasons why this is important.
+
+</Admonition>
+
+It's common in `DEV` branches to "seed" data. This is basic test data for users.
+
 
 ### Merge all changes
 
@@ -100,21 +117,11 @@ curl https://api.supabase.com/v1/branches/merge \
 }'
 ```
 
-### Delete the branch
-
-- TODO
-- https://api.supabase.com/api/v1#tag/environments/DELETE/v1/branches/{branch_id}
-
-```sh
-curl https://api.supabase.com/v1/branches/ \
-  --request DELETE
-```
-
 
 ## Making changes
 
 
-## Database changes
+### Database changes
 
 Database changes are handled through migrations.
 
@@ -148,6 +155,7 @@ You can manage the configuration of all services using the Management API. This 
 ## Disaster Recovery
 
 - Rollbacks can cause data loss. Only use in in `PROD` when absolutely necessary
+- Only available in prod when a user has explicitly enabled PITR
 
 ![Rollback](/docs/img/integrations/rollback.png)
 
