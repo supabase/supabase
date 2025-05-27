@@ -1,0 +1,78 @@
+---
+title: pg_replicate
+description: Replicate your Supabase database to external destinations
+---
+
+`pg_replicate` simplifies the process of syncing your data to an external destination. This could be another database, a data warehouse, or a specialized service such as customer management or business analytics software.
+
+<Admonition type="caution">
+
+`pg_replicate` is currently in alpha.
+
+</Admonition>
+
+Syncing requires a source and a destination. The source is your Supabase database. The destination is a third party. See the [supported destinations](#destinations).
+
+## Sources
+
+Choose what data to sync by creating a publication in your database. A publication is a set of changes, which can be filtered by table and change type.
+
+### Managing publications
+
+1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+2. Click on **Publications** in the sidebar.
+3. Control which database events are sent by toggling **Insert**, **Update**, and **Delete**.
+4. Control which tables broadcast changes by selecting **Source** and toggling each table.
+
+<video width="99%" muted playsInline controls={true}>
+  <source
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-realtime.mp4"
+    type="video/mp4"
+  />
+</video>
+
+## Destinations
+
+Currently available destinations:
+
+- [BigQuery](#bigquery)
+
+### BigQuery
+
+#### Prerequisites
+
+Before setting up replication to BigQuery, you'll need:
+
+1. A [Google Cloud Platform (GCP)](https://cloud.google.com/gcp) account
+2. A [BigQuery dataset](https://cloud.google.com/bigquery/docs/datasets-intro) in your GCP project
+3. A [GCP service account key](https://cloud.google.com/iam/docs/keys-create-delete) in JSON format
+
+#### Configuring BigQuery replication
+
+1. Navigate to the Database section in your Supabase Dashboard and select the **Replication** tab.
+2. Click **Add destination** to open the New Destination panel.
+3. Click **Enable replication**.
+4. Configure your replication settings:
+   - **Name**: Enter a descriptive name for your replication destination
+   - **Publication**: Select an existing publication or create a new one
+   - **Type**: Select "BigQuery" from the destination types
+   - **Project Id**: Enter your GCP project ID
+   - **Project's Dataset Id**: Enter the ID of your BigQuery dataset
+   - **Service Account Key**: Enter your GCP service account key
+5. Review the [Advanced Settings](#advanced-settings) if you need to customize the replication behavior.
+6. Click **Create** to start the replication process.
+
+#### Advanced settings
+
+- **Max size**: Changes are sent in batches. Max size limits the size of an individual batch.
+- **Max fill seconds**: Number of seconds after which a batch should be sent, even if it hasn't reached the max size.
+- **Max staleness**: See BigQuery's [`max_staleness`](https://cloud.google.com/bigquery/docs/change-data-capture#manage_table_staleness) option
+
+## Monitoring replication
+
+After setting up replication, data will begin flowing within a few minutes. You can monitor the replication status and review any errors directly from the [Supabase Dashboard](https://supabase.com/dashboard/project/_/database/replication).
+
+## Limitations
+
+- Large values stored as [TOASTed values](https://www.postgresql.org/docs/current/storage-toast.html) are not replicated.
+- Custom data types are not supported.
