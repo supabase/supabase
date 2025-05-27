@@ -27,7 +27,7 @@ const ErrorFallback = ({
         <AlertCircle />
         <AlertTitle_Shadcn_>{message}</AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_>
-          We've been notified and are working to fix this issue.
+          We've been notified and will review and fix this issue.
         </AlertDescription_Shadcn_>
         <div className="mt-4 flex gap-2">
           <Button type="default" onClick={resetErrorBoundary} className="text-sm">
