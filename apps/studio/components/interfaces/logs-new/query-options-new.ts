@@ -545,8 +545,8 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
         throw error
       }
     },
-    // Initial load without any pagination parameters
-    initialPageParam: undefined,
+    // Initial load with proper cursor for live mode pagination
+    initialPageParam: { cursor: new Date().getTime(), direction: 'next' } as PageParam,
     getPreviousPageParam: (
       firstPage: InfiniteQueryResponse<ExtendedColumnSchema[], UnifiedLogsMeta>
     ) => {
