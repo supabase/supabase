@@ -21,9 +21,8 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { parseArgs } from 'node:util'
 import { SimpleGit, simpleGit } from 'simple-git'
-import toml from 'toml'
-
-import { Section } from './helpers.mdx'
+import { parse } from 'smol-toml'
+import { type Section } from './helpers.mdx'
 
 interface Options {
   reset: boolean
@@ -164,7 +163,7 @@ function processMdx(rawContent: string): Array<SectionWithChecksum> {
   } catch (err) {
     content = matter(rawContent, {
       language: 'toml',
-      engines: { toml: toml.parse.bind(toml) },
+      engines: { toml: parse },
     }).content
   }
 

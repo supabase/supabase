@@ -19,8 +19,7 @@ import { toMarkdown } from 'mdast-util-to-markdown'
 import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { readFile, writeFile } from 'node:fs/promises'
-import { stringify } from 'smol-toml'
-import toml from 'toml'
+import { parse, stringify } from 'smol-toml'
 
 import {
   getAllTroubleshootingEntriesInternal as getAllTroubleshootingEntries,
@@ -173,7 +172,7 @@ function calculateChecksum(content) {
 
   const { data, content: body } = matter(bodyNormalized, {
     language: 'toml',
-    engines: { toml: toml.parse.bind(toml) },
+    engines: { toml: parse },
   })
   const newFrontmatter = stringify(data)
   const normalized = `---\n${newFrontmatter}\n---\n${body}`
@@ -442,7 +441,7 @@ async function updateFileId(entry, id) {
   const fileContents = await readFile(entry.filePath, 'utf-8')
   const { data, content } = matter(fileContents, {
     language: 'toml',
-    engines: { toml: toml.parse.bind(toml) },
+    engines: { toml: parse },
   })
   data.database_id = id
 
