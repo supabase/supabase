@@ -147,7 +147,7 @@ description = "User accessing the API is not admin, i.e. the JWT does not contai
 description = "Using an OAuth provider which is disabled on the Auth server."
 
 [otp_disabled]
-description = "Sign in with OTPs (magic link, email OTP) is disabled. Check your sever's configuration."
+description = "Sign in with OTPs (magic link, email OTP) is disabled. Check your server's configuration."
 
 [otp_expired]
 description = "OTP code for this sign-in has expired. Ask the user to sign in again."
