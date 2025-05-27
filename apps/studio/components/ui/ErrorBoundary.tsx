@@ -1,7 +1,7 @@
 import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary'
 import * as Sentry from '@sentry/nextjs'
-import { Button } from 'ui'
-import { AlertTriangle } from 'lucide-react'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { AlertCircle } from 'lucide-react'
 import { ErrorInfo } from 'react'
 
 interface ErrorFallbackProps {
@@ -23,14 +23,12 @@ const ErrorFallback = ({
 }: ErrorFallbackProps) => {
   return (
     <div className="p-4 bg-destructive-foreground h-full flex flex-col justify-center items-center">
-      <div className="flex flex-col gap-2 border border-foreground/20 bg-background rounded-md p-4">
-        <span className="text-destructive">
-          <AlertTriangle />
-        </span>
-        <h3 className="text-foreground">{message}</h3>
-        <p className="mt-2 text-sm text-foreground/50">
+      <Alert_Shadcn_ variant="destructive">
+        <AlertCircle />
+        <AlertTitle_Shadcn_>{message}</AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>
           We've been notified and are working to fix this issue.
-        </p>
+        </AlertDescription_Shadcn_>
         <div className="mt-4 flex gap-2">
           <Button type="default" onClick={resetErrorBoundary} className="text-sm">
             Try again
@@ -41,7 +39,7 @@ const ErrorFallback = ({
             </Button>
           ))}
         </div>
-      </div>
+      </Alert_Shadcn_>
     </div>
   )
 }
