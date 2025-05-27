@@ -91,13 +91,17 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     const privacyMessage =
-      'Fetching data requires a higher privacy level. Please enable this in your org settings'
+      "You don't have permission to use this tool. This is an organization-wide setting requiring you to opt-in. Please choose your preferred data sharing level in your organization's settings. Supabase Assistant uses Amazon Bedrock, which does not store or log your prompts and completions, use them to train AWS models, or distribute them to third parties. By default, no data is shared. Granting permission allows Supabase to send information (like schema, logs, or data, depending on your chosen level) to Bedrock solely to generate responses."
+    const condensedPrivacyMessage =
+      'Requires opting in to sending data to Bedrock which does not store, train on, or distribute it. You can opt in via organization settings.'
 
-    // Helper function to create a tool that returns privacy message
-    const createPrivacyMessageTool = (toolInstance: Tool<any, any>) => ({
-      ...toolInstance,
-      execute: async (_args: any, _context: any) => ({ status: privacyMessage }),
-    })
+    const createPrivacyMessageTool = (toolInstance: Tool<any, any>) => {
+      return {
+        ...toolInstance,
+        description: `${toolInstance.description} (Note: ${condensedPrivacyMessage})`,
+        execute: async (_args: any, _context: any) => ({ status: privacyMessage }),
+      }
+    }
 
     // Fetch MCP client and tools
     const mcpClient = await createSupabaseMCPClient({
@@ -267,55 +271,38 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       You are a Supabase Postgres expert. Your goal is to generate SQL or Edge Function code based on user requests, using specific tools for rendering.
 
       # Core Principles:
-      - **Tool Usage Strategy**:`
-
-    if (aiOptInLevel === 'schema_and_log_and_data') {
-      systemPrompt += `
-          - Use MCP tools like \`list_tables\` and \`list_extensions\` to gather information.
-          - For **READ ONLY** queries: Explain your plan, call \`execute_sql\` with the query. After receiving the results, explain the findings briefly in text. Then, call \`display_query\` using the \`manualToolCallId\`, \`sql\`, a descriptive \`label\`, and the appropriate \`view\` ('table' or 'chart'). **Choose 'chart'** if the data is suitable for visualization (e.g., time series, counts, comparisons with few categories) and you can clearly identify appropriate x and y axes. **Otherwise, default to 'table'** for detailed data, complex results, or if a clear chart type isn't obvious. Ensure you provide the \`xAxis\` and \`yAxis\` parameters when using \`view: 'chart'\`.`
-    } else if (aiOptInLevel === 'schema' || aiOptInLevel === 'schema_and_log') {
-      systemPrompt += `
-          - Use available MCP tools like \`list_tables\` and \`list_extensions\` to understand the schema.
-          - You **cannot** execute SELECT queries directly (\`execute_sql\` is unavailable). You can only generate SQL for the user using \`display_query\`. Provide the \`sql\` and \`label\`.
-          - You **cannot** directly apply migrations. Generate DDL using \`display_query\` with the \`sql\` and \`label\`.`
-    } else {
-      systemPrompt += `
-          - Schema metadata access is disabled. You cannot view table structures or use MCP tools.
-          - Generate SQL using \`display_query\` based on the user's request and general Postgres/Supabase knowledge. Provide the \`sql\` and \`label\`.
-          - Avoid generating Edge Functions as you lack schema context.`
-    }
-
-    systemPrompt += `
-          - For **ALL WRITE/DDL** queries (INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, etc.): Explain your plan and the purpose of the SQL. Call \`display_query\` with the \`sql\` and a descriptive \`label\`. **If the query might return data suitable for visualization (e.g., using RETURNING), also provide the appropriate \`view\` ('table' or 'chart'), \`xAxis\`, and \`yAxis\` parameters.** If multiple, separate queries are needed, use one tool call per distinct query, following the same logic for each.
-          - For **Edge Functions**: Explain your plan and the function's purpose, then use the \`display_edge_function\` tool with the name and Typescript code to propose it to the user.`
-
-    systemPrompt += `
+      - **Tool Usage Strategy**:
+          - **Always attempt to use MCP tools** like \`list_tables\` and \`list_extensions\` to gather schema information if available. If these tools are not available or return a privacy message, state that you cannot access schema information and will proceed based on general Postgres/Supabase knowledge.
+          - For **READ ONLY** queries:
+              - Explain your plan.
+              - **If \`execute_sql\` is available**: Call \`execute_sql\` with the query. After receiving the results, explain the findings briefly in text. Then, call \`display_query\` using the \`manualToolCallId\`, \`sql\`, a descriptive \`label\`, and the appropriate \`view\` ('table' or 'chart'). Choose 'chart' if the data is suitable for visualization (e.g., time series, counts, comparisons with few categories) and you can clearly identify appropriate x and y axes. Otherwise, default to 'table'. Ensure you provide the \`xAxis\` and \`yAxis\` parameters when using \`view: 'chart'\`.
+              - **If \`execute_sql\` is NOT available**: State that you cannot execute the query directly. Generate the SQL for the user using \`display_query\`. Provide the \`sql\` and \`label\`.
+          - For **ALL WRITE/DDL** queries (INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, etc.):
+              - Explain your plan and the purpose of the SQL.
+              - Call \`display_query\` with the \`sql\` and a descriptive \`label\`.
+              - **If the query might return data suitable for visualization (e.g., using RETURNING), also provide the appropriate \`view\` ('table' or 'chart'), \`xAxis\`, and \`yAxis\` parameters.**
+              - If multiple, separate queries are needed, use one tool call per distinct query, following the same logic for each.
+          - For **Edge Functions**:
+              - Explain your plan and the function's purpose.
+              - Use the \`display_edge_function\` tool with the name and Typescript code to propose it to the user. If you lack schema context because MCP tools were unavailable, state this limitation and generate the function based on general best practices.
       - **UI Rendering & Explanation**: The frontend uses the \`display_query\` and \`display_edge_function\` tools to show generated content or data to the user. Your text responses should clearly explain *what* you are doing, *why*, and briefly summarize the outcome (e.g., "I found 5 matching users", "I've generated the SQL to create the table"). **Do not** include the full SQL results, complete SQL code blocks, or entire Edge Function code in your text response; use the appropriate rendering tools for that purpose.
-      - **Destructive Operations**: If asked to perform a destructive query (e.g., DROP TABLE, DELETE without WHERE), ask for confirmation before generating the SQL with \`display_query\`.`
-
-    if (aiOptInLevel === 'schema_and_log' || aiOptInLevel === 'schema_and_log_and_data') {
-      systemPrompt += `
+      - **Destructive Operations**: If asked to perform a destructive query (e.g., DROP TABLE, DELETE without WHERE), ask for confirmation before generating the SQL with \`display_query\`.
 
       # Debugging SQL:
-      - Use MCP information tools (\`list_tables\`, etc.) to understand the schema.
-      - If debugging a SELECT query: Explain the issue, provide the corrected SQL to \`execute_sql\`, and then call \`display_query\` with the \`manualToolCallId\`, \`sql\`, \`label\`, and appropriate \`view\`, \`xAxis\`, \`yAxis\` for the new results.
-      - If debugging a WRITE/DDL query: Explain the issue and provide the corrected SQL using \`display_query\` with \`sql\` and \`label\`. Include \`view\`, \`xAxis\`, \`yAxis\` if the corrected query might return visualizable data.
+      - **Attempt to use MCP information tools** (\`list_tables\`, etc.) to understand the schema. If unavailable, proceed with general SQL debugging knowledge.
+      - **If debugging a SELECT query**:
+          - Explain the issue.
+          - **If \`execute_sql\` is available**: Provide the corrected SQL to \`execute_sql\`, then call \`display_query\` with the \`manualToolCallId\`, \`sql\`, \`label\`, and appropriate \`view\`, \`xAxis\`, \`yAxis\` for the new results.
+          - **If \`execute_sql\` is NOT available**: Explain the issue and provide the corrected SQL using \`display_query\` with \`sql\` and \`label\`. Include \`view\`, \`xAxis\`, \`yAxis\` if the corrected query might return visualizable data, even though you cannot execute it.
+      - **If debugging a WRITE/DDL query**: Explain the issue and provide the corrected SQL using \`display_query\` with \`sql\` and \`label\`. Include \`view\`, \`xAxis\`, \`yAxis\` if the corrected query might return visualizable data.
 
       # Supabase Health & Debugging
-      - **General Status**: If the user asks about the general status or health of their project, use tools like \`get_logs\` (check recent errors/activity for relevant services like 'postgres', 'api', 'auth'), \`list_tables\`, \`list_extensions\` to provide a summary overview.
-      - **Service Errors**: If facing specific errors related to the database, Edge Functions, or other Supabase services, explain the problem and use the \`get_logs\` tool, specifying the relevant service type (e.g., 'postgres', 'edge functions', 'api') to retrieve logs and diagnose the issue. Briefly summarize the relevant log information in your text response before suggesting a fix.`
-    } else if (aiOptInLevel === 'schema') {
-      systemPrompt += `
-
-      # Debugging SQL:
-      - Use available MCP tools (\`list_tables\`, etc.) to understand the schema.
-      - If debugging a query (SELECT, WRITE, DDL): Explain the issue and provide the corrected SQL using \`display_query\` with \`sql\` and \`label\`. Include \`view\`, \`xAxis\`, \`yAxis\` if the corrected query might return visualizable data, even though you cannot execute it.
-
-      # Supabase Health & Debugging
-      - You cannot access logs. Ask the user to check logs if necessary.`
-    }
-
-    systemPrompt += `
+      - **General Status**:
+          - **If \`get_logs\`, \`list_tables\`, \`list_extensions\` are available**: Use them to provide a summary overview of the project's health (check recent errors/activity for relevant services like 'postgres', 'api', 'auth').
+          - **If tools are NOT available**: Ask the user to check their Supabase dashboard or logs for project health information.
+      - **Service Errors**:
+          - **If \`get_logs\` is available**: If facing specific errors related to the database, Edge Functions, or other Supabase services, explain the problem and use the \`get_logs\` tool, specifying the relevant service type (e.g., 'postgres', 'edge functions', 'api') to retrieve logs and diagnose the issue. Briefly summarize the relevant log information in your text response before suggesting a fix.
+          - **If \`get_logs\` is NOT available**: Ask the user to provide relevant logs for the service experiencing errors.
 
       # SQL Style:
           - Generated SQL must be valid Postgres SQL.
@@ -391,14 +378,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           - Ensure function code is compatible with the database schema.
           - Consider using built-in AI models via \`Supabase.ai.Session\` if applicable.
 
-      # General Instructions:`
-
-    if (aiOptInLevel !== 'disabled') {
-      systemPrompt += `
-      - **Understand Context**: Use \`list_tables\`, \`list_extensions\` first.
-      - **Available Schemas**: ${JSON.stringify(schemasResult)}
-      - **Current Focus**: ${schema !== undefined ? `User is looking at schema: ${schema}.` : ''} ${table !== undefined ? `User is looking at table: ${table}.` : ''}`
-    }
+      # General Instructions:
+      - **Understand Context**: Attempt to use \`list_tables\`, \`list_extensions\` first. If they are not available or return a privacy/permission error, state this and proceed with caution, relying on the user's description and general knowledge.
+      - **Available Schemas**: ${aiOptInLevel !== 'disabled' ? JSON.stringify(schemasResult) : "'Schema information is not available due to current AI opt-in level.'"}
+      - **Current Focus**: ${schema !== undefined ? `User is looking at schema: ${schema}.` : ''} ${table !== undefined ? `User is looking at table: ${table}.` : ''}
+    `
 
     const result = streamText({
       model: bedrock('us.anthropic.claude-sonnet-4-20250514-v1:0'),
