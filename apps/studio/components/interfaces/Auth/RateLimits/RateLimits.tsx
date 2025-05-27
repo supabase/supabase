@@ -54,6 +54,7 @@ const RateLimits = () => {
   const canUpdateEmailLimit = authConfig?.EXTERNAL_EMAIL_ENABLED && isSmtpEnabled(authConfig)
   const canUpdateSMSRateLimit = authConfig?.EXTERNAL_PHONE_ENABLED
   const canUpdateAnonymousUsersRateLimit = authConfig?.EXTERNAL_ANONYMOUS_USERS_ENABLED
+  const canUpdateWeb3RateLimit = authConfig?.EXTERNAL_WEB3_SOLANA_ENABLED
 
   const FormSchema = z.object({
     RATE_LIMIT_TOKEN_REFRESH: z.coerce
@@ -80,6 +81,10 @@ const RateLimits = () => {
       .number()
       .min(0, 'Must be not be lower than 0')
       .max(32767, 'Must not be more than 32,767 an hour'),
+    RATE_LIMIT_WEB3: z.coerce
+      .number()
+      .min(0, 'Must be not be lower than 0')
+      .max(32767, 'Must not be more than 32,767 an hour'),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -91,6 +96,7 @@ const RateLimits = () => {
       RATE_LIMIT_SMS_SENT: 0,
       RATE_LIMIT_ANONYMOUS_USERS: 0,
       RATE_LIMIT_OTP: 0,
+      RATE_LIMIT_WEB3: 0,
     },
   })
 
@@ -105,6 +111,7 @@ const RateLimits = () => {
       'RATE_LIMIT_SMS_SENT',
       'RATE_LIMIT_ANONYMOUS_USERS',
       'RATE_LIMIT_OTP',
+      'RATE_LIMIT_WEB3',
     ] as (keyof typeof payload)[]
     params.forEach((param) => {
       if (data[param] !== authConfig?.[param]) payload[param] = data[param]
@@ -122,6 +129,7 @@ const RateLimits = () => {
         RATE_LIMIT_SMS_SENT: authConfig.RATE_LIMIT_SMS_SENT,
         RATE_LIMIT_ANONYMOUS_USERS: authConfig.RATE_LIMIT_ANONYMOUS_USERS,
         RATE_LIMIT_OTP: authConfig.RATE_LIMIT_OTP,
+        RATE_LIMIT_WEB3: authConfig.RATE_LIMIT_WEB3 ?? 0,
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -366,9 +374,9 @@ const RateLimits = () => {
                       {!canUpdateConfig || !canUpdateAnonymousUsersRateLimit ? (
                         <TooltipContent side="left" className="w-80 p-4">
                           <p className="font-medium">
-                            Anonymous logins are not enabled for your project
+                            Anonymous sign-ins are not enabled for your project. Enable them to
+                            control this rate limit.
                           </p>
-                          <p className="mt-1">Enable anonymous logins to update this rate limit</p>
                           <div className="mt-3">
                             <Button asChild type="default" size="tiny">
                               <Link href={`/project/${projectRef}/auth/providers`}>
@@ -422,6 +430,49 @@ const RateLimits = () => {
                         {form.watch('RATE_LIMIT_OTP') * 12} requests per hour
                       </p>
                     )}
+                  </FormItemLayout>
+                )}
+              />
+            </CardContent>
+
+            <CardContent>
+              <FormField_Shadcn_
+                control={form.control}
+                name="RATE_LIMIT_WEB3"
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label="Rate limit for Web3 sign up and sign-in"
+                    description="Number of Web3 (Sign in with Solana) sign up or sign in requests that can be made per IP address in 5 minutes"
+                  >
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <FormControl_Shadcn_>
+                          <Input_Shadcn_
+                            type="number"
+                            className="w-24"
+                            min={0}
+                            {...field}
+                            disabled={!canUpdateConfig || !canUpdateWeb3RateLimit}
+                          />
+                        </FormControl_Shadcn_>
+                      </TooltipTrigger>
+                      {!canUpdateConfig || !canUpdateWeb3RateLimit ? (
+                        <TooltipContent side="left" className="w-80 p-4">
+                          <p className="font-medium">
+                            Web3 auth provider is not enabled for this project. Enable it to control
+                            this rate limit.
+                          </p>
+                          <div className="mt-3">
+                            <Button asChild type="default" size="tiny">
+                              <Link href={`/project/${projectRef}/auth/providers`}>
+                                View Auth provider settings
+                              </Link>
+                            </Button>
+                          </div>
+                        </TooltipContent>
+                      ) : null}
+                    </Tooltip>
                   </FormItemLayout>
                 )}
               />

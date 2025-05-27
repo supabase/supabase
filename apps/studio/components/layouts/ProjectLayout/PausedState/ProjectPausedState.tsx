@@ -13,8 +13,8 @@ import { useParams } from 'common'
 import { PostgresVersionSelector } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { PostgresEngine, ReleaseChannel } from 'data/config/project-unpause-postgres-versions-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { PostgresEngine, ReleaseChannel } from 'data/projects/new-project.constants'
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
@@ -42,7 +42,7 @@ export interface ProjectPausedStateProps {
 }
 
 interface PostgresVersionDetails {
-  postgresEngine: PostgresEngine
+  postgresEngine: Exclude<PostgresEngine, '13' | '14'>
   releaseChannel: ReleaseChannel
 }
 

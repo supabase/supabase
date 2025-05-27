@@ -4570,7 +4570,7 @@ functions:
         description: Specify the referenced table when ordering by a column in an embedded resource.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
@@ -4731,7 +4731,7 @@ functions:
         description: Set this to limit rows of referenced tables instead of the parent table.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
@@ -4829,7 +4829,7 @@ functions:
         description: Set this to limit rows of referenced tables instead of the parent table.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
@@ -4868,7 +4868,7 @@ functions:
       Retrieves only one row from the result. Result must be one row (e.g. using limit), otherwise this will result in an error.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
@@ -5237,7 +5237,7 @@ functions:
         ```
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
@@ -5381,7 +5381,7 @@ functions:
         description: The value to filter with, following PostgREST syntax.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: false
         code: |
           ```dart
@@ -5412,7 +5412,7 @@ functions:
           ]
           ```
       - id: with-update
-        name: With `update()`
+        name: With update()
         code: |
           ```dart
           final data = await supabase
@@ -5421,7 +5421,7 @@ functions:
             .not('name', 'eq', 'Rohan');
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With delete()
         code: |
           ```dart
           final data = await supabase
@@ -5430,7 +5430,7 @@ functions:
             .not('name', 'eq', 'Mordor');
           ```
       - id: with-rpc
-        name: With `rpc()`
+        name: With rpc()
         code: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
@@ -5450,7 +5450,7 @@ functions:
         description: The object to filter with, with column names as keys mapped to their filter values
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5497,7 +5497,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5545,7 +5545,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5597,7 +5597,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5645,7 +5645,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5697,7 +5697,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5745,7 +5745,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5797,7 +5797,7 @@ functions:
         description: The pattern to match with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5845,7 +5845,7 @@ functions:
         description: The pattern to match with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5946,7 +5946,7 @@ functions:
         description: The List to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -6253,7 +6253,7 @@ functions:
         description: The range to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -6310,7 +6310,7 @@ functions:
         description: The range to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -6367,7 +6367,7 @@ functions:
         description: The range to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -6424,7 +6424,7 @@ functions:
         description: The range to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -6481,7 +6481,7 @@ functions:
         description: The range to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -6747,7 +6747,7 @@ functions:
       ```
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
@@ -6779,7 +6779,7 @@ functions:
           ]
           ```
       - id: with-update
-        name: With `update()`
+        name: With update()
         code: |
           ```dart
           final data = await supabase
@@ -6788,7 +6788,7 @@ functions:
             .filter('name', 'in', '("harpsichord","clavichord")');
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With delete()
         code: |
           ```dart
           final data = await supabase
@@ -6797,7 +6797,7 @@ functions:
             .filter('name', 'in', '("Rohan","Mordor")');
           ```
       - id: with-rpc
-        name: With `rpc()`
+        name: With rpc()
         code: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.

@@ -120,7 +120,7 @@ export const fetchAllTableRows = async ({
     const primaryKeys = getDefaultOrderByColumns(table)
     if (primaryKeys.length > 0) {
       primaryKeys.forEach((col) => {
-        queryChains = queryChains.order(table.name, col, true, true)
+        queryChains = queryChains.order(table.name, col)
       })
     }
   } else {
