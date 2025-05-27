@@ -16,22 +16,23 @@ const AI_OPT_IN_LEVELS = [
   {
     value: 'disabled',
     title: 'Disabled',
-    description: 'No data is sent to OpenAI, responses will be generic.',
+    description: 'No data is sent to OpenAI, responses will be generic',
   },
   {
     value: 'schema',
     title: 'Schema Only',
-    description: 'Send only your database schema to OpenAI for better responses.',
+    description: 'We will only ever send your database schema to Bedrock',
   },
   {
     value: 'schema_and_log',
     title: 'Schema & Logs',
-    description: 'Send schema and logging data for improved AI responses.',
+    description:
+      'Schema and logs (may contain PII/database data) will be sent to Bedrock for better results',
   },
   {
     value: 'schema_and_log_and_data',
-    title: 'Schema, Logs & Data',
-    description: 'Send schema, logs, and query data for the best AI responses.',
+    title: 'Schema, Logs & Database Data',
+    description: 'Give Bedrock full access to run database read only queries and analyze results',
   },
 ]
 
@@ -76,11 +77,21 @@ export const AIOptInLevelSelector = ({
     <FormItemLayout
       label={label}
       description={
-        <p className="my-4 max-w-xl">
-          By opting into sending anonymous data, Supabase AI can improve the answers it shows you.
-          This is an organization-wide setting. Select the level of data you are comfortable
-          sharing. <OptInToOpenAIToggle />.
-        </p>
+        <div className="space-y-4 my-4 max-w-xl space-y-4">
+          <p>
+            Supabase AI can provide more relevant answers if you choose to share anonymous data.
+            This feature is powered by Amazon Bedrock which does not store or log your prompts and
+            completions, nor does it use them to train AWS models or distribute them to third
+            parties.
+          </p>
+          <p>
+            This is an organization-wide setting. Please select the level of data you are
+            comfortable sharing.{' '}
+          </p>
+          <p>
+            <OptInToOpenAIToggle />
+          </p>
+        </div>
       }
       layout={layout}
     >

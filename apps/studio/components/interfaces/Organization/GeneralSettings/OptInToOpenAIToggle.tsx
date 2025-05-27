@@ -8,6 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
   Button,
+  Button_Shadcn_,
 } from 'ui'
 
 interface OptInToOpenAIToggleProps {
@@ -17,32 +18,33 @@ export default function OptInToOpenAIToggle({ className }: OptInToOpenAITogglePr
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          type="text"
-          className="text-brand border-b p-0 hover:bg-transparent hover:text-foreground text-sm"
-        >
-          Learn more about data privacy
-        </Button>
+        <Button type="outline">Learn more about data privacy</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader padding="small" className="border-b">
-          <DialogTitle>What do we do with your data?</DialogTitle>
+          <DialogTitle>Data Privacy and Supabase AI</DialogTitle>
         </DialogHeader>
         <DialogSection className="space-y-4 text-sm text-foreground-light" padding="small">
           <p>
-            Supabase AI is a support tool powered by Amazon Bedrock ("Bedrock"). By default, no
-            information is shared with Bedrock unless you explicitly provide consent.
+            Supabase AI utilizes Amazon Bedrock ("Bedrock"), a service designed with a strong focus
+            on data privacy and security.
+          </p>
+          <p>
+            Amazon Bedrock does not store or log your prompts and completions. This data is not used
+            to train any AWS models and is not distributed to third parties or model providers.
+            Model providers do not have access to Amazon Bedrock logs or customer prompts and
+            completions.
+          </p>
+          <p>
+            By default, no information is shared with Bedrock unless you explicitly provide consent.
+            With your permission, Supabase may share customer-generated prompts, database schema,
+            database data, and project logs with Bedrock. This information is used solely to
+            generate responses to your queries and is not retained by Bedrock or used to train their
+            foundation models.
           </p>
 
           <p>
-            To improve our services, and only with your permission, we may share customer-generated
-            prompts, database schema, database data, and project logs with Bedrock. This information
-            is used solely to generate responses to your queries and is not retained or used to
-            train their models.
-          </p>
-
-          <p>
-            If you are a HIPAA Covered Entity, please note that Bedrock is HIPPA eligible and
+            If you are a HIPAA Covered Entity, please note that Bedrock is HIPAA eligible, and
             Supabase has a Business Associate Agreement in place covering this use.
           </p>
 
@@ -54,9 +56,10 @@ export default function OptInToOpenAIToggle({ className }: OptInToOpenAITogglePr
               rel="noreferrer"
               className="text-brand hover:text-foreground"
             >
-              privacy policy
+              Privacy Policy
             </Link>
-            .
+            . You can choose which types of information you consent to share by selecting from the
+            options in the AI settings.
           </p>
         </DialogSection>
       </DialogContent>
