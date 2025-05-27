@@ -7,7 +7,6 @@ import remarkGfm from 'remark-gfm'
 
 import { AiIconAnimation, cn, markdownComponents, WarningIcon } from 'ui'
 import { Heading3, InlineCode, Link, ListItem, MarkdownPre, OrderedList } from './MessageMarkdown'
-import { QueryBlock } from '../QueryBlock/QueryBlock'
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 

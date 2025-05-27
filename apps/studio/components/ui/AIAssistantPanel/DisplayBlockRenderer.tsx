@@ -6,7 +6,6 @@ import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartC
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { findResultForManualId } from './Message.utils'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
