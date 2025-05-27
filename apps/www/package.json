@@ -29,7 +29,7 @@
     "@octokit/graphql": "^8.0.0",
     "@octokit/plugin-paginate-graphql": "^4.0.0",
     "@octokit/rest": "^21.0.0",
-    "@payloadcms/live-preview-react": "^3.36.1",
+    "@payloadcms/live-preview-react": "^3.39.1",
     "@radix-ui/react-dialog": "^1.0.5",
     "@strapi/client": "^1.3.0",
     "@supabase/supabase-js": "catalog:",

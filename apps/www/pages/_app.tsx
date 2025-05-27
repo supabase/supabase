@@ -17,6 +17,7 @@ import { useRouter } from 'next/router'
 import { SonnerToaster, themes, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsentToast } from 'ui-patterns/consent'
+import { RefreshRouteOnSave as PayloadLivePreview } from '@payloadcms/live-preview-react'
 
 import MetaFaviconsPagesRouter, {
   DEFAULT_FAVICON_ROUTE,
@@ -101,6 +102,10 @@ export default function App({ Component, pageProps }: AppProps) {
                   API_URL={API_URL}
                   hasAcceptedConsent={hasAcceptedConsent}
                   enabled={IS_PLATFORM}
+                />
+                <PayloadLivePreview
+                  refresh={() => router.replace(router.asPath)}
+                  serverURL={process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030'}
                 />
               </CommandProvider>
             </TooltipProvider>

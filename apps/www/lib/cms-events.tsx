@@ -2,7 +2,7 @@ import { generateReadingTime } from './helpers'
 const toc = require('markdown-toc')
 
 // Payload API configuration
-const PAYLOAD_URL = process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://localhost:3000'
+const PAYLOAD_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3000'
 const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY
 
 type CMSEvent = {
@@ -150,9 +150,7 @@ export async function getAllCMSEventSlugs() {
  */
 export async function getCMSEventBySlug(slug: string, preview = false) {
   const PAYLOAD_URL =
-    process.env.NEXT_PUBLIC_PAYLOAD_URL ||
-    process.env.NEXT_PUBLIC_CMS_URL ||
-    'http://localhost:3030'
+    process.env.NEXT_PUBLIC_CMS_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030'
   console.log(
     `[getCMSEventBySlug] Fetching event '${slug}', preview: ${preview}, from ${PAYLOAD_URL}`
   )

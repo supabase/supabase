@@ -95,6 +95,7 @@
         "NEXT_PUBLIC_API_URL",
         "NEXT_PUBLIC_HCAPTCHA_SITE_KEY",
         "HCAPTCHA_SECRET_KEY",
+        "NEXT_PUBLIC_CMS_URL",
         "NODE_ENV",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",

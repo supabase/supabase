@@ -2,8 +2,7 @@ import { generateReadingTime } from './helpers'
 const toc = require('markdown-toc')
 
 // Payload API configuration
-const PAYLOAD_URL =
-  process.env.NEXT_PUBLIC_PAYLOAD_URL || process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030'
+const PAYLOAD_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030'
 const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY
 
 type CMSBlogPost = {
@@ -172,10 +171,7 @@ export async function getAllCMSPostSlugs() {
  * Fetch a single blog post from the CMS by slug
  */
 export async function getCMSPostBySlug(slug: string, preview = false) {
-  const PAYLOAD_URL =
-    process.env.NEXT_PUBLIC_PAYLOAD_URL ||
-    process.env.NEXT_PUBLIC_CMS_URL ||
-    'http://localhost:3030'
+  const PAYLOAD_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030'
   console.log(
     `[getCMSPostBySlug] Fetching post '${slug}', preview: ${preview}, from ${PAYLOAD_URL}`
   )

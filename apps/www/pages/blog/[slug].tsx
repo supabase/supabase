@@ -1,5 +1,5 @@
 import matter from 'gray-matter'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
@@ -28,7 +28,6 @@ import LW14Summary from '~/components/LaunchWeek/14/Releases/LWSummary'
 import BlogLinks from '~/components/LaunchWeek/7/BlogLinks'
 import LWXSummary from '~/components/LaunchWeek/X/LWXSummary'
 import DefaultLayout from '~/components/Layouts/Default'
-import { LivePreview } from '~/components/Blog/LivePreview'
 import { DraftModeBanner } from '~/components/Blog/DraftModeBanner'
 
 type Post = ReturnType<typeof getSortedPosts>[number]
@@ -316,11 +315,18 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   console.log('isDraftMode', isDraftMode)
   const [previewData, setPreviewData] = useState<ProcessedBlogData>(props.blog)
 
+  // Only use live preview hook for CMS posts in draft mode
+  const shouldUseLivePreview = isDraftMode && props.blog.isCMS
+
   const { data: livePreviewData, isLoading: isLivePreviewLoading } = useLivePreview({
     initialData: props.blog,
     serverURL: process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030',
     depth: 2,
   })
+
+  useEffect(() => {
+    console.log('livePreviewData', livePreviewData)
+  }, [livePreviewData])
 
   console.log('[BlogPostPage] LivePreview data from hook:', livePreviewData)
   console.log('[BlogPostPage] Initial data:', props.blog)
@@ -335,23 +341,28 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
 
   // Extract raw content from data if available
   const livePreviewContent = useMemo(() => {
-    // Priority 1: Use data from LivePreview hook
-    if (livePreviewData) {
+    // Priority 1: Use data from LivePreview hook (only in draft mode)
+    if (
+      isDraftMode &&
+      shouldUseLivePreview &&
+      livePreviewData &&
+      typeof livePreviewData === 'object'
+    ) {
       console.log('[BlogPostPage] Using livePreviewData for content')
 
       // If content is a string, use it directly
-      if (typeof livePreviewData.content === 'string') {
-        return livePreviewData.content
+      if (typeof (livePreviewData as any).content === 'string') {
+        return (livePreviewData as any).content
       }
 
       // If content is from source property
-      if (livePreviewData.source && typeof livePreviewData.source === 'string') {
-        return livePreviewData.source
+      if ((livePreviewData as any).source && typeof (livePreviewData as any).source === 'string') {
+        return (livePreviewData as any).source
       }
     }
 
     // Priority 2: Use data from postMessage updates
-    if (previewData !== props.blog) {
+    if (isDraftMode && previewData !== props.blog) {
       console.log('[BlogPostPage] Using previewData from postMessage for content')
 
       // If content is a string, use it directly
@@ -367,14 +378,14 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
 
     // Fallback to props.blog.source
     return props.blog.source || ''
-  }, [livePreviewData, previewData, props.blog])
+  }, [isDraftMode, shouldUseLivePreview, livePreviewData, previewData, props.blog])
 
   // Only use the live preview data for metadata
   const blogMetaData = useMemo(() => {
-    if (isDraftMode) {
+    if (isDraftMode && shouldUseLivePreview) {
       // Priority 1: Use data from LivePreview hook
-      if (livePreviewData) {
-        return livePreviewData
+      if (livePreviewData && typeof livePreviewData === 'object') {
+        return { ...props.blog, ...livePreviewData }
       }
 
       // Priority 2: Use data from postMessage updates
@@ -385,7 +396,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
 
     // Fallback to props.blog
     return props.blog
-  }, [isDraftMode, livePreviewData, previewData, props.blog])
+  }, [isDraftMode, shouldUseLivePreview, livePreviewData, previewData, props.blog])
 
   const handlePreviewUpdate = (data: any) => {
     console.log('[BlogPostPage] Received preview update:', data)
@@ -417,6 +428,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   const isLaunchWeek13 = blogMetaData.launchweek?.toString().toLocaleLowerCase() === '13'
   const isLaunchWeek14 = blogMetaData.launchweek?.toString().toLocaleLowerCase() === '14'
 
+  console.log('livePreviewData', livePreviewData)
   // For CMS posts, the author info is already included
   // For static posts, we need to look up the author in authors.json
   const author = isCMS
@@ -572,7 +584,6 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
         <div className="fixed top-10 right-10 border rounded-full rounded-tr-none animate-spin transform w-10 h-10 bg-transparent" />
       )}
       {isDraftMode && <DraftModeBanner />}
-      {isDraftMode && <LivePreview onUpdate={handlePreviewUpdate} />}
       <DefaultLayout className="overflow-x-hidden">
         <div
           className="

@@ -1355,8 +1355,8 @@ importers:
         specifier: ^21.0.0
         version: 21.1.1
       '@payloadcms/live-preview-react':
-        specifier: ^3.36.1
-        version: 3.38.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^3.39.1
+        version: 3.39.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-dialog':
         specifier: ^1.0.5
         version: 1.0.5(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -5858,14 +5858,14 @@ packages:
       graphql: ^16.8.1
       payload: 3.33.0
 
-  '@payloadcms/live-preview-react@3.38.0':
-    resolution: {integrity: sha512-Da3oYzcK5khgQxSWhuDhQuiMGnenD+5AAJl0dCKBavQ6qACFr4GbJVPf65pZoZbU4WyQ2gv3Fqzd9bqTLuq1jw==}
+  '@payloadcms/live-preview-react@3.39.1':
+    resolution: {integrity: sha512-9vY8X3QEtVZNuHmjzIxQUcqvtGfx3D/uMdAm40s/zkY8NGWE1Eq/UMs6SsKEKHIJhbPpMYyxOQAjjfetdRBNxQ==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc-65a56d0e-20241020
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc-65a56d0e-20241020
 
-  '@payloadcms/live-preview@3.38.0':
-    resolution: {integrity: sha512-2NgsNTFtm3E8MnQYMvjMtkHHgjSDFma4m3uMi0fzaBM+ZFd5/okOjGiWouuppjKU24df7VcOk+Tm2/uqO3t3sQ==}
+  '@payloadcms/live-preview@3.39.1':
+    resolution: {integrity: sha512-G84XrzV8kETXSbsKFjouNjopwux/43PoEgwjqYeX8gLfPYNyCFQWXlwEpNfTJepsKF30WnEskPBSIiHC868qtg==}
 
   '@payloadcms/next@3.33.0':
     resolution: {integrity: sha512-gdiMalPLmzUJaRfBU4hWMNbEktXkc7Xqh/40h1FJ5sORl68/mYz8H9I0SqmLNe2jXAEEfptUwTwVPF9LTv2l7A==}
@@ -9288,7 +9288,7 @@ packages:
 
   '@vercel/flags@2.6.0':
     resolution: {integrity: sha512-GvLX0CK/OsIqq672OBvcCeu0k3tb3QdE0lRn1P5zulMQJIPTLlUDEH0y9TeAyC7TMWlpTTT5Bealqu0rmncyXQ==}
-    deprecated: This package was renamed to flags, which offers the same functionality. https://vercel.com/changelog/npm-i-flags
+    deprecated: This package has been renamed to flags. It offers the same functionality under a new name. Please follow the upgrade guide https://github.com/vercel/flags/blob/main/packages/flags/guides/upgrade-to-v4.md
     peerDependencies:
       '@sveltejs/kit': '*'
       next: '*'
@@ -11586,7 +11586,6 @@ packages:
     resolution: {integrity: sha512-t0q23FIpvHDTtnORW+bDJziGsal5uh9RJTJ1fyH8drd4lICOoXhJ5pLMUZ5C0VQei6dNmwTzzoTRgMkO9JgHEQ==}
     peerDependencies:
       eslint: '>= 5'
-    bundledDependencies: []
 
   eslint-plugin-import@2.29.1:
     resolution: {integrity: sha512-BbPC0cuExzhiMo4Ff1BTVwHpjjv28C5R+btTOGaCRC7UEz801up0JadwkeSk5Ued6TG34uaczuVuH6qyy5YUxw==}
@@ -14705,6 +14704,7 @@ packages:
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
+    deprecated: Use your platform's native DOMException instead
 
   node-emoji@1.11.0:
     resolution: {integrity: sha512-wo2DpQkQp7Sjm2A0cq+sN7EHKO6Sl0ctXeBdFZrL9T9+UywORbufTcTZxom8YqpLQt/FqNMUkOpkZrJVYSKD3A==}
@@ -23541,13 +23541,13 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@payloadcms/live-preview-react@3.38.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@payloadcms/live-preview-react@3.39.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@payloadcms/live-preview': 3.38.0
+      '@payloadcms/live-preview': 3.39.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@payloadcms/live-preview@3.38.0': {}
+  '@payloadcms/live-preview@3.39.1': {}
 
   '@payloadcms/next@3.33.0(@types/react@19.1.0)(graphql@16.10.0)(monaco-editor@0.52.2)(next@15.3.0(@opentelemetry/api@1.9.0)(@playwright/test@1.49.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.77.4))(payload@3.33.0(graphql@16.10.0)(typescript@5.7.3))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(supports-color@8.1.1)(typescript@5.7.3)':
     dependencies:
@@ -30833,7 +30833,7 @@ snapshots:
       '@typescript-eslint/parser': 7.2.0(eslint@9.27.0(jiti@2.4.2)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.7.3)
       eslint: 9.27.0(jiti@2.4.2)(supports-color@8.1.1)
       eslint-import-resolver-node: 0.3.9(supports-color@8.1.1)
-      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@7.2.0(eslint@9.27.0(jiti@2.4.2)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-plugin-import@2.29.1)(eslint@9.27.0(jiti@2.4.2)(supports-color@8.1.1))(supports-color@8.1.1)
+      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@7.2.0(eslint@9.27.0(jiti@2.4.2)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-plugin-import@2.31.0)(eslint@9.27.0(jiti@2.4.2)(supports-color@8.1.1))(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
