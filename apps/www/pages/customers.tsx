@@ -75,7 +75,6 @@ export async function getStaticProps() {
 }
 
 function CustomerStoriesPage(props: any) {
-  console.log('customers props', props)
   const { basePath } = useRouter()
   const _allCustomers = props.blogs?.map((blog: PostTypes, idx: number) => {
     return {

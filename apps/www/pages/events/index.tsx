@@ -21,7 +21,6 @@ interface Props {
 }
 
 function Events({ events: allEvents, onDemandEvents, categories }: Props) {
-  console.log('allEvents', allEvents)
   const [events, setEvents] = useState(allEvents)
   const router = useRouter()
 
@@ -178,7 +177,7 @@ export async function getStaticProps() {
       acc.all = (acc.all || 0) + 1
 
       // Increment the counter for each category
-      event.categories?.forEach((category) => {
+      event.categories?.forEach((category: string) => {
         acc[category] = (acc[category] || 0) + 1
       })
 

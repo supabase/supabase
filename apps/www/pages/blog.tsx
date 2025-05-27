@@ -107,8 +107,6 @@ export async function getStaticProps() {
   // Get CMS blog posts
   const cmsPostsData = await getAllCMSPosts()
 
-  console.log('cmsPostsData', cmsPostsData)
-
   // Combine both data sources
   const allPostsData = [...staticPostsData, ...cmsPostsData].sort((a: any, b: any) => {
     const dateA = a.date ? new Date(a.date).getTime() : new Date(a.formattedDate).getTime()

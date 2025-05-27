@@ -119,12 +119,15 @@ function convertRichTextToMarkdown(content: CMSEvent['content']): string {
  */
 export async function getAllCMSEventSlugs() {
   try {
-    const response = await fetch(`${PAYLOAD_URL}/api/events?limit=100&depth=1`, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
-      },
-    })
+    const response = await fetch(
+      `${PAYLOAD_URL}/api/events?limit=100&depth=1&draft=false&where[_status][equals]=published`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+        },
+      }
+    )
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
@@ -305,12 +308,15 @@ export async function getAllCMSEvents({
   currentEventSlug?: string
 } = {}): Promise<ProcessedEvent[]> {
   try {
-    const response = await fetch(`${PAYLOAD_URL}/api/events?depth=1&draft=false`, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
-      },
-    })
+    const response = await fetch(
+      `${PAYLOAD_URL}/api/events?depth=1&draft=false&where[_status][equals]=published`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+        },
+      }
+    )
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)

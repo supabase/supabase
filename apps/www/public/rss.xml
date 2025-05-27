@@ -5,14 +5,14 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 22 May 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Tue, 20 May 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
-  <guid>https://supabase.com/blog/from-cms</guid>
-  <title>FROM CMS</title>
-  <link>https://supabase.com/blog/from-cms</link>
-  <description>asdf</description>
-  <pubDate>Thu, 22 May 2025 00:00:00 -0700</pubDate>
+  <guid>https://supabase.com/blog/blog-from-cms</guid>
+  <title>Blog from CMS</title>
+  <link>https://supabase.com/blog/blog-from-cms</link>
+  <description></description>
+  <pubDate>Tue, 20 May 2025 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/simplify-backend-with-data-api</guid>

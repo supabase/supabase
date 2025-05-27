@@ -118,12 +118,15 @@ function convertRichTextToMarkdown(content: CMSBlogPost['content']): string {
  */
 export async function getAllCMSPostSlugs() {
   try {
-    const response = await fetch(`${PAYLOAD_URL}/api/posts?limit=100&depth=1&draft=true`, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
-      },
-    })
+    const response = await fetch(
+      `${PAYLOAD_URL}/api/posts?limit=100&depth=1&draft=false&where[_status][equals]=published`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+        },
+      }
+    )
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
@@ -316,12 +319,15 @@ export async function getAllCMSPosts({
   currentPostSlug?: string
 } = {}): Promise<ProcessedPost[]> {
   try {
-    const response = await fetch(`${PAYLOAD_URL}/api/posts?depth=1&draft=false`, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
-      },
-    })
+    const response = await fetch(
+      `${PAYLOAD_URL}/api/posts?depth=1&draft=false&where[_status][equals]=published`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(PAYLOAD_API_KEY && { Authorization: `Bearer ${PAYLOAD_API_KEY}` }),
+        },
+      }
+    )
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
