@@ -142,34 +142,16 @@ export async function getAccessToken() {
     ? currentSession.expires_at - Math.ceil(Date.now() / 1000) < 30
     : false
 
-  if (!currentSession || aboutToExpire) {
-    try {
+    if (!currentSession || aboutToExpire) {
       const {
         data: { session },
         error,
       } = await gotrueClient.getSession()
-      
       if (error) {
-        // If getSession fails, try to refresh the session
-        console.warn('getSession failed, attempting refresh:', error.message)
-        try {
-          const { data: refreshData, error: refreshError } = await gotrueClient.refreshSession()
-          if (refreshError) {
-            throw refreshError
-          }
-          return refreshData.session?.access_token
-        } catch (refreshErr) {
-          throw error
-        }
+        throw error
       }
-
+  
       return session?.access_token
-    } catch (err) {
-      throw err
     }
-  }
-
   return currentSession.access_token
 }
-
-export * from './session-utils'
