@@ -1,8 +1,7 @@
 import { type SupabaseClient, createClient } from '@supabase/supabase-js'
-import { upperFirst } from 'lodash'
-
-import { BaseLoader, BaseSource } from './base'
-import { processMdx } from '../../helpers.mdx'
+import { upperFirst } from 'lodash-es'
+import { processMdx } from '../../helpers.mdx.js'
+import { BaseLoader, BaseSource } from './base.js'
 
 type PartnerData = {
   slug: string // The partner slug corresponding to the last part of the URL
