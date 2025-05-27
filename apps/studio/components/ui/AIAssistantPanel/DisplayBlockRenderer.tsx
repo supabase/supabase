@@ -14,6 +14,7 @@ import { identifyQueryType } from './AIAssistant.utils'
 import { useParams } from 'common/hooks'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Message } from 'ai/react'
+import { Badge } from 'ui'
 
 interface DisplayBlockRendererProps {
   messageId: string
@@ -46,7 +47,6 @@ export const DisplayBlockRenderer = ({
   const router = useRouter()
   const { profile } = useProfile()
   const { mutate: sendEvent } = useSendEventMutation()
-  const supportSQLBlocks = useFlag('reportsV2')
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
@@ -74,8 +74,7 @@ export const DisplayBlockRenderer = ({
     [snap, messageId, resultId]
   )
   const displayData = liveResultData ?? cachedResults
-  const isDraggableToReports =
-    supportSQLBlocks && canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
+  const isDraggableToReports = canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
   const label = initialArgs.label || 'SQL Results'
   const sqlQuery = initialArgs.sql
 
@@ -115,7 +114,7 @@ export const DisplayBlockRenderer = ({
         label={label}
         sql={sqlQuery}
         lockColumns={true}
-        showSql={true}
+        showSql={!isChart}
         results={displayData}
         chartConfig={chartConfig}
         isChart={isChart}
@@ -123,6 +122,16 @@ export const DisplayBlockRenderer = ({
         isLoading={isLoading}
         draggable={isDraggableToReports}
         runQuery={initialArgs.runQuery === true && !displayData && !manualId}
+        tooltip={
+          isDraggableToReports ? (
+            <div className="flex items-center gap-x-2">
+              <Badge variant="success" className="text-xs rounded px-1">
+                NEW
+              </Badge>
+              <p>Drag to add this chart into your custom report</p>
+            </div>
+          ) : undefined
+        }
         onResults={(results) => onResults({ messageId, resultId, results })}
         onRunQuery={handleRunQuery}
         onUpdateChartConfig={handleUpdateChartConfig}
