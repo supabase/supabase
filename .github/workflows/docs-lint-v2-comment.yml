@@ -1,4 +1,4 @@
-name: Comment on external PRs with linter results
+name: docs_lint_comment_external
 
 # This is a continuation of ./docs-lint-v2.yml, to write comments on external
 # PRs.
@@ -11,7 +11,7 @@ name: Comment on external PRs with linter results
 
 on:
   workflow_run:
-    workflows: ['[Docs] Lint v2']
+    workflows: [docs_lint]
     types:
       - completed
 
