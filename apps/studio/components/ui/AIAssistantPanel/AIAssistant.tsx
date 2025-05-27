@@ -315,7 +315,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       }}
       actions={[
         {
-          label: 'Clear Messages and refresh',
+          label: 'Clear messages and refresh',
           onClick: () => {
             handleClearMessages()
             window.location.reload()
