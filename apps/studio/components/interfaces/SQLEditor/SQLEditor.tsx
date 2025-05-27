@@ -143,14 +143,9 @@ export const SQLEditor = () => {
   useAddDefinitions(id, monacoRef.current)
 
   /** React query data fetching  */
-  // only need to check subscription settings if org is opted into AI
-  let hasHipaaAddon: boolean = false
-  if (isOptedInToAI) {
-    const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
-    const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
-    hasHipaaAddon =
-      subscriptionHasHipaaAddon(subscription) && (projectSettings?.is_sensitive || false)
-  }
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
 
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery(
     {
