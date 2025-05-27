@@ -2,21 +2,19 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 import { toast } from 'sonner'
 
-import { useIsLoggedIn, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useParams } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import useLatest from 'hooks/misc/useLatest'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useIsNewLayoutEnabled } from './FeaturePreview/FeaturePreviewContext'
 
 // Ideally these could all be within a _middleware when we use Next 12
 const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const { ref, slug, id } = useParams()
-  const newLayoutPreview = useIsNewLayoutEnabled()
 
   const isLoggedIn = useIsLoggedIn()
   const snap = useAppStateSnapshot()
@@ -33,11 +31,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     ''
   )
 
-  const DEFAULT_HOME = IS_PLATFORM
-    ? newLayoutPreview
-      ? '/organizations'
-      : '/projects'
-    : '/project/default'
+  const DEFAULT_HOME = IS_PLATFORM ? '/organizations' : '/project/default'
 
   /**
    * Array of urls/routes that should be ignored

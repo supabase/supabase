@@ -4,12 +4,13 @@ import { toast } from 'sonner'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { copyToClipboard } from 'lib/helpers'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { fetchFileUrl } from './useFetchFileUrlQuery'
 
 export const useCopyUrl = () => {
-  const { projectRef, selectedBucket, getPathAlongOpenedFolders } = useStorageStore()
+  const { projectRef, selectedBucket, getPathAlongOpenedFolders } =
+    useStorageExplorerStateSnapshot()
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef: projectRef })
 

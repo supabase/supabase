@@ -22,7 +22,9 @@ export const sqlAiDisclaimerComment = `
 
 export const untitledSnippetTitle = 'Untitled query'
 
-export const destructiveSqlRegex = [/^(.*;)?\s*(drop|delete|truncate)\s/is]
+export const destructiveSqlRegex = [
+  /^(.*;)?\s*(drop|delete|truncate|alter\s+table\s+.*\s+drop\s+column)\s/is,
+]
 
 export const ASSISTANT_TEMPLATES = [
   {

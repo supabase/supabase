@@ -3,7 +3,6 @@ import { Clipboard, Copy, Download, Edit, Lock, MoreHorizontal, Trash, Unlock } 
 import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
-import { useSnapshot } from 'valtio'
 
 import { IS_PLATFORM } from 'common'
 import {
@@ -28,7 +27,7 @@ import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { copyToClipboard } from 'lib/helpers'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { createTabId, getTabsStore, makeTabPermanent } from 'state/tabs'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   cn,
   DropdownMenu,
@@ -45,11 +44,19 @@ import {
   TreeViewItemVariant,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { useTableDefinitionQuery } from 'data/database/table-definition-query'
+import { formatSql } from 'lib/formatSql'
+
 export interface EntityListItemProps {
   id: number | string
   projectRef: string
   isLocked: boolean
   isActive?: boolean
+}
+
+// [jordi] Used to determine the entity is a table and not a view or other unsupported entity type
+function isTableLikeEntityListItem(entity: { type?: string }) {
+  return entity?.type === ENTITY_TYPE.TABLE || entity?.type === ENTITY_TYPE.PARTITIONED_TABLE
 }
 
 const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
@@ -63,13 +70,21 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
 
+  const { data: tableDefinition, isLoading: isTableDefinitionLoading } = useTableDefinitionQuery(
+    {
+      id: entity.id,
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: isTableLikeEntityListItem(entity) }
+  )
+
   // For tabs preview flag logic
   const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
   const tabId = createTabId(entity.type, { id: entity.id })
-  const tabStore = getTabsStore(projectRef)
-  const isPreview = isTableEditorTabsEnabled ? tabStore.previewTabId === tabId : false
+  const tabs = useTabsStateSnapshot()
+  const isPreview = isTableEditorTabsEnabled ? tabs.previewTabId === tabId : false
 
-  const tabs = useSnapshot(tabStore)
   const isOpened = Object.values(tabs.tabsMap).some((tab) => tab.metadata?.tableId === entity.id)
   const isActive = Number(id) === entity.id
   const canEdit = isActive && !isLocked
@@ -233,7 +248,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       onDoubleClick={(e) => {
         e.preventDefault()
         const tabId = createTabId(entity.type, { id: entity.id })
-        makeTabPermanent(projectRef, tabId)
+        tabs.makeTabPermanent(tabId)
       }}
     >
       <>
@@ -287,6 +302,30 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                 <Clipboard size={12} />
                 <span>Copy name</span>
               </DropdownMenuItem>
+
+              {isTableLikeEntityListItem(entity) && (
+                <DropdownMenuItem
+                  key="copy-schema"
+                  className="space-x-2"
+                  disabled={isTableDefinitionLoading || !tableDefinition}
+                  onClick={async (e) => {
+                    e.stopPropagation()
+                    if (!tableDefinition) return
+                    try {
+                      const formatted = formatSql(tableDefinition)
+                      await copyToClipboard(formatted)
+                      toast.success('Table schema copied to clipboard', { id: 'copy-schema' })
+                    } catch (err: any) {
+                      toast.error('Failed to copy schema: ' + (err.message || err), {
+                        id: 'copy-schema',
+                      })
+                    }
+                  }}
+                >
+                  <Clipboard size={12} />
+                  <span>Copy table schema</span>
+                </DropdownMenuItem>
+              )}
 
               {entity.type === ENTITY_TYPE.TABLE && (
                 <>

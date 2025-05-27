@@ -3,17 +3,15 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useOrganizationDeleteMutation } from 'data/organizations/organization-delete-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { Button, Form, Input, Modal } from 'ui'
 
-const DeleteOrganizationButton = () => {
+export const DeleteOrganizationButton = () => {
   const router = useRouter()
-  const newLayoutPreview = useIsNewLayoutEnabled()
   const selectedOrganization = useSelectedOrganization()
   const { slug: orgSlug, name: orgName } = selectedOrganization ?? {}
 
@@ -29,12 +27,8 @@ const DeleteOrganizationButton = () => {
   const { mutate: deleteOrganization, isLoading: isDeleting } = useOrganizationDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted ${orgName}`)
-      if (newLayoutPreview) {
-        setLastVisitedOrganization('')
-        router.push('/organizations')
-      } else {
-        router.push('/projects')
-      }
+      setLastVisitedOrganization('')
+      router.push('/organizations')
     },
   })
 
@@ -127,5 +121,3 @@ const DeleteOrganizationButton = () => {
     </>
   )
 }
-
-export default DeleteOrganizationButton

@@ -16,7 +16,7 @@ import {
 } from 'ui'
 import { useProjectContext } from '../ProjectContext'
 
-const HelpPopover = () => {
+export const HelpPopover = () => {
   const router = useRouter()
   const { project } = useProjectContext()
   const org = useSelectedOrganization()
@@ -144,5 +144,3 @@ const HelpPopover = () => {
     </Popover_Shadcn_>
   )
 }
-
-export default HelpPopover

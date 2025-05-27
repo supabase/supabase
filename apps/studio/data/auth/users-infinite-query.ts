@@ -10,7 +10,7 @@ export type Filter = 'verified' | 'unverified' | 'anonymous'
 
 export type UsersVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   page?: number
   keywords?: string
   filter?: Filter
@@ -51,7 +51,7 @@ export const getUsersSQL = ({
     // [Joshen] Escape single quotes properly
     const formattedKeywords = keywords.replaceAll("'", "''")
     conditions.push(
-      `id::text like '%${formattedKeywords}%' or email like '%${formattedKeywords}%' or phone like '%${formattedKeywords}%'`
+      `id::text like '%${formattedKeywords}%' or email like '%${formattedKeywords}%' or phone like '%${formattedKeywords}%' or raw_user_meta_data->>'full_name' ilike '%${formattedKeywords}%' or raw_user_meta_data->>'first_name' ilike '%${formattedKeywords}%' or raw_user_meta_data->>'last_name' ilike '%${formattedKeywords}%' or raw_user_meta_data->>'display_name' ilike '%${formattedKeywords}%'`
     )
   }
 

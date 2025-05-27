@@ -173,7 +173,7 @@ const ColumnEditor = ({
 
       if (isEmpty(errors)) {
         const payload = isNewRecord
-          ? generateCreateColumnPayload(selectedTable.id, columnFields)
+          ? generateCreateColumnPayload(selectedTable, columnFields)
           : generateUpdateColumnPayload(column!, selectedTable, columnFields)
         const configuration = {
           columnId: column?.id,

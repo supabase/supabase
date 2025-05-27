@@ -2,7 +2,7 @@ import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useAppStateSnapshot } from 'state/app-state'
 import { AiIconAnimation, Button } from 'ui'
 
-const AssistantButton = () => {
+export const AssistantButton = () => {
   const snap = useAiAssistantStateSnapshot()
   const { setEditorPanel } = useAppStateSnapshot()
 
@@ -21,5 +21,3 @@ const AssistantButton = () => {
     </Button>
   )
 }
-
-export default AssistantButton

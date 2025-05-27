@@ -27,7 +27,7 @@ interface FileExplorerAndEditorProps {
   aiEndpoint?: string
   aiMetadata?: {
     projectRef?: string
-    connectionString?: string
+    connectionString?: string | null
     includeSchemaMetadata?: boolean
   }
 }
@@ -251,7 +251,7 @@ const FileExplorerAndEditor = ({
           aiMetadata={aiMetadata}
           options={{
             tabSize: 2,
-            fontSize: 12,
+            fontSize: 13,
             minimap: { enabled: false },
             wordWrap: 'on',
             lineNumbers: 'on',

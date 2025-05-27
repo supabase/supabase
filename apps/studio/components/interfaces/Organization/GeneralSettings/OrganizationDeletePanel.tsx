@@ -2,7 +2,7 @@ import Panel from 'components/ui/Panel'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Admonition } from 'ui-patterns'
-import DeleteOrganizationButton from './DeleteOrganizationButton'
+import { DeleteOrganizationButton } from './DeleteOrganizationButton'
 
 const OrganizationDeletePanel = () => {
   const selectedOrganization = useSelectedOrganization()
