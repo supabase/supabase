@@ -316,7 +316,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   console.log('isDraftMode', isDraftMode)
   const [previewData, setPreviewData] = useState<ProcessedBlogData>(props.blog)
 
-  const { data: livePreviewData } = useLivePreview({
+  const { data: livePreviewData, isLoading: isLivePreviewLoading } = useLivePreview({
     initialData: props.blog,
     serverURL: process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030',
     depth: 2,
@@ -568,6 +568,9 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
           ],
         }}
       />
+      {isLivePreviewLoading && (
+        <div className="fixed top-10 right-10 border rounded-full rounded-tr-none animate-spin transform w-10 h-10 bg-transparent" />
+      )}
       {isDraftMode && <DraftModeBanner />}
       {isDraftMode && <LivePreview onUpdate={handlePreviewUpdate} />}
       <DefaultLayout className="overflow-x-hidden">
@@ -592,8 +595,11 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
               {/* Title and description */}
               <div className="mb-6 lg:mb-10 max-w-5xl space-y-8">
                 <div className="space-y-4">
-                  <Link href="/blog" className="text-brand hidden lg:inline">
-                    Blog
+                  <Link href="/blog" className="text-brand hidden lg:inline-flex items-center">
+                    Blog{' '}
+                    {isLivePreviewLoading && (
+                      <div className="text-xs text-foreground-lighter ml-4">Draft loading...</div>
+                    )}
                   </Link>
                   <h1 className="text-2xl sm:text-4xl">{blogMetaData.title}</h1>
                   <div className="text-light flex space-x-3 text-sm">

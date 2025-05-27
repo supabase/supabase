@@ -29,6 +29,12 @@ type CMSBlogPost = {
   toc_depth?: number
   readingTime?: number
   tags?: string[]
+  industry?: string[]
+  supabase_products?: string[]
+  company_size?: string
+  region?: string
+  logo?: string
+  logo_inverse?: string
   thumb?: {
     url: string
   }
@@ -56,6 +62,12 @@ type ProcessedPost = {
   date: string
   formattedDate: string
   readingTime: string
+  industry?: string[]
+  supabase_products?: string[]
+  company_size?: string
+  region?: string
+  logo?: string
+  logo_inverse?: string
   authors: Array<{
     author: string
     author_id: string

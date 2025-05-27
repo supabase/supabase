@@ -55,11 +55,11 @@ type CMSCustomer = {
 type ProcessedCustomer = {
   slug: string
   name: string
-  title: string
-  description: string
+  title?: string
+  description?: string
   date: string
   formattedDate: string
-  readingTime: string
+  readingTime?: string
   authors: Array<{
     author: string
     author_id: string
@@ -71,12 +71,17 @@ type ProcessedCustomer = {
   toc_depth: number
   thumb: string | null
   image: string | null
-  logo: string | null
   url: string
   path: string
   isCMS: boolean
   tags: string[]
   content: string
+  industry?: string[]
+  supabase_products?: string[]
+  company_size?: string
+  region?: string
+  logo?: string
+  logo_inverse?: string
 }
 
 /**

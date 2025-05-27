@@ -15,7 +15,7 @@ import Link from 'next/link'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import CustomersFilters from '../components/CustomerStories/CustomersFilters'
 import { useState } from 'react'
-import { Button, cn } from 'ui'
+import { cn } from 'ui'
 import { getAllCMSCustomers } from '../lib/cms-customers'
 
 export async function getStaticProps() {
