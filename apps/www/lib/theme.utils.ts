@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect } from 'react'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'

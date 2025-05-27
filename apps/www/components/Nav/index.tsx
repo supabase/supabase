@@ -1,6 +1,8 @@
+'use client'
+
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
 
@@ -33,7 +35,7 @@ interface Props {
 
 const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const { resolvedTheme } = useTheme()
-  const router = useRouter()
+  const pathname = usePathname()
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
   const isLoggedIn = useIsLoggedIn()
@@ -42,10 +44,10 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const user = useUser()
   const userMenu = useDropdownMenu(user)
 
-  const isHomePage = router.pathname === '/'
-  const isLaunchWeekPage = router.pathname.includes('/launch-week')
-  const isLaunchWeekXPage = router.pathname === '/launch-week/x'
-  const isGAWeekSection = router.pathname.startsWith('/ga-week')
+  const isHomePage = pathname === '/'
+  const isLaunchWeekPage = pathname?.includes('/launch-week')
+  const isLaunchWeekXPage = pathname === '/launch-week/x'
+  const isGAWeekSection = pathname?.startsWith('/ga-week')
   const disableStickyNav = isLaunchWeekXPage || isGAWeekSection || isLaunchWeekPage || !stickyNavbar
   const showLaunchWeekNavMode = (isLaunchWeekPage || isGAWeekSection) && !open
 

@@ -1,5 +1,4 @@
 import { generateReadingTime } from './helpers'
-const toc = require('markdown-toc')
 
 // Payload API configuration
 const PAYLOAD_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030'
@@ -273,11 +272,6 @@ function processPostData(post: any) {
   const thumbUrl = post.thumb?.url ? `${PAYLOAD_URL}${post.thumb.url}` : null
   const imageUrl = post.image?.url ? `${PAYLOAD_URL}${post.image.url}` : null
 
-  // Generate TOC from content for CMS posts
-  const tocResult = toc(markdownContent, {
-    maxdepth: post.toc_depth ? post.toc_depth : 2,
-  })
-
   return {
     slug: post.slug,
     source: markdownContent,
@@ -307,10 +301,6 @@ function processPostData(post: any) {
     isCMS: true,
     content: markdownContent,
     tags: post.tags || [],
-    toc: {
-      content: tocResult.content,
-      json: tocResult.json,
-    },
   }
 }
 
@@ -372,11 +362,6 @@ export async function getAllCMSPosts({
               author_id: author.author_id || '',
               position: author.position || '',
               author_url: author.author_url || '#',
-              // author_image_url: author.author_image_url?.url
-              //   ? author.author_image_url.url.includes('http')
-              //     ? author.author_image_url.url
-              //     : `${PAYLOAD_URL}${author.author_image_url.url}`
-              //   : null,
               author_image_url: author.author_image_url?.url
                 ? `${PAYLOAD_URL}${author.author_image_url.url}`
                 : null,

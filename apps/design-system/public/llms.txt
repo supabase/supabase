@@ -1,5 +1,5 @@
 # Supabase Design System
-Last updated: 2025-04-24T06:00:07.374Z
+Last updated: 2025-05-27T16:25:34.367Z
 
 ## Overview
 The Design System used in Supabase Studio.

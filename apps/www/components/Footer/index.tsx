@@ -1,7 +1,9 @@
+'use client'
+
 import { CheckIcon } from '@heroicons/react/outline'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
 import SectionContainer from '../Layouts/SectionContainer'
 
@@ -17,7 +19,7 @@ interface Props {
 }
 
 const Footer = (props: Props) => {
-  const { pathname } = useRouter()
+  const pathname = usePathname()
 
   const isDarkLaunchWeek = useDarkLaunchWeeks()
   const isGAWeek = pathname.includes('/ga-week')
