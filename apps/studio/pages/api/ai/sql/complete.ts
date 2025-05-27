@@ -1,4 +1,5 @@
-import { bedrock } from '@ai-sdk/amazon-bedrock'
+import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock'
+import { fromNodeProviderChain } from '@aws-sdk/credential-providers'
 import pgMeta from '@supabase/pg-meta'
 import { streamText } from 'ai'
 import { NextApiRequest, NextApiResponse } from 'next'
@@ -8,14 +9,42 @@ import apiWrapper from 'lib/api/apiWrapper'
 import { getTools } from '../sql/tools'
 
 export const maxDuration = 30
-const awsAccessKeyId = process.env.AWS_ACCESS_KEY_ID
+const credentialProvider = fromNodeProviderChain()
+
+const bedrock = createAmazonBedrock({
+  credentialProvider,
+})
+
+async function hasAwsCredentials() {
+  try {
+    const credentials = await credentialProvider()
+    return !!credentials
+  } catch (error) {
+    return false
+  }
+}
+
+const hasCredentials = await hasAwsCredentials()
 const pgMetaSchemasList = pgMeta.schemas.list()
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (!awsAccessKeyId) {
+  if (!process.env.AWS_REGION) {
     return new Response(
       JSON.stringify({
-        error: 'No AWS_ACCESS_KEY_ID set. Create this environment variable to use AI features.',
+        error: 'AWS_REGION is not set',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
+  }
+
+  if (!hasCredentials) {
+    return new Response(
+      JSON.stringify({
+        error:
+          'AWS credentials are not configured. Set up a local profile or add environment variables.',
       }),
       {
         status: 500,
@@ -62,7 +91,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       : { result: [] }
 
     const result = await streamText({
-      model: bedrock('us.anthropic.claude-3-7-sonnet-20250219-v1:0'),
+      model: bedrock('us.anthropic.claude-sonnet-4-20250514-v1:0'),
       maxSteps: 5,
       tools: getTools({ projectRef, connectionString, authorization, includeSchemaMetadata }),
       system: `

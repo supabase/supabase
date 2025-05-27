@@ -73,7 +73,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { messages } = req.body
 
   const result = await streamText({
-    model: bedrock('us.anthropic.claude-3-7-sonnet-20250219-v1:0'),
+    model: bedrock('us.anthropic.claude-sonnet-4-20250514-v1:0'),
     maxSteps: 7,
     system: `
       You are a Supabase expert who helps people set up their Supabase project. You specializes in database schema design. You are to help the user design a database schema for their application but also suggest Supabase services they should use. 
