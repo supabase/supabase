@@ -92,7 +92,7 @@ function ApiKeyInput() {
   // The default publisahble key will always be the first one
   const apiKey = publishableApiKeys[0]
 
-  const baseClasses = 'flex-1 grow gap-1 rounded-full min-w-[300px] truncate'
+  const baseClasses = 'flex-1 grow gap-1 rounded-full min-w-[32em]'
   const size = 'tiny'
 
   if (isApiKeysLoading || isPermissionsLoading) {

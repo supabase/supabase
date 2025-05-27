@@ -28,6 +28,7 @@ import { useParams } from 'next/navigation'
 
 const FORM_ID = 'create-publishable-api-key'
 const SCHEMA = z.object({
+  name: z.string(),
   description: z.string(),
 })
 
@@ -48,6 +49,7 @@ function CreatePublishableAPIKeyDialog() {
   const form = useForm<z.infer<typeof SCHEMA>>({
     resolver: zodResolver(SCHEMA),
     defaultValues: {
+      name: '',
       description: '',
     },
   })
@@ -59,7 +61,8 @@ function CreatePublishableAPIKeyDialog() {
       {
         projectRef,
         type: 'publishable',
-        description: values.description.trim(),
+        name: values.name,
+        description: values.description.trim() || null,
       },
       {
         onSuccess: () => {
@@ -93,6 +96,21 @@ function CreatePublishableAPIKeyDialog() {
               id={FORM_ID}
               onSubmit={form.handleSubmit(onSubmit)}
             >
+              <FormField_Shadcn_
+                key="name"
+                name="name"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout
+                    label="Name"
+                    description="A short name of lowercase alphanumeric characters and underscore, must start with letter or underscore."
+                  >
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_ {...field} />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
               <FormField_Shadcn_
                 key="description"
                 name="description"

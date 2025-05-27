@@ -14,12 +14,12 @@ import type { NextPageWithLayout } from 'types'
 import { Separator } from 'ui'
 
 const ApiKeysNewPage: NextPageWithLayout = () => {
-  const { isInRollout, shouldDisableUI } = useApiKeysVisibility()
+  const { isInRollout, shouldDisableUI, canInitApiKeys } = useApiKeysVisibility()
 
   return (
     <>
       {!isInRollout && <ApiKeysComingSoonBanner />}
-      <ApiKeysCreateCallout />
+      {canInitApiKeys && <ApiKeysCreateCallout />}
       <ApiKeysFeedbackBanner />
       <DisableInteraction disabled={shouldDisableUI} className="flex flex-col gap-8">
         <PublishableAPIKeys />

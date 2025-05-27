@@ -112,29 +112,35 @@ export function ApiKeyPill({
         <div
           className={cn(
             InputVariants({ size: 'tiny' }),
-            'flex-1 grow gap-0 font-mono rounded-full overflow-hidden',
+            'flex-1 grow gap-0 font-mono rounded-full',
+            isSecret ? 'overflow-hidden' : '',
             show ? 'ring-1 ring-foreground-lighter ring-opacity-50' : 'ring-0 ring-opacity-0',
             'transition-all',
-            'max-w-[340px]',
+            'max-w-[380px]',
             'cursor-text',
             'relative'
           )}
           style={{ userSelect: 'all' }}
         >
-          <span>{apiKey?.api_key.slice(0, 15)}</span>
-          <motion.span
-            key={show ? 'shown' : 'hidden'}
-            initial={{ opacity: 0, y: show ? 16 : -16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: show ? 16 : -16 }}
-            transition={{
-              duration: 0.1,
-              y: { type: 'spring', stiffness: 1000, damping: 55 },
-            }}
-            className="truncate"
-          >
-            {show && data?.api_key ? data?.api_key.slice(15) : '••••••••••••••••'}
-          </motion.span>
+          {isSecret ? (
+            <>
+              <span>{apiKey?.api_key.slice(0, 15)}</span>
+              <motion.span
+                key={show ? 'shown' : 'hidden'}
+                initial={{ opacity: 0, y: show ? 16 : -16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: show ? 16 : -16 }}
+                transition={{
+                  duration: 0.1,
+                  y: { type: 'spring', stiffness: 1000, damping: 55 },
+                }}
+              >
+                {show && data?.api_key ? data?.api_key.slice(15) : '••••••••••••••••'}
+              </motion.span>
+            </>
+          ) : (
+            <span>{apiKey?.api_key}</span>
+          )}
         </div>
       </AnimatePresence>
 

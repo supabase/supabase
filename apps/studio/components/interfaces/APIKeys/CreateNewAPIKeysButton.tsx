@@ -30,14 +30,14 @@ export const CreateNewAPIKeysButton = () => {
       await createAPIKey({
         projectRef,
         type: 'publishable',
-        description: 'Default publishable key',
+        name: 'default',
       })
 
       // Create secret key
       await createAPIKey({
         projectRef,
         type: 'secret',
-        description: 'default',
+        name: 'default',
       })
 
       setCreateKeysDialogOpen(false)

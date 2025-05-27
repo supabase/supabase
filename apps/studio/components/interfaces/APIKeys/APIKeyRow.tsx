@@ -32,12 +32,13 @@ export const APIKeyRow = ({
         mass: 1,
       }}
     >
-      <TableCell className="py-2 w-[300px]">{apiKey.description || '/'}</TableCell>
-      <TableCell className="py-2 w-full">
+      <TableCell className="py-2">{apiKey.name}</TableCell>
+      <TableCell className="py-2">
         <div className="flex flex-row gap-2">
           <ApiKeyPill apiKey={apiKey} />
         </div>
       </TableCell>
+      <TableCell className="py-2">{apiKey.description || '/'}</TableCell>
 
       <TableCell className="flex justify-end">
         <DropdownMenu>

@@ -39,12 +39,9 @@ export function useApiKeysVisibility(): ApiKeysVisibilityState {
   const hasApiKeys = publishableApiKeys.length > 0
 
   // Can initialize API keys when in rollout, has permissions, not loading, and no API keys yet
-  const canInitApiKeys = isInRollout && canReadAPIKeys && !isLoading && !hasApiKeys
+  const canInitApiKeys = hasApiKeys ? false : isInRollout && canReadAPIKeys && !isLoading
 
-  // Disable and fade the UI when:
-  // 1. Not in the rollout OR
-  // 2. In the rollout but has no API keys yet
-  const shouldDisableUI = !isInRollout || !hasApiKeys
+  const shouldDisableUI = hasApiKeys ? false : !isInRollout
 
   return {
     isInRollout,

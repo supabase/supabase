@@ -22,22 +22,22 @@ import { useApiKeysVisibility } from './hooks/useApiKeysVisibility'
 // Mock API Keys for demo
 const mockApiKeys = [
   {
-    id: 'mock-id-1',
-    type: 'secret',
-    api_key: 'sb_secret_8I4Se•••••••••••••',
-    description: 'New Key',
-  },
-  {
     id: 'mock-id-2',
-    type: 'secret',
-    api_key: 'sb_secret_pL9Tz•••••••••••••',
-    description: 'Service Key',
+    type: 'publishable',
+    api_key: 'sb_publishable_ltaNA7nnVozoSCOcZIjg',
+    name: 'web',
   },
   {
     id: 'mock-id-3',
+    type: 'publishable',
+    api_key: 'sb_publishable_YpotEpinEWsC2dI7FIKI',
+    name: 'mobile',
+  },
+  {
+    id: 'mock-id-1',
     type: 'secret',
-    api_key: 'sb_secret_bR7Ax•••••••••••••',
-    description: 'Backend Key',
+    api_key: 'sb_secret_8I4Se•••••••••••••',
+    name: 'backend_api',
   },
 ] as Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>[]
 
@@ -69,7 +69,7 @@ export const ApiKeysTableIllustration = () => {
           <TableBody>
             {mockApiKeys.map((apiKey) => (
               <TableRow key={apiKey.id}>
-                <TableCell className="py-2 w-[180px]">{apiKey.description}</TableCell>
+                <TableCell className="py-2 w-[180px]">{apiKey.name}</TableCell>
                 <TableCell className="py-2">
                   <div className="flex flex-row gap-2">
                     <ApiKeyPill apiKey={apiKey} />
