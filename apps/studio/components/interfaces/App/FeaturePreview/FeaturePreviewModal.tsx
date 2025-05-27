@@ -1,12 +1,11 @@
 import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { removeTabsByEditor } from 'state/tabs'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
@@ -19,17 +18,26 @@ const FeaturePreviewModal = () => {
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const isFeaturePreviewTabsTableEditorFlag = useFlag('featurePreviewTabsTableEditor')
-  const isFeaturePreviewTabsSqlEditorFlag = useFlag('featurePreviewSqlEditorTabs')
+  // [Joshen] Use this if we want to feature flag previews
+  function isReleasedToPublic(feature: (typeof FEATURE_PREVIEWS)[number]) {
+    switch (feature.key) {
+      default:
+        return true
+    }
+  }
 
-  const selectedFeaturePreview =
-    snap.selectedFeaturePreview === '' ? FEATURE_PREVIEWS[0].key : snap.selectedFeaturePreview
-
-  const [selectedFeatureKey, setSelectedFeatureKey] = useState<string>(selectedFeaturePreview)
+  const selectedFeatureKey =
+    snap.selectedFeaturePreview === ''
+      ? FEATURE_PREVIEWS.filter((feature) => isReleasedToPublic(feature))[0].key
+      : snap.selectedFeaturePreview
 
   const { flags, onUpdateFlag } = featurePreviewContext
   const selectedFeature = FEATURE_PREVIEWS.find((preview) => preview.key === selectedFeatureKey)
   const isSelectedFeatureEnabled = flags[selectedFeatureKey]
+
+  const allFeaturePreviews = IS_PLATFORM
+    ? FEATURE_PREVIEWS
+    : FEATURE_PREVIEWS.filter((x) => !x.isPlatformOnly)
 
   const toggleFeature = () => {
     onUpdateFlag(selectedFeatureKey, !isSelectedFeatureEnabled)
@@ -39,37 +47,17 @@ const FeaturePreviewModal = () => {
       groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
 
-    if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS) {
-      removeTabsByEditor(ref as string | undefined, 'table')
+    if (ref && selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS) {
+      removeTabsByEditor(ref, 'table')
     }
-    if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS) {
-      removeTabsByEditor(ref as string | undefined, 'sql')
+    if (ref && selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS) {
+      removeTabsByEditor(ref, 'sql')
     }
   }
 
   function handleCloseFeaturePreviewModal() {
     snap.setShowFeaturePreviewModal(false)
-    snap.setSelectedFeaturePreview(FEATURE_PREVIEWS[0].key)
   }
-
-  function isReleasedToPublic(feature: (typeof FEATURE_PREVIEWS)[number]) {
-    switch (feature.key) {
-      case LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS:
-        return isFeaturePreviewTabsTableEditorFlag
-      case LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS:
-        return isFeaturePreviewTabsSqlEditorFlag
-      default:
-        return true
-    }
-  }
-  // this modal can be triggered on other pages
-  // Update local state when valtio state changes
-
-  useEffect(() => {
-    if (snap.selectedFeaturePreview !== '') {
-      setSelectedFeatureKey(snap.selectedFeaturePreview)
-    }
-  }, [snap.selectedFeaturePreview])
 
   useEffect(() => {
     if (snap.showFeaturePreviewModal) {
@@ -94,32 +82,31 @@ const FeaturePreviewModal = () => {
         <div className="flex">
           <div>
             <ScrollArea className="h-[550px] w-[280px] border-r">
-              {FEATURE_PREVIEWS.filter((feature) => {
-                // filter out preview features that are not released to the public
-                return isReleasedToPublic(feature)
-              }).map((feature) => {
-                const isEnabled = flags[feature.key] ?? false
+              {allFeaturePreviews
+                .filter((feature) => isReleasedToPublic(feature))
+                .map((feature) => {
+                  const isEnabled = flags[feature.key] ?? false
 
-                return (
-                  <div
-                    key={feature.key}
-                    onClick={() => setSelectedFeatureKey(feature.key)}
-                    className={cn(
-                      'flex items-center space-x-3 p-4 border-b cursor-pointer bg transition',
-                      selectedFeatureKey === feature.key ? 'bg-surface-300' : 'bg-surface-100'
-                    )}
-                  >
-                    {isEnabled ? (
-                      <Eye size={14} strokeWidth={2} className="text-brand" />
-                    ) : (
-                      <EyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
-                    )}
-                    <p className="text-sm truncate" title={feature.name}>
-                      {feature.name}
-                    </p>
-                  </div>
-                )
-              })}
+                  return (
+                    <div
+                      key={feature.key}
+                      onClick={() => snap.setSelectedFeaturePreview(feature.key)}
+                      className={cn(
+                        'flex items-center space-x-3 p-4 border-b cursor-pointer bg transition',
+                        selectedFeatureKey === feature.key ? 'bg-surface-300' : 'bg-surface-100'
+                      )}
+                    >
+                      {isEnabled ? (
+                        <Eye size={14} strokeWidth={2} className="text-brand" />
+                      ) : (
+                        <EyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
+                      )}
+                      <p className="text-sm truncate" title={feature.name}>
+                        {feature.name}
+                      </p>
+                    </div>
+                  )
+                })}
             </ScrollArea>
           </div>
           <div className="flex-grow max-h-[550px] p-4 space-y-3 overflow-y-auto">

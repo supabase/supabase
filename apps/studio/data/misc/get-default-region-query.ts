@@ -1,17 +1,25 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import type { ResponseError } from 'types'
-import { miscKeys } from './keys'
 import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
-import { getDistanceLatLonKM } from 'lib/helpers'
 import {
   AWS_REGIONS_COORDINATES,
   FLY_REGIONS_COORDINATES,
 } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { fetchHandler } from 'data/fetchers'
+import { getDistanceLatLonKM } from 'lib/helpers'
 import type { CloudProvider } from 'shared-data'
 import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
+import type { ResponseError } from 'types'
+import { miscKeys } from './keys'
 
-const RESTRICTED_POOL = ['EAST_US', 'CENTRAL_EU', 'SOUTHEAST_ASIA']
+const RESTRICTED_POOL = [
+  'EAST_US_2',
+  'CENTRAL_EU',
+  'NORTH_EU',
+  'WEST_EU',
+  'WEST_EU_2',
+  'SOUTHEAST_ASIA',
+]
 
 export type DefaultRegionVariables = {
   cloudProvider?: CloudProvider
@@ -25,7 +33,9 @@ export async function getDefaultRegionOption({
   if (!cloudProvider) throw new Error('Cloud provider is required')
 
   try {
-    const data = await fetch('https://www.cloudflare.com/cdn-cgi/trace').then((res) => res.text())
+    const data = await fetchHandler('https://www.cloudflare.com/cdn-cgi/trace').then((res) =>
+      res.text()
+    )
     const locationCode: keyof typeof COUNTRY_LAT_LON = Object.fromEntries(
       data.split('\n').map((item) => item.split('='))
     )['loc']

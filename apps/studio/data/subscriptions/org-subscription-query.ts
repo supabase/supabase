@@ -5,13 +5,10 @@ import { get, handleError } from 'data/fetchers'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { ResponseError } from 'types'
 import { subscriptionKeys } from './keys'
-import { components } from 'api-types'
 
 export type OrgSubscriptionVariables = {
   orgSlug?: string
 }
-
-export type PlanType = components['schemas']['BillingPlanId']
 
 export async function getOrgSubscription(
   { orgSlug }: OrgSubscriptionVariables,
@@ -58,5 +55,5 @@ export const useOrgSubscriptionQuery = <TData = OrgSubscriptionData>(
 
 export const useHasAccessToProjectLevelPermissions = (slug: string) => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
-  return subscription?.plan.id === 'enterprise'
+  return subscription?.plan.id === 'enterprise' || subscription?.plan.id === 'team'
 }

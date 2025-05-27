@@ -52,7 +52,7 @@ export abstract class ReferenceLoader<SpecSection> extends BaseLoader {
           `${this.path}/${refSection.slug}`,
           refSection,
           specSection,
-          this.meta
+          this.enhanceMeta(specSection)
         )
       })
       .filter(Boolean)
@@ -62,6 +62,9 @@ export abstract class ReferenceLoader<SpecSection> extends BaseLoader {
 
   abstract getSpecSections(specContents: string): SpecSection[]
   abstract matchSpecSection(specSections: SpecSection[], id: string): SpecSection
+  enhanceMeta(section: SpecSection): Json {
+    return this.meta
+  }
 }
 
 export abstract class ReferenceSource<SpecSection> extends BaseSource {
@@ -186,8 +189,13 @@ export class ClientLibReferenceLoader extends ReferenceLoader<IFunctionDefinitio
 
     return spec.functions
   }
+
   matchSpecSection(functionDefinitions: IFunctionDefinition[], id: string): IFunctionDefinition {
     return functionDefinitions.find((functionDefinition) => functionDefinition.id === id)
+  }
+
+  enhanceMeta(section: IFunctionDefinition): Json {
+    return { ...this.meta, slug: section.id, methodName: section.title }
   }
 }
 

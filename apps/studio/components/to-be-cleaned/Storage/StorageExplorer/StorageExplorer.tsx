@@ -1,14 +1,13 @@
-import { useParams } from 'common'
 import { compact, get, isEmpty, uniqBy } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
 
+import { useParams } from 'common'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import type { Bucket } from 'data/storage/buckets-query'
 import { IS_PLATFORM } from 'lib/constants'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
-import ConfirmDeleteModal from './ConfirmDeleteModal'
+import { ConfirmDeleteModal } from './ConfirmDeleteModal'
 import CustomExpiryModal from './CustomExpiryModal'
 import FileExplorer from './FileExplorer'
 import FileExplorerHeader from './FileExplorerHeader'
@@ -21,26 +20,17 @@ interface StorageExplorerProps {
 }
 
 const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
-  const storageExplorerStore = useStorageStore()
+  const { ref } = useParams()
+  const storageExplorerRef = useRef(null)
   const {
-    columns,
-    selectedFilePreview,
-    closeFilePreview,
-    selectedItems,
-    setSelectedItems,
-    clearSelectedItems,
-    selectedItemsToDelete,
-    clearSelectedItemsToDelete,
-    openedFolders,
-    popColumnAtIndex,
-    popOpenedFoldersAtIndex,
-    selectedItemsToMove,
-    clearSelectedItemsToMove,
     view,
-    currentBucketName,
+    columns,
+    selectedItems,
+    selectedItemsToDelete,
+    openedFolders,
+    selectedItemsToMove,
+    selectedBucket,
     openBucket,
-
-    loadExplorerPreferences,
     fetchFolderContents,
     fetchMoreFolderContents,
     fetchFoldersByPath,
@@ -48,18 +38,18 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
     uploadFiles,
     deleteFiles,
     moveFiles,
-  } = storageExplorerStore
+    popColumnAtIndex,
+    popOpenedFoldersAtIndex,
+    setSelectedItems,
+    clearSelectedItems,
+    setSelectedFilePreview,
+    setSelectedItemsToMove,
+    setSelectedItemsToDelete,
+  } = useStorageExplorerStateSnapshot()
 
-  const storageExplorerRef = useRef(null)
-
-  const { ref } = useParams()
-
-  // [Joshen] This is to ensure that StorageExplorerStore can get the storage file size limit
-  // Will be better once we deprecate the mobx store entirely, which we will get there
   useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
 
   // This state exists outside of the header because FileExplorerColumn needs to listen to these as well
-  // I'm keeping them outside of the mobx store as I feel that the store should contain persistent data
   // Things like showing results from a search filter is "temporary", hence we use react state to manage
   const [itemSearchString, setItemSearchString] = useState('')
 
@@ -76,36 +66,40 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
         if (itemSearchString) {
           if (!currentFolder) {
             // At root of bucket
-            await fetchFolderContents(bucket.id, bucket.name, -1, itemSearchString)
+            await fetchFolderContents({
+              folderId: bucket.id,
+              folderName: bucket.name,
+              index: -1,
+              searchString: itemSearchString,
+            })
           } else {
-            await fetchFolderContents(
-              currentFolder.id,
-              currentFolder.name,
-              currentFolderIdx,
-              itemSearchString
-            )
+            await fetchFolderContents({
+              folderId: currentFolder.id,
+              folderName: currentFolder.name,
+              index: currentFolderIdx,
+              searchString: itemSearchString,
+            })
           }
         } else {
           if (!currentFolder) {
             // At root of bucket
-            await fetchFolderContents(bucket.id, bucket.name, -1)
+            await fetchFolderContents({ folderId: bucket.id, folderName: bucket.name, index: -1 })
           } else {
-            await fetchFolderContents(currentFolder.id, currentFolder.name, currentFolderIdx)
+            await fetchFolderContents({
+              folderId: currentFolder.id,
+              folderName: currentFolder.name,
+              index: currentFolderIdx,
+            })
           }
         }
       } else if (view === STORAGE_VIEWS.COLUMNS) {
         const paths = openedFolders.map((folder) => folder.name)
-        fetchFoldersByPath(paths, itemSearchString, true)
+        fetchFoldersByPath({ paths, searchString: itemSearchString, showLoading: true })
       }
     }
 
     fetchContents()
   }, [itemSearchString])
-
-  useEffect(() => {
-    // Load user preferences (view and sort)
-    loadExplorerPreferences()
-  }, [])
 
   useEffect(() => {
     openBucket(bucket)
@@ -144,7 +138,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
     event.persist()
     const items = event.target.files || event.dataTransfer.items
     const isDrop = !isEmpty(get(event, ['dataTransfer', 'items'], []))
-    await uploadFiles(items, columnIndex, isDrop)
+    await uploadFiles({ files: items, columnIndex, isDrop })
     event.target.value = ''
   }
 
@@ -162,11 +156,11 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
           await deleteFolder(itemToDelete)
           break
         case STORAGE_ROW_TYPES.FILE:
-          await deleteFiles([itemToDelete])
+          await deleteFiles({ files: [itemToDelete] })
           break
       }
     } else {
-      await deleteFiles(selectedItemsToDelete)
+      await deleteFiles({ files: selectedItemsToDelete })
     }
   }
 
@@ -174,17 +168,14 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   const onSelectColumnEmptySpace = (columnIndex: number) => {
     popColumnAtIndex(columnIndex)
     popOpenedFoldersAtIndex(columnIndex - 1)
-    closeFilePreview()
+    setSelectedFilePreview(undefined)
     clearSelectedItems()
   }
 
   return (
     <div
       ref={storageExplorerRef}
-      className="
-        bg-studio
-        border-overlay flex
-        h-full w-full flex-col rounded-md border"
+      className="bg-studio border rounded-md border-overlay flex h-full w-full flex-col"
     >
       {selectedItems.length === 0 ? (
         <FileExplorerHeader
@@ -197,7 +188,6 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
       )}
       <div className="flex h-full" style={{ height: fileExplorerHeight }}>
         <FileExplorer
-          view={view}
           columns={columns}
           openedFolders={openedFolders}
           selectedItems={selectedItems}
@@ -206,7 +196,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
           onSelectAllItemsInColumn={onSelectAllItemsInColumn}
           onSelectColumnEmptySpace={onSelectColumnEmptySpace}
           onColumnLoadMore={(index, column) =>
-            fetchMoreFolderContents(index, column, itemSearchString)
+            fetchMoreFolderContents({ index, column, searchString: itemSearchString })
           }
         />
         <PreviewPane />
@@ -214,14 +204,14 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
       <ConfirmDeleteModal
         visible={selectedItemsToDelete.length > 0}
         selectedItemsToDelete={selectedItemsToDelete}
-        onSelectCancel={clearSelectedItemsToDelete}
+        onSelectCancel={() => setSelectedItemsToDelete([])}
         onSelectDelete={onDeleteSelectedFiles}
       />
       <MoveItemsModal
-        bucketName={currentBucketName}
+        bucketName={selectedBucket.name}
         visible={selectedItemsToMove.length > 0}
         selectedItemsToMove={selectedItemsToMove}
-        onSelectCancel={clearSelectedItemsToMove}
+        onSelectCancel={() => setSelectedItemsToMove([])}
         onSelectMove={onMoveSelectedFiles}
       />
       <CustomExpiryModal />
@@ -230,4 +220,4 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
 }
 
 StorageExplorer.displayName = 'StorageExplorer'
-export default observer(StorageExplorer)
+export default StorageExplorer

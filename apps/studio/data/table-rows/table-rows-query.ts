@@ -1,3 +1,5 @@
+import { Query } from '@supabase/pg-meta/src/query'
+import { getTableRowsSql } from '@supabase/pg-meta/src/query/table-row-query'
 import {
   useQuery,
   useQueryClient,
@@ -6,14 +8,12 @@ import {
 } from '@tanstack/react-query'
 
 import { IS_PLATFORM } from 'common'
-import { Query } from '@supabase/pg-meta/src/query'
-import { getTableRowsSql } from '@supabase/pg-meta/src/query/table-row-query'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import {
-  ImpersonationRole,
   ROLE_IMPERSONATION_NO_RESULTS,
+  RoleImpersonationState,
   wrapWithRoleImpersonation,
 } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
@@ -28,7 +28,7 @@ export interface GetTableRowsArgs {
   sorts?: Sort[]
   limit?: number
   page?: number
-  impersonatedRole?: ImpersonationRole
+  roleImpersonationState?: RoleImpersonationState
 }
 
 // return the primary key columns if exists, otherwise return the first column to use as a default sort
@@ -45,11 +45,11 @@ async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function executeWithRetry(
-  fn: () => Promise<any>,
+export async function executeWithRetry<T>(
+  fn: () => Promise<T>,
   maxRetries: number = 3,
   baseDelay: number = 500
-): Promise<any> {
+): Promise<T> {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn()
@@ -64,6 +64,7 @@ async function executeWithRetry(
       throw error
     }
   }
+  throw new Error('Max retries reached without success')
 }
 
 // TODO: fetchAllTableRows is used for CSV export, but since it doesn't actually truncate anything, (compare to getTableRows)
@@ -78,15 +79,15 @@ export const fetchAllTableRows = async ({
   table,
   filters = [],
   sorts = [],
-  impersonatedRole,
+  roleImpersonationState,
   progressCallback,
 }: {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   table: SupaTable
   filters?: Filter[]
   sorts?: Sort[]
-  impersonatedRole?: ImpersonationRole
+  roleImpersonationState?: RoleImpersonationState
   progressCallback?: (value: number) => void
 }) => {
   if (IS_PLATFORM && !connectionString) {
@@ -119,7 +120,7 @@ export const fetchAllTableRows = async ({
     const primaryKeys = getDefaultOrderByColumns(table)
     if (primaryKeys.length > 0) {
       primaryKeys.forEach((col) => {
-        queryChains = queryChains.order(table.name, col, true, true)
+        queryChains = queryChains.order(table.name, col)
       })
     }
   } else {
@@ -136,10 +137,10 @@ export const fetchAllTableRows = async ({
     page += 1
     const from = page * rowsPerPage
     const to = (page + 1) * rowsPerPage - 1
-    const query = wrapWithRoleImpersonation(queryChains.range(from, to).toSql(), {
-      projectRef,
-      role: impersonatedRole,
-    })
+    const query = wrapWithRoleImpersonation(
+      queryChains.range(from, to).toSql(),
+      roleImpersonationState
+    )
 
     try {
       const { result } = await executeWithRetry(async () =>
@@ -153,7 +154,7 @@ export const fetchAllTableRows = async ({
       await sleep(THROTTLE_DELAY)
     } catch (error) {
       throw new Error(
-        `Error fetching table rows: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Error fetching all table rows: ${error instanceof Error ? error.message : 'Unknown error'}`
       )
     }
   }
@@ -166,7 +167,7 @@ export type TableRows = { rows: SupaRow[] }
 export type TableRowsVariables = Omit<GetTableRowsArgs, 'table'> & {
   queryClient: QueryClient
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   tableId?: number
 }
 
@@ -179,7 +180,7 @@ export async function getTableRows(
     projectRef,
     connectionString,
     tableId,
-    impersonatedRole,
+    roleImpersonationState,
     filters,
     sorts,
     limit,
@@ -200,28 +201,30 @@ export async function getTableRows(
 
   const sql = wrapWithRoleImpersonation(
     getTableRowsSql({ table: entity, filters, sorts, limit, page }),
-    {
-      projectRef: projectRef ?? 'ref',
-      role: impersonatedRole,
-    }
-  )
-  const { result } = await executeSql(
-    {
-      projectRef,
-      connectionString,
-      sql,
-      queryKey: ['table-rows', table?.id],
-      isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
-    },
-    signal
+    roleImpersonationState
   )
 
-  const rows = result.map((x: any, index: number) => {
-    return { idx: index, ...x }
-  }) as SupaRow[]
+  try {
+    const { result } = await executeSql(
+      {
+        projectRef,
+        connectionString,
+        sql,
+        queryKey: ['table-rows', table?.id],
+        isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+      },
+      signal
+    )
 
-  return {
-    rows,
+    const rows = result.map((x: any, index: number) => {
+      return { idx: index, ...x }
+    }) as SupaRow[]
+
+    return { rows }
+  } catch (error) {
+    throw new Error(
+      `Error fetching table rows: ${error instanceof Error ? error.message : 'Unknown error'}`
+    )
   }
 }
 
@@ -231,7 +234,10 @@ export const useTableRowsQuery = <TData = TableRowsData>(
 ) => {
   const queryClient = useQueryClient()
   return useQuery<TableRowsData, TableRowsError, TData>(
-    tableRowKeys.tableRows(projectRef, { table: { id: tableId }, ...args }),
+    tableRowKeys.tableRows(projectRef, {
+      table: { id: tableId },
+      ...args,
+    }),
     ({ signal }) =>
       getTableRows({ queryClient, projectRef, connectionString, tableId, ...args }, signal),
     {
@@ -243,16 +249,13 @@ export const useTableRowsQuery = <TData = TableRowsData>(
 
 export function prefetchTableRows(
   client: QueryClient,
-  {
-    projectRef,
-    connectionString,
-    tableId,
-    impersonatedRole,
-    ...args
-  }: Omit<TableRowsVariables, 'queryClient'>
+  { projectRef, connectionString, tableId, ...args }: Omit<TableRowsVariables, 'queryClient'>
 ) {
   return client.fetchQuery(
-    tableRowKeys.tableRows(projectRef, { table: { id: tableId }, ...args }),
+    tableRowKeys.tableRows(projectRef, {
+      table: { id: tableId },
+      ...args,
+    }),
     ({ signal }) =>
       getTableRows({ queryClient: client, projectRef, connectionString, tableId, ...args }, signal)
   )

@@ -12,14 +12,20 @@ import {
   isTableLike,
   isView,
 } from 'data/table-editor/table-editor-types'
+import { useGetTables } from 'data/tables/tables-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import Link from 'next/link'
+import { useAppStateSnapshot } from 'state/app-state'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
-import { makeActiveTabPermanent } from 'state/tabs'
-import { TableGridSkeletonLoader } from './LoadingState'
-import NotFoundState from './NotFoundState'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
+import { Button } from 'ui'
+import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import { useIsTableEditorTabsEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
+import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
 import TableDefinition from './TableDefinition'
 
@@ -28,13 +34,18 @@ export interface TableGridEditorProps {
   selectedTable?: Entity
 }
 
-const TableGridEditor = ({
+export const TableGridEditor = ({
   isLoadingSelectedTable = false,
   selectedTable,
 }: TableGridEditorProps) => {
   const router = useRouter()
   const project = useSelectedProject()
+  const appSnap = useAppStateSnapshot()
   const { ref: projectRef, id } = useParams()
+
+  const tabs = useTabsStateSnapshot()
+  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
+  const { selectedSchema } = useQuerySchemaState()
 
   useLoadTableEditorStateFromLocalStorageIntoUrl({
     projectRef,
@@ -46,6 +57,17 @@ const TableGridEditor = ({
   const canEditTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
   const canEditColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
   const isReadOnly = !canEditTables && !canEditColumns
+  const tabId = !!id ? tabs.openTabs.find((x) => x.endsWith(id)) : undefined
+  const openTabs = tabs.openTabs.filter((x) => !x.startsWith('sql'))
+
+  const getTables = useGetTables({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const onClearDashboardHistory = () => {
+    if (projectRef) appSnap.setDashboardHistory(projectRef, 'editor', undefined)
+  }
 
   const onTableCreated = useCallback(
     (table: { id: number }) => {
@@ -54,13 +76,88 @@ const TableGridEditor = ({
     [projectRef, router]
   )
 
+  const onTableDeleted = useCallback(async () => {
+    // For simplicity for now, we just open the first table within the same schema
+    if (isTableEditorTabsEnabled && selectedTable) {
+      // Close tab
+      const tabId = createTabId(selectedTable.entity_type, { id: selectedTable.id })
+      tabs.handleTabClose({ id: tabId, router, editor: 'table', onClearDashboardHistory })
+    } else {
+      const tables = await getTables(selectedSchema)
+      if (tables.length > 0) {
+        router.push(`/project/${projectRef}/editor/${tables[0].id}`)
+      } else {
+        router.push(`/project/${projectRef}/editor`)
+      }
+    }
+  }, [getTables, isTableEditorTabsEnabled, projectRef, router, selectedSchema])
+
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isLoadingSelectedTable || !projectRef) {
-    return <TableGridSkeletonLoader />
+    return (
+      <div className="flex flex-col">
+        <div className="h-10 bg-dash-sidebar dark:bg-surface-100" />
+        <div className="h-9 border-y" />
+        <div className="p-2 col-span-full">
+          <GenericSkeletonLoader />
+        </div>
+      </div>
+    )
   }
 
   if (isUndefined(selectedTable)) {
-    return <NotFoundState id={Number(id)} />
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="w-[400px]">
+          <Admonition
+            type="default"
+            title={`Unable to find your table with ID ${id}`}
+            description="This table doesn't exist in your database"
+          >
+            {isTableEditorTabsEnabled && (
+              <>
+                {!!tabId ? (
+                  <Button
+                    type="default"
+                    className="mt-2"
+                    onClick={() => {
+                      tabs.handleTabClose({
+                        id: tabId,
+                        router,
+                        editor: 'table',
+                        onClearDashboardHistory,
+                      })
+                    }}
+                  >
+                    Close tab
+                  </Button>
+                ) : tabs.openTabs.length > 0 ? (
+                  <Button
+                    asChild
+                    type="default"
+                    className="mt-2"
+                    onClick={() => appSnap.setDashboardHistory(projectRef, 'editor', undefined)}
+                  >
+                    <Link href={`/project/${projectRef}/editor/${tabs.openTabs[0].split('-')[1]}`}>
+                      Close tab
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button
+                    asChild
+                    type="default"
+                    className="mt-2"
+                    onClick={() => appSnap.setDashboardHistory(projectRef, 'editor', undefined)}
+                  >
+                    <Link href={`/project/${projectRef}/editor`}>Head back</Link>
+                  </Button>
+                )}
+              </>
+            )}
+          </Admonition>
+        </div>
+      </div>
+    )
   }
 
   const isViewSelected = isView(selectedTable) || isMaterializedView(selectedTable)
@@ -78,7 +175,7 @@ const TableGridEditor = ({
 
   return (
     // When any click happens in a table tab, the tab becomes permanent
-    <div className="h-full" onClick={() => makeActiveTabPermanent(project?.ref)}>
+    <div className="h-full" onClick={() => tabs.makeActiveTabPermanent()}>
       <TableEditorTableStateContextProvider
         key={`table-editor-table-${selectedTable.id}`}
         projectRef={projectRef}
@@ -109,9 +206,11 @@ const TableGridEditor = ({
           selectedTable={isTableLike(selectedTable) ? selectedTable : undefined}
           onTableCreated={onTableCreated}
         />
+        <DeleteConfirmationDialogs
+          selectedTable={isTableLike(selectedTable) ? selectedTable : undefined}
+          onTableDeleted={onTableDeleted}
+        />
       </TableEditorTableStateContextProvider>
     </div>
   )
 }
-
-export default TableGridEditor

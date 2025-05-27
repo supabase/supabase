@@ -46,6 +46,7 @@ import AIOnboarding from './AIOnboarding'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
 import { useAutoScroll } from './hooks'
+import { ErrorBoundary } from '../ErrorBoundary'
 
 const MemoizedMessage = memo(
   ({
@@ -129,7 +130,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const currentTable = tables?.find((t) => t.id.toString() === entityId)
   const currentSchema = searchParams?.get('schema') ?? 'public'
-  const currentChat = snap.chats[snap.activeChatId ?? ''].name
+  const currentChat = snap.activeChat?.name
 
   const { ref } = useParams()
   const org = useSelectedOrganization()
@@ -221,9 +222,16 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     // Store the user message in the ref before appending
     lastUserMessageRef.current = payload
 
-    append(payload, {
-      headers: { Authorization: headerData.get('Authorization') ?? '' },
-    })
+    const authorizationHeader = headerData.get('Authorization')
+
+    append(
+      payload,
+      authorizationHeader
+        ? {
+            headers: { Authorization: authorizationHeader },
+          }
+        : undefined
+    )
 
     setValue('')
 
@@ -297,11 +305,28 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   }, [snap.open, isInSQLEditor, snippetContent])
 
   return (
-    <>
+    <ErrorBoundary
+      message="Something went wrong with the AI Assistant"
+      sentryContext={{
+        component: 'AIAssistant',
+        feature: 'AI Assistant Panel',
+        projectRef: project?.ref,
+        organizationSlug: selectedOrganization?.slug,
+      }}
+      actions={[
+        {
+          label: 'Clear messages and refresh',
+          onClick: () => {
+            handleClearMessages()
+            window.location.reload()
+          },
+        },
+      ]}
+    >
       <div className={cn('flex flex-col h-full', className)}>
         <div ref={scrollContainerRef} className={cn('flex-grow overflow-auto flex flex-col')}>
           <div className="z-30 sticky top-0">
-            <div className="border-b flex items-center bg gap-x-3 px-5 h-[46px]">
+            <div className="border-b flex items-center bg gap-x-3 pl-5 pr-4 h-[46px]">
               <AiIconAnimation allowHoverEffect />
 
               <div className="text-sm flex-1 flex items-center gap-x-2">
@@ -632,6 +657,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
         <OptInToOpenAIToggle />
       </ConfirmationModal>
-    </>
+    </ErrorBoundary>
   )
 }

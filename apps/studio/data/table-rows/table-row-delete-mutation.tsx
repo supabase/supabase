@@ -7,7 +7,7 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { DocsButton } from 'components/ui/DocsButton'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { Entity } from 'data/table-editor/table-editor-types'
-import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import type { ResponseError } from 'types'
 import { tableRowKeys } from './keys'
@@ -15,10 +15,10 @@ import { getPrimaryKeys } from './utils'
 
 export type TableRowDeleteVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   table: Entity
   rows: SupaRow[]
-  impersonatedRole?: ImpersonationRole
+  roleImpersonationState?: RoleImpersonationState
 }
 
 export function getTableRowDeleteSql({
@@ -42,18 +42,18 @@ export async function deleteTableRow({
   connectionString,
   table,
   rows,
-  impersonatedRole,
+  roleImpersonationState,
 }: TableRowDeleteVariables) {
-  const sql = wrapWithRoleImpersonation(getTableRowDeleteSql({ table, rows }), {
-    projectRef,
-    role: impersonatedRole,
-  })
+  const sql = wrapWithRoleImpersonation(
+    getTableRowDeleteSql({ table, rows }),
+    roleImpersonationState
+  )
 
   const { result } = await executeSql({
     projectRef,
     connectionString,
     sql,
-    isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+    isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
   })
 
   return result

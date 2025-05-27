@@ -208,7 +208,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                   className={cn('w-full xl:min-w-[600px] bg-dash-sidebar')}
                 >
                   <main
-                    className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden"
+                    className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden @container"
                     ref={ref}
                   >
                     {showPausedState ? (
@@ -233,8 +233,10 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                       minSize={30}
                       maxSize={50}
                       className={cn(
-                        'border-l xl:border-l-0 bg fixed z-40 md:absolute md:z-0 right-0 top-0 md:top-[48px] bottom-0 xl:relative xl:top-0',
-                        'w-screen h-[100dvh] md:h-auto md:w-auto'
+                        'border-l bg fixed z-40 right-0 top-0 bottom-0',
+                        'w-screen h-[100dvh]',
+                        'md:absolute md:h-auto md:w-3/4',
+                        'xl:relative xl:border-l-0'
                       )}
                     >
                       {aiSnap.open ? (

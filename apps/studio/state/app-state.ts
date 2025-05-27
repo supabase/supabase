@@ -1,8 +1,7 @@
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
-import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS, LOCAL_STORAGE_KEYS } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 export type Template = {
   name: string
@@ -52,15 +51,16 @@ const getInitialState = () => {
       activeDocsSection: ['introduction'],
       docsLanguage: 'js',
       showProjectApiDocs: false,
-      isOptedInTelemetry: false,
       showEnableBranchingModal: false,
       showFeaturePreviewModal: false,
       selectedFeaturePreview: '',
       showAiSettingsModal: false,
       showGenerateSqlModal: false,
+      showConnectDialog: false,
       ongoingQueriesPanelOpen: false,
       mobileMenuOpen: false,
       showSidebar: true,
+      lastRouteBeforeVisitingAccountPage: '',
     }
   }
 
@@ -82,15 +82,16 @@ const getInitialState = () => {
     activeDocsSection: ['introduction'],
     docsLanguage: 'js',
     showProjectApiDocs: false,
-    isOptedInTelemetry: false,
     showEnableBranchingModal: false,
     showFeaturePreviewModal: false,
     selectedFeaturePreview: '',
     showAiSettingsModal: false,
     showGenerateSqlModal: false,
+    showConnectDialog: false,
     ongoingQueriesPanelOpen: false,
     mobileMenuOpen: false,
     showSidebar: true,
+    lastRouteBeforeVisitingAccountPage: '',
   }
 }
 
@@ -126,6 +127,11 @@ export const appState = proxy({
     if (typeof window !== 'undefined' && value !== null) {
       localStorage.setItem(COMMON_LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
     }
+  },
+
+  isMfaEnforced: false,
+  setIsMfaEnforced: (value: boolean) => {
+    appState.isMfaEnforced = value
   },
 
   showEnableBranchingModal: false,
@@ -182,6 +188,11 @@ export const appState = proxy({
   mobileMenuOpen: false,
   setMobileMenuOpen: (value: boolean) => {
     appState.mobileMenuOpen = value
+  },
+
+  lastRouteBeforeVisitingAccountPage: '',
+  setLastRouteBeforeVisitingAccountPage: (value: string) => {
+    appState.lastRouteBeforeVisitingAccountPage = value
   },
 })
 

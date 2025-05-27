@@ -18,7 +18,7 @@ interface AIEditorProps {
   aiEndpoint?: string
   aiMetadata?: {
     projectRef?: string
-    connectionString?: string
+    connectionString?: string | null
     includeSchemaMetadata?: boolean
   }
   initialPrompt?: string
@@ -195,8 +195,10 @@ const AIEditor = ({
       }))
 
       const headerData = await constructHeaders()
+      const authorizationHeader = headerData.get('Authorization')
+
       await complete(prompt, {
-        headers: { Authorization: headerData.get('Authorization') ?? '' },
+        ...(authorizationHeader ? { headers: { Authorization: authorizationHeader } } : undefined),
         body: {
           ...aiMetadata,
           completionMetadata: {
@@ -287,7 +289,7 @@ const AIEditor = ({
       {isDiffMode ? (
         <div className="w-full h-full">
           <DiffEditor
-            theme="vs-dark"
+            theme="supabase"
             language={language}
             original={diffValue.original}
             modified={diffValue.modified}

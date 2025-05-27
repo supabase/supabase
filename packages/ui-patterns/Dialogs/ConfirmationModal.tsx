@@ -11,8 +11,8 @@ import {
   DialogTitle,
   cn,
 } from 'ui'
-import { Admonition } from './../admonition'
 import { DialogDescription, DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
+import { Admonition } from './../admonition'
 
 export interface ConfirmationModalProps {
   loading?: boolean
@@ -46,7 +46,7 @@ const ConfirmationModal = forwardRef<
       visible,
       onCancel,
       onConfirm,
-      loading: loading_ = false,
+      loading: loading_,
       cancelLabel = 'Cancel',
       confirmLabel = 'Submit',
       confirmLabelLoading,
@@ -58,20 +58,26 @@ const ConfirmationModal = forwardRef<
     },
     ref
   ) => {
-    useEffect(() => {
-      if (visible) {
-        setLoading(false)
-      }
-    }, [visible])
-
-    const [loading, setLoading] = useState(false)
+    // [Joshen] If `loading_` is provided, let loading state be entirely controlled by the param
+    // Otherwise, if the action onConfirm errors out, the UI is stuck in a loading state
+    const [loading, setLoading] = useState(loading_ !== undefined ? loading_ : false)
 
     const onSubmit: MouseEventHandler<HTMLButtonElement> = (e) => {
       e.preventDefault()
       e.stopPropagation()
-      setLoading(true)
       onConfirm()
+      if (loading === undefined) setLoading(true)
     }
+
+    useEffect(() => {
+      if (visible && loading_ === undefined) {
+        setLoading(false)
+      }
+    }, [visible])
+
+    useEffect(() => {
+      if (loading_ !== undefined) setLoading(loading_)
+    }, [loading_])
 
     return (
       <Dialog
@@ -85,7 +91,7 @@ const ConfirmationModal = forwardRef<
       >
         <DialogContent ref={ref} className="p-0 gap-0 pb-5 !block" size={size}>
           <DialogHeader className={cn('border-b')} padding={'small'}>
-            <DialogTitle className="">{title}</DialogTitle>
+            <DialogTitle>{title}</DialogTitle>
             {description && <DialogDescription>{description}</DialogDescription>}
           </DialogHeader>
           {alert && (

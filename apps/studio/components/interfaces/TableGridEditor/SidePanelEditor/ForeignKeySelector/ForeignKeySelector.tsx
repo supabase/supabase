@@ -293,7 +293,7 @@ export const ForeignKeySelector = ({
                   Select columns from{' '}
                   <code className="text-xs">
                     {fk.schema}.{fk.table}
-                  </code>
+                  </code>{' '}
                   to reference to
                 </label>
                 <div className="grid grid-cols-10 gap-y-2">

@@ -1,10 +1,10 @@
-import { useParams } from 'common'
-import { BillingSettings } from 'components/interfaces/Organization'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import { Loading } from 'components/ui/Loading'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useEffect } from 'react'
+
+import { useParams } from 'common'
+import { BillingSettings } from 'components/interfaces/Organization/BillingSettings/BillingSettings'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import OrganizationLayout from 'components/layouts/OrganizationLayout'
+import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
 import {
   ORG_SETTINGS_PANEL_KEYS,
   useOrgSettingsPageStateSnapshot,
@@ -14,8 +14,6 @@ import type { NextPageWithLayout } from 'types'
 const OrgBillingSettings: NextPageWithLayout = () => {
   const { panel } = useParams()
   const snap = useOrgSettingsPageStateSnapshot()
-  const { isLoading: isLoadingPermissions } = usePermissionsQuery()
-  const selectedOrganization = useSelectedOrganization()
 
   useEffect(() => {
     const allowedValues = ['subscriptionPlan', 'costControl']
@@ -26,16 +24,14 @@ const OrgBillingSettings: NextPageWithLayout = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [panel])
 
-  return (
-    <>
-      {selectedOrganization === undefined && isLoadingPermissions ? (
-        <Loading />
-      ) : (
-        <BillingSettings />
-      )}
-    </>
-  )
+  return <BillingSettings />
 }
 
-OrgBillingSettings.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
+OrgBillingSettings.getLayout = (page) => (
+  <DefaultLayout>
+    <OrganizationLayout>
+      <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
+    </OrganizationLayout>
+  </DefaultLayout>
+)
 export default OrgBillingSettings

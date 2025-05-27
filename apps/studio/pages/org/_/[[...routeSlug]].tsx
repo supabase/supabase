@@ -8,7 +8,7 @@ import CardButton from 'components/ui/CardButton'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 
 const Header = () => {
   return (
@@ -27,6 +27,7 @@ const Header = () => {
   )
 }
 
+// [Joshen] Thinking we can deprecate this page in favor of /organizations
 const GenericOrganizationPage: NextPage = () => {
   const router = useRouter()
 
@@ -51,64 +52,68 @@ const GenericOrganizationPage: NextPage = () => {
   return (
     <>
       <Header />
-      <div className="flex flex-col mx-auto w-full max-w-5xl space-y-3">
-        <h3 className="mt-8 text-2xl">Select an organization to continue</h3>
+      <div className="flex flex-col mx-auto w-full space-y-3">
+        <h3 className="mt-8 text-2xl w-full max-w-5xl mx-auto">
+          Select an organization to continue
+        </h3>
         <div
-          className="flex-grow py-6 space-y-8 overflow-y-auto"
+          className="flex-grow py-6 overflow-y-auto"
           style={{ maxHeight: 'calc(100vh - 49px - 64px)' }}
         >
-          {isLoading ? (
-            <ul
-              className={[
-                'mx-auto grid grid-cols-1 gap-4',
-                'sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3',
-              ].join(' `')}
-            >
-              <ShimmeringCard />
-              <ShimmeringCard />
-            </ul>
-          ) : organizations?.length === 0 ? (
-            <div className="col-span-4 space-y-4 rounded-lg border border-dashed border-muted p-6 text-center">
-              <div className="space-y-1">
-                <p>You are not part of any organizations yet</p>
-                <p className="text-sm text-foreground-light">
-                  Get started by creating a new organization.
-                </p>
+          <div className="w-full max-w-5xl mx-auto flex flex-col gap-y-8">
+            {isLoading ? (
+              <ul
+                className={cn(
+                  'mx-auto grid grid-cols-1 gap-4',
+                  'sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3'
+                )}
+              >
+                <ShimmeringCard />
+                <ShimmeringCard />
+              </ul>
+            ) : organizations?.length === 0 ? (
+              <div className="col-span-4 space-y-4 rounded-lg border border-dashed border-muted p-6 text-center">
+                <div className="space-y-1">
+                  <p>You are not part of any organizations yet</p>
+                  <p className="text-sm text-foreground-light">
+                    Get started by creating a new organization.
+                  </p>
+                </div>
+                <div>
+                  <Button asChild icon={<Plus />}>
+                    <Link href="/new">New organization</Link>
+                  </Button>
+                </div>
               </div>
-              <div>
-                <Button asChild icon={<Plus />}>
-                  <Link href="/new">New organization</Link>
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <ul
-              className={[
-                'mx-auto grid grid-cols-1 gap-4',
-                'sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3',
-              ].join(' `')}
-            >
-              {organizations?.map((organization) => (
-                <li key={organization.slug} className="col-span-1">
-                  <CardButton
-                    linkHref={urlRewriterFactory(routeSlug)(organization.slug)}
-                    title={
-                      <div className="flex w-full flex-row justify-between gap-1">
-                        <span className="flex-shrink truncate">{organization.name}</span>
-                      </div>
-                    }
-                    footer={
-                      <div className="flex items-end justify-between">
-                        <span className="text-sm lowercase text-foreground-light">
-                          {organization.slug}
-                        </span>
-                      </div>
-                    }
-                  />
-                </li>
-              ))}
-            </ul>
-          )}
+            ) : (
+              <ul
+                className={cn(
+                  'w-full mx-auto grid grid-cols-1 gap-4',
+                  'sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3'
+                )}
+              >
+                {organizations?.map((organization) => (
+                  <li key={organization.slug} className="col-span-1">
+                    <CardButton
+                      linkHref={urlRewriterFactory(routeSlug)(organization.slug)}
+                      title={
+                        <div className="flex w-full flex-row justify-between gap-1">
+                          <span className="flex-shrink truncate">{organization.name}</span>
+                        </div>
+                      }
+                      footer={
+                        <div className="flex items-end justify-between">
+                          <span className="text-sm lowercase text-foreground-light">
+                            {organization.slug}
+                          </span>
+                        </div>
+                      }
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </div>
     </>

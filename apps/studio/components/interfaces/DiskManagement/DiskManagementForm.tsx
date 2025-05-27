@@ -22,7 +22,6 @@ import { useUpdateDiskAutoscaleConfigMutation } from 'data/config/disk-autoscale
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AddonVariantId } from 'data/subscriptions/types'
@@ -30,6 +29,7 @@ import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { GB, PROJECT_STATUS } from 'lib/constants'
+import { CloudProvider } from 'shared-data'
 import {
   Button,
   cn,
@@ -56,7 +56,6 @@ import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
 import { DiskType, RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
-import { CloudProvider } from 'shared-data'
 
 export function DiskManagementForm() {
   // isLoading is used to avoid a useCheckPermissions() race condition
@@ -115,6 +114,8 @@ export function DiskManagementForm() {
             setRefetchInterval(false)
             toast.success('Disk configuration changes have been successfully applied!')
           }
+        } else {
+          setRefetchInterval(2000)
         }
       },
       enabled: project != null && !isFlyArchitecture,
@@ -132,9 +133,7 @@ export function DiskManagementForm() {
     },
     { enabled: project != null && !isFlyArchitecture }
   )
-  const { data: subscription, isSuccess: isSubscriptionSuccess } = useOrgSubscriptionQuery({
-    orgSlug: org?.slug,
-  })
+
   const { data: diskAutoscaleConfig, isSuccess: isDiskAutoscaleConfigSuccess } =
     useDiskAutoscaleCustomConfigQuery(
       { projectRef },
@@ -178,13 +177,12 @@ export function DiskManagementForm() {
     isDiskAttributesSuccess &&
     isDiskUtilizationSuccess &&
     isReadReplicasSuccess &&
-    isSubscriptionSuccess &&
     isDiskAutoscaleConfigSuccess &&
     isCooldownSuccess
 
   const isRequestingChanges = data?.requested_modification !== undefined
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
-  const isPlanUpgradeRequired = subscription?.plan.id === 'free'
+  const isPlanUpgradeRequired = org?.plan.id === 'free'
 
   const { formState } = form
   const usedSize = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
@@ -193,7 +191,7 @@ export function DiskManagementForm() {
 
   const disableIopsThroughputConfig =
     RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(form.watch('computeSize')) &&
-    subscription?.plan.id !== 'free'
+    org?.plan.id !== 'free'
 
   const isBranch = project?.parent_project_ref !== undefined
 

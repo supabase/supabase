@@ -7,7 +7,7 @@ import { vaultSecretsKeys } from './keys'
 export const getVaultSecretsSql = () => {
   const sql = new Query()
     .from('secrets', 'vault')
-    .select('id,name,description,secret,key_id,created_at,updated_at')
+    .select('id,name,description,secret,created_at,updated_at')
     .toSql()
 
   return sql
@@ -15,7 +15,7 @@ export const getVaultSecretsSql = () => {
 
 export type VaultSecretsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getVaultSecrets(

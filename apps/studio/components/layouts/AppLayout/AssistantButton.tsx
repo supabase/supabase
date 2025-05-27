@@ -2,7 +2,7 @@ import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useAppStateSnapshot } from 'state/app-state'
 import { AiIconAnimation, Button } from 'ui'
 
-const AssistantButton = () => {
+export const AssistantButton = () => {
   const snap = useAiAssistantStateSnapshot()
   const { setEditorPanel } = useAppStateSnapshot()
 
@@ -11,15 +11,13 @@ const AssistantButton = () => {
       type="text"
       size="tiny"
       id="assistant-trigger"
-      className="h-full w-full rounded-none"
+      className="w-[24px] h-[24px] flex items-center justify-center p-0"
       onClick={() => {
         snap.toggleAssistant()
         setEditorPanel({ open: false })
       }}
     >
-      <AiIconAnimation allowHoverEffect size={20} />
+      <AiIconAnimation allowHoverEffect size={16} />
     </Button>
   )
 }
-
-export default AssistantButton

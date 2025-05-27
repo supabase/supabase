@@ -4,12 +4,10 @@ import { AnalyticsSettings } from 'components/interfaces/Account/Preferences/Ana
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import { ThemeSettings } from 'components/interfaces/Account/Preferences/ThemeSettings'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
+import { AccountSettingsLayout } from 'components/layouts/AccountLayout/AccountSettingsLayout'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -18,31 +16,19 @@ import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
 
 const User: NextPageWithLayout = () => {
-  return (
-    <ScaffoldContainer>
-      <ScaffoldHeader>
-        <ScaffoldTitle>User Preferences</ScaffoldTitle>
-        <ScaffoldDescription>
-          Manage your profile, account settings, and preferences for your Supabase experience
-        </ScaffoldDescription>
-      </ScaffoldHeader>
-      <ProfileCard />
-    </ScaffoldContainer>
-  )
+  return <ProfileCard />
 }
 
 User.getLayout = (page) => (
-  <AccountLayout
-    title="Preferences"
-    breadcrumbs={[
-      {
-        key: `supabase-settings`,
-        label: 'Preferences',
-      },
-    ]}
-  >
-    {page}
-  </AccountLayout>
+  <AppLayout>
+    <DefaultLayout headerTitle="Account">
+      <OrganizationLayout>
+        <AccountLayout title="Preferences">
+          <AccountSettingsLayout>{page}</AccountSettingsLayout>
+        </AccountLayout>
+      </OrganizationLayout>
+    </DefaultLayout>
+  </AppLayout>
 )
 
 export default User

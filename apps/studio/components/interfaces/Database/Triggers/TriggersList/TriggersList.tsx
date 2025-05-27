@@ -1,6 +1,7 @@
+import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
-import { Search } from 'lucide-react'
+import { Plus, Search } from 'lucide-react'
 import { useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -13,6 +14,7 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
@@ -23,8 +25,8 @@ import TriggerList from './TriggerList'
 
 interface TriggersListProps {
   createTrigger: () => void
-  editTrigger: (trigger: any) => void
-  deleteTrigger: (trigger: any) => void
+  editTrigger: (trigger: PostgresTrigger) => void
+  deleteTrigger: (trigger: PostgresTrigger) => void
 }
 
 const TriggersList = ({
@@ -46,6 +48,12 @@ const TriggersList = ({
   )
   const schema = schemas?.find((schema) => schema.name === selectedSchema)
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+
+  const { data = [], isSuccess } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const hasTables = data.filter((a) => !PROTECTED_SCHEMAS.includes(a.schema)).length > 0
 
   const {
     data: triggers,
@@ -110,50 +118,56 @@ const TriggersList = ({
             {!isLocked && (
               <div className="flex items-center gap-x-2">
                 <ButtonTooltip
-                  disabled={!canCreateTriggers}
+                  disabled={!hasTables || !canCreateTriggers}
+                  icon={<Plus />}
                   onClick={() => createTrigger()}
                   className="flex-grow"
                   tooltip={{
                     content: {
                       side: 'bottom',
-                      text: !canCreateTriggers
-                        ? 'You need additional permissions to create triggers'
-                        : undefined,
+                      text: !hasTables
+                        ? 'Create a table first before creating triggers'
+                        : !canCreateTriggers
+                          ? 'You need additional permissions to create triggers'
+                          : undefined,
                     },
                   }}
                 >
-                  Create a new trigger
+                  New trigger
                 </ButtonTooltip>
-                <ButtonTooltip
-                  type="default"
-                  disabled={!canCreateTriggers}
-                  className="px-1 pointer-events-auto"
-                  icon={<AiIconAnimation size={16} />}
-                  onClick={() =>
-                    aiSnap.newChat({
-                      name: 'Create new trigger',
-                      open: true,
-                      initialInput: `Create a new trigger for the schema ${selectedSchema} that does ...`,
-                      suggestions: {
-                        title:
-                          'I can help you create a new trigger, here are a few example prompts to get you started:',
-                        prompts: [
-                          'Create a trigger that logs changes to the users table',
-                          'Create a trigger that updates updated_at timestamp',
-                          'Create a trigger that validates email format before insert',
-                        ],
+
+                {hasTables && (
+                  <ButtonTooltip
+                    type="default"
+                    disabled={!hasTables || !canCreateTriggers}
+                    className="px-1 pointer-events-auto"
+                    icon={<AiIconAnimation size={16} />}
+                    onClick={() =>
+                      aiSnap.newChat({
+                        name: 'Create new trigger',
+                        open: true,
+                        initialInput: `Create a new trigger for the schema ${selectedSchema} that does ...`,
+                        suggestions: {
+                          title:
+                            'I can help you create a new trigger, here are a few example prompts to get you started:',
+                          prompts: [
+                            'Create a trigger that logs changes to the users table',
+                            'Create a trigger that updates updated_at timestamp',
+                            'Create a trigger that validates email format before insert',
+                          ],
+                        },
+                      })
+                    }
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: !canCreateTriggers
+                          ? 'You need additional permissions to create triggers'
+                          : 'Create with Supabase Assistant',
                       },
-                    })
-                  }
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: !canCreateTriggers
-                        ? 'You need additional permissions to create triggers'
-                        : 'Create with Supabase Assistant',
-                    },
-                  }}
-                />
+                    }}
+                  />
+                )}
               </div>
             )}
           </div>

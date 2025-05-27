@@ -97,7 +97,8 @@ export const pluckObjectFields = (model: any, fields: any[]) => {
  */
 export const tryParseInt = (str: string) => {
   try {
-    return parseInt(str, 10)
+    const int = parseInt(str, 10)
+    return isNaN(int) ? undefined : int
   } catch (error) {
     return undefined
   }
@@ -129,8 +130,15 @@ export const formatBytes = (
   const sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
   if (bytes === 0 || bytes === undefined) return size !== undefined ? `0 ${size}` : '0 bytes'
-  const i = size !== undefined ? sizes.indexOf(size) : Math.floor(Math.log(bytes) / Math.log(k))
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+
+  // Handle negative values
+  const isNegative = bytes < 0
+  const absBytes = Math.abs(bytes)
+
+  const i = size !== undefined ? sizes.indexOf(size) : Math.floor(Math.log(absBytes) / Math.log(k))
+  const formattedValue = parseFloat((absBytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+
+  return isNegative ? '-' + formattedValue : formattedValue
 }
 
 export const snakeToCamel = (str: string) =>
@@ -292,7 +300,7 @@ const currencyFormatterSmallValues = Intl.NumberFormat('en-US', {
 export const formatCurrency = (amount: number | undefined | null): string | null => {
   if (amount === undefined || amount === null) {
     return null
-  } else if (amount < 0.01) {
+  } else if (amount > 0 && amount < 0.01) {
     return currencyFormatterSmallValues.format(amount)
   } else {
     return currencyFormatterDefault.format(amount)

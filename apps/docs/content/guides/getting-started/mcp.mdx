@@ -8,11 +8,12 @@ sidebar_label: 'Model context protocol (MCP)'
 
 The [Model Context Protocol](https://modelcontextprotocol.io/introduction) (MCP) is a standard for connecting Large Language Models (LLMs) to platforms like Supabase. This guide covers how to connect Supabase to the following AI tools using MCP:
 
-- [Cursor](https://www.cursor.com/)
-- [Windsurf](https://docs.codeium.com/windsurf) (Codium)
-- [Cline](https://github.com/cline/cline) (VS Code extension)
-- [Claude desktop](https://claude.ai/download)
-- [Claude code](https://claude.ai/code)
+- [Cursor](#cursor)
+- [Windsurf](#windsurf) (Codium)
+- [Visual Studio Code](#visual-studio-code-copilot) (Copilot)
+- [Cline](#cline) (VS Code extension)
+- [Claude desktop](#claude-desktop)
+- [Claude code](#claude-code)
 
 Once connected, your AI assistants can interact with and query your Supabase projects on your behalf.
 
@@ -26,7 +27,7 @@ MCP compatible tools can connect to Supabase using the [Supabase MCP server](htt
 
 ### Cursor
 
-1.  Open Cursor and create a `.cursor` directory in your project root if it doesn't exist.
+1.  Open [Cursor](https://www.cursor.com/) and create a `.cursor` directory in your project root if it doesn't exist.
 1.  Create a `.cursor/mcp.json` file if it doesn't exist and open it.
 1.  Add the following configuration:
 
@@ -38,7 +39,7 @@ MCP compatible tools can connect to Supabase using the [Supabase MCP server](htt
 
 ### Windsurf
 
-1. Open Windsurf and navigate to the Cascade assistant.
+1. Open [Windsurf](https://docs.codeium.com/windsurf) and navigate to the Cascade assistant.
 1. Tap on the hammer (MCP) icon, then **Configure** to open the configuration file.
 1. Add the following configuration:
 
@@ -48,9 +49,22 @@ MCP compatible tools can connect to Supabase using the [Supabase MCP server](htt
 
 1. You should see a green active status after the server is successfully connected.
 
+### Visual Studio Code (Copilot)
+
+1.  Open [VS Code](https://code.visualstudio.com/) and create a `.vscode` directory in your project root if it doesn't exist.
+1.  Create a `.vscode/mcp.json` file if it doesn't exist and open it.
+1.  Add the following configuration:
+
+    <$Partial path="mcp_supabase_vscode_config.mdx" />
+
+1.  Save the configuration file.
+1.  Open Copilot chat and switch to "Agent" mode. You should see a tool icon that you can tap to confirm the MCP tools are available. Once you begin using the server, you will be prompted to enter your personal access token. Enter the token that you created earlier.
+
+For more info on using MCP in VS Code, see the [Copilot documentation](https://code.visualstudio.com/docs/copilot/chat/mcp-servers).
+
 ### Cline
 
-1. Open the Cline extension in VS Code and tap the **MCP Servers** icon.
+1. Open the [Cline](https://github.com/cline/cline) extension in VS Code and tap the **MCP Servers** icon.
 1. Tap **Configure MCP Servers** to open the configuration file.
 1. Add the following configuration:
 
@@ -62,7 +76,7 @@ MCP compatible tools can connect to Supabase using the [Supabase MCP server](htt
 
 ### Claude desktop
 
-1. Open Claude desktop and navigate to **Settings**.
+1. Open [Claude desktop](https://claude.ai/download) and navigate to **Settings**.
 1. Under the **Developer** tab, tap **Edit Config** to open the configuration file.
 1. Add the following configuration:
 
@@ -81,7 +95,7 @@ MCP compatible tools can connect to Supabase using the [Supabase MCP server](htt
 
 1. Save the configuration file.
 
-1. Restart Claude code to apply the new configuration.
+1. Restart [Claude code](https://claude.ai/code) to apply the new configuration.
 
 ### Next steps
 

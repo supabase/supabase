@@ -106,14 +106,17 @@ You can use the [Supabase CLI](/docs/guides/cli) to manage changes inside a loca
     <StepHikeCompact.Step step={2}>
         <StepHikeCompact.Details title="Pull your database migration" fullWidth>
 
-            Pull your database changes using `supabase db pull`. You can find your database URL in your [database settings](https://supabase.com/dashboard/project/_/settings/database), under the URI tab of the Connection String settings panel. Make sure **Use connection pooling** is checked so you can use the IPv4-enabled connection pooler. (Without connection pooling, your database is only accessible over IPv6, which isn't yet supported by all network providers.)
+            Pull your database changes using `supabase db pull`. To get your database connection string, go to your project dashboard, click [Connect](https://supabase.com/dashboard/project/_?showConnect=true) and look for the Session pooler connection string.
 
             ```markdown
-            supabase db pull --db-url <db_url>
+            supabase db pull --db-url <db_connection_string>
 
-            # Your Database URL looks something like:
+            # Your Database connection string will look like this:
             # postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres
             ```
+        <Admonition type="note">
+          If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/27034) or have the IPv4 Add-On, you can use the direct connection string instead of Supavisor in Session mode.
+        </Admonition>
 
         </StepHikeCompact.Details>
     </StepHikeCompact.Step>
@@ -458,8 +461,10 @@ You can disable branching at any time. Navigate to the [Branches](/dashboard/pro
 
 ### Persistent branches
 
-Persistent branches are the type of branches that will remain active even after the underlying PR is closed.
+Persistent branches are the type of branches that will remain active even after the underlying PR is closed. Any PR based on a persistent branch will also have a corresponding preview branch created automatically.
+
 You can change any branch to be persistent on the [Branches](/dashboard/project/_/branches) page by clicking the triple dots icon next to the branch you want to modify, and selecting "Switch to persistent".
+
 All persistent branches can be toggled back to be an ephemeral branch in the exact same way.
 
 ## Migration and seeding behavior
@@ -619,7 +624,7 @@ You can make a similar setup with a distinct project for each environment. Or ju
 
 Branching is available on the Pro Plan and above. The price is:
 
-- Each Preview branch costs $0.32 per day
+- Each Preview branch costs <Price price="0.32" /> per day
 - Each Preview branch is billed until it is removed
 
 ## Troubleshooting
@@ -637,6 +642,22 @@ The new preview branch is reseeded from the `./supabase/seed.sql` file by defaul
 A deployment might fail for various reasons, including invalid SQL statements and schema conflicts in migrations, errors within the `config.toml` config, or something else.
 
 To check the error message, see the Supabase workflow run for your branch under the [View logs](/dashboard/project/_/branches) section.
+
+### Network restrictions
+
+If you enable [network restrictions](/docs/guides/platform/network-restrictions) on your project, the branching cluster will be blocked from connecting to your project by default. This often results in database connection failures when migrating your production project after merging a development branch.
+
+The workaround is to explicitly allow the IPv6 CIDR range of the branching cluster in your project's [database settings](https://supabase.com/dashboard/project/_/settings/database) page: `2600:1f18:2b7d:f600::/56`
+
+<Image
+  alt="Network restrictions to allow connections from branching cluster"
+  src={{
+    dark: '/docs/img/guides/branching/cidr-dark.png',
+    light: '/docs/img/guides/branching/cidr-light.png',
+  }}
+  className="max-w-[550px] !mx-auto border rounded-md"
+  zoomable
+/>
 
 ### Schema drift between preview branches
 

@@ -119,6 +119,12 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'platform',
           },
           {
+            label: 'Security',
+            icon: 'security',
+            href: '/guides/security',
+            level: 'security',
+          },
+          {
             label: 'Telemetry',
             icon: 'telemetry',
             href: '/guides/telemetry',
@@ -625,6 +631,7 @@ export const auth = {
           ],
         },
         { name: 'Anonymous Sign-Ins', url: '/guides/auth/auth-anonymous' },
+        { name: 'Web3 (Sign in with Solana)', url: '/guides/auth/auth-web3' },
         { name: 'Mobile Deep Linking', url: '/guides/auth/native-mobile-deep-linking' },
         {
           name: 'Identity Linking',
@@ -1950,6 +1957,10 @@ export const local_development: NavMenuConstant = {
           url: '/guides/local-development/managing-config',
         },
         {
+          name: 'Restoring downloaded backup',
+          url: '/guides/local-development/restoring-downloaded-backup',
+        },
+        {
           name: 'Customizing email templates',
           url: '/guides/local-development/customizing-email-templates',
         },
@@ -2048,14 +2059,18 @@ export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof Ico
 ]
 
 export const security: NavMenuConstant = {
-  icon: 'platform',
+  icon: 'security',
   title: 'Security',
   url: '/guides/security',
   items: [
     { name: 'Overview', url: '/guides/security' },
     {
       name: 'Product security',
-      url: '/guides/security/product-security',
+      url: undefined,
+      items: [
+        { name: 'Product configuration', url: '/guides/security/product-security' },
+        { name: 'Security testing', url: '/guides/security/security-testing' },
+      ],
     },
     {
       name: 'Compliance',
@@ -2146,7 +2161,6 @@ export const platform: NavMenuConstant = {
         { name: 'Regions', url: '/guides/platform/regions' },
         { name: 'Compute and Disk', url: '/guides/platform/compute-and-disk' },
         { name: 'Database Size', url: '/guides/platform/database-size' },
-        { name: 'Fly Postgres', url: '/guides/platform/fly-postgres' },
         { name: 'HIPAA Projects', url: '/guides/platform/hipaa-projects' },
         {
           name: 'Network Restrictions',

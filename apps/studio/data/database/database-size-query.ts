@@ -12,7 +12,7 @@ select sum(pg_database_size(pg_database.datname))::bigint as db_size from pg_dat
 
 export type DatabaseSizeVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getDatabaseSize(

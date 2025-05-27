@@ -16,7 +16,7 @@ import {
 } from 'ui'
 import { useProjectContext } from '../ProjectContext'
 
-const HelpPopover = () => {
+export const HelpPopover = () => {
   const router = useRouter()
   const { project } = useProjectContext()
   const org = useSelectedOrganization()
@@ -24,7 +24,7 @@ const HelpPopover = () => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   const projectRef = project?.parent_project_ref ?? router.query.ref
-  const supportUrl = `/support/new${projectRef ? `?ref=${projectRef}` : ''}`
+  const supportUrl = `/support/new${projectRef ? `?projectRef=${projectRef}` : ''}`
 
   return (
     <Popover_Shadcn_>
@@ -144,5 +144,3 @@ const HelpPopover = () => {
     </Popover_Shadcn_>
   )
 }
-
-export default HelpPopover

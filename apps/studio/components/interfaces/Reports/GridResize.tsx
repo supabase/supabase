@@ -12,6 +12,7 @@ import {
   useContentUpsertMutation,
 } from 'data/content/content-upsert-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import uuidv4 from 'lib/uuid'
 import { Dashboards } from 'types'
@@ -54,6 +55,7 @@ export const GridResize = ({
   const { ref } = useParams()
   const { profile } = useProfile()
   const { project } = useProjectContext()
+  const selectedOrg = useSelectedOrganization()
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: upsertContent } = useContentUpsertMutation()
@@ -134,7 +136,10 @@ export const GridResize = ({
         },
       }
     )
-    sendEvent({ action: 'custom_report_assistant_sql_block_added' })
+    sendEvent({
+      action: 'custom_report_assistant_sql_block_added',
+      groups: { project: ref ?? 'Unknown', organization: selectedOrg?.slug ?? 'Unknown' },
+    })
   }
 
   if (!editableReport) return null

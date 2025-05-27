@@ -1,3 +1,6 @@
+import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   cn,
@@ -8,12 +11,9 @@ import {
   DropdownMenuTrigger,
   Separator,
 } from 'ui'
-import type { PreviewLogData, LogSearchCallback } from '../Logs.types'
-import { toast } from 'sonner'
 import { TimestampInfo } from 'ui-patterns'
-import { useState, useEffect } from 'react'
+import type { LogSearchCallback, PreviewLogData } from '../Logs.types'
 import { ResponseCodeFormatter } from '../LogsFormatters'
-import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 
 const LogRowCodeBlock = ({ value, className }: { value: string; className?: string }) => (
   <pre
@@ -37,7 +37,7 @@ const PropertyRow = ({
   value: any
   dataTestId?: string
 }) => {
-  const { search, setSearch } = useLogsUrlState()
+  const { setSearch } = useLogsUrlState()
   const handleSearch: LogSearchCallback = async (event: string, { query }: { query?: string }) => {
     setSearch(query || '')
   }
@@ -175,10 +175,13 @@ const PropertyRow = ({
 
 const DefaultPreviewSelectionRenderer = ({ log }: { log: PreviewLogData }) => {
   const { timestamp, event_message, metadata, id, status, ...rest } = log
+  const log_file = log?.metadata?.[0]?.log_file
 
   return (
     <div data-testid="log-selection" className={`p-2 flex flex-col`}>
-      {log?.id && <PropertyRow key={'id'} keyName={'id'} value={log.id} />}
+      {log?.id && (
+        <PropertyRow dataTestId="log-selection-id" key={'id'} keyName={'id'} value={log.id} />
+      )}
       {log?.status && <PropertyRow key={'status'} keyName={'status'} value={log.status} />}
       {log?.timestamp && (
         <PropertyRow
@@ -193,9 +196,10 @@ const DefaultPreviewSelectionRenderer = ({ log }: { log: PreviewLogData }) => {
       })}
 
       {log?.event_message && (
-        <PropertyRow key={'event_message'} keyName={'event_message'} value={log.event_message} />
+        <PropertyRow key="event_message" keyName="event_message" value={log.event_message} />
       )}
-      {log?.metadata && <PropertyRow key={'metadata'} keyName={'metadata'} value={log.metadata} />}
+      {!!log_file && <PropertyRow key="log_file" keyName="log_file" value={log_file} />}
+      {log?.metadata && <PropertyRow key="metadata" keyName="metadata" value={log.metadata} />}
     </div>
   )
 }

@@ -9,6 +9,7 @@ import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useCronJobRunQuery } from 'data/database-cron-jobs/database-cron-jobs-run-query'
 import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   Badge,
   Button,
@@ -21,12 +22,14 @@ import {
   DropdownMenuTrigger,
   Label_Shadcn_,
   Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { convertCronToString, getNextRun } from './CronJobs.utils'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 interface CronJobCardProps {
   job: CronJob
@@ -53,6 +56,17 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: toggleDatabaseCronJob, isLoading } = useDatabaseCronJobToggleMutation()
 
+  const onEdit = () => {
+    sendEvent({
+      action: 'cron_job_update_clicked',
+      groups: {
+        project: selectedProject?.ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
+    })
+    onEditCronJob(job)
+  }
+
   return (
     <>
       <div className="bg-surface-100 border-default overflow-hidden border shadow px-5 py-4 flex flex-row rounded-md space-x-4">
@@ -64,10 +78,10 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
             <span
               className={cn(
                 'text-base',
-                job.jobname === null ? 'text-foreground-lighter' : 'text-foreground'
+                job.jobname ? 'text-foreground' : 'text-foreground-lighter'
               )}
             >
-              {job.jobname ?? 'No name provided'}
+              {job.jobname || 'No name provided'}
             </span>
             <div className="flex items-center gap-x-2">
               {isLoading ? (
@@ -102,7 +116,7 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                 }}
               >
                 <Link
-                  href={`/project/${ref}/integrations/cron/jobs/${encodeURIComponent(job.jobname)}`}
+                  href={`/project/${ref}/integrations/cron/jobs/${encodeURIComponent(job.jobid)}?child-label=${encodeURIComponent(job.jobname || `Job #${job.jobid}`)}`}
                 >
                   History
                 </Link>
@@ -112,20 +126,21 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                   <Button type="default" icon={<MoreVertical />} className="px-1.5" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-36">
-                  <DropdownMenuItem
-                    onClick={() => {
-                      sendEvent({
-                        action: 'cron_job_update_clicked',
-                        groups: {
-                          project: selectedProject?.ref ?? 'Unknown',
-                          organization: org?.slug ?? 'Unknown',
-                        },
-                      })
-                      onEditCronJob(job)
-                    }}
-                  >
-                    Edit cron job
-                  </DropdownMenuItem>
+                  {job.jobname ? (
+                    <DropdownMenuItem onClick={onEdit}>Edit cron job</DropdownMenuItem>
+                  ) : (
+                    <Tooltip>
+                      <TooltipTrigger className="w-full">
+                        <DropdownMenuItem onClick={onEdit} disabled>
+                          Edit cron job
+                        </DropdownMenuItem>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        This cron job doesn’t have a name and can’t be edited. Create a new one and
+                        delete this job.
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={() => {

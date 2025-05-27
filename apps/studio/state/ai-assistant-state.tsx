@@ -1,8 +1,9 @@
+import { openDB, DBSchema, IDBPDatabase } from 'idb'
 import type { Message as MessageType } from 'ai/react'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
-
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { debounce } from 'lodash'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 type SuggestionsType = {
   title: string
@@ -14,7 +15,7 @@ type AssistantMessageType = MessageType & { results?: { [id: string]: any[] } }
 type ChatSession = {
   id: string
   name: string
-  messages: readonly AssistantMessageType[]
+  messages: AssistantMessageType[]
   createdAt: Date
   updatedAt: Date
 }
@@ -29,6 +30,14 @@ type AiAssistantData = {
   activeChatId?: string
 }
 
+// Data structure stored in IndexedDB
+type StoredAiAssistantState = {
+  projectRef: string
+  open: boolean
+  activeChatId?: string
+  chats: Record<string, ChatSession>
+}
+
 const INITIAL_AI_ASSISTANT: AiAssistantData = {
   open: false,
   initialInput: '',
@@ -39,55 +48,162 @@ const INITIAL_AI_ASSISTANT: AiAssistantData = {
   activeChatId: undefined,
 }
 
-export const createAiAssistantState = (projectRef: string | undefined) => {
-  const getInitialState = (): AiAssistantData => {
-    if (typeof window === 'undefined') {
-      return INITIAL_AI_ASSISTANT
-    }
+const DB_NAME = 'ai-assistant-db'
+const DB_VERSION = 1
+const STORE_NAME = 'assistantState'
 
-    const stored = localStorage.getItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
-    const urlParams = new URLSearchParams(window.location.search)
-    const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
+interface AiAssistantDB extends DBSchema {
+  [STORE_NAME]: {
+    key: string
+    value: StoredAiAssistantState
+  }
+}
 
-    let parsedAiAssistant = INITIAL_AI_ASSISTANT
-
-    try {
-      if (stored) {
-        parsedAiAssistant = JSON.parse(stored, (key, value) => {
-          if ((key === 'createdAt' || key === 'updatedAt') && value) {
-            return new Date(value)
-          }
-          return value
-        })
+async function openAiDb(): Promise<IDBPDatabase<AiAssistantDB>> {
+  return openDB<AiAssistantDB>(DB_NAME, DB_VERSION, {
+    upgrade(db) {
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: 'projectRef' })
       }
-    } catch {
-      // Ignore parsing errors
-    }
+    },
+  })
+}
 
-    return {
-      ...parsedAiAssistant,
-      open:
-        aiAssistantPanelOpenParam !== null
-          ? aiAssistantPanelOpenParam === 'true'
-          : parsedAiAssistant.open,
+async function getAiState(projectRef: string): Promise<StoredAiAssistantState | undefined> {
+  if (!projectRef) return undefined
+  try {
+    const db = await openAiDb()
+    return await db.get(STORE_NAME, projectRef)
+  } catch (error) {
+    console.error('Failed to get AI state from IndexedDB:', error)
+    return undefined
+  }
+}
+
+async function saveAiState(state: StoredAiAssistantState): Promise<void> {
+  if (!state.projectRef) return
+  try {
+    const db = await openAiDb()
+    await db.put(STORE_NAME, state)
+  } catch (error) {
+    console.error('Failed to save AI state to IndexedDB:', error)
+  }
+}
+
+// Helper function to load state from IndexedDB
+async function loadFromIndexedDB(projectRef: string): Promise<StoredAiAssistantState | null> {
+  try {
+    const persistedState = await getAiState(projectRef)
+    if (persistedState) {
+      // Revive dates
+      Object.values(persistedState.chats).forEach((chat: ChatSession) => {
+        if (chat && typeof chat === 'object') {
+          chat.createdAt = new Date(chat.createdAt)
+          chat.updatedAt = new Date(chat.updatedAt)
+        }
+      })
+      return persistedState
+    }
+  } catch (error) {
+    console.error('Error loading AI state from IndexedDB:', error)
+  }
+  return null
+}
+
+// Helper function to attempt migration from localStorage
+async function tryMigrateFromLocalStorage(
+  projectRef: string
+): Promise<StoredAiAssistantState | null> {
+  const stored = localStorage.getItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
+  if (!stored) {
+    return null
+  }
+
+  let migratedState: StoredAiAssistantState | null = null
+  try {
+    const parsedFromLocalStorage = JSON.parse(stored, (key, value) => {
+      if ((key === 'createdAt' || key === 'updatedAt') && value) {
+        return new Date(value)
+      }
+      return value
+    })
+
+    if (parsedFromLocalStorage && typeof parsedFromLocalStorage.chats === 'object') {
+      migratedState = {
+        projectRef: projectRef,
+        open: parsedFromLocalStorage.open ?? false,
+        activeChatId: parsedFromLocalStorage.activeChatId,
+        chats: parsedFromLocalStorage.chats,
+      }
+    } else {
+      console.warn('Data in localStorage is not in the expected format, ignoring.')
+      // Clean up invalid data
+      localStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
+    }
+  } catch (error) {
+    console.error('Failed to parse state from localStorage:', error)
+    // Clear potentially corrupted data
+    localStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
+  }
+
+  if (migratedState) {
+    try {
+      await saveAiState(migratedState)
+      localStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
+      return migratedState
+    } catch (saveError) {
+      console.error('Failed to save migrated state to IndexedDB:', saveError)
+      return null
     }
   }
 
-  const initialState = getInitialState()
+  return null
+}
 
-  const state = proxy({
-    open: initialState.open,
-    initialInput: initialState.initialInput,
-    sqlSnippets: initialState.sqlSnippets,
-    suggestions: initialState.suggestions,
-    tables: initialState.tables,
-    chats: initialState.chats,
-    activeChatId: initialState.activeChatId,
+// Helper function to ensure an active chat exists or initialize a new one
+function ensureActiveChatOrInitialize(state: AiAssistantState) {
+  // Check URL param again to override loaded 'open' state if present
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search)
+    const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
+    if (aiAssistantPanelOpenParam !== null) {
+      state.open = aiAssistantPanelOpenParam === 'true'
+    }
+  }
+
+  // Ensure an active chat exists after loading/migration
+  if (!state.activeChatId || !state.chats[state.activeChatId]) {
+    const chatIds = Object.keys(state.chats)
+    if (chatIds.length > 0) {
+      // Select the most recently updated chat
+      state.activeChatId = chatIds.sort(
+        (a, b) =>
+          (state.chats[b].updatedAt?.getTime() || 0) - (state.chats[a].updatedAt?.getTime() || 0)
+      )[0]
+    } else {
+      // If loaded/migrated state had no chats, create a new one
+      state.newChat()
+    }
+  }
+}
+
+export const createAiAssistantState = (): AiAssistantState => {
+  // Initialize with defaults, loading happens asynchronously in the provider
+  const initialState = { ...INITIAL_AI_ASSISTANT }
+
+  // Check URL params for initial 'open' state, overriding any loaded state later if present
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search)
+    const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
+    if (aiAssistantPanelOpenParam !== null) {
+      initialState.open = aiAssistantPanelOpenParam === 'true'
+    }
+  }
+
+  const state: AiAssistantState = proxy({
+    ...initialState, // Spread initial values directly
 
     resetAiAssistantPanel: () => {
-      state.open = state.open
-      state.chats = state.chats
-      state.activeChatId = state.activeChatId
       Object.assign(state, INITIAL_AI_ASSISTANT)
     },
 
@@ -105,7 +221,7 @@ export const createAiAssistantState = (projectRef: string | undefined) => {
     },
 
     // Chat management
-    get activeChat() {
+    get activeChat(): ChatSession | undefined {
       return state.activeChatId ? state.chats[state.activeChatId] : undefined
     },
 
@@ -129,11 +245,12 @@ export const createAiAssistantState = (projectRef: string | undefined) => {
       }
       state.activeChatId = chatId
 
+      // Update non-chat related state based on options, falling back to current state, then initial
       state.open = options?.open ?? state.open
-      state.initialInput = options?.initialInput ?? initialState.initialInput
-      state.sqlSnippets = options?.sqlSnippets ?? initialState.sqlSnippets
-      state.suggestions = options?.suggestions ?? initialState.suggestions
-      state.tables = options?.tables ?? initialState.tables
+      state.initialInput = options?.initialInput ?? INITIAL_AI_ASSISTANT.initialInput
+      state.sqlSnippets = options?.sqlSnippets ?? INITIAL_AI_ASSISTANT.sqlSnippets
+      state.suggestions = options?.suggestions ?? INITIAL_AI_ASSISTANT.suggestions
+      state.tables = options?.tables ?? INITIAL_AI_ASSISTANT.tables
 
       return chatId
     },
@@ -148,7 +265,6 @@ export const createAiAssistantState = (projectRef: string | undefined) => {
       const { [id]: _, ...remainingChats } = state.chats
       state.chats = remainingChats
 
-      // If the deleted chat was the active one, select a new active chat
       if (id === state.activeChatId) {
         const remainingChatIds = Object.keys(remainingChats)
         state.activeChatId = remainingChatIds.length > 0 ? remainingChatIds[0] : undefined
@@ -158,14 +274,8 @@ export const createAiAssistantState = (projectRef: string | undefined) => {
     renameChat: (id: string, name: string) => {
       const chat = state.chats[id]
       if (chat && chat.name !== name) {
-        state.chats = {
-          ...state.chats,
-          [id]: {
-            ...chat,
-            name,
-            updatedAt: new Date(),
-          },
-        }
+        chat.name = name
+        chat.updatedAt = new Date()
       }
     },
 
@@ -174,25 +284,27 @@ export const createAiAssistantState = (projectRef: string | undefined) => {
       if (chat) {
         chat.messages = []
         chat.updatedAt = new Date()
-
         state.sqlSnippets = []
         state.initialInput = ''
       }
     },
 
     saveMessage: (message: MessageType | MessageType[]) => {
-      let chat = state.activeChat
+      const chat = state.activeChat
       if (!chat) return
 
       const existingMessages = chat.messages
       const messagesToAdd = Array.isArray(message)
-        ? message.filter((msg) => !existingMessages.some((existing) => existing.id === msg.id))
-        : !existingMessages.some((existing) => existing.id === message.id)
+        ? message.filter(
+            (msg) =>
+              !existingMessages.some((existing: AssistantMessageType) => existing.id === msg.id)
+          )
+        : !existingMessages.some((existing: AssistantMessageType) => existing.id === message.id)
           ? [message]
           : []
 
       if (messagesToAdd.length > 0) {
-        chat.messages = [...existingMessages, ...messagesToAdd]
+        chat.messages.push(...messagesToAdd)
         chat.updatedAt = new Date()
       }
     },
@@ -206,60 +318,98 @@ export const createAiAssistantState = (projectRef: string | undefined) => {
       resultId?: string
       results: any[]
     }) => {
-      let chat = state.activeChat
+      const chat = state.activeChat
       if (!chat || !resultId) return
 
-      const existingMessages = chat.messages
-      const updatedMessages = existingMessages.map((msg) => {
-        if (msg.id === id) {
-          return { ...msg, results: { ...(msg.results ?? {}), [resultId]: results } }
-        } else {
-          return msg
+      const messageIndex = chat.messages.findIndex((msg) => msg.id === id)
+
+      if (messageIndex !== -1) {
+        const msg = chat.messages[messageIndex]
+        if (!msg.results) {
+          msg.results = {}
         }
-      })
-      chat.messages = updatedMessages
+        msg.results[resultId] = results
+      }
     },
 
     setSqlSnippets: (snippets: string[]) => {
       state.sqlSnippets = snippets
     },
 
-    // SQL snippets and suggestions
     clearSqlSnippets: () => {
       state.sqlSnippets = undefined
-      // Remove suggestions if sqlSnippets were removed
       state.suggestions = undefined
     },
 
     getCachedSQLResults: ({ messageId, snippetId }: { messageId: string; snippetId?: string }) => {
-      let chat = state.activeChat
+      const chat = state.activeChat
       if (!chat || !snippetId) return
 
       const message = chat.messages.find((msg) => msg.id === messageId)
       const results = (message?.results ?? {})[snippetId]
       return results
     },
-  })
 
-  // If there's no active chat when the state is created
-  // select the first chat, or create a new one if there are none
-  if (!state.activeChat) {
-    const chatIds = Object.keys(state.chats)
-    if (chatIds.length > 0) {
-      state.activeChatId = chatIds[0]
-    } else {
-      state.newChat()
-    }
-  }
+    // --- New function to load persisted state ---
+    loadPersistedState: (persistedState: StoredAiAssistantState) => {
+      state.open = persistedState.open
+      state.chats = persistedState.chats
+      state.activeChatId = persistedState.activeChatId
+
+      // Check URL param again to override loaded 'open' state if present
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search)
+        const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
+        if (aiAssistantPanelOpenParam !== null) {
+          state.open = aiAssistantPanelOpenParam === 'true'
+        }
+      }
+
+      // Ensure an active chat exists after loading
+      if (!state.activeChat) {
+        const chatIds = Object.keys(state.chats)
+        if (chatIds.length > 0) {
+          // Maybe select the most recently updated? For now, first.
+          state.activeChatId = chatIds.sort(
+            (a, b) =>
+              (state.chats[b].updatedAt?.getTime() || 0) -
+              (state.chats[a].updatedAt?.getTime() || 0)
+          )[0]
+        } else {
+          // If loaded state had no chats, create a new one
+          state.newChat()
+        }
+      }
+    },
+  })
 
   return state
 }
 
-export type AiAssistantState = ReturnType<typeof createAiAssistantState>
+export type AiAssistantState = AiAssistantData & {
+  resetAiAssistantPanel: () => void
+  openAssistant: () => void
+  closeAssistant: () => void
+  toggleAssistant: () => void
+  activeChat: ChatSession | undefined
+  newChat: (
+    options?: { name?: string } & Partial<
+      Pick<AiAssistantData, 'open' | 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
+    >
+  ) => string
+  selectChat: (id: string) => void
+  deleteChat: (id: string) => void
+  renameChat: (id: string, name: string) => void
+  clearMessages: () => void
+  saveMessage: (message: MessageType | MessageType[]) => void
+  updateMessage: (args: { id: string; resultId?: string; results: any[] }) => void
+  setSqlSnippets: (snippets: string[]) => void
+  clearSqlSnippets: () => void
+  getCachedSQLResults: (args: { messageId: string; snippetId?: string }) => any[] | undefined
+  loadPersistedState: (persistedState: StoredAiAssistantState) => void
+}
 
-export const AiAssistantStateContext = createContext<AiAssistantState>(
-  createAiAssistantState(undefined)
-)
+export const AiAssistantStateContext = createContext<AiAssistantState>(createAiAssistantState())
 
 export const AiAssistantStateContextProvider = ({
   projectRef,
@@ -267,39 +417,84 @@ export const AiAssistantStateContextProvider = ({
 }: PropsWithChildren<{
   projectRef: string | undefined
 }>) => {
-  const [state, setState] = useState(() => createAiAssistantState(projectRef))
+  // Initialize state. createAiAssistantState now just sets defaults.
+  const [state] = useState(() => createAiAssistantState())
 
+  // Effect to load state from IndexedDB on mount or projectRef change
   useEffect(() => {
-    setState(createAiAssistantState(projectRef))
-  }, [projectRef])
+    let isMounted = true
 
+    async function loadAndInitializeState() {
+      if (!projectRef || typeof window === 'undefined') {
+        if (projectRef === undefined) {
+          state.resetAiAssistantPanel()
+        }
+        return // Don't load if no projectRef or not in browser
+      }
+
+      let loadedState: StoredAiAssistantState | null = null
+
+      // 1. Try loading from IndexedDB
+      loadedState = await loadFromIndexedDB(projectRef)
+
+      // 2. If not in IndexedDB, try migrating from localStorage
+      if (!loadedState) {
+        loadedState = await tryMigrateFromLocalStorage(projectRef)
+      }
+
+      if (!isMounted) return // Component unmounted during async operations
+
+      // 3. If state was loaded or migrated, update the valtio state
+      if (loadedState) {
+        state.loadPersistedState(loadedState)
+      }
+
+      // 4. Ensure an active chat exists and handle URL overrides
+      ensureActiveChatOrInitialize(state)
+    }
+
+    loadAndInitializeState()
+
+    return () => {
+      isMounted = false
+    }
+  }, [projectRef, state])
+
+  // Effect to save state to IndexedDB on changes
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      return subscribe(state, () => {
+    if (typeof window !== 'undefined' && projectRef) {
+      // Create a debounced version of saveAiState
+      const debouncedSaveAiState = debounce(saveAiState, 500)
+
+      const unsubscribe = subscribe(state, () => {
         const snap = snapshot(state)
-        // Save AI assistant state with limited message history
-        const aiAssistantState = {
+        // Prepare state for IndexedDB
+        const stateToSave: StoredAiAssistantState = {
+          projectRef: projectRef,
           open: snap.open,
           activeChatId: snap.activeChatId,
           chats: snap.chats
             ? Object.entries(snap.chats).reduce((acc, [chatId, chat]) => {
+                // Limit messages before saving
                 return {
                   ...acc,
                   [chatId]: {
                     ...chat,
-                    messages: chat.messages?.slice(-20) || [], // Only keep last 20 messages
+                    messages: chat.messages?.slice(-20) || [],
                   },
                 }
               }, {})
             : {},
         }
-
-        localStorage.setItem(
-          LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef),
-          JSON.stringify(aiAssistantState)
-        )
+        debouncedSaveAiState(stateToSave)
       })
+      // Clean up subscription and cancel any pending saves on unmount or projectRef change
+      return () => {
+        debouncedSaveAiState.cancel()
+        unsubscribe()
+      }
     }
+    return undefined
   }, [state, projectRef])
 
   return (
@@ -309,6 +504,5 @@ export const AiAssistantStateContextProvider = ({
 
 export const useAiAssistantStateSnapshot = (options?: Parameters<typeof useSnapshot>[1]) => {
   const state = useContext(AiAssistantStateContext)
-
   return useSnapshot(state, options)
 }

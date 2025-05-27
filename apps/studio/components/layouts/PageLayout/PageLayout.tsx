@@ -2,7 +2,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactNode } from 'react'
 
-import { Button, cn, NavMenu, NavMenuItem } from 'ui'
+import { useParams } from 'common'
+import { Badge, Button, cn, NavMenu, NavMenuItem } from 'ui'
 import { ScaffoldContainer } from '../Scaffold'
 import { PageHeader } from './PageHeader'
 
@@ -12,6 +13,7 @@ export interface NavigationItem {
   href?: string
   icon?: ReactNode
   onClick?: () => void
+  badge?: string
 }
 
 interface PageLayoutProps {
@@ -68,6 +70,7 @@ export const PageLayout = ({
   size = 'default',
   isCompact = false,
 }: PageLayoutProps) => {
+  const { ref } = useParams()
   const router = useRouter()
 
   return (
@@ -103,7 +106,11 @@ export const PageLayout = ({
               <NavMenuItem key={item.label} active={router.asPath.split('?')[0] === item.href}>
                 {item.href ? (
                   <Link
-                    href={item.href}
+                    href={
+                      item.href.includes('[ref]') && !!ref
+                        ? item.href.replace('[ref]', ref)
+                        : item.href
+                    }
                     className={cn(
                       'inline-flex items-center gap-2',
                       router.asPath === item.href && 'text-foreground'
@@ -112,6 +119,7 @@ export const PageLayout = ({
                   >
                     {item.icon && <span>{item.icon}</span>}
                     {item.label}
+                    {item.badge && <Badge variant="default">{item.badge}</Badge>}
                   </Link>
                 ) : (
                   <Button
@@ -121,6 +129,7 @@ export const PageLayout = ({
                   >
                     {item.icon && <span className="mr-2">{item.icon}</span>}
                     {item.label}
+                    {item.badge && <Badge variant="default">{item.badge}</Badge>}
                   </Button>
                 )}
               </NavMenuItem>

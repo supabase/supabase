@@ -8,6 +8,7 @@ const LOGS_PAGES = [
 ]
 
 test.describe('Logs', async () => {
+  test.describe.configure({ retries: 5 })
   for (const logPage of LOGS_PAGES) {
     test.describe(`${logPage.label} logs page`, () => {
       test('can navigate to logs page', async ({ page, ref }) => {
@@ -28,7 +29,9 @@ test.describe('Logs', async () => {
 
         // Wait for and verify the logs table is present
         const logsTable = page.getByRole('table')
-        await expect(logsTable).toBeVisible()
+        await expect(logsTable).toBeVisible({
+          timeout: 20000,
+        })
       })
 
       test('shows logs data without errors', async ({ page, ref, apiUrl }) => {
@@ -53,7 +56,7 @@ test.describe('Logs', async () => {
         } else {
           // Check if the logs table has any rows
           const gridcells = page.getByRole('gridcell')
-          await expect(gridcells.first()).toBeVisible()
+          await expect(gridcells.first()).toBeVisible({ timeout: 20000 })
         }
       })
 

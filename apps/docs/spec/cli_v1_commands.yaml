@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.20.5
+  version: 2.23.4
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -871,7 +871,7 @@ commands:
     title: supabase services
     summary: Show versions of all Supabase services
     tags:
-      - management-api
+      - local-dev
     links: []
     usage: supabase services
     subcommands: []
@@ -904,6 +904,17 @@ commands:
   - id: supabase-secrets
     title: supabase secrets
     summary: Manage Supabase secrets
+    description: |2
+
+      Provides tools for managing environment variables and secrets for your Supabase project.
+
+      This command group allows you to set, unset, and list secrets that are securely stored and made available to Edge Functions as environment variables.
+
+      Secrets management through the CLI is useful for:
+      - Setting environment-specific configuration
+      - Managing sensitive credentials securely
+
+      Secrets can be set individually or loaded from .env files for convenience.
     tags:
       - management-api
     links: []
@@ -958,6 +969,13 @@ commands:
   - id: supabase-projects
     title: supabase projects
     summary: Manage Supabase projects
+    description: |2
+
+      Provides tools for creating and managing your Supabase projects.
+
+      This command group allows you to list all projects in your organizations, create new projects, delete existing projects, and retrieve API keys. These operations help you manage your Supabase infrastructure programmatically without using the dashboard.
+
+      Project management via CLI is especially useful for automation scripts and when you need to provision environments in a repeatable way.
     tags:
       - management-api
     links: []
@@ -2482,6 +2500,15 @@ commands:
   - id: supabase-gen
     title: supabase gen
     summary: Run code generation tools
+    description: |2
+
+      Automatically generates type definitions based on your Postgres database schema.
+
+      This command connects to your database (local or remote) and generates typed definitions that match your database tables, views, and stored procedures. By default, it generates TypeScript definitions, but also supports Go and Swift.
+
+      Generated types give you type safety and autocompletion when working with your database in code, helping prevent runtime errors and improving developer experience.
+
+      The types respect relationships, constraints, and custom types defined in your database schema.
     tags:
       - local-dev
     links: []
@@ -2571,6 +2598,15 @@ commands:
   - id: supabase-functions
     title: supabase functions
     summary: Manage Supabase Edge functions
+    description: |2
+
+      Manage Supabase Edge Functions.
+
+      Supabase Edge Functions are server-less functions that run close to your users.
+
+      Edge Functions allow you to execute custom server-side code without deploying or scaling a traditional server. They're ideal for handling webhooks, custom API endpoints, data validation, and serving personalized content.
+
+      Edge Functions are written in TypeScript and run on Deno compatible edge runtime, which is a secure runtime with no package management needed, fast cold starts, and built-in security.
     tags:
       - management-api
     links: []
@@ -2656,6 +2692,13 @@ commands:
   - id: supabase-functions-new
     title: supabase functions new
     summary: Create a new Function locally
+    description: |2
+
+      Creates a new Edge Function with boilerplate code in the `supabase/functions` directory.
+
+      This command generates a starter TypeScript file with the necessary Deno imports and a basic function structure. The function is created as a new directory with the name you specify, containing an `index.ts` file with the function code.
+
+      After creating the function, you can edit it locally and then use `supabase functions serve`  to test it before deploying with `supabase functions deploy`.
     tags: []
     links: []
     usage: supabase functions new <Function name>
@@ -3384,6 +3427,11 @@ commands:
   - id: supabase-config-push
     title: supabase config push
     summary: Pushes local config.toml to the linked project
+    description: |2
+
+      Updates the configurations of a linked Supabase project with the local `supabase/config.toml` file.
+
+      This command allows you to manage project configuration as code by defining settings locally and then pushing them to your remote project.
     tags: []
     links: []
     usage: supabase config push

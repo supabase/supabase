@@ -23,7 +23,6 @@ import {
   MAX_REPLICAS_BELOW_XL,
   useReadReplicasQuery,
 } from 'data/read-replicas/replicas-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -73,12 +72,11 @@ const DeployNewReplicaPanel = ({
 
   const { data } = useReadReplicasQuery({ projectRef })
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const { data: diskConfiguration } = useDiskAttributesQuery({ projectRef })
 
   const isNotOnTeamOrEnterprisePlan = useMemo(
-    () => !['team', 'enterprise'].includes(subscription?.plan.id ?? ''),
-    [subscription]
+    () => !['team', 'enterprise'].includes(org?.plan.id ?? ''),
+    [org]
   )
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
     enabled: isNotOnTeamOrEnterprisePlan,
@@ -166,14 +164,13 @@ const DeployNewReplicaPanel = ({
     : MAX_REPLICAS_ABOVE_XL
   const reachedMaxReplicas =
     (data ?? []).filter((db) => db.identifier !== projectRef).length >= maxNumberOfReplicas
-  const isFreePlan = subscription?.plan.id === 'free'
+  const isFreePlan = org?.plan.id === 'free'
   const isAWSProvider = project?.cloud_provider === 'AWS'
   const isWalgEnabled = project?.is_physical_backups_enabled
   const currentComputeAddon = addons?.selected_addons.find(
     (addon) => addon.type === 'compute_instance'
   )
-  const isProWithSpendCapEnabled =
-    subscription?.plan.id === 'pro' && !subscription.usage_billing_enabled
+  const isProWithSpendCapEnabled = org?.plan.id === 'pro' && !org.usage_billing_enabled
   const isMinimallyOnSmallCompute =
     currentComputeAddon?.variant.identifier !== undefined &&
     currentComputeAddon?.variant.identifier !== 'ci_micro'
@@ -194,7 +191,9 @@ const DeployNewReplicaPanel = ({
 
   const availableRegions =
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-      ? AVAILABLE_REPLICA_REGIONS.filter((x) => x.key === 'SOUTHEAST_ASIA')
+      ? AVAILABLE_REPLICA_REGIONS.filter((x) =>
+          ['SOUTHEAST_ASIA', 'CENTRAL_EU', 'EAST_US'].includes(x.key)
+        )
       : AVAILABLE_REPLICA_REGIONS
 
   const onSubmit = async () => {
@@ -239,7 +238,7 @@ const DeployNewReplicaPanel = ({
               </span>
               <div className="mt-3">
                 <Button asChild type="default">
-                  <Link href={`/org/${org?.slug}/invoices`}>View invoices</Link>
+                  <Link href={`/org/${org?.slug}/billing#invoices`}>View invoices</Link>
                 </Button>
               </div>
             </AlertDescription_Shadcn_>
@@ -445,13 +444,15 @@ const DeployNewReplicaPanel = ({
                   <CollapsibleTrigger_Shadcn_ className="w-full flex items-center justify-between [&[data-state=open]>svg]:!-rotate-180">
                     <p className="text-sm text-left">
                       New replica will cost an additional{' '}
-                      {formatCurrency(
-                        estComputeMonthlyCost +
-                          additionalCostDiskSize +
-                          Number(additionalCostIOPS) +
-                          Number(additionalCostThroughput)
-                      )}
-                      /month
+                      <span translate="no">
+                        {formatCurrency(
+                          estComputeMonthlyCost +
+                            additionalCostDiskSize +
+                            Number(additionalCostIOPS) +
+                            Number(additionalCostThroughput)
+                        )}
+                        /month
+                      </span>
                     </p>
                     <ChevronDown size={14} className="transition" />
                   </CollapsibleTrigger_Shadcn_>
@@ -475,7 +476,7 @@ const DeployNewReplicaPanel = ({
                         <TableRow>
                           <TableCell className="pl-0">Compute size</TableCell>
                           <TableCell>{selectedComputeMeta?.name}</TableCell>
-                          <TableCell className="text-right font-mono pr-0">
+                          <TableCell className="text-right font-mono pr-0" translate="no">
                             {formatCurrency(estComputeMonthlyCost)}
                           </TableCell>
                         </TableRow>
@@ -484,14 +485,14 @@ const DeployNewReplicaPanel = ({
                           <TableCell>
                             {((size_gb ?? 0) * 1.25).toLocaleString()} GB ({type})
                           </TableCell>
-                          <TableCell className="text-right font-mono pr-0">
+                          <TableCell className="text-right font-mono pr-0" translate="no">
                             {formatCurrency(additionalCostDiskSize)}
                           </TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell className="pl-0">IOPS</TableCell>
                           <TableCell>{iops?.toLocaleString()} IOPS</TableCell>
-                          <TableCell className="text-right font-mono pr-0">
+                          <TableCell className="text-right font-mono pr-0" translate="no">
                             {formatCurrency(+additionalCostIOPS)}
                           </TableCell>
                         </TableRow>
@@ -515,7 +516,10 @@ const DeployNewReplicaPanel = ({
                 read replica on the{' '}
                 <span className="text-foreground">{selectedComputeMeta?.name}</span> size incurs
                 additional{' '}
-                <span className="text-foreground">{selectedComputeMeta?.price_description}</span>.
+                <span className="text-foreground" translate="no">
+                  {selectedComputeMeta?.price_description}
+                </span>
+                .
               </p>
             )}
 

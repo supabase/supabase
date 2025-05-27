@@ -12,18 +12,20 @@
   },
   "dependencies": {
     "@types/dat.gui": "^0.7.12",
+    "@usercentrics/cmp-browser-sdk": "^4.42.0",
     "@vercel/flags": "^2.6.0",
     "api-types": "workspace:*",
     "config": "workspace:*",
     "dat.gui": "^0.7.9",
     "lodash": "^4.17.21",
     "next-themes": "^0.3.0",
-    "react-use": "^17.4.0"
+    "react-use": "^17.4.0",
+    "valtio": "catalog:"
   },
   "devDependencies": {
     "@types/lodash": "4.17.5",
-    "@types/react": "^18.2.24",
-    "@types/react-dom": "^18.2.8",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "tsconfig": "workspace:*",
     "typescript": "~5.5.0"
   },
@@ -31,7 +33,7 @@
     "@supabase/auth-js": "catalog:",
     "@supabase/supabase-js": "catalog:",
     "next": "catalog:",
-    "react": "*",
-    "react-dom": "*"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   }
 }

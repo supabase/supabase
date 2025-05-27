@@ -1,12 +1,13 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
 
-import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
+import { SimpleCodeBlock } from 'ui'
 import {
   ConnectTabContent,
   ConnectTabs,
   ConnectTabTrigger,
   ConnectTabTriggers,
 } from 'components/interfaces/Connect/ConnectTabs'
+import { IS_PLATFORM } from 'lib/constants'
 
 const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
   return (
@@ -41,11 +42,11 @@ DIRECT_URL="${connectionStringPooler.sessionShared}"
 # DIRECT_URL="${connectionStringPooler.sessionDedicated}"
  `
               : `
-# Connect to Supabase via connection pooling.
-DATABASE_URL="${connectionStringPooler.transactionShared}?pgbouncer=true"
+# Connect to Supabase ${IS_PLATFORM ? 'via connection pooling' : ''}
+DATABASE_URL="${IS_PLATFORM ? `${connectionStringPooler.transactionShared}?pgbouncer=true` : connectionStringPooler.direct}"
 
-# Direct connection to the database. Used for migrations.
-DIRECT_URL="${connectionStringPooler.sessionShared}"
+# Direct connection to the database. Used for migrations
+DIRECT_URL="${IS_PLATFORM ? connectionStringPooler.sessionShared : connectionStringPooler.direct}"
 `}
         </SimpleCodeBlock>
       </ConnectTabContent>

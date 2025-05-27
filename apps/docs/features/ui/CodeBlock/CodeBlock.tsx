@@ -1,22 +1,23 @@
 import { type PropsWithChildren } from 'react'
-import { type BundledLanguage, codeToTokens, type ThemedToken } from 'shiki'
+import { bundledLanguages, createHighlighter, type BundledLanguage, type ThemedToken } from 'shiki'
 import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
 import { cn } from 'ui'
 
 import { AnnotatedSpan, CodeCopyButton } from './CodeBlock.client'
+import { getFontStyle } from './CodeBlock.utils'
+import theme from './supabase-2.json' with { type: 'json' }
 import denoTypes from './types/lib.deno.d.ts.include'
 
 const extraFiles: ExtraFiles = { 'deno.d.ts': denoTypes }
 
 const twoslasher = createTwoslasher({ extraFiles })
-const TWOSLASHABLE_LANGS: ReadonlyArray<string> = [
-  'js',
-  'ts',
-  'jsx',
-  'tsx',
-  'javascript',
-  'typescript',
-]
+const TWOSLASHABLE_LANGS: ReadonlyArray<string> = ['js', 'ts', 'javascript', 'typescript']
+
+const BUNDLED_LANGUAGES = Object.keys(bundledLanguages)
+const highlighter = await createHighlighter({
+  themes: [theme],
+  langs: BUNDLED_LANGUAGES,
+})
 
 export async function CodeBlock({
   className,
@@ -24,17 +25,19 @@ export async function CodeBlock({
   lineNumbers = true,
   contents,
   children,
+  skipTypeGeneration,
 }: PropsWithChildren<{
   className?: string
   lang?: string
   lineNumbers?: boolean
   contents?: string
+  skipTypeGeneration?: boolean
 }>) {
   let code = (contents || extractCode(children)).trim()
   const lang = tryToBundledLanguage(langSetting) || extractLang(children)
 
   let twoslashed = null as null | Map<number, Map<number, Array<NodeHover>>>
-  if (TWOSLASHABLE_LANGS.includes(lang)) {
+  if (!skipTypeGeneration && TWOSLASHABLE_LANGS.includes(lang)) {
     try {
       const { code: editedCode, nodes } = twoslasher(code)
       const hoverNodes: Array<NodeHover> = nodes.filter((node) => node.type === 'hover')
@@ -42,15 +45,16 @@ export async function CodeBlock({
       code = editedCode
     } catch (_err) {
       // Silently ignore, if imports aren't defined type compilation fails
+      // Uncomment lines below to debug in dev
+      // console.log('\n==========CODE==========\n')
+      // console.log(code)
+      // console.error(_err.recommendation)
     }
   }
 
-  const { tokens } = await codeToTokens(code, {
+  const { tokens } = highlighter.codeToTokens(code, {
     lang,
-    themes: {
-      light: 'vitesse-light',
-      dark: 'vitesse-dark',
-    },
+    theme: 'Supabase Theme',
   })
 
   return (
@@ -117,7 +121,7 @@ function CodeLine({
             annotations={twoslash.get(token.offset)!}
           />
         ) : (
-          <span key={token.offset} style={token.htmlStyle}>
+          <span key={token.offset} style={{ color: token.color, ...getFontStyle(token.fontStyle) }}>
             {token.content}
           </span>
         )
@@ -177,288 +181,3 @@ function tryToBundledLanguage(lang: string): BundledLanguage | null {
   }
   return null
 }
-
-const BUNDLED_LANGUAGES = [
-  'abap',
-  'actionscript-3',
-  'ada',
-  'adoc',
-  'angular-html',
-  'angular-ts',
-  'apache',
-  'apex',
-  'apl',
-  'applescript',
-  'ara',
-  'asciidoc',
-  'asm',
-  'astro',
-  'awk',
-  'ballerina',
-  'bash',
-  'bat',
-  'batch',
-  'be',
-  'beancount',
-  'berry',
-  'bibtex',
-  'bicep',
-  'blade',
-  'c',
-  'c#',
-  'c++',
-  'cadence',
-  'cdc',
-  'clarity',
-  'clj',
-  'clojure',
-  'closure-templates',
-  'cmake',
-  'cmd',
-  'cobol',
-  'codeowners',
-  'codeql',
-  'coffee',
-  'coffeescript',
-  'common-lisp',
-  'console',
-  'cpp',
-  'cql',
-  'crystal',
-  'cs',
-  'csharp',
-  'css',
-  'csv',
-  'cue',
-  'cypher',
-  'd',
-  'dart',
-  'dax',
-  'desktop',
-  'diff',
-  'docker',
-  'dockerfile',
-  'dream-maker',
-  'elisp',
-  'elixir',
-  'elm',
-  'emacs-lisp',
-  'erb',
-  'erl',
-  'erlang',
-  'f',
-  'f#',
-  'f03',
-  'f08',
-  'f18',
-  'f77',
-  'f90',
-  'f95',
-  'fennel',
-  'fish',
-  'fluent',
-  'for',
-  'fortran-fixed-form',
-  'fortran-free-form',
-  'fs',
-  'fsharp',
-  'fsl',
-  'ftl',
-  'gdresource',
-  'gdscript',
-  'gdshader',
-  'genie',
-  'gherkin',
-  'git-commit',
-  'git-rebase',
-  'gjs',
-  'gleam',
-  'glimmer-js',
-  'glimmer-ts',
-  'glsl',
-  'gnuplot',
-  'go',
-  'gql',
-  'graphql',
-  'groovy',
-  'gts',
-  'hack',
-  'haml',
-  'handlebars',
-  'haskell',
-  'haxe',
-  'hbs',
-  'hcl',
-  'hjson',
-  'hlsl',
-  'hs',
-  'html',
-  'html-derivative',
-  'http',
-  'hxml',
-  'hy',
-  'imba',
-  'ini',
-  'jade',
-  'java',
-  'javascript',
-  'jinja',
-  'jison',
-  'jl',
-  'js',
-  'json',
-  'json5',
-  'jsonc',
-  'jsonl',
-  'jsonnet',
-  'jssm',
-  'jsx',
-  'julia',
-  'kotlin',
-  'kql',
-  'kt',
-  'kts',
-  'kusto',
-  'latex',
-  'less',
-  'liquid',
-  'lisp',
-  'log',
-  'logo',
-  'lua',
-  'make',
-  'makefile',
-  'markdown',
-  'marko',
-  'matlab',
-  'md',
-  'mdc',
-  'mdx',
-  'mediawiki',
-  'mermaid',
-  'mojo',
-  'move',
-  'nar',
-  'narrat',
-  'nextflow',
-  'nf',
-  'nginx',
-  'nim',
-  'nix',
-  'nu',
-  'nushell',
-  'objc',
-  'objective-c',
-  'objective-cpp',
-  'ocaml',
-  'pascal',
-  'perl',
-  'perl6',
-  'php',
-  'plsql',
-  'po',
-  'postcss',
-  'pot',
-  'potx',
-  'powerquery',
-  'powershell',
-  'prisma',
-  'prolog',
-  'properties',
-  'proto',
-  'ps',
-  'ps1',
-  'pug',
-  'puppet',
-  'purescript',
-  'py',
-  'python',
-  'ql',
-  'qml',
-  'qmldir',
-  'qss',
-  'r',
-  'racket',
-  'raku',
-  'razor',
-  'rb',
-  'reg',
-  'regex',
-  'regexp',
-  'rel',
-  'riscv',
-  'rs',
-  'rst',
-  'ruby',
-  'rust',
-  'sas',
-  'sass',
-  'scala',
-  'scheme',
-  'scss',
-  'sh',
-  'shader',
-  'shaderlab',
-  'shell',
-  'shellscript',
-  'shellsession',
-  'smalltalk',
-  'solidity',
-  'soy',
-  'sparql',
-  'spl',
-  'splunk',
-  'sql',
-  'ssh-config',
-  'stata',
-  'styl',
-  'stylus',
-  'svelte',
-  'swift',
-  'system-verilog',
-  'systemd',
-  'tasl',
-  'tcl',
-  'terraform',
-  'tex',
-  'tf',
-  'tfvars',
-  'toml',
-  'ts',
-  'tsp',
-  'tsv',
-  'tsx',
-  'turtle',
-  'twig',
-  'typ',
-  'typescript',
-  'typespec',
-  'typst',
-  'v',
-  'vala',
-  'vb',
-  'verilog',
-  'vhdl',
-  'vim',
-  'viml',
-  'vimscript',
-  'vue',
-  'vue-html',
-  'vy',
-  'vyper',
-  'wasm',
-  'wenyan',
-  'wgsl',
-  'wiki',
-  'wikitext',
-  'wl',
-  'wolfram',
-  'xml',
-  'xsl',
-  'yaml',
-  'yml',
-  'zenscript',
-  'zig',
-  'zsh',
-  '文言',
-]

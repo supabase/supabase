@@ -2375,6 +2375,12 @@ module.exports = [
     source: '/docs/guides/integrations/zuplo',
     destination: '/partners/integrations/zuplo',
   },
+  // toddle.dev pivoted to nordcraft
+  {
+    permanent: true,
+    source: '/partners/integrations/toddle',
+    destination: '/partners/integrations/nordcraft',
+  },
   {
     permanent: true,
     source: '/docs/guides/platform/oauth-apps/publish-an-oauth-app',
@@ -2998,5 +3004,10 @@ module.exports = [
     permanent: true,
     source: '/features/fly-postgres',
     destination: '/features/postgres-database',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/fly-postgres',
+    destination: '/docs/guides/database/overview',
   },
 ]

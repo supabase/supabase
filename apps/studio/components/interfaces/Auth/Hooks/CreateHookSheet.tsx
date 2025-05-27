@@ -240,7 +240,7 @@ export const CreateHookSheet = ({
 
         form.reset({
           hookType: definition.title,
-          enabled: authConfig?.[definition.enabledKey] || false,
+          enabled: authConfig?.[definition.enabledKey] || true,
           selectedType: values.type,
           httpsValues: {
             url: (values.type === 'https' && values.url) || '',

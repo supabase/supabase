@@ -477,17 +477,6 @@ export const pricing: Pricing = {
         },
         usage_based: true,
       },
-      {
-        key: 'functions.scriptSize',
-        title: 'Script size',
-        plans: {
-          free: '20 MB',
-          pro: '20 MB',
-          team: '20 MB',
-          enterprise: 'Custom',
-        },
-        usage_based: false,
-      },
     ],
   },
   realtime: {
@@ -602,8 +591,8 @@ export const pricing: Pricing = {
           pro: false,
           team: [
             '$60 per drain per month',
-            'and $0.20 per Million processed',
-            'and $0.09 per GB bandwidth',
+            '+ $0.20 per million events',
+            '+ $0.09 per GB bandwidth',
           ],
           enterprise: 'Custom',
         },
@@ -670,7 +659,7 @@ export const pricing: Pricing = {
         plans: {
           free: 'Owner, Admin, Developer',
           pro: 'Owner, Admin, Developer',
-          team: 'Owner, Admin, Developer, Read-only',
+          team: 'Owner, Admin, Developer, Read-only, Predefined project scoped roles',
           enterprise: 'Custom project scoped roles',
         },
         usage_based: false,
