@@ -2,116 +2,10 @@ const { withSentryConfig } = require('@sentry/nextjs')
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
+const { getCSP } = require('./csp')
 
 // Required for nextjs standalone build
 const path = require('path')
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL
-  ? new URL(process.env.NEXT_PUBLIC_API_URL).origin
-  : ''
-const SUPABASE_URL = process.env.SUPABASE_URL ? new URL(process.env.SUPABASE_URL).origin : ''
-const GOTRUE_URL = process.env.NEXT_PUBLIC_GOTRUE_URL
-  ? new URL(process.env.NEXT_PUBLIC_GOTRUE_URL).origin
-  : ''
-const SUPABASE_PROJECTS_URL = 'https://*.supabase.co'
-const SUPABASE_PROJECTS_URL_WS = 'wss://*.supabase.co'
-
-// construct the URL for the Websocket Local URLs
-let SUPABASE_LOCAL_PROJECTS_URL_WS = ''
-if (SUPABASE_URL) {
-  const url = new URL(SUPABASE_URL)
-  const wsUrl = `${url.hostname}:${url.port}`
-  SUPABASE_LOCAL_PROJECTS_URL_WS = `ws://${wsUrl} wss://${wsUrl}`
-}
-
-// Needed to test docs search in local dev
-const SUPABASE_DOCS_PROJECT_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
-  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin
-  : ''
-
-const SUPABASE_STAGING_PROJECTS_URL = 'https://*.supabase.red'
-const SUPABASE_STAGING_PROJECTS_URL_WS = 'wss://*.supabase.red'
-const SUPABASE_COM_URL = 'https://supabase.com'
-const CLOUDFLARE_CDN_URL = 'https://cdnjs.cloudflare.com'
-const HCAPTCHA_SUBDOMAINS_URL = 'https://*.hcaptcha.com'
-const HCAPTCHA_ASSET_URL = 'https://newassets.hcaptcha.com'
-const HCAPTCHA_JS_URL = 'https://js.hcaptcha.com'
-const CONFIGCAT_URL = 'https://cdn-global.configcat.com'
-const STRIPE_SUBDOMAINS_URL = 'https://*.stripe.com'
-const STRIPE_JS_URL = 'https://js.stripe.com'
-const STRIPE_NETWORK_URL = 'https://*.stripe.network'
-const CLOUDFLARE_URL = 'https://www.cloudflare.com'
-const ONE_ONE_ONE_ONE_URL = 'https://one.one.one.one'
-const VERCEL_URL = 'https://vercel.com'
-const VERCEL_INSIGHTS_URL = 'https://*.vercel-insights.com'
-const GITHUB_API_URL = 'https://api.github.com'
-const GITHUB_USER_CONTENT_URL = 'https://raw.githubusercontent.com'
-const GITHUB_USER_AVATAR_URL = 'https://avatars.githubusercontent.com'
-const GOOGLE_USER_AVATAR_URL = 'https://lh3.googleusercontent.com'
-const GOOGLE_TAG_MANAGER_URL = 'https://www.googletagmanager.com'
-// IMG src for GTM, used only for testing purposes in preview mode
-const GOOGLE_TAG_MANAGER_IMG_URL =
-  'https://www.googletagmanager.com https://ssl.gstatic.com https://www.gstatic.com'
-// This is a custom domain for Stape, which isused for GTM servers
-const STAPE_URL = 'https://ss.supabase.com'
-// Google Ads are loaded through img src
-const GOOGLE_ADS_URLS =
-  'https://googleads.g.doubleclick.net https://www.googleadservices.com https://www.google.com'
-
-const VERCEL_LIVE_URL = 'https://vercel.live'
-const SENTRY_URL =
-  'https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io'
-const SUPABASE_ASSETS_URL =
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-    ? 'https://frontend-assets.supabase.green'
-    : 'https://frontend-assets.supabase.com'
-
-const USERCENTRICS_URLS = 'https://*.usercentrics.eu'
-const USERCENTRICS_APP_URL = 'https://app.usercentrics.eu'
-
-// used by vercel live preview
-const PUSHER_URL = 'https://*.pusher.com'
-const PUSHER_URL_WS = 'wss://*.pusher.com'
-
-const DEFAULT_SRC_URLS = `${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_LOCAL_PROJECTS_URL_WS} ${SUPABASE_PROJECTS_URL} ${SUPABASE_PROJECTS_URL_WS} ${HCAPTCHA_SUBDOMAINS_URL} ${CONFIGCAT_URL} ${STRIPE_SUBDOMAINS_URL} ${STRIPE_NETWORK_URL} ${CLOUDFLARE_URL} ${ONE_ONE_ONE_ONE_URL} ${VERCEL_INSIGHTS_URL} ${GITHUB_API_URL} ${GITHUB_USER_CONTENT_URL} ${SUPABASE_ASSETS_URL} ${USERCENTRICS_URLS} ${GOOGLE_TAG_MANAGER_URL}`
-const SCRIPT_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${STRIPE_JS_URL} ${SUPABASE_ASSETS_URL} ${GOOGLE_TAG_MANAGER_URL}`
-const FRAME_SRC_URLS = `${HCAPTCHA_ASSET_URL} ${STRIPE_JS_URL} ${STAPE_URL}`
-const IMG_SRC_URLS = `${SUPABASE_URL} ${SUPABASE_COM_URL} ${SUPABASE_PROJECTS_URL} ${GITHUB_USER_AVATAR_URL} ${GOOGLE_USER_AVATAR_URL} ${SUPABASE_ASSETS_URL} ${USERCENTRICS_APP_URL} ${GOOGLE_TAG_MANAGER_IMG_URL} ${STAPE_URL} ${GOOGLE_ADS_URLS}`
-const STYLE_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${SUPABASE_ASSETS_URL}`
-const FONT_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${SUPABASE_ASSETS_URL}`
-
-const csp = [
-  ...(process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' ||
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-    ? [
-        `default-src 'self' ${DEFAULT_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${SUPABASE_STAGING_PROJECTS_URL_WS} ${VERCEL_LIVE_URL} ${PUSHER_URL_WS} ${SUPABASE_DOCS_PROJECT_URL} ${SENTRY_URL};`,
-        `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL} ${PUSHER_URL};`,
-        `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `img-src 'self' blob: data: ${IMG_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${VERCEL_URL};`,
-        `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `font-src 'self' ${FONT_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `worker-src 'self' blob: data:;`,
-      ]
-    : [
-        `default-src 'self' ${DEFAULT_SRC_URLS} ${PUSHER_URL_WS} ${SENTRY_URL};`,
-        `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL} ${PUSHER_URL};`,
-        `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `img-src 'self' blob: data: ${IMG_SRC_URLS} ;`,
-        `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `font-src 'self' ${FONT_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `worker-src 'self' blob: data:;`,
-      ]),
-  `object-src 'none';`,
-  `base-uri 'self';`,
-  `form-action 'self';`,
-  `frame-ancestors 'none';`,
-  `block-all-mixed-content;`,
-  ...(process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' &&
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
-    ? [`upgrade-insecure-requests;`]
-    : []),
-].join(' ')
 
 function getAssetPrefix() {
   // If not force enabled, but not production env, disable CDN
@@ -492,6 +386,8 @@ const nextConfig = {
     ]
   },
   async headers() {
+    const csp = await getCSP()
+
     return [
       {
         source: '/(.*?)',
