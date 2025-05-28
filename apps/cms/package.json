@@ -1,7 +1,7 @@
 {
   "name": "cms",
   "version": "1.0.0",
-  "description": "CMS based on Payload",
+  "description": "Payload CMS for Supabase",
   "license": "MIT",
   "type": "module",
   "scripts": {
