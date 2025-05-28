@@ -141,7 +141,6 @@ exports.getCSP = async () => {
   const STYLE_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]
   const FONT_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]
 
-  // Build directive arrays based on environment
   const isDevOrStaging =
     process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' ||
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
