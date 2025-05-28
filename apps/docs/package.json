@@ -29,6 +29,7 @@
     "pretest": "pnpm run codegen:examples",
     "pretypecheck": "pnpm run codegen:graphql",
     "start": "next start",
+    "sync": "tsx --conditions=react-server ./resources/rootSync.ts",
     "test": "pnpm supabase start && pnpm run test:local && pnpm supabase stop",
     "test:local": "vitest --exclude \"**/*.smoke.test.ts\"",
     "test:smoke": "pnpm run codegen:references && vitest -t \"prod smoke test\"",
