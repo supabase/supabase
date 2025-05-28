@@ -7,16 +7,16 @@ import {
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-import { anyone } from '../access/anyone'
-import { authenticated } from '../access/authenticated'
+import { isAnyone } from '@/access/isAnyone'
+import { isAuthenticated } from '@/access/isAuthenticated'
 
 export const Media: CollectionConfig = {
   slug: 'media',
   access: {
-    create: authenticated,
-    delete: authenticated,
-    read: anyone,
-    update: authenticated,
+    create: isAuthenticated,
+    delete: isAuthenticated,
+    read: isAnyone,
+    update: isAuthenticated,
   },
   fields: [
     {
