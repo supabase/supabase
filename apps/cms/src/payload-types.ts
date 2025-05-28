@@ -398,7 +398,9 @@ export interface Event {
   /**
    * Event type
    */
-  type?: ('conference' | 'hackathon' | 'launch-week' | 'meetup' | 'webinar' | 'workshop' | 'other')[] | null;
+  type?:
+    | ('conference' | 'hackathon' | 'launch-week' | 'meetup' | 'office-hours' | 'webinar' | 'workshop' | 'other')[]
+    | null;
   date?: string | null;
   description?: string | null;
   duration?: string | null;
@@ -843,7 +845,7 @@ export interface Event {
    */
   disable_page_build?: boolean | null;
   /**
-   * Used on event previews to link to a custom event page
+   * Used on event previews to link to a custom page if "disable_page_build" is true.
    */
   link?: {
     href?: string | null;

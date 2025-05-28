@@ -9,15 +9,13 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { authenticated } from '../../access/authenticated'
-import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
-import { Banner } from '../../blocks/Banner/config'
-import { Code } from '../../blocks/Code/config'
-import { MediaBlock } from '../../blocks/MediaBlock/config'
-import { Quote } from '../../blocks/Quote/config'
-import { YouTube } from '../../blocks/YouTube/config'
-import { generatePreviewPath } from '../../utilities/generatePreviewPath'
-// import { populateAuthors } from './hooks/populateAuthors'
+import { authenticated } from '@/access/authenticated'
+import { authenticatedOrPublished } from '@/access/authenticatedOrPublished'
+import { Banner } from '@/blocks/Banner/config'
+import { Code } from '@/blocks/Code/config'
+import { MediaBlock } from '@/blocks/MediaBlock/config'
+import { Quote } from '@/blocks/Quote/config'
+import { YouTube } from '@/blocks/YouTube/config'
 import { revalidateDelete, revalidateEvent } from './hooks/revalidateEvent'
 
 import {
@@ -28,13 +26,14 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 import { slugField } from '@/fields/slug'
-import { timezoneOptions } from '../../config/timezones'
+import { timezoneOptions } from '../../utilities/timezones'
 
 const eventTypeOptions = [
   { label: 'Conference', value: 'conference' },
   { label: 'Hackathon', value: 'hackathon' },
   { label: 'Launch Week', value: 'launch-week' },
   { label: 'Meetup', value: 'meetup' },
+  { label: 'Office Hours', value: 'office-hours' },
   { label: 'Webinar', value: 'webinar' },
   { label: 'Workshop', value: 'workshop' },
   { label: 'Other', value: 'other' },
@@ -100,7 +99,7 @@ export const Events: CollectionConfig = {
           ],
         },
         {
-          label: 'Meta',
+          label: 'Metadata',
           fields: [
             {
               name: 'thumb',
@@ -169,8 +168,10 @@ export const Events: CollectionConfig = {
               name: 'link',
               type: 'group',
               admin: {
-                description: 'Used on event previews to link to a custom event page',
-                position: 'sidebar',
+                description: 'Used on event previews to link to a custom page if "disable_page_build" is true.',
+                condition: (data) => {
+                  return data.disable_page_build;
+                },
               },
               fields: [
                 {
@@ -186,10 +187,6 @@ export const Events: CollectionConfig = {
                     { label: 'New window', value: '_blank' },
                   ],
                   defaultValue: '_blank',
-                },
-                {
-                  name: 'label',
-                  type: 'text',
                 },
               ],
             },

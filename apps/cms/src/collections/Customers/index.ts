@@ -132,7 +132,7 @@ export const Customers: CollectionConfig = {
           ],
         },
         {
-          label: 'Meta',
+          label: 'Metadata',
           fields: [
             {
               name: 'description',
