@@ -20,26 +20,30 @@ All features of Supabase can be managed through the [Management API](/docs/refer
 
 ### Launching projects
 
-- Launch an new project
-- [Docs: Create a project](https://api.supabase.com/api/v1#tag/projects/POST/v1/projects)
+https://api.supabase.com/api/v1#tag/projects/POST/v1/projects
+
+You can launch a new project using `POST /projects`. Use a _very_ secure database password (we recommend generating one for users). This password should never be stored in plain text.
 
 ```sh
 curl https://api.supabase.com/v1/projects \
   --request POST \
   --header 'Content-Type: application/json' \
   --data '{
-  "db_pass": "",
-  "name": "",
-  "organization_id": "",
-  "region": "us-east-1",
-  "desired_instance_size": "pico",
-  "template_url": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
-}'
+        "name": "Todo App",
+        "organization_id": "{ref}",
+        "region": "us-east-1",
+        "desired_instance_size": "pico",
+        "db_pass": ""
+    }'
 ```
+
+- Pico instances are available for Partners. Pico databases scale down when they are not used.
+- You can use your own organization ID if you are managing databases on behalf of the users. If you are launching a database in their account you will need your users to provide you with an API token which has the appropriate [OAuth Scopes](/docs/guides/integrations/build-a-supabase-integration/oauth-scopes).
+
 
 ## Development workflow
 
-Supabase is a _stateful_ service: we store data. If anything breaks in production, you can't simply "roll back" to a point in time because doing so might cause your users to lose any data that their production enviroment recieved since the last checkpoint.
+Supabase is a _stateful_ service: we store data. If anything breaks in production, you can't simply "roll back" to a point in time because doing so might cause your users to lose any data that their production enviroment received since the last checkpoint.
 
 Because of this, it's important that you adopt a development workflow on behalf of your users:
 
