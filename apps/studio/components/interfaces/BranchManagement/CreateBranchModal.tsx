@@ -15,6 +15,7 @@ import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-ch
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { useAppStateSnapshot } from 'state/app-state'
 import { sidePanelsState } from 'state/side-panels'
 import {
@@ -34,6 +35,7 @@ import {
   DialogSection,
   DialogSectionSeparator,
   cn,
+  Badge,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import Image from 'next/image'
@@ -49,6 +51,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
   const snap = useAppStateSnapshot()
+  const gitlessBranching = useFlag('gitlessBranching')
 
   const [isGitBranchValid, setIsGitBranchValid] = useState(false)
 
@@ -84,6 +87,8 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
 
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
   const [repoOwner, repoName] = githubConnection?.repository.name.split('/') ?? []
+
+  const isBranchingEnabled = gitlessBranching || !!githubConnection
 
   const formId = 'create-branch-form'
   const FormSchema = z
@@ -136,7 +141,7 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
 
   const isFormValid =
     form.formState.isValid && (!form.getValues('gitBranchName') || isGitBranchValid)
-  const canSubmit = isFormValid && !isCreating && !isChecking
+  const canSubmit = isFormValid && !isCreating && !isChecking && isBranchingEnabled
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -252,10 +257,18 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
                   {!githubConnection && (
                     <div className="flex items-center gap-2 justify-between">
                       <div>
-                        <Label>GitHub Repository</Label>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Label>GitHub Repository</Label>
+                          {!gitlessBranching && (
+                            <Badge variant="warning" size="small">
+                              Required
+                            </Badge>
+                          )}
+                        </div>
                         <p className="text-sm text-foreground-light">
-                          Optionally connect to a GitHub repository to manage migrations
-                          automatically for this branch.
+                          {gitlessBranching
+                            ? 'Optionally connect to a GitHub repository to manage migrations automatically for this branch.'
+                            : 'Connect to a GitHub repository to enable branch creation. This allows you to manage migrations automatically for this branch.'}
                         </p>
                       </div>
                       <Button type="default" icon={<Github />} onClick={openLinkerPanel}>

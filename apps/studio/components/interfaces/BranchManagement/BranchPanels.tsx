@@ -26,6 +26,7 @@ import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import type { Branch } from 'data/branches/branches-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useFlag } from 'hooks/ui/useFlag'
 import {
   Badge,
   Button,
@@ -107,6 +108,7 @@ export const BranchRow = ({
 }: BranchRowProps) => {
   const { ref: projectRef } = useParams()
   const isActive = projectRef === branch?.project_ref
+  const gitlessBranching = useFlag('gitlessBranching')
 
   const canDeleteBranches = useCheckPermissions(PermissionAction.DELETE, 'preview_branches')
   const canUpdateBranches = useCheckPermissions(PermissionAction.UPDATE, 'preview_branches')
@@ -319,29 +321,31 @@ export const BranchRow = ({
                   )}
                 </Tooltip>
 
-                <Tooltip>
-                  <TooltipTrigger
-                    asChild={canUpdateBranches && isBranchActiveHealthy}
-                    className="w-full"
-                  >
-                    <DropdownMenuItem
-                      className="gap-x-2"
-                      disabled={!canUpdateBranches || !isBranchActiveHealthy || isUpdating}
-                      onSelect={() => setShowEditBranchModal(true)}
-                      onClick={() => setShowEditBranchModal(true)}
+                {gitlessBranching && (
+                  <Tooltip>
+                    <TooltipTrigger
+                      asChild={canUpdateBranches && isBranchActiveHealthy}
+                      className="w-full"
                     >
-                      <Pencil size={14} />
-                      Edit Branch
-                    </DropdownMenuItem>
-                  </TooltipTrigger>
-                  {(!canUpdateBranches || !isBranchActiveHealthy) && (
-                    <TooltipContent side="left">
-                      {!canUpdateBranches
-                        ? 'You need additional permissions to edit branches'
-                        : 'Branch is still initializing. Please wait for the branch to become healthy before editing.'}
-                    </TooltipContent>
-                  )}
-                </Tooltip>
+                      <DropdownMenuItem
+                        className="gap-x-2"
+                        disabled={!canUpdateBranches || !isBranchActiveHealthy || isUpdating}
+                        onSelect={() => setShowEditBranchModal(true)}
+                        onClick={() => setShowEditBranchModal(true)}
+                      >
+                        <Pencil size={14} />
+                        Edit Branch
+                      </DropdownMenuItem>
+                    </TooltipTrigger>
+                    {(!canUpdateBranches || !isBranchActiveHealthy) && (
+                      <TooltipContent side="left">
+                        {!canUpdateBranches
+                          ? 'You need additional permissions to edit branches'
+                          : 'Branch is still initializing. Please wait for the branch to become healthy before editing.'}
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                )}
 
                 <Tooltip>
                   <TooltipTrigger asChild={canDeleteBranches} className="w-full">

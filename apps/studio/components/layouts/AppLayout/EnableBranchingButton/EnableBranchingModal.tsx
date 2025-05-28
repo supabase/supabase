@@ -19,6 +19,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { DollarSign, ExternalLink, FileText, GitBranch, Github, Loader2, Check } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { sidePanelsState } from 'state/side-panels'
@@ -39,6 +40,7 @@ import {
   DialogSection,
   DialogSectionSeparator,
   Form_Shadcn_,
+  Badge,
 } from 'ui'
 import BranchingPITRNotice from './BranchingPITRNotice'
 import BranchingPlanNotice from './BranchingPlanNotice'
@@ -50,6 +52,7 @@ const EnableBranchingModal = () => {
   const snap = useAppStateSnapshot()
   const selectedOrg = useSelectedOrganization()
   const project = useSelectedProject()
+  const gitlessBranching = useFlag('gitlessBranching')
 
   const [isGitBranchValid, setIsGitBranchValid] = useState(false)
 
@@ -142,7 +145,8 @@ const EnableBranchingModal = () => {
   const isSuccess = isSuccessConnections
 
   const isFormValid = form.formState.isValid
-  const canSubmit = isFormValid && !isCreating && !isChecking
+  const canSubmit =
+    isFormValid && !isCreating && !isChecking && (gitlessBranching || !!githubConnection)
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!ref) return console.error('Project ref is required')
@@ -292,10 +296,18 @@ const EnableBranchingModal = () => {
                         ) : (
                           <div className="flex items-center gap-2 justify-between">
                             <div>
-                              <Label>GitHub Repository</Label>
+                              <div className="flex items-center gap-2 mb-2">
+                                <Label>GitHub Repository</Label>
+                                {!gitlessBranching && (
+                                  <Badge variant="warning" size="small">
+                                    Required
+                                  </Badge>
+                                )}
+                              </div>
                               <p className="text-sm text-foreground-light">
-                                Optionally connect to a GitHub repository to enable deploying
-                                previews on Pull Requests and manage migrations automatically.
+                                {gitlessBranching
+                                  ? 'Optionally connect to a GitHub repository to enable deploying previews on Pull Requests and manage migrations automatically.'
+                                  : 'Connect to a GitHub repository to enable database branching. This allows you to deploy previews on Pull Requests and manage migrations automatically.'}
                               </p>
                             </div>
                             <Button type="default" icon={<Github />} onClick={openLinkerPanel}>
