@@ -51,7 +51,8 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
   const snap = useAppStateSnapshot()
-  const gitlessBranching = useFlag('gitlessBranching')
+  // const gitlessBranching = useFlag('gitlessBranching')
+  const gitlessBranching = true
 
   const [isGitBranchValid, setIsGitBranchValid] = useState(false)
 

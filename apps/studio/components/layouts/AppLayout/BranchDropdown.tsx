@@ -1,4 +1,12 @@
-import { AlertCircle, Check, ChevronsUpDown, ListTree, MessageCircle, Shield } from 'lucide-react'
+import {
+  AlertCircle,
+  Check,
+  ChevronsUpDown,
+  GitMerge,
+  ListTree,
+  MessageCircle,
+  Shield,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -136,6 +144,28 @@ export const BranchDropdown = () => {
                   </CommandGroup_Shadcn_>
                   <CommandSeparator_Shadcn_ />
                   <CommandGroup_Shadcn_>
+                    {/* Show merge button only for non-main branches */}
+                    {isBranch && selectedBranch && !selectedBranch.is_default && (
+                      <>
+                        <CommandItem_Shadcn_
+                          className="cursor-pointer w-full"
+                          onSelect={() => {
+                            setOpen(false)
+                            router.push(`/project/${ref}/merge`)
+                          }}
+                          onClick={() => setOpen(false)}
+                        >
+                          <Link
+                            href={`/project/${ref}/merge`}
+                            className="w-full flex items-center gap-2"
+                          >
+                            <GitMerge size={14} strokeWidth={1.5} />
+                            <p>Request a merge</p>
+                          </Link>
+                        </CommandItem_Shadcn_>
+                        <CommandSeparator_Shadcn_ />
+                      </>
+                    )}
                     <CommandItem_Shadcn_
                       className="cursor-pointer w-full"
                       onSelect={(e) => {
