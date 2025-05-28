@@ -365,6 +365,10 @@ export interface Customer {
   };
   publishedAt?: string | null;
   logo?: (number | null) | Media;
+  /**
+   * Light mode logo
+   */
+  logo_inverse?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -378,7 +382,11 @@ export interface Event {
   title: string;
   slug?: string | null;
   slugLock?: boolean | null;
-  content: {
+  /**
+   * Used in the event page as subtitle.
+   */
+  subtitle?: string | null;
+  content?: {
     root: {
       type: string;
       children: {
@@ -392,18 +400,26 @@ export interface Event {
       version: number;
     };
     [k: string]: unknown;
-  };
+  } | null;
   thumb?: (number | null) | Media;
   image?: (number | null) | Media;
   /**
    * Event type
    */
   type?:
-    | ('conference' | 'hackathon' | 'launch-week' | 'meetup' | 'office-hours' | 'webinar' | 'workshop' | 'other')[]
+    | (
+        | 'conference'
+        | 'hackathon'
+        | 'launch-week'
+        | 'meetup'
+        | 'office-hours'
+        | 'talk'
+        | 'webinar'
+        | 'workshop'
+        | 'other'
+      )[]
     | null;
   date?: string | null;
-  description?: string | null;
-  duration?: string | null;
   timezone?:
     | (
         | 'Africa/Abidjan'
@@ -835,31 +851,62 @@ export interface Event {
         | 'UTC'
       )
     | null;
-  authors?: (number | Author)[] | null;
+  showEndDate?: boolean | null;
   /**
-   * Events that are on-demand following a registration process
+   * If "showEndDate" is true, this will define when the event terminates.
+   */
+  endDate?: string | null;
+  /**
+   * Text string to display on the event page to indicate the duration of the event. (e.g. "45 mins", "2 days")
+   */
+  duration?: string | null;
+  /**
+   * Events that are will remain available on the events page after the event has ended.
    */
   onDemand?: boolean | null;
   /**
-   * When true, we don't build the page and link directly to an external event page (requires Link to be set)
+   * When true, the event page will not be built. It will link directly to an external event page (requires Link to be set)
    */
-  disable_page_build?: boolean | null;
+  disablePageBuild?: boolean | null;
   /**
-   * Used on event previews to link to a custom page if "disable_page_build" is true.
+   * Used on event previews to link to a custom page if "disablePageBuild" is true.
    */
   link?: {
     href?: string | null;
     target?: ('_self' | '_blank') | null;
-    label?: string | null;
   };
   /**
    * Main CTA button on the event page
    */
-  main_cta?: {
+  mainCta?: {
     href?: string | null;
     target?: ('_self' | '_blank') | null;
     label?: string | null;
+    disabled?: boolean | null;
+    /**
+     * Text for the main CTA button if "mainCta.disabled" is true.
+     */
     disabled_label?: string | null;
+  };
+  company?: {
+    /**
+     * If an external company is collaborating with the event, this will display their logo on the event page.
+     */
+    showCompany?: boolean | null;
+    name?: string | null;
+    websiteUrl?: string | null;
+    logo?: (number | null) | Media;
+    /**
+     * Light mode logo
+     */
+    logo_light?: (number | null) | Media;
+  };
+  participants?: {
+    /**
+     * Could be speakers, authors, guests, etc. It would source from Authors collections.
+     */
+    showParticipants?: boolean | null;
+    participants?: (number | Author)[] | null;
   };
   meta?: {
     title?: string | null;
@@ -1698,6 +1745,7 @@ export interface CustomersSelect<T extends boolean = true> {
       };
   publishedAt?: T;
   logo?: T;
+  logo_inverse?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -1710,31 +1758,47 @@ export interface EventsSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   slugLock?: T;
+  subtitle?: T;
   content?: T;
   thumb?: T;
   image?: T;
   type?: T;
   date?: T;
-  description?: T;
-  duration?: T;
   timezone?: T;
-  authors?: T;
+  showEndDate?: T;
+  endDate?: T;
+  duration?: T;
   onDemand?: T;
-  disable_page_build?: T;
+  disablePageBuild?: T;
   link?:
     | T
     | {
         href?: T;
         target?: T;
-        label?: T;
       };
-  main_cta?:
+  mainCta?:
     | T
     | {
         href?: T;
         target?: T;
         label?: T;
+        disabled?: T;
         disabled_label?: T;
+      };
+  company?:
+    | T
+    | {
+        showCompany?: T;
+        name?: T;
+        websiteUrl?: T;
+        logo?: T;
+        logo_light?: T;
+      };
+  participants?:
+    | T
+    | {
+        showParticipants?: T;
+        participants?: T;
       };
   meta?:
     | T

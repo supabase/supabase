@@ -136,7 +136,7 @@ export const Customers: CollectionConfig = {
           fields: [
             {
               name: 'description',
-              type: 'textarea',
+              type: 'text',
             },
             {
               name: 'about',
@@ -283,6 +283,16 @@ export const Customers: CollectionConfig = {
       required: false,
       admin: {
         position: 'sidebar',
+      },
+    },
+    {
+      name: 'logo_inverse',
+      type: 'upload',
+      relationTo: 'media',
+      required: false,
+      admin: {
+        position: 'sidebar',
+        description: 'Light mode logo',
       },
     },
   ],

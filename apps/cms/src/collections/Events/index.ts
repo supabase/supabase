@@ -34,6 +34,7 @@ const eventTypeOptions = [
   { label: 'Launch Week', value: 'launch-week' },
   { label: 'Meetup', value: 'meetup' },
   { label: 'Office Hours', value: 'office-hours' },
+  { label: 'Talk', value: 'talk' },
   { label: 'Webinar', value: 'webinar' },
   { label: 'Workshop', value: 'workshop' },
   { label: 'Other', value: 'other' },
@@ -73,6 +74,13 @@ export const Events: CollectionConfig = {
     },
     ...slugField(),
     {
+      name: 'subtitle',
+      type: 'text',
+      admin: {
+        description: 'Used in the event page as subtitle.',
+      },
+    },
+    {
       type: 'tabs',
       tabs: [
         {
@@ -94,7 +102,7 @@ export const Events: CollectionConfig = {
                 },
               }),
               label: false,
-              required: true,
+              required: false,
             },
           ],
         },
@@ -126,16 +134,10 @@ export const Events: CollectionConfig = {
               name: 'date',
               type: 'date',
               admin: {
-                position: 'sidebar',
+                date: {
+                  pickerAppearance: 'dayAndTime',
+                },
               },
-            },
-            {
-              name: 'description',
-              type: 'textarea',
-            },
-            {
-              name: 'duration',
-              type: 'text',
             },
             {
               name: 'timezone',
@@ -143,34 +145,52 @@ export const Events: CollectionConfig = {
               options: timezoneOptions,
             },
             {
-              name: 'authors',
-              type: 'relationship',
-              relationTo: 'authors',
-              hasMany: true,
+              name: 'showEndDate',
+              type: 'checkbox',
+              defaultValue: false,
+              admin: {
+              },
+            },
+            {
+              name: 'endDate',
+              type: 'date',
+              admin: {
+                description: 'If "showEndDate" is true, this will define when the event terminates.',
+                condition: (data) => {
+                  return data.showEndDate;
+                },
+              },
+            },
+            {
+              name: 'duration',
+              type: 'text',
+              admin: {
+                description: 'Text string to display on the event page to indicate the duration of the event. (e.g. "45 mins", "2 days")',
+              },
             },
             {
               name: 'onDemand',
               type: 'checkbox',
               defaultValue: false,
               admin: {
-                description: 'Events that are on-demand following a registration process',
+                description: 'Events that are will remain available on the events page after the event has ended.',
               },
             },
             {
-              name: 'disable_page_build',
+              name: 'disablePageBuild',
               type: 'checkbox',
               defaultValue: false,
               admin: {
-                description: 'When true, we don\'t build the page and link directly to an external event page (requires Link to be set)',
+                description: "When true, the event page will not be built. It will link directly to an external event page (requires Link to be set)",
               },
             },
             {
               name: 'link',
               type: 'group',
               admin: {
-                description: 'Used on event previews to link to a custom page if "disable_page_build" is true.',
+                description: 'Used on event previews to link to a custom page if "disablePageBuild" is true.',
                 condition: (data) => {
-                  return data.disable_page_build;
+                  return data.disablePageBuild;
                 },
               },
               fields: [
@@ -191,7 +211,7 @@ export const Events: CollectionConfig = {
               ],
             },
             {
-              name: 'main_cta',
+              name: 'mainCta',
               type: 'group',
               admin: {
                 description: 'Main CTA button on the event page',
@@ -216,10 +236,95 @@ export const Events: CollectionConfig = {
                   type: 'text',
                 },
                 {
+                  name: 'disabled',
+                  type: 'checkbox',
+                  defaultValue: false,
+                },
+                {
                   name: 'disabled_label',
                   type: 'text',
+                  admin: {
+                    description: 'Text for the main CTA button if "mainCta.disabled" is true.',
+                    condition: (data) => data.mainCta.disabled
+                  },
                 },
               ],
+            },
+          ],
+        },
+        {
+          label: 'Participants',
+          fields: [
+            {
+              name: 'company',
+              type: 'group',
+              fields: [
+                {
+                  name: 'showCompany',
+                  type: 'checkbox',
+                  defaultValue: false,
+                  admin: {
+                    description: 'If an external company is collaborating with the event, this will display their logo on the event page.',
+                  }
+                },
+                {
+                  name: 'name',
+                  type: 'text',
+                  required: false,
+                  admin: {
+                    condition: (data) => data.company.showCompany
+                  },
+                },
+                {
+                  name: 'websiteUrl',
+                  type: 'text',
+                  admin: {
+                    condition: (data) => data.company.showCompany
+                  },
+                },
+                {
+                  name: 'logo',
+                  type: 'upload',
+                  relationTo: 'media',
+                  required: false,
+                  admin: {
+                    condition: (data) => data.company.showCompany
+                  },
+                },
+                {
+                  name: 'logo_light',
+                  type: 'upload',
+                  relationTo: 'media',
+                  required: false,
+                  admin: {
+                    description: 'Light mode logo',
+                    condition: (data) => data.company.showCompany
+                  },
+                },
+              ],
+            },
+            {
+              name: 'participants',
+              type: 'group',
+              fields: [
+                {
+                  name: 'showParticipants',
+                  type: 'checkbox',
+                  defaultValue: false,
+                  admin: {
+                    description: 'Could be speakers, authors, guests, etc. It would source from Authors collections.',
+                  },
+                },
+                {
+                  name: 'participants',
+                  type: 'relationship',
+                  relationTo: 'authors',
+                  hasMany: true,
+                  admin: {
+                    condition: (data) => data.participants.showParticipants
+                  },
+                },
+              ]
             },
           ],
         },
