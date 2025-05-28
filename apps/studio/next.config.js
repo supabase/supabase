@@ -55,7 +55,8 @@ const GOOGLE_TAG_MANAGER_IMG_URL =
 // This is a custom domain for Stape, which isused for GTM servers
 const STAPE_URL = 'https://ss.supabase.com'
 // Google Ads are loaded through img src
-const GOOGLE_ADS_URLS = 'https://googleads.g.doubleclick.net https://www.googleadservices.com'
+const GOOGLE_ADS_URLS =
+  'https://googleads.g.doubleclick.net https://www.googleadservices.com https://www.google.com'
 
 const VERCEL_LIVE_URL = 'https://vercel.live'
 const SENTRY_URL =
