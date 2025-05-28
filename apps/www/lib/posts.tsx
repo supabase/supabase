@@ -2,7 +2,6 @@ import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
 import { generateReadingTime } from './helpers'
-import { BlogPost } from '../.contentlayer/generated'
 
 type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives' | '_events'
 
@@ -39,7 +38,7 @@ export const getSortedPosts = ({
           ? filename.replace('.mdx', '').substring(FILENAME_SUBSTRING)
           : filename.replace('.mdx', '')
 
-      const fullPath = path.join(postDirectory, filename)
+      const fullPath = path?.join(postDirectory, filename)
 
       //Extracts contents of the MDX file
       const fileContents = fs.readFileSync(fullPath, 'utf8')
@@ -138,6 +137,7 @@ export const getPostdata = async (slug: string, directory: string) => {
    * Return full directory
    */
   const postDirectory = path.join(process.cwd(), directory)
+  console.log('postDirectory', postDirectory, path)
   const folderfiles = fs.readdirSync(postDirectory)
 
   /**
@@ -149,7 +149,7 @@ export const getPostdata = async (slug: string, directory: string) => {
    */
   const found = folderfiles.filter((x) => x.includes(slug))[0]
 
-  const fullPath = path.join(postDirectory, found)
+  const fullPath = path?.join(postDirectory, found)
   const postContent = fs.readFileSync(fullPath, 'utf8')
   return postContent
 }
