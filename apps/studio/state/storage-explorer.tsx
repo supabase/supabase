@@ -177,17 +177,19 @@ function createStorageExplorerState({
     },
 
     sortBy,
-    setSortBy: (value: STORAGE_SORT_BY) => {
+    setSortBy: async (value: STORAGE_SORT_BY) => {
       state.sortBy = value
       state.updateExplorerPreference()
       state.setSelectedFilePreview(undefined)
+      await state.refetchAllOpenedFolders()
     },
 
     sortByOrder,
-    setSortByOrder: (value: STORAGE_SORT_BY_ORDER) => {
+    setSortByOrder: async (value: STORAGE_SORT_BY_ORDER) => {
       state.sortByOrder = value
       state.updateExplorerPreference()
       state.setSelectedFilePreview(undefined)
+      await state.refetchAllOpenedFolders()
     },
 
     isSearching: false,
