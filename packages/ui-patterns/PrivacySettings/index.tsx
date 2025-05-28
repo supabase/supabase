@@ -1,6 +1,6 @@
 'use client'
 
-import { useConsentState } from 'common'
+// import { useConsentState } from 'common'
 import Link from 'next/link'
 import { PropsWithChildren, useState } from 'react'
 import { Modal, Toggle } from 'ui'
@@ -14,7 +14,7 @@ export const PrivacySettings = ({
   ...props
 }: PropsWithChildren<PrivacySettingsProps>) => {
   const [isOpen, setIsOpen] = useState(false)
-  const { categories, updateServices } = useConsentState()
+  // const { categories, updateServices } = useConsentState()
 
   const [serviceConsentMap, setServiceConsentMap] = useState(() => new Map<string, boolean>())
 
@@ -31,7 +31,7 @@ export const PrivacySettings = ({
       serviceId: id,
       status,
     }))
-    updateServices(services)
+    // updateServices(services)
 
     setIsOpen(false)
   }
@@ -64,7 +64,7 @@ export const PrivacySettings = ({
         size="medium"
       >
         <div className="pt-3 divide-y divide-border">
-          {categories
+          {/* {categories
             ?.toReversed()
             .map((category) => (
               <Category
@@ -72,7 +72,7 @@ export const PrivacySettings = ({
                 category={category}
                 handleServicesChange={handleServicesChange}
               />
-            ))}
+            ))} */}
         </div>
       </Modal>
     </>

@@ -4,13 +4,8 @@ import { RefreshRouteOnSave as PayloadLivePreview } from '@payloadcms/live-previ
 import { useRouter } from 'next/navigation'
 import React from 'react'
 
-export const RefreshRouteOnSave: React.FC = () => {
+export const RefreshRouteOnSave: React.FC<{ serverURL: string }> = ({ serverURL }) => {
   const router = useRouter()
 
-  return (
-    <PayloadLivePreview
-      refresh={() => router.refresh()}
-      serverURL={process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030'}
-    />
-  )
+  return <PayloadLivePreview refresh={() => router.refresh()} serverURL={serverURL} />
 }

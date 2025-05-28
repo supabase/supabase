@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { Badge } from 'ui'
 import Link from 'next/link'
+import React from 'react'
 
 import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 import { NextCard } from './NextCard'
@@ -20,6 +21,55 @@ interface BlogContentProps {
   toc_depth?: number
   prevPost: any
   nextPost: any
+  isCMS?: boolean
+  richContent?: any // Raw Lexical content from CMS
+}
+
+// Simple Lexical content renderer for CMS content
+const LexicalContentRenderer = ({ content }: { content: any }) => {
+  if (!content?.root?.children) {
+    return <p>No content available</p>
+  }
+
+  const renderNode = (node: any, index: number): React.ReactNode => {
+    switch (node.type) {
+      case 'paragraph':
+        return (
+          <p key={index} className="mb-4">
+            {node.children?.map((child: any, childIndex: number) =>
+              child.type === 'text' ? child.text : ''
+            )}
+          </p>
+        )
+      case 'heading':
+        const HeadingTag = node.tag || 'h2'
+        const headingText = node.children?.map((child: any) => child.text).join('') || ''
+        return React.createElement(
+          HeadingTag,
+          { key: index, className: 'mb-4 font-bold' },
+          headingText
+        )
+      case 'list':
+        const ListTag = node.listType === 'number' ? 'ol' : 'ul'
+        return React.createElement(
+          ListTag,
+          { key: index, className: 'mb-4 ml-6' },
+          node.children?.map((listItem: any, listIndex: number) => (
+            <li key={listIndex} className="mb-2">
+              {listItem.children?.map((child: any) => child.text).join('') || ''}
+            </li>
+          ))
+        )
+      default:
+        return null
+    }
+  }
+
+  return (
+    <div className="prose prose-docs max-w-none">
+      {content.root.children.map((node: any, index: number) => renderNode(node, index))}
+    </div>
+  )
 }
 
 export const BlogContent = ({
@@ -33,6 +83,8 @@ export const BlogContent = ({
   toc_depth,
   prevPost,
   nextPost,
+  isCMS = false,
+  richContent,
 }: BlogContentProps) => {
   return (
     <div className="grid grid-cols-12 lg:gap-16 xl:gap-8">
@@ -63,7 +115,15 @@ export const BlogContent = ({
                 </div>
               )
             )}
-            <BlogMarkdownProcessor content={content} mdxSource={mdxSource} toc_depth={toc_depth} />
+            {isCMS && richContent ? (
+              <LexicalContentRenderer content={richContent} />
+            ) : (
+              <BlogMarkdownProcessor
+                content={content}
+                mdxSource={mdxSource}
+                toc_depth={toc_depth}
+              />
+            )}
           </div>
         </article>
         <div className="block lg:hidden py-8">

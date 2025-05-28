@@ -24,8 +24,11 @@ import { BlogContent } from '../components/BlogContent'
 import { AuthorList } from '../components/AuthorList'
 import { BlogMarkdownProcessor } from '../components/BlogMarkdownProcessor'
 import type { BlogData, CMSAuthor, StaticAuthor } from '../types'
+import { RefreshRouteOnSave } from '../RefreshRouteOnSave'
 
 type Post = ReturnType<typeof getSortedPosts>[number]
+
+export const dynamic = 'force-dynamic'
 
 // Generate static params for all blog posts
 export async function generateStaticParams() {
@@ -121,6 +124,9 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   const { isEnabled: isDraftMode } = draftMode()
   const slug = params.slug
 
+  console.log(`[BlogPostPage] Starting with slug: '${slug}', isDraftMode: ${isDraftMode}`)
+  console.log(`[BlogPostPage] Environment: NEXT_PUBLIC_CMS_URL=${process.env.NEXT_PUBLIC_CMS_URL}`)
+
   let props: {
     prevPost: Post | null
     nextPost: Post | null
@@ -128,75 +134,143 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     blog: BlogData & {
       rawContent: string
       mdxSource: any
+      content?: any // Original rich content from CMS
     }
     isDraftMode: boolean
   }
 
-  // Try static post first
-  try {
-    const postContent = await getPostdata(slug, '_blog')
-    const parsedContent = matter(postContent) as unknown as { data: BlogData; content: string }
-    const content = parsedContent.content
-    const mdxSource = await mdxSerialize(content)
-    const blogPost = { ...parsedContent.data }
+  // When in draft mode, prioritize CMS posts over static posts
+  if (isDraftMode) {
+    console.log(`[BlogPostPage] In draft mode, checking CMS first...`)
 
-    // Get all posts for navigation and related posts
-    const allStaticPosts = getSortedPosts({ directory: '_blog' })
-    const allCmsPosts = await getAllCMSPosts()
-    const allPosts = [...allStaticPosts, ...allCmsPosts].sort(
-      (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    )
-    const currentIndex = allPosts.findIndex((post) => post.slug === slug)
-    const nextPost = currentIndex === allPosts.length - 1 ? null : allPosts[currentIndex + 1]
-    const prevPost = currentIndex === 0 ? null : allPosts[currentIndex - 1]
-    const relatedPosts = getSortedPosts({
-      directory: '_blog',
-      limit: 3,
-      tags: mdxSource.scope.tags,
-      currentPostSlug: slug,
-    }) as unknown as (BlogData & Post)[]
-
-    props = {
-      prevPost,
-      nextPost,
-      relatedPosts,
-      blog: {
-        ...blogPost,
-        rawContent: content,
-        mdxSource,
-      },
-      isDraftMode,
-    }
-  } catch {
-    // Try CMS post if static post not found
     const cmsPost = await getCMSPostBySlug(slug, isDraftMode)
-    if (!cmsPost) {
-      throw new Error('Post not found')
+    if (cmsPost) {
+      console.log(`[BlogPostPage] Found CMS post in draft mode: ${cmsPost.title}`)
+
+      const content = cmsPost.content || ''
+      const mdxSource = await mdxSerialize(content)
+
+      props = {
+        prevPost: null,
+        nextPost: null,
+        relatedPosts: [],
+        blog: {
+          ...cmsPost,
+          tags: cmsPost.tags || [],
+          authors: cmsPost.authors || [],
+          isCMS: true,
+          rawContent: content,
+          mdxSource,
+          image: cmsPost.image || undefined,
+          thumb: cmsPost.thumb || undefined,
+          toc: undefined,
+          content: cmsPost.richContent, // Store the original rich content
+        },
+        isDraftMode,
+      }
+    } else {
+      console.error(`[BlogPostPage] No CMS post found in draft mode - slug: '${slug}'`)
+      return (
+        <DefaultLayout>
+          <div className="container mx-auto px-4 py-8 text-center">
+            <h1 className="text-2xl font-bold mb-4">Draft Post Not Found</h1>
+            <p className="text-gray-600 mb-4">The draft post "{slug}" could not be found.</p>
+            <p className="text-sm text-gray-500">Draft mode: enabled</p>
+          </div>
+        </DefaultLayout>
+      )
     }
+  } else {
+    // When not in draft mode, try static post first, then CMS
+    try {
+      console.log(`[BlogPostPage] Not in draft mode, trying static post first...`)
 
-    const content = cmsPost.content || ''
-    const mdxSource = await mdxSerialize(content)
+      const postContent = await getPostdata(slug, '_blog')
+      const parsedContent = matter(postContent) as unknown as { data: BlogData; content: string }
+      const content = parsedContent.content
+      const mdxSource = await mdxSerialize(content)
+      const blogPost = { ...parsedContent.data }
 
-    props = {
-      prevPost: null,
-      nextPost: null,
-      relatedPosts: [],
-      blog: {
-        ...cmsPost,
-        tags: cmsPost.tags || [],
-        authors: cmsPost.authors || [],
-        isCMS: true,
-        rawContent: content,
-        mdxSource,
-        image: cmsPost.image || undefined,
-        thumb: cmsPost.thumb || undefined,
-        toc: undefined,
-      },
-      isDraftMode,
+      // Get all posts for navigation and related posts
+      const allStaticPosts = getSortedPosts({ directory: '_blog' })
+      const allCmsPosts = await getAllCMSPosts()
+      const allPosts = [...allStaticPosts, ...allCmsPosts].sort(
+        (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      )
+      const currentIndex = allPosts.findIndex((post) => post.slug === slug)
+      const nextPost = currentIndex === allPosts.length - 1 ? null : allPosts[currentIndex + 1]
+      const prevPost = currentIndex === 0 ? null : allPosts[currentIndex - 1]
+      const relatedPosts = getSortedPosts({
+        directory: '_blog',
+        limit: 3,
+        tags: mdxSource.scope.tags,
+        currentPostSlug: slug,
+      }) as unknown as (BlogData & Post)[]
+
+      props = {
+        prevPost,
+        nextPost,
+        relatedPosts,
+        blog: {
+          ...blogPost,
+          rawContent: content,
+          mdxSource,
+          content,
+        },
+        isDraftMode,
+      }
+    } catch {
+      // Try CMS post if static post not found
+      console.log(`[BlogPostPage] Static post not found, trying CMS...`)
+
+      const cmsPost = await getCMSPostBySlug(slug, isDraftMode)
+      if (!cmsPost) {
+        console.error(
+          `[BlogPostPage] Post not found - slug: '${slug}', isDraftMode: ${isDraftMode}`
+        )
+        console.error(`[BlogPostPage] NEXT_PUBLIC_CMS_URL: ${process.env.NEXT_PUBLIC_CMS_URL}`)
+
+        // Instead of throwing an error, return a not-found response
+        return (
+          <DefaultLayout>
+            <div className="container mx-auto px-4 py-8 text-center">
+              <h1 className="text-2xl font-bold mb-4">Post Not Found</h1>
+              <p className="text-gray-600 mb-4">The blog post "{slug}" could not be found.</p>
+              <p className="text-sm text-gray-500">
+                Draft mode: {isDraftMode ? 'enabled' : 'disabled'}
+              </p>
+            </div>
+          </DefaultLayout>
+        )
+      }
+
+      const content = cmsPost.content || ''
+      const mdxSource = await mdxSerialize(content)
+
+      props = {
+        prevPost: null,
+        nextPost: null,
+        relatedPosts: [],
+        blog: {
+          ...cmsPost,
+          tags: cmsPost.tags || [],
+          authors: cmsPost.authors || [],
+          isCMS: true,
+          rawContent: content,
+          mdxSource,
+          image: cmsPost.image || undefined,
+          thumb: cmsPost.thumb || undefined,
+          toc: undefined,
+          content: cmsPost.richContent, // Store the original rich content
+        },
+        isDraftMode,
+      }
     }
   }
 
   const { blog: blogMetaData, isDraftMode: isPreview } = props
+
+  console.log('isPreview 2', isPreview)
 
   // For CMS posts, the author info is already included
   // For static posts, we need to look up the author in authors.json
@@ -221,6 +295,11 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
   return (
     <>
+      {isPreview && (
+        <RefreshRouteOnSave
+          serverURL={process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030'}
+        />
+      )}
       {isPreview && <DraftModeBanner />}
       <DefaultLayout className="overflow-x-hidden">
         <div className="container mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16 xl:px-20">
@@ -250,7 +329,8 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                 </div>
               </div>
               <BlogContent
-                content={props.blog.rawContent}
+                // content={props.blog.rawContent}
+                content={blogMetaData.content}
                 mdxSource={props.blog.mdxSource}
                 youtubeHero={blogMetaData.youtubeHero}
                 thumb={blogMetaData.thumb}
@@ -260,6 +340,8 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                 toc_depth={blogMetaData.toc_depth}
                 prevPost={props.prevPost}
                 nextPost={props.nextPost}
+                isCMS={blogMetaData.isCMS}
+                richContent={props.blog.content}
               />
             </div>
           </div>

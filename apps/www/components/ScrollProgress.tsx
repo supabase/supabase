@@ -1,11 +1,11 @@
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
 const ScrollProgress = () => {
   const [progressPercentage, setProgressPercentage] = useState(0)
-  const { pathname } = useRouter()
+  const pathname = usePathname()
 
-  const isBlogPost = pathname.includes('/blog/')
+  const isBlogPost = pathname?.includes('/blog/')
   if (!isBlogPost) return null
 
   const handleScroll = () => {

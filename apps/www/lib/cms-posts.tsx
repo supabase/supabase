@@ -4,6 +4,14 @@ import { generateReadingTime } from './helpers'
 const PAYLOAD_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030'
 const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY
 
+// Debug logging for environment variables
+console.log('[cms-posts] PAYLOAD_URL:', PAYLOAD_URL)
+console.log('[cms-posts] PAYLOAD_API_KEY exists:', !!PAYLOAD_API_KEY)
+console.log('[cms-posts] Environment:', {
+  NODE_ENV: process.env.NODE_ENV,
+  NEXT_PUBLIC_CMS_URL: process.env.NEXT_PUBLIC_CMS_URL,
+})
+
 type CMSBlogPost = {
   id: string
   title: string
@@ -170,7 +178,6 @@ export async function getAllCMSPostSlugs() {
  * Fetch a single blog post from the CMS by slug
  */
 export async function getCMSPostBySlug(slug: string, preview = false) {
-  const PAYLOAD_URL = process.env.NEXT_PUBLIC_CMS_URL || 'http://localhost:3030'
   console.log(
     `[getCMSPostBySlug] Fetching post '${slug}', preview: ${preview}, from ${PAYLOAD_URL}`
   )
@@ -195,6 +202,8 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
 
     if (!response.ok) {
       console.error(`[getCMSPostBySlug] HTTP error: ${response.status} ${response.statusText}`)
+      const errorText = await response.text()
+      console.error(`[getCMSPostBySlug] Error response body:`, errorText)
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
@@ -207,12 +216,14 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
     // In preview mode, we want to return the draft even if it's not published
     if (!data.docs.length && !preview) {
       console.log(`[getCMSPostBySlug] No docs found, not in preview mode, returning null`)
+      console.log(`[getCMSPostBySlug] Slug searched: '${slug}'`)
       return null
     }
 
     // If we're in preview mode and there's no draft, try to get the published version
     if (!data.docs.length && preview) {
       console.log(`[getCMSPostBySlug] No draft found but in preview mode, trying published version`)
+      console.log(`[getCMSPostBySlug] Slug searched: '${slug}'`)
       const publishedUrl = `${PAYLOAD_URL}/api/posts?where[slug][equals]=${slug}&depth=2`
       console.log(`[getCMSPostBySlug] Published API URL: ${publishedUrl}`)
 
@@ -237,6 +248,9 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
 
       if (!publishedData.docs.length) {
         console.log(`[getCMSPostBySlug] No published version found either, returning null`)
+        console.log(
+          `[getCMSPostBySlug] Slug searched: '${slug}', preview: ${preview}, PAYLOAD_URL: ${PAYLOAD_URL}`
+        )
         return null
       }
 
@@ -253,8 +267,21 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
     console.log(`[getCMSPostBySlug] Post title: ${post.title}`)
     console.log(`[getCMSPostBySlug] Post status: ${post._status || 'published'}`)
     console.log(`[getCMSPostBySlug] Post content type:`, typeof post.content)
+    console.log(`[getCMSPostBySlug] Post slug: ${post.slug}`)
+    console.log(`[getCMSPostBySlug] About to call processPostData...`)
 
-    return processPostData(post)
+    try {
+      const processedPost = processPostData(post)
+      console.log(`[getCMSPostBySlug] Successfully processed post:`, {
+        slug: processedPost.slug,
+        title: processedPost.title,
+        isCMS: processedPost.isCMS,
+      })
+      return processedPost
+    } catch (error) {
+      console.error(`[getCMSPostBySlug] Error in processPostData:`, error)
+      return null
+    }
   } catch (error) {
     console.error('Error fetching CMS post by slug:', error)
     return null
@@ -263,44 +290,65 @@ export async function getCMSPostBySlug(slug: string, preview = false) {
 
 // Helper function to process post data
 function processPostData(post: any) {
-  const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
-  const formattedDate = new Date(post.date || new Date()).toLocaleDateString('en-IN', options)
-  const markdownContent = convertRichTextToMarkdown(post.content)
-  const readingTime = post.readingTime || generateReadingTime(markdownContent)
-
-  // Extract thumb and image URLs from the nested structure
-  const thumbUrl = post.thumb?.url ? `${PAYLOAD_URL}${post.thumb.url}` : null
-  const imageUrl = post.image?.url ? `${PAYLOAD_URL}${post.image.url}` : null
-
-  return {
+  console.log(`[processPostData] Starting to process post:`, {
+    id: post.id,
+    title: post.title,
     slug: post.slug,
-    source: markdownContent,
-    title: post.title || 'Untitled Post',
-    date: post.date || new Date().toISOString(),
-    formattedDate,
-    readingTime,
-    launchweek: post.launchweek || null,
-    authors:
-      post.authors?.map((author: any) => ({
-        author: author.author || 'Unknown Author',
-        author_id: author.author_id || '',
-        position: author.position || '',
-        author_url: author.author_url || '#',
-        author_image_url: author.author_image_url?.url
-          ? author.author_image_url.url.includes('http')
-            ? author.author_image_url?.url
-            : `${PAYLOAD_URL}${author.author_image_url.url}`
-          : null,
-        username: author.username || '',
-      })) || [],
-    toc_depth: post.toc_depth || 2,
-    thumb: thumbUrl,
-    image: imageUrl,
-    url: `/blog/${post.slug}`,
-    path: `/blog/${post.slug}`,
-    isCMS: true,
-    content: markdownContent,
-    tags: post.tags || [],
+    _status: post._status,
+  })
+
+  try {
+    const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
+    const formattedDate = new Date(post.date || new Date()).toLocaleDateString('en-IN', options)
+
+    console.log(`[processPostData] About to convert rich text to markdown...`)
+    const markdownContent = convertRichTextToMarkdown(post.content)
+    console.log(`[processPostData] Markdown conversion successful, length:`, markdownContent.length)
+
+    const readingTime = post.readingTime || generateReadingTime(markdownContent)
+
+    // Extract thumb and image URLs from the nested structure
+    const thumbUrl = post.thumb?.url ? `${PAYLOAD_URL}${post.thumb.url}` : null
+    const imageUrl = post.image?.url ? `${PAYLOAD_URL}${post.image.url}` : null
+
+    console.log(`[processPostData] About to return processed data...`)
+    const processedData = {
+      slug: post.slug,
+      source: markdownContent,
+      title: post.title || 'Untitled Post',
+      date: post.date || new Date().toISOString(),
+      formattedDate,
+      readingTime,
+      launchweek: post.launchweek || null,
+      authors:
+        post.authors?.map((author: any) => ({
+          author: author.author || 'Unknown Author',
+          author_id: author.author_id || '',
+          position: author.position || '',
+          author_url: author.author_url || '#',
+          author_image_url: author.author_image_url?.url
+            ? author.author_image_url.url.includes('http')
+              ? author.author_image_url?.url
+              : `${PAYLOAD_URL}${author.author_image_url.url}`
+            : null,
+          username: author.username || '',
+        })) || [],
+      toc_depth: post.toc_depth || 2,
+      thumb: thumbUrl,
+      image: imageUrl,
+      url: `/blog/${post.slug}`,
+      path: `/blog/${post.slug}`,
+      isCMS: true,
+      content: markdownContent,
+      richContent: post.content,
+      tags: post.tags || [],
+    }
+
+    console.log(`[processPostData] Successfully processed data for:`, processedData.title)
+    return processedData
+  } catch (error) {
+    console.error(`[processPostData] Error processing post data:`, error)
+    throw error
   }
 }
 

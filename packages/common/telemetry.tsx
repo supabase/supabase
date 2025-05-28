@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useRef } from 'react'
 import { useLatest } from 'react-use'
 import { useUser } from './auth'
-import { hasConsented } from './consent-state'
+// import { hasConsented } from './consent-state'
 import { LOCAL_STORAGE_KEYS } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
@@ -182,7 +182,8 @@ export const PageTelemetry = ({
 type EventBody = components['schemas']['TelemetryEventBodyV2Dto']
 
 export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathname?: string) {
-  const consent = hasConsented()
+  const consent = true
+  // const consent = hasConsented()
   if (!consent) return
 
   const body: EventBody = {
@@ -211,7 +212,7 @@ export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathn
 type IdentifyBody = components['schemas']['TelemetryIdentifyBodyV2']
 
 export function sendTelemetryIdentify(API_URL: string, body: IdentifyBody) {
-  const consent = hasConsented()
+  const consent = true
 
   if (!consent) return Promise.resolve()
 

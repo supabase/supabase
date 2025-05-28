@@ -65,8 +65,7 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  cors: [getServerSideURL()],
-  csrf: [getServerSideURL()].filter(Boolean),
+  cors: [getServerSideURL()].filter(Boolean),
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URI || '',

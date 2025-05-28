@@ -37,13 +37,8 @@ export const Posts: CollectionConfig = {
     livePreview: {
       url: ({ data, req }) => {
         const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
-        const isDraft = data?._status === 'draft'
-
-        if (isDraft) {
-          return `${baseUrl}/api/preview?slug=${data?.slug}&secret=${process.env.PREVIEW_SECRET || 'preview-secret'}`
-        }
-
-        return `${baseUrl}/blog/${data?.slug}`
+        // Always use the preview route for live preview to ensure draft mode is enabled
+        return `${baseUrl}/api/preview?slug=${data?.slug}&secret=${process.env.PREVIEW_SECRET || 'preview-secret'}`
       },
       breakpoints: [
         {
@@ -68,13 +63,8 @@ export const Posts: CollectionConfig = {
     },
     preview: (data) => {
       const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
-      const isDraft = data?._status === 'draft'
-
-      if (isDraft) {
-        return `${baseUrl}/api/preview?slug=${data?.slug}&secret=${process.env.PREVIEW_SECRET || 'preview-secret'}`
-      }
-      
-      return `${baseUrl}/blog/${data?.slug}`
+      // Always use the preview route to ensure draft mode is enabled
+      return `${baseUrl}/api/preview?slug=${data?.slug}&secret=${process.env.PREVIEW_SECRET || 'preview-secret'}`
     },
   },
   access: {

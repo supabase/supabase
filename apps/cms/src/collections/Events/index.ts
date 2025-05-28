@@ -28,39 +28,23 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 import { slugField } from '@/fields/slug'
+import { timezoneOptions } from '../../config/timezones'
+
+const eventTypeOptions = [
+  { label: 'Conference', value: 'conference' },
+  { label: 'Hackathon', value: 'hackathon' },
+  { label: 'Launch Week', value: 'launch-week' },
+  { label: 'Meetup', value: 'meetup' },
+  { label: 'Webinar', value: 'webinar' },
+  { label: 'Workshop', value: 'workshop' },
+  { label: 'Other', value: 'other' },
+]
 
 export const Events: CollectionConfig = {
   slug: 'events',
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'updatedAt'],
-    // livePreview: {
-    //   url: ({ data, req }) => {
-    //     const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
-    //     const isDraft = data?._status === 'draft'
-    //     return `${baseUrl}/blog/${data?.slug}${isDraft ? '?preview=true' : ''}`
-    //   },
-    //   breakpoints: [
-    //     {
-    //       label: 'Desktop',
-    //       name: 'desktop',
-    //       width: 1920,
-    //       height: 1080,
-    //     },
-    //     {
-    //       label: 'Tablet',
-    //       name: 'tablet',
-    //       width: 768,
-    //       height: 1024,
-    //     },
-    //     {
-    //       label: 'Mobile',
-    //       name: 'mobile',
-    //       width: 375,
-    //       height: 667,
-    //     },
-    //   ],
-    // },
     preview: (data) => {
       const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
       const isDraft = data?._status === 'draft'
@@ -131,13 +115,13 @@ export const Events: CollectionConfig = {
               required: false,
             },
             {
-              name: 'categories',
-              type: 'relationship',
-              admin: {
-                position: 'sidebar',
-              },
+              name: 'type',
+              type: 'select',
               hasMany: true,
-              relationTo: 'categories',
+              options: eventTypeOptions,
+              admin: {
+                description: 'Event type',
+              },
             },
             {
               name: 'date',
@@ -149,6 +133,15 @@ export const Events: CollectionConfig = {
             {
               name: 'description',
               type: 'textarea',
+            },
+            {
+              name: 'duration',
+              type: 'text',
+            },
+            {
+              name: 'timezone',
+              type: 'select',
+              options: timezoneOptions,
             },
             {
               name: 'authors',
@@ -177,6 +170,7 @@ export const Events: CollectionConfig = {
               type: 'group',
               admin: {
                 description: 'Used on event previews to link to a custom event page',
+                position: 'sidebar',
               },
               fields: [
                 {
@@ -195,6 +189,37 @@ export const Events: CollectionConfig = {
                 },
                 {
                   name: 'label',
+                  type: 'text',
+                },
+              ],
+            },
+            {
+              name: 'main_cta',
+              type: 'group',
+              admin: {
+                description: 'Main CTA button on the event page',
+              },
+              fields: [
+                {
+                  name: 'href',
+                  type: 'text',
+                  required: false,
+                },
+                {
+                  name: 'target',
+                  type: 'select',
+                  options: [
+                    { label: 'Same window', value: '_self' },
+                    { label: 'New window', value: '_blank' },
+                  ],
+                  defaultValue: '_blank',
+                },
+                {
+                  name: 'label',
+                  type: 'text',
+                },
+                {
+                  name: 'disabled_label',
                   type: 'text',
                 },
               ],
