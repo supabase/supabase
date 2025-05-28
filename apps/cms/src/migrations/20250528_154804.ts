@@ -46,6 +46,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "cms-payload"."enum__pages_v_version_status" AS ENUM('draft', 'published');
   CREATE TYPE "cms-payload"."enum_posts_status" AS ENUM('draft', 'published');
   CREATE TYPE "cms-payload"."enum__posts_v_version_status" AS ENUM('draft', 'published');
+  CREATE TYPE "cms-payload"."enum_users_roles" AS ENUM('admin', 'editor');
   CREATE TYPE "cms-payload"."enum_redirects_to_type" AS ENUM('reference', 'custom');
   CREATE TYPE "cms-payload"."enum_forms_confirmation_type" AS ENUM('message', 'redirect');
   CREATE TYPE "cms-payload"."enum_payload_jobs_log_task_slug" AS ENUM('inline', 'schedulePublish');
@@ -675,6 +676,13 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"name" varchar NOT NULL,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
   	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
+  );
+  
+  CREATE TABLE IF NOT EXISTS "cms-payload"."users_roles" (
+  	"order" integer NOT NULL,
+  	"parent_id" integer NOT NULL,
+  	"value" "cms-payload"."enum_users_roles",
+  	"id" serial PRIMARY KEY NOT NULL
   );
   
   CREATE TABLE IF NOT EXISTS "cms-payload"."users" (
@@ -1480,6 +1488,12 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   END $$;
   
   DO $$ BEGIN
+   ALTER TABLE "cms-payload"."users_roles" ADD CONSTRAINT "users_roles_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "cms-payload"."users"("id") ON DELETE cascade ON UPDATE no action;
+  EXCEPTION
+   WHEN duplicate_object THEN null;
+  END $$;
+  
+  DO $$ BEGIN
    ALTER TABLE "cms-payload"."redirects_rels" ADD CONSTRAINT "redirects_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "cms-payload"."redirects"("id") ON DELETE cascade ON UPDATE no action;
   EXCEPTION
    WHEN duplicate_object THEN null;
@@ -1904,6 +1918,8 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX IF NOT EXISTS "_posts_v_rels_tags_id_idx" ON "cms-payload"."_posts_v_rels" USING btree ("tags_id");
   CREATE INDEX IF NOT EXISTS "tags_updated_at_idx" ON "cms-payload"."tags" USING btree ("updated_at");
   CREATE INDEX IF NOT EXISTS "tags_created_at_idx" ON "cms-payload"."tags" USING btree ("created_at");
+  CREATE INDEX IF NOT EXISTS "users_roles_order_idx" ON "cms-payload"."users_roles" USING btree ("order");
+  CREATE INDEX IF NOT EXISTS "users_roles_parent_idx" ON "cms-payload"."users_roles" USING btree ("parent_id");
   CREATE INDEX IF NOT EXISTS "users_updated_at_idx" ON "cms-payload"."users" USING btree ("updated_at");
   CREATE INDEX IF NOT EXISTS "users_created_at_idx" ON "cms-payload"."users" USING btree ("created_at");
   CREATE UNIQUE INDEX IF NOT EXISTS "users_email_idx" ON "cms-payload"."users" USING btree ("email");
@@ -2052,6 +2068,7 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "cms-payload"."_posts_v" CASCADE;
   DROP TABLE "cms-payload"."_posts_v_rels" CASCADE;
   DROP TABLE "cms-payload"."tags" CASCADE;
+  DROP TABLE "cms-payload"."users_roles" CASCADE;
   DROP TABLE "cms-payload"."users" CASCADE;
   DROP TABLE "cms-payload"."redirects" CASCADE;
   DROP TABLE "cms-payload"."redirects_rels" CASCADE;
@@ -2123,6 +2140,7 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "cms-payload"."enum__pages_v_version_status";
   DROP TYPE "cms-payload"."enum_posts_status";
   DROP TYPE "cms-payload"."enum__posts_v_version_status";
+  DROP TYPE "cms-payload"."enum_users_roles";
   DROP TYPE "cms-payload"."enum_redirects_to_type";
   DROP TYPE "cms-payload"."enum_forms_confirmation_type";
   DROP TYPE "cms-payload"."enum_payload_jobs_log_task_slug";
