@@ -1,7 +1,7 @@
 import React from 'react'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { Button, cn } from 'ui'
+import { Badge, Button, cn } from 'ui'
 import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
 import { Github } from 'lucide-react' // Import Github icon
@@ -25,12 +25,6 @@ const AccountConnections = () => {
     openInstallGitHubIntegrationWindow('authorize')
   }
 
-  // TODO: Implement disconnect functionality
-  const handleDisconnect = () => {
-    console.log('Disconnect GitHub clicked')
-    // This will likely involve a mutation to revoke the authorization.
-  }
-
   return (
     <Panel
       className="mb-4 md:mb-8"
@@ -38,7 +32,7 @@ const AccountConnections = () => {
         <div>
           <h5>Connections</h5>
           <p className="text-sm text-foreground-lighter">
-            Connect your GitHub account to sync projects with GitHub repositories
+            Connect your Supabase account with other services
           </p>
         </div>
       }
@@ -71,15 +65,13 @@ const AccountConnections = () => {
             <div>
               <p className="text-sm">GitHub</p>
               <p className="text-sm text-foreground-lighter">
-                {isConnected ? 'Authorized' : 'Not authorized'}
+                Sync GitHub repos to Supabase projects
               </p>
             </div>
           </div>
           <div className="flex items-center gap-x-1">
             {isConnected ? (
-              <Button type="default" onClick={handleDisconnect}>
-                Disconnect
-              </Button>
+              <Badge variant="success">Connected</Badge>
             ) : (
               <Button type="primary" onClick={handleConnect}>
                 Connect
