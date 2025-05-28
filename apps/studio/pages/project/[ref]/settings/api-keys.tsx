@@ -1,49 +1,25 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-
-import LegacyAPIKeys from 'components/interfaces/APIKeys/LegacyAPIKeys'
-import { PublishableAPIKeys } from 'components/interfaces/APIKeys/PublishableAPIKeys'
-import { SecretAPIKeys } from 'components/interfaces/APIKeys/SecretAPIKeys'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import ApiKeysLayout from 'components/layouts/project/[ref]/settings/APIKeysLayout'
-import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import type { NextPageWithLayout } from 'types'
-import { Separator } from 'ui'
 
-const ApiKeysSettings: NextPageWithLayout = () => {
-  const { ref: projectRef } = useParams()
-  const [apiKeysView] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.API_KEYS_VIEW(projectRef ?? ''),
-    undefined
-  )
+export default function ApiKeysLegacyPage() {
+  const router = useRouter()
+  const { ref } = useParams()
 
-  // const isPermissionsLoaded = usePermissionsLoaded()
-  // TODO: check if these permissions cover third party auth as well
-  const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'api_keys')
+  // For backward compatibility, check if there's a view query parameter
+  const view = router.query.view as string
 
-  return (
-    <>
-      {apiKeysView !== 'legacy-keys' ? (
-        <>
-          <PublishableAPIKeys />
-          <Separator />
-          <SecretAPIKeys />
-        </>
-      ) : (
-        <LegacyAPIKeys />
-      )}
-    </>
-  )
+  // Get the view from local storage if no query parameter
+  const [storedView] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.API_KEYS_VIEW(ref ?? ''), 'new-keys')
+
+  // Determine which page to redirect to
+  const targetView = view || storedView || 'new-keys'
+
+  useEffect(() => {
+    // Redirect to the appropriate page
+    router.replace(`/project/${ref}/settings/api-keys/${targetView}`)
+  }, [])
+
+  return null
 }
-
-ApiKeysSettings.getLayout = (page) => (
-  <DefaultLayout>
-    <SettingsLayout>
-      <ApiKeysLayout>{page}</ApiKeysLayout>
-    </SettingsLayout>
-  </DefaultLayout>
-)
-
-export default ApiKeysSettings

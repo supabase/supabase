@@ -315,58 +315,6 @@ revoke all
 ```
 
 </TabPanel>
-<TabPanel id="add-metadata-claim-plv8" label="Add claim via plv8">
-You can add custom claims to the access token. In this example, we fetch the level of an existing user from the `profiles` table and assign new users a default level of zero.
-
-For convenience, we enable the `plv8` extension under [`Database > Extensions`](/dashboard/project/_/database/extensions) to run JavaScript within our query.
-
-Create a `profiles` table to hold information:
-
-```sql
-create table profiles (
-  user_id uuid not null primary key references auth.users (id),
-  level integer,
-  is_admin boolean not null default false
-);
-```
-
-```sql
-create or replace function custom_access_token_hook(event jsonb)
-returns jsonb
-language plv8
-as $$
-  var user_level;
-
-  -- Fetch the current user's level from the profiles table
-  var result = plv8.execute("select level from public.profiles where user_id = $1", [event.user_id]);
-  if (result.length > 0) {
-    user_level = result[0].level;
-  } else {
-    -- Assign a default level of 0 if no level is found
-    user_level = 0;
-  }
-
-  -- Check if 'claims' exists in the event object; if not, initialize it
-  if (!event.claims) {
-    event.claims = {};
-  }
-
-  -- Update the level in the claims
-  event.claims.level = user_level;
-
-  return event;
-$$;
-
-grant all
-  on table public.profiles
-  to supabase_auth_admin;
-
-revoke all
-  on table public.profiles
-  from authenticated, anon, public;
-```
-
-</TabPanel>
 <TabPanel id="restrict-access-to-sso-users" label="Restrict access to SSO users">
 You can restrict access to internal applications with a hook. For example, you can require that employees log in via [SAML Single Sign On (SSO)](/docs/guides/auth/sso/auth-sso-saml). You can exempt select employees from the policy via an allowlist.
 

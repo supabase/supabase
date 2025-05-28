@@ -26,6 +26,7 @@
         "NEXT_PUBLIC_SITE_URL",
         "NEXT_PUBLIC_DEV_AUTH_PAGE",
         "NEXT_PUBLIC_IS_PLATFORM",
+        "NEXT_PUBLIC_SENTRY_DSN",
         "NEXT_PUBLIC_VERCEL_ENV",
         "NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA",
         // These envs are used in the packages

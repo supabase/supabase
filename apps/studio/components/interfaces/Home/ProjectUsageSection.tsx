@@ -14,7 +14,7 @@ export const ProjectUsageSection = () => {
   // wait for the stats to load before showing the usage section to eliminate multiple spinners
   const { isLoading: isLogsStatsLoading } = useProjectLogStatsQuery({
     projectRef: project?.ref,
-    interval: 'minutely',
+    interval: '1hr',
   })
 
   if (isLoading || isLogsStatsLoading) {
