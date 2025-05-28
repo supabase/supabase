@@ -1,11 +1,11 @@
+import { Github } from 'lucide-react'
+import Link from 'next/link'
 import { cn } from 'ui'
-
 import Breadcrumbs from '~/components/Breadcrumbs'
 import { Feedback } from '~/components/Feedback'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 import { MDXRemoteBase } from './MdxBase'
 import { getTroubleshootingUpdatedDates, type ITroubleshootingEntry } from './Troubleshooting.utils'
-import Link from 'next/link'
 import { formatError, serializeTroubleshootingSearchParams } from './Troubleshooting.utils.shared'
 
 export default async function TroubleshootingPage({ entry }: { entry: ITroubleshootingEntry }) {
@@ -95,6 +95,19 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                 </>
               )}
               <Feedback className="px-0 mb-6 lg:mb-8" />
+              {entry.data.github_url && (
+                <>
+                  <hr className="my-6" aria-hidden />
+                  <Link
+                    target="_blank"
+                    href={entry.data.github_url}
+                    className="flex items-center gap-2 text-sm text-foreground-lighter"
+                  >
+                    <Github size={14} />
+                    View discussion on GitHub
+                  </Link>
+                </>
+              )}
             </aside>
           </div>
         </article>
