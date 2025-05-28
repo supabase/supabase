@@ -71,23 +71,26 @@ curl https://api.supabase.com/v1/projects/branches \
 
 https://api.supabase.com/api/v1#tag/database/POST/v1/projects/{ref}/database/migrations
 
-For this example we will create a todos table using the `POST database/migrations` endpoint.
+For this example we will create a todos table using the `POST /database/migrations` endpoint.
 
 ```sql
-create table todos (
+create table public.todos (
   id serial primary key,
   task text not null
 );
+
+alter table public.todos
+enable row level security;
 ```
 
 This endpoint will automatically create a migration inside the `supabase_migrations` schema. If the schema migration fails, the changes will be rolled back.
 
 ```sh
-curl https://api.supabase.com/v1/projects/database/migrations \
+curl https://api.supabase.com/v1/projects/{ref}/database/migrations \
   --request POST \
   --header 'Content-Type: application/json' \
   --data '{
-  "query": "create table todos (id serial primary key, task text not null);",
+  "query": "create table public.todos (id serial primary key, task text not null); alter table public.todos enable row level security;",
   "name": "Create a todos table"
 }'
 ```
@@ -100,13 +103,35 @@ It's important that the data in development branches is NOT production data, esp
 
 </Admonition>
 
-It's common in `DEV` branches to "seed" data. This is basic test data for users.
+It's common in `DEV` branches to "seed" data. This is basic test data for users. Let's insert the following seed to our new todos table:
+
+```sql
+insert into todos (task)
+values
+    ('Task 1'),
+    ('Task 2'),
+    ('Task 3');
+```
+
+You can use the `POST /database/query` endpoint to add data:
+
+```sh
+curl https://api.supabase.com/v1/projects/{ref}/database/query \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --data @- <<EOF
+  {
+    "query": "insert into todos (task) values ('Task 1'), ('Task 2'), ('Task 3');"
+  }
+  EOF
+```
 
 
 ### Merge all changes
 
-- TODO
-- https://api.supabase.com/api/v1#tag/environments/POST/v1/branches/{branch_id}/merge
+https://api.supabase.com/api/v1#tag/environments/POST/v1/branches/{branch_id}/merge
+
+Once the changes have been made, you can merge the changes into production
 
 ```sh
 curl https://api.supabase.com/v1/branches/merge \
@@ -117,6 +142,15 @@ curl https://api.supabase.com/v1/branches/merge \
 }'
 ```
 
+Merging changes will automatically merge:
+
+* Database changes
+* Edge Functions
+
+The following changes are _not_ automatically merged right now and need to be run manually on your production branch:
+
+*
+
 
 ## Making changes
 
@@ -126,7 +160,7 @@ curl https://api.supabase.com/v1/branches/merge \
 Database changes are handled through migrations.
 
 
-### Edge Functions
+### Edge Functions changes
 
 You can develop Edge Functions on a branch and then merge them into Production.
 
@@ -140,16 +174,61 @@ curl https://api.supabase.com/v1/projects/functions/deploy \
   --form 'metadata={"entrypoint_path":"","import_map_path":"","static_patterns":[""],"verify_jwt":true,"name":""}'
 ```
 
-### Configuration
+### Configuration changes
 
 You can manage the configuration of all services using the Management API. This includes Auth configuration like enabling and disabling SSO Pro
 
+- Auth: https://api.supabase.com/api/v1#tag/auth/PATCH/v1/projects/{ref}/config/auth
+- Data APIs: https://api.supabase.com/api/v1#tag/rest/PATCH/v1/projects/{ref}/postgrest
+- Storage: https://api.supabase.com/api/v1#tag/storage/PATCH/v1/projects/{ref}/config/storage
 
-### Reverting changes
+## Reverting changes
 
 - TODO
 
 ![Revert](/docs/img/integrations/revert.png)
+
+### Reverting database changes
+
+https://api.supabase.com/api/v1#tag/database/POST/v1/projects/{ref}/database/backups/restore-pitr
+
+<Admonition type="warning" title="Use the {ref} of the branch, not the production project!">
+
+If you revert a production database it can result in data loss.
+
+</Admonition>
+
+You call roll back your database to a timestamp in the past:
+
+```sh
+curl https://api.supabase.com/v1/projects/{ref}/database/backups/restore-pitr \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "recovery_time_target_unix": 1
+}'
+```
+
+When you revert the database, you are undo-ing all database changes since the specified point in time, including:
+
+* Schema changes
+* Any seed data that you inserted
+* Any test users who have signed up (and auth tokens for sign ins)
+* Pointers to files in Supabase Storage.
+
+It will not affect:
+
+* Configuration changes
+* Any secrets that have been added
+
+### Reverting Edge Functions
+
+- `TODO`: how to roll back an edge function to a previous version
+
+
+### Reverting configuration
+
+- `TODO`: how to roll back config
 
 
 ## Disaster Recovery
@@ -170,3 +249,9 @@ curl https://api.supabase.com/v1/projects/database/backups/restore-pitr \
   "recovery_time_target_unix": 1
 }'
 ```
+
+## Claims flow
+
+If you are developing projects on behalf of your users (in your own account), there might come a time where your users want to claim their project into their own Supabase Account.
+
+- `TODO`: add docs.
