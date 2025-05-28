@@ -14,7 +14,7 @@ import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useOrgOptedIntoAiAndHippaProject } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
@@ -100,8 +100,8 @@ const NewFunctionPage = () => {
   const router = useRouter()
   const { ref, template } = useParams()
   const project = useSelectedProject()
-  const isOptedInToAI = useOrgOptedIntoAi()
-  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
+  const { isOptedInToAI, isHipaaProjectDisallowed } = useOrgOptedIntoAiAndHippaProject()
+  const includeSchemaMetadata = (isOptedInToAI && !isHipaaProjectDisallowed) || !IS_PLATFORM
   const snap = useAiAssistantStateSnapshot()
   const { mutate: sendEvent } = useSendEventMutation()
   const org = useSelectedOrganization()

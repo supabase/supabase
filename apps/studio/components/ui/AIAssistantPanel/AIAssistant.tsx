@@ -9,19 +9,16 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams, useSearchParamsShallow } from 'common/hooks'
-import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { Markdown } from 'components/interfaces/Markdown'
 import OptInToOpenAIToggle from 'components/interfaces/Organization/GeneralSettings/OptInToOpenAIToggle'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { constructHeaders } from 'data/fetchers'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useOrgOptedIntoAiAndHippaProject } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -90,9 +87,9 @@ interface AIAssistantProps {
 export const AIAssistant = ({ className }: AIAssistantProps) => {
   const router = useRouter()
   const project = useSelectedProject()
-  const isOptedInToAI = useOrgOptedIntoAi()
+  const { isOptedInToAI, isHipaaProjectDisallowed } = useOrgOptedIntoAiAndHippaProject()
   const selectedOrganization = useSelectedOrganization()
-  const { ref: ref, id: entityId } = useParams()
+  const { ref, id: entityId } = useParams()
   const searchParams = useSearchParamsShallow()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
@@ -115,10 +112,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const isInSQLEditor = router.pathname.includes('/sql/[id]')
   const snippet = snippets[entityId ?? '']
   const snippetContent = snippet?.snippet?.content?.sql
-
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
-  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: project?.ref || ref })
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
 
   const { data: tables, isLoading: isLoadingTables } = useTablesQuery(
     {
@@ -369,13 +362,13 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 type="default"
                 title="Project metadata is not shared"
                 description={
-                  hasHipaaAddon
+                  isHipaaProjectDisallowed
                     ? 'Your organization has the HIPAA addon and will not send project metadata with your prompts for projects marked as HIPAA.'
                     : 'The Assistant can improve the quality of the answers if you send project metadata along with your prompts. Opt into sending anonymous data to share your schema and table definitions.'
                 }
                 className="border-0 border-b rounded-none bg-background"
               >
-                {!hasHipaaAddon && (
+                {!isHipaaProjectDisallowed && (
                   <Button
                     type="default"
                     className="w-fit mt-4"
