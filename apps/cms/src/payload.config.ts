@@ -12,7 +12,6 @@ import { Categories } from './collections/Categories'
 import { Customers } from './collections/Customers'
 import { Events } from './collections/Events'
 import { Media } from './collections/Media'
-import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Tags } from './collections/Tags'
 import { Users } from './collections/Users'
@@ -55,7 +54,6 @@ export default buildConfig({
     Customers,
     Events,
     Media,
-    Pages,
     Posts,
     Tags, 
     Users

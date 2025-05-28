@@ -22,32 +22,9 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "cms-payload"."enum__events_v_version_link_target" AS ENUM('_self', '_blank');
   CREATE TYPE "cms-payload"."enum__events_v_version_main_cta_target" AS ENUM('_self', '_blank');
   CREATE TYPE "cms-payload"."enum__events_v_version_status" AS ENUM('draft', 'published');
-  CREATE TYPE "cms-payload"."enum_pages_hero_links_link_type" AS ENUM('reference', 'custom');
-  CREATE TYPE "cms-payload"."enum_pages_hero_links_link_appearance" AS ENUM('default', 'outline');
-  CREATE TYPE "cms-payload"."enum_pages_blocks_cta_links_link_type" AS ENUM('reference', 'custom');
-  CREATE TYPE "cms-payload"."enum_pages_blocks_cta_links_link_appearance" AS ENUM('default', 'outline');
-  CREATE TYPE "cms-payload"."enum_pages_blocks_content_columns_size" AS ENUM('oneThird', 'half', 'twoThirds', 'full');
-  CREATE TYPE "cms-payload"."enum_pages_blocks_content_columns_link_type" AS ENUM('reference', 'custom');
-  CREATE TYPE "cms-payload"."enum_pages_blocks_content_columns_link_appearance" AS ENUM('default', 'outline');
-  CREATE TYPE "cms-payload"."enum_pages_blocks_archive_populate_by" AS ENUM('collection', 'selection');
-  CREATE TYPE "cms-payload"."enum_pages_blocks_archive_relation_to" AS ENUM('posts');
-  CREATE TYPE "cms-payload"."enum_pages_hero_type" AS ENUM('none', 'highImpact', 'mediumImpact', 'lowImpact');
-  CREATE TYPE "cms-payload"."enum_pages_status" AS ENUM('draft', 'published');
-  CREATE TYPE "cms-payload"."enum__pages_v_version_hero_links_link_type" AS ENUM('reference', 'custom');
-  CREATE TYPE "cms-payload"."enum__pages_v_version_hero_links_link_appearance" AS ENUM('default', 'outline');
-  CREATE TYPE "cms-payload"."enum__pages_v_blocks_cta_links_link_type" AS ENUM('reference', 'custom');
-  CREATE TYPE "cms-payload"."enum__pages_v_blocks_cta_links_link_appearance" AS ENUM('default', 'outline');
-  CREATE TYPE "cms-payload"."enum__pages_v_blocks_content_columns_size" AS ENUM('oneThird', 'half', 'twoThirds', 'full');
-  CREATE TYPE "cms-payload"."enum__pages_v_blocks_content_columns_link_type" AS ENUM('reference', 'custom');
-  CREATE TYPE "cms-payload"."enum__pages_v_blocks_content_columns_link_appearance" AS ENUM('default', 'outline');
-  CREATE TYPE "cms-payload"."enum__pages_v_blocks_archive_populate_by" AS ENUM('collection', 'selection');
-  CREATE TYPE "cms-payload"."enum__pages_v_blocks_archive_relation_to" AS ENUM('posts');
-  CREATE TYPE "cms-payload"."enum__pages_v_version_hero_type" AS ENUM('none', 'highImpact', 'mediumImpact', 'lowImpact');
-  CREATE TYPE "cms-payload"."enum__pages_v_version_status" AS ENUM('draft', 'published');
   CREATE TYPE "cms-payload"."enum_posts_status" AS ENUM('draft', 'published');
   CREATE TYPE "cms-payload"."enum__posts_v_version_status" AS ENUM('draft', 'published');
   CREATE TYPE "cms-payload"."enum_users_roles" AS ENUM('admin', 'editor');
-  CREATE TYPE "cms-payload"."enum_redirects_to_type" AS ENUM('reference', 'custom');
   CREATE TYPE "cms-payload"."enum_forms_confirmation_type" AS ENUM('message', 'redirect');
   CREATE TYPE "cms-payload"."enum_payload_jobs_log_task_slug" AS ENUM('inline', 'schedulePublish');
   CREATE TYPE "cms-payload"."enum_payload_jobs_log_state" AS ENUM('failed', 'succeeded');
@@ -365,243 +342,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"sizes_og_filename" varchar
   );
   
-  CREATE TABLE IF NOT EXISTS "cms-payload"."pages_hero_links" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"link_type" "cms-payload"."enum_pages_hero_links_link_type" DEFAULT 'reference',
-  	"link_new_tab" boolean,
-  	"link_url" varchar,
-  	"link_label" varchar,
-  	"link_appearance" "cms-payload"."enum_pages_hero_links_link_appearance" DEFAULT 'default'
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."pages_blocks_cta_links" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" varchar NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"link_type" "cms-payload"."enum_pages_blocks_cta_links_link_type" DEFAULT 'reference',
-  	"link_new_tab" boolean,
-  	"link_url" varchar,
-  	"link_label" varchar,
-  	"link_appearance" "cms-payload"."enum_pages_blocks_cta_links_link_appearance" DEFAULT 'default'
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."pages_blocks_cta" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"_path" text NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"rich_text" jsonb,
-  	"block_name" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."pages_blocks_content_columns" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" varchar NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"size" "cms-payload"."enum_pages_blocks_content_columns_size" DEFAULT 'oneThird',
-  	"rich_text" jsonb,
-  	"enable_link" boolean,
-  	"link_type" "cms-payload"."enum_pages_blocks_content_columns_link_type" DEFAULT 'reference',
-  	"link_new_tab" boolean,
-  	"link_url" varchar,
-  	"link_label" varchar,
-  	"link_appearance" "cms-payload"."enum_pages_blocks_content_columns_link_appearance" DEFAULT 'default'
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."pages_blocks_content" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"_path" text NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"block_name" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."pages_blocks_media_block" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"_path" text NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"media_id" integer,
-  	"block_name" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."pages_blocks_archive" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"_path" text NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"intro_content" jsonb,
-  	"populate_by" "cms-payload"."enum_pages_blocks_archive_populate_by" DEFAULT 'collection',
-  	"relation_to" "cms-payload"."enum_pages_blocks_archive_relation_to" DEFAULT 'posts',
-  	"limit" numeric DEFAULT 10,
-  	"block_name" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."pages_blocks_form_block" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"_path" text NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"form_id" integer,
-  	"enable_intro" boolean,
-  	"intro_content" jsonb,
-  	"block_name" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."pages" (
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"title" varchar,
-  	"hero_type" "cms-payload"."enum_pages_hero_type" DEFAULT 'lowImpact',
-  	"hero_rich_text" jsonb,
-  	"hero_media_id" integer,
-  	"meta_title" varchar,
-  	"meta_image_id" integer,
-  	"meta_description" varchar,
-  	"published_at" timestamp(3) with time zone,
-  	"slug" varchar,
-  	"slug_lock" boolean DEFAULT true,
-  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
-  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
-  	"_status" "cms-payload"."enum_pages_status" DEFAULT 'draft'
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."pages_rels" (
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"order" integer,
-  	"parent_id" integer NOT NULL,
-  	"path" varchar NOT NULL,
-  	"pages_id" integer,
-  	"posts_id" integer,
-  	"categories_id" integer
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."_pages_v_version_hero_links" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"link_type" "cms-payload"."enum__pages_v_version_hero_links_link_type" DEFAULT 'reference',
-  	"link_new_tab" boolean,
-  	"link_url" varchar,
-  	"link_label" varchar,
-  	"link_appearance" "cms-payload"."enum__pages_v_version_hero_links_link_appearance" DEFAULT 'default',
-  	"_uuid" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."_pages_v_blocks_cta_links" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"link_type" "cms-payload"."enum__pages_v_blocks_cta_links_link_type" DEFAULT 'reference',
-  	"link_new_tab" boolean,
-  	"link_url" varchar,
-  	"link_label" varchar,
-  	"link_appearance" "cms-payload"."enum__pages_v_blocks_cta_links_link_appearance" DEFAULT 'default',
-  	"_uuid" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."_pages_v_blocks_cta" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"_path" text NOT NULL,
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"rich_text" jsonb,
-  	"_uuid" varchar,
-  	"block_name" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."_pages_v_blocks_content_columns" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"size" "cms-payload"."enum__pages_v_blocks_content_columns_size" DEFAULT 'oneThird',
-  	"rich_text" jsonb,
-  	"enable_link" boolean,
-  	"link_type" "cms-payload"."enum__pages_v_blocks_content_columns_link_type" DEFAULT 'reference',
-  	"link_new_tab" boolean,
-  	"link_url" varchar,
-  	"link_label" varchar,
-  	"link_appearance" "cms-payload"."enum__pages_v_blocks_content_columns_link_appearance" DEFAULT 'default',
-  	"_uuid" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."_pages_v_blocks_content" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"_path" text NOT NULL,
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"_uuid" varchar,
-  	"block_name" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."_pages_v_blocks_media_block" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"_path" text NOT NULL,
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"media_id" integer,
-  	"_uuid" varchar,
-  	"block_name" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."_pages_v_blocks_archive" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"_path" text NOT NULL,
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"intro_content" jsonb,
-  	"populate_by" "cms-payload"."enum__pages_v_blocks_archive_populate_by" DEFAULT 'collection',
-  	"relation_to" "cms-payload"."enum__pages_v_blocks_archive_relation_to" DEFAULT 'posts',
-  	"limit" numeric DEFAULT 10,
-  	"_uuid" varchar,
-  	"block_name" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."_pages_v_blocks_form_block" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"_path" text NOT NULL,
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"form_id" integer,
-  	"enable_intro" boolean,
-  	"intro_content" jsonb,
-  	"_uuid" varchar,
-  	"block_name" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."_pages_v" (
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"parent_id" integer,
-  	"version_title" varchar,
-  	"version_hero_type" "cms-payload"."enum__pages_v_version_hero_type" DEFAULT 'lowImpact',
-  	"version_hero_rich_text" jsonb,
-  	"version_hero_media_id" integer,
-  	"version_meta_title" varchar,
-  	"version_meta_image_id" integer,
-  	"version_meta_description" varchar,
-  	"version_published_at" timestamp(3) with time zone,
-  	"version_slug" varchar,
-  	"version_slug_lock" boolean DEFAULT true,
-  	"version_updated_at" timestamp(3) with time zone,
-  	"version_created_at" timestamp(3) with time zone,
-  	"version__status" "cms-payload"."enum__pages_v_version_status" DEFAULT 'draft',
-  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
-  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
-  	"latest" boolean,
-  	"autosave" boolean
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."_pages_v_rels" (
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"order" integer,
-  	"parent_id" integer NOT NULL,
-  	"path" varchar NOT NULL,
-  	"pages_id" integer,
-  	"posts_id" integer,
-  	"categories_id" integer
-  );
-  
   CREATE TABLE IF NOT EXISTS "cms-payload"."posts" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"title" varchar,
@@ -696,24 +436,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"hash" varchar,
   	"login_attempts" numeric DEFAULT 0,
   	"lock_until" timestamp(3) with time zone
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."redirects" (
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"from" varchar NOT NULL,
-  	"to_type" "cms-payload"."enum_redirects_to_type" DEFAULT 'reference',
-  	"to_url" varchar,
-  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
-  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."redirects_rels" (
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"order" integer,
-  	"parent_id" integer NOT NULL,
-  	"path" varchar NOT NULL,
-  	"pages_id" integer,
-  	"posts_id" integer
   );
   
   CREATE TABLE IF NOT EXISTS "cms-payload"."forms_blocks_checkbox" (
@@ -874,34 +596,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
   );
   
-  CREATE TABLE IF NOT EXISTS "cms-payload"."search_categories" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"relation_to" varchar,
-  	"title" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."search" (
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"title" varchar,
-  	"priority" numeric,
-  	"slug" varchar,
-  	"meta_title" varchar,
-  	"meta_description" varchar,
-  	"meta_image_id" integer,
-  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
-  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."search_rels" (
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"order" integer,
-  	"parent_id" integer NOT NULL,
-  	"path" varchar NOT NULL,
-  	"posts_id" integer
-  );
-  
   CREATE TABLE IF NOT EXISTS "cms-payload"."payload_jobs_log" (
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
@@ -948,14 +642,11 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"customers_id" integer,
   	"events_id" integer,
   	"media_id" integer,
-  	"pages_id" integer,
   	"posts_id" integer,
   	"tags_id" integer,
   	"users_id" integer,
-  	"redirects_id" integer,
   	"forms_id" integer,
   	"form_submissions_id" integer,
-  	"search_id" integer,
   	"payload_jobs_id" integer
   );
   
@@ -1200,204 +891,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   END $$;
   
   DO $$ BEGIN
-   ALTER TABLE "cms-payload"."pages_hero_links" ADD CONSTRAINT "pages_hero_links_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."pages"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."pages_blocks_cta_links" ADD CONSTRAINT "pages_blocks_cta_links_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."pages_blocks_cta"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."pages_blocks_cta" ADD CONSTRAINT "pages_blocks_cta_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."pages"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."pages_blocks_content_columns" ADD CONSTRAINT "pages_blocks_content_columns_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."pages_blocks_content"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."pages_blocks_content" ADD CONSTRAINT "pages_blocks_content_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."pages"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."pages_blocks_media_block" ADD CONSTRAINT "pages_blocks_media_block_media_id_media_id_fk" FOREIGN KEY ("media_id") REFERENCES "cms-payload"."media"("id") ON DELETE set null ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."pages_blocks_media_block" ADD CONSTRAINT "pages_blocks_media_block_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."pages"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."pages_blocks_archive" ADD CONSTRAINT "pages_blocks_archive_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."pages"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."pages_blocks_form_block" ADD CONSTRAINT "pages_blocks_form_block_form_id_forms_id_fk" FOREIGN KEY ("form_id") REFERENCES "cms-payload"."forms"("id") ON DELETE set null ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."pages_blocks_form_block" ADD CONSTRAINT "pages_blocks_form_block_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."pages"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."pages" ADD CONSTRAINT "pages_hero_media_id_media_id_fk" FOREIGN KEY ("hero_media_id") REFERENCES "cms-payload"."media"("id") ON DELETE set null ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."pages" ADD CONSTRAINT "pages_meta_image_id_media_id_fk" FOREIGN KEY ("meta_image_id") REFERENCES "cms-payload"."media"("id") ON DELETE set null ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."pages_rels" ADD CONSTRAINT "pages_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "cms-payload"."pages"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."pages_rels" ADD CONSTRAINT "pages_rels_pages_fk" FOREIGN KEY ("pages_id") REFERENCES "cms-payload"."pages"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."pages_rels" ADD CONSTRAINT "pages_rels_posts_fk" FOREIGN KEY ("posts_id") REFERENCES "cms-payload"."posts"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."pages_rels" ADD CONSTRAINT "pages_rels_categories_fk" FOREIGN KEY ("categories_id") REFERENCES "cms-payload"."categories"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."_pages_v_version_hero_links" ADD CONSTRAINT "_pages_v_version_hero_links_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."_pages_v"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."_pages_v_blocks_cta_links" ADD CONSTRAINT "_pages_v_blocks_cta_links_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."_pages_v_blocks_cta"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."_pages_v_blocks_cta" ADD CONSTRAINT "_pages_v_blocks_cta_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."_pages_v"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."_pages_v_blocks_content_columns" ADD CONSTRAINT "_pages_v_blocks_content_columns_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."_pages_v_blocks_content"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."_pages_v_blocks_content" ADD CONSTRAINT "_pages_v_blocks_content_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."_pages_v"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."_pages_v_blocks_media_block" ADD CONSTRAINT "_pages_v_blocks_media_block_media_id_media_id_fk" FOREIGN KEY ("media_id") REFERENCES "cms-payload"."media"("id") ON DELETE set null ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."_pages_v_blocks_media_block" ADD CONSTRAINT "_pages_v_blocks_media_block_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."_pages_v"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."_pages_v_blocks_archive" ADD CONSTRAINT "_pages_v_blocks_archive_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."_pages_v"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."_pages_v_blocks_form_block" ADD CONSTRAINT "_pages_v_blocks_form_block_form_id_forms_id_fk" FOREIGN KEY ("form_id") REFERENCES "cms-payload"."forms"("id") ON DELETE set null ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."_pages_v_blocks_form_block" ADD CONSTRAINT "_pages_v_blocks_form_block_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."_pages_v"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."_pages_v" ADD CONSTRAINT "_pages_v_parent_id_pages_id_fk" FOREIGN KEY ("parent_id") REFERENCES "cms-payload"."pages"("id") ON DELETE set null ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."_pages_v" ADD CONSTRAINT "_pages_v_version_hero_media_id_media_id_fk" FOREIGN KEY ("version_hero_media_id") REFERENCES "cms-payload"."media"("id") ON DELETE set null ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."_pages_v" ADD CONSTRAINT "_pages_v_version_meta_image_id_media_id_fk" FOREIGN KEY ("version_meta_image_id") REFERENCES "cms-payload"."media"("id") ON DELETE set null ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."_pages_v_rels" ADD CONSTRAINT "_pages_v_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "cms-payload"."_pages_v"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."_pages_v_rels" ADD CONSTRAINT "_pages_v_rels_pages_fk" FOREIGN KEY ("pages_id") REFERENCES "cms-payload"."pages"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."_pages_v_rels" ADD CONSTRAINT "_pages_v_rels_posts_fk" FOREIGN KEY ("posts_id") REFERENCES "cms-payload"."posts"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."_pages_v_rels" ADD CONSTRAINT "_pages_v_rels_categories_fk" FOREIGN KEY ("categories_id") REFERENCES "cms-payload"."categories"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
    ALTER TABLE "cms-payload"."posts" ADD CONSTRAINT "posts_thumb_id_media_id_fk" FOREIGN KEY ("thumb_id") REFERENCES "cms-payload"."media"("id") ON DELETE set null ON UPDATE no action;
   EXCEPTION
    WHEN duplicate_object THEN null;
@@ -1494,24 +987,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   END $$;
   
   DO $$ BEGIN
-   ALTER TABLE "cms-payload"."redirects_rels" ADD CONSTRAINT "redirects_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "cms-payload"."redirects"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."redirects_rels" ADD CONSTRAINT "redirects_rels_pages_fk" FOREIGN KEY ("pages_id") REFERENCES "cms-payload"."pages"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."redirects_rels" ADD CONSTRAINT "redirects_rels_posts_fk" FOREIGN KEY ("posts_id") REFERENCES "cms-payload"."posts"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
    ALTER TABLE "cms-payload"."forms_blocks_checkbox" ADD CONSTRAINT "forms_blocks_checkbox_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."forms"("id") ON DELETE cascade ON UPDATE no action;
   EXCEPTION
    WHEN duplicate_object THEN null;
@@ -1590,30 +1065,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   END $$;
   
   DO $$ BEGIN
-   ALTER TABLE "cms-payload"."search_categories" ADD CONSTRAINT "search_categories_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."search"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."search" ADD CONSTRAINT "search_meta_image_id_media_id_fk" FOREIGN KEY ("meta_image_id") REFERENCES "cms-payload"."media"("id") ON DELETE set null ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."search_rels" ADD CONSTRAINT "search_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "cms-payload"."search"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."search_rels" ADD CONSTRAINT "search_rels_posts_fk" FOREIGN KEY ("posts_id") REFERENCES "cms-payload"."posts"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
    ALTER TABLE "cms-payload"."payload_jobs_log" ADD CONSTRAINT "payload_jobs_log_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."payload_jobs"("id") ON DELETE cascade ON UPDATE no action;
   EXCEPTION
    WHEN duplicate_object THEN null;
@@ -1656,12 +1107,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   END $$;
   
   DO $$ BEGIN
-   ALTER TABLE "cms-payload"."payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_pages_fk" FOREIGN KEY ("pages_id") REFERENCES "cms-payload"."pages"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
    ALTER TABLE "cms-payload"."payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_posts_fk" FOREIGN KEY ("posts_id") REFERENCES "cms-payload"."posts"("id") ON DELETE cascade ON UPDATE no action;
   EXCEPTION
    WHEN duplicate_object THEN null;
@@ -1680,12 +1125,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   END $$;
   
   DO $$ BEGIN
-   ALTER TABLE "cms-payload"."payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_redirects_fk" FOREIGN KEY ("redirects_id") REFERENCES "cms-payload"."redirects"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
    ALTER TABLE "cms-payload"."payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_forms_fk" FOREIGN KEY ("forms_id") REFERENCES "cms-payload"."forms"("id") ON DELETE cascade ON UPDATE no action;
   EXCEPTION
    WHEN duplicate_object THEN null;
@@ -1693,12 +1132,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   
   DO $$ BEGIN
    ALTER TABLE "cms-payload"."payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_form_submissions_fk" FOREIGN KEY ("form_submissions_id") REFERENCES "cms-payload"."form_submissions"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_search_fk" FOREIGN KEY ("search_id") REFERENCES "cms-payload"."search"("id") ON DELETE cascade ON UPDATE no action;
   EXCEPTION
    WHEN duplicate_object THEN null;
   END $$;
@@ -1810,81 +1243,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX IF NOT EXISTS "media_sizes_large_sizes_large_filename_idx" ON "cms-payload"."media" USING btree ("sizes_large_filename");
   CREATE INDEX IF NOT EXISTS "media_sizes_xlarge_sizes_xlarge_filename_idx" ON "cms-payload"."media" USING btree ("sizes_xlarge_filename");
   CREATE INDEX IF NOT EXISTS "media_sizes_og_sizes_og_filename_idx" ON "cms-payload"."media" USING btree ("sizes_og_filename");
-  CREATE INDEX IF NOT EXISTS "pages_hero_links_order_idx" ON "cms-payload"."pages_hero_links" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "pages_hero_links_parent_id_idx" ON "cms-payload"."pages_hero_links" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_cta_links_order_idx" ON "cms-payload"."pages_blocks_cta_links" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_cta_links_parent_id_idx" ON "cms-payload"."pages_blocks_cta_links" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_cta_order_idx" ON "cms-payload"."pages_blocks_cta" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_cta_parent_id_idx" ON "cms-payload"."pages_blocks_cta" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_cta_path_idx" ON "cms-payload"."pages_blocks_cta" USING btree ("_path");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_content_columns_order_idx" ON "cms-payload"."pages_blocks_content_columns" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_content_columns_parent_id_idx" ON "cms-payload"."pages_blocks_content_columns" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_content_order_idx" ON "cms-payload"."pages_blocks_content" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_content_parent_id_idx" ON "cms-payload"."pages_blocks_content" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_content_path_idx" ON "cms-payload"."pages_blocks_content" USING btree ("_path");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_media_block_order_idx" ON "cms-payload"."pages_blocks_media_block" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_media_block_parent_id_idx" ON "cms-payload"."pages_blocks_media_block" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_media_block_path_idx" ON "cms-payload"."pages_blocks_media_block" USING btree ("_path");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_media_block_media_idx" ON "cms-payload"."pages_blocks_media_block" USING btree ("media_id");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_archive_order_idx" ON "cms-payload"."pages_blocks_archive" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_archive_parent_id_idx" ON "cms-payload"."pages_blocks_archive" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_archive_path_idx" ON "cms-payload"."pages_blocks_archive" USING btree ("_path");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_form_block_order_idx" ON "cms-payload"."pages_blocks_form_block" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_form_block_parent_id_idx" ON "cms-payload"."pages_blocks_form_block" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_form_block_path_idx" ON "cms-payload"."pages_blocks_form_block" USING btree ("_path");
-  CREATE INDEX IF NOT EXISTS "pages_blocks_form_block_form_idx" ON "cms-payload"."pages_blocks_form_block" USING btree ("form_id");
-  CREATE INDEX IF NOT EXISTS "pages_hero_hero_media_idx" ON "cms-payload"."pages" USING btree ("hero_media_id");
-  CREATE INDEX IF NOT EXISTS "pages_meta_meta_image_idx" ON "cms-payload"."pages" USING btree ("meta_image_id");
-  CREATE INDEX IF NOT EXISTS "pages_slug_idx" ON "cms-payload"."pages" USING btree ("slug");
-  CREATE INDEX IF NOT EXISTS "pages_updated_at_idx" ON "cms-payload"."pages" USING btree ("updated_at");
-  CREATE INDEX IF NOT EXISTS "pages_created_at_idx" ON "cms-payload"."pages" USING btree ("created_at");
-  CREATE INDEX IF NOT EXISTS "pages__status_idx" ON "cms-payload"."pages" USING btree ("_status");
-  CREATE INDEX IF NOT EXISTS "pages_rels_order_idx" ON "cms-payload"."pages_rels" USING btree ("order");
-  CREATE INDEX IF NOT EXISTS "pages_rels_parent_idx" ON "cms-payload"."pages_rels" USING btree ("parent_id");
-  CREATE INDEX IF NOT EXISTS "pages_rels_path_idx" ON "cms-payload"."pages_rels" USING btree ("path");
-  CREATE INDEX IF NOT EXISTS "pages_rels_pages_id_idx" ON "cms-payload"."pages_rels" USING btree ("pages_id");
-  CREATE INDEX IF NOT EXISTS "pages_rels_posts_id_idx" ON "cms-payload"."pages_rels" USING btree ("posts_id");
-  CREATE INDEX IF NOT EXISTS "pages_rels_categories_id_idx" ON "cms-payload"."pages_rels" USING btree ("categories_id");
-  CREATE INDEX IF NOT EXISTS "_pages_v_version_hero_links_order_idx" ON "cms-payload"."_pages_v_version_hero_links" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "_pages_v_version_hero_links_parent_id_idx" ON "cms-payload"."_pages_v_version_hero_links" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_cta_links_order_idx" ON "cms-payload"."_pages_v_blocks_cta_links" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_cta_links_parent_id_idx" ON "cms-payload"."_pages_v_blocks_cta_links" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_cta_order_idx" ON "cms-payload"."_pages_v_blocks_cta" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_cta_parent_id_idx" ON "cms-payload"."_pages_v_blocks_cta" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_cta_path_idx" ON "cms-payload"."_pages_v_blocks_cta" USING btree ("_path");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_content_columns_order_idx" ON "cms-payload"."_pages_v_blocks_content_columns" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_content_columns_parent_id_idx" ON "cms-payload"."_pages_v_blocks_content_columns" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_content_order_idx" ON "cms-payload"."_pages_v_blocks_content" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_content_parent_id_idx" ON "cms-payload"."_pages_v_blocks_content" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_content_path_idx" ON "cms-payload"."_pages_v_blocks_content" USING btree ("_path");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_media_block_order_idx" ON "cms-payload"."_pages_v_blocks_media_block" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_media_block_parent_id_idx" ON "cms-payload"."_pages_v_blocks_media_block" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_media_block_path_idx" ON "cms-payload"."_pages_v_blocks_media_block" USING btree ("_path");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_media_block_media_idx" ON "cms-payload"."_pages_v_blocks_media_block" USING btree ("media_id");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_archive_order_idx" ON "cms-payload"."_pages_v_blocks_archive" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_archive_parent_id_idx" ON "cms-payload"."_pages_v_blocks_archive" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_archive_path_idx" ON "cms-payload"."_pages_v_blocks_archive" USING btree ("_path");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_form_block_order_idx" ON "cms-payload"."_pages_v_blocks_form_block" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_form_block_parent_id_idx" ON "cms-payload"."_pages_v_blocks_form_block" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_form_block_path_idx" ON "cms-payload"."_pages_v_blocks_form_block" USING btree ("_path");
-  CREATE INDEX IF NOT EXISTS "_pages_v_blocks_form_block_form_idx" ON "cms-payload"."_pages_v_blocks_form_block" USING btree ("form_id");
-  CREATE INDEX IF NOT EXISTS "_pages_v_parent_idx" ON "cms-payload"."_pages_v" USING btree ("parent_id");
-  CREATE INDEX IF NOT EXISTS "_pages_v_version_hero_version_hero_media_idx" ON "cms-payload"."_pages_v" USING btree ("version_hero_media_id");
-  CREATE INDEX IF NOT EXISTS "_pages_v_version_meta_version_meta_image_idx" ON "cms-payload"."_pages_v" USING btree ("version_meta_image_id");
-  CREATE INDEX IF NOT EXISTS "_pages_v_version_version_slug_idx" ON "cms-payload"."_pages_v" USING btree ("version_slug");
-  CREATE INDEX IF NOT EXISTS "_pages_v_version_version_updated_at_idx" ON "cms-payload"."_pages_v" USING btree ("version_updated_at");
-  CREATE INDEX IF NOT EXISTS "_pages_v_version_version_created_at_idx" ON "cms-payload"."_pages_v" USING btree ("version_created_at");
-  CREATE INDEX IF NOT EXISTS "_pages_v_version_version__status_idx" ON "cms-payload"."_pages_v" USING btree ("version__status");
-  CREATE INDEX IF NOT EXISTS "_pages_v_created_at_idx" ON "cms-payload"."_pages_v" USING btree ("created_at");
-  CREATE INDEX IF NOT EXISTS "_pages_v_updated_at_idx" ON "cms-payload"."_pages_v" USING btree ("updated_at");
-  CREATE INDEX IF NOT EXISTS "_pages_v_latest_idx" ON "cms-payload"."_pages_v" USING btree ("latest");
-  CREATE INDEX IF NOT EXISTS "_pages_v_autosave_idx" ON "cms-payload"."_pages_v" USING btree ("autosave");
-  CREATE INDEX IF NOT EXISTS "_pages_v_rels_order_idx" ON "cms-payload"."_pages_v_rels" USING btree ("order");
-  CREATE INDEX IF NOT EXISTS "_pages_v_rels_parent_idx" ON "cms-payload"."_pages_v_rels" USING btree ("parent_id");
-  CREATE INDEX IF NOT EXISTS "_pages_v_rels_path_idx" ON "cms-payload"."_pages_v_rels" USING btree ("path");
-  CREATE INDEX IF NOT EXISTS "_pages_v_rels_pages_id_idx" ON "cms-payload"."_pages_v_rels" USING btree ("pages_id");
-  CREATE INDEX IF NOT EXISTS "_pages_v_rels_posts_id_idx" ON "cms-payload"."_pages_v_rels" USING btree ("posts_id");
-  CREATE INDEX IF NOT EXISTS "_pages_v_rels_categories_id_idx" ON "cms-payload"."_pages_v_rels" USING btree ("categories_id");
   CREATE INDEX IF NOT EXISTS "posts_slug_idx" ON "cms-payload"."posts" USING btree ("slug");
   CREATE INDEX IF NOT EXISTS "posts_thumb_idx" ON "cms-payload"."posts" USING btree ("thumb_id");
   CREATE INDEX IF NOT EXISTS "posts_image_idx" ON "cms-payload"."posts" USING btree ("image_id");
@@ -1923,14 +1281,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX IF NOT EXISTS "users_updated_at_idx" ON "cms-payload"."users" USING btree ("updated_at");
   CREATE INDEX IF NOT EXISTS "users_created_at_idx" ON "cms-payload"."users" USING btree ("created_at");
   CREATE UNIQUE INDEX IF NOT EXISTS "users_email_idx" ON "cms-payload"."users" USING btree ("email");
-  CREATE INDEX IF NOT EXISTS "redirects_from_idx" ON "cms-payload"."redirects" USING btree ("from");
-  CREATE INDEX IF NOT EXISTS "redirects_updated_at_idx" ON "cms-payload"."redirects" USING btree ("updated_at");
-  CREATE INDEX IF NOT EXISTS "redirects_created_at_idx" ON "cms-payload"."redirects" USING btree ("created_at");
-  CREATE INDEX IF NOT EXISTS "redirects_rels_order_idx" ON "cms-payload"."redirects_rels" USING btree ("order");
-  CREATE INDEX IF NOT EXISTS "redirects_rels_parent_idx" ON "cms-payload"."redirects_rels" USING btree ("parent_id");
-  CREATE INDEX IF NOT EXISTS "redirects_rels_path_idx" ON "cms-payload"."redirects_rels" USING btree ("path");
-  CREATE INDEX IF NOT EXISTS "redirects_rels_pages_id_idx" ON "cms-payload"."redirects_rels" USING btree ("pages_id");
-  CREATE INDEX IF NOT EXISTS "redirects_rels_posts_id_idx" ON "cms-payload"."redirects_rels" USING btree ("posts_id");
   CREATE INDEX IF NOT EXISTS "forms_blocks_checkbox_order_idx" ON "cms-payload"."forms_blocks_checkbox" USING btree ("_order");
   CREATE INDEX IF NOT EXISTS "forms_blocks_checkbox_parent_id_idx" ON "cms-payload"."forms_blocks_checkbox" USING btree ("_parent_id");
   CREATE INDEX IF NOT EXISTS "forms_blocks_checkbox_path_idx" ON "cms-payload"."forms_blocks_checkbox" USING btree ("_path");
@@ -1969,16 +1319,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX IF NOT EXISTS "form_submissions_form_idx" ON "cms-payload"."form_submissions" USING btree ("form_id");
   CREATE INDEX IF NOT EXISTS "form_submissions_updated_at_idx" ON "cms-payload"."form_submissions" USING btree ("updated_at");
   CREATE INDEX IF NOT EXISTS "form_submissions_created_at_idx" ON "cms-payload"."form_submissions" USING btree ("created_at");
-  CREATE INDEX IF NOT EXISTS "search_categories_order_idx" ON "cms-payload"."search_categories" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "search_categories_parent_id_idx" ON "cms-payload"."search_categories" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "search_slug_idx" ON "cms-payload"."search" USING btree ("slug");
-  CREATE INDEX IF NOT EXISTS "search_meta_meta_image_idx" ON "cms-payload"."search" USING btree ("meta_image_id");
-  CREATE INDEX IF NOT EXISTS "search_updated_at_idx" ON "cms-payload"."search" USING btree ("updated_at");
-  CREATE INDEX IF NOT EXISTS "search_created_at_idx" ON "cms-payload"."search" USING btree ("created_at");
-  CREATE INDEX IF NOT EXISTS "search_rels_order_idx" ON "cms-payload"."search_rels" USING btree ("order");
-  CREATE INDEX IF NOT EXISTS "search_rels_parent_idx" ON "cms-payload"."search_rels" USING btree ("parent_id");
-  CREATE INDEX IF NOT EXISTS "search_rels_path_idx" ON "cms-payload"."search_rels" USING btree ("path");
-  CREATE INDEX IF NOT EXISTS "search_rels_posts_id_idx" ON "cms-payload"."search_rels" USING btree ("posts_id");
   CREATE INDEX IF NOT EXISTS "payload_jobs_log_order_idx" ON "cms-payload"."payload_jobs_log" USING btree ("_order");
   CREATE INDEX IF NOT EXISTS "payload_jobs_log_parent_id_idx" ON "cms-payload"."payload_jobs_log" USING btree ("_parent_id");
   CREATE INDEX IF NOT EXISTS "payload_jobs_completed_at_idx" ON "cms-payload"."payload_jobs" USING btree ("completed_at");
@@ -2001,14 +1341,11 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_customers_id_idx" ON "cms-payload"."payload_locked_documents_rels" USING btree ("customers_id");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_events_id_idx" ON "cms-payload"."payload_locked_documents_rels" USING btree ("events_id");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_media_id_idx" ON "cms-payload"."payload_locked_documents_rels" USING btree ("media_id");
-  CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_pages_id_idx" ON "cms-payload"."payload_locked_documents_rels" USING btree ("pages_id");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_posts_id_idx" ON "cms-payload"."payload_locked_documents_rels" USING btree ("posts_id");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_tags_id_idx" ON "cms-payload"."payload_locked_documents_rels" USING btree ("tags_id");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_users_id_idx" ON "cms-payload"."payload_locked_documents_rels" USING btree ("users_id");
-  CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_redirects_id_idx" ON "cms-payload"."payload_locked_documents_rels" USING btree ("redirects_id");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_forms_id_idx" ON "cms-payload"."payload_locked_documents_rels" USING btree ("forms_id");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_form_submissions_id_idx" ON "cms-payload"."payload_locked_documents_rels" USING btree ("form_submissions_id");
-  CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_search_id_idx" ON "cms-payload"."payload_locked_documents_rels" USING btree ("search_id");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_payload_jobs_id_idx" ON "cms-payload"."payload_locked_documents_rels" USING btree ("payload_jobs_id");
   CREATE INDEX IF NOT EXISTS "payload_preferences_key_idx" ON "cms-payload"."payload_preferences" USING btree ("key");
   CREATE INDEX IF NOT EXISTS "payload_preferences_updated_at_idx" ON "cms-payload"."payload_preferences" USING btree ("updated_at");
@@ -2043,26 +1380,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "cms-payload"."_events_v" CASCADE;
   DROP TABLE "cms-payload"."_events_v_rels" CASCADE;
   DROP TABLE "cms-payload"."media" CASCADE;
-  DROP TABLE "cms-payload"."pages_hero_links" CASCADE;
-  DROP TABLE "cms-payload"."pages_blocks_cta_links" CASCADE;
-  DROP TABLE "cms-payload"."pages_blocks_cta" CASCADE;
-  DROP TABLE "cms-payload"."pages_blocks_content_columns" CASCADE;
-  DROP TABLE "cms-payload"."pages_blocks_content" CASCADE;
-  DROP TABLE "cms-payload"."pages_blocks_media_block" CASCADE;
-  DROP TABLE "cms-payload"."pages_blocks_archive" CASCADE;
-  DROP TABLE "cms-payload"."pages_blocks_form_block" CASCADE;
-  DROP TABLE "cms-payload"."pages" CASCADE;
-  DROP TABLE "cms-payload"."pages_rels" CASCADE;
-  DROP TABLE "cms-payload"."_pages_v_version_hero_links" CASCADE;
-  DROP TABLE "cms-payload"."_pages_v_blocks_cta_links" CASCADE;
-  DROP TABLE "cms-payload"."_pages_v_blocks_cta" CASCADE;
-  DROP TABLE "cms-payload"."_pages_v_blocks_content_columns" CASCADE;
-  DROP TABLE "cms-payload"."_pages_v_blocks_content" CASCADE;
-  DROP TABLE "cms-payload"."_pages_v_blocks_media_block" CASCADE;
-  DROP TABLE "cms-payload"."_pages_v_blocks_archive" CASCADE;
-  DROP TABLE "cms-payload"."_pages_v_blocks_form_block" CASCADE;
-  DROP TABLE "cms-payload"."_pages_v" CASCADE;
-  DROP TABLE "cms-payload"."_pages_v_rels" CASCADE;
   DROP TABLE "cms-payload"."posts" CASCADE;
   DROP TABLE "cms-payload"."posts_rels" CASCADE;
   DROP TABLE "cms-payload"."_posts_v" CASCADE;
@@ -2070,8 +1387,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "cms-payload"."tags" CASCADE;
   DROP TABLE "cms-payload"."users_roles" CASCADE;
   DROP TABLE "cms-payload"."users" CASCADE;
-  DROP TABLE "cms-payload"."redirects" CASCADE;
-  DROP TABLE "cms-payload"."redirects_rels" CASCADE;
   DROP TABLE "cms-payload"."forms_blocks_checkbox" CASCADE;
   DROP TABLE "cms-payload"."forms_blocks_country" CASCADE;
   DROP TABLE "cms-payload"."forms_blocks_email" CASCADE;
@@ -2086,9 +1401,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "cms-payload"."forms" CASCADE;
   DROP TABLE "cms-payload"."form_submissions_submission_data" CASCADE;
   DROP TABLE "cms-payload"."form_submissions" CASCADE;
-  DROP TABLE "cms-payload"."search_categories" CASCADE;
-  DROP TABLE "cms-payload"."search" CASCADE;
-  DROP TABLE "cms-payload"."search_rels" CASCADE;
   DROP TABLE "cms-payload"."payload_jobs_log" CASCADE;
   DROP TABLE "cms-payload"."payload_jobs" CASCADE;
   DROP TABLE "cms-payload"."payload_locked_documents" CASCADE;
@@ -2116,32 +1428,9 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "cms-payload"."enum__events_v_version_link_target";
   DROP TYPE "cms-payload"."enum__events_v_version_main_cta_target";
   DROP TYPE "cms-payload"."enum__events_v_version_status";
-  DROP TYPE "cms-payload"."enum_pages_hero_links_link_type";
-  DROP TYPE "cms-payload"."enum_pages_hero_links_link_appearance";
-  DROP TYPE "cms-payload"."enum_pages_blocks_cta_links_link_type";
-  DROP TYPE "cms-payload"."enum_pages_blocks_cta_links_link_appearance";
-  DROP TYPE "cms-payload"."enum_pages_blocks_content_columns_size";
-  DROP TYPE "cms-payload"."enum_pages_blocks_content_columns_link_type";
-  DROP TYPE "cms-payload"."enum_pages_blocks_content_columns_link_appearance";
-  DROP TYPE "cms-payload"."enum_pages_blocks_archive_populate_by";
-  DROP TYPE "cms-payload"."enum_pages_blocks_archive_relation_to";
-  DROP TYPE "cms-payload"."enum_pages_hero_type";
-  DROP TYPE "cms-payload"."enum_pages_status";
-  DROP TYPE "cms-payload"."enum__pages_v_version_hero_links_link_type";
-  DROP TYPE "cms-payload"."enum__pages_v_version_hero_links_link_appearance";
-  DROP TYPE "cms-payload"."enum__pages_v_blocks_cta_links_link_type";
-  DROP TYPE "cms-payload"."enum__pages_v_blocks_cta_links_link_appearance";
-  DROP TYPE "cms-payload"."enum__pages_v_blocks_content_columns_size";
-  DROP TYPE "cms-payload"."enum__pages_v_blocks_content_columns_link_type";
-  DROP TYPE "cms-payload"."enum__pages_v_blocks_content_columns_link_appearance";
-  DROP TYPE "cms-payload"."enum__pages_v_blocks_archive_populate_by";
-  DROP TYPE "cms-payload"."enum__pages_v_blocks_archive_relation_to";
-  DROP TYPE "cms-payload"."enum__pages_v_version_hero_type";
-  DROP TYPE "cms-payload"."enum__pages_v_version_status";
   DROP TYPE "cms-payload"."enum_posts_status";
   DROP TYPE "cms-payload"."enum__posts_v_version_status";
   DROP TYPE "cms-payload"."enum_users_roles";
-  DROP TYPE "cms-payload"."enum_redirects_to_type";
   DROP TYPE "cms-payload"."enum_forms_confirmation_type";
   DROP TYPE "cms-payload"."enum_payload_jobs_log_task_slug";
   DROP TYPE "cms-payload"."enum_payload_jobs_log_state";

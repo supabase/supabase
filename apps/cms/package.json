@@ -22,8 +22,6 @@
     "@payloadcms/payload-cloud": "3.33.0",
     "@payloadcms/plugin-form-builder": "3.33.0",
     "@payloadcms/plugin-nested-docs": "3.33.0",
-    "@payloadcms/plugin-redirects": "3.33.0",
-    "@payloadcms/plugin-search": "3.33.0",
     "@payloadcms/plugin-seo": "3.33.0",
     "@payloadcms/richtext-lexical": "3.33.0",
     "@payloadcms/storage-s3": "3.33.0",
