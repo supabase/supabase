@@ -263,7 +263,6 @@ export const SchemaGraph = () => {
             <div className="flex items-center gap-x-2">
               <ButtonTooltip
                 type="outline"
-                className="flex gap-x-1.5 items-center"
                 icon={copied ? <Check /> : <Clipboard />}
                 onClick={() => {
                   if (tables) {
