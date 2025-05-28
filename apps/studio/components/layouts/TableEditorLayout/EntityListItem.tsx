@@ -46,6 +46,7 @@ import {
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import { useTableDefinitionQuery } from 'data/database/table-definition-query'
 import { formatSql } from 'lib/formatSql'
+import { useParams } from 'common'
 
 export interface EntityListItemProps {
   id: number | string
@@ -69,6 +70,8 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
+  const { id: routeId } = useParams()
+  const currentTableId = routeId ? Number(routeId) : undefined
 
   const { data: tableDefinition, isLoading: isTableDefinitionLoading } = useTableDefinitionQuery(
     {
@@ -76,7 +79,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { enabled: isTableLikeEntityListItem(entity) }
+    { enabled: isTableLikeEntityListItem(entity) && entity.id === currentTableId }
   )
 
   // For tabs preview flag logic
