@@ -4,7 +4,7 @@ import { useEffectOnce } from 'react-use'
 
 import { IS_PLATFORM } from 'common'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useOrgOptedIntoAiAndHippaProject } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { formatSql } from 'lib/formatSql'
@@ -45,11 +45,14 @@ import { SAMPLE_QUERIES, generatePrompt } from './SqlGenerator.utils'
 import { SQLOutputActions } from './SqlOutputActions'
 
 function useSchemaMetadataForAi() {
-  const isOptedInToAI = useOrgOptedIntoAi()
+  const { isOptedInToAI, isHipaaProjectDisallowed } = useOrgOptedIntoAiAndHippaProject()
   const project = useSelectedProject()
 
   const [schemas] = useSchemasForAi(project?.ref!)
-  const includeMetadata = (isOptedInToAI || !IS_PLATFORM) && schemas.length > 0 && !!project
+  const includeMetadata =
+    ((isOptedInToAI && !isHipaaProjectDisallowed) || !IS_PLATFORM) &&
+    schemas.length > 0 &&
+    !!project
 
   const metadataSkipReason: AiMetadataSkipReason = !project ? 'no_project' : 'forbidden'
 
