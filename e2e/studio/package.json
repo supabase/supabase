@@ -9,9 +9,7 @@
     "e2e:ci": "TEST_ENV=ci playwright test",
     "e2e:selfhosted": "TEST_ENV=selfhosted playwright test",
     "e2e:dev-selfhosted": "TEST_ENV=dev-selfhosted playwright test",
-    "e2e:dev-hosted": "TEST_ENV=dev-hosted playwright test",
-    "supabase:start": "supabase start",
-    "supabase:stop": "supabase stop"
+    "e2e:dev-hosted": "TEST_ENV=dev-hosted playwright test"
   },
   "keywords": [],
   "author": "",
