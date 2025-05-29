@@ -21,6 +21,7 @@
     "common": "workspace:*",
     "common-tags": "^1.8.2",
     "dayjs": "^1.11.13",
+    "echarts": "^5.6.0",
     "framer-motion": "^11.1.9",
     "github-slugger": "^2.0.0",
     "icons": "workspace:*",

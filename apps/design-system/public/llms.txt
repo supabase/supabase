@@ -140,6 +140,8 @@ The Design System used in Supabase Studio.
     - InnerSideMenu is a component that provides a collapsible side menu with multiple sections.
 - [Logs Bar Chart](https://supabase-design-system.vercel.app/design-system/docs/fragments/logs-bar-chart)
     - A stacked bar chart that displays logs errors and successes.
+- [Horizontal Waterfall Chart](https://supabase-design-system.vercel.app/design-system/docs/fragments/horizontal-waterfall-chart)
+    - A horizontal waterfall chart.
 - [Modal](https://supabase-design-system.vercel.app/design-system/docs/fragments/modal)
     - A window overlaid on either the primary window or another dialog window, rendering the content underneath inert.
 - [Multi Select](https://supabase-design-system.vercel.app/design-system/docs/fragments/multi-select)
