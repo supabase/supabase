@@ -2,7 +2,8 @@
 
 import { useCallback, type ComponentPropsWithoutRef, type PropsWithChildren } from 'react'
 import { Tabs as TabsPrimitive, type TabsProps } from 'ui'
-import { withQueryParams, withSticky, type QueryParamsProps } from 'ui-patterns/ComplexTabs'
+import { withQueryParams, withSticky } from 'ui-patterns/ComplexTabs'
+import type { QueryParamsProps } from 'ui-patterns'
 import { useTocRerenderTrigger } from '~/features/docs/GuidesMdx.state'
 
 const TabsWithStickyAndQueryParams = withSticky<PropsWithChildren<TabsProps & QueryParamsProps>>(

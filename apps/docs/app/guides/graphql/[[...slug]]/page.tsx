@@ -1,11 +1,11 @@
-import { type SerializeOptions } from 'next-mdx-remote/dist/types'
+import type { serialize } from 'next-mdx-remote/serialize'
 import { notFound } from 'next/navigation'
-import { isAbsolute, relative } from 'path'
+import { isAbsolute, relative } from 'node:path'
 import rehypeSlug from 'rehype-slug'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { REVALIDATION_TAGS } from '~/features/helpers.fetch'
-import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
+import { type UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
@@ -116,7 +116,7 @@ const PGGraphQLDocs = async (props: { params: Promise<Params> }) => {
       remarkPlugins: [remarkMkDocsAdmonition, remarkPyMdownTabs, [removeTitle, meta.title]],
       rehypePlugins: [[linkTransform, urlTransform], rehypeSlug],
     },
-  } as SerializeOptions
+  } as Parameters<typeof serialize>[1]
 
   return <GuideTemplate mdxOptions={options} meta={meta} {...data} />
 }

@@ -1,14 +1,14 @@
-import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import { MDXRemote } from 'next-mdx-remote/rsc'
-import { type ComponentProps } from 'react'
+import type { ComponentProps } from 'react'
 import remarkGfm from 'remark-gfm'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 
 import { preprocessMdxWithDefaults } from '~/features/directives/utils'
 import { components } from '~/features/docs/MdxBase.shared'
+import type { serialize } from 'next-mdx-remote/serialize'
 
-const mdxOptions: SerializeOptions = {
+const mdxOptions: Parameters<typeof serialize>[1] = {
   mdxOptions: {
     useDynamicImport: true,
     remarkPlugins: [[remarkMath, { singleDollarTextMath: false }], remarkGfm],
@@ -47,7 +47,7 @@ const MDXRemoteBase = async ({
       remarkPlugins: [...(originalRemarkPlugins ?? []), ...(remarkPlugins ?? [])],
       rehypePlugins: [...(originalRehypePlugins ?? []), ...(rehypePlugins ?? [])],
     },
-  } as SerializeOptions
+  } as Parameters<typeof serialize>[1]
 
   return (
     <MDXRemote

@@ -1,6 +1,5 @@
 import { Octokit } from '@octokit/core'
 import { capitalize } from 'lodash'
-import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import rehypeSlug from 'rehype-slug'
 
 import { Heading } from 'ui'
@@ -10,10 +9,11 @@ import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
 import { Tabs, TabPanel } from '~/features/ui/Tabs'
-import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
+import { type UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
+import type { serialize } from 'next-mdx-remote/serialize'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -51,7 +51,7 @@ const DatabaseAdvisorDocs = async () => {
       remarkPlugins: [remarkMkDocsAdmonition, remarkPyMdownTabs, [removeTitle, meta.title]],
       rehypePlugins: [[linkTransform, urlTransform(lintsList)], rehypeSlug],
     },
-  } as SerializeOptions
+  } as Parameters<typeof serialize>[1]
 
   return (
     <GuideTemplate meta={meta} editLink={editLink}>

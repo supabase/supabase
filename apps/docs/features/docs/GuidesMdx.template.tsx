@@ -1,6 +1,6 @@
 import { ExternalLink } from 'lucide-react'
-import { type SerializeOptions } from 'next-mdx-remote/dist/types'
-import { type ReactNode } from 'react'
+import type { serialize } from 'next-mdx-remote/serialize'
+import type { ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
 
 import { cn } from 'ui'
@@ -10,7 +10,7 @@ import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import type { WithRequired } from '~/features/helpers.types'
-import { type GuideFrontmatter } from '~/lib/docs'
+import type { GuideFrontmatter } from '~/lib/docs'
 
 const EDIT_LINK_SYMBOL = Symbol('edit link')
 interface EditLink {
@@ -53,7 +53,7 @@ interface BaseGuideTemplateProps {
   content?: string
   children?: ReactNode
   editLink: EditLink
-  mdxOptions?: SerializeOptions
+  mdxOptions?: Parameters<typeof serialize>[1]
 }
 
 type GuideTemplateProps =

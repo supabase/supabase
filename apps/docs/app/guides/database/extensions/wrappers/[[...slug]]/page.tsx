@@ -1,5 +1,5 @@
 import matter from 'gray-matter'
-import { type SerializeOptions } from 'next-mdx-remote/dist/types'
+import type { serialize } from 'next-mdx-remote/serialize'
 import { readFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import rehypeSlug from 'rehype-slug'
@@ -12,7 +12,7 @@ import {
 } from '~/features/docs/GuidesMdx.utils'
 import { REVALIDATION_TAGS } from '~/features/helpers.fetch'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter } from '~/lib/docs'
-import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
+import { type UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
@@ -223,7 +223,7 @@ const WrappersDocs = async (props: { params: Promise<Params> }) => {
           ],
           rehypePlugins: [[linkTransform, urlTransform], rehypeSlug],
         },
-      } as SerializeOptions)
+      } as Parameters<typeof serialize>[1])
     : undefined
 
   return <GuideTemplate meta={meta} mdxOptions={options} {...data} />

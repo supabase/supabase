@@ -1,6 +1,5 @@
 import matter from 'gray-matter'
 import { serialize } from 'next-mdx-remote/serialize'
-import type { SerializeOptions } from 'next-mdx-remote/dist/types'
 import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
 import { basename, extname, join, sep } from 'node:path'
@@ -126,7 +125,7 @@ export async function getGuidesStaticProps(
     return
   }
 
-  const mdxOptions: SerializeOptions = {
+  const mdxOptions: Parameters<typeof serialize>[1] = {
     mdxOptions: {
       useDynamicImport: true,
       remarkPlugins: [[remarkMath, { singleDollarTextMath: false }], remarkGfm],

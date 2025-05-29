@@ -6,7 +6,8 @@
     "module": "ESNext",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "isolatedModules": false
+    "isolatedModules": false,
+    "incremental": true
   },
   "include": [".contentlayer/generated", "scripts/**/*.ts"],
   "exclude": ["node_modules"]
