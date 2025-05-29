@@ -324,7 +324,7 @@ importers:
       libpg-query:
         specifier: 15.2.0
         version: 15.2.0(encoding@0.1.13)(supports-color@8.1.1)
-      lodash:
+      lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
       lucide-react:
@@ -484,6 +484,9 @@ importers:
       '@types/jsrsasign':
         specifier: ^10.5.12
         version: 10.5.12
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       '@types/mdast':
         specifier: ^3.0.0
         version: 3.0.15
@@ -7690,6 +7693,9 @@ packages:
 
   '@types/katex@0.16.7':
     resolution: {integrity: sha512-HMwFiRujE5PjrgwHQ25+bsLJgowjGjm5Z8FVSf0N6PwgJrwxH0QxzHYDcKsTfV3wva0vzrpqMTJS2jXPr5BMEQ==}
+
+  '@types/lodash-es@4.17.12':
+    resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
 
   '@types/lodash.template@4.5.0':
     resolution: {integrity: sha512-4LgHxK16IPbGR7TmXpPvNT7iNGsLCdQY6Rc0mi1a/JECt8et/D4hx6NMVAJej/d932sj1mJsg0QYHKL189O0Qw==}
@@ -23522,9 +23528,13 @@ snapshots:
 
   '@types/katex@0.16.7': {}
 
+  '@types/lodash-es@4.17.12':
+    dependencies:
+      '@types/lodash': 4.17.16
+
   '@types/lodash.template@4.5.0':
     dependencies:
-      '@types/lodash': 4.17.5
+      '@types/lodash': 4.17.16
 
   '@types/lodash@4.17.16': {}
 
