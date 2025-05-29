@@ -39,7 +39,7 @@ export const MediaBlock: React.FC<Props> = (props) => {
         {
           container: enableGutter,
         },
-        className,
+        className
       )}
     >
       {(media || staticImage) && (
@@ -56,7 +56,7 @@ export const MediaBlock: React.FC<Props> = (props) => {
             {
               container: !disableInnerContainer,
             },
-            captionClassName,
+            captionClassName
           )}
         >
           <RichText data={caption} enableGutter={false} />

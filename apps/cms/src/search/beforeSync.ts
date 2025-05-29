@@ -35,7 +35,7 @@ export const beforeSyncWithSearch: BeforeSync = async ({ originalDoc, searchDoc 
       modifiedDoc.categories = mappedCategories
     } catch (_err) {
       console.error(
-        `Failed. Category not found when syncing collection '${collection}' with id: '${id}' to search.`,
+        `Failed. Category not found when syncing collection '${collection}' with id: '${id}' to search.`
       )
     }
   }

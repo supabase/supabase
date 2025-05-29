@@ -62,7 +62,7 @@ export const SlugComponent: React.FC<SlugComponentProps> = ({
         value: !checkboxValue,
       })
     },
-    [checkboxValue, checkboxFieldPath, dispatchFields],
+    [checkboxValue, checkboxFieldPath, dispatchFields]
   )
 
   const readOnly = readOnlyFromProps || checkboxValue

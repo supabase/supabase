@@ -62,14 +62,14 @@ export const SeedButton: React.FC = () => {
             loading: 'Seeding with data....',
             success: <SuccessMessage />,
             error: 'An error occurred while seeding.',
-          },
+          }
         )
       } catch (err) {
         const error = err instanceof Error ? err.message : String(err)
         setError(error)
       }
     },
-    [loading, seeded, error],
+    [loading, seeded, error]
   )
 
   let message = ''

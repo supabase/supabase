@@ -27,7 +27,7 @@ const buttonVariants = cva(
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
       },
     },
-  },
+  }
 )
 
 export interface ButtonProps
