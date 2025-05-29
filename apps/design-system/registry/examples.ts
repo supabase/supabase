@@ -1227,4 +1227,39 @@ export const examples: Registry = [
     type: 'components:example',
     files: ['example/logs-bar-chart.tsx'],
   },
+  {
+    name: 'flame-graph',
+    type: 'components:example',
+    files: ['example/flame-graph.tsx'],
+  },
+  {
+    name: 'flame-graph-colorMode-width',
+    type: 'components:example',
+    registryDependencies: ['flame-graph'],
+    files: ['example/flame-graph-colorMode-width.tsx'],
+  },
+  {
+    name: 'flame-graph-data-violations',
+    type: 'components:example',
+    registryDependencies: ['flame-graph'],
+    files: ['example/flame-graph-data-violations.tsx'],
+  },
+  {
+    name: 'flame-graph-orphan-children',
+    type: 'components:example',
+    registryDependencies: ['flame-graph'],
+    files: ['example/flame-graph-orphan-children.tsx'],
+  },
+  {
+    name: 'flame-graph-no-root',
+    type: 'components:example',
+    registryDependencies: ['flame-graph'],
+    files: ['example/flame-graph-no-root.tsx'],
+  },
+  {
+    name: 'flame-graph-multiple-root',
+    type: 'components:example',
+    registryDependencies: ['flame-graph'],
+    files: ['example/flame-graph-multiple-root.tsx'],
+  },
 ]
