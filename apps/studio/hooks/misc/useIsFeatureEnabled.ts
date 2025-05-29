@@ -2,7 +2,7 @@ import type { Feature } from 'data/profile/types'
 import { useProfile } from 'lib/profile'
 
 function checkFeature(feature: Feature, features?: Feature[]) {
-  return !features?.includes(feature) ?? true
+  return features ? features.includes(feature) : true
 }
 
 type SnakeToCamelCase<S extends string> = S extends `${infer First}_${infer Rest}`
