@@ -2084,7 +2084,10 @@ export const security: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Production Checklist', url: '/guides/deployment/going-into-prod' },
-        { name: 'Shared Responsibility Model', url: '/guides/deployment/shared-responsibility-model' },
+        {
+          name: 'Shared Responsibility Model',
+          url: '/guides/deployment/shared-responsibility-model',
+        },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         { name: 'Hardening the Data API', url: '/guides/database/hardening-data-api' },
       ],
