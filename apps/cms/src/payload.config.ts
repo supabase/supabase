@@ -48,16 +48,7 @@ export default buildConfig({
       ],
     },
   },
-  collections: [
-    Authors,
-    Categories,
-    Customers,
-    Events,
-    Media,
-    Posts,
-    Tags, 
-    Users
-  ],
+  collections: [Authors, Categories, Customers, Events, Media, Posts, Tags, Users],
   editor: defaultLexical,
   secret: process.env.PAYLOAD_SECRET,
   typescript: {
@@ -71,5 +62,5 @@ export default buildConfig({
     schemaName: 'cms-payload',
   }),
   sharp,
-  plugins
+  plugins,
 })

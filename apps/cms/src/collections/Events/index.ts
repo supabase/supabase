@@ -149,16 +149,16 @@ export const Events: CollectionConfig = {
               name: 'showEndDate',
               type: 'checkbox',
               defaultValue: false,
-              admin: {
-              },
+              admin: {},
             },
             {
               name: 'endDate',
               type: 'date',
               admin: {
-                description: 'If "showEndDate" is true, this will define when the event terminates.',
+                description:
+                  'If "showEndDate" is true, this will define when the event terminates.',
                 condition: (data) => {
-                  return data.showEndDate;
+                  return data.showEndDate
                 },
               },
             },
@@ -166,7 +166,8 @@ export const Events: CollectionConfig = {
               name: 'duration',
               type: 'text',
               admin: {
-                description: 'Text string to display on the event page to indicate the duration of the event. (e.g. "45 mins", "2 days")',
+                description:
+                  'Text string to display on the event page to indicate the duration of the event. (e.g. "45 mins", "2 days")',
               },
             },
             {
@@ -174,7 +175,8 @@ export const Events: CollectionConfig = {
               type: 'checkbox',
               defaultValue: false,
               admin: {
-                description: 'Events that are will remain available on the events page after the event has ended.',
+                description:
+                  'Events that are will remain available on the events page after the event has ended.',
               },
             },
             {
@@ -182,16 +184,18 @@ export const Events: CollectionConfig = {
               type: 'checkbox',
               defaultValue: false,
               admin: {
-                description: "When true, the event page will not be built. It will link directly to an external event page (requires Link to be set)",
+                description:
+                  'When true, the event page will not be built. It will link directly to an external event page (requires Link to be set)',
               },
             },
             {
               name: 'link',
               type: 'group',
               admin: {
-                description: 'Used on event previews to link to a custom page if "disablePageBuild" is true.',
+                description:
+                  'Used on event previews to link to a custom page if "disablePageBuild" is true.',
                 condition: (data) => {
-                  return data.disablePageBuild;
+                  return data.disablePageBuild
                 },
               },
               fields: [
@@ -246,7 +250,7 @@ export const Events: CollectionConfig = {
                   type: 'text',
                   admin: {
                     description: 'Text for the main CTA button if "mainCta.disabled" is true.',
-                    condition: (data) => data.mainCta.disabled
+                    condition: (data) => data.mainCta.disabled,
                   },
                 },
               ],
@@ -265,22 +269,23 @@ export const Events: CollectionConfig = {
                   type: 'checkbox',
                   defaultValue: false,
                   admin: {
-                    description: 'If an external company is collaborating with the event, this will display their logo on the event page.',
-                  }
+                    description:
+                      'If an external company is collaborating with the event, this will display their logo on the event page.',
+                  },
                 },
                 {
                   name: 'name',
                   type: 'text',
                   required: false,
                   admin: {
-                    condition: (data) => data.company.showCompany
+                    condition: (data) => data.company.showCompany,
                   },
                 },
                 {
                   name: 'websiteUrl',
                   type: 'text',
                   admin: {
-                    condition: (data) => data.company.showCompany
+                    condition: (data) => data.company.showCompany,
                   },
                 },
                 {
@@ -289,7 +294,7 @@ export const Events: CollectionConfig = {
                   relationTo: 'media',
                   required: false,
                   admin: {
-                    condition: (data) => data.company.showCompany
+                    condition: (data) => data.company.showCompany,
                   },
                 },
                 {
@@ -299,7 +304,7 @@ export const Events: CollectionConfig = {
                   required: false,
                   admin: {
                     description: 'Light mode logo',
-                    condition: (data) => data.company.showCompany
+                    condition: (data) => data.company.showCompany,
                   },
                 },
               ],
@@ -313,7 +318,8 @@ export const Events: CollectionConfig = {
                   type: 'checkbox',
                   defaultValue: false,
                   admin: {
-                    description: 'Could be speakers, authors, guests, etc. It would source from Authors collections.',
+                    description:
+                      'Could be speakers, authors, guests, etc. It would source from Authors collections.',
                   },
                 },
                 {
@@ -322,10 +328,10 @@ export const Events: CollectionConfig = {
                   relationTo: 'authors',
                   hasMany: true,
                   admin: {
-                    condition: (data) => data.participants.showParticipants
+                    condition: (data) => data.participants.showParticipants,
                   },
                 },
-              ]
+              ],
             },
           ],
         },

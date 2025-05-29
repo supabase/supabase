@@ -4,8 +4,6 @@ import {
   InlineToolbarFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
-import path from 'path'
-import { fileURLToPath } from 'url'
 
 import { isAnyone } from '@/access/isAnyone'
 import { isAuthenticated } from '@/access/isAuthenticated'
@@ -22,7 +20,6 @@ export const Media: CollectionConfig = {
     {
       name: 'alt',
       type: 'text',
-      // required: true,
     },
     {
       name: 'caption',

@@ -42,7 +42,7 @@
     "eslint": "^9.16.0",
     "eslint-config-next": "15.3.0",
     "prettier": "^3.4.2",
-    "typescript": "5.7.3"
+    "typescript": "~5.4.5"
   },
   "engines": {
     "node": "^18.20.2 || >=20.9.0",

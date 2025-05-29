@@ -17,7 +17,6 @@ import { Code } from '../../blocks/Code/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
 import { Quote } from '../../blocks/Quote/config'
 import { YouTube } from '../../blocks/YouTube/config'
-import { generatePreviewPath } from '../../utilities/generatePreviewPath'
 import { populateAuthors } from './hooks/populateAuthors'
 import { revalidateDelete, revalidatePost } from './hooks/revalidatePost'
 
@@ -36,7 +35,7 @@ export const Posts: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
-      url: ({ data, req }) => {
+      url: ({ data }) => {
         const baseUrl = process.env.BLOG_APP_URL || 'http://localhost:3000'
         // Always use the preview route for live preview to ensure draft mode is enabled
         return `${baseUrl}/api/preview?slug=${data?.slug}&secret=${process.env.PREVIEW_SECRET || 'preview-secret'}`

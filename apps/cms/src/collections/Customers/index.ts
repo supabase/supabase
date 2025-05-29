@@ -238,7 +238,6 @@ export const Customers: CollectionConfig = {
             }),
             MetaTitleField({
               hasGenerateFn: true,
-
             }),
             MetaImageField({
               relationTo: 'media',

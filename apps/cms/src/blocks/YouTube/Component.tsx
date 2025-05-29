@@ -19,4 +19,4 @@ export const YouTubeBlock: React.FC<Props> = ({ className, youtubeId }) => {
       />
     </div>
   )
-} 
+}

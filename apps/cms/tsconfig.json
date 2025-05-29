@@ -23,14 +23,14 @@
     "isolatedModules": true,
     "plugins": [
       {
-        "name": "next"
-      }
+        "name": "next",
+      },
     ],
     "paths": {
       "@payload-config": ["./src/payload.config.ts"],
       "react": ["./node_modules/@types/react"],
-      "@/*": ["./src/*"]
-    }
+      "@/*": ["./src/*"],
+    },
   },
   "include": [
     "**/*.ts",
@@ -38,7 +38,7 @@
     ".next/types/**/*.ts",
     "redirects.js",
     "next.config.js",
-    "next-sitemap.config.cjs"
+    "next-sitemap.config.cjs",
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
 }

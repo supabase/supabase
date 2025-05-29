@@ -12,7 +12,7 @@ import { getServerSideURL } from '@/utilities/getURL'
 
 const siteName = 'Supabase'
 
-const generateTitle: GenerateTitle<Post & Customer & Event> = ({ doc, collectionSlug,...rest }) => {
+const generateTitle: GenerateTitle<Post & Customer & Event> = ({ doc, collectionSlug }) => {
   switch (collectionSlug) {
     case 'customers':
       return `${doc.name} | ${siteName} Customer Stories`
@@ -21,7 +21,7 @@ const generateTitle: GenerateTitle<Post & Customer & Event> = ({ doc, collection
     case 'posts':
       return doc.title
     default:
-        return `${doc.title} | ${siteName}`
+      return `${doc.title} | ${siteName}`
   }
 }
 
