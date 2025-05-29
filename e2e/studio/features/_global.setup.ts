@@ -1,7 +1,7 @@
 import { expect, test as setup } from '@playwright/test'
 import dotenv from 'dotenv'
 import path from 'path'
-import { Env, ENV, getApiUrl, getStudioUrl, STORAGE_STATE_PATH } from '../env.config'
+import { env, STORAGE_STATE_PATH } from '../env.config'
 
 /**
  * Run any setup tasks for the tests.
@@ -15,38 +15,12 @@ dotenv.config({
 
 const IS_PLATFORM = process.env.IS_PLATFORM
 
-const ENVS_WITH_AUTH: Env[] = ['staging', 'production', 'dev-hosted', 'ci']
-
-const AUTH_ENV = {
-  'dev-hosted': {
-    email: process.env.DEV_HOSTED_EMAIL,
-    password: process.env.DEV_HOSTED_PASSWORD,
-    projectRef: process.env.DEV_HOSTED_PROJECT_REF,
-  },
-  staging: {
-    email: process.env.STAGING_EMAIL,
-    password: process.env.STAGING_PASSWORD,
-    projectRef: process.env.STAGING_PROJECT_REF,
-  },
-  production: {
-    email: process.env.PRODUCTION_EMAIL,
-    password: process.env.PRODUCTION_PASSWORD,
-    projectRef: process.env.PRODUCTION_PROJECT_REF,
-  },
-  ci: {
-    email: process.env.CI_EMAIL,
-    password: process.env.CI_PASSWORD,
-    projectRef: process.env.CI_PROJECT_REF,
-  },
-} as const
-
-const envHasAuth = ENVS_WITH_AUTH.includes(ENV)
+const envHasAuth = env.AUTHENTICATION
 
 setup('Global Setup', async ({ page }) => {
   console.log(`\n 🧪 Setting up test environment.
-    - Environment: ${ENV}
-    - Studio URL: ${getStudioUrl()}
-    - API URL: ${getApiUrl()}
+    - Studio URL: ${env.STUDIO_URL}
+    - API URL: ${env.API_URL}
     - Auth: ${envHasAuth ? 'enabled' : 'disabled'}
     - Is Platform: ${IS_PLATFORM}
     `)
@@ -55,8 +29,8 @@ setup('Global Setup', async ({ page }) => {
    * Studio Check
    */
 
-  const studioUrl = getStudioUrl()
-  const apiUrl = getApiUrl()
+  const studioUrl = env.STUDIO_URL
+  const apiUrl = env.API_URL
 
   await page.goto(studioUrl).catch((err) => {
     console.error(
@@ -95,12 +69,11 @@ To start API locally, run:
   /**
    * Only run authentication if the environment requires it
    */
-  if (!ENVS_WITH_AUTH.includes(ENV)) {
-    console.log(`\n 🔑 Skipping authentication for ${ENV}`)
+  if (!env.AUTHENTICATION) {
+    console.log(`\n 🔑 Skipping authentication for ${env.STUDIO_URL}`)
     return
   } else {
-    const env = AUTH_ENV[ENV]
-    if (!env.email || !env.password || !env.projectRef) {
+    if (!env.EMAIL || !env.PASSWORD || !env.PROJECT_REF) {
       console.error(`Missing environment variables. Check README.md for more information.`)
       throw new Error('Missing environment variables')
     }
@@ -140,7 +113,11 @@ To start API locally, run:
     }
   }
 
-  const auth = AUTH_ENV[ENV]
+  const auth = {
+    email: env.EMAIL,
+    password: env.PASSWORD,
+    projectRef: env.PROJECT_REF,
+  }
 
   expect(auth).toBeDefined()
   expect(auth.email).toBeDefined()

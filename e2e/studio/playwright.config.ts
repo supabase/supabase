@@ -1,5 +1,9 @@
 import { defineConfig } from '@playwright/test'
-import { ENV_URLS, ENV, STORAGE_STATE_PATH } from './env.config'
+import { env, STORAGE_STATE_PATH } from './env.config'
+import dotenv from 'dotenv'
+import path from 'path'
+
+dotenv.config({ path: path.resolve(__dirname, '.env.local') })
 
 const IS_CI = !!process.env.CI
 
@@ -10,7 +14,7 @@ export default defineConfig({
   forbidOnly: IS_CI,
   retries: 3,
   use: {
-    baseURL: ENV_URLS[ENV],
+    baseURL: env.STUDIO_URL,
     screenshot: 'off',
     video: 'retain-on-failure',
     headless: IS_CI,

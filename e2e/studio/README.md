@@ -1,18 +1,58 @@
 # Supabase Studio E2E Tests
 
-## Goal
-
-Make sure new features, bug fixes or refactors do not break existing functionality.
-
----
-
 ## Set up
 
 ```bash
 cp .env.local.example .env.local
 ```
 
-Edit the `.env.local` file with your credentials.
+Edit the `.env.local` file with your credentials and environment.
+
+## Environments
+
+### Staging
+
+```bash
+STUDIO_URL=https://supabase.green/dashboard
+API_URL=https://api.supabase.green
+AUTHENTICATION=true
+EMAIL=your@email.com
+PASSWORD=yourpassword
+PROJECT_REF=yourprojectref
+```
+
+### CLI (NO AUTH)
+
+You'll need to run the CLI locally.
+
+```bash
+STUDIO_URL=http://localhost:54323
+API_URL=http://localhost:54323/api
+AUTHENTICATION=false
+```
+
+### CLI Development (NO AUTH)
+
+You'll need to run Studio in development mode with `IS_PLATFORM=false`
+
+```bash
+STUDIO_URL=http://localhost:8082/
+API_URL=http://localhost:8082/api
+AUTHENTICATION=false
+```
+
+### Hosted Development
+
+You'll need to run Studio in development mode with `IS_PLATFORM=true`
+
+```bash
+STUDIO_URL=http://localhost:8082/
+API_URL=http://localhost:8080/api
+AUTHENTICATION=true
+EMAIL=your@email.com
+PASSWORD=yourpassword
+PROJECT_REF=yourprojectref
+```
 
 ---
 
@@ -23,7 +63,7 @@ Check the `package.json` for the available commands and environments.
 #### Example:
 
 ```bash
-npm run e2e:dev-selfhosted
+npm run e2e:dev-cli
 ```
 
 With Playwright UI:

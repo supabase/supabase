@@ -33,9 +33,9 @@ jobs:
     continue-on-error: true
 
     env:
-      CI_EMAIL: ${{ secrets.CI_EMAIL }}
-      CI_PASSWORD: ${{ secrets.CI_PASSWORD }}
-      CI_PROJECT_REF: ${{ secrets.CI_PROJECT_REF }}
+      EMAIL: ${{ secrets.CI_EMAIL }}
+      PASSWORD: ${{ secrets.CI_PASSWORD }}
+      PROJECT_REF: ${{ secrets.CI_PROJECT_REF }}
       NEXT_PUBLIC_IS_PLATFORM: true
       NEXT_PUBLIC_API_URL: https://api.supabase.green
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}

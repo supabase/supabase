@@ -1,5 +1,5 @@
-import { getStudioUrl } from '../env.config'
+import { env } from '../env.config'
 
 export function toUrl(path: `/${string}`) {
-  return `${getStudioUrl()}${path}`
+  return `${env.STUDIO_URL}${path}`
 }
