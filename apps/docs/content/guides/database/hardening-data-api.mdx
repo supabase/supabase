@@ -4,7 +4,7 @@ title: 'Hardening the Data API'
 
 Your database's auto-generated Data API exposes the `public` schema by default. You can change this to any schema in your database, or even disable the Data API completely.
 
-Any tables that are accsible through the Data API _must_ have [Row Level Security](/docs/guides/database/postgres/row-level-security) enabled. Row Level Security (RLS) is enabled by default when you create tables from the Supabase Dashboard.
+Any tables that are accesible through the Data API _must_ have [Row Level Security](/docs/guides/database/postgres/row-level-security) enabled. Row Level Security (RLS) is enabled by default when you create tables from the Supabase Dashboard.
 
 ## Shared responsibility
 
@@ -15,7 +15,7 @@ Your application's security is your responsibility as a developer. This includes
 
 ## Private schemas
 
-We highly recommend creating a `private` schema for storing tables that you do not want to expose via the Data API. These tables can be accessed via Supabase Edge Functions or any other serverside tool. In this model, you should implement your security model in your serverside code. Although it's not required, we _still_ recommend enabling RLS for private tables and then connecting to your database using a Postgres role with `bypassrls` priveleges.
+We highly recommend creating a `private` schema for storing tables that you do not want to expose via the Data API. These tables can be accessed via Supabase Edge Functions or any other serverside tool. In this model, you should implement your security model in your serverside code. Although it's not required, we _still_ recommend enabling RLS for private tables and then connecting to your database using a Postgres role with `bypassrls` privileges.
 
 ## Managing the public schema
 
