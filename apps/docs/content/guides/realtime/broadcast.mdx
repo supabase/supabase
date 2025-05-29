@@ -76,11 +76,14 @@ Go to your Supabase project's [API Settings](https://supabase.com/dashboard/proj
   <TabPanel id="python" label="Python">
 
     ```python
-    from supabase import create_client
+    from supabase import acreate_client
 
     URL = "https://<project>.supabase.co"
     KEY = "<your-anon-key>"
-    supabase = create_client(URL, KEY)
+
+    async def create_supabase():
+      supabase = await acreate_client(URL, KEY)
+      return supabase
     ```
 
   </TabPanel>
@@ -190,7 +193,7 @@ You can provide a callback for the `broadcast` channel to receive message. This 
       print(f"Broadcast received: {payload}")
 
     # Subscribe to the Channel
-    my_channel
+    await my_channel
       .on_broadcast('shout', message_received) # Listen for "shout". Can be "*" to listen to all events
       .subscribe()
     ```
@@ -332,12 +335,12 @@ You can use the Supabase client libraries to send Broadcast messages.
       if status != RealtimeSubscribeStates.SUBSCRIBED:
         return
 
-      my_channel.send_broadcast(
+      asyncio.create_task(my_channel.send_broadcast(
         'shout',
         { "message": 'hello, world' },
-      )
+      ))
 
-    my_channel.subscribe(on_subscribe)
+    await my_channel.subscribe(on_subscribe)
     ```
 
   </TabPanel>
