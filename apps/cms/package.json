@@ -26,7 +26,10 @@
     "@payloadcms/richtext-lexical": "3.33.0",
     "@payloadcms/storage-s3": "3.33.0",
     "@payloadcms/ui": "3.33.0",
+    "common": "workspace:*",
+    "config": "workspace:*",
     "cross-env": "^7.0.3",
+    "eslint-config-supabase": "workspace:*",
     "graphql": "^16.8.1",
     "next": "catalog:",
     "payload": "3.33.0",
@@ -35,13 +38,9 @@
     "sharp": "0.32.6"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.2.0",
     "@types/node": "catalog:",
-    "@types/react": "catalog:",
+    "@types/react": "eslint/eslintrc:",
     "@types/react-dom": "catalog:",
-    "eslint": "^9.16.0",
-    "eslint-config-next": "15.3.0",
-    "prettier": "^3.4.2",
     "typescript": "5.7.3"
   },
   "engines": {
