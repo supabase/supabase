@@ -74,6 +74,7 @@ const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabProps>(
 
     const ContentFile = useMemo(() => {
       return dynamic<ConnectContentTabProps>(() => import(`./content/${filePath}/content`), {
+        ssr: false,
         loading: () => (
           <div className="p-4 min-h-[331px]">
             <GenericSkeletonLoader />

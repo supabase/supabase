@@ -5,9 +5,8 @@ module.exports = config({
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
     // purge styles from grid library
-    '!./../../packages/ui-patterns/node_modules/**/*', // ignore node_modules rule
     './../../packages/ui/src/**/*.{tsx,ts,js}',
-    './../../packages/ui-patterns/**/*.{tsx,ts,js}',
+    './../../packages/ui-patterns/src/**/*.{tsx,ts,js}',
   ],
   plugins: [require('@tailwindcss/container-queries')],
   theme: {

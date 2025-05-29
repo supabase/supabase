@@ -88,6 +88,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
       if (childId) {
         return dynamic(() => import('../Queues/QueueTab').then((mod) => mod.QueueTab), {
+          ssr: false,
           loading: Loading,
         })
       }
