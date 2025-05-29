@@ -3,14 +3,8 @@ import dayjs from 'dayjs'
 import Error from 'next/error'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { LW14_DATE, LW14_TITLE, LW14_URL, SITE_ORIGIN } from '~/lib/constants'
-import { LwView } from '~/components/LaunchWeek/14/LwView'
-import {
-  Lw14ConfDataProvider,
-  UserTicketData,
-} from '~/components/LaunchWeek/14/hooks/use-conf-data'
+import { UserTicketData } from '~/components/LaunchWeek/14/hooks/use-conf-data'
 import { createClient } from '@supabase/supabase-js'
-import DefaultLayout from '~/components/Layouts/Default'
-import { Tunnel } from '~/components/LaunchWeek/14/Tunnel'
 
 interface Props {
   user: UserTicketData
@@ -45,12 +39,6 @@ const Lw14Page = ({ user, ogImageUrl }: Props) => {
           ],
         }}
       />
-
-      <Lw14ConfDataProvider initState={{ partymodeStatus: 'on' }}>
-        <DefaultLayout className='font-["Departure_Mono"] lg:pt-32 border-b pb-0 md:pb-16 lg:!pb-[230px]'>
-          <LwView />
-        </DefaultLayout>
-      </Lw14ConfDataProvider>
     </>
   )
 }
