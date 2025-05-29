@@ -127,7 +127,7 @@
     "@types/jsrsasign": "^10.5.12",
     "@types/mdast": "^3.0.0",
     "@types/node": "catalog:",
-    "@types/react": "eslint/eslintrc:",
+    "@types/react": "catalog:",
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-dom": "catalog:",
     "@types/unist": "^2.0.6",
