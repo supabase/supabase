@@ -1,6 +1,6 @@
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
-export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
+export async function up({ db }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
    CREATE TYPE "cms-payload"."enum_customers_industry" AS ENUM('healthcare', 'fintech', 'ecommerce', 'education', 'gaming', 'media', 'real-estate', 'saas', 'social', 'analytics', 'ai', 'developer-tools');
   CREATE TYPE "cms-payload"."enum_customers_supabase_products" AS ENUM('database', 'auth', 'storage', 'realtime', 'functions', 'vector');
@@ -25,7 +25,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "cms-payload"."enum_posts_status" AS ENUM('draft', 'published');
   CREATE TYPE "cms-payload"."enum__posts_v_version_status" AS ENUM('draft', 'published');
   CREATE TYPE "cms-payload"."enum_users_roles" AS ENUM('admin', 'editor');
-  CREATE TYPE "cms-payload"."enum_forms_confirmation_type" AS ENUM('message', 'redirect');
   CREATE TYPE "cms-payload"."enum_payload_jobs_log_task_slug" AS ENUM('inline', 'schedulePublish');
   CREATE TYPE "cms-payload"."enum_payload_jobs_log_state" AS ENUM('failed', 'succeeded');
   CREATE TYPE "cms-payload"."enum_payload_jobs_task_slug" AS ENUM('inline', 'schedulePublish');
@@ -438,164 +437,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"lock_until" timestamp(3) with time zone
   );
   
-  CREATE TABLE IF NOT EXISTS "cms-payload"."forms_blocks_checkbox" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"_path" text NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"name" varchar NOT NULL,
-  	"label" varchar,
-  	"width" numeric,
-  	"required" boolean,
-  	"default_value" boolean,
-  	"block_name" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."forms_blocks_country" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"_path" text NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"name" varchar NOT NULL,
-  	"label" varchar,
-  	"width" numeric,
-  	"required" boolean,
-  	"block_name" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."forms_blocks_email" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"_path" text NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"name" varchar NOT NULL,
-  	"label" varchar,
-  	"width" numeric,
-  	"required" boolean,
-  	"block_name" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."forms_blocks_message" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"_path" text NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"message" jsonb,
-  	"block_name" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."forms_blocks_number" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"_path" text NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"name" varchar NOT NULL,
-  	"label" varchar,
-  	"width" numeric,
-  	"default_value" numeric,
-  	"required" boolean,
-  	"block_name" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."forms_blocks_select_options" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" varchar NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"label" varchar NOT NULL,
-  	"value" varchar NOT NULL
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."forms_blocks_select" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"_path" text NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"name" varchar NOT NULL,
-  	"label" varchar,
-  	"width" numeric,
-  	"default_value" varchar,
-  	"placeholder" varchar,
-  	"required" boolean,
-  	"block_name" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."forms_blocks_state" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"_path" text NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"name" varchar NOT NULL,
-  	"label" varchar,
-  	"width" numeric,
-  	"required" boolean,
-  	"block_name" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."forms_blocks_text" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"_path" text NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"name" varchar NOT NULL,
-  	"label" varchar,
-  	"width" numeric,
-  	"default_value" varchar,
-  	"required" boolean,
-  	"block_name" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."forms_blocks_textarea" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"_path" text NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"name" varchar NOT NULL,
-  	"label" varchar,
-  	"width" numeric,
-  	"default_value" varchar,
-  	"required" boolean,
-  	"block_name" varchar
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."forms_emails" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"email_to" varchar,
-  	"cc" varchar,
-  	"bcc" varchar,
-  	"reply_to" varchar,
-  	"email_from" varchar,
-  	"subject" varchar DEFAULT 'You''''ve received a new message.' NOT NULL,
-  	"message" jsonb
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."forms" (
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"title" varchar NOT NULL,
-  	"submit_button_label" varchar,
-  	"confirmation_type" "cms-payload"."enum_forms_confirmation_type" DEFAULT 'message',
-  	"confirmation_message" jsonb,
-  	"redirect_url" varchar,
-  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
-  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."form_submissions_submission_data" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"field" varchar NOT NULL,
-  	"value" varchar NOT NULL
-  );
-  
-  CREATE TABLE IF NOT EXISTS "cms-payload"."form_submissions" (
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"form_id" integer NOT NULL,
-  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
-  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
-  );
-  
   CREATE TABLE IF NOT EXISTS "cms-payload"."payload_jobs_log" (
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
@@ -645,8 +486,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"posts_id" integer,
   	"tags_id" integer,
   	"users_id" integer,
-  	"forms_id" integer,
-  	"form_submissions_id" integer,
   	"payload_jobs_id" integer
   );
   
@@ -987,84 +826,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   END $$;
   
   DO $$ BEGIN
-   ALTER TABLE "cms-payload"."forms_blocks_checkbox" ADD CONSTRAINT "forms_blocks_checkbox_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."forms"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."forms_blocks_country" ADD CONSTRAINT "forms_blocks_country_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."forms"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."forms_blocks_email" ADD CONSTRAINT "forms_blocks_email_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."forms"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."forms_blocks_message" ADD CONSTRAINT "forms_blocks_message_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."forms"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."forms_blocks_number" ADD CONSTRAINT "forms_blocks_number_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."forms"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."forms_blocks_select_options" ADD CONSTRAINT "forms_blocks_select_options_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."forms_blocks_select"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."forms_blocks_select" ADD CONSTRAINT "forms_blocks_select_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."forms"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."forms_blocks_state" ADD CONSTRAINT "forms_blocks_state_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."forms"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."forms_blocks_text" ADD CONSTRAINT "forms_blocks_text_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."forms"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."forms_blocks_textarea" ADD CONSTRAINT "forms_blocks_textarea_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."forms"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."forms_emails" ADD CONSTRAINT "forms_emails_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."forms"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."form_submissions_submission_data" ADD CONSTRAINT "form_submissions_submission_data_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."form_submissions"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."form_submissions" ADD CONSTRAINT "form_submissions_form_id_forms_id_fk" FOREIGN KEY ("form_id") REFERENCES "cms-payload"."forms"("id") ON DELETE set null ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
    ALTER TABLE "cms-payload"."payload_jobs_log" ADD CONSTRAINT "payload_jobs_log_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "cms-payload"."payload_jobs"("id") ON DELETE cascade ON UPDATE no action;
   EXCEPTION
    WHEN duplicate_object THEN null;
@@ -1120,18 +881,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   
   DO $$ BEGIN
    ALTER TABLE "cms-payload"."payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_users_fk" FOREIGN KEY ("users_id") REFERENCES "cms-payload"."users"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_forms_fk" FOREIGN KEY ("forms_id") REFERENCES "cms-payload"."forms"("id") ON DELETE cascade ON UPDATE no action;
-  EXCEPTION
-   WHEN duplicate_object THEN null;
-  END $$;
-  
-  DO $$ BEGIN
-   ALTER TABLE "cms-payload"."payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_form_submissions_fk" FOREIGN KEY ("form_submissions_id") REFERENCES "cms-payload"."form_submissions"("id") ON DELETE cascade ON UPDATE no action;
   EXCEPTION
    WHEN duplicate_object THEN null;
   END $$;
@@ -1281,44 +1030,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX IF NOT EXISTS "users_updated_at_idx" ON "cms-payload"."users" USING btree ("updated_at");
   CREATE INDEX IF NOT EXISTS "users_created_at_idx" ON "cms-payload"."users" USING btree ("created_at");
   CREATE UNIQUE INDEX IF NOT EXISTS "users_email_idx" ON "cms-payload"."users" USING btree ("email");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_checkbox_order_idx" ON "cms-payload"."forms_blocks_checkbox" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_checkbox_parent_id_idx" ON "cms-payload"."forms_blocks_checkbox" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_checkbox_path_idx" ON "cms-payload"."forms_blocks_checkbox" USING btree ("_path");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_country_order_idx" ON "cms-payload"."forms_blocks_country" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_country_parent_id_idx" ON "cms-payload"."forms_blocks_country" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_country_path_idx" ON "cms-payload"."forms_blocks_country" USING btree ("_path");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_email_order_idx" ON "cms-payload"."forms_blocks_email" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_email_parent_id_idx" ON "cms-payload"."forms_blocks_email" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_email_path_idx" ON "cms-payload"."forms_blocks_email" USING btree ("_path");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_message_order_idx" ON "cms-payload"."forms_blocks_message" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_message_parent_id_idx" ON "cms-payload"."forms_blocks_message" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_message_path_idx" ON "cms-payload"."forms_blocks_message" USING btree ("_path");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_number_order_idx" ON "cms-payload"."forms_blocks_number" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_number_parent_id_idx" ON "cms-payload"."forms_blocks_number" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_number_path_idx" ON "cms-payload"."forms_blocks_number" USING btree ("_path");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_select_options_order_idx" ON "cms-payload"."forms_blocks_select_options" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_select_options_parent_id_idx" ON "cms-payload"."forms_blocks_select_options" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_select_order_idx" ON "cms-payload"."forms_blocks_select" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_select_parent_id_idx" ON "cms-payload"."forms_blocks_select" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_select_path_idx" ON "cms-payload"."forms_blocks_select" USING btree ("_path");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_state_order_idx" ON "cms-payload"."forms_blocks_state" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_state_parent_id_idx" ON "cms-payload"."forms_blocks_state" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_state_path_idx" ON "cms-payload"."forms_blocks_state" USING btree ("_path");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_text_order_idx" ON "cms-payload"."forms_blocks_text" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_text_parent_id_idx" ON "cms-payload"."forms_blocks_text" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_text_path_idx" ON "cms-payload"."forms_blocks_text" USING btree ("_path");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_textarea_order_idx" ON "cms-payload"."forms_blocks_textarea" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_textarea_parent_id_idx" ON "cms-payload"."forms_blocks_textarea" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "forms_blocks_textarea_path_idx" ON "cms-payload"."forms_blocks_textarea" USING btree ("_path");
-  CREATE INDEX IF NOT EXISTS "forms_emails_order_idx" ON "cms-payload"."forms_emails" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "forms_emails_parent_id_idx" ON "cms-payload"."forms_emails" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "forms_updated_at_idx" ON "cms-payload"."forms" USING btree ("updated_at");
-  CREATE INDEX IF NOT EXISTS "forms_created_at_idx" ON "cms-payload"."forms" USING btree ("created_at");
-  CREATE INDEX IF NOT EXISTS "form_submissions_submission_data_order_idx" ON "cms-payload"."form_submissions_submission_data" USING btree ("_order");
-  CREATE INDEX IF NOT EXISTS "form_submissions_submission_data_parent_id_idx" ON "cms-payload"."form_submissions_submission_data" USING btree ("_parent_id");
-  CREATE INDEX IF NOT EXISTS "form_submissions_form_idx" ON "cms-payload"."form_submissions" USING btree ("form_id");
-  CREATE INDEX IF NOT EXISTS "form_submissions_updated_at_idx" ON "cms-payload"."form_submissions" USING btree ("updated_at");
-  CREATE INDEX IF NOT EXISTS "form_submissions_created_at_idx" ON "cms-payload"."form_submissions" USING btree ("created_at");
   CREATE INDEX IF NOT EXISTS "payload_jobs_log_order_idx" ON "cms-payload"."payload_jobs_log" USING btree ("_order");
   CREATE INDEX IF NOT EXISTS "payload_jobs_log_parent_id_idx" ON "cms-payload"."payload_jobs_log" USING btree ("_parent_id");
   CREATE INDEX IF NOT EXISTS "payload_jobs_completed_at_idx" ON "cms-payload"."payload_jobs" USING btree ("completed_at");
@@ -1344,8 +1055,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_posts_id_idx" ON "cms-payload"."payload_locked_documents_rels" USING btree ("posts_id");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_tags_id_idx" ON "cms-payload"."payload_locked_documents_rels" USING btree ("tags_id");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_users_id_idx" ON "cms-payload"."payload_locked_documents_rels" USING btree ("users_id");
-  CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_forms_id_idx" ON "cms-payload"."payload_locked_documents_rels" USING btree ("forms_id");
-  CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_form_submissions_id_idx" ON "cms-payload"."payload_locked_documents_rels" USING btree ("form_submissions_id");
   CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_payload_jobs_id_idx" ON "cms-payload"."payload_locked_documents_rels" USING btree ("payload_jobs_id");
   CREATE INDEX IF NOT EXISTS "payload_preferences_key_idx" ON "cms-payload"."payload_preferences" USING btree ("key");
   CREATE INDEX IF NOT EXISTS "payload_preferences_updated_at_idx" ON "cms-payload"."payload_preferences" USING btree ("updated_at");
@@ -1358,7 +1067,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX IF NOT EXISTS "payload_migrations_created_at_idx" ON "cms-payload"."payload_migrations" USING btree ("created_at");`)
 }
 
-export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
+export async function down({ db }: MigrateDownArgs): Promise<void> {
   await db.execute(sql`
    DROP TABLE "cms-payload"."authors" CASCADE;
   DROP TABLE "cms-payload"."categories_breadcrumbs" CASCADE;
@@ -1387,20 +1096,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "cms-payload"."tags" CASCADE;
   DROP TABLE "cms-payload"."users_roles" CASCADE;
   DROP TABLE "cms-payload"."users" CASCADE;
-  DROP TABLE "cms-payload"."forms_blocks_checkbox" CASCADE;
-  DROP TABLE "cms-payload"."forms_blocks_country" CASCADE;
-  DROP TABLE "cms-payload"."forms_blocks_email" CASCADE;
-  DROP TABLE "cms-payload"."forms_blocks_message" CASCADE;
-  DROP TABLE "cms-payload"."forms_blocks_number" CASCADE;
-  DROP TABLE "cms-payload"."forms_blocks_select_options" CASCADE;
-  DROP TABLE "cms-payload"."forms_blocks_select" CASCADE;
-  DROP TABLE "cms-payload"."forms_blocks_state" CASCADE;
-  DROP TABLE "cms-payload"."forms_blocks_text" CASCADE;
-  DROP TABLE "cms-payload"."forms_blocks_textarea" CASCADE;
-  DROP TABLE "cms-payload"."forms_emails" CASCADE;
-  DROP TABLE "cms-payload"."forms" CASCADE;
-  DROP TABLE "cms-payload"."form_submissions_submission_data" CASCADE;
-  DROP TABLE "cms-payload"."form_submissions" CASCADE;
   DROP TABLE "cms-payload"."payload_jobs_log" CASCADE;
   DROP TABLE "cms-payload"."payload_jobs" CASCADE;
   DROP TABLE "cms-payload"."payload_locked_documents" CASCADE;
@@ -1431,7 +1126,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "cms-payload"."enum_posts_status";
   DROP TYPE "cms-payload"."enum__posts_v_version_status";
   DROP TYPE "cms-payload"."enum_users_roles";
-  DROP TYPE "cms-payload"."enum_forms_confirmation_type";
   DROP TYPE "cms-payload"."enum_payload_jobs_log_task_slug";
   DROP TYPE "cms-payload"."enum_payload_jobs_log_state";
   DROP TYPE "cms-payload"."enum_payload_jobs_task_slug";`)

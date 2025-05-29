@@ -11,6 +11,7 @@ type CMSCustomer = {
   title?: string
   slug: string
   description: string
+  about?: string
   content: {
     root: {
       children: Array<{
@@ -57,6 +58,7 @@ type ProcessedCustomer = {
   name: string
   title?: string
   description?: string
+  about?: string
   date: string
   formattedDate: string
   readingTime?: string
@@ -266,6 +268,7 @@ function processCustomerData(customer: any) {
     source: markdownContent,
     name: customer.name || 'Customer',
     title: customer.title || 'Untitled customer',
+    about: customer.about,
     date: customer.date || new Date().toISOString(),
     formattedDate,
     readingTime,
@@ -353,6 +356,7 @@ export async function getAllCMSCustomers({
           name: customer.name || '',
           title: customer.title || '',
           description: customer.description || '',
+          about: customer.about,
           date: customer.date || new Date().toISOString(),
           formattedDate,
           readingTime,
