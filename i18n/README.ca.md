@@ -7,85 +7,115 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) és una alternativa de codi obert a Firebase. Estem construint les funcionalitats de Firebase usant eines de codi obert de nivell empresarial.
+[Supabase](https://supabase.com) és una alternativa de codi obert a Firebase. Construïm les funcionalitats de Firebase utilitzant eines de codi obert de nivell empresarial.
 
-- [x] Allotjament de base de dades Postgres
-- [x] Subscripcions en temps real
-- [x] Autenticació i autorització
-- [x] API autogenerada
-- [x] Panell de control
-- [x] Emmagatzematge
-- [x] Funcions
+**Característiques principals:**
 
-![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+- [x] **Base de dades Postgres gestionada:** [Documentació](https://supabase.com/docs/guides/database)
+- [x] **Autenticació i autorització:** [Documentació](https://supabase.com/docs/guides/auth)
+- [x] **API generades automàticament:**
+    - [x] REST: [Documentació](https://supabase.com/docs/guides/api)
+    - [x] GraphQL: [Documentació](https://supabase.com/docs/guides/graphql)
+    - [x] Subscripcions en temps real: [Documentació](https://supabase.com/docs/guides/realtime)
+- [x] **Funcions:**
+    - [x] Funcions de base de dades: [Documentació](https://supabase.com/docs/guides/database/functions)
+    - [x] Edge Functions (funcions al límit de la xarxa): [Documentació](https://supabase.com/docs/guides/functions)
+- [x] **Emmagatzematge de fitxers:** [Documentació](https://supabase.com/docs/guides/storage)
+- [x] **Eines d'IA, vectors i incrustacions (embeddings):** [Documentació](https://supabase.com/docs/guides/ai)
+- [x] **Tauler de control**
+
+![Tauler de control de Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+
+Subscriviu-vos a "releases" d'aquest repositori per rebre notificacions sobre actualitzacions importants. Això us permetrà estar al dia de les últimes modificacions i millores.
+
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Seguir el repositori"/></kbd>
 
 ## Documentació
 
-Per a veure la documentació completa, visita [supabase.com/docs](https://supabase.com/docs).
+La documentació completa està disponible a [supabase.com/docs](https://supabase.com/docs). Allà hi trobareu totes les guies i materials de referència necessaris.
+
+Si voleu contribuir al desenvolupament del projecte, consulteu la secció [Començant](./../DEVELOPERS.md).
 
 ## Comunitat i suport
 
-- [Fòrum de la comunitat](https://github.com/supabase/supabase/discussions). Millor per a: ajuda construint, discussions sobre les millors pràctiques de base de dades.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). Millor per a: errors que et pots trobar utilitzant Supabase.
-- [Suport per correu electrònic](https://supabase.com/docs/support#business-*support). Millor per a: problemes amb la base de dades o infraestructura.
-- [Discord](https://discord.supabase.com). Millor per a: compartir les teves aplicacions i passar l’estona amb la comunitat.
+*   **Fòrum de la comunitat:** [https://github.com/supabase/supabase/discussions](https://github.com/supabase/supabase/discussions). Ideal per obtenir ajuda amb el desenvolupament i discutir les millors pràctiques per treballar amb bases de dades.
+*   **GitHub Issues:** [https://github.com/supabase/supabase/issues](https://github.com/supabase/supabase/issues). Utilitzeu-lo per informar d'errors i problemes que trobeu en utilitzar Supabase.
+*   **Suport per correu electrònic:** [https://supabase.com/docs/support#business-support](https://supabase.com/docs/support#business-support). La millor opció per resoldre problemes amb la vostra base de dades o infraestructura.
+*   **Discord:** [https://discord.supabase.com](https://discord.supabase.com). Un lloc fantàstic per compartir les vostres aplicacions i comunicar-vos amb la comunitat.
 
-## Estat
+## Funcionament
 
-- [x] Alfa: Estem provant Supabase amb un cercle tancat de clients.
-- [x] Alfa pública: Qualsevol pot registrar-se a [supabase.com/dashboard](https://supabase.com/dashboard). Però sigues flexible amb nosaltres; encara poden existir obstacles.
-- [x] Beta pública: Prou estable per a la majoria dels casos no empresarials.
-- [ ] Públic: Llest per a producció.
+Supabase combina diverses eines de codi obert. Construïm funcionalitats similars a Firebase utilitzant productes provats de nivell empresarial. Si una eina o comunitat existeix i té una llicència MIT, Apache 2 o una llicència oberta similar, utilitzarem i donarem suport a aquesta eina. Si aquesta eina no existeix, la crearem nosaltres mateixos i obrirem el seu codi. Supabase no és una rèplica exacta de Firebase. El nostre objectiu és proporcionar als desenvolupadors una experiència còmoda, comparable a Firebase, però utilitzant eines de codi obert.
 
-Actualment estem en la fase de beta pública. Pots subscriure’t a les _releases_ d’aquest repositori per a mantenir-te notificat d’actualitzacions majors.
+**Arquitectura**
 
-<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Segueix aquest repositori"/></kbd>
+Supabase és una [plataforma gestionada](https://supabase.com/dashboard). Podeu registrar-vos i començar a utilitzar Supabase immediatament, sense instal·lar res. També podeu [desplegar la vostra pròpia infraestructura](https://supabase.com/docs/guides/hosting/overview) i [desenvolupar localment](https://supabase.com/docs/guides/local-development).
 
----
+![Arquitectura](./../apps/docs/public/img/supabase-architecture.svg)
 
-## Com funciona
+*   **PostgreSQL:** Un sistema de gestió de bases de dades relacional d'objectes amb més de 30 anys d'història de desenvolupament actiu. És conegut per la seva fiabilitat, funcionalitat i rendiment.
+*   **Realtime:** Un servidor Elixir que us permet escoltar els canvis a PostgreSQL (insercions, actualitzacions i supressions) mitjançant websockets. Realtime utilitza la funcionalitat de replicació integrada de Postgres, converteix els canvis a JSON i els transmet als clients autoritzats.
+*   **PostgREST:** Un servidor web que converteix la vostra base de dades PostgreSQL en una API RESTful.
+*   **GoTrue:** Una API basada en JWT per gestionar usuaris i emetre tokens JWT.
+*   **Storage:** Proporciona una interfície RESTful per gestionar fitxers emmagatzemats a S3, utilitzant Postgres per gestionar els permisos.
+*   **pg_graphql:** Una extensió de PostgreSQL que proporciona una API GraphQL.
+*   **postgres-meta:** Una API RESTful per gestionar el vostre Postgres, que us permet obtenir taules, afegir rols, executar consultes, etc.
+*   **Kong:** Una passarel·la d'API nativa del núvol.
 
-Supabase és una combinació d’eines de codi obert. Estem construint les funcionalitats de Firebase utilitzant solucions de codi obert de nivell empresarial. Si les eines i comunitats existeixen amb una llicència oberta MIT, Apache 2 o equivalent, usarem i secundarem tal eina. Si l’eina no existeix, la desenvoluparem i la llançarem com a eina de codi obert nosaltres mateixos. Supabase no és un mapatge _1 a 1_ de Firebase. El nostre objectiu és donar als desenvolupadors una experiència semblant a la de Firebase utilitzant eines de codi obert.
+#### Biblioteques de client
 
-**Arquitectura actual**
+Utilitzem un enfocament modular per a les biblioteques de client. Cada sub-biblioteca està dissenyada per treballar amb un únic sistema extern. Aquesta és una de les maneres de donar suport a les eines existents.
 
-Supabase és una [plataforma allotjada](https://supabase.com/dashboard). Et pots registrar i començar a utilitzar Supabase sense instal·lar res. També podeu tenir una [_host_ pròpia](https://supabase.com/docs/guides/hosting/overview) i [desenvolupar localment](https://supabase.com/docs/guides/local-development).
+(Taula amb biblioteques de client, com a l'original, però amb noms en català i explicacions, on sigui necessari).
 
-![Arquitectura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
+| Llenguatge                       | Client Supabase                                                     | [PostgREST](https://www.postgresql.org/)                                                                         | [GoTrue](https://github.com/supabase/gotrue)                                                                                | [Realtime](https://github.com/supabase/realtime)                                                                              | [Storage](https://github.com/supabase/storage-api)                                                                                 | Functions                                                                               |
+| :-------------------------- | :------------------------------------------------------------------ | :-------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------- |
+| **⚡️Oficials⚡️**      |                                                                     |                                                                                   |                                                                                      |                                                                                     |                                                                                        |                                                                                      |
+| JavaScript (TypeScript)     | [supabase-js](https://github.com/supabase/supabase-js)               | [postgrest-js](https://github.com/supabase/postgrest-js)                             | [gotrue-js](https://github.com/supabase/gotrue-js)                                     | [realtime-js](https://github.com/supabase/realtime-js)                                 | [storage-js](https://github.com/supabase/storage-js)                                   | [functions-js](https://github.com/supabase/functions-js)                             |
+| Flutter                     | [supabase-flutter](https://github.com/supabase/supabase-flutter)     | [postgrest-dart](https://github.com/supabase/postgrest-dart)                         | [gotrue-dart](https://github.com/supabase/gotrue-dart)                                 | [realtime-dart](https://github.com/supabase/realtime-dart)                             | [storage-dart](https://github.com/supabase/storage-dart)                               | [functions-dart](https://github.com/supabase/functions-dart)                         |
+| Swift                      | [supabase-swift](https://github.com/supabase/supabase-swift)          | [postgrest-swift](https://github.com/supabase/supabase-swift/tree/main/Sources/PostgREST) | [auth-swift](https://github.com/supabase/supabase-swift/tree/main/Sources/Auth)     | [realtime-swift](https://github.com/supabase/supabase-swift/tree/main/Sources/Realtime) | [storage-swift](https://github.com/supabase/supabase-swift/tree/main/Sources/Storage) | [functions-swift](https://github.com/supabase/supabase-swift/tree/main/Sources/Functions) |
+| Python                      | [supabase-py](https://github.com/supabase/supabase-py)               | [postgrest-py](https://github.com/supabase/postgrest-py)                             | [gotrue-py](https://github.com/supabase/gotrue-py)                                     | [realtime-py](https://github.com/supabase/realtime-py)                                 | [storage-py](https://github.com/supabase/storage-py)                                   | [functions-py](https://github.com/supabase/functions-py)                             |
+| **💚Mantingudes per la comunitat💚** |                                                                     |                                                                                   |                                                                                      |                                                                                     |                                                                                        |                                                                                      |
+| C#                          | [supabase-csharp](https://github.com/supabase-community/supabase-csharp) | [postgrest-csharp](https://github.com/supabase-community/postgrest-csharp)           | [gotrue-csharp](https://github.com/supabase-community/gotrue-csharp)                 | [realtime-csharp](https://github.com/supabase-community/realtime-csharp)             | [storage-csharp](https://github.com/supabase-community/storage-csharp)                 | [functions-csharp](https://github.com/supabase-community/functions-csharp)           |
+| Go                          | -                                                                   | [postgrest-go](https://github.com/supabase-community/postgrest-go)                     | [gotrue-go](https://github.com/supabase-community/gotrue-go)                           | -                                                                                   | [storage-go](https://github.com/supabase-community/storage-go)                       | [functions-go](https://github.com/supabase-community/functions-go)                   |
+| Java                        | -                                                                   | -                                                                                   | [gotrue-java](https://github.com/supabase-community/gotrue-java)                       | -                                                                                   | [storage-java](https://github.com/supabase-community/storage-java)                   | -                                                                                   |
+| Kotlin                      | [supabase-kt](https://github.com/supabase-community/supabase-kt)       | [postgrest-kt](https://github.com/supabase-community/supabase-kt/tree/master/Postgrest) | [auth-kt](https://github.com/supabase-community/supabase-kt/tree/master/Auth)         | [realtime-kt](https://github.com/supabase-community/supabase-kt/tree/master/Realtime)   | [storage-kt](https://github.com/supabase-community/supabase-kt/tree/master/Storage)   | [functions-kt](https://github.com/supabase-community/supabase-kt/tree/master/Functions) |
+| Ruby                      | [supabase-rb](https://github.com/supabase-community/supabase-rb)      |      [postgrest-rb](https://github.com/supabase-community/postgrest-rb)                                                                             |    -                                                                                  |        -                                                                            |     -                                                                                 |          -                                                                          |
+| Rust                      |      -                                                                 |       [postgrest-rs](https://github.com/supabase-community/postgrest-rs)                                                                            |      -                                                                                 |       -                                                                             |       -                                                                                |         -                                                                           |
+| Godot Engine (GDScript)      |   [supabase-gdscript](https://github.com/supabase-community/godot-engine.supabase)                                                                  |        [postgrest-gdscript](https://github.com/supabase-community/postgrest-gdscript)                                                                            |        [gotrue-gdscript](https://github.com/supabase-community/gotrue-gdscript)                                                                                |    [realtime-gdscript](https://github.com/supabase-community/realtime-gdscript)                                                                                  |         [storage-gdscript](https://github.com/supabase-community/storage-gdscript)                                                                                 |  [functions-gdscript](https://github.com/supabase-community/functions-gdscript)                                                                                       |
 
-- [PostgreSQL](https://www.postgresql.org/) és un sistema de base de dades objecte–relacional amb més de 30 anys de desenvolupament actiu que s’ha guanyat la seva forta reputació per ser de confiança, robust i d’alt rendiment.
-- [Temps real](https://github.com/supabase/realtime) és un server construït en Elixir que permet escoltar els _inserts_, _updates_ i _deletes_ de PostgreSQL utilitzant WebSockets. Supabase escolta a la funcionalitat de replicació integrada de PostgreSQL, converteix el byte de replicació en un JSON i després transmet el JSON a través de WebSockets.
-- [PostgREST](http://postgrest.org/) és un servidor web que converteix la base de dades PostgreSQL directament en una API RESTful.
-- [Emmagatzematge](https://github.com/supabase/storage-api) proporciona una interfície RESTful per a manipular els arxius allotjats en S3, utilitzant Postgres per a gestionar els permisos.
-- [postgres-meta](https://github.com/supabase/postgres-meta) és una API RESTful per a gestionar Postgres, permet obtenir informació de taules, agregar rols, executar consultes, etc.
-- [GoTrue](https://github.com/netlify/gotrue) és una API basada en SWT per a administrar usuaris i distribuir tokens SWT.
-- [Kong](https://github.com/kong/kong) és un API gateway nadiu allotjat en el núvol.
+## Insígnies (Badges)
 
-#### Llibreries de client
+Podeu utilitzar aquestes insígnies per mostrar que la vostra aplicació està creada amb Supabase:
 
-La nostra llibreria de client és modular. Cada subllibreria és una implementació independent per a cada sistema extern. Aquesta és una de les maneres de donar suport a les eines existents.
+**Clar:**
 
-- **`supabase-{lang}`**: Combina llibreries i afegeix millores.
-  - `postgrest-{lang}`: Llibreria de client per a treballar amb [PostgREST](https://github.com/postgrest/postgrest)
-  - `realtime-{lang}`: Llibreria de client per a treballar amb [Realtime](https://github.com/supabase/realtime)
-  - `gotrue-{lang}`: Llibreria de client per a treballar amb [GoTrue](https://github.com/netlify/gotrue)
+![Fet amb Supabase](./../apps/www/public/badge-made-with-supabase.svg)
 
-| Repositori            | Oficial                                          | Comunitat                                                                                                                                                                                                                  |
-| --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`supabase-{lang}`** | [`JS`](https://github.com/supabase/supabase-js)  | [`C#`](https://github.com/supabase/supabase-csharp) \| [`Flutter`](https://github.com/supabase/supabase-Flutter) \| [`Python`](https://github.com/supabase/supabase-py) \| `Rust`                                          |
-| `postgrest-{lang}`    | [`JS`](https://github.com/supabase/postgrest-js) | [`C#`](https://github.com/supabase/postgrest-csharp) \| [`Dart`](https://github.com/supabase/postgrest-dart) \| [`Python`](https://github.com/supabase/postgrest-py) \| [`Rust`](https://github.com/supabase/postgrest-rs) |
-| `realtime-{lang}`     | [`JS`](https://github.com/supabase/realtime-js)  | [`C#`](https://github.com/supabase/realtime-csharp) \| [`Dart`](https://github.com/supabase/realtime-dart) \| [`Python`](https://github.com/supabase/realtime-py) \| `Rust`                                                |
-| `gotrue-{lang}`       | [`JS`](https://github.com/supabase/gotrue-js)    | [`C#`](https://github.com/supabase/gotrue-csharp) \| [`Dart`](https://github.com/supabase/gotrue-dart) \| [`Python`](https://github.com/supabase/gotrue-py) \| `Rust`                                                      |
+```md
+[![Fet amb Supabase](https://supabase.com/badge-made-with-supabase.svg)](https://supabase.com)
+```
 
-<!--- Remove this list if you're traslating to another language, it's hard to keep updated across multiple files-->
-<!--- Keep only the link to the list of translation files-->
+```html
+<a href="https://supabase.com">
+  <img width="168" height="30" src="https://supabase.com/badge-made-with-supabase.svg" alt="Fet amb Supabase" />
+</a>
+```
+
+**Fosc:**
+
+![Fet amb Supabase (versió fosca)](./../apps/www/public/badge-made-with-supabase-dark.svg)
+
+```md
+[![Fet amb Supabase](https://supabase.com/badge-made-with-supabase-dark.svg)](https://supabase.com)
+```
+
+```html
+<a href="https://supabase.com">
+  <img width="168" height="30" src="https://supabase.com/badge-made-with-supabase-dark.svg" alt="Fet amb Supabase" />
+</a>
+```
 
 ## Traduccions
 
-- [Llista de traduccions](/i18n/languages.md) <!--- Keep only the this-->
-
----
-
-## Patrocinadors
-
-[![Nou patrocinador](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
+[Llista de traduccions](./languages.md)
