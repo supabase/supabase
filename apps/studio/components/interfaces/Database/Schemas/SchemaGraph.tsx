@@ -17,16 +17,7 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { toast } from 'sonner'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
@@ -276,9 +267,10 @@ export const SchemaGraph = () => {
                     text: (
                       <div className="max-w-[180px] space-y-2 text-foreground-light">
                         <p className="text-foreground">Note</p>
-                        <p>This schema is for context or debugging only.</p>
-                        <p>Table order and constraints may be invalid.</p>
-                        <p>Not meant to be run as-is.</p>
+                        <p>
+                          This schema is for context or debugging only. Table order and constraints
+                          may be invalid. Not meant to be run as-is.
+                        </p>
                       </div>
                     ),
                   },
