@@ -141,11 +141,11 @@ To use `MergeDeep`, set `compilerOptions.strictNullChecks` to `true` in your `ts
 
 </Admonition>
 
-## Enhanced Type Inference for JSON Fields
+## Enhanced type inference for JSON fields
 
 Starting from [supabase-js v2.48.0](https://github.com/supabase/supabase-js/releases/tag/v2.48.0), you can define custom types for JSON fields and get enhanced type inference when using JSON selectors with the `->` and `->>` operators. This makes your code more type-safe and intuitive when working with JSON/JSONB columns.
 
-### Defining Custom JSON Types
+### Defining custom JSON types
 
 You can extend your generated database types to include custom JSON schemas using `MergeDeep`:
 
@@ -190,7 +190,7 @@ export type Database = MergeDeep<
 >
 ```
 
-### Type-Safe JSON Querying
+### Type-safe JSON querying
 
 Once you've defined your custom JSON types, TypeScript will automatically infer the correct types when using JSON selectors:
 
