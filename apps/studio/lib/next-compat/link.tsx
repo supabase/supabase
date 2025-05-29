@@ -1,4 +1,4 @@
-import { Link as RemixLink } from 'react-router'
+import { Link as TanstackRouterLink } from '@tanstack/react-router'
 
 export default function Link({
   children,
@@ -11,8 +11,8 @@ export default function Link({
   passHref?: boolean
 }) {
   return (
-    <RemixLink to={href} {...props}>
+    <TanstackRouterLink to={href} {...props}>
       {children}
-    </RemixLink>
+    </TanstackRouterLink>
   )
 }

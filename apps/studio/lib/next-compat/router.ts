@@ -1,26 +1,17 @@
-import { useLocation, useParams, useSearchParams, useNavigate } from 'react-router'
+import { useLocation, useParams, useSearch, useNavigate } from '@tanstack/react-router'
 import { BASE_PATH } from 'lib/constants'
 import { NextRouter } from 'next/router'
 import { parse } from 'querystring'
 import { useMemo } from 'react'
 
 export function useRouter(): NextRouter {
-  const params = useParams()
-  const [searchParams] = useSearchParams()
+  const params = useParams({ strict: false })
+  const searchParams = useSearch({ strict: false })
   const location = useLocation()
   const navigate = useNavigate()
 
   const query = useMemo(() => {
-    let q: { [key: string]: string | string[] | undefined } = Object.fromEntries(
-      Array.from(new Set(searchParams.keys())).map((key) => {
-        const values = searchParams.getAll(key)
-        return [key, values.length > 1 ? values : values[0]]
-      })
-    )
-
-    q = { ...q, ...params }
-
-    return q
+    return { ...params, ...searchParams }
   }, [params, searchParams])
 
   return {

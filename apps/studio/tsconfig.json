@@ -13,7 +13,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "rootDirs": [".", "./.react-router/types"],
+    "rootDirs": ["."],
     "baseUrl": ".",
     "downlevelIteration": true,
     "incremental": true,
@@ -23,13 +23,6 @@
     "useDefineForClassFields": true,
     "types": ["node", "vite/client"]
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.js",
-    "**/*.jsx",
-    "./../../packages/ui/src/**/*.d.ts",
-    ".react-router/types/**/*"
-  ],
+  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "./../../packages/ui/src/**/*.d.ts"],
   "exclude": ["node_modules", "public/deno/*.ts"]
 }

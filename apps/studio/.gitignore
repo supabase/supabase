@@ -8,11 +8,9 @@
 # testing
 /coverage
 
-# react-router
-/.react-router/
-
 # production
 /build
+/dist
 
 # misc
 .DS_Store
