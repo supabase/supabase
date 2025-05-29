@@ -39,7 +39,7 @@ where
     t.typrelid = 0
     or (
       select
-        c.relkind = 'c'
+        c.relkind in ('c', 'r', 'v')
       from
         pg_class c
       where

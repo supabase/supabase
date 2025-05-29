@@ -23,6 +23,7 @@ export const pgFunctionZod = z.object({
       name: z.string(),
       type_id: z.number(),
       has_default: z.boolean(),
+      table_name: z.union([z.string(), z.null()]),
     })
   ),
   argument_types: z.string(),
@@ -31,6 +32,9 @@ export const pgFunctionZod = z.object({
   return_type: z.string(),
   return_type_relation_id: z.union([z.number(), z.null()]),
   is_set_returning_function: z.boolean(),
+  returns_set_of_table: z.boolean(),
+  return_table_name: z.union([z.string(), z.null()]),
+  returns_multiple_rows: z.boolean(),
   behavior: z.union([z.literal('IMMUTABLE'), z.literal('STABLE'), z.literal('VOLATILE')]),
   security_definer: z.boolean(),
   config_params: z.union([z.record(z.string(), z.string()), z.null()]),
