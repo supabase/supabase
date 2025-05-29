@@ -16,8 +16,7 @@ test.describe('SQL Editor', () => {
     await page.keyboard.press('ControlOrMeta+KeyA')
     await page.keyboard.type(`select 'hello world';`)
 
-    // run the query
-    await page.getByRole('button', { name: 'Run', exact: true }).click()
+    await page.getByRole('button', { name: /^Run( CTRL)?$/, exact: false }).click()
 
     // Should say "Running..."
     await expect(page.getByText('Running...')).toBeVisible()
