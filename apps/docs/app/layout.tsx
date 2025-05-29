@@ -1,5 +1,6 @@
 import '@code-hike/mdx/styles'
 import 'config/code-hike.css'
+import '../styles/tailwind.css'
 import '../styles/main.css'
 import '../styles/prism-okaidia.css'
 

@@ -4,12 +4,6 @@
 @import './../../../packages/ui/build/css/themes/light.css';
 @import './../../../packages/ui/build/css/themes/classic-dark.css';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-
-
 :root {
   --chart-1: hsl(var(--brand-default));
   --chart-2: 173 58% 39%;
