@@ -126,7 +126,6 @@ const SchemaSelector = ({
             className="p-0 min-w-[200px] pointer-events-auto"
             side="bottom"
             align="start"
-            portal={true}
             sameWidthAsTrigger
           >
             <Command_Shadcn_>

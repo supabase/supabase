@@ -218,12 +218,7 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
             : `${dayjs(value.from).format('DD MMM, HH:mm')} - ${dayjs(value.to || new Date()).format('DD MMM, HH:mm')}`}
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
-        className="flex w-full p-0"
-        side="bottom"
-        align="center"
-        portal={true}
-      >
+      <PopoverContent_Shadcn_ className="flex w-full p-0" side="bottom" align="center">
         <RadioGroup
           onValueChange={handleHelperChange}
           value={value.isHelper ? value.text : ''}
