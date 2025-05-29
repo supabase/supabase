@@ -23,14 +23,14 @@ export const usePermissionsQuery = <TData = PermissionsData>({
   enabled = true,
   ...options
 }: UseQueryOptions<PermissionsData, PermissionsError, TData> = {}) => {
-  const isSignedIn = useIsLoggedIn()
+  const isLoggedIn = useIsLoggedIn()
 
   return useQuery<PermissionsData, PermissionsError, TData>(
     permissionKeys.list(),
     ({ signal }) => getPermissions(signal),
     {
       ...options,
-      enabled: IS_PLATFORM && enabled && isSignedIn,
+      enabled: IS_PLATFORM && enabled && isLoggedIn,
       staleTime: 30 * 60 * 1000,
     }
   )
