@@ -416,7 +416,7 @@ const InfrastructureActivity = () => {
                     </div>
                   ) : chartData.length ? (
                     <UsageBarChart
-                      name={`${attribute.chartPrefix || ''}${attribute.name}`}
+                      name={`${attribute.chartPrefix || ''} ${attribute.name}`}
                       unit={attribute.unit}
                       attributes={attribute.attributes}
                       data={chartData}
