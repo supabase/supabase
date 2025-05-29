@@ -1,18 +1,15 @@
 import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock'
 import { fromNodeProviderChain } from '@aws-sdk/credential-providers'
-import pgMeta from '@supabase/pg-meta'
 import crypto from 'crypto'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
 import { streamText, tool, type Tool } from 'ai'
-import { executeSql } from 'data/sql/execute-sql-query'
 import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import apiWrapper from 'lib/api/apiWrapper'
 import { createSupabaseMCPClient } from './supabase-mcp'
 
 export const maxDuration = 30
-const pgMetaSchemasList = pgMeta.schemas.list()
 
 const credentialProvider = fromNodeProviderChain()
 
@@ -62,10 +59,9 @@ const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
 export default wrapper
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
-  const { messages, projectRef, connectionString, aiOptInLevel, schema, table } = req.body as {
+  const { messages, projectRef, aiOptInLevel, schema, table } = req.body as {
     messages: any[] // Use stronger types if available
     projectRef: string
-    connectionString?: string
     aiOptInLevel: AiOptInLevel
     schema?: string
     table?: string
@@ -77,7 +73,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     })
   }
 
-  const cookie = req.headers.cookie
   const authorization = req.headers.authorization
   const accessToken = authorization?.replace('Bearer ', '')
 
@@ -87,7 +82,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   let mcpTools: Record<string, Tool<any, unknown>> = {}
   let wrappedExecuteSqlTool: Tool<any, unknown> | undefined = undefined
-  let schemasResult: any[] = []
 
   try {
     const privacyMessage =
@@ -193,24 +187,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       console.warn(
         'execute_sql tool not found in mcpTools or not allowed at this permission level.'
       )
-    }
-
-    // Only fetch schemas if not disabled
-    if (aiOptInLevel !== 'disabled') {
-      const { result: fetchedSchemas } = await executeSql(
-        {
-          projectRef,
-          connectionString,
-          sql: pgMetaSchemasList.sql,
-        },
-        undefined,
-        {
-          'Content-Type': 'application/json',
-          ...(cookie && { cookie }),
-          ...(authorization && { Authorization: authorization }),
-        }
-      )
-      schemasResult = fetchedSchemas
     }
 
     const display_query = tool({
@@ -412,7 +388,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       # General Instructions:
       - **Understand Context**: Attempt to use \`list_tables\`, \`list_extensions\` first. If they are not available or return a privacy/permission error, state this and proceed with caution, relying on the user's description and general knowledge.
-      - **Available Schemas**: ${aiOptInLevel !== 'disabled' ? JSON.stringify(schemasResult) : "'Schema information is not available due to current AI opt-in level.'"}
       - **Current Focus**: ${schema !== undefined ? `User is looking at schema: ${schema}.` : ''} ${table !== undefined ? `User is looking at table: ${table}.` : ''}
     `
 
@@ -429,8 +404,4 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     console.error('Error in handlePost:', error)
     return res.status(500).json({ message: error.message })
   }
-}
-
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
 }
