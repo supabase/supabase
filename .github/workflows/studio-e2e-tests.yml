@@ -80,7 +80,7 @@ jobs:
         id: playwright
         env:
           BASE_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}/dashboard
-        run: pnpm e2e:ci
+        run: pnpm e2e
 
       - uses: actions/upload-artifact@v4
         if: always()

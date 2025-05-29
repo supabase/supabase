@@ -12,11 +12,12 @@ test.describe('SQL Editor', () => {
     // write some sql in the editor
     // This has to be done since the editor is not editable (input, textarea, etc.)
     await editor.click()
+    await editor.click()
     await page.keyboard.press('ControlOrMeta+KeyA')
     await page.keyboard.type(`select 'hello world';`)
 
     // run the query
-    await page.getByTestId('sql-run-button').click()
+    await page.getByRole('button', { name: 'Run', exact: true }).click()
 
     // Should say "Running..."
     await expect(page.getByText('Running...')).toBeVisible()
