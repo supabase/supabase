@@ -1,5 +1,3 @@
-// [Joshen] https://github.com/sindresorhus/github-markdown-css
-
 @media (prefers-color-scheme: dark) {
   .markdown-body,
   [data-theme='dark'] {
@@ -374,7 +372,6 @@
     SF Mono,
     Menlo,
     Consolas,
-    Liberation Mono,
     monospace;
   line-height: 10px;
   color: var(--color-fg-default);
@@ -470,7 +467,6 @@
     SF Mono,
     Menlo,
     Consolas,
-    Liberation Mono,
     monospace;
   font-size: 12px;
 }
@@ -484,7 +480,6 @@
     SF Mono,
     Menlo,
     Consolas,
-    Liberation Mono,
     monospace;
   font-size: 12px;
   word-wrap: normal;

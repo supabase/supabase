@@ -19,7 +19,6 @@
   line-height: inherit;
 }
 
-// Apply parent bg colour while editing
 .rdg-cell.rdg-editor-container > * {
   background-color: inherit;
 }
@@ -146,7 +145,7 @@
 .sb-grid {
   /* reset styles */
   [type='checkbox'] {
-    webkit-appearance: none;
+    -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
     padding: 0;
