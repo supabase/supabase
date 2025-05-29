@@ -7,7 +7,7 @@ import { foreignTableKeys } from './keys'
 
 export type ForeignTablesVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   schema?: string
 }
 

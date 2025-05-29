@@ -117,8 +117,8 @@ $$;
 type SchemaRemoveParams = {
   cascade?: boolean
 }
-function remove({ id }: { id: number }, params: SchemaRemoveParams): { sql: string }
-function remove({ name }: { name: string }, params: SchemaRemoveParams): { sql: string }
+function remove({ id }: { id: number }, params?: SchemaRemoveParams): { sql: string }
+function remove({ name }: { name: string }, params?: SchemaRemoveParams): { sql: string }
 function remove(
   {
     id,

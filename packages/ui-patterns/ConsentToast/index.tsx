@@ -1,17 +1,8 @@
 'use client'
 
-import {
-  LOCAL_STORAGE_KEYS,
-  handlePageTelemetry,
-  isBrowser,
-  useBreakpoint,
-  useTelemetryProps,
-} from 'common'
-
+import { useBreakpoint } from 'common'
 import { noop } from 'lodash'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { toast } from 'sonner'
-import { Button, cn } from 'ui'
+import { Button } from 'ui'
 import { PrivacySettings } from '../PrivacySettings'
 
 interface ConsentToastProps {
@@ -26,7 +17,7 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
     <div className="py-1 flex flex-col gap-y-3 w-full">
       <div>
         <p className="text-sm text-foreground">
-          We use first-party cookies to improve our services.{' '}
+          We use cookies to collect data and improve our services.{' '}
           <a
             target="_blank"
             rel="noreferrer noopener"
@@ -76,113 +67,3 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
     </div>
   )
 }
-
-export const useConsent = () => {
-  const { TELEMETRY_CONSENT, TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
-  const consentToastId = useRef<string | number>()
-  const telemetryProps = useTelemetryProps()
-
-  const initialValue = isBrowser ? localStorage?.getItem(TELEMETRY_CONSENT) : null
-  const [consentValue, setConsentValue] = useState<string | null>(initialValue)
-
-  const handleConsent = (value: 'true' | 'false') => {
-    if (!isBrowser) return
-
-    if (value === 'true') {
-      const cookies = document.cookie.split(';')
-      const telemetryCookie = cookies.find((cookie) => cookie.trim().startsWith(TELEMETRY_DATA))
-      if (telemetryCookie) {
-        try {
-          const encodedData = telemetryCookie.split('=')[1]
-          const telemetryData = JSON.parse(decodeURIComponent(encodedData))
-          handlePageTelemetry(
-            process.env.NEXT_PUBLIC_API_URL!,
-            window.location.pathname,
-            telemetryData
-          )
-          // remove the telemetry cookie
-          document.cookie = `${TELEMETRY_DATA}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
-        } catch (error) {
-          console.error('Invalid telemetry data:', error)
-        }
-      } else {
-        const telemetryData = {
-          page_url: telemetryProps.page_url,
-          page_title: typeof document !== 'undefined' ? document?.title : '',
-          pathname: telemetryProps.pathname,
-          ph: {
-            referrer: typeof document !== 'undefined' ? document?.referrer : '',
-            language: telemetryProps.language,
-            search: telemetryProps.search,
-            viewport_height: telemetryProps.viewport_height,
-            viewport_width: telemetryProps.viewport_width,
-            user_agent: navigator.userAgent,
-          },
-        }
-
-        handlePageTelemetry(
-          process.env.NEXT_PUBLIC_API_URL!,
-          window.location.pathname,
-          telemetryData
-        )
-      }
-    } else {
-      // remove the telemetry cookie
-      document.cookie = `${TELEMETRY_DATA}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
-    }
-
-    setConsentValue(value)
-    localStorage.setItem(TELEMETRY_CONSENT, value)
-
-    if (consentToastId.current) {
-      toast.dismiss(consentToastId.current)
-    }
-  }
-
-  const triggerConsentToast = useCallback(() => {
-    if (isBrowser && consentValue === null) {
-      consentToastId.current = toast(
-        <ConsentToast
-          onAccept={() => handleConsent('true')}
-          onOptOut={() => handleConsent('false')}
-        />,
-        {
-          id: 'consent-toast',
-          position: 'bottom-right',
-          duration: Infinity,
-          closeButton: false,
-          dismissible: false,
-          className: cn(
-            '!w-screen !fixed !border-t !h-auto !left-0 !bottom-0 !top-auto !right-0 !rounded-none !max-w-none !bg-overlay !text',
-            'sm:!w-full sm:!max-w-[356px] sm:!left-auto sm:!right-8 sm:!bottom-8 sm:!rounded-lg sm:border'
-          ),
-        }
-      )
-    }
-  }, [])
-
-  useEffect(() => {
-    const handleSetLocalStorage = () => {
-      if (localStorage?.getItem(TELEMETRY_CONSENT)) toast.dismiss(consentToastId.current)
-    }
-
-    if (isBrowser) {
-      window.addEventListener('storage', handleSetLocalStorage)
-      return window.removeEventListener('storage', () => null)
-    }
-  }, [])
-
-  useEffect(() => {
-    setTimeout(() => {
-      consentValue === null && triggerConsentToast()
-    }, 300)
-  }, [consentValue])
-
-  return {
-    consentValue,
-    hasAcceptedConsent: consentValue === 'true',
-    triggerConsentToast,
-  }
-}
-
-export { useConsentValue } from './useConsentValue'

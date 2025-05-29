@@ -29,13 +29,14 @@ export const useNewQuery = () => {
     subject: { id: profile?.id },
   })
 
-  const newQuery = async (sql: string, name: string) => {
+  const newQuery = async (sql: string, name: string, shouldRedirect: boolean = true) => {
     if (!ref) return console.error('Project ref is required')
     if (!project) return console.error('Project is required')
     if (!profile) return console.error('Profile is required')
 
     if (!canCreateSQLSnippet) {
-      return toast('Your queries will not be saved as you do not have sufficient permissions')
+      toast('Your queries will not be saved as you do not have sufficient permissions')
+      return undefined
     }
 
     try {
@@ -48,9 +49,15 @@ export const useNewQuery = () => {
       })
       snapV2.addSnippet({ projectRef: ref, snippet })
       snapV2.addNeedsSaving(snippet.id)
-      router.push(`/project/${ref}/sql/${snippet.id}`)
+      if (shouldRedirect) {
+        router.push(`/project/${ref}/sql/${snippet.id}`)
+        return undefined
+      } else {
+        return snippet.id
+      }
     } catch (error: any) {
       toast.error(`Failed to create new query: ${error.message}`)
+      return undefined
     }
   }
 
@@ -60,7 +67,6 @@ export const useNewQuery = () => {
 export function useSqlEditorDiff() {
   const [sourceSqlDiff, setSourceSqlDiff] = useState<ContentDiff>()
   const [selectedDiffType, setSelectedDiffType] = useState<DiffType>()
-  const [pendingTitle, setPendingTitle] = useState<string>()
   const [isAcceptDiffLoading, setIsAcceptDiffLoading] = useState(false)
 
   const isDiffOpen = !!sourceSqlDiff
@@ -84,7 +90,6 @@ export function useSqlEditorDiff() {
 
   const closeDiff = useCallback(() => {
     setSourceSqlDiff(undefined)
-    setPendingTitle(undefined)
     setSelectedDiffType(undefined)
   }, [])
 
@@ -93,8 +98,6 @@ export function useSqlEditorDiff() {
     setSourceSqlDiff,
     selectedDiffType,
     setSelectedDiffType,
-    pendingTitle,
-    setPendingTitle,
     isAcceptDiffLoading,
     setIsAcceptDiffLoading,
     isDiffOpen,

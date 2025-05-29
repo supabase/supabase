@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "WARNING: This will remove all containers and their data. This action cannot be undone!"
+echo "WARNING: This will remove all containers and container data, and will reset the .env file. This action cannot be undone!"
 read -p "Are you sure you want to proceed? (y/N) " -n 1 -r
 echo    # Move to a new line
 if [[ ! $REPLY =~ ^[Yy]$ ]]
@@ -22,7 +22,7 @@ for DIR in "${BIND_MOUNTS[@]}"; do
     echo "Deleting $DIR..."
     rm -rf "$DIR"
   else
-    echo "Directory $DIR does not exist. Skipping..."
+    echo "Directory $DIR does not exist. Skipping bind mount deletion step..."
   fi
 done
 
@@ -30,13 +30,15 @@ echo "Resetting .env file..."
 if [ -f ".env" ]; then
   echo "Removing existing .env file..."
   rm -f .env
+else
+  echo "No .env file found. Skipping .env removal step..."
 fi
 
 if [ -f ".env.example" ]; then
   echo "Copying .env.example to .env..."
   cp .env.example .env
 else
-  echo ".env.example file not found. Skipping .env setup..."
+  echo ".env.example file not found. Skipping .env reset step..."
 fi
 
 echo "Cleanup complete!"

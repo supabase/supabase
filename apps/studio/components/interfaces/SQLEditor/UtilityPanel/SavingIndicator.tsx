@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { usePrevious } from 'hooks/deprecated'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import ReadOnlyBadge from './ReadOnlyBadge'
 
 export type SavingIndicatorProps = { id: string }
@@ -51,27 +51,27 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
           </Button>
         )}
         {showSavedText ? (
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_>
+          <Tooltip>
+            <TooltipTrigger>
               <Check className="text-brand" size={14} strokeWidth={3} />
-            </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ side="bottom">All changes saved</TooltipContent_Shadcn_>
-          </Tooltip_Shadcn_>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">All changes saved</TooltipContent>
+          </Tooltip>
         ) : savingState === 'UPDATING' ? (
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_>
+          <Tooltip>
+            <TooltipTrigger>
               <Loader2 className="animate-spin" size={14} strokeWidth={2} />
-            </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_>Saving changes...</TooltipContent_Shadcn_>
-          </Tooltip_Shadcn_>
+            </TooltipTrigger>
+            <TooltipContent>Saving changes...</TooltipContent>
+          </Tooltip>
         ) : savingState === 'UPDATING_FAILED' ? (
           isSnippetOwner ? (
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_>
+            <Tooltip>
+              <TooltipTrigger>
                 <AlertCircle className="text-red-900" size={14} strokeWidth={2} />
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_>Failed to save changes</TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
+              </TooltipTrigger>
+              <TooltipContent>Failed to save changes</TooltipContent>
+            </Tooltip>
           ) : (
             <ReadOnlyBadge id={id} />
           )

@@ -12,9 +12,10 @@ import {
   DropdownMenuTrigger,
   Input_Shadcn_,
   Skeleton,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TreeViewItemVariant,
   cn,
 } from 'ui'
 import ShimmeringLoader from '../ShimmeringLoader'
@@ -115,6 +116,37 @@ const InnerSideMenuItem = forwardRef<
   )
 })
 
+const InnerSideMenuDataItem = forwardRef<
+  ElementRef<typeof Link>,
+  React.ComponentPropsWithoutRef<typeof Link> & {
+    isActive?: boolean
+    forceHoverState?: boolean | null
+    isPreview?: boolean
+    isOpened?: boolean
+  }
+>(({ isActive = true, forceHoverState, isPreview, isOpened = true, ...props }, ref) => {
+  return (
+    <Link
+      ref={ref}
+      {...props}
+      aria-current={isActive}
+      className={cn(
+        TreeViewItemVariant({
+          isSelected: isActive && !isPreview,
+          isOpened: isOpened && !isPreview,
+          isPreview,
+        }),
+        'px-4',
+        // forceHoverState && 'bg-surface-200',
+        props.className
+      )}
+    >
+      {!isPreview && isActive && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
+      {props.children}
+    </Link>
+  )
+})
+
 function InnerSideMenuItemLoading({
   className,
   ...props
@@ -192,21 +224,21 @@ const InnerSideBarFilterSortDropdown = forwardRef<
 >(({ value, onValueChange, contentClassName, triggerClassName, ...props }, ref) => {
   return (
     <DropdownMenu modal={false}>
-      <Tooltip_Shadcn_ delayDuration={0}>
+      <Tooltip delayDuration={0}>
         <DropdownMenuTrigger
           asChild
           className={cn(
             'absolute right-1 top-[.4rem] md:top-[.3rem]',
-            'text-foreground-muted transition-colors hover:text-foreground data-[state=open]:text-foreground',
+            'text-foreground transition-colors hover:text-foreground data-[state=open]:text-foreground',
             triggerClassName
           )}
         >
-          <TooltipTrigger_Shadcn_>
+          <TooltipTrigger>
             <ChevronsDown size={18} strokeWidth={1} />
-          </TooltipTrigger_Shadcn_>
+          </TooltipTrigger>
         </DropdownMenuTrigger>
-        <TooltipContent_Shadcn_ side="bottom">Sort By</TooltipContent_Shadcn_>
-      </Tooltip_Shadcn_>
+        <TooltipContent side="bottom">Sort By</TooltipContent>
+      </Tooltip>
       <DropdownMenuContent side="bottom" align="end" className={cn('w-48', contentClassName)}>
         <DropdownMenuRadioGroup value={value} onValueChange={onValueChange}>
           {props.children}
@@ -250,17 +282,18 @@ const InnerSideBarEmptyPanel = forwardRef<
       ref={ref}
       {...props}
       className={cn(
-        'border bg-surface-100/50 flex flex-col gap-y-3 items-center justify-center rounded-md px-5 py-4',
+        'border border-muted bg-surface-100 dark:bg-surface-75 flex flex-col gap-y-3 items-center justify-center rounded-md px-5 py-4',
         props.className
       )}
     >
-      <div className="flex flex-col gap-y-1 items-center justify-center">
+      <div className="w-full flex flex-col gap-y-1 items-center">
         {illustration}
         {title && <p className="text-xs text-foreground-light">{title}</p>}
         {description && (
           <p className="text-xs text-foreground-lighter text-center">{description}</p>
         )}
         {actions && <div className="mt-2">{actions}</div>}
+        {props.children}
       </div>
     </div>
   )
@@ -277,6 +310,7 @@ export {
   InnerSideMenuCollapsible,
   InnerSideMenuCollapsibleContent,
   InnerSideMenuCollapsibleTrigger,
+  InnerSideMenuDataItem,
   InnerSideMenuItem,
   InnerSideMenuItemLoading,
   InnerSideMenuSeparator,

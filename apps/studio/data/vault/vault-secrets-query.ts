@@ -1,5 +1,5 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { Query } from 'components/grid/query/Query'
+import { Query } from '@supabase/pg-meta/src/query'
 import type { VaultSecret } from 'types'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { vaultSecretsKeys } from './keys'
@@ -7,7 +7,7 @@ import { vaultSecretsKeys } from './keys'
 export const getVaultSecretsSql = () => {
   const sql = new Query()
     .from('secrets', 'vault')
-    .select('id,name,description,secret,key_id,created_at,updated_at')
+    .select('id,name,description,secret,created_at,updated_at')
     .toSql()
 
   return sql
@@ -15,7 +15,7 @@ export const getVaultSecretsSql = () => {
 
 export type VaultSecretsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getVaultSecrets(

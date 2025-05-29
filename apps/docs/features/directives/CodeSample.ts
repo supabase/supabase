@@ -10,6 +10,7 @@
  *   path="/path/to/file.ts"
  *   lines={[1, 2], [5, 7]} // -1 may be used in end position as an alias for the last line, e.g., [1, -1]
  *   meta="utils/client.ts" // Optional, for displaying a file path on the code block
+ *   hideElidedLines={true} // Optional, for hiding elided lines in the code block
  * />
  * ```
  *
@@ -24,21 +25,14 @@
  *   path="/path/to/file.ts"
  *   lines={[1, 2], [5, 7]} // -1 may be used in end position as an alias for the last line, e.g., [1, -1]
  *   meta="utils/client.ts" // Optional, for displaying a file path on the code block
+ *   hideElidedLines={true} // Optional, for hiding elided lines in the code block
  * />
  */
 
 import * as acorn from 'acorn'
 import tsPlugin from 'acorn-typescript'
-import { type BlockContent, type Code, type Root } from 'mdast'
-import type {
-  MdxJsxAttribute,
-  MdxJsxAttributeValueExpression,
-  MdxJsxExpressionAttribute,
-  MdxJsxFlowElement,
-  MdxJsxFlowElementHast,
-  MdxJsxTextElement,
-  MdxJsxTextElementHast,
-} from 'mdast-util-mdx-jsx'
+import { type DefinitionContent, type BlockContent, type Code, type Root } from 'mdast'
+import type { MdxJsxAttributeValueExpression, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { type Parent } from 'unist'
@@ -48,6 +42,7 @@ import { z, type SafeParseError } from 'zod'
 import { fetchWithNextOptions } from '~/features/helpers.fetch'
 import { IS_PLATFORM } from '~/lib/constants'
 import { EXAMPLES_DIRECTORY } from '~/lib/docs'
+import { getAttributeValue, getAttributeValueExpression } from './utils.server'
 
 const ALLOW_LISTED_GITHUB_ORGS = ['supabase', 'supabase-community'] as [string, ...string[]]
 
@@ -84,6 +79,7 @@ const codeSampleExternalSchema = z.object({
   path: z.string().transform((v) => (v.startsWith('/') ? v : `/${v}`)),
   lines: linesValidator,
   meta: z.string().optional(),
+  hideElidedLines: z.coerce.boolean().default(false),
 })
 type ICodeSampleExternal = z.infer<typeof codeSampleExternalSchema> & AdditionalMeta
 
@@ -95,6 +91,7 @@ const codeSampleInternalSchema = z.object({
   path: z.string().transform((v) => (v.startsWith('/') ? v : `/${v}`)),
   lines: linesValidator,
   meta: z.string().optional(),
+  hideElidedLines: z.coerce.boolean().default(false),
 })
 type ICodeSampleInternal = z.infer<typeof codeSampleInternalSchema> & AdditionalMeta
 
@@ -154,6 +151,9 @@ async function fetchSourceCodeContent(tree: Root, deps: Dependencies) {
       const path = getAttributeValue(node, 'path')
       const lines = getAttributeValueExpression(getAttributeValue(node, 'lines'))
       const meta = getAttributeValue(node, 'meta')
+      const hideElidedLines = getAttributeValueExpression(
+        getAttributeValue(node, 'hideElidedLines')
+      )
 
       const result = codeSampleExternalSchema.safeParse({
         external: isExternal,
@@ -163,6 +163,7 @@ async function fetchSourceCodeContent(tree: Root, deps: Dependencies) {
         path,
         lines,
         meta,
+        hideElidedLines,
       })
 
       if (!result.success) {
@@ -193,12 +194,16 @@ async function fetchSourceCodeContent(tree: Root, deps: Dependencies) {
       const path = getAttributeValue(node, 'path')
       const lines = getAttributeValueExpression(getAttributeValue(node, 'lines'))
       const meta = getAttributeValue(node, 'meta')
+      const hideElidedLines = getAttributeValueExpression(
+        getAttributeValue(node, 'hideElidedLines')
+      )
 
       const result = codeSampleInternalSchema.safeParse({
         external: isExternal,
         path,
         lines,
         meta,
+        hideElidedLines,
       })
 
       if (!result.success) {
@@ -229,23 +234,6 @@ async function fetchSourceCodeContent(tree: Root, deps: Dependencies) {
   return nodeContentMap
 }
 
-function getAttributeValue(
-  node: MdxJsxFlowElement | MdxJsxFlowElementHast | MdxJsxTextElement | MdxJsxTextElementHast,
-  attributeName: string
-) {
-  return (
-    node.attributes.find(
-      (attr: MdxJsxAttribute | MdxJsxExpressionAttribute) =>
-        'name' in attr && attr.name === attributeName
-    )?.value ?? undefined
-  )
-}
-
-function getAttributeValueExpression(node: MdxJsxAttributeValueExpression | string | undefined) {
-  if (typeof node === 'string' || node?.type !== 'mdxJsxAttributeValueExpression') return undefined
-  return node.value
-}
-
 function rewriteNodes(contentMap: Map<MdxJsxFlowElement, [CodeSampleMeta, string]>) {
   for (const [node, [meta, content]] of contentMap) {
     const lang = matchLang(meta.path.split('.').pop())
@@ -254,7 +242,7 @@ function rewriteNodes(contentMap: Map<MdxJsxFlowElement, [CodeSampleMeta, string
       ? `https://github.com/${meta.org}/${meta.repo}/blob/${meta.commit}${meta.path}`
       : `https://github.com/supabase/supabase/blob/${process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ?? 'master'}/examples${meta.path}`
 
-    const elidedContent = redactLines(content, meta.lines, lang)
+    const elidedContent = redactLines(content, meta.lines, lang, meta.hideElidedLines)
 
     const replacementContent: MdxJsxFlowElement | Code = meta.codeHikeAncestor
       ? {
@@ -363,18 +351,19 @@ function matchLang(lang: string) {
 function redactLines(
   content: string,
   lines: [number, number, ...unknown[]][],
-  lang: string | null
+  lang: string | null,
+  hideElidedLines: boolean = false
 ) {
   const contentLines = content.split('\n')
   const preservedLines = lines.reduce((acc, [start, end], index, arr) => {
-    if (index !== 0 || start !== 1) {
+    if (!hideElidedLines && (index !== 0 || start !== 1)) {
       acc.push(_createElidedLine(lang, contentLines, start, end))
     }
 
     // Start and end are 1-indexed and inclusive
     acc.push(...contentLines.slice(start - 1, end === -1 ? contentLines.length : end))
 
-    if (index === arr.length - 1 && end !== -1 && end !== contentLines.length) {
+    if (!hideElidedLines && index === arr.length - 1 && end !== -1 && end !== contentLines.length) {
       acc.push(_createElidedLine(lang, contentLines, start, end))
     }
 
@@ -484,4 +473,8 @@ function createArrayAttributeValueExpression(...arrayElements: string[]) {
     },
   }
   return expression
+}
+
+export function isCodeSampleWrapper(node: BlockContent | DefinitionContent) {
+  return node.type === 'mdxJsxFlowElement' && node.name === 'CodeSampleWrapper'
 }

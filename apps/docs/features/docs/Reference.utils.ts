@@ -1,6 +1,6 @@
 import { fromMarkdown } from 'mdast-util-from-markdown'
-import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
+import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import type { Metadata, ResolvingMetadata } from 'next'
 import { redirect } from 'next/navigation'
@@ -119,12 +119,11 @@ export async function generateReferenceStaticParams() {
 }
 
 export async function generateReferenceMetadata(
-  { params: { slug } }: { params: { slug: Array<string> } },
+  props: { params: Promise<{ slug: Array<string> }> },
   resolvingParent: ResolvingMetadata
 ): Promise<Metadata> {
-  console.log('[ENTER] generateReferenceMetadata')
+  const { slug } = await props.params
   const { alternates: parentAlternates, openGraph: parentOg } = await resolvingParent
-  console.log('[INFO] generateReferenceMetadata: post await resolvingParent')
 
   const parsedPath = parseReferencePath(slug)
   const isClientSdkReference = parsedPath.__type === 'clientSdk'
@@ -132,7 +131,7 @@ export async function generateReferenceMetadata(
   const isApiReference = parsedPath.__type === 'api'
   const isSelfHostingReference = parsedPath.__type === 'self-hosting'
   if (isClientSdkReference) {
-    const { sdkId, maybeVersion } = parsedPath
+    const { sdkId, maybeVersion, path } = parsedPath
     const version = maybeVersion ?? REFERENCES[sdkId].versions[0]
 
     const flattenedSections = await getFlattenedSections(sdkId, version)
@@ -142,7 +141,7 @@ export async function generateReferenceMetadata(
       slug.length > 0
         ? flattenedSections.find((section) => section.slug === slug[0])?.title
         : undefined
-    const url = [BASE_PATH, 'reference', sdkId, maybeVersion, slug[0]].filter(Boolean).join('/')
+    const url = [BASE_PATH, 'reference', sdkId, path[0]].filter(Boolean).join('/')
 
     const images = generateOpenGraphImageMeta({
       type: 'API Reference',
@@ -167,7 +166,6 @@ export async function generateReferenceMetadata(
       },
     }
   } else if (isCliReference) {
-    console.log('[PRE-RETURN] generateReferenceMetadata: isCliReference')
     return {
       title: 'CLI Reference | Supabase Docs',
       description: 'CLI reference for the Supabase CLI',

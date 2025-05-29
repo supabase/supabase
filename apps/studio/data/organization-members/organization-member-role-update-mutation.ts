@@ -25,7 +25,7 @@ export async function assignOrganizationMemberRole({
   const { data, error } = await put(
     '/platform/organizations/{slug}/members/{gotrue_id}/roles/{role_id}',
     {
-      params: { path: { slug, gotrue_id: gotrueId, role_id: roleId.toString() } },
+      params: { path: { slug, gotrue_id: gotrueId, role_id: roleId } },
       body: { name: roleName, role_scoped_projects: projects },
     }
   )

@@ -1,6 +1,6 @@
-import { boolean, number, object, string } from 'yup'
-import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
+import { NO_REQUIRED_CHARACTERS, urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import { ProjectAuthConfigData } from 'data/auth/auth-config-query'
+import { boolean, number, object, string } from 'yup'
 
 const parseBase64URL = (b64url: string) => {
   return atob(b64url.replace(/[-]/g, '+').replace(/[_]/g, '/'))
@@ -32,10 +32,48 @@ const PROVIDER_EMAIL = {
     },
     SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: {
       title: 'Secure password change',
-      description: `Users will need to be recently logged in to change their password without requiring reauthentication.
+      description: `Users will need to be recently logged in to change their password without requiring reauthentication. (A user is considered recently logged in if the session was created within the last 24 hours.)
       If disabled, a user can change their password at any time.`,
       type: 'boolean',
     },
+    PASSWORD_HIBP_ENABLED: {
+      title: 'Prevent use of leaked passwords',
+      description:
+        'Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API.',
+      type: 'boolean',
+    },
+    PASSWORD_MIN_LENGTH: {
+      title: 'Minimum password length',
+      type: 'number',
+      description:
+        'Passwords shorter than this value will be rejected as weak. Minimum 6, recommended 8 or more.',
+      units: 'characters',
+    },
+    PASSWORD_REQUIRED_CHARACTERS: {
+      type: 'select',
+      title: 'Password Requirements',
+      description: 'Passwords that do not have at least one of each will be rejected as weak.',
+      enum: [
+        {
+          label: 'No required characters (default)',
+          value: NO_REQUIRED_CHARACTERS,
+        },
+        {
+          label: 'Letters and digits',
+          value: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789',
+        },
+        {
+          label: 'Lowercase, uppercase letters and digits',
+          value: 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789',
+        },
+        {
+          label: 'Lowercase, uppercase letters, digits and symbols (recommended)',
+          value:
+            'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789:!@#$%^&*()_+-=[]{};\'\\\\:"|<>?,./`~',
+        },
+      ],
+    },
+
     MAILER_OTP_EXP: {
       title: 'Email OTP Expiration',
       type: 'number',
@@ -55,6 +93,9 @@ const PROVIDER_EMAIL = {
       .max(86400, 'Must be no more than 86400')
       .required('This is required'),
     MAILER_OTP_LENGTH: number().min(6, 'Must be at least 6').max(10, 'Must be no more than 10'),
+    PASSWORD_MIN_LENGTH: number()
+      .min(6, 'Must be greater or equal to 6.')
+      .required('This is required'),
   }),
   misc: {
     iconKey: 'email-icon2',
@@ -947,6 +988,7 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
 const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
+  key: 'linkedin_oidc',
   title: 'LinkedIn (OIDC)',
   link: 'https://supabase.com/docs/guides/auth/social-login/auth-linkedin',
   properties: {
@@ -1143,6 +1185,7 @@ const EXTERNAL_PROVIDER_SLACK_OIDC = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Slack (OIDC)',
+  key: 'slack_oidc',
   link: 'https://supabase.com/docs/guides/auth/social-login/auth-slack',
   properties: {
     EXTERNAL_SLACK_OIDC_ENABLED: {
@@ -1343,10 +1386,32 @@ const PROVIDER_SAML = {
   },
 }
 
+const PROVIDER_WEB3 = {
+  $schema: JSON_SCHEMA_VERSION,
+  type: 'object',
+  title: 'Web3 Wallet (Solana)',
+  link: 'https://supabase.com/docs/guides/auth/auth-web3',
+  properties: {
+    EXTERNAL_WEB3_SOLANA_ENABLED: {
+      title: 'Enable Sign in with Solana',
+      description:
+        'Allow Solana wallet holders to sign in to your project via the Sign in with Solana (SIWS, EIP-4361) standard. Set up [attack protection](../auth/protection) and adjust [rate limits](../auth/rate-limits) to counter abuse.',
+      type: 'boolean',
+    },
+  },
+  validationSchema: object().shape({
+    EXTERNAL_WEB3_SOLANA_ENABLED: boolean().required(),
+  }),
+  misc: {
+    iconKey: 'web3-icon',
+  },
+}
+
 export const PROVIDERS_SCHEMAS = [
   PROVIDER_EMAIL,
   PROVIDER_PHONE,
   PROVIDER_SAML,
+  PROVIDER_WEB3,
   EXTERNAL_PROVIDER_APPLE,
   EXTERNAL_PROVIDER_AZURE,
   EXTERNAL_PROVIDER_BITBUCKET,

@@ -21,6 +21,7 @@ import { Badge, Input } from 'ui'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
 import JWTSettings from './JWTSettings'
 import { PostgrestConfig } from './PostgrestConfig'
+import { ApiKeysMoved } from './ApiKeysMoved'
 
 const ServiceList = () => {
   const client = useQueryClient()
@@ -143,11 +144,11 @@ const ServiceList = () => {
             </Panel>
           </section>
 
-          <section>
-            <DisplayApiSettings key="DisplayAPISettings" />
+          <section className="mb-8">
+            <ApiKeysMoved />
           </section>
 
-          <section>
+          <section id="jwt-settings">
             <JWTSettings />
           </section>
 

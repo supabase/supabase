@@ -7,15 +7,9 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useProfile } from 'lib/profile'
-import {
-  Button,
-  Loading,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
-import { MemberRow } from './MemberRow'
+import { Button, Loading, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { MemberRow } from './MemberRow'
 
 export interface MembersViewProps {
   searchString: string
@@ -80,7 +74,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
       )}
 
       {isSuccessMembers && (
-        <div className="rounded w-full">
+        <div className="rounded w-full overflow-hidden overflow-x-scroll">
           <Loading active={!filteredMembers}>
             <Table
               head={[
@@ -91,8 +85,8 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                 </Table.th>,
                 <Table.th key="header-role" className="flex items-center space-x-1">
                   <span>Role</span>
-                  <Tooltip_Shadcn_>
-                    <TooltipTrigger_Shadcn_ asChild>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
                       <Button asChild type="text" className="px-1">
                         <a
                           target="_blank"
@@ -102,11 +96,9 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                           <HelpCircle size={14} className="text-foreground-light" />
                         </a>
                       </Button>
-                    </TooltipTrigger_Shadcn_>
-                    <TooltipContent_Shadcn_ side="bottom">
-                      How to configure access control?
-                    </TooltipContent_Shadcn_>
-                  </Tooltip_Shadcn_>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">How to configure access control?</TooltipContent>
+                  </Tooltip>
                 </Table.th>,
                 <Table.th key="header-action" />,
               ]}

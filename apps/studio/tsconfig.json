@@ -8,7 +8,7 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "ES2022",
+    "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -31,5 +31,5 @@
     "./../../packages/ui/src/**/*.d.ts",
     ".react-router/types/**/*"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "public/deno/*.ts"]
 }

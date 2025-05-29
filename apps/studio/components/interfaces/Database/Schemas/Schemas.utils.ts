@@ -4,22 +4,22 @@ import { uniqBy } from 'lodash'
 import { Edge, Node, Position } from 'reactflow'
 import 'reactflow/dist/style.css'
 
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNodeData } from './SchemaTableNode'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 const NODE_SEP = 25
 const RANK_SEP = 50
 
 export async function getGraphDataFromTables(
-  ref: string,
-  schema: PostgresSchema,
-  tables: PostgresTable[]
+  ref?: string,
+  schema?: PostgresSchema,
+  tables?: PostgresTable[]
 ): Promise<{
   nodes: Node<TableNodeData>[]
   edges: Edge[]
 }> {
-  if (!tables.length) {
+  if (!tables?.length) {
     return { nodes: [], edges: [] }
   }
 
@@ -121,7 +121,7 @@ export async function getGraphDataFromTables(
   }
 
   const savedPositionsLocalStorage = localStorage.getItem(
-    LOCAL_STORAGE_KEYS.SCHEMA_VISUALIZER_POSITIONS(ref, schema.id)
+    LOCAL_STORAGE_KEYS.SCHEMA_VISUALIZER_POSITIONS(ref ?? 'project', schema?.id ?? 0)
   )
   const savedPositions = tryParseJson(savedPositionsLocalStorage)
   return !!savedPositions

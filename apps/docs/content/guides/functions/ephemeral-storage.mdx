@@ -14,7 +14,7 @@ Ephemeral storage will reset on each function invocation. This means the files y
 Here are some use cases where ephemeral storage can be useful:
 
 - Unzip an archive of CSVs and then add them as records to the DB
-- Custom image manipulation workflows (using [MagickWasm](https://supabase.com/docs/guides/functions/examples/image-manipulation))
+- Custom image manipulation workflows (using [`magick-wasm`](https://supabase.com/docs/guides/functions/examples/image-manipulation))
 
 You can use [Background Tasks](https://supabase.com/docs/guides/functions/background-tasks) to handle slow file processing outside of a request.
 
@@ -45,9 +45,9 @@ Deno.serve(async (req) => {
 
 ### Unavailable APIs
 
-Currently, the synchronous APIs (eg: `Deno.writeFileSync` or `Deno.mkdirSync`) for creating or writing files are not supported.
+Currently, the synchronous APIs (e.g. `Deno.writeFileSync` or `Deno.mkdirSync`) for creating or writing files are not supported.
 
-You can use sync variations of read APIs (eg: `Deno.readFileSync`).
+You can use sync variations of read APIs (e.g. `Deno.readFileSync`).
 
 ### Limits
 

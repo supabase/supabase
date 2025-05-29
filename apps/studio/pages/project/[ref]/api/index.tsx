@@ -9,12 +9,17 @@ import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { snakeToCamel } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const PageConfig: NextPageWithLayout = () => {
   return <DocView />
 }
 
-PageConfig.getLayout = (page) => <DocsLayout title="API">{page}</DocsLayout>
+PageConfig.getLayout = (page) => (
+  <DefaultLayout>
+    <DocsLayout title="API">{page}</DocsLayout>
+  </DefaultLayout>
+)
 
 export default PageConfig
 

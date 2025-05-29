@@ -19,7 +19,7 @@ import { useParams } from 'common'
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
 import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { IS_PLATFORM } from 'lib/constants'
-import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { useProjectContext } from '../ProjectContext'
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
 
@@ -100,7 +100,7 @@ const UpgradingState = () => {
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">We ran into an issue while upgrading your project</p>
-                  <p className="mt-4 text-center text-sm text-foreground-light w-[450px] mx-auto">
+                  <p className="mt-4 text-center text-sm text-foreground-light w-full md:w-[450px] mx-auto">
                     Your project is back online and its data is not affected. Please reach out to us
                     via our support form for assistance with the upgrade.
                   </p>
@@ -225,14 +225,14 @@ const UpgradingState = () => {
                   </div>
 
                   {initiated_at !== undefined && (
-                    <Tooltip_Shadcn_>
-                      <TooltipTrigger_Shadcn_>
+                    <Tooltip>
+                      <TooltipTrigger>
                         <p className="text-sm text-center text-foreground-light">
                           Started on: {initiatedAtUTC} (UTC)
                         </p>
-                      </TooltipTrigger_Shadcn_>
-                      <TooltipContent_Shadcn_ side="bottom">{initiatedAt}</TooltipContent_Shadcn_>
-                    </Tooltip_Shadcn_>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">{initiatedAt}</TooltipContent>
+                    </Tooltip>
                   )}
                 </div>
               </div>

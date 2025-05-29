@@ -15,7 +15,7 @@ import z from 'zod'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import Panel from 'components/ui/Panel'
 import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
-import type { Profile } from 'data/profile/types'
+import { useProfile } from 'lib/profile'
 import type { FormSchema } from 'types'
 
 const FormSchema = z.object({
@@ -25,10 +25,12 @@ const FormSchema = z.object({
 
 const formId = 'profile-information-form'
 
-export const ProfileInformation = ({ profile }: { profile: Profile }) => {
+export const ProfileInformation = () => {
+  const { profile } = useProfile()
+
   const form = useForm({
     resolver: zodResolver(FormSchema),
-    defaultValues: { first_name: profile.first_name ?? '', last_name: profile.last_name ?? '' },
+    defaultValues: { first_name: profile?.first_name ?? '', last_name: profile?.last_name ?? '' },
   })
 
   const { mutate: updateProfile, isLoading } = useProfileUpdateMutation({
@@ -46,7 +48,7 @@ export const ProfileInformation = ({ profile }: { profile: Profile }) => {
   return (
     <>
       <Panel
-        className="mb-8"
+        className="mb-4 md:mb-8"
         title={<h5>Profile Information</h5>}
         footer={
           <FormActions
@@ -60,7 +62,7 @@ export const ProfileInformation = ({ profile }: { profile: Profile }) => {
         <Form_Shadcn_ {...form}>
           <form
             id={formId}
-            className="space-y-6 w-full px-8 py-8"
+            className="space-y-6 w-full p-4 md:p-8"
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <FormField_Shadcn_

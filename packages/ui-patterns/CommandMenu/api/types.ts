@@ -1,2 +1,2 @@
-export type { ICommand } from '../internal/Command'
+export type { ICommand } from '../internal/types'
 export type { CommandOptions } from '../internal/state/commandsState'

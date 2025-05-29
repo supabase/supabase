@@ -69,7 +69,7 @@ function SingleSource({ children, source }: PropsWithChildren<{ source: string |
         href={source.toString()}
         target="_blank"
         rel="noopener noreferrer"
-        className="block -mt-4 mb-4 text-right no-underline text-foreground-lighter text-sm"
+        className="block -mt-5 mb-4 text-right no-underline text-foreground-lighter text-sm"
       >
         View source
       </Link>

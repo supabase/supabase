@@ -10,7 +10,7 @@ The pg_net API is in beta. Functions signatures may change.
 
 </Admonition>
 
-[pg_net](https://github.com/supabase/pg_net/) enables PostgreSQL to make asynchronous HTTP/HTTPS requests in SQL. It differs from the [`http`](https://supabase.com/docs/guides/database/extensions/http) extension in that it is asynchronous by default. This makes it useful in blocking functions (like triggers).
+[pg_net](https://github.com/supabase/pg_net/) enables Postgres to make asynchronous HTTP/HTTPS requests in SQL. It differs from the [`http`](https://supabase.com/docs/guides/database/extensions/http) extension in that it is asynchronous by default. This makes it useful in blocking functions (like triggers).
 
 It eliminates the need for servers to continuously poll for database changes and instead allows the database to proactively notify external resources about significant events.
 
@@ -359,7 +359,7 @@ select
 
 ### Call an endpoint every minute with [pg_cron](https://supabase.com/docs/guides/database/extensions/pgcron)
 
-The pg_cron extension enables PostgreSQL to become its own cron server. With it you can schedule regular calls with up to a minute precision to endpoints.
+The pg_cron extension enables Postgres to become its own cron server. With it you can schedule regular calls with up to a minute precision to endpoints.
 
 ```sql
 select cron.schedule(
@@ -435,7 +435,7 @@ More examples can be seen on the [Extension's GitHub page](https://github.com/su
 - Can only make POST requests with JSON data. No other data formats are supported
 - Intended to handle at most 200 requests per second. Increasing the rate can introduce instability
 - Does not have support for PATCH/PUT requests
-- Can only work with one database at a time. It defaults to the postgres database.
+- Can only work with one database at a time. It defaults to the `postgres` database.
 
 ## Resources
 

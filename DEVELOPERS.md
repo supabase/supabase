@@ -12,7 +12,7 @@
       - [Shared components](#shared-components)
       - [Installing packages](#installing-packages)
   - [Running Docker for Supabase Studio](#running-docker-for-supabase-studio)
-    - [Prerequsites](#prerequsites)
+    - [Prerequisites](#prerequisites)
     - [Get Started](#get-started)
   - [Create a pull request](#create-a-pull-request)
   - [Issue assignment](#issue-assignment)
@@ -22,8 +22,6 @@
   - [Community channels](#community-channels)
   - [Contributors](#contributors)
 
-- [Common tasks](#common-tasks)
-  - [Add a redirect](#add-a-redirect)
 - [Community channels](#community-channels)
 
 ## Getting started
@@ -36,8 +34,8 @@ To ensure a positive and inclusive environment, please read our [code of conduct
 
 You will need to install and configure the following dependencies on your machine to build [Supabase](https://supabase.com):
 
-- [Git](http://git-scm.com/)
-- [Node.js v20.x (LTS)](http://nodejs.org)
+- [Git](https://git-scm.com/)
+- [Node.js v20.x (LTS)](https://nodejs.org)
 - [pnpm](https://pnpm.io/) version 9.x.x or higher
 - [make](https://www.gnu.org/software/make/) or the equivalent to `build-essentials` for your OS
 - [Docker](https://docs.docker.com/get-docker/) (to run studio locally)
@@ -129,7 +127,7 @@ For example:
 
 To run Studio locally, you'll need to setup Docker in addition to your NextJS frontend.
 
-#### Prerequsites
+#### Prerequisites
 
 First, make sure you have the Docker installed on your device. You can download and install it from [here](https://docs.docker.com/get-docker/).
 

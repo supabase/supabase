@@ -1,16 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { ExternalLink, Plug } from 'lucide-react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 
 import { DatabaseConnectionString } from 'components/interfaces/Connect/DatabaseConnectionString'
-import { DatabaseConnectionString as OldDatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
-
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from 'lib/constants'
 import {
   Button,
   DIALOG_PADDING_X,
@@ -32,9 +32,10 @@ import { getContentFilePath } from './Connect.utils'
 import ConnectDropdown from './ConnectDropdown'
 import ConnectTabContent from './ConnectTabContent'
 
-const Connect = () => {
+export const Connect = () => {
   const { ref: projectRef } = useParams()
-  const connectDialogUpdate = useFlag('connectDialogUpdate')
+  const selectedProject = useSelectedProject()
+  const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   const [showConnect, setShowConnect] = useQueryState(
     'showConnect',
@@ -52,7 +53,7 @@ const Connect = () => {
       ?.children.find((child) => child.key === selectedChild)?.children[0]?.key || ''
   )
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+  const { data: settings } = useProjectSettingsV2Query({ projectRef }, { enabled: showConnect })
   const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
 
   const handleParentChange = (value: string) => {
@@ -151,14 +152,29 @@ const Connect = () => {
     selectedGrandchild,
   })
 
+  if (!isActiveHealthy) {
+    return (
+      <ButtonTooltip
+        disabled
+        type="default"
+        className="rounded-full"
+        icon={<Plug className="rotate-90" />}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: 'Project is currently not active and cannot be connected',
+          },
+        }}
+      >
+        Connect
+      </ButtonTooltip>
+    )
+  }
+
   return (
     <Dialog open={showConnect} onOpenChange={(open) => setShowConnect(!open ? null : open)}>
       <DialogTrigger asChild>
-        <Button
-          type={connectDialogUpdate ? 'default' : 'primary'}
-          className={cn(connectDialogUpdate && 'rounded-full')}
-          icon={<Plug className="rotate-90" />}
-        >
+        <Button type="default" className="rounded-full" icon={<Plug className="rotate-90" />}>
           <span>Connect</span>
         </Button>
       </DialogTrigger>
@@ -171,7 +187,7 @@ const Connect = () => {
         </DialogHeader>
 
         <Tabs_Shadcn_ defaultValue="direct" onValueChange={(value) => handleConnectionType(value)}>
-          <TabsList_Shadcn_ className={cn('flex gap-x-4', DIALOG_PADDING_X)}>
+          <TabsList_Shadcn_ className={cn('flex overflow-x-scroll gap-x-4', DIALOG_PADDING_X)}>
             {CONNECTION_TYPES.map((type) => (
               <TabsTrigger_Shadcn_ key={type.key} value={type.key} className="px-0">
                 {type.label}
@@ -196,13 +212,7 @@ const Connect = () => {
                   className={cn('!mt-0', 'p-0', 'flex flex-col gap-6')}
                 >
                   <div className={DIALOG_PADDING_Y}>
-                    {connectDialogUpdate ? (
-                      <DatabaseConnectionString />
-                    ) : (
-                      <div className="px-7">
-                        <OldDatabaseConnectionString appearance="minimal" />
-                      </div>
-                    )}
+                    <DatabaseConnectionString />
                   </div>
                 </TabsContent_Shadcn_>
               )
@@ -214,8 +224,8 @@ const Connect = () => {
                 value={type.key}
                 className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, '!mt-0')}
               >
-                <div className="flex justify-between">
-                  <div className="flex items-center gap-3">
+                <div className="flex flex-col md:flex-row gap-2 justify-between">
+                  <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3">
                     <ConnectDropdown
                       state={selectedParent}
                       updateState={handleParentChange}
@@ -283,5 +293,3 @@ const Connect = () => {
     </Dialog>
   )
 }
-
-export default Connect

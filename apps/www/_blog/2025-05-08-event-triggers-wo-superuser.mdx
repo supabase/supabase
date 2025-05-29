@@ -1,0 +1,139 @@
+---
+title: PostgreSQL Event Triggers without superuser access
+description: Using Postgres Hooks to allow regular users to create event triggers
+author: steve_chavez
+author_url: https://github.com/steve-chavez
+author_image_url: https://github.com/steve-chavez.png
+image: 2025-05-08-event-triggers-wo-superuser/cover-event-triggers-dark.png
+thumb: 2025-05-08-event-triggers-wo-superuser/cover-event-triggers-dark.png
+categories:
+  - postgres
+tags:
+  - postgres
+  - planetpg
+  - event triggers
+  - extensions
+date: '2025-05-08'
+---
+
+Event Triggers in Postgres are powerful, but only a superuser can create them. In cloud environments, granting superuser access isn't an option.
+
+But thanks to Postgres' extensibility, we can allow regular users to create Event Triggers, in a safe way.
+
+In this blog post, we’ll explain how we do this in the `supautils` extension, using a combination of the Utility Hook and the Function Manager Hook.
+
+## Privileged Role
+
+<Img
+  wide
+  alt="Utility Hook"
+  src={{
+    dark: '/images/blog/2025-05-08-event-triggers-wo-superuser/utility-hook-dark.png',
+    light: '/images/blog/2025-05-08-event-triggers-wo-superuser/utility-hook-light.png',
+  }}
+/>
+
+The core of `supautils` is the “privileged role”, which is a role that serves as proxy to superuser. It provides a safe subset of superuser capabilities and it’s accessible to regular users.
+
+When the privileged role does a `create event trigger`, we intercept the statement with a Utility Hook (`ProcessUtility_hook`).
+Here we elevate the role to a superuser, continuing the usual flow and allowing the creation on Postgres core. As a last step, we downgrade to the privileged role and make
+it the event trigger owner [^1].
+
+Creating an event trigger like this is not safe though, as it would allow privilege escalation.
+
+## The privilege escalation problem
+
+Here, a problem arises. Once an Event Trigger is created:
+
+- It targets every role.
+- It runs using the target role privileges [^2].
+
+This means that a malicious user can create an Event Trigger like:
+
+```sql
+create or replace function become_super()
+    returns event_trigger
+    language plpgsql as
+$$
+begin
+    alter role malicious SUPERUSER;
+end;
+$$;
+
+create event trigger bad_event_trigger on ddl_command_end
+execute procedure become_super();
+```
+
+And once a superuser trips on the event trigger, it will fire with its privileges. Making the malicious user a superuser.
+
+## Skipping Event Triggers
+
+<Img
+  wide
+  alt="FMGR Hook"
+  src={{
+    dark: '/images/blog/2025-05-08-event-triggers-wo-superuser/fmgr-hook-dark.png',
+    light: '/images/blog/2025-05-08-event-triggers-wo-superuser/fmgr-hook-light.png',
+  }}
+/>
+
+A solution would be skipping user Event Triggers for superusers.
+
+The Function Manager hook (`fmgr_hook`) allows us to intercept and modify functions’ execution.
+
+We can intercept the Event Trigger function and replace it with a “noop”. Postgres doesn’t provide a noop function, but we can use the existing `version()` function for the same purpose.
+
+Besides superusers, we also want to skip user event triggers for “reserved roles” [^3]. These are used for managed services (like `pgbouncer`).
+
+## User Event Triggers
+
+This now allows users to safely create Event Triggers, without superuser access:
+
+```sql
+-- use the privileged role, which is configured to be "postgres"
+set role postgres;
+select current_setting('is_superuser'); -- prove it's not a superuser
+ current_setting
+-----------------
+ off
+(1 row)
+
+-- now create the event trigger
+create function show_current_user()
+returns event_trigger as $$
+begin
+  raise notice 'the event trigger is executed for %', current_user;
+end;
+$$ language plpgsql;
+
+create event trigger myevtrig on ddl_command_end
+execute procedure show_current_user();
+
+-- check it succeeds
+create table foo();
+NOTICE:  the event trigger is executed for postgres
+
+set role myrole;
+create table bar();
+NOTICE:  the event trigger is executed for myrole
+```
+
+## Future in Postgres core
+
+We would also like to allow regular user event triggers in Postgres core. To this end, we’ve submitted [some patches](https://www.postgresql.org/message-id/flat/CAGRrpzbtYDkg7_xwfzrqByYgCJQbbL38tADyuN%2B6tAkbA-Pnkg%40mail.gmail.com) which are already generating fruitful discussion.
+
+Note that user Event Triggers in Postgres core will likely be more restricted than the `supautils` version.
+
+## Try it out
+
+User Event Triggers are now available for new projects on the Supabase platform.
+
+You can also git clone the [supautils repo](https://github.com/supabase/supautils/) and `make install` it in your own deployment.
+
+Finally, we want to give a special shout out to the [Zero Sync](https://zero.rocicorp.dev) team, who pushed us to release this feature.
+
+---
+
+[^1]: This is so the event trigger can be altered or dropped by end users.
+[^2]: This is not true if you mark the event trigger function as `security definer`, then it will run with the privileges of the function owner. But this is not a usual practice on event triggers, as they usually want to preserve the context of the current user.
+[^3]: These are configurable. You can read more about reserved roles [here](https://supabase.com/blog/roles-postgres-hooks).

@@ -146,7 +146,7 @@ const DiskUsage = ({
                   <p className="text-sm">Current disk size per project</p>
                   <p className="text-sm text-foreground-light">
                     Breakdown of disk per project. Head to your project's disk management section to
-                    see database space used.
+                    see database size used.
                   </p>
                 </div>
 

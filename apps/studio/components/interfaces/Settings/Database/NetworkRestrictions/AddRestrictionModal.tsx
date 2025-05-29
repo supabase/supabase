@@ -1,18 +1,17 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
 import { toast } from 'sonner'
-import { Button, Form, Input, Modal } from 'ui'
+import { Button, Form, Input, Modal, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import InformationBox from 'components/ui/InformationBox'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
+import { HelpCircle } from 'lucide-react'
 import {
   checkIfPrivate,
   getAddressEndRange,
   isValidAddress,
   normalize,
 } from './NetworkRestrictions.utils'
-import { HelpCircle } from 'lucide-react'
 
 const IPV4_MAX_CIDR_BLOCK_SIZE = 32
 const IPV6_MAX_CIDR_BLOCK_SIZE = 128
@@ -31,7 +30,7 @@ const AddRestrictionModal = ({
   const formId = 'add-restriction-form'
   const { ref } = useParams()
 
-  const { data } = useNetworkRestrictionsQuery({ projectRef: ref })
+  const { data } = useNetworkRestrictionsQuery({ projectRef: ref }, { enabled: type !== undefined })
   const ipv4Restrictions = data?.config?.dbAllowedCidrs ?? []
   // @ts-ignore [Joshen] API typing issue
   const ipv6Restrictions = data?.config?.dbAllowedCidrsV6 ?? []
@@ -163,7 +162,7 @@ const AddRestrictionModal = ({
                   database.
                 </p>
                 <InformationBox
-                  title="Note: Restrictions only apply to direct connections to your database and Supavisor"
+                  title="Note: Restrictions only apply to direct connections to your database and connection pooler"
                   description="They do not currently apply to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication."
                   urlLabel="Learn more"
                   url="https://supabase.com/docs/guides/platform/network-restrictions#limitations"
@@ -182,33 +181,21 @@ const AddRestrictionModal = ({
                       label={
                         <div className="flex items-center space-x-2">
                           <p>CIDR Block Size</p>
-                          <Tooltip.Root delayDuration={0}>
-                            <Tooltip.Trigger>
+                          <Tooltip>
+                            <TooltipTrigger>
                               <HelpCircle size="14" strokeWidth={2} />
-                            </Tooltip.Trigger>
-                            <Tooltip.Portal>
-                              <Tooltip.Content side="bottom">
-                                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                <div
-                                  className={[
-                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                    'border border-background w-[300px]',
-                                  ].join(' ')}
-                                >
-                                  <span className="text-xs text-foreground">
-                                    Classless inter-domain routing (CIDR) notation is the notation
-                                    used to identify networks and hosts in the networks. The block
-                                    size tells us how many bits we need to take for the network
-                                    prefix, and is a value between 0 to{' '}
-                                    {type === 'IPv4'
-                                      ? IPV4_MAX_CIDR_BLOCK_SIZE
-                                      : IPV6_MAX_CIDR_BLOCK_SIZE}
-                                    .
-                                  </span>
-                                </div>
-                              </Tooltip.Content>
-                            </Tooltip.Portal>
-                          </Tooltip.Root>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" className="w-80">
+                              Classless inter-domain routing (CIDR) notation is the notation used to
+                              identify networks and hosts in the networks. The block size tells us
+                              how many bits we need to take for the network prefix, and is a value
+                              between 0 to{' '}
+                              {type === 'IPv4'
+                                ? IPV4_MAX_CIDR_BLOCK_SIZE
+                                : IPV6_MAX_CIDR_BLOCK_SIZE}
+                              .
+                            </TooltipContent>
+                          </Tooltip>
                         </div>
                       }
                       id="cidrBlockSize"

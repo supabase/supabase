@@ -1,6 +1,5 @@
-'use client'
-
 export * from './auth'
+export * from './consent-state'
 export * from './constants'
 export * from './database-types'
 export * from './gotrue'
@@ -9,3 +8,4 @@ export * from './hooks'
 export * from './MetaFavicons/pages-router'
 export * from './Providers'
 export * from './telemetry'
+export * from './feature-flags'

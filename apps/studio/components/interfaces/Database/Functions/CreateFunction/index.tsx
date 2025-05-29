@@ -156,7 +156,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         className={cn(
           // 'bg-surface-200',
           'p-0 flex flex-row gap-0',
-          assistantVisible ? '!min-w-[1200px]' : '!min-w-[600px]'
+          assistantVisible ? '!min-w-screen lg:!min-w-[1200px]' : '!min-w-screen lg:!min-w-[600px]'
         )}
       >
         <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>

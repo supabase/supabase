@@ -8,7 +8,7 @@ import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueuesVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 // [Joshen] Check if all the relevant functions exist to indicate whether PGMQ has been exposed through PostgREST

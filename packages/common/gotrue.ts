@@ -1,4 +1,4 @@
-import { AuthClient, navigatorLock } from '@supabase/auth-js'
+import { AuthClient, navigatorLock, User } from '@supabase/auth-js'
 
 export const STORAGE_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || 'supabase.dashboard.auth.token'
 export const AUTH_DEBUG_KEY =
@@ -111,3 +111,5 @@ export const gotrueClient = new AuthClient({
   debug: debug ? (persistedDebug ? logIndexedDB : true) : false,
   lock: navigatorLockEnabled ? navigatorLock : undefined,
 })
+
+export type { User }

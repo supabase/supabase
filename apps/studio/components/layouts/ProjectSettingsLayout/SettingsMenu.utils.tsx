@@ -14,7 +14,7 @@ export const generateSettingsMenu = (
     edgeFunctions?: boolean
     storage?: boolean
     invoices?: boolean
-    diskAndCompute?: boolean
+    newApiKeys?: boolean
   }
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -23,7 +23,6 @@ export const generateSettingsMenu = (
   const authEnabled = features?.auth ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
-  const newDiskComputeEnabled = features?.diskAndCompute ?? false
 
   return [
     {
@@ -35,7 +34,7 @@ export const generateSettingsMenu = (
           url: `/project/${ref}/settings/general`,
           items: [],
         },
-        ...(IS_PLATFORM && newDiskComputeEnabled
+        ...(IS_PLATFORM
           ? [
               {
                 name: 'Compute and Disk',
@@ -58,6 +57,13 @@ export const generateSettingsMenu = (
                 key: 'integrations',
                 url: `/project/${ref}/settings/integrations`,
                 items: [],
+              },
+              {
+                name: 'API Keys',
+                key: 'api-keys',
+                url: `/project/${ref}/settings/api-keys`,
+                items: [],
+                label: 'NEW',
               },
             ]
           : []),
@@ -87,7 +93,7 @@ export const generateSettingsMenu = (
           items: [],
         },
         {
-          name: 'API',
+          name: 'Data API',
           key: 'api',
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
           items: [],
@@ -117,8 +123,9 @@ export const generateSettingsMenu = (
               {
                 name: 'Edge Functions',
                 key: 'functions',
-                url: `/project/${ref}/settings/functions`,
+                url: `/project/${ref}/functions/secrets`,
                 items: [],
+                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
               },
             ]
           : []),

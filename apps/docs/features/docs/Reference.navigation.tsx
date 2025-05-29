@@ -28,12 +28,10 @@ export async function ReferenceNavigation({
   version,
   isLatestVersion,
 }: ReferenceNavigationProps) {
-  console.log('[Enter] ReferenceNavigation')
   const navSections = await getReferenceSections(libraryId, version)
 
   const basePath = `/reference/${libPath}${isLatestVersion ? '' : `/${version}`}`
 
-  console.log('[PreReturn] ReferenceNavigation')
   return (
     <ReferenceNavigationScrollHandler className="w-full flex flex-col pt-3 pb-5 gap-3">
       <div className="flex items-center gap-3">

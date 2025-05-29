@@ -240,7 +240,7 @@ export const CreateHookSheet = ({
 
         form.reset({
           hookType: definition.title,
-          enabled: authConfig?.[definition.enabledKey] || false,
+          enabled: authConfig?.[definition.enabledKey] || true,
           selectedType: values.type,
           httpsValues: {
             url: (values.type === 'https' && values.url) || '',
@@ -431,7 +431,7 @@ export const CreateHookSheet = ({
                   </div>
                 </>
               ) : (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-4 px-5">
                   <FormField_Shadcn_
                     key="httpsValues.url"
                     control={form.control}

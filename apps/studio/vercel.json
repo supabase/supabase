@@ -1,5 +1,6 @@
 {
   "framework": "vite",
+  "buildCommand": "pnpm build",
   "trailingSlash": false,
   "outputDirectory": "build/client",
   "rewrites": [

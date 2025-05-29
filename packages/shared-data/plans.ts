@@ -32,7 +32,7 @@ export const plans: PricingInformation[] = [
         features: [
           'Unlimited API requests',
           '50,000 monthly active users',
-          ['500 MB database space', 'Shared CPU • 500 MB RAM'],
+          ['500 MB database size', 'Shared CPU • 500 MB RAM'],
           '5 GB bandwidth',
           '1 GB file storage',
           'Community support',
@@ -43,7 +43,7 @@ export const plans: PricingInformation[] = [
         features: [
           'Unlimited API requests',
           '50,000 monthly active users',
-          ['500 MB database space', 'Shared CPU • 500 MB RAM'],
+          ['500 MB database size', 'Shared CPU • 500 MB RAM'],
           '5 GB bandwidth',
           'Community support',
         ],
@@ -113,8 +113,8 @@ export const plans: PricingInformation[] = [
         partners: [],
         features: [
           'SOC2',
+          'Project-scoped and read-only access',
           'HIPAA available as paid add-on',
-          'Read-only and Billing member roles',
           'SSO for Supabase Dashboard',
           'Priority email support & SLAs',
           'Daily backups stored for 14 days',
@@ -136,7 +136,7 @@ export const plans: PricingInformation[] = [
         features: [
           'Designated Support manager',
           'Uptime SLAs',
-          'On-premise support',
+          'BYO Cloud supported',
           '24×7×365 premium enterprise support',
           'Private Slack channel',
           'Custom Security Questionnaires',

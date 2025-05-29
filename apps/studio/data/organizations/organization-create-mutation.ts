@@ -5,6 +5,7 @@ import { handleError, post } from 'data/fetchers'
 import { permissionKeys } from 'data/permissions/keys'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
+import type { components } from 'data/api'
 
 export type OrganizationCreateVariables = {
   name: string
@@ -12,6 +13,9 @@ export type OrganizationCreateVariables = {
   size?: string
   tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
   payment_method?: string
+  billing_name?: string
+  address?: components['schemas']['CreateOrganizationBody']['address']
+  tax_id?: components['schemas']['CreateOrganizationBody']['tax_id']
 }
 
 export async function createOrganization({
@@ -20,15 +24,20 @@ export async function createOrganization({
   size,
   tier,
   payment_method,
+  address,
+  billing_name,
+  tax_id,
 }: OrganizationCreateVariables) {
   const { data, error } = await post('/platform/organizations', {
     body: {
       name,
-      // @ts-ignore [Joshen] Generated API spec is wrong
       kind,
       size,
       tier,
       payment_method,
+      address,
+      billing_name,
+      tax_id,
     },
   })
 
