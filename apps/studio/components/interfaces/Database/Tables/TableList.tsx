@@ -100,7 +100,7 @@ const TableList = ({
       select(tables) {
         return filterString.length === 0
           ? tables
-          : tables.filter((table) => table.name.toLowerCase().includes(filterString.toLowerCase()))
+          : tables.filter((table) => table.name.trim().toLowerCase().includes(filterString.trim().toLowerCase()))
       },
     }
   )
