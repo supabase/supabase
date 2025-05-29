@@ -46,4 +46,4 @@ export const FEATURE_PREVIEWS = [
     isNew: false,
     isPlatformOnly: false,
   },
-]
+] as const
