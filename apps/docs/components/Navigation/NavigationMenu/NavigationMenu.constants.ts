@@ -2059,7 +2059,7 @@ export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof Ico
 
 export const security: NavMenuConstant = {
   icon: 'security',
-  title: 'Security',
+  title: 'Security & Compliance',
   url: '/guides/security',
   items: [
     { name: 'Overview', url: '/guides/security' },
@@ -2077,6 +2077,16 @@ export const security: NavMenuConstant = {
       items: [
         { name: 'SOC 2', url: '/guides/security/soc-2-compliance' },
         { name: 'HIPAA', url: '/guides/security/hipaa-compliance' },
+      ],
+    },
+    {
+      name: 'Guides',
+      url: undefined,
+      items: [
+        { name: 'Production Checklist', url: '/guides/deployment/going-into-prod' },
+        { name: 'Shared Responsibility Model', url: '/guides/deployment/shared-responsibility-model' },
+        { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
+        { name: 'Hardening the Data API', url: '/guides/database/hardening-data-api' },
       ],
     },
   ],
