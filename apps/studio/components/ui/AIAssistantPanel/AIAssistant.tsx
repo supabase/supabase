@@ -12,7 +12,7 @@ import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscri
 import { Markdown } from 'components/interfaces/Markdown'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
-import { constructHeaders } from 'data/fetchers'
+import { constructHeaders, handleError } from 'data/fetchers'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -129,11 +129,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { ref } = useParams()
   const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
-
-  const handleError = useCallback((error: Error) => {
-    const errorMessage = JSON.parse(error.message).message
-    toast.error(errorMessage)
-  }, [])
 
   // Handle completion of the assistant's response
   const handleChatFinish = useCallback((message: MessageType) => {
