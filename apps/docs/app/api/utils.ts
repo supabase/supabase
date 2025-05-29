@@ -45,6 +45,24 @@ export class InvalidRequestError<Details extends ObjectOrNever = never> extends 
   }
 }
 
+export class NoDataError<Details extends ObjectOrNever = never> extends ApiError<Details> {
+  constructor(message: string, source?: unknown, details?: Details) {
+    super(`Data not found: ${message}`, source, details)
+  }
+
+  isPrivate() {
+    return false
+  }
+
+  isUserError() {
+    return true
+  }
+
+  statusCode() {
+    return 404
+  }
+}
+
 export function convertUnknownToApiError(error: unknown): ApiError {
   return new ApiError('Unknown error', error)
 }
