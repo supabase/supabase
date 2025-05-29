@@ -79,6 +79,7 @@ jobs:
       - name: Run Playwright tests
         id: playwright
         env:
+          AUTHENTICATION: true
           STUDIO_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}/dashboard
         run: pnpm e2e
 
