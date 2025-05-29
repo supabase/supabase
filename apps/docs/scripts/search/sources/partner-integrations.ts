@@ -1,17 +1,15 @@
 import { type SupabaseClient, createClient } from '@supabase/supabase-js'
-import { upperFirst } from 'lodash'
-
-import { BaseLoader, BaseSource } from './base'
-import { processMdx } from '../../helpers.mdx'
+import { upperFirst } from 'lodash-es'
+import { processMdx } from '../../helpers.mdx.js'
+import { BaseLoader, BaseSource } from './base.js'
 
 type PartnerData = {
   slug: string // The partner slug corresponding to the last part of the URL
   overview: string // The Markdown content for indexing
 }
 
-const supabaseUrl = process.env.NEXT_PUBLIC_MISC_USE_URL ?? process.env.NEXT_PUBLIC_MISC_URL
-const supabaseAnonKey =
-  process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY ?? process.env.NEXT_PUBLIC_MISC_ANON_KEY
+const supabaseUrl = process.env.NEXT_PUBLIC_MISC_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_MISC_ANON_KEY
 
 let supabaseClient: SupabaseClient
 function getSupabaseClient() {

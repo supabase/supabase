@@ -1,4 +1,4 @@
-name: '[Docs] Lint v2'
+name: docs_lint
 
 # Runs the docs linter on PRs that edit docs content.
 # There are two branches of this workflow for internal and external PRs, due
@@ -102,3 +102,6 @@ jobs:
         with:
           name: lint_results
           path: __github_actions__pr/
+      - name: fail if linter fails (external)
+        if: steps.filter.outputs.docs == 'true' && github.event.pull_request.head.repo.full_name != github.repository && steps.external_lint.outputs.LINT_EXIT_CODE != 0
+        run: exit 1

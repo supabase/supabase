@@ -1,5 +1,5 @@
 import { Octokit } from '@octokit/core'
-import { capitalize } from 'lodash'
+import { capitalize } from 'lodash-es'
 import rehypeSlug from 'rehype-slug'
 import { Heading } from 'ui'
 
