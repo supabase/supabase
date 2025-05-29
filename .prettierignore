@@ -24,4 +24,7 @@ apps/**/.contentlayer
 # invalid JSON file
 packages/ui/src/components/Form/examples/PhoneProvidersSchema.json
 apps/cms/config/api.ts
-apps/cms/src
+# auto-generated files by payload cms
+apps/cms/src/app/*
+apps/cms/src/migrations/*
+apps/cms/src/payload-types.ts

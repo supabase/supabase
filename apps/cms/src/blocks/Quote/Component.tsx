@@ -8,12 +8,10 @@ type Props = {
 } & QuoteBlockProps
 
 export const QuoteBlock: React.FC<Props> = ({ className, img, caption, text }) => {
-  return (
-    `<Quote img={${img}} caption={${caption ?? ""}} className={${className}}>
+  return `<Quote img={${img}} caption={${caption ?? ''}} className={${className}}>
 
 {${text}}
 
 </Quote>
 `
-  )
-} 
+}

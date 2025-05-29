@@ -32,7 +32,10 @@ export const revalidateCustomer: CollectionAfterChangeHook<Customer> = ({
   return doc
 }
 
-export const revalidateDelete: CollectionAfterDeleteHook<Customer> = ({ doc, req: { context } }) => {
+export const revalidateDelete: CollectionAfterDeleteHook<Customer> = ({
+  doc,
+  req: { context },
+}) => {
   if (!context.disableRevalidate) {
     const path = `/customers/${doc?.slug}`
 

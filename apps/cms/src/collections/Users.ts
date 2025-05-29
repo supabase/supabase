@@ -40,7 +40,7 @@ export const Users: CollectionConfig = {
           label: 'Editor',
           value: 'editor',
         },
-      ]
+      ],
     },
   ],
 }
