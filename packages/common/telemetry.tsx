@@ -1,13 +1,15 @@
 'use client'
 
+import { GoogleTagManager } from '@next/third-parties/google'
 import { components } from 'api-types'
 import { useRouter } from 'next/compat/router'
 import { usePathname } from 'next/navigation'
+import Script from 'next/script'
 import { useCallback, useEffect, useRef } from 'react'
 import { useLatest } from 'react-use'
 import { useUser } from './auth'
 import { hasConsented } from './consent-state'
-import { LOCAL_STORAGE_KEYS } from './constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
@@ -17,10 +19,44 @@ import { getSharedTelemetryData } from './telemetry-utils'
 
 const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 
+// Reexports GoogleTagManager with the right API key set
+export const TelemetryTagManager = () => {
+  const isGTMEnabled = Boolean(IS_PLATFORM && process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID)
+
+  if (!isGTMEnabled) {
+    return
+  }
+
+  return (
+    <>
+      <Script
+        id="consent"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+
+            gtag("consent", "default", {
+                ad_user_data: "denied",
+                ad_personalization: "denied",
+                ad_storage: "denied",
+                analytics_storage: "denied",
+                wait_for_update: 2000 // milliseconds to wait for update
+            });
+            `,
+        }}
+      />
+      <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID!} />
+    </>
+  )
+}
+
 //---
 // PAGE TELEMETRY
 //---
-
 export function handlePageTelemetry(
   API_URL: string,
   pathname?: string,
