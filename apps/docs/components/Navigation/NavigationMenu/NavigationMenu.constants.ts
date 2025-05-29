@@ -119,7 +119,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'platform',
           },
           {
-            label: 'Security',
+            label: 'Security & Compliance',
             icon: 'security',
             href: '/guides/security',
             level: 'security',
@@ -2059,7 +2059,7 @@ export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof Ico
 
 export const security: NavMenuConstant = {
   icon: 'security',
-  title: 'Security & Compliance',
+  title: 'Security',
   url: '/guides/security',
   items: [
     { name: 'Overview', url: '/guides/security' },
