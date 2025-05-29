@@ -31,7 +31,7 @@
     "cross-env": "^7.0.3",
     "eslint-config-supabase": "workspace:*",
     "graphql": "^16.8.1",
-    "next": "catalog:",
+    "next": "~15.3.0",
     "payload": "3.33.0",
     "react": "catalog:",
     "react-dom": "catalog:",
@@ -39,17 +39,8 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "@types/react": "eslint/eslintrc:",
+    "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "typescript": "5.7.3"
-  },
-  "engines": {
-    "node": "^18.20.2 || >=20.9.0",
-    "pnpm": "^9 || ^10"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "sharp"
-    ]
   }
 }
