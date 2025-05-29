@@ -247,6 +247,7 @@ const Pagination = () => {
         onCancel={() => setIsConfirmPreviousModalOpen(false)}
         onConfirm={() => {
           onConfirmPreviousPage()
+          setIsConfirmPreviousModalOpen(false)
         }}
       >
         <p className="text-sm text-foreground-light">
@@ -261,6 +262,7 @@ const Pagination = () => {
         onCancel={() => setIsConfirmNextModalOpen(false)}
         onConfirm={() => {
           onConfirmNextPage()
+          setIsConfirmNextModalOpen(false)
         }}
       >
         <p className="text-sm text-foreground-light">
