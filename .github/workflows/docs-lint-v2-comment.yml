@@ -21,7 +21,7 @@ permissions:
 jobs:
   comment_on_pr:
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
+    if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'failure'
     steps:
       - id: download_artifact
         name: 'Download artifact'
