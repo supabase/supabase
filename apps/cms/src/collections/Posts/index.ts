@@ -89,22 +89,6 @@ export const Posts: CollectionConfig = {
       type: 'text',
       required: true,
     },
-    // {
-    //   name: 'slug',
-    //   type: 'text',
-    //   required: true,
-    //   unique: true,
-    //   admin: {
-    //     position: 'sidebar',
-    //   },
-    //   validate: (value: string | string[] | null | undefined) => {
-    //     const regex = /^[a-z][a-z0-9-]{2,49}$/
-    //     if (!regex.test(value as string)) {
-    //       return 'Slug must start with a letter, contain only lowercase letters, numbers, and hyphens, and be between 3-50 characters'
-    //     }
-    //     return true
-    //   },
-    // },
     ...slugField(),
     {
       type: 'tabs',
