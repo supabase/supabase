@@ -31,7 +31,7 @@
 
   .rdg-cell,
   .rdg-cell span {
-    @apply text-foreground-light font-normal ;
+    @apply text-foreground-light font-normal;
   }
 
   .rdg-cell:first-child {

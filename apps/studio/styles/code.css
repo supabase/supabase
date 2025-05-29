@@ -58,7 +58,7 @@
   }
 
   .token.number {
-    @apply text-brand ;
+    @apply text-brand;
   }
 
   .token.boolean,

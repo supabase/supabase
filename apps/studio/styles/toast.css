@@ -174,7 +174,6 @@
   to {
     animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
   }
-
 }
 
 @keyframes Toastify__bounceOutRight {
@@ -230,7 +229,6 @@
   to {
     animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
     transform: translate3d(0, 0, 0);
-
   }
   from {
     opacity: 0;

@@ -8,8 +8,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
 :root {
   --chart-1: hsl(var(--brand-default));
   --chart-2: 173 58% 39%;
