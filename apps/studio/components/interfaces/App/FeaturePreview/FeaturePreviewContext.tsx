@@ -2,6 +2,7 @@ import { noop } from 'lodash'
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
+import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
 import { EMPTY_OBJ } from 'lib/void'
 import { APISidePanelPreview } from './APISidePanelPreview'
@@ -23,6 +24,7 @@ export const FEATURE_PREVIEWS = [
     key: LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS,
     name: 'Table Editor Tabs',
     content: <TableEditorTabsPreview />,
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/35636',
     isNew: true,
     isPlatformOnly: false,
   },
@@ -30,6 +32,7 @@ export const FEATURE_PREVIEWS = [
     key: LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS,
     name: 'SQL Editor Tabs',
     content: <SqlEditorTabsPreview />,
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/35636',
     isNew: true,
     isPlatformOnly: true,
   },
@@ -65,10 +68,15 @@ export const useFeaturePreviewContext = () => useContext(FeaturePreviewContext)
 
 export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}>) => {
   const { hasLoaded } = useContext(FeatureFlagContext)
+  const enableTabsInterface = useFlag('tabsInterface')
 
   // [Joshen] Similar logic to feature flagging previews, we can use flags to default opt in previews
   const isDefaultOptIn = (feature: (typeof FEATURE_PREVIEWS)[number]) => {
     switch (feature.key) {
+      case LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS:
+        return enableTabsInterface
+      case LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS:
+        return enableTabsInterface
       default:
         return false
     }

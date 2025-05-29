@@ -177,17 +177,19 @@ function createStorageExplorerState({
     },
 
     sortBy,
-    setSortBy: (value: STORAGE_SORT_BY) => {
+    setSortBy: async (value: STORAGE_SORT_BY) => {
       state.sortBy = value
       state.updateExplorerPreference()
       state.setSelectedFilePreview(undefined)
+      await state.refetchAllOpenedFolders()
     },
 
     sortByOrder,
-    setSortByOrder: (value: STORAGE_SORT_BY_ORDER) => {
+    setSortByOrder: async (value: STORAGE_SORT_BY_ORDER) => {
       state.sortByOrder = value
       state.updateExplorerPreference()
       state.setSelectedFilePreview(undefined)
+      await state.refetchAllOpenedFolders()
     },
 
     isSearching: false,
@@ -406,7 +408,7 @@ function createStorageExplorerState({
         )
 
         // Add items to column
-        const formattedItems = formatFolderItems(data)
+        const formattedItems = formatFolderItems(data, prefix)
         state.columns = state.columns.map((col, idx) => {
           if (idx === index) {
             return {
@@ -475,7 +477,8 @@ function createStorageExplorerState({
       )
 
       const formattedFolders = foldersItems.map((folderItems, idx) => {
-        const formattedItems = formatFolderItems(folderItems)
+        const prefix = paths.slice(0, idx).join('/')
+        const formattedItems = formatFolderItems(folderItems, prefix)
         return {
           id: null,
           status: STORAGE_ROW_STATUS.READY,

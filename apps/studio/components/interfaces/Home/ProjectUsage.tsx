@@ -27,9 +27,11 @@ import {
   Loading,
 } from 'ui'
 
+type ChartIntervalKey = ProjectLogStatsVariables['interval']
+
 const CHART_INTERVALS: ChartIntervals[] = [
   {
-    key: 'minutely',
+    key: '1hr',
     label: 'Last 60 minutes',
     startValue: 1,
     startUnit: 'hour',
@@ -37,21 +39,21 @@ const CHART_INTERVALS: ChartIntervals[] = [
     availableIn: ['free', 'pro', 'enterprise', 'team'],
   },
   {
-    key: 'hourly',
+    key: '1day',
     label: 'Last 24 hours',
     startValue: 24,
     startUnit: 'hour',
     format: 'MMM D, ha',
     availableIn: ['free', 'pro', 'enterprise', 'team'],
   },
-  {
-    key: 'daily',
-    label: 'Last 7 days',
-    startValue: 7,
-    startUnit: 'day',
-    format: 'MMM D',
-    availableIn: ['pro', 'enterprise', 'team'],
-  },
+  // {
+  //   key: '',
+  //   label: 'Last 7 days',
+  //   startValue: 7,
+  //   startUnit: 'day',
+  //   format: 'MMM D',
+  //   availableIn: ['pro', 'enterprise', 'team'],
+  // },
 ]
 
 const ProjectUsage = () => {
@@ -65,7 +67,9 @@ const ProjectUsage = () => {
 
   const { plan } = useCurrentOrgPlan()
 
-  const [interval, setInterval] = useState<ProjectLogStatsVariables['interval']>('minutely')
+  const DEFAULT_INTERVAL: ChartIntervalKey = plan?.id === 'free' ? '1hr' : '1day'
+
+  const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
 
   const { data, isLoading } = useProjectLogStatsQuery({ projectRef, interval })
 
@@ -137,7 +141,7 @@ const ProjectUsage = () => {
         </span>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-4">
-        <Panel>
+        <Panel className="mb-0 md:mb-0">
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={
@@ -163,7 +167,7 @@ const ProjectUsage = () => {
           </Panel.Content>
         </Panel>
         {authEnabled && (
-          <Panel>
+          <Panel className="mb-0 md:mb-0">
             <Panel.Content className="space-y-4">
               <PanelHeader
                 icon={
@@ -189,7 +193,7 @@ const ProjectUsage = () => {
           </Panel>
         )}
         {storageEnabled && (
-          <Panel>
+          <Panel className="mb-0 md:mb-0">
             <Panel.Content className="space-y-4">
               <PanelHeader
                 icon={
@@ -215,7 +219,7 @@ const ProjectUsage = () => {
             </Panel.Content>
           </Panel>
         )}
-        <Panel>
+        <Panel className="mb-0 md:mb-0">
           <Panel.Content className="space-y-4">
             <PanelHeader
               icon={

@@ -133,11 +133,10 @@ const DeleteConfirmationDialogs = ({
     if (selectedColumnToDelete === undefined) return
 
     deleteColumn({
-      id: selectedColumnToDelete.id,
+      column: selectedColumnToDelete,
       cascade: isDeleteWithCascade,
       projectRef: project.ref,
       connectionString: project?.connectionString,
-      table: selectedTable,
     })
   }
 
@@ -150,8 +149,9 @@ const DeleteConfirmationDialogs = ({
     deleteTable({
       projectRef: project?.ref!,
       connectionString: project?.connectionString,
-      schema: selectedTableToDelete.schema,
       id: selectedTableToDelete.id,
+      name: selectedTableToDelete.name,
+      schema: selectedTableToDelete.schema,
       cascade: isDeleteWithCascade,
     })
   }

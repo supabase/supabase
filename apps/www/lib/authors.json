@@ -99,6 +99,14 @@
     "author_image_url": "https://github.com/steve-chavez.png"
   },
   {
+    "author_id": "laurenceisla",
+    "author": "Laurence Isla",
+    "username": "laurenceisla",
+    "position": "PostgREST engineer",
+    "author_url": "https://github.com/laurenceisla",
+    "author_image_url": "https://github.com/laurenceisla.png"
+  },
+  {
     "author_id": "supabase",
     "author": "Supabase",
     "position": "",

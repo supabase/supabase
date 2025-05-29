@@ -143,6 +143,7 @@ allow_list = [
     "Entra",
     "ePHI",
     "Erlang",
+    "Ethereum",
     "Figma",
     "Firestore",
     "Fivetran",
@@ -241,6 +242,7 @@ allow_list = [
     "SendGrid",
     "Session Timebox",
     "Snaplet",
+    "Solana",
     "SolidJS",
     "Spotify",
     "Sqitch",
@@ -338,6 +340,7 @@ allow_list = [
     "vecs",
     "vs",
     "watchOS",
+    "[Xx]min",
 ]
 
 prefixes = ["bi", "over", "pre", "un"]

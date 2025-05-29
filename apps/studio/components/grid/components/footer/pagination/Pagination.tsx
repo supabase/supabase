@@ -5,7 +5,7 @@ import { useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { isTableLike } from 'data/table-editor/table-editor-types'
+import { isTable } from 'data/table-editor/table-editor-types'
 import { THRESHOLD_COUNT, useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
@@ -38,7 +38,7 @@ const Pagination = () => {
   })
 
   // rowsCountEstimate is only applicable to table entities
-  const rowsCountEstimate = isTableLike(selectedTable) ? selectedTable.live_rows_estimate : null
+  const rowsCountEstimate = isTable(selectedTable) ? selectedTable.live_rows_estimate : null
 
   const { filters } = useTableFilter()
   const page = snap.page
@@ -55,7 +55,7 @@ const Pagination = () => {
     setValue(String(page))
   }, [page])
 
-  const { data, isLoading, isSuccess, isError, isFetching } = useTableRowsCountQuery(
+  const { data, isLoading, isSuccess, isError, isFetching, error } = useTableRowsCountQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -132,6 +132,14 @@ const Pagination = () => {
       snap.setEnforceExactCount(rowsCountEstimate !== null && rowsCountEstimate <= THRESHOLD_COUNT)
     }
   }, [id])
+
+  useEffect(() => {
+    // If the count query encountered a timeout error with exact count
+    // turn off the exact count to rely on approximate
+    if (isError && snap.enforceExactCount && error?.code === 408) {
+      snap.setEnforceExactCount(false)
+    }
+  }, [isError, snap.enforceExactCount, error?.code])
 
   return (
     <div className="flex items-center gap-x-4">

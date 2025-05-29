@@ -10,6 +10,7 @@ import { ONE_DAY_IN_SECONDS } from './helpers.time'
 
 export const REVALIDATION_TAGS = {
   GRAPHQL: 'graphql',
+  PARTNERS: 'partners',
   WRAPPERS: 'wrappers',
 } as const
 // Casting to avoid problems with using this as a Zod enum, TypeScript does
@@ -33,4 +34,4 @@ const fetchRevalidatePerDay = fetchWithNextOptions({
   next: { revalidate: ONE_DAY_IN_SECONDS },
 })
 
-export { fetchWithNextOptions, fetchRevalidatePerDay }
+export { fetchRevalidatePerDay, fetchWithNextOptions }
