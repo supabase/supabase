@@ -24,7 +24,7 @@ export async function createDatabaseIndex({
   const { schema, entity, type, columns } = payload
 
   const sql = `
-  CREATE INDEX ON "${schema}"."${entity}" USING ${type} (${columns
+  CREATE INDEX CONCURRENTLY ON "${schema}"."${entity}" USING ${type} (${columns
     .map((column) => `"${column}"`)
     .join(', ')});
   `.trim()
