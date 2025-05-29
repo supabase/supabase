@@ -73,7 +73,6 @@
     "remark-html": "^16.0.1",
     "shared-data": "workspace:*",
     "swiper": "^11.0.7",
-    "three": "^0.170.0",
     "typed.js": "^2.0.16",
     "typescript": "~5.5.0",
     "ui": "workspace:*",
