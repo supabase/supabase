@@ -1,10 +1,11 @@
+@import './../../../packages/ui/build/css/source/global.css';
+@import './../../../packages/ui/build/css/themes/dark-combined.css';
+@import './../../../packages/ui/build/css/themes/light.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import './../../../packages/ui/build/css/source/global.css';
-@import './../../../packages/ui/build/css/themes/dark-combined.css';
-@import './../../../packages/ui/build/css/themes/light.css';
 
 @font-face {
   font-family: 'custom-font';
@@ -41,16 +42,6 @@ body {
 ::selection {
   background-color: #6ee7b7 !important;
   color: #333 !important;
-}
-
-// a {
-//   text-decoration: none !important;
-// }
-
-article h1 {
-  // margin-bottom: 2rem !important;
-  // font-size: 3rem !important;
-  // font-weight: 400 !important;
 }
 
 .thin-scrollbar {
@@ -90,9 +81,6 @@ code[class*='language-'],
 pre[class*='language-'] {
   text-shadow: none !important;
 }
-
-// Spec doc specifics ported from docusaurus
-// @TODO these should be converted to Tailwind classes
 
 .method-list-item {
   @apply border-t border-gray-400;
@@ -157,18 +145,11 @@ pre[class*='language-'] {
   margin-bottom: 4px;
 }
 
-// These should move to their own components
-// wasn't able to get an import path working
 .parent-menu-toggle.active {
   svg {
     transform: rotate(90deg);
   }
 }
-
-// ToC styles
-// .toc__menu-item--active {
-//   color: hsl(var(--brand-default)) !important;
-// }
 
 .video-container {
   position: relative;
@@ -189,7 +170,6 @@ pre[class*='language-'] {
   @apply m-0;
 }
 
-// format <code> inside <p>
 h2 code,
 h3 code,
 h4 code {
@@ -205,7 +185,6 @@ h4 code {
   }
 }
 
-// code inside admonitions
 .admonition-content p code {
   @apply bg-control;
   word-break: keep-all !important;
@@ -216,13 +195,10 @@ article p strong {
   color: inherit !important;
 }
 
-// fix box shadow when <code> is inside <a>
 a:has(code) {
   box-shadow: none !important;
 }
 
-// fix code line wrapping
-// need to set this to happen from medium onwards, otherwise the would cause horizontal scroll
 article p code {
   &::before,
   &::after {
@@ -237,12 +213,10 @@ article p code {
   }
 }
 
-// fix firefox issue with li wrapping
 .doc-content-container ul li div.relative {
   display: inline-block;
 }
 
-// fix ToC links when they have <code> inside
 .toc-menu li a code {
   background: none;
   border: none;
@@ -350,12 +324,10 @@ th code {
   @apply not-sr-only;
 }
 
-// Code blocks need margin applied when in content container
 .prose :where(.shiki:not(.shiki-wrapper *), .shiki-wrapper) {
   margin-block: 2rem;
 }
 
-// Code block theme colors for use with Supabase Theme
 [data-theme='dark'],
 [data-theme='deep-dark'],
 .dark,

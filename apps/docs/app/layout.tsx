@@ -1,8 +1,7 @@
 import '@code-hike/mdx/styles'
-import 'config/code-hike.scss'
-import '../styles/main.scss'
-import '../styles/new-docs.scss'
-import '../styles/prism-okaidia.scss'
+import 'config/code-hike.css'
+import '../styles/main.css'
+import '../styles/prism-okaidia.css'
 
 import { type Metadata, type Viewport } from 'next'
 
