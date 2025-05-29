@@ -13,9 +13,11 @@ export default (isMobile?: boolean) => ({
     ),
     subheader: (
       <>
-        There's never been a better time to build. Take our State of Startups 2025 survey and learn
-        the latest trends among builders in tech stacks, AI usage, problem domains, and more. Get an
-        exclusive Supabase t-shirt for sharing your insights.
+        There's never been a better time to build.
+        <br />
+        Take our State of Startups 2025 survey and learn the latest trends among builders in tech
+        stacks, AI usage, problem domains, and more. <br className="hidden md:block" />
+        Get an exclusive Supabase t-shirt for sharing your insights.
       </>
     ),
     // image: '/images/product/vector/vector-hero.svg',

@@ -33,7 +33,7 @@
     "@supabase/supabase-js": "catalog:",
     "@vercel/og": "^0.6.2",
     "ai-commands": "workspace:*",
-    "animejs": "^3.2.2",
+    "animejs": "^4.0.2",
     "class-variance-authority": "^0.7.1",
     "classnames": "^2.3.1",
     "clsx": "^1.2.1",
