@@ -2,7 +2,7 @@ import { createContext, PropsWithChildren, useCallback, useContext, useEffect } 
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import { useConstant } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import type { Project } from 'data/projects/project-detail-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import useLatest from 'hooks/misc/useLatest'
 import { getPostgrestClaims, ImpersonationRole } from 'lib/role-impersonation'
@@ -57,8 +57,10 @@ export const RoleImpersonationStateContext = createContext<RoleImpersonationStat
   createRoleImpersonationState('', { current: async () => {} })
 )
 
-export const RoleImpersonationStateContextProvider = ({ children }: PropsWithChildren) => {
-  const { project } = useProjectContext()
+export const RoleImpersonationStateContextProvider = ({
+  project,
+  children,
+}: PropsWithChildren<{ project: Project | undefined }>) => {
   async function customizeAccessToken({
     schema,
     functionName,

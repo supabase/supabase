@@ -8,7 +8,6 @@ import { proxy, snapshot, useSnapshot } from 'valtio'
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   STORAGE_ROW_STATUS,
   STORAGE_ROW_TYPES,
@@ -35,6 +34,7 @@ import { InlineLink } from 'components/ui/InlineLink'
 import { configKeys } from 'data/config/keys'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
+import type { Project } from 'data/projects/project-detail-query'
 import { getQueryClient } from 'data/query-client'
 import { deleteBucketObject } from 'data/storage/bucket-object-delete-mutation'
 import { downloadBucketObject } from 'data/storage/bucket-object-download-mutation'
@@ -1708,8 +1708,10 @@ const StorageExplorerStateContext = createContext<StorageExplorerState>(
   createStorageExplorerState(DEFAULT_STATE_CONFIG)
 )
 
-export const StorageExplorerStateContextProvider = ({ children }: PropsWithChildren) => {
-  const { project } = useProjectContext()
+export const StorageExplorerStateContextProvider = ({
+  project,
+  children,
+}: PropsWithChildren<{ project: Project | undefined }>) => {
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
 
   const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))
