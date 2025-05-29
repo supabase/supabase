@@ -2,7 +2,7 @@
   "framework": "vite",
   "buildCommand": "pnpm build",
   "trailingSlash": false,
-  "outputDirectory": "build/client",
+  "outputDirectory": "dist",
   "rewrites": [
     {
       "source": "/dashboard/assets/:match*",
