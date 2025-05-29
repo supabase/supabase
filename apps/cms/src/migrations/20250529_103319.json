@@ -1,5 +1,5 @@
 {
-  "id": "bcee383a-860c-46ab-bbf1-28263fee07de",
+  "id": "b20fdabe-061b-43a4-8abf-b401ef5818d1",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -3768,7 +3768,8 @@
         },
         "launchweek": {
           "name": "launchweek",
-          "type": "varchar",
+          "type": "enum_posts_launchweek",
+          "typeSchema": "cms-payload",
           "primaryKey": false,
           "notNull": false
         },
@@ -4259,7 +4260,8 @@
         },
         "version_launchweek": {
           "name": "version_launchweek",
-          "type": "varchar",
+          "type": "enum__posts_v_version_launchweek",
+          "typeSchema": "cms-payload",
           "primaryKey": false,
           "notNull": false
         },
@@ -7301,12 +7303,42 @@
         "published"
       ]
     },
+    "cms-payload.enum_posts_launchweek": {
+      "name": "enum_posts_launchweek",
+      "schema": "cms-payload",
+      "values": [
+        "6",
+        "7",
+        "8",
+        "x",
+        "ga",
+        "12",
+        "13",
+        "14",
+        "15"
+      ]
+    },
     "cms-payload.enum_posts_status": {
       "name": "enum_posts_status",
       "schema": "cms-payload",
       "values": [
         "draft",
         "published"
+      ]
+    },
+    "cms-payload.enum__posts_v_version_launchweek": {
+      "name": "enum__posts_v_version_launchweek",
+      "schema": "cms-payload",
+      "values": [
+        "6",
+        "7",
+        "8",
+        "x",
+        "ga",
+        "12",
+        "13",
+        "14",
+        "15"
       ]
     },
     "cms-payload.enum__posts_v_version_status": {

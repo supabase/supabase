@@ -22,7 +22,9 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "cms-payload"."enum__events_v_version_link_target" AS ENUM('_self', '_blank');
   CREATE TYPE "cms-payload"."enum__events_v_version_main_cta_target" AS ENUM('_self', '_blank');
   CREATE TYPE "cms-payload"."enum__events_v_version_status" AS ENUM('draft', 'published');
+  CREATE TYPE "cms-payload"."enum_posts_launchweek" AS ENUM('6', '7', '8', 'x', 'ga', '12', '13', '14', '15');
   CREATE TYPE "cms-payload"."enum_posts_status" AS ENUM('draft', 'published');
+  CREATE TYPE "cms-payload"."enum__posts_v_version_launchweek" AS ENUM('6', '7', '8', 'x', 'ga', '12', '13', '14', '15');
   CREATE TYPE "cms-payload"."enum__posts_v_version_status" AS ENUM('draft', 'published');
   CREATE TYPE "cms-payload"."enum_users_roles" AS ENUM('admin', 'editor');
   CREATE TYPE "cms-payload"."enum_payload_jobs_log_task_slug" AS ENUM('inline', 'schedulePublish');
@@ -349,7 +351,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"content" jsonb,
   	"thumb_id" integer,
   	"image_id" integer,
-  	"launchweek" varchar,
+  	"launchweek" "cms-payload"."enum_posts_launchweek",
   	"reading_time" numeric,
   	"date" timestamp(3) with time zone,
   	"toc_depth" numeric DEFAULT 2,
@@ -382,7 +384,7 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
   	"version_content" jsonb,
   	"version_thumb_id" integer,
   	"version_image_id" integer,
-  	"version_launchweek" varchar,
+  	"version_launchweek" "cms-payload"."enum__posts_v_version_launchweek",
   	"version_reading_time" numeric,
   	"version_date" timestamp(3) with time zone,
   	"version_toc_depth" numeric DEFAULT 2,
@@ -1123,7 +1125,9 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   DROP TYPE "cms-payload"."enum__events_v_version_link_target";
   DROP TYPE "cms-payload"."enum__events_v_version_main_cta_target";
   DROP TYPE "cms-payload"."enum__events_v_version_status";
+  DROP TYPE "cms-payload"."enum_posts_launchweek";
   DROP TYPE "cms-payload"."enum_posts_status";
+  DROP TYPE "cms-payload"."enum__posts_v_version_launchweek";
   DROP TYPE "cms-payload"."enum__posts_v_version_status";
   DROP TYPE "cms-payload"."enum_users_roles";
   DROP TYPE "cms-payload"."enum_payload_jobs_log_task_slug";

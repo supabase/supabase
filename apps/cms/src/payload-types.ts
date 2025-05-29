@@ -938,7 +938,10 @@ export interface Post {
   thumb?: (number | null) | Media;
   image?: (number | null) | Media;
   categories?: (number | Category)[] | null;
-  launchweek?: string | null;
+  /**
+   * Select a launch week to show launch week summary at the bottom of the blog post.
+   */
+  launchweek?: ('6' | '7' | '8' | 'x' | 'ga' | '12' | '13' | '14' | '15') | null;
   readingTime?: number | null;
   date?: string | null;
   toc_depth?: number | null;

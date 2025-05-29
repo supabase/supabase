@@ -12,11 +12,11 @@ import {
 import { isAnyone } from '@/access/isAnyone'
 import { isAuthenticated } from '@/access/isAuthenticated'
 
-import { Banner } from '../../blocks/Banner/config'
-import { Code } from '../../blocks/Code/config'
-import { MediaBlock } from '../../blocks/MediaBlock/config'
-import { Quote } from '../../blocks/Quote/config'
-import { YouTube } from '../../blocks/YouTube/config'
+import { Banner } from '@/blocks/Banner/config'
+import { Code } from '@/blocks/Code/config'
+import { MediaBlock } from '@/blocks/MediaBlock/config'
+import { Quote } from '@/blocks/Quote/config'
+import { YouTube } from '@/blocks/YouTube/config'
 import { populateAuthors } from './hooks/populateAuthors'
 import { revalidateDelete, revalidatePost } from './hooks/revalidatePost'
 
@@ -28,6 +28,18 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 import { slugField } from '@/fields/slug'
+
+const launchweekOptions = [
+  { label: '6', value: '6' },
+  { label: '7', value: '7' },
+  { label: '8', value: '8' },
+  { label: 'x', value: 'x' },
+  { label: 'ga', value: 'ga' },
+  { label: '12', value: '12' },
+  { label: '13', value: '13' },
+  { label: '14', value: '14' },
+  { label: '15', value: '15' },
+]
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -156,9 +168,11 @@ export const Posts: CollectionConfig = {
             },
             {
               name: 'launchweek',
-              type: 'text',
+              type: 'select',
+              options: launchweekOptions,
               admin: {
-                position: 'sidebar',
+                description:
+                  'Select a launch week to show launch week summary at the bottom of the blog post.',
               },
             },
             {
