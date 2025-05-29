@@ -1,0 +1,165 @@
+---
+title: Text
+description: Typography component with predefined variants for consistent text styling.
+featured: true
+component: true
+---
+
+<ComponentPreview name="text-demo" peekCode wide />
+
+## Usage
+
+```tsx
+import { Text } from 'ui'
+```
+
+```tsx
+<Text variant="body">Regular body text</Text>
+```
+
+## Variants
+
+The Text component comes with predefined variants that combine size, weight, and color for consistent typography throughout your application.
+
+### Heading Variants
+
+#### Heading Title
+
+The largest heading variant, typically used for page titles.
+
+```tsx
+<Text variant="headingTitle">Page Title</Text>
+```
+
+#### Heading Section
+
+Used for major section headings.
+
+```tsx
+<Text variant="headingSection">Section Heading</Text>
+```
+
+#### Heading Sub Section
+
+Used for subsection headings.
+
+```tsx
+<Text variant="headingSubSection">Subsection Heading</Text>
+```
+
+#### Heading
+
+General purpose heading variant.
+
+```tsx
+<Text variant="heading">General Heading</Text>
+```
+
+#### Heading Compact
+
+Smaller heading with medium font weight, good for compact layouts.
+
+```tsx
+<Text variant="headingCompact">Compact Heading</Text>
+```
+
+#### Heading Meta
+
+Monospace, uppercase variant for metadata and labels.
+
+```tsx
+<Text variant="headingMeta">Meta Information</Text>
+```
+
+### Body Variants
+
+#### Body
+
+Default text variant for regular content.
+
+```tsx
+<Text variant="body">Regular body text content</Text>
+```
+
+#### Body Sub Title
+
+Muted text variant for descriptions and subtitles.
+
+```tsx
+<Text variant="bodySubTitle">Description or subtitle text</Text>
+```
+
+#### Body Compact
+
+Smaller text variant for compact layouts.
+
+```tsx
+<Text variant="bodyCompact">Compact body text</Text>
+```
+
+## Overrides
+
+You can override the predefined variants with size and weight props:
+
+### Size Override
+
+```tsx
+<Text variant="body" size="lg">Body text with large size</Text>
+<Text variant="heading" size="xs">Small heading</Text>
+```
+
+Available sizes: `xs`, `sm`, `base`, `lg`, `xl`, `2xl`
+
+### Weight Override
+
+```tsx
+<Text variant="body" weight="semibold">Bold body text</Text>
+<Text variant="bodySubTitle" weight="regular">Regular weight subtitle</Text>
+```
+
+Available weights: `regular`, `semibold`
+
+## As Link
+
+Use the `asLink` prop to style text as a clickable link:
+
+```tsx
+<Text variant="body" asLink>Clickable body text</Text>
+<Text variant="headingSection" asLink>Clickable section heading</Text>
+```
+
+## Polymorphic Usage
+
+The Text component supports the `asChild` prop for polymorphic behavior:
+
+```tsx
+<Text asChild variant="body">
+  <a href="/link">Link with body text styling</a>
+</Text>
+
+<Text asChild variant="headingTitle">
+  <h1>Semantic h1 with title styling</h1>
+</Text>
+```
+
+## Examples
+
+### Combined Properties
+
+You can combine different props for custom styling:
+
+```tsx
+<Text variant="body" size="lg" weight="semibold" asLink>
+  Large, bold, clickable body text
+</Text>
+```
+
+### Custom Styling
+
+Add custom classes for additional styling:
+
+```tsx
+<Text variant="body" className="text-blue-500 italic">
+  Custom colored italic text
+</Text>
+```

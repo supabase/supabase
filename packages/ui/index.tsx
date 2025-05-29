@@ -177,6 +177,10 @@ export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
 
 export { Button as Button_Shadcn_ } from './src/components/shadcn/ui/button'
 
+export { Text } from './src/components/shadcn/ui/text'
+
+export { Heading as Heading_Shadcn_ } from './src/components/shadcn/ui/heading'
+
 export {
   Breadcrumb as Breadcrumb_Shadcn_,
   BreadcrumbItem as BreadcrumbItem_Shadcn_,

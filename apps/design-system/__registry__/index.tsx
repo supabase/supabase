@@ -1325,6 +1325,28 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "text-demo": {
+      name: "text-demo",
+      type: "components:example",
+      registryDependencies: ["text"],
+      component: React.lazy(() => import("@/registry/default/example/text-demo")),
+      source: "",
+      files: ["registry/default/example/text-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "heading-demo": {
+      name: "heading-demo",
+      type: "components:example",
+      registryDependencies: ["heading"],
+      component: React.lazy(() => import("@/registry/default/example/heading-demo")),
+      source: "",
+      files: ["registry/default/example/heading-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "toggle-group-demo": {
       name: "toggle-group-demo",
       type: "components:example",

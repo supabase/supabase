@@ -804,6 +804,18 @@ export const examples: Registry = [
     files: ['example/textarea-with-text.tsx'],
   },
   {
+    name: 'text-demo',
+    type: 'components:example',
+    registryDependencies: ['text'],
+    files: ['example/text-demo.tsx'],
+  },
+  {
+    name: 'heading-demo',
+    type: 'components:example',
+    registryDependencies: ['heading'],
+    files: ['example/heading-demo.tsx'],
+  },
+  {
     name: 'toggle-group-demo',
     type: 'components:example',
     registryDependencies: ['toggle-group'],

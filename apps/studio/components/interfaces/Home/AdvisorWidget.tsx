@@ -96,7 +96,7 @@ export const AdvisorWidget = () => {
     titleContent = (
       <h2 className="text-xl">
         {numberDisplay} {issuesText} need
-        {totalIssues === 1 ? 's' : ''} <span className={attentionClassName}>attention</span>
+        {totalIssues === 1 ? 's' : ''} attention
       </h2>
     )
   }
