@@ -1,14 +1,22 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'next/router'
+import { DiffEditor } from '@monaco-editor/react'
+import { editor as monacoEditor } from 'monaco-editor'
 
 import { useParams } from 'common'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useBranchMergeMutation } from 'data/branches/branch-merge-mutation'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import {
+  useBranchDatabaseComparison,
+  useTableDefinitionComparison,
+} from 'hooks/misc/useBranchDatabaseComparison'
+import {
+  Badge,
   Button,
   Card,
   CardContent,
@@ -21,6 +29,8 @@ import {
 } from 'ui'
 import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
+import { Code, Table, Plus, Minus, Edit } from 'lucide-react'
 
 const MergePage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -31,10 +41,80 @@ const MergePage: NextPageWithLayout = () => {
   const isBranch = project?.parent_project_ref !== undefined
   const parentProjectRef = project?.parent_project_ref
 
+  // Get main project details using the parent_project_ref
+  const { data: mainProject } = useProjectDetailQuery(
+    { ref: parentProjectRef },
+    { enabled: !!parentProjectRef }
+  )
+
   // Get branch information
   const { data: branches } = useBranchesQuery({ projectRef: parentProjectRef })
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
   const mainBranch = branches?.find((branch) => branch.is_default)
+
+  // Debug logging for branch setup
+  console.log('🌿 Branch Setup Debug:', {
+    currentRef: ref,
+    parentProjectRef,
+    isBranch,
+    mainProject: mainProject
+      ? {
+          ref: mainProject.ref,
+          connectionString: mainProject.connectionString ? '[REDACTED]' : null,
+        }
+      : null,
+    currentProject: project
+      ? {
+          ref: project.ref,
+          connectionString: project.connectionString ? '[REDACTED]' : null,
+        }
+      : null,
+    branches: branches?.map((b) => ({
+      name: b.name,
+      projectRef: b.project_ref,
+      isDefault: b.is_default,
+    })),
+    currentBranch: currentBranch
+      ? {
+          name: currentBranch.name,
+          projectRef: currentBranch.project_ref,
+          isDefault: currentBranch.is_default,
+        }
+      : null,
+    mainBranch: mainBranch
+      ? {
+          name: mainBranch.name,
+          projectRef: mainBranch.project_ref,
+          isDefault: mainBranch.is_default,
+        }
+      : null,
+  })
+
+  // Get database comparison using main project details
+  const databaseComparison = useBranchDatabaseComparison({
+    mainBranchProjectRef: parentProjectRef, // Use parent project ref for main branch
+    currentBranchProjectRef: ref, // Use current branch ref
+    mainBranchConnectionString: undefined, // Main project uses default connection (no special header)
+    currentBranchConnectionString: project?.connectionString, // Use current branch's connection
+  })
+
+  // Filter tables to show only those with changes or potential changes
+  const tablesWithChanges = useMemo(() => {
+    const filtered = databaseComparison.tables.filter((table) => table.status !== 'unchanged')
+    console.log('🎯 Tables With Changes Filter:', {
+      totalTables: databaseComparison.tables.length,
+      filteredCount: filtered.length,
+      allTables: databaseComparison.tables.map((t) => ({
+        name: `${t.schemaName}.${t.tableName}`,
+        status: t.status,
+      })),
+      filtered: filtered.map((t) => ({
+        name: `${t.schemaName}.${t.tableName}`,
+        status: t.status,
+      })),
+    })
+    return filtered
+  }, [databaseComparison.tables])
 
   const { mutate: mergeBranch, isLoading: isMerging } = useBranchMergeMutation({
     onSuccess: () => {
@@ -58,191 +138,228 @@ const MergePage: NextPageWithLayout = () => {
     })
   }
 
-  // Mock data for demonstration
-  const schemaDiff = [
-    {
-      type: 'added',
-      name: 'employees',
-      description: 'CREATE TABLE employees with job_title column',
-    },
-  ]
-
-  const configDiff = [
-    {
-      type: 'unchanged',
-      name: 'Database settings',
-      description: 'No configuration changes',
-    },
-  ]
-
-  const functionsDiff = [
-    {
-      type: 'added',
-      name: 'get_employee_by_id',
-      description: 'New function to retrieve employee by ID',
-    },
-  ]
+  // Monaco editor options for diff display
+  const defaultOptions: monacoEditor.IStandaloneDiffEditorConstructionOptions = {
+    readOnly: true,
+    renderSideBySide: false,
+    minimap: { enabled: false },
+    wordWrap: 'on',
+    lineNumbers: 'on',
+    folding: false,
+    padding: { top: 16, bottom: 16 },
+    lineNumbersMinChars: 3,
+    fontSize: 13,
+    scrollBeyondLastLine: false,
+  }
 
   if (!isBranch || !currentBranch) {
     return (
-      <ScaffoldContainer>
-        <ScaffoldHeader>
-          <ScaffoldTitle>Merge Request</ScaffoldTitle>
-        </ScaffoldHeader>
+      <PageLayout title="Merge Request">
         <div className="p-6">
           <p>This page is only available for preview branches.</p>
         </div>
-      </ScaffoldContainer>
+      </PageLayout>
     )
   }
 
+  const breadcrumbs = [
+    {
+      label: 'Branches',
+      href: `/project/${parentProjectRef}/branches`,
+    },
+  ]
+
+  const primaryActions = (
+    <Button type="primary" loading={isMerging || isSubmitting} onClick={handleMerge}>
+      Merge branch
+    </Button>
+  )
+
+  const pageTitle = () => (
+    <span>
+      Merge <span className="font-mono">{currentBranch.name}</span> into{' '}
+      <span className="font-mono">{mainBranch?.name || 'main'}</span>
+    </span>
+  )
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'added':
+        return <Plus size={16} strokeWidth={1.5} className="text-green-500" />
+      case 'removed':
+        return <Minus size={16} strokeWidth={1.5} className="text-red-500" />
+      case 'modified':
+        return <Edit size={16} strokeWidth={1.5} className="text-warning" />
+      default:
+        return <Table size={16} strokeWidth={1.5} className="text-foreground-light" />
+    }
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'added':
+        return 'text-green-500'
+      case 'removed':
+        return 'text-red-500'
+      case 'modified':
+        return 'text-warning'
+      default:
+        return 'text-foreground-light'
+    }
+  }
+
   return (
-    <ScaffoldContainer>
-      <ScaffoldHeader>
-        <ScaffoldTitle>Request a merge</ScaffoldTitle>
-        <div className="flex items-center gap-2">
-          <Button type="default" onClick={() => router.back()}>
-            Cancel
-          </Button>
-          <Button type="primary" loading={isMerging || isSubmitting} onClick={handleMerge}>
-            Open request
-          </Button>
-        </div>
-      </ScaffoldHeader>
-
-      <div className="p-6 space-y-6">
-        {/* Warning Card */}
-        <Card className="border-amber-200 bg-amber-50">
-          <CardHeader>
-            <CardTitle className="text-amber-800">⚠️ Local schema may be outdated</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-amber-700">
-              Dashboard changes may not be in your local or GitHub branch.
-            </p>
-            <div className="mt-2 p-2 bg-gray-800 rounded text-green-400 font-mono text-xs">
-              $ supabase db pull --project-ref {ref}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Merge Direction */}
-        <Card>
-          <CardContent className="py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <span className="text-sm">From</span>
-                <div className="px-3 py-1 bg-gray-100 rounded border">{currentBranch.name}</div>
-                <span className="text-sm">into</span>
-                <div className="px-3 py-1 bg-amber-100 rounded border flex items-center gap-2">
-                  🛡️ {mainBranch?.name || 'main'}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Diff Tabs */}
-        <Tabs_Shadcn_ defaultValue="schema" className="w-full">
-          <TabsList_Shadcn_ className="grid w-full grid-cols-3">
-            <TabsTrigger_Shadcn_ value="schema">Schema</TabsTrigger_Shadcn_>
-            <TabsTrigger_Shadcn_ value="config">Config</TabsTrigger_Shadcn_>
-            <TabsTrigger_Shadcn_ value="functions">Functions</TabsTrigger_Shadcn_>
+    <PageLayout
+      title={pageTitle()}
+      subtitle="Saxon created this branch 3 months ago"
+      breadcrumbs={breadcrumbs}
+      primaryActions={primaryActions}
+    >
+      <ScaffoldContainer className="pt-6">
+        <Tabs_Shadcn_ defaultValue="schema">
+          <TabsList_Shadcn_ className="gap-4 mb-8">
+            <TabsTrigger_Shadcn_ value="schema" className="gap-2 pb-3">
+              Database <Badge>{tablesWithChanges.length}</Badge>
+            </TabsTrigger_Shadcn_>
+            <TabsTrigger_Shadcn_ value="functions" className="gap-2 pb-3">
+              Functions <Badge>0</Badge>
+            </TabsTrigger_Shadcn_>
+            <TabsTrigger_Shadcn_ value="config" className="gap-2 pb-3">
+              Configuration <Badge>0</Badge>
+            </TabsTrigger_Shadcn_>
           </TabsList_Shadcn_>
 
-          <TabsContent_Shadcn_ value="schema" className="mt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>📊 EMPLOYEES</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-gray-900 text-gray-100 p-4 rounded font-mono text-sm">
-                  <div className="text-blue-400">CREATE TABLE</div>
-                  <div className="ml-4">
-                    <span className="text-yellow-300">employees</span> (
-                  </div>
-                  <div className="ml-8 space-y-1">
-                    <div>
-                      id <span className="text-purple-300">SERIAL PRIMARY KEY</span>,
-                    </div>
-                    <div>
-                      first_name <span className="text-purple-300">VARCHAR(50) NOT NULL</span>,
-                    </div>
-                    <div>
-                      last_name <span className="text-purple-300">VARCHAR(50) NOT NULL</span>,
-                    </div>
-                    <div>
-                      email <span className="text-purple-300">VARCHAR(100) UNIQUE NOT NULL</span>,
-                    </div>
-                    <div>
-                      phone_number <span className="text-purple-300">VARCHAR(20)</span>,
-                    </div>
-                    <div>
-                      hire_date <span className="text-purple-300">DATE NOT NULL</span>,
-                    </div>
-                    <div className="bg-green-800 px-1">
-                      job_title <span className="text-purple-300">VARCHAR(50) NOT NULL</span>,
-                    </div>
-                    <div>
-                      salary <span className="text-purple-300">NUMERIC(10, 2)</span>,
-                    </div>
-                    <div>
-                      department_id <span className="text-purple-300">INTEGER</span>,
-                    </div>
-                    <div>
-                      created_at{' '}
-                      <span className="text-purple-300">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
-                    </div>
-                    <div>
-                      updated_at{' '}
-                      <span className="text-purple-300">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>
-                    </div>
-                  </div>
-                  <div className="ml-4">);</div>
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent_Shadcn_ value="schema">
+            {databaseComparison.isLoading ? (
+              <div className="p-6 text-center">
+                <p>Loading database comparison...</p>
+              </div>
+            ) : databaseComparison.isError ? (
+              <div className="p-6 text-center text-red-500">
+                <p>Error loading database comparison</p>
+              </div>
+            ) : tablesWithChanges.length === 0 ? (
+              <div className="p-6 text-center">
+                <p>No database changes detected between branches</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {tablesWithChanges.map((table) => (
+                  <TableComparisonCard
+                    key={`${table.schemaName}.${table.tableName}`}
+                    table={table}
+                    mainProjectRef={parentProjectRef}
+                    currentProjectRef={ref}
+                    mainConnectionString={undefined} // Main project uses default connection
+                    currentConnectionString={project?.connectionString} // Use current branch's connection
+                    defaultOptions={defaultOptions}
+                    getStatusIcon={getStatusIcon}
+                    getStatusColor={getStatusColor}
+                  />
+                ))}
+              </div>
+            )}
+          </TabsContent_Shadcn_>
+
+          <TabsContent_Shadcn_ value="functions">
+            <div className="p-6 text-center">
+              <p>Function comparison not implemented yet</p>
+            </div>
           </TabsContent_Shadcn_>
 
           <TabsContent_Shadcn_ value="config" className="mt-4">
-            <Card>
-              <CardContent className="py-8 text-center text-gray-500">
-                No configuration changes detected
-              </CardContent>
-            </Card>
-          </TabsContent_Shadcn_>
-
-          <TabsContent_Shadcn_ value="functions" className="mt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>+ get_employee_by_id</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-gray-900 text-gray-100 p-4 rounded font-mono text-sm">
-                  <div className="text-green-400">
-                    + CREATE OR REPLACE FUNCTION get_employee_by_id(emp_id INTEGER)
-                  </div>
-                  <div className="text-green-400">
-                    + RETURNS TABLE(id INTEGER, name TEXT, title TEXT)
-                  </div>
-                  <div className="text-green-400">+ LANGUAGE plpgsql</div>
-                  <div className="text-green-400">+ AS $$</div>
-                  <div className="text-green-400">+ BEGIN</div>
-                  <div className="text-green-400">+ RETURN QUERY</div>
-                  <div className="text-green-400">
-                    + SELECT e.id, CONCAT(e.first_name, ' ', e.last_name), e.job_title
-                  </div>
-                  <div className="text-green-400">+ FROM employees e</div>
-                  <div className="text-green-400">+ WHERE e.id = emp_id;</div>
-                  <div className="text-green-400">+ END;</div>
-                  <div className="text-green-400">+ $$;</div>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="p-6 text-center">
+              <p>Configuration comparison not implemented yet</p>
+            </div>
           </TabsContent_Shadcn_>
         </Tabs_Shadcn_>
-      </div>
-    </ScaffoldContainer>
+      </ScaffoldContainer>
+    </PageLayout>
+  )
+}
+
+// Component for individual table comparison
+interface TableComparisonCardProps {
+  table: any
+  mainProjectRef?: string
+  currentProjectRef?: string
+  mainConnectionString?: string | null
+  currentConnectionString?: string | null
+  defaultOptions: monacoEditor.IStandaloneDiffEditorConstructionOptions
+  getStatusIcon: (status: string) => JSX.Element
+  getStatusColor: (status: string) => string
+}
+
+const TableComparisonCard = ({
+  table,
+  mainProjectRef,
+  currentProjectRef,
+  mainConnectionString,
+  currentConnectionString,
+  defaultOptions,
+  getStatusIcon,
+  getStatusColor,
+}: TableComparisonCardProps) => {
+  // Get table definitions for comparison
+  const { mainDefinition, currentDefinition, isLoading, isModified } = useTableDefinitionComparison(
+    mainProjectRef,
+    currentProjectRef,
+    mainConnectionString,
+    currentConnectionString,
+    table.mainTableId,
+    table.currentTableId
+  )
+
+  // Determine actual status based on definitions
+  const actualStatus = table.status === 'unchanged' && isModified ? 'modified' : table.status
+
+  // Prepare diff content
+  const originalContent =
+    table.status === 'added'
+      ? '-- Table does not exist in main branch'
+      : mainDefinition || '-- Loading...'
+  const modifiedContent =
+    table.status === 'removed'
+      ? '-- Table was removed in current branch'
+      : currentDefinition || '-- Loading...'
+
+  return (
+    <Card>
+      <CardHeader className="flex-row items-center gap-2 w-full space-y-0">
+        {getStatusIcon(actualStatus)}
+        <CardTitle className={getStatusColor(actualStatus)}>
+          {table.schemaName}.{table.tableName}
+        </CardTitle>
+        <Badge
+          variant={
+            actualStatus === 'added'
+              ? 'default'
+              : actualStatus === 'removed'
+                ? 'destructive'
+                : 'secondary'
+          }
+        >
+          {actualStatus}
+        </Badge>
+      </CardHeader>
+      <CardContent className="p-0">
+        <div className="h-96">
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <p>Loading table definition...</p>
+            </div>
+          ) : (
+            <DiffEditor
+              theme="supabase"
+              language="sql"
+              original={originalContent}
+              modified={modifiedContent}
+              options={defaultOptions}
+            />
+          )}
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 
