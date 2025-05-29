@@ -18,11 +18,12 @@ import matter from 'gray-matter'
 import { createHash } from 'node:crypto'
 import { readdirSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import path, { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 import { SimpleGit, simpleGit } from 'simple-git'
 import { parse } from 'smol-toml'
-import { type Section } from './helpers.mdx'
+import { Section } from './helpers.mdx.js'
 
 interface Options {
   reset: boolean
@@ -48,6 +49,8 @@ const REQUIRED_ENV_VARS = {
   SUPABASE_URL: 'NEXT_PUBLIC_SUPABASE_URL',
   SERVICE_ROLE_KEY: 'SUPABASE_SERVICE_ROLE_KEY',
 } as const
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 async function main() {
   console.log('Updating content timestamps....')
