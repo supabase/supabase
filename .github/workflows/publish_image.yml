@@ -134,3 +134,59 @@ jobs:
     with:
       version: ${{ needs.settings.outputs.image_version }}
     secrets: inherit
+
+  update-remote-repo:
+    needs:
+      - settings
+      - publish
+    runs-on: ubuntu-latest
+    env:
+      service_to_update: 'studio'
+      cli_repo_owner: supabase
+      cli_repo: cli
+      cli_repo_main_branch: 'develop'
+      cli_repo_pr_title: 'chore: Bump studio to the latest image version'
+      github_user: 'Ivan Bot'
+      github_user_email: 'vasilov.ivan@gmail.com'
+
+    steps:
+      - name: Setup Git config
+        run: |
+          git config --global user.name '${{ env.github_user }}'
+          git config --global user.email '${{ env.github_user_email }}'
+
+      - name: Checkout remote repository
+        uses: actions/checkout@v4
+        with:
+          repository: '${{ env.cli_repo_owner }}/${{ env.cli_repo }}'
+          token: ${{ secrets.USER_ACCESS_TOKEN }}
+          path: '${{ env.cli_repo }}'
+
+      - name: Create a new branch
+        run: |
+          cd ${{ env.cli_repo }}
+          git checkout ${{ env.cli_repo_main_branch }}
+          git checkout -b '${{ env.service_to_update }}/${{ needs.settings.outputs.image_version }}'
+
+      - name: Update file
+        run: |
+          cd ${{ env.cli_repo }}
+          sed -i 's/${{ env.cli_repo_owner }}\/${{ env.service_to_update }}:.*/${{ env.cli_repo_owner }}\/${{ env.service_to_update }}:${{ needs.settings.outputs.image_version }}"/' pkg/config/constants.go
+
+      - name: Commit changes
+        run: |
+          cd ${{ env.cli_repo }}
+          git add .
+          git commit -m "chore: Update ${{ env.service_to_update }} version to ${{ needs.settings.outputs.image_version }}"
+
+      - name: Push changes
+        run: |
+          cd ${{ env.cli_repo }}
+          git push origin '${{ env.service_to_update }}/${{ needs.settings.outputs.image_version }}'
+
+      - name: Create Pull Request
+        run: |
+          cd ${{ env.cli_repo }}
+          gh pr create --base '${{ env.cli_repo_main_branch }}' --title "${{ env.cli_repo_pr_title }} ${{ needs.settings.outputs.image_version }}" --body "Updates service ${{ env.service_to_update }} new version to ${{ needs.settings.outputs.image_version }}"
+        env:
+          GH_TOKEN: ${{ secrets.USER_ACCESS_TOKEN }}
