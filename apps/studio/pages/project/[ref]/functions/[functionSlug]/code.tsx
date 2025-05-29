@@ -45,9 +45,16 @@ const CodePage = () => {
       slug: functionSlug,
     },
     {
+      // [Alaister]: These parameters prevent the function files
+      // from being refetched when the user is editing the code
       retry: false,
-      refetchOnWindowFocus: false,
       retryOnMount: false,
+      refetchOnWindowFocus: false,
+      staleTime: Infinity,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      refetchInterval: false,
+      refetchIntervalInBackground: false,
     }
   )
   const [files, setFiles] = useState<

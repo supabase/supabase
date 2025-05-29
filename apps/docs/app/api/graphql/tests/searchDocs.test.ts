@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { Result } from '~/features/helpers.fn'
 import { type OpenAIClientInterface } from '~/lib/openAi'
 import { ApiError } from '../../utils'
@@ -45,6 +45,16 @@ vi.mock('~/lib/supabase', () => ({
 }))
 
 describe('/api/graphql searchDocs', () => {
+  beforeAll(() => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+  })
+
+  afterAll(() => {
+    vi.restoreAllMocks()
+    vi.doUnmock('~/lib/openAi')
+    vi.doUnmock('~/lib/supabase')
+  })
+
   it('should return search results when given a valid query', async () => {
     const searchQuery = `
       query {

@@ -499,8 +499,10 @@ export const SQLEditor = () => {
       }))
       const headerData = await constructHeaders()
 
+      const authorizationHeader = headerData.get('Authorization')
+
       await complete(prompt, {
-        headers: { Authorization: headerData.get('Authorization') ?? '' },
+        ...(authorizationHeader ? { headers: { Authorization: authorizationHeader } } : undefined),
         body: {
           completionMetadata: {
             textBeforeCursor: context.beforeSelection,
