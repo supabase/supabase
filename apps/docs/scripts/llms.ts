@@ -1,3 +1,5 @@
+import _configureDotEnv from './utils/dotenv'
+
 import 'dotenv/config'
 import fs from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
@@ -12,6 +14,8 @@ import {
   fetchSwiftLibReferenceSource,
   type SearchSource,
 } from './search/sources/index.js'
+
+const _ = _configureDotEnv
 
 interface Source {
   title: string

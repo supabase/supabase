@@ -11,7 +11,7 @@
  *  the last Git commit date.
  */
 
-import 'dotenv/config'
+import _configureDotEnv from './utils/dotenv'
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import matter from 'gray-matter'
@@ -24,6 +24,8 @@ import { parseArgs } from 'node:util'
 import { SimpleGit, simpleGit } from 'simple-git'
 import { parse } from 'smol-toml'
 import { Section } from './helpers.mdx.js'
+
+const _ = _configureDotEnv
 
 interface Options {
   reset: boolean
@@ -47,7 +49,7 @@ type SectionWithChecksum = Omit<Section, 'heading'> &
 
 const REQUIRED_ENV_VARS = {
   SUPABASE_URL: 'NEXT_PUBLIC_SUPABASE_URL',
-  SERVICE_ROLE_KEY: 'SUPABASE_SERVICE_ROLE_KEY',
+  SERVICE_ROLE_KEY: 'SUPABASE_SECRET_KEY',
 } as const
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))

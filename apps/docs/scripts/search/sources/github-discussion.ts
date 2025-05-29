@@ -25,11 +25,9 @@ export type DiscussionsResponse = {
   }
 }
 
-const appId = process.env.SEARCH_GITHUB_APP_ID ?? process.env.DOCS_GITHUB_APP_ID
-const installationId =
-  process.env.SEARCH_GITHUB_APP_INSTALLATION_ID ?? process.env.DOCS_GITHUB_APP_INSTALLATION_ID
-const privateKey =
-  process.env.SEARCH_GITHUB_APP_PRIVATE_KEY ?? process.env.DOCS_GITHUB_APP_PRIVATE_KEY
+const appId = process.env.DOCS_GITHUB_APP_ID
+const installationId = process.env.DOCS_GITHUB_APP_INSTALLATION_ID
+const privateKey = process.env.DOCS_GITHUB_APP_PRIVATE_KEY
 
 /**
  * Fetches GitHub discussions for a repository + category
