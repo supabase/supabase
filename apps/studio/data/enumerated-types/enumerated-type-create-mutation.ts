@@ -1,3 +1,4 @@
+import { ident, literal } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -5,6 +6,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import type { ResponseError } from 'types'
 import { enumeratedTypesKeys } from './keys'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type EnumeratedTypeCreateVariables = {
   projectRef: string
@@ -23,12 +25,14 @@ export async function createEnumeratedType({
   description,
   values,
 }: EnumeratedTypeCreateVariables) {
-  const createSql = `create type "${schema}"."${name}" as enum (${values
-    .map((x) => `'${x}'`)
-    .join(', ')});`
+  const createSql = `create type ${ident(schema)}.${ident(name)} as enum (${values
+    .map((x) => ident(x))
+    .join(', ')})`
   const commentSql =
-    description !== undefined ? `comment on type "${schema}"."${name}" is '${description}';` : ''
-  const sql = wrapWithTransaction(`${createSql} ${commentSql}`)
+    description !== undefined
+      ? `comment on type ${ident(schema)}.${ident(name)} is ${literal(description)}`
+      : ''
+  const sql = applyAndTrackMigrations(`${createSql}; ${commentSql}`, `create_type_${name}`)
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
 }

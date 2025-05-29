@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { invalidateRolesQuery } from './database-roles-query'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 type DropRoleBody = Parameters<typeof pgMeta.roles.remove>[1]
 
@@ -21,13 +22,15 @@ export async function deleteDatabaseRole({
   id,
   payload,
 }: DatabaseRoleDeleteVariables) {
-  const sql = pgMeta.roles.remove({ id }, payload).sql
+  const { sql } = pgMeta.roles.remove({ id }, payload)
+
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: applyAndTrackMigrations(sql, `delete_role_${id}`),
     queryKey: ['roles', 'delete'],
   })
+
   return result
 }
 

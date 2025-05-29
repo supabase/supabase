@@ -37,7 +37,6 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { CRONJOB_DEFINITIONS } from './CronJobs.constants'
 import {
-  buildCronQuery,
   buildHttpRequestCommand,
   cronPattern,
   parseCronJobCommand,
@@ -312,15 +311,13 @@ export const CreateCronJobSheet = ({
       return
     }
 
-    let command = `$$${values.snippet}$$`
-
-    const query = buildCronQuery(name, schedule, command)
-
     upsertCronJob(
       {
         projectRef: project!.ref,
         connectionString: project?.connectionString,
-        query,
+        name,
+        schedule,
+        command: values.snippet,
       },
       {
         onSuccess: () => {

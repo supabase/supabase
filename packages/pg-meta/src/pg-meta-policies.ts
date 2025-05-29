@@ -141,7 +141,7 @@ function update(
   const rolesSql = roles === undefined ? '' : `${alter} TO ${roles.map(ident).join(',')};`
 
   // nameSql must be last
-  const sql = `BEGIN; ${definitionSql} ${checkSql} ${rolesSql} ${nameSql} COMMIT;`
+  const sql = `${definitionSql} ${checkSql} ${rolesSql} ${nameSql}`
 
   return { sql }
 }

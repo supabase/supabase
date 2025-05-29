@@ -1,9 +1,11 @@
+import { literal } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databaseCronJobsKeys } from './keys'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type DatabaseCronJobToggleVariables = {
   projectRef: string
@@ -18,10 +20,12 @@ export async function toggleDatabaseCronJob({
   jobId,
   active,
 }: DatabaseCronJobToggleVariables) {
+  const sql = `select cron.alter_job(job_id := ${literal(jobId)}, active := ${literal(active)});`
+
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `select cron.alter_job(job_id := ${jobId}, active := ${active});`,
+    sql: applyAndTrackMigrations(sql, `${active ? 'create' : 'delete'}_cron_${jobId}`),
     queryKey: databaseCronJobsKeys.alter(),
   })
 
