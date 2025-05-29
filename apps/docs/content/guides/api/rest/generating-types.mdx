@@ -155,10 +155,10 @@ import { Database as DatabaseGenerated } from './database-generated.types'
 
 // Define your custom JSON type
 type CustomJsonType = {
-  foo: string;
-  bar: { baz: number };
-  en: 'ONE' | 'TWO' | 'THREE';
-};
+  foo: string
+  bar: { baz: number }
+  en: 'ONE' | 'TWO' | 'THREE'
+}
 
 export type Database = MergeDeep<
   DatabaseGenerated,
@@ -167,8 +167,8 @@ export type Database = MergeDeep<
       Tables: {
         your_table: {
           Row: {
-            data: CustomJsonType | null;
-          };
+            data: CustomJsonType | null
+          }
           // Optional: Use if you want type-checking for inserts and updates
           // Insert: {
           //   data?: CustomJsonType | null;
@@ -181,8 +181,8 @@ export type Database = MergeDeep<
       Views: {
         your_view: {
           Row: {
-            data: CustomJsonType | null;
-          };
+            data: CustomJsonType | null
+          }
         }
       }
     }
@@ -195,12 +195,10 @@ export type Database = MergeDeep<
 Once you've defined your custom JSON types, TypeScript will automatically infer the correct types when using JSON selectors:
 
 ```ts
-const res = await client
-  .from('your_table')
-  .select('data->bar->baz, data->en, data->bar');
+const res = await client.from('your_table').select('data->bar->baz, data->en, data->bar')
 
 if (res.data) {
-  console.log(res.data);
+  console.log(res.data)
   // TypeScript infers the shape of your JSON data:
   // [
   //   {
@@ -213,8 +211,9 @@ if (res.data) {
 ```
 
 This feature works with:
+
 - Single-level JSON access: `data->foo`
-- Nested JSON access: `data->bar->baz`  
+- Nested JSON access: `data->bar->baz`
 - Text extraction: `data->>foo` (returns string)
 - Mixed selections combining multiple JSON paths
 
