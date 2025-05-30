@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "skipLibCheck": true,
+    "esModuleInterop": true
+  }
+}
