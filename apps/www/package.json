@@ -96,7 +96,6 @@
     "@types/three": "^0.169.0",
     "@types/uuid": "^9.0.8",
     "api-types": "workspace:*",
-    "autoprefixer": "^10.4.14",
     "postcss": "^8.5.3",
     "react-hook-form": "^7.45.0",
     "tsconfig": "workspace:*",
