@@ -1,45 +1,15 @@
-import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock'
-import { fromNodeProviderChain } from '@aws-sdk/credential-providers'
 import { generateObject } from 'ai'
+import { source } from 'common-tags'
+import { getModel } from 'lib/ai/model'
+import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
-import apiWrapper from 'lib/api/apiWrapper'
-
-const credentialProvider = fromNodeProviderChain()
-
-const bedrock = createAmazonBedrock({
-  credentialProvider,
-})
-
-async function hasAwsCredentials() {
-  try {
-    const credentials = await credentialProvider()
-    return !!credentials
-  } catch (error) {
-    return false
-  }
-}
-
-const hasCredentials = await hasAwsCredentials()
 
 const cronSchema = z.object({
   cron_expression: z.string().describe('The generated cron expression.'),
 })
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (!process.env.AWS_REGION) {
-    return res.status(500).json({
-      error: 'AWS_REGION is not set',
-    })
-  }
-
-  if (!hasCredentials) {
-    return res.status(500).json({
-      error:
-        'AWS credentials are not configured. Set up a local profile or add environment variables.',
-    })
-  }
-
   const { method } = req
 
   switch (method) {
@@ -63,43 +33,51 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
+    const { model, error: modelError } = await getModel()
+
+    if (modelError) {
+      return res.status(500).json({ error: modelError.message })
+    }
+
     const result = await generateObject({
-      model: bedrock('us.anthropic.claude-sonnet-4-20250514-v1:0'),
+      model,
       schema: cronSchema,
-      prompt: `You are a cron syntax expert. Your purpose is to convert natural language time descriptions into valid cron expressions for pg_cron.
+      prompt: source`
+        You are a cron syntax expert. Your purpose is to convert natural language time descriptions into valid cron expressions for pg_cron.
 
-Rules for responses:
-- For standard intervals (minutes and above), output cron expressions in the 5-field format supported by pg_cron
-- For second-based intervals, use the special pg_cron "x seconds" syntax
-- Do not provide any explanation of what the cron expression does
-- Do not ask for clarification if you need it. Just output the cron expression.
+        Rules for responses:
+        - For standard intervals (minutes and above), output cron expressions in the 5-field format supported by pg_cron
+        - For second-based intervals, use the special pg_cron "x seconds" syntax
+        - Do not provide any explanation of what the cron expression does
+        - Do not ask for clarification if you need it. Just output the cron expression.
 
-Example input: "Every Monday at 3am"
-Example output: 0 3 * * 1
+        Example input: "Every Monday at 3am"
+        Example output: 0 3 * * 1
 
-Example input: "Every 30 seconds"
-Example output: 30 seconds
+        Example input: "Every 30 seconds"
+        Example output: 30 seconds
 
-Additional examples:
-- Every minute: * * * * *
-- Every 5 minutes: */5 * * * *
-- Every first of the month, at 00:00: 0 0 1 * *
-- Every night at midnight: 0 0 * * *
-- Every Monday at 2am: 0 2 * * 1
-- Every 15 seconds: 15 seconds
-- Every 45 seconds: 45 seconds
+        Additional examples:
+        - Every minute: * * * * *
+        - Every 5 minutes: */5 * * * *
+        - Every first of the month, at 00:00: 0 0 1 * *
+        - Every night at midnight: 0 0 * * *
+        - Every Monday at 2am: 0 2 * * 1
+        - Every 15 seconds: 15 seconds
+        - Every 45 seconds: 45 seconds
 
-Field order for standard cron:
-- minute (0-59)
-- hour (0-23)
-- day (1-31)
-- month (1-12)
-- weekday (0-6, Sunday=0)
+        Field order for standard cron:
+        - minute (0-59)
+        - hour (0-23)
+        - day (1-31)
+        - month (1-12)
+        - weekday (0-6, Sunday=0)
 
-Important: pg_cron uses "x seconds" for second-based intervals, not "x * * * *".
-If the user asks for seconds, do not use the 5-field format, instead use "x seconds".
+        Important: pg_cron uses "x seconds" for second-based intervals, not "x * * * *".
+        If the user asks for seconds, do not use the 5-field format, instead use "x seconds".
 
-Here is the user's prompt: ${prompt}`,
+        Here is the user's prompt: ${prompt}
+      `,
       temperature: 0,
     })
 

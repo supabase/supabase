@@ -1,26 +1,9 @@
-import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock'
-import { fromNodeProviderChain } from '@aws-sdk/credential-providers'
 import { generateObject } from 'ai'
+import { source } from 'common-tags'
+import { getModel } from 'lib/ai/model'
+import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
-import apiWrapper from 'lib/api/apiWrapper'
-
-const credentialProvider = fromNodeProviderChain()
-
-const bedrock = createAmazonBedrock({
-  credentialProvider,
-})
-
-async function hasAwsCredentials() {
-  try {
-    const credentials = await credentialProvider()
-    return !!credentials
-  } catch (error) {
-    return false
-  }
-}
-
-const hasCredentials = await hasAwsCredentials()
 
 const titleSchema = z.object({
   title: z
@@ -32,19 +15,6 @@ const titleSchema = z.object({
 })
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (!process.env.AWS_REGION) {
-    return res.status(500).json({
-      error: 'AWS_REGION is not set',
-    })
-  }
-
-  if (!hasCredentials) {
-    return res.status(500).json({
-      error:
-        'AWS credentials are not configured. Set up a local profile or add environment variables.',
-    })
-  }
-
   const { method } = req
 
   switch (method) {
@@ -68,14 +38,22 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
+    const { model, error: modelError } = await getModel()
+
+    if (modelError) {
+      return res.status(500).json({ error: modelError.message })
+    }
+
     const result = await generateObject({
-      model: bedrock('us.anthropic.claude-sonnet-4-20250514-v1:0'),
+      model,
       schema: titleSchema,
-      prompt: `Generate a short title and summarized description for this Postgres SQL snippet:
+      prompt: source`
+        Generate a short title and summarized description for this Postgres SQL snippet:
 
-${sql}
+        ${sql}
 
-The description should describe why this table was created (eg. "Table to track todos") or what the query does.`,
+        The description should describe why this table was created (eg. "Table to track todos") or what the query does.
+      `,
       temperature: 0,
     })
 
