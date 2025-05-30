@@ -1,7 +1,6 @@
 import { NextSeo } from 'next-seo'
 import DefaultLayout from '~/components/Layouts/Default'
 
-import { useBreakpoint } from 'common'
 import data from '~/data/surveys/state-of-startups-2025'
 import { Button, Checkbox, cn } from 'ui'
 import Link from 'next/link'
@@ -11,6 +10,7 @@ import { Label } from 'ui/src/components/shadcn/ui/label'
 import { useEffect, useRef } from 'react'
 import { animate, createSpring, createTimeline, stagger } from 'animejs'
 import Image from 'next/image'
+import { PopupFrame } from 'ui-patterns'
 
 function VectorPage() {
   const pageData = data()
@@ -143,185 +143,200 @@ const Hero = (props: any) => {
     return () => {}
   }, [])
 
-  return (
-    <div
-      className={cn(
-        'container relative w-full mx-auto px-6 py-8 md:py-16 sm:px-16 xl:px-20',
-        props.className
-      )}
-    >
-      <div
-        ref={animRef}
-        className="flex flex-col text-center items-center justify-center min-h-[70vh]"
-      >
-        <div className="absolute overflow-hidden inset-0 w-full h-full col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7 flex justify-center">
-          <svg
-            width="558"
-            height="392"
-            viewBox="0 0 558 392"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="absolute w-full h-full inset-0 -top-40 lg:top-0 xl:-left-40"
-          >
-            <circle
-              cx="278.831"
-              cy="112.952"
-              r="278.5"
-              transform="rotate(75 278.831 112.952)"
-              fill="url(#paint0_radial_183_1691)"
-              fillOpacity="0.2"
-            />
-            <defs>
-              <radialGradient
-                id="paint0_radial_183_1691"
-                cx="0"
-                cy="0"
-                r="1"
-                gradientUnits="userSpaceOnUse"
-                gradientTransform="translate(349.764 144.755) rotate(-132.179) scale(202.74 202.839)"
-              >
-                <stop stopColor="hsl(var(--foreground-default))" />
-                <stop offset="1" stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
-              </radialGradient>
-            </defs>
-          </svg>
+  const handleCtaClick = () => {
+    console.log('cta clicked')
+  }
 
-          <svg
-            width="1119"
-            height="1119"
-            viewBox="0 0 1119 1119"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="-mt-72 sm:-mt-60 md:-mt-40 lg:-mt-12 xl:mt-0 animate-spinner !ease-linear transform"
-            style={{
-              animationDuration: '20000ms',
-            }}
-          >
-            <g clipPath="url(#clip0_183_1690)">
-              <circle cx="559.5" cy="559.5" r="496" fill="url(#paint1_radial_183_1690)" />
-              <path
-                d="M982.759 -15.7995C1100.79 61.9162 1134.95 153.728 1129.8 236.892C1124.68 319.611 1080.66 393.869 1041.31 437.283C968.75 168.701 692.591 9.3387 423.687 80.9161C430.529 20.4699 450.367 -27.8768 480.826 -63.4144C511.422 -99.1129 552.763 -121.922 602.496 -131.075C701.21 -149.241 833.009 -113.601 979.3 -18.0675L982.759 -15.7995Z"
-                stroke="url(#paint2_radial_183_1690)"
-                strokeWidth="1.15887"
+  return (
+    <>
+      <div
+        className={cn(
+          'container relative w-full mx-auto px-6 py-8 md:py-16 sm:px-16 xl:px-20',
+          props.className
+        )}
+      >
+        <div
+          ref={animRef}
+          className="flex flex-col text-center items-center justify-center min-h-[70vh]"
+        >
+          <div className="absolute overflow-hidden inset-0 w-full h-full col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7 flex justify-center">
+            <svg
+              width="558"
+              height="392"
+              viewBox="0 0 558 392"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="absolute w-full h-full inset-0 -top-40 lg:top-0 xl:-left-40"
+            >
+              <circle
+                cx="278.831"
+                cy="112.952"
+                r="278.5"
+                transform="rotate(75 278.831 112.952)"
+                fill="url(#paint0_radial_183_1691)"
+                fillOpacity="0.2"
               />
-            </g>
-            <defs>
-              <radialGradient
-                id="paint1_radial_183_1690"
-                cx="0"
-                cy="0"
-                r="1"
-                gradientUnits="userSpaceOnUse"
-                gradientTransform="translate(571.212 579.87) rotate(122.182) scale(542.117 690.275)"
-              >
-                <stop stopColor="hsl(var(--border-muted))" />
-                <stop offset="0.716346" stopColor="hsl(var(--background-alternative-default))" />
-                <stop offset="0.754808" stopColor="hsl(var(--background-alternative-default))" />
-                <stop offset="1" stopColor="hsl(var(--border-strong))" />
-              </radialGradient>
-              <radialGradient
-                id="paint2_radial_183_1690"
-                cx="0"
-                cy="0"
-                r="1"
-                gradientUnits="userSpaceOnUse"
-                gradientTransform="translate(814.301 175.03) rotate(-38.9601) scale(142.974 294.371)"
-              >
-                <stop stopColor="hsl(var(--foreground-default))" />
-                <stop offset="1" stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
-              </radialGradient>
-              <clipPath id="clip0_183_1690">
-                <rect width="1119" height="1119" fill="white" />
-              </clipPath>
-            </defs>
-          </svg>
-          <svg
-            width="1096"
-            height="482"
-            viewBox="0 0 1096 482"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="absolute min-w-full inset-0 top-auto z-10"
-          >
-            <rect x="0.500488" width="1095" height="482" fill="url(#paint0_linear_183_1694)" />
-            <defs>
-              <linearGradient
-                id="paint0_linear_183_1694"
-                x1="922.165"
-                y1="63.3564"
-                x2="922.165"
-                y2="419.772"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stopColor="hsl(var(--background-alternative-default))" stopOpacity="0" />
-                <stop offset="1" stopColor="hsl(var(--background-alternative-default))" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-        <div className="relative w-full z-10 flex flex-col items-center mx-auto">
-          <div className="flex gap-2 mb-4 md:mb-8">
-            <div className="w-11 h-11 relative flex items-center justify-center border rounded-lg">
-              <Image
-                src="/images/supabase-logo-icon.svg"
-                alt="Supabase icon"
-                width={60}
-                height={60}
-                className="w-6 h-6"
-              />
-            </div>
-            <div className="w-11 h-11 relative flex items-center justify-center border rounded-lg bg-[#FB651E]">
-              <svg
-                width="20"
-                height="25"
-                viewBox="0 0 20 25"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+              <defs>
+                <radialGradient
+                  id="paint0_radial_183_1691"
+                  cx="0"
+                  cy="0"
+                  r="1"
+                  gradientUnits="userSpaceOnUse"
+                  gradientTransform="translate(349.764 144.755) rotate(-132.179) scale(202.74 202.839)"
+                >
+                  <stop stopColor="hsl(var(--foreground-default))" />
+                  <stop offset="1" stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
+                </radialGradient>
+              </defs>
+            </svg>
+
+            <svg
+              width="1119"
+              height="1119"
+              viewBox="0 0 1119 1119"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="-mt-72 sm:-mt-60 md:-mt-40 lg:-mt-12 xl:mt-0 animate-spinner !ease-linear transform"
+              style={{
+                animationDuration: '20000ms',
+              }}
+            >
+              <g clipPath="url(#clip0_183_1690)">
+                <circle cx="559.5" cy="559.5" r="496" fill="url(#paint1_radial_183_1690)" />
                 <path
-                  d="M8.59714 15.4749L0.863647 0.987762H4.39796L8.94708 10.156C9.01706 10.3193 9.09871 10.4884 9.19203 10.6634C9.28534 10.8383 9.36699 11.0191 9.43698 11.2058C9.48364 11.2758 9.51863 11.3399 9.54196 11.3982C9.56529 11.4566 9.58862 11.509 9.61195 11.5557C9.72859 11.789 9.83357 12.0164 9.92689 12.2381C10.0202 12.4597 10.1018 12.6638 10.1718 12.8505C10.3585 12.4539 10.5626 12.0281 10.7842 11.5732C11.0058 11.1183 11.2333 10.6459 11.4666 10.156L16.0857 0.987762H19.375L11.5716 15.6499V24.9931H8.59714V15.4749Z"
-                  fill="white"
+                  d="M982.759 -15.7995C1100.79 61.9162 1134.95 153.728 1129.8 236.892C1124.68 319.611 1080.66 393.869 1041.31 437.283C968.75 168.701 692.591 9.3387 423.687 80.9161C430.529 20.4699 450.367 -27.8768 480.826 -63.4144C511.422 -99.1129 552.763 -121.922 602.496 -131.075C701.21 -149.241 833.009 -113.601 979.3 -18.0675L982.759 -15.7995Z"
+                  stroke="url(#paint2_radial_183_1690)"
+                  strokeWidth="1.15887"
                 />
-              </svg>
-            </div>
+              </g>
+              <defs>
+                <radialGradient
+                  id="paint1_radial_183_1690"
+                  cx="0"
+                  cy="0"
+                  r="1"
+                  gradientUnits="userSpaceOnUse"
+                  gradientTransform="translate(571.212 579.87) rotate(122.182) scale(542.117 690.275)"
+                >
+                  <stop stopColor="hsl(var(--border-muted))" />
+                  <stop offset="0.716346" stopColor="hsl(var(--background-alternative-default))" />
+                  <stop offset="0.754808" stopColor="hsl(var(--background-alternative-default))" />
+                  <stop offset="1" stopColor="hsl(var(--border-strong))" />
+                </radialGradient>
+                <radialGradient
+                  id="paint2_radial_183_1690"
+                  cx="0"
+                  cy="0"
+                  r="1"
+                  gradientUnits="userSpaceOnUse"
+                  gradientTransform="translate(814.301 175.03) rotate(-38.9601) scale(142.974 294.371)"
+                >
+                  <stop stopColor="hsl(var(--foreground-default))" />
+                  <stop offset="1" stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
+                </radialGradient>
+                <clipPath id="clip0_183_1690">
+                  <rect width="1119" height="1119" fill="white" />
+                </clipPath>
+              </defs>
+            </svg>
+            <svg
+              width="1096"
+              height="482"
+              viewBox="0 0 1096 482"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="absolute min-w-full inset-0 top-auto z-10"
+            >
+              <rect x="0.500488" width="1095" height="482" fill="url(#paint0_linear_183_1694)" />
+              <defs>
+                <linearGradient
+                  id="paint0_linear_183_1694"
+                  x1="922.165"
+                  y1="63.3564"
+                  x2="922.165"
+                  y2="419.772"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop stopColor="hsl(var(--background-alternative-default))" stopOpacity="0" />
+                  <stop offset="1" stopColor="hsl(var(--background-alternative-default))" />
+                </linearGradient>
+              </defs>
+            </svg>
           </div>
-          <div>
-            {props.icon || props.title ? (
-              <div className="mb-2 flex justify-center items-center gap-3">
-                {props.title && (
-                  <h1
-                    className="text-brand font-mono uppercase tracking-widest text-sm"
-                    key={`product-name-${props.title}`}
-                  >
-                    {props.title}
-                  </h1>
-                )}
+          <div className="relative w-full z-10 flex flex-col items-center mx-auto">
+            <div className="flex gap-2 mb-4 md:mb-8">
+              <div className="w-11 h-11 relative flex items-center justify-center border rounded-lg">
+                <Image
+                  src="/images/supabase-logo-icon.svg"
+                  alt="Supabase icon"
+                  width={60}
+                  height={60}
+                  className="w-6 h-6"
+                />
               </div>
-            ) : null}
-          </div>
-          <div className={cn('flex flex-col gap-4 items-center')}>
-            <div className="flex h-[150px] items-center">
-              <div
-                id="anim"
-                className="will-change-transform text-5xl md:text-6xl min-h-[4rem] max-w-2xl [&_.letter]:transform"
-              >
-                State of Startups
+              <div className="w-11 h-11 relative flex items-center justify-center border rounded-lg bg-[#FB651E]">
+                <svg
+                  width="20"
+                  height="25"
+                  viewBox="0 0 20 25"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M8.59714 15.4749L0.863647 0.987762H4.39796L8.94708 10.156C9.01706 10.3193 9.09871 10.4884 9.19203 10.6634C9.28534 10.8383 9.36699 11.0191 9.43698 11.2058C9.48364 11.2758 9.51863 11.3399 9.54196 11.3982C9.56529 11.4566 9.58862 11.509 9.61195 11.5557C9.72859 11.789 9.83357 12.0164 9.92689 12.2381C10.0202 12.4597 10.1018 12.6638 10.1718 12.8505C10.3585 12.4539 10.5626 12.0281 10.7842 11.5732C11.0058 11.1183 11.2333 10.6459 11.4666 10.156L16.0857 0.987762H19.375L11.5716 15.6499V24.9931H8.59714V15.4749Z"
+                    fill="white"
+                  />
+                </svg>
               </div>
             </div>
-            <p className="p !text-foreground-light max-w-xl">{props.subheader}</p>
-          </div>
-          <div className="w-full sm:w-auto flex flex-col items-stretch sm:flex-row pt-2 sm:items-center gap-2">
-            {props.cta && (
-              <Button size="small" className="text-white" asChild>
-                <Link href={props.cta.link} as={props.cta.link}>
-                  {props.cta.label ?? 'Start for free'}
-                </Link>
-              </Button>
-            )}
+            <div>
+              {props.icon || props.title ? (
+                <div className="mb-2 flex justify-center items-center gap-3">
+                  {props.title && (
+                    <h1
+                      className="text-brand font-mono uppercase tracking-widest text-sm"
+                      key={`product-name-${props.title}`}
+                    >
+                      {props.title}
+                    </h1>
+                  )}
+                </div>
+              ) : null}
+            </div>
+            <div className={cn('flex flex-col gap-4 items-center')}>
+              <div className="flex h-[150px] items-center">
+                <div
+                  id="anim"
+                  className="will-change-transform text-5xl md:text-6xl min-h-[4rem] max-w-2xl [&_.letter]:transform"
+                >
+                  State of Startups
+                </div>
+              </div>
+              <p className="p !text-foreground-light max-w-xl">{props.subheader}</p>
+            </div>
+            <div className="w-full sm:w-auto flex flex-col items-stretch sm:flex-row pt-2 sm:items-center gap-2">
+              {props.cta && (
+                <PopupFrame
+                  trigger={<Button size="small">{props.cta.label ?? 'Start for free'}</Button>}
+                  className="[&_.modal-content]:min-h-[70vh] [&_.modal-content]:!h-full [&_.modal-content]:flex [&_.modal-content]:flex-col"
+                >
+                  <div className="w-full !h-full flex-1 flex flex-col">
+                    <iframe
+                      src={`https://form.typeform.com/to/YOUR_TYPEFORM_ID?embedded=true`}
+                      width="100%"
+                      height="100%"
+                      frameBorder="0"
+                      className="w-full !min-h-full flex-1"
+                    />
+                  </div>
+                </PopupFrame>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
