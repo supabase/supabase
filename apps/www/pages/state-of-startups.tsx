@@ -176,9 +176,9 @@ function StateOfStartupsPage() {
                       Register
                     </Button>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 text-left">
                     <Checkbox required id="terms" className="[&>input]:m-0" />
-                    <Label htmlFor="terms" className="text-foreground-lighter">
+                    <Label htmlFor="terms" className="text-foreground-lighter leading-5">
                       We process your information in accordance with our{' '}
                       <Link href="/privacy" className="text-foreground-light hover:underline">
                         Privacy Policy
@@ -407,7 +407,7 @@ const Hero = (props: any) => {
           </div>
           <div className="relative w-full z-10 flex flex-col items-center mx-auto">
             <div className="flex gap-2 mb-4 md:mb-8">
-              <div className="w-11 h-11 relative flex items-center justify-center border rounded-lg">
+              <div className="w-11 h-11 relative flex items-center justify-center bg-default border rounded-lg">
                 <Image
                   src="/images/supabase-logo-icon.svg"
                   alt="Supabase icon"
@@ -415,20 +415,6 @@ const Hero = (props: any) => {
                   height={60}
                   className="w-6 h-6"
                 />
-              </div>
-              <div className="w-11 h-11 relative flex items-center justify-center border rounded-lg bg-[#FB651E]">
-                <svg
-                  width="20"
-                  height="25"
-                  viewBox="0 0 20 25"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M8.59714 15.4749L0.863647 0.987762H4.39796L8.94708 10.156C9.01706 10.3193 9.09871 10.4884 9.19203 10.6634C9.28534 10.8383 9.36699 11.0191 9.43698 11.2058C9.48364 11.2758 9.51863 11.3399 9.54196 11.3982C9.56529 11.4566 9.58862 11.509 9.61195 11.5557C9.72859 11.789 9.83357 12.0164 9.92689 12.2381C10.0202 12.4597 10.1018 12.6638 10.1718 12.8505C10.3585 12.4539 10.5626 12.0281 10.7842 11.5732C11.0058 11.1183 11.2333 10.6459 11.4666 10.156L16.0857 0.987762H19.375L11.5716 15.6499V24.9931H8.59714V15.4749Z"
-                    fill="white"
-                  />
-                </svg>
               </div>
             </div>
             <div>
@@ -449,7 +435,7 @@ const Hero = (props: any) => {
               <div className="flex h-[150px] items-center">
                 <div
                   id="anim"
-                  className="will-change-transform text-5xl md:text-6xl min-h-[4rem] max-w-2xl [&_.letter]:transform"
+                  className="will-change-transform leading-[120%] text-4xl sm:text-5xl md:text-6xl min-h-[4rem] max-w-2xl [&_.letter]:transform"
                 >
                   State of Startups
                 </div>
