@@ -18,8 +18,8 @@ import {
   WarningIcon,
 } from 'ui'
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
-import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
+import { WRAPPERS } from './Wrappers.constants'
 import { WrapperTable } from './WrapperTable'
 
 export const WrapperOverviewTab = () => {
@@ -34,13 +34,12 @@ export const WrapperOverviewTab = () => {
     connectionString: project?.connectionString,
   })
 
-  const integration = INTEGRATIONS.find((i) => i.id === id)
+  const wrapperMeta = WRAPPERS.find((w) => w.name === id)
 
-  if (integration?.type !== 'wrapper') {
+  if (!wrapperMeta) {
     return <p className="text-sm text-foreground-light">Unsupported integration type</p>
   }
 
-  const wrapperMeta = integration.meta
   const wrappersExtension = data?.find((ext) => ext.name === 'wrappers')
   const isWrappersExtensionInstalled = !!wrappersExtension?.installed_version
   const hasRequiredVersion =
@@ -117,7 +116,7 @@ export const WrapperOverviewTab = () => {
       <Sheet open={!!createWrapperShown} onOpenChange={() => setisClosingCreateWrapper(true)}>
         <SheetContent size="lg" tabIndex={undefined}>
           <CreateWrapperSheet
-            wrapperMeta={integration.meta}
+            wrapperMeta={wrapperMeta}
             onClose={() => {
               setCreateWrapperShown(false)
               setisClosingCreateWrapper(false)

@@ -48,10 +48,14 @@ export const ProjectContextProvider = ({
             key={`ai-assistant-state-${projectRef}`}
             projectRef={projectRef}
           >
-            <StorageExplorerStateContextProvider key={`storage-explorer-state-${projectRef}`}>
+            <StorageExplorerStateContextProvider
+              key={`storage-explorer-state-${projectRef}`}
+              project={selectedProject}
+            >
               <DatabaseSelectorStateContextProvider key={`database-selector-state-${projectRef}`}>
                 <RoleImpersonationStateContextProvider
                   key={`role-impersonation-state-${projectRef}`}
+                  project={selectedProject}
                 >
                   {children}
                 </RoleImpersonationStateContextProvider>
