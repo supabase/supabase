@@ -31,6 +31,7 @@ import {
   PullRequestsEmptyState,
 } from './EmptyStates'
 import Overview from './Overview'
+import { useFlag } from 'hooks/ui/useFlag'
 
 type Tab = 'overview' | 'prs' | 'branches'
 
@@ -61,6 +62,7 @@ const BranchManagement = () => {
   const canDisableBranching = useCheckPermissions(PermissionAction.DELETE, 'preview_branches', {
     resource: { is_default: true },
   })
+  const gitlessBranching = useFlag('gitlessBranching')
 
   const {
     data: connections,
@@ -217,7 +219,7 @@ const BranchManagement = () => {
                     />
                   )}
 
-                  {isSuccessConnections && (
+                  {isSuccessConnections && !gitlessBranching && (
                     <div className="border rounded-lg px-6 py-2 flex items-center justify-between">
                       <div className="flex items-center gap-x-4">
                         <div className="w-8 h-8 bg-scale-300 border rounded-md flex items-center justify-center">
