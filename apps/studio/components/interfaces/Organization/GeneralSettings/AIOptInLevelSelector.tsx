@@ -16,7 +16,7 @@ const AI_OPT_IN_LEVELS = [
   {
     value: 'disabled',
     title: 'Disabled',
-    description: 'No data is sent to OpenAI, responses will be generic',
+    description: 'Responses will be generic',
   },
   {
     value: 'schema',
@@ -79,14 +79,11 @@ export const AIOptInLevelSelector = ({
       description={
         <div className="space-y-4 my-4 max-w-xl space-y-4">
           <p>
-            Supabase AI can provide more relevant answers if you choose to share anonymous data.
-            This feature is powered by Amazon Bedrock which does not store or log your prompts and
-            completions, nor does it use them to train AWS models or distribute them to third
-            parties.
-          </p>
-          <p>
-            This is an organization-wide setting. Please select the level of data you are
-            comfortable sharing.{' '}
+            Supabase AI can provide more relevant answers if you choose to share different levels of
+            data. This feature is powered by Amazon Bedrock which does not store or log your prompts
+            and completions, nor does it use them to train AWS models or distribute them to third
+            parties. This is an organization-wide setting, so please select the level of data you
+            are comfortable sharing.
           </p>
           <p>
             <OptInToOpenAIToggle />
