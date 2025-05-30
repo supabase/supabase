@@ -18,6 +18,8 @@ export interface TableComparison {
   status: 'added' | 'removed' | 'modified' | 'unchanged'
   mainDefinition?: string
   currentDefinition?: string
+  mainTable?: any // Add full table object from main branch
+  currentTable?: any // Add full table object from current branch
 }
 
 export interface DatabaseComparison {
@@ -59,7 +61,7 @@ export function useBranchDatabaseComparison({
     {
       projectRef: mainBranchProjectRef,
       connectionString: mainBranchConnectionString,
-      includeColumns: false,
+      includeColumns: true,
     },
     {
       enabled: !!mainBranchProjectRef,
@@ -75,7 +77,7 @@ export function useBranchDatabaseComparison({
     {
       projectRef: currentBranchProjectRef,
       connectionString: currentBranchConnectionString,
-      includeColumns: false,
+      includeColumns: true,
     },
     {
       enabled: !!currentBranchProjectRef,
@@ -148,20 +150,30 @@ export function useBranchDatabaseComparison({
           status: 'removed',
           mainDefinition: undefined, // Will be populated by parent component
           currentDefinition: undefined,
+          mainTable: mainTable,
+          currentTable: undefined,
         })
         console.log(`❌ Table ${mainTable.schema}.${mainTable.name} was REMOVED`)
       } else {
-        // Table exists in both - will need to check definitions at parent level
+        // Table exists in both - check if they are actually different by comparing SQL
+        const mainSQL = tableToSQL(mainTable)
+        const currentSQL = tableToSQL(currentTable)
+        const isModified = mainSQL !== currentSQL
+
         tableComparisons.push({
           tableName: mainTable.name,
           schemaName: mainTable.schema,
           mainTableId: mainTable.id,
           currentTableId: currentTable.id,
-          status: 'unchanged', // Will be updated after definition comparison
+          status: isModified ? 'modified' : 'unchanged',
           mainDefinition: undefined, // Will be populated by parent component
           currentDefinition: undefined, // Will be populated by parent component
+          mainTable: mainTable,
+          currentTable: currentTable,
         })
-        console.log(`✅ Table ${mainTable.schema}.${mainTable.name} exists in both branches`)
+        console.log(
+          `${isModified ? '🔄' : '✅'} Table ${mainTable.schema}.${mainTable.name} ${isModified ? 'was MODIFIED' : 'is UNCHANGED'}`
+        )
       }
     })
 
@@ -180,6 +192,8 @@ export function useBranchDatabaseComparison({
           status: 'added',
           mainDefinition: undefined,
           currentDefinition: undefined, // Will be populated by parent component
+          mainTable: undefined,
+          currentTable: currentTable,
         })
         console.log(`➕ Table ${currentTable.schema}.${currentTable.name} was ADDED`)
       }
@@ -290,4 +304,52 @@ export function useTableDefinitionComparison(
     isError: mainDefinition.isError || currentDefinition.isError,
     isModified,
   }
+}
+
+// Helper function to convert table data to SQL for comparison
+function tableToSQL(table: any): string {
+  if (!table || !Array.isArray(table.columns)) {
+    return '-- Table definition not available'
+  }
+
+  const columns = table.columns || []
+  const columnLines = columns.map((c: any) => {
+    let line = `  ${c.name} ${c.data_type}`
+    if (c.is_identity) {
+      line += ' GENERATED ALWAYS AS IDENTITY'
+    }
+    if (c.is_nullable === false) {
+      line += ' NOT NULL'
+    }
+    if (c.default_value !== null && c.default_value !== undefined) {
+      line += ` DEFAULT ${c.default_value}`
+    }
+    if (c.is_unique) {
+      line += ' UNIQUE'
+    }
+    if (c.check) {
+      line += ` CHECK (${c.check})`
+    }
+    return line
+  })
+
+  const constraints: string[] = []
+
+  if (Array.isArray(table.primary_keys) && table.primary_keys.length > 0) {
+    const pkCols = table.primary_keys.map((pk: any) => pk.name).join(', ')
+    constraints.push(`  CONSTRAINT ${table.name}_pkey PRIMARY KEY (${pkCols})`)
+  }
+
+  if (Array.isArray(table.relationships)) {
+    table.relationships.forEach((rel: any) => {
+      if (rel && rel.source_table_name === table.name) {
+        constraints.push(
+          `  CONSTRAINT ${rel.constraint_name} FOREIGN KEY (${rel.source_column_name}) REFERENCES ${rel.target_table_schema}.${rel.target_table_name}(${rel.target_column_name})`
+        )
+      }
+    })
+  }
+
+  const allLines = [...columnLines, ...constraints]
+  return `CREATE TABLE ${table.schema}.${table.name} (\n${allLines.join(',\n')}\n);`
 }
