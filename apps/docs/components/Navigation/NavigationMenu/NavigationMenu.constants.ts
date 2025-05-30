@@ -119,7 +119,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'platform',
           },
           {
-            label: 'Security',
+            label: 'Security & Compliance',
             icon: 'security',
             href: '/guides/security',
             level: 'security',
@@ -918,10 +918,6 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/configuration',
         },
         {
-          name: 'Managing database replication',
-          url: '/guides/database/replication',
-        },
-        {
           name: 'Query optimization',
           url: '/guides/database/query-optimization',
         },
@@ -960,6 +956,22 @@ export const database: NavMenuConstant = {
     },
     ormQuickstarts,
     guiQuickstarts,
+    {
+      name: 'Database replication',
+      url: undefined,
+      items: [
+        { name: 'Overview', url: '/guides/database/replication' },
+        {
+          name: 'Setting up replication',
+          url: '/guides/database/replication/setting-up-replication',
+        },
+        {
+          name: 'Monitoring replication',
+          url: '/guides/database/replication/monitoring-replication',
+        },
+        { name: 'FAQ', url: '/guides/database/replication/faq' },
+      ],
+    },
     {
       name: 'Extensions',
       url: undefined,
@@ -2078,6 +2090,19 @@ export const security: NavMenuConstant = {
       items: [
         { name: 'SOC 2', url: '/guides/security/soc-2-compliance' },
         { name: 'HIPAA', url: '/guides/security/hipaa-compliance' },
+      ],
+    },
+    {
+      name: 'Guides',
+      url: undefined,
+      items: [
+        { name: 'Production Checklist', url: '/guides/deployment/going-into-prod' },
+        {
+          name: 'Shared Responsibility Model',
+          url: '/guides/deployment/shared-responsibility-model',
+        },
+        { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
+        { name: 'Hardening the Data API', url: '/guides/database/hardening-data-api' },
       ],
     },
   ],
