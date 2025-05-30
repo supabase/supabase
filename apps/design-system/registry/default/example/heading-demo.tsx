@@ -81,8 +81,8 @@ export default function HeadingDemo() {
           <Heading variant="default" weight="regular">
             Default heading with regular weight override
           </Heading>
-          <Heading variant="default" weight="semibold">
-            Default heading with semibold weight override
+          <Heading variant="default" weight="medium">
+            Default heading with medium weight override
           </Heading>
         </div>
       </div>
@@ -117,8 +117,8 @@ export default function HeadingDemo() {
           <Heading variant="section" is="h2" size="lg" asLink>
             H2 section heading with large size as link
           </Heading>
-          <Heading variant="compact" size="base" weight="semibold">
-            Compact heading with base size and semibold weight
+          <Heading variant="compact" size="base" weight="medium">
+            Compact heading with base size and medium weight
           </Heading>
         </div>
       </div>
