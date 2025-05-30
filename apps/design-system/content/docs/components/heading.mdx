@@ -1,0 +1,153 @@
+---
+title: Heading
+description: Semantic heading component with predefined variants for consistent typography hierarchy.
+featured: true
+component: true
+---
+
+<ComponentPreview name="heading-demo" peekCode wide />
+
+## Usage
+
+```tsx
+import { Heading_Shadcn_ as Heading } from 'ui'
+```
+
+```tsx
+<Heading variant="title">Page Title</Heading>
+```
+
+## Semantic HTML
+
+The Heading component supports semantic HTML heading elements through the `is` prop:
+
+```tsx
+<Heading variant="title" is="h1">Main Page Title</Heading>
+<Heading variant="section" is="h2">Section Heading</Heading>
+<Heading variant="subSection" is="h3">Subsection Heading</Heading>
+```
+
+## Variants
+
+The Heading component comes with predefined variants for consistent typography hierarchy:
+
+### Title
+
+The largest heading variant, typically used for page titles.
+
+```tsx
+<Heading variant="title">Page Title</Heading>
+```
+
+### Section
+
+Used for major section headings.
+
+```tsx
+<Heading variant="section">Section Heading</Heading>
+```
+
+### Sub Section
+
+Used for subsection headings within sections.
+
+```tsx
+<Heading variant="subSection">Subsection Heading</Heading>
+```
+
+### Default
+
+The standard heading variant for general use. Paired with default body text.
+
+```tsx
+<Heading variant="default">Standard Heading</Heading>
+```
+
+### Compact
+
+A smaller, more compact heading for dense layouts. Paired with bodyCompact text.
+
+```tsx
+<Heading variant="compact">Compact Heading</Heading>
+```
+
+### Meta
+
+A small, uppercase, monospace heading for metadata and labels.
+
+```tsx
+<Heading variant="meta">Meta Heading</Heading>
+```
+
+## Size Override
+
+You can override the variant's default size using the `size` prop:
+
+```tsx
+<Heading variant="default" size="2xl">Large Default Heading</Heading>
+<Heading variant="title" size="base">Small Title Heading</Heading>
+```
+
+Available sizes: `xs`, `sm`, `base`, `lg`, `xl`, `2xl`
+
+## Weight Override
+
+You can override the variant's default font weight:
+
+```tsx
+<Heading variant="title" weight="regular">Regular Weight Title</Heading>
+<Heading variant="default" weight="semibold">Semibold Default</Heading>
+```
+
+Available weights: `regular`, `semibold`
+
+## As Link
+
+Use the `asLink` prop to style headings as clickable links:
+
+```tsx
+<Heading variant="section" asLink>
+  Clickable Section Heading
+</Heading>
+```
+
+## As Child
+
+Supports slot behavior with `asChild` prop for wrapping other components:
+
+```tsx
+<Heading asChild>
+  <Link href="/section">Section Link</Link>
+</Heading>
+```
+
+## Examples
+
+### Basic Usage
+
+```tsx
+<div>
+  <Heading variant="title" is="h1">
+    Welcome to Our Platform
+  </Heading>
+  <Heading variant="section" is="h2">
+    Getting Started
+  </Heading>
+  <Heading variant="subSection" is="h3">
+    Installation
+  </Heading>
+</div>
+```
+
+### With Overrides
+
+```tsx
+<div>
+  <Heading variant="default" size="xl" weight="regular">
+    Custom Styled Heading
+  </Heading>
+  <Heading variant="meta" size="sm">
+    Larger Meta Heading
+  </Heading>
+</div>
+```

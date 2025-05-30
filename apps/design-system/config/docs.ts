@@ -264,6 +264,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Heading',
+          href: '/docs/components/heading',
+          items: [],
+        },
+        {
           title: 'Hover Card',
           href: '/docs/components/hover-card',
           items: [],
@@ -387,6 +392,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Textarea',
           href: '/docs/components/textarea',
+          items: [],
+        },
+        {
+          title: 'Text',
+          href: '/docs/components/text',
           items: [],
         },
         {
