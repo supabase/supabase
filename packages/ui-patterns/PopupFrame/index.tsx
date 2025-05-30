@@ -45,6 +45,7 @@ export function PopupFrame({
       <Modal
         visible={open}
         hideFooter
+        showCloseButton={false}
         className={cn(
           '!bg-[#f8f9fa]/95 dark:!bg-[#1c1c1c]/80',
           '!border-[#e6e8eb]/90 dark:!border-[#282828]/90',

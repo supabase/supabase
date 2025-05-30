@@ -134,7 +134,7 @@ function StateOfStartupsPage() {
           ],
         }}
       />
-      <DefaultLayout className="!bg-alternative">
+      <DefaultLayout className="!bg-alternative overflow-hidden sm:!overflow-visible">
         <Hero {...pageData.heroSection} />
         <SectionContainer>
           <div className="flex flex-col text-center gap-4 py-8 items-center justify-center">
@@ -250,8 +250,8 @@ const Hero = (props: any) => {
         },
       }).add(animatedText.querySelectorAll('.letter'), {
         opacity: [0, 1],
-        translateY: [-6, 0],
-        ease: createSpring({ stiffness: 150, damping: 10 }),
+        translateY: [-8, 0],
+        ease: createSpring({ stiffness: 150, damping: 15 }),
         duration: 500,
         delay: stagger(10),
       })
@@ -278,10 +278,6 @@ const Hero = (props: any) => {
     return () => {}
   }, [])
 
-  const handleCtaClick = () => {
-    console.log('cta clicked')
-  }
-
   return (
     <>
       <div
@@ -294,14 +290,17 @@ const Hero = (props: any) => {
           ref={animRef}
           className="flex flex-col text-center items-center justify-center min-h-[70vh]"
         >
-          <div className="absolute overflow-hidden inset-0 w-full h-full col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7 flex justify-center">
+          <div className="absolute overflow-hidden -mx-[15vw] sm:mx-0 inset-0 w-[calc(100%+30vw)] sm:w-full h-full col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7 flex justify-center">
             <svg
               width="558"
               height="392"
               viewBox="0 0 558 392"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              className="absolute w-full h-full inset-0 -top-40 lg:top-0 xl:-left-40"
+              className="absolute w-full h-full inset-0 -top-40 lg:top-0 xl:-left-40 animate-pulse"
+              style={{
+                animationDuration: '20000ms',
+              }}
             >
               <circle
                 cx="278.831"
@@ -325,56 +324,63 @@ const Hero = (props: any) => {
                 </radialGradient>
               </defs>
             </svg>
-
-            <svg
-              width="1119"
-              height="1119"
-              viewBox="0 0 1119 1119"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="-mt-72 sm:-mt-60 md:-mt-40 lg:-mt-12 xl:mt-0 animate-spinner !ease-linear transform"
-              style={{
-                animationDuration: '20000ms',
-              }}
-            >
-              <g clipPath="url(#clip0_183_1690)">
-                <circle cx="559.5" cy="559.5" r="496" fill="url(#paint1_radial_183_1690)" />
-                <path
-                  d="M982.759 -15.7995C1100.79 61.9162 1134.95 153.728 1129.8 236.892C1124.68 319.611 1080.66 393.869 1041.31 437.283C968.75 168.701 692.591 9.3387 423.687 80.9161C430.529 20.4699 450.367 -27.8768 480.826 -63.4144C511.422 -99.1129 552.763 -121.922 602.496 -131.075C701.21 -149.241 833.009 -113.601 979.3 -18.0675L982.759 -15.7995Z"
-                  stroke="url(#paint2_radial_183_1690)"
-                  strokeWidth="1.15887"
-                />
-              </g>
-              <defs>
-                <radialGradient
-                  id="paint1_radial_183_1690"
-                  cx="0"
-                  cy="0"
-                  r="1"
-                  gradientUnits="userSpaceOnUse"
-                  gradientTransform="translate(571.212 579.87) rotate(122.182) scale(542.117 690.275)"
-                >
-                  <stop stopColor="hsl(var(--border-muted))" />
-                  <stop offset="0.716346" stopColor="hsl(var(--background-alternative-default))" />
-                  <stop offset="0.754808" stopColor="hsl(var(--background-alternative-default))" />
-                  <stop offset="1" stopColor="hsl(var(--border-strong))" />
-                </radialGradient>
-                <radialGradient
-                  id="paint2_radial_183_1690"
-                  cx="0"
-                  cy="0"
-                  r="1"
-                  gradientUnits="userSpaceOnUse"
-                  gradientTransform="translate(814.301 175.03) rotate(-38.9601) scale(142.974 294.371)"
-                >
-                  <stop stopColor="hsl(var(--foreground-default))" />
-                  <stop offset="1" stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
-                </radialGradient>
-                <clipPath id="clip0_183_1690">
-                  <rect width="1119" height="1119" fill="white" />
-                </clipPath>
-              </defs>
-            </svg>
+            <div className="sm:w-full sm_h-full sm:flex sm:justify-center">
+              <svg
+                width="1119"
+                height="1119"
+                viewBox="0 0 1119 1119"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="sm:w-auto -mb-72 sm:-mt-60 md:-mt-40 lg:-mt-12 xl:mt-0 animate-spinner !ease-linear transform"
+                style={{
+                  animationDuration: '20000ms',
+                }}
+              >
+                <g clipPath="url(#clip0_183_1690)">
+                  <circle cx="559.5" cy="559.5" r="496" fill="url(#paint1_radial_183_1690)" />
+                  <path
+                    d="M982.759 -15.7995C1100.79 61.9162 1134.95 153.728 1129.8 236.892C1124.68 319.611 1080.66 393.869 1041.31 437.283C968.75 168.701 692.591 9.3387 423.687 80.9161C430.529 20.4699 450.367 -27.8768 480.826 -63.4144C511.422 -99.1129 552.763 -121.922 602.496 -131.075C701.21 -149.241 833.009 -113.601 979.3 -18.0675L982.759 -15.7995Z"
+                    stroke="url(#paint2_radial_183_1690)"
+                    strokeWidth="1.15887"
+                  />
+                </g>
+                <defs>
+                  <radialGradient
+                    id="paint1_radial_183_1690"
+                    cx="0"
+                    cy="0"
+                    r="1"
+                    gradientUnits="userSpaceOnUse"
+                    gradientTransform="translate(571.212 579.87) rotate(122.182) scale(542.117 690.275)"
+                  >
+                    <stop stopColor="hsl(var(--border-muted))" />
+                    <stop
+                      offset="0.716346"
+                      stopColor="hsl(var(--background-alternative-default))"
+                    />
+                    <stop
+                      offset="0.754808"
+                      stopColor="hsl(var(--background-alternative-default))"
+                    />
+                    <stop offset="1" stopColor="hsl(var(--border-strong))" />
+                  </radialGradient>
+                  <radialGradient
+                    id="paint2_radial_183_1690"
+                    cx="0"
+                    cy="0"
+                    r="1"
+                    gradientUnits="userSpaceOnUse"
+                    gradientTransform="translate(814.301 175.03) rotate(-38.9601) scale(142.974 294.371)"
+                  >
+                    <stop stopColor="hsl(var(--foreground-default))" />
+                    <stop offset="1" stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
+                  </radialGradient>
+                  <clipPath id="clip0_183_1690">
+                    <rect width="1119" height="1119" fill="white" />
+                  </clipPath>
+                </defs>
+              </svg>
+            </div>
             <svg
               width="1096"
               height="482"
@@ -462,7 +468,7 @@ const Hero = (props: any) => {
                 >
                   <div className="w-full !h-full flex-1 flex flex-col">
                     <iframe
-                      src={`https://form.typeform.com/to/xwwpRnKJ?embedded=true`}
+                      src={`https://form.typeform.com/to/si6Z7XlW?embedded=true`}
                       width="100%"
                       height="100%"
                       frameBorder="0"
