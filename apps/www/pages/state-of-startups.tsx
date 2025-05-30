@@ -1,5 +1,4 @@
 import { NextSeo } from 'next-seo'
-import dynamic from 'next/dynamic'
 import DefaultLayout from '~/components/Layouts/Default'
 
 import { useBreakpoint } from 'common'
@@ -10,13 +9,11 @@ import SectionContainer from '../components/Layouts/SectionContainer'
 import { Input } from 'ui/src/components/shadcn/ui/input'
 import { Label } from 'ui/src/components/shadcn/ui/label'
 import { useEffect, useRef } from 'react'
-import { animate, createAnimatable, createSpring, createTimeline, stagger } from 'animejs'
+import { animate, createSpring, createTimeline, stagger } from 'animejs'
 import Image from 'next/image'
 
 function VectorPage() {
-  // base path for images
-  const isXs = useBreakpoint(640)
-  const pageData = data(isXs)
+  const pageData = data()
   const meta_title = pageData.metaTitle
   const meta_description = pageData.metaDescription
   const meta_image = pageData.metaImage
@@ -74,12 +71,10 @@ function VectorPage() {
 
 const Hero = (props: any) => {
   const animRef = useRef<HTMLDivElement | null>(null)
-  const svgRef = useRef<SVGSVGElement | null>(null)
 
   useEffect(() => {
     if (!animRef.current) return
 
-    // Array of strings to cycle through
     const strings = [
       "What's your tech stack?",
       "What's your favorite AI developer tool?",
@@ -138,62 +133,14 @@ const Hero = (props: any) => {
         duration: 500,
         delay: stagger(10),
         onComplete: () => {
-          // Start the next string animation
           setTimeout(animateText, -100)
         },
       })
     }
 
-    // Start the animation loop
     animateText()
 
-    // Cleanup function - anime.js v4 handles cleanup automatically
     return () => {}
-  }, [])
-
-  // SVG rotation effect
-  useEffect(() => {
-    if (!svgRef.current || !animRef.current) return
-
-    const svg = svgRef.current
-    const container = animRef.current
-
-    const { PI } = Math
-
-    // Create animatable for SVG rotation
-    const svgAnimatable = createAnimatable(svg, {
-      rotate: { unit: 'rad' },
-      duration: 0,
-    })
-
-    let bounds = container.getBoundingClientRect()
-    const refreshBounds = () => (bounds = container.getBoundingClientRect())
-
-    let lastAngle = 0
-    let angle = 0
-
-    const onMouseMove = (e: MouseEvent) => {
-      const { width, height, left, top } = bounds
-      const x = e.clientX - left - width / 2
-      const y = e.clientY - top - height / 2
-      const currentAngle = Math.atan2(y, x)
-      const diff = currentAngle - lastAngle
-      angle += diff > PI ? diff - 2 * PI : diff < -PI ? diff + 2 * PI : diff
-      lastAngle = currentAngle
-      svgAnimatable.rotate(angle * 0.1) // Slow down rotation with 0.1 multiplier
-    }
-
-    // Add event listeners
-    window.addEventListener('mousemove', onMouseMove)
-    window.addEventListener('scroll', refreshBounds)
-    window.addEventListener('resize', refreshBounds)
-
-    // Cleanup
-    return () => {
-      window.removeEventListener('mousemove', onMouseMove)
-      window.removeEventListener('scroll', refreshBounds)
-      window.removeEventListener('resize', refreshBounds)
-    }
   }, [])
 
   return (
@@ -214,7 +161,7 @@ const Hero = (props: any) => {
             viewBox="0 0 558 392"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="absolute w-full h-full inset-0 xl:-left-40"
+            className="absolute w-full h-full inset-0 -top-40 lg:top-0 xl:-left-40"
           >
             <circle
               cx="278.831"
@@ -222,7 +169,7 @@ const Hero = (props: any) => {
               r="278.5"
               transform="rotate(75 278.831 112.952)"
               fill="url(#paint0_radial_183_1691)"
-              fillOpacity="0.08"
+              fillOpacity="0.2"
             />
             <defs>
               <radialGradient
@@ -233,20 +180,22 @@ const Hero = (props: any) => {
                 gradientUnits="userSpaceOnUse"
                 gradientTransform="translate(349.764 144.755) rotate(-132.179) scale(202.74 202.839)"
               >
-                <stop stopColor="white" />
-                <stop offset="1" stopColor="#D9D9D9" stopOpacity="0" />
+                <stop stopColor="hsl(var(--foreground-default))" />
+                <stop offset="1" stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
               </radialGradient>
             </defs>
           </svg>
 
           <svg
-            ref={svgRef}
             width="1119"
             height="1119"
             viewBox="0 0 1119 1119"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="-mt-96 md:-mt-32 lg:-mt-12 xl:mt-0"
+            className="-mt-72 sm:-mt-60 md:-mt-40 lg:-mt-12 xl:mt-0 animate-spinner !ease-linear transform"
+            style={{
+              animationDuration: '20000ms',
+            }}
           >
             <g clipPath="url(#clip0_183_1690)">
               <circle cx="559.5" cy="559.5" r="496" fill="url(#paint1_radial_183_1690)" />
@@ -265,10 +214,10 @@ const Hero = (props: any) => {
                 gradientUnits="userSpaceOnUse"
                 gradientTransform="translate(571.212 579.87) rotate(122.182) scale(542.117 690.275)"
               >
-                <stop stopColor="#1B1B1B" />
-                <stop offset="0.716346" stopColor="#0D0D0D" />
-                <stop offset="0.754808" stopColor="#0A0A0A" />
-                <stop offset="1" stopColor="#383838" />
+                <stop stopColor="hsl(var(--border-muted))" />
+                <stop offset="0.716346" stopColor="hsl(var(--background-alternative-default))" />
+                <stop offset="0.754808" stopColor="hsl(var(--background-alternative-default))" />
+                <stop offset="1" stopColor="hsl(var(--border-strong))" />
               </radialGradient>
               <radialGradient
                 id="paint2_radial_183_1690"
@@ -278,8 +227,8 @@ const Hero = (props: any) => {
                 gradientUnits="userSpaceOnUse"
                 gradientTransform="translate(814.301 175.03) rotate(-38.9601) scale(142.974 294.371)"
               >
-                <stop stopColor="#D9D9D9" />
-                <stop offset="1" stopColor="#D9D9D9" stopOpacity="0" />
+                <stop stopColor="hsl(var(--foreground-default))" />
+                <stop offset="1" stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
               </radialGradient>
               <clipPath id="clip0_183_1690">
                 <rect width="1119" height="1119" fill="white" />
