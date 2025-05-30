@@ -1,6 +1,7 @@
 export default (isMobile?: boolean) => ({
   metaTitle: 'State of Startups 2025',
-  metaDescription: '',
+  metaDescription:
+    'Take the survey and learn the latest trends among builders in tech stacks, AI usage, problem domains, and more.',
   metaImage: '/images/modules/vector/og.png',
   docsUrl: '',
   heroSection: {
