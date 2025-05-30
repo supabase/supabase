@@ -44,19 +44,20 @@ export async function createSupabaseMCPClient({
   return client
 }
 
+const basicToolSchema = z.custom<Tool>((value) => typeof value === 'object')
+
 /**
  * Schema to validate that the expected tools are available from the Supabase MCP.
  *
  * Note that tool structure itself is not validated, only that the tools exist.
  */
 export const expectedToolsSchema = z.object({
-  list_tables: z.record(z.any()),
-  list_extensions: z.record(z.any()),
-  list_edge_functions: z.record(z.any()),
-  list_branches: z.record(z.any()),
-  get_project: z.record(z.any()),
-  get_logs: z.record(z.any()),
-  execute_sql: z.record(z.any()),
+  list_tables: basicToolSchema,
+  list_extensions: basicToolSchema,
+  list_edge_functions: basicToolSchema,
+  list_branches: basicToolSchema,
+  get_logs: basicToolSchema,
+  execute_sql: basicToolSchema,
 })
 
 export const toolWhitelist = Object.keys(expectedToolsSchema.shape)

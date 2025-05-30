@@ -54,7 +54,6 @@ describe('filterToolsByOptInLevel', () => {
     list_extensions: { execute: vitest.fn() },
     list_edge_functions: { execute: vitest.fn() },
     list_branches: { execute: vitest.fn() },
-    get_project: { execute: vitest.fn() },
     get_logs: { execute: vitest.fn() },
     execute_sql: { execute: vitest.fn() },
     other: { execute: vitest.fn() }, // This tool should be filtered out
@@ -103,7 +102,6 @@ describe('filterToolsByOptInLevel', () => {
       'list_extensions',
       'list_edge_functions',
       'list_branches',
-      'get_project',
       'get_logs',
       'execute_sql',
     ])
