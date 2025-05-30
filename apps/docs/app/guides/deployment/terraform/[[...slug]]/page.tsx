@@ -2,11 +2,11 @@ import matter from 'gray-matter'
 import { notFound } from 'next/navigation'
 import rehypeSlug from 'rehype-slug'
 
-import { genGuideMeta, removeRedundantH1 } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { genGuideMeta, removeRedundantH1 } from '~/features/docs/GuidesMdx.utils'
 import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
 import { isValidGuideFrontmatter } from '~/lib/docs'
-import { type UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
+import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
@@ -16,7 +16,7 @@ import {
   terraformDocsOrg,
   terraformDocsRepo,
 } from '../terraformConstants'
-import type { serialize } from 'next-mdx-remote/serialize'
+import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 
 export const dynamicParams = false
 
@@ -51,7 +51,7 @@ const TerraformDocs = async (props: { params: Promise<Params> }) => {
       remarkPlugins: [remarkMkDocsAdmonition, remarkPyMdownTabs, [removeTitle, meta.title]],
       rehypePlugins: [[linkTransform, urlTransform], rehypeSlug],
     },
-  } as Parameters<typeof serialize>[1]
+  } as SerializeOptions
 
   return <GuideTemplate mdxOptions={options} meta={meta} {...data} />
 }
@@ -146,4 +146,4 @@ const generateStaticParams = async () => pageMap.map(({ slug }) => ({ slug: slug
 const generateMetadata = genGuideMeta(getContent)
 
 export default TerraformDocs
-export { generateStaticParams, generateMetadata }
+export { generateMetadata, generateStaticParams }

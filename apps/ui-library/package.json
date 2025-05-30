@@ -64,7 +64,6 @@
     "@types/lodash": "^4.17.16",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "autoprefixer": "^10.0.1",
     "config": "workspace:^",
     "lodash": "^4.17.21",
     "mdast-util-toc": "^6.1.1",

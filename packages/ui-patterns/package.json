@@ -7,9 +7,10 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "test": "vitest",
+    "test:coverage": "vitest --run --coverage",
     "clean": "rimraf node_modules",
     "typecheck": "tsc --noEmit",
-    "gen:exports": "npx ./exports-script.ts"
+    "gen:exports": "tsx ./scripts/update-exports.ts"
   },
   "exports": {
     "./package.json": "./package.json",
@@ -483,6 +484,7 @@
     "@monaco-editor/react": "^4.6.0",
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",
+    "@vitest/coverage-v8": "^3.0.9",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
     "cmdk": "^1.0.0",
@@ -534,7 +536,8 @@
     "@types/react-dom": "catalog:",
     "api-types": "workspace:*",
     "next-router-mock": "^0.9.13",
-    "typescript": "~5.8.0",
+    "typescript": "~5.5.0",
+    "tsx": "^4.19.3",
     "unified": "^11.0.5",
     "vfile": "^6.0.3",
     "vite": "^6.2.6",

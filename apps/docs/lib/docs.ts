@@ -3,11 +3,11 @@ import { serialize } from 'next-mdx-remote/serialize'
 import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
 import { basename, extname, join, sep } from 'node:path'
-import remarkGfm from 'remark-gfm'
 import rehypeKatex from 'rehype-katex'
+import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 
-import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
+import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 
 // MUST be process.cwd() here, not import.meta.url, or files that are added
 // with outputFileTracingIncludes (not auto-traced) will not be found at
