@@ -7,16 +7,116 @@ import Link from 'next/link'
 import SectionContainer from '../components/Layouts/SectionContainer'
 import { Input } from 'ui/src/components/shadcn/ui/input'
 import { Label } from 'ui/src/components/shadcn/ui/label'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { animate, createSpring, createTimeline, stagger } from 'animejs'
 import Image from 'next/image'
 import { PopupFrame } from 'ui-patterns'
+import { useSendTelemetryEvent } from '../lib/telemetry'
 
-function VectorPage() {
+interface FormData {
+  email: string
+}
+
+const defaultFormValue: FormData = {
+  email: '',
+}
+
+const isValidEmail = (email: string): boolean => {
+  const emailPattern = /^[\w-\.+]+@([\w-]+\.)+[\w-]{2,8}$/
+  return emailPattern.test(email)
+}
+
+function StateOfStartupsPage() {
   const pageData = data()
   const meta_title = pageData.metaTitle
   const meta_description = pageData.metaDescription
   const meta_image = pageData.metaImage
+
+  const [formData, setFormData] = useState<FormData>(defaultFormValue)
+  const [honeypot, setHoneypot] = useState<string>('') // field to prevent spam
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [success, setSuccess] = useState<string | null>(null)
+  const [startTime, setStartTime] = useState<number>(0)
+
+  const sendTelemetryEvent = useSendTelemetryEvent()
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setErrors({})
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleReset = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault()
+    setFormData(defaultFormValue)
+    setSuccess(null)
+    setErrors({})
+  }
+
+  const validate = (): boolean => {
+    const newErrors: { [key in keyof FormData]?: string } = {}
+
+    if (!formData.email) {
+      setErrors({ email: 'This field is required' })
+    }
+
+    // Validate email
+    if (formData.email && !isValidEmail(formData.email)) {
+      newErrors.email = 'Invalid email address'
+    }
+
+    setErrors(newErrors)
+
+    // Return validation status, also check if honeypot is filled (indicating a bot)
+    return Object.keys(newErrors).length === 0 && honeypot === ''
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const currentTime = Date.now()
+    const timeElapsed = (currentTime - startTime) / 1000
+
+    // Spam prevention: Reject form if submitted too quickly (less than 3 seconds)
+    if (timeElapsed < 3) {
+      setErrors({ general: 'Submission too fast. Please fill the form correctly.' })
+      return
+    }
+
+    if (!validate()) {
+      return
+    }
+
+    setIsSubmitting(true)
+    setSuccess(null)
+
+    try {
+      const response = await fetch('/api-v2/submit-form-sos2025-newsletter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      if (response.ok) {
+        setSuccess('Thank you for your submission!')
+        setFormData({ email: '' })
+      } else {
+        const errorData = await response.json()
+        setErrors({ general: `Submission failed: ${errorData.message}` })
+      }
+    } catch (error) {
+      setErrors({ general: 'An unexpected error occurred. Please try again.' })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  useEffect(() => {
+    setStartTime(Date.now())
+  }, [])
 
   return (
     <>
@@ -43,24 +143,59 @@ function VectorPage() {
               Sign up for our newsletter to be notified when the survey results are available.
             </p>
             <div className="w-full mt-4 flex items-center justify-center text-center gap-4">
-              <form action="" className="w-full max-w-md flex flex-col gap-4 items-center">
-                <div className="w-full flex flex-col sm:flex-row sm:items-center gap-2">
-                  <Input type="email" placeholder="Email" />
-                  <Button size="small" onClick={() => null}>
-                    Register
-                  </Button>
+              {success ? (
+                <div className="flex flex-col h-full w-full min-w-[300px] gap-4 items-center justify-center opacity-0 transition-opacity animate-fade-in scale-1">
+                  <p className="text-center text-sm">{success}</p>
+                  <Button onClick={handleReset}>Reset</Button>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Checkbox id="terms" className="[&>input]:m-0" />
-                  <Label htmlFor="terms" className="text-foreground-lighter">
-                    We process your information in accordance with our{' '}
-                    <Link href="/privacy" className="text-foreground-light hover:underline">
-                      Privacy Policy
-                    </Link>
-                    .
-                  </Label>
-                </div>
-              </form>
+              ) : (
+                <form
+                  id="state-of-startups-form"
+                  onSubmit={handleSubmit}
+                  className="w-full max-w-md flex flex-col gap-4 items-center"
+                >
+                  <div className="w-full flex flex-col sm:flex-row sm:items-center gap-2">
+                    <Input
+                      onChange={handleChange}
+                      value={formData['email']}
+                      name="email"
+                      type="email"
+                      placeholder="Email"
+                    />
+                    <Button
+                      htmlType="submit"
+                      disabled={isSubmitting}
+                      size="small"
+                      onClick={() =>
+                        sendTelemetryEvent({
+                          action: 'register_for_state_of_startups_newsletter_clicked',
+                          properties: { buttonLocation: 'State of Startups 2025 Newsletter Form' },
+                        })
+                      }
+                    >
+                      Register
+                    </Button>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox required id="terms" className="[&>input]:m-0" />
+                    <Label htmlFor="terms" className="text-foreground-lighter">
+                      We process your information in accordance with our{' '}
+                      <Link href="/privacy" className="text-foreground-light hover:underline">
+                        Privacy Policy
+                      </Link>
+                      .
+                    </Label>
+                  </div>
+                  <div
+                    className={cn(
+                      'flex flex-nowrap text-right gap-1 items-center text-xs leading-none transition-opacity opacity-0 text-foreground-muted',
+                      errors['email'] && 'opacity-100 animate-fade-in'
+                    )}
+                  >
+                    {errors['email']}
+                  </div>
+                </form>
+              )}
             </div>
           </div>
         </SectionContainer>
@@ -318,7 +453,11 @@ const Hero = (props: any) => {
             <div className="w-full sm:w-auto flex flex-col items-stretch sm:flex-row pt-2 sm:items-center gap-2">
               {props.cta && (
                 <PopupFrame
-                  trigger={<Button size="small">{props.cta.label ?? 'Start for free'}</Button>}
+                  trigger={
+                    <Button size="small" asChild>
+                      <span>{props.cta.label}</span>
+                    </Button>
+                  }
                   className="[&_.modal-content]:min-h-[650px] [&_.modal-content]:!h-[75vh] [&_.modal-content]:flex [&_.modal-content]:flex-col"
                 >
                   <div className="w-full !h-full flex-1 flex flex-col">
@@ -340,4 +479,4 @@ const Hero = (props: any) => {
   )
 }
 
-export default VectorPage
+export default StateOfStartupsPage

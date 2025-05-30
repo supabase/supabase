@@ -917,6 +917,23 @@ export interface RequestDemoButtonClickedEvent {
 }
 
 /**
+ * User clicked the "Register" button in the State of Startups 2025 newsletter form.
+ *
+ * @group Events
+ * @source www
+ */
+export interface RegisterStateOfStartups2025NewsletterClicked {
+  action: 'register_for_state_of_startups_newsletter_clicked'
+  properties: {
+    /**
+     * The source of the button click, e.g. homepage hero, cta banner, product page header.
+     * If it states it came from the request demo form, it can come from different pages so refer to path name to determine.
+     */
+    buttonLocation: string
+  }
+}
+
+/**
  * User clicked the sign-in button in various locations described in properties.
  *
  * @group Events
@@ -1380,6 +1397,7 @@ export type TelemetryEvent =
   | StartProjectButtonClickedEvent
   | SeeDocumentationButtonClickedEvent
   | RequestDemoButtonClickedEvent
+  | RegisterStateOfStartups2025NewsletterClicked
   | SignInButtonClickedEvent
   | HelpButtonClickedEvent
   | ExampleProjectCardClickedEvent
