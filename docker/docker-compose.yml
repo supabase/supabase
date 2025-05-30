@@ -432,6 +432,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXP: ${JWT_EXPIRY}
+      SUPABASE_SELF_HOSTING: true
     command:
       [
         "postgres",
