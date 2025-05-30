@@ -125,7 +125,7 @@ export async function getGuidesStaticProps(
     return
   }
 
-  const mdxOptions: Parameters<typeof serialize>[1] = {
+  const mdxOptions: SerializeOptions = {
     mdxOptions: {
       useDynamicImport: true,
       remarkPlugins: [[remarkMath, { singleDollarTextMath: false }], remarkGfm],

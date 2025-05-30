@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 import Typed from 'typed.js'
-import { Button, type ButtonProps, cn } from 'ui'
+import { Button, ButtonProps, cn } from 'ui'
 import { CommandMenuTrigger } from 'ui-patterns/CommandMenu'
 
 import { questions } from 'shared-data'

@@ -85,7 +85,7 @@ const Metrics = ({ isActive }: { isActive?: boolean }) => {
       <div className="relative rounded-md w-full h-full border border-overlay shadow p-4 !min-w-[300px]">
         <p className="text-foreground text-sm mb-2">Execution time</p>
         <p className="text-foreground text-base mb-4">
-          {displayValue ? data[displayValue]?.pv : highlightedValue}ms {displayValue ? '' : '(Avg)'}
+          {displayValue ? data[displayValue]?.pv : highlightedValue}ms {!displayValue ?? '(Avg)'}
         </p>
         <ResponsiveContainer minWidth={200} minHeight={200} width="100%" height="90%">
           <AreaChart

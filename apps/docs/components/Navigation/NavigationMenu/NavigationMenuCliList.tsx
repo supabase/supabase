@@ -110,7 +110,10 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
           <span>Back to menu</span>
         </Link>
         <div className="flex items-center gap-3 my-3">
-          <img src={`${BASE_PATH}` + menu.icon} className="w-5 rounded" />
+          <img
+            src={`${BASE_PATH}` + menu.icon ?? `/img/icons/menu/${id}.svg`}
+            className="w-5 rounded"
+          />
 
           <h2 className={['text-foreground ', !menu.title && 'capitalize'].join(' ')}>
             {menu.title ?? currentLevel}

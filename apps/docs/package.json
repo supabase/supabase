@@ -151,7 +151,7 @@
     "tsconfig": "workspace:*",
     "tsx": "^4.19.3",
     "twoslash": "^0.3.1",
-    "typescript": "~5.8.0",
+    "typescript": "~5.5.0",
     "unist-util-visit-parents": "5.1.3",
     "vite": "^6.2.6",
     "vite-tsconfig-paths": "^4.3.2",
