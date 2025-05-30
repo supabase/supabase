@@ -13,19 +13,21 @@ tags:
 date: '2025-05-30'
 ---
 
-Postgres has supported SQL functions for a long time, with support for different languages through Trusted Language Extensions (TLEs). Supabase has had support for database functions as well as edge functions, letting you write custom logic in the place most suited to your use case.
+Functions. Quite a simple word that can mean different things to different people. Ask me and I will think database functions, ask Lakshan and he will think edge functions. Ask a hotel manager and they will think about the wedding they have booked that weekend.
 
-PLv8 is an extension that allows you to write functions in JavaScript, a syntax that many folks find easy to work with and helps to abstract away more complex data operations when compared with SQL.
+Let's stay on topic, though. Functions are custom logic that you can run on inputs provided. A relatively simple definition yet, in Supabase, this can still refer to a database function, an edge function or a function within our SDK. Within Postgres, this can be a function written in SQL, PLpgSQL, Perl or Python.
 
-However, a PLv8 database function is not the same as an edge function; with no access to node packages or the file system, PLv8 is excellent for performing operations on data but less so when it comes to calling out to external services or other business logic.
+Flexibility and choice are great things, it opens up accessibility to people from different backgrounds and with different skill sets. It can, however, be a source of confusion and make it harder to decide where to store your custom logic.
 
-So when should you use a database function and when should you use an edge function? The answer is a blurry line that is hard to find the best balance. Database functions run within your database and can use all of the resources available on your instance while edge functions autoscale, are globally distributed but do need to make a network call to your database.
+PLV8 is an extension that allows you to write database functions in JavaScript, a language that many are familiar with and helps to abstract away more complex data operations when compared with SQL.
 
-The more customers we work with, the more we have seen that most use cases for functions using PLv8 are best served by an edge function. SQL (or PLpgSQL) functions cover the outlying use cases.
+However, a PLV8 database function is not the same as an edge function; with no access to node packages or the file system, PLV8 is excellent for performing operations on data but less so when you need to do things you are used to doing with Javascript; using packages or making API calls to other services.
 
-With the release of Postgres 17, we have removed PLv8 as an extension (while it remains supported in Postgres 15 until EOL). In this blog post, we will cover an overview of how to move your PLv8 logic and how to decide where to move them to.
+With the release of Postgres 17, we have removed PLV8 as an extension (while it remains supported in Postgres 15 until EOL). In this blog post, we will cover an overview of how to move your PLV8 logic and how to decide where to move them to.
 
-## When to choose a database function vs an Edge function
+So, when should you use a database function and when should you use an edge function? The answer is a blurry line that is as wide as it is long. Database functions run within your database and can use all of the resources available on your instance while edge functions run separate to your instance, autoscale and are globally distributed; but they do need to make a network call to your database.
+
+The more customers we work with, the more we have seen that many use cases for functions using PLV8 can be best served by an edge function. For the remaining use cases, SQL (or PLpgSQL) functions are a good fit.
 
 Deciding where to put your business logic in Supabase comes down to a few key factors:
 
@@ -35,13 +37,29 @@ Deciding where to put your business logic in Supabase comes down to a few key fa
 - **Security & roles**: Database functions run with the caller's or definer's privileges inside a transaction. Edge functions run with your service role, anon key (or user) on separate compute resources.
 - **Maintainability**: Edge functions live in your `supabase/functions` directory within your repository whereas database functions are in your `supabase/schema` or `supabase/migrations` directories. 
 
-Let's go through 2 example PLv8 functions to determine where they are best suited and how to migrate them.
+Put another way, this could be shown as a decision tree:
+
+```mermaid
+flowchart TD
+  A["Requires HTTP/API or 3rd-party packages?"] -->|Yes| B[Edge Function]
+  A -->|No| C["Needs transactional consistency? (inside DB tx)"]
+  C -->|Yes| D[Database Function]
+  C -->|No| E["Uses window/set-returning or complex aggregation?"]
+  E -->|Yes| D
+  E -->|No| F["Long-running?"]
+  F -->|Yes| D
+  F -->|No| G["Requires NPM packages, or file I/O? "]
+  G -->|Yes| B
+  G -->|No| D
+```
+
+Using this information, let's go through 2 example PLV8 functions to determine where they are best suited and how to migrate them.
 
 ## Example 1: Rolling average
 
 You may have a function to calculate a rolling average on your user's scores. This is performing operations on your data exclusively and does not use external services. This is a perfect candidate for a database function.
 
-### PLv8 database function
+### PLV8 database function
 ```sql
 create or replace function avg_recent_score(
   user_id bigint,
@@ -72,9 +90,9 @@ $$ language sql;
 
 ## Example 2: Removing PII from user data
 
-Here we have a PLv8 function that scans rows in our `profiles` table, strips PII, and returns cleaned JSONB records based on filter or limit.
+Here we have a PLV8 function that scans rows in our `profiles` table, strips PII, and returns cleaned JSONB records based on filter or limit.
 
-### PLv8 database function
+### PLV8 database function
 ```sql
 create or replace function clean_profiles(
   limit_count integer default 10,
@@ -153,6 +171,6 @@ const { data, error } = await supabase.functions.invoke('clean-profiles', {
 
 ### Summary
 
-Your PLv8 functions may be infinitely more complex than this but, hopefully, this post provides a starting point to determine the best way to run your custom logic and the steps involved to migrate to a database function in SQL or an edge function.
+Your PLV8 functions may be infinitely more complex than this but, hopefully, this post provides a starting point to determine the best way to run your custom logic and the steps involved to migrate to a database function in SQL or an edge function.
 
 If you have specific questions about your functions or need help migrating, please reach out to our Success team at success@supabase.io.
