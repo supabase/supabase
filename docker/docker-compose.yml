@@ -386,9 +386,10 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.8.1.060
+    image: supabase/postgres:15-local
     restart: unless-stopped
     volumes:
+      - ./docker-entrypoint.sh:/usr/local/bin/custom-docker-entrypoint.sh:Z
       - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
       # Must be superuser to create event trigger
       - ./volumes/db/webhooks.sql:/docker-entrypoint-initdb.d/init-scripts/98-webhooks.sql:Z
@@ -432,7 +433,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXP: ${JWT_EXPIRY}
-      ROLES_INIT_SCRIPT_PATH: /docker-entrypoint-initdb.d/init-scripts/99-roles.sql
+    entrypoint: /usr/local/bin/custom-docker-entrypoint.sh
     command:
       [
         "postgres",
