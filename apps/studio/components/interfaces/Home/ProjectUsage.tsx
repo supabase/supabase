@@ -46,14 +46,14 @@ const CHART_INTERVALS: ChartIntervals[] = [
     format: 'MMM D, ha',
     availableIn: ['free', 'pro', 'enterprise', 'team'],
   },
-  // {
-  //   key: '',
-  //   label: 'Last 7 days',
-  //   startValue: 7,
-  //   startUnit: 'day',
-  //   format: 'MMM D',
-  //   availableIn: ['pro', 'enterprise', 'team'],
-  // },
+  {
+    key: '7day',
+    label: 'Last 7 days',
+    startValue: 7,
+    startUnit: 'day',
+    format: 'MMM D',
+    availableIn: ['pro', 'enterprise', 'team'],
+  },
 ]
 
 const ProjectUsage = () => {

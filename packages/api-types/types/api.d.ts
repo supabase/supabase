@@ -198,6 +198,24 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/organizations/{slug}/project-claim/{token}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets project details for the specified organization and claim token */
+    get: operations['v1-get-organization-project-claim']
+    put?: never
+    /** Claims project for the specified organization */
+    post: operations['v1-claim-project-for-organization']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects': {
     parameters: {
       query?: never
@@ -304,6 +322,40 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/analytics/endpoints/usage.api-counts': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets project's usage api counts */
+    get: operations['getApiCounts']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/analytics/endpoints/usage.api-requests-count': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets project's usage api requests count */
+    get: operations['getApiRequestsCount']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/api-keys': {
     parameters: {
       query?: never
@@ -399,6 +451,25 @@ export interface paths {
      * @description Disables preview branching for the specified project
      */
     delete: operations['v1-disable-preview-branching']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/claim-token': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets project claim token */
+    get: operations['v1-get-project-claim-token']
+    put?: never
+    /** Creates project claim token */
+    post: operations['v1-create-project-claim-token']
+    /** Revokes project claim token */
+    delete: operations['v1-delete-project-claim-token']
     options?: never
     head?: never
     patch?: never
@@ -557,14 +628,14 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's supavisor config */
-    get: operations['getSupavisorConfig']
+    get: operations['v1-get-pooler-config']
     put?: never
     post?: never
     delete?: never
     options?: never
     head?: never
     /** Updates project's supavisor config */
-    patch: operations['updateSupavisorConfig']
+    patch: operations['v1-update-pooler-config']
     trace?: never
   }
   '/v1/projects/{ref}/config/database/postgres': {
@@ -738,7 +809,7 @@ export interface paths {
      * [Beta] List applied migration versions
      * @description Only available to selected partner OAuth apps
      */
-    get: operations['v1-list-migrations']
+    get: operations['v1-list-migration-history']
     put?: never
     /**
      * [Beta] Apply a database migration
@@ -1367,6 +1438,23 @@ export interface components {
     ActivateVanitySubdomainResponse: {
       custom_domain: string
     }
+    AnalyticsResponse: {
+      error?:
+        | string
+        | {
+            code: number
+            errors: {
+              domain: string
+              location: string
+              locationType: string
+              message: string
+              reason: string
+            }[]
+            message: string
+            status: string
+          }
+      result?: unknown[]
+    }
     ApiKeyResponse: {
       api_key: string
       description?: string | null
@@ -1660,6 +1748,7 @@ export interface components {
       workflow_run_id: string
     }
     BulkUpdateFunctionBody: {
+      /** Format: int64 */
       created_at?: number
       entrypoint_path?: string
       id: string
@@ -1674,6 +1763,7 @@ export interface components {
     }[]
     BulkUpdateFunctionResponse: {
       functions: {
+        /** Format: int64 */
         created_at: number
         entrypoint_path?: string
         id: string
@@ -1683,6 +1773,7 @@ export interface components {
         slug: string
         /** @enum {string} */
         status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
+        /** Format: int64 */
         updated_at: number
         verify_jwt?: boolean
         version: number
@@ -1690,6 +1781,7 @@ export interface components {
     }
     CreateApiKeyBody: {
       description?: string | null
+      name: string
       secret_jwt_template?: {
         role: string
       } | null
@@ -1739,6 +1831,14 @@ export interface components {
     }
     CreateOrganizationV1: {
       name: string
+    }
+    CreateProjectClaimTokenResponse: {
+      created_at: string
+      /** Format: uuid */
+      created_by: string
+      expires_at: string
+      token: string
+      token_alias: string
     }
     CreateProviderBody: {
       attribute_mapping?: {
@@ -1866,6 +1966,7 @@ export interface components {
       updated_at?: string
     }
     DeployFunctionResponse: {
+      /** Format: int64 */
       created_at?: number
       entrypoint_path?: string
       id: string
@@ -1875,6 +1976,7 @@ export interface components {
       slug: string
       /** @enum {string} */
       status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
+      /** Format: int64 */
       updated_at?: number
       verify_jwt?: boolean
       version: number
@@ -1890,6 +1992,7 @@ export interface components {
       }
     }
     FunctionResponse: {
+      /** Format: int64 */
       created_at: number
       entrypoint_path?: string
       id: string
@@ -1899,11 +2002,13 @@ export interface components {
       slug: string
       /** @enum {string} */
       status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
+      /** Format: int64 */
       updated_at: number
       verify_jwt?: boolean
       version: number
     }
     FunctionSlugResponse: {
+      /** Format: int64 */
       created_at: number
       entrypoint_path?: string
       id: string
@@ -1913,6 +2018,7 @@ export interface components {
       slug: string
       /** @enum {string} */
       status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
+      /** Format: int64 */
       updated_at: number
       verify_jwt?: boolean
       version: number
@@ -2153,6 +2259,41 @@ export interface components {
       /** @enum {string} */
       token_type: 'Bearer'
     }
+    OrganizationProjectClaimResponse: {
+      created_at: string
+      /** Format: uuid */
+      created_by: string
+      expires_at: string
+      preview: {
+        errors: {
+          key: string
+          message: string
+        }[]
+        info: {
+          key: string
+          message: string
+        }[]
+        members_exceeding_free_project_limit: {
+          limit: number
+          name: string
+        }[]
+        /** @enum {string} */
+        source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise'
+        target_organization_eligible: boolean | null
+        target_organization_has_free_project_slots: boolean | null
+        /** @enum {string|null} */
+        target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | null
+        valid: boolean
+        warnings: {
+          key: string
+          message: string
+        }[]
+      }
+      project: {
+        name: string
+        ref: string
+      }
+    }
     OrganizationResponseV1: {
       id: string
       name: string
@@ -2193,6 +2334,13 @@ export interface components {
       db_schema: string
       jwt_secret?: string
       max_rows: number
+    }
+    ProjectClaimTokenResponse: {
+      created_at: string
+      /** Format: uuid */
+      created_by: string
+      expires_at: string
+      token_alias: string
     }
     ProjectUpgradeEligibilityResponse: {
       current_app_version: string
@@ -2366,6 +2514,7 @@ export interface components {
           enabled: boolean
         }
       }
+      /** Format: int64 */
       fileSizeLimit: number
     }
     StreamableFile: Record<string, never>
@@ -2406,6 +2555,7 @@ export interface components {
     }
     UpdateApiKeyBody: {
       description?: string | null
+      name?: string
       secret_jwt_template?: {
         role: string
       } | null
@@ -2735,6 +2885,7 @@ export interface components {
           enabled: boolean
         }
       }
+      /** Format: int64 */
       fileSizeLimit?: number
     }
     UpdateSupavisorConfigBody: {
@@ -2753,23 +2904,6 @@ export interface components {
       /** @enum {string} */
       release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       target_version: string
-    }
-    V1AnalyticsResponse: {
-      error?:
-        | string
-        | {
-            code: number
-            errors: {
-              domain: string
-              location: string
-              locationType: string
-              message: string
-              reason: string
-            }[]
-            message: string
-            status: string
-          }
-      result?: unknown[]
     }
     V1BackupsResponse: {
       backups: {
@@ -3467,6 +3601,62 @@ export interface operations {
       }
     }
   }
+  'v1-get-organization-project-claim': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+        token: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OrganizationProjectClaimResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-claim-project-for-organization': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+        token: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-list-all-projects': {
     parameters: {
       query?: never
@@ -3649,10 +3839,76 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1AnalyticsResponse']
+          'application/json': components['schemas']['AnalyticsResponse']
         }
       }
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  getApiCounts: {
+    parameters: {
+      query?: {
+        interval?: '15min' | '30min' | '1hr' | '3hr' | '1day' | '3day' | '7day'
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get project's usage api counts */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  getApiRequestsCount: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      /** @description Failed to get project's usage api requests count */
+      500: {
         headers: {
           [name: string]: unknown
         }
@@ -4032,6 +4288,88 @@ export interface operations {
       }
       /** @description Failed to disable preview branching */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-project-claim-token': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ProjectClaimTokenResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-create-project-claim-token': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateProjectClaimTokenResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-delete-project-claim-token': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -4603,7 +4941,7 @@ export interface operations {
       }
     }
   }
-  getSupavisorConfig: {
+  'v1-get-pooler-config': {
     parameters: {
       query?: never
       header?: never
@@ -4632,7 +4970,7 @@ export interface operations {
       }
     }
   }
-  updateSupavisorConfig: {
+  'v1-update-pooler-config': {
     parameters: {
       query?: never
       header?: never
@@ -5087,7 +5425,7 @@ export interface operations {
       }
     }
   }
-  'v1-list-migrations': {
+  'v1-list-migration-history': {
     parameters: {
       query?: never
       header?: never
