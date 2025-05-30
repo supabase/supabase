@@ -20,7 +20,6 @@ describe('getAllowedTools', () => {
     expect(tools).toContain('list_extensions')
     expect(tools).toContain('list_edge_functions')
     expect(tools).toContain('list_branches')
-    expect(tools).toContain('get_project')
     expect(tools).not.toContain('get_logs')
     expect(tools).not.toContain('execute_sql')
   })
@@ -31,7 +30,6 @@ describe('getAllowedTools', () => {
     expect(tools).toContain('list_extensions')
     expect(tools).toContain('list_edge_functions')
     expect(tools).toContain('list_branches')
-    expect(tools).toContain('get_project')
     expect(tools).toContain('get_logs')
     expect(tools).not.toContain('execute_sql')
   })
@@ -42,7 +40,6 @@ describe('getAllowedTools', () => {
     expect(tools).toContain('list_extensions')
     expect(tools).toContain('list_edge_functions')
     expect(tools).toContain('list_branches')
-    expect(tools).toContain('get_project')
     expect(tools).toContain('get_logs')
     expect(tools).toContain('execute_sql')
   })
@@ -183,7 +180,6 @@ describe('expectedToolsSchema', () => {
       list_extensions: {},
       list_edge_functions: {},
       list_branches: {},
-      get_project: {},
       get_logs: {},
       execute_sql: {},
       other: {},

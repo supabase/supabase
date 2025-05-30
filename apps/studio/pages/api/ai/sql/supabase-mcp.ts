@@ -129,13 +129,7 @@ export function getAllowedTools(aiOptInLevel: AiOptInLevel) {
     aiOptInLevel === 'schema_and_log' ||
     aiOptInLevel === 'schema_and_log_and_data'
   ) {
-    allowedTools.push(
-      'list_tables',
-      'list_extensions',
-      'list_edge_functions',
-      'list_branches',
-      'get_project'
-    )
+    allowedTools.push('list_tables', 'list_extensions', 'list_edge_functions', 'list_branches')
   }
 
   // For schema_and_log permission level, add log access tools
