@@ -6,6 +6,7 @@
     "lib": ["ES2015", "dom", "dom.iterable", "esnext"],
     "module": "ESNext",
     "target": "ES2021",
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "incremental": true
   }
 }

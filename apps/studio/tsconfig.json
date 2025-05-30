@@ -35,5 +35,5 @@
     ".next/types/**/*.ts",
     "./../../packages/ui/src/**/*.d.ts"
   ],
-  "exclude": ["node_modules", "public/deno/*.ts"]
+  "exclude": ["node_modules", "public/deno/*.ts", "data/__templates"]
 }
