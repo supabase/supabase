@@ -21,13 +21,6 @@ export default (isMobile?: boolean) => ({
         Get an exclusive Supabase t-shirt for sharing your insights.
       </>
     ),
-    // image: '/images/product/vector/vector-hero.svg',
-    // icon: null,
-    cta: {
-      label: 'Take the survey',
-      link: '#',
-      action: () => null,
-    },
     className: '[&_h1]:max-w-2xl',
   },
 })

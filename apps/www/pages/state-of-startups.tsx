@@ -457,26 +457,24 @@ const Hero = (props: any) => {
               <p className="p !text-foreground-light max-w-xl">{props.subheader}</p>
             </div>
             <div className="w-full sm:w-auto flex flex-col items-stretch sm:flex-row pt-2 sm:items-center gap-2">
-              {props.cta && (
-                <PopupFrame
-                  trigger={
-                    <Button size="small" asChild>
-                      <span>{props.cta.label}</span>
-                    </Button>
-                  }
-                  className="[&_.modal-content]:min-h-[650px] [&_.modal-content]:!h-[75vh] [&_.modal-content]:flex [&_.modal-content]:flex-col"
-                >
-                  <div className="w-full !h-full flex-1 flex flex-col">
-                    <iframe
-                      src={`https://form.typeform.com/to/si6Z7XlW?embedded=true`}
-                      width="100%"
-                      height="100%"
-                      frameBorder="0"
-                      className="w-full !min-h-full flex-1"
-                    />
-                  </div>
-                </PopupFrame>
-              )}
+              <PopupFrame
+                trigger={
+                  <Button size="small" asChild>
+                    <span>Take the survey</span>
+                  </Button>
+                }
+                className="[&_.modal-content]:min-h-[650px] [&_.modal-content]:!h-[75vh] [&_.modal-content]:flex [&_.modal-content]:flex-col"
+              >
+                <div className="w-full !h-full flex-1 flex flex-col">
+                  <iframe
+                    src={`https://form.typeform.com/to/si6Z7XlW?embedded=true`}
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    className="w-full !min-h-full flex-1"
+                  />
+                </div>
+              </PopupFrame>
             </div>
           </div>
         </div>
