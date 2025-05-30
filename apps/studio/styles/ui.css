@@ -26,6 +26,7 @@
   flex-wrap: wrap;
 }
 
+/* TO DO: REMOVE */
 .form-group label {
   @apply inline-block text-foreground-light text-sm py-2;
   width: 33%;
@@ -328,6 +329,7 @@
     display: none !important;
   }
 
+  /* for Firefox */
   scrollbar-width: none;
 }
 

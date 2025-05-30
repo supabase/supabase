@@ -19,6 +19,7 @@
   line-height: inherit;
 }
 
+/* Apply parent bg colour while editing */
 .rdg-cell.rdg-editor-container > * {
   background-color: inherit;
 }
