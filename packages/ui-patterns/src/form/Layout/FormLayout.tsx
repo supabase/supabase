@@ -101,12 +101,11 @@ const LabelContainerVariants = cva('transition-all duration-500 ease-in-out', {
       className: 'order-1',
     },
     {
-      layout: 'vertical',
+      layout: ['vertical', 'flex'],
       labelLayout: undefined,
       flex: false,
       className: 'flex flex-row gap-2 justify-between',
     },
-
     {
       layout: 'horizontal',
       className: 'flex flex-col gap-2',
@@ -144,7 +143,7 @@ const DataContainerVariants = cva('transition-all duration-500 ease-in-out', {
       className: 'order-2',
     },
     {
-      layout: 'vertical',
+      layout: ['vertical', 'flex'],
       className: 'col-span-12',
     },
     {
