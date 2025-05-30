@@ -372,6 +372,7 @@
     SF Mono,
     Menlo,
     Consolas,
+    Liberation Mono,
     monospace;
   line-height: 10px;
   color: var(--color-fg-default);
@@ -467,6 +468,7 @@
     SF Mono,
     Menlo,
     Consolas,
+    Liberation Mono,
     monospace;
   font-size: 12px;
 }
@@ -480,6 +482,7 @@
     SF Mono,
     Menlo,
     Consolas,
+    Liberation Mono,
     monospace;
   font-size: 12px;
   word-wrap: normal;
