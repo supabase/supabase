@@ -1,5 +1,6 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { Check } from 'lucide-react'
+import { cn } from 'ui'
 
 export interface AuthorizeRequesterDetailsProps {
   icon: string | null
@@ -8,11 +9,13 @@ export interface AuthorizeRequesterDetailsProps {
   scopes: OAuthScope[]
 }
 
-const ScopeSection = ({
+export const ScopeSection = ({
+  className,
   description,
   hasReadScope,
   hasWriteScope,
 }: {
+  className?: string
   description: string
   hasReadScope: boolean
   hasWriteScope: boolean
@@ -35,7 +38,12 @@ const ScopeSection = ({
       ))
 
     return (
-      <div className="first:border-t border-b flex flex-row space-x-1 text-sm text-foreground-light py-2 px-1">
+      <div
+        className={cn(
+          'first:border-t border-b flex flex-row space-x-1 text-sm text-foreground-light py-2 px-1',
+          className
+        )}
+      >
         <div className="pt-0.5">
           <Check stroke="green" height={18} width={18} strokeWidth={1.5} />
         </div>
@@ -48,6 +56,32 @@ const ScopeSection = ({
   return null
 }
 
+export const RequesterImage = ({
+  icon,
+  name,
+  className,
+}: {
+  icon: string | null
+  name: string
+  className?: string
+}) => {
+  return (
+    <div className="flex items-center">
+      <div
+        className={cn(
+          'w-14 h-14 md:w-16 md:h-16 bg-center bg-no-repeat bg-cover flex items-center justify-center rounded-md border border-control',
+          className
+        )}
+        style={{
+          backgroundImage: !!icon ? `url('${icon}')` : 'none',
+        }}
+      >
+        {!icon && <p className="text-foreground-light text-lg">{name[0]}</p>}
+      </div>
+    </div>
+  )
+}
+
 const AuthorizeRequesterDetails = ({
   icon,
   name,
@@ -57,16 +91,7 @@ const AuthorizeRequesterDetails = ({
   return (
     <div className="flex gap-y-4 flex-col">
       <div className="flex flex-row gap-x-4 items-center">
-        <div className="flex items-center">
-          <div
-            className="w-14 h-14 md:w-16 md:h-16 bg-center bg-no-repeat bg-cover flex items-center justify-center rounded-md border border-control"
-            style={{
-              backgroundImage: !!icon ? `url('${icon}')` : 'none',
-            }}
-          >
-            {!icon && <p className="text-foreground-light text-lg">{name[0]}</p>}
-          </div>
-        </div>
+        <RequesterImage icon={icon} name={name} />
         <p className="text-foreground">
           {name} ({domain}) is requesting API access to an organization.
         </p>
