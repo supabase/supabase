@@ -35,6 +35,7 @@ interface DatabaseSelectorProps {
   additionalOptions?: { id: string; name: string }[]
   buttonProps?: ButtonProps
   onSelectId?: (id: string) => void // Optional callback
+  onCreateReplicaClick?: () => void
 }
 
 const DatabaseSelector = ({
@@ -43,6 +44,7 @@ const DatabaseSelector = ({
   additionalOptions = [],
   onSelectId = noop,
   buttonProps,
+  onCreateReplicaClick = noop,
 }: DatabaseSelectorProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
@@ -215,6 +217,7 @@ const DatabaseSelector = ({
                       setOpen(false)
                       // [Joshen] This is used in the Connect UI which is available across all pages
                       setShowConnect(null)
+                      onCreateReplicaClick?.()
                     }}
                     className="w-full flex items-center gap-2"
                   >

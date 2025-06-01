@@ -1,4 +1,4 @@
-import type { Json, Section } from '../../helpers.mdx'
+import type { Json, Section } from '../../helpers.mdx.js'
 
 export abstract class BaseLoader {
   type: string

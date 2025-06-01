@@ -340,6 +340,7 @@ allow_list = [
     "vecs",
     "vs",
     "watchOS",
+    "[Xx]min",
 ]
 
 prefixes = ["bi", "over", "pre", "un"]

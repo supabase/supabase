@@ -792,6 +792,12 @@
     "title": "Realtime",
     "items": [
       {
+        "id": "realtime-api",
+        "title": "Overview",
+        "slug": "realtime-api",
+        "type": "function"
+      },
+      {
         "id": "stream",
         "title": "Listen to database changes",
         "slug": "stream",

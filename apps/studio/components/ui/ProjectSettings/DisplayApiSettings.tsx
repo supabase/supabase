@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useParams } from 'common'
@@ -8,6 +9,8 @@ import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import { AlertCircle, Loader2 } from 'lucide-react'
 import { Input } from 'ui'
+import { toast } from 'sonner'
+import { useLastUsedAPIKeysLogQuery, getLastUsedAPIKeys } from './DisplayApiSettings.utils'
 
 const DisplayApiSettings = ({
   legacy,
@@ -41,6 +44,24 @@ const DisplayApiSettings = ({
   const apiKeys = settings?.service_api_keys ?? []
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0
+
+  const { isLoading: isLoadingLastUsed, logData: lastUsedLogData } = useLastUsedAPIKeysLogQuery(
+    projectRef!
+  )
+
+  const lastUsedAPIKeys = useMemo(() => {
+    if (apiKeys.length < 1 || !lastUsedLogData || lastUsedLogData.length < 1) {
+      return {}
+    }
+
+    try {
+      return getLastUsedAPIKeys(apiKeys, lastUsedLogData)
+    } catch (e: any) {
+      toast.error('Failed to identify when the anon and service_role keys were last used')
+      console.error(e)
+      return {}
+    }
+  }, [lastUsedLogData, apiKeys])
 
   return (
     <>
@@ -143,6 +164,15 @@ const DisplayApiSettings = ({
                       (legacy ? 'Prefer using Secret API keys instead.' : '')
                 }
               />
+
+              <div
+                className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
+                data-invisible={isLoadingLastUsed}
+              >
+                {lastUsedAPIKeys[x.api_key]
+                  ? `Last request was ${lastUsedAPIKeys[x.api_key]} ago.`
+                  : 'No requests in the past 24 hours.'}
+              </div>
             </Panel.Content>
           ))
         )}

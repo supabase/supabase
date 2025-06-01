@@ -150,14 +150,6 @@ const LWXStickyNav: FC = () => {
                     <ArrowUpRight className="w-4 h-5 text-foreground-muted hidden sm:inline-block" />
                   </Link>
                 </li>
-                <li className="hidden sm:block">
-                  <Link
-                    href="#ticket"
-                    className="p-1 transition-colors hover:text-foreground pointer-events-auto"
-                  >
-                    Ticket
-                  </Link>
-                </li>
               </div>
             </ul>
           </div>

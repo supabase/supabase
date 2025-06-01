@@ -5,6 +5,7 @@ import { withSentryConfig } from '@sentry/nextjs'
 import withYaml from 'next-plugin-yaml'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
+import { parse as parseToml } from 'smol-toml'
 import remotePatterns from './lib/remotePatterns.js'
 
 const withBundleAnalyzer = configureBundleAnalyzer({
@@ -33,17 +34,17 @@ const nextConfig = {
     // @ts-ignore
     remotePatterns,
   },
-  // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
-  // mdxRs: true,
-  modularizeImports: {
-    lodash: {
-      transform: 'lodash/{{member}}',
-    },
-  },
   webpack: (config) => {
     config.module.rules.push({
       test: /\.include$/,
       type: 'asset/source',
+    })
+    config.module.rules.push({
+      test: /\.toml$/,
+      type: 'json',
+      parser: {
+        parse: parseToml,
+      },
     })
     return config
   },

@@ -11,19 +11,21 @@
  *  the last Git commit date.
  */
 
-import 'dotenv/config'
+import _configureDotEnv from './utils/dotenv'
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import matter from 'gray-matter'
 import { createHash } from 'node:crypto'
 import { readdirSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import path, { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 import { SimpleGit, simpleGit } from 'simple-git'
-import toml from 'toml'
+import { parse } from 'smol-toml'
+import { Section } from './helpers.mdx.js'
 
-import { Section } from './helpers.mdx'
+const _ = _configureDotEnv
 
 interface Options {
   reset: boolean
@@ -47,8 +49,10 @@ type SectionWithChecksum = Omit<Section, 'heading'> &
 
 const REQUIRED_ENV_VARS = {
   SUPABASE_URL: 'NEXT_PUBLIC_SUPABASE_URL',
-  SERVICE_ROLE_KEY: 'SUPABASE_SERVICE_ROLE_KEY',
+  SERVICE_ROLE_KEY: 'SUPABASE_SECRET_KEY',
 } as const
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 async function main() {
   console.log('Updating content timestamps....')
@@ -164,7 +168,7 @@ function processMdx(rawContent: string): Array<SectionWithChecksum> {
   } catch (err) {
     content = matter(rawContent, {
       language: 'toml',
-      engines: { toml: toml.parse.bind(toml) },
+      engines: { toml: parse },
     }).content
   }
 

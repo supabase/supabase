@@ -39,6 +39,7 @@ import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceCo
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
+import { useShowNewReplicaPanel } from './use-show-new-replica'
 
 const InstanceConfigurationUI = () => {
   const reactFlow = useReactFlow()
@@ -50,7 +51,7 @@ const InstanceConfigurationUI = () => {
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
   const [showDeleteAllModal, setShowDeleteAllModal] = useState(false)
-  const [showNewReplicaPanel, setShowNewReplicaPanel] = useState(false)
+  const { showNewReplicaPanel, setShowNewReplicaPanel } = useShowNewReplicaPanel()
   const [refetchInterval, setRefetchInterval] = useState<number | boolean>(10000)
   const [newReplicaRegion, setNewReplicaRegion] = useState<AWS_REGIONS_KEYS>()
   const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<Database>()
