@@ -10,24 +10,9 @@ Postgres provides a set of sensible defaults for you database size. In some case
 
 ## Timeouts
 
-By default, Supabase limits the maximum statement execution time to _8 seconds_ for users accessing the API. Additionally, all users are subject to a global limit of _2 minutes_. This serves as a backstop against resource exhaustion due to either poorly written queries, or abusive usage. This can be overridden using [Custom Postgres configuration](https://supabase.com/docs/guides/platform/custom-postgres-config#supported-parameters).
+See the [Timeouts](/docs/guides/database/postgres/timeouts) section.
 
-### Changing the default timeout
-
-The timeout values were picked as a reasonable default for the majority of use-cases, but can be modified using the [`alter role`](https://www.postgresql.org/docs/current/sql-alterrole.html) statement:
-
-```sql
--- For API users
-alter role authenticator set statement_timeout = '15s';
-```
-
-You can also update the statement timeout for a session:
-
-```sql
-set statement_timeout to 60000; -- 1 minute in milliseconds
-```
-
-### Statement optimization
+## Statement optimization
 
 All Supabase projects come with the [`pg_stat_statements`](https://www.postgresql.org/docs/current/pgstatstatements.html) extension installed, which tracks planning and execution statistics for all statements executed against it. These statistics can be used in order to diagnose the performance of your project.
 
@@ -35,8 +20,13 @@ This data can further be used in conjunction with the [`explain`](https://www.po
 
 ## Managing timezones
 
-Every Supabase database is set to UTC timezone by default. We strongly recommend keeping it this way, even if your users are in a different location.
-This is because it makes it much easier to calculate differences between timezones if you adopt the mental model that "everything in my database is in UTC time."
+Every hosted Supabase database is set to UTC timezone by default. We strongly recommend keeping it this way, even if your users are in a different location. This is because it makes it much easier to calculate differences between timezones if you adopt the mental model that everything in your database is in UTC time.
+
+<Admonition type="tip">
+
+On self-hosted databases, the timezone defaults to your local timezone. We recommend [changing this to UTC](/docs/guides/database/postgres/configuration#change-timezone) for the same reasons.
+
+</Admonition>
 
 ### Change timezone
 

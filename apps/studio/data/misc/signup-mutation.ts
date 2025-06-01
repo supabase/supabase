@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/nextjs'
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
@@ -10,6 +10,7 @@ const WHITELIST_ERRORS = [
   'Password should contain at least one character of each',
   'You attempted to send email to an inactive recipient',
   'email must be an email',
+  'Password is known to be weak and easy to guess, please choose a different one',
 ]
 
 export type SignUpVariables = {

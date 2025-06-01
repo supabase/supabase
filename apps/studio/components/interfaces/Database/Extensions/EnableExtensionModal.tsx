@@ -1,26 +1,29 @@
 import type { PostgresExtension } from '@supabase/postgres-meta'
-import { ExternalLinkIcon } from 'lucide-react'
+import { Database, ExternalLinkIcon, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { DocsButton } from 'components/ui/DocsButton'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
   Form,
-  IconDatabase,
-  IconPlus,
   Input,
   Listbox,
   Modal,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { Admonition } from 'ui-patterns'
+
+const orioleExtCallOuts = ['vector', 'postgis']
 
 interface EnableExtensionModalProps {
   visible: boolean
@@ -30,16 +33,20 @@ interface EnableExtensionModalProps {
 
 const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionModalProps) => {
   const { project } = useProjectContext()
+  const isOrioleDb = useIsOrioleDb()
   const [defaultSchema, setDefaultSchema] = useState()
   const [fetchingSchemaInfo, setFetchingSchemaInfo] = useState(false)
 
-  const { data: schemas, isLoading: isSchemasLoading } = useSchemasQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data: schemas, isLoading: isSchemasLoading } = useSchemasQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: visible }
+  )
   const { mutate: enableExtension, isLoading: isEnabling } = useDatabaseExtensionEnableMutation({
     onSuccess: () => {
-      toast.success(`${extension.name} is on.`)
+      toast.success(`Extension "${extension.name}" is now enabled`)
       onCancel()
     },
     onError: (error) => {
@@ -131,7 +138,17 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
         {({ values }: any) => {
           return (
             <>
-              <Modal.Content>
+              <Modal.Content className="flex flex-col gap-y-2">
+                {isOrioleDb && orioleExtCallOuts.includes(extension.name) && (
+                  <Admonition type="default" title="Extension is limited by OrioleDB">
+                    <span className="block">
+                      {extension.name} cannot be accelerated by indexes on tables that are using the
+                      OrioleDB access method
+                    </span>
+                    <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
+                  </Admonition>
+                )}
+
                 {fetchingSchemaInfo || isSchemasLoading ? (
                   <div className="space-y-2">
                     <ShimmeringLoader />
@@ -159,7 +176,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                       id="custom"
                       label={`Create a new schema "${extension.name}"`}
                       value="custom"
-                      addOnBefore={() => <IconPlus size={16} strokeWidth={1.5} />}
+                      addOnBefore={() => <Plus size={16} strokeWidth={1.5} />}
                     >
                       Create a new schema "{extension.name}"
                     </Listbox.Option>
@@ -171,7 +188,7 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
                           id={schema.name}
                           label={schema.name}
                           value={schema.name}
-                          addOnBefore={() => <IconDatabase size={16} strokeWidth={1.5} />}
+                          addOnBefore={() => <Database size={16} strokeWidth={1.5} />}
                         >
                           {schema.name}
                         </Listbox.Option>

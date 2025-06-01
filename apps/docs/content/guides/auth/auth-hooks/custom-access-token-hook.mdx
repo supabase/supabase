@@ -1,0 +1,484 @@
+---
+id: 'custom-access-token-hook'
+title: 'Custom Access Token Hook'
+subtitle: 'Customize the access token issued by Supabase Auth'
+---
+
+The custom access token hook runs before a token is issued and allows you to add additional claims based on the authentication method used.
+
+Claims returned must conform to our specification. Supabase Auth will check for these claims after the hook is run and return an error if they are not present.
+
+These are the fields currently available on an access token:
+
+Required Claims: `iss`, `aud`, `exp`, `iat`, `sub`, `role`, `aal`, `session_id`, `email`, `phone`, `is_anonymous`
+
+Optional Claims: `jti`, `nbf`, `app_metadata`, `user_metadata`, `amr`,
+
+**Inputs**
+
+| Field                   | Type     | Description                                                                                                                                                                                                                           |
+| ----------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `user_id`               | `string` | Unique identifier for the user attempting to sign in.                                                                                                                                                                                 |
+| `claims`                | `object` | Claims which are included in the access token.                                                                                                                                                                                        |
+| `authentication_method` | `string` | The authentication method used to request the access token. Possible values include: `oauth`, `password`, `otp`, `totp`, `recovery`, `invite`, `sso/saml`, `magiclink`, `email/signup`, `email_change`, `token_refresh`, `anonymous`. |
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+>
+
+<TabPanel id="custom-access-token-json" label="JSON">
+```json
+{
+  "user_id": "8ccaa7af-909f-44e7-84cb-67cdccb56be6",
+  "claims": {
+    "aud": "authenticated",
+    "exp": 1715690221,
+    "iat": 1715686621,
+    "sub": "8ccaa7af-909f-44e7-84cb-67cdccb56be6",
+    "email": "",
+    "phone": "",
+    "app_metadata": {},
+    "user_metadata": {},
+    "role": "authenticated",
+    "aal": "aal1",
+    "amr": [ { "method": "anonymous", "timestamp": 1715686621 } ],
+    "session_id": "4b938a09-5372-4177-a314-cfa292099ea2",
+    "is_anonymous": true
+  },
+  "authentication_method": "anonymous"
+}
+```
+</TabPanel>
+<TabPanel id="custom-access-token-json-schema" label="JSON Schema">
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "x-faker": "random.uuid"
+    },
+    "claims": {
+      "type": "object",
+      "properties": {
+        "aud": {
+          "type": "string",
+          "x-faker": "random.word"
+        },
+        "exp": {
+          "type": "integer",
+          "x-faker": "date.future"
+        },
+        "iat": {
+          "type": "integer",
+          "x-faker": "date.past"
+        },
+        "sub": {
+          "type": "string",
+          "x-faker": "random.uuid"
+        },
+        "email": {
+          "type": "string",
+          "x-faker": "internet.email"
+        },
+        "phone": {
+          "type": "string",
+          "x-faker": {
+            "fake": "{{phone.phoneNumber('+1##########')}}"
+          }
+        },
+        "app_metadata": {
+          "type": "object",
+          "x-faker": "random.objectElement"
+        },
+        "user_metadata": {
+          "type": "object",
+          "x-faker": "random.objectElement"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["anon", "authenticated"]
+        },
+        "aal": {
+          "type": "string",
+          "enum": ["aal1", "aal2", "aal3"]
+        },
+        "amr": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "method": {
+                "type": "string",
+                "enum": [
+                  "oauth",
+                  "password",
+                  "otp",
+                  "totp",
+                  "recovery",
+                  "invite",
+                  "sso/saml",
+                  "magiclink",
+                  "email/signup",
+                  "email_change",
+                  "token_refresh",
+                  "anonymous"
+                ]
+              },
+              "timestamp": {
+                "type": "integer",
+                "x-faker": "date.past"
+              }
+            },
+            "required": ["method", "timestamp"]
+          }
+        },
+        "session_id": {
+          "type": "string",
+          "x-faker": "random.uuid"
+        },
+        "is_anonymous": {
+          "type": "boolean",
+          "x-faker": "random.boolean"
+        }
+      },
+      "required": [
+        "aud",
+        "exp",
+        "iat",
+        "sub",
+        "email",
+        "phone",
+        "app_metadata",
+        "user_metadata",
+        "role",
+        "aal",
+        "amr",
+        "session_id",
+        "is_anonymous"
+      ]
+    },
+    "authentication_method": {
+      "type": "string",
+      "enum": [
+        "oauth",
+        "password",
+        "otp",
+        "totp",
+        "recovery",
+        "invite",
+        "sso/saml",
+        "magiclink",
+        "email/signup",
+        "email_change",
+        "token_refresh",
+        "anonymous"
+      ]
+    }
+  },
+  "required": ["user_id", "claims", "authentication_method"]
+}
+```
+
+</TabPanel>
+</Tabs>
+
+**Outputs**
+
+Return these only if your hook processed the input without errors.
+
+| Field    | Type     | Description                                     |
+| -------- | -------- | ----------------------------------------------- |
+| `claims` | `object` | The updated claims after the hook has been run. |
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="language"
+>
+<TabPanel id="sql" label="SQL">
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="minimal-jwt"
+>
+<TabPanel id="minimal-jwt" label="Minimal JWT">
+
+Sometimes the size of the JWT can be a problem especially if you're using a [Server-Side Rendering framework](/docs/guides/auth/server-side). Common situations where the JWT can get too large include:
+
+- The user has a particularly large name, email address or phone number
+- The default JWT has too many claims coming from OAuth providers
+- A large avatar URL is included
+
+To lower the size of the JWT you can define a Custom Access Token hook like the one below which will instruct the Auth server to issue a JWT with only the listed claims. Check the documentation above on what JWT claims must be present and cannot be removed.
+
+Refer to the [Postgres JSON functions](https://www.postgresql.org/docs/current/functions-json.html) on how to manipulate `jsonb` objects.
+
+```sql
+create or replace function public.custom_access_token_hook(event jsonb)
+returns jsonb
+language plpgsql
+as $$
+  declare
+    original_claims jsonb;
+    new_claims jsonb;
+    claim text;
+  begin
+    original_claims = event->'claims';
+    new_claims = '{}'::jsonb;
+
+    foreach claim in array array[
+      -- add claims you want to keep here
+      'iss',
+      'aud',
+      'exp',
+      'iat',
+      'sub',
+      'role',
+      'aal',
+      'session_id',
+      'email',
+      'phone',
+      'is_anonymous'
+   ] loop
+      if original_claims ? claim then
+        -- original_claims contains one of the listed claims, set it on new_claims
+        new_claims = jsonb_set(new_claims, array[claim], original_claims->claim);
+      end if;
+    end loop;
+
+    return jsonb_build_object('claims', new_claims);
+  end
+$$;
+```
+
+</TabPanel>
+
+<TabPanel id="add-admin-role" label="Add admin role">
+
+You can allow registered admin users to perform restricted actions by granting an `admin` claim to their token.
+
+Create a profiles table with an `is_admin` flag:
+
+```sql
+create table profiles (
+  user_id uuid not null primary key references auth.users (id),
+  is_admin boolean not null default false
+);
+```
+
+Create a hook:
+
+```sql
+create or replace function public.custom_access_token_hook(event jsonb)
+returns jsonb
+language plpgsql
+as $$
+  declare
+    claims jsonb;
+    is_admin boolean;
+  begin
+    -- Check if the user is marked as admin in the profiles table
+    select is_admin into is_admin from profiles where user_id = (event->>'user_id')::uuid;
+
+    -- Proceed only if the user is an admin
+    if is_admin then
+      claims := event->'claims';
+
+      -- Check if 'app_metadata' exists in claims
+      if jsonb_typeof(claims->'app_metadata') is null then
+        -- If 'app_metadata' does not exist, create an empty object
+        claims := jsonb_set(claims, '{app_metadata}', '{}');
+      end if;
+
+      -- Set a claim of 'admin'
+      claims := jsonb_set(claims, '{app_metadata, admin}', 'true');
+
+      -- Update the 'claims' object in the original event
+      event := jsonb_set(event, '{claims}', claims);
+    end if;
+
+    -- Return the modified or original event
+    return event;
+  end;
+$$;
+
+grant all
+  on table public.profiles
+  to supabase_auth_admin;
+
+revoke all
+  on table public.profiles
+  from authenticated, anon, public;
+```
+
+</TabPanel>
+<TabPanel id="restrict-access-to-sso-users" label="Restrict access to SSO users">
+You can restrict access to internal applications with a hook. For example, you can require that employees log in via [SAML Single Sign On (SSO)](/docs/guides/auth/sso/auth-sso-saml). You can exempt select employees from the policy via an allowlist.
+
+```sql
+create or replace function public.restrict_application_access(event jsonb)
+ returns jsonb
+ language plpgsql
+as $function$
+declare
+    authentication_method text;
+    email_claim text;
+    allowed_emails text[] := array['myemail@company.com', 'example@company.com'];
+begin
+    -- Extract email claim and authentication method
+    email_claim = event->'claims'->>'email';
+    authentication_method = event->'authentication_method';
+    -- Authentication methods come double quoted (e.g. "otp")
+    authentication_method = replace(authentication_method, '"', '');
+
+    if email_claim ilike '%@supabase.io' or authentication_method = 'sso/saml' or email_claim = any(allowed_emails) then
+        return event;
+    end if;
+
+    -- If none of the conditions are met, return an error
+    return jsonb_build_object(
+        'error', jsonb_build_object(
+            'http_code', 403,
+            'message', 'Staging access is only allowed to team members. Please use your @company.com account instead'
+        )
+    );
+end;
+$function$
+;
+-- manually added
+grant execute
+  on function public.restrict_application_access
+  to supabase_auth_admin;
+
+revoke execute
+  on function public.restrict_application_access
+  from authenticated, anon, public;
+```
+
+</TabPanel>
+</Tabs>
+</TabPanel>
+<TabPanel id="http" label="HTTP">
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="http-add-metadata-claim"
+>
+<TabPanel id="http-add-metadata-claim" label="Add claim">
+
+Your company wishes to add assign permissions via the role claim on the `app_metadata` field. Add the role claim to the token via a Hook.
+
+```javascript
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
+import { readAll } from 'https://deno.land/std/io/read_all.ts'
+import * as base64 from 'https://denopkg.com/chiefbiiko/base64/mod.ts'
+
+Deno.serve(async (req) => {
+  const payload = await req.text()
+  const base64_secret = Deno.env.get('CUSTOM_ACCESS_TOKEN_SECRET').replace('v1,whsec_', '')
+  const headers = Object.fromEntries(req.headers)
+  const wh = new Webhook(base64_secret)
+  try {
+    const { user_id, claims, authentication_method } = wh.verify(payload, headers)
+    if (claims.app_metadata && claims.app_metadata.role) {
+      claims['role'] = claims.app_metadata.role
+    }
+    return new Response(
+      JSON.stringify({
+        claims,
+      }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        error: `Failed to process the request: ${error}`,
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  }
+})
+```
+
+</TabPanel>
+<TabPanel id="http-restrict-access-to-sso-users" label="Restrict access to SSO users">
+You can restrict access to internal applications with a hook. For example, you can require that employees log in via [SAML Single Sign On (SSO)](/docs/guides/auth/sso/auth-sso-saml). You can exempt select employees from the policy via an allowlist.
+
+```javascript
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
+import { readAll } from 'https://deno.land/std/io/read_all.ts'
+import * as base64 from 'https://denopkg.com/chiefbiiko/base64/mod.ts'
+
+Deno.serve(async (req) => {
+  const payload = await req.text()
+  const base64_secret = Deno.env.get('CUSTOM_ACCESS_TOKEN_SECRET').replace('v1,whsec_', '')
+  const headers = Object.fromEntries(req.headers)
+  const wh = new Webhook(base64_secret)
+  try {
+    const { user_id, claims, authentication_method } = wh.verify(payload, headers)
+
+    // Check the condition
+    const allowedEmails = ['myemail@company.com', 'example@company.com']
+    if (authentication_method === 'sso/saml' || allowedEmails.includes(claims.email)) {
+      return new Response(
+        JSON.stringify({
+          claims,
+        }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+    } else {
+      return new Response(
+        JSON.stringify({
+          error: 'Unauthorized',
+        }),
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+    }
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        error: `Failed to process the request: ${error}`,
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  }
+})
+```
+
+</TabPanel>
+</Tabs>
+</TabPanel>
+</Tabs>

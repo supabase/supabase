@@ -1,11 +1,12 @@
-import * as Yup from 'yup'
 import { useState } from 'react'
-import { Button, Form, IconDownload, Input } from 'ui'
+import { Button, Form, Input } from 'ui'
+import * as Yup from 'yup'
 
-import supabase from '~/lib/supabaseMisc'
 import CTABanner from 'components/CTABanner/index'
 import Layout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import supabase from '~/lib/supabaseMisc'
+import { Download } from 'lucide-react'
 
 const DPA = () => {
   const [email, setEmail] = useState<string>('')
@@ -29,7 +30,7 @@ const DPA = () => {
 
       resetForm()
       setFormSubmitted(true)
-      window.open('https://supabase.com/downloads/docs/Supabase+DPA+231211.pdf', '_blank')
+      window.open('https://supabase.com/downloads/docs/Supabase+DPA+250314.pdf', '_blank')
     } catch (error: any) {
       setError(error.message)
     }
@@ -88,7 +89,7 @@ const DPA = () => {
                             <Button
                               htmlType="submit"
                               type="default"
-                              iconRight={<IconDownload />}
+                              iconRight={<Download />}
                               className="mr-1"
                               loading={isSubmitting}
                             >

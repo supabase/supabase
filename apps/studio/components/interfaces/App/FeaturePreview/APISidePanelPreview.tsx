@@ -1,9 +1,9 @@
 import { useParams } from 'common'
-import { Markdown } from 'components/interfaces/Markdown'
+import { InlineLink } from 'components/ui/InlineLink'
 import { BASE_PATH } from 'lib/constants'
 import Image from 'next/image'
 
-const APISidePanelPreview = () => {
+export const APISidePanelPreview = () => {
   const { ref } = useParams()
 
   return (
@@ -28,15 +28,11 @@ const APISidePanelPreview = () => {
             that can be accessed anywhere while in a project.
           </li>
           <li>
-            <Markdown
-              className="text-foreground-light"
-              content={`Move the GraphiQL interface the Database section of the dashboard [here](/project/${ref}/database/graphiql).`}
-            />
+            Move the GraphiQL interface the Database section of the dashboard{' '}
+            <InlineLink href={`/project/${ref}/database/graphiql`}>here</InlineLink>.
           </li>
         </ul>
       </div>
     </div>
   )
 }
-
-export default APISidePanelPreview

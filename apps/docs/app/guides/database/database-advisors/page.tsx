@@ -1,18 +1,18 @@
 import { Octokit } from '@octokit/core'
-import { capitalize } from 'lodash'
-import { type SerializeOptions } from 'next-mdx-remote/dist/types'
+import { capitalize } from 'lodash-es'
 import rehypeSlug from 'rehype-slug'
-
 import { Heading } from 'ui'
 
+import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
-import { GuideTemplate, MDXRemoteGuides, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
-import { Tabs, TabPanel } from '~/features/ui/Tabs'
+import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
+import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -54,7 +54,7 @@ const DatabaseAdvisorDocs = async () => {
 
   return (
     <GuideTemplate meta={meta} editLink={editLink}>
-      <MDXRemoteGuides source={markdownIntro} />
+      <MDXRemoteBase source={markdownIntro} />
       <Heading tag="h2">Available checks</Heading>
       <Tabs listClassNames="flex flex-wrap gap-2 [&>button]:!m-0" queryGroup="lint">
         {lints.map((lint) => (
@@ -64,7 +64,7 @@ const DatabaseAdvisorDocs = async () => {
             label={capitalize(getBasename(lint.path).replace(/_/g, ' '))}
           >
             <section id={getBasename(lint.path)}>
-              <MDXRemoteGuides source={lint.content} options={options} />
+              <MDXRemoteBase source={lint.content} options={options} />
             </section>
           </TabPanel>
         ))}

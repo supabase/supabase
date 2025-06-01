@@ -1,19 +1,34 @@
+// This file configures the initialization of Sentry on the client.
+// The config you add here will be used whenever a users loads a page in their browser.
+// https://docs.sentry.io/platforms/javascript/guides/nextjs/
+
 import * as Sentry from '@sentry/nextjs'
+import { hasConsented } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
-import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
 import { match } from 'path-to-regexp'
+
+// This is a workaround to ignore hCaptcha related errors.
+function isHCaptchaRelatedError(event: Sentry.Event): boolean {
+  const errors = event.exception?.values ?? []
+  for (const error of errors) {
+    if (
+      error.value?.includes('is not a function') &&
+      error.stacktrace?.frames?.some((f) => f.filename === 'api.js')
+    ) {
+      return true
+    }
+  }
+  return false
+}
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-  tracesSampleRate: 0.01,
+  // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
   beforeSend(event, hint) {
-    const consent =
-      typeof window !== 'undefined'
-        ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-        : null
+    const consent = hasConsented()
 
-    if (IS_PLATFORM && consent === 'true') {
+    if (IS_PLATFORM && consent) {
       // Ignore invalid URL events for 99% of the time because it's using up a lot of quota.
       const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
         `Failed to construct 'URL': Invalid URL`
@@ -23,22 +38,13 @@ Sentry.init({
       }
       return event
     }
+
+    if (isHCaptchaRelatedError(event)) {
+      return null
+    }
+
     return null
   },
-  integrations: [
-    new Sentry.BrowserTracing({
-      // TODO: update gotrue + api to support Access-Control-Request-Headers: authorization,baggage,sentry-trace,x-client-info
-      // then remove these options
-      traceFetch: false,
-      traceXHR: false,
-      beforeNavigate: (context) => {
-        return {
-          ...context,
-          name: standardiseRouterUrl(location.pathname),
-        }
-      },
-    }),
-  ],
   ignoreErrors: [
     // Used exclusively in Monaco Editor.
     'ResizeObserver',
@@ -79,7 +85,7 @@ Sentry.init({
 function standardiseRouterUrl(url: string) {
   let finalUrl = url
 
-  const orgMatch = match('/org/:slug/(.*)', { decode: decodeURIComponent })
+  const orgMatch = match('/org/:slug{/*path}', { decode: decodeURIComponent })
   const orgMatchResult = orgMatch(finalUrl)
   if (orgMatchResult) {
     finalUrl = finalUrl.replace((orgMatchResult.params as any).slug, '[slug]')
@@ -91,7 +97,7 @@ function standardiseRouterUrl(url: string) {
     finalUrl = finalUrl.replace((newOrgMatchResult.params as any).slug, '[slug]')
   }
 
-  const projectMatch = match('/project/:ref/(.*)', { decode: decodeURIComponent })
+  const projectMatch = match('/project/:ref{/*path}', { decode: decodeURIComponent })
   const projectMatchResult = projectMatch(finalUrl)
   if (projectMatchResult) {
     finalUrl = finalUrl.replace((projectMatchResult.params as any).ref, '[ref]')

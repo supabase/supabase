@@ -1,8 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
-import { Button, IconAlertCircle, IconSearch, Input, Toggle } from 'ui'
+import { toast } from 'sonner'
+import { Button, Input, Toggle } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -13,6 +13,7 @@ import { useDatabasePublicationsQuery } from 'data/database-publications/databas
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import PublicationSkeleton from './PublicationSkeleton'
+import { Search, AlertCircle } from 'lucide-react'
 
 interface PublicationEvent {
   event: string
@@ -80,8 +81,8 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Input
-              size="small"
-              icon={<IconSearch size="tiny" />}
+              size="tiny"
+              icon={<Search size="14" />}
               placeholder={'Filter'}
               value={filterString}
               onChange={(e) => setFilterString(e.target.value)}
@@ -90,7 +91,7 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
           {isPermissionsLoaded && !canUpdatePublications && (
             <div className="w-[500px]">
               <InformationBox
-                icon={<IconAlertCircle className="text-foreground-light" strokeWidth={2} />}
+                icon={<AlertCircle className="text-foreground-light" strokeWidth={2} />}
                 title="You need additional permissions to update database publications"
               />
             </div>
@@ -98,15 +99,11 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
         </div>
       </div>
 
-      <div className="overflow-hidden rounded">
+      <div className="w-full overflow-hidden overflow-x-auto">
         <Table
           head={[
-            <Table.th key="header.name" style={{ width: '25%' }}>
-              Name
-            </Table.th>,
-            <Table.th key="header.id" className="hidden lg:table-cell" style={{ width: '25%' }}>
-              System ID
-            </Table.th>,
+            <Table.th key="header.name">Name</Table.th>,
+            <Table.th key="header.id">System ID</Table.th>,
             <Table.th key="header.insert">Insert</Table.th>,
             <Table.th key="header.update">Update</Table.th>,
             <Table.th key="header.delete">Delete</Table.th>,
@@ -120,12 +117,8 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
               ? Array.from({ length: 5 }).map((_, i) => <PublicationSkeleton key={i} index={i} />)
               : publications.map((x) => (
                   <Table.tr className="border-t" key={x.name}>
-                    <Table.td className="px-4 py-3" style={{ width: '25%' }}>
-                      {x.name}
-                    </Table.td>
-                    <Table.td className="hidden lg:table-cell" style={{ width: '25%' }}>
-                      {x.id}
-                    </Table.td>
+                    <Table.td className="px-4 py-3">{x.name}</Table.td>
+                    <Table.td>{x.id}</Table.td>
                     {publicationEvents.map((event) => (
                       <Table.td key={event.key}>
                         <Toggle
@@ -161,15 +154,15 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
                 ))
           }
         />
-
-        {!isLoading && publications.length === 0 && (
-          <NoSearchResults
-            searchString={filterString}
-            onResetFilter={() => setFilterString('')}
-            className="rounded-t-none border-t-0"
-          />
-        )}
       </div>
+
+      {!isLoading && publications.length === 0 && (
+        <NoSearchResults
+          searchString={filterString}
+          onResetFilter={() => setFilterString('')}
+          className="rounded-t-none border-t-0"
+        />
+      )}
 
       <ConfirmationModal
         visible={toggleListenEventValue !== null}

@@ -10,13 +10,16 @@ on:
         required: false
         type: boolean
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SEARCH_SUPABASE_URL }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SEARCH_SUPABASE_SERVICE_ROLE_KEY }}
+      SUPABASE_SECRET_KEY: ${{ secrets.SEARCH_SUPABASE_SERVICE_ROLE_KEY }}
 
     steps:
       - name: Check out repo
@@ -26,20 +29,25 @@ jobs:
           sparse-checkout: |
             apps/docs
 
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          run_install: false
+
       - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
 
       - name: Download dependencies
-        run: npm ci
+        run: pnpm i
 
       - name: Update last-changed dates
         working-directory: ./apps/docs
         if: ${{ !inputs.reset }}
-        run: npm run last-changed
+        run: pnpm run last-changed
 
       - name: Reset last-changed dates
         working-directory: ./apps/docs
         if: ${{ inputs.reset }}
-        run: npm run last-changed:reset
+        run: pnpm run last-changed:reset

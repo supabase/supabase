@@ -11,9 +11,7 @@ Referencing the other files in the `data` directory is a good way to see how to 
 
 ### SQL queries and mutations
 
-The dashboard often needs to query the users database directly. There are already some reusable hooks for this in `data/sql`. Reference the `data/fdw` directory for an example of how to use them.
-
-Note that the query key of the `useExecuteSqlQuery` hook will be automatically filled with an md5 hash of the SQL query, unless you provide a name for the query.
+The dashboard often needs to query the users database directly. You can use the `executeSql()` function to do this.
 
 ## Files
 

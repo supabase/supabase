@@ -71,6 +71,18 @@ val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+from supabase import create_client
+
+SUPABASE_URL = 'https://<project>.supabase.co'
+SUPABASE_KEY = '<your-anon-key>'
+
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+```
+
+</TabPanel>
 </Tabs>
 
 ### Sync and track state
@@ -87,6 +99,10 @@ val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
 Listen to the `sync`, `join`, and `leave` events triggered whenever any client joins or leaves the channel or changes their slice of state:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 const roomOne = supabase.channel('room_01')
 
 roomOne
@@ -157,6 +173,21 @@ roomOne.subscribe()
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+Listen to the `sync`, `join`, and `leave` events triggered whenever any client joins or leaves the channel or changes their slice of state:
+
+```python
+room_one = supabase.channel('room_01')
+
+room_one
+  .on_presence_sync(lambda: print('sync', room_one.presenceState()))
+  .on_presence_join(lambda key, curr_presences, joined_presences: print('join', key, curr_presences, joined_presences))
+  .on_presence_leave(lambda key, curr_presences, left_presences: print('leave', key, curr_presences, left_presences))
+  .subscribe()
+```
+
+</TabPanel>
 </Tabs>
 
 ### Sending state
@@ -174,6 +205,10 @@ You can send state to all subscribers using `track()`:
 
 {/* prettier-ignore */}
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 const roomOne = supabase.channel('room_01')
 
 const userStatus = {
@@ -250,6 +285,26 @@ roomOne.track(userStatus)
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+room_one = supabase.channel('room_01')
+
+user_status = {
+  "user": 'user-1',
+  "online_at": datetime.datetime.now().isoformat(),
+}
+
+def on_subscribe(status, err):
+  if status != RealtimeSubscribeStates.SUBSCRIBED:
+    return
+
+  room_one.track(user_status)
+
+room_one.subscribe(on_subscribe)
+```
+
+</TabPanel>
 </Tabs>
 
 A client will receive state from any other client that is subscribed to the same topic (in this case `room_01`). It will also automatically trigger its own `sync` and `join` event handlers.
@@ -268,6 +323,11 @@ You can stop tracking presence using the `untrack()` method. This will trigger t
 <TabPanel id="js" label="JavaScript">
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+const roomOne = supabase.channel('room_01')
+
+// ---cut---
 const untrackPresence = async () => {
   const presenceUntrackStatus = await roomOne.untrack()
   console.log(presenceUntrackStatus)
@@ -309,6 +369,13 @@ untrackPresence()
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+room_one.untrack()
+```
+
+</TabPanel>
 </Tabs>
 
 ## Presence options
@@ -330,6 +397,7 @@ By default, Presence will generate a unique `UUIDv1` key on the server to track 
 
 ```js
 import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('SUPABASE_URL', 'SUPABASE_ANON_KEY')
 
 const channelC = supabase.channel('test', {
   config: {
@@ -368,6 +436,19 @@ val channelC = supabase.channel("test") {
         key = "userId-123"
     }
 }
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+channel_c = supabase.channel('test', {
+  "config": {
+    "presence": {
+      "key": 'userId-123',
+    },
+  },
+})
 ```
 
 </TabPanel>

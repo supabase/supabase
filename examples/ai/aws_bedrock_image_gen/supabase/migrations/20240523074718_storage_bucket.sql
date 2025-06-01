@@ -12,4 +12,4 @@ insert into "storage"."buckets"
     "owner_id"
   )
 values
-  ('images', 'images', null, now(), now(), true, false, null, null, null);
+  ('images', 'images', null, now(), now(), true, false, null, '{image/png}', null);

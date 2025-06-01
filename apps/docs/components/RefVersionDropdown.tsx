@@ -1,4 +1,8 @@
-import { usePathname, useRouter } from 'next/navigation'
+'use client'
+
+import { ChevronDown } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+
 import {
   Badge,
   DropdownMenu,
@@ -6,34 +10,32 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-  IconChevronDown,
 } from 'ui'
-import { REFERENCES } from './Navigation/NavigationMenu/NavigationMenu.constants'
 
-const RevVersionDropdown = () => {
-  const pathname = usePathname()
+import { REFERENCES } from '~/content/navigation.references'
+
+const RevVersionDropdown = ({
+  library,
+  currentVersion,
+}: {
+  library: string
+  currentVersion: string
+}) => {
   const { push } = useRouter()
-  const pathSegments = pathname.split('/')
 
-  const library = pathSegments.length >= 3 ? pathSegments[2] : undefined
   const libraryMeta = REFERENCES?.[library] ?? undefined
   const versions = libraryMeta?.versions ?? []
 
-  const currentVersion = versions.includes(pathSegments[pathSegments.indexOf(library) + 1])
-    ? pathSegments[pathSegments.indexOf(library) + 1]
-    : versions[0]
-
-  const onSelectVersion = (version: string) => {
-    if (!library) return
-    if (version === versions[0]) {
-      push(`/reference/${library}/start`)
-    } else {
-      push(`/reference/${library}/${version}/start`)
-    }
+  if (!versions || versions.length <= 1) {
+    return null
   }
 
-  if (!versions || versions.length === 0) {
-    return <></>
+  const onSelectVersion = (version: string) => {
+    if (version === versions[0]) {
+      push(`/reference/${library}`)
+    } else {
+      push(`/reference/${library}/${version}`)
+    }
   }
 
   return (
@@ -52,11 +54,10 @@ const RevVersionDropdown = () => {
           flex items-center gap-1 text-foreground-muted text-xs group-hover:text-foreground transition
           "
         >
-          {/* <span>version</span> */}
           <span className="text-foreground text-sm group-hover:text-foreground transition">
             {currentVersion}.0
           </span>
-          <IconChevronDown size={14} strokeWidth={2} />
+          <ChevronDown size={14} strokeWidth={2} />
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" side="bottom" className="w-48">

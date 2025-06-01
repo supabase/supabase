@@ -74,6 +74,7 @@ const Image = ({ src, alt = '', zoomable, ...props }: ImageProps) => {
           : undefined)}
       >
         <NextImage
+          key={resolvedTheme}
           alt={alt}
           src={source}
           sizes={sizes}

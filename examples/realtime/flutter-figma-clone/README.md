@@ -2,8 +2,9 @@
 
 ![Supabase Figma Clone](https://raw.githubusercontent.com/dshukertjr/examples/main/.github/images/design.png 'Supabase Figma Clone')
 
-First of all, Figma clone is an over statement 😂 This app demonstrates the real-time communication capabilities of [Supabase](https://supabase.com) by creating an interactive design board where you can draw some shapes and move them around while seeing each other's cursors.
+This app demonstrates the real-time communication capabilities of [Supabase](https://supabase.com) by creating an interactive design board where you can draw some shapes and move them around while seeing each other's cursors.
 
+- Authorized Realtime channel
 - Cursor position sharing in real-time
 - Drawing shapes in real-time
 

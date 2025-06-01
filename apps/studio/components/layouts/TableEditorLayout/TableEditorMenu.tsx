@@ -1,11 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { Filter, Plus } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
+import { useIsTableEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
+import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InfiniteList from 'components/ui/InfiniteList'
@@ -13,9 +15,11 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   AlertDescription_Shadcn_,
@@ -34,15 +38,19 @@ import {
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
   InnerSideBarFilters,
-  InnerSideBarShimmeringLoaders,
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { useTableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import EntityListItem from './EntityListItem'
+import { TableMenuEmptyState } from './TableMenuEmptyState'
 
 const TableEditorMenu = () => {
-  const router = useRouter()
-  const { id } = useParams()
+  const { ref, id: _id } = useParams()
+  const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
+  const isMobile = useBreakpoint()
 
   const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
@@ -59,7 +67,6 @@ const TableEditorMenu = () => {
     isSuccess,
     isError,
     error,
-    refetch,
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
@@ -67,8 +74,8 @@ const TableEditorMenu = () => {
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: snap.selectedSchemaName,
-      search: searchText || undefined,
+      schemas: [selectedSchema],
+      search: searchText.trim() || undefined,
       sort,
       filterTypes: visibleTypes,
     },
@@ -87,34 +94,45 @@ const TableEditorMenu = () => {
     connectionString: project?.connectionString,
   })
 
-  const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
+  const schema = schemas?.find((schema) => schema.name === selectedSchema)
   const canCreateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
-  const refreshTables = async () => {
-    await refetch()
-  }
-
-  refreshTables
   const [protectedSchemas] = partition(
     (schemas ?? []).sort((a, b) => a.name.localeCompare(b.name)),
-    (schema) => EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+    (schema) => PROTECTED_SCHEMAS.includes(schema?.name ?? '')
   )
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
+  const { data: selectedTable } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
+
+  useEffect(() => {
+    if (selectedTable?.schema) {
+      setSelectedSchema(selectedTable.schema)
+    }
+  }, [selectedTable?.schema])
+
+  const tableEditorTabsCleanUp = useTableEditorTabsCleanUp()
+  useEffect(() => {
+    // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
+    if (isTableEditorTabsEnabled && entityTypes && !searchText) {
+      tableEditorTabsCleanUp({ schemas: [selectedSchema], entities: entityTypes })
+    }
+  }, [entityTypes, isTableEditorTabsEnabled, searchText, selectedSchema, tableEditorTabsCleanUp])
+
   return (
     <>
-      <div
-        className="pt-5 flex flex-col flex-grow gap-5 h-full"
-        style={{ maxHeight: 'calc(100vh - 48px)' }}
-      >
+      <div className="flex flex-col flex-grow gap-5 pt-5 h-full">
         <div className="flex flex-col gap-y-1.5">
           <SchemaSelector
             className="mx-4"
-            selectedSchemaName={snap.selectedSchemaName}
+            selectedSchemaName={selectedSchema}
             onSelectSchema={(name: string) => {
               setSearchText('')
-              snap.setSelectedSchemaName(name)
-              router.push(`/project/${project?.ref}/editor`)
+              setSelectedSchema(name)
             }}
             onSelectCreateSchema={() => snap.onAddSchema()}
           />
@@ -134,7 +152,9 @@ const TableEditorMenu = () => {
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text: 'You need additional permissions to create tables',
+                    text: !canCreateTables
+                      ? 'You need additional permissions to create tables'
+                      : undefined,
                   },
                 }}
               >
@@ -157,16 +177,15 @@ const TableEditorMenu = () => {
             )}
           </div>
         </div>
-        <div className="flex flex-auto flex-col gap-2 pb-4 px-2">
-          <InnerSideBarFilters>
+        <div className="flex flex-auto flex-col gap-2 pb-4">
+          <InnerSideBarFilters className="mx-2">
             <InnerSideBarFilterSearchInput
+              autoFocus={!isMobile}
               name="search-tables"
-              aria-labelledby="Search tables"
-              onChange={(e) => {
-                setSearchText(e.target.value.trim())
-              }}
               value={searchText}
               placeholder="Search tables..."
+              aria-labelledby="Search tables"
+              onChange={(e) => setSearchText(e.target.value)}
             >
               <InnerSideBarFilterSortDropdown
                 value={sort}
@@ -191,7 +210,7 @@ const TableEditorMenu = () => {
               <PopoverTrigger_Shadcn_ asChild>
                 <Button
                   type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
-                  className="h-[28px] px-1.5"
+                  className="h-[32px] md:h-[28px] px-1.5"
                   icon={<Filter />}
                 />
               </PopoverTrigger_Shadcn_>
@@ -234,20 +253,18 @@ const TableEditorMenu = () => {
             </Popover_Shadcn_>
           </InnerSideBarFilters>
 
-          {isLoading && <InnerSideBarShimmeringLoaders />}
+          {isLoading && <EditorMenuListSkeleton />}
 
           {isError && (
-            <AlertError error={(error ?? null) as any} subject="Failed to retrieve tables" />
+            <div className="mx-4">
+              <AlertError error={(error ?? null) as any} subject="Failed to retrieve tables" />
+            </div>
           )}
 
           {isSuccess && (
             <>
               {searchText.length === 0 && (entityTypes?.length ?? 0) <= 0 && (
-                <InnerSideBarEmptyPanel
-                  className="mx-2"
-                  title="No entities available"
-                  description="This schema has no entities available yet"
-                />
+                <TableMenuEmptyState />
               )}
               {searchText.length > 0 && (entityTypes?.length ?? 0) <= 0 && (
                 <InnerSideBarEmptyPanel
@@ -257,9 +274,10 @@ const TableEditorMenu = () => {
                 />
               )}
               {(entityTypes?.length ?? 0) > 0 && (
-                <div className="flex flex-1" data-testid="tables-list">
+                <div className="flex flex-1 flex-grow" data-testid="tables-list">
                   <InfiniteList
                     items={entityTypes}
+                    // @ts-expect-error
                     ItemComponent={EntityListItem}
                     itemProps={{
                       projectRef: project?.ref!,

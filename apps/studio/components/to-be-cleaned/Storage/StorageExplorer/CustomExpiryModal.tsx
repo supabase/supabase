@@ -1,13 +1,9 @@
 import dayjs from 'dayjs'
-import { observer } from 'mobx-react-lite'
 import { Button, Form, Input, Listbox, Modal } from 'ui'
 
 import { DATETIME_FORMAT } from 'lib/constants'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-
-export interface CustomExpiryModalProps {
-  onCopyUrl: (name: string, url: string) => void
-}
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import { useCopyUrl } from './useCopyUrl'
 
 const unitMap = {
   days: 3600 * 24,
@@ -16,9 +12,10 @@ const unitMap = {
   years: 3600 * 24 * 365,
 }
 
-const CustomExpiryModal = ({ onCopyUrl }: CustomExpiryModalProps) => {
-  const storageExplorerStore = useStorageStore()
-  const { getFileUrl, selectedFileCustomExpiry, setSelectedFileCustomExpiry } = storageExplorerStore
+const CustomExpiryModal = () => {
+  const { onCopyUrl } = useCopyUrl()
+  const snap = useStorageExplorerStateSnapshot()
+  const { selectedFileCustomExpiry, setSelectedFileCustomExpiry } = snap
 
   const visible = selectedFileCustomExpiry !== undefined
   const onClose = () => setSelectedFileCustomExpiry(undefined)
@@ -38,12 +35,9 @@ const CustomExpiryModal = ({ onCopyUrl }: CustomExpiryModalProps) => {
         initialValues={{ expiresIn: '', units: 'days' }}
         onSubmit={async (values: any, { setSubmitting }: any) => {
           setSubmitting(true)
-          onCopyUrl(
+          await onCopyUrl(
             selectedFileCustomExpiry!.name,
-            await getFileUrl(
-              selectedFileCustomExpiry!,
-              values.expiresIn * unitMap[values.units as 'days' | 'weeks' | 'months' | 'years']
-            )
+            values.expiresIn * unitMap[values.units as 'days' | 'weeks' | 'months' | 'years']
           )
           setSubmitting(false)
           onClose()
@@ -107,4 +101,4 @@ const CustomExpiryModal = ({ onCopyUrl }: CustomExpiryModalProps) => {
   )
 }
 
-export default observer(CustomExpiryModal)
+export default CustomExpiryModal

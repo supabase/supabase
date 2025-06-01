@@ -5,6 +5,7 @@ export const invoicesKeys = {
   list: (slug: string | undefined, offset: number | undefined) =>
     ['invoices', slug, offset] as const,
   count: (slug: string | undefined) => ['invoices', slug, 'count'] as const,
+  listAndCount: (slug: string | undefined) => ['invoices', slug] as const,
 
   projectInvoices: (projectRef: string | undefined, offset: number | undefined) =>
     ['invoices', projectRef, offset] as const,

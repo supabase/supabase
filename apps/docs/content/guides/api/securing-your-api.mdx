@@ -53,26 +53,6 @@ Any table **without RLS enabled** in the `public` schema will be accessible to t
 
 </Admonition>
 
-## Safeguards towards accidental deletes and updates
-
-By default, all projects have the [safeupdate](https://github.com/eradman/pg-safeupdate) Postgres extension enabled for API queries. This ensures that `delete()` and `update()` requests will fail if there are no filters provided.
-
-To confirm that safeupdate is enabled for API queries, run the following query:
-
-```sql
-select
-  usename,
-  useconfig
-from pg_shadow
-where usename = 'authenticator';
-```
-
-The expected value for `useconfig` should be:
-
-```javascript
-;['session_preload_libraries=supautils, safeupdate']
-```
-
 ## Disable the API or restrict to custom schema
 
 If you don't use the Data API, or if you don't want to expose the `public` schema, you can either disable it entirely or change the automatically exposed schema to one of your choice. See **[Hardening the Data API](/docs/guides/database/hardening-data-api)** for instructions.
@@ -312,8 +292,9 @@ create function public.check_request()
 declare
   req_app_api_key text := current_setting('request.headers', true)::json->>'x-app-api-key';
   is_app_api_key_registered boolean;
+  jwt_role text := current_setting('request.jwt.claims', true)::json->>'role';
 begin
-  if current_role <> 'anon' then
+  if jwt_role <> 'anon' then
     -- not `anon` role, allow the request to pass
     return;
   end if;
@@ -322,7 +303,7 @@ begin
     true into is_app_api_key_registered
   from private.anon_api_keys
   where
-    id = req_app_api_key
+    id = req_app_api_key::uuid
   limit 1;
 
   if is_app_api_key_registered is true then

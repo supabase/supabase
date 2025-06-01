@@ -2,11 +2,11 @@ import { type PropsWithChildren } from 'react'
 
 import HomePageCover from '~/components/HomePageCover'
 import { LayoutMainContent } from './DefaultLayout'
-import { MainSkeleton } from './MainSkeleton'
+import { SidebarSkeleton } from './MainSkeleton'
 
 const HomeLayout = ({ children }: PropsWithChildren) => {
   return (
-    <MainSkeleton>
+    <SidebarSkeleton hideSideNav>
       <article>
         <HomePageCover title="Supabase Documentation" />
         <LayoutMainContent>
@@ -15,7 +15,7 @@ const HomeLayout = ({ children }: PropsWithChildren) => {
           </div>
         </LayoutMainContent>
       </article>
-    </MainSkeleton>
+    </SidebarSkeleton>
   )
 }
 

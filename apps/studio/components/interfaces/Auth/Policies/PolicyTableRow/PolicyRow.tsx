@@ -1,40 +1,51 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
+import { Edit, MoreVertical, Trash } from 'lucide-react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import Panel from 'components/ui/Panel'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Badge,
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconEdit,
-  IconMoreVertical,
-  IconTrash,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
+import { generatePolicyUpdateSQL } from './PolicyTableRow.utils'
 
 interface PolicyRowProps {
   policy: PostgresPolicy
   onSelectEditPolicy: (policy: PostgresPolicy) => void
   onSelectDeletePolicy: (policy: PostgresPolicy) => void
+  isLocked: boolean
 }
 
 const PolicyRow = ({
   policy,
+  isLocked: isLockedDefault,
   onSelectEditPolicy = noop,
   onSelectDeletePolicy = noop,
 }: PolicyRowProps) => {
+  const aiSnap = useAiAssistantStateSnapshot()
   const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
 
   const { project } = useProjectContext()
   const { data: authConfig } = useAuthConfigQuery({ projectRef: project?.ref })
+
+  // override islocked for Realtime messages table
+  const isLocked =
+    policy.schema === 'realtime' && policy.table === 'messages' ? false : isLockedDefault
 
   // TODO(km): Simple check for roles that allow authenticated access.
   // In the future, we'll use splinter to return proper warnings for policies that allow anonymous user access.
@@ -44,101 +55,107 @@ const PolicyRow = ({
 
   return (
     <Panel.Content
-      className={['flex border-overlay', 'w-full space-x-4 border-b py-4 lg:items-center'].join(
-        ' '
+      className={cn(
+        'flex border-overlay',
+        'w-full last:border-0 space-x-4 border-b py-4 lg:items-center'
       )}
     >
-      <div className="flex grow flex-col space-y-1">
-        <div className="flex items-center space-x-4">
-          <p className="font-mono text-xs text-foreground-light">{policy.command}</p>
-          <p className="text-sm text-foreground">{policy.name}</p>
+      <div className="flex grow flex-col gap-y-1">
+        <div className="flex items-start gap-x-4">
+          <p className="font-mono text-xs text-foreground-light translate-y-[2px] min-w-12">
+            {policy.command}
+          </p>
+
+          <div className="flex flex-col gap-y-1">
+            <Button
+              type="text"
+              className="h-auto text-foreground text-sm border-none p-0 hover:bg-transparent justify-start"
+              onClick={() => onSelectEditPolicy(policy)}
+            >
+              {policy.name}
+            </Button>
+            <div className="flex items-center gap-x-1">
+              <div className="text-foreground-lighter text-sm">
+                Applied to:{' '}
+                {policy.roles.slice(0, 3).map((role, i) => (
+                  <code key={`policy-${role}-${i}`} className="text-foreground-light text-xs">
+                    {role}
+                    {policy.roles.length > 1 ? '' : ' '}
+                  </code>
+                ))}
+                {policy.roles.length > 1 ? 'roles' : 'role'}
+              </div>
+              {policy.roles.length > 3 && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <code key="policy-etc" className="text-foreground-light text-xs">
+                      + {policy.roles.length - 3} more roles
+                    </code>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" align="center">
+                    {policy.roles.slice(3).join(', ')}
+                  </TooltipContent>
+                </Tooltip>
+              )}
+            </div>
+          </div>
+
           {appliesToAnonymousUsers ? (
             <Badge color="yellow">Applies to anonymous users</Badge>
           ) : null}
         </div>
-        <div className="flex items-center space-x-2">
-          <p className="text-foreground-light text-sm">Applied to:</p>
-          {policy.roles.slice(0, 3).map((role, i) => (
-            <code key={`policy-${role}-${i}`} className="text-foreground-light text-xs">
-              {role}
-            </code>
-          ))}
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              {policy.roles.length > 3 && (
-                <code key={`policy-etc`} className="text-foreground-light text-xs">
-                  + {policy.roles.length - 3} more roles
-                </code>
-              )}
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background max-w-[220px] text-center',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">
-                    {policy.roles.slice(3).join(', ')}
-                  </span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
-        </div>
       </div>
       <div>
-        {canUpdatePolicies ? (
+        {!isLocked && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                type="default"
-                style={{ paddingLeft: 4, paddingRight: 4 }}
-                icon={<IconMoreVertical />}
-              />
+              <Button type="default" className="px-1.5" icon={<MoreVertical />} />
             </DropdownMenuTrigger>
-            <DropdownMenuContent side="bottom" align="end" className="w-40">
-              <DropdownMenuItem className="space-x-2" onClick={() => onSelectEditPolicy(policy)}>
-                <IconEdit size={14} />
+            <DropdownMenuContent side="bottom" align="end" className="w-52">
+              <DropdownMenuItem className="gap-x-2" onClick={() => onSelectEditPolicy(policy)}>
+                <Edit size={14} />
                 <p>Edit policy</p>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="space-x-2" onClick={() => onSelectDeletePolicy(policy)}>
-                <IconTrash size={14} />
-                <p>Delete policy</p>
+              <DropdownMenuItem
+                className="space-x-2"
+                onClick={() => {
+                  const sql = generatePolicyUpdateSQL(policy)
+                  aiSnap.newChat({
+                    name: `Update policy ${policy.name}`,
+                    open: true,
+                    sqlSnippets: [sql],
+                    initialInput: `Update the policy with name "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table. It should...`,
+                    suggestions: {
+                      title: `I can help you make a change to the policy "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table, here are a few example prompts to get you started:`,
+                      prompts: [
+                        'Tell me how I can improve this policy...',
+                        'Duplicate this policy for another table...',
+                        'Add extra conditions to this policy...',
+                      ],
+                    },
+                  })
+                }}
+              >
+                <Edit size={14} />
+                <p>Edit policy with Assistant</p>
               </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItemTooltip
+                className="gap-x-2"
+                disabled={!canUpdatePolicies}
+                onClick={() => onSelectDeletePolicy(policy)}
+                tooltip={{
+                  content: {
+                    side: 'left',
+                    text: 'You need additional permissions to delete policies',
+                  },
+                }}
+              >
+                <Trash size={14} />
+                <p>Delete policy</p>
+              </DropdownMenuItemTooltip>
             </DropdownMenuContent>
           </DropdownMenu>
-        ) : (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger asChild>
-              <Button
-                disabled
-                type="default"
-                style={{ paddingLeft: 4, paddingRight: 4 }}
-                icon={<IconMoreVertical />}
-              />
-            </Tooltip.Trigger>
-            {!canUpdatePolicies && (
-              <Tooltip.Portal>
-                <Tooltip.Content side="left">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      You need additional permissions to edit RLS policies
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            )}
-          </Tooltip.Root>
         )}
       </div>
     </Panel.Content>

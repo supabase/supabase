@@ -1,34 +1,16 @@
 import Link from 'next/link'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 import { primaryLinks, secondaryLinks } from '~/data/footer'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 
-const Footer = () => (
-  <LayoutMainContent className="pt-0">
+const Footer = ({ className }: { className?: string }) => (
+  <LayoutMainContent className={cn('pt-0', className)}>
     <footer role="contentinfo" aria-label="footer">
       <div className="mt-16">
         <ul className="flex flex-col gap-2">
-          {primaryLinks.map(({ url, featherIcon: Icon, icon, text, ctaLabel }) => (
+          {primaryLinks.map(({ url, featherIcon: Icon, text, ctaLabel }) => (
             <li key={url} className="flex items-center gap-1 text-xs text-foreground-lighter">
-              {icon && (
-                <svg
-                  aria-hidden="true"
-                  width="16"
-                  height="17"
-                  viewBox="0 0 16 17"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d={icon}
-                    stroke="hsl(var(--foreground-muted))"
-                    strokeWidth={0.7}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              )}
-              {Icon && <Icon aria-hidden="true" width={16} height={16} />}
+              {Icon && <Icon aria-hidden="true" size={16} strokeWidth={1} />}
               <p>{text}</p>
               <Link
                 href={url}

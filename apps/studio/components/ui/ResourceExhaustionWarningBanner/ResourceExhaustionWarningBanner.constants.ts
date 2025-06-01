@@ -1,4 +1,21 @@
-export const RESOURCE_WARNING_MESSAGES = {
+interface ResourceWarningMessage {
+  // should match pathnames, ex: ('/', 'project/[ref]/auth', 'project/[ref]/database', '/project/[ref]/settings/api')
+  restrictToRoutes?: string[]
+
+  bannerContent: {
+    warning: { title: string; description: string }
+    critical: { title?: string; description?: string }
+  }
+  cardContent: {
+    warning: { title: string; description: string }
+    critical: { title?: string; description?: string }
+  }
+  docsUrl?: string
+  buttonText?: string
+  metric: string | null
+}
+
+export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> = {
   is_readonly_mode_enabled: {
     bannerContent: {
       warning: {
@@ -25,7 +42,7 @@ export const RESOURCE_WARNING_MESSAGES = {
       },
     },
     docsUrl: 'https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode',
-    buttonText: 'View database settings',
+    buttonText: 'Learn more',
     metric: 'read_only',
   },
   disk_io_exhaustion: {
@@ -52,8 +69,8 @@ export const RESOURCE_WARNING_MESSAGES = {
         description: 'It may become unresponsive',
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-disk-io',
-    buttonText: 'Check usage',
+    docsUrl: 'https://supabase.com/docs/guides/troubleshooting/exhaust-disk-io',
+    buttonText: 'Learn more',
     metric: 'disk_io',
   },
   disk_space_exhaustion: {
@@ -107,8 +124,8 @@ export const RESOURCE_WARNING_MESSAGES = {
         description: `Performance is affected`,
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-cpu',
-    buttonText: 'Check usage',
+    docsUrl: 'https://supabase.com/docs/guides/troubleshooting/high-cpu-usage',
+    buttonText: 'Learn more',
     metric: 'cpu',
   },
   memory_and_swap_exhaustion: {
@@ -135,8 +152,8 @@ export const RESOURCE_WARNING_MESSAGES = {
         description: `Performance is affected`,
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-ram',
-    buttonText: 'Check usage',
+    docsUrl: 'https://supabase.com/docs/guides/troubleshooting/exhaust-ram',
+    buttonText: 'Learn more',
     metric: 'ram',
   },
   auth_rate_limit_exhaustion: {

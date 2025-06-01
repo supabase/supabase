@@ -1,39 +1,40 @@
-import { useParams } from 'common'
 import { toPng } from 'html-to-image'
+import { Camera, CircleCheck, Image as ImageIcon, Upload, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
+
+import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
+import { useParams } from 'common'
+import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { timeout } from 'lib/helpers'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconCamera,
-  IconImage,
-  IconUpload,
-  IconX,
-  Input,
+  TextArea_Shadcn_,
 } from 'ui'
-
-import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
-import { timeout } from 'lib/helpers'
 import { convertB64toBlob, uploadAttachment } from './FeedbackDropdown.utils'
 
 interface FeedbackWidgetProps {
-  onClose: () => void
   feedback: string
-  setFeedback: (value: string) => void
   screenshot: string | undefined
+  onClose: () => void
+  setFeedback: (value: string) => void
   setScreenshot: (value: string | undefined) => void
 }
 
 const FeedbackWidget = ({
-  onClose,
   feedback,
-  setFeedback,
   screenshot,
+  onClose,
+  setFeedback,
   setScreenshot,
 }: FeedbackWidgetProps) => {
   const FEEDBACK_STORAGE_KEY = 'feedback_content'
@@ -41,21 +42,23 @@ const FeedbackWidget = ({
 
   const router = useRouter()
   const { ref, slug } = useParams()
-  const inputRef = useRef<any>(null)
-  const uploadButtonRef = useRef()
+  const org = useSelectedOrganization()
+  const uploadButtonRef = useRef(null)
 
   const [isSending, setSending] = useState(false)
   const [isSavingScreenshot, setIsSavingScreenshot] = useState(false)
+  const [isFeedbackSent, setIsFeedbackSent] = useState(false)
+
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const { mutate: submitFeedback } = useSendFeedbackMutation({
     onSuccess: () => {
+      setIsFeedbackSent(true)
       setFeedback('')
       setScreenshot(undefined)
       localStorage.removeItem(FEEDBACK_STORAGE_KEY)
       localStorage.removeItem(SCREENSHOT_STORAGE_KEY)
-      toast.success(
-        'Feedback sent. Thank you!\n\nPlease be aware that we do not provide responses to feedback. If you require assistance or a reply, consider submitting a support ticket.',
-        { duration: 8000 }
-      )
+
       setSending(false)
     },
     onError: (error) => {
@@ -86,21 +89,6 @@ const FeedbackWidget = ({
     }
   }, [screenshot])
 
-  useEffect(() => {
-    inputRef?.current?.focus()
-  }, [inputRef])
-
-  function onFeedbackChange(e: any) {
-    setFeedback(e.target.value)
-  }
-
-  const clearFeedback = () => {
-    setFeedback('')
-    setScreenshot(undefined)
-    localStorage.removeItem(FEEDBACK_STORAGE_KEY)
-    localStorage.removeItem(SCREENSHOT_STORAGE_KEY)
-  }
-
   const captureScreenshot = async () => {
     setIsSavingScreenshot(true)
 
@@ -118,7 +106,7 @@ const FeedbackWidget = ({
         localStorage.setItem(SCREENSHOT_STORAGE_KEY, dataUrl)
         setScreenshot(dataUrl)
       })
-      .catch((error: any) => toast.error('Failed to capture screenshot'))
+      .catch(() => toast.error('Failed to capture screenshot'))
       .finally(() => {
         setIsSavingScreenshot(false)
       })
@@ -140,6 +128,24 @@ const FeedbackWidget = ({
     event.target.value = ''
   }
 
+  const handlePasteEvent = async () => {
+    // [Joshen] Support pasting images via Cmd / Ctrl + V
+    const [data] = await navigator.clipboard.read()
+
+    if (screenshot === undefined && data.types[0] === 'image/png') {
+      const blob = await data.getType('image/png')
+      const reader = new FileReader()
+      reader.onload = function (event) {
+        const dataUrl = event.target?.result
+        if (typeof dataUrl === 'string') {
+          setScreenshot(dataUrl)
+          localStorage.setItem(SCREENSHOT_STORAGE_KEY, dataUrl)
+        }
+      }
+      reader.readAsDataURL(blob)
+    }
+  }
+
   const sendFeedback = async () => {
     if (feedback.length === 0 && screenshot !== undefined) {
       return toast.error('Please include a message in your feedback.')
@@ -159,118 +165,156 @@ const FeedbackWidget = ({
         pathname: router.asPath,
       })
     }
-
-    return onClose()
   }
 
-  return (
-    <div id="feedback-widget" className="text-area-text-sm">
-      <Input.TextArea
-        className="w-80 p-3"
-        size="small"
-        placeholder="Ideas on how to improve this page.&#10;Use the Support Form for technical issues."
-        rows={5}
-        value={feedback}
-        onChange={onFeedbackChange}
-      />
-      <div className="w-full h-px bg-border" />
-      <div className="w-80 space-y-3 px-3 py-2 pb-4">
-        <div className="flex justify-between space-x-2">
-          <Button type="default" onClick={onClose}>
-            Cancel
-          </Button>
-          <div className="flex items-center space-x-2">
-            <Button type="default" onClick={clearFeedback}>
-              Clear
-            </Button>
-            {screenshot !== undefined ? (
-              <div
-                style={{ backgroundImage: `url("${screenshot}")` }}
-                onClick={() => {
-                  const blob = convertB64toBlob(screenshot)
-                  const blobUrl = URL.createObjectURL(blob)
-                  window.open(blobUrl, '_blank')
+  return isFeedbackSent ? (
+    <ThanksMessage onClose={onClose} />
+  ) : (
+    <>
+      <div className="px-5">
+        <TextArea_Shadcn_
+          placeholder="It would be great if..."
+          rows={5}
+          value={feedback}
+          onChange={(e) => setFeedback(e.target.value)}
+          onPaste={handlePasteEvent}
+          className="text-sm mt-4 mb-1"
+        />
+      </div>
+      <PopoverSeparator />
+      <div className="px-5 flex flex-row justify-between items-start">
+        <div>
+          <p className="text-xs text-foreground">Have a technical issue?</p>
+          <p className="text-xs text-foreground-light">
+            Contact{' '}
+            <Link href="/support/new">
+              <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
+                support
+              </span>
+            </Link>{' '}
+            or{' '}
+            <a href="https://supabase.com/docs" target="_blank" rel="noreferrer">
+              <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
+                see docs
+              </span>
+            </a>
+            .
+          </p>
+        </div>
+        <div className="flex items-center gap-2 flex-row">
+          {screenshot !== undefined ? (
+            <div
+              style={{ backgroundImage: `url("${screenshot}")` }}
+              onClick={() => {
+                const blob = convertB64toBlob(screenshot)
+                const blobUrl = URL.createObjectURL(blob)
+                window.open(blobUrl, '_blank')
+              }}
+              className="cursor-pointer rounded h-[26px] w-[30px] border border-control relative bg-cover bg-center bg-no-repeat"
+            >
+              <button
+                className={[
+                  'cursor-pointer rounded-full bg-red-900 h-3 w-3',
+                  'flex items-center justify-center absolute -top-1 -right-1',
+                ].join(' ')}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  setScreenshot(undefined)
                 }}
-                className="cursor-pointer rounded h-[26px] w-[30px] border border-control relative bg-cover bg-center bg-no-repeat"
               >
-                <button
-                  className={[
-                    'cursor-pointer rounded-full bg-red-900 h-3 w-3',
-                    'flex items-center justify-center absolute -top-1 -right-1',
-                  ].join(' ')}
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    setScreenshot(undefined)
+                <X size={8} strokeWidth={3} />
+              </button>
+            </div>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="default"
+                  disabled={isSavingScreenshot}
+                  loading={isSavingScreenshot}
+                  className="px-2"
+                >
+                  <ImageIcon size={14} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="bottom" align="end" className="w-fit">
+                <DropdownMenuItem
+                  className="flex gap-2"
+                  key="upload-screenshot"
+                  onSelect={() => {
+                    if (uploadButtonRef.current) (uploadButtonRef.current as any).click()
                   }}
                 >
-                  <IconX size={8} strokeWidth={3} />
-                </button>
-              </div>
-            ) : (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    type="default"
-                    disabled={isSavingScreenshot}
-                    loading={isSavingScreenshot}
-                    className="px-2 py-1.5"
-                  >
-                    <IconImage size={14} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="bottom" align="end">
-                  <DropdownMenuItem
-                    className="flex gap-2"
-                    key="upload-screenshot"
-                    onSelect={() => {
-                      if (uploadButtonRef.current) (uploadButtonRef.current as any).click()
-                    }}
-                  >
-                    <IconUpload size={14} />
-                    Upload screenshot
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="flex gap-2"
-                    key="capture-screenshot"
-                    onSelect={() => captureScreenshot()}
-                  >
-                    <IconCamera size={14} />
-                    Capture screenshot
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-            <input
-              type="file"
-              // @ts-ignore
-              ref={uploadButtonRef}
-              className="hidden"
-              accept="image/png"
-              onChange={onFilesUpload}
-            />
-            <Button disabled={isSending} loading={isSending} onClick={sendFeedback}>
-              Send feedback
-            </Button>
-          </div>
+                  <Upload size={14} />
+                  Upload screenshot
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="flex gap-2"
+                  key="capture-screenshot"
+                  onSelect={() => captureScreenshot()}
+                >
+                  <Camera size={14} />
+                  Capture screenshot
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+          <input
+            type="file"
+            ref={uploadButtonRef}
+            className="hidden"
+            accept="image/png"
+            onChange={onFilesUpload}
+          />
+          <Button
+            disabled={feedback.length === 0 || isSending}
+            loading={isSending}
+            onClick={() => {
+              sendFeedback()
+              sendEvent({
+                action: 'send_feedback_button_clicked',
+                groups: { project: ref, organization: org?.slug },
+              })
+            }}
+          >
+            Send
+          </Button>
         </div>
-        <p className="text-xs text-foreground-light">
-          Have a technical issue? Contact{' '}
-          <Link href="/support/new">
-            <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
-              Supabase support
-            </span>
-          </Link>{' '}
-          or{' '}
-          <a href="https://supabase.com/docs" target="_blank" rel="noreferrer">
-            <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
-              browse our docs
-            </span>
-          </a>
-          .
-        </p>
       </div>
-    </div>
+    </>
   )
 }
 
 export default FeedbackWidget
+
+const ThanksMessage = ({ onClose }: { onClose: () => void }) => {
+  return (
+    <div className="px-0 pt-3 pb-0">
+      <div className="grid gap-3">
+        <div className="px-6 grid gap-3 py-2 text-center text-foreground-light">
+          <CircleCheck className="mx-auto text-brand-500" size={24} />
+          <p className="text-foreground text-base">Your feedback has been sent. Thanks!</p>
+          <p className="text-sm ">
+            We do not always respond to feedback. If you require assistance, please contact support
+            instead.
+          </p>
+        </div>
+        <PopoverSeparator />
+        <div className="flex items-center justify-between px-4">
+          <p className="text-xs text-foreground-light">
+            <Link href="/support/new">
+              <span className="cursor-pointer text-brand transition-colors hover:text-brand-600">
+                Create a Support Ticket
+              </span>
+            </Link>
+          </p>
+
+          <Button type="default" onClick={onClose}>
+            Close
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}

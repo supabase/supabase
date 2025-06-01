@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
@@ -8,7 +8,7 @@ import { sqlKeys } from './keys'
 export type QueryAbortVariables = {
   pid: number
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function abortQuery({ pid, projectRef, connectionString }: QueryAbortVariables) {
@@ -33,7 +33,7 @@ export const useQueryAbortMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(sqlKeys.query(projectRef, ['ongoing-queries']))
+        await queryClient.invalidateQueries(sqlKeys.ongoingQueries(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

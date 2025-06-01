@@ -8,29 +8,8 @@ hideToc: true
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Set up a Supabase project with sample data">
 
-    [Create a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
-
-    After your project is ready, create a table in your Supabase database using the [SQL Editor](https://supabase.com/dashboard/project/_/sql) in the Dashboard. Use the following SQL statement to create a `countries` table with some sample data.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-     ```sql SQL_EDITOR
-      -- Create the table
-      CREATE TABLE countries (
-      id SERIAL PRIMARY KEY,
-      name VARCHAR(255) NOT NULL
-      );
-      -- Insert some sample data into the table
-      INSERT INTO countries (name) VALUES ('United States');
-      INSERT INTO countries (name) VALUES ('Canada');
-      INSERT INTO countries (name) VALUES ('Mexico');
-      ````
-
-    </StepHikeCompact.Code>
+    <$Partial path="quickstart_db_setup.mdx" />
 
   </StepHikeCompact.Step>
 
@@ -60,7 +39,7 @@ hideToc: true
 
     <StepHikeCompact.Details title="Initialize the Supabase client">
 
-      Create a new `Supabase.swift` file add a new supabase instance using your project URL and public API (anon) key:
+      Create a new `Supabase.swift` file add a new Supabase instance using your project URL and public API (anon) key:
 
       <ProjectConfigVariables variable="url" />
       <ProjectConfigVariables variable="anonKey" />
@@ -69,7 +48,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```swift Supabase.swift
+      ```swift name=Supabase.swift
       import Supabase
 
       let supabase = SupabaseClient(
@@ -84,18 +63,18 @@ hideToc: true
 
   <StepHikeCompact.Step step={5}>
 
-    <StepHikeCompact.Details title="Create a data model for countries">
+    <StepHikeCompact.Details title="Create a data model for instruments">
 
     Create a decodable struct to deserialize the data from the database.
 
-    Add the following code to a new file named `Country.swift`.
+    Add the following code to a new file named `Instrument.swift`.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```swift Supabase.swift
-      struct Country: Decodable, Identifiable {
+      ```swift name=Supabase.swift
+      struct Instrument: Decodable, Identifiable {
         let id: Int
         let name: String
       }
@@ -117,23 +96,23 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```swift ContentView.swift
+      ```swift name=ContentView.swift
       struct ContentView: View {
 
-        @State var countries: [Country] = []
+        @State var instruments: [Instrument] = []
 
         var body: some View {
-          List(countries) { country in
-            Text(country.name)
+          List(instruments) { instrument in
+            Text(instrument.name)
           }
           .overlay {
-            if countries.isEmpty {
+            if instruments.isEmpty {
               ProgressView()
             }
           }
           .task {
             do {
-              countries = try await supabase.from("countries").select().execute().value
+              instruments = try await supabase.from("instruments").select().execute().value
             } catch {
               dump(error)
             }

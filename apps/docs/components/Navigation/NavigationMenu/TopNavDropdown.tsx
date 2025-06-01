@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { Fragment } from 'react'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
 import { Menu } from 'lucide-react'
@@ -19,7 +19,6 @@ import {
   cn,
   themes,
 } from 'ui'
-
 import MenuIconPicker from './MenuIconPicker'
 
 const menu = [
@@ -70,9 +69,9 @@ const TopNavDropdown = () => {
           <Menu size={18} strokeWidth={1} />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" align="end" className="w-64">
+      <DropdownMenuContent side="bottom" align="end" className="w-52">
         {menu.map((menuSection, sectionIdx) => (
-          <>
+          <Fragment key={`topnav--${sectionIdx}`}>
             {sectionIdx !== 0 && <DropdownMenuSeparator key={`topnav--${sectionIdx}`} />}
             {menuSection.map((sectionItem, itemIdx) => (
               <Link
@@ -88,7 +87,7 @@ const TopNavDropdown = () => {
                 </DropdownMenuItem>
               </Link>
             ))}
-          </>
+          </Fragment>
         ))}
         <DropdownMenuSeparator />
         <DropdownMenuGroup>

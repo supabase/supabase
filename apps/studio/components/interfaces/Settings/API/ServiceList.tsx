@@ -2,7 +2,7 @@ import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-ty
 import { useQueryClient } from '@tanstack/react-query'
 import { AlertCircle } from 'lucide-react'
 import { useEffect, useRef } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -12,7 +12,6 @@ import { DisplayApiSettings } from 'components/ui/ProjectSettings'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { configKeys } from 'data/config/keys'
-import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
@@ -22,6 +21,7 @@ import { Badge, Input } from 'ui'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
 import JWTSettings from './JWTSettings'
 import { PostgrestConfig } from './PostgrestConfig'
+import { ApiKeysMoved } from './ApiKeysMoved'
 
 const ServiceList = () => {
   const client = useQueryClient()
@@ -29,11 +29,8 @@ const ServiceList = () => {
   const { ref: projectRef, source } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
-  const { data: settings, isError } = useProjectApiQuery({
-    projectRef,
-  })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
-  const { data: databases } = useReadReplicasQuery({ projectRef })
+  const { data: databases, isError } = useReadReplicasQuery({ projectRef })
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef })
 
   const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })
@@ -147,11 +144,11 @@ const ServiceList = () => {
             </Panel>
           </section>
 
-          <section>
-            <DisplayApiSettings key="DisplayAPISettings" />
+          <section className="mb-8">
+            <ApiKeysMoved />
           </section>
 
-          <section>
+          <section id="jwt-settings">
             <JWTSettings />
           </section>
 

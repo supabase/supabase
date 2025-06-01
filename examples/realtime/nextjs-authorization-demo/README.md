@@ -6,9 +6,9 @@ You can provide feedback on our [Github Discussion](https://github.com/orgs/supa
 
 ## Objective
 
-Build a chat system using Realtime Broadcast and Presence with Authorized Channels where users can create rooms and invite existing users to a room.
+Build a chat system using Realtime Broadcast with Authorized Channels where users can create rooms, invite each other to rooms, and send each other ephemeral messages.
 
-Each room restricts users authorized by applying RLS policies applied to the `public` schema tables you'll be creating and the auto-generated `realtime.messages` tables.
+Each room restricts the number of users authorized by applying RLS Policies applied to `public` schema tables you'll be creating and the auto-generated `realtime` schema tables.
 
 ## Run It
 
@@ -23,7 +23,7 @@ Each room restricts users authorized by applying RLS policies applied to the `pu
 
 In this scenario both users are able to access it:
 ![Both users were able to connect](./chat_success.png)
-And here one of the user does not have access because their RLS rules made the user be denied access
+And here one of the user does not have access because their RLS policies made the user be denied access
 ![Both users were able to connect](./chat_unauthorized.png)
 
 ## Schema
@@ -143,7 +143,9 @@ $$
   BEGIN
     INSERT INTO public.profiles (id, email) VALUES (NEW.id, NEW.email); RETURN NEW;
   END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+   SECURITY DEFINER
+   SET search_path = public;
 
 CREATE OR REPLACE TRIGGER "on_new_auth_create_profile"
 AFTER INSERT ON auth.users FOR EACH ROW

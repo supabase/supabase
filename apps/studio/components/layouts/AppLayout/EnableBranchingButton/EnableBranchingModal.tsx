@@ -1,27 +1,25 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { last } from 'lodash'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import AlertError from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
-import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { DollarSign, FileText } from 'lucide-react'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { DollarSign, FileText, GitBranch } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
-import { Button, Form_Shadcn_, IconExternalLink, IconGitBranch, Modal } from 'ui'
+import { Button, Form_Shadcn_, Modal } from 'ui'
 import BranchingPITRNotice from './BranchingPITRNotice'
 import BranchingPlanNotice from './BranchingPlanNotice'
 import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
@@ -37,27 +35,22 @@ const EnableBranchingModal = () => {
   // and makes the validation run onChange instead. This is a workaround
   const [isValid, setIsValid] = useState(false)
 
-  const canCreateBranches = useCheckPermissions(PermissionAction.CREATE, 'preview_branches')
-
   const {
     data: connections,
     error: connectionsError,
     isLoading: isLoadingConnections,
     isSuccess: isSuccessConnections,
     isError: isErrorConnections,
-  } = useGitHubConnectionsQuery({ organizationId: selectedOrg?.id })
+  } = useGitHubConnectionsQuery(
+    {
+      organizationId: selectedOrg?.id,
+    },
+    { enabled: snap.showEnableBranchingModal }
+  )
 
-  const {
-    data,
-    error: upgradeEligibilityError,
-    isLoading: isLoadingUpgradeEligibility,
-    isError: isErrorUpgradeEligibility,
-    isSuccess: isSuccessUpgradeEligibility,
-  } = useProjectUpgradeEligibilityQuery({
-    projectRef: ref,
-  })
+  const project = useSelectedProject()
   const hasMinimumPgVersion =
-    Number(last(data?.current_app_version.split('-') ?? [])?.split('.')[0] ?? 0) >= 15
+    Number(last(project?.dbVersion?.split('-') ?? [])?.split('.')[0] ?? 0) >= 15
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
   const isFreePlan = subscription?.plan.id === 'free'
@@ -111,9 +104,9 @@ const EnableBranchingModal = () => {
     defaultValues: { branchName: '' },
   })
 
-  const isLoading = isLoadingConnections || isLoadingUpgradeEligibility
-  const isError = isErrorConnections || isErrorUpgradeEligibility
-  const isSuccess = isSuccessConnections && isSuccessUpgradeEligibility
+  const isLoading = isLoadingConnections
+  const isError = isErrorConnections
+  const isSuccess = isSuccessConnections
 
   const canSubmit = form.getValues('branchName').length > 0 && !isChecking && isValid
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
@@ -146,21 +139,13 @@ const EnableBranchingModal = () => {
           >
             <Modal.Content className="flex items-center justify-between space-x-4">
               <div className="flex items-center gap-x-4">
-                <IconGitBranch strokeWidth={2} size={20} />
+                <GitBranch strokeWidth={2} size={20} />
                 <div>
                   <p className="text-foreground">Enable database branching</p>
                   <p className="text-sm text-foreground-light">Manage environments in Supabase</p>
                 </div>
               </div>
-              <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                <Link
-                  href="https://supabase.com/docs/guides/platform/branching"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Documentation
-                </Link>
-              </Button>
+              <DocsButton href="https://supabase.com/docs/guides/platform/branching" />
             </Modal.Content>
 
             {isLoading && (
@@ -178,11 +163,6 @@ const EnableBranchingModal = () => {
                 <Modal.Content className="px-7 py-6">
                   {isErrorConnections ? (
                     <AlertError error={connectionsError} subject="Failed to retrieve connections" />
-                  ) : isErrorUpgradeEligibility ? (
-                    <AlertError
-                      error={upgradeEligibilityError}
-                      subject="Failed to retrieve Postgres version"
-                    />
                   ) : null}
                 </Modal.Content>
                 <Modal.Separator />
@@ -211,36 +191,33 @@ const EnableBranchingModal = () => {
                   </p>
                   <div className="flex flex-row gap-4">
                     <div>
-                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-400 flex items-center justify-center">
-                        <DollarSign className="text-warning" size={20} strokeWidth={2} />
+                      <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
+                        <DollarSign className="text-info" size={20} strokeWidth={2} />
                       </figure>
                     </div>
                     <div className="flex flex-col gap-y-1">
                       <p className="text-sm text-foreground">
-                        Preview branches are billed $0.32 per day (approximately $10 per month)
+                        Preview branches are billed <span translate="no">$0.32</span> per day
                       </p>
                       <p className="text-sm text-foreground-light">
-                        Launching a new preview branch incurs additional compute costs at $0.32 per
-                        day. This cost will continue for as long as the branch has not been removed.
-                        This pricing is for Early Access and is subject to change.
+                        This cost will continue for as long as the branch has not been removed.
                       </p>
                     </div>
                   </div>
                   <div className="flex flex-row gap-4 mt-2">
                     <div>
-                      <figure className="w-10 h-10 rounded-md bg-warning-200 border border-warning-400 flex items-center justify-center">
-                        <FileText className="text-warning" size={20} strokeWidth={2} />
+                      <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
+                        <FileText className="text-info" size={20} strokeWidth={2} />
                       </figure>
                     </div>
                     <div className="flex flex-col gap-y-1">
                       <p className="text-sm text-foreground">
-                        Branching uses your GitHub repository to apply migrations
+                        Migrations are applied from your GitHub repository
                       </p>
                       <p className="text-sm text-foreground-light">
-                        Database migrations are handled via the{' '}
-                        <code className="text-xs">./supabase</code> directory in your GitHub repo.
-                        Migration files will run on both Preview Branches and Production when
-                        pushing to and merging git branches.
+                        Migration files in your <code className="text-xs">./supabase</code>{' '}
+                        directory will run on both Preview Branches and Production when pushing and
+                        merging branches.
                       </p>
                     </div>
                   </div>

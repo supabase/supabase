@@ -1,11 +1,10 @@
 import { CheckSquare } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useOrganizationAcceptInvitationMutation } from 'data/organization-members/organization-invitation-accept-mutation'
-import { useOrganizationDeleteInvitationMutation } from 'data/organization-members/organization-invitation-delete-mutation'
 import { useOrganizationInvitationTokenQuery } from 'data/organization-members/organization-invitation-token-query'
 import { useProfile } from 'lib/profile'
 import { ResponseError } from 'types'
@@ -26,27 +25,18 @@ export const OrganizationInvite = () => {
   )
   const hasError =
     isError || (isSuccess && (data.token_does_not_exist || data.expired_token || !data.email_match))
+  const isNotSignedInError = error?.message.includes('No authorization token was found')
 
-  const organizationName = data?.organization_name ?? name ?? 'an organization'
-  const loginRedirectLink = `/?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
+  const organizationName = isSuccess ? data?.organization_name : 'an organization'
+  const loginRedirectLink = `/sign-in?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
 
   const { mutate: joinOrganization, isLoading: isJoining } =
     useOrganizationAcceptInvitationMutation({
       onSuccess: () => {
-        router.push('/')
+        router.push('/organizations')
       },
       onError: (error) => {
         toast.error(`Failed to join organization: ${error.message}`)
-      },
-    })
-
-  const { mutate: declineOrganization, isLoading: isDeclining } =
-    useOrganizationDeleteInvitationMutation({
-      onSuccess: () => {
-        router.push('/')
-      },
-      onError: (error) => {
-        toast.error(`Failed to decline invitation: ${error.message}`)
       },
     })
 
@@ -56,58 +46,49 @@ export const OrganizationInvite = () => {
     joinOrganization({ slug, token })
   }
 
-  async function handleDeclineJoinOrganization() {
-    if (!slug) return console.error('Slug is required')
-    if (!data?.invite_id) return console.error('Invite ID is required')
-    declineOrganization({ slug, id: data.invite_id })
-  }
-
   return (
     <Loading active={profile !== undefined && isLoading}>
       <div className="flex flex-col gap-2 px-6 py-8">
         <p className="text-sm text-foreground">You have been invited to join </p>
         <p className="text-3xl text-foreground">{organizationName}</p>
-        {slug && <p className="text-xs text-foreground-lighter">{`organization slug: ${slug}`}</p>}
+        {isSuccess && slug && (
+          <p className="text-xs text-foreground-lighter">{`organization slug: ${slug}`}</p>
+        )}
       </div>
 
       <div className={cn('border-t border-muted', hasError ? 'bg-alternative' : 'bg-transparent')}>
-        <div className={cn('flex flex-col gap-4', !isLoading && !hasError && 'px-6 py-4')}>
-          {profile === undefined && (
-            <div className="flex flex-col gap-3">
-              <p className="text-xs text-foreground-lighter">
-                You will need to sign in to accept this invitation
-              </p>
-              <div className="flex justify-center gap-3">
-                <Button asChild type="default">
-                  <Link href={loginRedirectLink}>Sign in</Link>
-                </Button>
-                <Button asChild type="default">
-                  <Link href={loginRedirectLink}>Create an account</Link>
-                </Button>
-              </div>
+        {profile === undefined && (
+          <div className="flex flex-col gap-3 py-4">
+            <p className="text-xs text-foreground-lighter">
+              You will need to sign in to accept this invitation
+            </p>
+            <div className="flex justify-center gap-3">
+              <Button asChild type="default">
+                <Link href={loginRedirectLink}>Sign in</Link>
+              </Button>
+              <Button asChild type="default">
+                <Link href={loginRedirectLink}>Create an account</Link>
+              </Button>
             </div>
-          )}
-          {hasError && (
+          </div>
+        )}
+        <div className={cn('flex flex-col gap-4', !isLoading && !hasError && 'px-6 py-4')}>
+          {hasError && !isNotSignedInError && (
             <OrganizationInviteError
               data={data}
               error={error as unknown as ResponseError}
               isError={isError}
             />
           )}
-          {isSuccess && (
+          {isSuccess && !hasError && (
             <div className="flex flex-row items-center justify-center gap-3">
-              <Button
-                type="default"
-                loading={isDeclining}
-                disabled={isJoining || isDeclining}
-                onClick={handleDeclineJoinOrganization}
-              >
-                Decline
+              <Button type="default" disabled={isJoining} asChild>
+                <Link href="/projects">Decline</Link>
               </Button>
               <Button
                 type="primary"
                 loading={isJoining}
-                disabled={isJoining || isDeclining}
+                disabled={isJoining}
                 onClick={handleJoinOrganization}
                 icon={<CheckSquare />}
               >

@@ -26,15 +26,27 @@ const footerData = [
       },
       {
         text: 'Vector',
-        url: '/vector',
+        url: '/modules/vector',
+      },
+      {
+        text: 'Cron',
+        url: '/modules/cron',
       },
       {
         text: 'Pricing',
         url: '/pricing',
       },
       {
-        text: 'GA Week',
-        url: '/ga-week',
+        text: 'Launch Week',
+        url: '/launch-week',
+      },
+      {
+        text: 'AI Builders',
+        url: '/solutions/ai-builders',
+      },
+      {
+        text: 'Switch from Neon',
+        url: '/solutions/switch-from-neon',
       },
     ],
   },
@@ -56,10 +68,6 @@ const footerData = [
       {
         text: 'Integrations',
         url: '/partners/integrations',
-      },
-      {
-        text: 'Experts',
-        url: '/partners/experts',
       },
       {
         text: 'Brand Assets / Logos',
@@ -89,6 +97,10 @@ const footerData = [
       {
         text: 'Documentation',
         url: '/docs',
+      },
+      {
+        text: 'Supabase UI',
+        url: 'https://supabase.com/ui',
       },
       {
         text: 'Changelog',
@@ -134,6 +146,10 @@ const footerData = [
       {
         text: 'Company',
         url: '/company',
+      },
+      {
+        text: 'Events & Webinars',
+        url: '/events',
       },
       {
         text: 'General Availability',

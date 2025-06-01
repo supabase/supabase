@@ -1,7 +1,9 @@
-import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
-import { CloudProvider, PROVIDERS } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
+
+import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
+import { PROVIDERS } from 'lib/constants'
+import type { CloudProvider } from 'shared-data'
 import {
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -17,15 +19,26 @@ interface RegionSelectorProps {
   cloudProvider: CloudProvider
   field: ControllerRenderProps<any, 'dbRegion'>
   form: UseFormReturn<any>
+  layout?: 'vertical' | 'horizontal'
 }
 
-export const RegionSelector = ({ cloudProvider, field, form }: RegionSelectorProps) => {
+// [Joshen] Let's use a library to maintain the flag SVGs in the future
+// I tried using https://flagpack.xyz/docs/development/react/ but couldn't get it to render
+// ^ can try again next time
+
+export const RegionSelector = ({
+  cloudProvider,
+  field,
+  layout = 'horizontal',
+}: RegionSelectorProps) => {
   const router = useRouter()
+
   const showNonProdFields =
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
 
   const availableRegions = getAvailableRegions(PROVIDERS[cloudProvider].id)
+  const regionsArray = Object.entries(availableRegions)
 
   const { isLoading: isLoadingDefaultRegion } = useDefaultRegionQuery({
     cloudProvider,
@@ -33,13 +46,15 @@ export const RegionSelector = ({ cloudProvider, field, form }: RegionSelectorPro
 
   return (
     <FormItemLayout
-      layout="horizontal"
+      layout={layout}
       label="Region"
       description={
         <>
           <p>Select the region closest to your users for the best performance.</p>
           {showNonProdFields && (
-            <p className="text-warning">Note: Only SG is supported for local/staging projects</p>
+            <p className="text-warning">
+              Note: Only US (NV), Frankfurt and SG are supported for local/staging projects
+            </p>
           )}
         </>
       }
@@ -54,15 +69,15 @@ export const RegionSelector = ({ cloudProvider, field, form }: RegionSelectorPro
         </SelectTrigger_Shadcn_>
         <SelectContent_Shadcn_>
           <SelectGroup_Shadcn_>
-            {Object.keys(availableRegions).map((option: string, i) => {
-              const label = Object.values(availableRegions)[i] as string
+            {regionsArray.map(([key, value]) => {
+              const label = value.displayName as string
               return (
-                <SelectItem_Shadcn_ key={option} value={label}>
+                <SelectItem_Shadcn_ key={key} value={label}>
                   <div className="flex items-center gap-3">
                     <img
                       alt="region icon"
                       className="w-5 rounded-sm"
-                      src={`${router.basePath}/img/regions/${Object.keys(availableRegions)[i]}.svg`}
+                      src={`${router.basePath}/img/regions/${key}.svg`}
                     />
                     <span className="text-foreground">{label}</span>
                   </div>

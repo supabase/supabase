@@ -1,18 +1,21 @@
 'use client'
 
-import { type PropsWithChildren, memo, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
+import { usePathname } from 'next/navigation'
+import { memo, useEffect, type PropsWithChildren, type ReactNode } from 'react'
+
 import { cn } from 'ui'
+
+import { type NavMenuSection } from '~/components/Navigation/Navigation.types'
+import DefaultNavigationMenu, {
+  MenuId,
+} from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import { getMenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
+import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
 
-import { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
-import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
-
 const Footer = dynamic(() => import('~/components/Navigation/Footer'))
-const NavigationMenu = dynamic(
-  () => import('~/components/Navigation/NavigationMenu/NavigationMenu')
-)
 
 const levelsData = {
   home: {
@@ -26,6 +29,14 @@ const levelsData = {
   database: {
     icon: 'database',
     name: 'Database',
+  },
+  cron: {
+    icon: 'cron',
+    name: 'Cron',
+  },
+  queues: {
+    icon: 'queues',
+    name: 'Queues',
   },
   api: {
     icon: 'rest',
@@ -43,6 +54,10 @@ const levelsData = {
     icon: 'edge-functions',
     name: 'Edge Functions',
   },
+  telemetry: {
+    icon: 'telemetry',
+    name: 'Telemetry',
+  },
   realtime: {
     icon: 'realtime',
     name: 'Realtime',
@@ -59,13 +74,21 @@ const levelsData = {
     icon: 'ai',
     name: 'AI & Vectors',
   },
-  supabase_cli: {
+  local_development: {
     icon: 'reference-cli',
-    name: 'Supabase CLI',
+    name: 'Local Development',
+  },
+  security: {
+    icon: 'platform',
+    name: 'Security',
   },
   platform: {
     icon: 'platform',
     name: 'Platform',
+  },
+  contributing: {
+    icon: 'contributing',
+    name: 'Contributing',
   },
   resources: {
     icon: 'resources',
@@ -123,6 +146,10 @@ const levelsData = {
     icon: 'reference-kotlin',
     name: 'Kotlin Reference v2.0',
   },
+  reference_kotlin_v3: {
+    icon: 'reference-kotlin',
+    name: 'Kotlin Reference v3.0',
+  },
   reference_cli: {
     icon: 'reference-cli',
     name: 'CLI Reference',
@@ -153,9 +180,10 @@ const levelsData = {
   },
 }
 
-const MobileHeader = memo(function MobileHeader({ menuId }: { menuId: MenuId }) {
+type MobileHeaderProps = { menuId: MenuId } | { menuName: string }
+
+const MobileHeader = memo(function MobileHeader(props: MobileHeaderProps) {
   const mobileMenuOpen = useMenuMobileOpen()
-  const menuLevel = menuId
 
   return (
     <div
@@ -204,9 +232,9 @@ const MobileHeader = memo(function MobileHeader({ menuId }: { menuId: MenuId }) 
       >
         {mobileMenuOpen
           ? 'Close'
-          : menuLevel
-            ? levelsData[menuLevel]?.name
-            : levelsData['home'].name}
+          : 'menuId' in props
+            ? levelsData[props.menuId]?.name ?? levelsData['home'].name
+            : props.menuName}
       </span>
     </div>
   )
@@ -264,14 +292,14 @@ const Container = memo(function Container({
   )
 })
 
-const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) {
+const NavContainer = memo(function NavContainer({ children }: PropsWithChildren) {
   const mobileMenuOpen = useMenuMobileOpen()
 
   return (
     <nav
       aria-labelledby="main-nav-title"
       className={cn(
-        'fixed lg:relative z-50 lg:z-40',
+        'fixed lg:relative z-40 lg:z-auto',
         mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0' : 'w-0 -left-full',
         'lg:w-[420px] !lg:left-0',
         'lg:top-[var(--header-height)] lg:sticky',
@@ -292,6 +320,7 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
           'relative lg:sticky',
           'w-full lg:w-auto',
           'h-fit lg:h-screen overflow-y-scroll lg:overflow-auto',
+          '[overscroll-behavior:contain]',
           'backdrop-blur backdrop-filter bg-background',
           'flex flex-col flex-grow'
         )}
@@ -313,53 +342,89 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
             'lg:opacity-100 lg:visible'
           )}
         >
-          <NavigationMenu menuId={menuId} />
+          {children}
         </div>
       </div>
     </nav>
   )
 })
 
-function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId?: MenuId }>) {
-  const ref = useRef(null)
-  const mobileMenuOpen = useMenuMobileOpen()
-  const hideSideNav = !menuId
+interface SkeletonProps extends PropsWithChildren {
+  menuId?: MenuId
+  menuName?: string
+  hideSideNav?: boolean
+  NavigationMenu?: ReactNode
+  hideFooter?: boolean
+  className?: string
+  additionalNavItems?: Record<string, Partial<NavMenuSection>[]>
+}
 
+function TopNavSkeleton({ children }) {
   return (
     <div className="flex flex-col h-full w-full">
-      <div ref={ref} className="hidden lg:sticky w-full lg:flex top-0 left-0 right-0 z-50">
+      <div className="hidden lg:sticky w-full lg:flex top-0 left-0 right-0 z-50">
         <TopNavBar />
       </div>
-      <div className="flex flex-row h-full relative">
-        {!hideSideNav && <NavContainer menuId={menuId} />}
-        <Container>
-          <div
-            className={cn(
-              'flex lg:hidden w-full top-0 left-0 right-0 z-50',
-              hideSideNav && 'sticky',
-              mobileMenuOpen && 'z-10'
-            )}
-          >
-            <TopNavBar />
-          </div>
-          <div
-            className={cn(
-              'sticky',
-              'transition-all top-0 z-10',
-              'backdrop-blur backdrop-filter bg-background'
-            )}
-          >
-            {!hideSideNav && <MobileHeader menuId={menuId} />}
-          </div>
-          <div className="grow">
-            {children}
-            <Footer />
-          </div>
-          <MobileMenuBackdrop />
-        </Container>
-      </div>
+      {children}
     </div>
   )
 }
 
-export { MainSkeleton }
+function SidebarSkeleton({
+  children,
+  menuId: _menuId,
+  menuName,
+  NavigationMenu,
+  hideFooter = false,
+  className,
+  hideSideNav,
+  additionalNavItems,
+}: SkeletonProps) {
+  const pathname = usePathname()
+  const menuId = _menuId ?? getMenuId(pathname)
+
+  const mobileMenuOpen = useMenuMobileOpen()
+
+  return (
+    <div className={cn('flex flex-row h-full relative', className)}>
+      {!hideSideNav && (
+        <NavContainer>
+          {NavigationMenu ?? (
+            <DefaultNavigationMenu menuId={menuId} additionalNavItems={additionalNavItems} />
+          )}
+        </NavContainer>
+      )}
+      <Container>
+        <div
+          className={cn(
+            'flex lg:hidden w-full top-0 left-0 right-0 z-50',
+            hideSideNav && 'sticky',
+            mobileMenuOpen && 'z-10'
+          )}
+        >
+          <TopNavBar />
+        </div>
+        <div
+          className={cn(
+            'sticky',
+            'transition-all top-0 z-10',
+            'backdrop-blur backdrop-filter bg-background'
+          )}
+        >
+          {hideSideNav ? null : menuName ? (
+            <MobileHeader menuName={menuName} />
+          ) : (
+            <MobileHeader menuId={menuId} />
+          )}
+        </div>
+        <div className="grow">
+          {children}
+          {!hideFooter && <Footer />}
+        </div>
+        <MobileMenuBackdrop />
+      </Container>
+    </div>
+  )
+}
+
+export { SidebarSkeleton, TopNavSkeleton }

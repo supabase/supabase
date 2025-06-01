@@ -6,11 +6,7 @@
  * access to a function's type definition, given its name and module.
  */
 
-import { join } from 'node:path'
-
-import { cache_fullProcess_withDevCacheBust } from '~/features/helpers.fs'
-import { SPEC_DIRECTORY } from '~/lib/docs'
-import _typeSpec from '~/spec/enrichments/tsdoc_v2/combined.json' assert { type: 'json' }
+import _typeSpec from '~/spec/enrichments/tsdoc_v2/combined.json' with { type: 'json' }
 
 // [Charis] 2024-07-10
 // Types are more trouble than they're worth here: manually defining the types
@@ -26,7 +22,7 @@ export const TYPESPEC_NODE_ANONYMOUS = Symbol('anonymous')
  * Definitions for the methods and types defined in each Supabase JS client
  * library.
  */
-interface ModuleTypes {
+export interface ModuleTypes {
   name: string
   methods: Map<string, MethodTypes>
 }
@@ -37,8 +33,14 @@ interface ModuleTypes {
 export interface MethodTypes {
   name: string | typeof TYPESPEC_NODE_ANONYMOUS
   comment?: Comment
-  params: Array<ParamType>
+  params: Array<FunctionParameterType>
   ret: ReturnType | undefined
+  altSignatures?: [
+    {
+      params: Array<FunctionParameterType>
+      ret: ReturnType | undefined
+    },
+  ]
 }
 
 interface Comment {
@@ -46,18 +48,19 @@ interface Comment {
   text?: string
 }
 
-interface ParamType {
+export interface FunctionParameterType {
   name: string | typeof TYPESPEC_NODE_ANONYMOUS
   comment?: Comment
   isOptional?: boolean
-  type: Type | undefined
+  type: TypeDetails | undefined
 }
 
 interface ReturnType {
-  type: Type | undefined
+  type: TypeDetails | undefined
+  comment?: Comment
 }
 
-type Type = IntrinsicType | LiteralType | CustomType
+export type TypeDetails = IntrinsicType | LiteralType | CustomType
 
 /**
  * Type definition for an intrinsic (built-in) TypeScript type, for example,
@@ -91,24 +94,24 @@ interface NameOnlyType {
 }
 
 interface CustomObjectType {
-  type: 'customObject'
+  type: 'object'
   name?: string | typeof TYPESPEC_NODE_ANONYMOUS
   comment?: Comment
-  properties: Array<PropertyType>
+  properties: Array<CustomTypePropertyType>
 }
 
-interface CustomUnionType {
-  type: 'customUnion'
+export interface CustomUnionType {
+  type: 'union'
   name?: string | typeof TYPESPEC_NODE_ANONYMOUS
   comment?: Comment
-  subTypes: Array<Type>
+  subTypes: Array<TypeDetails>
 }
 
 interface CustomFunctionType {
   type: 'function'
   name?: string | typeof TYPESPEC_NODE_ANONYMOUS
   comment?: Comment
-  params: Array<ParamType>
+  params: Array<FunctionParameterType>
   ret: ReturnType | undefined
 }
 
@@ -116,71 +119,106 @@ interface ArrayType {
   type: 'array'
   name?: string | typeof TYPESPEC_NODE_ANONYMOUS
   comment?: Comment
-  elemType: Type | undefined
+  elemType: TypeDetails | undefined
 }
 
 interface RecordType {
   type: 'record'
   name?: string | typeof TYPESPEC_NODE_ANONYMOUS
   comment?: Comment
-  keyType: Type | undefined
-  valueType: Type | undefined
+  keyType: TypeDetails | undefined
+  valueType: TypeDetails | undefined
 }
 
 interface IndexSignatureType {
   type: 'index signature'
   name?: string | typeof TYPESPEC_NODE_ANONYMOUS
   comment?: Comment
-  keyType: Type | undefined
-  valueType: Type | undefined
+  keyType: TypeDetails | undefined
+  valueType: TypeDetails | undefined
 }
 
 interface PromiseType {
   type: 'promise'
   name?: string | typeof TYPESPEC_NODE_ANONYMOUS
   comment?: Comment
-  awaited: Type | undefined
+  awaited: TypeDetails | undefined
 }
 
 /**
  * Type definition for a property on a custom type definition.
  */
-interface PropertyType {
+export interface CustomTypePropertyType {
   name?: string | typeof TYPESPEC_NODE_ANONYMOUS
   comment?: Comment
   isOptional?: boolean
-  type: Type | undefined
+  type: TypeDetails | undefined
 }
 
-// The following is the API of this module, and the only externally exposed
-// piece. Given a reference to a function (method), return its type definition.
-
 /**
- * Get the type definition for a function (a method).
  *
- * @param ref The method identifier, in the form `@supabase/supabase-js.index.SupabaseClient.constructor`.
+ * New versions of `typedoc` added the variant property, so this is a quick and
+ * dirty way of checking version.
  */
-export async function getTypeSpec(ref: string) {
-  const modules = await parseTypeSpec()
-
-  const delimiter = ref.indexOf('.')
-  const refMod = ref.substring(0, delimiter)
-
-  const mod = modules.find((mod) => mod.name === refMod)
-  return mod?.methods.get(ref)
+function isNewTypedoc(node: any) {
+  return 'variant' in node
 }
 
-const parseTypeSpec = cache_fullProcess_withDevCacheBust(
-  __parseTypeSpec,
-  join(SPEC_DIRECTORY, 'enrichments/tsdoc_v2/combined.json'),
-  () => JSON.stringify([])
-)
-
 /**
- * @private
- * Exposed for testing purposes only, PRIVATE DO NOT USE externally.
+ *
+ * The shape of a new `typedoc` comment. `typedoc` changed their Comment class
+ * in v0.23.0.
  */
-export function __parseTypeSpec() {
+interface TypedocComment {
+  summary: CommentKind[]
+  blockTags: CommentBlockTag[]
+}
+
+type CommentKind = CommentKindText | CommentKindCode
+
+interface CommentKindText {
+  kind: 'text'
+  text: string
+}
+
+interface CommentKindCode {
+  kind: 'code'
+  text: string
+}
+
+interface CommentBlockTag {
+  /**
+   * An @ string, e.g., `@returns`
+   */
+  tag: string
+  content: CommentKind[]
+}
+
+function normalizeComment(original: TypedocComment | Comment): Comment {
+  if (!original) return
+
+  if ('shortText' in original || 'text' in original) {
+    // This is the old comment type, just return it
+    return original
+  }
+
+  let comment: Comment = {}
+
+  if ('summary' in original) {
+    comment.shortText = original.summary.map((part) => part.text).join('')
+  }
+
+  return comment
+}
+
+// The meaning of kind flags from `typedoc`:
+// https://github.com/TypeStrong/typedoc/blob/2953b0148253589448176881a7acb46090f941bd/src/lib/output/themes/default/assets/typedoc/Application.ts#L36
+const KIND_CLASS = 128
+const KIND_CONSTRUCTOR = 512
+const KIND_METHOD = 2048
+const KIND_TYPE_LITERAL = 65536
+
+export function parseTypeSpec() {
   const modules = (typeSpec.children ?? []).map(parseMod)
   return modules as Array<ModuleTypes>
 }
@@ -225,30 +263,41 @@ function parseModInternal(
 ) {
   let updatedPath: Array<string>
 
-  switch (node.kindString) {
-    case 'Module':
+  switch ((node.kindString ?? node.variant)?.toLowerCase()) {
+    case 'module':
       updatedPath = [...currentPath, node.name]
       node.children?.forEach((child: any) => parseModInternal(child, map, updatedPath, res))
       return
-    // Some libraries have undefined where others have Project for the same type
-    // of top-level node.
-    case 'Project':
+    // Some libraries have undefined where others have Project or declaration // for the same type of top-level node.
+    case 'project':
     case undefined:
       updatedPath = [...currentPath, node.name]
       node.children?.forEach((child: any) => parseModInternal(child, map, updatedPath, res))
-    case 'Class':
+      return
+    case 'class':
       updatedPath = [...currentPath, node.name]
       node.children?.forEach((child: any) => parseModInternal(child, map, updatedPath, res))
       return
-    case 'Constructor':
-      parseConstructor(node, map, currentPath, res)
-    case 'Method':
-      parseMethod(node, map, currentPath, res)
-    case 'Interface':
+    case 'constructor':
+      return parseConstructor(node, map, currentPath, res)
+    case 'method':
+      return parseMethod(node, map, currentPath, res)
+    case 'interface':
       updatedPath = [...currentPath, node.name]
       node.children?.forEach((child: any) => parseModInternal(child, map, updatedPath, res))
-    case 'Property':
-    case 'Reference':
+      return
+    case 'declaration':
+      if (node.kind === KIND_CLASS) {
+        updatedPath = [...currentPath, node.name]
+        node.children?.forEach((child: any) => parseModInternal(child, map, updatedPath, res))
+      } else if (node.kind === KIND_CONSTRUCTOR) {
+        parseConstructor(node, map, currentPath, res)
+      } else if (node.kind === KIND_METHOD) {
+        return parseMethod(node, map, currentPath, res)
+      }
+      return
+    case 'property':
+    case 'reference':
     default:
       return undefined
   }
@@ -316,17 +365,27 @@ function parseMethod(
     comment,
   }
 
+  if (node.signatures.length > 1) {
+    types.altSignatures = node.signatures
+      .slice(1)
+      .map((signature) => parseSignature(signature, map))
+  }
+
   res.methods.set($ref, types)
 }
 
 function parseSignature(
   signature: any,
   map: Map<number, any>
-): { params: Array<ParamType>; ret: ReturnType; comment?: Comment } {
-  const params: Array<ParamType> = (signature.parameters ?? []).map((param: any) => {
+): {
+  params: Array<FunctionParameterType>
+  ret: ReturnType
+  comment?: Comment
+} {
+  const params: Array<FunctionParameterType> = (signature.parameters ?? []).map((param: any) => {
     const type = parseType(param.type, map)
 
-    const res: ParamType = {
+    const res: FunctionParameterType = {
       name: nameOrAnonymous(param),
       type,
     }
@@ -336,7 +395,7 @@ function parseSignature(
     }
 
     if (param.comment) {
-      res.comment = param.comment
+      res.comment = normalizeComment(param.comment)
     }
 
     return res
@@ -355,7 +414,7 @@ function parseSignature(
   return {
     params,
     ret,
-    comment: signature.comment,
+    comment: normalizeComment(signature.comment),
   }
 }
 
@@ -422,8 +481,8 @@ function delegateParsing(original: any, referenced: any, map: Map<number, any>) 
 
   if (original.comment) {
     dereferencedType.comment = {
-      ...dereferencedType.comment,
-      ...original.comment,
+      ...normalizeComment(dereferencedType.comment),
+      ...normalizeComment(original.comment),
     }
   }
 
@@ -439,14 +498,52 @@ function parseReferenceType(type: any, map: Map<number, any>) {
     return delegateParsing(type, type.dereferenced, map)
   }
 
-  if (type.package === 'typescript' && type.qualifiedName === 'Record') {
+  if (
+    type.package === 'typescript' &&
+    (type.name === 'Record' || type.qualifiedName === 'Record')
+  ) {
     return parseRecordType(type, map)
   }
 
-  if (type.package === 'typescript' && type.qualifiedName === 'Promise') {
+  if (
+    type.package === 'typescript' &&
+    (type.name === 'Promise' || type.qualifiedName === 'Promise')
+  ) {
     return parsePromiseType(type, map)
   }
 
+  if (
+    type.package === 'typescript' &&
+    (type.name === 'Extract' || type.qualifiedName === 'Extract')
+  ) {
+    return parseExtractType(type, map)
+  }
+
+  if (type.package === 'typescript' && (type.name === 'Pick' || type.qualifiedName === 'Pick')) {
+    return parsePickType(type, map)
+  }
+
+  // If we still haven't produced a meaningful type, try looking up the reference
+  const referenced = map.get(type.id ?? type.target) // became target in newer versions of tsdoc
+  if (referenced) {
+    const maybeType =
+      typeof referenced.type === 'object' && 'type' in referenced.type
+        ? /* need to go down a level */ delegateParsing(type, referenced.type, map)
+        : delegateParsing(type, referenced, map)
+
+    if (maybeType) {
+      return maybeType
+    } else if (isNewTypedoc(referenced) && referenced.kind === KIND_CLASS) {
+      // Class is too complicated to display here, just return its name
+      return {
+        type: 'nameOnly',
+        name: referenced.name,
+      }
+    }
+  }
+
+  // We produced nothing, let's just return some strings in case they're in any
+  // way meaningful.
   if (type.package && type.qualifiedName) {
     return {
       type: 'nameOnly',
@@ -459,19 +556,6 @@ function parseReferenceType(type: any, map: Map<number, any>) {
 
   if (type.name === 'default' && type.typeArguments?.[0]) {
     return parseType(type.typeArguments[0], map)
-  }
-
-  // If we still haven't produced a meaningful type, try looking up the reference
-  const referenced = map.get(type.id)
-  if (referenced) {
-    const maybeType =
-      typeof referenced.type === 'object' && 'type' in referenced.type
-        ? /* need to go down a level */ delegateParsing(type, referenced.type, map)
-        : delegateParsing(type, referenced, map)
-
-    if (maybeType) {
-      return maybeType
-    }
   }
 
   // Final fallback
@@ -500,7 +584,7 @@ function parseUnionType(type: any, map: Map<number, any>): CustomUnionType {
   const subTypes = type.types.filter(Boolean).map((type) => parseType(type, map))
 
   return {
-    type: 'customUnion',
+    type: 'union',
     name: nameOrAnonymous(type),
     subTypes,
   }
@@ -525,14 +609,52 @@ function parsePromiseType(type: any, map: Map<number, any>): PromiseType {
   }
 }
 
+function parseExtractType(type: any, map: Map<number, any>): CustomUnionType {
+  const extractedUnion = parseUnionType(type.typeArguments[1], map)
+  return extractedUnion
+}
+
+function parsePickType(type: any, map: Map<number, any>) {
+  if (type.typeArguments[0].type === 'reference') {
+    const dereferencedNode = map.get(type.typeArguments[0].id)
+    if (!dereferencedNode) return undefined
+    const dereferencedType = parseType(dereferencedNode, map)
+    if (!dereferencedType?.properties) return undefined
+
+    switch (type.typeArguments[1].type) {
+      case 'literal':
+        return dereferencedType.properties.find(
+          (property) => property.name === type.typeArguments[1].value
+        )
+      case 'union':
+      default:
+        const subTypes = dereferencedType.properties.filter((property) =>
+          type.typeArguments[1].types.some((type) => type.value === property.name)
+        )
+        if (subTypes.length === 0) return undefined
+
+        return {
+          type: 'union',
+          subTypes,
+        }
+    }
+  }
+
+  return undefined
+}
+
 function parseReflectionType(type: any, map: Map<number, any>) {
   if (!type.declaration) return undefined
 
-  let res: Type
-  switch (type.declaration.kindString) {
-    case 'Type literal':
+  let res: TypeDetails
+  switch ((type.declaration.kindString ?? type.declaration.variant).toLowerCase()) {
+    case 'type literal':
       res = parseTypeLiteral(type, map)
       break
+    case 'declaration':
+      if (type.declaration.kind === KIND_TYPE_LITERAL) {
+        res = parseTypeLiteral(type, map)
+      }
     default:
       break
   }
@@ -540,14 +662,14 @@ function parseReflectionType(type: any, map: Map<number, any>) {
   return res
 }
 
-function parseTypeLiteral(type: any, map: Map<number, any>): Type {
+function parseTypeLiteral(type: any, map: Map<number, any>): TypeDetails {
   const name = nameOrAnonymous(type)
 
   if ('children' in type.declaration) {
     const properties = type.declaration.children.map((child: any) => parseTypeInternals(child, map))
     return {
       name,
-      type: 'customObject',
+      type: 'object',
       properties,
     } satisfies CustomObjectType
   }
@@ -563,8 +685,8 @@ function parseTypeLiteral(type: any, map: Map<number, any>): Type {
     }
   }
 
-  if ('indexSignature' in type.declaration) {
-    const signature = type.declaration.indexSignature
+  if ('indexSignature' in type.declaration || 'indexSignatures' in type.declaration) {
+    const signature = type.declaration.indexSignature ?? type.declaration.indexSignatures[0]
 
     return {
       name,
@@ -582,7 +704,7 @@ function parseTypeLiteral(type: any, map: Map<number, any>): Type {
 function parseIndexedAccessType(type: any, map: Map<number, any>) {
   return {
     type: 'nameOnly',
-    name: `${type.objectType?.name ?? ''}[${type.indexType.value ?? type.indexType.name ?? ''}]`,
+    name: `${type.objectType?.name ?? ''}['${type.indexType.value ?? type.indexType.name ?? ''}']`,
   }
 }
 
@@ -599,7 +721,7 @@ function parseInterface(type: any, map: Map<number, any>): CustomObjectType {
   const properties = (type.children ?? []).map((child) => parseTypeInternals(child, map))
 
   return {
-    type: 'customObject',
+    type: 'object',
     name: nameOrAnonymous(type),
     properties,
   }
@@ -609,10 +731,11 @@ function parseInterface(type: any, map: Map<number, any>): CustomObjectType {
 // properties of an interface.
 
 function parseTypeInternals(elem: any, map: Map<number, any>) {
-  switch (elem.kindString) {
-    case 'Property':
+  switch ((elem.kindString || elem.variant).toLowerCase()) {
+    case 'property':
+    case 'declaration':
       return parseInternalProperty(elem, map)
-    case 'Method':
+    case 'method':
       if (elem.signatures?.[0]) {
         const { params, ret, comment } = parseSignature(elem.signatures?.[0], map)
         const res = {
@@ -624,7 +747,7 @@ function parseTypeInternals(elem: any, map: Map<number, any>) {
         } as CustomFunctionType
 
         if (elem.comment) {
-          res.comment = { ...res.comment, ...elem.comment }
+          res.comment = { ...normalizeComment(res.comment), ...normalizeComment(elem.comment) }
         }
 
         return res
@@ -641,14 +764,14 @@ function parseInternalProperty(elem: any, map: Map<number, any>) {
   const res = {
     name,
     type,
-  } as PropertyType
+  } as CustomTypePropertyType
 
   if (elem.flags?.isOptional) {
     res.isOptional = true
   }
 
   if (elem.comment) {
-    res.comment = elem.comment
+    res.comment = normalizeComment(elem.comment)
   }
 
   return res

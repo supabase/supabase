@@ -1,15 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { ExternalLink, MessageCircle } from 'lucide-react'
+import { ExternalLink, Github, MessageCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
@@ -19,7 +20,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
-import { Button, IconGitHub } from 'ui'
+import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { BranchLoader, BranchManagementSection, BranchRow } from './BranchPanels'
@@ -77,25 +78,7 @@ const BranchManagement = () => {
     isLoading: isLoadingBranches,
     isError: isErrorBranches,
     isSuccess: isSuccessBranches,
-  } = useBranchesQuery(
-    { projectRef },
-    {
-      refetchInterval(data) {
-        if (
-          data?.some(
-            (branch) =>
-              branch.status === 'CREATING_PROJECT' ||
-              branch.status === 'RUNNING_MIGRATIONS' ||
-              branch.status === 'MIGRATIONS_FAILED'
-          )
-        ) {
-          return 1000 * 3 // 3 seconds
-        }
-
-        return false
-      },
-    }
-  )
+  } = useBranchesQuery({ projectRef })
   const [[mainBranch], previewBranchesUnsorted] = partition(branches, (branch) => branch.is_default)
   const previewBranches = previewBranchesUnsorted.sort((a, b) =>
     new Date(a.updated_at) < new Date(b.updated_at) ? 1 : -1
@@ -190,25 +173,21 @@ const BranchManagement = () => {
                     All branches
                   </Button>
                 </div>
-                <div className="flex items-center justify-between space-x-2">
+                <div className="flex items-center justify-between gap-x-2">
                   <Button
-                    type={'text'}
-                    icon={<MessageCircle className="text-muted" size={14} strokeWidth={1} />}
                     asChild
+                    type="text"
+                    icon={<MessageCircle className="text-muted" strokeWidth={1} />}
                   >
-                    <a href="https://github.com/orgs/supabase/discussions/18937" target="_blank">
+                    <a
+                      target="_blank"
+                      rel="noreferrer"
+                      href="https://github.com/orgs/supabase/discussions/18937"
+                    >
                       Branching Feedback
                     </a>
                   </Button>
-                  <Button type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                    <Link
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://supabase.com/docs/guides/platform/branching"
-                    >
-                      Documentation
-                    </Link>
-                  </Button>
+                  <DocsButton href="https://supabase.com/docs/guides/platform/branching" />
                   <ButtonTooltip
                     type="primary"
                     disabled={!canCreateBranches}
@@ -216,7 +195,9 @@ const BranchManagement = () => {
                     tooltip={{
                       content: {
                         side: 'bottom',
-                        text: 'You need additional permissions to create branches',
+                        text: !canCreateBranches
+                          ? 'You need additional permissions to create branches'
+                          : undefined,
                       },
                     }}
                   >
@@ -240,7 +221,7 @@ const BranchManagement = () => {
                     <div className="border rounded-lg px-6 py-2 flex items-center justify-between">
                       <div className="flex items-center gap-x-4">
                         <div className="w-8 h-8 bg-scale-300 border rounded-md flex items-center justify-center">
-                          <IconGitHub size={18} strokeWidth={2} />
+                          <Github size={18} strokeWidth={2} />
                         </div>
                         <p className="text-sm">GitHub branch workflow</p>
                         <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
@@ -271,7 +252,9 @@ const BranchManagement = () => {
                         tooltip={{
                           content: {
                             side: 'bottom',
-                            text: 'You need additional permissions to disable branching',
+                            text: !canDisableBranching
+                              ? 'You need additional permissions to disable branching'
+                              : undefined,
                           },
                         }}
                       >

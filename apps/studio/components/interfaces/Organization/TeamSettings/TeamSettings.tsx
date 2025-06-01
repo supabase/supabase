@@ -1,49 +1,59 @@
 import { Search } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   ScaffoldActionsContainer,
   ScaffoldActionsGroup,
   ScaffoldContainerLegacy,
   ScaffoldFilterAndContent,
   ScaffoldSectionContent,
+  ScaffoldTitle,
 } from 'components/layouts/Scaffold'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
-import { Input } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { InviteMemberButton } from './InviteMemberButton'
 import MembersView from './MembersView'
 import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
 
-const TeamSettings = () => {
-  const { slug } = useParams()
+export const TeamSettings = () => {
+  const [_, setLastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
 
   const {
     organizationMembersCreate: organizationMembersCreationEnabled,
     organizationMembersDelete: organizationMembersDeletionEnabled,
   } = useIsFeatureEnabled(['organization_members:create', 'organization_members:delete'])
 
+  const { slug } = useParams()
+  const router = useRouter()
   const { profile } = useProfile()
   const selectedOrganization = useSelectedOrganization()
   const isOwner = selectedOrganization?.is_owner
 
   const { data: permissions } = usePermissionsQuery()
-  const { data: rolesData } = useOrganizationRolesQuery({ slug })
+  const { refetch: refetchOrganizations } = useOrganizationsQuery()
+  const { data: rolesData } = useOrganizationRolesV2Query({ slug })
   const { data: members } = useOrganizationMembersQuery({ slug })
 
-  const roles = rolesData?.roles ?? []
+  const roles = rolesData?.org_scoped_roles ?? []
 
   const { rolesAddable } = useGetRolesManagementPermissions(
-    selectedOrganization?.id,
+    selectedOrganization?.slug,
     roles,
     permissions ?? []
   )
@@ -55,10 +65,15 @@ const TeamSettings = () => {
   const canLeave = !isOwner || (isOwner && hasMultipleOwners(members, roles))
 
   const { mutate: deleteMember } = useOrganizationMemberDeleteMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       setIsLeaving(false)
       setIsLeaveTeamModalOpen(false)
-      window?.location.replace('/') // Force reload to clear Store
+
+      await refetchOrganizations()
+      toast.success(`Successfully left ${selectedOrganization?.name}`)
+
+      setLastVisitedOrganization('')
+      router.push('/organizations')
     },
     onError: (error) => {
       setIsLeaving(false)
@@ -78,18 +93,20 @@ const TeamSettings = () => {
   return (
     <>
       <ScaffoldContainerLegacy>
+        <ScaffoldTitle>Team</ScaffoldTitle>
         <ScaffoldFilterAndContent>
-          <ScaffoldActionsContainer className="justify-between">
+          <ScaffoldActionsContainer className="w-full flex-col md:flex-row gap-2 justify-between">
             <Input
+              size="tiny"
+              autoComplete="off"
               icon={<Search size={12} />}
-              size="small"
               value={searchString}
               onChange={(e: any) => setSearchString(e.target.value)}
               name="email"
               id="email"
               placeholder="Filter members"
             />
-            <ScaffoldActionsGroup>
+            <ScaffoldActionsGroup className="w-full md:w-auto">
               {organizationMembersCreationEnabled &&
                 canAddMembers &&
                 profile !== undefined &&
@@ -122,13 +139,31 @@ const TeamSettings = () => {
       </ScaffoldContainerLegacy>
 
       <ConfirmationModal
+        size="medium"
         visible={isLeaveTeamModalOpen}
-        title="Are you sure?"
+        title="Confirm to leave organization"
         confirmLabel="Leave"
-        onCancel={() => setIsLeaveTeamModalOpen(false)}
-        onConfirm={() => {
-          leaveTeam()
+        variant="warning"
+        alert={{
+          title: 'All of your user content will be permanently removed.',
+          description: (
+            <div>
+              <p>
+                Leaving the organization will delete all of your saved content in the projects of
+                the organization, which includes:
+              </p>
+              <ul className="list-disc pl-4">
+                <li>
+                  SQL snippets <span className="text-foreground">(both private and shared)</span>
+                </li>
+                <li>Custom reports</li>
+                <li>Log Explorer queries</li>
+              </ul>
+            </div>
+          ),
         }}
+        onCancel={() => setIsLeaveTeamModalOpen(false)}
+        onConfirm={() => leaveTeam()}
       >
         <p className="text-sm text-foreground-light">
           Are you sure you want to leave this organization? This is permanent.
@@ -137,5 +172,3 @@ const TeamSettings = () => {
     </>
   )
 }
-
-export default TeamSettings

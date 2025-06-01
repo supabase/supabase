@@ -1,15 +1,15 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import pgMeta from '@supabase/pg-meta'
-import { toast } from 'react-hot-toast'
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-import type { ResponseError } from 'types'
 import { executeSql } from 'data/sql/execute-sql-query'
+import type { ResponseError } from 'types'
 import { invalidateSchemasQuery } from './schemas-query'
 
 export type SchemaCreateVariables = {
   name: string
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function createSchema({ name, projectRef, connectionString }: SchemaCreateVariables) {

@@ -1,52 +1,19 @@
 'use client'
 
-import { useTelemetryProps } from 'common'
-import { usePathname } from 'next/navigation'
-import { useCallback, useEffect } from 'react'
-import { useConsent } from 'ui-patterns/ConsentToast'
-import { BASE_PATH, IS_PLATFORM } from '~/lib/constants'
-import { unauthedAllowedPost } from '~/lib/fetch/fetchWrappers'
-
-const useSendPageTelemetryWithConsent = () => {
-  const { hasAcceptedConsent } = useConsent()
-  const telemetryProps = useTelemetryProps()
-
-  const sendPageTelemetry = useCallback(
-    (route: string) => {
-      if (!(IS_PLATFORM && hasAcceptedConsent)) return
-
-      unauthedAllowedPost('/platform/telemetry/page', {
-        body: {
-          referrer: document.referrer,
-          title: document.title,
-          route: `${BASE_PATH}${route}`,
-          ga: {
-            screen_resolution: telemetryProps?.screenResolution,
-            language: telemetryProps?.language,
-            session_id: '',
-          },
-        },
-      }).catch((e) => {
-        console.error('Problem sending telemetry:', e)
-      })
-    },
-    [telemetryProps, hasAcceptedConsent]
-  )
-
-  return sendPageTelemetry
-}
+import { IS_PLATFORM, PageTelemetry as PageTelemetryImpl } from 'common'
+import { useConsentToast } from 'ui-patterns/consent'
+import { API_URL } from '~/lib/constants'
 
 const PageTelemetry = () => {
-  const pathname = usePathname()
-  const sendPageTelemetry = useSendPageTelemetryWithConsent()
+  const { hasAcceptedConsent } = useConsentToast()
 
-  useEffect(() => {
-    if (pathname) {
-      sendPageTelemetry(pathname)
-    }
-  }, [pathname, sendPageTelemetry])
-
-  return null
+  return (
+    <PageTelemetryImpl
+      API_URL={API_URL}
+      hasAcceptedConsent={hasAcceptedConsent}
+      enabled={IS_PLATFORM}
+    />
+  )
 }
 
 export { PageTelemetry }

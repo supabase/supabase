@@ -59,7 +59,7 @@ const buttonVariants = cva(
           data-[state=open]:border-foreground-lighter
           data-[state=open]:outline-border-strong
         `,
-        // @deprecated use 'primary' instead
+        /** @deprecated use 'primary' instead */
         alternative: `
           text-foreground
           bg-brand-400 hover:bg-brand-500
@@ -170,13 +170,13 @@ const IconContainerVariants = cva('', {
     },
     type: {
       primary: 'text-brand-600',
-      default: 'text-foreground-muted',
+      default: 'text-foreground-lighter',
       secondary: 'text-border-muted',
-      alternative: 'text-foreground-muted',
-      outline: 'text-foreground-muted',
-      dashed: 'text-foreground-muted',
+      alternative: 'text-foreground-lighter',
+      outline: 'text-foreground-lighter',
+      dashed: 'text-foreground-lighter',
       link: 'text-brand-600',
-      text: 'text-foreground-muted',
+      text: 'text-foreground-lighter',
       danger: 'text-destructive-600',
       warning: 'text-warning-600',
     },
@@ -188,11 +188,11 @@ const loadingVariants = cva('', {
   variants: {
     type: {
       primary: 'text-brand-600',
-      default: 'text-foreground-muted',
+      default: 'text-foreground-lighter',
       secondary: 'text-border-muted',
-      alternative: 'text-foreground-muted',
-      outline: 'text-foreground-muted',
-      dashed: 'text-foreground-muted',
+      alternative: 'text-foreground-lighter',
+      outline: 'text-foreground-lighter',
+      dashed: 'text-foreground-lighter',
       link: 'text-brand-600',
       text: 'text-foreground-muted',
       danger: 'text-destructive-600',

@@ -1,4 +1,4 @@
-import { products } from 'shared-data'
+import { PRODUCT_MODULES, products } from 'shared-data'
 
 type HomeMenuIcon = {
   width?: number
@@ -450,7 +450,7 @@ export function IconMenuAI({ width = 16, height = 16, className }: HomeMenuIcon)
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d={products.vector.icon[16]}
+        d={PRODUCT_MODULES.vector.icon[16]}
         stroke="currentColor"
         strokeMiterlimit="10"
         strokeLinecap="round"
@@ -571,6 +571,37 @@ export function IconGitHub({ width = 16, height = 16, className }: HomeMenuIcon)
         clipRule="evenodd"
         d="M9.00011 1.8714C4.96998 1.8714 1.70312 5.14337 1.70312 9.18079C1.70312 12.4097 3.79371 15.1497 6.69353 16.1158C7.05838 16.183 7.19119 15.9575 7.19119 15.7634C7.19119 15.5905 7.18535 15.13 7.1817 14.5207C5.15168 14.9622 4.72335 13.5407 4.72335 13.5407C4.39206 12.6957 3.91338 12.471 3.91338 12.471C3.25082 12.0186 3.96373 12.0273 3.96373 12.0273C4.69562 12.0784 5.0809 12.7804 5.0809 12.7804C5.73179 13.8968 6.78912 13.5743 7.20432 13.3875C7.27145 12.9154 7.45972 12.5936 7.66841 12.4112C6.04848 12.2265 4.34463 11.599 4.34463 8.79843C4.34463 8.00087 4.62922 7.34779 5.09549 6.837C5.02033 6.65238 4.77005 5.90882 5.167 4.9033C5.167 4.9033 5.77995 4.70628 7.17367 5.65197C7.76894 5.48962 8.3831 5.40693 9.00011 5.40606C9.62035 5.40898 10.2442 5.48997 10.8273 5.65197C12.2203 4.70628 12.8318 4.90257 12.8318 4.90257C13.2302 5.90882 12.9792 6.65238 12.9047 6.837C13.3717 7.34779 13.6549 8.00087 13.6549 8.79843C13.6549 11.6063 11.9481 12.2244 10.3231 12.4053C10.585 12.6308 10.8178 13.0766 10.8178 13.7589C10.8178 14.7353 10.809 15.5241 10.809 15.7634C10.809 15.959 10.9404 16.1866 11.3111 16.1151C12.7641 15.6278 14.0272 14.6961 14.922 13.4517C15.8167 12.2074 16.2977 10.7134 16.2971 9.18079C16.2971 5.14337 13.0295 1.8714 9.00011 1.8714Z"
         fill="currentColor"
+      />
+    </svg>
+  )
+}
+
+export function IconSecurity({ width = 16, height = 16, className }: HomeMenuIcon) {
+  return (
+    <svg
+      className={className}
+      width={width}
+      height={height}
+      viewBox="0 0 18 18"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M9 2L3 4V11C3 14 6 16 9 16.5C12 16 15 14 15 11V4L9 2Z"
+        stroke="currentColor"
+        strokeMiterlimit="10"
+        strokeLinejoin="bevel"
+      />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M7 10L8 12L12 8"
+        stroke="currentColor"
+        strokeMiterlimit="10"
+        strokeLinejoin="round"
+        strokeLinecap="round"
       />
     </svg>
   )

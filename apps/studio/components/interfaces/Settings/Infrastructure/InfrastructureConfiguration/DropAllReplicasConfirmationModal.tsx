@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { replicaKeys } from 'data/read-replicas/keys'
@@ -70,7 +70,7 @@ const DropAllReplicasConfirmationModal = ({
       }}
     >
       <p className="text-sm">Before deleting all replicas, consider:</p>
-      <ul className="text-sm text-foreground-light list-disc">
+      <ul className="text-sm text-foreground-light list-disc pl-6">
         <li>Network traffic from this region may slow down</li>
       </ul>
     </ConfirmationModal>

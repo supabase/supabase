@@ -7,10 +7,9 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
-import Link from 'next/link'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_ } from 'ui'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
+import { useFlag } from 'hooks/ui/useFlag'
 
 export interface DatabaseLayoutProps {
   title?: string
@@ -42,21 +41,6 @@ const DatabaseProductMenu = () => {
           columnLevelPrivileges,
         })}
       />
-      <div className="px-3">
-        <Alert_Shadcn_>
-          <AlertTitle_Shadcn_ className="text-sm">
-            Replication section has been renamed
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_ className="text-xs">
-            <p className="mb-2">
-              It can be now found under{' '}
-              <Link href={`/project/${project?.ref}/database/publications`} className="underline">
-                Publications
-              </Link>
-            </p>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
-      </div>
     </>
   )
 }
@@ -64,9 +48,7 @@ const DatabaseProductMenu = () => {
 const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
   return (
     <ProjectLayout product="Database" productMenu={<DatabaseProductMenu />} isBlocking={false}>
-      <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-        {children}
-      </main>
+      {children}
     </ProjectLayout>
   )
 }

@@ -1,4 +1,175 @@
-export const data = [
+export type CustomerStoryType = {
+  type: 'Customer Story'
+  title: string
+  description: string
+  organization: string
+  imgUrl: string
+  logo: string
+  logo_inverse?: string
+  url: string
+  ctaText?: string
+  path?: string
+  postMeta?: {
+    name: string
+    avatarUrl: string
+    publishDate: string
+    readLength: number
+  }
+}
+
+export const data: CustomerStoryType[] = [
+  {
+    type: 'Customer Story',
+    title: 'Kayhan Space saw 8x improvement in developer speed when moving to Supabase',
+    description:
+      'The Kayhan Space team migrated to Supabase from Amazon RDS and Auth0 to simplify infrastructure and unlock developer velocity.',
+    organization: 'Kayhan Space',
+    imgUrl: 'images/customers/logos/kayhanspace.png',
+    logo: '/images/customers/logos/kayhanspace.png',
+    logo_inverse: '/images/customers/logos/light/kayhanspace.png',
+    url: '/customers/kayhanspace',
+  },
+  {
+    type: 'Customer Story',
+    title: 'Udio hits the right notes with Supabase',
+    description:
+      'Udio built a scalable, AI-driven music platform on a Supabase backend from day one.',
+    organization: 'Udio',
+    imgUrl: 'images/customers/logos/udio.png',
+    logo: '/images/customers/logos/udio.png',
+    logo_inverse: '/images/customers/logos/light/udio.png',
+    url: '/customers/udio',
+  },
+  {
+    type: 'Customer Story',
+    title: 'Euka used Supabase to unlock faster growth',
+    description:
+      'Supabase helped Euka accelerate development, simplify AI feature rollout, and scale creator marketing faster than ever.',
+    organization: 'Euka',
+    imgUrl: 'images/customers/logos/euka.png',
+    logo: '/images/customers/logos/euka.png',
+    logo_inverse: '/images/customers/logos/light/euka.png',
+    url: '/customers/euka',
+  },
+  {
+    type: 'Customer Story',
+    title: "Bree's Migration to Supabase from Fauna",
+    description:
+      'Discover how Bree found 10X performance gains, greater developer velocity, and a better foundation for AI when switching to Supabase.',
+    organization: 'Bree',
+    imgUrl: 'images/customers/logos/bree.png',
+    logo: '/images/customers/logos/bree.png',
+    logo_inverse: '/images/customers/logos/light/bree.png',
+    url: '/customers/bree',
+  },
+  {
+    type: 'Customer Story',
+    title: 'Deriv: Accelerating Online Trading with a Scalable Postgres Backend',
+    description: 'Accelerating Online Trading with a Scalable Postgres Backend',
+    organization: 'Deriv',
+    imgUrl: 'images/customers/logos/deriv.png',
+    logo: '/images/customers/logos/deriv.png',
+    logo_inverse: '/images/customers/logos/light/deriv.png',
+    url: '/customers/deriv',
+  },
+  {
+    type: 'Customer Story',
+    title:
+      'Quilia Empowers Personal Injury Clients with Streamlined Data Management using Supabase',
+    description:
+      'Migrating to Supabase resulted in a 75% reduction in development time, 50% lower costs, and enhanced security for sensitive client data.',
+    organization: 'Quilia',
+    imgUrl: 'images/customers/logos/quilia.png',
+    logo: '/images/customers/logos/quilia.png',
+    logo_inverse: '/images/customers/logos/light/quilia.png',
+    url: '/customers/quilia',
+  },
+  {
+    type: 'Customer Story',
+    title: "Resend's Journey with Supabase: Scaling Email Infrastructure with Ease",
+    description:
+      'Scaling seamlessly to 5,000+ paying customers & millions of emails sent daily with Supabase',
+    organization: 'Resend',
+    imgUrl: 'images/customers/logos/resend.png',
+    logo: '/images/customers/logos/resend.png',
+    logo_inverse: '/images/customers/logos/light/resend.png',
+    url: '/customers/resend',
+  },
+  {
+    type: 'Customer Story',
+    title: 'Scaling Innovation with Supabase: Meshy’s Migration to Cost-Effective Authentication',
+    description:
+      'Discover how a rapidly growing Meshy migrated from an expensive authentication model with Auth0 to Supabase Auth, and significantly reduced their costs.',
+    organization: 'Meshy',
+    imgUrl: 'images/customers/logos/meshy.png',
+    logo: '/images/customers/logos/meshy.png',
+    logo_inverse: '/images/customers/logos/light/meshy.png',
+    url: '/customers/meshy',
+    ctaText: 'View story',
+  },
+  {
+    type: 'Customer Story',
+    title:
+      'Scaling Beyond No-Code: asap.work’s Journey to a Faster, Flexible Solution with Supabase',
+    description:
+      'asap.work is a construction recruitment startup founded by industry experts from Adecco and Manpower. Using their knowledge and experience of the construction recruitment industry, asap.work focuses on providing a fair marketplace for temporary construction workers and fair pricing for clients.',
+    organization: 'Asap.work',
+    imgUrl: 'images/customers/logos/asap-work.png',
+    logo: '/images/customers/logos/asap-work.png',
+    logo_inverse: '/images/customers/logos/light/asap-work.png',
+    url: '/customers/asap-work',
+    ctaText: 'View story',
+  },
+  {
+    type: 'Customer Story',
+    title:
+      "Maergo's Express Delivery: How Supabase Helped Achieve Scalability, Speed, and Cost Saving",
+    description:
+      'Discover how Maergo, a nationwide expedited parcel delivery service, reduced its codebase by 90%, decreased deployment times to just seconds, and achieved unprecedented scalability with Supabase.',
+    organization: 'Maergo',
+    imgUrl: 'images/customers/logos/maergo.png',
+    logo: '/images/customers/logos/maergo.png',
+    logo_inverse: '/images/customers/logos/light/maergo.png',
+    url: '/customers/maergo',
+    ctaText: 'View story',
+  },
+  {
+    type: 'Customer Story',
+    title: 'Streamlining Success: How Tinloof Scaled Seamlessly with Supabase',
+    description:
+      'Discover Tinloof, how a full-stack development agency, managed and scaled backend services using Supabase, without having to dedicate resources to infrastructure management.',
+    organization: 'Tinloof',
+    imgUrl: 'images/customers/logos/tinloof.png',
+    logo: '/images/customers/logos/tinloof.png',
+    logo_inverse: '/images/customers/logos/light/tinloof.png',
+    url: '/customers/tinloof',
+    ctaText: 'View story',
+  },
+  {
+    type: 'Customer Story',
+    title: 'HappyTeams unlocks better performance and reduces cost with Supabase.',
+    description:
+      'How a bootstrapped startup migrated from Heroku to Supabase in 30 minutes and never looked back.',
+    organization: 'HappyTeams',
+    imgUrl: 'images/customers/logos/happyteams.png',
+    logo: '/images/customers/logos/happyteams.png',
+    logo_inverse: '/images/customers/logos/light/happyteams.png',
+    url: '/customers/happyteams',
+    ctaText: 'View story',
+  },
+  {
+    type: 'Customer Story',
+    title:
+      'How Mobbin migrated 200,000 users from Firebase for a better authentication experience.',
+    description:
+      'Mobbin helps over 200,000 creators globally search and view the latest design patterns from well-known apps.',
+    organization: 'Mobbin',
+    imgUrl: 'images/customers/logos/shotgun.png',
+    logo: '/images/customers/logos/mobbin.png',
+    logo_inverse: '/images/customers/logos/light/mobbin.png',
+    url: '/customers/mobbin',
+    ctaText: 'View story',
+  },
   {
     type: 'Customer Story',
     title: 'Supabase migration drives shotgun to an 83% reduction in data infrastructure costs',

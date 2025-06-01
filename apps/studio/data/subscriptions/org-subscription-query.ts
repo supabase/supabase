@@ -47,7 +47,13 @@ export const useOrgSubscriptionQuery = <TData = OrgSubscriptionData>(
     ({ signal }) => getOrgSubscription({ orgSlug }, signal),
     {
       enabled: enabled && canReadSubscriptions && typeof orgSlug !== 'undefined',
+      staleTime: 60 * 60 * 1000, // 60 minutes
       ...options,
     }
   )
+}
+
+export const useHasAccessToProjectLevelPermissions = (slug: string) => {
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+  return subscription?.plan.id === 'enterprise' || subscription?.plan.id === 'team'
 }

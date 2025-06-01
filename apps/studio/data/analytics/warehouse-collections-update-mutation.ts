@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
@@ -13,6 +13,7 @@ export type UpdateCollectionArgs = {
 export type UpdateCollectionPayload = {
   name?: string
   // description?: string
+  retention_days?: number
 }
 
 export async function updateCollection(
@@ -51,7 +52,7 @@ export const useUpdateCollection = ({
     (payload) =>
       updateCollection(
         { projectRef: payload.projectRef, collectionToken: payload.collectionToken },
-        { name: payload.name }
+        { name: payload.name, retention_days: payload.retention_days }
       ),
     {
       async onSuccess(data, variables, context) {

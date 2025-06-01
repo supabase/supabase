@@ -1,0 +1,100 @@
+---
+title: Realtime Chat
+description: Real-time chat component for collaborative applications
+---
+
+<DualRealtimeChat />
+
+## Installation
+
+<BlockItem
+  name="realtime-chat-tanstack"
+  description="Renders a real-time chat interface for users in a shared room."
+/>
+
+## Folder structure
+
+<RegistryBlock itemName="realtime-chat-tanstack" />
+
+## Introduction
+
+The Realtime Chat component provides a complete chat interface that enables users to exchange messages in real-time within a shared room.
+
+## Usage
+
+### Basic usage
+
+```tsx
+import { RealtimeChat } from '@/components/realtime-chat'
+
+export default function ChatPage() {
+  return <RealtimeChat roomName="my-chat-room" username="john_doe" />
+}
+```
+
+### With initial messages
+
+```tsx
+import { RealtimeChat } from '@/components/realtime-chat'
+import { useMessagesQuery } from '@/hooks/use-messages-query'
+
+export default function ChatPage() {
+  const { data: messages } = useMessagesQuery()
+
+  return <RealtimeChat roomName="my-chat-room" username="john_doe" messages={messages} />
+}
+```
+
+### Storing messages
+
+```tsx
+import { RealtimeChat } from '@/components/realtime-chat'
+import { useMessagesQuery } from '@/hooks/use-messages-query'
+import { storeMessages } from '@/lib/store-messages'
+
+export default function ChatPage() {
+  const { data: messages } = useMessagesQuery()
+  const handleMessage = (messages: ChatMessage[]) => {
+    // Store messages in your database
+    await storeMessages(messages)
+  }
+
+  return <RealtimeChat roomName="my-chat-room" username="john_doe" onMessage={handleMessage} />
+}
+```
+
+## Features
+
+- Real-time message synchronization
+- Message persistence support with `onMessage` and `messages` props
+- Customizable message appearance
+- Automatic scroll-to-bottom on new messages
+- Room-based isolation for scoped conversations
+- Low-latency updates using Supabase Realtime
+
+## Props
+
+| Prop         | Type                                | Description                                                   |
+| ------------ | ----------------------------------- | ------------------------------------------------------------- |
+| `roomName`   | `string`                            | Unique identifier for the shared chat room.                   |
+| `username`   | `string`                            | Name of the current user; used to identify message senders.   |
+| `onMessage?` | `(messages: ChatMessage[]) => void` | Optional callback to handle messages, useful for persistence. |
+| `messages?`  | `ChatMessage[]`                     | Optional initial messages to display in the chat.             |
+
+### ChatMessage type
+
+```typescript
+interface ChatMessage {
+  id: string
+  content: string
+  user: {
+    name: string
+  }
+  createdAt: string
+}
+```
+
+## Further reading
+
+- [Realtime Broadcast](https://supabase.com/docs/guides/realtime/broadcast)
+- [Realtime authorization](https://supabase.com/docs/guides/realtime/authorization)

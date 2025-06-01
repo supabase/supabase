@@ -1,9 +1,9 @@
 import type { PostgresTrigger } from '@supabase/postgres-meta'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface DeleteHookModalProps {
   visible: boolean
@@ -12,7 +12,7 @@ interface DeleteHookModalProps {
 }
 
 const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProps) => {
-  const { id, name, schema } = selectedHook ?? {}
+  const { name, schema } = selectedHook ?? {}
 
   const { project } = useProjectContext()
   const { mutate: deleteDatabaseTrigger, isLoading: isDeleting } = useDatabaseTriggerDeleteMutation(
@@ -28,12 +28,12 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
     if (!project) {
       return console.error('Project ref is required')
     }
-    if (!id) {
+    if (!selectedHook) {
       return toast.error('Unable find selected hook')
     }
 
     deleteDatabaseTrigger({
-      id,
+      trigger: selectedHook,
       projectRef: project.ref,
       connectionString: project.connectionString,
     })
@@ -41,7 +41,7 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
 
   return (
     <TextConfirmModal
-      variant={'warning'}
+      variant="destructive"
       visible={visible}
       size="medium"
       onCancel={() => onClose()}

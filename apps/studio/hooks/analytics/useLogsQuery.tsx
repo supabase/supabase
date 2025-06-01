@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { Dispatch, SetStateAction, useState } from 'react'
 
+import { IS_PLATFORM } from 'common'
 import {
   EXPLORER_DATEPICKER_HELPERS,
-  genQueryParams,
   getDefaultHelper,
 } from 'components/interfaces/Settings/Logs/Logs.constants'
 import type {
@@ -11,8 +11,11 @@ import type {
   Logs,
   LogsEndpointParams,
 } from 'components/interfaces/Settings/Logs/Logs.types'
-import { get, isResponseOk } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import {
+  checkForILIKEClause,
+  checkForWithClause,
+} from 'components/interfaces/Settings/Logs/Logs.utils'
+import { get } from 'data/fetchers'
 
 export interface LogsQueryHook {
   params: LogsEndpointParams
@@ -45,7 +48,8 @@ const useLogsQuery = (
 
   const _enabled = enabled && typeof projectRef !== 'undefined' && Boolean(params.sql)
 
-  const queryParams = genQueryParams(params as any)
+  const usesWith = checkForWithClause(params.sql || '')
+  const usesILIKE = checkForILIKEClause(params.sql || '')
 
   const {
     data,
@@ -54,11 +58,21 @@ const useLogsQuery = (
     isRefetching,
     refetch,
   } = useQuery(
-    ['projects', projectRef, 'logs', queryParams],
-    ({ signal }) =>
-      get<Logs>(`${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${queryParams}`, {
+    ['projects', projectRef, 'logs', params],
+    async ({ signal }) => {
+      const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+        params: {
+          path: { ref: projectRef },
+          query: params,
+        },
         signal,
-      }),
+      })
+      if (error) {
+        throw error
+      }
+
+      return data as unknown as Logs
+    },
     {
       enabled: _enabled,
       refetchOnWindowFocus: false,
@@ -70,6 +84,21 @@ const useLogsQuery = (
   if (!error && data?.error) {
     error = data?.error
   }
+
+  if (IS_PLATFORM) {
+    if (usesWith) {
+      error = {
+        message: 'The parser does not yet support WITH and subquery statements.',
+        docs: 'https://supabase.com/docs/guides/platform/advanced-log-filtering#the-with-keyword-and-subqueries-are-not-supported',
+      }
+    }
+    if (usesILIKE) {
+      error = {
+        message: 'BigQuery does not support ILIKE. Use REGEXP_CONTAINS instead.',
+        docs: 'https://supabase.com/docs/guides/platform/advanced-log-filtering#the-ilike-and-similar-to-keywords-are-not-supported',
+      }
+    }
+  }
   const changeQuery = (newQuery = '') => {
     setParams((prev) => ({ ...prev, sql: newQuery }))
   }
@@ -77,7 +106,7 @@ const useLogsQuery = (
   return {
     params,
     isLoading: (_enabled && isLoading) || isRefetching,
-    logData: isResponseOk(data) && data.result ? data.result : [],
+    logData: data?.result ?? [],
     error,
     changeQuery,
     runQuery: () => refetch(),

@@ -1,5 +1,3 @@
-import clsx from 'clsx'
-import { DataPoint } from 'data/analytics/constants'
 import dayjs from 'dayjs'
 import {
   Bar,
@@ -11,6 +9,9 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+
+import { DataPoint } from 'data/analytics/constants'
+import { cn } from 'ui'
 import { Attribute, COLOR_MAP } from './Usage.constants'
 import { MultiAttributeTooltipContent, SingleAttributeTooltipContent } from './UsageChartTooltips'
 
@@ -21,7 +22,7 @@ export interface UsageBarChartProps {
   data: DataPoint[]
   name: string // Used within the tooltip
   attributes: Attribute[]
-  unit: 'bytes' | 'absolute' | 'percentage' | 'hours'
+  unit: 'bytes' | 'absolute' | 'percentage' | 'hours' | 'gigabytes'
   yLimit?: number
   yMin?: number
   yLeftMargin?: number
@@ -67,7 +68,7 @@ const UsageBarChart = ({
                 const isAfterToday = dataPeriod.startOf('day').isAfter(dayjs().startOf('day'))
                 return (
                   <div
-                    className={clsx(
+                    className={cn(
                       'border bg-surface-100 rounded-md px-2 py-2',
                       attributes.length > 1 && !isAfterToday ? 'w-[250px]' : 'w-[170px]'
                     )}

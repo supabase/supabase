@@ -1,16 +1,16 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
+import type { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import type { components } from 'api-types'
 
 export type ProjectRestartVariables = {
   ref: string
   identifier?: string
 }
 
-type RestartProjectBody = components['schemas']['RestartProjectInfo']
+type RestartProjectBody = components['schemas']['RestartProjectBody']
 
 export async function restartProject({ ref, identifier }: ProjectRestartVariables) {
   const payload: RestartProjectBody = {}
