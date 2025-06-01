@@ -141,6 +141,84 @@ To use `MergeDeep`, set `compilerOptions.strictNullChecks` to `true` in your `ts
 
 </Admonition>
 
+## Enhanced type inference for JSON fields
+
+Starting from [supabase-js v2.48.0](https://github.com/supabase/supabase-js/releases/tag/v2.48.0), you can define custom types for JSON fields and get enhanced type inference when using JSON selectors with the `->` and `->>` operators. This makes your code more type-safe and intuitive when working with JSON/JSONB columns.
+
+### Defining custom JSON types
+
+You can extend your generated database types to include custom JSON schemas using `MergeDeep`:
+
+```ts ./database.types.ts
+import { MergeDeep } from 'type-fest'
+import { Database as DatabaseGenerated } from './database-generated.types'
+
+// Define your custom JSON type
+type CustomJsonType = {
+  foo: string
+  bar: { baz: number }
+  en: 'ONE' | 'TWO' | 'THREE'
+}
+
+export type Database = MergeDeep<
+  DatabaseGenerated,
+  {
+    public: {
+      Tables: {
+        your_table: {
+          Row: {
+            data: CustomJsonType | null
+          }
+          // Optional: Use if you want type-checking for inserts and updates
+          // Insert: {
+          //   data?: CustomJsonType | null;
+          // };
+          // Update: {
+          //   data?: CustomJsonType | null;
+          // };
+        }
+      }
+      Views: {
+        your_view: {
+          Row: {
+            data: CustomJsonType | null
+          }
+        }
+      }
+    }
+  }
+>
+```
+
+### Type-safe JSON querying
+
+Once you've defined your custom JSON types, TypeScript will automatically infer the correct types when using JSON selectors:
+
+```ts
+const res = await client.from('your_table').select('data->bar->baz, data->en, data->bar')
+
+if (res.data) {
+  console.log(res.data)
+  // TypeScript infers the shape of your JSON data:
+  // [
+  //   {
+  //     baz: number;
+  //     en: 'ONE' | 'TWO' | 'THREE';
+  //     bar: { baz: number };
+  //   }
+  // ]
+}
+```
+
+This feature works with:
+
+- Single-level JSON access: `data->foo`
+- Nested JSON access: `data->bar->baz`
+- Text extraction: `data->>foo` (returns string)
+- Mixed selections combining multiple JSON paths
+
+The type inference automatically handles the difference between `->` (returns JSON) and `->>` (returns text) operators, ensuring your TypeScript types match the actual runtime behavior.
+
 You can also override the type of an individual successful response if needed:
 
 ```ts
