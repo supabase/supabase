@@ -169,7 +169,7 @@ export const PauseDisabledState = () => {
             Restore backup to a new Supabase project guide
           </a>
         </Button>
-        <Button asChild type="default" icon={<ExternalLink />} className="mb-4">
+        <Button asChild type="default" icon={<ExternalLink />} className="mb-3">
           <a
             target="_blank"
             rel="noreferrer"
