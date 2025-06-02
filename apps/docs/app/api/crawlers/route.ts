@@ -85,7 +85,6 @@ function htmlShell(
     `<meta name="og:image" content="https://supabase.com/docs/img/supabase-og-image.png">` +
     `<meta name="twitter:image" content="https://supabase.com/docs/img/supabase-og-image.png">` +
     `<link rel="canonical" href="https://supabase.com/docs/reference/${lib}` +
-    (version ? '/' + version : '') +
     (slug ? '/' + slug : '') +
     `">` +
     '</head>' +
