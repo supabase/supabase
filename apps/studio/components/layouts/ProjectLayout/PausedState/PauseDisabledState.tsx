@@ -160,7 +160,7 @@ export const PauseDisabledState = () => {
             </DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button asChild type="default" icon={<ExternalLink />} className="my-4">
+        <Button asChild type="default" icon={<ExternalLink />} className="my-3">
           <a
             target="_blank"
             rel="noreferrer"
