@@ -16,10 +16,44 @@ import data from '~/data/surveys/state-of-startups-2025'
 
 interface FormData {
   email: string
+  terms: boolean
+}
+
+interface FormItem {
+  type: 'email' | 'checkbox'
+  label: string
+  placeholder: string
+  required: boolean
+  className?: string
+  component: typeof Input | typeof Checkbox
+}
+
+type FormConfig = {
+  [K in keyof FormData]: FormItem
+}
+
+const formConfig: FormConfig = {
+  email: {
+    type: 'email',
+    label: 'Email',
+    placeholder: 'Email',
+    required: true,
+    className: '',
+    component: Input,
+  },
+  terms: {
+    type: 'checkbox',
+    label: '',
+    placeholder: '',
+    required: true,
+    className: '',
+    component: Checkbox,
+  },
 }
 
 const defaultFormValue: FormData = {
   email: '',
+  terms: false,
 }
 
 const isValidEmail = (email: string): boolean => {
@@ -58,8 +92,15 @@ function StateOfStartupsPage() {
   const validate = (): boolean => {
     const newErrors: { [key in keyof FormData]?: string } = {}
 
-    if (!formData.email) {
-      setErrors({ email: 'This field is required' })
+    // Check required fields
+    for (const key in formConfig) {
+      if (formConfig[key as keyof FormData].required && !formData[key as keyof FormData]) {
+        if (key === 'email') {
+          newErrors[key as keyof FormData] = `Email is required`
+        } else if (key === 'terms') {
+          newErrors[key as keyof FormData] = `You must agree to the terms`
+        }
+      }
     }
 
     // Validate email
@@ -103,7 +144,7 @@ function StateOfStartupsPage() {
 
       if (response.ok) {
         setSuccess('Thank you for your submission!')
-        setFormData({ email: '' })
+        setFormData({ email: '', terms: false })
       } else {
         const errorData = await response.json()
         setErrors({ general: `Submission failed: ${errorData.message}` })
@@ -151,12 +192,25 @@ function StateOfStartupsPage() {
                 </div>
               ) : (
                 <form
+                  noValidate
                   id="state-of-startups-form"
                   onSubmit={handleSubmit}
                   className="w-full max-w-md flex flex-col gap-4 items-center"
                 >
                   <div className="w-full flex flex-col sm:flex-row sm:items-center gap-2">
+                    {/* Spam prevention */}
+                    <input
+                      type="text"
+                      name="honeypot"
+                      value={honeypot}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setHoneypot(e.target.value)
+                      }
+                      style={{ display: 'none' }}
+                      aria-hidden="true"
+                    />
                     <Input
+                      required
                       onChange={handleChange}
                       value={formData['email']}
                       name="email"
@@ -178,7 +232,13 @@ function StateOfStartupsPage() {
                     </Button>
                   </div>
                   <div className="flex items-center gap-2 text-left">
-                    <Checkbox required id="terms" className="[&>input]:m-0" />
+                    <Checkbox
+                      required
+                      name="terms"
+                      id="terms"
+                      onChange={handleChange}
+                      className="[&>input]:m-0"
+                    />
                     <Label htmlFor="terms" className="text-foreground-lighter leading-5">
                       We process your information in accordance with our{' '}
                       <Link href="/privacy" className="text-foreground-light hover:underline">
@@ -189,11 +249,12 @@ function StateOfStartupsPage() {
                   </div>
                   <div
                     className={cn(
-                      'flex flex-nowrap text-right gap-1 items-center text-xs leading-none transition-opacity opacity-0 text-foreground-muted',
-                      errors['email'] && 'opacity-100 animate-fade-in'
+                      'flex flex-nowrap text-right gap-1 items-center text-xs leading-none transition-opacity opacity-0 text-foreground-lighter',
+                      errors['email'] && 'opacity-100 animate-fade-in',
+                      errors['terms'] && 'opacity-100 animate-fade-in'
                     )}
                   >
-                    {errors['email']}
+                    {errors['email'] ? errors['email'] : errors['terms']}
                   </div>
                 </form>
               )}
