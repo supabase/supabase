@@ -40,7 +40,7 @@ import { FeaturePreviewContextProvider } from 'components/interfaces/App/Feature
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
 import { GenerateSql } from 'components/interfaces/SqlGenerator/SqlGenerator'
-import { ErrorBoundaryState } from 'components/ui/ErrorBoundaryState'
+import { ErrorBoundaryState } from 'components/ui/GlobalErrorBoundaryState'
 import { useRootQueryClient } from 'data/query-client'
 import { customFont, sourceCodePro } from 'fonts'
 import { AuthProvider } from 'lib/auth'
