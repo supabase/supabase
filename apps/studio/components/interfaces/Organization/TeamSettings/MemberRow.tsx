@@ -73,7 +73,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
       <Table.td>
         <div className="flex items-center gap-x-4">
           <ProfileImage
-            alt={member.username}
+            alt={member.primary_email ?? member.username ?? ''}
             src={profileImageUrl}
             className="border rounded-full w-[32px] h-[32px] md:w-[40px] md:h-[40px]"
             placeholder={
@@ -88,11 +88,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             }
           />
           <div className="flex item-center gap-x-2">
-            {isInvitedUser === undefined ? (
-              <p className="text-foreground-light truncate">{member.primary_email}</p>
-            ) : (
-              <p className="text-foreground truncate">{getUserDisplayName(member)}</p>
-            )}
+            <p className="text-foreground-light truncate">{member.primary_email}</p>
             {member.primary_email === profile?.primary_email && <Badge color="scale">You</Badge>}
           </div>
 
