@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useParams } from 'common'
@@ -8,9 +7,10 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import { AlertCircle, Loader2 } from 'lucide-react'
-import { Input } from 'ui'
+import { useMemo } from 'react'
 import { toast } from 'sonner'
-import { useLastUsedAPIKeysLogQuery, getLastUsedAPIKeys } from './DisplayApiSettings.utils'
+import { Input } from 'ui'
+import { getLastUsedAPIKeys, useLastUsedAPIKeysLogQuery } from './DisplayApiSettings.utils'
 
 const DisplayApiSettings = ({
   legacy,
@@ -21,7 +21,7 @@ const DisplayApiSettings = ({
 }) => {
   const { ref: projectRef } = useParams()
 
-  const newApiKeysFlag = useFlag('newApiKeys')
+  const newApiKeysInRollOut = useFlag('basicApiKeys')
 
   const {
     data: settings,
@@ -177,7 +177,7 @@ const DisplayApiSettings = ({
           ))
         )}
         {showNotice ? (
-          newApiKeysFlag ? (
+          newApiKeysInRollOut ? (
             <Panel.Notice
               className="border-t"
               title="API keys have moved"
