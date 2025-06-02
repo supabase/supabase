@@ -18,7 +18,7 @@ export type FallbackProps = {
   resetErrorBoundary: (...args: any[]) => void
 }
 
-export const ErrorBoundaryState = ({ error, resetErrorBoundary }: FallbackProps) => {
+export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: FallbackProps) => {
   const router = useRouter()
   const checkIsError = isError(error)
 
