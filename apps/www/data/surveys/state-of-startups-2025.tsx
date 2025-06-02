@@ -16,9 +16,8 @@ export default (isMobile?: boolean) => ({
       <>
         There's never been a better time to build.
         <br />
-        Take our State of Startups 2025 survey and learn the latest trends among builders in tech
-        stacks, AI usage, problem domains, and more. <br className="hidden md:block" />
-        Get an exclusive Supabase t-shirt for sharing your insights.
+        Take our State of Startups survey to receive an exclusive Supabase t-shirt and a report on
+        the survey results.
       </>
     ),
     className: '[&_h1]:max-w-2xl',

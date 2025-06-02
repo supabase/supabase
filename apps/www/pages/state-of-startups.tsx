@@ -1,17 +1,18 @@
-import { NextSeo } from 'next-seo'
-import DefaultLayout from '~/components/Layouts/Default'
-
-import data from '~/data/surveys/state-of-startups-2025'
-import { Button, Checkbox, cn } from 'ui'
-import Link from 'next/link'
-import SectionContainer from '../components/Layouts/SectionContainer'
-import { Input } from 'ui/src/components/shadcn/ui/input'
-import { Label } from 'ui/src/components/shadcn/ui/label'
 import { useEffect, useRef, useState } from 'react'
 import { animate, createSpring, createTimeline, stagger } from 'animejs'
+import Link from 'next/link'
 import Image from 'next/image'
+import { NextSeo } from 'next-seo'
+
+import { Button, Checkbox, cn } from 'ui'
 import { PopupFrame } from 'ui-patterns'
-import { useSendTelemetryEvent } from '../lib/telemetry'
+import { Input } from 'ui/src/components/shadcn/ui/input'
+import { Label } from 'ui/src/components/shadcn/ui/label'
+import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+
+import data from '~/data/surveys/state-of-startups-2025'
 
 interface FormData {
   email: string
@@ -440,7 +441,7 @@ const Hero = (props: any) => {
                   State of Startups
                 </div>
               </div>
-              <p className="p !text-foreground-light max-w-xl">{props.subheader}</p>
+              <p className="p !text-foreground-light max-w-md">{props.subheader}</p>
             </div>
             <div className="w-full sm:w-auto flex flex-col items-stretch sm:flex-row pt-2 sm:items-center gap-2">
               <PopupFrame
