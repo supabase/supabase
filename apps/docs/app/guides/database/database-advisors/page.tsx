@@ -1,19 +1,18 @@
 import { Octokit } from '@octokit/core'
-import { capitalize } from 'lodash'
-import { type SerializeOptions } from 'next-mdx-remote/dist/types'
+import { capitalize } from 'lodash-es'
 import rehypeSlug from 'rehype-slug'
-
 import { Heading } from 'ui'
 
-import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
-import { Tabs, TabPanel } from '~/features/ui/Tabs'
+import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
+import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
