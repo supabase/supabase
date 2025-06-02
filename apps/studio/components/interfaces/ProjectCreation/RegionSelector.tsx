@@ -40,9 +40,7 @@ export const RegionSelector = ({
   const availableRegions = getAvailableRegions(PROVIDERS[cloudProvider].id)
   const regionsArray = Object.entries(availableRegions)
 
-  const { isLoading: isLoadingDefaultRegion } = useDefaultRegionQuery({
-    cloudProvider,
-  })
+  const { isLoading: isLoadingDefaultRegion } = useDefaultRegionQuery({ cloudProvider })
 
   return (
     <FormItemLayout

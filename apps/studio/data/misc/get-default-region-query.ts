@@ -6,28 +6,22 @@ import {
   FLY_REGIONS_COORDINATES,
 } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { fetchHandler } from 'data/fetchers'
-import { getDistanceLatLonKM } from 'lib/helpers'
+import { useFlag } from 'hooks/ui/useFlag'
+import { getDistanceLatLonKM, tryParseJson } from 'lib/helpers'
 import type { CloudProvider } from 'shared-data'
 import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 import type { ResponseError } from 'types'
 import { miscKeys } from './keys'
 
-const RESTRICTED_POOL = [
-  'EAST_US_2',
-  'CENTRAL_EU',
-  'NORTH_EU',
-  'WEST_EU',
-  'WEST_EU_2',
-  'SOUTHEAST_ASIA',
-]
-
 export type DefaultRegionVariables = {
   cloudProvider?: CloudProvider
+  restrictedPool?: string[]
   useRestrictedPool?: boolean
 }
 
 export async function getDefaultRegionOption({
   cloudProvider,
+  restrictedPool,
   useRestrictedPool = true,
 }: DefaultRegionVariables) {
   if (!cloudProvider) throw new Error('Cloud provider is required')
@@ -44,11 +38,12 @@ export async function getDefaultRegionOption({
     if (locLatLon === undefined) return undefined
 
     const allRegions = cloudProvider === 'AWS' ? AWS_REGIONS_COORDINATES : FLY_REGIONS_COORDINATES
-    const locations = useRestrictedPool
-      ? Object.entries(allRegions)
-          .filter((x) => RESTRICTED_POOL.includes(x[0]))
-          .reduce((o, val) => ({ ...o, [val[0]]: val[1] }), {})
-      : allRegions
+    const locations =
+      useRestrictedPool && restrictedPool
+        ? Object.entries(allRegions)
+            .filter((x) => restrictedPool.includes(x[0]))
+            .reduce((o, val) => ({ ...o, [val[0]]: val[1] }), {})
+        : allRegions
 
     const distances = Object.keys(locations).map((reg) => {
       const region: { lat: number; lon: number } = {
@@ -74,15 +69,21 @@ export type DefaultRegionError = ResponseError
 export const useDefaultRegionQuery = <TData = DefaultRegionData>(
   { cloudProvider, useRestrictedPool }: DefaultRegionVariables,
   { enabled = true, ...options }: UseQueryOptions<DefaultRegionData, DefaultRegionError, TData> = {}
-) =>
-  useQuery<DefaultRegionData, DefaultRegionError, TData>(
+) => {
+  // [Joshen] Flag allows us to specify restricted regions for users based on percentage
+  const restrictedPoolFlag = useFlag('defaultRegionRestrictedPool')
+  const restrictedPool = tryParseJson(restrictedPoolFlag)
+
+  return useQuery<DefaultRegionData, DefaultRegionError, TData>(
     miscKeys.defaultRegion(cloudProvider, useRestrictedPool ?? true),
-    () => getDefaultRegionOption({ cloudProvider, useRestrictedPool }),
+    () => getDefaultRegionOption({ cloudProvider, restrictedPool, useRestrictedPool }),
     {
-      enabled: enabled && typeof cloudProvider !== 'undefined',
+      enabled:
+        enabled && typeof cloudProvider !== 'undefined' && typeof restrictedPool !== 'undefined',
       retry(failureCount) {
         return failureCount < 1
       },
       ...options,
     }
   )
+}
