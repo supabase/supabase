@@ -62,7 +62,7 @@ export const DeleteUserModal = ({
           checked={softDelete}
           onChange={(e) => setSoftDelete(e.target.checked)}
         />
-        <span className="text-sm">Soft-delete (retain user record for data auditing)</span>
+        <span className="text-sm">Soft-delete (preserves data associated with the user record for data auditing)</span>
       </label>
       <p className="text-sm text-foreground-light">
         This is permanent! Are you sure you want to delete the user{' '}
