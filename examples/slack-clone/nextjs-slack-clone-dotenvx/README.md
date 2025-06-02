@@ -116,6 +116,8 @@ Visit `localhost:3000` to test the app with GitHub OAuth integration.
 - **Vercel Account**
 - **Supabase Account**
 
+### How to Deploy Locally
+
 1. **Create a Supabase Project:**
 
 Sign up at [Supabase Dashboard](https://supabase.com/dashboard) and create a new project. After the database initializes, create `supabase/.env.production` file with your project specific values.
