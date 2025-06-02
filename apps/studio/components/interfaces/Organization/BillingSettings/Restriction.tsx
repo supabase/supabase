@@ -90,15 +90,20 @@ export const Restriction = () => {
                 {dayjs(org.restriction_data['grace_period_end']).format('DD MMM, YYYY')}
               </span>
               . After that, the Fair Use Policy will apply. If you plan to maintain this level of
-              usage, upgrade your plan to avoid any restrictions. If restrictions are applied,
-              requests to your projects will return a 402 status code.
+              usage, {org.plan.id === 'free' ? 'upgrade your plan' : 'disable spend cap'} to avoid
+              any restrictions. If restrictions are applied, requests to your projects will return a
+              402 status code.
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button asChild key="upgrade-button" type="default">
                 <Link
-                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=fairUseGracePeriodStarted`}
+                  href={`/org/${org?.slug}/billing?panel=${
+                    org.plan.id === 'free'
+                      ? 'subscriptionPlan&source=fairUseGracePeriodStarted'
+                      : 'costControl&source=fairUseGracePeriodStarted'
+                  }`}
                 >
-                  Upgrade plan
+                  {org.plan.id === 'free' ? 'Upgrade plan' : 'Disable spend cap'}
                 </Link>
               </Button>
               <Button asChild type="default" icon={<ExternalLink />}>
@@ -120,16 +125,20 @@ export const Restriction = () => {
               <span className="text-foreground">
                 {dayjs(org.restriction_data['grace_period_end']).format('DD MMM, YYYY')}
               </span>
-              . Fair Use Policy applies now. Stay below your plan’s quota or upgrade your plan if
-              you expect to exceed it. If you exceed your quota, requests will respond with a 402
-              status code.
+              . Fair Use Policy applies now. Stay below your plan’s quota or{' '}
+              {org.plan.id === 'free' ? 'upgrade your plan' : 'disable spend cap'} if you expect to
+              exceed it. If you exceed your quota, requests will respond with a 402 status code.
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button key="upgrade-button" asChild type="default">
                 <Link
-                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=fairUseGracePeriodOver`}
+                  href={`/org/${org?.slug}/billing?panel=${
+                    org.plan.id === 'free'
+                      ? 'subscriptionPlan&source=fairUseGracePeriodOver'
+                      : 'costControl&source=fairUseGracePeriodOver'
+                  }`}
                 >
-                  Upgrade plan
+                  {org.plan.id === 'free' ? 'Upgrade plan' : 'Disable spend cap'}
                 </Link>
               </Button>
               <Button asChild type="default" icon={<ExternalLink />}>
@@ -153,14 +162,19 @@ export const Restriction = () => {
               <span className="text-foreground">
                 {dayjs(org.restriction_data['grace_period_end']).format('DD MMM, YYYY')}
               </span>
-              . Upgrade to lift restrictions or wait until your quota refills.
+              . {org.plan.id === 'free' ? 'Upgrade your plan' : 'Disable spend cap'} to lift
+              restrictions or wait until your quota refills.
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button key="upgrade-button" asChild type="default">
                 <Link
-                  href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=fairUseRestricted`}
+                  href={`/org/${org?.slug}/billing?panel=${
+                    org.plan.id === 'free'
+                      ? 'subscriptionPlan&source=fairUseRestricted'
+                      : 'costControl&source=fairUseRestricted'
+                  }`}
                 >
-                  Upgrade plan
+                  {org.plan.id === 'free' ? 'Upgrade plan' : 'Disable spend cap'}
                 </Link>
               </Button>
               <Button asChild type="default" icon={<ExternalLink />}>
