@@ -1,48 +1,23 @@
-import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock'
-import { fromNodeProviderChain } from '@aws-sdk/credential-providers'
 import crypto from 'crypto'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import { streamText, tool, type Tool } from 'ai'
-import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { streamText, tool, ToolSet } from 'ai'
+import { source } from 'common-tags'
+import { aiOptInLevelSchema } from 'hooks/misc/useOrgOptedIntoAi'
+import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
-import { createSupabaseMCPClient } from './supabase-mcp'
+import {
+  createSupabaseMCPClient,
+  expectedToolsSchema,
+  filterToolsByOptInLevel,
+  transformToolResult,
+} from './supabase-mcp'
 
 export const maxDuration = 30
 
-const credentialProvider = fromNodeProviderChain()
-
-const bedrock = createAmazonBedrock({
-  credentialProvider,
-})
-
-async function hasAwsCredentials() {
-  try {
-    const credentials = await credentialProvider()
-    return !!credentials
-  } catch (error) {
-    return false
-  }
-}
-
-const hasCredentials = await hasAwsCredentials()
-
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
-
-  if (!process.env.AWS_REGION) {
-    return res.status(500).json({
-      error: 'AWS_REGION is not set',
-    })
-  }
-
-  if (!hasCredentials) {
-    return res.status(500).json({
-      error:
-        'AWS credentials are not configured. Set up a local profile or add environment variables.',
-    })
-  }
 
   switch (method) {
     case 'POST':
@@ -58,21 +33,15 @@ const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
 
 export default wrapper
 
+const requestBodySchema = z.object({
+  messages: z.array(z.any()),
+  projectRef: z.string(),
+  aiOptInLevel: aiOptInLevelSchema,
+  schema: z.string().optional(),
+  table: z.string().optional(),
+})
+
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
-  const { messages, projectRef, aiOptInLevel, schema, table } = req.body as {
-    messages: any[] // Use stronger types if available
-    projectRef: string
-    aiOptInLevel: AiOptInLevel
-    schema?: string
-    table?: string
-  }
-
-  if (!projectRef) {
-    return res.status(400).json({
-      error: 'Missing project_ref in query parameters',
-    })
-  }
-
   const authorization = req.headers.authorization
   const accessToken = authorization?.replace('Bearer ', '')
 
@@ -80,175 +49,122 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(401).json({ error: 'Authorization token is required' })
   }
 
-  let mcpTools: Record<string, Tool<any, unknown>> = {}
-  let wrappedExecuteSqlTool: Tool<any, unknown> | undefined = undefined
+  const { model, error: modelError } = await getModel()
+
+  if (modelError) {
+    return res.status(500).json({ error: modelError.message })
+  }
+
+  const { data, error: parseError } = requestBodySchema.safeParse(req.body)
+
+  if (parseError) {
+    return res.status(400).json({
+      error: 'Invalid request body',
+      issues: parseError.issues,
+    })
+  }
+
+  const { messages, projectRef, aiOptInLevel, schema, table } = data
 
   try {
-    const privacyMessage =
-      "You don't have permission to use this tool. This is an organization-wide setting requiring you to opt-in. Please choose your preferred data sharing level in your organization's settings. Supabase Assistant uses Amazon Bedrock, which does not store or log your prompts and completions, use them to train AWS models, or distribute them to third parties. By default, no data is shared. Granting permission allows Supabase to send information (like schema, logs, or data, depending on your chosen level) to Bedrock solely to generate responses."
-    const condensedPrivacyMessage =
-      'Requires opting in to sending data to Bedrock which does not store, train on, or distribute it. You can opt in via organization settings.'
-
-    const createPrivacyMessageTool = (toolInstance: Tool<any, any>) => {
-      return {
-        ...toolInstance,
-        description: `${toolInstance.description} (Note: ${condensedPrivacyMessage})`,
-        execute: async (_args: any, _context: any) => ({ status: privacyMessage }),
-      }
-    }
-
     // Fetch MCP client and tools
     const mcpClient = await createSupabaseMCPClient({
       accessToken,
       projectId: projectRef,
     })
 
-    let availableMcpTools = await mcpClient.tools()
+    const availableMcpTools = await mcpClient.tools()
 
-    let allAllowedTools = [
-      'list_tables',
-      'list_extensions',
-      'list_edge_functions',
-      'list_branches',
-      'get_project',
-      'execute_sql',
-      'get_logs',
-    ]
+    // Validate that the expected tools are available
+    const { data: validatedTools, error: validationError } =
+      expectedToolsSchema.safeParse(availableMcpTools)
 
-    // Filter out tools that should never be available across any permission level
-    availableMcpTools = Object.fromEntries(
-      Object.entries(availableMcpTools).filter(([key]) => allAllowedTools.includes(key))
-    )
-
-    // Build allowed tools based on permission level
-    let allowedTools: string[] = []
-
-    // For schema and above permission levels
-    if (
-      aiOptInLevel === 'schema' ||
-      aiOptInLevel === 'schema_and_log' ||
-      aiOptInLevel === 'schema_and_log_and_data'
-    ) {
-      allowedTools = [
-        'list_tables',
-        'list_extensions',
-        'list_edge_functions',
-        'list_branches',
-        'get_project',
-      ]
+    if (validationError) {
+      console.error('MCP tools validation error:', validationError)
+      return res.status(500).json({
+        error: 'Internal error: MCP tools validation failed',
+        issues: validationError.issues,
+      })
     }
 
-    // For schema_and_log permission level, add log access tools
-    if (aiOptInLevel === 'schema_and_log' || aiOptInLevel === 'schema_and_log_and_data') {
-      allowedTools = [...allowedTools, 'get_logs']
-    }
+    // Modify the execute_sql tool to add manualToolCallId
+    const modifiedMcpTools = {
+      ...availableMcpTools,
+      execute_sql: transformToolResult(validatedTools.execute_sql, (result) => {
+        const manualToolCallId = `manual_${crypto.randomUUID()}`
 
-    // For schema_and_log_and_data permission level, add data access tools
-    if (aiOptInLevel === 'schema_and_log_and_data') {
-      allowedTools = [...allowedTools, 'execute_sql']
-    }
-
-    // Process tools based on permission level
-    mcpTools = Object.fromEntries(
-      Object.entries(availableMcpTools).map(([key, toolInstance]) => {
-        if (allowedTools.includes(key)) {
-          return [key, toolInstance]
+        if (typeof result === 'object') {
+          return { ...result, manualToolCallId }
+        } else {
+          console.warn('execute_sql result is not an object, cannot add manualToolCallId')
+          return {
+            error: 'Internal error: Unexpected tool result format',
+            manualToolCallId,
+          }
         }
-        return [key, createPrivacyMessageTool(toolInstance)]
-      })
-    )
-
-    // Wrap execute_sql only if it's allowed and exists
-    const originalExecuteSqlTool = mcpTools.execute_sql as Tool<any, any> | undefined
-    if (originalExecuteSqlTool && allowedTools.includes('execute_sql')) {
-      wrappedExecuteSqlTool = tool({
-        ...originalExecuteSqlTool,
-        execute: async (args, context) => {
-          if (!originalExecuteSqlTool.execute) {
-            throw new Error('Original execute_sql tool has no execute function.')
-          }
-          const originalResult = await originalExecuteSqlTool.execute(args, context)
-          const manualToolCallId = `manual_${crypto.randomUUID()}`
-
-          if (originalResult && typeof originalResult === 'object') {
-            ;(originalResult as any).manualToolCallId = manualToolCallId
-          } else {
-            console.warn('execute_sql result is not an object, cannot add manualToolCallId')
-            return {
-              error: 'Internal error: Unexpected tool result format',
-              manualToolCallId: manualToolCallId,
-            }
-          }
-
-          return originalResult
-        },
-      })
-    } else {
-      console.warn(
-        'execute_sql tool not found in mcpTools or not allowed at this permission level.'
-      )
+      }),
     }
 
-    const display_query = tool({
-      description:
-        'Displays SQL query results (table or chart) or renders SQL for write/DDL operations. Use this for all query display needs. Optionally references a previous execute_sql call via manualToolCallId for displaying SELECT results.',
-      parameters: z.object({
-        manualToolCallId: z
-          .string()
-          .optional()
-          .describe(
-            'The manual ID from the corresponding execute_sql result (for SELECT queries).'
-          ),
-        sql: z.string().describe('The SQL query.'),
-        label: z
-          .string()
-          .describe(
-            'The title or label for this query block (e.g., "Users Over Time", "Create Users Table").'
-          ),
-        view: z
-          .enum(['table', 'chart'])
-          .optional()
-          .describe(
-            'Display mode for SELECT results: table or chart. Required if manualToolCallId is provided.'
-          ),
-        xAxis: z.string().optional().describe('Key for the x-axis (required if view is chart).'),
-        yAxis: z.string().optional().describe('Key for the y-axis (required if view is chart).'),
-        runQuery: z
-          .boolean()
-          .optional()
-          .describe(
-            'Whether to automatically run the query. Set to true for read-only queries when manualToolCallId does not exist due to permissions. Should be false for write/DDL operations.'
-          ),
-      }),
-      execute: async (args) => {
-        const statusMessage = args.manualToolCallId
-          ? 'Tool call sent to client for rendering SELECT results.'
-          : 'Tool call sent to client for rendering write/DDL query.'
-        return { status: statusMessage }
-      },
-    })
+    // Filter tools based on the AI opt-in level
+    const mcpTools = filterToolsByOptInLevel(modifiedMcpTools, aiOptInLevel)
 
-    const display_edge_function = tool({
-      description: 'Renders the code for a Supabase Edge Function for the user to deploy manually.',
-      parameters: z.object({
-        name: z
-          .string()
-          .describe('The URL-friendly name of the Edge Function (e.g., "my-function").'),
-        code: z.string().describe('The TypeScript code for the Edge Function.'),
-      }),
-      execute: async (args) => {
-        return { status: 'Tool call sent to client for rendering.' }
-      },
-    })
-
-    const allTools = {
+    // Combine MCP tools with custom tools
+    const tools: ToolSet = {
       ...mcpTools,
-      ...(wrappedExecuteSqlTool && { execute_sql: wrappedExecuteSqlTool }),
-      display_query,
-      display_edge_function,
+      display_query: tool({
+        description:
+          'Displays SQL query results (table or chart) or renders SQL for write/DDL operations. Use this for all query display needs. Optionally references a previous execute_sql call via manualToolCallId for displaying SELECT results.',
+        parameters: z.object({
+          manualToolCallId: z
+            .string()
+            .optional()
+            .describe(
+              'The manual ID from the corresponding execute_sql result (for SELECT queries).'
+            ),
+          sql: z.string().describe('The SQL query.'),
+          label: z
+            .string()
+            .describe(
+              'The title or label for this query block (e.g., "Users Over Time", "Create Users Table").'
+            ),
+          view: z
+            .enum(['table', 'chart'])
+            .optional()
+            .describe(
+              'Display mode for SELECT results: table or chart. Required if manualToolCallId is provided.'
+            ),
+          xAxis: z.string().optional().describe('Key for the x-axis (required if view is chart).'),
+          yAxis: z.string().optional().describe('Key for the y-axis (required if view is chart).'),
+          runQuery: z
+            .boolean()
+            .optional()
+            .describe(
+              'Whether to automatically run the query. Set to true for read-only queries when manualToolCallId does not exist due to permissions. Should be false for write/DDL operations.'
+            ),
+        }),
+        execute: async (args) => {
+          const statusMessage = args.manualToolCallId
+            ? 'Tool call sent to client for rendering SELECT results.'
+            : 'Tool call sent to client for rendering write/DDL query.'
+          return { status: statusMessage }
+        },
+      }),
+      display_edge_function: tool({
+        description:
+          'Renders the code for a Supabase Edge Function for the user to deploy manually.',
+        parameters: z.object({
+          name: z
+            .string()
+            .describe('The URL-friendly name of the Edge Function (e.g., "my-function").'),
+          code: z.string().describe('The TypeScript code for the Edge Function.'),
+        }),
+        execute: async () => {
+          return { status: 'Tool call sent to client for rendering.' }
+        },
+      }),
     }
 
-    let systemPrompt = `
+    const system = source`
       The current project is ${projectRef}.
       You are a Supabase Postgres expert. Your goal is to generate SQL or Edge Function code based on user requests, using specific tools for rendering.
 
@@ -392,16 +308,19 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     `
 
     const result = streamText({
-      model: bedrock('us.anthropic.claude-sonnet-4-20250514-v1:0'),
+      model,
       maxSteps: 10,
-      system: systemPrompt.trim(),
+      system,
       messages,
-      tools: allTools,
+      tools,
     })
 
     result.pipeDataStreamToResponse(res)
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error in handlePost:', error)
-    return res.status(500).json({ message: error.message })
+    if (error instanceof Error) {
+      return res.status(500).json({ message: error.message })
+    }
+    return res.status(500).json({ message: 'An unexpected error occurred.' })
   }
 }
