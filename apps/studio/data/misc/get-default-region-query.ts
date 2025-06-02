@@ -12,13 +12,7 @@ import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 import type { ResponseError } from 'types'
 import { miscKeys } from './keys'
 
-const RESTRICTED_POOL = [
-  'EAST_US_2',
-  'NORTH_EU',
-  'WEST_EU',
-  'WEST_EU_2',
-  'SOUTHEAST_ASIA',
-]
+const RESTRICTED_POOL = ['EAST_US_2', 'NORTH_EU', 'WEST_EU', 'WEST_EU_2', 'SOUTHEAST_ASIA']
 
 export type DefaultRegionVariables = {
   cloudProvider?: CloudProvider
