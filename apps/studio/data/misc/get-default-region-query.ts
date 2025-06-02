@@ -14,7 +14,6 @@ import { miscKeys } from './keys'
 
 const RESTRICTED_POOL = [
   'EAST_US_2',
-  'CENTRAL_EU',
   'NORTH_EU',
   'WEST_EU',
   'WEST_EU_2',
