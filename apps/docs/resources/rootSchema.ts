@@ -6,6 +6,7 @@ import {
   printSchema,
 } from 'graphql'
 import { RootQueryTypeResolvers } from '~/__generated__/graphql'
+import { errorRoot } from './error/errorResolver'
 import { searchRoot } from './globalSearch/globalSearchResolver'
 import { GraphQLObjectTypeGuide } from './guide/guideSchema'
 import { GraphQLObjectTypeReferenceCLICommand } from './reference/referenceCLISchema'
@@ -35,6 +36,7 @@ export const rootGraphQLSchema = new GraphQLSchema({
     fields: {
       ...introspectRoot,
       ...searchRoot,
+      ...errorRoot,
     },
   }),
   types: [

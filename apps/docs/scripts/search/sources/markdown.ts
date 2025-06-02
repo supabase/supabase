@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises'
-import { processMdx } from '../../helpers.mdx'
-import { BaseLoader, BaseSource } from './base'
+import { processMdx } from '../../helpers.mdx.js'
+import { BaseLoader, BaseSource } from './base.js'
 
 export class MarkdownLoader extends BaseLoader {
   type = 'markdown' as const

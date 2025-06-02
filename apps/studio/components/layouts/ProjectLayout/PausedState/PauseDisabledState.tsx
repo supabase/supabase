@@ -160,7 +160,7 @@ export const PauseDisabledState = () => {
             </DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button asChild type="default" icon={<ExternalLink />}>
+        <Button asChild type="default" icon={<ExternalLink />} className="my-3">
           <a
             target="_blank"
             rel="noreferrer"
@@ -169,7 +169,7 @@ export const PauseDisabledState = () => {
             Restore backup to a new Supabase project guide
           </a>
         </Button>
-        <Button asChild type="default" icon={<ExternalLink />}>
+        <Button asChild type="default" icon={<ExternalLink />} className="mb-3">
           <a
             target="_blank"
             rel="noreferrer"
