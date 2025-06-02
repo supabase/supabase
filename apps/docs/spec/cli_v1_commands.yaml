@@ -1678,6 +1678,8 @@ commands:
       > If you do not want to be prompted for the database password, such as in a CI environment, you may specify it explicitly via the `SUPABASE_DB_PASSWORD` environment variable.
 
       Some commands like `db dump`, `db push`, and `db pull` require your project to be linked first.
+
+      The selected project ref is stored in `supabase/.temp/project_ref`.
     examples:
       - id: basic-usage
         name: Basic usage
