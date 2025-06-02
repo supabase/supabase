@@ -220,6 +220,7 @@ export const UsersV2 = () => {
         `Successfully deleted the selected ${selectedUsers.size} user${selectedUsers.size > 1 ? 's' : ''}`
       )
       setShowDeleteModal(false)
+      setIsDeletingUsers(false)
       setSelectedUsers(new Set([]))
 
       if (userIds.includes(selectedUser)) setSelectedUser(undefined)
