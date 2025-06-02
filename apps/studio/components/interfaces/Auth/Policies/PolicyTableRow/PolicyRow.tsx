@@ -78,10 +78,10 @@ const PolicyRow = ({
               <div className="text-foreground-lighter text-sm">
                 Applied to:{' '}
                 {policy.roles.slice(0, 3).map((role, i) => (
-                  <code key={`policy-${role}-${i}`} className="text-foreground-light text-xs">
-                    {role}
-                    {policy.roles.length > 1 ? '' : ' '}
-                  </code>
+                  <span key={`policy-${role}-${i}`}>
+                    <code className="text-foreground-light text-xs">{role}</code>
+                    {i < Math.min(policy.roles.length, 3) - 1 && ', '}
+                  </span>
                 ))}
                 {policy.roles.length > 1 ? 'roles' : 'role'}
               </div>
