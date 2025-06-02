@@ -18,6 +18,10 @@ export class ApiError<Details extends ObjectOrNever = never> extends Error {
     return true
   }
 
+  isUserError() {
+    return false
+  }
+
   statusCode() {
     return 500
   }
@@ -32,8 +36,30 @@ export class InvalidRequestError<Details extends ObjectOrNever = never> extends 
     return false
   }
 
+  isUserError() {
+    return true
+  }
+
   statusCode() {
     return 400
+  }
+}
+
+export class NoDataError<Details extends ObjectOrNever = never> extends ApiError<Details> {
+  constructor(message: string, source?: unknown, details?: Details) {
+    super(`Data not found: ${message}`, source, details)
+  }
+
+  isPrivate() {
+    return false
+  }
+
+  isUserError() {
+    return true
+  }
+
+  statusCode() {
+    return 404
   }
 }
 

@@ -1,6 +1,8 @@
+import _configureDotEnv from './utils/dotenv'
+
 import 'dotenv/config'
 import fs from 'node:fs/promises'
-
+import { fileURLToPath } from 'node:url'
 import {
   fetchCliLibReferenceSource,
   fetchCSharpLibReferenceSource,
@@ -11,7 +13,9 @@ import {
   fetchPythonLibReferenceSource,
   fetchSwiftLibReferenceSource,
   type SearchSource,
-} from './search/sources'
+} from './search/sources/index.js'
+
+const _ = _configureDotEnv
 
 interface Source {
   title: string
@@ -97,6 +101,6 @@ async function generateLlmsTxt() {
   }
 }
 
-if (require.main === module) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   generateLlmsTxt()
 }

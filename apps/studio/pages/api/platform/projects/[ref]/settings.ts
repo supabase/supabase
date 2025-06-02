@@ -4,7 +4,9 @@ import { components } from 'api-types'
 import apiWrapper from 'lib/api/apiWrapper'
 import { PROJECT_ENDPOINT, PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
-type ProjectAppConfig = components['schemas']['ProjectAppConfigResponse'] & { protocol?: string }
+type ProjectAppConfig = components['schemas']['ProjectSettingsResponse']['app_config'] & {
+  protocol?: string
+}
 export type ProjectSettings = components['schemas']['ProjectSettingsResponse'] & {
   app_config?: ProjectAppConfig
 }

@@ -46,7 +46,8 @@ async function resolveSearchImpl(
   _context: unknown,
   info: GraphQLResolveInfo
 ): Promise<Result<Array<SearchResultModel>, ApiErrorGeneric>> {
-  const requestedFields = Object.keys(graphQLFields(info).nodes)
+  const fieldsInfo = graphQLFields(info)
+  const requestedFields = Object.keys(fieldsInfo.nodes ?? fieldsInfo.edges?.node ?? {})
   return await SearchResultModel.search(args, requestedFields)
 }
 
