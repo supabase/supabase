@@ -164,7 +164,6 @@
     "@vitest/coverage-v8": "^3.0.9",
     "@vitest/ui": "^3.0.0",
     "api-types": "workspace:*",
-    "autoprefixer": "^10.4.14",
     "common": "workspace:*",
     "config": "workspace:*",
     "date-fns": "^2.30.0",

@@ -4,8 +4,8 @@ description: Using Postgres Hooks to allow regular users to create event trigger
 author: steve_chavez
 author_url: https://github.com/steve-chavez
 author_image_url: https://github.com/steve-chavez.png
-image: 2025-05-08-event-triggers-wo-superuser/cover-event-triggers.png
-thumb: 2025-05-08-event-triggers-wo-superuser/cover-event-triggers.png
+image: 2025-05-08-event-triggers-wo-superuser/cover-event-triggers-dark.png
+thumb: 2025-05-08-event-triggers-wo-superuser/cover-event-triggers-dark.png
 categories:
   - postgres
 tags:
@@ -24,7 +24,14 @@ In this blog post, we’ll explain how we do this in the `supautils` extension, 
 
 ## Privileged Role
 
-![utility hook](/images/blog/2025-05-08-event-triggers-wo-superuser/utility-hook.png)
+<Img
+  wide
+  alt="Utility Hook"
+  src={{
+    dark: '/images/blog/2025-05-08-event-triggers-wo-superuser/utility-hook-dark.png',
+    light: '/images/blog/2025-05-08-event-triggers-wo-superuser/utility-hook-light.png',
+  }}
+/>
 
 The core of `supautils` is the “privileged role”, which is a role that serves as proxy to superuser. It provides a safe subset of superuser capabilities and it’s accessible to regular users.
 
@@ -61,7 +68,14 @@ And once a superuser trips on the event trigger, it will fire with its privilege
 
 ## Skipping Event Triggers
 
-![fmgr hook](/images/blog/2025-05-08-event-triggers-wo-superuser/fmgr-hook.png)
+<Img
+  wide
+  alt="FMGR Hook"
+  src={{
+    dark: '/images/blog/2025-05-08-event-triggers-wo-superuser/fmgr-hook-dark.png',
+    light: '/images/blog/2025-05-08-event-triggers-wo-superuser/fmgr-hook-light.png',
+  }}
+/>
 
 A solution would be skipping user Event Triggers for superusers.
 

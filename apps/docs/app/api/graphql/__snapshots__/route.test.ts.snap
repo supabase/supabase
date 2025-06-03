@@ -131,6 +131,9 @@ type RootQueryType {
 
   """Search the Supabase docs for content matching a query string"""
   searchDocs(query: String!, limit: Int): SearchResultCollection
+
+  """Get the details of an error code returned from a Supabase service"""
+  error(code: String!, service: Service!): Error
 }
 
 """A collection of search results containing content from Supabase docs"""
@@ -149,5 +152,30 @@ type SearchResultCollection {
 type SearchResultEdge {
   """The SearchResult at the end of the edge"""
   node: SearchResult!
+}
+
+"""An error returned by a Supabase service"""
+type Error {
+  """
+  The unique code identifying the error. The code is stable, and can be used for string matching during error handling.
+  """
+  code: String!
+
+  """The Supabase service that returns this error."""
+  service: Service!
+
+  """The HTTP status code returned with this error."""
+  httpStatusCode: Int
+
+  """
+  A human-readable message describing the error. The message is not stable, and should not be used for string matching during error handling. Use the code instead.
+  """
+  message: String
+}
+
+enum Service {
+  AUTH
+  REALTIME
+  STORAGE
 }"
 `;
