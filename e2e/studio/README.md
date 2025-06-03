@@ -8,6 +8,12 @@ cp .env.local.example .env.local
 
 Edit the `.env.local` file with your credentials and environment.
 
+### Install the playwright browser
+
+```bash
+pnpm exec playwright install
+```
+
 ## Environments
 
 ### Staging
