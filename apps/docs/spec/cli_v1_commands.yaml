@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.23.4
+  version: 2.24.3
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -1070,23 +1070,47 @@ commands:
         description: Select a desired instance size for your project.
         default_value: ''
         accepted_values:
-          - id: micro
-            name: micro
-            type: string
-          - id: small
-            name: small
+          - id: large
+            name: large
             type: string
           - id: medium
             name: medium
             type: string
-          - id: large
-            name: large
+          - id: micro
+            name: micro
             type: string
-          - id: xlarge
-            name: xlarge
+          - id: 12xlarge
+            name: 12xlarge
+            type: string
+          - id: 16xlarge
+            name: 16xlarge
+            type: string
+          - id: 24xlarge
+            name: 24xlarge
+            type: string
+          - id: 24xlarge_high_memory
+            name: 24xlarge_high_memory
+            type: string
+          - id: 24xlarge_optimized_cpu
+            name: 24xlarge_optimized_cpu
+            type: string
+          - id: 24xlarge_optimized_memory
+            name: 24xlarge_optimized_memory
             type: string
           - id: 2xlarge
             name: 2xlarge
+            type: string
+          - id: 48xlarge
+            name: 48xlarge
+            type: string
+          - id: 48xlarge_high_memory
+            name: 48xlarge_high_memory
+            type: string
+          - id: 48xlarge_optimized_cpu
+            name: 48xlarge_optimized_cpu
+            type: string
+          - id: 48xlarge_optimized_memory
+            name: 48xlarge_optimized_memory
             type: string
           - id: 4xlarge
             name: 4xlarge
@@ -1094,11 +1118,14 @@ commands:
           - id: 8xlarge
             name: 8xlarge
             type: string
-          - id: 12xlarge
-            name: 12xlarge
+          - id: pico
+            name: pico
             type: string
-          - id: 16xlarge
-            name: 16xlarge
+          - id: small
+            name: small
+            type: string
+          - id: xlarge
+            name: xlarge
             type: string
   - id: supabase-projects-api-keys
     title: supabase projects api-keys
@@ -1678,8 +1705,6 @@ commands:
       > If you do not want to be prompted for the database password, such as in a CI environment, you may specify it explicitly via the `SUPABASE_DB_PASSWORD` environment variable.
 
       Some commands like `db dump`, `db push`, and `db pull` require your project to be linked first.
-
-      The selected project ref is stored in `supabase/.temp/project_ref`.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -3772,23 +3797,47 @@ commands:
         description: Select a desired instance size for the branch database.
         default_value: ''
         accepted_values:
-          - id: micro
-            name: micro
-            type: string
-          - id: small
-            name: small
+          - id: large
+            name: large
             type: string
           - id: medium
             name: medium
             type: string
-          - id: large
-            name: large
+          - id: micro
+            name: micro
             type: string
-          - id: xlarge
-            name: xlarge
+          - id: 12xlarge
+            name: 12xlarge
+            type: string
+          - id: 16xlarge
+            name: 16xlarge
+            type: string
+          - id: 24xlarge
+            name: 24xlarge
+            type: string
+          - id: 24xlarge_high_memory
+            name: 24xlarge_high_memory
+            type: string
+          - id: 24xlarge_optimized_cpu
+            name: 24xlarge_optimized_cpu
+            type: string
+          - id: 24xlarge_optimized_memory
+            name: 24xlarge_optimized_memory
             type: string
           - id: 2xlarge
             name: 2xlarge
+            type: string
+          - id: 48xlarge
+            name: 48xlarge
+            type: string
+          - id: 48xlarge_high_memory
+            name: 48xlarge_high_memory
+            type: string
+          - id: 48xlarge_optimized_cpu
+            name: 48xlarge_optimized_cpu
+            type: string
+          - id: 48xlarge_optimized_memory
+            name: 48xlarge_optimized_memory
             type: string
           - id: 4xlarge
             name: 4xlarge
@@ -3796,11 +3845,14 @@ commands:
           - id: 8xlarge
             name: 8xlarge
             type: string
-          - id: 12xlarge
-            name: 12xlarge
+          - id: pico
+            name: pico
             type: string
-          - id: 16xlarge
-            name: 16xlarge
+          - id: small
+            name: small
+            type: string
+          - id: xlarge
+            name: xlarge
             type: string
       - id: experimental
         name: --experimental
