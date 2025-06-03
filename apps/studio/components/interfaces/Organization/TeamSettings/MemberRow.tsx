@@ -1,4 +1,5 @@
 import { ArrowRight, Check, Minus, User, X } from 'lucide-react'
+import Link from 'next/link'
 
 import Table from 'components/to-be-cleaned/Table'
 import PartnerIcon from 'components/ui/PartnerIcon'
@@ -9,7 +10,6 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { getGitHubProfileImgUrl } from 'lib/github'
 import { useProfile } from 'lib/profile'
-import Link from 'next/link'
 import {
   Badge,
   HoverCardContent_Shadcn_,
@@ -19,7 +19,7 @@ import {
   cn,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
+import { isInviteExpired } from '../Organization.utils'
 import { MemberActions } from './MemberActions'
 
 interface MemberRowProps {
