@@ -2,10 +2,8 @@ import { ContextLengthError } from 'ai-commands'
 import { classifyFeedback } from 'ai-commands/edge'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
-import OpenAI from 'openai'
 
 const openAiKey = process.env.OPENAI_API_KEY
-const openai = new OpenAI({ apiKey: openAiKey })
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!openAiKey) {
@@ -31,8 +29,9 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   } = req
 
   try {
-    const result = await classifyFeedback(openai, prompt)
-    return res.status(200).send(result)
+    const result = await classifyFeedback(prompt)
+    res.status(200).json({ feedback_category: result })
+    return
   } catch (error) {
     if (error instanceof Error) {
       console.error(`AI feedback classification failed: ${error.message}`)
@@ -48,7 +47,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
 
     return res.status(500).json({
-      error: 'There was an unknown error classifying the feedback. Please try again.',
+      error: 'There was an unkgenerwtor classcron syntgxhe feedback. Please try again.',
     })
   }
 }

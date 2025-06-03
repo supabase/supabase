@@ -1,9 +1,17 @@
 import { toPng } from 'html-to-image'
-import { Camera, CircleCheck, Image as ImageIcon, Upload, X } from 'lucide-react'
+import {
+  Camera,
+  CircleCheck,
+  Image as ImageIcon,
+  MessageCircleQuestion,
+  Upload,
+  X,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { AnimatePresence, motion } from 'framer-motion'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { useParams } from 'common'
@@ -12,6 +20,9 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { timeout } from 'lib/helpers'
 import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -20,11 +31,9 @@ import {
   DropdownMenuTrigger,
   TextArea_Shadcn_,
 } from 'ui'
-import { convertB64toBlob, uploadAttachment } from './FeedbackDropdown.utils'
-import { useCompletion } from 'ai/react'
-import { BASE_PATH } from 'lib/constants'
-import { constructHeaders } from 'data/fetchers'
 import { useDebounce } from 'use-debounce'
+import { useFeedbackCategoryQuery } from 'data/feedback/feedback-category'
+import { convertB64toBlob, uploadAttachment } from './FeedbackDropdown.utils'
 
 interface FeedbackWidgetProps {
   feedback: string
@@ -54,23 +63,10 @@ const FeedbackWidget = ({
   const [isFeedbackSent, setIsFeedbackSent] = useState(false)
   const [debouncedFeedback] = useDebounce(feedback, 750)
 
-  const {
-    complete: classifyFeedback,
-    isLoading: isClassifyingFeedback,
-    stop,
-  } = useCompletion({
-    api: `${BASE_PATH}/api/ai/feedback/classify`,
-    onResponse: async (response) => {
-      if (response.ok) {
-        const category = (await response.text()).trim().replace(/^"|"$/g, '')
-        console.log('category', category)
-      }
-    },
-    onError: (error) => {
-      console.error('Error classifying feedback:', error)
-    },
+  const { data: category, isLoading: isClassifying } = useFeedbackCategoryQuery({
+    prompt: debouncedFeedback,
   })
-
+  console.log('the rq category is:', { category })
   const { mutate: sendEvent } = useSendEventMutation()
 
   const { mutate: submitFeedback } = useSendFeedbackMutation({
@@ -110,19 +106,6 @@ const FeedbackWidget = ({
       localStorage.setItem(SCREENSHOT_STORAGE_KEY, screenshot)
     }
   }, [screenshot])
-
-  useEffect(() => {
-    if (debouncedFeedback) {
-      console.log('debouncedFeedback', debouncedFeedback)
-      constructHeaders().then((headers) =>
-        classifyFeedback(debouncedFeedback, {
-          headers: { Authorization: headers.get('Authorization') ?? '' },
-        })
-      )
-      return () => stop()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedFeedback])
 
   const captureScreenshot = async () => {
     setIsSavingScreenshot(true)
@@ -215,6 +198,33 @@ const FeedbackWidget = ({
           onPaste={handlePasteEvent}
           className="text-sm mt-4 mb-1"
         />
+
+        <AnimatePresence>
+          {category === 'support' && (
+            <motion.div
+              key="support-alert"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 16 }}
+              transition={{ duration: 0.25 }}
+            >
+              <Alert_Shadcn_ className="mt-3">
+                <MessageCircleQuestion className="h-4 w-4" />
+                <AlertTitle_Shadcn_>Heads up!</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  This seems like a support issue. We don't reply to all product feedback, so please{' '}
+                  <Link
+                    href={`/support/new/?projectRef=${slug}&message=${encodeURIComponent(feedback)}`}
+                    className="underline"
+                  >
+                    open a support ticket
+                  </Link>{' '}
+                  to get help with this issue.
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       <PopoverSeparator />
       <div className="px-5 flex flex-row justify-between items-start">
