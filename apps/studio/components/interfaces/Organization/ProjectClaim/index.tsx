@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { ProjectClaimBenefits } from 'components/interfaces/Organization/ProjectClaim/benefits'
 import { ProjectClaimChooseOrg } from 'components/interfaces/Organization/ProjectClaim/choose-org'
@@ -8,12 +8,18 @@ import { FormPanel } from 'components/ui/Forms/FormPanel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { ApiAuthorizationResponse } from 'data/api-authorization/api-authorization-query'
 import { useOrganizationProjectClaimQuery } from 'data/organizations/organization-project-claim-query'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { Alert } from 'ui'
 
 export const ProjectClaim = ({ requester }: { requester: ApiAuthorizationResponse }) => {
   const { token: claimToken } = useParams()
   const [selectedOrgSlug, setSelectedOrgSlug] = useState<string>()
   const [step, setStep] = useState<'choose-org' | 'benefits' | 'confirm'>('choose-org')
+  const { data: organizations } = useOrganizationsQuery()
+
+  const selectedOrganization = useMemo(() => {
+    return (organizations || []).find((org) => org.slug === selectedOrgSlug)
+  }, [selectedOrgSlug, organizations])
 
   const {
     data: projectClaim,
@@ -30,7 +36,7 @@ export const ProjectClaim = ({ requester }: { requester: ApiAuthorizationRespons
     }
   )
 
-  if (step === 'choose-org') {
+  if (step === 'choose-org' || !selectedOrganization) {
     return (
       <ProjectClaimChooseOrg
         onChoose={(org) => {
@@ -84,7 +90,8 @@ export const ProjectClaim = ({ requester }: { requester: ApiAuthorizationRespons
 
   return (
     <ProjectClaimConfirm
-      organizationSlug={selectedOrgSlug!}
+      setStep={setStep}
+      selectedOrganization={selectedOrganization}
       projectClaim={projectClaim}
       requester={requester}
     />

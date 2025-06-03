@@ -8,8 +8,12 @@ import { BASE_PATH } from 'lib/constants'
 import { CheckCircle2, ChevronRight, ChevronsLeftRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
+import { Organization } from 'types'
 import {
+  Badge,
   Button,
+  Card,
+  CardContent,
   cn,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
@@ -18,13 +22,15 @@ import {
 import { ScopeSection } from '../OAuthApps/AuthorizeRequesterDetails'
 
 export const ProjectClaimConfirm = ({
-  organizationSlug,
+  selectedOrganization,
   projectClaim,
   requester,
+  setStep,
 }: {
-  organizationSlug: string
+  selectedOrganization: Organization
   projectClaim: OrganizationProjectClaimResponse
   requester: ApiAuthorizationResponse
+  setStep: (step: 'choose-org' | 'benefits' | 'confirm') => void
 }) => {
   const { token: claimToken } = useParams()
   const { resolvedTheme } = useTheme()
@@ -52,7 +58,7 @@ export const ProjectClaimConfirm = ({
             }
             onClick={() =>
               claimProject({
-                slug: organizationSlug,
+                slug: selectedOrganization.slug,
                 token: claimToken!,
               })
             }
@@ -64,7 +70,7 @@ export const ProjectClaimConfirm = ({
     >
       <div className="w-full px-8 py-6 space-y-8 text-sm">
         <div className="flex flex-col items-center mt-6">
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
             <div
               className={cn(
                 'w-8 h-8 bg-center bg-no-repeat bg-cover flex items-center justify-center rounded-md'
@@ -77,29 +83,52 @@ export const ProjectClaimConfirm = ({
                 <p className="text-foreground-light text-lg">{requester.name[0]}</p>
               )}
             </div>
-
-            <div className="flex items-center justify-center w-28 relative">
-              <div className="h-0.5 w-full border-2 border-dashed border-stronger" />
-              <div className="rounded-full border flex items-center justify-center h-10 w-full shadow-sm">
-                <ChevronsLeftRight className="text-muted-foreground" size={24} />
-              </div>
-              <div className="h-0.5  w-full border-2 border-dashed border-stronger z-10" />
-            </div>
-
-            <div className="w-8 h-8">
-              <Image
-                src={
-                  resolvedTheme?.includes('dark')
-                    ? `${BASE_PATH}/img/supabase-logo.svg`
-                    : `${BASE_PATH}/img/supabase-logo.svg`
-                }
-                alt="Supabase Logo"
-                className="w-full h-full"
-                width={100}
-                height={100}
-              />
-            </div>
+            <p className="text-base">{requester.name}</p>
           </div>
+
+          <div className="flex items-center justify-center h-28 relative flex-col">
+            <div className="w-0.5 h-28 mt-2 border-2 border-dashed border-stronger" />
+            <div className="rounded-full border flex items-center justify-center w-10 h-full shadow-sm">
+              <ChevronsLeftRight className="text-muted-foreground" size={24} />
+            </div>
+            <div className="w-0.5 h-28 mb-6 border-2 border-dashed border-stronger z-10" />
+          </div>
+
+          <Card className="relative min-w-72 flex items-center justify-center">
+            <Card className="absolute -top-6 bg-surface-200">
+              <CardContent className="flex items-center gap-2 flex-row border-2 w-60">
+                <div className="w-8 h-8">
+                  <Image
+                    src={
+                      resolvedTheme?.includes('dark')
+                        ? `${BASE_PATH}/img/supabase-logo.svg`
+                        : `${BASE_PATH}/img/supabase-logo.svg`
+                    }
+                    alt="Supabase Logo"
+                    className="w-full h-full"
+                    width={50}
+                    height={50}
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <p className="truncate">{projectClaim?.project?.name}</p>
+                  <p className="text-foreground-lighter text-sm">Project</p>
+                </div>
+              </CardContent>
+            </Card>
+            <CardContent className="mt-12 flex flex-col">
+              <div className="flex items-end gap-2">
+                <p>{selectedOrganization.name}</p>
+                <Badge>{selectedOrganization.plan.name}</Badge>
+              </div>
+              <a
+                className="text-foreground-lighter text-sm underline cursor-pointer"
+                onClick={() => setStep('choose-org')}
+              >
+                Choose another organization
+              </a>
+            </CardContent>
+          </Card>
         </div>
         <div>
           <h2 className="text-center text-base text-foreground-light">
