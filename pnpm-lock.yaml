@@ -1352,8 +1352,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ai-commands
       animejs:
-        specifier: ^3.2.2
-        version: 3.2.2
+        specifier: ^4.0.2
+        version: 4.0.2
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -9426,8 +9426,8 @@ packages:
   amazon-cognito-identity-js@6.3.15:
     resolution: {integrity: sha512-G2mzTlGYHKYh9oZDO0Gk94xVQ4iY9GYWBaYScbDYvz05ps6dqi0IvdNx1Lxi7oA3tjS5X+mUN7/svFJJdOB9YA==}
 
-  animejs@3.2.2:
-    resolution: {integrity: sha512-Ao95qWLpDPXXM+WrmwcKbl6uNlC5tjnowlaRYtuVDHHoygjtIPfDUoK9NthrlZsQSKjZXlmji2TrBUAVbiH0LQ==}
+  animejs@4.0.2:
+    resolution: {integrity: sha512-f0L/kSya2RF23iMSF/VO01pMmLwlAFoiQeNAvBXhEyLzIPd2/QTBRatwGUqkVCC6seaAJYzAkGir55N4SL+h3A==}
 
   anser@2.3.2:
     resolution: {integrity: sha512-PMqBCBvrOVDRqLGooQb+z+t1Q0PiPyurUQeZRR5uHBOVZcW8B04KMmnT12USnhpNX2wCPagWzLVppQMUG3u0Dw==}
@@ -27828,8 +27828,8 @@ snapshots:
       js-cookie: 2.2.1
     transitivePeerDependencies:
       - encoding
-
-  animejs@3.2.2: {}
+  
+  animejs@4.0.2: {}
 
   anser@2.3.2: {}
 
