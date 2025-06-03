@@ -7,12 +7,12 @@ import type {
   ICommonSection,
   IFunctionDefinition,
   ISpec,
-} from '../../../components/reference/Reference.types'
-import type { CliCommand, CliSpec } from '../../../generator/types/CliSpec'
-import { flattenSections } from '../../../lib/helpers'
-import { enrichedOperation, gen_v3 } from '../../../lib/refGenerator/helpers'
-import type { Json } from '../../helpers.mdx'
-import { BaseLoader, BaseSource } from './base'
+} from '../../../components/reference/Reference.types.js'
+import type { CliCommand, CliSpec } from '../../../generator/types/CliSpec.js'
+import { flattenSections } from '../../../lib/helpers.js'
+import { enrichedOperation, gen_v3 } from '../../../lib/refGenerator/helpers.js'
+import type { Json } from '../../helpers.mdx.js'
+import { BaseLoader, BaseSource } from './base.js'
 
 export abstract class ReferenceLoader<SpecSection> extends BaseLoader {
   type = 'reference' as const

@@ -1,3 +1,5 @@
+'use client'
+
 import { type TabsProps } from 'ui/src/components/Tabs'
 import { useSticky } from './withSticky.utils'
 import { PropsWithChildren, useCallback, type FC } from 'react'

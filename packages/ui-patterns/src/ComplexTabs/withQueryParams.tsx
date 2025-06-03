@@ -1,3 +1,5 @@
+'use client'
+
 import { useSearchParamsShallow } from 'common'
 import { xor } from 'lodash'
 import { Children, useEffect, useRef, type FC, type PropsWithChildren } from 'react'

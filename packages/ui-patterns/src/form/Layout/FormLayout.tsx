@@ -86,7 +86,7 @@ const LabelContainerVariants = cva('transition-all duration-500 ease-in-out', {
     labelLayout: {
       horizontal: '',
       vertical: '',
-      ['']: '',
+      '': '',
     },
   },
   compoundVariants: [
@@ -101,12 +101,11 @@ const LabelContainerVariants = cva('transition-all duration-500 ease-in-out', {
       className: 'order-1',
     },
     {
-      layout: 'vertical' || 'flex',
+      layout: ['vertical', 'flex'],
       labelLayout: undefined,
       flex: false,
       className: 'flex flex-row gap-2 justify-between',
     },
-
     {
       layout: 'horizontal',
       className: 'flex flex-col gap-2',
@@ -144,7 +143,7 @@ const DataContainerVariants = cva('transition-all duration-500 ease-in-out', {
       className: 'order-2',
     },
     {
-      layout: 'vertical' || 'flex',
+      layout: ['vertical', 'flex'],
       className: 'col-span-12',
     },
     {
@@ -289,7 +288,7 @@ export const FormLayout = React.forwardRef<
       size = 'medium',
       beforeLabel,
       afterLabel,
-      nonBoxInput = label ? false : true,
+      nonBoxInput = !label,
       hideMessage = false,
       isReactForm,
       ...props
@@ -321,7 +320,7 @@ export const FormLayout = React.forwardRef<
         <FormDescription_Shadcn_
           className={cn(DescriptionVariants({ size, layout }))}
           data-formlayout-id={'description'}
-          id={id + '-description'}
+          id={`${id}-description`}
         >
           {description}
         </FormDescription_Shadcn_>

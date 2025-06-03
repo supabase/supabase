@@ -1,10 +1,13 @@
+import _configureDotenv from '../utils/dotenv'
+
 import { createClient } from '@supabase/supabase-js'
-import 'dotenv/config'
 import { parseArgs } from 'node:util'
 import { OpenAI } from 'openai'
 import { v4 as uuidv4 } from 'uuid'
-import type { Json, Section } from '../helpers.mdx'
-import { fetchAllSources } from './sources'
+import type { Json, Section } from '../helpers.mdx.js'
+import { fetchAllSources } from './sources/index.js'
+
+const _ = _configureDotenv
 
 const args = parseArgs({
   options: {
@@ -18,19 +21,20 @@ async function generateEmbeddings() {
   const shouldRefresh = Boolean(args.values.refresh)
 
   const requiredEnvVars = [
+    'DOCS_GITHUB_APP_ID',
+    'DOCS_GITHUB_APP_INSTALLATION_ID',
+    'DOCS_GITHUB_APP_PRIVATE_KEY',
+    'NEXT_PUBLIC_MISC_ANON_KEY',
+    'NEXT_PUBLIC_MISC_URL',
     'NEXT_PUBLIC_SUPABASE_URL',
-    'SUPABASE_SERVICE_ROLE_KEY',
     'OPENAI_API_KEY',
-    'NEXT_PUBLIC_MISC_USE_URL',
-    'NEXT_PUBLIC_MISC_USE_ANON_KEY',
-    'SEARCH_GITHUB_APP_ID',
-    'SEARCH_GITHUB_APP_INSTALLATION_ID',
-    'SEARCH_GITHUB_APP_PRIVATE_KEY',
+    'SUPABASE_SECRET_KEY',
   ]
 
-  if (requiredEnvVars.some((name) => !process.env[name])) {
+  const missingEnvVars = requiredEnvVars.filter((name) => !process.env[name])
+  if (missingEnvVars.length > 0) {
     throw new Error(
-      `Environment variables ${requiredEnvVars.join(
+      `Environment variables ${missingEnvVars.join(
         ', '
       )} are required: skipping embeddings generation`
     )
@@ -38,8 +42,7 @@ async function generateEmbeddings() {
 
   const supabaseClient = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
-    // eslint-disable-next-line turbo/no-undeclared-env-vars
-    process.env.SUPABASE_SERVICE_ROLE_KEY,
+    process.env.SUPABASE_SECRET_KEY,
     {
       auth: {
         persistSession: false,

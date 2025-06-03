@@ -2,7 +2,7 @@
 
 import * as Collapsible from '@radix-ui/react-collapsible'
 
-import { debounce } from 'lodash'
+import { debounce } from 'lodash-es'
 import { ChevronUp } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'

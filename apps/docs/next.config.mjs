@@ -34,13 +34,6 @@ const nextConfig = {
     // @ts-ignore
     remotePatterns,
   },
-  // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
-  // mdxRs: true,
-  modularizeImports: {
-    lodash: {
-      transform: 'lodash/{{member}}',
-    },
-  },
   webpack: (config) => {
     config.module.rules.push({
       test: /\.include$/,
