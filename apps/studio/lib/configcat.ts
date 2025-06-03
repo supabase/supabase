@@ -7,11 +7,10 @@ function getClient() {
     return client
   }
 
-  client = configcat.getClient(
-    process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY ?? '',
-    configcat.PollingMode.AutoPoll,
-    { pollIntervalSeconds: 7 * 60 } // 7 minutes
-  )
+  client = configcat.getClient('configcat-proxy/frontend-v2', configcat.PollingMode.AutoPoll, {
+    baseUrl: process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL,
+    pollIntervalSeconds: 7 * 60, // 7 minutes
+  })
 
   return client
 }
