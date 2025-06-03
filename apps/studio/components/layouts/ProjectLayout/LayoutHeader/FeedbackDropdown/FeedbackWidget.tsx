@@ -21,6 +21,10 @@ import {
   TextArea_Shadcn_,
 } from 'ui'
 import { convertB64toBlob, uploadAttachment } from './FeedbackDropdown.utils'
+import { useCompletion } from 'ai/react'
+import { BASE_PATH } from 'lib/constants'
+import { constructHeaders } from 'data/fetchers'
+import { useDebounce } from 'use-debounce'
 
 interface FeedbackWidgetProps {
   feedback: string
@@ -48,6 +52,24 @@ const FeedbackWidget = ({
   const [isSending, setSending] = useState(false)
   const [isSavingScreenshot, setIsSavingScreenshot] = useState(false)
   const [isFeedbackSent, setIsFeedbackSent] = useState(false)
+  const [debouncedFeedback] = useDebounce(feedback, 750)
+
+  const {
+    complete: classifyFeedback,
+    isLoading: isClassifyingFeedback,
+    stop,
+  } = useCompletion({
+    api: `${BASE_PATH}/api/ai/feedback/classify`,
+    onResponse: async (response) => {
+      if (response.ok) {
+        const category = (await response.text()).trim().replace(/^"|"$/g, '')
+        console.log('category', category)
+      }
+    },
+    onError: (error) => {
+      console.error('Error classifying feedback:', error)
+    },
+  })
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -88,6 +110,19 @@ const FeedbackWidget = ({
       localStorage.setItem(SCREENSHOT_STORAGE_KEY, screenshot)
     }
   }, [screenshot])
+
+  useEffect(() => {
+    if (debouncedFeedback) {
+      console.log('debouncedFeedback', debouncedFeedback)
+      constructHeaders().then((headers) =>
+        classifyFeedback(debouncedFeedback, {
+          headers: { Authorization: headers.get('Authorization') ?? '' },
+        })
+      )
+      return () => stop()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedFeedback])
 
   const captureScreenshot = async () => {
     setIsSavingScreenshot(true)
