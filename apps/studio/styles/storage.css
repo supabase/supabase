@@ -35,11 +35,6 @@
   }
 }
 
-// May need to just comment this out, the smooth scrolling looks weird
-// .file-explorer {
-// scroll-behavior: smooth;
-// }
-
 .storage-row:hover,
 button[aria-haspopup='menu'][data-state='open'],
 button[aria-haspopup='menu']:focus-visible {

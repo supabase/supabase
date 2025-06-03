@@ -4,6 +4,7 @@
   "exclude": ["dist", "build", "node_modules"],
   "compilerOptions": {
     "moduleResolution": "bundler",
-    "types": ["./test/extensions.d.ts"]
+    "types": ["./test/extensions.d.ts"],
+    "incremental": true
   }
 }
