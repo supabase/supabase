@@ -1,6 +1,6 @@
 import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { ReactNode, useEffect } from 'react'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -18,7 +18,7 @@ import { SqlEditorTabsPreview } from './SqlEditorTabs'
 import { TableEditorTabsPreview } from './TableEditorTabs'
 
 const FEATURE_PREVIEW_KEY_TO_CONTENT: {
-  [key: string]: React.ReactNode
+  [key: string]: ReactNode
 } = {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]: <InlineEditorPreview />,
   [LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS]: <TableEditorTabsPreview />,
