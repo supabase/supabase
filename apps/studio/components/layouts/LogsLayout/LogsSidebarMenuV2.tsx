@@ -218,22 +218,24 @@ export function LogsSidebarMenuV2() {
             onChange={(e) => setSearchText(e.target.value)}
           ></InnerSideBarFilterSearchInput>
         </InnerSideBarFilters>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              type="default"
-              icon={<Plus className="text-foreground" />}
-              className="w-[26px]"
-            />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem className="gap-x-2" asChild>
-              <Link href={`/project/${ref}/logs/explorer`}>
-                <FilePlus size={14} />
-                Create query
-              </Link>
-            </DropdownMenuItem>
-            {warehouseEnabled && (
+
+        {warehouseEnabled ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="default"
+                icon={<Plus className="text-foreground" />}
+                className="w-[26px]"
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem className="gap-x-2" asChild>
+                <Link href={`/project/${ref}/logs/explorer`}>
+                  <FilePlus size={14} />
+                  Create query
+                </Link>
+              </DropdownMenuItem>
+
               <Tooltip>
                 <TooltipTrigger asChild>
                   <DropdownMenuItem className="gap-x-2" asChild>
@@ -253,9 +255,17 @@ export function LogsSidebarMenuV2() {
                   </TooltipContent>
                 )}
               </Tooltip>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <Button
+            type="default"
+            icon={<Plus className="text-foreground" />}
+            className="w-[26px]"
+            onClick={() => router.push(`/project/${ref}/logs/explorer`)}
+          />
+        )}
+
         <CreateWarehouseCollectionModal
           open={createCollectionOpen}
           onOpenChange={setCreateCollectionOpen}
