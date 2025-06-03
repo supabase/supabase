@@ -23,6 +23,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
+  Button,
   cn,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
@@ -81,6 +82,13 @@ const Home: NextPageWithLayout = () => {
           <div className="flex flex-col md:flex-row md:items-center gap-6 justify-between w-full">
             <div className="flex flex-col md:flex-row md:items-center gap-3 w-full">
               <h1 className="text-3xl">{projectName}</h1>
+              <Button
+                onClick={() => {
+                  throw Error('lol')
+                }}
+              >
+                Click
+              </Button>
               {isOrioleDb && (
                 <Tooltip>
                   <TooltipTrigger asChild>
