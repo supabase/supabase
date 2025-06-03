@@ -2,10 +2,10 @@ import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscri
 import {
   ComplianceConfig,
   CustomDomainConfig,
-  DeleteProjectPanel,
   General,
   TransferProjectPanel,
 } from 'components/interfaces/Settings/General'
+import { DeleteProjectPanel } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectPanel'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'

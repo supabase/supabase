@@ -1,8 +1,10 @@
 import { openai } from '@ai-sdk/openai'
 import pgMeta from '@supabase/pg-meta'
 import { streamText } from 'ai'
+import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
 import apiWrapper from 'lib/api/apiWrapper'
+import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getTools } from '../sql/tools'
 
@@ -56,7 +58,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           {
             'Content-Type': 'application/json',
             ...(authorization && { Authorization: authorization }),
-          }
+          },
+          IS_PLATFORM ? undefined : queryPgMetaSelfHosted
         )
       : { result: [] }
 
