@@ -15,15 +15,19 @@ import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import { InlineLink } from 'components/ui/InlineLink'
 import { ProjectUpgradeFailedBanner } from 'components/ui/ProjectUpgradeFailedBanner'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useOAuthAppsQuery } from 'data/oauth/oauth-apps-query'
+import { createClaimToken } from 'data/projects/project-claim-token'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDb, useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { toast } from 'sonner'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
+  Button,
   cn,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
@@ -76,6 +80,44 @@ const Home: NextPageWithLayout = () => {
   // [Joshen] JFYI minus 1 as the replicas endpoint returns the primary DB minimally
   const replicasCount = Math.max(0, (replicasData?.length ?? 1) - 1)
 
+  const { data: apps } = useOAuthAppsQuery({ slug: organization?.slug })
+
+  const buildOAuthUrl = async () => {
+    try {
+      const data = await createClaimToken({ projectRef: project?.ref! })
+      console.log(data)
+
+      const app = apps?.[0]
+      if (!app) {
+        toast.error('No OAuth app found')
+        return
+      }
+      if (!app.redirect_uris) {
+        toast.error('No redirect URI found')
+        return
+      }
+
+      const url = `${process.env.NEXT_PUBLIC_API_ADMIN_URL}/oauth/authorize?client_id=${app.client_id!}&response_type=code&redirect_uri=${app.redirect_uris[0]}`
+      console.log(url)
+
+      // const response = await fetch(
+      //   `${process.env.NEXT_PUBLIC_API_ADMIN_URL}/oauth/authorize?client_id=${app.app_id!}&response_type=code&redirect_uri=${app.redirect_uris[0]}`,
+      //   {
+      //     method: 'GET',
+      //     redirect: 'manual',
+      //   }
+      // )
+      // // get the redirect url from the OAuth app authorization
+      // const redirectUrl = response.headers.get('Location')
+
+      // append the token to the authorization url
+      // await copyToClipboard(`${redirectUrl}&token=${data.token}`)
+      toast.success('URL pasted in console')
+    } catch (error: any) {
+      toast.error('Failed to create claim token', error!.message)
+    }
+  }
+
   return (
     <div className="w-full">
       <div className={cn('py-16 px-8', !isPaused && 'border-b border-muted ')}>
@@ -106,6 +148,7 @@ const Home: NextPageWithLayout = () => {
                   infra_compute_size: project?.infra_compute_size,
                 }}
               />
+              <Button onClick={buildOAuthUrl}>Generate URL for claiming</Button>
             </div>
             <div className="flex items-center">
               {project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && (

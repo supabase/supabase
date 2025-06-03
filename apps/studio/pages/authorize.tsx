@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import AuthorizeRequesterDetails from 'components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
+import { ProjectClaim } from 'components/interfaces/Organization/ProjectClaim'
 import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -30,7 +31,7 @@ import {
 
 const APIAuthorizationPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { auth_id } = useParams()
+  const { auth_id, token: claimToken } = useParams()
   const [isApproving, setIsApproving] = useState(false)
   const [isDeclining, setIsDeclining] = useState(false)
   const [selectedOrgSlug, setSelectedOrgSlug] = useState<string>()
@@ -46,7 +47,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 
   const { mutate: approveRequest } = useApiAuthorizationApproveMutation({
     onSuccess: (res) => {
-      window.location.href = res.url
+      window.location.href = res.url!
     },
   })
   const { mutate: declineRequest } = useApiAuthorizationDeclineMutation({
@@ -158,6 +159,10 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   }
 
   searchParams.set('returnTo', pathname)
+
+  if (claimToken) {
+    return <ProjectClaim requester={requester} />
+  }
 
   return (
     <FormPanel
