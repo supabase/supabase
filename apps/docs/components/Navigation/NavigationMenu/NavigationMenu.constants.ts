@@ -119,7 +119,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'platform',
           },
           {
-            label: 'Security',
+            label: 'Security & Compliance',
             icon: 'security',
             href: '/guides/security',
             level: 'security',
@@ -2090,6 +2090,19 @@ export const security: NavMenuConstant = {
       items: [
         { name: 'SOC 2', url: '/guides/security/soc-2-compliance' },
         { name: 'HIPAA', url: '/guides/security/hipaa-compliance' },
+      ],
+    },
+    {
+      name: 'Guides',
+      url: undefined,
+      items: [
+        { name: 'Production Checklist', url: '/guides/deployment/going-into-prod' },
+        {
+          name: 'Shared Responsibility Model',
+          url: '/guides/deployment/shared-responsibility-model',
+        },
+        { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
+        { name: 'Hardening the Data API', url: '/guides/database/hardening-data-api' },
       ],
     },
   ],

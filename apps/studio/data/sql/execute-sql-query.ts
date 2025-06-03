@@ -39,7 +39,11 @@ export async function executeSql<T = any>(
     | 'isRoleImpersonationEnabled'
   >,
   signal?: AbortSignal,
-  headersInit?: HeadersInit
+  headersInit?: HeadersInit,
+  fetcherOverride?: (
+    sql: string,
+    headers?: HeadersInit
+  ) => Promise<{ data: T } | { error: ResponseError }>
 ): Promise<{ result: T }> {
   if (!projectRef) throw new Error('projectRef is required')
 
@@ -52,21 +56,37 @@ export async function executeSql<T = any>(
   let headers = new Headers(headersInit)
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  let { data, error } = await post('/platform/pg-meta/{ref}/query', {
-    signal,
-    params: {
-      header: { 'x-connection-encrypted': connectionString ?? '' },
-      path: { ref: projectRef },
-      // @ts-expect-error: This is just a client side thing to identify queries better
-      query: {
-        key:
-          queryKey?.filter((seg) => typeof seg === 'string' || typeof seg === 'number').join('-') ??
-          '',
+  let data
+  let error
+
+  if (fetcherOverride) {
+    const result = await fetcherOverride(sql, headers)
+    if ('data' in result) {
+      data = result.data
+    } else {
+      error = result.error
+    }
+  } else {
+    const result = await post('/platform/pg-meta/{ref}/query', {
+      signal,
+      params: {
+        header: { 'x-connection-encrypted': connectionString ?? '' },
+        path: { ref: projectRef },
+        // @ts-expect-error: This is just a client side thing to identify queries better
+        query: {
+          key:
+            queryKey
+              ?.filter((seg) => typeof seg === 'string' || typeof seg === 'number')
+              .join('-') ?? '',
+        },
       },
-    },
-    body: { query: sql },
-    headers,
-  })
+      body: { query: sql },
+      headers,
+    })
+
+    data = result.data
+    error = result.error
+  }
 
   if (error) {
     if (

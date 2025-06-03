@@ -5655,6 +5655,7 @@ export interface components {
       MAILER_TEMPLATES_MAGIC_LINK_CONTENT: string
       MAILER_TEMPLATES_REAUTHENTICATION_CONTENT: string
       MAILER_TEMPLATES_RECOVERY_CONTENT: string
+      MFA_ALLOW_LOW_AAL: boolean
       MFA_MAX_ENROLLED_FACTORS: number
       MFA_PHONE_ENROLL_ENABLED: boolean
       MFA_PHONE_MAX_FREQUENCY: number
@@ -6221,6 +6222,7 @@ export interface components {
           | 'MONTHLY_ACTIVE_USERS'
           | 'MONTHLY_ACTIVE_SSO_USERS'
           | 'FUNCTION_INVOCATIONS'
+          | 'FUNCTION_CPU_MILLISECONDS'
           | 'STORAGE_IMAGES_TRANSFORMED'
           | 'REALTIME_MESSAGE_COUNT'
           | 'REALTIME_PEAK_CONNECTIONS'
@@ -7318,6 +7320,7 @@ export interface components {
           enabled: boolean
         }
       }
+      /** Format: int64 */
       fileSizeLimit: number
     }
     StorageObject: {
@@ -7554,6 +7557,7 @@ export interface components {
           | 'MONTHLY_ACTIVE_USERS'
           | 'MONTHLY_ACTIVE_SSO_USERS'
           | 'FUNCTION_INVOCATIONS'
+          | 'FUNCTION_CPU_MILLISECONDS'
           | 'STORAGE_IMAGES_TRANSFORMED'
           | 'REALTIME_MESSAGE_COUNT'
           | 'REALTIME_PEAK_CONNECTIONS'
@@ -7848,6 +7852,7 @@ export interface components {
       MAILER_TEMPLATES_MAGIC_LINK_CONTENT?: string | null
       MAILER_TEMPLATES_REAUTHENTICATION_CONTENT?: string | null
       MAILER_TEMPLATES_RECOVERY_CONTENT?: string | null
+      MFA_ALLOW_LOW_AAL?: boolean | null
       MFA_MAX_ENROLLED_FACTORS?: number | null
       MFA_PHONE_ENROLL_ENABLED?: boolean | null
       MFA_PHONE_MAX_FREQUENCY?: number | null
@@ -8172,6 +8177,7 @@ export interface components {
           enabled: boolean
         }
       }
+      /** Format: int64 */
       fileSizeLimit?: number
     }
     UpdateSubscriptionBody: {
@@ -10766,6 +10772,7 @@ export interface operations {
           | 'MONTHLY_ACTIVE_USERS'
           | 'MONTHLY_ACTIVE_SSO_USERS'
           | 'FUNCTION_INVOCATIONS'
+          | 'FUNCTION_CPU_MILLISECONDS'
           | 'STORAGE_IMAGES_TRANSFORMED'
           | 'REALTIME_MESSAGE_COUNT'
           | 'REALTIME_PEAK_CONNECTIONS'
@@ -14319,7 +14326,7 @@ export interface operations {
   UsageApiController_getApiCounts: {
     parameters: {
       query?: {
-        interval?: '15min' | '30min' | '1hr' | '3hr' | '1day'
+        interval?: '15min' | '30min' | '1hr' | '3hr' | '1day' | '3day' | '7day'
       }
       header?: never
       path: {
@@ -16190,6 +16197,8 @@ export interface operations {
           | 'total_storage_post_requests'
           | 'total_storage_delete_requests'
           | 'total_logdrain_egress'
+          | 'total_func_invocations'
+          | 'total_func_cpu_time_ms'
         endDate: string
         interval?: string
         startDate: string
@@ -16520,6 +16529,13 @@ export interface operations {
           | 'physical_replication_lag_physical_replica_lag_seconds'
           | 'pg_stat_database_num_backends'
           | 'supavisor_connections_active'
+          | 'client_connections_postgres'
+          | 'client_connections_authenticator'
+          | 'client_connections_supabase_auth_admin'
+          | 'client_connections_supabase_storage_admin'
+          | 'client_connections_supabase_admin'
+          | 'client_connections_other'
+          | 'max_db_connections'
           | 'network_receive_bytes'
           | 'network_transmit_bytes'
           | 'pgbouncer_pools_client_active_connections'
