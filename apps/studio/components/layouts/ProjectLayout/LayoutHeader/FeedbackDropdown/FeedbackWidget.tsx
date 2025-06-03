@@ -63,10 +63,10 @@ const FeedbackWidget = ({
   const [isFeedbackSent, setIsFeedbackSent] = useState(false)
   const [debouncedFeedback] = useDebounce(feedback, 750)
 
-  const { data: category, isLoading: isClassifying } = useFeedbackCategoryQuery({
+  const { data: category } = useFeedbackCategoryQuery({
     prompt: debouncedFeedback,
   })
-  console.log('the rq category is:', { category })
+
   const { mutate: sendEvent } = useSendEventMutation()
 
   const { mutate: submitFeedback } = useSendFeedbackMutation({
