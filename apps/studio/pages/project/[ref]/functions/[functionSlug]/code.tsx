@@ -260,6 +260,7 @@ const CodePage = () => {
         visible={showDeployWarning}
         onCancel={() => setShowDeployWarning(false)}
         onConfirm={handleDeployConfirm}
+        isDeploying={isDeploying}
       />
     </div>
   )

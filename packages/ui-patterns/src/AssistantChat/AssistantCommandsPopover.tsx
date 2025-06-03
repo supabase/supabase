@@ -16,9 +16,9 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from './../../ui/src/components/shadcn/ui/command'
-import { Popover, PopoverAnchor, PopoverContent } from './../../ui/src/components/shadcn/ui/popover'
-import { cn } from './../../ui/src/lib/utils/cn'
+} from 'ui/src/components/shadcn/ui/command'
+import { Popover, PopoverAnchor, PopoverContent } from 'ui/src/components/shadcn/ui/popover'
+import { cn } from 'ui/src/lib/utils/cn'
 
 const AssistantCommandsPopover = forwardRef<
   ElementRef<typeof Popover>,
