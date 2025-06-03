@@ -1,7 +1,8 @@
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
+
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { Organization } from 'types'
 import { Badge, Button, Card, CardDescription, CardHeader, CardTitle, Input_Shadcn_ } from 'ui'
 
@@ -29,7 +30,14 @@ export function ProjectClaimChooseOrg({ onChoose }: ProjectClaimChooseOrgProps) 
   searchParams.set('returnTo', pathname)
 
   return (
-    <FormPanel header={<h2>Choose a Supabase Organisation</h2>}>
+    <FormPanel
+      header={
+        <div className="flex items-center justify-between">
+          <h2>Choose a Supabase Organisation</h2>
+          <p className="text-foreground-light text-xs">Step 1 of 3</p>
+        </div>
+      }
+    >
       <div className="w-full max-w-md mx-auto gap-y-4 py-6 flex flex-col">
         <p className="text-sm text-foreground-light">
           The chosen organization will be used to claim the project.
@@ -47,19 +55,19 @@ export function ProjectClaimChooseOrg({ onChoose }: ProjectClaimChooseOrgProps) 
           {filteredOrgs.map((org) => (
             <Card
               key={org.id}
-              className="flex items-center justify-between hover:bg-surface-200 group pr-6 rounded-none first:rounded-t-lg last:rounded-b-lg -mb-px"
+              className="hover:bg-surface-200 rounded-none first:rounded-t-lg last:rounded-b-lg -mb-px"
             >
-              <CardHeader className="flex flex-col min-w-0 flex-1 border-none">
-                <CardTitle className="flex items-center gap-2 min-w-0">
+              <CardHeader className="flex flex-row justify-between border-none">
+                <CardTitle className="flex items-center gap-2">
                   <span className="truncate" title={org.name}>
                     {org.name}
                   </span>
-                  <Badge className="ml-1">{org.plan?.name}</Badge>
+                  <Badge>{org.plan?.name}</Badge>
                 </CardTitle>
+                <Button size="small" onClick={() => onChoose(org)}>
+                  Choose
+                </Button>
               </CardHeader>
-              <Button size="small" onClick={() => onChoose(org)}>
-                Choose
-              </Button>
             </Card>
           ))}
         </div>

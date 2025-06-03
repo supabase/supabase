@@ -34,49 +34,48 @@ export const ProjectClaimConfirm = ({
   return (
     <FormPanel
       header={
-        <p>
-          Claim a project <span className="text-brand">{projectClaim?.project?.name}</span> from{' '}
-          <span className="text-brand">{requester?.name}</span>
-        </p>
+        <div className="flex items-center justify-between">
+          <p>
+            Claim a project <span className="text-brand">{projectClaim?.project?.name}</span> from{' '}
+            <span className="text-brand">{requester?.name}</span>
+          </p>
+          <p className="text-foreground-light text-xs">Step 3 of 3</p>
+        </div>
       }
       footer={
-        <div className="flex items-center justify-end py-4 px-8">
-          <div className="flex items-center space-x-2">
-            <Button
-              loading={isLoading}
-              disabled={
-                isLoading
-                // errorProjectClaim?.message === 'Project is already in the target organization.'
-              }
-              onClick={() =>
-                claimProject({
-                  slug: organizationSlug,
-                  token: claimToken!,
-                })
-              }
-            >
-              Claim {projectClaim?.project?.name}
-            </Button>
-          </div>
+        <div className="flex justify-end py-4 px-8">
+          <Button
+            loading={isLoading}
+            disabled={
+              isLoading
+              // errorProjectClaim?.message === 'Project is already in the target organization.'
+            }
+            onClick={() =>
+              claimProject({
+                slug: organizationSlug,
+                token: claimToken!,
+              })
+            }
+          >
+            Claim {projectClaim?.project?.name}
+          </Button>
         </div>
       }
     >
       <div className="w-full px-8 py-6 space-y-8 text-sm">
         <div className="flex flex-col items-center mt-6">
           <div className="flex items-center">
-            <div className="flex items-center">
-              <div
-                className={cn(
-                  'w-8 h-8 bg-center bg-no-repeat bg-cover flex items-center justify-center rounded-md'
-                )}
-                style={{
-                  backgroundImage: !!requester.icon ? `url('${requester.icon}')` : 'none',
-                }}
-              >
-                {!requester.icon && (
-                  <p className="text-foreground-light text-lg">{requester.name[0]}</p>
-                )}
-              </div>
+            <div
+              className={cn(
+                'w-8 h-8 bg-center bg-no-repeat bg-cover flex items-center justify-center rounded-md'
+              )}
+              style={{
+                backgroundImage: !!requester.icon ? `url('${requester.icon}')` : 'none',
+              }}
+            >
+              {!requester.icon && (
+                <p className="text-foreground-light text-lg">{requester.name[0]}</p>
+              )}
             </div>
 
             <div className="flex items-center justify-center w-28 relative">

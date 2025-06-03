@@ -42,5 +42,4 @@ export const useOrganizationProjectClaimQuery = <TData = OrganizationProjectClai
     organizationKeys.projectClaim(slug, token),
     ({ signal }) => getOrganizationProjectClaim({ slug, token }, signal),
     { ...options }
-    // { enabled: enabled && typeof slug !== 'undefined' && typeof token !== 'undefined', ...options }
   )

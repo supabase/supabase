@@ -1,13 +1,14 @@
+import { CheckCircle2, ChevronsLeftRight } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Image from 'next/image'
+
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { ApiAuthorizationResponse } from 'data/api-authorization/api-authorization-query'
 import { OrganizationProjectClaimResponse } from 'data/organizations/organization-project-claim-query'
 import { BASE_PATH } from 'lib/constants'
-import { CheckCircle2, ChevronsLeftRight } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import Image from 'next/image'
 import { Button, cn } from 'ui'
 
-export const ProjectClaimIntro = ({
+export const ProjectClaimBenefits = ({
   projectClaim,
   requester,
   onContinue,
@@ -17,33 +18,33 @@ export const ProjectClaimIntro = ({
   onContinue: () => void
 }) => {
   const { resolvedTheme } = useTheme()
-  console.log(projectClaim)
 
   return (
     <FormPanel
       header={
-        <p>
-          Claim a project <span className="text-brand">{projectClaim?.project?.name}</span> from{' '}
-          <span className="text-brand">{requester?.name}</span>
-        </p>
+        <div className="flex items-center justify-between">
+          <p>
+            Claim a project <span className="text-brand">{projectClaim?.project?.name}</span> from{' '}
+            <span className="text-brand">{requester?.name}</span>
+          </p>
+          <p className="text-foreground-light text-xs">Step 2 of 3</p>
+        </div>
       }
     >
       <div className="w-full px-8 py-6 space-y-8 text-sm">
         <div className="flex flex-col items-center mt-6">
           <div className="flex items-center">
-            <div className="flex items-center">
-              <div
-                className={cn(
-                  'w-8 h-8 bg-center bg-no-repeat bg-cover flex items-center justify-center rounded-md'
-                )}
-                style={{
-                  backgroundImage: !!requester.icon ? `url('${requester.icon}')` : 'none',
-                }}
-              >
-                {!requester.icon && (
-                  <p className="text-foreground-light text-lg">{requester.name[0]}</p>
-                )}
-              </div>
+            <div
+              className={cn(
+                'w-8 h-8 bg-center bg-no-repeat bg-cover flex items-center justify-center rounded-md'
+              )}
+              style={{
+                backgroundImage: !!requester.icon ? `url('${requester.icon}')` : 'none',
+              }}
+            >
+              {!requester.icon && (
+                <p className="text-foreground-light text-lg">{requester.name[0]}</p>
+              )}
             </div>
 
             <div className="flex items-center justify-center w-28 relative">
@@ -51,7 +52,7 @@ export const ProjectClaimIntro = ({
               <div className="rounded-full border flex items-center justify-center h-10 w-full shadow-sm">
                 <ChevronsLeftRight className="text-muted-foreground" size={24} />
               </div>
-              <div className="h-0.5  w-full border-2 border-dashed border-stronger z-10" />
+              <div className="h-0.5 w-full border-2 border-dashed border-stronger z-10" />
             </div>
 
             <div className="w-8 h-8">
@@ -82,7 +83,7 @@ export const ProjectClaimIntro = ({
           <Button onClick={onContinue}>Continue connection</Button>
         </div>
         <div className="w-full space-y-4">
-          <h3 className="">Why connect Lovable to Supabase?</h3>
+          <h3 className="">Why connect {requester.name} to Supabase?</h3>
           <ul className="space-y-3">
             <li className="flex space-x-2">
               <CheckCircle2 className="text-brand w-5 h-5" />

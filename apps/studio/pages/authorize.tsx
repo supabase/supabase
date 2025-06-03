@@ -47,7 +47,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 
   const { mutate: approveRequest } = useApiAuthorizationApproveMutation({
     onSuccess: (res) => {
-      window.location.href = res.url!
+      window.location.href = res.url
     },
   })
   const { mutate: declineRequest } = useApiAuthorizationDeclineMutation({
