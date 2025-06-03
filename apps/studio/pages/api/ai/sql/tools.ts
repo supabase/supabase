@@ -3,10 +3,12 @@ import { stripIndent } from 'common-tags'
 import { z } from 'zod'
 
 // import { processSql, renderSupabaseJs } from '@supabase/sql-to-rest'
+import { IS_PLATFORM } from 'common'
 import { getDatabaseFunctions } from 'data/database-functions/database-functions-query'
 import { getDatabasePolicies } from 'data/database-policies/database-policies-query'
 import { getEntityDefinitionsSql } from 'data/database/entity-definitions-query'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 
 export const getTools = ({
   projectRef,
@@ -43,7 +45,8 @@ export const getTools = ({
                   sql: getEntityDefinitionsSql({ schemas }),
                 },
                 undefined,
-                headers
+                headers,
+                IS_PLATFORM ? undefined : queryPgMetaSelfHosted
               )
             : { result: [] }
 
