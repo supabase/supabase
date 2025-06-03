@@ -63,13 +63,13 @@ Check the `package.json` for the available commands and environments.
 #### Example:
 
 ```bash
-npm run e2e:dev-cli
+npm run e2e
 ```
 
 With Playwright UI:
 
 ```bash
-npm run e2e:dev-selfhosted -- --ui
+npm run e2e -- --ui
 ```
 
 ---
@@ -98,7 +98,7 @@ import { test } from '../utils/test'
 - Use the PWDEBUG environment variable to debug the tests.
 
 ```bash
-PWDEBUG=1 npm run e2e:dev-selfhosted -- --ui
+PWDEBUG=1 npm run e2e -- --ui
 ```
 
 ---
@@ -135,31 +135,3 @@ await page.route(`*/**/logs.all*`, async (route) => {
   await route.fulfill({ body: JSON.stringify(mockAPILogs) })
 })
 ```
-
----
-
-## Environments
-
-### `dev-selfhosted`
-
-Runs against Supabase Studio in development mode for self-hosted Supabase. You have to be running studio in dev mode and IS_HOSTED=false locally.
-
-### `dev-hosted`
-
-Runs against a local Supabase-hosted dev environment. This requires special access. Used by Supabase employees.
-
-### `selfhosted`
-
-Runs against a self-hosted Supabase instance. You can run `pnpm run e2e:supabase:start` to start one instance for testing.
-
-### `staging`
-
-Runs against Supabase Staging aka supabase.green.
-
-### `prod`
-
-Runs against Supabase Production aka supabase.com.
-
-### `preview`
-
-Runs against a preview environment. Used in CI to run tests against Vercel Previews in PRs.
