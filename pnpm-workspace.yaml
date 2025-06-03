@@ -1,7 +1,6 @@
 packages:
   - 'apps/*'
   - 'packages/*'
-  - 'tests/*'
   - 'e2e/*'
 
 catalog:

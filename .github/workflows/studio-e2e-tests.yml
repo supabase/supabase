@@ -5,7 +5,6 @@ on:
     paths:
       - 'packages/pg-meta/**/*'
       - 'apps/studio/**'
-      - 'tests/studio-tests/**'
       - 'e2e/studio/**'
       - 'pnpm-lock.yaml'
   pull_request:
@@ -13,7 +12,6 @@ on:
     paths:
       - 'packages/pg-meta/**/*'
       - 'apps/studio/**'
-      - 'tests/studio-tests/**'
       - 'e2e/studio/**'
       - 'pnpm-lock.yaml'
 
