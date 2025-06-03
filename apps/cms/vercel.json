@@ -1,0 +1,17 @@
+{
+  "buildCommand": "cd ../.. && pnpm --filter=cms ci",
+  "installCommand": "cd ../.. && pnpm install",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "functions": {
+    "app/**": {
+      "maxDuration": 60
+    },
+    "src/app/**": {
+      "maxDuration": 60
+    }
+  },
+  "env": {
+    "NODE_OPTIONS": "--no-deprecation"
+  }
+}
