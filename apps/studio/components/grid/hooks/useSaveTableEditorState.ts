@@ -1,7 +1,7 @@
-import { useCallback } from 'react'
-
 import { saveTableEditorStateToLocalStorage } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useCallback } from 'react'
+
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 
 /**
