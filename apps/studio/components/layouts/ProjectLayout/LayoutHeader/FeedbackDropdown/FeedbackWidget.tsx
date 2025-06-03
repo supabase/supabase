@@ -61,7 +61,7 @@ const FeedbackWidget = ({
   const [isSending, setSending] = useState(false)
   const [isSavingScreenshot, setIsSavingScreenshot] = useState(false)
   const [isFeedbackSent, setIsFeedbackSent] = useState(false)
-  const [debouncedFeedback] = useDebounce(feedback, 750)
+  const [debouncedFeedback] = useDebounce(feedback, 450)
 
   const { data: category } = useFeedbackCategoryQuery({
     prompt: debouncedFeedback,
