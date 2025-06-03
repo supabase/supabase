@@ -69,13 +69,13 @@ Check the `package.json` for the available commands and environments.
 #### Example:
 
 ```bash
-npm run e2e
+pnpm run e2e
 ```
 
 With Playwright UI:
 
 ```bash
-npm run e2e -- --ui
+pnpm run e2e -- --ui
 ```
 
 ---
@@ -83,7 +83,7 @@ npm run e2e -- --ui
 ## Tips for development
 
 - Read [Playwright Best Practices](https://playwright.dev/docs/best-practices)
-- Use `npm run e2e -- --ui` to get the playwright UI.
+- Use `pnpm run e2e -- --ui` to get the playwright UI.
 - Add the tests in `examples/examples.ts` to Cursor as context.
 - Add messages to expect statements to make them easier to debug.
 
@@ -104,7 +104,7 @@ import { test } from '../utils/test'
 - Use the PWDEBUG environment variable to debug the tests.
 
 ```bash
-PWDEBUG=1 npm run e2e -- --ui
+PWDEBUG=1 pnpm run e2e -- --ui
 ```
 
 ---
