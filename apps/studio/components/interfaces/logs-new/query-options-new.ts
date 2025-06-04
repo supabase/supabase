@@ -7,46 +7,9 @@ import type { BaseChartSchema, FacetMetadataSchema } from './schema'
 import { ColumnSchema } from './schema'
 import type { SearchParamsType } from './search-params'
 
-// Define the basic types we need
+// Debug mode flag - set to true to enable detailed logs
+const DEBUG_MODE = false
 
-// -- function event logs
-// -- select
-// --   id,
-// --   fl.timestamp as timestamp,
-// --   'function events' as log_type,
-// --   'undefined' as status,
-// --   CASE
-// --     WHEN LOWER(fl_metadata.level) = 'error' THEN 'error'
-// --     WHEN LOWER(fl_metadata.level) = 'warn' OR LOWER(fl_metadata.level) = 'warning' THEN 'warning'
-// --     ELSE 'success'
-// --   END as level,
-// --   null as path,
-// --   null as host,
-// --   fl.event_message as event_message,
-// --   null as method,
-// --   'api_role' as api_role,
-// --   null as auth_user
-// -- from function_logs as fl
-// -- cross join unnest(metadata) as fl_metadata
-
-// -- union all
-
-// union all
-
-// select
-//   id,
-//   pgul.timestamp as timestamp,
-//   'postgres upgrade' as log_type,
-//   'undefined' as status,
-//   'undefined' as level,
-//   null as path,
-//   null as host,
-//   null as event_message,
-//   null as method,
-//   'api_role' as api_role,
-//   null as auth_user,
-//   null as log_count,
-// from pg_upgrade_logs as pgul
 export type UnifiedLogSchema = {
   id: string
   timestamp: Date
@@ -183,7 +146,7 @@ export const useChartData = (search: SearchParamsType, projectRef: string) => {
         )
 
         if (error) {
-          console.error('API returned error for chart data:', error)
+          if (DEBUG_MODE) console.error('API returned error for chart data:', error)
           throw error
         }
 
@@ -286,14 +249,14 @@ export const useChartData = (search: SearchParamsType, projectRef: string) => {
         chartData.sort((a, b) => a.timestamp - b.timestamp)
 
         // Add debugging info for totalCount
-        console.log(`Total count from chart query: ${totalCount}`)
+        if (DEBUG_MODE) console.log(`Total count from chart query: ${totalCount}`)
 
         return {
           chartData,
           totalCount,
         }
       } catch (error) {
-        console.error('Error fetching chart data:', error)
+        if (DEBUG_MODE) console.error('Error fetching chart data:', error)
         throw error
       }
     },
@@ -314,6 +277,17 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
     },
     {} as Record<string, any>
   )
+
+  // Calculate the appropriate initial cursor based on the selected date range
+  const getInitialCursor = () => {
+    if (search.date && search.date.length === 2) {
+      // Use the end of the selected date range
+      return new Date(search.date[1]).getTime()
+    } else {
+      // Default to current time if no date range is selected
+      return new Date().getTime()
+    }
+  }
 
   // Simply return the options object
   return {
@@ -373,7 +347,7 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
         )
 
         if (countsError) {
-          console.error('API returned error for counts data:', countsError)
+          if (DEBUG_MODE) console.error('API returned error for counts data:', countsError)
           throw countsError
         }
 
@@ -426,15 +400,34 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
         })
 
         // Now, fetch the logs data with pagination
-        const timestampStart = isPagination
-          ? cursorValue
-            ? new Date(Number(cursorValue) / 1000).toISOString()
-            : isoTimestampEnd
-          : isoTimestampStart
+        // ONLY convert to ISO when we're about to send to the API
+        let timestampStart: string
+        let timestampEnd: string
 
-        console.log(
-          `Query params: isPagination=${isPagination}, cursorValue=${cursorValue}, iso_timestamp_start=${timestampStart}, iso_timestamp_end=${isoTimestampEnd}`
-        )
+        if (isPagination && direction === 'prev') {
+          // Live mode: fetch logs newer than the cursor
+          timestampStart = cursorValue
+            ? new Date(Number(cursorValue) / 1000).toISOString() // Convert microseconds to ISO for API
+            : isoTimestampStart
+          timestampEnd = new Date().toISOString() // Current time as ISO for API
+        } else if (isPagination && direction === 'next') {
+          // Regular pagination: fetch logs older than the cursor
+          timestampStart = isoTimestampStart
+          timestampEnd = cursorValue
+            ? new Date(Number(cursorValue) / 1000).toISOString() // Convert microseconds to ISO for API
+            : isoTimestampEnd
+        } else {
+          // Initial load: use the original date range
+          timestampStart = isoTimestampStart
+          timestampEnd = isoTimestampEnd
+        }
+
+        if (DEBUG_MODE) {
+          console.log(
+            `🔍 Query function called: isPagination=${isPagination}, cursorValue=${cursorValue}, direction=${direction}, iso_timestamp_start=${timestampStart}, iso_timestamp_end=${timestampEnd}`
+          )
+          console.log('🔍 Raw pageParam received:', pageParam)
+        }
 
         const { data: logsData, error: logsError } = await post(
           `/platform/projects/{ref}/analytics/endpoints/logs.all`,
@@ -446,7 +439,7 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
               path: { ref: projectRef },
               query: {
                 iso_timestamp_start: timestampStart,
-                iso_timestamp_end: isoTimestampEnd,
+                iso_timestamp_end: timestampEnd,
                 project: projectRef,
               },
             },
@@ -454,14 +447,14 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
         )
 
         if (logsError) {
-          console.error('API returned error for logs data:', logsError)
+          if (DEBUG_MODE) console.error('API returned error for logs data:', logsError)
           throw logsError
         }
 
         // Process the logs results
         const resultData = logsData?.result || []
 
-        console.log(`Received ${resultData.length} records from API`)
+        if (DEBUG_MODE) console.log(`Received ${resultData.length} records from API`)
 
         // Define specific level types
         type LogLevel = 'success' | 'warning' | 'error'
@@ -505,7 +498,11 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
         const lastRow = result.length > 0 ? result[result.length - 1] : null
         const firstRow = result.length > 0 ? result[0] : null
         const nextCursor = lastRow ? lastRow.timestamp : null
-        const prevCursor = firstRow ? firstRow.timestamp : null
+
+        // FIXED: Always provide prevCursor like DataTableDemo does
+        // This ensures live mode never breaks the infinite query chain
+        // DataTableDemo uses milliseconds, but our timestamps are in microseconds
+        const prevCursor = result.length > 0 ? firstRow!.timestamp : new Date().getTime() * 1000
 
         // Determine if there might be more data
         const pageLimit = 50
@@ -516,9 +513,11 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
         // For now, we consider 49 records as a "full page" to ensure pagination works correctly
         const hasMore = result.length >= pageLimit - 1 // Consider 49 or 50 records as a full page
 
-        console.log(
-          `Pagination info: result.length=${result.length}, hasMore=${hasMore}, nextCursor=${nextCursor}`
-        )
+        if (DEBUG_MODE) {
+          console.log(
+            `Pagination info: result.length=${result.length}, hasMore=${hasMore}, nextCursor=${nextCursor}, prevCursor=${prevCursor}`
+          )
+        }
 
         // Create response with pagination info
         const response = {
@@ -541,17 +540,35 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
 
         return response
       } catch (error) {
-        console.error('Error fetching unified logs:', error)
+        if (DEBUG_MODE) console.error('Error fetching unified logs:', error)
         throw error
       }
     },
     // Initial load with proper cursor for live mode pagination
-    initialPageParam: { cursor: new Date().getTime(), direction: 'next' } as PageParam,
+    // Use microseconds format to match database timestamps
+    initialPageParam: { cursor: new Date().getTime() * 1000, direction: 'next' } as PageParam,
     getPreviousPageParam: (
       firstPage: InfiniteQueryResponse<ExtendedColumnSchema[], UnifiedLogsMeta>
     ) => {
-      if (!firstPage.prevCursor) return null
-      return { cursor: firstPage.prevCursor, direction: 'prev' } as PageParam
+      if (DEBUG_MODE) {
+        console.log('🔍 getPreviousPageParam called with:', {
+          hasFirstPage: !!firstPage,
+          dataLength: firstPage?.data?.length || 0,
+          prevCursor: firstPage?.prevCursor,
+          nextCursor: firstPage?.nextCursor,
+          firstPageKeys: firstPage ? Object.keys(firstPage) : 'no firstPage',
+        })
+      }
+
+      // Use the same logic as the working DataTableDemo
+      if (!firstPage.prevCursor) {
+        if (DEBUG_MODE) console.log('🔍 getPreviousPageParam returning: null (no prevCursor)')
+        return null
+      }
+
+      const result = { cursor: firstPage.prevCursor, direction: 'prev' } as PageParam
+      if (DEBUG_MODE) console.log('🔍 getPreviousPageParam returning:', result)
+      return result
     },
     getNextPageParam: (
       lastPage: InfiniteQueryResponse<ExtendedColumnSchema[], UnifiedLogsMeta>,

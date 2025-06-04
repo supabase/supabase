@@ -10,7 +10,7 @@ import { useQueryStates } from 'nuqs'
 import * as React from 'react'
 import { searchParamsParser } from '../search-params'
 
-const REFRESH_INTERVAL = 4_000
+const REFRESH_INTERVAL = 10_000
 
 interface LiveButtonProps {
   fetchPreviousPage?: (options?: FetchPreviousPageOptions | undefined) => Promise<unknown>
@@ -63,7 +63,7 @@ export function LiveButton({ fetchPreviousPage }: LiveButtonProps) {
     <Button
       className={cn(live && 'border-info text-info hover:text-info')}
       onClick={handleClick}
-      type="default"
+      type={live ? 'primary' : 'default'}
       size="small"
       icon={
         live ? <CirclePause className="mr-2 h-4 w-4" /> : <CirclePlay className="mr-2 h-4 w-4" />
