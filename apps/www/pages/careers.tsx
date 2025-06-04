@@ -1,4 +1,4 @@
-import { NextPage } from 'next'
+import { GetServerSideProps, NextPage } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -16,7 +16,10 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { groupJobsByTeam, filterGenericJob, JobItemProps, PLACEHOLDER_JOB_ID } from '~/lib/careers'
 import career from '~/data/career.json'
 
-export async function getStaticProps() {
+export const getServerSideProps: GetServerSideProps = (async ({ res }) => {
+  // refresh every 5 minutes
+  res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=300')
+
   const job_res = await fetch('https://api.ashbyhq.com/posting-api/job-board/supabase')
   const job_data = await job_res.json()
 
@@ -65,23 +68,9 @@ export async function getStaticProps() {
     }
   )
 
-  if (!job_data && !contributors) {
-    return {
-      props: {
-        notFound: true,
-      },
-    }
-  }
-
-  return {
-    props: {
-      jobs,
-      placeholderJob: placeholderJob ?? null,
-      contributors: contributors,
-    },
-    revalidate: 60 * 5, // 5 minutes,
-  }
-}
+  // Pass data to the page via props
+  return { props: { jobs, placeholderJob: placeholderJob ?? null, contributors } }
+}) satisfies GetServerSideProps<CareersPageProps>
 
 interface CareersPageProps {
   jobs: Record<string, JobItemProps[]>
