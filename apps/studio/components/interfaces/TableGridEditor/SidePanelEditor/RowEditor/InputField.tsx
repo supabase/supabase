@@ -321,12 +321,24 @@ const InputField = ({
     )
   }
 
+  const isTruncated = isValueTruncated(field.value)
+
   return (
     <Input
       data-testid={`${field.name}-input`}
       layout="horizontal"
       label={field.name}
-      descriptionText={field.comment}
+      descriptionText={
+        <>
+          {field.comment && <p>{field.comment}</p>}
+          {isTruncated && (
+            <p>
+              Note: Value is too large to be rendered in the dashboard. Please expand the editor to
+              edit the value
+            </p>
+          )}
+        </>
+      }
       labelOptional={field.format}
       error={errors[field.name]}
       value={field.value ?? ''}
@@ -337,8 +349,20 @@ const InputField = ({
             ? `Default: ${field.defaultValue}`
             : 'NULL'
       }
-      disabled={!isEditable}
+      disabled={!isEditable || isTruncated}
       onChange={(event: any) => onUpdateField({ [field.name]: event.target.value })}
+      actions={
+        isTruncated ? (
+          <Button
+            type="default"
+            htmlType="button"
+            onClick={() => onEditJson({ column: field.name, value: field.value })}
+            icon={isEditable ? <Edit2 /> : <Eye />}
+          >
+            {isEditable ? 'Edit' : 'View'}
+          </Button>
+        ) : undefined
+      }
     />
   )
 }
