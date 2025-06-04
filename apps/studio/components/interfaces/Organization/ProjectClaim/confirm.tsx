@@ -1,25 +1,22 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
+import { CheckCircle2, ChevronRight } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { toast } from 'sonner'
+
 import { useParams } from 'common'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { ApiAuthorizationResponse } from 'data/api-authorization/api-authorization-query'
 import { useOrganizationProjectClaimMutation } from 'data/organizations/organization-project-claim-mutation'
 import { OrganizationProjectClaimResponse } from 'data/organizations/organization-project-claim-query'
-import { BASE_PATH } from 'lib/constants'
-import { CheckCircle2, ChevronRight, ChevronsLeftRight } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import Image from 'next/image'
 import { Organization } from 'types'
 import {
-  Badge,
   Button,
-  Card,
-  CardContent,
   cn,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
 } from 'ui'
 import { ScopeSection } from '../OAuthApps/AuthorizeRequesterDetails'
+import { ProjectClaimLayout } from './layout'
 
 export const ProjectClaimConfirm = ({
   selectedOrganization,
@@ -32,104 +29,30 @@ export const ProjectClaimConfirm = ({
   requester: ApiAuthorizationResponse
   setStep: (step: 'choose-org' | 'benefits' | 'confirm') => void
 }) => {
+  const router = useRouter()
   const { token: claimToken } = useParams()
-  const { resolvedTheme } = useTheme()
 
-  const { mutate: claimProject, isLoading } = useOrganizationProjectClaimMutation()
+  const { mutate: claimProject, isLoading } = useOrganizationProjectClaimMutation({
+    onSuccess: () => {
+      toast.success('Project claimed successfully')
+      router.push(`/org/${selectedOrganization.slug}`)
+    },
+    onError: (error) => {
+      toast.error(`Failed to claim project ${error.message}`)
+    },
+  })
 
   return (
-    <FormPanel
-      header={
-        <div className="flex items-center justify-between">
-          <p>
-            Claim a project <span className="text-brand">{projectClaim?.project?.name}</span> from{' '}
-            <span className="text-brand">{requester?.name}</span>
-          </p>
-          <p className="text-foreground-light text-xs">Step 3 of 3</p>
-        </div>
+    <ProjectClaimLayout
+      title={
+        <>
+          Claim a project <span className="text-brand">{projectClaim?.project?.name}</span> from{' '}
+          <span className="text-brand">{requester?.name}</span>
+        </>
       }
-      footer={
-        <div className="flex justify-end py-4 px-8">
-          <Button
-            loading={isLoading}
-            disabled={
-              isLoading
-              // errorProjectClaim?.message === 'Project is already in the target organization.'
-            }
-            onClick={() =>
-              claimProject({
-                slug: selectedOrganization.slug,
-                token: claimToken!,
-              })
-            }
-          >
-            Claim {projectClaim?.project?.name}
-          </Button>
-        </div>
-      }
+      description="Step 3 of 3"
     >
       <div className="w-full px-8 py-6 space-y-8 text-sm">
-        <div className="flex flex-col items-center mt-6">
-          <div className="flex items-center gap-2">
-            <div
-              className={cn(
-                'w-8 h-8 bg-center bg-no-repeat bg-cover flex items-center justify-center rounded-md'
-              )}
-              style={{
-                backgroundImage: !!requester.icon ? `url('${requester.icon}')` : 'none',
-              }}
-            >
-              {!requester.icon && (
-                <p className="text-foreground-light text-lg">{requester.name[0]}</p>
-              )}
-            </div>
-            <p className="text-base">{requester.name}</p>
-          </div>
-
-          <div className="flex items-center justify-center h-28 relative flex-col">
-            <div className="w-0.5 h-28 mt-2 border-2 border-dashed border-stronger" />
-            <div className="rounded-full border flex items-center justify-center w-10 h-full shadow-sm">
-              <ChevronsLeftRight className="text-muted-foreground" size={24} />
-            </div>
-            <div className="w-0.5 h-28 mb-6 border-2 border-dashed border-stronger z-10" />
-          </div>
-
-          <Card className="relative min-w-72 flex items-center justify-center">
-            <Card className="absolute -top-6 bg-surface-200">
-              <CardContent className="flex items-center gap-2 flex-row border-2 w-60">
-                <div className="w-8 h-8">
-                  <Image
-                    src={
-                      resolvedTheme?.includes('dark')
-                        ? `${BASE_PATH}/img/supabase-logo.svg`
-                        : `${BASE_PATH}/img/supabase-logo.svg`
-                    }
-                    alt="Supabase Logo"
-                    className="w-full h-full"
-                    width={50}
-                    height={50}
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <p className="truncate">{projectClaim?.project?.name}</p>
-                  <p className="text-foreground-lighter text-sm">Project</p>
-                </div>
-              </CardContent>
-            </Card>
-            <CardContent className="mt-12 flex flex-col">
-              <div className="flex items-end gap-2">
-                <p>{selectedOrganization.name}</p>
-                <Badge>{selectedOrganization.plan.name}</Badge>
-              </div>
-              <a
-                className="text-foreground-lighter text-sm underline cursor-pointer"
-                onClick={() => setStep('choose-org')}
-              >
-                Choose another organization
-              </a>
-            </CardContent>
-          </Card>
-        </div>
         <div>
           <h2 className="text-center text-base text-foreground-light">
             Supabase will become the backend for{' '}
@@ -147,18 +70,34 @@ export const ProjectClaimConfirm = ({
           </p>
           <ul className="space-y-3">
             <li className="flex space-x-2">
-              <CheckCircle2 className="text-brand w-5 h-5" />
-              <span>The project will be transferred to your Supabase organization.</span>
+              <span>
+                <CheckCircle2 className="text-brand h-5 w-5" />
+              </span>
+              <span>
+                The project will be transferred to your Supabase organization{' '}
+                <span className="text-foreground">{selectedOrganization.name}.</span>{' '}
+                <a
+                  href="#"
+                  onClick={() => setStep('choose-org')}
+                  className="text-foreground-light underline"
+                >
+                  Choose another organization?
+                </a>
+              </span>
             </li>
             <li className="flex space-x-2">
-              <CheckCircle2 className="text-brand w-5 h-5 flex-none" />
+              <span>
+                <CheckCircle2 className="text-brand h-5 w-5" />
+              </span>
               <span>
                 {requester?.name} will receive API access to all projects within your organization
                 to continue providing its functionality.
               </span>
             </li>
             <li className="flex space-x-2">
-              <CheckCircle2 className="text-brand w-5 h-5 flex-none" />
+              <span>
+                <CheckCircle2 className="text-brand h-5 w-5" />
+              </span>
               <span>
                 You’ll be responsible for maintaining the project, which may include additional
                 costs.
@@ -249,64 +188,22 @@ export const ProjectClaimConfirm = ({
             </CollapsibleContent_Shadcn_>
           </Collapsible_Shadcn_>
         </div>
-
-        {/* Expiry warning */}
-        {/* {isExpired && (
-          <Alert withIcon variant="warning" title="This authorization request is expired">
-            Please retry your authorization request from the requesting app
-          </Alert>
-        )} */}
-
-        {/* Organization selection */}
-        {/* {isLoadingOrganizations ? (
-          <div className="py-4 space-y-2">
-            <ShimmeringLoader />
-            <ShimmeringLoader className="w-3/4" />
-          </div>
-        ) : organizations?.length === 0 ? (
-          <Alert_Shadcn_ variant="warning">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle_Shadcn_>
-              Organization is needed for installing an integration
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="">
-              Your account isn't associated with any organizations. To use this integration, it must
-              be installed within an organization. You'll be redirected to create an organization
-              first.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-        ) : (
-          <>
-            <Listbox
-              label="Select an organization to grant API access to"
-              value={selectedOrgSlug}
-              disabled={isExpired}
-              onChange={setSelectedOrgSlug}
-            >
-              {(organizations ?? []).map((organization) => (
-                <Listbox.Option
-                  key={organization?.slug}
-                  label={organization?.name}
-                  value={organization?.slug}
-                >
-                  {organization.name}
-                </Listbox.Option>
-              ))}
-            </Listbox>
-            {errorProjectClaim?.message === 'Project is already in the target organization.' && (
-              <Alert_Shadcn_ variant="warning">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle_Shadcn_>
-                  The project is already in the target organization.
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_ className="">
-                  Please select a different organization to claim the project.
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-            )}
-          </>
-        )} */}
       </div>
-    </FormPanel>
+      <div className="flex justify-center sticky bottom-0">
+        <Button
+          size="large"
+          loading={isLoading}
+          disabled={isLoading}
+          onClick={() =>
+            claimProject({
+              slug: selectedOrganization.slug,
+              token: claimToken!,
+            })
+          }
+        >
+          Claim project {projectClaim?.project?.name}
+        </Button>
+      </div>
+    </ProjectClaimLayout>
   )
 }

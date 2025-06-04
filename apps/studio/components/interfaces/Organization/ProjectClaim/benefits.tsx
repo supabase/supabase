@@ -2,11 +2,11 @@ import { CheckCircle2, ChevronsLeftRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 
-import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { ApiAuthorizationResponse } from 'data/api-authorization/api-authorization-query'
 import { OrganizationProjectClaimResponse } from 'data/organizations/organization-project-claim-query'
 import { BASE_PATH } from 'lib/constants'
 import { Button, cn } from 'ui'
+import { ProjectClaimLayout } from './layout'
 
 export const ProjectClaimBenefits = ({
   projectClaim,
@@ -20,18 +20,16 @@ export const ProjectClaimBenefits = ({
   const { resolvedTheme } = useTheme()
 
   return (
-    <FormPanel
-      header={
-        <div className="flex items-center justify-between">
-          <p>
-            Claim a project <span className="text-brand">{projectClaim?.project?.name}</span> from{' '}
-            <span className="text-brand">{requester?.name}</span>
-          </p>
-          <p className="text-foreground-light text-xs">Step 2 of 3</p>
-        </div>
+    <ProjectClaimLayout
+      title={
+        <>
+          Claim a project <span className="text-brand">{projectClaim?.project?.name}</span> from{' '}
+          <span className="text-brand">{requester?.name}</span>
+        </>
       }
+      description="Step 2 of 3"
     >
-      <div className="w-full px-8 py-6 space-y-8 text-sm">
+      <div className="w-full space-y-8 text-sm">
         <div className="flex flex-col items-center mt-6">
           <div className="flex items-center">
             <div
@@ -79,9 +77,6 @@ export const ProjectClaimBenefits = ({
             Your backend will then be managed by Supabase.
           </p>
         </div>
-        <div className="flex justify-center">
-          <Button onClick={onContinue}>Continue connection</Button>
-        </div>
         <div className="w-full space-y-4">
           <h3 className="">Why connect {requester.name} to Supabase?</h3>
           <ul className="space-y-3">
@@ -112,7 +107,12 @@ export const ProjectClaimBenefits = ({
             </li>
           </ul>
         </div>
+        <div className="flex justify-center sticky bottom-0">
+          <Button size="large" onClick={onContinue}>
+            Continue connection
+          </Button>
+        </div>
       </div>
-    </FormPanel>
+    </ProjectClaimLayout>
   )
 }
