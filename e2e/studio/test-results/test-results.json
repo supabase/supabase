@@ -1,0 +1,404 @@
+{
+  "config": {
+    "configFile": "/Users/joshen-supabase/Desktop/supabase/e2e/studio/playwright.config.ts",
+    "rootDir": "/Users/joshen-supabase/Desktop/supabase/e2e/studio/features",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 4
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/test-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/joshen-supabase/Desktop/supabase/e2e/studio/test-results",
+        "repeatEach": 1,
+        "retries": 3,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "setup",
+        "name": "setup",
+        "testDir": "/Users/joshen-supabase/Desktop/supabase/e2e/studio/features",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\.setup\\.ts/"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/joshen-supabase/Desktop/supabase/e2e/studio/test-results",
+        "repeatEach": 1,
+        "retries": 3,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "Features",
+        "name": "Features",
+        "testDir": "/Users/joshen-supabase/Desktop/supabase/e2e/studio/features",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\.spec\\.ts/"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.52.0",
+    "workers": 6,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "_global.setup.ts",
+      "file": "_global.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Global Setup",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "setup",
+              "projectName": "setup",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4383,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "\n 🧪 Setting up test environment.\n    - Studio URL: http://localhost:8082/\n    - API URL: http://localhost:8080/api\n    - Auth: enabled\n    - Is Platform: true\n    \n"
+                    },
+                    {
+                      "text": "\n ✅ Studio is running at http://localhost:8082/\n"
+                    },
+                    {
+                      "text": "\n ✅ API is running at http://localhost:8080/api\n"
+                    },
+                    {
+                      "text": "\n 🔑 Navigating to sign in page: http://localhost:8082//sign-in\n"
+                    },
+                    {
+                      "text": "\n 📍 Current URL: http://localhost:8082/sign-in\n"
+                    },
+                    {
+                      "text": "\n 🔍 Checking form elements:\n"
+                    },
+                    {
+                      "text": "Email input exists: true\n"
+                    },
+                    {
+                      "text": "Password input exists: true\n"
+                    },
+                    {
+                      "text": "Sign in button exists: true\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2025-06-03T10:26:55.540Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "706511a1bb0f809cccea-e757554ade4021482abf",
+          "file": "_global.setup.ts",
+          "line": 20,
+          "column": 6
+        }
+      ]
+    },
+    {
+      "title": "home.spec.ts",
+      "file": "home.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Project",
+          "file": "home.spec.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Can navigate to project home page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Features",
+                  "projectName": "Features",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4353,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "about:blank\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-03T10:27:00.809Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d318381359a9b96acb1e-43d698c34cefcfa22956",
+              "file": "home.spec.ts",
+              "line": 6,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "logs.spec.ts",
+      "file": "logs.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Logs",
+          "file": "logs.spec.ts",
+          "line": 43,
+          "column": 6,
+          "specs": [
+            {
+              "title": "API Gateway logs page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Features",
+                  "projectName": "Features",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 32274,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-03T10:27:00.822Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ee800b8f709b91acd6c6-6381532c1e622cb7b3e0",
+              "file": "logs.spec.ts",
+              "line": 45,
+              "column": 9
+            },
+            {
+              "title": "Postgres logs page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Features",
+                  "projectName": "Features",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 18774,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-03T10:27:33.475Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ee800b8f709b91acd6c6-93ac8c4670aa4bbdae48",
+              "file": "logs.spec.ts",
+              "line": 45,
+              "column": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "sql-editor.spec.ts",
+      "file": "sql-editor.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "SQL Editor",
+          "file": "sql-editor.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should check if SQL editor can run simple commands",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Features",
+                  "projectName": "Features",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 27902,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-03T10:27:00.810Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7fe3f2f2fb7434d2c507-ad895f6d92cb42fdfb1e",
+              "file": "sql-editor.spec.ts",
+              "line": 7,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "table-editor.spec.ts",
+      "file": "table-editor.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Table Editor",
+          "file": "table-editor.spec.ts",
+          "line": 47,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should perform all table operations sequentially",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Features",
+                  "projectName": "Features",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 16954,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-03T10:27:00.819Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "f142e7f9eab86f9b4c2e-aaa34846f5983a431fdc",
+              "file": "table-editor.spec.ts",
+              "line": 116,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-06-03T10:26:55.187Z",
+    "duration": 57190.428,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
