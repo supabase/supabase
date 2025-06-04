@@ -254,8 +254,41 @@ curl https://api.supabase.com/v1/projects/database/backups/restore-pitr \
 }'
 ```
 
-## Claims flow
+## Project transfer flow
 
-If you are developing projects on behalf of your users (in your own account), there might come a time where your users want to claim their project into their own Supabase Account.
+If you’re building Supabase Projects under your Supabase Organization on behalf of your users, they might eventually want to transfer those Projects to their own Organizations.
 
-- `TODO`: add docs.
+You can transfer a Project under your Organization to your user's Organization while gaining permission to continue interacting with the Project by following these steps:
+
+1. **Generate a project transfer token** to begin the transfer process. You must be an `Owner` of the Project in order to initiate the transfer.
+
+   ```sh
+   curl https://api.supabase.com/v1/projects/{ref}/claim-token \
+     --request POST \
+     --header 'Content-Type: application/json' \
+     --header 'Authorization: Bearer {PERSONAL_ACCESS_TOKEN}'
+   ```
+
+2. **Generate an OAuth ID** to gain permission to your user's Organization and the Project after it's transferred. Make sure you do not follow the redirect to get the `auth_id` from the redirect URI as part of the response.
+
+   ```sh
+   curl --request GET \
+     --url 'https://api.supabase.com/v1/oauth/authorize?client_id={OAUTH_CLIENT_ID}&response_type=code&redirect_uri={OAUTH_REDIRECT_URI}' \
+     --max-redirs 0
+   ```
+
+   For details on creating a Supabase OAuth integration, see the [Build a Supabase Integration](/docs/guides/integrations/build-a-supabase-integration) guide.
+
+3. **Complete the project transfer** by taking the project transfer token and the OAuth ID from previous steps and redirecting the user to the project transfer + OAuth approval UI.
+
+   ```sh
+   curl -i 'https://supabase.com/authorize?token={PROJECT_TRANSFER_TOKEN}&auth_id={OAUTH_ID}'
+   ```
+
+   The user can then follow these steps in the UI:
+
+   1. Create a new Supabase account or sign in to an existing one
+   2. Create a new Supabase Organization or select an existing one
+   3. Review your OAuth app's permission scopes
+   4. Review the Project transfer details
+   5. Confirm the OAuth integration and the Project transfer for the selected Organization
