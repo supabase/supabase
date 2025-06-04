@@ -1,3 +1,5 @@
+import { toast } from 'sonner'
+
 import { authKeys } from 'data/auth/keys'
 import { databaseExtensionsKeys } from 'data/database-extensions/keys'
 import { databaseIndexesKeys } from 'data/database-indexes/keys'
@@ -6,6 +8,7 @@ import { databaseTriggerKeys } from 'data/database-triggers/keys'
 import { databaseKeys } from 'data/database/keys'
 import { enumeratedTypesKeys } from 'data/enumerated-types/keys'
 import { tableKeys } from 'data/tables/keys'
+import { tryParseJson } from 'lib/helpers'
 import { SAFE_FUNCTIONS } from './AiAssistant.constants'
 
 // [Joshen] This is just very basic identification, but possible can extend perhaps
@@ -98,4 +101,13 @@ export const getContextualInvalidationKeys = ({
       } as const
     )[key] ?? []
   )
+}
+
+export const onErrorChat = (error: { message: string }) => {
+  const errorObject = tryParseJson(error.message)
+  if (errorObject) {
+    toast.error(errorObject.error)
+  } else {
+    toast.error(error.message)
+  }
 }
