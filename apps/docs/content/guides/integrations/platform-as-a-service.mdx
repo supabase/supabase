@@ -43,14 +43,14 @@ curl https://api.supabase.com/v1/projects \
 
 ## Development workflow
 
-Supabase is a _stateful_ service: we store data. If anything breaks in production, you can't simply "roll back" to a point in time because doing so might cause your users to lose any data that their production enviroment received since the last checkpoint.
+Supabase is a _stateful_ service: we store data. If anything breaks in production, you can't  "roll back" to a point in time because doing so might cause your users to lose any data that their production enviroment received since the last checkpoint.
 
 Because of this, it's important that you adopt a development workflow on behalf of your users:
 
 ![Change flow](/docs/img/integrations/change-flow.png)
 
 
-### Creating a `DEV` Branch
+### Creating a `DEV` branch
 
 https://api.supabase.com/api/v1#tag/environments/POST/v1/projects/{ref}/branches
 
@@ -235,7 +235,7 @@ It will not affect:
 - `TODO`: how to roll back config
 
 
-## Disaster Recovery
+## Disaster recovery
 
 - Rollbacks can cause data loss. Only use in in `PROD` when absolutely necessary
 - Only available in prod when a user has explicitly enabled PITR
