@@ -18,12 +18,13 @@ import { getMockDataForAttribute } from 'data/reports/auth-charts'
 import type { ChartData } from './Charts.types'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 
-type Provider = 'infra-monitoring' | 'daily-stats' | 'mock'
+type Provider = 'infra-monitoring' | 'daily-stats' | 'mock' | 'reference-line'
 
 export type MultiAttribute = {
   attribute: string
   provider: Provider
   label?: string
+  stackId?: string
   format?: 'percent' | 'number'
   description?: string
   docsLink?: string
@@ -36,6 +37,12 @@ export type MultiAttribute = {
     light: string
     dark: string
   }
+  customValue?: number
+  id?: string
+  value?: number
+  isReferenceLine?: boolean
+  strokeDasharray?: string
+  className?: string
 }
 
 interface ComposedChartHandlerProps {
@@ -61,6 +68,7 @@ interface ComposedChartHandlerProps {
   valuePrecision?: number
   isVisible?: boolean
   titleTooltip?: string
+  docsUrl?: string
 }
 
 /**
@@ -131,6 +139,8 @@ const ComposedChartHandler = ({
   valuePrecision,
   isVisible = true,
   titleTooltip,
+  id,
+  ...otherProps
 }: PropsWithChildren<ComposedChartHandlerProps>) => {
   const router = useRouter()
   const { ref } = router.query
@@ -166,34 +176,48 @@ const ComposedChartHandler = ({
     // Get all unique timestamps from all datasets
     const timestamps = new Set<string>()
     attributeQueries.forEach((query: any) => {
-      query.data?.data?.forEach((dataPoint: any) => {
-        timestamps.add(dataPoint.period_start)
+      query.data?.data?.forEach((point: any) => {
+        if (point?.period_start) {
+          timestamps.add(point.period_start)
+        }
       })
     })
 
-    // Get only enabled attributes (or those without an enabled property)
-    const enabledAttributes = attributes.filter((attr) => attr.enabled !== false)
+    const referenceLineQueries = attributeQueries.filter(
+      (_, index) => attributes[index].provider === 'reference-line'
+    )
 
     // Combine data points for each timestamp
     const combined = Array.from(timestamps)
       .sort()
       .map((timestamp) => {
-        const dataPoint: any = { period_start: timestamp, timestamp: timestamp }
+        const point: any = { timestamp }
 
-        // Only include data for enabled attributes
-        enabledAttributes.forEach((attr) => {
-          const queryIndex = attributeQueries.findIndex(
-            (q: any) => q.data?.data?.[0]?.[attr.attribute] !== undefined
-          )
-
-          if (queryIndex >= 0) {
-            const queryData = attributeQueries[queryIndex].data?.data
-            const matchingPoint = queryData?.find((p: any) => p.period_start === timestamp)
-            dataPoint[attr.attribute] = matchingPoint?.[attr.attribute] ?? 0
+        // Add regular attributes
+        attributes.forEach((attr, index) => {
+          if (!attr) return
+          // Handle custom value attributes (like disk size)
+          if (attr.customValue !== undefined) {
+            point[attr.attribute] = attr.customValue
+            return
           }
+
+          // Skip reference line attributes here, we'll add them below
+          if (attr.provider === 'reference-line') return
+
+          const queryData = attributeQueries[index]?.data?.data
+          const matchingPoint = queryData?.find((p: any) => p.period_start === timestamp)
+          point[attr.attribute] = matchingPoint?.[attr.attribute] ?? 0
         })
 
-        return dataPoint
+        // Add reference line values for each timestamp
+        referenceLineQueries.forEach((query: any) => {
+          const attr = query.data.attribute
+          const value = query.data.total
+          point[attr] = value
+        })
+
+        return point as DataPoint
       })
 
     return combined as DataPoint[]
@@ -259,19 +283,14 @@ const ComposedChartHandler = ({
     <Panel
       noMargin
       noHideOverflow
-      className={cn('relative py-2 w-full', className)}
+      className={cn('relative py-2 w-full scroll-mt-16', className)}
       wrapWithLoading={false}
+      id={id ?? label.toLowerCase().replaceAll(' ', '-')}
     >
       <Panel.Content className="flex flex-col gap-4">
-        <div
-          className="absolute right-6 z-50 flex justify-between scroll-mt-10"
-          id={label.toLowerCase().replaceAll(' ', '-')}
-        >
-          {children}
-        </div>
+        <div className="absolute right-6 z-50 flex justify-between scroll-mt-16">{children}</div>
         <ComposedChart
           attributes={attributes}
-          YAxisProps={{ width: 1 }}
           data={combinedData as DataPoint[]}
           format={format}
           xAxisKey="period_start"
@@ -290,6 +309,7 @@ const ComposedChartHandler = ({
           valuePrecision={valuePrecision}
           hideChartType={hideChartType}
           titleTooltip={titleTooltip}
+          {...otherProps}
         />
       </Panel.Content>
     </Panel>
@@ -307,12 +327,13 @@ const useAttributeQueries = (
   isVisible: boolean
 ) => {
   const infraAttributes = attributes
-    .filter((attr) => attr.provider === 'infra-monitoring')
+    .filter((attr) => attr?.provider === 'infra-monitoring')
     .map((attr) => attr.attribute as InfraMonitoringAttribute)
   const dailyStatsAttributes = attributes
-    .filter((attr) => attr.provider === 'daily-stats')
+    .filter((attr) => attr?.provider === 'daily-stats')
     .map((attr) => attr.attribute as ProjectDailyStatsAttribute)
   const mockAttributes = attributes.filter((attr) => attr.provider === 'mock')
+  const referenceLines = attributes.filter((attr) => attr?.provider === 'reference-line')
 
   const infraQueries = useInfraMonitoringQueries(
     infraAttributes,
@@ -351,7 +372,23 @@ const useAttributeQueries = (
       })
   }, [])
 
-  return [...infraQueries, ...dailyStatsQueries, ...mockQueries]
+  const referenceLineQueries = referenceLines.map((line) => {
+    let value = line.value || 0
+
+    return {
+      data: {
+        data: [], // Will be populated in combinedData
+        attribute: line.attribute,
+        total: value,
+        maximum: value,
+        totalGrouped: { [line.attribute]: value },
+      },
+      isLoading: false,
+      isError: false,
+    }
+  })
+
+  return [...infraQueries, ...dailyStatsQueries, ...referenceLineQueries, ...mockQueries]
 }
 
 export default function LazyComposedChartHandler(props: ComposedChartHandlerProps) {

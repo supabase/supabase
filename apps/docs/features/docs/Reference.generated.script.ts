@@ -1,4 +1,4 @@
-import { isPlainObject, keyBy } from 'lodash'
+import { isPlainObject, keyBy } from 'lodash-es'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'

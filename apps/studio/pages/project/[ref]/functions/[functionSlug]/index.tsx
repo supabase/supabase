@@ -34,18 +34,11 @@ import {
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
-    key: '5min',
-    label: '5 min',
-    startValue: 5,
-    startUnit: 'minute',
-    format: 'MMM D, h:mm:ssa',
-  },
-  {
     key: '15min',
     label: '15 min',
     startValue: 15,
     startUnit: 'minute',
-    format: 'MMM D, h:mma',
+    format: 'MMM D, h:mm:ssa',
   },
   {
     key: '1hr',
@@ -61,13 +54,13 @@ const CHART_INTERVALS: ChartIntervals[] = [
     startUnit: 'hour',
     format: 'MMM D, h:mma',
   },
-  {
-    key: '7day',
-    label: '7 days',
-    startValue: 7,
-    startUnit: 'day',
-    format: 'MMM D',
-  },
+  // {
+  //   key: '7day',
+  //   label: '7 days',
+  //   startValue: 7,
+  //   startUnit: 'day',
+  //   format: 'MMM D',
+  // },
 ]
 
 const PageLayout: NextPageWithLayout = () => {

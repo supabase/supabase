@@ -19,7 +19,7 @@ export async function getGitHubBranches(
   })
 
   if (error) handleError(error)
-  return data
+  return data as Record<string, never>[]
 }
 
 export type GitHubBranchesData = Awaited<ReturnType<typeof getGitHubBranches>>

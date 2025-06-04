@@ -131,7 +131,7 @@ export const getTableRowsSql = ({
     const defaultOrderByColumns = getDefaultOrderByColumns(table as PGTable)
     if (defaultOrderByColumns.length > 0) {
       defaultOrderByColumns.forEach((col) => {
-        queryChains = queryChains.order(table.name, col, true, true)
+        queryChains = queryChains.order(table.name, col)
       })
     }
   } else {

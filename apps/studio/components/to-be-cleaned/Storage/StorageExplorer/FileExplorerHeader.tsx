@@ -379,7 +379,9 @@ const FileExplorerHeader = ({
                 <DropdownMenuItem key={option.key} onClick={() => snap.setView(option.key)}>
                   <div className="flex items-center justify-between w-full">
                     <p>{option.name}</p>
-                    {snap.view === option.key && <Check className="text-brand" strokeWidth={2} />}
+                    {snap.view === option.key && (
+                      <Check size={16} className="text-brand" strokeWidth={2} />
+                    )}
                   </div>
                 </DropdownMenuItem>
               ))}
@@ -391,7 +393,9 @@ const FileExplorerHeader = ({
                     <DropdownMenuItem key={option.key} onClick={() => setSortBy(option.key)}>
                       <div className="flex items-center justify-between w-full">
                         <p>{option.name}</p>
-                        {sortBy === option.key && <Check className="text-brand" strokeWidth={2} />}
+                        {sortBy === option.key && (
+                          <Check size={16} className="text-brand" strokeWidth={2} />
+                        )}
                       </div>
                     </DropdownMenuItem>
                   ))}
@@ -405,7 +409,7 @@ const FileExplorerHeader = ({
                       <div className="flex items-center justify-between w-full">
                         <p>{option.name}</p>
                         {sortByOrder === option.key && (
-                          <Check className="text-brand" strokeWidth={2} />
+                          <Check size={16} className="text-brand" strokeWidth={2} />
                         )}
                       </div>
                     </DropdownMenuItem>

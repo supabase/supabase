@@ -1,5 +1,6 @@
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Activity, BarChartIcon, GitCommitHorizontalIcon, InfoIcon } from 'lucide-react'
+import Link from 'next/link'
 
 export interface ChartHeaderProps {
   title?: string
@@ -9,18 +10,20 @@ export interface ChartHeaderProps {
   displayDateInUtc?: boolean
   highlightedLabel?: number | string | any | null
   highlightedValue?: number | string | any | null
+  hideHighlightedValue?: boolean
   hideChartType?: boolean
   chartStyle?: string
   onChartStyleChange?: (style: string) => void
   showMaxValue?: boolean
   setShowMaxValue?: (value: boolean) => void
-  titleTooltip?: string
+  docsUrl?: string
 }
 
 const ChartHeader = ({
   format,
   highlightedValue,
   highlightedLabel,
+  hideHighlightedValue = false,
   title,
   minimalHeader = false,
   hideChartType = false,
@@ -28,25 +31,23 @@ const ChartHeader = ({
   onChartStyleChange,
   showMaxValue = false,
   setShowMaxValue,
-  titleTooltip,
+  docsUrl,
 }: ChartHeaderProps) => {
   const chartTitle = (
-    <h3
-      className={
-        'text-foreground-lighter flex gap-2 flex-wrap items-center' +
-        (minimalHeader ? 'text-xs' : 'text-sm')
-      }
-    >
-      {title}{' '}
-      {titleTooltip && (
-        <Tooltip>
-          <TooltipTrigger>
-            <InfoIcon className="w-3 h-3" />
-          </TooltipTrigger>
-          <TooltipContent>{titleTooltip}</TooltipContent>
-        </Tooltip>
+    <div className="flex flex-row items-center gap-x-2">
+      <h3 className={'text-foreground-lighter ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
+        {title}
+      </h3>
+      {docsUrl && (
+        <Link
+          href={docsUrl}
+          target="_blank"
+          className="text-foreground-lighter hover:text-foreground-light"
+        >
+          <InfoIcon className="w-3.5 h-3.5" />
+        </Link>
       )}
-    </h3>
+    </div>
   )
 
   const highlighted = (
@@ -67,7 +68,7 @@ const ChartHeader = ({
       <div className="flex flex-row items-center gap-x-4" style={{ minHeight: '1.8rem' }}>
         {title && chartTitle}
         <div className="flex flex-row items-baseline gap-x-2">
-          {highlightedValue !== undefined && highlighted}
+          {highlightedValue !== undefined && !hideHighlightedValue && highlighted}
           {label}
         </div>
       </div>
@@ -78,7 +79,7 @@ const ChartHeader = ({
     <div className="flex-grow flex justify-between items-start min-h-16">
       <div className="flex flex-col min-h-20">
         {title && chartTitle}
-        {highlightedValue !== undefined && highlighted}
+        {highlightedValue !== undefined && !hideHighlightedValue && highlighted}
         {label}
       </div>
       <div className="flex items-center gap-2">
@@ -92,7 +93,7 @@ const ChartHeader = ({
                 onClick={() => onChartStyleChange(chartStyle === 'bar' ? 'line' : 'bar')}
               />
             </TooltipTrigger>
-            <TooltipContent side="left" align="center">
+            <TooltipContent side="top" align="center">
               View as {chartStyle === 'bar' ? 'line chart' : 'bar chart'}
             </TooltipContent>
           </Tooltip>
@@ -105,13 +106,13 @@ const ChartHeader = ({
                 className="px-1.5"
                 icon={
                   <GitCommitHorizontalIcon
-                    className={showMaxValue ? 'text-foreground' : 'text-foreground-lighter'}
+                    className={showMaxValue ? 'text-foreground-light' : 'text-foreground-lighter'}
                   />
                 }
                 onClick={() => setShowMaxValue(!showMaxValue)}
               />
             </TooltipTrigger>
-            <TooltipContent side="left" align="center">
+            <TooltipContent side="top" align="center">
               {showMaxValue ? 'Hide' : 'Show'} limit
             </TooltipContent>
           </Tooltip>

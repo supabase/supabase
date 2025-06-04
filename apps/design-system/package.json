@@ -51,7 +51,6 @@
     "@types/lodash.template": "4.5.0",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "autoprefixer": "^10.0.1",
     "config": "workspace:^",
     "mdast-util-toc": "^6.1.1",
     "postcss": "^8.5.3",

@@ -63,10 +63,12 @@ function pgMetaGuard(request: Request) {
     // If there is no valid `x-connection-encrypted`, pg-meta will necesseraly fail to connect to the target database
     // in such case, we save the hops and throw a 421 response instead
     if (!isValidConnString(request.headers.get('x-connection-encrypted'))) {
+      const retryAfterHeader = request.headers.get('Retry-After')
       throw new ResponseError(
         'API Error: happened while trying to acquire connection to the database',
         400,
-        request.headers.get('X-Request-Id') ?? undefined
+        request.headers.get('X-Request-Id') ?? undefined,
+        retryAfterHeader ? parseInt(retryAfterHeader) : undefined
       )
     }
   }
@@ -98,6 +100,8 @@ client.use(
         // add code field to body
         body.code = response.status
         body.requestId = request.headers.get('X-Request-Id')
+        const retryAfterHeader = response.headers.get('Retry-After')
+        body.retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
 
         return new Response(JSON.stringify(body), {
           headers: response.headers,
@@ -136,9 +140,11 @@ export const handleError = (error: unknown): never => {
     const errorCode = 'code' in error && typeof error.code === 'number' ? error.code : undefined
     const requestId =
       'requestId' in error && typeof error.requestId === 'string' ? error.requestId : undefined
+    const retryAfter =
+      'retryAfter' in error && typeof error.retryAfter === 'number' ? error.retryAfter : undefined
 
     if (errorMessage) {
-      throw new ResponseError(errorMessage, errorCode, requestId)
+      throw new ResponseError(errorMessage, errorCode, requestId, retryAfter)
     }
   }
 
