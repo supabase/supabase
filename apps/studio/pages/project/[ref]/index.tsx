@@ -70,9 +70,9 @@ const Home: NextPageWithLayout = () => {
     projectRef: project?.ref,
   })
 
-  const tablesCount = tablesData?.length ?? 0
-  const functionsCount = functionsData?.length ?? 0
-  const replicasCount = (replicasData?.length ?? 1) - 1
+  const tablesCount = Math.max(0, tablesData?.length ?? 0)
+  const functionsCount = Math.max(0, functionsData?.length ?? 0)
+  const replicasCount = Math.max(0, replicasData?.length ?? 0)
 
   return (
     <div className="w-full">
