@@ -15,7 +15,9 @@ tags:
 date: '2025-06-04'
 ---
 
-Functions. Quite a simple word that can mean different things to different people. Ask me and I will think database functions, ask Lakshan and he will think edge functions. Ask a hotel manager and they will think about the wedding they have booked that weekend.
+With the release of [Postgres 17](https://github.com/orgs/supabase/discussions/35851), we have removed PLV8 as an extension (while it remains supported in Postgres 15 until EOL). In this blog post, we will cover an overview of how to move your PLV8 logic and how to decide where to move them to.
+
+Functions. Quite a simple word with many different meanings to different people. Ask me and I will think database functions, ask Lakshan and he will think edge functions. Ask a hotel manager and they will think about the wedding function they have booked that weekend.
 
 Let's stay on topic, though. Functions are custom logic that you can run on inputs provided. A relatively simple definition yet, in Supabase, this can still refer to a database function, an edge function or a function within our SDK. Within Postgres, this can be a function written in SQL, PLpgSQL, Perl or Python.
 
@@ -24,8 +26,6 @@ Flexibility and choice are great things, it opens up accessibility to people fro
 PLV8 is an extension that allows you to write database functions in JavaScript, a language that many are familiar with and helps to abstract away more complex data operations when compared with SQL.
 
 However, a PLV8 database function is not the same as an edge function; with no access to node packages or the file system, PLV8 is excellent for performing operations on data but less so when you need to do things you are used to doing with Javascript; using packages or making API calls to other services.
-
-With the release of Postgres 17, we have removed PLV8 as an extension (while it remains supported in Postgres 15 until EOL). In this blog post, we will cover an overview of how to move your PLV8 logic and how to decide where to move them to.
 
 So, when should you use a database function and when should you use an edge function? The answer is a blurry line that is as wide as it is long. Database functions run within your database and can use all of the resources available on your instance while edge functions run separate to your instance, autoscale and are globally distributed; but they do need to make a network call to your database.
 
