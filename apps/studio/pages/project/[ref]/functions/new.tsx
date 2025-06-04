@@ -17,7 +17,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { BASE_PATH } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,

@@ -1,19 +1,19 @@
-import React, { useState, useMemo, DragEvent, PropsWithChildren } from 'react'
-import { useRouter } from 'next/router'
-
-import { QueryBlock, DEFAULT_CHART_CONFIG } from '../QueryBlock/QueryBlock'
-import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { findResultForManualId } from './Message.utils'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useProfile } from 'lib/profile'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { identifyQueryType } from './AIAssistant.utils'
-import { useParams } from 'common/hooks'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Message } from 'ai/react'
+import { useRouter } from 'next/router'
+import { DragEvent, PropsWithChildren, useMemo, useState } from 'react'
+
+import { useParams } from 'common'
+import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useProfile } from 'lib/profile'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { Badge } from 'ui'
+import { DEFAULT_CHART_CONFIG, QueryBlock } from '../QueryBlock/QueryBlock'
+import { identifyQueryType } from './AIAssistant.utils'
+import { findResultForManualId } from './Message.utils'
 
 interface DisplayBlockRendererProps {
   messageId: string
@@ -41,19 +41,17 @@ export const DisplayBlockRenderer = ({
   isLoading,
   onResults,
 }: PropsWithChildren<DisplayBlockRendererProps>) => {
-  // --- Hooks ---
-  const snap = useAiAssistantStateSnapshot()
   const router = useRouter()
+  const { ref } = useParams()
   const { profile } = useProfile()
+  const org = useSelectedOrganization()
+  const snap = useAiAssistantStateSnapshot()
+
   const { mutate: sendEvent } = useSendEventMutation()
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
-  const { ref } = useParams()
-  const org = useSelectedOrganization()
-
-  console.log('initialArgs', initialArgs)
 
   const [chartConfig, setChartConfig] = useState<ChartConfig>(() => ({
     ...DEFAULT_CHART_CONFIG,
@@ -77,7 +75,6 @@ export const DisplayBlockRenderer = ({
   const label = initialArgs.label || 'SQL Results'
   const sqlQuery = initialArgs.sql
 
-  // --- Handlers ---
   const handleRunQuery = (queryType: 'select' | 'mutation') => {
     sendEvent({
       action: 'assistant_suggestion_run_query_clicked',

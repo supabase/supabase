@@ -6,9 +6,10 @@ import {
   ToolExecutionOptions,
   ToolSet,
 } from 'ai'
+import { z } from 'zod'
+
 import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { API_URL } from 'lib/constants'
-import { z } from 'zod'
 
 export async function createSupabaseMCPClient({
   accessToken,

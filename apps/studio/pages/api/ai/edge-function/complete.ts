@@ -1,12 +1,13 @@
 import pgMeta from '@supabase/pg-meta'
 import { streamText } from 'ai'
-import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
+import { NextApiRequest, NextApiResponse } from 'next'
+
+import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
-import { NextApiRequest, NextApiResponse } from 'next'
 import { getTools } from '../sql/tools'
 
 export const maxDuration = 30

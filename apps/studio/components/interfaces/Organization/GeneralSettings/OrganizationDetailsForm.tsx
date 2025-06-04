@@ -1,43 +1,40 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
 import { toast } from 'sonner'
-import { useQueryClient } from '@tanstack/react-query'
+import * as z from 'zod'
+
 import { useParams } from 'common'
-
-// Import hooks for org and permissions
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-import type { ResponseError } from 'types' // Removed Organization import as it's now fetched internally
+import CopyButton from 'components/ui/CopyButton'
+import { FormActions } from 'components/ui/Forms/FormActions'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import type { ResponseError } from 'types'
 import {
-  Form_Shadcn_,
   Card,
   CardContent,
   CardFooter,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_ as Input,
   PrePostTab,
 } from 'ui'
-import { FormActions } from 'components/ui/Forms/FormActions'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import CopyButton from 'components/ui/CopyButton'
 
-// Schema for organization details using Zod
 const OrgDetailsSchema = z.object({
   name: z.string().min(1, 'Organization name is required'),
 })
 
-const OrganizationDetailsForm = () => {
-  const selectedOrganization = useSelectedOrganization()
-  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+export const OrganizationDetailsForm = () => {
   const { slug } = useParams()
   const queryClient = useQueryClient()
+  const selectedOrganization = useSelectedOrganization()
+  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
   const { mutate: updateOrganization, isLoading: isUpdatingDetails } =
     useOrganizationUpdateMutation()
@@ -46,12 +43,6 @@ const OrganizationDetailsForm = () => {
     resolver: zodResolver(OrgDetailsSchema),
     defaultValues: { name: selectedOrganization?.name ?? '' },
   })
-
-  useEffect(() => {
-    if (selectedOrganization && !isUpdatingDetails) {
-      orgDetailsForm.reset({ name: selectedOrganization.name ?? '' })
-    }
-  }, [selectedOrganization, orgDetailsForm.reset, isUpdatingDetails])
 
   const onUpdateOrganizationDetails = async (values: z.infer<typeof OrgDetailsSchema>) => {
     if (!canUpdateOrganization) {
@@ -76,6 +67,12 @@ const OrganizationDetailsForm = () => {
   const permissionsHelperText = !canUpdateOrganization
     ? "You need additional permissions to manage this organization's settings"
     : undefined
+
+  useEffect(() => {
+    if (selectedOrganization && !isUpdatingDetails) {
+      orgDetailsForm.reset({ name: selectedOrganization.name ?? '' })
+    }
+  }, [selectedOrganization, orgDetailsForm, isUpdatingDetails])
 
   return (
     <Form_Shadcn_ {...orgDetailsForm}>
@@ -132,5 +129,3 @@ const OrganizationDetailsForm = () => {
     </Form_Shadcn_>
   )
 }
-
-export default OrganizationDetailsForm

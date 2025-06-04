@@ -3,9 +3,7 @@ import { fromNodeProviderChain } from '@aws-sdk/credential-providers'
 
 const credentialProvider = fromNodeProviderChain()
 
-export const bedrock = createAmazonBedrock({
-  credentialProvider,
-})
+export const bedrock = createAmazonBedrock({ credentialProvider })
 
 export async function checkAwsCredentials() {
   try {

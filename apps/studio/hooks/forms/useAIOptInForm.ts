@@ -1,17 +1,17 @@
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { toast } from 'sonner'
-import { useQueryClient } from '@tanstack/react-query'
-
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import type { ResponseError } from 'types'
+import { useQueryClient } from '@tanstack/react-query'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import * as z from 'zod'
+
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { OPT_IN_TAGS } from 'lib/constants'
+import type { ResponseError } from 'types'
 
 // Shared schema definition
 export const AIOptInSchema = z.object({

@@ -16,10 +16,9 @@ export async function generateSqlCron({ prompt }: SqlCronGenerateVariables) {
   const response = await fetchHandler(`${BASE_PATH}/api/ai/sql/cron`, {
     headers,
     method: 'POST',
-    body: JSON.stringify({
-      prompt,
-    }),
+    body: JSON.stringify({ prompt }),
   })
+
   let body: any
 
   try {

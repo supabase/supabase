@@ -1,14 +1,14 @@
 import { Message as VercelMessage } from 'ai/react'
 import { User } from 'lucide-react'
-import { createContext, PropsWithChildren, useMemo } from 'react'
+import { createContext, PropsWithChildren, ReactNode, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Components } from 'react-markdown/lib/ast-to-react'
 import remarkGfm from 'remark-gfm'
 
 import { AiIconAnimation, cn, markdownComponents, WarningIcon } from 'ui'
-import { Heading3, InlineCode, Link, ListItem, MarkdownPre, OrderedList } from './MessageMarkdown'
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
+import { Heading3, InlineCode, Link, ListItem, MarkdownPre, OrderedList } from './MessageMarkdown'
 
 interface MessageContextType {
   isLoading: boolean
@@ -29,7 +29,7 @@ interface MessageProps {
   message: VercelMessage
   isLoading: boolean
   readOnly?: boolean
-  action?: React.ReactNode
+  action?: ReactNode
   variant?: 'default' | 'warning'
   onResults: ({
     messageId,
@@ -122,7 +122,6 @@ export const Message = function Message({
                     const { toolCallId, toolName, args } = part.toolInvocation
                     switch (toolName) {
                       case 'display_query': {
-                        console.log('args', args)
                         return (
                           <DisplayBlockRenderer
                             key={`${id}-tool-${toolCallId}`}

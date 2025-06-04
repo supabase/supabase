@@ -5,13 +5,13 @@ import {
   ScaffoldSection,
   ScaffoldSectionTitle,
 } from 'components/layouts/Scaffold'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import OrganizationDeletePanel from './OrganizationDeletePanel'
 
 // Import the new form components
-import OrganizationDetailsForm from './OrganizationDetailsForm'
-import DataPrivacyForm from './DataPrivacyForm'
+import { DataPrivacyForm } from './DataPrivacyForm'
+import { OrganizationDetailsForm } from './OrganizationDetailsForm'
 
 const GeneralSettings = () => {
   const organizationDeletionEnabled = useIsFeatureEnabled('organizations:delete')

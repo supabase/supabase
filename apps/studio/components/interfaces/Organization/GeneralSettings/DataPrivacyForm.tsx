@@ -1,23 +1,23 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect } from 'react'
-import * as z from 'zod'
-import { Form_Shadcn_, Card, CardContent, CardFooter } from 'ui'
+
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { useAIOptInForm } from 'hooks/forms/useAIOptInForm'
-import { AIOptInLevelSelector } from './AIOptInLevelSelector'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Card, CardContent, CardFooter, Form_Shadcn_ } from 'ui'
+import { AIOptInLevelSelector } from './AIOptInLevelSelector'
 
-const DataPrivacyForm = () => {
+export const DataPrivacyForm = () => {
   const { form, onSubmit, isUpdating, currentOptInLevel } = useAIOptInForm()
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-
-  useEffect(() => {
-    form.reset({ aiOptInLevel: currentOptInLevel })
-  }, [currentOptInLevel, form.reset])
 
   const permissionsHelperText = !canUpdateOrganization
     ? "You need additional permissions to manage this organization's settings"
     : undefined
+
+  useEffect(() => {
+    form.reset({ aiOptInLevel: currentOptInLevel })
+  }, [currentOptInLevel, form])
 
   return (
     <Form_Shadcn_ {...form}>
@@ -46,5 +46,3 @@ const DataPrivacyForm = () => {
     </Form_Shadcn_>
   )
 }
-
-export default DataPrivacyForm

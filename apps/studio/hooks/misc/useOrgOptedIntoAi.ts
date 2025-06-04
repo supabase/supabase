@@ -1,8 +1,8 @@
+import { z } from 'zod'
+
 import { useDisallowHipaa } from 'hooks/misc/useDisallowHipaa'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { OPT_IN_TAGS } from 'lib/constants'
-import { IS_PLATFORM } from 'lib/constants'
-import { z } from 'zod'
+import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 
 export const aiOptInLevelSchema = z.enum([
   'disabled',

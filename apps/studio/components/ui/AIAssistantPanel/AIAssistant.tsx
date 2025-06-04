@@ -5,7 +5,6 @@ import { last } from 'lodash'
 import { ArrowDown, FileText, Info, RefreshCw, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { toast } from 'sonner'
 
 import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
@@ -35,14 +34,14 @@ import {
 } from 'ui'
 import { Admonition, AssistantChatForm, GenericSkeletonLoader } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
-import DotGrid from '../DotGrid'
+import { DotGrid } from '../DotGrid'
+import { ErrorBoundary } from '../ErrorBoundary'
 import { AIAssistantChatSelector } from './AIAssistantChatSelector'
-import AIOnboarding from './AIOnboarding'
-import CollapsibleCodeBlock from './CollapsibleCodeBlock'
+import { AIOnboarding } from './AIOnboarding'
+import { AIOptInModal } from './AIOptInModal'
+import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
 import { Message } from './Message'
 import { useAutoScroll } from './hooks'
-import { AIOptInModal } from './AIOptInModal'
-import { ErrorBoundary } from '../ErrorBoundary'
 
 const MemoizedMessage = memo(
   ({
@@ -452,7 +451,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               <GenericSkeletonLoader className="w-4/5" />
             </div>
           ) : (tables ?? [])?.length > 0 ? (
-            <AIOnboarding setMessages={setMessages} onSendMessage={sendMessageToAssistant} />
+            <AIOnboarding onSendMessage={sendMessageToAssistant} />
           ) : isApiKeySet ? (
             <div className="w-full flex flex-col justify-end flex-1 h-full p-5">
               <h2 className="text-base mb-2">Welcome to Supabase!</h2>

@@ -1,9 +1,10 @@
 import { generateObject } from 'ai'
 import { source } from 'common-tags'
-import { getModel } from 'lib/ai/model'
-import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
+
+import { getModel } from 'lib/ai/model'
+import apiWrapper from 'lib/api/apiWrapper'
 
 const titleSchema = z.object({
   title: z
