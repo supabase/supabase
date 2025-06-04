@@ -1,13 +1,15 @@
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useAppStateSnapshot } from 'state/app-state'
-import { AiIconAnimation, Button } from 'ui'
+import { AiIconAnimation } from 'ui'
+import { KeyboardShortcut } from 'ui'
 
 export const AssistantButton = () => {
   const snap = useAiAssistantStateSnapshot()
   const { setEditorPanel } = useAppStateSnapshot()
 
   return (
-    <Button
+    <ButtonTooltip
       type="text"
       size="tiny"
       id="assistant-trigger"
@@ -16,8 +18,18 @@ export const AssistantButton = () => {
         snap.toggleAssistant()
         setEditorPanel({ open: false })
       }}
+      tooltip={{
+        content: {
+          text: (
+            <div className="flex items-center gap-1">
+              <span>AI Assistant</span>
+              <KeyboardShortcut keys={['⌘', 'i']} />
+            </div>
+          ),
+        },
+      }}
     >
       <AiIconAnimation allowHoverEffect size={16} />
-    </Button>
+    </ButtonTooltip>
   )
 }
