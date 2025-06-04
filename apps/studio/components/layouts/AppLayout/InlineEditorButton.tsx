@@ -21,9 +21,9 @@ export const InlineEditorButton = () => {
       tooltip={{
         content: {
           text: (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-4">
               <span>SQL Editor</span>
-              <KeyboardShortcut keys={['⌘', 'e']} />
+              <KeyboardShortcut keys={['Meta', 'e']} />
             </div>
           ),
         },

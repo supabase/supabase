@@ -21,9 +21,9 @@ export const AssistantButton = () => {
       tooltip={{
         content: {
           text: (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-4">
               <span>AI Assistant</span>
-              <KeyboardShortcut keys={['⌘', 'i']} />
+              <KeyboardShortcut keys={['Meta', 'i']} />
             </div>
           ),
         },

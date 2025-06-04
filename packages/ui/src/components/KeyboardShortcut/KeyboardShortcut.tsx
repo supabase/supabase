@@ -20,7 +20,7 @@ export const KeyboardShortcut = ({ keys }: { keys: string[] }) => {
     <div className="text-xs text-foreground-light flex items-center gap-[3px]">
       {keysWithMetaAndShift.map((key) => (
         <span
-          className="size-5 rounded-sm border-b-2 flex items-center justify-center border border-foreground-lightest cursor-default"
+          className="px-1.5 py-0.5 rounded-sm border-b-2 flex items-center justify-center border border-foreground-lightest cursor-default"
           key={key}
         >
           {key}
