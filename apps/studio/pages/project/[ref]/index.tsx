@@ -73,6 +73,7 @@ const Home: NextPageWithLayout = () => {
 
   const tablesCount = Math.max(0, tablesData?.length ?? 0)
   const functionsCount = Math.max(0, functionsData?.length ?? 0)
+  // [Joshen] JFYI minus 1 as the replicas endpoint returns the primary DB minimally
   const replicasCount = Math.max(0, (replicasData?.length ?? 1) - 1)
 
   return (
