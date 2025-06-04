@@ -38,7 +38,7 @@ export async function fetchDiscussions(owner: string, repo: string, categoryId: 
     auth: {
       appId,
       installationId,
-      privateKey: crypto.createPrivateKey(privateKey).export({ type: 'pkcs8', format: 'pem' }),
+      privateKey: crypto.createPrivateKey(privateKey!).export({ type: 'pkcs8', format: 'pem' }),
     },
   })
 
