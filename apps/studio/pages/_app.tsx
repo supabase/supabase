@@ -39,7 +39,7 @@ import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
-import { ErrorBoundaryState } from 'components/ui/ErrorBoundaryState'
+import { GlobalErrorBoundaryState } from 'components/ui/GlobalErrorBoundaryState'
 import { useRootQueryClient } from 'data/query-client'
 import { customFont, sourceCodePro } from 'fonts'
 import { AuthProvider } from 'lib/auth'
@@ -94,7 +94,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
   return (
-    <ErrorBoundary FallbackComponent={ErrorBoundaryState} onError={errorBoundaryHandler}>
+    <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
       <QueryClientProvider client={queryClient}>
         <NuqsAdapter>
           <Hydrate state={pageProps.dehydratedState}>

@@ -184,12 +184,7 @@ const DefaultPreviewSelectionRenderer = ({ log }: { log: PreviewLogData }) => {
       )}
       {log?.status && <PropertyRow key={'status'} keyName={'status'} value={log.status} />}
       {log?.timestamp && (
-        <PropertyRow
-          dataTestId="log-selection-timestamp"
-          key={'timestamp'}
-          keyName={'timestamp'}
-          value={log.timestamp}
-        />
+        <PropertyRow key={'timestamp'} keyName={'timestamp'} value={log.timestamp} />
       )}
       {Object.entries(rest).map(([key, value]) => {
         return <PropertyRow key={key} keyName={key} value={value} />
