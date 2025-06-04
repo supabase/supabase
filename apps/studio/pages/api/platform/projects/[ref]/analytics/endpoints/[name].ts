@@ -35,7 +35,6 @@ const proxyRequest = async (req: NextApiRequest) => {
   const search = '?' + new URLSearchParams(payload as any).toString()
   const apiKey = process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN
   const url = `${PROJECT_ANALYTICS_URL}endpoints/query/${name}${search}`
-  console.log('url', url)
   const result = await fetch(url, {
     method: 'GET',
     headers: {
