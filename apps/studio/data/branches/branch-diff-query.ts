@@ -25,14 +25,13 @@ export const useBranchDiffQuery = (
   {
     enabled = true,
     ...options
-  }: Omit<UseQueryOptions<BranchDiffData, ResponseError>, 'queryKey'> = {}
-) => {
-  return useQuery<BranchDiffData, ResponseError>(
+  }: Omit<UseQueryOptions<BranchDiffData, ResponseError>, 'queryKey' | 'queryFn'> = {}
+) =>
+  useQuery<BranchDiffData, ResponseError>(
     branchKeys.diff(branchId),
     () => getBranchDiff({ branchId }),
     {
-      enabled: enabled && !!branchId,
+      enabled: enabled && typeof branchId !== 'undefined',
       ...options,
     }
   )
-}

@@ -1,7 +1,5 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
-import { DiffEditor } from '@monaco-editor/react'
-import { editor as monacoEditor } from 'monaco-editor'
 
 import { useParams } from 'common'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
@@ -11,7 +9,16 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useBranchMergeMutation } from 'data/branches/branch-merge-mutation'
 import { useBranchDiffQuery } from 'data/branches/branch-diff-query'
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import DatabaseDiffPanel from 'components/interfaces/BranchManagement/DatabaseDiffPanel'
+import EdgeFunctionsDiffPanel from 'components/interfaces/BranchManagement/EdgeFunctionsDiffPanel'
 import { Button } from 'ui'
+import {
+  Tabs_Shadcn_ as Tabs,
+  TabsContent_Shadcn_ as TabsContent,
+  TabsList_Shadcn_ as TabsList,
+  TabsTrigger_Shadcn_ as TabsTrigger,
+} from 'ui'
 import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
@@ -36,8 +43,20 @@ const MergePage: NextPageWithLayout = () => {
     isLoading: isDiffLoading,
     error: diffError,
   } = useBranchDiffQuery(
-    { branchId: currentBranch?.id || '', projectRef: parentProjectRef || '' },
+    {
+      branchId: currentBranch?.id || '',
+      projectRef: parentProjectRef || '',
+    },
     { enabled: !!currentBranch?.id }
+  )
+
+  // Get edge functions for both branches
+  const { data: currentBranchFunctions, isLoading: isCurrentFunctionsLoading } =
+    useEdgeFunctionsQuery({ projectRef: ref }, { enabled: !!ref })
+
+  const { data: mainBranchFunctions, isLoading: isMainFunctionsLoading } = useEdgeFunctionsQuery(
+    { projectRef: parentProjectRef },
+    { enabled: !!parentProjectRef }
   )
 
   const { mutate: mergeBranch, isLoading: isMerging } = useBranchMergeMutation({
@@ -60,20 +79,6 @@ const MergePage: NextPageWithLayout = () => {
       projectRef: parentProjectRef,
       migration_version: undefined,
     })
-  }
-
-  // Monaco editor options for diff display
-  const defaultOptions: monacoEditor.IStandaloneDiffEditorConstructionOptions = {
-    readOnly: true,
-    renderSideBySide: false,
-    minimap: { enabled: false },
-    wordWrap: 'on',
-    lineNumbers: 'on',
-    folding: false,
-    padding: { top: 16, bottom: 16 },
-    lineNumbersMinChars: 3,
-    fontSize: 13,
-    scrollBeyondLastLine: false,
   }
 
   if (!isBranch || !currentBranch) {
@@ -114,30 +119,31 @@ const MergePage: NextPageWithLayout = () => {
       primaryActions={primaryActions}
     >
       <ScaffoldContainer className="pt-6">
-        {isDiffLoading ? (
-          <div className="p-6 text-center">
-            <p>Loading branch diff...</p>
-          </div>
-        ) : diffError ? (
-          <div className="p-6 text-center text-red-500">
-            <p>Error loading branch diff: {diffError.message}</p>
-          </div>
-        ) : !diffContent || diffContent.trim() === '' ? (
-          <div className="p-6 text-center">
-            <p>No changes detected between branches</p>
-          </div>
-        ) : (
-          <div className="h-96 border rounded-lg overflow-hidden">
-            <DiffEditor
-              theme="supabase"
-              language="sql"
-              height="100%"
-              original=""
-              modified={diffContent}
-              options={defaultOptions}
+        <Tabs defaultValue="database" className="w-full">
+          <TabsList>
+            <TabsTrigger value="database">Database</TabsTrigger>
+            <TabsTrigger value="edge-functions">Edge Functions</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="database">
+            <DatabaseDiffPanel
+              diffContent={diffContent}
+              isLoading={isDiffLoading}
+              error={diffError}
             />
-          </div>
-        )}
+          </TabsContent>
+
+          <TabsContent value="edge-functions">
+            <EdgeFunctionsDiffPanel
+              currentBranchFunctions={currentBranchFunctions}
+              mainBranchFunctions={mainBranchFunctions}
+              isCurrentFunctionsLoading={isCurrentFunctionsLoading}
+              isMainFunctionsLoading={isMainFunctionsLoading}
+              currentBranchRef={ref}
+              mainBranchRef={parentProjectRef}
+            />
+          </TabsContent>
+        </Tabs>
       </ScaffoldContainer>
     </PageLayout>
   )
