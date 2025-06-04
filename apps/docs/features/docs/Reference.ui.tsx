@@ -250,7 +250,9 @@ export function ReturnTypeDetails({ returnType }: { returnType: MethodTypes['ret
     <div>
       <h3 className="mb-3 text-base text-foreground">Return Type</h3>
       <div className="border-t border-b py-5 flex flex-col gap-3">
-        <div className="text-xs text-foreground-muted">{returnType ? getTypeName(returnType) : ''}</div>
+        <div className="text-xs text-foreground-muted">
+          {returnType ? getTypeName(returnType) : ''}
+        </div>
         {returnType?.comment?.shortText && (
           <div className="prose text-sm">
             <MDXRemoteBase
@@ -380,7 +382,7 @@ export function ApiOperationRequestBodyDetails({
       {availableSchemes.map((scheme, index) => (
         <ApiOperationRequestBodyDetailsInternal
           key={index}
-          schema={requestBody?.content?.[scheme]?.schema || {} as ISchema}
+          schema={requestBody?.content?.[scheme]?.schema || ({} as ISchema)}
           hidden={index > 0}
           {...{
             [API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES.KEY]: scheme,
@@ -457,7 +459,7 @@ function ApiOperationRequestBodyDetailsInternal({
             name: property,
             required: schema.required?.includes(property) || false,
             in: 'body' as const,
-            schema: schema.properties?.[property] || {} as ISchema,
+            schema: schema.properties?.[property] || ({} as ISchema),
           }))
           .map((property, index) => (
             <ApiSchemaParamDetails key={index} param={property} />
@@ -599,7 +601,11 @@ function getTypeName(parameter: object): string {
     return parameter.type
   }
 
-  if (typeof parameter.type !== 'object' || parameter.type === null || !('type' in parameter.type)) {
+  if (
+    typeof parameter.type !== 'object' ||
+    parameter.type === null ||
+    !('type' in parameter.type)
+  ) {
     return ''
   }
 
@@ -688,14 +694,21 @@ function getSubDetails(parentType: MethodTypes['params'][number] | MethodTypes['
           type: { ...subType },
           isOptional: 'NA',
         }))
-      } else if (parentType?.type?.awaited?.type === 'object' && 'properties' in parentType.type.awaited) {
+      } else if (
+        parentType?.type?.awaited?.type === 'object' &&
+        'properties' in parentType.type.awaited
+      ) {
         subDetails = (parentType.type.awaited as any).properties?.map((property) => ({
           ...property,
           isOptional: 'NA',
         }))
       } else if (parentType?.type?.awaited?.type === 'array') {
         subDetails = [
-          { name: 'array element', type: (parentType?.type?.awaited as any)?.elemType, isOptional: 'NA' },
+          {
+            name: 'array element',
+            type: (parentType?.type?.awaited as any)?.elemType,
+            isOptional: 'NA',
+          },
         ]
       }
       break
@@ -885,12 +898,14 @@ function isDefaultExpanded(meta: object) {
   return (
     'type' in meta &&
     typeof meta.type === 'object' &&
-    meta.type && 'type' in meta.type &&
+    meta.type &&
+    'type' in meta.type &&
     (meta.type.type == 'union' ||
       (meta.type.type === 'promise' &&
         'awaited' in meta.type &&
         typeof meta.type.awaited === 'object' &&
-        meta.type.awaited && 'type' in meta.type.awaited &&
+        meta.type.awaited &&
+        'type' in meta.type.awaited &&
         meta.type.awaited.type === 'union'))
   )
 }

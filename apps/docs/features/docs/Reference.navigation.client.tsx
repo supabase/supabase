@@ -203,7 +203,8 @@ export function RefLink({
 
   if (!('title' in section)) return null
 
-  const isCompoundSection = !skipChildren && 'items' in section && section.items && section.items.length > 0
+  const isCompoundSection =
+    !skipChildren && 'items' in section && section.items && section.items.length > 0
 
   return (
     <>

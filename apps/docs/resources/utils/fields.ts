@@ -94,24 +94,26 @@ function getDirectiveResults(ast: SelectionNode, info: GraphQLResolveInfo) {
     shouldInclude: true,
     shouldSkip: false,
   }
-  return ast.directives?.reduce((result, directive) => {
-    switch (directive.name.value) {
-      case 'include':
-        const directiveValue = getDirectiveValue(directive, info)
-        if (directiveValue != undefined) {
-          return { ...result, shouldInclude: directiveValue }
-        }
-        return result
-      case 'skip':
-        const directiveSkipValue = getDirectiveValue(directive, info)
-        if (directiveSkipValue != undefined) {
-          return { ...result, shouldSkip: directiveSkipValue }
-        }
-        return result
-      default:
-        return result
-    }
-  }, directiveResult) ?? directiveResult
+  return (
+    ast.directives?.reduce((result, directive) => {
+      switch (directive.name.value) {
+        case 'include':
+          const directiveValue = getDirectiveValue(directive, info)
+          if (directiveValue != undefined) {
+            return { ...result, shouldInclude: directiveValue }
+          }
+          return result
+        case 'skip':
+          const directiveSkipValue = getDirectiveValue(directive, info)
+          if (directiveSkipValue != undefined) {
+            return { ...result, shouldSkip: directiveSkipValue }
+          }
+          return result
+        default:
+          return result
+      }
+    }, directiveResult) ?? directiveResult
+  )
 }
 
 function flattenAST(

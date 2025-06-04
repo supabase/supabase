@@ -14,14 +14,12 @@ export function octokit() {
     if (!privateKey) {
       throw new Error('DOCS_GITHUB_APP_PRIVATE_KEY environment variable is required')
     }
-    
+
     // https://github.com/gr2m/universal-github-app-jwt?tab=readme-ov-file#converting-pkcs1-to-pkcs8
-    const privateKeyPkcs8 = crypto
-      .createPrivateKey(privateKey)
-      .export({
-        type: 'pkcs8',
-        format: 'pem',
-      })
+    const privateKeyPkcs8 = crypto.createPrivateKey(privateKey).export({
+      type: 'pkcs8',
+      format: 'pem',
+    })
 
     octokitInstance = new Octokit({
       authStrategy: createAppAuth,

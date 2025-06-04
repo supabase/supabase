@@ -78,7 +78,7 @@ export function ApiOperationBodySchemeSelector({
     const elements = containerRef.current?.querySelectorAll(
       `[${API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES.KEY}]`
     )
-    allSchemeDetails.current = elements ? Array.from(elements) as HTMLUListElement[] : []
+    allSchemeDetails.current = elements ? (Array.from(elements) as HTMLUListElement[]) : []
   }, [])
 
   useEffect(() => {

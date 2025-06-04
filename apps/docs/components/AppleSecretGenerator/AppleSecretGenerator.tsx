@@ -133,8 +133,8 @@ const AppleSecretGenerator = () => {
         <input
           type="file"
           onChange={(e) => {
-              setFile({ file: e.target.files?.[0] || null })
-            }}
+            setFile({ file: e.target.files?.[0] || null })
+          }}
         />
       </div>
       <div style={{ height: '1rem' }} />

@@ -286,7 +286,8 @@ function rewriteNodes(contentMap: Map<MdxJsxFlowElement, [CodeSampleMeta, string
           existingWrapper.attributes[0].value = newSource
         } else if (
           typeof existingSource !== 'string' &&
-          existingSource && existingSource.type === 'mdxJsxAttributeValueExpression'
+          existingSource &&
+          existingSource.type === 'mdxJsxAttributeValueExpression'
         ) {
           const existingSourceArray =
             // @ts-ignore
@@ -405,8 +406,10 @@ export function _createElidedLine(
 
 function isContainedInJsx(tree: acorn.Node, line: number) {
   const acornNodeContainsLine = (node: acorn.Node, line) =>
-    node.loc?.start?.line != null && node.loc?.end?.line != null && 
-    node.loc.start.line <= line && node.loc.end.line >= line
+    node.loc?.start?.line != null &&
+    node.loc?.end?.line != null &&
+    node.loc.start.line <= line &&
+    node.loc.end.line >= line
   if (!acornNodeContainsLine(tree, line)) {
     return false
   }
@@ -431,10 +434,18 @@ function isContainedInJsx(tree: acorn.Node, line: number) {
             continue
           } else {
             if (
-              (child.loc?.start?.line != null && candidateNarrowestContainingNode.loc?.start?.line != null && child.loc.start.line > candidateNarrowestContainingNode.loc.start.line) ||
-              (child.loc?.end?.line != null && candidateNarrowestContainingNode.loc?.end?.line != null && child.loc.end.line < candidateNarrowestContainingNode.loc.end.line) ||
-              (child.loc?.start?.column != null && candidateNarrowestContainingNode.loc?.start?.column != null && child.loc.start.column > candidateNarrowestContainingNode.loc.start.column) ||
-              (child.loc?.end?.column != null && candidateNarrowestContainingNode.loc?.end?.column != null && child.loc.end.column < candidateNarrowestContainingNode.loc.end.column)
+              (child.loc?.start?.line != null &&
+                candidateNarrowestContainingNode.loc?.start?.line != null &&
+                child.loc.start.line > candidateNarrowestContainingNode.loc.start.line) ||
+              (child.loc?.end?.line != null &&
+                candidateNarrowestContainingNode.loc?.end?.line != null &&
+                child.loc.end.line < candidateNarrowestContainingNode.loc.end.line) ||
+              (child.loc?.start?.column != null &&
+                candidateNarrowestContainingNode.loc?.start?.column != null &&
+                child.loc.start.column > candidateNarrowestContainingNode.loc.start.column) ||
+              (child.loc?.end?.column != null &&
+                candidateNarrowestContainingNode.loc?.end?.column != null &&
+                child.loc.end.column < candidateNarrowestContainingNode.loc.end.column)
             ) {
               candidateNarrowestContainingNode = child
               getNarrowestContainingNode(child, line)

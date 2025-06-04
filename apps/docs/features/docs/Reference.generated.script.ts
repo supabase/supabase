@@ -92,7 +92,10 @@ function mapEndpointsById(
   return endpointsById
 }
 
-function genClientSdkSectionTree(fns: Array<{ id: unknown }>, excludeName: string): AbbrevApiReferenceSection[] {
+function genClientSdkSectionTree(
+  fns: Array<{ id: unknown }>,
+  excludeName: string
+): AbbrevApiReferenceSection[] {
   const validSections = deepFilterRec(
     commonClientLibSections as AbbrevApiReferenceSection[],
     'items',
@@ -313,7 +316,9 @@ async function writeSelfHostingReferenceSections() {
         )
       )
 
-      const flattenedSelfHostedSections = flattenCommonClientLibSections(selfHostedSectionTree as AbbrevApiReferenceSection[])
+      const flattenedSelfHostedSections = flattenCommonClientLibSections(
+        selfHostedSectionTree as AbbrevApiReferenceSection[]
+      )
       tasks.push(
         writeFile(
           join(GENERATED_DIRECTORY, `${service.id}.latest.flat.json`),

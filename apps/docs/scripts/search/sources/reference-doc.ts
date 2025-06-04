@@ -166,9 +166,9 @@ export class OpenApiReferenceSource extends ReferenceSource<enrichedOperation> {
 
   extractIndexedContent(): string {
     const { summary, description, operation, tags } = this.specSection
-    return `# ${this.meta.title ?? ''}\n\n${summary ?? ''}\n\n${description ?? ''}\n\n${operation ?? ''}\n\n${tags?.join(
-      ', '
-    ) ?? ''}`
+    return `# ${this.meta.title ?? ''}\n\n${summary ?? ''}\n\n${description ?? ''}\n\n${operation ?? ''}\n\n${
+      tags?.join(', ') ?? ''
+    }`
   }
 }
 
@@ -190,7 +190,10 @@ export class ClientLibReferenceLoader extends ReferenceLoader<IFunctionDefinitio
     return spec.functions
   }
 
-  matchSpecSection(functionDefinitions: IFunctionDefinition[], id: string): IFunctionDefinition | undefined {
+  matchSpecSection(
+    functionDefinitions: IFunctionDefinition[],
+    id: string
+  ): IFunctionDefinition | undefined {
     return functionDefinitions.find((functionDefinition) => functionDefinition.id === id)
   }
 

@@ -29,7 +29,11 @@ export abstract class SearchResultModel {
           max_result: args.limit ?? undefined,
         })
       )
-        .map((matches) => matches.map(createModelFromMatch).filter((item): item is SearchResultInterface => item !== null))
+        .map((matches) =>
+          matches
+            .map(createModelFromMatch)
+            .filter((item): item is SearchResultInterface => item !== null)
+        )
         .mapError(convertPostgrestToApiError)
 
       return matchResult

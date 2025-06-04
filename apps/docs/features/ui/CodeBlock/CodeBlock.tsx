@@ -121,7 +121,10 @@ function CodeLine({
             annotations={twoslash.get(token.offset)!}
           />
         ) : (
-          <span key={token.offset} style={{ color: token.color, ...getFontStyle(token.fontStyle || 0) }}>
+          <span
+            key={token.offset}
+            style={{ color: token.color, ...getFontStyle(token.fontStyle || 0) }}
+          >
             {token.content}
           </span>
         )
