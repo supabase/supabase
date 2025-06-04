@@ -81,7 +81,6 @@ interface CareersPageProps {
 const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contributors }) => {
   const { basePath } = useRouter()
 
-  console.log(jobs, placeholderJob, contributors)
   const meta_title = 'Careers | Supabase'
   const meta_description = 'Help build software developers love'
 
