@@ -11,7 +11,7 @@ import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscri
 import { Markdown } from 'components/interfaces/Markdown'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
-import { constructHeaders, handleError } from 'data/fetchers'
+import { constructHeaders } from 'data/fetchers'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -36,6 +36,7 @@ import { Admonition, AssistantChatForm, GenericSkeletonLoader } from 'ui-pattern
 import { ButtonTooltip } from '../ButtonTooltip'
 import { DotGrid } from '../DotGrid'
 import { ErrorBoundary } from '../ErrorBoundary'
+import { onErrorChat } from './AIAssistant.utils'
 import { AIAssistantChatSelector } from './AIAssistantChatSelector'
 import { AIOnboarding } from './AIOnboarding'
 import { AIOptInModal } from './AIOptInModal'
@@ -164,7 +165,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       schema: currentSchema,
       table: currentTable?.name,
     },
-    onError: handleError,
+    onError: onErrorChat,
     onFinish: handleChatFinish,
   })
 
