@@ -36,14 +36,14 @@ const proxyRequest = async (req: NextApiRequest) => {
   const apiKey = process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN
   const url = `${PROJECT_ANALYTICS_URL}endpoints/query/${name}${search}`
   console.log('url', url)
-  const result =  await fetch(url, {
+  const result = await fetch(url, {
     method: 'GET',
     headers: {
       'x-api-key': apiKey as string,
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
-  }).then(res => res.json())
+  }).then((res) => res.json())
 
   return result
 }
