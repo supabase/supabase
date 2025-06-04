@@ -1,7 +1,9 @@
 import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock'
 import { fromNodeProviderChain } from '@aws-sdk/credential-providers'
 
-const credentialProvider = fromNodeProviderChain()
+const credentialProvider = fromNodeProviderChain({
+  profile: process.env.SUPABASE_AWS_PROFILE,
+})
 
 export const bedrock = createAmazonBedrock({ credentialProvider })
 
