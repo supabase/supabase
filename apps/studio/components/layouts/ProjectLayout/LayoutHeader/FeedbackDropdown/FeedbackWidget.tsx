@@ -4,6 +4,7 @@ import {
   CircleCheck,
   Image as ImageIcon,
   MessageCircleQuestion,
+  TriangleAlert,
   Upload,
   X,
 } from 'lucide-react'
@@ -208,20 +209,23 @@ const FeedbackWidget = ({
               exit={{ opacity: 0, y: 16 }}
               transition={{ duration: 0.25 }}
             >
-              <Alert_Shadcn_ className="mt-3">
-                <MessageCircleQuestion className="h-4 w-4" />
-                <AlertTitle_Shadcn_>Heads up!</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  This seems like a support issue. We don't reply to all product feedback, so please{' '}
-                  <Link
-                    href={`/support/new/?projectRef=${slug}&message=${encodeURIComponent(feedback)}`}
-                    className="underline"
-                  >
-                    open a support ticket
-                  </Link>{' '}
-                  to get help with this issue.
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+              <div className="flex gap-4 border-t mt-3 -mx-5 px-5 pt-4 pb-2">
+                <TriangleAlert size="20" className="shrink-0 text-destructive-600" />
+                <div>
+                  <span>Heads up!</span>
+                  <p className="text-xs text-foreground-light">
+                    This seems like a support issue. We don't reply to all product feedback, so
+                    please{' '}
+                    <Link
+                      href={`/support/new/?projectRef=${slug}&message=${encodeURIComponent(feedback)}`}
+                      className="underline"
+                    >
+                      open a support ticket
+                    </Link>{' '}
+                    to get help with this issue.
+                  </p>
+                </div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
