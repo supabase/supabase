@@ -82,7 +82,7 @@
         "OPENAI_API_KEY",
         "AUTH_JWT_SECRET",
         "LOGFLARE_URL",
-        "LOGFLARE_API_KEY",
+        "LOGFLARE_PRIVATE_ACCESS_TOKEN",
         "SENTRY_ORG",
         "SENTRY_PROJECT",
         "SENTRY_AUTH_TOKEN",

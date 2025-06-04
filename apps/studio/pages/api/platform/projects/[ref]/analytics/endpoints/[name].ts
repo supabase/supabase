@@ -11,7 +11,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (method) {
     case 'GET':
       const missingEnvVars = [
-        process.env.LOGFLARE_API_KEY ? null : 'LOGFLARE_API_KEY',
+        process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN ? null : 'LOGFLARE_PRIVATE_ACCESS_TOKEN',
         process.env.LOGFLARE_URL ? null : 'LOGFLARE_URL',
       ].filter((v) => v)
       if (missingEnvVars.length == 0) {
@@ -33,14 +33,17 @@ const proxyRequest = async (req: NextApiRequest) => {
   const { name, ...toForward } = req.query
   const payload = { ...toForward, project_tier: 'ENTERPRISE' }
   const search = '?' + new URLSearchParams(payload as any).toString()
-  const apiKey = process.env.LOGFLARE_API_KEY
+  const apiKey = process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN
   const url = `${PROJECT_ANALYTICS_URL}endpoints/query/${name}${search}`
-  const result = await get(url, {
+  console.log('url', url)
+  const result =  await fetch(url, {
+    method: 'GET',
     headers: {
-      'x-api-key': apiKey,
+      'x-api-key': apiKey as string,
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
-  })
+  }).then(res => res.json())
+
   return result
 }
