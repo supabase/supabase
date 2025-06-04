@@ -25,7 +25,7 @@ import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { QueryBlock } from '../QueryBlock/QueryBlock'
 import { AssistantSnippetProps } from './AIAssistant.types'
 import { identifyQueryType } from './AIAssistant.utils'
-import CollapsibleCodeBlock from './CollapsibleCodeBlock'
+import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
 import { MessageContext } from './Message'
 
 export const OrderedList = memo(({ children }: { children: ReactNode }) => (
