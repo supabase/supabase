@@ -1,7 +1,7 @@
 // Follow this setup guide to integrate the Deno language server with your editor:
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
-
+import {decode} from "jsr:@zaubrik/djwt"
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
 
@@ -14,34 +14,23 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
+    // First get the token from the Authorization header
+    const jwt = req.headers.get('Authorization')?.replace('Bearer ','')!
+    const [_header,payload,_signature]=decode(jwt)
+    //Now use `payload as the user info`
+    
     // Create a Supabase client with the Auth context of the logged in user.
     const supabaseClient = createClient(
       // Supabase API URL - env var exported by default.
       Deno.env.get('SUPABASE_URL') ?? '',
       // Supabase API ANON KEY - env var exported by default.
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      // Create client with Auth context of the user that called the function.
-      // This way your row-level-security (RLS) policies are applied.
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
+      jwt
     )
 
-    // First get the token from the Authorization header
-    const token = req.headers.get('Authorization').replace('Bearer ', '')
-
-    // Now we can get the session or user object
-    const {
-      data: { user },
-    } = await supabaseClient.auth.getUser(token)
-
-    // And we can run queries in the context of our authenticated user
     const { data, error } = await supabaseClient.from('users').select('*')
     if (error) throw error
 
-    return new Response(JSON.stringify({ user, data }), {
+    return new Response(JSON.stringify({ user:payload, data }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     })
