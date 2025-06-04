@@ -2,7 +2,10 @@ import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock'
 import { createCredentialChain, fromNodeProviderChain } from '@aws-sdk/credential-providers'
 
 const credentialProvider = createCredentialChain(
+  // Env vars will be used for staging and production
   fromCustomEnv(),
+
+  // Profile will be used for local development
   fromNodeProviderChain({
     profile: process.env.AWS_BEDROCK_PROFILE,
   })
