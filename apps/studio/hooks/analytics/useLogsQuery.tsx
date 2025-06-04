@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useState, useEffect } from 'react'
 
 import { IS_PLATFORM } from 'common'
 import {
@@ -45,6 +45,22 @@ const useLogsQuery = (
       ? initialParams.iso_timestamp_end
       : defaultHelper.calcTo(),
   })
+
+  useEffect(() => {
+    setParams((prev) => ({
+      ...prev,
+      ...initialParams,
+      project: projectRef,
+      sql: initialParams?.sql ?? prev.sql,
+      iso_timestamp_start: initialParams.iso_timestamp_start ?? prev.iso_timestamp_start,
+      iso_timestamp_end: initialParams.iso_timestamp_end ?? prev.iso_timestamp_end,
+    }))
+  }, [
+    projectRef,
+    initialParams.sql,
+    initialParams.iso_timestamp_start,
+    initialParams.iso_timestamp_end,
+  ])
 
   const _enabled = enabled && typeof projectRef !== 'undefined' && Boolean(params.sql)
 
