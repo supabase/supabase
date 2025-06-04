@@ -87,7 +87,7 @@
         "SENTRY_PROJECT",
         "SENTRY_AUTH_TOKEN",
         "AWS_REGION",
-        "SUPABASE_AWS_PROFILE",
+        "AWS_BEDROCK_PROFILE",
         "AWS_ACCESS_KEY_ID",
         "AWS_SECRET_ACCESS_KEY",
         "FORCE_ASSET_CDN",
