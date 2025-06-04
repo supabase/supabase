@@ -22,7 +22,7 @@ function ClientLibHeader({ menuData, className }: ClientLibHeaderProps) {
     <div className={cn('flex items-start gap-6', className)}>
       {'icon' in menuData && (
         <MenuIconPicker
-          icon={menuData.icon}
+          icon={menuData.icon || ''}
           width={35}
           height={35}
           className="text-foreground-light"
