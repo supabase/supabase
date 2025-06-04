@@ -79,6 +79,7 @@ export async function getStaticProps() {
       placeholderJob: placeholderJob ?? null,
       contributors: contributors,
     },
+    revalidate: 60 * 5, // 5 minutes,
   }
 }
 

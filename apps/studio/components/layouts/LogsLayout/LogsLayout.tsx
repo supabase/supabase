@@ -23,13 +23,15 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   const router = useRouter()
   const [_, setLastLogsPage] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_LOGS_PAGE,
-    router.pathname.split('/logs/')[1]
+    router.pathname.split('/logs/')[1] || ''
   )
 
   useEffect(() => {
     if (router.pathname.includes('/logs/')) {
       const path = router.pathname.split('/logs/')[1]
-      setLastLogsPage(path)
+      if (path) {
+        setLastLogsPage(path)
+      }
     }
   }, [router, setLastLogsPage])
 
