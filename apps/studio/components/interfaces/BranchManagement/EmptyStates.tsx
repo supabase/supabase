@@ -1,11 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink, GitBranch, GitPullRequest } from 'lucide-react'
+import { ExternalLink, GitBranch, GitPullRequest, Github } from 'lucide-react'
 import Link from 'next/link'
 
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAppStateSnapshot } from 'state/app-state'
+import { sidePanelsState } from 'state/side-panels'
 import { Button } from 'ui'
 
 export const BranchingEmptyState = () => {
@@ -55,10 +56,36 @@ export const BranchingEmptyState = () => {
 export const PullRequestsEmptyState = ({
   url,
   hasBranches,
+  githubConnection,
+  gitlessBranching,
 }: {
   url: string
   hasBranches: boolean
+  githubConnection?: any
+  gitlessBranching?: boolean
 }) => {
+  // Show GitHub connection message if GitHub is not connected and gitless branching is enabled
+  if (!githubConnection && gitlessBranching) {
+    return (
+      <div className="p-16 text-center">
+        <div>
+          <h3 className="mb-1">Connect to GitHub for seamless branching</h3>
+          <p className="text-sm text-foreground-light mb-4">
+            Connect your GitHub repository to create preview branches that automatically track pull
+            requests.
+          </p>
+        </div>
+        <Button
+          type="default"
+          icon={<Github />}
+          onClick={() => sidePanelsState.setGithubConnectionsOpen(true)}
+        >
+          Connect to GitHub
+        </Button>
+      </div>
+    )
+  }
+
   return (
     <div className="flex items-center flex-col justify-center w-full py-10">
       <p>No pull requests made yet for this repository</p>
