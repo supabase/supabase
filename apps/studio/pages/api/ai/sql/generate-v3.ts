@@ -1,4 +1,5 @@
 import crypto from 'crypto'
+import pgMeta from '@supabase/pg-meta'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
@@ -13,6 +14,10 @@ import {
   filterToolsByOptInLevel,
   transformToolResult,
 } from './supabase-mcp'
+import { getTools } from '../sql/tools'
+import { IS_PLATFORM } from 'common'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 
 export const maxDuration = 30
 
@@ -37,6 +42,7 @@ const requestBodySchema = z.object({
   messages: z.array(z.any()),
   projectRef: z.string(),
   aiOptInLevel: aiOptInLevelSchema,
+  connectionString: z.string(),
   schema: z.string().optional(),
   table: z.string().optional(),
 })
@@ -64,53 +70,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     })
   }
 
-  const { messages, projectRef, aiOptInLevel, schema, table } = data
+  const { messages, projectRef, connectionString, aiOptInLevel, schema, table } = data
 
   try {
-    // Fetch MCP client and tools
-    const mcpClient = await createSupabaseMCPClient({
-      accessToken,
-      projectId: projectRef,
-    })
-
-    const availableMcpTools = await mcpClient.tools()
-
-    // Validate that the expected tools are available
-    const { data: validatedTools, error: validationError } =
-      expectedToolsSchema.safeParse(availableMcpTools)
-
-    if (validationError) {
-      console.error('MCP tools validation error:', validationError)
-      return res.status(500).json({
-        error: 'Internal error: MCP tools validation failed',
-        issues: validationError.issues,
-      })
-    }
-
-    // Modify the execute_sql tool to add manualToolCallId
-    const modifiedMcpTools = {
-      ...availableMcpTools,
-      execute_sql: transformToolResult(validatedTools.execute_sql, (result) => {
-        const manualToolCallId = `manual_${crypto.randomUUID()}`
-
-        if (typeof result === 'object') {
-          return { ...result, manualToolCallId }
-        } else {
-          console.warn('execute_sql result is not an object, cannot add manualToolCallId')
-          return {
-            error: 'Internal error: Unexpected tool result format',
-            manualToolCallId,
-          }
-        }
-      }),
-    }
-
-    // Filter tools based on the AI opt-in level
-    const mcpTools = filterToolsByOptInLevel(modifiedMcpTools, aiOptInLevel)
-
-    // Combine MCP tools with custom tools
-    const tools: ToolSet = {
-      ...mcpTools,
+    let mcpTools: ToolSet = {}
+    let localTools: ToolSet = {
       display_query: tool({
         description:
           'Displays SQL query results (table or chart) or renders SQL for write/DDL operations. Use this for all query display needs. Optionally references a previous execute_sql call via manualToolCallId for displaying SELECT results.',
@@ -162,6 +126,91 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           return { status: 'Tool call sent to client for rendering.' }
         },
       }),
+    }
+
+    // Get a list of all schemas to add to context
+    const pgMetaSchemasList = pgMeta.schemas.list()
+
+    const { result: schemas } =
+      aiOptInLevel !== 'disabled'
+        ? await executeSql(
+            {
+              projectRef,
+              connectionString,
+              sql: pgMetaSchemasList.sql,
+            },
+            undefined,
+            {
+              'Content-Type': 'application/json',
+              ...(authorization && { Authorization: authorization }),
+            },
+            IS_PLATFORM ? undefined : queryPgMetaSelfHosted
+          )
+        : { result: [] }
+
+    const schemasString =
+      schemas.length > 0
+        ? `The available database schema names are: ${JSON.stringify(schemas)}`
+        : "You don't have access to any schemas."
+
+    // If self-hosted, add local tools and exclude MCP tools
+    if (!IS_PLATFORM) {
+      localTools = {
+        ...localTools,
+        ...getTools({
+          projectRef,
+          connectionString,
+          authorization,
+          includeSchemaMetadata: aiOptInLevel !== 'disabled',
+        }),
+      }
+    } else {
+      // If platform, fetch MCP client and tools which replace old local tools
+      const mcpClient = await createSupabaseMCPClient({
+        accessToken,
+        projectId: projectRef,
+      })
+
+      const availableMcpTools = await mcpClient.tools()
+
+      // Validate that the expected tools are available
+      const { data: validatedTools, error: validationError } =
+        expectedToolsSchema.safeParse(availableMcpTools)
+
+      if (validationError) {
+        console.error('MCP tools validation error:', validationError)
+        return res.status(500).json({
+          error: 'Internal error: MCP tools validation failed',
+          issues: validationError.issues,
+        })
+      }
+
+      // Modify the execute_sql tool to add manualToolCallId
+      const modifiedMcpTools = {
+        ...availableMcpTools,
+        execute_sql: transformToolResult(validatedTools.execute_sql, (result) => {
+          const manualToolCallId = `manual_${crypto.randomUUID()}`
+
+          if (typeof result === 'object') {
+            return { ...result, manualToolCallId }
+          } else {
+            console.warn('execute_sql result is not an object, cannot add manualToolCallId')
+            return {
+              error: 'Internal error: Unexpected tool result format',
+              manualToolCallId,
+            }
+          }
+        }),
+      }
+
+      // Filter tools based on the AI opt-in level
+      mcpTools = filterToolsByOptInLevel(modifiedMcpTools, aiOptInLevel)
+    }
+
+    // Combine MCP tools with custom tools
+    const tools: ToolSet = {
+      ...mcpTools,
+      ...localTools,
     }
 
     const system = source`
@@ -303,8 +352,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           \`\`\`
 
       # General Instructions:
+      - **Available Schemas**: ${schemasString}
       - **Understand Context**: Attempt to use \`list_tables\`, \`list_extensions\` first. If they are not available or return a privacy/permission error, state this and proceed with caution, relying on the user's description and general knowledge.
-      - **Current Focus**: ${schema !== undefined ? `User is looking at schema: ${schema}.` : ''} ${table !== undefined ? `User is looking at table: ${table}.` : ''}
     `
 
     const result = streamText({
