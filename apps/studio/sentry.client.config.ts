@@ -21,6 +21,27 @@ function isHCaptchaRelatedError(event: Sentry.Event): boolean {
   return false
 }
 
+// We want to ignore errors not originating from docs app static files
+// (such as errors from browser extensions). Those errors come from files
+// not starting with 'app:///_next'.
+//
+// However, there is a complication because the Sentry code that sends
+// the error shows up in the stack trace, and that _does_ start with
+// 'app:///_next'. It is always the first frame in the stack trace,
+// and has a specific pre_context comment that we can use for filtering.
+// Copied from docs app instrumentation-client.ts
+function isThirdPartyError(frames: Sentry.StackFrame[] | undefined) {
+  if (!frames) return false
+
+  function isSentryFrame(frame: Sentry.StackFrame, index: number) {
+    return index === 0 && frame.pre_context?.[0]?.includes('sentry.javascript')
+  }
+
+  return !frames.some((frame, index) => {
+    frame.abs_path?.startsWith('app:///_next') && !isSentryFrame(frame, index)
+  })
+}
+
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
@@ -28,22 +49,32 @@ Sentry.init({
   beforeSend(event, hint) {
     const consent = hasConsented()
 
-    if (IS_PLATFORM && consent) {
-      // Ignore invalid URL events for 99% of the time because it's using up a lot of quota.
-      const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
-        `Failed to construct 'URL': Invalid URL`
-      )
-      if (isInvalidUrlEvent && Math.random() > 0.01) {
-        return null
-      }
-      return event
+    if (!consent) {
+      return null
+    }
+
+    if (!IS_PLATFORM) {
+      return null
+    }
+
+    // Ignore invalid URL events for 99% of the time because it's using up a lot of quota.
+    const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
+      `Failed to construct 'URL': Invalid URL`
+    )
+    if (isInvalidUrlEvent && Math.random() > 0.01) {
+      return null
     }
 
     if (isHCaptchaRelatedError(event)) {
       return null
     }
 
-    return null
+    const frames = event.exception?.values?.[0].stacktrace?.frames || []
+    if (isThirdPartyError(frames)) {
+      return null
+    }
+
+    return event
   },
   ignoreErrors: [
     // Used exclusively in Monaco Editor.
