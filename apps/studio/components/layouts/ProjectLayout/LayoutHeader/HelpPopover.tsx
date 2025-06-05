@@ -78,7 +78,7 @@ export const HelpPopover = () => {
                   })
                 }}
               >
-                AI Assistant
+                Supabase Assistant
               </ButtonGroupItem>
             )}
             <ButtonGroupItem
