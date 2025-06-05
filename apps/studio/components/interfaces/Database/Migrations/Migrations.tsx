@@ -11,6 +11,7 @@ import { Search } from 'lucide-react'
 import { Button, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
 import MigrationsEmptyState from './MigrationsEmptyState'
+import { ContactSupportButton } from 'components/ui/ContactSupportButton'
 
 const Migrations = () => {
   const [search, setSearch] = useState('')
@@ -53,13 +54,12 @@ const Migrations = () => {
               </>
             }
           >
-            <Button key="contact-support" asChild type="default">
-              <Link
-                href={`/support/new?projectRef=${project?.ref}&category=dashboard_bug&subject=Unable%20to%20view%20database%20migrations`}
-              >
-                Contact support
-              </Link>
-            </Button>
+            <ContactSupportButton
+              category="DASHBOARD_BUG"
+              subject="Unable to view database migrations"
+              message="I'm unable to view the database migrations"
+              projectRef={project?.ref}
+            />
           </Admonition>
         )}
         {isSuccess && (
