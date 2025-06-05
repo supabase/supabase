@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import sumBy from 'lodash/sumBy'
-import { Archive, ChevronDown, Database, Key, Zap } from 'lucide-react'
+import { Archive, ChevronDown, Code, Database, Key, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -92,21 +92,25 @@ const ProjectUsage = () => {
     'timestamp',
     [
       'total_auth_requests',
-      'total_rest_requests',
+      'total_func_invocations',
       'total_storage_requests',
       'total_realtime_requests',
+      'total_requests',
     ],
     0,
     startDateLocal.toISOString(),
     endDateLocal.toISOString(),
     5
   )
+
+  console.log('data:', data)
+
   const datetimeFormat = selectedInterval.format || 'MMM D, ha'
 
   const handleBarClick = (
     value: UsageApiCounts,
     // TODO (ziinc): link to edge logs with correct filter applied
-    _type: 'rest' | 'realtime' | 'storage' | 'auth'
+    _type: 'rest' | 'realtime' | 'storage' | 'auth' | 'edge-functions'
   ) => {
     const unit = selectedInterval.startUnit
     const selectedStart = dayjs(value?.timestamp)
@@ -182,7 +186,7 @@ const ProjectUsage = () => {
           Statistics for {selectedInterval.label.toLowerCase()}
         </span>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-5">
         <Panel className="mb-0 md:mb-0">
           <Panel.Content className="space-y-4">
             <PanelHeader
@@ -200,10 +204,10 @@ const ProjectUsage = () => {
                 title="REST Requests"
                 data={charts}
                 xAxisKey="timestamp"
-                yAxisKey="total_rest_requests"
+                yAxisKey="total_func_invocations"
                 onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'rest')}
                 customDateFormat={datetimeFormat}
-                highlightedValue={sumBy(charts, 'total_rest_requests')}
+                highlightedValue={sumBy(charts, 'total_func_invocations')}
               />
             </Loading>
           </Panel.Content>
@@ -281,6 +285,31 @@ const ProjectUsage = () => {
                 onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'realtime')}
                 customDateFormat={datetimeFormat}
                 highlightedValue={sumBy(charts, 'total_realtime_requests')}
+              />
+            </Loading>
+          </Panel.Content>
+        </Panel>
+        <Panel className="mb-0 md:mb-0">
+          <Panel.Content className="space-y-4">
+            <PanelHeader
+              icon={
+                <div className="rounded bg-surface-300 p-1.5 text-foreground-light shadow-sm">
+                  <Code strokeWidth={2} size={16} />
+                </div>
+              }
+              title="Edge Functions"
+              href={`/project/${projectRef}/functions`}
+            />
+
+            <Loading active={isLoading}>
+              <BarChart
+                title="Edge Functions Requests"
+                data={charts}
+                xAxisKey="timestamp"
+                yAxisKey="total_requests"
+                onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'edge-functions')}
+                customDateFormat={datetimeFormat}
+                highlightedValue={sumBy(charts, 'total_requests')}
               />
             </Loading>
           </Panel.Content>

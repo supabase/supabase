@@ -18,6 +18,7 @@ export interface UsageApiCounts {
   total_storage_requests: number
   total_rest_requests: number
   total_realtime_requests: number
+  total_func_invocations: number
   timestamp: string
 }
 
