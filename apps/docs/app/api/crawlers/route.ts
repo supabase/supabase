@@ -29,8 +29,8 @@ export async function GET(request: Request) {
     slug = maybeVersion
   }
 
-  let section: AbbrevApiReferenceSection
-  let sectionsWithUrl: Array<AbbrevApiReferenceSection & { url: URL }>
+  let section: AbbrevApiReferenceSection | undefined
+  let sectionsWithUrl: Array<AbbrevApiReferenceSection & { url: URL }> = []
   try {
     const flattenedSections = (await getFlattenedSections(lib, version)) ?? []
     sectionsWithUrl = flattenedSections.map((section) => {

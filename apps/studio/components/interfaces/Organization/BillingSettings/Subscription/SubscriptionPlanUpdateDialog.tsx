@@ -312,7 +312,8 @@ export const SubscriptionPlanUpdateDialog = ({
                                         subscriptionPreview?.breakdown?.filter(
                                           (item) =>
                                             item.description?.toLowerCase().includes('compute') &&
-                                            item.breakdown?.length > 0
+                                            item.breakdown &&
+                                            item.breakdown.length > 0
                                         ) || []
 
                                       const computeCreditsItem =
@@ -325,11 +326,11 @@ export const SubscriptionPlanUpdateDialog = ({
                                       )
 
                                       const allProjects = computeItems.flatMap((item) =>
-                                        item.breakdown.map((project) => ({
+                                        (item.breakdown || []).map((project) => ({
                                           ...project,
                                           computeType: item.description,
                                           computeCosts: Math.round(
-                                            item.total_price / item.breakdown.length
+                                            item.total_price / item.breakdown!.length
                                           ),
                                         }))
                                       )
@@ -412,7 +413,7 @@ export const SubscriptionPlanUpdateDialog = ({
                                               <TableCell className="text-xs py-2 px-0">
                                                 <div className="flex items-center gap-1">
                                                   <span>{item.description ?? 'Unknown'}</span>
-                                                  {item.breakdown.length > 0 && (
+                                                  {item.breakdown && item.breakdown.length > 0 && (
                                                     <InfoTooltip className="max-w-sm">
                                                       <p>Projects using {item.description}:</p>
                                                       <ul className="ml-6 list-disc">

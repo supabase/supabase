@@ -269,7 +269,7 @@ export class GraphQLCollectionBuilder {
     const result = await fetch(args)
     const { items: fetchedItems, totalCount, hasNextPage = false, hasPreviousPage = false } = result
     const edges = fetchedItems.map((item) => {
-      return { node: item, cursor: getCursor(item) }
+      return { node: item, cursor: getCursor?.(item) ?? '' }
     })
 
     return {
@@ -291,7 +291,7 @@ export class GraphQLCollectionBuilder {
       return { node: item, cursor: getCursor(item, idx) }
     })
 
-    const { edges, hasPreviousPage, hasNextPage } = getRequestedSlice(allEdges, args)
+    const { edges, hasPreviousPage, hasNextPage } = getRequestedSlice(allEdges, args ?? {})
 
     return {
       edges,
@@ -323,12 +323,12 @@ function getRequestedSlice<ItemType>(
   let beforeIndex = allEdges.length
   let afterIndex = -1
 
-  const requestedBefore = toNumber(pageArgs.before)
+  const requestedBefore = pageArgs.before ? toNumber(pageArgs.before) : undefined
   if (requestedBefore && requestedBefore >= 0 && requestedBefore < beforeIndex) {
     beforeIndex = requestedBefore
     hasNextPage = true
   }
-  const requestedAfter = toNumber(pageArgs.after)
+  const requestedAfter = pageArgs.after ? toNumber(pageArgs.after) : undefined
   if (requestedAfter && requestedAfter >= 0) {
     afterIndex = requestedAfter
     hasPreviousPage = true
@@ -336,10 +336,10 @@ function getRequestedSlice<ItemType>(
 
   let edges = allEdges.slice(afterIndex + 1, beforeIndex)
 
-  if (pageArgs.first >= 0 && edges.length > pageArgs.first) {
+  if (pageArgs.first != null && pageArgs.first >= 0 && edges.length > pageArgs.first) {
     edges = edges.slice(0, pageArgs.first)
     hasNextPage = true
-  } else if (pageArgs.last >= 0 && edges.length > pageArgs.last) {
+  } else if (pageArgs.last != null && pageArgs.last >= 0 && edges.length > pageArgs.last) {
     edges = edges.slice(edges.length - pageArgs.last)
     hasPreviousPage = true
   }

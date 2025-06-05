@@ -71,7 +71,7 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
         </Accordion.Item>
       ) : (
         <Link
-          href={section[0].href}
+          href={section[0].href || '#'}
           className={cn(activeLabel === section[0].label && '!text-foreground', itemClassName)}
         >
           {section[0].label}

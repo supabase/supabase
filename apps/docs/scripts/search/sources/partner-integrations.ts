@@ -8,15 +8,15 @@ type PartnerData = {
   overview: string // The Markdown content for indexing
 }
 
-const supabaseUrl = process.env.NEXT_PUBLIC_MISC_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_MISC_ANON_KEY
+const supabaseUrl = process.env.NEXT_PUBLIC_MISC_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_MISC_ANON_KEY!
 
 let supabaseClient: SupabaseClient
 function getSupabaseClient() {
   if (!supabaseClient) {
     supabaseClient = createClient(supabaseUrl, supabaseAnonKey)
-    return supabaseClient
   }
+  return supabaseClient
 }
 
 export async function fetchPartners() {
@@ -27,7 +27,7 @@ export async function fetchPartners() {
     .eq('approved', true)
     // We want to show technology integrations, not agencies, in search
     .neq('type', 'expert')
-  return partners
+  return partners ?? []
 }
 
 export class IntegrationLoader extends BaseLoader {

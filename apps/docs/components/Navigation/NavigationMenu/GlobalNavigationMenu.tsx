@@ -81,7 +81,7 @@ const GlobalNavigationMenu: FC = () => {
                   )}
                 >
                   {section[0].label === 'Home' ? (
-                    <MenuIconPicker icon={section[0].icon} />
+                    <MenuIconPicker icon={section[0].icon || ''} />
                   ) : (
                     section[0].label
                   )}
@@ -125,7 +125,7 @@ const GlobalNavigationMenu: FC = () => {
               >
                 <NavigationMenuLink asChild>
                   <Link
-                    href={section[0].href}
+                    href={section[0].href || '#'}
                     className={cn(
                       navigationMenuTriggerStyle(),
                       triggerClassName,
@@ -133,7 +133,7 @@ const GlobalNavigationMenu: FC = () => {
                     )}
                   >
                     {section[0].label === 'Home' ? (
-                      <MenuIconPicker icon={section[0].icon} />
+                      <MenuIconPicker icon={section[0].icon || ''} />
                     ) : (
                       section[0].label
                     )}

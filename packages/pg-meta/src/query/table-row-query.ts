@@ -194,10 +194,20 @@ export const getTableRowsSql = ({
       // This returns the first MAX_ARRAY_SIZE elements of the array (adjustable) and adds '...' if truncated
       // NOTE: this is not optimal, as the first element in the array could still be very large (more than 10Kb) and in such case
       // the trimming might fail.
+      // Also handle multi-dimentionals array truncation, but won't happen the extra `...` element to it as we can't determine what's
+      // the right number of items to generate within the array. Studio side, we'll consider any multi-dimentional array as possibly
+      // truncated.
       selectExpressions[index] = `
         case 
           when octet_length(${ident(columnName)}::text) > ${maxCharacters} 
-          then (select array_cat(${ident(columnName)}[1:${maxArraySize}]::${typeCast}, ${lastElement}::${typeCast}))::${typeCast}
+          then
+            case
+              when array_ndims(${ident(columnName)}) = 1
+              then
+                (select array_cat(${ident(columnName)}[1:${maxArraySize}]::${typeCast}, ${lastElement}::${typeCast}))::${typeCast}
+              else
+                ${ident(columnName)}[1:${maxArraySize}]::${typeCast}
+            end
           else ${ident(columnName)}::${typeCast}
         end
       `

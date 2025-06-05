@@ -34,6 +34,7 @@ interface SchemaSelectorProps {
   excludedSchemas?: string[]
   onSelectSchema: (name: string) => void
   onSelectCreateSchema?: () => void
+  portal?: boolean
 }
 
 const SchemaSelector = ({
@@ -46,6 +47,7 @@ const SchemaSelector = ({
   excludedSchemas = [],
   onSelectSchema,
   onSelectCreateSchema,
+  portal = true,
 }: SchemaSelectorProps) => {
   const [open, setOpen] = useState(false)
   const canCreateSchemas = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'schemas')
@@ -126,7 +128,7 @@ const SchemaSelector = ({
             className="p-0 min-w-[200px] pointer-events-auto"
             side="bottom"
             align="start"
-            portal={true}
+            portal={portal}
             sameWidthAsTrigger
           >
             <Command_Shadcn_>

@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks/useParams'
+import { useIsSQLEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useSQLSnippetFolderContentsQuery } from 'data/content/sql-folder-contents-query'
 import { Snippet } from 'data/content/sql-folders-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -82,6 +83,7 @@ export const SQLEditorTreeViewItem = ({
   const { profile } = useProfile()
   const { className, onClick } = getNodeProps()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   const isOwner = profile?.id === element?.metadata.owner_id
   const isSharedSnippet = element.metadata.visibility === 'project'
@@ -265,7 +267,7 @@ export const SQLEditorTreeViewItem = ({
               >
                 <Link
                   href={`/project/${projectRef}/sql/${element.id}`}
-                  target="_blank"
+                  target={isSQLEditorTabsEnabled ? '_self' : '_blank'}
                   rel="noreferrer"
                 >
                   <ExternalLink size={14} />

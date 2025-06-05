@@ -62,7 +62,13 @@ const InfoTooltip = ({
     [_setTooltipOpen, id, isMobile]
   )
 
-  useEffect(() => () => clearTimeout(timeout.current), [])
+  useEffect(() => {
+    return () => {
+      if (timeout.current) {
+        clearTimeout(timeout.current)
+      }
+    }
+  }, [])
 
   return (
     <>

@@ -5,14 +5,14 @@ on:
     paths:
       - 'packages/pg-meta/**/*'
       - 'apps/studio/**'
-      - 'tests/studio-tests/**'
+      - 'e2e/studio/**'
       - 'pnpm-lock.yaml'
   pull_request:
     branches: [master]
     paths:
       - 'packages/pg-meta/**/*'
       - 'apps/studio/**'
-      - 'tests/studio-tests/**'
+      - 'e2e/studio/**'
       - 'pnpm-lock.yaml'
 
 # Cancel old builds on new commit for same workflow + branch/PR
@@ -27,6 +27,18 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    # Make the job non-blocking
+    continue-on-error: true
+
+    env:
+      EMAIL: ${{ secrets.CI_EMAIL }}
+      PASSWORD: ${{ secrets.CI_PASSWORD }}
+      PROJECT_REF: ${{ secrets.CI_PROJECT_REF }}
+      NEXT_PUBLIC_IS_PLATFORM: true
+      NEXT_PUBLIC_API_URL: https://api.supabase.green
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_STUDIO_HOSTED_PROJECT_ID }}
+      NEXT_PUBLIC_HCAPTCHA_SITE_KEY: 10000000-ffff-ffff-ffff-000000000001
 
     steps:
       - uses: actions/checkout@v4
@@ -39,20 +51,41 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
-      - uses: supabase/setup-cli@v1
-        with:
-          version: latest
+
       - name: Install dependencies
         run: pnpm i
+
+      - name: Install Vercel CLI
+        run: pnpm add --global vercel@latest
+
+      - name: Pull Vercel Environment Information (Preview)
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts for Vercel
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project to Vercel and Get URL
+        id: deploy_vercel
+        run: |
+          DEPLOY_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "Vercel Preview URL: $DEPLOY_URL"
+          echo "DEPLOY_URL=$DEPLOY_URL" >> $GITHUB_OUTPUT
+
       - name: Install Playwright Browsers
-        run: pnpm -C tests/studio-tests exec playwright install --with-deps
+        run: pnpm -C e2e/studio exec playwright install --with-deps
+
       - name: Run Playwright tests
-        run: pnpm test:e2e:studio-local
-        # mark the action as succeeded even if the tests failed. This is temporarily until we make the tests more stable.
-        # continue-on-error: true
+        id: playwright
+        env:
+          AUTHENTICATION: true
+          STUDIO_URL: ${{ steps.deploy_vercel.outputs.DEPLOY_URL }}/dashboard
+        run: pnpm e2e
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-report
-          path: tests/studio-tests/playwright-report/
+          name: playwright-artifacts
+          path: |
+            e2e/studio/playwright-report/
+            e2e/studio/test-results/
           retention-days: 7

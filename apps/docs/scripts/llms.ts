@@ -1,4 +1,4 @@
-import _configureDotEnv from './utils/dotenv'
+import './utils/dotenv.js'
 
 import 'dotenv/config'
 import fs from 'node:fs/promises'
@@ -14,8 +14,6 @@ import {
   fetchSwiftLibReferenceSource,
   type SearchSource,
 } from './search/sources/index.js'
-
-const _ = _configureDotEnv
 
 interface Source {
   title: string
@@ -39,37 +37,58 @@ const SOURCES: Source[] = [
   {
     title: 'Supabase Reference (JavaScript)',
     relPath: 'llms/js.txt',
-    fetch: fetchJsLibReferenceSource,
+    fetch: async () =>
+      (await fetchJsLibReferenceSource()).filter(
+        (item): item is SearchSource => item !== undefined
+      ),
   },
   {
     title: 'Supabase Reference (Dart)',
     relPath: 'llms/dart.txt',
-    fetch: fetchDartLibReferenceSource,
+    fetch: async () =>
+      (await fetchDartLibReferenceSource()).filter(
+        (item): item is SearchSource => item !== undefined
+      ),
   },
   {
     title: 'Supabase Reference (Swift)',
     relPath: 'llms/swift.txt',
-    fetch: fetchSwiftLibReferenceSource,
+    fetch: async () =>
+      (await fetchSwiftLibReferenceSource()).filter(
+        (item): item is SearchSource => item !== undefined
+      ),
   },
   {
     title: 'Supabase Reference (Kotlin)',
-    relPath: 'llms/kt.txt',
-    fetch: fetchKtLibReferenceSource,
+    relPath: 'llms/kotlin.txt',
+    fetch: async () =>
+      (await fetchKtLibReferenceSource()).filter(
+        (item): item is SearchSource => item !== undefined
+      ),
   },
   {
     title: 'Supabase Reference (Python)',
-    relPath: 'llms/py.txt',
-    fetch: fetchPythonLibReferenceSource,
+    relPath: 'llms/python.txt',
+    fetch: async () =>
+      (await fetchPythonLibReferenceSource()).filter(
+        (item): item is SearchSource => item !== undefined
+      ),
   },
   {
     title: 'Supabase Reference (C#)',
     relPath: 'llms/csharp.txt',
-    fetch: fetchCSharpLibReferenceSource,
+    fetch: async () =>
+      (await fetchCSharpLibReferenceSource()).filter(
+        (item): item is SearchSource => item !== undefined
+      ),
   },
   {
-    title: 'Supabase Reference (CLI)',
+    title: 'Supabase CLI Reference',
     relPath: 'llms/cli.txt',
-    fetch: fetchCliLibReferenceSource,
+    fetch: async () =>
+      (await fetchCliLibReferenceSource()).filter(
+        (item): item is SearchSource => item !== undefined
+      ),
   },
 ]
 
