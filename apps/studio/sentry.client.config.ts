@@ -49,15 +49,20 @@ Sentry.init({
   beforeSend(event, hint) {
     const consent = hasConsented()
 
-    if (IS_PLATFORM && consent) {
-      // Ignore invalid URL events for 99% of the time because it's using up a lot of quota.
-      const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
-        `Failed to construct 'URL': Invalid URL`
-      )
-      if (isInvalidUrlEvent && Math.random() > 0.01) {
-        return null
-      }
-      return event
+    if (!consent) {
+      return null
+    }
+
+    if (!IS_PLATFORM) {
+      return null
+    }
+
+    // Ignore invalid URL events for 99% of the time because it's using up a lot of quota.
+    const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
+      `Failed to construct 'URL': Invalid URL`
+    )
+    if (isInvalidUrlEvent && Math.random() > 0.01) {
+      return null
     }
 
     if (isHCaptchaRelatedError(event)) {
@@ -69,7 +74,7 @@ Sentry.init({
       return null
     }
 
-    return null
+    return event
   },
   ignoreErrors: [
     // Used exclusively in Monaco Editor.
