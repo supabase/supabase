@@ -60,7 +60,7 @@ export const HelpPopover = () => {
             {projectRef && (
               <ButtonGroupItem
                 size="tiny"
-                icon={<AiIconAnimation allowHoverEffect size={16} />}
+                icon={<AiIconAnimation allowHoverEffect size={14} />}
                 onClick={() => {
                   snap.newChat({
                     name: 'Support',
@@ -83,7 +83,7 @@ export const HelpPopover = () => {
             )}
             <ButtonGroupItem
               size="tiny"
-              icon={<Wrench strokeWidth={1.5} size={16} />}
+              icon={<Wrench strokeWidth={1.5} size={14} />}
               onClick={() =>
                 window.open('https://supabase.com/docs/guides/platform/troubleshooting', '_blank')
               }
@@ -92,21 +92,21 @@ export const HelpPopover = () => {
             </ButtonGroupItem>
             <ButtonGroupItem
               size="tiny"
-              icon={<BookOpen strokeWidth={1.5} size={16} />}
+              icon={<BookOpen strokeWidth={1.5} size={14} />}
               onClick={() => window.open('https://supabase.com/docs/', '_blank')}
             >
               Docs
             </ButtonGroupItem>
             <ButtonGroupItem
               size="tiny"
-              icon={<Activity strokeWidth={1.5} size={16} />}
+              icon={<Activity strokeWidth={1.5} size={14} />}
               onClick={() => window.open('https://status.supabase.com/', '_blank')}
             >
               Supabase Status
             </ButtonGroupItem>
             <ButtonGroupItem
               size="tiny"
-              icon={<Mail strokeWidth={1.5} size={16} />}
+              icon={<Mail strokeWidth={1.5} size={14} />}
               onClick={() => router.push(supportUrl)}
             >
               Contact Support
