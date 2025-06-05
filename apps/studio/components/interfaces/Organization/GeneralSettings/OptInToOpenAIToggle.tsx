@@ -14,7 +14,9 @@ export const OptInToOpenAIToggle = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="outline">Learn more about data privacy</Button>
+        <Button type="outline" className="w-fit">
+          Learn more about data privacy
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader padding="small" className="border-b">

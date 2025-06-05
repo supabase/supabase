@@ -13,7 +13,6 @@ export const aiOptInLevelSchema = z.enum([
 
 export type AiOptInLevel = z.infer<typeof aiOptInLevelSchema>
 
-// Exported helper function
 export const getAiOptInLevel = (tags: string[] | undefined): AiOptInLevel => {
   const hasSql = tags?.includes(OPT_IN_TAGS.AI_SQL)
   const hasData = tags?.includes(OPT_IN_TAGS.AI_DATA)
@@ -42,7 +41,7 @@ export function useOrgOptedIntoAi(): boolean {
   const level = getAiOptInLevel(optInTags)
 
   const disallowHipaa = useDisallowHipaa()
-  return disallowHipaa(level !== 'disabled')
+  return disallowHipaa(level !== 'disabled') || !IS_PLATFORM
 }
 
 /**
@@ -60,7 +59,11 @@ export function useOrgAiOptInLevel(): {
   const level = getAiOptInLevel(optInTags)
 
   const disallowHipaa = useDisallowHipaa()
-  const aiOptInLevel = disallowHipaa(level !== 'disabled') ? level : 'disabled'
+  const aiOptInLevel = !IS_PLATFORM
+    ? 'schema'
+    : disallowHipaa(level !== 'disabled')
+      ? level
+      : 'disabled'
 
   const includeSchemaMetadata =
     aiOptInLevel === 'schema' ||
