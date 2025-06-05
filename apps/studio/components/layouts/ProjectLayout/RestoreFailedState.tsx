@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { useProjectContext } from './ProjectContext'
+import { ContactSupportButton } from 'components/ui/ContactSupportButton'
 
 const RestoreFailedState = () => {
   const { ref } = useParams()
@@ -63,13 +64,12 @@ const RestoreFailedState = () => {
             </div>
 
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
-              <Button asChild type="default">
-                <Link
-                  href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Restoration%20failed%20for%20project`}
-                >
-                  Contact support
-                </Link>
-              </Button>
+              <ContactSupportButton
+                category="DATABASE_UNRESPONSIVE"
+                subject="Restore failed for project"
+                message="I'm unable to restore my project"
+                projectRef={project?.ref}
+              />
               <ButtonTooltip
                 type="default"
                 icon={<Download />}
