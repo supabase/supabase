@@ -22,7 +22,7 @@ interface ApiKeysVisibilityState {
 export function useApiKeysVisibility(): ApiKeysVisibilityState {
   const { ref: projectRef } = useParams()
   const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'api_keys')
-  const isInRollout = useFlag('basicApiKeys')
+  const isBasicApiKeysEnabled = useFlag('basicApiKeys')
 
   const { data: apiKeysData, isLoading } = useAPIKeysQuery({
     projectRef,
@@ -39,12 +39,13 @@ export function useApiKeysVisibility(): ApiKeysVisibilityState {
   const hasApiKeys = publishableApiKeys.length > 0
 
   // Can initialize API keys when in rollout, has permissions, not loading, and no API keys yet
-  const canInitApiKeys = hasApiKeys ? false : isInRollout && canReadAPIKeys && !isLoading
+  const canInitApiKeys = isBasicApiKeysEnabled && canReadAPIKeys && !isLoading && !hasApiKeys
 
-  const shouldDisableUI = hasApiKeys ? false : !isInRollout
+  // Disable UI for publishable keys and secrets keys if flag is not enabled OR no API keys created yet
+  const shouldDisableUI = !isBasicApiKeysEnabled || !hasApiKeys
 
   return {
-    isInRollout,
+    isInRollout: isBasicApiKeysEnabled,
     hasApiKeys,
     isLoading,
     canReadAPIKeys,
