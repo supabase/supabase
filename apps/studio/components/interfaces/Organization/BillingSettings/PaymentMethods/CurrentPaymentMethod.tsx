@@ -9,6 +9,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button } from 'ui'
 import CreditCard from './CreditCard'
+import { ContactSupportButton } from 'components/ui/ContactSupportButton'
 
 const CurrentPaymentMethod = () => {
   const { slug } = useParams()
@@ -66,11 +67,15 @@ const CurrentPaymentMethod = () => {
 
       <Button type="outline" asChild>
         {subscription?.payment_method_type === 'invoice' ? (
-          <Link
-            href={`/support/new?slug=${slug}&ref=no-project&message=${encodeURIComponent('I would like to change my payment method')}&category=${SupportCategories.BILLING}`}
-          >
-            Contact support
-          </Link>
+          <ContactSupportButton
+            category="BILLING"
+            subject="Unable to change payment method"
+            message="I'm unable to change my payment method"
+            errorContext={{
+              organizationSlug: slug,
+              paymentMethodType: subscription?.payment_method_type,
+            }}
+          />
         ) : (
           <Link href={`/org/${slug}/billing#payment-methods`}>Manage payment methods</Link>
         )}
